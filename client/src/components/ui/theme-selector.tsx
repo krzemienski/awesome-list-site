@@ -36,6 +36,9 @@ export default function ThemeSelector() {
     document.documentElement.style.setProperty("--ring", selectedTheme.color);
     document.documentElement.style.setProperty("--sidebar-primary", selectedTheme.color);
     document.documentElement.style.setProperty("--sidebar-ring", selectedTheme.color);
+    
+    // Also set data-theme attribute for theme CSS classes to work
+    document.documentElement.setAttribute("data-theme", storedTheme);
   }, []);
   
   // Change theme variant
@@ -48,6 +51,9 @@ export default function ThemeSelector() {
     document.documentElement.style.setProperty("--ring", selectedTheme.color);
     document.documentElement.style.setProperty("--sidebar-primary", selectedTheme.color);
     document.documentElement.style.setProperty("--sidebar-ring", selectedTheme.color);
+    
+    // Also set data-theme attribute for theme CSS classes to work
+    document.documentElement.setAttribute("data-theme", theme);
     
     localStorage.setItem("theme-variant", theme);
     setOpen(false);

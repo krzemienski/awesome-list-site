@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ModernSidebar from "./ModernSidebar";
 import { AwesomeList } from "@/types/awesome-list";
 import TopBar from "../TopBar";
@@ -18,11 +18,28 @@ export default function MainLayout({ awesomeList, isLoading, children }: MainLay
   const [searchOpen, setSearchOpen] = useState(false);
   const isMobile = useIsMobile();
 
+  // Close sidebar when window resizes from mobile to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768 && isSidebarOpen) {
+        setIsSidebarOpen(false);
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isSidebarOpen]);
+  
+  // Toggle sidebar function with proper state handling
+  const toggleSidebar = () => {
+    setIsSidebarOpen(prev => !prev);
+  };
+
   return (
     <div className="flex min-h-screen flex-col">
       <TopBar 
         isSidebarOpen={isSidebarOpen}
-        setIsSidebarOpen={setIsSidebarOpen}
+        setIsSidebarOpen={toggleSidebar}
         onSearchOpen={() => setSearchOpen(true)}
         title={awesomeList?.title || "Awesome Selfhosted"}
         repoUrl={awesomeList?.repoUrl}
@@ -37,7 +54,7 @@ export default function MainLayout({ awesomeList, isLoading, children }: MainLay
           isLoading={isLoading}
         />
         
-        <main className="flex-1 py-6 px-4 md:px-6 md:ml-4">
+        <main className="flex-1 py-6 px-4 md:px-6">
           {children}
         </main>
       </div>
