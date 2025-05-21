@@ -1,12 +1,25 @@
-import { users, type User, type InsertUser } from "@shared/schema";
+import { users, type User, type InsertUser, type Resource, type Category, type Subcategory, type AwesomeList } from "@shared/schema";
 
 // modify the interface with any CRUD methods
 // you might need
 
 export interface IStorage {
+  // User methods
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  
+  // Awesome List data methods
+  getAwesomeList?(id: number): Promise<AwesomeList | null>;
+  getLatestAwesomeList?(): Promise<AwesomeList | null>;
+  createAwesomeList?(list: any): Promise<AwesomeList>;
+  getCategories?(): Promise<Category[]>;
+  createCategory?(category: any): Promise<Category>;
+  getSubcategories?(categoryId: number): Promise<Subcategory[]>;
+  createSubcategory?(subcategory: any): Promise<Subcategory>;
+  getResources?(): Promise<Resource[]>;
+  createResource?(resource: any): Promise<Resource>;
+  storeAwesomeListData?(listData: any, categories: any[]): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -36,4 +49,11 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Import the database storage implementation
+import { DbStorage } from './db/storage';
+
+// Create and export the storage instance
+// Use the database storage if DATABASE_URL is available, otherwise use memory storage
+export const storage = process.env.DATABASE_URL 
+  ? new DbStorage() 
+  : new MemStorage();
