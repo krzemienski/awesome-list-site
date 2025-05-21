@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { Menu, Search, Github, Sun, Moon } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface TopBarProps {
   isSidebarOpen: boolean;
@@ -19,16 +20,18 @@ export default function TopBar({
   repoUrl
 }: TopBarProps) {
   const { theme, setTheme } = useTheme();
+  const isMobile = useIsMobile();
   
   return (
-    <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center justify-between">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="flex h-14 items-center justify-between px-4 md:container">
         <div className="flex items-center gap-2 md:gap-4">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             aria-label="Toggle sidebar"
+            className="mr-1"
           >
             <Menu className="h-5 w-5" />
           </Button>
@@ -49,17 +52,17 @@ export default function TopBar({
               <line x1="12" x2="12" y1="12" y2="12" />
               <line x1="12" x2="12" y1="16" y2="16" />
             </svg>
-            <span className="font-bold hidden md:inline-block">{title}</span>
+            <span className="font-bold text-sm md:text-base">{isMobile ? "Awesome" : title}</span>
           </Link>
         </div>
         
-        <div className="flex-1 mx-4 lg:mx-8">
+        <div className="flex-1 mx-2 md:mx-4 lg:mx-8">
           <button
             onClick={onSearchOpen}
-            className="w-full flex items-center h-9 rounded-md border border-input px-4 py-2 text-sm bg-background ring-offset-background file:border-0 file:bg-transparent placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full flex items-center h-9 rounded-md border border-input px-3 py-2 text-sm bg-background ring-offset-background file:border-0 file:bg-transparent placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-            <span className="text-muted-foreground">Search resources...</span>
+            <span className="text-muted-foreground truncate">Search resources...</span>
             <div className="ml-auto flex items-center gap-2">
               <kbd className="pointer-events-none h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-xs text-muted-foreground opacity-100 hidden md:flex">
                 <span className="text-xs">/</span>
@@ -68,12 +71,13 @@ export default function TopBar({
           </button>
         </div>
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 md:gap-2">
           {repoUrl && (
             <Button
               variant="ghost"
               size="icon"
               asChild
+              className="hidden md:inline-flex"
             >
               <a 
                 href={repoUrl} 

@@ -29,13 +29,26 @@ export default function ThemeSelector() {
   useEffect(() => {
     const storedTheme = localStorage.getItem("theme-variant") || "red";
     setThemeVariant(storedTheme);
-    document.documentElement.setAttribute("data-theme", storedTheme);
+    
+    // Apply theme CSS variables from the selected theme
+    const selectedTheme = themes.find(t => t.value === storedTheme) || themes[0];
+    document.documentElement.style.setProperty("--primary", selectedTheme.color);
+    document.documentElement.style.setProperty("--ring", selectedTheme.color);
+    document.documentElement.style.setProperty("--sidebar-primary", selectedTheme.color);
+    document.documentElement.style.setProperty("--sidebar-ring", selectedTheme.color);
   }, []);
   
   // Change theme variant
   const changeTheme = (theme: string) => {
     setThemeVariant(theme);
-    document.documentElement.setAttribute("data-theme", theme);
+    
+    // Apply theme CSS variables from the selected theme
+    const selectedTheme = themes.find(t => t.value === theme) || themes[0];
+    document.documentElement.style.setProperty("--primary", selectedTheme.color);
+    document.documentElement.style.setProperty("--ring", selectedTheme.color);
+    document.documentElement.style.setProperty("--sidebar-primary", selectedTheme.color);
+    document.documentElement.style.setProperty("--sidebar-ring", selectedTheme.color);
+    
     localStorage.setItem("theme-variant", theme);
     setOpen(false);
   };
