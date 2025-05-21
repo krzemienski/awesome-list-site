@@ -174,10 +174,50 @@ export default function SidebarNav({
       {DesktopSidebar}
       
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <div className="md:hidden">
-          <SheetContent side="left" className="w-[80%] max-w-xs p-6">
-            <SheetHeader>
-              <SheetTitle className="flex items-center gap-2">
+        <SheetContent side="left" className="w-[85%] sm:max-w-sm p-4">
+          <div className="flex items-center justify-between mb-4">
+            <SheetTitle className="flex items-center gap-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-6 w-6 text-primary"
+              >
+                <path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5a2 2 0 0 0 2 2h1" />
+                <path d="M16 3h1a2 2 0 0 1 2 2v5a2 2 0 0 0 2 2 2 2 0 0 0-2 2v5a2 2 0 0 1-2 2h-1" />
+                <line x1="12" x2="12" y1="8" y2="8" />
+                <line x1="12" x2="12" y1="12" y2="12" />
+                <line x1="12" x2="12" y1="16" y2="16" />
+              </svg>
+              <span className="font-bold truncate">{title}</span>
+            </SheetTitle>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => setIsOpen(false)}
+              className="h-8 w-8"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+          
+          <div className="mt-4 h-[calc(100vh-100px)] overflow-y-auto">
+            <nav className="flex flex-col space-y-1">
+              <div
+                className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium cursor-pointer ${
+                  location === "/" ? "bg-accent text-accent-foreground" : "hover:bg-accent hover:text-accent-foreground"
+                }`}
+                onClick={() => {
+                  setIsOpen(false);
+                  window.location.href = "/";
+                }}
+                role="button"
+                tabIndex={0}
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -186,129 +226,99 @@ export default function SidebarNav({
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className="h-6 w-6 text-primary"
+                  className="h-4 w-4"
                 >
-                  <path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5a2 2 0 0 0 2 2h1" />
-                  <path d="M16 3h1a2 2 0 0 1 2 2v5a2 2 0 0 0 2 2 2 2 0 0 0-2 2v5a2 2 0 0 1-2 2h-1" />
-                  <line x1="12" x2="12" y1="8" y2="8" />
-                  <line x1="12" x2="12" y1="12" y2="12" />
-                  <line x1="12" x2="12" y1="16" y2="16" />
+                  <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                  <polyline points="9 22 9 12 15 12 15 22" />
                 </svg>
-                <span className="font-bold">{title}</span>
-              </SheetTitle>
-            </SheetHeader>
-            
-            <div className="mt-6">
-              <nav className="flex flex-col space-y-1">
-                <div
-                  className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium cursor-pointer ${
-                    location === "/" ? "bg-accent text-accent-foreground" : "hover:bg-accent hover:text-accent-foreground"
-                  }`}
-                  onClick={() => {
-                    setIsOpen(false);
-                    window.location.href = "/";
-                  }}
-                  role="button"
-                  tabIndex={0}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="h-4 w-4"
-                  >
-                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                    <polyline points="9 22 9 12 15 12 15 22" />
-                  </svg>
-                  Home
-                </div>
-                
-                <div className="pt-4">
-                  {isLoading ? (
-                    Array(3).fill(0).map((_, i) => (
-                      <div key={i} className="pb-1">
-                        <Skeleton className="h-10 w-full mb-2" />
-                        <div className="pl-6">
-                          <Skeleton className="h-8 w-4/5 mb-1" />
-                        </div>
+                Home
+              </div>
+              
+              <div className="pt-4">
+                {isLoading ? (
+                  Array(3).fill(0).map((_, i) => (
+                    <div key={i} className="pb-1">
+                      <Skeleton className="h-10 w-full mb-2" />
+                      <div className="pl-6">
+                        <Skeleton className="h-8 w-4/5 mb-1" />
                       </div>
-                    ))
-                  ) : (
-                    categories.map(category => (
-                      <Accordion
-                        key={category.name}
-                        type="multiple"
-                        value={openCategories}
-                        className="pb-1"
-                      >
-                        <AccordionItem value={category.name} className="border-0">
-                          <AccordionTrigger
-                            onClick={() => toggleCategory(category.name)}
-                            className="py-2 px-3 text-sm hover:bg-accent hover:text-accent-foreground rounded-md"
-                          >
-                            <div className="flex items-center gap-2">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                className="h-4 w-4"
+                    </div>
+                  ))
+                ) : (
+                  categories.map(category => (
+                    <Accordion
+                      key={category.name}
+                      type="multiple"
+                      value={openCategories}
+                      className="pb-1"
+                    >
+                      <AccordionItem value={category.name} className="border-0">
+                        <AccordionTrigger
+                          onClick={() => toggleCategory(category.name)}
+                          className="py-2 px-3 text-sm hover:bg-accent hover:text-accent-foreground rounded-md"
+                        >
+                          <div className="flex items-center gap-2">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="h-4 w-4 flex-shrink-0"
+                            >
+                              <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z" />
+                            </svg>
+                            <span className="truncate">{category.name}</span>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="pb-1 pl-6">
+                          <div className="space-y-1 flex flex-col">
+                            <div
+                              className={`rounded-md px-3 py-2 text-sm font-medium cursor-pointer ${
+                                location === `/category/${getCategorySlug(category.name)}` 
+                                  ? "bg-accent text-accent-foreground" 
+                                  : "hover:bg-accent hover:text-accent-foreground"
+                              }`}
+                              onClick={() => {
+                                setIsOpen(false);
+                                window.location.href = `/category/${getCategorySlug(category.name)}`;
+                              }}
+                              role="button"
+                              tabIndex={0}
+                            >
+                              All ({category.resources.length})
+                            </div>
+                            
+                            {category.subcategories?.map(subcategory => (
+                              <div 
+                                key={subcategory.name}
+                                className={`rounded-md px-3 py-2 text-sm font-medium cursor-pointer ${
+                                  location === `/subcategory/${getSubcategorySlug(category.name, subcategory.name)}` 
+                                    ? "bg-accent text-accent-foreground" 
+                                    : "hover:bg-accent hover:text-accent-foreground"
+                                }`}
+                                onClick={() => {
+                                  setIsOpen(false);
+                                  window.location.href = `/subcategory/${getSubcategorySlug(category.name, subcategory.name)}`;
+                                }}
+                                role="button"
+                                tabIndex={0}
                               >
-                                <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z" />
-                              </svg>
-                              <span>{category.name}</span>
-                            </div>
-                          </AccordionTrigger>
-                          <AccordionContent className="pb-1 pl-6">
-                            <div className="space-y-1 flex flex-col">
-                              <Link href={`/category/${getCategorySlug(category.name)}`}>
-                                <a 
-                                  className={`rounded-md px-3 py-2 text-sm font-medium ${
-                                    location === `/category/${getCategorySlug(category.name)}` 
-                                      ? "bg-accent text-accent-foreground" 
-                                      : "hover:bg-accent hover:text-accent-foreground"
-                                  }`}
-                                  onClick={() => setIsOpen(false)}
-                                >
-                                  All ({category.resources.length})
-                                </a>
-                              </Link>
-                              
-                              {category.subcategories?.map(subcategory => (
-                                <Link 
-                                  key={subcategory.name}
-                                  href={`/subcategory/${getSubcategorySlug(category.name, subcategory.name)}`}
-                                >
-                                  <a 
-                                    className={`rounded-md px-3 py-2 text-sm font-medium ${
-                                      location === `/subcategory/${getSubcategorySlug(category.name, subcategory.name)}` 
-                                        ? "bg-accent text-accent-foreground" 
-                                        : "hover:bg-accent hover:text-accent-foreground"
-                                    }`}
-                                    onClick={() => setIsOpen(false)}
-                                  >
-                                    {subcategory.name} ({subcategory.resources.length})
-                                  </a>
-                                </Link>
-                              ))}
-                            </div>
-                          </AccordionContent>
-                        </AccordionItem>
-                      </Accordion>
-                    ))
-                  )}
-                </div>
-              </nav>
-            </div>
-          </SheetContent>
-        </div>
+                                <span className="truncate">{subcategory.name}</span> <span className="text-muted-foreground">({subcategory.resources.length})</span>
+                              </div>
+                            ))}
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                  ))
+                )}
+              </div>
+            </nav>
+          </div>
+        </SheetContent>
       </Sheet>
     </>
   );
