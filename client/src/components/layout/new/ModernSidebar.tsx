@@ -127,57 +127,67 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
           </div>
         ) : (
           <div className="space-y-1">
-            {categories.map(category => (
-              <Accordion
-                key={category.name}
-                type="multiple"
-                value={openCategories}
-                className="w-full"
-              >
-                <AccordionItem value={category.name} className="border-0">
-                  <AccordionTrigger
-                    onClick={() => toggleCategory(category.name)}
-                    className="py-2 px-2 text-sm hover:bg-accent hover:text-accent-foreground rounded-md"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Folder className="h-4 w-4" />
-                      <span>{category.name}</span>
-                    </div>
-                  </AccordionTrigger>
-                  
-                  <AccordionContent className="pb-1 pl-4">
-                    <Button
-                      variant="ghost"
-                      className={cn(
-                        "w-full justify-start font-normal text-sm mb-1",
-                        location === `/category/${getCategorySlug(category.name)}` 
-                          ? "bg-accent text-accent-foreground" 
-                          : ""
-                      )}
-                      onClick={() => navigate(`/category/${getCategorySlug(category.name)}`)}
+            {categories
+              .filter(cat => 
+                cat.resources.length > 0 && 
+                cat.name !== "Table of contents" && 
+                !cat.name.startsWith("List of") &&
+                !["Contributing", "License", "External Links", "Anti-features"].includes(cat.name)
+              )
+              .map(category => (
+                <Accordion
+                  key={category.name}
+                  type="multiple"
+                  value={openCategories}
+                  className="w-full"
+                >
+                  <AccordionItem value={category.name} className="border-0">
+                    <AccordionTrigger
+                      onClick={() => toggleCategory(category.name)}
+                      className="py-2 px-2 text-sm hover:bg-accent hover:text-accent-foreground rounded-md"
                     >
-                      All ({category.resources.length})
-                    </Button>
+                      <div className="flex items-center gap-2">
+                        <Folder className="h-4 w-4" />
+                        <span>{category.name}</span>
+                      </div>
+                    </AccordionTrigger>
                     
-                    {category.subcategories?.map(subcategory => (
+                    <AccordionContent className="pb-1 pl-4">
                       <Button
-                        key={subcategory.name}
                         variant="ghost"
                         className={cn(
                           "w-full justify-start font-normal text-sm mb-1",
-                          location === `/subcategory/${getSubcategorySlug(category.name, subcategory.name)}` 
+                          location === `/category/${getCategorySlug(category.name)}` 
                             ? "bg-accent text-accent-foreground" 
                             : ""
                         )}
-                        onClick={() => navigate(`/subcategory/${getSubcategorySlug(category.name, subcategory.name)}`)}
+                        onClick={() => navigate(`/category/${getCategorySlug(category.name)}`)}
                       >
-                        {subcategory.name} ({subcategory.resources.length})
+                        All ({category.resources.length})
                       </Button>
-                    ))}
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            ))}
+                      
+                      {category.subcategories
+                        .filter(sub => sub.resources.length > 0)
+                        .map(subcategory => (
+                          <Button
+                            key={subcategory.name}
+                            variant="ghost"
+                            className={cn(
+                              "w-full justify-start font-normal text-sm mb-1",
+                              location === `/subcategory/${getSubcategorySlug(category.name, subcategory.name)}` 
+                                ? "bg-accent text-accent-foreground" 
+                                : ""
+                            )}
+                            onClick={() => navigate(`/subcategory/${getSubcategorySlug(category.name, subcategory.name)}`)}
+                          >
+                            {subcategory.name} ({subcategory.resources.length})
+                          </Button>
+                        ))
+                      }
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              ))}
           </div>
         )}
       </div>
