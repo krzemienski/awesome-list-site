@@ -11,8 +11,8 @@ type ThemeOption = {
 };
 
 const themes: ThemeOption[] = [
-  { value: "default", label: "Default", color: "hsl(221.2, 83.2%, 53.3%)" },
-  { value: "red", label: "Red", color: "hsl(0, 72.2%, 50.6%)" },
+  { value: "default", label: "Default", color: "oklch(0.637 0.237 25.331)" }, // Red is default
+  { value: "red", label: "Red", color: "oklch(0.637 0.237 25.331)" },
   { value: "rose", label: "Rose", color: "hsl(346.8, 77.2%, 49.8%)" },
   { value: "orange", label: "Orange", color: "hsl(24.6, 95%, 53.1%)" },
   { value: "green", label: "Green", color: "hsl(142.1, 76.2%, 36.3%)" },
@@ -24,11 +24,11 @@ const themes: ThemeOption[] = [
 export default function ThemeSelector() {
   const [open, setOpen] = useState(false);
   const { theme: mode, setTheme: setMode } = useTheme();
-  const [themeVariant, setThemeVariant] = useState("orange");
+  const [themeVariant, setThemeVariant] = useState("default");
   
   // Initialize theme variant from localStorage
   useEffect(() => {
-    const storedTheme = localStorage.getItem("theme-variant") || "orange";
+    const storedTheme = localStorage.getItem("theme-variant") || "default";
     setThemeVariant(storedTheme);
     document.documentElement.setAttribute("data-theme", storedTheme);
   }, []);
