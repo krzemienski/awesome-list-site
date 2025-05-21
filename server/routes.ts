@@ -5,7 +5,7 @@ import { fetchAwesomeList } from "./parser";
 import { createLogger } from "vite";
 
 const logger = createLogger();
-const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/sindresorhus/awesome/main/readme.md";
+const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/krzemienski/awesome-video/master/README.md";
 let awesomeListData: any = null;
 
 export async function registerRoutes(app: Express): Promise<Server> {
