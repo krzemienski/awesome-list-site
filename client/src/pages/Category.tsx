@@ -93,14 +93,73 @@ export default function Category() {
       const decodedCategoryName = deslugify(slug);
       setCategoryName(decodedCategoryName);
       
-      // Filter sample resources by category
-      let resources = sampleResources.filter(
-        resource => slugify(resource.category) === slug || resource.category.toLowerCase().includes(decodedCategoryName.toLowerCase())
-      );
+      // Set up some resources for the Communication Systems category
+      if (slug === "communication-systems") {
+        const communicationResources = [
+          {
+            id: "c1",
+            title: "Element",
+            url: "https://element.io",
+            description: "All-in-one secure chat app for teams, friends and organizations powered by Matrix.",
+            category: "Communication Systems"
+          },
+          {
+            id: "c2",
+            title: "Rocket.Chat",
+            url: "https://rocket.chat",
+            description: "Team collaboration platform with chat, video conferencing, and more.",
+            category: "Communication Systems"
+          },
+          {
+            id: "c3",
+            title: "Mattermost",
+            url: "https://mattermost.com",
+            description: "Open source, self-hosted Slack alternative.",
+            category: "Communication Systems"
+          },
+          {
+            id: "c4",
+            title: "Jitsi Meet",
+            url: "https://jitsi.org/jitsi-meet/",
+            description: "Secure, fully featured, open source video conferencing.",
+            category: "Communication Systems"
+          },
+          {
+            id: "c5",
+            title: "Synapse",
+            url: "https://github.com/matrix-org/synapse",
+            description: "Matrix reference homeserver written in Python/Twisted.",
+            category: "Communication Systems"
+          },
+          {
+            id: "c6",
+            title: "Mail-in-a-Box",
+            url: "https://mailinabox.email",
+            description: "Easy-to-deploy mail server in a box.",
+            category: "Communication Systems"
+          }
+        ];
+        setFilteredResources(communicationResources);
+      } else {
+        // For other categories, filter from sample resources
+        const filteredCategoryResources = sampleResources.filter(
+          resource => resource.category.toLowerCase().includes(decodedCategoryName.toLowerCase())
+        );
+        setFilteredResources(filteredCategoryResources);
+      }
       
-      // Apply search filter if provided
+      // Don't need this section anymore as we're directly setting filteredResources above
+    }
+  }, [slug]);
+  
+  // Apply search filter and sorting separately
+  useEffect(() => {
+    if (filteredResources.length > 0) {
+      let filtered = [...filteredResources];
+      
+      // Apply search filter
       if (searchTerm) {
-        resources = resources.filter(
+        filtered = filtered.filter(
           resource => 
             resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
             resource.description.toLowerCase().includes(searchTerm.toLowerCase())
@@ -110,22 +169,22 @@ export default function Category() {
       // Apply sorting
       switch(sortBy) {
         case "name-asc":
-          resources.sort((a, b) => a.title.localeCompare(b.title));
+          filtered.sort((a, b) => a.title.localeCompare(b.title));
           break;
         case "name-desc":
-          resources.sort((a, b) => b.title.localeCompare(a.title));
+          filtered.sort((a, b) => b.title.localeCompare(a.title));
           break;
         case "newest":
           // For demo purposes, using random sorting for "newest"
-          resources.sort(() => Math.random() - 0.5);
+          filtered.sort(() => Math.random() - 0.5);
           break;
         default:
           break;
       }
       
-      setFilteredResources(resources);
+      setFilteredResources(filtered);
     }
-  }, [slug, searchTerm, sortBy]);
+  }, [searchTerm, sortBy, filteredResources.length]);
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

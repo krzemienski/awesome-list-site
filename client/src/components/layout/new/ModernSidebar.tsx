@@ -59,6 +59,11 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
     }
   }, [categories, location]);
   
+  // This function will properly toggle the sidebar on mobile
+  const handleSidebarToggle = () => {
+    setIsOpen(!isOpen);
+  };
+  
   // Toggle category open state
   const toggleCategory = (category: string) => {
     setOpenCategories(prev => 
