@@ -152,17 +152,61 @@ export default function Category() {
     }
   }, [slug]);
   
-  // Apply search filter and sorting separately
+  // Apply search filter and sorting separately when these criteria change
   useEffect(() => {
-    if (filteredResources.length > 0) {
-      let filtered = [...filteredResources];
+    if (slug === "communication-systems") {
+      // For Communication Systems, provide specific demo resources
+      const resources = [
+        {
+          id: "c1",
+          title: "Element",
+          url: "https://element.io",
+          description: "All-in-one secure chat app for teams, friends and organizations powered by Matrix.",
+          category: "Communication Systems"
+        },
+        {
+          id: "c2",
+          title: "Rocket.Chat",
+          url: "https://rocket.chat",
+          description: "Team collaboration platform with chat, video conferencing, and more.",
+          category: "Communication Systems"
+        },
+        {
+          id: "c3",
+          title: "Mattermost",
+          url: "https://mattermost.com",
+          description: "Open source, self-hosted Slack alternative.",
+          category: "Communication Systems"
+        },
+        {
+          id: "c4",
+          title: "Jitsi Meet",
+          url: "https://jitsi.org/jitsi-meet/",
+          description: "Secure, fully featured, open source video conferencing.",
+          category: "Communication Systems"
+        },
+        {
+          id: "c5",
+          title: "Synapse",
+          url: "https://github.com/matrix-org/synapse",
+          description: "Matrix reference homeserver written in Python/Twisted.",
+          category: "Communication Systems"
+        },
+        {
+          id: "c6",
+          title: "Mail-in-a-Box",
+          url: "https://mailinabox.email",
+          description: "Easy-to-deploy mail server in a box.",
+          category: "Communication Systems"
+        }
+      ];
       
       // Apply search filter
+      let filtered = resources;
       if (searchTerm) {
-        filtered = filtered.filter(
-          resource => 
-            resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            resource.description.toLowerCase().includes(searchTerm.toLowerCase())
+        filtered = filtered.filter(resource => 
+          resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          resource.description.toLowerCase().includes(searchTerm.toLowerCase())
         );
       }
       
@@ -184,7 +228,7 @@ export default function Category() {
       
       setFilteredResources(filtered);
     }
-  }, [searchTerm, sortBy, filteredResources.length]);
+  }, [slug, searchTerm, sortBy]);
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
