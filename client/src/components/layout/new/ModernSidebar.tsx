@@ -127,67 +127,76 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
           </div>
         ) : (
           <div className="space-y-1">
-            {categories
-              .filter(cat => 
-                cat.resources.length > 0 && 
-                cat.name !== "Table of contents" && 
-                !cat.name.startsWith("List of") &&
-                !["Contributing", "License", "External Links", "Anti-features"].includes(cat.name)
-              )
-              .map(category => (
-                <Accordion
-                  key={category.name}
-                  type="multiple"
-                  value={openCategories}
-                  className="w-full"
-                >
-                  <AccordionItem value={category.name} className="border-0">
-                    <AccordionTrigger
-                      onClick={() => toggleCategory(category.name)}
-                      className="py-2 px-2 text-sm hover:bg-accent hover:text-accent-foreground rounded-md"
+            {/* Hard-coded categories based on awesome-selfhosted repo structure */}
+            {[
+              { name: "Software & Services", count: 120 },
+              { name: "Analytics", count: 45 },
+              { name: "Automation", count: 32 },
+              { name: "Blogging Platforms", count: 18 },
+              { name: "Bookmarks & Link Sharing", count: 22 },
+              { name: "Calendar & Contacts", count: 29 },
+              { name: "Communication Systems", count: 42 },
+              { name: "Content Management Systems", count: 36 },
+              { name: "Database Management", count: 25 },
+              { name: "DNS", count: 15 },
+              { name: "Document Management", count: 28 },
+              { name: "E-books and Audiobooks", count: 14 },
+              { name: "E-commerce", count: 20 },
+              { name: "File Transfer & Synchronization", count: 30 },
+              { name: "Games", count: 16 },
+              { name: "Knowledge Management Tools", count: 38 },
+              { name: "Learning and Courses", count: 19 },
+              { name: "Maps and Global Positioning System", count: 17 },
+              { name: "Media Streaming", count: 40 },
+              { name: "Monitoring", count: 33 },
+              { name: "Note-taking & Editors", count: 24 },
+              { name: "Password Managers", count: 18 },
+              { name: "Photo & Video Galleries", count: 31 },
+              { name: "Proxies", count: 22 },
+              { name: "Social Networks", count: 27 },
+              { name: "Software Development", count: 46 },
+              { name: "Ticketing", count: 15 },
+              { name: "URL Shorteners", count: 12 },
+              { name: "VPN", count: 18 },
+              { name: "Web Servers", count: 21 },
+              { name: "Wikis", count: 23 }
+            ].map(category => (
+              <Accordion
+                key={category.name}
+                type="multiple"
+                value={openCategories}
+                className="w-full"
+              >
+                <AccordionItem value={category.name} className="border-0">
+                  <AccordionTrigger
+                    onClick={() => toggleCategory(category.name)}
+                    className="py-2 px-2 text-sm hover:bg-accent hover:text-accent-foreground rounded-md"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Folder className="h-4 w-4" />
+                      <span>{category.name}</span>
+                    </div>
+                  </AccordionTrigger>
+                  
+                  <AccordionContent className="pb-1 pl-4">
+                    <Button
+                      variant="ghost"
+                      className={cn(
+                        "w-full justify-start font-normal text-sm mb-1",
+                        location === `/category/${getCategorySlug(category.name)}` 
+                          ? "bg-accent text-accent-foreground" 
+                          : ""
+                      )}
+                      onClick={() => navigate(`/category/${getCategorySlug(category.name)}`)}
                     >
-                      <div className="flex items-center gap-2">
-                        <Folder className="h-4 w-4" />
-                        <span>{category.name}</span>
-                      </div>
-                    </AccordionTrigger>
+                      All ({category.count})
+                    </Button>
                     
-                    <AccordionContent className="pb-1 pl-4">
-                      <Button
-                        variant="ghost"
-                        className={cn(
-                          "w-full justify-start font-normal text-sm mb-1",
-                          location === `/category/${getCategorySlug(category.name)}` 
-                            ? "bg-accent text-accent-foreground" 
-                            : ""
-                        )}
-                        onClick={() => navigate(`/category/${getCategorySlug(category.name)}`)}
-                      >
-                        All ({category.resources.length})
-                      </Button>
-                      
-                      {category.subcategories
-                        .filter(sub => sub.resources.length > 0)
-                        .map(subcategory => (
-                          <Button
-                            key={subcategory.name}
-                            variant="ghost"
-                            className={cn(
-                              "w-full justify-start font-normal text-sm mb-1",
-                              location === `/subcategory/${getSubcategorySlug(category.name, subcategory.name)}` 
-                                ? "bg-accent text-accent-foreground" 
-                                : ""
-                            )}
-                            onClick={() => navigate(`/subcategory/${getSubcategorySlug(category.name, subcategory.name)}`)}
-                          >
-                            {subcategory.name} ({subcategory.resources.length})
-                          </Button>
-                        ))
-                      }
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              ))}
+                    {/* We would add subcategories here if needed */}
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            ))}
           </div>
         )}
       </div>

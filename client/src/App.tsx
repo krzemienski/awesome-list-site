@@ -11,16 +11,20 @@ import About from "@/pages/About";
 import NotFound from "@/pages/not-found";
 
 import { AwesomeList } from "@/types/awesome-list";
+import { processAwesomeListData } from "@/lib/parser";
 
 function App() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [location] = useLocation();
 
   // Fetch awesome list data
-  const { data: awesomeList, isLoading, error } = useQuery<AwesomeList>({
+  const { data: rawData, isLoading, error } = useQuery({
     queryKey: ["/api/awesome-list"],
     staleTime: 1000 * 60 * 60, // 1 hour
   });
+  
+  // Process the raw data into a structured AwesomeList
+  const awesomeList = rawData ? processAwesomeListData(rawData) : undefined;
 
   // Keyboard shortcuts
   useEffect(() => {
