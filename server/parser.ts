@@ -1,13 +1,7 @@
-import fetch from "node-fetch";
-import * as remark from "remark";
-import { visit } from "unist-util-visit";
-import * as z from "zod";
-import { nanoid } from "nanoid";
-import { createLogger } from "vite";
-import path from "path";
-import fs from "fs";
+import { remark } from 'remark';
+import { visit } from 'unist-util-visit';
+import fetch from 'node-fetch';
 
-// Define types
 interface Resource {
   id: string;
   title: string;
@@ -15,6 +9,10 @@ interface Resource {
   description: string;
   category: string;
   subcategory?: string;
+  license?: string;
+  language?: string;
+  sourceCode?: string;
+  demo?: string;
 }
 
 interface AwesomeListData {
@@ -24,289 +22,255 @@ interface AwesomeListData {
   resources: Resource[];
 }
 
-// Set up logging
-const logger = createLogger();
-const logFilePath = path.resolve(process.cwd(), "logs");
-
-// Ensure logs directory exists
-if (!fs.existsSync(logFilePath)) {
-  fs.mkdirSync(logFilePath, { recursive: true });
-}
-
-const logFile = path.resolve(
-  logFilePath, 
-  `build-${new Date().toISOString().split('T')[0]}.log`
-);
-
 function log(message: string) {
-  const timestamp = new Date().toISOString();
-  const logMessage = `${timestamp} - ${message}`;
-  
-  logger.info(logMessage);
-  
-  // Append to log file
-  fs.appendFileSync(logFile, logMessage + "\n");
+  console.log(`${new Date().toISOString()} - ${message}`);
 }
-
-// Resource schema
-const resourceSchema = z.object({
-  id: z.string(),
-  title: z.string(),
-  url: z.string().url(),
-  description: z.string().optional().default(""),
-  category: z.string(),
-  subcategory: z.string().optional(),
-});
 
 /**
  * Extract GitHub repo info from URL
  */
 function extractRepoInfo(url: string) {
-  try {
-    const urlObj = new URL(url);
-    if (urlObj.hostname === 'github.com') {
-      const parts = urlObj.pathname.split('/');
-      if (parts.length >= 3) {
-        return {
-          owner: parts[1],
-          repo: parts[2],
-        };
-      }
-    }
-    return null;
-  } catch (e) {
-    return null;
+  const match = url.match(/github\.com\/([^\/]+)\/([^\/]+)/);
+  if (match) {
+    return { owner: match[1], repo: match[2] };
   }
+  return null;
 }
 
 /**
- * Remove badges from markdown content
+ * Generate unique ID for resource
  */
-function removeBadges() {
-  return (tree: any) => {
-    visit(tree, 'paragraph', (node: any) => {
-      // Check if paragraph contains only images
-      const hasBadges = node.children.every(
-        (child: any) => child.type === 'image' || 
-          (child.type === 'text' && child.value.trim() === '')
-      );
-      
-      if (hasBadges) {
-        node.children = [];
-      }
-    });
-  };
+function generateId(): string {
+  return Math.random().toString(36).substr(2, 9);
+}
+
+/**
+ * Clean markdown text by removing links and formatting
+ */
+function cleanText(text: string): string {
+  return text
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Remove markdown links
+    .replace(/`([^`]+)`/g, '$1') // Remove code formatting
+    .replace(/\*\*([^*]+)\*\*/g, '$1') // Remove bold
+    .replace(/\*([^*]+)\*/g, '$1') // Remove italic
+    .replace(/\s+/g, ' ') // Normalize whitespace
+    .trim();
+}
+
+/**
+ * Extract metadata from resource text (license, language, etc.)
+ */
+function extractMetadata(text: string) {
+  const metadata: any = {};
+  
+  // Extract source code link
+  const sourceMatch = text.match(/\[Source Code\]\(([^)]+)\)/i);
+  if (sourceMatch) {
+    metadata.sourceCode = sourceMatch[1];
+  }
+  
+  // Extract demo link
+  const demoMatch = text.match(/\[Demo\]\(([^)]+)\)/i);
+  if (demoMatch) {
+    metadata.demo = demoMatch[1];
+  }
+  
+  // Extract license (usually in backticks)
+  const licenseMatch = text.match(/`([A-Z][A-Z0-9\-\.]+)`/);
+  if (licenseMatch) {
+    metadata.license = licenseMatch[1];
+  }
+  
+  // Extract language/platform (usually the last backtick item)
+  const platformMatches = text.match(/`([^`]+)`/g);
+  if (platformMatches && platformMatches.length > 1) {
+    const lastMatch = platformMatches[platformMatches.length - 1];
+    const platform = lastMatch.replace(/`/g, '');
+    if (!platform.match(/^[A-Z][A-Z0-9\-\.]+$/)) { // Not a license format
+      metadata.language = platform;
+    }
+  }
+  
+  return metadata;
 }
 
 /**
  * Parse list items into resources
  */
-function parseListItems(tree: any, currentCategory: string, currentSubcategory?: string) {
+function parseListItems(tree: any, currentCategory: string, currentSubcategory?: string): Resource[] {
   const resources: Resource[] = [];
   
   visit(tree, 'listItem', (node: any) => {
-    try {
-      const paragraphs = node.children.filter((n: any) => n.type === 'paragraph');
-      
-      if (paragraphs.length === 0) return;
-      
-      const firstParagraph = paragraphs[0];
-      const link = firstParagraph.children.find((n: any) => n.type === 'link');
-      
-      if (!link) return;
-      
-      // Extract title and URL
-      const title = link.children[0]?.value || "";
-      const url = link.url || "";
-      
-      if (!title || !url) return;
-      
-      // Extract description (text after the link)
-      let description = "";
-      let foundLink = false;
-      
-      for (const child of firstParagraph.children) {
-        if (foundLink) {
-          if (child.type === 'text') {
-            description += child.value;
-          }
-        }
-        
-        if (child === link) {
-          foundLink = true;
-        }
-      }
-      
-      // Clean up description
-      description = description.replace(/^(\s*[-–—]\s*)/, "").trim();
-      
-      // Create resource
-      const resource: Resource = {
-        id: nanoid(),
-        title,
-        url,
-        description,
-        category: currentCategory,
-      };
-      
-      if (currentSubcategory) {
-        resource.subcategory = currentSubcategory;
-      }
-      
-      // Validate resource
-      try {
-        resourceSchema.parse(resource);
-        resources.push(resource);
-      } catch (e) {
-        log(`Invalid resource: ${JSON.stringify(resource)}`);
-      }
-    } catch (e) {
-      log(`Error parsing list item: ${e}`);
+    // Skip if this is a table of contents item (contains only links to headers)
+    const text = extractTextFromNode(node);
+    if (text.startsWith('#') || text.includes('back to top')) {
+      return;
     }
+    
+    // Extract the main link (first link in the list item)
+    let title = '';
+    let url = '';
+    let description = '';
+    
+    let linkCount = 0;
+    visit(node, 'link', (linkNode: any) => {
+      if (linkCount === 0) { // First link is the main resource
+        title = extractTextFromNode(linkNode);
+        url = linkNode.url;
+      }
+      linkCount++;
+    });
+    
+    // Skip if no main link found or if it's an internal anchor link
+    if (!title || !url || url.startsWith('#')) {
+      return;
+    }
+    
+    // Extract description (text after the first link)
+    const fullText = extractTextFromNode(node);
+    const titleIndex = fullText.indexOf(title);
+    if (titleIndex !== -1) {
+      description = fullText.substring(titleIndex + title.length).trim();
+      // Remove leading dashes and clean up
+      description = description.replace(/^[\s\-]+/, '').trim();
+    }
+    
+    // Extract metadata
+    const metadata = extractMetadata(fullText);
+    
+    // Clean description by removing metadata parts
+    description = cleanText(description);
+    
+    const resource: Resource = {
+      id: generateId(),
+      title: cleanText(title),
+      url,
+      description,
+      category: currentCategory,
+      subcategory: currentSubcategory,
+      ...metadata
+    };
+    
+    resources.push(resource);
   });
   
   return resources;
 }
 
 /**
- * Parse markdown content into list data
+ * Extract plain text from markdown node
+ */
+function extractTextFromNode(node: any): string {
+  let text = '';
+  
+  visit(node, (child: any) => {
+    if (child.type === 'text') {
+      text += child.value;
+    } else if (child.type === 'inlineCode') {
+      text += '`' + child.value + '`';
+    }
+  });
+  
+  return text;
+}
+
+/**
+ * Parse markdown content into structured data
  */
 async function parseMarkdown(content: string, repoUrl: string): Promise<AwesomeListData> {
-  log(`Parsing markdown content from ${repoUrl}`);
+  const tree = remark().parse(content);
+  const resources: Resource[] = [];
   
-  // Initialize data
-  const data: AwesomeListData = {
-    title: "Awesome List",
-    description: "",
-    repoUrl,
-    resources: [],
-  };
+  let currentCategory = '';
+  let currentSubcategory = '';
   
-  try {
-    // Parse markdown
-    const processor = remark.remark().use(removeBadges);
-    const tree = processor.parse(content);
-    
-    // Extract title and description
-    let titleFound = false;
-    
-    visit(tree, 'heading', (node: any) => {
-      if (node.depth === 1 && !titleFound) {
-        data.title = node.children[0]?.value || data.title;
-        titleFound = true;
-      } else if (node.depth === 2 && node.children[0]?.value === 'Contents') {
-        // Skip contents section
+  // Extract title and description from the top of the document
+  let title = 'Awesome List';
+  let description = '';
+  
+  visit(tree, 'heading', (node: any) => {
+    if (node.depth === 1) {
+      title = extractTextFromNode(node);
+    }
+  });
+  
+  // Extract description from the first paragraph after title
+  let paragraphCount = 0;
+  visit(tree, 'paragraph', (node: any) => {
+    if (paragraphCount === 0 && !description) {
+      const text = extractTextFromNode(node);
+      if (text && !text.includes('badge') && !text.includes('build')) {
+        description = cleanText(text);
+      }
+    }
+    paragraphCount++;
+  });
+  
+  // Process each section
+  visit(tree, (node: any) => {
+    if (node.type === 'heading') {
+      const headingText = extractTextFromNode(node);
+      
+      // Skip table of contents, contributing, license sections
+      if (headingText.toLowerCase().includes('contents') ||
+          headingText.toLowerCase().includes('contributing') ||
+          headingText.toLowerCase().includes('license') ||
+          headingText.toLowerCase().includes('external') ||
+          headingText.toLowerCase().includes('anti-features')) {
         return;
       }
-    });
-    
-    // Find first paragraph after title for description
-    let foundTitle = false;
-    visit(tree, 'paragraph', (node: any) => {
-      if (foundTitle && !data.description) {
-        const text = node.children
-          .filter((n: any) => n.type === 'text')
-          .map((n: any) => n.value)
-          .join(' ');
-        
-        if (text) {
-          data.description = text.trim();
-        }
-      }
-      
-      if (node.children[0]?.value === data.title) {
-        foundTitle = true;
-      }
-    });
-    
-    // Extract resources by category and subcategory
-    let currentCategory = "";
-    let currentSubcategory: string | undefined = undefined;
-    
-    visit(tree, 'heading', (node: any, _: any, parent: any) => {
-      const headingText = node.children[0]?.value || "";
       
       if (node.depth === 2) {
-        // Skip certain sections
-        if (['Contents', 'Contributing', 'License'].includes(headingText)) {
-          return;
-        }
-        
+        // Main category (## Category)
         currentCategory = headingText;
-        currentSubcategory = undefined;
-        
-        // Find the next list and parse resources
-        const listIndex = parent.children.findIndex((n: any) => n === node);
-        
-        for (let i = listIndex + 1; i < parent.children.length; i++) {
-          const child = parent.children[i];
-          
-          if (child.type === 'heading' && child.depth <= 2) {
-            break;
-          }
-          
-          if (child.type === 'list') {
-            const resources = parseListItems(child, currentCategory);
-            data.resources.push(...resources);
-          }
-        }
-      } else if (node.depth === 3 && currentCategory) {
+        currentSubcategory = '';
+      } else if (node.depth === 3) {
+        // Subcategory (### Subcategory)
         currentSubcategory = headingText;
-        
-        // Find the next list and parse resources
-        const listIndex = parent.children.findIndex((n: any) => n === node);
-        
-        for (let i = listIndex + 1; i < parent.children.length; i++) {
-          const child = parent.children[i];
-          
-          if (child.type === 'heading') {
-            break;
-          }
-          
-          if (child.type === 'list') {
-            const resources = parseListItems(child, currentCategory, currentSubcategory);
-            data.resources.push(...resources);
-          }
-        }
       }
-    });
-    
-    log(`Parsed ${data.resources.length} resources from ${repoUrl}`);
-    return data;
-  } catch (e) {
-    log(`Error parsing markdown: ${e}`);
-    throw new Error(`Failed to parse markdown content: ${e}`);
-  }
+    } else if (node.type === 'list' && currentCategory) {
+      // Parse resources from this list
+      const sectionResources = parseListItems(node, currentCategory, currentSubcategory);
+      resources.push(...sectionResources);
+    }
+  });
+  
+  const data: AwesomeListData = {
+    title: cleanText(title),
+    description: description || `A curated list of awesome ${title.replace('Awesome', '').trim()} resources`,
+    repoUrl,
+    resources: resources.filter(r => r.title && r.url && !r.url.startsWith('#'))
+  };
+  
+  log(`Parsed ${data.resources.length} resources from ${repoUrl}`);
+  return data;
 }
 
 /**
  * Fetch and parse awesome list from GitHub
  */
 export async function fetchAwesomeList(rawUrl: string): Promise<AwesomeListData> {
-  log(`Fetching awesome list from ${rawUrl}`);
-  
   try {
-    // Fetch markdown content
-    const response = await fetch(rawUrl);
+    log(`Fetching awesome list from: ${rawUrl}`);
     
+    const response = await fetch(rawUrl);
     if (!response.ok) {
-      throw new Error(`Failed to fetch awesome list: ${response.statusText}`);
+      throw new Error(`Failed to fetch: ${response.status} ${response.statusText}`);
     }
     
     const content = await response.text();
     
-    // Parse repo URL from raw URL
-    const repoInfo = extractRepoInfo(rawUrl);
-    let repoUrl = rawUrl;
+    // Extract repo URL from raw URL
+    const repoUrl = rawUrl
+      .replace('raw.githubusercontent.com', 'github.com')
+      .replace(/\/[^\/]+\/README\.md$/, '');
     
-    if (repoInfo) {
-      repoUrl = `https://github.com/${repoInfo.owner}/${repoInfo.repo}`;
-    }
+    const data = await parseMarkdown(content, repoUrl);
+    log(`Successfully parsed ${data.resources.length} resources`);
     
-    // Parse markdown into list data
-    return await parseMarkdown(content, repoUrl);
-  } catch (e) {
-    log(`Error fetching awesome list: ${e}`);
-    throw new Error(`Failed to fetch awesome list: ${e}`);
+    return data;
+  } catch (error: any) {
+    log(`Error fetching awesome list: ${error.message}`);
+    throw error;
   }
 }

@@ -9,17 +9,11 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   
-  // Awesome List data methods
-  getAwesomeList?(id: number): Promise<AwesomeList | null>;
-  getLatestAwesomeList?(): Promise<AwesomeList | null>;
-  createAwesomeList?(list: any): Promise<AwesomeList>;
-  getCategories?(): Promise<Category[]>;
-  createCategory?(category: any): Promise<Category>;
-  getSubcategories?(categoryId: number): Promise<Subcategory[]>;
-  createSubcategory?(subcategory: any): Promise<Subcategory>;
-  getResources?(): Promise<Resource[]>;
-  createResource?(resource: any): Promise<Resource>;
-  storeAwesomeListData?(listData: any, categories: any[]): Promise<void>;
+  // Awesome List data methods (in-memory only)
+  setAwesomeListData(data: any): void;
+  getAwesomeListData(): any | null;
+  getCategories(): any[];
+  getResources(): any[];
 }
 
 export class MemStorage implements IStorage {
