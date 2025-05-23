@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Switch, Route, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
+import { initGA } from "./lib/analytics";
+import { useAnalytics } from "./hooks/use-analytics";
 
 import MainLayout from "@/components/layout/new/MainLayout";
 import ErrorPage from "@/pages/ErrorPage";
@@ -13,7 +15,10 @@ import NotFound from "@/pages/not-found";
 import { AwesomeList } from "@/types/awesome-list";
 import { processAwesomeListData } from "@/lib/parser";
 
-function App() {
+function Router() {
+  // Track page views when routes change
+  useAnalytics();
+  
   const [searchOpen, setSearchOpen] = useState(false);
   const [location] = useLocation();
 
@@ -74,6 +79,22 @@ function App() {
         <Route component={NotFound} />
       </Switch>
     </MainLayout>
+  );
+}
+
+function App() {
+  // Initialize Google Analytics when app loads
+  useEffect(() => {
+    // Verify required environment variable is present
+    if (!import.meta.env.VITE_GA_MEASUREMENT_ID) {
+      console.warn('Missing required Google Analytics key: VITE_GA_MEASUREMENT_ID');
+    } else {
+      initGA();
+    }
+  }, []);
+
+  return (
+    <Router />
   );
 }
 

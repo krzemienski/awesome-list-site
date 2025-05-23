@@ -94,11 +94,6 @@ export class MemStorage implements IStorage {
   }
 }
 
-// Import the database storage implementation
-import { DbStorage } from './db/storage';
-
-// Create and export the storage instance
-// Use the database storage if DATABASE_URL is available, otherwise use memory storage
-export const storage = process.env.DATABASE_URL 
-  ? new DbStorage() 
-  : new MemStorage();
+// Always use memory storage for awesome list generator
+// This is faster and simpler for self-hosted awesome lists
+export const storage = new MemStorage();
