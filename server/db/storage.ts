@@ -21,6 +21,7 @@ const logger = createLogger();
 
 export class DbStorage implements IStorage {
   private memStorage: MemStorage;
+  private awesomeListData: any = null;
 
   constructor() {
     this.memStorage = new MemStorage();

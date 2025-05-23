@@ -41,6 +41,57 @@ export class MemStorage implements IStorage {
     this.users.set(id, user);
     return user;
   }
+
+  private awesomeListData: any = null;
+
+  setAwesomeListData(data: any): void {
+    this.awesomeListData = data;
+  }
+
+  getAwesomeListData(): any | null {
+    return this.awesomeListData;
+  }
+
+  getCategories(): any[] {
+    if (!this.awesomeListData) return [];
+    
+    const categories = new Map();
+    this.awesomeListData.resources.forEach((resource: any) => {
+      if (resource.category) {
+        if (!categories.has(resource.category)) {
+          categories.set(resource.category, {
+            name: resource.category,
+            slug: resource.category.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+            resources: [],
+            subcategories: new Map()
+          });
+        }
+        
+        const category = categories.get(resource.category);
+        category.resources.push(resource);
+        
+        if (resource.subcategory) {
+          if (!category.subcategories.has(resource.subcategory)) {
+            category.subcategories.set(resource.subcategory, {
+              name: resource.subcategory,
+              slug: resource.subcategory.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+              resources: []
+            });
+          }
+          category.subcategories.get(resource.subcategory).resources.push(resource);
+        }
+      }
+    });
+    
+    return Array.from(categories.values()).map(cat => ({
+      ...cat,
+      subcategories: Array.from(cat.subcategories.values())
+    }));
+  }
+
+  getResources(): any[] {
+    return this.awesomeListData?.resources || [];
+  }
 }
 
 // Import the database storage implementation
