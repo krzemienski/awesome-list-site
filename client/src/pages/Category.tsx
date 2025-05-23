@@ -75,6 +75,7 @@ const sampleResources: Resource[] = [
 
 export default function Category() {
   const { slug } = useParams<{ slug: string }>();
+  const [baseResources, setBaseResources] = useState<Resource[]>([]);
   const [filteredResources, setFilteredResources] = useState<Resource[]>([]);
   const [categoryName, setCategoryName] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -102,95 +103,48 @@ export default function Category() {
       );
       
       if (matchingCategory) {
-        setFilteredResources(matchingCategory.resources);
+        setBaseResources(matchingCategory.resources);
       } else {
         // If no exact match, search by partial name match
         const allResources = awesomeList.resources || [];
         const matchingResources = allResources.filter(resource => 
           resource.category && slugify(resource.category) === slug
         );
-        setFilteredResources(matchingResources);
+        setBaseResources(matchingResources);
       }
     }
   }, [slug, rawData]);
   
-  // Apply search filter and sorting separately when these criteria change
+  // Apply search filter and sorting when criteria change
   useEffect(() => {
-    if (slug === "communication-systems") {
-      // For Communication Systems, provide specific demo resources
-      const resources = [
-        {
-          id: "c1",
-          title: "Element",
-          url: "https://element.io",
-          description: "All-in-one secure chat app for teams, friends and organizations powered by Matrix.",
-          category: "Communication Systems"
-        },
-        {
-          id: "c2",
-          title: "Rocket.Chat",
-          url: "https://rocket.chat",
-          description: "Team collaboration platform with chat, video conferencing, and more.",
-          category: "Communication Systems"
-        },
-        {
-          id: "c3",
-          title: "Mattermost",
-          url: "https://mattermost.com",
-          description: "Open source, self-hosted Slack alternative.",
-          category: "Communication Systems"
-        },
-        {
-          id: "c4",
-          title: "Jitsi Meet",
-          url: "https://jitsi.org/jitsi-meet/",
-          description: "Secure, fully featured, open source video conferencing.",
-          category: "Communication Systems"
-        },
-        {
-          id: "c5",
-          title: "Synapse",
-          url: "https://github.com/matrix-org/synapse",
-          description: "Matrix reference homeserver written in Python/Twisted.",
-          category: "Communication Systems"
-        },
-        {
-          id: "c6",
-          title: "Mail-in-a-Box",
-          url: "https://mailinabox.email",
-          description: "Easy-to-deploy mail server in a box.",
-          category: "Communication Systems"
-        }
-      ];
-      
-      // Apply search filter
-      let filtered = resources;
-      if (searchTerm) {
-        filtered = filtered.filter(resource => 
-          resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          resource.description.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-      }
-      
-      // Apply sorting
-      switch(sortBy) {
-        case "name-asc":
-          filtered.sort((a, b) => a.title.localeCompare(b.title));
-          break;
-        case "name-desc":
-          filtered.sort((a, b) => b.title.localeCompare(a.title));
-          break;
-        case "newest":
-          // For demo purposes, using random sorting for "newest"
-          filtered.sort(() => Math.random() - 0.5);
-          break;
-        default:
-          break;
-      }
-      
-      setFilteredResources(filtered);
+    let filtered = [...baseResources];
+    
+    // Apply search filter
+    if (searchTerm) {
+      filtered = filtered.filter(resource => 
+        resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        resource.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
     }
-  }, [slug, searchTerm, sortBy]);
+    
+    // Apply sorting
+    switch(sortBy) {
+      case "name-asc":
+        filtered.sort((a, b) => a.title.localeCompare(b.title));
+        break;
+      case "name-desc":
+        filtered.sort((a, b) => b.title.localeCompare(a.title));
+        break;
+      case "newest":
+        // For demo purposes, using random sorting for "newest"
+        filtered.sort(() => Math.random() - 0.5);
+        break;
+      default:
+        break;
+    }
+    
+    setFilteredResources(filtered);
+  }, [baseResources, searchTerm, sortBy]);
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

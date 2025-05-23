@@ -132,40 +132,15 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
           </div>
         ) : (
           <div className="space-y-1">
-            {/* Hard-coded categories based on awesome-selfhosted repo structure */}
-            {[
-              { name: "Software & Services", count: 120 },
-              { name: "Analytics", count: 45 },
-              { name: "Automation", count: 32 },
-              { name: "Blogging Platforms", count: 18 },
-              { name: "Bookmarks & Link Sharing", count: 22 },
-              { name: "Calendar & Contacts", count: 29 },
-              { name: "Communication Systems", count: 42 },
-              { name: "Content Management Systems", count: 36 },
-              { name: "Database Management", count: 25 },
-              { name: "DNS", count: 15 },
-              { name: "Document Management", count: 28 },
-              { name: "E-books and Audiobooks", count: 14 },
-              { name: "E-commerce", count: 20 },
-              { name: "File Transfer & Synchronization", count: 30 },
-              { name: "Games", count: 16 },
-              { name: "Knowledge Management Tools", count: 38 },
-              { name: "Learning and Courses", count: 19 },
-              { name: "Maps and Global Positioning System", count: 17 },
-              { name: "Media Streaming", count: 40 },
-              { name: "Monitoring", count: 33 },
-              { name: "Note-taking & Editors", count: 24 },
-              { name: "Password Managers", count: 18 },
-              { name: "Photo & Video Galleries", count: 31 },
-              { name: "Proxies", count: 22 },
-              { name: "Social Networks", count: 27 },
-              { name: "Software Development", count: 46 },
-              { name: "Ticketing", count: 15 },
-              { name: "URL Shorteners", count: 12 },
-              { name: "VPN", count: 18 },
-              { name: "Web Servers", count: 21 },
-              { name: "Wikis", count: 23 }
-            ].map(category => (
+            {/* Real categories from awesome-selfhosted data */}
+            {categories
+              .filter(cat => 
+                cat.resources.length > 0 && 
+                cat.name !== "Table of contents" && 
+                !cat.name.startsWith("List of") &&
+                !["Contributing", "License", "External Links", "Anti-features"].includes(cat.name)
+              )
+              .map(category => (
               <Accordion
                 key={category.name}
                 type="multiple"
@@ -194,7 +169,7 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
                       )}
                       onClick={() => navigate(`/category/${getCategorySlug(category.name)}`)}
                     >
-                      All ({category.count})
+                      All ({category.resources.length})
                     </Button>
                     
                     {/* We would add subcategories here if needed */}
