@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { Menu, Search, Github, Sun, Moon, Palette } from "lucide-react";
+import { Menu, Search, Github, Sun, Moon, Palette, List, BarChart3 } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
 import { useIsMobile } from "@/hooks/use-mobile";
 import CustomThemeManager, { CustomTheme } from "@/components/ui/custom-theme-manager";
+import ListSwitcher, { AwesomeListConfig } from "@/components/ui/list-switcher";
+import AnalyticsDashboard from "@/components/ui/analytics-dashboard";
 
 interface TopBarProps {
   isSidebarOpen: boolean;
@@ -12,6 +14,7 @@ interface TopBarProps {
   onSearchOpen: () => void;
   title: string;
   repoUrl?: string;
+  resources?: any[];
 }
 
 export default function TopBar({
@@ -19,17 +22,35 @@ export default function TopBar({
   setIsSidebarOpen,
   onSearchOpen,
   title,
-  repoUrl
+  repoUrl,
+  resources = []
 }: TopBarProps) {
   const { theme, setTheme } = useTheme();
   const isMobile = useIsMobile();
   const [isThemeManagerOpen, setIsThemeManagerOpen] = useState(false);
+  const [isListSwitcherOpen, setIsListSwitcherOpen] = useState(false);
+  const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false);
   const [currentCustomTheme, setCurrentCustomTheme] = useState<CustomTheme | undefined>();
+  const [currentList, setCurrentList] = useState<AwesomeListConfig>({
+    id: "awesome-selfhosted",
+    name: "Awesome Self-Hosted",
+    description: "A list of Free Software network services and web applications which can be hosted on your own servers",
+    repository: "awesome-selfhosted/awesome-selfhosted",
+    rawUrl: "https://raw.githubusercontent.com/awesome-selfhosted/awesome-selfhosted/master/README.md",
+    category: "Self-Hosting",
+    icon: "🏠",
+    isActive: true
+  });
 
   const handleThemeApply = (customTheme: CustomTheme) => {
     setCurrentCustomTheme(customTheme);
-    // Store the applied custom theme in localStorage
     localStorage.setItem('applied-custom-theme', JSON.stringify(customTheme));
+  };
+
+  const handleListChange = (list: AwesomeListConfig) => {
+    setCurrentList(list);
+    // In a real implementation, this would trigger fetching the new list data
+    window.location.reload(); // Simple reload for demo
   };
   
   return (
@@ -103,6 +124,26 @@ export default function TopBar({
           <Button
             variant="ghost"
             size="icon"
+            onClick={() => setIsListSwitcherOpen(true)}
+            aria-label="Switch awesome list"
+            title="Switch List"
+          >
+            <List className="h-5 w-5" />
+          </Button>
+          
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsAnalyticsOpen(true)}
+            aria-label="View analytics"
+            title="Analytics Dashboard"
+          >
+            <BarChart3 className="h-5 w-5" />
+          </Button>
+          
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => setIsThemeManagerOpen(true)}
             aria-label="Custom themes"
             title="Custom Themes"
@@ -122,6 +163,19 @@ export default function TopBar({
           </Button>
         </div>
       </div>
+      
+      <ListSwitcher
+        currentList={currentList}
+        onListChange={handleListChange}
+        isOpen={isListSwitcherOpen}
+        onClose={() => setIsListSwitcherOpen(false)}
+      />
+      
+      <AnalyticsDashboard
+        resources={resources}
+        isOpen={isAnalyticsOpen}
+        onClose={() => setIsAnalyticsOpen(false)}
+      />
       
       <CustomThemeManager
         isOpen={isThemeManagerOpen}
