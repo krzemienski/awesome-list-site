@@ -86,71 +86,33 @@ export default function Category() {
     staleTime: 1000 * 60 * 60, // 1 hour
   });
   
-  // Sample resources for the selected category
+  // Filter real resources by category
   useEffect(() => {
-    if (slug) {
+    if (slug && rawData) {
+      // Process the raw data into structured format
+      const awesomeList = processAwesomeListData(rawData);
+      
       // Convert slug back to category name
       const decodedCategoryName = deslugify(slug);
       setCategoryName(decodedCategoryName);
       
-      // Set up some resources for the Communication Systems category
-      if (slug === "communication-systems") {
-        const communicationResources = [
-          {
-            id: "c1",
-            title: "Element",
-            url: "https://element.io",
-            description: "All-in-one secure chat app for teams, friends and organizations powered by Matrix.",
-            category: "Communication Systems"
-          },
-          {
-            id: "c2",
-            title: "Rocket.Chat",
-            url: "https://rocket.chat",
-            description: "Team collaboration platform with chat, video conferencing, and more.",
-            category: "Communication Systems"
-          },
-          {
-            id: "c3",
-            title: "Mattermost",
-            url: "https://mattermost.com",
-            description: "Open source, self-hosted Slack alternative.",
-            category: "Communication Systems"
-          },
-          {
-            id: "c4",
-            title: "Jitsi Meet",
-            url: "https://jitsi.org/jitsi-meet/",
-            description: "Secure, fully featured, open source video conferencing.",
-            category: "Communication Systems"
-          },
-          {
-            id: "c5",
-            title: "Synapse",
-            url: "https://github.com/matrix-org/synapse",
-            description: "Matrix reference homeserver written in Python/Twisted.",
-            category: "Communication Systems"
-          },
-          {
-            id: "c6",
-            title: "Mail-in-a-Box",
-            url: "https://mailinabox.email",
-            description: "Easy-to-deploy mail server in a box.",
-            category: "Communication Systems"
-          }
-        ];
-        setFilteredResources(communicationResources);
-      } else {
-        // For other categories, filter from sample resources
-        const filteredCategoryResources = sampleResources.filter(
-          resource => resource.category.toLowerCase().includes(decodedCategoryName.toLowerCase())
-        );
-        setFilteredResources(filteredCategoryResources);
-      }
+      // Find matching category from the real data
+      const matchingCategory = awesomeList.categories.find(category => 
+        slugify(category.name) === slug
+      );
       
-      // Don't need this section anymore as we're directly setting filteredResources above
+      if (matchingCategory) {
+        setFilteredResources(matchingCategory.resources);
+      } else {
+        // If no exact match, search by partial name match
+        const allResources = awesomeList.resources || [];
+        const matchingResources = allResources.filter(resource => 
+          resource.category && slugify(resource.category) === slug
+        );
+        setFilteredResources(matchingResources);
+      }
     }
-  }, [slug]);
+  }, [slug, rawData]);
   
   // Apply search filter and sorting separately when these criteria change
   useEffect(() => {
