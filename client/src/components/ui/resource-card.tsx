@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ExternalLink } from "lucide-react";
 import { Resource } from "@/types/awesome-list";
 import { motion } from "framer-motion";
+import { trackResourceClick } from "@/lib/analytics";
 
 interface ResourceCardProps {
   resource: Resource;
@@ -45,6 +46,7 @@ export default function ResourceCard({ resource, index }: ResourceCardProps) {
                 className="hover:underline inline-flex items-center gap-1.5"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackResourceClick(resource.title, resource.url, resource.category)}
               >
                 {resource.title}
                 <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
