@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { Menu, Search, Github, Sun, Moon } from "lucide-react";
+import { Menu, Search, Github, Sun, Moon, Palette } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
 import { useIsMobile } from "@/hooks/use-mobile";
+import CustomThemeManager, { CustomTheme } from "@/components/ui/custom-theme-manager";
 
 interface TopBarProps {
   isSidebarOpen: boolean;
@@ -21,6 +23,14 @@ export default function TopBar({
 }: TopBarProps) {
   const { theme, setTheme } = useTheme();
   const isMobile = useIsMobile();
+  const [isThemeManagerOpen, setIsThemeManagerOpen] = useState(false);
+  const [currentCustomTheme, setCurrentCustomTheme] = useState<CustomTheme | undefined>();
+
+  const handleThemeApply = (customTheme: CustomTheme) => {
+    setCurrentCustomTheme(customTheme);
+    // Store the applied custom theme in localStorage
+    localStorage.setItem('applied-custom-theme', JSON.stringify(customTheme));
+  };
   
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -93,6 +103,16 @@ export default function TopBar({
           <Button
             variant="ghost"
             size="icon"
+            onClick={() => setIsThemeManagerOpen(true)}
+            aria-label="Custom themes"
+            title="Custom Themes"
+          >
+            <Palette className="h-5 w-5" />
+          </Button>
+          
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             aria-label="Toggle theme"
           >
@@ -102,6 +122,13 @@ export default function TopBar({
           </Button>
         </div>
       </div>
+      
+      <CustomThemeManager
+        isOpen={isThemeManagerOpen}
+        onClose={() => setIsThemeManagerOpen(false)}
+        onThemeApply={handleThemeApply}
+        currentTheme={currentCustomTheme}
+      />
     </header>
   );
 }
