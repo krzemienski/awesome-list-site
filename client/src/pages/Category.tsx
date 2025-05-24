@@ -163,7 +163,28 @@ export default function Category() {
     }
     
     setFilteredResources(filtered);
+    
+    // Reset to first page when filters change
+    setCurrentPage(1);
   }, [baseResources, searchTerm, sortBy, selectedTags]);
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredResources.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedResources = filteredResources.slice(startIndex, endIndex);
+
+  // Handle page changes
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Scroll to top when page changes
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setItemsPerPage(newPageSize);
+    setCurrentPage(1); // Reset to first page
+  };
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -259,7 +280,7 @@ export default function Category() {
       {/* Resource Display */}
       {layout === "cards" && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredResources.map((resource, index) => (
+          {paginatedResources.map((resource, index) => (
             <ResourceCard 
               key={`${resource.title}-${index}`} 
               resource={resource}
@@ -271,7 +292,7 @@ export default function Category() {
 
       {layout === "list" && (
         <div className="border border-border rounded-lg overflow-hidden">
-          {filteredResources.map((resource, index) => (
+          {paginatedResources.map((resource, index) => (
             <ResourceListItem 
               key={`${resource.title}-${index}`} 
               resource={resource}
@@ -283,7 +304,7 @@ export default function Category() {
 
       {layout === "compact" && (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-          {filteredResources.map((resource, index) => (
+          {paginatedResources.map((resource, index) => (
             <ResourceCompactItem 
               key={`${resource.title}-${index}`} 
               resource={resource}
@@ -299,6 +320,21 @@ export default function Category() {
           <p className="text-muted-foreground">
             {searchTerm ? `No resources matching "${searchTerm}" in this category.` : 'There are no resources in this category.'}
           </p>
+        </div>
+      )}
+
+      {/* Pagination */}
+      {filteredResources.length > 0 && totalPages > 1 && (
+        <div className="mt-8 pt-8 border-t border-border">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            itemsPerPage={itemsPerPage}
+            totalItems={filteredResources.length}
+            pageSizeOptions={pageSizeOptions}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+          />
         </div>
       )}
     </div>
