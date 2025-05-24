@@ -39,10 +39,11 @@ export default function MainLayout({ awesomeList, isLoading, children }: MainLay
     <div className="flex min-h-screen flex-col">
       <TopBar 
         isSidebarOpen={isSidebarOpen}
-        setIsSidebarOpen={toggleSidebar}
+        setIsSidebarOpen={setIsSidebarOpen}
         onSearchOpen={() => setSearchOpen(true)}
         title={awesomeList?.title || "Awesome Selfhosted"}
         repoUrl={awesomeList?.repoUrl}
+        resources={awesomeList?.resources || []}
       />
       
       <div className="flex flex-1 w-full">

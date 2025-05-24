@@ -30,13 +30,13 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
 
   // Search when query changes
   useEffect(() => {
-    if (!query) {
+    if (!query || query.length < 2) {
       setResults([]);
       return;
     }
 
     const searchResults = fuse.search(query);
-    setResults(searchResults.map(result => result.item));
+    setResults(searchResults.slice(0, 10).map(result => result.item));
   }, [query, fuse]);
 
   // Focus input when dialog opens
