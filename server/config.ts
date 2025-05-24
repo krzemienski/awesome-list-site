@@ -48,6 +48,8 @@ interface FeaturesConfig {
   pagination: boolean;
   items_per_page: number;
   page_size_options: number[];
+  default_layout: "cards" | "list" | "compact";
+  allow_layout_switching: boolean;
   ai_tags: boolean;
   ai_descriptions: boolean;
 }
@@ -98,6 +100,8 @@ const defaultConfig: AwesomeListConfig = {
     pagination: true,
     items_per_page: 24,
     page_size_options: [12, 24, 48, 96],
+    default_layout: "list",
+    allow_layout_switching: true,
     ai_tags: !!process.env.OPENAI_API_KEY,
     ai_descriptions: !!process.env.OPENAI_API_KEY
   },

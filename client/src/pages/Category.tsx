@@ -86,7 +86,7 @@ export default function Category() {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("name-asc");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [layout, setLayout] = useState<LayoutType>("cards");
+  const [layout, setLayout] = useState<LayoutType>("list");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(24);
   
@@ -244,6 +244,7 @@ export default function Category() {
           </form>
           
           <div className="flex gap-4 items-center">
+            {/* Only show layout switcher if enabled in config */}
             <LayoutSwitcher
               currentLayout={layout}
               onLayoutChange={setLayout}

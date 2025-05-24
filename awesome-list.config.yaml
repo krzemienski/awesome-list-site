@@ -74,6 +74,9 @@ features:
   pagination: true
   items_per_page: 24
   page_size_options: [12, 24, 48, 96]
+  # Default layout configuration
+  default_layout: "list"  # Options: "cards", "list", "compact"
+  allow_layout_switching: true
   # AI-powered features (requires OpenAI API key)
   ai_tags: false
   ai_descriptions: false

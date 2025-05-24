@@ -115,8 +115,44 @@ theme:
 features:
   search: true
   analytics_dashboard: true
+  # Layout configuration
+  default_layout: "list"  # Options: "cards", "list", "compact"
+  allow_layout_switching: true
+  # Pagination settings
+  pagination: true
+  items_per_page: 24
+  page_size_options: [12, 24, 48, 96]
   ai_tags: true  # Requires OpenAI API key
 ```
+
+## 🎯 Recent Enhancements & Features
+
+### ✨ Latest Updates
+
+**🔧 CLI Validation Tool**
+- `tsx server/cli/parse-list.ts <url>` - Validate awesome lists before deployment
+- Comprehensive error reporting and fix suggestions
+- Integration ready for CI/CD pipelines
+
+**📱 Mobile Experience Improvements**
+- Fixed tooltip behavior on touch devices
+- Enhanced tag display showing multiple tags per resource
+- Improved analytics dashboard mobile responsiveness
+
+**📋 Layout System Overhaul**
+- Three layout options: List (default), Cards, and Compact Grid
+- Configurable default layouts via `awesome-list.config.yaml`
+- Smart responsive behavior adapting to device capabilities
+
+**⚡ Performance & UX**
+- Pagination system with configurable page sizes
+- Contextual hover tooltips with resource metadata
+- Robust error handling with detailed parsing logs
+
+**🚀 Deployment Ready**
+- Comprehensive GitHub Pages deployment guide
+- Environment variable configuration for static builds
+- Automated validation in deployment pipelines
 
 ## 📊 Analytics & Tracking
 
@@ -445,7 +481,53 @@ Use the validator in your deployment pipeline:
   run: npm run build
 ```
 
-## 🎨 Customization
+## 🎨 Customization & Layout Options
+
+### Default Layout Configuration
+
+Configure how your awesome list appears to visitors by default:
+
+```yaml
+# In awesome-list.config.yaml
+features:
+  # Choose default layout when users first visit
+  default_layout: "list"  # Options: "cards", "list", "compact"
+  
+  # Allow users to switch between layouts
+  allow_layout_switching: true
+  
+  # Pagination settings
+  pagination: true
+  items_per_page: 24
+  page_size_options: [12, 24, 48, 96]
+```
+
+### Layout Options Explained
+
+**📋 List View (Recommended Default)**
+- Clean, scannable format perfect for browsing many resources
+- Shows title, description, and tags in compact rows
+- Fastest loading and most accessible option
+- Best for mobile devices and quick scanning
+
+**🃏 Card View**
+- Rich visual layout with full descriptions
+- Great for showcasing detailed resource information
+- More visual appeal but requires more scrolling
+- Best for sites with fewer, high-quality resources
+
+**⚡ Compact Grid**
+- Maximum density - shows the most resources at once
+- Truncated descriptions for space efficiency
+- Perfect for power users who want to see everything
+- Ideal for large lists with 500+ resources
+
+### Responsive Behavior
+
+The layout system automatically adapts:
+- **Mobile**: Always uses optimized compact layouts regardless of setting
+- **Tablet**: Respects user's layout choice with mobile-friendly adjustments  
+- **Desktop**: Full layout switching capabilities with hover tooltips
 
 ### Environment Variables
 
@@ -453,7 +535,7 @@ Use the validator in your deployment pipeline:
 - `PORT` - Server port (default: 5000)
 - `NODE_ENV` - Environment (development/production)
 
-### Themes
+### Theme System
 
 The application includes:
 - **Light/Dark mode toggle** - Automatic system preference detection
