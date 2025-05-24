@@ -158,6 +158,30 @@ function parseListItems(tree: any, currentCategory: string, currentSubcategory?:
 }
 
 /**
+ * Get default description based on the awesome list title
+ */
+function getDefaultDescription(title: string): string {
+  const cleanTitle = title.toLowerCase();
+  
+  if (cleanTitle.includes('go')) {
+    return 'A curated list of awesome Go frameworks, libraries and software';
+  } else if (cleanTitle.includes('python')) {
+    return 'A curated list of awesome Python frameworks, libraries and software';
+  } else if (cleanTitle.includes('javascript') || cleanTitle.includes('js')) {
+    return 'A curated list of awesome JavaScript frameworks, libraries and software';
+  } else if (cleanTitle.includes('react')) {
+    return 'A curated list of awesome React frameworks, libraries and software';
+  } else if (cleanTitle.includes('vue')) {
+    return 'A curated list of awesome Vue.js frameworks, libraries and software';
+  } else if (cleanTitle.includes('node')) {
+    return 'A curated list of awesome Node.js frameworks, libraries and software';
+  } else {
+    const topic = title.replace(/^awesome\s*/i, '').trim();
+    return `A curated list of awesome ${topic} frameworks, libraries and software`;
+  }
+}
+
+/**
  * Extract plain text from markdown node
  */
 function extractTextFromNode(node: any): string {
@@ -194,16 +218,26 @@ async function parseMarkdown(content: string, repoUrl: string): Promise<AwesomeL
     }
   });
   
-  // Extract description from the first paragraph after title
-  let paragraphCount = 0;
+  // Extract description from the first meaningful paragraph after title
+  let foundDescription = false;
   visit(tree, 'paragraph', (node: any) => {
-    if (paragraphCount === 0 && !description) {
+    if (!foundDescription && !description) {
       const text = extractTextFromNode(node);
-      if (text && !text.includes('badge') && !text.includes('build')) {
+      // Skip badges, build status, and other metadata
+      if (text && 
+          !text.includes('badge') && 
+          !text.includes('build') && 
+          !text.includes('Build Status') &&
+          !text.includes('Awesome') &&
+          !text.includes('Slack') &&
+          !text.includes('Netlify') &&
+          !text.includes('Track Awesome') &&
+          !text.includes('Last Commit') &&
+          text.length > 20) {
         description = cleanText(text);
+        foundDescription = true;
       }
     }
-    paragraphCount++;
   });
   
   // Track if we're inside the main content area (after Contents)
@@ -258,7 +292,7 @@ async function parseMarkdown(content: string, repoUrl: string): Promise<AwesomeL
   
   const data: AwesomeListData = {
     title: cleanText(title),
-    description: description || `A curated list of awesome ${title.replace('Awesome', '').trim()} resources`,
+    description: description || getDefaultDescription(title),
     repoUrl,
     resources: resources.filter(r => r.title && r.url && !r.url.startsWith('#'))
   };
