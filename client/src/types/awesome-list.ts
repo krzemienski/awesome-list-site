@@ -5,6 +5,7 @@ export interface Resource {
   description: string;
   category: string;
   subcategory?: string;
+  tags?: string[];
 }
 
 export interface Subcategory {

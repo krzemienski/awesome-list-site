@@ -9,6 +9,7 @@ interface Resource {
   description: string;
   category: string;
   subcategory?: string;
+  tags?: string[];
   license?: string;
   language?: string;
   sourceCode?: string;
@@ -55,6 +56,107 @@ function cleanText(text: string): string {
     .replace(/\*([^*]+)\*/g, '$1') // Remove italic
     .replace(/\s+/g, ' ') // Normalize whitespace
     .trim();
+}
+
+/**
+ * Generate automatic tags based on URL and content
+ */
+function generateAutoTags(url: string, title: string, description: string): string[] {
+  const tags: string[] = [];
+  
+  // URL-based tags
+  if (url.includes('github.com')) {
+    tags.push('GitHub');
+  } else if (url.includes('gitlab.com')) {
+    tags.push('GitLab');
+  } else if (url.includes('bitbucket.org')) {
+    tags.push('Bitbucket');
+  }
+  
+  // Documentation/website tags
+  if (url.includes('docs.') || url.includes('/docs/') || url.includes('documentation')) {
+    tags.push('Documentation');
+  }
+  
+  if (url.includes('blog.') || url.includes('/blog/')) {
+    tags.push('Blog');
+  }
+  
+  if (url.includes('api.') || url.includes('/api/')) {
+    tags.push('API');
+  }
+  
+  // Content-based tags
+  const content = `${title} ${description}`.toLowerCase();
+  
+  if (content.includes('cli') || content.includes('command line')) {
+    tags.push('CLI');
+  }
+  
+  if (content.includes('web') || content.includes('http') || content.includes('server')) {
+    tags.push('Web');
+  }
+  
+  if (content.includes('database') || content.includes('db') || content.includes('sql')) {
+    tags.push('Database');
+  }
+  
+  if (content.includes('api') || content.includes('rest') || content.includes('graphql')) {
+    tags.push('API');
+  }
+  
+  if (content.includes('library') || content.includes('package')) {
+    tags.push('Library');
+  }
+  
+  if (content.includes('framework')) {
+    tags.push('Framework');
+  }
+  
+  if (content.includes('tool') || content.includes('utility')) {
+    tags.push('Tool');
+  }
+  
+  if (content.includes('test') || content.includes('testing')) {
+    tags.push('Testing');
+  }
+  
+  if (content.includes('docker') || content.includes('container')) {
+    tags.push('Docker');
+  }
+  
+  if (content.includes('kubernetes') || content.includes('k8s')) {
+    tags.push('Kubernetes');
+  }
+  
+  if (content.includes('json') || content.includes('xml') || content.includes('yaml')) {
+    tags.push('Data Format');
+  }
+  
+  if (content.includes('security') || content.includes('auth') || content.includes('crypto')) {
+    tags.push('Security');
+  }
+  
+  if (content.includes('monitor') || content.includes('log') || content.includes('metrics')) {
+    tags.push('Monitoring');
+  }
+  
+  if (content.includes('embed') || content.includes('lightweight') || content.includes('minimal')) {
+    tags.push('Lightweight');
+  }
+  
+  if (content.includes('performance') || content.includes('fast') || content.includes('speed')) {
+    tags.push('Performance');
+  }
+  
+  // Remove duplicates and return
+  const uniqueTags: string[] = [];
+  tags.forEach(tag => {
+    if (!uniqueTags.includes(tag)) {
+      uniqueTags.push(tag);
+    }
+  });
+  return uniqueTags;
 }
 
 /**
@@ -141,6 +243,9 @@ function parseListItems(tree: any, currentCategory: string, currentSubcategory?:
     // Clean description by removing metadata parts
     description = cleanText(description);
     
+    // Generate automatic tags
+    const autoTags = generateAutoTags(url, title, description);
+    
     const resource: Resource = {
       id: generateId(),
       title: cleanText(title),
@@ -148,6 +253,7 @@ function parseListItems(tree: any, currentCategory: string, currentSubcategory?:
       description,
       category: currentCategory,
       subcategory: currentSubcategory,
+      tags: autoTags,
       ...metadata
     };
     

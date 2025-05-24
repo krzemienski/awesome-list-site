@@ -16,6 +16,7 @@ export function processAwesomeListData(data: any): AwesomeList {
     description: resource.description || "",
     category: resource.category,
     subcategory: resource.subcategory || undefined,
+    tags: resource.tags || [],
   }));
   
   // Create categories with their resources
