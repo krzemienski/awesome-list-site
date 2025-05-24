@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
 import ResourceCard from "@/components/ui/resource-card";
 import LayoutSwitcher from "@/components/ui/layout-switcher";
 import Pagination from "@/components/ui/pagination";
 import { AwesomeList } from "@/types/awesome-list";
 import { Helmet } from "react-helmet";
-import { Filter } from "lucide-react";
+import { Filter, Search } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface HomeProps {
@@ -19,13 +20,26 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
   const [layout, setLayout] = useState<LayoutType>("list");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(24);
-  const [sortBy, setSortBy] = useState("name-asc");
+  const [sortBy, setSortBy] = useState("category");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   
   // Use all resources for home page display
   const allResources = awesomeList?.resources || [];
   
+  // Filter resources by search and category
+  const filteredResources = allResources.filter(resource => {
+    const matchesSearch = searchTerm === "" || 
+      resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      resource.description.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesCategory = selectedCategory === "all" || resource.category === selectedCategory;
+    
+    return matchesSearch && matchesCategory;
+  });
+  
   // Sort resources
-  const sortedResources = [...allResources].sort((a, b) => {
+  const sortedResources = [...filteredResources].sort((a, b) => {
     switch (sortBy) {
       case "name-asc":
         return a.title.localeCompare(b.title);
@@ -44,10 +58,13 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
   const endIndex = startIndex + itemsPerPage;
   const paginatedResources = sortedResources.slice(startIndex, endIndex);
   
-  // Reset page when items per page changes
+  // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [itemsPerPage]);
+  }, [itemsPerPage, searchTerm, selectedCategory]);
+  
+  // Get unique categories for filter
+  const categories = awesomeList?.categories?.map(cat => cat.name).sort() || [];
   
   return (
     <div className="flex flex-col">
@@ -72,24 +89,72 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
         </>
       ) : (
         <>
-          <p className="text-muted-foreground mb-6">
-            {awesomeList?.description || "A curated list of awesome resources"}
-          </p>
+          <div className="mb-6">
+            <p className="text-muted-foreground mb-4">
+              {awesomeList?.description || "A curated list of awesome resources"}
+            </p>
+            
+            {/* Search Bar */}
+            <div className="relative mb-4">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Search resources..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
           
           {/* Controls */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span>{allResources.length} resources total</span>
+            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <span>
+                Showing {filteredResources.length} of {allResources.length} resources
+              </span>
+              {searchTerm && (
+                <span className="text-blue-600">
+                  for "{searchTerm}"
+                </span>
+              )}
+              {selectedCategory !== "all" && (
+                <span className="text-green-600">
+                  in {selectedCategory}
+                </span>
+              )}
             </div>
             
-            <div className="flex gap-4 items-center">
+            <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+              {/* Category Filter */}
+              <div className="flex gap-2 items-center">
+                <Filter className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">Category:</span>
+                <Select
+                  value={selectedCategory}
+                  onValueChange={setSelectedCategory}
+                >
+                  <SelectTrigger className="w-40">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    {categories.map(category => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Layout Switcher */}
               <LayoutSwitcher
                 currentLayout={layout}
                 onLayoutChange={setLayout}
               />
               
+              {/* Sort */}
               <div className="flex gap-2 items-center">
-                <Filter className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">Sort:</span>
                 <Select
                   value={sortBy}
@@ -99,9 +164,9 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="category">Category</SelectItem>
                     <SelectItem value="name-asc">Name (A-Z)</SelectItem>
                     <SelectItem value="name-desc">Name (Z-A)</SelectItem>
-                    <SelectItem value="category">Category</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
