@@ -352,6 +352,98 @@ const SKIP_PATTERNS = [
 - `npm run build` - Build for production
 - `npm start` - Start production server
 - `npm run preview` - Preview production build locally
+- `tsx server/cli/parse-list.ts <url>` - Validate and test an awesome list
+
+## 🔍 Awesome List Validation Tool
+
+Before deploying your site, validate your awesome list using our built-in CLI tool:
+
+### Basic Usage
+
+```bash
+# Validate any awesome list
+tsx server/cli/parse-list.ts https://raw.githubusercontent.com/sindresorhus/awesome/main/readme.md
+
+# Test your own repository
+tsx server/cli/parse-list.ts https://raw.githubusercontent.com/your-username/your-awesome-list/main/README.md
+```
+
+### Example Validation Output
+
+**✅ Successful Validation:**
+```
+🚀 Awesome List Parser & Validator
+=====================================
+
+🔍 Validating: https://raw.githubusercontent.com/avelino/awesome-go/main/README.md
+⏳ Fetching and parsing...
+
+📊 Parsing Results:
+===================
+✅ Status: SUCCESS
+📄 Title: Awesome Go
+📝 Description: A curated list of awesome Go frameworks, libraries and software
+📊 Resources found: 2,752
+📁 Categories: 47
+🏷️  Tags extracted: 156
+⏱️  Parse time: 1.23s
+
+🎉 Your awesome list is ready to deploy!
+```
+
+**❌ Failed Validation:**
+```
+📊 Parsing Results:
+===================
+❌ Status: FAILED
+
+❌ Errors found:
+   - Invalid URL: Please use the raw GitHub URL
+   - No valid resources found in markdown
+
+💡 Common fixes:
+   - Ensure the URL is a raw GitHub/GitLab URL
+   - Check that the repository is public
+   - Verify the markdown follows awesome-list format
+   - Use ## for main categories and ### for subcategories
+   - Format resources as: - [Name](url) - Description
+```
+
+### Testing Different Lists
+
+```bash
+# Test popular awesome lists
+tsx server/cli/parse-list.ts https://raw.githubusercontent.com/sindresorhus/awesome/main/readme.md
+tsx server/cli/parse-list.ts https://raw.githubusercontent.com/vinta/awesome-python/master/README.md
+tsx server/cli/parse-list.ts https://raw.githubusercontent.com/awesome-selfhosted/awesome-selfhosted/master/README.md
+
+# Get help
+tsx server/cli/parse-list.ts --help
+```
+
+### Validation Checklist
+
+Before deploying, ensure your awesome list passes these checks:
+
+- ✅ **URL Format**: Uses `raw.githubusercontent.com` or similar raw URL
+- ✅ **Repository Access**: Public repository that's accessible
+- ✅ **Markdown Structure**: Proper heading hierarchy (## categories, ### subcategories)
+- ✅ **Resource Format**: Links formatted as `- [Name](url) - Description`
+- ✅ **Minimum Content**: At least 5 resources across categories
+- ✅ **Valid Links**: All resource URLs are accessible
+
+### Integration with Deployment
+
+Use the validator in your deployment pipeline:
+
+```yaml
+# In .github/workflows/deploy.yml
+- name: Validate Awesome List
+  run: tsx server/cli/parse-list.ts ${{ env.AWESOME_RAW_URL }}
+
+- name: Deploy if validation passes
+  run: npm run build
+```
 
 ## 🎨 Customization
 
