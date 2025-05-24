@@ -19,6 +19,9 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
   const [, navigate] = useLocation();
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Debug: Log resources to see if they're being passed correctly
+  console.log(`Search dialog has ${resources?.length || 0} resources`);
+
   // Create Fuse.js instance for search
   const fuse = useMemo(() => {
     if (!resources || resources.length === 0) return null;
