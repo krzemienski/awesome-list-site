@@ -21,22 +21,25 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
 
   // Create Fuse.js instance for search
   const fuse = useMemo(() => {
+    if (!resources || resources.length === 0) return null;
     return new Fuse(resources, {
-      keys: ['title', 'description'],
-      threshold: 0.4,
-      includeScore: true
+      keys: ['title', 'description', 'category', 'subcategory'],
+      threshold: 0.3,
+      includeScore: true,
+      ignoreLocation: true,
+      minMatchCharLength: 2
     });
   }, [resources]);
 
   // Search when query changes
   useEffect(() => {
-    if (!query || query.length < 2) {
+    if (!query || query.length < 2 || !fuse) {
       setResults([]);
       return;
     }
 
-    const searchResults = fuse.search(query);
-    setResults(searchResults.slice(0, 10).map(result => result.item));
+    const searchResults = fuse!.search(query);
+    setResults(searchResults.slice(0, 15).map(result => result.item));
   }, [query, fuse]);
 
   // Focus input when dialog opens
