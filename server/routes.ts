@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { fetchAwesomeList } from "./parser";
 import { processAwesomeListData } from "../client/src/lib/parser";
+import { fetchAwesomeLists, searchAwesomeLists } from "./github-api";
 
 const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md";
 
@@ -149,6 +150,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error switching list:', error);
       res.status(500).json({ error: 'Failed to switch list' });
+    }
+  });
+
+  // GitHub awesome lists discovery routes
+  app.get("/api/github/awesome-lists", async (req, res) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const perPage = parseInt(req.query.per_page as string) || 30;
+      
+      const result = await fetchAwesomeLists(page, perPage);
+      res.json(result);
+    } catch (error) {
+      console.error('Error fetching awesome lists from GitHub:', error);
+      res.status(500).json({ error: 'Failed to fetch awesome lists' });
+    }
+  });
+
+  app.get("/api/github/search", async (req, res) => {
+    try {
+      const query = req.query.q as string;
+      const page = parseInt(req.query.page as string) || 1;
+      
+      if (!query) {
+        return res.status(400).json({ error: 'Search query is required' });
+      }
+      
+      const result = await searchAwesomeLists(query, page);
+      res.json(result);
+    } catch (error) {
+      console.error('Error searching awesome lists:', error);
+      res.status(500).json({ error: 'Failed to search awesome lists' });
     }
   });
 

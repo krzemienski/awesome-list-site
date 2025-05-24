@@ -5,7 +5,7 @@ import { Menu, Search, Github, Sun, Moon, Palette, List, BarChart3 } from "lucid
 import { useTheme } from "@/hooks/use-theme";
 import { useIsMobile } from "@/hooks/use-mobile";
 import CustomThemeManager, { CustomTheme } from "@/components/ui/custom-theme-manager";
-import ListSwitcher, { AwesomeListConfig } from "@/components/ui/list-switcher";
+import AwesomeListExplorer from "@/components/ui/awesome-list-explorer";
 import AnalyticsDashboard from "@/components/ui/analytics-dashboard";
 
 interface TopBarProps {
@@ -28,29 +28,12 @@ export default function TopBar({
   const { theme, setTheme } = useTheme();
   const isMobile = useIsMobile();
   const [isThemeManagerOpen, setIsThemeManagerOpen] = useState(false);
-  const [isListSwitcherOpen, setIsListSwitcherOpen] = useState(false);
   const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false);
   const [currentCustomTheme, setCurrentCustomTheme] = useState<CustomTheme | undefined>();
-  const [currentList, setCurrentList] = useState<AwesomeListConfig>({
-    id: "awesome-selfhosted",
-    name: "Awesome Self-Hosted",
-    description: "A list of Free Software network services and web applications which can be hosted on your own servers",
-    repository: "awesome-selfhosted/awesome-selfhosted",
-    rawUrl: "https://raw.githubusercontent.com/awesome-selfhosted/awesome-selfhosted/master/README.md",
-    category: "Self-Hosting",
-    icon: "🏠",
-    isActive: true
-  });
 
   const handleThemeApply = (customTheme: CustomTheme) => {
     setCurrentCustomTheme(customTheme);
     localStorage.setItem('applied-custom-theme', JSON.stringify(customTheme));
-  };
-
-  const handleListChange = (list: AwesomeListConfig) => {
-    setCurrentList(list);
-    // In a real implementation, this would trigger fetching the new list data
-    window.location.reload(); // Simple reload for demo
   };
   
   return (
