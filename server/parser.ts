@@ -23,8 +23,28 @@ interface AwesomeListData {
   resources: Resource[];
 }
 
-function log(message: string) {
-  console.log(`${new Date().toISOString()} - ${message}`);
+function log(message: string, level: 'info' | 'warn' | 'error' = 'info') {
+  const timestamp = new Date().toISOString();
+  const prefix = level === 'error' ? '❌' : level === 'warn' ? '⚠️' : '✅';
+  console.log(`${timestamp} - ${prefix} ${message}`);
+}
+
+function logParsingStats(data: AwesomeListData, parseTime: number) {
+  const stats = {
+    totalResources: data.resources.length,
+    categories: Array.from(new Set(data.resources.map(r => r.category))).length,
+    tags: Array.from(new Set(data.resources.flatMap(r => r.tags || []))).length,
+    githubRepos: data.resources.filter(r => r.url.includes('github.com')).length,
+    gitlabRepos: data.resources.filter(r => r.url.includes('gitlab.com')).length,
+    parseTime: parseTime.toFixed(2)
+  };
+  
+  log(`Successfully parsed awesome list:`);
+  log(`📄 Source: ${data.repoUrl}`);
+  log(`📊 Found ${stats.totalResources} resources across ${stats.categories} categories`);
+  log(`🏷️ Extracted ${stats.tags} unique tags`);
+  log(`⏱️ Parsing completed in ${stats.parseTime}s`);
+  log(`🔗 Repository detection: ${((stats.githubRepos / stats.totalResources) * 100).toFixed(1)}% GitHub, ${((stats.gitlabRepos / stats.totalResources) * 100).toFixed(1)}% GitLab`);
 }
 
 /**
@@ -351,18 +371,137 @@ async function parseMarkdown(content: string, repoUrl: string): Promise<AwesomeL
 }
 
 /**
- * Fetch and parse awesome list from GitHub
+ * Validate URL format and accessibility
+ */
+function validateUrl(url: string): { isValid: boolean; error?: string } {
+  try {
+    const urlObj = new URL(url);
+    
+    if (!url.includes('raw.githubusercontent.com') && !url.includes('github.com') && !url.includes('gitlab.com')) {
+      return {
+        isValid: false,
+        error: 'URL should be a raw GitHub/GitLab URL (e.g., https://raw.githubusercontent.com/user/repo/main/README.md)'
+      };
+    }
+    
+    if (url.includes('github.com') && !url.includes('raw.githubusercontent.com')) {
+      return {
+        isValid: false,
+        error: 'Please use the raw GitHub URL. Replace "github.com" with "raw.githubusercontent.com" and adjust the path.'
+      };
+    }
+    
+    return { isValid: true };
+  } catch (error) {
+    return { isValid: false, error: 'Invalid URL format' };
+  }
+}
+
+/**
+ * Validate markdown structure for awesome list compliance
+ */
+function validateMarkdownStructure(content: string): { isValid: boolean; warnings: string[] } {
+  const warnings: string[] = [];
+  let isValid = true;
+  
+  const hasHeadings = /^#{2,3}\s+.+$/m.test(content);
+  if (!hasHeadings) {
+    warnings.push('No category headings found (## or ###)');
+    isValid = false;
+  }
+  
+  const hasListItems = /^- \[.+\]\(.+\)/m.test(content);
+  if (!hasListItems) {
+    warnings.push('No properly formatted resource links found');
+    isValid = false;
+  }
+  
+  if (content.length < 500) {
+    warnings.push('Content seems unusually short for an awesome list');
+  }
+  
+  const linkCount = (content.match(/- \[.+\]\(.+\)/g) || []).length;
+  if (linkCount < 5) {
+    warnings.push(`Only ${linkCount} resources found, expected more for a typical awesome list`);
+  }
+  
+  return { isValid, warnings };
+}
+
+/**
+ * Fetch and parse awesome list from GitHub with comprehensive error handling
  */
 export async function fetchAwesomeList(rawUrl: string): Promise<AwesomeListData> {
+  const startTime = Date.now();
+  
   try {
     log(`Fetching awesome list from: ${rawUrl}`);
     
-    const response = await fetch(rawUrl);
+    // Validate URL format
+    const urlValidation = validateUrl(rawUrl);
+    if (!urlValidation.isValid) {
+      log(`URL validation failed: ${urlValidation.error}`, 'error');
+      throw new Error(`Invalid URL: ${urlValidation.error}`);
+    }
+    
+    // Fetch with timeout and detailed error handling
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+    
+    let response: Response;
+    try {
+      response = await fetch(rawUrl, { 
+        signal: controller.signal,
+        headers: {
+          'User-Agent': 'Awesome-List-Generator/1.0',
+          'Accept': 'text/plain,text/markdown,text/*'
+        }
+      });
+      clearTimeout(timeoutId);
+    } catch (fetchError: any) {
+      clearTimeout(timeoutId);
+      if (fetchError.name === 'AbortError') {
+        log('Request timed out after 30 seconds', 'error');
+        throw new Error('Request timeout: The awesome list URL took too long to respond');
+      }
+      log(`Network error: ${fetchError.message}`, 'error');
+      throw new Error(`Network error: Unable to connect to ${rawUrl}. Please check the URL and try again.`);
+    }
+    
+    // Handle HTTP errors with specific messages
     if (!response.ok) {
-      throw new Error(`Failed to fetch: ${response.status} ${response.statusText}`);
+      const errorMessages: Record<number, string> = {
+        404: 'File not found. Please verify the repository exists and the file path is correct.',
+        403: 'Access forbidden. The repository might be private or you may have hit rate limits.',
+        429: 'Rate limit exceeded. Please try again later.',
+        500: 'Server error on GitHub/GitLab. Please try again later.',
+      };
+      
+      const errorMessage = errorMessages[response.status] || `HTTP ${response.status}: ${response.statusText}`;
+      log(`HTTP error ${response.status}: ${errorMessage}`, 'error');
+      throw new Error(`Failed to fetch awesome list: ${errorMessage}`);
     }
     
     const content = await response.text();
+    
+    if (!content || content.trim().length === 0) {
+      log('Empty content received from URL', 'error');
+      throw new Error('Empty file: The awesome list file appears to be empty');
+    }
+    
+    log(`Content fetched successfully (${content.length} characters)`);
+    
+    // Validate markdown structure
+    const structureValidation = validateMarkdownStructure(content);
+    if (!structureValidation.isValid) {
+      log('Markdown structure validation failed:', 'error');
+      structureValidation.warnings.forEach(warning => log(`  - ${warning}`, 'error'));
+      throw new Error(`Invalid awesome list format: ${structureValidation.warnings.join(', ')}`);
+    }
+    
+    if (structureValidation.warnings.length > 0) {
+      structureValidation.warnings.forEach(warning => log(`Warning: ${warning}`, 'warn'));
+    }
     
     // Extract repo URL from raw URL
     const repoUrl = rawUrl
@@ -370,11 +509,26 @@ export async function fetchAwesomeList(rawUrl: string): Promise<AwesomeListData>
       .replace(/\/[^\/]+\/README\.md$/, '');
     
     const data = await parseMarkdown(content, repoUrl);
-    log(`Successfully parsed ${data.resources.length} resources`);
+    
+    if (data.resources.length === 0) {
+      log('No resources were extracted from the markdown', 'error');
+      throw new Error('Parsing failed: No valid resources found in the awesome list. Please check the markdown format.');
+    }
+    
+    const parseTime = (Date.now() - startTime) / 1000;
+    logParsingStats(data, parseTime);
     
     return data;
+    
   } catch (error: any) {
-    log(`Error fetching awesome list: ${error.message}`);
+    const parseTime = (Date.now() - startTime) / 1000;
+    log(`Parsing failed after ${parseTime.toFixed(2)}s: ${error.message}`, 'error');
+    
+    log('Debugging information:', 'info');
+    log(`  - URL: ${rawUrl}`, 'info');
+    log(`  - Error type: ${error.constructor.name}`, 'info');
+    log(`  - Time elapsed: ${parseTime.toFixed(2)}s`, 'info');
+    
     throw error;
   }
 }
