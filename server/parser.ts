@@ -206,29 +206,50 @@ async function parseMarkdown(content: string, repoUrl: string): Promise<AwesomeL
     paragraphCount++;
   });
   
+  // Track if we're inside the main content area (after Contents)
+  let insideMainContent = false;
+  let skipContentsSection = true;
+  
   // Process each section
   visit(tree, (node: any) => {
     if (node.type === 'heading') {
       const headingText = extractTextFromNode(node);
       
-      // Skip table of contents, contributing, license sections
-      if (headingText.toLowerCase().includes('contents') ||
-          headingText.toLowerCase().includes('contributing') ||
+      // Skip certain sections entirely
+      if (headingText.toLowerCase().includes('contributing') ||
           headingText.toLowerCase().includes('license') ||
           headingText.toLowerCase().includes('external') ||
-          headingText.toLowerCase().includes('anti-features')) {
+          headingText.toLowerCase().includes('anti-features') ||
+          headingText.toLowerCase().includes('credits')) {
+        currentCategory = '';
+        currentSubcategory = '';
         return;
       }
       
-      if (node.depth === 2) {
-        // Main category (## Category)
+      // Handle Contents section specially - this marks the start of categories
+      if (headingText.toLowerCase().includes('contents')) {
+        insideMainContent = true;
+        skipContentsSection = true;
+        currentCategory = '';
+        currentSubcategory = '';
+        return;
+      }
+      
+      // Skip the Contents section itself but process everything after it
+      if (skipContentsSection && headingText.toLowerCase().includes('contents')) {
+        return;
+      }
+      
+      if (node.depth === 2 && insideMainContent) {
+        // Main category (## Category) - these are the real categories
         currentCategory = headingText;
         currentSubcategory = '';
-      } else if (node.depth === 3) {
+        skipContentsSection = false;
+      } else if (node.depth === 3 && currentCategory) {
         // Subcategory (### Subcategory)
         currentSubcategory = headingText;
       }
-    } else if (node.type === 'list' && currentCategory) {
+    } else if (node.type === 'list' && currentCategory && !skipContentsSection) {
       // Parse resources from this list
       const sectionResources = parseListItems(node, currentCategory, currentSubcategory);
       resources.push(...sectionResources);

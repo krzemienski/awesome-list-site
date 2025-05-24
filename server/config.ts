@@ -64,13 +64,13 @@ interface AwesomeListConfig {
 // Default configuration
 const defaultConfig: AwesomeListConfig = {
   site: {
-    title: process.env.VITE_SITE_TITLE || "Awesome List",
-    description: process.env.VITE_SITE_DESCRIPTION || "A curated list of awesome resources",
+    title: process.env.VITE_SITE_TITLE || "Awesome Go",
+    description: process.env.VITE_SITE_DESCRIPTION || "A curated list of awesome Go frameworks, libraries and software",
     url: process.env.VITE_SITE_URL || "http://localhost:5000",
     author: "Awesome List Community"
   },
   source: {
-    url: process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/awesome-selfhosted/awesome-selfhosted/master/README.md",
+    url: process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md",
     refresh_interval: 60,
     additional_lists: []
   },
