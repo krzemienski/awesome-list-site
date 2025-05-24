@@ -45,8 +45,8 @@ export default function SEOHead({
       : siteDescription
   );
 
-  // Generate social sharing image (using a service like Open Graph image generator)
-  const socialImage = image || `${baseUrl}/og-image.png`;
+  // Generate social sharing image
+  const socialImage = image || `${baseUrl}/og-image.svg?title=${encodeURIComponent(pageTitle)}&category=${encodeURIComponent(category || '')}&resourceCount=${resourceCount || awesomeList?.resources?.length || ''}`;
 
   // Extract repository info for additional metadata
   const repoInfo = awesomeList?.repoUrl ? extractRepoInfo(awesomeList.repoUrl) : null;

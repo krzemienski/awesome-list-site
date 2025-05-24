@@ -72,9 +72,16 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
       {/* SEO Head */}
       <Helmet>
         <title>{awesomeList?.title || "Awesome List"}</title>
-        <meta name="description" content={awesomeList?.description || "A curated list of awesome resources"} />
+        <meta name="description" content={`${awesomeList?.description || "A curated list of awesome resources"} - ${allResources.length} resources across ${categories.length} categories.`} />
+        <meta name="keywords" content={`awesome list, ${awesomeList?.title?.toLowerCase() || 'resources'}, developer tools, curated resources, programming`} />
         <meta property="og:title" content={awesomeList?.title || "Awesome List"} />
-        <meta property="og:description" content={awesomeList?.description || "A curated list of awesome resources"} />
+        <meta property="og:description" content={`${awesomeList?.description || "A curated list of awesome resources"} - ${allResources.length} resources available.`} />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="/og-image.svg" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={awesomeList?.title || "Awesome List"} />
+        <meta name="twitter:description" content={`${awesomeList?.description || "A curated list of awesome resources"} - ${allResources.length} resources available.`} />
+        <link rel="canonical" href="/" />
       </Helmet>
       
       {isLoading ? (

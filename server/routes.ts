@@ -152,6 +152,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // SEO routes
+  app.get("/sitemap.xml", generateSitemap);
+  app.get("/og-image.svg", generateOpenGraphImage);
+
   // Health check
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });

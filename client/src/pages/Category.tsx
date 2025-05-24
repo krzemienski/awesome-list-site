@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import ResourceCard from "@/components/ui/resource-card";
 import ResourcePreviewTooltip from "@/components/ui/resource-preview-tooltip";
+import SEOHead from "@/components/layout/SEOHead";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -16,7 +17,6 @@ import { Search, Filter } from "lucide-react";
 import { deslugify, slugify } from "@/lib/utils";
 import { Resource, AwesomeList } from "@/types/awesome-list";
 import NotFound from "@/pages/not-found";
-import { Helmet } from "react-helmet";
 import { processAwesomeListData } from "@/lib/parser";
 
 // Sample resources for categories
