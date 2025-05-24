@@ -36,12 +36,15 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
 
   // Search when query changes
   useEffect(() => {
+    console.log(`Searching for: "${query}", query length: ${query.length}, fuse exists: ${!!fuse}`);
+    
     if (!query || query.length < 2 || !fuse) {
       setResults([]);
       return;
     }
 
     const searchResults = fuse!.search(query);
+    console.log(`Search results for "${query}":`, searchResults.length);
     setResults(searchResults.slice(0, 15).map(result => result.item));
   }, [query, fuse]);
 
@@ -92,7 +95,10 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
             ref={inputRef}
             placeholder="Search..."
             value={query}
-            onValueChange={setQuery}
+            onValueChange={(value) => {
+              console.log(`CommandInput value changed to: "${value}"`);
+              setQuery(value);
+            }}
           />
           <CommandList className="h-[300px] overflow-y-auto">
             <CommandEmpty>
