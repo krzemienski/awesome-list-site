@@ -69,15 +69,8 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
   const handleSelect = (resource: Resource) => {
     setIsOpen(false);
     
-    // Navigate to category/subcategory page
-    if (resource.subcategory) {
-      const categorySlug = resource.category.toLowerCase().replace(/\s+/g, '-');
-      const subcategorySlug = resource.subcategory.toLowerCase().replace(/\s+/g, '-');
-      navigate(`/subcategory/${categorySlug}-${subcategorySlug}`);
-    } else {
-      const categorySlug = resource.category.toLowerCase().replace(/\s+/g, '-');
-      navigate(`/category/${categorySlug}`);
-    }
+    // Open the resource URL in a new tab
+    window.open(resource.url, '_blank', 'noopener,noreferrer');
   };
 
   return (
