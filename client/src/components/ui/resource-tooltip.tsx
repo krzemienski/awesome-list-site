@@ -14,16 +14,27 @@ export default function ResourceTooltip({ resource, children }: ResourceTooltipP
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
   const handleMouseEnter = (e: React.MouseEvent) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setPosition({
-      x: rect.left + rect.width / 2,
-      y: rect.top - 10
-    });
-    setIsVisible(true);
+    // Only show tooltip on desktop (non-touch devices)
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      setPosition({
+        x: rect.left + rect.width / 2,
+        y: rect.top - 10
+      });
+      setIsVisible(true);
+    }
   };
 
   const handleMouseLeave = () => {
     setIsVisible(false);
+  };
+
+  const handleClick = (e: React.MouseEvent) => {
+    // On mobile/touch devices, prevent the default click and don't show tooltip
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      // Let the click pass through to open the resource
+      return;
+    }
   };
 
   // Extract domain from URL for display
@@ -43,6 +54,7 @@ export default function ResourceTooltip({ resource, children }: ResourceTooltipP
       className="relative"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      onClick={handleClick}
     >
       {children}
       

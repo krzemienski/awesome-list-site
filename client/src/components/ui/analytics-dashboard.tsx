@@ -274,6 +274,21 @@ export default function AnalyticsDashboard({
                   <CardDescription>Resources by category</CardDescription>
                 </CardHeader>
                 <CardContent>
+                  <div className="block md:hidden mb-4">
+                    {/* Mobile legend */}
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      {analyticsData.categoryDistribution.slice(0, 6).map((entry, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <div 
+                            className="w-3 h-3 rounded-full" 
+                            style={{ backgroundColor: entry.color }}
+                          />
+                          <span className="truncate">{entry.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
                   <ResponsiveContainer width="100%" height={300}>
                     <PieChart>
                       <Pie
@@ -282,13 +297,21 @@ export default function AnalyticsDashboard({
                         cy="50%"
                         outerRadius={100}
                         dataKey="value"
-                        label={({ name, percentage }) => `${name} (${percentage?.toFixed(1)}%)`}
+                        label={window.innerWidth > 768 ? ({ name, percentage }) => {
+                          const truncatedName = name.length > 15 ? name.substring(0, 12) + "..." : name;
+                          return `${truncatedName} (${percentage?.toFixed(1)}%)`;
+                        } : false}
                       >
                         {analyticsData.categoryDistribution.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
-                      <Tooltip />
+                      <Tooltip 
+                        formatter={(value: number, name: string) => [
+                          `${value} resources`,
+                          name
+                        ]}
+                      />
                     </PieChart>
                   </ResponsiveContainer>
                 </CardContent>

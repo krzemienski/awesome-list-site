@@ -60,11 +60,23 @@ export default function ResourceCard({ resource, index }: ResourceCardProps) {
               {resource.description}
             </p>
             
-            {resource.subcategory && (
-              <div className="mt-3 flex items-center gap-1">
-                <span className="text-xs px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground">
-                  {resource.subcategory}
-                </span>
+            {(resource.subcategory || (resource.tags && resource.tags.length > 0)) && (
+              <div className="mt-3 flex items-center gap-1 flex-wrap">
+                {resource.subcategory && (
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground">
+                    {resource.subcategory}
+                  </span>
+                )}
+                {resource.tags?.slice(0, 3).map((tag, index) => (
+                  <span key={index} className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                    {tag}
+                  </span>
+                ))}
+                {resource.tags && resource.tags.length > 3 && (
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                    +{resource.tags.length - 3}
+                  </span>
+                )}
               </div>
             )}
           </CardContent>
