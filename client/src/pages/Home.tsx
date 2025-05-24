@@ -58,9 +58,6 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
         </>
       ) : (
         <>
-          <h1 className="text-3xl font-bold tracking-tight mb-4">
-            {awesomeList?.title || "Awesome List"}
-          </h1>
           <p className="text-muted-foreground mb-8">
             {awesomeList?.description || "A curated list of awesome resources"}
           </p>
