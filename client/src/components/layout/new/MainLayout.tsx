@@ -14,21 +14,30 @@ interface MainLayoutProps {
 }
 
 export default function MainLayout({ awesomeList, isLoading, children }: MainLayoutProps) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const isMobile = useIsMobile();
+  
+  // Initialize sidebar state based on screen size
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth >= 768; // Open by default on desktop
+    }
+    return false;
+  });
 
-  // Close sidebar when window resizes from mobile to desktop
+  // Handle responsive sidebar behavior
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 768 && isSidebarOpen) {
+      const isDesktop = window.innerWidth >= 768;
+      // On mobile, close sidebar. On desktop, keep current state unless it's closed
+      if (!isDesktop) {
         setIsSidebarOpen(false);
       }
     };
     
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [isSidebarOpen]);
+  }, []);
   
   // Toggle sidebar function with proper state handling
   const toggleSidebar = () => {
