@@ -175,6 +175,12 @@ function parseListItems(tree: any, currentCategory: string, currentSubcategory?:
     // Generate simple URL-based tags only (GitHub, GitLab, etc.)
     const urlTags = generateUrlTags(url);
     
+    // Add subcategory as a tag if it exists (this is what shows below resources)
+    const subcategoryTags = currentSubcategory ? [currentSubcategory] : [];
+    
+    // Combine URL tags with subcategory tags
+    const allTags = [...urlTags, ...subcategoryTags];
+    
     const resource: Resource = {
       id: generateId(),
       title: cleanText(title),
@@ -182,7 +188,7 @@ function parseListItems(tree: any, currentCategory: string, currentSubcategory?:
       description,
       category: currentCategory,
       subcategory: currentSubcategory,
-      tags: urlTags,
+      tags: allTags,
       ...metadata
     };
     
