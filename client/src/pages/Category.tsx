@@ -6,6 +6,7 @@ import ResourceCard from "@/components/ui/resource-card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import TagFilter from "@/components/ui/tag-filter";
 import { Search, Filter } from "lucide-react";
 import { deslugify, slugify } from "@/lib/utils";
 import { Resource, AwesomeList } from "@/types/awesome-list";
@@ -80,6 +81,7 @@ export default function Category() {
   const [categoryName, setCategoryName] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("name-asc");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   
   // Fetch awesome list data
   const { data: rawData, isLoading, error } = useQuery({
@@ -115,7 +117,7 @@ export default function Category() {
     }
   }, [slug, rawData]);
   
-  // Apply search filter and sorting when criteria change
+  // Apply search filter, tag filter, and sorting when criteria change
   useEffect(() => {
     let filtered = [...baseResources];
     
@@ -124,6 +126,13 @@ export default function Category() {
       filtered = filtered.filter(resource => 
         resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         resource.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
+    // Apply tag filter
+    if (selectedTags.length > 0) {
+      filtered = filtered.filter(resource => 
+        resource.tags && selectedTags.some(tag => resource.tags?.includes(tag))
       );
     }
     
@@ -144,7 +153,7 @@ export default function Category() {
     }
     
     setFilteredResources(filtered);
-  }, [baseResources, searchTerm, sortBy]);
+  }, [baseResources, searchTerm, sortBy, selectedTags]);
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -188,37 +197,46 @@ export default function Category() {
       </p>
       
       {/* Search and filter bar */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-8">
-        <form onSubmit={handleSearch} className="flex-1">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search resources..."
-              className="pl-8"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+      <div className="flex flex-col gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <form onSubmit={handleSearch} className="flex-1">
+            <div className="relative">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search resources..."
+                className="pl-8"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </form>
+          
+          <div className="flex gap-2 items-center">
+            <Filter className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">Sort:</span>
+            <Select
+              value={sortBy}
+              onValueChange={setSortBy}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="name-asc">Name (A-Z)</SelectItem>
+                <SelectItem value="name-desc">Name (Z-A)</SelectItem>
+                <SelectItem value="newest">Newest first</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-        </form>
-        
-        <div className="flex gap-2 items-center">
-          <Filter className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm text-muted-foreground">Sort:</span>
-          <Select
-            value={sortBy}
-            onValueChange={setSortBy}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="name-asc">Name (A-Z)</SelectItem>
-              <SelectItem value="name-desc">Name (Z-A)</SelectItem>
-              <SelectItem value="newest">Newest first</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
+        
+        {/* Tag filter */}
+        <TagFilter
+          resources={baseResources}
+          selectedTags={selectedTags}
+          onTagsChange={setSelectedTags}
+        />
       </div>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
