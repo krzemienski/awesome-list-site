@@ -212,9 +212,15 @@ async function parseMarkdown(content: string, repoUrl: string): Promise<AwesomeL
   let title = 'Awesome List';
   let description = '';
   
+  // Find the first h1 heading that contains "Awesome"
+  let titleFound = false;
   visit(tree, 'heading', (node: any) => {
-    if (node.depth === 1) {
-      title = extractTextFromNode(node);
+    if (node.depth === 1 && !titleFound) {
+      const headingText = extractTextFromNode(node);
+      if (headingText.toLowerCase().includes('awesome')) {
+        title = headingText;
+        titleFound = true;
+      }
     }
   });
   
@@ -298,6 +304,8 @@ async function parseMarkdown(content: string, repoUrl: string): Promise<AwesomeL
   };
   
   log(`Parsed ${data.resources.length} resources from ${repoUrl}`);
+  log(`Title extracted: "${data.title}"`);
+  log(`Description extracted: "${data.description}"`);
   return data;
 }
 
