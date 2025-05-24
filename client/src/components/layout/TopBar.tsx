@@ -108,15 +108,7 @@ export default function TopBar({
             </Button>
           )}
           
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsListSwitcherOpen(true)}
-            aria-label="Switch awesome list"
-            title="Switch List"
-          >
-            <List className="h-5 w-5" />
-          </Button>
+          <AwesomeListExplorer />
           
           <Button
             variant="ghost"
@@ -150,13 +142,6 @@ export default function TopBar({
           </Button>
         </div>
       </div>
-      
-      <ListSwitcher
-        currentList={currentList}
-        onListChange={handleListChange}
-        isOpen={isListSwitcherOpen}
-        onClose={() => setIsListSwitcherOpen(false)}
-      />
       
       <AnalyticsDashboard
         resources={resources}
