@@ -7,6 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import TagFilter from "@/components/ui/tag-filter";
+import LayoutSwitcher, { LayoutType } from "@/components/ui/layout-switcher";
+import ResourceListItem from "@/components/ui/resource-list-item";
+import ResourceCompactItem from "@/components/ui/resource-compact-item";
 import { Search, Filter } from "lucide-react";
 import { deslugify, slugify } from "@/lib/utils";
 import { Resource, AwesomeList } from "@/types/awesome-list";
@@ -82,6 +85,7 @@ export default function Category() {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("name-asc");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [layout, setLayout] = useState<LayoutType>("cards");
   
   // Fetch awesome list data
   const { data: rawData, isLoading, error } = useQuery({
@@ -212,22 +216,29 @@ export default function Category() {
             </div>
           </form>
           
-          <div className="flex gap-2 items-center">
-            <Filter className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">Sort:</span>
-            <Select
-              value={sortBy}
-              onValueChange={setSortBy}
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="name-asc">Name (A-Z)</SelectItem>
-                <SelectItem value="name-desc">Name (Z-A)</SelectItem>
-                <SelectItem value="newest">Newest first</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="flex gap-4 items-center">
+            <LayoutSwitcher
+              currentLayout={layout}
+              onLayoutChange={setLayout}
+            />
+            
+            <div className="flex gap-2 items-center">
+              <Filter className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">Sort:</span>
+              <Select
+                value={sortBy}
+                onValueChange={setSortBy}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="name-asc">Name (A-Z)</SelectItem>
+                  <SelectItem value="name-desc">Name (Z-A)</SelectItem>
+                  <SelectItem value="newest">Newest first</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
         
@@ -239,15 +250,42 @@ export default function Category() {
         />
       </div>
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredResources.map((resource, index) => (
-          <ResourceCard 
-            key={`${resource.title}-${index}`} 
-            resource={resource}
-            index={index}
-          />
-        ))}
-      </div>
+      {/* Resource Display */}
+      {layout === "cards" && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredResources.map((resource, index) => (
+            <ResourceCard 
+              key={`${resource.title}-${index}`} 
+              resource={resource}
+              index={index}
+            />
+          ))}
+        </div>
+      )}
+
+      {layout === "list" && (
+        <div className="border border-border rounded-lg overflow-hidden">
+          {filteredResources.map((resource, index) => (
+            <ResourceListItem 
+              key={`${resource.title}-${index}`} 
+              resource={resource}
+              index={index}
+            />
+          ))}
+        </div>
+      )}
+
+      {layout === "compact" && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+          {filteredResources.map((resource, index) => (
+            <ResourceCompactItem 
+              key={`${resource.title}-${index}`} 
+              resource={resource}
+              index={index}
+            />
+          ))}
+        </div>
+      )}
       
       {filteredResources.length === 0 && !isLoading && (
         <div className="flex flex-col items-center justify-center py-12 text-center">
