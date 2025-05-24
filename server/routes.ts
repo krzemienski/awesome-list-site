@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { fetchAwesomeList } from "./parser";
 import { processAwesomeListData } from "../client/src/lib/parser";
 
-const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/awesome-selfhosted/awesome-selfhosted/master/README.md";
+const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize awesome list data
