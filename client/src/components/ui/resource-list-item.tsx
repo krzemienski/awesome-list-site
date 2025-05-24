@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Star, GitFork } from "lucide-react";
 import { Resource } from "@/types/awesome-list";
-import ResourceTooltip from "@/components/ui/resource-tooltip";
+import ResourcePreviewTooltip from "@/components/ui/resource-preview-tooltip";
 
 interface ResourceListItemProps {
   resource: Resource;

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import ResourceCard from "@/components/ui/resource-card";
+import ResourcePreviewTooltip from "@/components/ui/resource-preview-tooltip";
 import LayoutSwitcher from "@/components/ui/layout-switcher";
 import Pagination from "@/components/ui/pagination";
 import { AwesomeList } from "@/types/awesome-list";
@@ -184,14 +185,16 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <a
-                          href={resource.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-lg font-medium text-foreground hover:text-primary transition-colors"
-                        >
-                          {resource.title}
-                        </a>
+                        <ResourcePreviewTooltip resource={resource} side="top" align="start">
+                          <a
+                            href={resource.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-lg font-medium text-foreground hover:text-primary transition-colors"
+                          >
+                            {resource.title}
+                          </a>
+                        </ResourcePreviewTooltip>
                         <span className="text-xs px-2 py-0.5 bg-muted rounded-full text-muted-foreground">
                           {resource.category}
                         </span>
@@ -228,14 +231,16 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                   key={`${resource.title}-${resource.url}`}
                   className="p-3 border border-border rounded-md bg-card hover:bg-accent/50 transition-colors"
                 >
-                  <a
-                    href={resource.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm font-medium text-foreground hover:text-primary transition-colors block mb-1"
-                  >
-                    {resource.title}
-                  </a>
+                  <ResourcePreviewTooltip resource={resource} side="top" align="start">
+                    <a
+                      href={resource.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm font-medium text-foreground hover:text-primary transition-colors block mb-1"
+                    >
+                      {resource.title}
+                    </a>
+                  </ResourcePreviewTooltip>
                   <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
                     {resource.description}
                   </p>

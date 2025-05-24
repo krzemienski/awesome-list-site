@@ -3,6 +3,7 @@ import { useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import ResourceCard from "@/components/ui/resource-card";
+import ResourcePreviewTooltip from "@/components/ui/resource-preview-tooltip";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
