@@ -1,6 +1,6 @@
-# 🚀 AwesomeList Generator
+# 🚀 Awesome List Static Site Generator
 
-Transform any GitHub "Awesome-List" into a beautiful, searchable, and mobile-optimized website. Think **mkdocs for Awesome Lists** - a self-hosted generator that creates stunning sites from remote markdown URLs.
+Transform any GitHub "Awesome-List" into a beautiful, searchable, and SEO-optimized website. A comprehensive static site generator that creates professional websites from awesome list repositories with advanced features and analytics.
 
 ## 🌟 What This Does
 
@@ -73,12 +73,12 @@ Create a `.env` file or set environment variables:
 
 ```bash
 # Required - Source awesome list
-AWESOME_RAW_URL="https://raw.githubusercontent.com/your-org/awesome-list/main/README.md"
+AWESOME_RAW_URL="https://raw.githubusercontent.com/avelino/awesome-go/main/README.md"
 
 # Site Configuration
-VITE_SITE_TITLE="Your Awesome List"
-VITE_SITE_DESCRIPTION="A curated list of awesome resources"
-VITE_SITE_URL="https://your-domain.com"
+VITE_SITE_TITLE="Awesome Go"
+VITE_SITE_DESCRIPTION="A curated list of awesome Go frameworks, libraries, and software"
+VITE_SITE_URL="https://your-awesome-go-site.github.io"
 
 # Analytics (Optional)
 VITE_GA_MEASUREMENT_ID="G-XXXXXXXXXX"
@@ -602,9 +602,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ### Live Examples
 
-- [Awesome Self-Hosted](https://your-domain.com) - Default configuration
-- [Awesome Go](https://your-domain.com) - Go programming resources
-- [Awesome Python](https://your-domain.com) - Python ecosystem tools
+Example deployments using this static site generator:
+
+- **Awesome Self-Hosted** - Self-hosted application resources
+- **Awesome Go** - Go programming framework and library showcase  
+- **Awesome Python** - Python ecosystem tools and packages
+- **Awesome React** - React components and development tools
 
 ### Custom Deployments
 
@@ -614,7 +617,49 @@ This generator works with any properly formatted awesome list. Popular formats i
 - **Curated-\*** lists following similar markdown patterns
 - **Custom resource lists** using the supported markdown format
 
-## 🚀 Deployment Options
+## 🚀 Quick Start Guide
+
+### Option 1: Clone and Customize (Recommended)
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/yourusername/awesome-list-static-site.git
+   cd awesome-list-static-site
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Configure your awesome list:**
+   Edit `awesome-list.config.yaml`:
+   ```yaml
+   site:
+     title: "Your Awesome List"
+     description: "Your curated collection"
+     url: "https://yourusername.github.io/your-repo"
+   
+   source:
+     url: "https://raw.githubusercontent.com/your-org/your-awesome-list/main/README.md"
+   ```
+
+4. **Start development server:**
+   ```bash
+   npm run dev
+   ```
+   Visit `http://localhost:5000` to see your site
+
+5. **Build for production:**
+   ```bash
+   npm run build
+   ```
+
+### Option 2: Fork and Deploy to GitHub Pages
+
+1. **Fork this repository** to your GitHub account
+
+## 🌐 Deployment Options
 
 ### GitHub Pages (Static Deployment) - Recommended
 
