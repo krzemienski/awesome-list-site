@@ -15,7 +15,7 @@ export default function ResourceListItem({ resource }: ResourceListItemProps) {
   };
 
   return (
-    <ResourceTooltip resource={resource}>
+    <ResourcePreviewTooltip resource={resource} side="right" align="start">
       <div 
         className="flex items-center justify-between p-4 border-b border-border hover:bg-accent/50 cursor-pointer transition-colors"
         onClick={handleClick}
@@ -44,6 +44,6 @@ export default function ResourceListItem({ resource }: ResourceListItemProps) {
           </div>
         </div>
       </div>
-    </ResourceTooltip>
+    </ResourcePreviewTooltip>
   );
 }
