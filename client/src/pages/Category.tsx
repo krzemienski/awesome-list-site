@@ -10,6 +10,7 @@ import TagFilter from "@/components/ui/tag-filter";
 import LayoutSwitcher, { LayoutType } from "@/components/ui/layout-switcher";
 import ResourceListItem from "@/components/ui/resource-list-item";
 import ResourceCompactItem from "@/components/ui/resource-compact-item";
+import Pagination from "@/components/ui/pagination";
 import { Search, Filter } from "lucide-react";
 import { deslugify, slugify } from "@/lib/utils";
 import { Resource, AwesomeList } from "@/types/awesome-list";
@@ -86,6 +87,11 @@ export default function Category() {
   const [sortBy, setSortBy] = useState("name-asc");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [layout, setLayout] = useState<LayoutType>("cards");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(24);
+  
+  // Configuration from config
+  const pageSizeOptions = [12, 24, 48, 96];
   
   // Fetch awesome list data
   const { data: rawData, isLoading, error } = useQuery({

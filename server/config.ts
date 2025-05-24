@@ -45,6 +45,9 @@ interface FeaturesConfig {
   theme_switcher: boolean;
   list_switcher: boolean;
   resource_previews: boolean;
+  pagination: boolean;
+  items_per_page: number;
+  page_size_options: number[];
   ai_tags: boolean;
   ai_descriptions: boolean;
 }
@@ -92,6 +95,9 @@ const defaultConfig: AwesomeListConfig = {
     theme_switcher: true,
     list_switcher: true,
     resource_previews: true,
+    pagination: true,
+    items_per_page: 24,
+    page_size_options: [12, 24, 48, 96],
     ai_tags: !!process.env.OPENAI_API_KEY,
     ai_descriptions: !!process.env.OPENAI_API_KEY
   },
