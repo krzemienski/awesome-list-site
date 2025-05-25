@@ -192,18 +192,20 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <button
-                          className="text-lg font-medium text-foreground hover:text-primary transition-colors touch-manipulation text-left"
-                          style={{ touchAction: 'manipulation' }}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            console.log('List view resource clicked:', resource.title, resource.url);
-                            window.open(resource.url, '_blank', 'noopener,noreferrer');
+                        <a
+                          href={resource.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-lg font-semibold text-blue-600 hover:text-blue-700 underline"
+                          style={{ 
+                            touchAction: 'manipulation',
+                            minHeight: '44px',
+                            display: 'flex',
+                            alignItems: 'center'
                           }}
                         >
                           {resource.title}
-                        </button>
+                        </a>
                         <span className="text-xs px-2 py-0.5 bg-muted rounded-full text-muted-foreground">
                           {resource.category}
                         </span>
@@ -234,30 +236,44 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
               ))}
             </div>
           ) : layout === "compact" ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 mb-8">
+            <div className="space-y-4 mb-8">
               {paginatedResources.map((resource, index) => (
                 <div
                   key={`${resource.title}-${resource.url}`}
-                  className="p-3 border border-border rounded-md bg-card hover:bg-accent/50 transition-colors"
+                  className="p-4 border border-border rounded-lg bg-card"
                 >
-                  <a
-                    href={resource.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm font-medium text-blue-600 hover:text-blue-700 underline decoration-blue-600 block mb-1"
-                    style={{ 
-                      touchAction: 'manipulation',
-                      textDecoration: 'underline'
-                    }}
-                  >
-                    {resource.title}
-                  </a>
-                  <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
-                    {resource.description}
-                  </p>
-                  <span className="text-xs px-1.5 py-0.5 bg-muted rounded text-muted-foreground">
-                    {resource.category}
-                  </span>
+                  <div className="space-y-2">
+                    <a
+                      href={resource.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-lg font-semibold text-blue-600 hover:text-blue-700 underline block"
+                      style={{ 
+                        touchAction: 'manipulation',
+                        minHeight: '44px',
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}
+                    >
+                      {resource.title}
+                    </a>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {resource.description}
+                    </p>
+                    <div className="flex items-center gap-2 pt-1">
+                      <span className="text-xs px-2 py-1 bg-secondary rounded-full text-secondary-foreground">
+                        {resource.category}
+                      </span>
+                      {resource.tags?.slice(0, 2).map((tag, tagIndex) => (
+                        <span
+                          key={tagIndex}
+                          className="text-xs px-2 py-1 bg-accent rounded-full text-accent-foreground"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
