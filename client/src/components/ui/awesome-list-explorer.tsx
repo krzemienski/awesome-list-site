@@ -158,8 +158,12 @@ export default function AwesomeListExplorer() {
                   key={category}
                   variant={selectedCategory === category ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setSelectedCategory(category)}
-                  className="whitespace-nowrap flex-shrink-0"
+                  onClick={() => {
+                    setSelectedCategory(category);
+                    console.log('Category selected:', category);
+                  }}
+                  className="whitespace-nowrap flex-shrink-0 touch-manipulation"
+                  style={{ touchAction: 'manipulation' }}
                 >
                   {category}
                   {category !== "All" && listsData?.lists && (

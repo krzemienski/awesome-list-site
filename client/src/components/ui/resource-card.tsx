@@ -45,10 +45,15 @@ export default function ResourceCard({ resource, index }: ResourceCardProps) {
               <h3 className="text-lg font-semibold leading-none tracking-tight">
                 <a
                   href={resource.url}
-                  className="hover:underline inline-flex items-center gap-1.5"
+                  className="hover:underline inline-flex items-center gap-1.5 touch-manipulation"
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={() => trackResourceClick(resource.title, resource.url, resource.category)}
+                  style={{ touchAction: 'manipulation' }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    trackResourceClick(resource.title, resource.url, resource.category);
+                    console.log('Resource clicked:', resource.title, resource.url);
+                  }}
                 >
                   {resource.title}
                   <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />

@@ -197,7 +197,12 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                             href={resource.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-lg font-medium text-foreground hover:text-primary transition-colors"
+                            className="text-lg font-medium text-foreground hover:text-primary transition-colors touch-manipulation"
+                            style={{ touchAction: 'manipulation' }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              console.log('List view resource clicked:', resource.title, resource.url);
+                            }}
                           >
                             {resource.title}
                           </a>
@@ -243,7 +248,12 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                       href={resource.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm font-medium text-foreground hover:text-primary transition-colors block mb-1"
+                      className="text-sm font-medium text-foreground hover:text-primary transition-colors block mb-1 touch-manipulation"
+                      style={{ touchAction: 'manipulation' }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        console.log('Compact view resource clicked:', resource.title, resource.url);
+                      }}
                     >
                       {resource.title}
                     </a>
