@@ -240,18 +240,18 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                   key={`${resource.title}-${resource.url}`}
                   className="p-3 border border-border rounded-md bg-card hover:bg-accent/50 transition-colors"
                 >
-                  <button
-                    className="text-sm font-medium text-foreground hover:text-primary transition-colors block mb-1 touch-manipulation text-left w-full"
-                    style={{ touchAction: 'manipulation' }}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      console.log('Compact view resource clicked:', resource.title, resource.url);
-                      window.open(resource.url, '_blank', 'noopener,noreferrer');
+                  <a
+                    href={resource.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-medium text-blue-600 hover:text-blue-700 underline decoration-blue-600 block mb-1"
+                    style={{ 
+                      touchAction: 'manipulation',
+                      textDecoration: 'underline'
                     }}
                   >
                     {resource.title}
-                  </button>
+                  </a>
                   <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
                     {resource.description}
                   </p>
