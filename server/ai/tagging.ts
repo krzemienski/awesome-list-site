@@ -1,7 +1,7 @@
-import OpenAI from "openai";
+import Anthropic from '@anthropic-ai/sdk';
 
-// Use OpenAI for AI-powered features
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+// Use Anthropic for AI-powered features
+const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 interface AITagSuggestion {
   tags: string[];

@@ -3,15 +3,15 @@
 
 # Site Configuration
 site:
-  title: "Awesome Self-Hosted"
-  description: "A list of Free Software network services and web applications which can be hosted on your own servers"
+  title: "Awesome Video"
+  description: "A curated list of awesome video frameworks, libraries, and software for video processing, streaming, and manipulation"
   url: "https://awesome-selfhosted.net"
   author: "awesome-selfhosted community"
   
 # Source Configuration
 source:
   # Primary awesome list to parse
-  url: "https://raw.githubusercontent.com/awesome-selfhosted/awesome-selfhosted/master/README.md"
+  url: "https://raw.githubusercontent.com/krzemienski/awesome-video/master/README.md"
   # Auto-refresh interval in minutes (0 to disable)
   refresh_interval: 60
   # Additional lists for multi-list switching
@@ -77,9 +77,9 @@ features:
   # Default layout configuration
   default_layout: "list"  # Options: "cards", "list", "compact"
   allow_layout_switching: true
-  # AI-powered features (requires OpenAI API key)
-  ai_tags: false
-  ai_descriptions: false
+  # AI-powered features (requires Anthropic API key)
+  ai_tags: true
+  ai_descriptions: true
 
 # Build Configuration
 build:
