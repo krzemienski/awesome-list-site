@@ -151,8 +151,8 @@ export default function AwesomeListExplorer() {
           </div>
 
           {/* Category Filters - Scrollable on mobile */}
-          <ScrollArea className="w-full whitespace-nowrap">
-            <div className="flex gap-2 pb-2">
+          <div className="w-full overflow-x-auto scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <div className="flex gap-2 pb-2" style={{ width: 'max-content' }}>
               {categories.map((category) => (
                 <Button
                   key={category}
@@ -174,7 +174,7 @@ export default function AwesomeListExplorer() {
                 </Button>
               ))}
             </div>
-          </ScrollArea>
+          </div>
         </div>
 
         <Separator />

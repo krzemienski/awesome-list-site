@@ -192,21 +192,19 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <ResourcePreviewTooltip resource={resource} side="top" align="start">
-                          <a
-                            href={resource.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-lg font-medium text-foreground hover:text-primary transition-colors touch-manipulation"
-                            style={{ touchAction: 'manipulation' }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              console.log('List view resource clicked:', resource.title, resource.url);
-                            }}
-                          >
-                            {resource.title}
-                          </a>
-                        </ResourcePreviewTooltip>
+                        <a
+                          href={resource.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-lg font-medium text-foreground hover:text-primary transition-colors touch-manipulation"
+                          style={{ touchAction: 'manipulation' }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            console.log('List view resource clicked:', resource.title, resource.url);
+                          }}
+                        >
+                          {resource.title}
+                        </a>
                         <span className="text-xs px-2 py-0.5 bg-muted rounded-full text-muted-foreground">
                           {resource.category}
                         </span>
@@ -243,21 +241,19 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                   key={`${resource.title}-${resource.url}`}
                   className="p-3 border border-border rounded-md bg-card hover:bg-accent/50 transition-colors"
                 >
-                  <ResourcePreviewTooltip resource={resource} side="top" align="start">
-                    <a
-                      href={resource.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm font-medium text-foreground hover:text-primary transition-colors block mb-1 touch-manipulation"
-                      style={{ touchAction: 'manipulation' }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        console.log('Compact view resource clicked:', resource.title, resource.url);
-                      }}
-                    >
-                      {resource.title}
-                    </a>
-                  </ResourcePreviewTooltip>
+                  <a
+                    href={resource.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-medium text-foreground hover:text-primary transition-colors block mb-1 touch-manipulation"
+                    style={{ touchAction: 'manipulation' }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      console.log('Compact view resource clicked:', resource.title, resource.url);
+                    }}
+                  >
+                    {resource.title}
+                  </a>
                   <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
                     {resource.description}
                   </p>
