@@ -5,7 +5,7 @@ import { fetchAwesomeList } from "./parser";
 import { processAwesomeListData } from "../client/src/lib/parser";
 import { fetchAwesomeLists, searchAwesomeLists } from "./github-api";
 
-const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/krzemienski/awesome-video/master/README.md";
+const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md";
 
 // SEO route handlers
 function generateSitemap(req: any, res: any) {
