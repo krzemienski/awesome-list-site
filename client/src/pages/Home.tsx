@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import ResourceCard from "@/components/ui/resource-card";
-import ResourcePreviewTooltip from "@/components/ui/resource-preview-tooltip";
+import MobileResourcePopover from "@/components/ui/mobile-resource-popover";
 import LayoutSwitcher from "@/components/ui/layout-switcher";
 import Pagination from "@/components/ui/pagination";
 import { AwesomeList } from "@/types/awesome-list";
@@ -183,128 +183,82 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
           
           {/* Resources Display */}
           {layout === "list" ? (
-            <div className="space-y-4 mb-8">
+            <div className="space-y-1 mb-8">
               {paginatedResources.map((resource, index) => (
-                <div
-                  key={`${resource.title}-${resource.url}`}
-                  className="p-4 border-l-4 border-l-blue-500 bg-card rounded-lg"
-                >
-                  <div className="space-y-2">
-                    <a
-                      href={resource.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-lg font-semibold text-blue-600 hover:text-blue-700 underline block"
-                      style={{ 
-                        touchAction: 'manipulation',
-                        minHeight: '44px',
-                        display: 'flex',
-                        alignItems: 'center'
-                      }}
-                    >
-                      {resource.title}
-                    </a>
-                    <p className="text-sm text-muted-foreground">
-                      {resource.description}
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
-                        {resource.category}
-                      </span>
-                      {resource.tags?.slice(0, 3).map((tag, tagIndex) => (
-                        <span
-                          key={tagIndex}
-                          className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded-full"
-                        >
-                          {tag}
-                        </span>
-                      ))}
+                <MobileResourcePopover key={`${resource.title}-${resource.url}`} resource={resource}>
+                  <div className="p-4 border-l-4 border-l-blue-500 bg-white dark:bg-gray-800 rounded-r-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors min-h-[60px] flex items-center">
+                    <div className="flex-1">
+                      <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">
+                        {resource.title}
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-1">
+                        {resource.description}
+                      </p>
+                    </div>
+                    <div className="ml-2 text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full shrink-0">
+                      {resource.category}
                     </div>
                   </div>
-                </div>
+                </MobileResourcePopover>
               ))}
             </div>
           ) : layout === "compact" ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 mb-8">
+            <div className="grid grid-cols-2 gap-2 mb-8">
               {paginatedResources.map((resource, index) => (
-                <div
-                  key={`${resource.title}-${resource.url}`}
-                  className="p-3 border border-border rounded-md bg-card hover:bg-accent/50 transition-colors"
-                >
-                  <a
-                    href={resource.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm font-medium text-blue-600 hover:text-blue-700 underline block mb-2"
-                    style={{ 
-                      touchAction: 'manipulation',
-                      minHeight: '44px',
-                      display: 'flex',
-                      alignItems: 'center'
-                    }}
-                  >
-                    {resource.title}
-                  </a>
-                  <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
-                    {resource.description}
-                  </p>
-                  <span className="text-xs px-1.5 py-0.5 bg-muted rounded text-muted-foreground">
-                    {resource.category}
-                  </span>
-                </div>
+                <MobileResourcePopover key={`${resource.title}-${resource.url}`} resource={resource}>
+                  <div className="p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors min-h-[120px] flex flex-col">
+                    <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-2 line-clamp-2 flex-shrink-0">
+                      {resource.title}
+                    </h3>
+                    <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-3 flex-1">
+                      {resource.description}
+                    </p>
+                    <span className="text-xs px-1.5 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded mt-2 self-start">
+                      {resource.category}
+                    </span>
+                  </div>
+                </MobileResourcePopover>
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 gap-4 mb-8">
               {paginatedResources.map((resource, index) => (
-                <div
-                  key={`${resource.title}-${resource.url}`}
-                  className="p-6 border border-border rounded-lg bg-card shadow-sm hover:shadow-md transition-all"
-                >
-                  <div className="space-y-3">
-                    <a
-                      href={resource.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-lg font-semibold text-blue-600 hover:text-blue-700 underline block"
-                      style={{ 
-                        touchAction: 'manipulation',
-                        minHeight: '44px',
-                        display: 'flex',
-                        alignItems: 'center'
-                      }}
-                    >
-                      {resource.title}
-                    </a>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {resource.description}
-                    </p>
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full font-medium">
-                          {resource.category}
-                        </span>
-                      </div>
-                      {resource.tags && resource.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1">
-                          {resource.tags.slice(0, 4).map((tag, tagIndex) => (
-                            <span
-                              key={tagIndex}
-                              className="text-xs px-2 py-1 bg-secondary text-secondary-foreground rounded"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                          {resource.tags.length > 4 && (
-                            <span className="text-xs text-muted-foreground">
-                              +{resource.tags.length - 4} more
-                            </span>
-                          )}
+                <MobileResourcePopover key={`${resource.title}-${resource.url}`} resource={resource}>
+                  <div className="p-6 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-all">
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        {resource.title}
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                        {resource.description}
+                      </p>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full font-medium">
+                            {resource.category}
+                          </span>
                         </div>
-                      )}
+                        {resource.tags && resource.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1">
+                            {resource.tags.slice(0, 4).map((tag, tagIndex) => (
+                              <span
+                                key={tagIndex}
+                                className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                            {resource.tags.length > 4 && (
+                              <span className="text-xs text-gray-500 dark:text-gray-400">
+                                +{resource.tags.length - 4} more
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
+                </MobileResourcePopover>
               ))}
             </div>
           )}
