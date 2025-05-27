@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { fetchAwesomeList } from "./parser";
+import { fetchAwesomeVideoList } from "./awesome-video-parser";
 import { processAwesomeListData } from "../client/src/lib/parser";
 import { fetchAwesomeLists, searchAwesomeLists } from "./github-api";
 
@@ -103,14 +104,14 @@ function generateOpenGraphImage(req: any, res: any) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Initialize awesome list data
+  // Initialize awesome video data
   try {
-    console.log(`Fetching awesome list from ${AWESOME_RAW_URL}`);
-    const awesomeListData = await fetchAwesomeList(AWESOME_RAW_URL);
-    storage.setAwesomeListData(awesomeListData);
-    console.log(`Successfully fetched awesome list with ${awesomeListData.resources.length} resources`);
+    console.log('Fetching awesome-video data from JSON source');
+    const awesomeVideoData = await fetchAwesomeVideoList();
+    storage.setAwesomeListData(awesomeVideoData);
+    console.log(`Successfully fetched awesome-video with ${awesomeVideoData.resources.length} resources`);
   } catch (error) {
-    console.error(`Error fetching awesome list: ${error}`);
+    console.error(`Error fetching awesome-video data: ${error}`);
   }
 
   // API routes
