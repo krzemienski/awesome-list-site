@@ -11,9 +11,10 @@ interface VideoCategory {
 
 interface VideoResource {
   title: string;
-  url: string;
+  homepage: string;
   description: string;
-  category?: string;
+  category?: string[];
+  tags?: string[];
 }
 
 interface AwesomeVideoData {
@@ -71,24 +72,28 @@ export async function fetchAwesomeVideoList(): Promise<AwesomeListData> {
       tags?: string[];
     }> = [];
     
-    if (data.resources) {
-      data.resources.forEach((resource: VideoResource, index: number) => {
-        // Generate video-specific tags
-        const tags = generateVideoTags(resource.title, resource.description, resource.url);
+    if (data.projects) {
+      data.projects.forEach((resource: VideoResource, index: number) => {
+        if (!resource.homepage || !resource.title) return; // Skip invalid resources
         
-        // Determine category
-        const category = resource.category || 'Video Tools';
-        const categoryInfo = categoryMap.get(resource.category || '');
-        const subcategory = categoryInfo?.parent ? categoryMap.get(categoryInfo.parent)?.title : undefined;
+        // Use existing tags or generate video-specific tags
+        const existingTags = resource.tags || [];
+        const generatedTags = generateVideoTags(resource.title, resource.description || '', resource.homepage);
+        const allTags = Array.from(new Set([...existingTags, ...generatedTags])); // Remove duplicates
+        
+        // Determine category from the resource's category array
+        const categoryId = resource.category?.[0] || 'video-tools';
+        const categoryInfo = categoryMap.get(categoryId);
+        const parentCategoryInfo = categoryInfo?.parent ? categoryMap.get(categoryInfo.parent) : null;
         
         resources.push({
           id: `video-${index}`,
           title: resource.title,
-          url: resource.url,
+          url: resource.homepage,
           description: resource.description,
-          category: categoryInfo?.title || category,
-          subcategory: subcategory,
-          tags: tags
+          category: categoryInfo?.title || 'Video Tools',
+          subcategory: parentCategoryInfo?.title,
+          tags: allTags.slice(0, 8) // Limit to 8 tags
         });
       });
     }
