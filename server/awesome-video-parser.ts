@@ -20,7 +20,7 @@ interface VideoResource {
 interface AwesomeVideoData {
   title: string;
   categories: VideoCategory[];
-  resources: VideoResource[];
+  projects: VideoResource[];
 }
 
 interface AwesomeListData {
