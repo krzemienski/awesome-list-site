@@ -120,15 +120,7 @@ export default function TopBar({
             <BarChart3 className="h-5 w-5" />
           </Button>
           
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsThemeManagerOpen(true)}
-            aria-label="Custom themes"
-            title="Custom Themes"
-          >
-            <Palette className="h-5 w-5" />
-          </Button>
+
           
 
         </div>
