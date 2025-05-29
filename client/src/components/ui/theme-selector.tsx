@@ -16,9 +16,9 @@ export default function ThemeSelector() {
     const storedTheme = localStorage.getItem("theme-variant") || "red";
     setThemeVariant(storedTheme);
     
-    // Apply theme CSS variables from the selected theme (always dark)
-    const selectedTheme = shadcnThemes.find((t) => t.value === storedTheme) || shadcnThemes[0];
-    applyTheme(selectedTheme, "dark");
+    // Apply the red theme immediately
+    const redTheme = shadcnThemes.find((t) => t.value === "red") || shadcnThemes[0];
+    applyTheme(redTheme, "dark");
   }, [setMode]);
 
   // Apply theme when variant changes (always dark)
