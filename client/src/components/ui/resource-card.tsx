@@ -45,7 +45,7 @@ export default function ResourceCard({ resource, index }: ResourceCardProps) {
               <h3 className="text-lg font-semibold leading-none tracking-tight">
                 <a
                   href={resource.url}
-                  className="text-blue-600 hover:text-blue-700 underline inline-flex items-center gap-1.5 touch-manipulation"
+                  className="text-primary hover:text-primary/80 underline inline-flex items-center gap-1.5 touch-manipulation"
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{ 
