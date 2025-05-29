@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Palette } from "lucide-react";
+import { Palette, Sun, Moon } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
 
 type ThemeOption = {
@@ -23,11 +23,11 @@ const themes: ThemeOption[] = [
 export default function ThemeSelector() {
   const [open, setOpen] = useState(false);
   const { theme: mode, setTheme: setMode } = useTheme();
-  const [themeVariant, setThemeVariant] = useState("red");
+  const [themeVariant, setThemeVariant] = useState("rose");
   
   // Initialize theme variant from localStorage
   useEffect(() => {
-    const storedTheme = localStorage.getItem("theme-variant") || "red";
+    const storedTheme = localStorage.getItem("theme-variant") || "rose";
     setThemeVariant(storedTheme);
     
     // Apply theme CSS variables from the selected theme
@@ -77,26 +77,56 @@ export default function ThemeSelector() {
           sideOffset={10}
           className="w-64 p-2"
         >
-          <div className="flex flex-col gap-1 p-2">
-            <p className="text-sm font-medium">Select a theme</p>
-            <div className="grid grid-cols-3 gap-2 mt-2">
-              {themes.map((theme) => (
+          <div className="flex flex-col gap-3">
+            <div>
+              <p className="text-sm font-medium mb-2">Light/Dark Mode</p>
+              <div className="flex gap-2">
                 <button
-                  key={theme.value}
-                  onClick={() => changeTheme(theme.value)}
-                  className={`flex flex-col items-center justify-center gap-1 rounded-md ${
-                    themeVariant === theme.value
-                      ? "border-2 border-primary"
-                      : "border border-muted"
-                  } bg-background p-2 hover:border-accent`}
+                  onClick={() => setMode("light")}
+                  className={`flex items-center justify-center gap-2 px-3 py-2 rounded-md text-xs ${
+                    mode === "light"
+                      ? "bg-primary text-primary-foreground"
+                      : "border border-muted hover:bg-accent"
+                  } transition-colors`}
                 >
-                  <div 
-                    className="h-5 w-5 rounded-full" 
-                    style={{ backgroundColor: theme.color }}
-                  />
-                  <span className="text-xs">{theme.label}</span>
+                  <Sun className="h-4 w-4" />
+                  Light
                 </button>
-              ))}
+                <button
+                  onClick={() => setMode("dark")}
+                  className={`flex items-center justify-center gap-2 px-3 py-2 rounded-md text-xs ${
+                    mode === "dark"
+                      ? "bg-primary text-primary-foreground"
+                      : "border border-muted hover:bg-accent"
+                  } transition-colors`}
+                >
+                  <Moon className="h-4 w-4" />
+                  Dark
+                </button>
+              </div>
+            </div>
+            
+            <div>
+              <p className="text-sm font-medium mb-2">Color Theme</p>
+              <div className="grid grid-cols-3 gap-2">
+                {themes.map((theme) => (
+                  <button
+                    key={theme.value}
+                    onClick={() => changeTheme(theme.value)}
+                    className={`flex flex-col items-center justify-center gap-1 rounded-md ${
+                      themeVariant === theme.value
+                        ? "border-2 border-primary"
+                        : "border border-muted"
+                    } bg-background p-2 hover:bg-accent transition-colors`}
+                  >
+                    <div 
+                      className="h-5 w-5 rounded-full" 
+                      style={{ backgroundColor: theme.color }}
+                    />
+                    <span className="text-xs">{theme.label}</span>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </PopoverContent>
