@@ -34,14 +34,14 @@ export default function MobileResourcePopover({ resource, children }: MobileReso
           {children}
         </div>
       </DialogTrigger>
-      <DialogContent className="w-[95vw] max-w-md mx-auto">
+      <DialogContent className="w-[95vw] max-w-md mx-auto" aria-describedby="resource-description">
         <DialogHeader>
-          <DialogTitle className="text-lg font-semibold leading-tight">
+          <DialogTitle className="text-lg font-semibold leading-tight text-foreground">
             {resource.title}
           </DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-4">
+        <div className="space-y-4" id="resource-description">
           {/* Description */}
           <p className="text-sm text-muted-foreground leading-relaxed">
             {resource.description}
