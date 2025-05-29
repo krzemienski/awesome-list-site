@@ -29,7 +29,7 @@ export default function ThemeSelector() {
   function changeTheme(themeName: string) {
     setThemeVariant(themeName);
     localStorage.setItem("theme-variant", themeName);
-    const selectedTheme = shadcnThemes.find(t => t.value === themeName) || shadcnThemes[0];
+    const selectedTheme = shadcnThemes.find((t) => t.value === themeName) || shadcnThemes[0];
     applyTheme(selectedTheme, mode === "dark" ? "dark" : "light");
     setOpen(false);
   }
