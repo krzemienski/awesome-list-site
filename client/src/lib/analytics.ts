@@ -85,3 +85,96 @@ export const trackThemeChange = (themeName: string) => {
 export const trackListSwitch = (fromList: string, toList: string) => {
   trackEvent('list_switch', 'navigation', `${fromList} -> ${toList}`);
 };
+
+// Track layout changes
+export const trackLayoutChange = (layout: string) => {
+  trackEvent('layout_change', 'ui_interaction', layout);
+};
+
+// Track filter usage
+export const trackFilterUsage = (filterType: string, filterValue: string, resultCount: number) => {
+  trackEvent('filter_applied', 'engagement', `${filterType}: ${filterValue}`, resultCount);
+};
+
+// Track sort changes
+export const trackSortChange = (sortType: string) => {
+  trackEvent('sort_change', 'ui_interaction', sortType);
+};
+
+// Track popover interactions
+export const trackPopoverView = (resourceTitle: string, category: string) => {
+  trackEvent('resource_preview', 'engagement', `${category}: ${resourceTitle}`);
+};
+
+// Track mobile-specific interactions
+export const trackMobileInteraction = (action: string, element: string) => {
+  trackEvent('mobile_interaction', 'touch', `${action}: ${element}`);
+};
+
+// Track performance metrics
+export const trackPerformance = (metric: string, value: number) => {
+  trackEvent('performance', 'technical', metric, Math.round(value));
+};
+
+// Track user engagement time
+export const trackEngagementTime = (timeSpent: number, page: string) => {
+  trackEvent('engagement_time', 'behavior', page, Math.round(timeSpent / 1000));
+};
+
+// Track scroll depth
+export const trackScrollDepth = (percentage: number, page: string) => {
+  trackEvent('scroll_depth', 'engagement', page, percentage);
+};
+
+// Track copy actions
+export const trackCopyAction = (content: string, type: string) => {
+  trackEvent('copy_action', 'engagement', `${type}: ${content.substring(0, 50)}`);
+};
+
+// Track share actions
+export const trackShareAction = (method: string, resource: string) => {
+  trackEvent('share_action', 'engagement', `${method}: ${resource}`);
+};
+
+// Track error events
+export const trackError = (errorType: string, errorMessage: string) => {
+  trackEvent('error', 'technical', `${errorType}: ${errorMessage}`);
+};
+
+// Track API response times
+export const trackApiPerformance = (endpoint: string, responseTime: number, status: number) => {
+  trackEvent('api_performance', 'technical', `${endpoint} (${status})`, Math.round(responseTime));
+};
+
+// Track resource favoriting/bookmarking
+export const trackResourceFavorite = (resourceTitle: string, category: string, action: 'add' | 'remove') => {
+  trackEvent('resource_favorite', 'engagement', `${action}: ${category}: ${resourceTitle}`);
+};
+
+// Track keyboard shortcuts usage
+export const trackKeyboardShortcut = (shortcut: string, action: string) => {
+  trackEvent('keyboard_shortcut', 'power_user', `${shortcut}: ${action}`);
+};
+
+// Track export actions
+export const trackExportAction = (format: string, itemCount: number) => {
+  trackEvent('export_action', 'data_export', format, itemCount);
+};
+
+// Track tag interactions
+export const trackTagInteraction = (tag: string, action: string) => {
+  trackEvent('tag_interaction', 'navigation', `${action}: ${tag}`);
+};
+
+// Track session quality metrics
+export const trackSessionQuality = (metrics: {
+  resourcesViewed: number;
+  searchesPerformed: number;
+  timeSpent: number;
+  categoriesExplored: number;
+}) => {
+  trackEvent('session_quality', 'behavior', 'resources_viewed', metrics.resourcesViewed);
+  trackEvent('session_quality', 'behavior', 'searches_performed', metrics.searchesPerformed);
+  trackEvent('session_quality', 'behavior', 'time_spent', Math.round(metrics.timeSpent / 1000));
+  trackEvent('session_quality', 'behavior', 'categories_explored', metrics.categoriesExplored);
+};

@@ -6,6 +6,7 @@ import { Search } from "lucide-react";
 import { useLocation } from "wouter";
 import Fuse from "fuse.js";
 import { Resource } from "@/types/awesome-list";
+import { trackSearch, trackResourceClick, trackPerformance } from "@/lib/analytics";
 
 interface SearchDialogProps {
   isOpen: boolean;
@@ -43,8 +44,16 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
       return;
     }
 
+    const startTime = performance.now();
     const searchResults = fuse!.search(query);
+    const endTime = performance.now();
+    
     console.log(`Search results for "${query}":`, searchResults.length);
+    
+    // Track search analytics
+    trackSearch(query, searchResults.length);
+    trackPerformance('search_time', endTime - startTime);
+    
     setResults(searchResults.slice(0, 15).map(result => result.item));
   }, [query, fuse]);
 

@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ExternalLink } from "lucide-react";
 import { Resource } from "@/types/awesome-list";
 import { motion } from "framer-motion";
-import { trackResourceClick } from "@/lib/analytics";
+import { trackResourceClick, trackPopoverView, trackMobileInteraction } from "@/lib/analytics";
 import ResourceTooltip from "@/components/ui/resource-tooltip";
 
 interface ResourceCardProps {
