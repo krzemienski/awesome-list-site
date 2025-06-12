@@ -158,7 +158,7 @@ export function useSessionAnalytics() {
   const addCategoryExplored = (category: string) => {
     setSessionData(prev => ({ 
       ...prev, 
-      categoriesExplored: new Set([...prev.categoriesExplored, category])
+      categoriesExplored: new Set(Array.from(prev.categoriesExplored).concat([category]))
     }));
   };
 

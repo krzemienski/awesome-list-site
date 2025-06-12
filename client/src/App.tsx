@@ -22,6 +22,9 @@ function Router() {
   // Track page views when routes change
   useAnalytics();
   
+  // Track comprehensive session analytics
+  const sessionAnalytics = useSessionAnalytics();
+  
   const [searchOpen, setSearchOpen] = useState(false);
   const [location] = useLocation();
 
@@ -41,17 +44,22 @@ function Router() {
       if (e.key === "/" && !e.ctrlKey && !e.metaKey && 
           !(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) {
         e.preventDefault();
+        trackKeyboardShortcut("/", "open_search");
+        sessionAnalytics.incrementSearchesPerformed();
         setSearchOpen(true);
       }
       
       // Escape key to close search
       if (e.key === "Escape" && searchOpen) {
+        trackKeyboardShortcut("Escape", "close_search");
         setSearchOpen(false);
       }
       
       // Ctrl/Cmd+K for search
       if ((e.ctrlKey || e.metaKey) && e.key === "k") {
         e.preventDefault();
+        trackKeyboardShortcut("Ctrl+K", "open_search");
+        sessionAnalytics.incrementSearchesPerformed();
         setSearchOpen(true);
       }
     };

@@ -9,6 +9,7 @@ import { AwesomeList } from "@/types/awesome-list";
 import { Helmet } from "react-helmet";
 import { Filter, Search } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { trackCategoryView, trackFilterUsage, trackSortChange } from "@/lib/analytics";
 
 interface HomeProps {
   awesomeList?: AwesomeList;
@@ -24,6 +25,29 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
   const [sortBy, setSortBy] = useState("category");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+
+  // Handle category change with analytics
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category);
+    if (category !== "all") {
+      trackCategoryView(category);
+      trackFilterUsage("category", category, filteredResources.length);
+    }
+  };
+
+  // Handle sort change with analytics
+  const handleSortChange = (sort: string) => {
+    setSortBy(sort);
+    trackSortChange(sort);
+  };
+
+  // Handle search with analytics
+  const handleSearchChange = (search: string) => {
+    setSearchTerm(search);
+    if (search.length >= 2) {
+      trackFilterUsage("search", search, filteredResources.length);
+    }
+  };
   
   // Use all resources for home page display
   const allResources = awesomeList?.resources || [];

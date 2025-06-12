@@ -1,4 +1,5 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
+import { trackApiPerformance, trackError } from "./analytics";
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
@@ -29,16 +30,36 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey[0] as string, {
-      credentials: "include",
-    });
+    const url = queryKey[0] as string;
+    const startTime = performance.now();
+    
+    try {
+      const res = await fetch(url, {
+        credentials: "include",
+      });
 
-    if (unauthorizedBehavior === "returnNull" && res.status === 401) {
-      return null;
+      const endTime = performance.now();
+      const responseTime = endTime - startTime;
+
+      // Track API performance
+      trackApiPerformance(url, responseTime, res.status);
+
+      if (unauthorizedBehavior === "returnNull" && res.status === 401) {
+        return null;
+      }
+
+      await throwIfResNotOk(res);
+      return await res.json();
+    } catch (error) {
+      const endTime = performance.now();
+      const responseTime = endTime - startTime;
+      
+      // Track API errors
+      trackApiPerformance(url, responseTime, 0);
+      trackError('api_error', `${url}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      
+      throw error;
     }
-
-    await throwIfResNotOk(res);
-    return await res.json();
   };
 
 export const queryClient = new QueryClient({
