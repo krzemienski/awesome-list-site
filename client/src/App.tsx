@@ -3,6 +3,8 @@ import { Switch, Route, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { initGA } from "./lib/analytics";
 import { useAnalytics } from "./hooks/use-analytics";
+import { useSessionAnalytics } from "./hooks/use-session-analytics";
+import { trackKeyboardShortcut } from "./lib/analytics";
 
 import MainLayout from "@/components/layout/new/MainLayout";
 import ErrorPage from "@/pages/ErrorPage";

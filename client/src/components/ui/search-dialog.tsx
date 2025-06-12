@@ -76,6 +76,9 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
 
   // Handle resource selection
   const handleSelect = (resource: Resource) => {
+    // Track search result click
+    trackResourceClick(resource.title, resource.url, resource.category);
+    
     setIsOpen(false);
     
     // Open the resource URL in a new tab

@@ -4,6 +4,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Palette } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
 import { shadcnThemes, applyTheme } from "@/lib/shadcn-themes";
+import { trackThemeChange } from "@/lib/analytics";
 
 export default function ThemeSelector() {
   const [open, setOpen] = useState(false);
@@ -32,6 +33,10 @@ export default function ThemeSelector() {
     localStorage.setItem("theme-variant", themeName);
     const selectedTheme = shadcnThemes.find((t) => t.value === themeName) || shadcnThemes[0];
     applyTheme(selectedTheme, "dark");
+    
+    // Track theme change
+    trackThemeChange(themeName);
+    
     setOpen(false);
   }
 
