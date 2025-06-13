@@ -34,13 +34,13 @@ jobs:
       run: npm ci
       
     - name: Generate static data
-      run: tsx scripts/build-static.ts
+      run: npx tsx scripts/build-static.ts
       env:
         VITE_STATIC_BUILD: 'true'
         
     - name: Build for production
       timeout-minutes: 10
-      run: tsx scripts/deploy-simple.ts
+      run: npx tsx scripts/deploy-simple.ts
       env:
         NODE_ENV: 'production'
         VITE_STATIC_BUILD: 'true'
