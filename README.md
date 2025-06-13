@@ -1,6 +1,6 @@
-# Awesome List Dashboard
+# Awesome List Static Site Generator
 
-Transform any GitHub awesome list into a sophisticated, interactive web dashboard with AI-powered enhancements, advanced search, and modern UI components.
+Transform any GitHub awesome list into a beautiful, SEO-optimized static website with search, categorization, and optional AI enhancements.
 
 ## System Architecture
 
@@ -85,30 +85,11 @@ Visit the live dashboard: [https://krzemienski.github.io/awesome-list-site](http
 
 ## Quick Start
 
-### Deploy Your Own Awesome List
-
-### Interactive Setup (Recommended)
-
-For new projects, use the interactive configuration wizard:
-
-```bash
-npx tsx scripts/init-project.ts
-```
-
-The wizard provides:
-- Step-by-step project configuration
-- Popular awesome list selection from curated options
-- Theme and feature customization
-- Environment variable guidance
-- Automatic initial deployment
-
-### Manual Setup
-
 1. **Fork this repository**
-2. **Configure your list** in `awesome-list.config.yaml`:
+2. **Configure your awesome list** in `awesome-list.config.yaml`:
    ```yaml
    site:
-     title: "Your Awesome List Dashboard"
+     title: "Your Awesome List"
      url: "https://yourusername.github.io/awesome-list-site"
    source:
      url: "https://raw.githubusercontent.com/username/awesome-list/main/README.md"
@@ -116,21 +97,23 @@ The wizard provides:
    features:
      ai_tags: true       # Requires ANTHROPIC_API_KEY
    ```
-3. **Set up repository secrets** (optional but recommended):
-   - `ANTHROPIC_API_KEY` - AI features ($0.25-$15/month)
-   - `GA_MEASUREMENT_ID` - Google Analytics tracking
+3. **Set environment variables** (for AI features):
+   ```bash
+   export ANTHROPIC_API_KEY="sk-ant-your-key-here"
+   ```
 4. **Deploy**:
    ```bash
    npx tsx scripts/build-and-deploy.ts
    ```
 5. **Enable GitHub Pages** in repository settings → Pages → Source: GitHub Actions
 
-Your dashboard will be live at: `https://yourusername.github.io/awesome-list-site`
+Your site will be live at: `https://yourusername.github.io/awesome-list-site`
 
 ### Local Development
 
 ```bash
 npm install
+export ANTHROPIC_API_KEY="sk-ant-your-key-here"  # Optional, for AI features
 npm run dev
 # Visit http://localhost:5000
 ```
@@ -424,238 +407,80 @@ features:
 - **Domain Expertise**: Web development, data science, systems programming
 - **Maturity Assessment**: Production-ready vs experimental projects
 
-## Environment Variables and Secrets
+## Environment Variables
 
-### Interactive Setup Process
+### AI Features (Optional)
 
-The deployment script automatically checks and validates environment variables:
-
-```bash
-npx tsx scripts/build-and-deploy.ts
-```
-
-During the interactive setup, the script will:
-- Detect existing environment variables
-- Validate API key formats (ANTHROPIC_API_KEY must start with `sk-ant-`)
-- Show status for each variable (Found ✅, Missing ⚠️, Invalid ❌)
-- Prompt for confirmation before proceeding
-
-### Environment Variables Reference
-
-#### AI Features (Optional)
-```bash
-ANTHROPIC_API_KEY=sk-ant-your-key-here
-```
-- **Purpose**: Enables AI-powered tagging and categorization
-- **Format**: Must start with `sk-ant-`
-- **Cost**: $0.25-$15/month depending on model choice
-- **Setup**: Get from [console.anthropic.com](https://console.anthropic.com)
-
-#### Analytics (Optional)
-```bash
-VITE_GA_MEASUREMENT_ID=G-XXXXXXXXXX
-```
-- **Purpose**: Google Analytics 4 tracking
-- **Format**: Must start with `G-`
-- **Setup**: Get from Google Analytics dashboard
-
-#### Theme Configuration (Optional)
-```bash
-VITE_DEFAULT_THEME=red
-```
-- **Options**: red, blue, green, purple
-- **Default**: Uses theme from awesome-list.config.yaml
-
-### Repository Secrets Setup
-
-For GitHub Actions deployment, add these secrets:
-
-1. Go to repository **Settings → Secrets and variables → Actions**
-2. Click **"New repository secret"**
-3. Add each secret:
-
-| Secret Name | Required | Description |
-|-------------|----------|-------------|
-| `ANTHROPIC_API_KEY` | Optional | AI features (starts with `sk-ant-`) |
-| `GA_MEASUREMENT_ID` | Optional | Google Analytics (starts with `G-`) |
-
-### Local Development Environment
-
-For local testing, set environment variables:
+For AI-powered tagging and categorization, set your Anthropic API key:
 
 ```bash
-# Option 1: Export in terminal
-export ANTHROPIC_API_KEY="sk-ant-your-key"
-export VITE_GA_MEASUREMENT_ID="G-YOUR-ID"
+# Local development
+export ANTHROPIC_API_KEY="sk-ant-your-key-here"
 
-# Option 2: Create .env file (not committed)
-echo "ANTHROPIC_API_KEY=sk-ant-your-key" > .env
-echo "VITE_GA_MEASUREMENT_ID=G-YOUR-ID" >> .env
+# GitHub deployment - add as repository secret
+# Settings → Secrets and variables → Actions → New repository secret
+# Name: ANTHROPIC_API_KEY
+# Value: sk-ant-your-key-here
 ```
 
-### Deployment Branch Configuration
+Get your API key from [console.anthropic.com](https://console.anthropic.com). Cost: $0.25-$15/month depending on usage.
 
-The interactive script allows you to specify the deployment branch:
+### Analytics (Optional)
 
-**Default Branch**: `gh-pages-build`
-**Alternative Options**: `gh-pages`, `deploy`, `build`, or any custom name
+For Google Analytics tracking:
 
-**Important**: The GitHub Actions workflow automatically detects pushes to:
-- `gh-pages-build` (default)
-- `gh-pages` (alternative)
-- Any branch specified during interactive setup
+```bash
+# Local development
+export VITE_GA_MEASUREMENT_ID="G-XXXXXXXXXX"
 
-This ensures the deployment workflow matches your chosen branch name exactly.
+# GitHub deployment - add as repository secret
+# Name: GA_MEASUREMENT_ID
+# Value: G-XXXXXXXXXX
+```
 
-## Configuration Wizard Guide
+## Configuration
 
-### Interactive Setup Process
+Edit `awesome-list.config.yaml` to configure your site:
 
-The configuration wizard (`npx tsx scripts/init-project.ts`) provides a complete guided setup experience:
-
-#### Step 1: Project Information
-- **Title**: Display name for your dashboard
-- **Description**: Brief summary of your awesome list content  
-- **Author**: Your name or organization
-- **URL**: GitHub Pages URL (auto-detected from git remote)
-
-#### Step 2: Awesome List Source Selection
-
-Choose from popular curated lists:
-
-| List | Category | Stars | Description |
-|------|----------|-------|-------------|
-| Awesome Video | Media & Entertainment | 1.5K | Video frameworks, libraries, and tools |
-| Awesome JavaScript | Programming Languages | 33K | Browser-side JavaScript libraries |
-| Awesome Python | Programming Languages | 220K | Python frameworks and software |
-| Awesome React | Frontend Frameworks | 64K | React ecosystem resources |
-| Awesome Vue.js | Frontend Frameworks | 72K | Vue.js related tools |
-| Awesome Node.js | Backend Development | 58K | Node.js packages and resources |
-| Awesome Machine Learning | AI & ML | 65K | ML frameworks and libraries |
-| Awesome Docker | DevOps & Infrastructure | 30K | Docker resources and projects |
-
-Or provide a custom URL for any GitHub awesome list.
-
-#### Step 3: Theme Selection
-
-**Available Themes:**
-- **Red**: Bold high-contrast theme (default)
-- **Blue**: Professional business theme
-- **Green**: Nature-inspired theme
-- **Purple**: Creative and modern theme
-- **Orange**: Energetic and vibrant theme
-- **Teal**: Modern minimalist theme
-
-#### Step 4: Feature Configuration
-
-**Core Features (Recommended):**
-- **Search**: Real-time search with filters and sorting
-- **Categories**: Category-based navigation and filtering
-- **Analytics Dashboard**: Built-in usage statistics
-
-**AI-Powered Features (Optional - Requires API Key):**
-- **AI Tags**: Automatic tagging based on content analysis
-- **AI Descriptions**: Enhanced descriptions using AI analysis
-- **AI Categories**: Intelligent categorization of resources
-
-**Cost Estimate for AI Features**: $0.25-$15/month depending on list size and model choice
-
-#### Step 5: Analytics Setup
-
-**Google Analytics 4 Integration:**
-- Provides detailed visitor analytics
-- Tracks user interactions and popular resources
-- Requires GA4 Measurement ID (format: G-XXXXXXXXXX)
-
-### Configuration Examples
-
-#### Basic Setup (No AI Features)
 ```yaml
+# Basic configuration
 site:
-  title: "My Development Resources"
-  description: "Curated tools for developers"
-  url: "https://username.github.io/dev-resources"
-  author: "Developer Name"
+  title: "Your Awesome List"
+  description: "Description of your awesome list"
+  url: "https://username.github.io/awesome-list-site"
+  author: "Your Name"
 
 source:
-  url: "https://raw.githubusercontent.com/sindresorhus/awesome/main/readme.md"
-  format: "markdown"
+  url: "https://raw.githubusercontent.com/username/awesome-list/main/README.md"
+  format: "markdown"  # or "json"
   refresh_interval: 24
 
 theme:
-  default: "blue"
-  primary_color: "#3b82f6"
-
-features:
-  search: true
-  categories: true
-  analytics_dashboard: true
-  ai_tags: false
-  ai_descriptions: false
-  ai_categories: false
-```
-
-#### Full-Featured Setup (With AI)
-```yaml
-site:
-  title: "AI-Enhanced Awesome List"
-  description: "Intelligent curation of development resources"
-  url: "https://username.github.io/ai-awesome"
-  author: "Tech Curator"
-
-source:
-  url: "https://raw.githubusercontent.com/awesome-machine-learning/awesome-machine-learning/master/README.md"
-  format: "markdown"
-  refresh_interval: 12
-
-theme:
-  default: "purple"
-  primary_color: "#8b5cf6"
-
-features:
-  search: true
-  categories: true
-  analytics_dashboard: true
-  ai_tags: true
-  ai_descriptions: true
-  ai_categories: true
-
-analytics:
-  google_analytics: "G-XXXXXXXXXX"
-```
-
-#### JSON-based Configuration (Awesome Video)
-```yaml
-site:
-  title: "Video Tools Dashboard"
-  description: "Comprehensive video development resources"
-  url: "https://username.github.io/video-tools"
-  author: "Video Engineer"
-
-source:
-  url: "https://raw.githubusercontent.com/krzemienski/awesome-video/master/contents.json"
-  format: "json"
-  refresh_interval: 24
-
-theme:
-  default: "red"
+  default: "red"  # red, blue, green, purple
   primary_color: "#ef4444"
 
 features:
   search: true
   categories: true
-  analytics_dashboard: true
-  ai_tags: true
+  ai_tags: false      # Requires ANTHROPIC_API_KEY
   ai_descriptions: false
   ai_categories: false
 
 analytics:
-  google_analytics: "G-383541848"
+  google_analytics: "G-XXXXXXXXXX"  # Optional
 ```
 
-## Configuration Reference
+## Commands
 
-Configure your dashboard by editing `awesome-list.config.yaml`:
+```bash
+# Development
+npm install
+npm run dev                           # Start development server
+
+# Deployment  
+npx tsx scripts/build-and-deploy.ts  # Interactive deployment
+npx tsx scripts/setup-wizard.ts      # Configuration wizard only
+```
 
 ### Basic Configuration
 ```yaml

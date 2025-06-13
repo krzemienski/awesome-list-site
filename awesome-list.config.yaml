@@ -1,12 +1,12 @@
-# Awesome List Dashboard Configuration
-# Configure your awesome list dashboard deployment
+# Awesome List Static Site Configuration
+# Configure your awesome list static site deployment
 
 # Site Configuration
 site:
-  title: "Awesome Video Dashboard"
-  description: "A curated collection of awesome video resources, tools, and technologies for developers and content creators"
+  title: "Awesome Video"
+  description: "A curated list of awesome video frameworks, libraries, and tools"
   url: "https://krzemienski.github.io/awesome-list-site"
-  author: "Awesome List Dashboard"
+  author: "krzemienski"
   
 # Source Configuration
 source:
@@ -16,20 +16,6 @@ source:
   format: "json"
   # Auto-refresh interval in hours
   refresh_interval: 24
-  # Additional lists for multi-list switching
-  additional_lists:
-    - name: "Awesome Go"
-      url: "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md"
-      category: "Programming"
-      icon: "🐹"
-    - name: "Awesome Python"
-      url: "https://raw.githubusercontent.com/vinta/awesome-python/master/README.md"
-      category: "Programming"
-      icon: "🐍"
-    - name: "Awesome JavaScript"
-      url: "https://raw.githubusercontent.com/sorrycc/awesome-javascript/master/README.md"
-      category: "Programming"
-      icon: "💛"
 
 # Theme Configuration
 theme:
@@ -70,7 +56,6 @@ features:
   categories: true
   analytics_dashboard: true
   theme_switcher: true
-  list_switcher: true
   resource_previews: true
   # Pagination settings
   pagination: true
