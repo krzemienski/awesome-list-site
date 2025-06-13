@@ -1,768 +1,146 @@
-# 🚀 Awesome List Static Site Generator
+# Awesome Video Dashboard
 
-Transform any GitHub "Awesome-List" into a beautiful, searchable, and SEO-optimized website. A comprehensive static site generator that creates professional websites from awesome list repositories with advanced features and analytics.
+A modern, interactive web application that transforms the [awesome-video](https://github.com/krzemienski/awesome-video) curated list into a searchable, filterable dashboard with advanced analytics and mobile-optimized design.
 
-## 🌟 What This Does
+## Features
 
-This tool converts GitHub Awesome-List README.md files into dynamic, SEO-friendly websites featuring:
+- **2,011+ Video Resources** - Comprehensive collection of video tools, libraries, and technologies
+- **Advanced Search & Filtering** - Find resources by name, category, or description
+- **Mobile-Optimized Design** - Touch-friendly interface with popover interactions
+- **Dark Theme Interface** - Professional red-accented dark theme
+- **Real-time Analytics** - Google Analytics integration with detailed user behavior tracking
+- **Static Site Generation** - Fast loading with pre-generated data
+- **Responsive Categories** - Organized by video processing, streaming, codecs, and more
+- **Keyboard Shortcuts** - Quick navigation with `/` for search, `Ctrl+K` shortcuts
 
-- **📱 Mobile-first responsive design** - Perfect experience on all devices
-- **🔍 Advanced search & filtering** - Find resources by title, description, category
-- **🎨 Custom themes** - Dark/light mode + custom theme editor
-- **📊 Analytics dashboard** - Track resource popularity and usage patterns
-- **🚀 Multi-list support** - Switch between different awesome lists
-- **⚡ Fast loading** - Optimized performance with animated skeletons
-- **🔗 Rich previews** - Interactive hover cards with GitHub stats
-- **♿ SEO optimized** - Proper meta tags and structured data
-- **🤖 AI-powered enhancements** - Automatic tag suggestions and descriptions
-- **📈 Google Analytics integration** - Track user behavior and popular resources
+## Live Demo
 
-## 🏗️ System Architecture
+Visit the live dashboard: [https://yourusername.github.io/awesome-dash-video](https://yourusername.github.io/awesome-dash-video)
 
-```mermaid
-graph TB
-    A[GitHub Awesome-List Repository] -->|Raw Markdown URL| B[Markdown Parser]
-    B --> C[Resource Extractor]
-    C --> D[In-Memory Storage]
-    
-    E[YAML Configuration] --> F[Config Loader]
-    F --> G[Express Server]
-    
-    D --> H[REST API]
-    H --> I[React Frontend]
-    
-    I --> J[Search Engine]
-    I --> K[Theme System]
-    I --> L[Analytics Tracking]
-    
-    M[Google Analytics] <--> L
-    N[OpenAI API] <--> O[AI Tag Generator]
-    O --> C
-    
-    P[Environment Variables] --> F
-    Q[GitHub Actions] --> R[Static Build]
-    R --> S[GitHub Pages/Vercel/Netlify]
-    
-    subgraph "Frontend Features"
-        I
-        J
-        K
-        T[Multi-List Switcher]
-        U[Interactive Previews]
-        V[Mobile Navigation]
-    end
-    
-    subgraph "Configuration System"
-        E
-        P
-        F
-    end
-    
-    subgraph "Deployment Options"
-        S
-        W[Self-Hosted VPS]
-        X[Docker Container]
-    end
-```
+## Quick Start
 
-## 🔧 Configuration System
+### For Repository Owner
 
-### Environment Variables
+1. **Configure Repository Settings**:
+   - Go to Settings > Pages > Set source to "GitHub Actions"
+   - Add repository variables and secrets (see [REPOSITORY-CONFIG.md](REPOSITORY-CONFIG.md))
 
-Create a `.env` file or set environment variables:
+2. **Deploy**:
+   ```bash
+   git push origin main
+   ```
+   GitHub Actions will automatically build and deploy to GitHub Pages.
 
+### For Fork Users
+
+See [FORK-SETUP.md](FORK-SETUP.md) for complete instructions on customizing this dashboard for your own awesome list.
+
+## Technology Stack
+
+- **Frontend**: React 18, TypeScript, Tailwind CSS
+- **UI Components**: Radix UI, Shadcn/ui
+- **Build System**: Vite, ESBuild
+- **Deployment**: GitHub Actions, GitHub Pages
+- **Analytics**: Google Analytics 4
+- **Data Source**: awesome-video JSON API
+
+## Development
+
+### Local Development
 ```bash
-# Required - Source awesome list
-AWESOME_RAW_URL="https://raw.githubusercontent.com/avelino/awesome-go/main/README.md"
-
-# Site Configuration
-VITE_SITE_TITLE="Awesome Go"
-VITE_SITE_DESCRIPTION="A curated list of awesome Go frameworks, libraries, and software"
-VITE_SITE_URL="https://your-awesome-go-site.github.io"
-
-# Analytics (Optional)
-VITE_GA_MEASUREMENT_ID="G-XXXXXXXXXX"
-
-# AI Features (Optional)
-OPENAI_API_KEY="sk-..."
-
-# Theme
-VITE_DEFAULT_THEME="dark"  # light, dark, or auto
+npm install
+npm run dev
 ```
 
-### YAML Configuration
+### Static Build Testing
+```bash
+tsx scripts/build-static.ts
+VITE_STATIC_BUILD=true npm run build
+npm run preview
+```
 
-Create `awesome-list.config.yaml` for advanced configuration:
+### Test Deployment System
+```bash
+tsx scripts/test-deployment.ts
+```
+
+## Configuration
+
+The dashboard is configured via `awesome-list.config.yaml`:
 
 ```yaml
 site:
-  title: "Awesome Self-Hosted"
-  description: "A curated list of self-hosted applications"
-  url: "https://awesome-selfhosted.net"
+  title: "Awesome Video Dashboard"
+  description: "A curated collection of awesome video resources"
+  url: "https://yourusername.github.io/awesome-dash-video"
 
 source:
-  url: "https://raw.githubusercontent.com/awesome-selfhosted/awesome-selfhosted/master/README.md"
-  refresh_interval: 60  # minutes
-
-analytics:
-  google_analytics: "${VITE_GA_MEASUREMENT_ID}"
-  events: ["resource_clicks", "category_views", "search_queries"]
-
-theme:
-  default: "auto"
-  primary_color: "#dc2626"
+  url: "https://raw.githubusercontent.com/krzemienski/awesome-video/master/contents.json"
+  refresh_interval: 3600
 
 features:
   search: true
+  categories: true
   analytics_dashboard: true
-  # Layout configuration
-  default_layout: "list"  # Options: "cards", "list", "compact"
-  allow_layout_switching: true
-  # Pagination settings
   pagination: true
   items_per_page: 24
-  page_size_options: [12, 24, 48, 96]
-  ai_tags: true  # Requires OpenAI API key
 ```
 
-## 🎯 Recent Enhancements & Features
+## Analytics Tracking
 
-### ✨ Latest Updates
+Comprehensive analytics implementation tracks:
+- Page views and user sessions
+- Search queries and filter usage
+- Resource clicks and category navigation
+- Mobile interactions and touch events
+- Performance metrics and Core Web Vitals
+- Error tracking and API response times
 
-**🔧 CLI Validation Tool**
-- `tsx server/cli/parse-list.ts <url>` - Validate awesome lists before deployment
-- Comprehensive error reporting and fix suggestions
-- Integration ready for CI/CD pipelines
+## Deployment
 
-**📱 Mobile Experience Improvements**
-- Fixed tooltip behavior on touch devices
-- Enhanced tag display showing multiple tags per resource
-- Improved analytics dashboard mobile responsiveness
+### Automatic Deployment
+- Pushes to main branch trigger GitHub Actions
+- Fresh data fetched from awesome-video source
+- Static site generated and deployed to GitHub Pages
+- Typically completes in 3-5 minutes
 
-**📋 Layout System Overhaul**
-- Three layout options: List (default), Cards, and Compact Grid
-- Configurable default layouts via `awesome-list.config.yaml`
-- Smart responsive behavior adapting to device capabilities
+### Manual Deployment
+- Go to Actions tab in GitHub repository
+- Run "Deploy to GitHub Pages" workflow manually
 
-**⚡ Performance & UX**
-- Pagination system with configurable page sizes
-- Contextual hover tooltips with resource metadata
-- Robust error handling with detailed parsing logs
+## Documentation
 
-**🚀 Deployment Ready**
-- Comprehensive GitHub Pages deployment guide
-- Environment variable configuration for static builds
-- Automated validation in deployment pipelines
+- [DEPLOYMENT.md](DEPLOYMENT.md) - Complete deployment guide
+- [FORK-SETUP.md](FORK-SETUP.md) - Fork and customization instructions
+- [REPOSITORY-CONFIG.md](REPOSITORY-CONFIG.md) - Repository-specific configuration
 
-## 📊 Analytics & Tracking
+## Data Source
 
-The system tracks key metrics for awesome lists:
+This dashboard uses the [awesome-video](https://github.com/krzemienski/awesome-video) curated list, which contains video-related tools and resources organized by:
 
-### Resource Analytics
-- **Most clicked resources** - Which tools are most popular
-- **Category performance** - Which categories get most engagement
-- **Search patterns** - What users are looking for
-- **Geographic usage** - Where your audience is located
+- Video Processing Libraries
+- Streaming Technologies
+- Codecs and Formats
+- Players and Frameworks
+- APIs and Services
+- Learning Resources
 
-### User Behavior
-- **Session duration** - How long users explore
-- **Navigation patterns** - Popular user journeys
-- **Device types** - Mobile vs desktop usage
-- **Time-based usage** - Peak usage hours
+Data is automatically refreshed on each deployment to ensure the latest resources are always available.
 
-### Custom Events
-- `resource_click` - When users click external links
-- `category_view` - Category page visits
-- `search_query` - Search terms used
-- `theme_change` - Theme preferences
-- `list_switch` - Multi-list navigation
-
-## 🏗️ Technical Architecture
-
-### Data Flow
-
-1. **Configuration Loading**
-   - Load YAML config file
-   - Override with environment variables
-   - Set up site metadata and features
-
-2. **Content Parsing**
-   - Fetch raw markdown from GitHub
-   - Parse using Remark AST
-   - Extract resources, categories, metadata
-   - Filter out navigation/TOC items
-
-3. **Storage & API**
-   - Store in memory for fast access
-   - Provide REST endpoints
-   - Handle list switching dynamically
-
-4. **Frontend Rendering**
-   - React SPA with routing
-   - Real-time search and filtering
-   - Analytics event tracking
-   - Responsive design system
-
-### Build Process
-
-```bash
-# Development
-npm run dev          # Start dev server with hot reload
-
-# Production Build
-npm run build        # Build optimized static files
-npm start           # Serve production build
-
-# Static Generation
-npm run generate    # Generate static site for GitHub Pages
-```
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- Node.js 18+ and npm
-- Git
-
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone <your-repo-url>
-   cd awesome-list-generator
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Configure your awesome list** (Optional)
-   
-   Set the `AWESOME_RAW_URL` environment variable to point to your awesome list:
-   ```bash
-   export AWESOME_RAW_URL="https://raw.githubusercontent.com/your-org/your-awesome-list/main/README.md"
-   ```
-   
-   Default: `https://raw.githubusercontent.com/awesome-selfhosted/awesome-selfhosted/master/README.md`
-
-4. **Start development server**
-   ```bash
-   npm run dev
-   ```
-   
-   The site will be available at `http://localhost:5000`
-
-### Production Deployment
-
-1. **Build the application**
-   ```bash
-   npm run build
-   ```
-
-2. **Start production server**
-   ```bash
-   npm start
-   ```
-
-## 📝 Awesome List Parsing & Validation
-
-### Supported Markdown Formats
-
-The parser automatically handles standard awesome-list markdown formats:
-
-#### Basic Resource Entry
-```markdown
-- [Resource Name](https://example.com) - Description of the resource. `License` `Language/Platform`
-```
-
-#### With Additional Links
-```markdown
-- [Resource Name](https://example.com) - Description. ([Demo](https://demo.com), [Source Code](https://github.com/user/repo)) `MIT` `JavaScript`
-```
-
-#### Category Structure
-```markdown
-## Main Category
-
-### Subcategory (Optional)
-
-- [Resource 1](https://example.com) - Description.
-- [Resource 2](https://example.com) - Another description.
-```
-
-### Parser Validation & Error Handling
-
-The system includes comprehensive validation and error reporting:
-
-#### ✅ Successful Parsing Indicators
-- **Resource Count**: `Parsed X resources from Y categories`
-- **Structure Validation**: Detected proper heading hierarchy
-- **Link Validation**: All resource URLs are accessible
-- **Format Compliance**: Follows awesome-list conventions
-
-#### ❌ Common Parsing Issues & Solutions
-
-**1. Empty or Invalid URL**
-```
-❌ Error: Unable to fetch awesome list from URL
-💡 Solution: Verify the raw GitHub URL is correct and accessible
-   Example: https://raw.githubusercontent.com/user/repo/main/README.md
-```
-
-**2. Invalid Markdown Structure**
-```
-❌ Error: No valid resources found in markdown
-💡 Solution: Ensure your list follows the standard format:
-   - Use ## for main categories
-   - Use ### for subcategories (optional)
-   - Start resource items with - [Name](url) - Description
-```
-
-**3. Missing or Malformed Links**
-```
-❌ Warning: Found X items without valid links
-💡 Solution: Check that all resources have proper markdown links:
-   ✅ - [Resource](https://example.com) - Description
-   ❌ - Resource without link - Description
-```
-
-**4. Network/Access Issues**
-```
-❌ Error: GitHub rate limit exceeded or repository is private
-💡 Solution: 
-   - Ensure repository is public
-   - Use raw.githubusercontent.com URLs
-   - Check repository exists and is accessible
-```
-
-#### 🔍 Debugging Parser Issues
-
-Enable detailed logging by setting:
-```bash
-NODE_ENV=development
-DEBUG_PARSER=true
-```
-
-The parser will output:
-- **Fetch Status**: URL accessibility and response codes
-- **Structure Analysis**: Category/subcategory detection
-- **Resource Extraction**: Individual item parsing results
-- **Validation Warnings**: Non-critical formatting issues
-- **Performance Metrics**: Parsing time and resource counts
-
-#### 📊 Parser Statistics
-
-After successful parsing, the system reports:
-```
-✅ Successfully parsed awesome list:
-   📄 Source: https://github.com/user/awesome-list
-   📊 Found 1,247 resources across 23 categories
-   🏷️ Extracted 156 unique tags
-   ⏱️ Parsing completed in 1.2s
-   🔗 Repository detection: 89% GitHub, 8% GitLab, 3% other
-```
-
-#### 🛠️ Custom Parser Rules
-
-For non-standard markdown formats, you can customize parsing in `server/parser.ts`:
-
-```javascript
-// Custom resource pattern matching
-const CUSTOM_RESOURCE_PATTERN = /^- \[([^\]]+)\]\(([^)]+)\)(.*)/;
-
-// Custom category detection
-const CUSTOM_CATEGORY_PATTERN = /^#{2,3}\s+(.+)/;
-
-// Skip unwanted sections
-const SKIP_PATTERNS = [
-  /table of contents/i,
-  /contributing/i,
-  /license/i
-];
-```
-
-## 🛠️ Available Scripts
-
-- `npm run dev` - Start development server (both frontend and backend)
-- `npm run build` - Build for production
-- `npm start` - Start production server
-- `npm run preview` - Preview production build locally
-- `tsx server/cli/parse-list.ts <url>` - Validate and test an awesome list
-
-## 🔍 Awesome List Validation Tool
-
-Before deploying your site, validate your awesome list using our built-in CLI tool:
-
-### Basic Usage
-
-```bash
-# Validate any awesome list
-tsx server/cli/parse-list.ts https://raw.githubusercontent.com/sindresorhus/awesome/main/readme.md
-
-# Test your own repository
-tsx server/cli/parse-list.ts https://raw.githubusercontent.com/your-username/your-awesome-list/main/README.md
-```
-
-### Example Validation Output
-
-**✅ Successful Validation:**
-```
-🚀 Awesome List Parser & Validator
-=====================================
-
-🔍 Validating: https://raw.githubusercontent.com/avelino/awesome-go/main/README.md
-⏳ Fetching and parsing...
-
-📊 Parsing Results:
-===================
-✅ Status: SUCCESS
-📄 Title: Awesome Go
-📝 Description: A curated list of awesome Go frameworks, libraries and software
-📊 Resources found: 2,752
-📁 Categories: 47
-🏷️  Tags extracted: 156
-⏱️  Parse time: 1.23s
-
-🎉 Your awesome list is ready to deploy!
-```
-
-**❌ Failed Validation:**
-```
-📊 Parsing Results:
-===================
-❌ Status: FAILED
-
-❌ Errors found:
-   - Invalid URL: Please use the raw GitHub URL
-   - No valid resources found in markdown
-
-💡 Common fixes:
-   - Ensure the URL is a raw GitHub/GitLab URL
-   - Check that the repository is public
-   - Verify the markdown follows awesome-list format
-   - Use ## for main categories and ### for subcategories
-   - Format resources as: - [Name](url) - Description
-```
-
-### Testing Different Lists
-
-```bash
-# Test popular awesome lists
-tsx server/cli/parse-list.ts https://raw.githubusercontent.com/sindresorhus/awesome/main/readme.md
-tsx server/cli/parse-list.ts https://raw.githubusercontent.com/vinta/awesome-python/master/README.md
-tsx server/cli/parse-list.ts https://raw.githubusercontent.com/awesome-selfhosted/awesome-selfhosted/master/README.md
-
-# Get help
-tsx server/cli/parse-list.ts --help
-```
-
-### Validation Checklist
-
-Before deploying, ensure your awesome list passes these checks:
-
-- ✅ **URL Format**: Uses `raw.githubusercontent.com` or similar raw URL
-- ✅ **Repository Access**: Public repository that's accessible
-- ✅ **Markdown Structure**: Proper heading hierarchy (## categories, ### subcategories)
-- ✅ **Resource Format**: Links formatted as `- [Name](url) - Description`
-- ✅ **Minimum Content**: At least 5 resources across categories
-- ✅ **Valid Links**: All resource URLs are accessible
-
-### Integration with Deployment
-
-Use the validator in your deployment pipeline:
-
-```yaml
-# In .github/workflows/deploy.yml
-- name: Validate Awesome List
-  run: tsx server/cli/parse-list.ts ${{ env.AWESOME_RAW_URL }}
-
-- name: Deploy if validation passes
-  run: npm run build
-```
-
-## 🎨 Customization & Layout Options
-
-### Default Layout Configuration
-
-Configure how your awesome list appears to visitors by default:
-
-```yaml
-# In awesome-list.config.yaml
-features:
-  # Choose default layout when users first visit
-  default_layout: "list"  # Options: "cards", "list", "compact"
-  
-  # Allow users to switch between layouts
-  allow_layout_switching: true
-  
-  # Pagination settings
-  pagination: true
-  items_per_page: 24
-  page_size_options: [12, 24, 48, 96]
-```
-
-### Layout Options Explained
-
-**📋 List View (Recommended Default)**
-- Clean, scannable format perfect for browsing many resources
-- Shows title, description, and tags in compact rows
-- Fastest loading and most accessible option
-- Best for mobile devices and quick scanning
-
-**🃏 Card View**
-- Rich visual layout with full descriptions
-- Great for showcasing detailed resource information
-- More visual appeal but requires more scrolling
-- Best for sites with fewer, high-quality resources
-
-**⚡ Compact Grid**
-- Maximum density - shows the most resources at once
-- Truncated descriptions for space efficiency
-- Perfect for power users who want to see everything
-- Ideal for large lists with 500+ resources
-
-### Responsive Behavior
-
-The layout system automatically adapts:
-- **Mobile**: Always uses optimized compact layouts regardless of setting
-- **Tablet**: Respects user's layout choice with mobile-friendly adjustments  
-- **Desktop**: Full layout switching capabilities with hover tooltips
-
-### Environment Variables
-
-- `AWESOME_RAW_URL` - URL to the raw markdown file of your awesome list
-- `PORT` - Server port (default: 5000)
-- `NODE_ENV` - Environment (development/production)
-
-### Theme System
-
-The application includes:
-- **Light/Dark mode toggle** - Automatic system preference detection
-- **Custom theme editor** - Create and save your own color schemes
-- **Pre-built themes** - Several beautiful themes included
-- **Theme persistence** - Themes saved to localStorage
-
-### Adding New Lists
-
-The multi-list switcher supports switching between different awesome lists. To add new lists:
-
-1. Update the `predefinedLists` array in `client/src/components/ui/list-switcher.tsx`
-2. Add the raw GitHub URL and metadata for your list
-3. The parser will automatically handle different markdown formats
-
-## 🔧 Advanced Configuration
-
-### Custom Parser Rules
-
-To modify how resources are parsed, edit `server/parser.ts`:
-
-- `extractMetadata()` - Customize license/language extraction
-- `parseListItems()` - Modify resource parsing logic
-- `parseMarkdown()` - Adjust category/subcategory handling
-
-### Styling
-
-The design system uses:
-- **Tailwind CSS** - Utility-first CSS framework
-- **shadcn/ui** - High-quality React components
-- **CSS Variables** - Easy theme customization
-- **Dark mode** - Built-in dark/light mode support
-
-Custom styles can be added in `client/src/index.css`.
-
-## 📊 Analytics Features
-
-The built-in analytics dashboard provides:
-- **Resource popularity** - Most viewed and trending resources
-- **Category distribution** - Visual breakdown of categories
-- **Search trends** - Popular search terms and patterns
-- **Usage patterns** - Time-based usage analytics
-- **Performance metrics** - Loading times and user engagement
-
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Commit changes: `git commit -m 'Add amazing feature'`
-4. Push to branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
+2. Create a feature branch
+3. Make your changes
+4. Test with `tsx scripts/test-deployment.ts`
+5. Submit a pull request
 
-## 📜 License
+## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License - see LICENSE file for details
 
-## 🙋‍♂️ Support
+## Acknowledgments
 
-- **Issues**: Report bugs and request features via GitHub Issues
-- **Discussions**: Join community discussions for help and ideas
-- **Documentation**: This README and inline code comments
-
-## 🌍 Examples
-
-### Live Examples
-
-Example deployments using this static site generator:
-
-- **Awesome Self-Hosted** - Self-hosted application resources
-- **Awesome Go** - Go programming framework and library showcase  
-- **Awesome Python** - Python ecosystem tools and packages
-- **Awesome React** - React components and development tools
-
-### Custom Deployments
-
-This generator works with any properly formatted awesome list. Popular formats include:
-
-- **Awesome-\*** lists from the [Awesome](https://github.com/sindresorhus/awesome) ecosystem
-- **Curated-\*** lists following similar markdown patterns
-- **Custom resource lists** using the supported markdown format
-
-## 🚀 Quick Start Guide
-
-### Option 1: Clone and Customize (Recommended)
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/yourusername/awesome-list-static-site.git
-   cd awesome-list-static-site
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-3. **Configure your awesome list:**
-   Edit `awesome-list.config.yaml`:
-   ```yaml
-   site:
-     title: "Your Awesome List"
-     description: "Your curated collection"
-     url: "https://yourusername.github.io/your-repo"
-   
-   source:
-     url: "https://raw.githubusercontent.com/your-org/your-awesome-list/main/README.md"
-   ```
-
-4. **Start development server:**
-   ```bash
-   npm run dev
-   ```
-   Visit `http://localhost:5000` to see your site
-
-5. **Build for production:**
-   ```bash
-   npm run build
-   ```
-
-### Option 2: Fork and Deploy to GitHub Pages
-
-1. **Fork this repository** to your GitHub account
-
-## 🌐 Deployment Options
-
-### GitHub Pages (Static Deployment) - Recommended
-
-This repository includes a GitHub Actions workflow for automatic deployment to GitHub Pages:
-
-1. **Fork this repository** to your GitHub account
-
-2. **Configure your awesome list** by editing `awesome-list.config.yaml`:
-   ```yaml
-   site:
-     title: "Your Awesome List Title"
-     description: "Your description"
-     url: "https://yourusername.github.io/your-repo-name"
-   
-   source:
-     url: "https://raw.githubusercontent.com/your-org/your-awesome-list/main/README.md"
-   
-   deploy:
-     method: "github-pages"
-     github:
-       repository: "yourusername/your-repo-name"
-       branch: "gh-pages"
-   ```
-
-3. **Enable GitHub Pages** in your repository:
-   - Go to Settings → Pages
-   - Source: Deploy from a branch
-   - Branch: `gh-pages` / `/ (root)`
-
-4. **Set up environment variables** (optional):
-   - Go to Settings → Secrets and variables → Actions
-   - Add secrets like `VITE_GA_MEASUREMENT_ID` for analytics
-
-5. **Deploy**: Push changes to trigger automatic deployment via GitHub Actions
-
-The workflow (`.github/workflows/deploy.yml`) will:
-- Build the static site
-- Parse your awesome list
-- Deploy to GitHub Pages
-- Run on every push to main branch
-
-### Build Configuration for Static Deployment
-
-The static build process handles:
-- **Environment variable substitution** for GitHub Pages
-- **Base URL configuration** for subdirectory deployment
-- **Asset optimization** and minification
-- **SEO meta tag generation** from config
-- **Sitemap generation** for search engines
-
-### Environment Variables for Static Builds
-
-Set these in GitHub repository secrets:
-
-```bash
-# Analytics (Optional)
-VITE_GA_MEASUREMENT_ID=G-XXXXXXXXXX
-
-# Site Configuration
-VITE_SITE_TITLE="Your Site Title"
-VITE_SITE_DESCRIPTION="Your site description"
-VITE_SITE_URL="https://yourusername.github.io/repo-name"
-
-# Theme
-VITE_DEFAULT_THEME=auto
-
-# AI Features (Optional)
-OPENAI_API_KEY=sk-...
-```
-
-### Alternative Deployment Methods
-
-#### Vercel
-1. Connect your GitHub repository to Vercel
-2. Set environment variables in project settings
-3. Build command: `npm run build`
-4. Output directory: `dist`
-
-#### Netlify
-1. Connect repository to Netlify
-2. Build command: `npm run build`
-3. Publish directory: `dist`
-4. Set environment variables in site settings
-
-#### Docker
-```dockerfile
-FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY . .
-RUN npm run build
-EXPOSE 5000
-CMD ["npm", "start"]
-```
-
-#### Traditional VPS
-1. Clone repository on your server
-2. Install dependencies with `npm ci`
-3. Build with `npm run build`
-4. Use PM2 or similar for process management
-5. Set up reverse proxy (nginx/Apache) for production
-
----
-
-**Made with ❤️ for the awesome list community**
+- [awesome-video](https://github.com/krzemienski/awesome-video) - Data source and curation
+- [Sindre Sorhus](https://github.com/sindresorhus/awesome) - Awesome list format
+- Shadcn/ui and Radix UI - Component libraries

@@ -3,10 +3,10 @@
 
 # Site Configuration
 site:
-  title: "Awesome Video"
-  description: "A curated list of awesome video frameworks, libraries, and software for video processing, streaming, and manipulation"
-  url: "https://awesome-selfhosted.net"
-  author: "awesome-selfhosted community"
+  title: "Awesome Video Dashboard"
+  description: "A curated collection of awesome video resources, tools, and technologies for developers and content creators"
+  url: "https://krzemienski.github.io/awesome-video"
+  author: "krzemienski"
   
 # Source Configuration
 source:
@@ -49,7 +49,7 @@ theme:
 # Analytics Configuration
 analytics:
   # Google Analytics 4 Measurement ID
-  google_analytics: "${VITE_GA_MEASUREMENT_ID}"
+  google_analytics: "G-383541848"
   # Track these events
   events:
     - resource_clicks
@@ -100,7 +100,7 @@ deploy:
   custom_domain: ""
   # GitHub Pages specific settings
   github:
-    repository: "username/awesome-list-site"
+    repository: "krzemienski/awesome-video"
     branch: "gh-pages"
     cname: ""
 
