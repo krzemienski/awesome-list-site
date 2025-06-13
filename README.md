@@ -87,6 +87,23 @@ Visit the live dashboard: [https://krzemienski.github.io/awesome-list-site](http
 
 ### Deploy Your Own Awesome List
 
+### Interactive Setup (Recommended)
+
+For new projects, use the interactive configuration wizard:
+
+```bash
+npx tsx scripts/init-project.ts
+```
+
+The wizard provides:
+- Step-by-step project configuration
+- Popular awesome list selection from curated options
+- Theme and feature customization
+- Environment variable guidance
+- Automatic initial deployment
+
+### Manual Setup
+
 1. **Fork this repository**
 2. **Configure your list** in `awesome-list.config.yaml`:
    ```yaml
@@ -490,6 +507,152 @@ The interactive script allows you to specify the deployment branch:
 
 This ensures the deployment workflow matches your chosen branch name exactly.
 
+## Configuration Wizard Guide
+
+### Interactive Setup Process
+
+The configuration wizard (`npx tsx scripts/init-project.ts`) provides a complete guided setup experience:
+
+#### Step 1: Project Information
+- **Title**: Display name for your dashboard
+- **Description**: Brief summary of your awesome list content  
+- **Author**: Your name or organization
+- **URL**: GitHub Pages URL (auto-detected from git remote)
+
+#### Step 2: Awesome List Source Selection
+
+Choose from popular curated lists:
+
+| List | Category | Stars | Description |
+|------|----------|-------|-------------|
+| Awesome Video | Media & Entertainment | 1.5K | Video frameworks, libraries, and tools |
+| Awesome JavaScript | Programming Languages | 33K | Browser-side JavaScript libraries |
+| Awesome Python | Programming Languages | 220K | Python frameworks and software |
+| Awesome React | Frontend Frameworks | 64K | React ecosystem resources |
+| Awesome Vue.js | Frontend Frameworks | 72K | Vue.js related tools |
+| Awesome Node.js | Backend Development | 58K | Node.js packages and resources |
+| Awesome Machine Learning | AI & ML | 65K | ML frameworks and libraries |
+| Awesome Docker | DevOps & Infrastructure | 30K | Docker resources and projects |
+
+Or provide a custom URL for any GitHub awesome list.
+
+#### Step 3: Theme Selection
+
+**Available Themes:**
+- **Red**: Bold high-contrast theme (default)
+- **Blue**: Professional business theme
+- **Green**: Nature-inspired theme
+- **Purple**: Creative and modern theme
+- **Orange**: Energetic and vibrant theme
+- **Teal**: Modern minimalist theme
+
+#### Step 4: Feature Configuration
+
+**Core Features (Recommended):**
+- **Search**: Real-time search with filters and sorting
+- **Categories**: Category-based navigation and filtering
+- **Analytics Dashboard**: Built-in usage statistics
+
+**AI-Powered Features (Optional - Requires API Key):**
+- **AI Tags**: Automatic tagging based on content analysis
+- **AI Descriptions**: Enhanced descriptions using AI analysis
+- **AI Categories**: Intelligent categorization of resources
+
+**Cost Estimate for AI Features**: $0.25-$15/month depending on list size and model choice
+
+#### Step 5: Analytics Setup
+
+**Google Analytics 4 Integration:**
+- Provides detailed visitor analytics
+- Tracks user interactions and popular resources
+- Requires GA4 Measurement ID (format: G-XXXXXXXXXX)
+
+### Configuration Examples
+
+#### Basic Setup (No AI Features)
+```yaml
+site:
+  title: "My Development Resources"
+  description: "Curated tools for developers"
+  url: "https://username.github.io/dev-resources"
+  author: "Developer Name"
+
+source:
+  url: "https://raw.githubusercontent.com/sindresorhus/awesome/main/readme.md"
+  format: "markdown"
+  refresh_interval: 24
+
+theme:
+  default: "blue"
+  primary_color: "#3b82f6"
+
+features:
+  search: true
+  categories: true
+  analytics_dashboard: true
+  ai_tags: false
+  ai_descriptions: false
+  ai_categories: false
+```
+
+#### Full-Featured Setup (With AI)
+```yaml
+site:
+  title: "AI-Enhanced Awesome List"
+  description: "Intelligent curation of development resources"
+  url: "https://username.github.io/ai-awesome"
+  author: "Tech Curator"
+
+source:
+  url: "https://raw.githubusercontent.com/awesome-machine-learning/awesome-machine-learning/master/README.md"
+  format: "markdown"
+  refresh_interval: 12
+
+theme:
+  default: "purple"
+  primary_color: "#8b5cf6"
+
+features:
+  search: true
+  categories: true
+  analytics_dashboard: true
+  ai_tags: true
+  ai_descriptions: true
+  ai_categories: true
+
+analytics:
+  google_analytics: "G-XXXXXXXXXX"
+```
+
+#### JSON-based Configuration (Awesome Video)
+```yaml
+site:
+  title: "Video Tools Dashboard"
+  description: "Comprehensive video development resources"
+  url: "https://username.github.io/video-tools"
+  author: "Video Engineer"
+
+source:
+  url: "https://raw.githubusercontent.com/krzemienski/awesome-video/master/contents.json"
+  format: "json"
+  refresh_interval: 24
+
+theme:
+  default: "red"
+  primary_color: "#ef4444"
+
+features:
+  search: true
+  categories: true
+  analytics_dashboard: true
+  ai_tags: true
+  ai_descriptions: false
+  ai_categories: false
+
+analytics:
+  google_analytics: "G-383541848"
+```
+
 ## Configuration Reference
 
 Configure your dashboard by editing `awesome-list.config.yaml`:
@@ -605,13 +768,21 @@ The interactive script will:
 6. **Build Process** - Attempts local React build or creates GitHub Actions trigger
 7. **Git Operations** - Handles all branch creation, commits, and pushes
 
-### Local Development Commands
+### Available Commands
+
 ```bash
-npm install                             # Install dependencies
-npm run dev                            # Start development server
-npx tsx scripts/build-static.ts       # Test data fetching
-npx tsx scripts/build-and-deploy.ts   # Interactive deployment
-./build-deploy.sh                     # Simple deployment (legacy)
+# Project Setup
+npx tsx scripts/init-project.ts       # Complete project initialization with wizard
+npx tsx scripts/setup-wizard.ts       # Configuration wizard only
+
+# Development
+npm install                            # Install dependencies
+npm run dev                           # Start development server
+npx tsx scripts/build-static.ts      # Test data fetching
+
+# Deployment  
+npx tsx scripts/build-and-deploy.ts  # Interactive deployment with validation
+./build-deploy.sh                    # Simple deployment (legacy)
 ```
 
 ### Troubleshooting
