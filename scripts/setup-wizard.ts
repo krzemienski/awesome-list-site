@@ -340,6 +340,67 @@ To set up Google Analytics:
   return undefined;
 }
 
+async function setupEnvironmentVariables(config: WizardConfig): Promise<void> {
+  section('Environment Variables Setup');
+  
+  const needsAnthropicKey = config.features.ai_tags || config.features.ai_descriptions || config.features.ai_categories;
+  
+  if (needsAnthropicKey) {
+    console.log(`
+🤖 AI features are enabled and require an Anthropic API key.
+
+To get your API key:
+1. Visit https://console.anthropic.com
+2. Create an account or sign in
+3. Generate an API key (starts with "sk-ant-")
+    `);
+    
+    const hasKey = await prompt('Do you have an Anthropic API key? (y/n): ');
+    
+    if (hasKey.toLowerCase() === 'y' || hasKey.toLowerCase() === 'yes') {
+      const apiKey = await prompt('Enter your Anthropic API key: ');
+      
+      if (apiKey.trim() && apiKey.startsWith('sk-ant-')) {
+        console.log(`
+✅ API key received. To use it:
+
+For local development:
+export ANTHROPIC_API_KEY="${apiKey}"
+
+For GitHub deployment:
+1. Go to repository Settings → Secrets and variables → Actions
+2. Add new secret: ANTHROPIC_API_KEY
+3. Value: ${apiKey}
+        `);
+      } else {
+        log('Invalid API key format. Must start with "sk-ant-"', 'warn');
+        console.log('You can set this up later in your environment variables.');
+      }
+    } else {
+      console.log(`
+ℹ️ You can enable AI features later by:
+1. Getting an API key from https://console.anthropic.com
+2. Setting ANTHROPIC_API_KEY environment variable
+3. Cost: $0.25-$15/month depending on usage
+      `);
+    }
+  }
+  
+  if (config.analytics?.google_analytics) {
+    console.log(`
+📊 Google Analytics is configured. To use it:
+
+For local development:
+export VITE_GA_MEASUREMENT_ID="${config.analytics.google_analytics}"
+
+For GitHub deployment:
+1. Go to repository Settings → Secrets and variables → Actions  
+2. Add new secret: GA_MEASUREMENT_ID
+3. Value: ${config.analytics.google_analytics}
+    `);
+  }
+}
+
 async function generateConfiguration(config: WizardConfig): Promise<void> {
   section('Generating Configuration');
   
@@ -463,8 +524,8 @@ async function main(): Promise<void> {
     // Step 6: Generate configuration file
     await generateConfiguration(config);
     
-    // Step 7: Environment guidance
-    await environmentGuidance(config);
+    // Step 7: Environment variables setup
+    await setupEnvironmentVariables(config);
     
     // Step 8: Next steps
     await nextStepsGuidance();

@@ -438,22 +438,26 @@ async function displayEnvironmentStatus(envChecks: EnvironmentCheck[]): Promise<
     }
   }
   
-  const missingRequired = envChecks.filter(c => c.required && c.status !== 'found');
+  const missingAI = envChecks.filter(c => c.name === 'ANTHROPIC_API_KEY' && c.status !== 'found');
   const invalidVars = envChecks.filter(c => c.status === 'invalid');
   
-  if (missingRequired.length > 0 || invalidVars.length > 0) {
-    log('Some environment variables need attention', 'warn');
-    
-    if (missingRequired.length > 0) {
-      log('Missing required variables will use defaults', 'warn');
-    }
-    
-    if (invalidVars.length > 0) {
-      log('Invalid variables detected - please check format', 'error');
-      const answer = await prompt('❓ Continue anyway? (y/n): ');
-      if (answer.toLowerCase() !== 'y' && answer.toLowerCase() !== 'yes') {
-        throw new Error('Deployment cancelled due to invalid environment variables');
-      }
+  if (missingAI.length > 0) {
+    console.log(`
+ℹ️ AI features require an API key. To set up:
+
+1. Get your key from https://console.anthropic.com
+2. For local use: export ANTHROPIC_API_KEY="sk-ant-your-key"
+3. For GitHub deployment: Add as repository secret
+
+Deployment will continue without AI features if key is not set.
+    `);
+  }
+  
+  if (invalidVars.length > 0) {
+    log('Invalid variables detected - please check format', 'error');
+    const answer = await prompt('❓ Continue anyway? (y/n): ');
+    if (answer.toLowerCase() !== 'y' && answer.toLowerCase() !== 'yes') {
+      throw new Error('Deployment cancelled due to invalid environment variables');
     }
   }
 }

@@ -39,34 +39,29 @@ npm run dev
 
 ## Environment Variables
 
-### AI Features (Optional)
-
-For AI-powered tagging and categorization, set your Anthropic API key:
+### Option 1: Use the Setup Helper (Recommended)
 
 ```bash
-# Local development
-export ANTHROPIC_API_KEY="sk-ant-your-key-here"
-
-# GitHub deployment - add as repository secret
-# Settings → Secrets and variables → Actions → New repository secret
-# Name: ANTHROPIC_API_KEY
-# Value: sk-ant-your-key-here
+npx tsx scripts/setup-env.ts
 ```
 
-Get your API key from [console.anthropic.com](https://console.anthropic.com). Cost: $0.25-$15/month depending on usage.
+This creates a `.env` file with your API keys for local development.
 
-### Analytics (Optional)
+### Option 2: Manual Setup
 
-For Google Analytics tracking:
+Set environment variables before running the development server:
 
 ```bash
-# Local development
-export VITE_GA_MEASUREMENT_ID="G-XXXXXXXXXX"
-
-# GitHub deployment - add as repository secret
-# Name: GA_MEASUREMENT_ID
-# Value: G-XXXXXXXXXX
+export ANTHROPIC_API_KEY="sk-ant-your-key-here"  # For AI features
+export VITE_GA_MEASUREMENT_ID="G-XXXXXXXXXX"     # For analytics
+npm run dev
 ```
+
+### GitHub Deployment
+
+Add secrets in repository settings for production deployment:
+- `ANTHROPIC_API_KEY` - Get from [console.anthropic.com](https://console.anthropic.com)
+- `GA_MEASUREMENT_ID` - From Google Analytics dashboard
 
 ## Configuration
 
@@ -103,16 +98,19 @@ analytics:
 ## Commands
 
 ```bash
+# Setup
+npx tsx scripts/setup-wizard.ts      # Complete configuration wizard
+npx tsx scripts/setup-env.ts         # Environment variables helper
+
 # Development
 npm install
 npm run dev                           # Start development server
 
 # Deployment  
-npx tsx scripts/build-and-deploy.ts  # Interactive deployment
-npx tsx scripts/setup-wizard.ts      # Configuration wizard only
+npx tsx scripts/build-and-deploy.ts  # Interactive deployment with validation
 ```
 
-**Note**: The deployment branch (`gh-pages-build`) is fixed to ensure GitHub Actions workflow compatibility. This prevents deployment issues that would occur if the branch name were changed.
+**Note**: The deployment branch (`gh-pages-build`) is fixed to ensure GitHub Actions workflow compatibility.
 
 ## Troubleshooting
 
