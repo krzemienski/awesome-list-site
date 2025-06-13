@@ -1,10 +1,76 @@
 # Awesome List Dashboard
 
-Transform any GitHub awesome list into a sophisticated, interactive web dashboard with advanced search, filtering, and modern UI components. Deploy your own awesome list dashboard in minutes.
+Transform any GitHub awesome list into a sophisticated, interactive web dashboard with AI-powered enhancements, advanced search, and modern UI components.
+
+## System Architecture
+
+```mermaid
+graph TB
+    subgraph "Data Sources"
+        GL[GitHub Awesome Lists]
+        JSON[JSON APIs]
+        MD[Markdown Files]
+    end
+    
+    subgraph "Local Development"
+        DEV[npm run dev]
+        LOCAL[localhost:5000]
+    end
+    
+    subgraph "Build Process"
+        SCRIPT[./build-deploy.sh]
+        FETCH[Data Fetching]
+        AI[AI Enhancement]
+        BUILD[React Build]
+        BRANCH[gh-pages-build]
+    end
+    
+    subgraph "GitHub Actions"
+        TRIGGER[Build Trigger]
+        WORKFLOW[Build Workflow]
+        DEPLOY[Deploy Workflow]
+        PAGES[GitHub Pages]
+    end
+    
+    subgraph "AI Services"
+        ANTHROPIC[Anthropic Claude]
+        TAGS[Smart Tagging]
+        CATEGORIES[Auto Categorization]
+    end
+    
+    subgraph "Analytics & Monitoring"
+        GA[Google Analytics]
+        METRICS[Performance Metrics]
+    end
+    
+    GL --> FETCH
+    JSON --> FETCH
+    MD --> FETCH
+    
+    SCRIPT --> FETCH
+    FETCH --> AI
+    AI --> ANTHROPIC
+    ANTHROPIC --> TAGS
+    ANTHROPIC --> CATEGORIES
+    AI --> BUILD
+    BUILD --> BRANCH
+    BRANCH --> TRIGGER
+    
+    TRIGGER --> WORKFLOW
+    WORKFLOW --> DEPLOY
+    DEPLOY --> PAGES
+    
+    PAGES --> GA
+    GA --> METRICS
+    
+    DEV --> LOCAL
+    LOCAL --> GA
+```
 
 ## Features
 
 - **Universal Awesome List Support** - Works with any GitHub awesome list format
+- **AI-Powered Enhancement** - Smart tagging and categorization ($0.25-$15/month)
 - **Advanced Search & Filtering** - Real-time fuzzy search with category filters
 - **Mobile-First Design** - Touch-optimized responsive interface
 - **Modern UI Components** - shadcn/ui with dark mode themes
@@ -22,19 +88,25 @@ Visit the live dashboard: [https://krzemienski.github.io/awesome-list-site](http
 ### Deploy Your Own Awesome List
 
 1. **Fork this repository**
-2. **Edit configuration** in `awesome-list.config.yaml`:
+2. **Configure your list** in `awesome-list.config.yaml`:
    ```yaml
    site:
      title: "Your Awesome List Dashboard"
      url: "https://yourusername.github.io/awesome-list-site"
    source:
-     url: "https://github.com/username/your-awesome-list"
+     url: "https://raw.githubusercontent.com/username/awesome-list/main/README.md"
+     format: "markdown"  # or "json" for structured data
+   features:
+     ai_tags: true       # Requires ANTHROPIC_API_KEY
    ```
-3. **Run the deployment**:
+3. **Set up repository secrets** (optional but recommended):
+   - `ANTHROPIC_API_KEY` - AI features ($0.25-$15/month)
+   - `GA_MEASUREMENT_ID` - Google Analytics tracking
+4. **Deploy**:
    ```bash
    ./build-deploy.sh
    ```
-4. **Enable GitHub Pages** in repository settings
+5. **Enable GitHub Pages** in repository settings → Pages → Source: GitHub Actions
 
 Your dashboard will be live at: `https://yourusername.github.io/awesome-list-site`
 
@@ -46,14 +118,35 @@ npm run dev
 # Visit http://localhost:5000
 ```
 
+## Deployment Workflow
+
+```mermaid
+sequenceDiagram
+    participant Dev as Developer
+    participant Local as Local Script
+    participant GitHub as GitHub Actions
+    participant Pages as GitHub Pages
+    participant AI as Anthropic API
+    
+    Dev->>Local: ./build-deploy.sh
+    Local->>Local: Fetch awesome list data
+    Local->>AI: Enhance with AI tags (optional)
+    Local->>Local: Create gh-pages-build branch
+    Local->>GitHub: Push deployment branch
+    GitHub->>GitHub: Build React app (30-90 min)
+    GitHub->>Pages: Deploy to GitHub Pages
+    Pages->>Dev: Live dashboard ready
+```
+
 ## Technology Stack
 
 - **Frontend**: React 18, TypeScript, Tailwind CSS
-- **UI Components**: Radix UI, Shadcn/ui
-- **Build System**: Vite, ESBuild
-- **Deployment**: GitHub Actions, GitHub Pages
+- **UI Components**: Radix UI, shadcn/ui
+- **Build System**: Vite, ESBuild (with 2-hour timeout handling)
+- **AI Enhancement**: Anthropic Claude (Haiku/Sonnet/Opus)
+- **Deployment**: GitHub Actions multi-job workflow
+- **Hosting**: GitHub Pages
 - **Analytics**: Google Analytics 4
-- **Data Source**: awesome-video JSON API
 
 ## Development
 
@@ -128,9 +221,11 @@ The deployment uses a two-stage optimized build system:
 
 ## Documentation
 
-- [DEPLOYMENT.md](DEPLOYMENT.md) - Complete deployment guide
-- [FORK-SETUP.md](FORK-SETUP.md) - Fork and customization instructions
-- [REPOSITORY-CONFIG.md](REPOSITORY-CONFIG.md) - Repository-specific configuration
+- [SETUP-GUIDE.md](SETUP-GUIDE.md) - Complete setup guide for any awesome list
+- [AI-FEATURES.md](AI-FEATURES.md) - AI-powered tagging and categorization ($0.25-$15/month)
+- [ENVIRONMENT-VARIABLES.md](ENVIRONMENT-VARIABLES.md) - Configuration and API keys
+- [DEVELOPER-BUILD-GUIDE.md](DEVELOPER-BUILD-GUIDE.md) - Local development and deployment
+- [README-DEPLOYMENT.md](README-DEPLOYMENT.md) - Quick deployment reference
 
 ## Data Source
 

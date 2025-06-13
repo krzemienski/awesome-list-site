@@ -95,7 +95,9 @@ async function buildReactApplication(): Promise<void> {
     VITE_SITE_TITLE: 'Awesome Video Dashboard',
     VITE_SITE_DESCRIPTION: 'A curated collection of awesome video resources and tools',
     VITE_SITE_URL: 'https://krzemienski.github.io/awesome-list-site',
-    VITE_DEFAULT_THEME: 'red'
+    VITE_DEFAULT_THEME: 'red',
+    // AI features (optional - requires API key)
+    ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY || ''
   };
   
   try {

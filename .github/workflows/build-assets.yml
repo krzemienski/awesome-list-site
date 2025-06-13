@@ -45,6 +45,7 @@ jobs:
         export VITE_SITE_DESCRIPTION="A curated collection of awesome video resources and tools"
         export VITE_SITE_URL="https://krzemienski.github.io/awesome-list-site"
         export VITE_DEFAULT_THEME="red"
+        export ANTHROPIC_API_KEY="${{ secrets.ANTHROPIC_API_KEY }}"
         
         echo "Starting optimized Vite build..."
         # Build with chunking and optimizations

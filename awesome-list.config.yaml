@@ -1,12 +1,12 @@
-# Awesome List Generator Configuration
-# This file configures your self-hosted awesome list site
+# Awesome List Dashboard Configuration
+# Configure your awesome list dashboard deployment
 
 # Site Configuration
 site:
   title: "Awesome Video Dashboard"
   description: "A curated collection of awesome video resources, tools, and technologies for developers and content creators"
   url: "https://krzemienski.github.io/awesome-list-site"
-  author: "krzemienski"
+  author: "Awesome List Dashboard"
   
 # Source Configuration
 source:
@@ -77,9 +77,10 @@ features:
   # Default layout configuration
   default_layout: "list"  # Options: "cards", "list", "compact"
   allow_layout_switching: true
-  # AI-powered features (requires Anthropic API key)
-  ai_tags: true
-  ai_descriptions: true
+  # AI-powered features (requires ANTHROPIC_API_KEY environment variable)
+  ai_tags: true           # Generate smart tags using AI analysis
+  ai_descriptions: true   # Enhance descriptions for better searchability
+  ai_categories: true     # Intelligent auto-categorization
 
 # Build Configuration
 build:
