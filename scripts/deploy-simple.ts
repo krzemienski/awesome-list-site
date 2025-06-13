@@ -1,326 +1,223 @@
 #!/usr/bin/env tsx
+
 /**
- * Simplified deployment script that creates a basic static site
- * without complex bundling that causes timeouts
+ * Simplified Deployment Script
+ * 
+ * This script provides a reliable deployment process without complex git operations
+ * that can fail in restricted environments.
  */
 
-import { writeFileSync, mkdirSync, existsSync, readFileSync, copyFileSync } from 'fs';
-import { join } from 'path';
-import { fetchAwesomeVideoList } from '../server/awesome-video-parser';
+import { createInterface } from 'readline';
+import { execSync } from 'child_process';
+import * as fs from 'fs';
+import * as yaml from 'js-yaml';
 
-async function createSimpleDeployment() {
-  console.log('🚀 Creating simplified deployment...');
+interface DeployConfig {
+  site: {
+    title: string;
+    description: string;
+    url: string;
+    author: string;
+  };
+  source: {
+    url: string;
+    format: string;
+    refresh_interval: number;
+  };
+  theme: {
+    default: string;
+    primary_color: string;
+  };
+  features: {
+    ai_tags: boolean;
+    ai_descriptions: boolean;
+    ai_categories: boolean;
+    search: boolean;
+    categories: boolean;
+  };
+  analytics?: {
+    google_analytics?: string;
+  };
+}
+
+const rl = createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
+
+function log(message: string, level: 'info' | 'success' | 'error' | 'warn' = 'info'): void {
+  const colors = {
+    info: '\x1b[36m',
+    success: '\x1b[32m',
+    error: '\x1b[31m',
+    warn: '\x1b[33m'
+  };
+  const reset = '\x1b[0m';
+  const prefix = level === 'success' ? '✅' : level === 'error' ? '❌' : level === 'warn' ? '⚠️' : 'ℹ️';
+  console.log(`${colors[level]}${prefix} ${message}${reset}`);
+}
+
+function prompt(question: string): Promise<string> {
+  return new Promise((resolve) => {
+    rl.question(question, resolve);
+  });
+}
+
+function header(title: string): void {
+  console.log('\n' + '='.repeat(50));
+  console.log(`🚀 ${title}`);
+  console.log('='.repeat(50));
+}
+
+async function loadConfiguration(): Promise<DeployConfig> {
+  if (!fs.existsSync('awesome-list.config.yaml')) {
+    throw new Error('Configuration file not found. Run: npx tsx scripts/setup-wizard.ts');
+  }
   
   try {
-    // Create output directory
-    const outputDir = join(process.cwd(), 'dist', 'public');
-    if (!existsSync(outputDir)) {
-      mkdirSync(outputDir, { recursive: true });
-    }
-
-    // Fetch and generate static data
-    console.log('📡 Fetching awesome-video data...');
-    const awesomeListData = await fetchAwesomeVideoList();
-    
-    // Create data directory
-    const dataDir = join(outputDir, 'data');
-    if (!existsSync(dataDir)) {
-      mkdirSync(dataDir, { recursive: true });
-    }
-    
-    // Write static data
-    writeFileSync(
-      join(dataDir, 'awesome-list.json'),
-      JSON.stringify(awesomeListData, null, 2)
-    );
-
-    // Create sitemap
-    const sitemapData = {
-      lastBuild: new Date().toISOString(),
-      totalResources: awesomeListData.resources.length,
-      categories: [...new Set(awesomeListData.resources.map(r => r.category))],
-      urls: ['/']
-    };
-    
-    writeFileSync(
-      join(dataDir, 'sitemap.json'),
-      JSON.stringify(sitemapData, null, 2)
-    );
-
-    // Create a sophisticated HTML page that matches our React interface
-    const htmlContent = `<!DOCTYPE html>
-<html lang="en" class="dark">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Awesome Video Dashboard</title>
-    <meta name="description" content="A curated collection of awesome video resources, tools, and technologies for developers and content creators">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        border: 'hsl(var(--border))',
-                        input: 'hsl(var(--input))',
-                        ring: 'hsl(var(--ring))',
-                        background: 'hsl(var(--background))',
-                        foreground: 'hsl(var(--foreground))',
-                        primary: {
-                            DEFAULT: 'hsl(var(--primary))',
-                            foreground: 'hsl(var(--primary-foreground))'
-                        },
-                        secondary: {
-                            DEFAULT: 'hsl(var(--secondary))',
-                            foreground: 'hsl(var(--secondary-foreground))'
-                        },
-                        destructive: {
-                            DEFAULT: 'hsl(var(--destructive))',
-                            foreground: 'hsl(var(--destructive-foreground))'
-                        },
-                        muted: {
-                            DEFAULT: 'hsl(var(--muted))',
-                            foreground: 'hsl(var(--muted-foreground))'
-                        },
-                        accent: {
-                            DEFAULT: 'hsl(var(--accent))',
-                            foreground: 'hsl(var(--accent-foreground))'
-                        },
-                        popover: {
-                            DEFAULT: 'hsl(var(--popover))',
-                            foreground: 'hsl(var(--popover-foreground))'
-                        },
-                        card: {
-                            DEFAULT: 'hsl(var(--card))',
-                            foreground: 'hsl(var(--card-foreground))'
-                        }
-                    },
-                    borderRadius: {
-                        lg: 'var(--radius)',
-                        md: 'calc(var(--radius) - 2px)',
-                        sm: 'calc(var(--radius) - 4px)'
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        :root {
-            --background: 0 0% 4%;
-            --foreground: 0 0% 98%;
-            --card: 0 0% 4%;
-            --card-foreground: 0 0% 98%;
-            --popover: 0 0% 4%;
-            --popover-foreground: 0 0% 98%;
-            --primary: 0 72% 51%;
-            --primary-foreground: 0 86% 97%;
-            --secondary: 0 0% 9%;
-            --secondary-foreground: 0 0% 98%;
-            --muted: 0 0% 9%;
-            --muted-foreground: 0 0% 64%;
-            --accent: 0 0% 9%;
-            --accent-foreground: 0 0% 98%;
-            --destructive: 0 63% 31%;
-            --destructive-foreground: 0 86% 97%;
-            --border: 0 0% 15%;
-            --input: 0 0% 15%;
-            --ring: 0 72% 51%;
-            --radius: 0.5rem;
-        }
-        
-        * {
-            border-color: hsl(var(--border));
-        }
-        
-        body {
-            background-color: hsl(var(--background));
-            color: hsl(var(--foreground));
-            font-feature-settings: "rlig" 1, "calt" 1;
-        }
-        
-        .search-input {
-            background-color: hsl(var(--background));
-            border: 1px solid hsl(var(--border));
-            color: hsl(var(--foreground));
-        }
-        
-        .search-input:focus {
-            outline: 2px solid transparent;
-            outline-offset: 2px;
-            box-shadow: 0 0 0 2px hsl(var(--ring));
-        }
-        
-        .resource-card {
-            background-color: hsl(var(--card));
-            border: 1px solid hsl(var(--border));
-            color: hsl(var(--card-foreground));
-            transition: all 0.2s ease-in-out;
-        }
-        
-        .resource-card:hover {
-            border-color: hsl(var(--ring));
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-        }
-        
-        .btn-primary {
-            background-color: hsl(var(--primary));
-            color: hsl(var(--primary-foreground));
-            border: 1px solid hsl(var(--primary));
-            transition: all 0.2s ease-in-out;
-        }
-        
-        .btn-primary:hover {
-            background-color: hsl(var(--primary) / 0.9);
-        }
-        
-        .btn-secondary {
-            background-color: hsl(var(--secondary));
-            color: hsl(var(--secondary-foreground));
-            border: 1px solid hsl(var(--border));
-        }
-        
-        .btn-secondary:hover {
-            background-color: hsl(var(--accent));
-        }
-        
-        .badge {
-            background-color: hsl(var(--primary));
-            color: hsl(var(--primary-foreground));
-        }
-        
-        .stats-card {
-            background-color: hsl(var(--card));
-            border: 1px solid hsl(var(--border));
-        }
-        
-        .animate-in {
-            animation: slideIn 0.3s ease-out;
-        }
-        
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .fade-in {
-            animation: fadeIn 0.5s ease-in;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-    </style>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=${process.env.VITE_GA_MEASUREMENT_ID || 'G-383541848'}"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', '${process.env.VITE_GA_MEASUREMENT_ID || 'G-383541848'}');
-    </script>
-</head>
-<body>
-    <header class="header">
-        <div class="container">
-            <h1>Awesome Video Dashboard</h1>
-            <p class="subtitle">A curated collection of awesome video resources, tools, and technologies</p>
-        </div>
-    </header>
-    
-    <main class="main">
-        <div class="container">
-            <div class="stats">
-                <h2>Loading awesome video resources...</h2>
-                <p>Fetching ${awesomeListData.resources.length} curated video tools and technologies</p>
-            </div>
-            
-            <div id="content" class="loading">
-                <p>Loading resources from awesome-video...</p>
-            </div>
-        </div>
-    </main>
-
-    <script>
-        // Embedded data for reliability on GitHub Pages
-        const embeddedData = ${JSON.stringify(awesomeListData)};
-        
-        // Function to render data
-        function renderData(data) {
-            console.log('Rendering data with', data.resources?.length, 'resources');
-            const content = document.getElementById('content');
-            const categories = {};
-            
-            // Group by category
-            data.resources.forEach(resource => {
-                if (!categories[resource.category]) {
-                    categories[resource.category] = [];
-                }
-                categories[resource.category].push(resource);
-            });
-            
-            // Render categories
-            content.innerHTML = Object.entries(categories)
-                .map(([category, resources]) => \`
-                    <div class="card">
-                        <h3>\${category} (\${resources.length} resources)</h3>
-                        <div class="resources">
-                            \${resources.slice(0, 10).map(resource => \`
-                                <div class="resource">
-                                    <div class="resource-title">
-                                        <a href="\${resource.url}" target="_blank" style="color: #ef4444; text-decoration: none;">
-                                            \${resource.title}
-                                        </a>
-                                    </div>
-                                    <div class="resource-description">\${resource.description}</div>
-                                    <span class="category">\${resource.category}</span>
-                                </div>
-                            \`).join('')}
-                            \${resources.length > 10 ? \`<p style="color: #888; font-style: italic;">... and \${resources.length - 10} more resources</p>\` : ''}
-                        </div>
-                    </div>
-                \`).join('');
-            
-            // Track page view
-            gtag('event', 'page_view', {
-                page_title: 'Awesome Video Dashboard',
-                page_location: window.location.href
-            });
-        }
-        
-        // Use embedded data immediately
-        try {
-            renderData(embeddedData);
-        } catch (error) {
-            console.error('Error rendering embedded data:', error);
-            document.getElementById('content').innerHTML = \`
-                <div class="error">
-                    <h3>Error loading resources</h3>
-                    <p>Failed to render awesome-video data: \${error.message}</p>
-                </div>
-            \`;
-        }
-    </script>
-</body>
-</html>`;
-
-    writeFileSync(join(outputDir, 'index.html'), htmlContent);
-
-    console.log(`✅ Simple deployment created successfully!`);
-    console.log(`📊 Generated site with ${awesomeListData.resources.length} resources`);
-    console.log(`📁 Output directory: ${outputDir}`);
-    
+    const configContent = fs.readFileSync('awesome-list.config.yaml', 'utf8');
+    const config = yaml.load(configContent) as DeployConfig;
+    return config;
   } catch (error) {
-    console.error('❌ Deployment failed:', error);
-    process.exit(1);
+    throw new Error(`Failed to parse configuration: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
-createSimpleDeployment();
+async function showConfiguration(config: DeployConfig): Promise<boolean> {
+  console.log('\n📋 Configuration Summary:');
+  console.log(`  Site: ${config.site.title}`);
+  console.log(`  URL: ${config.site.url}`);
+  console.log(`  Source: ${config.source.url}`);
+  console.log(`  Format: ${config.source.format}`);
+  console.log(`  Theme: ${config.theme.default}`);
+  
+  if (config.features.ai_tags || config.features.ai_descriptions) {
+    console.log(`  AI Features: Enabled`);
+  }
+  
+  if (config.analytics?.google_analytics) {
+    console.log(`  Analytics: ${config.analytics.google_analytics}`);
+  }
+  
+  const answer = await prompt('\n❓ Deploy with this configuration? (y/n): ');
+  return answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes';
+}
+
+async function checkEnvironment(): Promise<void> {
+  const envVars = [
+    { name: 'ANTHROPIC_API_KEY', description: 'AI features' },
+    { name: 'VITE_GA_MEASUREMENT_ID', description: 'Google Analytics' }
+  ];
+  
+  console.log('\n🔧 Environment Variables:');
+  
+  for (const envVar of envVars) {
+    const value = process.env[envVar.name];
+    if (value) {
+      log(`${envVar.name}: Found`, 'success');
+    } else {
+      log(`${envVar.name}: Missing (${envVar.description})`, 'warn');
+    }
+  }
+  
+  const hasAIFeatures = process.env.ANTHROPIC_API_KEY;
+  if (!hasAIFeatures) {
+    console.log(`
+ℹ️ To enable AI features:
+  export ANTHROPIC_API_KEY="sk-ant-your-key"
+  
+For GitHub deployment, add as repository secret.
+    `);
+  }
+}
+
+async function fetchData(): Promise<void> {
+  log('Fetching awesome list data...');
+  
+  try {
+    execSync('npx tsx scripts/build-static.ts', { stdio: 'inherit' });
+    log('Data fetched successfully', 'success');
+  } catch (error) {
+    throw new Error('Failed to fetch data. Check your internet connection and source URL.');
+  }
+}
+
+async function createTriggerForGitHub(): Promise<void> {
+  log('Creating GitHub Actions trigger...');
+  
+  const triggerData = {
+    timestamp: new Date().toISOString(),
+    trigger: 'deployment-request',
+    message: 'Deploy awesome list static site'
+  };
+  
+  fs.writeFileSync('.deploy-trigger', JSON.stringify(triggerData, null, 2));
+  
+  try {
+    execSync('git add .deploy-trigger', { stdio: 'pipe' });
+    execSync('git commit -m "Trigger deployment"', { stdio: 'pipe' });
+    
+    const pushAnswer = await prompt('❓ Push trigger to GitHub? (y/n): ');
+    if (pushAnswer.toLowerCase() === 'y' || pushAnswer.toLowerCase() === 'yes') {
+      execSync('git push origin main', { stdio: 'inherit' });
+      log('Trigger pushed to GitHub', 'success');
+    } else {
+      log('Trigger created locally but not pushed', 'info');
+    }
+  } catch (error) {
+    log('Could not commit trigger file. Ensure git is properly configured.', 'warn');
+    log('You can manually commit and push the .deploy-trigger file', 'info');
+  }
+}
+
+async function main(): Promise<void> {
+  try {
+    header('Simple Deployment');
+    
+    // Step 1: Load configuration
+    const config = await loadConfiguration();
+    log('Configuration loaded', 'success');
+    
+    // Step 2: Show configuration and confirm
+    const confirmed = await showConfiguration(config);
+    if (!confirmed) {
+      log('Deployment cancelled', 'info');
+      return;
+    }
+    
+    // Step 3: Check environment
+    await checkEnvironment();
+    
+    // Step 4: Fetch data
+    await fetchData();
+    
+    // Step 5: Create deployment trigger
+    await createTriggerForGitHub();
+    
+    // Success
+    log('Deployment initiated successfully!', 'success');
+    console.log(`
+🎉 Next Steps:
+1. GitHub Actions will build and deploy your site
+2. Enable GitHub Pages in repository settings if not already done
+3. Your site will be available at: ${config.site.url}
+4. Check the Actions tab for deployment progress
+    `);
+    
+  } catch (error) {
+    log(`Deployment failed: ${error instanceof Error ? error.message : String(error)}`, 'error');
+    console.log(`
+🔧 Troubleshooting:
+- Ensure you're in the project root directory
+- Run the setup wizard: npx tsx scripts/setup-wizard.ts
+- Check your internet connection
+- Verify the awesome list URL is accessible
+    `);
+  } finally {
+    rl.close();
+  }
+}
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main().catch(console.error);
+}

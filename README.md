@@ -107,7 +107,8 @@ npm install
 npm run dev                           # Start development server
 
 # Deployment  
-npx tsx scripts/build-and-deploy.ts  # Interactive deployment with validation
+npx tsx scripts/deploy-simple.ts     # Reliable deployment (recommended)
+npx tsx scripts/build-and-deploy.ts  # Advanced deployment with local build
 ```
 
 **Note**: The deployment branch (`gh-pages-build`) is fixed to ensure GitHub Actions workflow compatibility.
