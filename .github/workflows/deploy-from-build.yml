@@ -5,6 +5,10 @@ on:
     workflows: ["Build React Assets"]
     types:
       - completed
+  push:
+    branches:
+      - gh-pages-build
+      - gh-pages
   workflow_dispatch:
 
 permissions:

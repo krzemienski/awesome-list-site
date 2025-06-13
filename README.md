@@ -104,7 +104,7 @@ Visit the live dashboard: [https://krzemienski.github.io/awesome-list-site](http
    - `GA_MEASUREMENT_ID` - Google Analytics tracking
 4. **Deploy**:
    ```bash
-   ./build-deploy.sh
+   npx tsx scripts/build-and-deploy.ts
    ```
 5. **Enable GitHub Pages** in repository settings → Pages → Source: GitHub Actions
 
@@ -407,24 +407,88 @@ features:
 - **Domain Expertise**: Web development, data science, systems programming
 - **Maturity Assessment**: Production-ready vs experimental projects
 
-## Environment Variables Setup
+## Environment Variables and Secrets
 
-### Required for AI Features
+### Interactive Setup Process
+
+The deployment script automatically checks and validates environment variables:
+
 ```bash
-# Repository Secrets (Settings → Secrets and variables → Actions)
-ANTHROPIC_API_KEY=sk-ant-your-key-here  # From console.anthropic.com
+npx tsx scripts/build-and-deploy.ts
 ```
 
-### Optional Configuration
+During the interactive setup, the script will:
+- Detect existing environment variables
+- Validate API key formats (ANTHROPIC_API_KEY must start with `sk-ant-`)
+- Show status for each variable (Found ✅, Missing ⚠️, Invalid ❌)
+- Prompt for confirmation before proceeding
+
+### Environment Variables Reference
+
+#### AI Features (Optional)
 ```bash
-GA_MEASUREMENT_ID=G-XXXXXXXXXX    # Google Analytics tracking
-VITE_DEFAULT_THEME=red            # Theme override
+ANTHROPIC_API_KEY=sk-ant-your-key-here
 ```
+- **Purpose**: Enables AI-powered tagging and categorization
+- **Format**: Must start with `sk-ant-`
+- **Cost**: $0.25-$15/month depending on model choice
+- **Setup**: Get from [console.anthropic.com](https://console.anthropic.com)
+
+#### Analytics (Optional)
+```bash
+VITE_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+```
+- **Purpose**: Google Analytics 4 tracking
+- **Format**: Must start with `G-`
+- **Setup**: Get from Google Analytics dashboard
+
+#### Theme Configuration (Optional)
+```bash
+VITE_DEFAULT_THEME=red
+```
+- **Options**: red, blue, green, purple
+- **Default**: Uses theme from awesome-list.config.yaml
 
 ### Repository Secrets Setup
-1. Go to repository Settings → Secrets and variables → Actions
-2. Add `ANTHROPIC_API_KEY` with your API key
-3. Add `GA_MEASUREMENT_ID` for analytics (optional)
+
+For GitHub Actions deployment, add these secrets:
+
+1. Go to repository **Settings → Secrets and variables → Actions**
+2. Click **"New repository secret"**
+3. Add each secret:
+
+| Secret Name | Required | Description |
+|-------------|----------|-------------|
+| `ANTHROPIC_API_KEY` | Optional | AI features (starts with `sk-ant-`) |
+| `GA_MEASUREMENT_ID` | Optional | Google Analytics (starts with `G-`) |
+
+### Local Development Environment
+
+For local testing, set environment variables:
+
+```bash
+# Option 1: Export in terminal
+export ANTHROPIC_API_KEY="sk-ant-your-key"
+export VITE_GA_MEASUREMENT_ID="G-YOUR-ID"
+
+# Option 2: Create .env file (not committed)
+echo "ANTHROPIC_API_KEY=sk-ant-your-key" > .env
+echo "VITE_GA_MEASUREMENT_ID=G-YOUR-ID" >> .env
+```
+
+### Deployment Branch Configuration
+
+The interactive script allows you to specify the deployment branch:
+
+**Default Branch**: `gh-pages-build`
+**Alternative Options**: `gh-pages`, `deploy`, `build`, or any custom name
+
+**Important**: The GitHub Actions workflow automatically detects pushes to:
+- `gh-pages-build` (default)
+- `gh-pages` (alternative)
+- Any branch specified during interactive setup
+
+This ensures the deployment workflow matches your chosen branch name exactly.
 
 ## Configuration Reference
 
@@ -524,12 +588,30 @@ graph LR
     H --> I[localhost:5000]
 ```
 
+### Interactive Deployment
+
+Run the interactive deployment script:
+
+```bash
+npx tsx scripts/build-and-deploy.ts
+```
+
+The interactive script will:
+1. **Check Prerequisites** - Validates git repository and configuration files
+2. **Environment Review** - Checks API keys and environment variables
+3. **Configuration Confirmation** - Reviews settings with user confirmation
+4. **Branch Selection** - Prompts for deployment branch name (default: gh-pages-build)
+5. **Data Fetching** - Downloads latest awesome list data
+6. **Build Process** - Attempts local React build or creates GitHub Actions trigger
+7. **Git Operations** - Handles all branch creation, commits, and pushes
+
 ### Local Development Commands
 ```bash
-npm install                   # Install dependencies
-npm run dev                  # Start development server
-npx tsx scripts/build-static.ts  # Test data fetching
-./build-deploy.sh           # Deploy to production
+npm install                             # Install dependencies
+npm run dev                            # Start development server
+npx tsx scripts/build-static.ts       # Test data fetching
+npx tsx scripts/build-and-deploy.ts   # Interactive deployment
+./build-deploy.sh                     # Simple deployment (legacy)
 ```
 
 ### Troubleshooting
