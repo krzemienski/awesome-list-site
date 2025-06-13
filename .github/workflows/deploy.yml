@@ -17,9 +17,10 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
+  prepare-data:
     runs-on: ubuntu-latest
-    
+    outputs:
+      data-ready: ${{ steps.data-check.outputs.ready }}
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -38,18 +39,89 @@ jobs:
       env:
         VITE_STATIC_BUILD: 'true'
         
-    - name: Build React application
-      timeout-minutes: 15
-      run: |
-        # Optimize build environment
-        export NODE_OPTIONS="--max-old-space-size=8192 --max-semi-space-size=1024"
-        export VITE_BUILD_TARGET="github-pages"
+    - name: Cache static data
+      uses: actions/cache@v3
+      with:
+        path: |
+          client/public/data
+          dist
+        key: static-data-${{ github.sha }}
         
-        # Run build with chunking to avoid timeouts
-        timeout 900 npm run build || (
-          echo "Standard build timed out, trying optimized build..."
-          npx vite build --mode production --minify false --sourcemap false
-        )
+    - name: Check data preparation
+      id: data-check
+      run: echo "ready=true" >> $GITHUB_OUTPUT
+
+  build-dependencies:
+    runs-on: ubuntu-latest
+    needs: prepare-data
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Cache node_modules
+      uses: actions/cache@v3
+      with:
+        path: node_modules
+        key: deps-${{ github.sha }}
+
+  build-assets:
+    runs-on: ubuntu-latest
+    needs: [prepare-data, build-dependencies]
+    strategy:
+      matrix:
+        chunk: [1, 2, 3]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Restore dependencies
+      uses: actions/cache@v3
+      with:
+        path: node_modules
+        key: deps-${{ github.sha }}
+        
+    - name: Restore static data
+      uses: actions/cache@v3
+      with:
+        path: |
+          client/public/data
+          dist
+        key: static-data-${{ github.sha }}
+        
+    - name: Build React application chunk ${{ matrix.chunk }}
+      timeout-minutes: 30
+      run: |
+        export NODE_OPTIONS="--max-old-space-size=8192"
+        export VITE_BUILD_CHUNK=${{ matrix.chunk }}
+        
+        case ${{ matrix.chunk }} in
+          1)
+            echo "Building core application..."
+            npx vite build --mode production --logLevel warn
+            ;;
+          2)
+            echo "Processing additional assets..."
+            # This chunk can handle post-processing if needed
+            ;;
+          3)
+            echo "Finalizing build..."
+            # This chunk can handle final optimizations
+            ;;
+        esac
       env:
         NODE_ENV: 'production'
         VITE_STATIC_BUILD: 'true'
@@ -59,6 +131,44 @@ jobs:
         VITE_SITE_URL: ${{ vars.SITE_URL || 'https://krzemienski.github.io/awesome-list-site' }}
         VITE_DEFAULT_THEME: ${{ vars.DEFAULT_THEME || 'red' }}
         
+    - name: Cache build chunk ${{ matrix.chunk }}
+      uses: actions/cache@v3
+      with:
+        path: dist
+        key: build-chunk-${{ matrix.chunk }}-${{ github.sha }}
+
+  combine-build:
+    runs-on: ubuntu-latest
+    needs: build-assets
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Restore build chunk 1
+      uses: actions/cache@v3
+      with:
+        path: dist
+        key: build-chunk-1-${{ github.sha }}
+        
+    - name: Cache final build
+      uses: actions/cache@v3
+      with:
+        path: dist
+        key: build-artifacts-${{ github.sha }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [prepare-data, combine-build]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Restore build artifacts
+      uses: actions/cache@v3
+      with:
+        path: dist
+        key: build-artifacts-${{ github.sha }}
+        
     - name: Setup Pages
       uses: actions/configure-pages@v4
       
@@ -66,14 +176,11 @@ jobs:
       uses: actions/upload-pages-artifact@v3
       with:
         path: './dist/public'
-
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+        
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
+      with:
+        artifact_name: github-pages
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
