@@ -11,9 +11,11 @@ site:
 # Source Configuration
 source:
   # Primary awesome list to parse
-  url: "https://raw.githubusercontent.com/krzemienski/awesome-video/master/README.md"
-  # Auto-refresh interval in minutes (0 to disable)
-  refresh_interval: 60
+  url: "https://raw.githubusercontent.com/krzemienski/awesome-video/master/contents.json"
+  # Format of the source data
+  format: "json"
+  # Auto-refresh interval in hours
+  refresh_interval: 24
   # Additional lists for multi-list switching
   additional_lists:
     - name: "Awesome Go"
