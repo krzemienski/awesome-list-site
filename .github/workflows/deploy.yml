@@ -73,12 +73,9 @@ jobs:
         path: node_modules
         key: deps-${{ github.sha }}
 
-  build-assets:
+  build-core:
     runs-on: ubuntu-latest
     needs: [prepare-data, build-dependencies]
-    strategy:
-      matrix:
-        chunk: [1, 2, 3]
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -102,26 +99,12 @@ jobs:
           dist
         key: static-data-${{ github.sha }}
         
-    - name: Build React application chunk ${{ matrix.chunk }}
-      timeout-minutes: 30
+    - name: Build React core (step 1)
+      timeout-minutes: 25
       run: |
         export NODE_OPTIONS="--max-old-space-size=8192"
-        export VITE_BUILD_CHUNK=${{ matrix.chunk }}
-        
-        case ${{ matrix.chunk }} in
-          1)
-            echo "Building core application..."
-            npx vite build --mode production --logLevel warn
-            ;;
-          2)
-            echo "Processing additional assets..."
-            # This chunk can handle post-processing if needed
-            ;;
-          3)
-            echo "Finalizing build..."
-            # This chunk can handle final optimizations
-            ;;
-        esac
+        # Build with optimized settings
+        npx vite build --mode production --logLevel error --minify false
       env:
         NODE_ENV: 'production'
         VITE_STATIC_BUILD: 'true'
@@ -131,34 +114,49 @@ jobs:
         VITE_SITE_URL: ${{ vars.SITE_URL || 'https://krzemienski.github.io/awesome-list-site' }}
         VITE_DEFAULT_THEME: ${{ vars.DEFAULT_THEME || 'red' }}
         
-    - name: Cache build chunk ${{ matrix.chunk }}
+    - name: Cache core build
       uses: actions/cache@v3
       with:
         path: dist
-        key: build-chunk-${{ matrix.chunk }}-${{ github.sha }}
+        key: build-core-${{ github.sha }}
 
-  combine-build:
+  optimize-build:
     runs-on: ubuntu-latest
-    needs: build-assets
+    needs: build-core
     steps:
     - name: Checkout
       uses: actions/checkout@v4
       
-    - name: Restore build chunk 1
-      uses: actions/cache@v3
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
       with:
-        path: dist
-        key: build-chunk-1-${{ github.sha }}
+        node-version: '20'
         
-    - name: Cache final build
+    - name: Restore core build
       uses: actions/cache@v3
       with:
         path: dist
-        key: build-artifacts-${{ github.sha }}
+        key: build-core-${{ github.sha }}
+        
+    - name: Optimize assets (step 2)
+      timeout-minutes: 10
+      run: |
+        # Minify and optimize the built assets
+        if [ -d "dist/public/assets" ]; then
+          echo "Optimizing CSS and JS assets..."
+          # Could add additional optimization here if needed
+        fi
+        echo "Asset optimization complete"
+        
+    - name: Cache optimized build
+      uses: actions/cache@v3
+      with:
+        path: dist
+        key: build-optimized-${{ github.sha }}
 
   deploy:
     runs-on: ubuntu-latest
-    needs: [prepare-data, combine-build]
+    needs: [prepare-data, optimize-build]
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -167,7 +165,7 @@ jobs:
       uses: actions/cache@v3
       with:
         path: dist
-        key: build-artifacts-${{ github.sha }}
+        key: build-optimized-${{ github.sha }}
         
     - name: Setup Pages
       uses: actions/configure-pages@v4

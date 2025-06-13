@@ -47,7 +47,7 @@ async function createSimpleDeployment() {
       JSON.stringify(sitemapData, null, 2)
     );
 
-    // Create a simple HTML page
+    // Create a sophisticated HTML page that matches our React interface
     const htmlContent = `<!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
@@ -55,97 +55,168 @@ async function createSimpleDeployment() {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Awesome Video Dashboard</title>
     <meta name="description" content="A curated collection of awesome video resources, tools, and technologies for developers and content creators">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        border: 'hsl(var(--border))',
+                        input: 'hsl(var(--input))',
+                        ring: 'hsl(var(--ring))',
+                        background: 'hsl(var(--background))',
+                        foreground: 'hsl(var(--foreground))',
+                        primary: {
+                            DEFAULT: 'hsl(var(--primary))',
+                            foreground: 'hsl(var(--primary-foreground))'
+                        },
+                        secondary: {
+                            DEFAULT: 'hsl(var(--secondary))',
+                            foreground: 'hsl(var(--secondary-foreground))'
+                        },
+                        destructive: {
+                            DEFAULT: 'hsl(var(--destructive))',
+                            foreground: 'hsl(var(--destructive-foreground))'
+                        },
+                        muted: {
+                            DEFAULT: 'hsl(var(--muted))',
+                            foreground: 'hsl(var(--muted-foreground))'
+                        },
+                        accent: {
+                            DEFAULT: 'hsl(var(--accent))',
+                            foreground: 'hsl(var(--accent-foreground))'
+                        },
+                        popover: {
+                            DEFAULT: 'hsl(var(--popover))',
+                            foreground: 'hsl(var(--popover-foreground))'
+                        },
+                        card: {
+                            DEFAULT: 'hsl(var(--card))',
+                            foreground: 'hsl(var(--card-foreground))'
+                        }
+                    },
+                    borderRadius: {
+                        lg: 'var(--radius)',
+                        md: 'calc(var(--radius) - 2px)',
+                        sm: 'calc(var(--radius) - 4px)'
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: system-ui, -apple-system, sans-serif; 
-            background: #0a0a0a; 
-            color: #ffffff; 
-            line-height: 1.6; 
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+        :root {
+            --background: 0 0% 4%;
+            --foreground: 0 0% 98%;
+            --card: 0 0% 4%;
+            --card-foreground: 0 0% 98%;
+            --popover: 0 0% 4%;
+            --popover-foreground: 0 0% 98%;
+            --primary: 0 72% 51%;
+            --primary-foreground: 0 86% 97%;
+            --secondary: 0 0% 9%;
+            --secondary-foreground: 0 0% 98%;
+            --muted: 0 0% 9%;
+            --muted-foreground: 0 0% 64%;
+            --accent: 0 0% 9%;
+            --accent-foreground: 0 0% 98%;
+            --destructive: 0 63% 31%;
+            --destructive-foreground: 0 86% 97%;
+            --border: 0 0% 15%;
+            --input: 0 0% 15%;
+            --ring: 0 72% 51%;
+            --radius: 0.5rem;
         }
-        .header { 
-            background: #1a1a1a; 
-            padding: 2rem; 
-            border-bottom: 1px solid #333; 
+        
+        * {
+            border-color: hsl(var(--border));
         }
-        .container { 
-            max-width: 1200px; 
-            margin: 0 auto; 
-            padding: 0 1rem; 
+        
+        body {
+            background-color: hsl(var(--background));
+            color: hsl(var(--foreground));
+            font-feature-settings: "rlig" 1, "calt" 1;
         }
-        h1 { 
-            color: #ef4444; 
-            font-size: 2.5rem; 
-            margin-bottom: 0.5rem; 
+        
+        .search-input {
+            background-color: hsl(var(--background));
+            border: 1px solid hsl(var(--border));
+            color: hsl(var(--foreground));
         }
-        .subtitle { 
-            color: #888; 
-            font-size: 1.1rem; 
+        
+        .search-input:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            box-shadow: 0 0 0 2px hsl(var(--ring));
         }
-        .main { 
-            flex: 1; 
-            padding: 2rem; 
+        
+        .resource-card {
+            background-color: hsl(var(--card));
+            border: 1px solid hsl(var(--border));
+            color: hsl(var(--card-foreground));
+            transition: all 0.2s ease-in-out;
         }
-        .stats { 
-            background: #1a1a1a; 
-            padding: 1.5rem; 
-            border-radius: 8px; 
-            margin-bottom: 2rem; 
-            border: 1px solid #333;
+        
+        .resource-card:hover {
+            border-color: hsl(var(--ring));
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
         }
-        .grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
-            gap: 1rem; 
-            margin-top: 2rem; 
+        
+        .btn-primary {
+            background-color: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+            border: 1px solid hsl(var(--primary));
+            transition: all 0.2s ease-in-out;
         }
-        .card { 
-            background: #1a1a1a; 
-            padding: 1.5rem; 
-            border-radius: 8px; 
-            border: 1px solid #333; 
+        
+        .btn-primary:hover {
+            background-color: hsl(var(--primary) / 0.9);
         }
-        .loading { 
-            text-align: center; 
-            padding: 3rem; 
-            color: #888; 
+        
+        .btn-secondary {
+            background-color: hsl(var(--secondary));
+            color: hsl(var(--secondary-foreground));
+            border: 1px solid hsl(var(--border));
         }
-        .error { 
-            background: #fee; 
-            color: #c53030; 
-            padding: 1rem; 
-            border-radius: 4px; 
-            margin: 1rem 0; 
+        
+        .btn-secondary:hover {
+            background-color: hsl(var(--accent));
         }
-        .resource { 
-            margin-bottom: 1rem; 
-            padding-bottom: 1rem; 
-            border-bottom: 1px solid #333; 
+        
+        .badge {
+            background-color: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
         }
-        .resource:last-child { 
-            border-bottom: none; 
-            margin-bottom: 0; 
+        
+        .stats-card {
+            background-color: hsl(var(--card));
+            border: 1px solid hsl(var(--border));
         }
-        .resource-title { 
-            color: #ef4444; 
-            font-weight: 600; 
-            margin-bottom: 0.5rem; 
+        
+        .animate-in {
+            animation: slideIn 0.3s ease-out;
         }
-        .resource-description { 
-            color: #ccc; 
-            font-size: 0.9rem; 
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        .category { 
-            background: #ef4444; 
-            color: white; 
-            padding: 0.25rem 0.5rem; 
-            border-radius: 4px; 
-            font-size: 0.8rem; 
-            display: inline-block; 
-            margin-top: 0.5rem; 
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
     </style>
     <script async src="https://www.googletagmanager.com/gtag/js?id=${process.env.VITE_GA_MEASUREMENT_ID || 'G-383541848'}"></script>
