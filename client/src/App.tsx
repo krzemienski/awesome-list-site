@@ -17,6 +17,7 @@ import NotFound from "@/pages/not-found";
 
 import { AwesomeList } from "@/types/awesome-list";
 import { processAwesomeListData } from "@/lib/parser";
+import { fetchStaticAwesomeList } from "@/lib/static-data";
 
 function Router() {
   // Track page views when routes change
