@@ -1,59 +1,61 @@
-name: Build and Deploy to GitHub Pages
+name: Deploy to GitHub Pages
 
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
   group: "pages"
   cancel-in-progress: false
 
 jobs:
-  # Build job
   build:
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
         
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          
-      - name: Install dependencies
-        run: npm ci
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Generate static data
+      run: tsx scripts/build-static.ts
+      env:
+        VITE_STATIC_BUILD: 'true'
         
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
+    - name: Build for production
+      run: npm run build
+      env:
+        VITE_STATIC_BUILD: 'true'
+        VITE_GA_MEASUREMENT_ID: ${{ secrets.GA_MEASUREMENT_ID }}
+        VITE_SITE_TITLE: ${{ vars.SITE_TITLE || 'Awesome Video Dashboard' }}
+        VITE_SITE_DESCRIPTION: ${{ vars.SITE_DESCRIPTION || 'A curated collection of awesome video resources and tools' }}
+        VITE_SITE_URL: ${{ vars.SITE_URL || 'https://yourusername.github.io/awesome-dash-video' }}
+        VITE_DEFAULT_THEME: ${{ vars.DEFAULT_THEME || 'red' }}
         
-      - name: Build application
-        run: npm run build
-        env:
-          # Add any environment variables needed for build
-          NODE_ENV: production
-          VITE_SITE_TITLE: "Awesome List Explorer"
-          VITE_SITE_DESCRIPTION: "A curated collection of awesome resources"
-          VITE_SITE_URL: "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}"
-          VITE_DEFAULT_THEME: "light"
-          
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./server/public
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+      
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: './dist'
 
-  # Deployment job
   deploy:
     environment:
       name: github-pages

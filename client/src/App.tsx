@@ -29,9 +29,10 @@ function Router() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [location] = useLocation();
 
-  // Fetch awesome list data
+  // Fetch awesome list data - use static data in production builds
   const { data: rawData, isLoading, error } = useQuery({
-    queryKey: ["/api/awesome-list"],
+    queryKey: ["awesome-list-data"],
+    queryFn: fetchStaticAwesomeList,
     staleTime: 1000 * 60 * 60, // 1 hour
   });
   
