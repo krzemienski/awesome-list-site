@@ -21,7 +21,7 @@ import {
   Search,
   ExternalLink,
   Download
-} from "lucide-react/icons";
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export interface AwesomeListConfig {
