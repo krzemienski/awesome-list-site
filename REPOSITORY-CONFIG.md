@@ -1,6 +1,6 @@
-# Awesome Dash Video Repository Configuration
+# Awesome Video Repository Configuration
 
-This document contains the specific configuration needed for your awesome-dash-video repository to deploy successfully to GitHub Pages.
+This document contains the specific configuration for your awesome-video repository to deploy successfully to GitHub Pages.
 
 ## Required GitHub Repository Settings
 
@@ -10,7 +10,7 @@ Go to **Settings > Secrets and variables > Actions > Variables** and add:
 ```
 SITE_TITLE=Awesome Video Dashboard
 SITE_DESCRIPTION=A curated collection of awesome video resources, tools, and technologies for developers and content creators
-SITE_URL=https://yourusername.github.io/awesome-dash-video
+SITE_URL=https://krzemienski.github.io/awesome-video
 DEFAULT_THEME=red
 ```
 
@@ -18,10 +18,8 @@ DEFAULT_THEME=red
 Go to **Settings > Secrets and variables > Actions > Secrets** and add:
 
 ```
-GA_MEASUREMENT_ID=G-XXXXXXXXXX
+GA_MEASUREMENT_ID=G-383541848
 ```
-
-*Replace `G-XXXXXXXXXX` with your Google Analytics Measurement ID*
 
 ### 3. GitHub Pages Configuration
 1. Go to **Settings > Pages**

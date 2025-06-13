@@ -15,7 +15,7 @@ A modern, interactive web application that transforms the [awesome-video](https:
 
 ## Live Demo
 
-Visit the live dashboard: [https://yourusername.github.io/awesome-dash-video](https://yourusername.github.io/awesome-dash-video)
+Visit the live dashboard: [https://krzemienski.github.io/awesome-video](https://krzemienski.github.io/awesome-video)
 
 ## Quick Start
 
@@ -72,7 +72,7 @@ The dashboard is configured via `awesome-list.config.yaml`:
 site:
   title: "Awesome Video Dashboard"
   description: "A curated collection of awesome video resources"
-  url: "https://yourusername.github.io/awesome-dash-video"
+  url: "https://krzemienski.github.io/awesome-video"
 
 source:
   url: "https://raw.githubusercontent.com/krzemienski/awesome-video/master/contents.json"
