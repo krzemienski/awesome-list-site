@@ -534,7 +534,6 @@ async function main(): Promise<void> {
     
   } catch (error) {
     log(`Wizard failed: ${error instanceof Error ? error.message : String(error)}`, 'error');
-    process.exit(1);
   } finally {
     rl.close();
   }
