@@ -785,7 +785,60 @@ npx tsx scripts/build-and-deploy.ts  # Interactive deployment with validation
 ./build-deploy.sh                    # Simple deployment (legacy)
 ```
 
-### Troubleshooting
+## Configuration Wizard Troubleshooting
+
+### Common Setup Issues
+
+**"Script not found" or permission errors**
+```bash
+# Ensure you're in the project root directory
+pwd  # Should show your project path
+ls scripts/  # Should list setup-wizard.ts and init-project.ts
+```
+
+**"Configuration wizard failed"**
+- Check internet connection for awesome list validation
+- Ensure git repository is properly initialized
+- Verify write permissions in project directory
+
+**"Invalid awesome list URL" during wizard**
+- URL must point to raw GitHub content, not the UI
+- Test URL accessibility: `curl -I [your-url]`
+- Ensure repository is public
+
+**"AI features require API key" warnings**
+- Expected behavior if ANTHROPIC_API_KEY not set
+- Features will be disabled automatically
+- Add API key later in repository secrets
+
+### Wizard Recovery
+
+If the wizard is interrupted:
+```bash
+# Remove incomplete configuration
+rm awesome-list.config.yaml
+
+# Restart wizard
+npx tsx scripts/setup-wizard.ts
+```
+
+### Manual Configuration After Wizard
+
+Edit `awesome-list.config.yaml` directly:
+```yaml
+# Add custom settings not available in wizard
+theme:
+  custom_themes:
+    - name: "corporate"
+      primary: "#1e40af" 
+      secondary: "#64748b"
+
+features:
+  pagination: true
+  items_per_page: 50
+```
+
+### Deployment Issues
 
 **Build timeouts**: Expected behavior - GitHub Actions handles extended build time automatically
 
