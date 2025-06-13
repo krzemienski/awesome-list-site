@@ -5,7 +5,7 @@
 site:
   title: "Awesome Video Dashboard"
   description: "A curated collection of awesome video resources, tools, and technologies for developers and content creators"
-  url: "https://krzemienski.github.io/awesome-video"
+  url: "https://krzemienski.github.io/awesome-list-site"
   author: "krzemienski"
   
 # Source Configuration
@@ -100,7 +100,7 @@ deploy:
   custom_domain: ""
   # GitHub Pages specific settings
   github:
-    repository: "krzemienski/awesome-video"
+    repository: "krzemienski/awesome-list-site"
     branch: "gh-pages"
     cname: ""
 

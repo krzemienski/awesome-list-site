@@ -1,6 +1,11 @@
-# Awesome Video Repository Configuration
+# Repository Configuration for awesome-list-site
 
-This document contains the specific configuration for your awesome-video repository to deploy successfully to GitHub Pages.
+This repository deploys an awesome-video dashboard using krzemienski/awesome-video as the data source.
+
+## Architecture
+- **Data Source**: krzemienski/awesome-video (JSON API with 2,011 resources)
+- **Deployment Repository**: krzemienski/awesome-list-site (this repository)
+- **Deployment URL**: https://krzemienski.github.io/awesome-list-site
 
 ## Required GitHub Repository Settings
 
@@ -10,7 +15,7 @@ Go to **Settings > Secrets and variables > Actions > Variables** and add:
 ```
 SITE_TITLE=Awesome Video Dashboard
 SITE_DESCRIPTION=A curated collection of awesome video resources, tools, and technologies for developers and content creators
-SITE_URL=https://krzemienski.github.io/awesome-video
+SITE_URL=https://krzemienski.github.io/awesome-list-site
 DEFAULT_THEME=red
 ```
 
