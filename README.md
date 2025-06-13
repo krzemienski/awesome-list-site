@@ -1,17 +1,17 @@
-# Awesome Video Dashboard
+# Awesome List Dashboard
 
-A modern, interactive web application that transforms the [awesome-video](https://github.com/krzemienski/awesome-video) curated list into a searchable, filterable dashboard with advanced analytics and mobile-optimized design.
+Transform any GitHub awesome list into a sophisticated, interactive web dashboard with advanced search, filtering, and modern UI components. Deploy your own awesome list dashboard in minutes.
 
 ## Features
 
-- **2,011+ Video Resources** - Comprehensive collection of video tools, libraries, and technologies
-- **Advanced Search & Filtering** - Find resources by name, category, or description
-- **Mobile-Optimized Design** - Touch-friendly interface with popover interactions
-- **Dark Theme Interface** - Professional red-accented dark theme
-- **Real-time Analytics** - Google Analytics integration with detailed user behavior tracking
-- **Static Site Generation** - Fast loading with pre-generated data
-- **Responsive Categories** - Organized by video processing, streaming, codecs, and more
-- **Keyboard Shortcuts** - Quick navigation with `/` for search, `Ctrl+K` shortcuts
+- **Universal Awesome List Support** - Works with any GitHub awesome list format
+- **Advanced Search & Filtering** - Real-time fuzzy search with category filters
+- **Mobile-First Design** - Touch-optimized responsive interface
+- **Modern UI Components** - shadcn/ui with dark mode themes
+- **Analytics Integration** - Google Analytics 4 tracking ready
+- **Static Deployment** - GitHub Pages with automated builds
+- **Performance Optimized** - Fast loading with code splitting
+- **Keyboard Shortcuts** - Quick navigation with `/` for search
 
 ## Live Demo
 
@@ -19,21 +19,32 @@ Visit the live dashboard: [https://krzemienski.github.io/awesome-list-site](http
 
 ## Quick Start
 
-### For Repository Owner
+### Deploy Your Own Awesome List
 
-1. **Configure Repository Settings**:
-   - Go to Settings > Pages > Set source to "GitHub Actions"
-   - Add repository variables and secrets (see [REPOSITORY-CONFIG.md](REPOSITORY-CONFIG.md))
-
-2. **Deploy**:
-   ```bash
-   git push origin main
+1. **Fork this repository**
+2. **Edit configuration** in `awesome-list.config.yaml`:
+   ```yaml
+   site:
+     title: "Your Awesome List Dashboard"
+     url: "https://yourusername.github.io/awesome-list-site"
+   source:
+     url: "https://github.com/username/your-awesome-list"
    ```
-   GitHub Actions will automatically build and deploy to GitHub Pages.
+3. **Run the deployment**:
+   ```bash
+   ./build-deploy.sh
+   ```
+4. **Enable GitHub Pages** in repository settings
 
-### For Fork Users
+Your dashboard will be live at: `https://yourusername.github.io/awesome-list-site`
 
-See [FORK-SETUP.md](FORK-SETUP.md) for complete instructions on customizing this dashboard for your own awesome list.
+### Local Development
+
+```bash
+npm install
+npm run dev
+# Visit http://localhost:5000
+```
 
 ## Technology Stack
 
@@ -96,17 +107,24 @@ Comprehensive analytics implementation tracks:
 - Performance metrics and Core Web Vitals
 - Error tracking and API response times
 
-## Deployment
+## Deployment Process
 
-### Automatic Deployment
-- Pushes to main branch trigger GitHub Actions
-- Fresh data fetched from awesome-video source
-- Static site generated and deployed to GitHub Pages
-- Typically completes in 3-5 minutes
+The deployment uses a two-stage optimized build system:
 
-### Manual Deployment
-- Go to Actions tab in GitHub repository
-- Run "Deploy to GitHub Pages" workflow manually
+### Local Script Deployment
+```bash
+./build-deploy.sh
+```
+- Fetches latest data from your awesome list
+- Creates deployment branch with built assets
+- Triggers GitHub Actions for containerized build
+
+### GitHub Actions Build
+- Builds React application with extended timeout (up to 2 hours)
+- Handles complex dependency compilation automatically
+- Deploys to GitHub Pages when complete
+
+**Total deployment time**: 30-90 minutes depending on build complexity
 
 ## Documentation
 
