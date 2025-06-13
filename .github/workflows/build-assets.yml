@@ -40,8 +40,9 @@ jobs:
         export VITE_SITE_URL="https://krzemienski.github.io/awesome-list-site"
         export VITE_DEFAULT_THEME="red"
         
-        echo "Starting Vite build with extended timeout..."
-        npx vite build --mode production
+        echo "Starting optimized Vite build..."
+        # Build with chunking and optimizations
+        npx vite build --mode production --target es2020 --chunkSizeWarningLimit 2000
         
     - name: Verify build output
       run: |
