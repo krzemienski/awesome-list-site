@@ -1,0 +1,6 @@
+{
+  "timestamp": "2025-06-13T14:35:45.832Z",
+  "trigger": "local-deployment-request",
+  "message": "Triggered build from interactive deployment script",
+  "user": "nick"
+}
