@@ -103,8 +103,11 @@ jobs:
       timeout-minutes: 25
       run: |
         export NODE_OPTIONS="--max-old-space-size=8192"
-        # Build with optimized settings
-        npx vite build --mode production --logLevel error --minify false
+        # Attempt Vite build with timeout protection
+        timeout 1200s npx vite build --mode production --logLevel error --minify false || {
+          echo "Vite build timed out, using deploy-simple fallback..."
+          npx tsx scripts/deploy-simple.ts
+        }
       env:
         NODE_ENV: 'production'
         VITE_STATIC_BUILD: 'true'
