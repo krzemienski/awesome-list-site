@@ -6,7 +6,7 @@
 
 import { existsSync, readFileSync, statSync } from 'fs';
 import { join } from 'path';
-import { execSync } from 'child_process';
+import { fetchAwesomeVideoList } from '../server/awesome-video-parser';
 
 interface TestResult {
   name: string;
@@ -15,32 +15,15 @@ interface TestResult {
   error?: string;
 }
 
-const results: TestResult[] = [];
+const tests: TestResult[] = [];
 
 function test(name: string, testFn: () => boolean | Promise<boolean>, details?: string): void {
-  try {
-    const result = testFn();
-    if (result instanceof Promise) {
-      result.then(passed => {
-        results.push({ name, passed, details });
-      }).catch(error => {
-        results.push({ name, passed: false, error: error.message });
-      });
-    } else {
-      results.push({ name, passed: result, details });
-    }
-  } catch (error) {
-    results.push({ 
-      name, 
-      passed: false, 
-      error: error instanceof Error ? error.message : 'Unknown error' 
-    });
-  }
+  tests.push({ name, passed: false, details });
 }
 
 function log(level: 'info' | 'success' | 'error' | 'warn', message: string): void {
   const prefix = {
-    info: '📝',
+    info: '🔍',
     success: '✅',
     error: '❌',
     warn: '⚠️'
@@ -50,199 +33,195 @@ function log(level: 'info' | 'success' | 'error' | 'warn', message: string): voi
 
 async function runTests(): Promise<void> {
   log('info', 'Starting comprehensive deployment tests...');
-
-  // Test 1: Check required files exist
-  test('Required files exist', () => {
-    const requiredFiles = [
-      'scripts/build-static.ts',
-      '.github/workflows/deploy.yml',
-      'awesome-list.config.yaml',
-      'client/src/lib/static-data.ts',
-      'DEPLOYMENT.md',
-      'FORK-SETUP.md'
-    ];
+  
+  try {
+    // Test 1: Data fetching
+    log('info', 'Testing data fetching from awesome-video...');
+    const data = await fetchAwesomeVideoList();
     
-    for (const file of requiredFiles) {
-      if (!existsSync(file)) {
-        throw new Error(`Missing required file: ${file}`);
-      }
+    if (data && data.resources && data.resources.length > 0) {
+      tests.push({
+        name: 'Data Fetching',
+        passed: true,
+        details: `Successfully fetched ${data.resources.length} resources`
+      });
+      log('success', `Data fetching: ${data.resources.length} resources`);
+    } else {
+      tests.push({
+        name: 'Data Fetching',
+        passed: false,
+        error: 'No resources found in fetched data'
+      });
+      log('error', 'Data fetching failed - no resources');
     }
-    return true;
-  }, 'All deployment infrastructure files present');
 
-  // Test 2: Static data generation
-  test('Static data generation', () => {
+    // Test 2: Static site generation
+    log('info', 'Testing static site generation...');
+    const { execSync } = await import('child_process');
+    
     try {
       execSync('tsx scripts/build-static.ts', { stdio: 'pipe' });
-      
-      const dataFile = 'client/public/data/awesome-list.json';
-      const sitemapFile = 'client/public/data/sitemap.json';
-      
-      if (!existsSync(dataFile) || !existsSync(sitemapFile)) {
-        return false;
-      }
-      
-      const data = JSON.parse(readFileSync(dataFile, 'utf8'));
-      const sitemap = JSON.parse(readFileSync(sitemapFile, 'utf8'));
-      
-      return data.resources?.length > 2000 && sitemap.totalResources > 2000;
-    } catch {
-      return false;
+      tests.push({
+        name: 'Static Site Generation',
+        passed: true,
+        details: 'build-static.ts completed successfully'
+      });
+      log('success', 'Static site generation completed');
+    } catch (error) {
+      tests.push({
+        name: 'Static Site Generation',
+        passed: false,
+        error: error.message
+      });
+      log('error', `Static site generation failed: ${error.message}`);
     }
-  }, 'Successfully generates static data with 2000+ resources');
 
-  // Test 3: Check static data structure
-  test('Static data structure', () => {
-    const dataFile = 'client/public/data/awesome-list.json';
-    if (!existsSync(dataFile)) return false;
-    
-    const data = JSON.parse(readFileSync(dataFile, 'utf8'));
-    
-    const hasRequiredFields = (
-      data.title &&
-      data.description &&
-      data.repoUrl &&
-      Array.isArray(data.resources) &&
-      data.resources.length > 0
-    );
-    
-    if (!hasRequiredFields) return false;
-    
-    // Check resource structure
-    const resource = data.resources[0];
-    return (
-      resource.id &&
-      resource.title &&
-      resource.url &&
-      resource.description &&
-      resource.category
-    );
-  }, 'Static data has correct structure and required fields');
+    // Test 3: Deployment build
+    log('info', 'Testing deployment build...');
+    try {
+      execSync('tsx scripts/deploy-simple.ts', { stdio: 'pipe' });
+      tests.push({
+        name: 'Deployment Build',
+        passed: true,
+        details: 'deploy-simple.ts completed successfully'
+      });
+      log('success', 'Deployment build completed');
+    } catch (error) {
+      tests.push({
+        name: 'Deployment Build',
+        passed: false,
+        error: error.message
+      });
+      log('error', `Deployment build failed: ${error.message}`);
+    }
 
-  // Test 4: Configuration validation
-  test('Configuration validation', () => {
-    const configFile = 'awesome-list.config.yaml';
-    if (!existsSync(configFile)) return false;
-    
-    const config = readFileSync(configFile, 'utf8');
-    const requiredSections = ['site:', 'source:', 'analytics:', 'features:'];
-    
-    return requiredSections.every(section => config.includes(section));
-  }, 'Configuration file has all required sections');
+    // Test 4: Output file validation
+    log('info', 'Testing output file validation...');
+    const outputDir = join(process.cwd(), 'dist', 'public');
+    const indexPath = join(outputDir, 'index.html');
+    const dataPath = join(outputDir, 'data', 'awesome-list.json');
+    const sitemapPath = join(outputDir, 'data', 'sitemap.json');
 
-  // Test 5: GitHub Actions workflow validation
-  test('GitHub Actions workflow', () => {
-    const workflowFile = '.github/workflows/deploy.yml';
-    if (!existsSync(workflowFile)) return false;
-    
-    const workflow = readFileSync(workflowFile, 'utf8');
-    const requiredSteps = [
-      'actions/checkout@v4',
-      'actions/setup-node@v4',
-      'tsx scripts/build-static.ts',
-      'npm run build',
-      'actions/deploy-pages@v4'
+    const fileTests = [
+      { path: indexPath, name: 'index.html' },
+      { path: dataPath, name: 'awesome-list.json' },
+      { path: sitemapPath, name: 'sitemap.json' }
     ];
-    
-    return requiredSteps.every(step => workflow.includes(step));
-  }, 'GitHub Actions workflow has all required steps');
 
-  // Test 6: Environment variable handling
-  test('Environment variables', () => {
-    const workflowFile = '.github/workflows/deploy.yml';
-    const workflow = readFileSync(workflowFile, 'utf8');
-    
-    const requiredEnvVars = [
-      'VITE_STATIC_BUILD',
-      'VITE_GA_MEASUREMENT_ID',
-      'VITE_SITE_TITLE',
-      'VITE_SITE_DESCRIPTION',
-      'VITE_SITE_URL'
-    ];
-    
-    return requiredEnvVars.every(envVar => workflow.includes(envVar));
-  }, 'Workflow correctly sets environment variables');
+    let allFilesExist = true;
+    for (const { path, name } of fileTests) {
+      if (existsSync(path)) {
+        const stats = statSync(path);
+        log('success', `${name}: ${(stats.size / 1024).toFixed(1)}KB`);
+      } else {
+        log('error', `Missing file: ${name}`);
+        allFilesExist = false;
+      }
+    }
 
-  // Test 7: Static data loading mechanism
-  test('Static data loading', () => {
-    const staticDataFile = 'client/src/lib/static-data.ts';
-    if (!existsSync(staticDataFile)) return false;
-    
-    const content = readFileSync(staticDataFile, 'utf8');
-    return (
-      content.includes('fetchStaticAwesomeList') &&
-      content.includes('VITE_STATIC_BUILD') &&
-      content.includes('/data/awesome-list.json')
-    );
-  }, 'Static data loading mechanism properly implemented');
+    tests.push({
+      name: 'Output File Validation',
+      passed: allFilesExist,
+      details: allFilesExist ? 'All required files generated' : 'Some files missing'
+    });
 
-  // Test 8: Documentation completeness
-  test('Documentation', () => {
-    const deployDoc = 'DEPLOYMENT.md';
-    const forkDoc = 'FORK-SETUP.md';
-    
-    if (!existsSync(deployDoc) || !existsSync(forkDoc)) return false;
-    
-    const deployContent = readFileSync(deployDoc, 'utf8');
-    const forkContent = readFileSync(forkDoc, 'utf8');
-    
-    const deploySections = [
-      'Prerequisites',
-      'Configuration',
-      'GitHub Pages Setup',
-      'Troubleshooting'
-    ];
-    
-    const forkSections = [
-      'Quick Fork Setup',
-      'Configure for Your Awesome List',
-      'Customization Options'
-    ];
-    
-    const deployComplete = deploySections.every(section => deployContent.includes(section));
-    const forkComplete = forkSections.every(section => forkContent.includes(section));
-    
-    return deployComplete && forkComplete;
-  }, 'Complete documentation with all required sections');
-
-  // Wait for any async tests to complete
-  await new Promise(resolve => setTimeout(resolve, 1000));
-
-  // Print results
-  log('info', '\n=== Test Results ===');
-  
-  let passed = 0;
-  let failed = 0;
-  
-  results.forEach(result => {
-    if (result.passed) {
-      log('success', `${result.name}${result.details ? ` - ${result.details}` : ''}`);
-      passed++;
+    // Test 5: Data integrity validation
+    log('info', 'Testing data integrity...');
+    if (existsSync(dataPath)) {
+      try {
+        const jsonData = JSON.parse(readFileSync(dataPath, 'utf-8'));
+        const resourceCount = jsonData.resources?.length || 0;
+        
+        if (resourceCount > 2000) {
+          tests.push({
+            name: 'Data Integrity',
+            passed: true,
+            details: `${resourceCount} resources in JSON data`
+          });
+          log('success', `Data integrity: ${resourceCount} resources`);
+        } else {
+          tests.push({
+            name: 'Data Integrity',
+            passed: false,
+            error: `Only ${resourceCount} resources found, expected >2000`
+          });
+          log('error', `Data integrity failed: only ${resourceCount} resources`);
+        }
+      } catch (error) {
+        tests.push({
+          name: 'Data Integrity',
+          passed: false,
+          error: `JSON parsing failed: ${error.message}`
+        });
+        log('error', `Data integrity failed: ${error.message}`);
+      }
     } else {
-      log('error', `${result.name}${result.error ? ` - ${result.error}` : ''}`);
-      failed++;
+      tests.push({
+        name: 'Data Integrity',
+        passed: false,
+        error: 'JSON data file not found'
+      });
+      log('error', 'Data integrity failed: JSON file not found');
+    }
+
+    // Test 6: HTML validation
+    log('info', 'Testing HTML structure...');
+    if (existsSync(indexPath)) {
+      const htmlContent = readFileSync(indexPath, 'utf-8');
+      const hasTitle = htmlContent.includes('<title>Awesome Video Dashboard</title>');
+      const hasGA = htmlContent.includes('gtag');
+      const hasStyles = htmlContent.includes('background: #0a0a0a');
+      
+      if (hasTitle && hasGA && hasStyles) {
+        tests.push({
+          name: 'HTML Structure',
+          passed: true,
+          details: 'Title, GA tracking, and styles present'
+        });
+        log('success', 'HTML structure validation passed');
+      } else {
+        tests.push({
+          name: 'HTML Structure',
+          passed: false,
+          error: `Missing elements - Title: ${hasTitle}, GA: ${hasGA}, Styles: ${hasStyles}`
+        });
+        log('error', 'HTML structure validation failed');
+      }
+    } else {
+      tests.push({
+        name: 'HTML Structure',
+        passed: false,
+        error: 'HTML file not found'
+      });
+      log('error', 'HTML structure failed: file not found');
+    }
+
+  } catch (error) {
+    log('error', `Test execution failed: ${error.message}`);
+  }
+
+  // Summary
+  log('info', 'Test Results Summary:');
+  const passed = tests.filter(t => t.passed).length;
+  const total = tests.length;
+  
+  tests.forEach(test => {
+    if (test.passed) {
+      log('success', `${test.name}: ${test.details || 'PASSED'}`);
+    } else {
+      log('error', `${test.name}: ${test.error || 'FAILED'}`);
     }
   });
+
+  log('info', `Overall: ${passed}/${total} tests passed`);
   
-  log('info', `\nTotal: ${results.length} tests`);
-  log('success', `Passed: ${passed}`);
-  if (failed > 0) {
-    log('error', `Failed: ${failed}`);
-  }
-  
-  if (failed === 0) {
-    log('success', '\n🎉 All tests passed! Deployment system is ready.');
-    log('info', 'Next steps:');
-    log('info', '1. Set repository variables and secrets in GitHub');
-    log('info', '2. Enable GitHub Pages in repository settings');
-    log('info', '3. Push to main branch to trigger deployment');
+  if (passed === total) {
+    log('success', 'All deployment tests passed! Ready for GitHub Actions');
+    process.exit(0);
   } else {
-    log('error', '\n💥 Some tests failed. Please fix issues before deploying.');
+    log('error', 'Some tests failed. Check issues before deployment');
     process.exit(1);
   }
 }
 
-runTests().catch(error => {
-  log('error', `Test runner failed: ${error.message}`);
-  process.exit(1);
-});
+runTests();

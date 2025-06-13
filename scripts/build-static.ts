@@ -8,7 +8,7 @@
 
 import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join } from 'path';
-import { fetchAwesomeVideoList } from '../server/awesome-video-parser.js';
+import { fetchAwesomeVideoList } from '../server/awesome-video-parser';
 
 async function buildStaticData() {
   console.log('🚀 Starting static site generation...');

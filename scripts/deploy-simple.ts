@@ -6,7 +6,7 @@
 
 import { writeFileSync, mkdirSync, existsSync, readFileSync, copyFileSync } from 'fs';
 import { join } from 'path';
-import { fetchAwesomeVideoList } from '../server/awesome-video-parser.js';
+import { fetchAwesomeVideoList } from '../server/awesome-video-parser';
 
 async function createSimpleDeployment() {
   console.log('🚀 Creating simplified deployment...');
