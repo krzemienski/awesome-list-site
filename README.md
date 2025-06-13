@@ -148,112 +148,438 @@ sequenceDiagram
 - **Hosting**: GitHub Pages
 - **Analytics**: Google Analytics 4
 
-## Development
+## Primary Use Case: Awesome Video Dashboard
 
-### Local Development
-```bash
-npm install
-npm run dev
-```
+This platform was specifically designed for the [awesome-video](https://github.com/krzemienski/awesome-video) curated list, which contains 2,000+ video-related tools and resources. The awesome-video list provides structured JSON data making it ideal for rich dashboard features.
 
-### Static Build Testing
-```bash
-tsx scripts/build-static.ts
-VITE_STATIC_BUILD=true npm run build
-npm run preview
-```
+### Awesome Video Features
+- **2,000+ Video Resources** - Comprehensive video tools collection
+- **Structured Categories** - Video processing, streaming, codecs, players
+- **AI-Enhanced Tags** - Smart categorization for video technologies
+- **JSON Data Format** - Optimized for dashboard functionality
+- **Regular Updates** - Curated by video industry professionals
 
-### Test Deployment System
-```bash
-tsx scripts/test-deployment.ts
-```
+### Video-Specific Categories
+- **Video Processing** - FFmpeg, transcoding tools, format converters
+- **Streaming Technologies** - HLS, DASH, WebRTC, live streaming
+- **Codecs & Formats** - H.264, H.265, VP9, AV1, container formats
+- **Video Players** - Web players, mobile SDKs, custom implementations
+- **Editing Tools** - Timeline editors, effects, post-production
+- **APIs & Services** - Video APIs, cloud processing, CDNs
 
-## Configuration
+## Configuration Examples
 
-The dashboard is configured via `awesome-list.config.yaml`:
+### 1. Awesome Video Dashboard (Primary Example)
 
 ```yaml
+# awesome-list.config.yaml
 site:
   title: "Awesome Video Dashboard"
-  description: "A curated collection of awesome video resources"
-  url: "https://krzemienski.github.io/awesome-list-site"
+  description: "A curated collection of video tools, libraries, and technologies for developers and creators"
+  url: "https://yourusername.github.io/awesome-video-dashboard"
+  author: "Your Name"
 
 source:
+  # Uses structured JSON format for rich features
   url: "https://raw.githubusercontent.com/krzemienski/awesome-video/master/contents.json"
+  format: "json"
   refresh_interval: 3600
+
+theme:
+  default: "dark"
+  primary_color: "#dc2626"  # Video industry red
+
+analytics:
+  google_analytics: "G-YOUR-MEASUREMENT-ID"
 
 features:
   search: true
   categories: true
+  ai_tags: true           # Generates video-specific tags
+  ai_descriptions: true   # Enhanced descriptions for video tools
+  analytics_dashboard: true
+  pagination: true
+  items_per_page: 24
+  resource_previews: true
+
+# AI will generate tags like:
+# "ffmpeg", "h264", "streaming", "transcoding", "webrtc", "hls"
+```
+
+**AI Enhancement for Video**: The system understands video terminology and generates relevant tags like `codec`, `streaming`, `transcoding`, `live-video`, `webrtc`, `hls`, `dash`.
+
+**Expected Monthly AI Cost**: $3 (Sonnet) for 2,000 video resources
+
+### 2. Awesome Python Dashboard
+
+```yaml
+site:
+  title: "Awesome Python Dashboard"
+  description: "Comprehensive Python libraries, frameworks, and development tools"
+  url: "https://yourusername.github.io/awesome-python-dashboard"
+
+source:
+  # Uses markdown format (most common)
+  url: "https://raw.githubusercontent.com/vinta/awesome-python/master/README.md"
+  format: "markdown"
+
+theme:
+  primary_color: "#306998"  # Python blue
+
+features:
+  ai_tags: true
+  ai_categories: true
+  search: true
+  categories: true
+
+# AI generates Python-specific tags:
+# "web-framework", "data-science", "machine-learning", "django", "flask"
+```
+
+**Python Categories**: Web Frameworks, Data Science, Machine Learning, DevOps, Testing, GUI Development
+
+**Expected Resources**: ~1,500 Python tools and libraries
+
+### 3. Awesome JavaScript Dashboard
+
+```yaml
+site:
+  title: "Awesome JavaScript Dashboard"
+  description: "Modern JavaScript libraries, frameworks, and development tools"
+  url: "https://yourusername.github.io/awesome-js-dashboard"
+
+source:
+  url: "https://raw.githubusercontent.com/sorrycc/awesome-javascript/master/README.md"
+  format: "markdown"
+
+theme:
+  primary_color: "#f7df1e"  # JavaScript yellow
+
+features:
+  ai_tags: true
+  ai_descriptions: true
+  search: true
+  categories: true
+  items_per_page: 36      # More browsing for frontend developers
+
+# AI generates JS-specific tags:
+# "frontend-framework", "nodejs", "build-tool", "react", "vue", "webpack"
+```
+
+**JavaScript Categories**: Frontend Frameworks, Node.js Libraries, Build Tools, Testing, UI Components
+
+**Expected Resources**: ~1,200 JavaScript tools and packages
+
+### 4. Awesome Go Dashboard
+
+```yaml
+site:
+  title: "Awesome Go Dashboard"
+  description: "Go packages, tools, and resources for systems programming"
+  url: "https://yourusername.github.io/awesome-go-dashboard"
+
+source:
+  url: "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md"
+  format: "markdown"
+
+theme:
+  primary_color: "#00add8"  # Go cyan
+
+features:
+  ai_tags: true
+  ai_categories: true
+  search: true
+  categories: true
+
+# AI generates Go-specific tags:
+# "microservices", "cli-tool", "web-framework", "database", "concurrency"
+```
+
+**Go Categories**: Web Frameworks, CLI Tools, Database Drivers, Microservices, System Programming
+
+**Expected Resources**: ~2,500 Go packages and tools
+
+## Deployment Instructions by List Type
+
+### Deploy Awesome Video Dashboard (Recommended)
+
+1. **Fork this repository** as `awesome-video-dashboard`
+2. **Configure for video resources**:
+   ```yaml
+   # Keep existing awesome-video configuration
+   source:
+     url: "https://raw.githubusercontent.com/krzemienski/awesome-video/master/contents.json"
+     format: "json"
+   ```
+3. **Add repository secrets**:
+   - `ANTHROPIC_API_KEY` - For video-specific AI tagging
+   - `GA_MEASUREMENT_ID` - Track video tool usage
+4. **Deploy**:
+   ```bash
+   ./build-deploy.sh
+   ```
+5. **Result**: Live at `https://yourusername.github.io/awesome-video-dashboard`
+
+### Deploy Awesome Python Dashboard
+
+1. **Fork** as `awesome-python-dashboard`
+2. **Update configuration**:
+   ```yaml
+   site:
+     title: "Awesome Python Dashboard"
+   source:
+     url: "https://raw.githubusercontent.com/vinta/awesome-python/master/README.md"
+     format: "markdown"
+   theme:
+     primary_color: "#306998"
+   ```
+3. **Deploy**: `./build-deploy.sh`
+4. **Result**: Python-focused dashboard with ML/data science categories
+
+### Deploy Awesome JavaScript Dashboard
+
+1. **Fork** as `awesome-js-dashboard`
+2. **Update configuration**:
+   ```yaml
+   site:
+     title: "Awesome JavaScript Dashboard"
+   source:
+     url: "https://raw.githubusercontent.com/sorrycc/awesome-javascript/master/README.md"
+     format: "markdown"
+   theme:
+     primary_color: "#f7df1e"
+   ```
+3. **Deploy**: `./build-deploy.sh`
+4. **Result**: Frontend/Node.js focused dashboard
+
+### Deploy Awesome Go Dashboard
+
+1. **Fork** as `awesome-go-dashboard`
+2. **Update configuration**:
+   ```yaml
+   site:
+     title: "Awesome Go Dashboard"
+   source:
+     url: "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md"
+     format: "markdown"
+   theme:
+     primary_color: "#00add8"
+   ```
+3. **Deploy**: `./build-deploy.sh`
+4. **Result**: Go ecosystem dashboard with systems programming focus
+
+## AI Enhancement System
+
+### Setup and Costs
+
+1. **Get Anthropic API Key**: [console.anthropic.com](https://console.anthropic.com)
+2. **Add to repository secrets**: `ANTHROPIC_API_KEY`
+3. **Choose model based on budget**:
+
+| Model | Cost per 1K resources | Quality | Speed | Use Case |
+|-------|----------------------|---------|-------|----------|
+| Claude 3 Haiku | $0.25/month | Good | Fast | Budget deployments |
+| Claude 3.5 Sonnet | $3.00/month | Excellent | Medium | Production (default) |
+| Claude 3 Opus | $15.00/month | Premium | Slow | High-quality analysis |
+
+### AI Features in Detail
+
+**Smart Tagging**: Generates relevant tags like `web-framework`, `machine-learning`, `open-source`
+
+**Auto Categorization**: Intelligently sorts resources into categories:
+- **Python lists**: Web Frameworks, Data Science, DevOps Tools
+- **JavaScript lists**: Frontend Libraries, Node.js, Build Tools  
+- **Video lists**: Codecs, Streaming, Processing, Players
+
+**Enhanced Descriptions**: Improves resource descriptions for better searchability
+
+**Fallback System**: When AI is unavailable, uses rule-based tagging automatically
+
+### AI Enhancement by List Type
+
+#### Video-Specific AI Features
+- **Technology Detection**: Recognizes codecs (H.264, VP9, AV1), streaming protocols (HLS, DASH)
+- **Category Intelligence**: Distinguishes between processing, streaming, editing, and playback tools
+- **Quality Assessment**: Identifies enterprise vs developer tools, open-source vs commercial
+
+#### Programming Language AI Features
+- **Framework Classification**: Web, mobile, desktop, CLI applications
+- **Domain Expertise**: Web development, data science, systems programming
+- **Maturity Assessment**: Production-ready vs experimental projects
+
+## Environment Variables Setup
+
+### Required for AI Features
+```bash
+# Repository Secrets (Settings → Secrets and variables → Actions)
+ANTHROPIC_API_KEY=sk-ant-your-key-here  # From console.anthropic.com
+```
+
+### Optional Configuration
+```bash
+GA_MEASUREMENT_ID=G-XXXXXXXXXX    # Google Analytics tracking
+VITE_DEFAULT_THEME=red            # Theme override
+```
+
+### Repository Secrets Setup
+1. Go to repository Settings → Secrets and variables → Actions
+2. Add `ANTHROPIC_API_KEY` with your API key
+3. Add `GA_MEASUREMENT_ID` for analytics (optional)
+
+## Configuration Reference
+
+Configure your dashboard by editing `awesome-list.config.yaml`:
+
+### Basic Configuration
+```yaml
+site:
+  title: "Your Awesome List Dashboard"
+  description: "Description of your awesome resources"
+  url: "https://yourusername.github.io/awesome-list-site"
+  author: "Your Name"
+
+source:
+  # For markdown awesome lists (most common)
+  url: "https://raw.githubusercontent.com/user/awesome-repo/main/README.md"
+  format: "markdown"
+  
+  # For JSON format lists (like awesome-video)
+  # url: "https://raw.githubusercontent.com/user/awesome-repo/main/data.json"
+  # format: "json"
+  
+  refresh_interval: 3600  # seconds
+
+theme:
+  default: "dark"        # light, dark, or auto
+  primary_color: "#dc2626"  # hex color code
+```
+
+### AI-Powered Features
+```yaml
+features:
+  ai_tags: true           # Smart tagging based on content analysis
+  ai_descriptions: true   # Enhanced descriptions for searchability
+  ai_categories: true     # Intelligent auto-categorization
+  search: true           # Enable search functionality
+  categories: true       # Show category filters
   analytics_dashboard: true
   pagination: true
   items_per_page: 24
 ```
 
-## Analytics Tracking
-
-Comprehensive analytics implementation tracks:
-- Page views and user sessions
-- Search queries and filter usage
-- Resource clicks and category navigation
-- Mobile interactions and touch events
-- Performance metrics and Core Web Vitals
-- Error tracking and API response times
-
-## Deployment Process
-
-The deployment uses a two-stage optimized build system:
-
-### Local Script Deployment
-```bash
-./build-deploy.sh
+### Multi-List Support
+```yaml
+source:
+  url: "https://raw.githubusercontent.com/main/awesome-list/README.md"
+  additional_lists:
+    - name: "Awesome Alternative"
+      url: "https://raw.githubusercontent.com/other/awesome-alt/README.md"
+      category: "Alternative"
+      icon: "🔀"
 ```
-- Fetches latest data from your awesome list
-- Creates deployment branch with built assets
-- Triggers GitHub Actions for containerized build
 
-### GitHub Actions Build
-- Builds React application with extended timeout (up to 2 hours)
-- Handles complex dependency compilation automatically
-- Deploys to GitHub Pages when complete
+## Supported Awesome Lists
 
-**Total deployment time**: 30-90 minutes depending on build complexity
+Works with 1000+ awesome lists including:
 
-## Documentation
+### Popular Examples
+- [awesome-video](https://github.com/krzemienski/awesome-video) - Video tools and technologies (Primary)
+- [awesome-python](https://github.com/vinta/awesome-python) - Python libraries and frameworks
+- [awesome-javascript](https://github.com/sorrycc/awesome-javascript) - JavaScript resources
+- [awesome-react](https://github.com/enaqx/awesome-react) - React ecosystem
+- [awesome-vue](https://github.com/vuejs/awesome-vue) - Vue.js resources
+- [awesome-go](https://github.com/avelino/awesome-go) - Go packages
 
-- [SETUP-GUIDE.md](SETUP-GUIDE.md) - Complete setup guide for any awesome list
-- [AI-FEATURES.md](AI-FEATURES.md) - AI-powered tagging and categorization ($0.25-$15/month)
-- [ENVIRONMENT-VARIABLES.md](ENVIRONMENT-VARIABLES.md) - Configuration and API keys
-- [DEVELOPER-BUILD-GUIDE.md](DEVELOPER-BUILD-GUIDE.md) - Local development and deployment
-- [README-DEPLOYMENT.md](README-DEPLOYMENT.md) - Quick deployment reference
+## Supported List Formats
 
-## Data Source
+### JSON Format (Like awesome-video)
+```json
+{
+  "categories": [{"title": "Video Processing", "id": "processing"}],
+  "projects": [{"title": "FFmpeg", "homepage": "...", "description": "..."}]
+}
+```
 
-This dashboard uses the [awesome-video](https://github.com/krzemienski/awesome-video) curated list, which contains video-related tools and resources organized by:
+### Markdown Format (Most awesome lists)
+```markdown
+# Awesome Python
+## Web Frameworks
+- [Django](https://github.com/django/django) - High-level web framework
+```
 
-- Video Processing Libraries
-- Streaming Technologies
-- Codecs and Formats
-- Players and Frameworks
-- APIs and Services
-- Learning Resources
+The system automatically detects and parses both formats.
 
-Data is automatically refreshed on each deployment to ensure the latest resources are always available.
+## Development Workflow
+
+```mermaid
+graph LR
+    A[Fork Repository] --> B[Edit Config]
+    B --> C[Set Secrets]
+    C --> D[Local Test]
+    D --> E[Deploy Script]
+    E --> F[GitHub Actions]
+    F --> G[Live Dashboard]
+    
+    D --> H[npm run dev]
+    H --> I[localhost:5000]
+```
+
+### Local Development Commands
+```bash
+npm install                   # Install dependencies
+npm run dev                  # Start development server
+npx tsx scripts/build-static.ts  # Test data fetching
+./build-deploy.sh           # Deploy to production
+```
+
+### Troubleshooting
+
+**Build timeouts**: Expected behavior - GitHub Actions handles extended build time automatically
+
+**Data not loading**: 
+- Verify awesome list URL is accessible
+- Check format setting (markdown vs json)
+- Ensure repository is public
+
+**AI features not working**:
+- Verify `ANTHROPIC_API_KEY` is set in repository secrets
+- Check API key format starts with `sk-ant-`
+- Monitor usage at console.anthropic.com
+
+**Analytics not tracking**:
+- Add `GA_MEASUREMENT_ID` to repository secrets
+- Verify measurement ID format `G-XXXXXXXXXX`
+- Allow 24-48 hours for data to appear
+
+## Performance and Analytics
+
+### Tracked Events
+- Page views and user sessions
+- Search queries and filter usage  
+- Resource clicks and downloads
+- Category navigation patterns
+- AI tag usage and effectiveness
+- Mobile interactions and performance
+
+### Performance Features
+- Code splitting for faster loading
+- Lazy loading of images and components
+- Service worker for offline support
+- Optimized bundle sizes with chunking
+- Fast search with Fuse.js fuzzy matching
 
 ## Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test with `tsx scripts/test-deployment.ts`
-5. Submit a pull request
+2. Create feature branch: `git checkout -b feature-name`
+3. Make changes and test locally
+4. Ensure deployment works: `./build-deploy.sh`
+5. Submit pull request
 
 ## License
 
-MIT License - see LICENSE file for details
+MIT License - Create awesome list dashboards for any project
 
-## Acknowledgments
+Built for the awesome list community to make curated resources more discoverable and engaging.
 
-- [awesome-video](https://github.com/krzemienski/awesome-video) - Data source and curation
-- [Sindre Sorhus](https://github.com/sindresorhus/awesome) - Awesome list format
-- Shadcn/ui and Radix UI - Component libraries
+Optimized for awesome-video but supports any awesome list format.
