@@ -191,7 +191,7 @@ async function confirmConfiguration(config: AwesomeListConfig, buildConfig: Buil
   console.log(`📊 Source URL: ${config.source.url}`);
   console.log(`📋 Format: ${config.source.format}`);
   console.log(`🎨 Theme: ${config.theme.default} (${config.theme.primary_color})`);
-  console.log(`🌿 Deploy Branch: ${buildConfig.branchName}`);
+  console.log(`🌿 Deploy Branch: ${buildConfig.branchName} (fixed for workflow compatibility)`);
   
   if (config.features.ai_tags || config.features.ai_descriptions) {
     console.log(`🤖 AI Features: Enabled (requires ANTHROPIC_API_KEY)`);
@@ -412,11 +412,8 @@ function switchBackToOriginalBranch(): void {
 async function getBuildConfiguration(): Promise<BuildConfig> {
   section('Build Configuration');
   
-  const defaultBranch = DEFAULT_CONFIG.branchName;
-  const branchAnswer = await prompt(`🌿 Deploy branch name (default: ${defaultBranch}): `);
-  const branchName = branchAnswer.trim() || defaultBranch;
-  
-  log(`Deploy branch set to: ${branchName}`, 'info');
+  const branchName = DEFAULT_CONFIG.branchName;
+  log(`Deploy branch: ${branchName} (matches GitHub Actions workflow)`, 'info');
   
   return {
     ...DEFAULT_CONFIG,

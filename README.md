@@ -112,6 +112,8 @@ npx tsx scripts/build-and-deploy.ts  # Interactive deployment
 npx tsx scripts/setup-wizard.ts      # Configuration wizard only
 ```
 
+**Note**: The deployment branch (`gh-pages-build`) is fixed to ensure GitHub Actions workflow compatibility. This prevents deployment issues that would occur if the branch name were changed.
+
 ## Troubleshooting
 
 **Configuration errors**: Ensure YAML syntax is correct and all required fields are present
