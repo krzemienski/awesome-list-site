@@ -3,6 +3,12 @@ name: Build React Assets
 on:
   push:
     branches: [ main ]
+    paths:
+      - '.build-trigger'
+      - 'client/**'
+      - 'scripts/**'
+      - 'package.json'
+      - 'vite.config.ts'
   workflow_dispatch:
 
 jobs:
