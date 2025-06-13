@@ -46,15 +46,7 @@ interface WizardConfig {
   };
 }
 
-interface AwesomeListOption {
-  name: string;
-  title: string;
-  description: string;
-  url: string;
-  category: string;
-  stars: number;
-  language?: string;
-}
+
 
 const rl = createInterface({
   input: process.stdin,
@@ -153,72 +145,12 @@ function multiChoice(options: { name: string; description: string; recommended?:
   });
 }
 
-const POPULAR_AWESOME_LISTS: AwesomeListOption[] = [
-  {
-    name: 'awesome-video',
-    title: 'Awesome Video',
-    description: 'A curated list of awesome video frameworks, libraries, and tools',
-    url: 'https://raw.githubusercontent.com/krzemienski/awesome-video/master/contents.json',
-    category: 'Media & Entertainment',
-    stars: 1500,
-    language: 'JSON'
-  },
-  {
-    name: 'awesome-javascript',
-    title: 'Awesome JavaScript',
-    description: 'A collection of awesome browser-side JavaScript libraries',
-    url: 'https://raw.githubusercontent.com/sorrycc/awesome-javascript/master/README.md',
-    category: 'Programming Languages',
-    stars: 33000
-  },
-  {
-    name: 'awesome-python',
-    title: 'Awesome Python',
-    description: 'A curated list of awesome Python frameworks, libraries, and software',
-    url: 'https://raw.githubusercontent.com/vinta/awesome-python/master/README.md',
-    category: 'Programming Languages',
-    stars: 220000
-  },
-  {
-    name: 'awesome-react',
-    title: 'Awesome React',
-    description: 'A collection of awesome things regarding React ecosystem',
-    url: 'https://raw.githubusercontent.com/enaqx/awesome-react/master/README.md',
-    category: 'Frontend Frameworks',
-    stars: 64000
-  },
-  {
-    name: 'awesome-vue',
-    title: 'Awesome Vue.js',
-    description: 'A curated list of awesome things related to Vue.js',
-    url: 'https://raw.githubusercontent.com/vuejs/awesome-vue/master/README.md',
-    category: 'Frontend Frameworks',
-    stars: 72000
-  },
-  {
-    name: 'awesome-nodejs',
-    title: 'Awesome Node.js',
-    description: 'Delightful Node.js packages and resources',
-    url: 'https://raw.githubusercontent.com/sindresorhus/awesome-nodejs/main/readme.md',
-    category: 'Backend Development',
-    stars: 58000
-  },
-  {
-    name: 'awesome-machine-learning',
-    title: 'Awesome Machine Learning',
-    description: 'A curated list of awesome Machine Learning frameworks and libraries',
-    url: 'https://raw.githubusercontent.com/josephmisiti/awesome-machine-learning/master/README.md',
-    category: 'AI & Machine Learning',
-    stars: 65000
-  },
-  {
-    name: 'awesome-docker',
-    title: 'Awesome Docker',
-    description: 'A curated list of Docker resources and projects',
-    url: 'https://raw.githubusercontent.com/veggiemonk/awesome-docker/master/README.md',
-    category: 'DevOps & Infrastructure',
-    stars: 30000
-  }
+// Common awesome list examples for reference
+const EXAMPLE_LISTS = [
+  'https://raw.githubusercontent.com/sindresorhus/awesome/main/readme.md',
+  'https://raw.githubusercontent.com/vinta/awesome-python/master/README.md',
+  'https://raw.githubusercontent.com/enaqx/awesome-react/master/README.md',
+  'https://raw.githubusercontent.com/krzemienski/awesome-video/master/contents.json'
 ];
 
 const THEME_OPTIONS = [
@@ -325,35 +257,20 @@ async function collectProjectInfo(): Promise<WizardConfig['site']> {
 }
 
 async function selectAwesomeList(): Promise<WizardConfig['source']> {
-  section('Awesome List Source Selection');
+  section('Awesome List Source Configuration');
   
-  console.log('Choose an awesome list to power your dashboard:');
+  console.log('Enter the URL of your awesome list:');
+  console.log('Examples:');
+  EXAMPLE_LISTS.forEach(url => console.log(`  ${url}`));
   
-  const listOptions = POPULAR_AWESOME_LISTS.map(list => 
-    `${list.title} - ${list.description} (⭐ ${list.stars.toLocaleString()})`
-  );
-  listOptions.push('Custom URL - I have my own awesome list');
+  const customUrl = await prompt('\nEnter the raw GitHub URL of your awesome list: ');
+  const formatChoice = await choice(['Markdown', 'JSON'], 'What format is your awesome list?');
   
-  const selectedIndex = await choice(listOptions, 'Which awesome list would you like to use?');
-  
-  if (selectedIndex === listOptions.length - 1) {
-    // Custom URL
-    const customUrl = await prompt('Enter the raw URL of your awesome list: ');
-    const formatChoice = await choice(['Markdown', 'JSON'], 'What format is your awesome list?');
-    
-    return {
-      url: customUrl,
-      format: formatChoice === 0 ? 'markdown' : 'json',
-      refresh_interval: 24
-    };
-  } else {
-    const selectedList = POPULAR_AWESOME_LISTS[selectedIndex];
-    return {
-      url: selectedList.url,
-      format: selectedList.language === 'JSON' ? 'json' : 'markdown',
-      refresh_interval: 24
-    };
-  }
+  return {
+    url: customUrl,
+    format: formatChoice === 0 ? 'markdown' : 'json',
+    refresh_interval: 24
+  };
 }
 
 async function selectTheme(): Promise<WizardConfig['theme']> {
