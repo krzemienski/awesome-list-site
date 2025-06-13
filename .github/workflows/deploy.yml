@@ -38,9 +38,11 @@ jobs:
       env:
         VITE_STATIC_BUILD: 'true'
         
-    - name: Build for production
-      timeout-minutes: 10
-      run: npx tsx scripts/deploy-simple.ts
+    - name: Build React application
+      timeout-minutes: 8
+      run: |
+        # Build the actual React application
+        npm run build
       env:
         NODE_ENV: 'production'
         VITE_STATIC_BUILD: 'true'
@@ -56,7 +58,7 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
       with:
-        path: './dist/public'
+        path: './dist'
 
   deploy:
     environment:
