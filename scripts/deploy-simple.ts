@@ -178,57 +178,64 @@ async function createSimpleDeployment() {
     </main>
 
     <script>
-        // Load and display data
-        fetch('/data/awesome-list.json')
-            .then(response => response.json())
-            .then(data => {
-                const content = document.getElementById('content');
-                const categories = {};
-                
-                // Group by category
-                data.resources.forEach(resource => {
-                    if (!categories[resource.category]) {
-                        categories[resource.category] = [];
-                    }
-                    categories[resource.category].push(resource);
-                });
-                
-                // Render categories
-                content.innerHTML = Object.entries(categories)
-                    .map(([category, resources]) => \`
-                        <div class="card">
-                            <h3>\${category} (\${resources.length} resources)</h3>
-                            <div class="resources">
-                                \${resources.slice(0, 10).map(resource => \`
-                                    <div class="resource">
-                                        <div class="resource-title">
-                                            <a href="\${resource.url}" target="_blank" style="color: #ef4444; text-decoration: none;">
-                                                \${resource.title}
-                                            </a>
-                                        </div>
-                                        <div class="resource-description">\${resource.description}</div>
-                                        <span class="category">\${resource.category}</span>
-                                    </div>
-                                \`).join('')}
-                                \${resources.length > 10 ? \`<p style="color: #888; font-style: italic;">... and \${resources.length - 10} more resources</p>\` : ''}
-                            </div>
-                        </div>
-                    \`).join('');
-                
-                // Track page view
-                gtag('event', 'page_view', {
-                    page_title: 'Awesome Video Dashboard',
-                    page_location: window.location.href
-                });
-            })
-            .catch(error => {
-                document.getElementById('content').innerHTML = \`
-                    <div class="error">
-                        <h3>Error loading resources</h3>
-                        <p>Failed to load awesome-video data: \${error.message}</p>
-                    </div>
-                \`;
+        // Embedded data for reliability on GitHub Pages
+        const embeddedData = ${JSON.stringify(awesomeListData)};
+        
+        // Function to render data
+        function renderData(data) {
+            console.log('Rendering data with', data.resources?.length, 'resources');
+            const content = document.getElementById('content');
+            const categories = {};
+            
+            // Group by category
+            data.resources.forEach(resource => {
+                if (!categories[resource.category]) {
+                    categories[resource.category] = [];
+                }
+                categories[resource.category].push(resource);
             });
+            
+            // Render categories
+            content.innerHTML = Object.entries(categories)
+                .map(([category, resources]) => \`
+                    <div class="card">
+                        <h3>\${category} (\${resources.length} resources)</h3>
+                        <div class="resources">
+                            \${resources.slice(0, 10).map(resource => \`
+                                <div class="resource">
+                                    <div class="resource-title">
+                                        <a href="\${resource.url}" target="_blank" style="color: #ef4444; text-decoration: none;">
+                                            \${resource.title}
+                                        </a>
+                                    </div>
+                                    <div class="resource-description">\${resource.description}</div>
+                                    <span class="category">\${resource.category}</span>
+                                </div>
+                            \`).join('')}
+                            \${resources.length > 10 ? \`<p style="color: #888; font-style: italic;">... and \${resources.length - 10} more resources</p>\` : ''}
+                        </div>
+                    </div>
+                \`).join('');
+            
+            // Track page view
+            gtag('event', 'page_view', {
+                page_title: 'Awesome Video Dashboard',
+                page_location: window.location.href
+            });
+        }
+        
+        // Use embedded data immediately
+        try {
+            renderData(embeddedData);
+        } catch (error) {
+            console.error('Error rendering embedded data:', error);
+            document.getElementById('content').innerHTML = \`
+                <div class="error">
+                    <h3>Error loading resources</h3>
+                    <p>Failed to render awesome-video data: \${error.message}</p>
+                </div>
+            \`;
+        }
     </script>
 </body>
 </html>`;
