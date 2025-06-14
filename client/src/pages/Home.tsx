@@ -1,15 +1,13 @@
 import { useState, useEffect } from "react";
 import { Skeleton } from "../components/ui/skeleton";
 import { Input } from "../components/ui/input";
-import ResourceCard from "../components/ui/resource-card";
-import MobileResourcePopover from "../components/ui/mobile-resource-popover";
-import LayoutSwitcher from "../components/ui/layout-switcher";
-import Pagination from "../components/ui/pagination";
-import { AwesomeList } from "../types/awesome-list";
+import { Badge } from "../components/ui/badge";
+import { Button } from "../components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
+import { AwesomeList, Resource } from "../types/awesome-list";
 import { Helmet } from "react-helmet";
-import { Filter, Search } from "lucide-react";
+import { Filter, Search, ExternalLink, Grid, List, LayoutGrid } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
-import { trackCategoryView, trackFilterUsage, trackSortChange } from "../lib/analytics";
 
 interface HomeProps {
   awesomeList?: AwesomeList;
@@ -19,34 +17,28 @@ interface HomeProps {
 type LayoutType = "cards" | "list" | "compact";
 
 export default function Home({ awesomeList, isLoading }: HomeProps) {
-  const [layout, setLayout] = useState<LayoutType>("list");
+  const [layout, setLayout] = useState<LayoutType>("cards");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(24);
   const [sortBy, setSortBy] = useState("category");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
-  // Handle category change with analytics
+  // Handle category change
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
-    if (category !== "all") {
-      trackCategoryView(category);
-      trackFilterUsage("category", category, filteredResources.length);
-    }
+    setCurrentPage(1);
   };
 
-  // Handle sort change with analytics
+  // Handle sort change
   const handleSortChange = (sort: string) => {
     setSortBy(sort);
-    trackSortChange(sort);
   };
 
-  // Handle search with analytics
+  // Handle search
   const handleSearchChange = (search: string) => {
     setSearchTerm(search);
-    if (search.length >= 2) {
-      trackFilterUsage("search", search, filteredResources.length);
-    }
+    setCurrentPage(1);
   };
   
   // Use all resources for home page display
