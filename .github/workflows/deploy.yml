@@ -1,6 +1,10 @@
-name: Deploy to GitHub Pages
+# DEPRECATED - Use deploy-clean.yml instead
+# This file is kept for reference but should not be used
+
+name: DEPRECATED - Deploy to GitHub Pages
 
 on:
+  # Disabled - use deploy-clean.yml instead
   workflow_dispatch:
 
 permissions:
@@ -13,7 +17,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  prepare-data:
+  deprecated-notice:
     runs-on: ubuntu-latest
     outputs:
       data-ready: ${{ steps.data-check.outputs.ready }}
