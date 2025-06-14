@@ -1,0 +1,57 @@
+name: Deploy Simple
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Generate static data
+      run: npx tsx scripts/build-static.ts
+      
+    - name: Build application
+      run: npx vite build --mode production
+      env:
+        NODE_ENV: 'production'
+        VITE_STATIC_BUILD: 'true'
+        VITE_SITE_TITLE: 'Awesome Video'
+        VITE_SITE_DESCRIPTION: 'A curated collection of awesome video resources and tools'
+        VITE_SITE_URL: 'https://krzemienski.github.io/awesome-list-site'
+        VITE_DEFAULT_THEME: 'red'
+        VITE_GA_MEASUREMENT_ID: ${{ secrets.GA_MEASUREMENT_ID }}
+        
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+      
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: './dist/public'
+        
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
