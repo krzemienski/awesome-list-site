@@ -7,10 +7,13 @@
 
 import { AwesomeList } from '@/types/awesome-list';
 
+// Get base URL from Vite
+const BASE_URL = import.meta.env.BASE_URL || '/';
+
 export async function fetchStaticAwesomeList(): Promise<any> {
   // For static builds, always use the pre-generated JSON data
   try {
-    const response = await fetch('/data/awesome-list.json');
+    const response = await fetch(`${BASE_URL}data/awesome-list.json`);
     if (!response.ok) {
       throw new Error(`Failed to load data: ${response.status} ${response.statusText}`);
     }
@@ -25,7 +28,7 @@ export async function fetchStaticAwesomeList(): Promise<any> {
 
 export async function fetchSitemapData(): Promise<any> {
   try {
-    const response = await fetch('/data/sitemap.json');
+    const response = await fetch(`${BASE_URL}data/sitemap.json`);
     if (!response.ok) {
       return null;
     }
