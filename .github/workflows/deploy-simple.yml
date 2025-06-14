@@ -1,9 +1,9 @@
-name: Deploy Simple
+name: Deploy Simple Static Site
 
 on:
-  workflow_dispatch:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -15,34 +15,427 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
+    
     steps:
     - name: Checkout
       uses: actions/checkout@v4
       
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
+    - name: Create static site
+      run: |
+        # Create build directory
+        mkdir -p build/data
         
-    - name: Install dependencies
-      run: npm ci
-      
-    - name: Generate static data
-      run: npx tsx scripts/build-static.ts
-      
-    - name: Build application
-      run: npx vite build --mode production
-      env:
-        NODE_ENV: 'production'
-        VITE_STATIC_BUILD: 'true'
-        VITE_SITE_TITLE: 'Awesome Video'
-        VITE_SITE_DESCRIPTION: 'A curated collection of awesome video resources and tools'
-        VITE_SITE_URL: 'https://krzemienski.github.io/awesome-list-site'
-        VITE_DEFAULT_THEME: 'red'
-        VITE_GA_MEASUREMENT_ID: ${{ secrets.GA_MEASUREMENT_ID }}
+        # Fetch awesome-video data
+        curl -s "https://raw.githubusercontent.com/krzemienski/awesome-video/master/contents.json" > raw-data.json
+        
+        # Process data into our format
+        node -e "
+        const fs = require('fs');
+        const rawData = JSON.parse(fs.readFileSync('raw-data.json', 'utf8'));
+        
+        const resources = rawData.projects.map((project, index) => ({
+          id: index + 1,
+          title: project.title || 'Untitled',
+          url: project.homepage || '#',
+          description: project.description || 'Video tool or resource',
+          category: Array.isArray(project.category) ? project.category[0] : (project.category || 'Tools'),
+          subcategory: Array.isArray(project.category) && project.category[1] ? project.category[1] : undefined,
+          tags: project.tags || []
+        }));
+        
+        const siteData = {
+          title: 'Awesome Video',
+          description: 'A curated list of awesome video tools and resources',
+          repoUrl: 'https://github.com/krzemienski/awesome-video',
+          resources: resources
+        };
+        
+        fs.writeFileSync('build/data/awesome-list.json', JSON.stringify(siteData, null, 2));
+        console.log('Generated data with', resources.length, 'resources');
+        "
+        
+        # Create index.html
+        cat > build/index.html << 'EOF'
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Awesome Video - Curated Video Tools & Resources</title>
+          <meta name="description" content="A curated list of awesome video tools and resources">
+          <link rel="canonical" href="https://krzemienski.github.io/awesome-list-site/">
+          <style>
+            :root {
+              --primary: #dc2626;
+              --bg: #0f0f0f;
+              --card-bg: #1a1a1a;
+              --text: #ffffff;
+              --text-secondary: #a3a3a3;
+              --border: #333;
+            }
+            
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+              background: var(--bg);
+              color: var(--text);
+              line-height: 1.6;
+            }
+            
+            .container {
+              max-width: 1200px;
+              margin: 0 auto;
+              padding: 20px;
+            }
+            
+            header {
+              text-align: center;
+              margin-bottom: 40px;
+              padding: 40px 0;
+            }
+            
+            h1 {
+              font-size: 3rem;
+              color: var(--primary);
+              margin-bottom: 10px;
+              font-weight: 800;
+            }
+            
+            .subtitle {
+              font-size: 1.2rem;
+              color: var(--text-secondary);
+              margin-bottom: 20px;
+            }
+            
+            .stats {
+              display: inline-flex;
+              gap: 20px;
+              margin-top: 20px;
+            }
+            
+            .stat {
+              background: var(--card-bg);
+              padding: 10px 20px;
+              border-radius: 8px;
+              border: 1px solid var(--border);
+            }
+            
+            .search-section {
+              margin: 40px 0;
+            }
+            
+            .search-box {
+              width: 100%;
+              max-width: 600px;
+              margin: 0 auto;
+              position: relative;
+            }
+            
+            #searchInput {
+              width: 100%;
+              padding: 16px 20px;
+              font-size: 16px;
+              background: var(--card-bg);
+              border: 1px solid var(--border);
+              border-radius: 12px;
+              color: var(--text);
+              outline: none;
+              transition: border-color 0.2s;
+            }
+            
+            #searchInput:focus {
+              border-color: var(--primary);
+            }
+            
+            .filters {
+              display: flex;
+              gap: 10px;
+              justify-content: center;
+              margin: 20px 0;
+              flex-wrap: wrap;
+            }
+            
+            .filter-btn {
+              padding: 8px 16px;
+              background: var(--card-bg);
+              border: 1px solid var(--border);
+              border-radius: 20px;
+              color: var(--text);
+              cursor: pointer;
+              transition: all 0.2s;
+              font-size: 14px;
+            }
+            
+            .filter-btn:hover, .filter-btn.active {
+              background: var(--primary);
+              border-color: var(--primary);
+            }
+            
+            .grid {
+              display: grid;
+              grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+              gap: 20px;
+              margin-top: 30px;
+            }
+            
+            .card {
+              background: var(--card-bg);
+              border: 1px solid var(--border);
+              border-radius: 12px;
+              padding: 24px;
+              transition: all 0.2s;
+              position: relative;
+              overflow: hidden;
+            }
+            
+            .card:hover {
+              border-color: var(--primary);
+              transform: translateY(-2px);
+            }
+            
+            .card-category {
+              background: var(--primary);
+              color: white;
+              padding: 4px 12px;
+              border-radius: 16px;
+              font-size: 12px;
+              font-weight: 600;
+              display: inline-block;
+              margin-bottom: 16px;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+            }
+            
+            .card h3 {
+              font-size: 1.3rem;
+              margin-bottom: 12px;
+              color: var(--text);
+              font-weight: 600;
+            }
+            
+            .card p {
+              color: var(--text-secondary);
+              margin-bottom: 20px;
+              line-height: 1.5;
+              display: -webkit-box;
+              -webkit-line-clamp: 3;
+              -webkit-box-orient: vertical;
+              overflow: hidden;
+            }
+            
+            .card-link {
+              color: var(--primary);
+              text-decoration: none;
+              font-weight: 600;
+              display: inline-flex;
+              align-items: center;
+              gap: 8px;
+              transition: color 0.2s;
+            }
+            
+            .card-link:hover {
+              color: #f87171;
+            }
+            
+            .no-results {
+              text-align: center;
+              padding: 60px 20px;
+              color: var(--text-secondary);
+            }
+            
+            .loading {
+              text-align: center;
+              padding: 60px 20px;
+              color: var(--text-secondary);
+            }
+            
+            footer {
+              margin-top: 80px;
+              padding: 40px 0;
+              text-align: center;
+              border-top: 1px solid var(--border);
+              color: var(--text-secondary);
+            }
+            
+            @media (max-width: 768px) {
+              .container { padding: 15px; }
+              h1 { font-size: 2rem; }
+              .grid { grid-template-columns: 1fr; gap: 15px; }
+              .stats { flex-direction: column; gap: 10px; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <header>
+              <h1>🎥 Awesome Video</h1>
+              <p class="subtitle">A curated list of awesome video tools and resources</p>
+              <div class="stats">
+                <div class="stat">
+                  <strong id="totalCount">Loading...</strong> Resources
+                </div>
+                <div class="stat">
+                  <strong id="categoryCount">0</strong> Categories
+                </div>
+              </div>
+            </header>
+            
+            <div class="search-section">
+              <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search video tools, frameworks, libraries..." onkeyup="filterResources()">
+              </div>
+              <div class="filters" id="categoryFilters"></div>
+            </div>
+            
+            <div id="loadingState" class="loading">
+              Loading awesome video resources...
+            </div>
+            
+            <div class="grid" id="resourceGrid" style="display: none;"></div>
+            
+            <div id="noResults" class="no-results" style="display: none;">
+              <h3>No resources found</h3>
+              <p>Try adjusting your search terms or category filters</p>
+            </div>
+            
+            <footer>
+              <p>Data sourced from <a href="https://github.com/krzemienski/awesome-video" target="_blank" style="color: var(--primary);">krzemienski/awesome-video</a></p>
+              <p>Built with ❤️ for the video community</p>
+            </footer>
+          </div>
+          
+          <script>
+            let allResources = [];
+            let filteredResources = [];
+            let activeCategory = 'all';
+            
+            async function loadResources() {
+              try {
+                const response = await fetch('./data/awesome-list.json');
+                const data = await response.json();
+                allResources = data.resources || [];
+                filteredResources = [...allResources];
+                
+                updateStats();
+                createCategoryFilters();
+                displayResources(filteredResources);
+                
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('resourceGrid').style.display = 'grid';
+                
+              } catch (error) {
+                console.error('Error loading resources:', error);
+                document.getElementById('loadingState').innerHTML = '<p style="color: var(--primary);">Error loading resources. Please refresh the page.</p>';
+              }
+            }
+            
+            function updateStats() {
+              const categories = [...new Set(allResources.map(r => r.category))];
+              document.getElementById('totalCount').textContent = allResources.length;
+              document.getElementById('categoryCount').textContent = categories.length;
+            }
+            
+            function createCategoryFilters() {
+              const categories = [...new Set(allResources.map(r => r.category))].sort();
+              const filtersContainer = document.getElementById('categoryFilters');
+              
+              const allBtn = document.createElement('button');
+              allBtn.className = 'filter-btn active';
+              allBtn.textContent = 'All';
+              allBtn.onclick = () => filterByCategory('all');
+              filtersContainer.appendChild(allBtn);
+              
+              categories.forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'filter-btn';
+                btn.textContent = category;
+                btn.onclick = () => filterByCategory(category);
+                filtersContainer.appendChild(btn);
+              });
+            }
+            
+            function filterByCategory(category) {
+              activeCategory = category;
+              
+              // Update active button
+              document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if ((category === 'all' && btn.textContent === 'All') || btn.textContent === category) {
+                  btn.classList.add('active');
+                }
+              });
+              
+              filterResources();
+            }
+            
+            function filterResources() {
+              const query = document.getElementById('searchInput').value.toLowerCase().trim();
+              
+              filteredResources = allResources.filter(resource => {
+                const matchesCategory = activeCategory === 'all' || resource.category === activeCategory;
+                const matchesSearch = !query || 
+                  resource.title.toLowerCase().includes(query) ||
+                  resource.description.toLowerCase().includes(query) ||
+                  resource.category.toLowerCase().includes(query) ||
+                  (resource.tags && resource.tags.some(tag => tag.toLowerCase().includes(query)));
+                
+                return matchesCategory && matchesSearch;
+              });
+              
+              displayResources(filteredResources);
+            }
+            
+            function displayResources(resources) {
+              const grid = document.getElementById('resourceGrid');
+              const noResults = document.getElementById('noResults');
+              
+              if (resources.length === 0) {
+                grid.style.display = 'none';
+                noResults.style.display = 'block';
+                return;
+              }
+              
+              grid.style.display = 'grid';
+              noResults.style.display = 'none';
+              
+              grid.innerHTML = resources.map(resource => `
+                <div class="card">
+                  <div class="card-category">${resource.category}</div>
+                  <h3>${resource.title}</h3>
+                  <p>${resource.description}</p>
+                  <a href="${resource.url}" target="_blank" rel="noopener" class="card-link">
+                    View Resource →
+                  </a>
+                </div>
+              `).join('');
+              
+              // Track analytics
+              if (window.gtag) {
+                gtag('event', 'resources_displayed', {
+                  'event_category': 'search',
+                  'value': resources.length
+                });
+              }
+            }
+            
+            // Initialize
+            loadResources();
+          </script>
+          
+          <!-- Google Analytics -->
+          <script async src="https://www.googletagmanager.com/gtag/js?id=G-383541848"></script>
+          <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-383541848');
+          </script>
+        </body>
+        </html>
+        EOF
         
     - name: Setup Pages
       uses: actions/configure-pages@v4
@@ -50,8 +443,15 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
       with:
-        path: './dist/public'
-        
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
+        path: ./build
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

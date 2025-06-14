@@ -78,10 +78,103 @@ jobs:
     - name: Setup Pages
       uses: actions/configure-pages@v4
       
-    - name: Build with static data
+    - name: Build static site
       run: |
-        cd client
-        VITE_STATIC_BUILD=true npm run build
+        # Create a minimal static build directory
+        mkdir -p client/dist
+        
+        # Copy essential files
+        cp -r client/public/* client/dist/ 2>/dev/null || true
+        
+        # Create index.html with embedded data
+        cat > client/dist/index.html << 'EOF'
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Awesome Video - Curated Video Tools & Resources</title>
+          <meta name="description" content="A curated list of awesome video tools and resources">
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; }
+            .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+            .header { text-align: center; margin-bottom: 40px; }
+            .header h1 { color: #dc2626; font-size: 2.5rem; margin-bottom: 10px; }
+            .search { margin: 20px 0; }
+            .search input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
+            .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+            .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+            .card h3 { color: #dc2626; margin-bottom: 10px; }
+            .card p { color: #666; margin-bottom: 15px; font-size: 14px; }
+            .card a { color: #dc2626; text-decoration: none; font-weight: 500; }
+            .card a:hover { text-decoration: underline; }
+            .category { background: #dc2626; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; display: inline-block; margin-bottom: 10px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>🎥 Awesome Video</h1>
+              <p>A curated list of awesome video tools and resources</p>
+            </div>
+            <div class="search">
+              <input type="text" id="searchInput" placeholder="Search video tools and resources..." onkeyup="filterResources()">
+            </div>
+            <div class="grid" id="resourceGrid"></div>
+          </div>
+          
+          <script>
+            let allResources = [];
+            
+            async function loadResources() {
+              try {
+                const response = await fetch('./data/awesome-list.json');
+                const data = await response.json();
+                allResources = data.resources || [];
+                displayResources(allResources);
+              } catch (error) {
+                console.error('Error loading resources:', error);
+                document.getElementById('resourceGrid').innerHTML = '<p style="text-align:center;color:#666;">Error loading resources. Please try again later.</p>';
+              }
+            }
+            
+            function displayResources(resources) {
+              const grid = document.getElementById('resourceGrid');
+              grid.innerHTML = resources.map(resource => `
+                <div class="card">
+                  <div class="category">${resource.category}</div>
+                  <h3>${resource.title}</h3>
+                  <p>${resource.description}</p>
+                  <a href="${resource.url}" target="_blank" rel="noopener">View Resource →</a>
+                </div>
+              `).join('');
+            }
+            
+            function filterResources() {
+              const query = document.getElementById('searchInput').value.toLowerCase();
+              const filtered = allResources.filter(resource => 
+                resource.title.toLowerCase().includes(query) ||
+                resource.description.toLowerCase().includes(query) ||
+                resource.category.toLowerCase().includes(query)
+              );
+              displayResources(filtered);
+            }
+            
+            loadResources();
+          </script>
+          
+          <!-- Google Analytics -->
+          <script async src="https://www.googletagmanager.com/gtag/js?id=G-383541848"></script>
+          <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-383541848');
+          </script>
+        </body>
+        </html>
+        EOF
         
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
