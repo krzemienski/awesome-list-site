@@ -1,5 +1,7 @@
-# This file is disabled - use deploy-static-site.yml
-name: DISABLED
+name: Deploy to GitHub Pages
+
+on:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -11,7 +13,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deprecated-notice:
+  prepare-data:
     runs-on: ubuntu-latest
     outputs:
       data-ready: ${{ steps.data-check.outputs.ready }}

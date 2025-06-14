@@ -1,8 +1,14 @@
-# DISABLED
-name: DISABLED
+name: Build React Assets
 
 on:
-  # Disabled to prevent conflicts
+  push:
+    branches: [ main ]
+    paths:
+      - '.build-trigger'
+      - 'client/**'
+      - 'scripts/**'
+      - 'package.json'
+      - 'vite.config.ts'
   workflow_dispatch:
 
 jobs:

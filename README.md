@@ -1,145 +1,124 @@
-# Awesome Video Site
+# Awesome List Static Site Generator
 
-A modern, fast static site that showcases the curated awesome-video collection with powerful search and filtering capabilities.
+Transform any GitHub awesome list into a beautiful, SEO-optimized static website with search, categorization, and optional AI enhancements.
 
-## Overview
+## Quick Start
 
-This project transforms the [krzemienski/awesome-video](https://github.com/krzemienski/awesome-video) repository into an interactive web experience, deployed automatically to GitHub Pages at [krzemienski.github.io/awesome-list-site](https://krzemienski.github.io/awesome-list-site).
+1. **Fork this repository**
+2. **Configure your awesome list** in `awesome-list.config.yaml`:
+   ```yaml
+   site:
+     title: "Your Awesome List"
+     url: "https://yourusername.github.io/awesome-list-site"
+   source:
+     url: "https://raw.githubusercontent.com/username/awesome-list/main/README.md"
+     format: "markdown"  # or "json" for structured data
+   features:
+     ai_tags: true       # Requires ANTHROPIC_API_KEY
+   ```
+3. **Set environment variables** (for AI features):
+   ```bash
+   export ANTHROPIC_API_KEY="sk-ant-your-key-here"
+   ```
+4. **Deploy**:
+   ```bash
+   npx tsx scripts/build-and-deploy.ts
+   ```
+5. **Enable GitHub Pages** in repository settings → Pages → Source: GitHub Actions
 
-## Features
-
-- **Authentic Data**: Fetches real-time data from awesome-video repository (2011+ resources)
-- **Advanced Search**: Real-time search across titles, descriptions, and categories
-- **Smart Filtering**: Dynamic category filtering with visual feedback
-- **Modern Design**: Dark theme with responsive design optimized for all devices
-- **Analytics Integration**: Google Analytics tracking for user engagement
-- **Zero Maintenance**: Automated deployment with no manual builds required
-
-## Live Site
-
-Visit the deployed site: **https://krzemienski.github.io/awesome-list-site**
-
-## Deployment Architecture
-
-The site uses a streamlined GitHub Actions workflow that:
-
-1. **Fetches** latest data from awesome-video repository JSON source
-2. **Processes** 2011+ video resources into optimized format
-3. **Generates** a static site with embedded search and filtering
-4. **Deploys** automatically to GitHub Pages
-
-### Deployment Workflow
-
-The single deployment workflow (`.github/workflows/deploy-clean.yml`) handles everything:
-
-```yaml
-# Triggers on push to main branch or manual dispatch
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
-
-# Processes authentic data and deploys static site
-jobs:
-  build:
-    - Fetch awesome-video JSON data
-    - Transform into site format
-    - Generate static HTML with embedded functionality
-    - Deploy to GitHub Pages
-```
+Your site will be live at: `https://yourusername.github.io/awesome-list-site`
 
 ## Local Development
 
-For local development and testing:
-
 ```bash
-# Install dependencies
 npm install
-
-# Start development server
+export ANTHROPIC_API_KEY="sk-ant-your-key-here"  # Optional, for AI features
 npm run dev
-
-# Access at http://localhost:5000
+# Visit http://localhost:5000
 ```
 
-The development server fetches live data from the awesome-video repository and provides the same functionality as the deployed site.
+## Environment Variables
+
+### Option 1: Use the Setup Helper (Recommended)
+
+```bash
+npx tsx scripts/setup-env.ts
+```
+
+This creates a `.env` file with your API keys for local development.
+
+### Option 2: Manual Setup
+
+Set environment variables before running the development server:
+
+```bash
+export ANTHROPIC_API_KEY="sk-ant-your-key-here"  # For AI features
+export VITE_GA_MEASUREMENT_ID="G-XXXXXXXXXX"     # For analytics
+npm run dev
+```
+
+### GitHub Deployment
+
+Add secrets in repository settings for production deployment:
+- `ANTHROPIC_API_KEY` - Get from [console.anthropic.com](https://console.anthropic.com)
+- `GA_MEASUREMENT_ID` - From Google Analytics dashboard
 
 ## Configuration
 
-Site configuration is managed in `awesome-list.config.yaml`:
+Edit `awesome-list.config.yaml` to configure your site:
 
 ```yaml
+# Basic configuration
 site:
-  title: "Awesome Video"
-  description: "A curated list of awesome video tools and resources"
-  url: "https://krzemienski.github.io/awesome-list-site"
+  title: "Your Awesome List"
+  description: "Description of your awesome list"
+  url: "https://username.github.io/awesome-list-site"
+  author: "Your Name"
 
 source:
-  url: "https://raw.githubusercontent.com/krzemienski/awesome-video/master/contents.json"
-  format: "json"
-
-analytics:
-  google_analytics: "G-383541848"
+  url: "https://raw.githubusercontent.com/username/awesome-list/main/README.md"
+  format: "markdown"  # or "json"
+  refresh_interval: 24
 
 theme:
-  default: "dark"
-  primary_color: "#dc2626"
+  default: "red"  # red, blue, green, purple
+  primary_color: "#ef4444"
+
+features:
+  search: true
+  categories: true
+  ai_tags: false      # Requires ANTHROPIC_API_KEY
+  ai_descriptions: false
+  ai_categories: false
+
+analytics:
+  google_analytics: "G-XXXXXXXXXX"  # Optional
 ```
 
-## Project Structure
+## Commands
 
+```bash
+# Setup
+npx tsx scripts/setup-wizard.ts      # Complete configuration wizard
+npx tsx scripts/setup-env.ts         # Environment variables helper
+
+# Development
+npm install
+npm run dev                           # Start development server
+
+# Deployment  
+npx tsx scripts/deploy-simple.ts     # Reliable deployment (recommended)
+npx tsx scripts/build-and-deploy.ts  # Advanced deployment with local build
 ```
-├── .github/workflows/
-│   └── deploy-clean.yml     # Single deployment workflow
-├── client/                  # Development environment
-├── awesome-list.config.yaml # Site configuration
-├── README.md               # This file
-└── replit.md              # Project documentation
-```
 
-## Data Flow
+**Note**: The deployment branch (`gh-pages-build`) is fixed to ensure GitHub Actions workflow compatibility.
 
-1. **Source**: awesome-video repository (JSON format, 2011+ resources)
-2. **Processing**: GitHub Actions transforms data into site format
-3. **Generation**: Static HTML created with embedded search/filter functionality
-4. **Deployment**: Automatic deployment to GitHub Pages
-5. **Analytics**: Google Analytics tracks user interactions
+## Troubleshooting
 
-## Key Technologies
+**Configuration errors**: Ensure YAML syntax is correct and all required fields are present
 
-- **Static Site Generation**: No complex build dependencies
-- **GitHub Actions**: Automated deployment pipeline
-- **Authentic Data**: Real-time fetching from source repository
-- **Modern JavaScript**: Vanilla JS with optimized performance
-- **Responsive Design**: Mobile-first CSS with dark theme
+**Data not loading**: Verify the awesome list URL is accessible and points to raw content
 
-## Maintenance
+**AI features not working**: Set ANTHROPIC_API_KEY environment variable locally
 
-The site requires zero maintenance:
-- Data updates automatically when awesome-video repository changes
-- Deployment triggers on any push to main branch
-- No local builds or manual deployments needed
-- Analytics provide insights into usage patterns
-
-## Contributing
-
-To modify the site:
-
-1. Update configuration in `awesome-list.config.yaml`
-2. Modify deployment workflow if needed
-3. Push changes to main branch
-4. GitHub Actions handles the rest
-
-## Analytics
-
-The site includes Google Analytics (G-383541848) tracking:
-- Resource views and clicks
-- Search queries and patterns
-- Category filter usage
-- Performance metrics
-
-## Support
-
-- Source data: [awesome-video repository](https://github.com/krzemienski/awesome-video)
-- Live site: [krzemienski.github.io/awesome-list-site](https://krzemienski.github.io/awesome-list-site)
-- Issues: Create GitHub issues for bugs or feature requests
+**Build failures**: Check logs for specific errors and ensure all dependencies are installed

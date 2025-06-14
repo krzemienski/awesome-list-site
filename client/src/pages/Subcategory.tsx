@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { Skeleton } from "../components/ui/skeleton";
-import ResourceCard from "../components/ui/resource-card";
-import { Input } from "../components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import ResourceCard from "@/components/ui/resource-card";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Filter } from "lucide-react";
-import { deslugify } from "../lib/utils";
-import { Resource, AwesomeList } from "../types/awesome-list";
-import NotFound from "./not-found";
+import { deslugify } from "@/lib/utils";
+import { Resource, AwesomeList } from "@/types/awesome-list";
+import NotFound from "@/pages/not-found";
 import { Helmet } from "react-helmet";
 
 // Demo subcategory resources

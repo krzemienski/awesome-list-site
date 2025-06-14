@@ -1,5 +1,5 @@
-import { Resource, Category, Subcategory, AwesomeList } from "../types/awesome-list";
-import { slugify } from "./utils";
+import { Resource, Category, Subcategory, AwesomeList } from "@/types/awesome-list";
+import { slugify } from "@/lib/utils";
 
 /**
  * Process the raw JSON data from the API into a structured AwesomeList

@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { Switch, Route, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { initGA } from "@/lib/analytics";
-import { useAnalytics } from "@/hooks/use-analytics";
-import { useSessionAnalytics } from "@/hooks/use-session-analytics";
-import { trackKeyboardShortcut } from "@/lib/analytics";
+import { initGA } from "./lib/analytics";
+import { useAnalytics } from "./hooks/use-analytics";
+import { useSessionAnalytics } from "./hooks/use-session-analytics";
+import { trackKeyboardShortcut } from "./lib/analytics";
 
 import MainLayout from "@/components/layout/new/MainLayout";
 import ErrorPage from "@/pages/ErrorPage";
@@ -17,49 +17,82 @@ import NotFound from "@/pages/not-found";
 
 import { AwesomeList } from "@/types/awesome-list";
 import { processAwesomeListData } from "@/lib/parser";
+import { fetchStaticAwesomeList } from "@/lib/static-data";
 
 function Router() {
-  // Fetch awesome list data
+  // Track page views when routes change
+  useAnalytics();
+  
+  // Track comprehensive session analytics
+  const sessionAnalytics = useSessionAnalytics();
+  
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [location] = useLocation();
+
+  // Fetch awesome list data - use static data in production builds
   const { data: rawData, isLoading, error } = useQuery({
-    queryKey: ["/api/awesome-list"],
+    queryKey: ["awesome-list-data"],
+    queryFn: fetchStaticAwesomeList,
     staleTime: 1000 * 60 * 60, // 1 hour
   });
   
   // Process the raw data into a structured AwesomeList
   const awesomeList = rawData ? processAwesomeListData(rawData) : undefined;
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-destructive mb-4">Error Loading Data</h1>
-          <p className="text-muted-foreground">{error.message}</p>
-        </div>
-      </div>
-    );
-  }
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // '/' key for search
+      if (e.key === "/" && !e.ctrlKey && !e.metaKey && 
+          !(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) {
+        e.preventDefault();
+        trackKeyboardShortcut("/", "open_search");
+        sessionAnalytics.incrementSearchesPerformed();
+        setSearchOpen(true);
+      }
+      
+      // Escape key to close search
+      if (e.key === "Escape" && searchOpen) {
+        trackKeyboardShortcut("Escape", "close_search");
+        setSearchOpen(false);
+      }
+      
+      // Ctrl/Cmd+K for search
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        trackKeyboardShortcut("Ctrl+K", "open_search");
+        sessionAnalytics.incrementSearchesPerformed();
+        setSearchOpen(true);
+      }
+    };
+    
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [searchOpen]);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Loading...</h1>
-          <p className="text-muted-foreground">Fetching awesome video resources...</p>
-        </div>
-      </div>
-    );
+  if (error) {
+    return <ErrorPage error={error} />;
   }
 
   return (
-    <Switch>
-      <Route path="/" component={() => 
-        <Home 
-          awesomeList={awesomeList} 
-          isLoading={isLoading} 
-        />
-      } />
-      <Route component={NotFound} />
-    </Switch>
+    <MainLayout 
+      awesomeList={awesomeList} 
+      isLoading={isLoading}
+    >
+      <Switch>
+        <Route path="/" component={() => 
+          <Home 
+            awesomeList={awesomeList} 
+            isLoading={isLoading} 
+          />
+        } />
+        <Route path="/category/:slug" component={Category} />
+        <Route path="/subcategory/:slug" component={Subcategory} />
+        <Route path="/about" component={About} />
+        <Route path="/advanced" component={Advanced} />
+        <Route component={NotFound} />
+      </Switch>
+    </MainLayout>
   );
 }
 

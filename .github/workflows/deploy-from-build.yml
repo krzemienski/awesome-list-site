@@ -1,9 +1,13 @@
-# DISABLED
-name: DISABLED
+name: Deploy to GitHub Pages
 
 on:
-  # Disabled to prevent conflicts
-  workflow_dispatch:
+  workflow_run:
+    workflows: ["Build React Assets"]
+    types:
+      - completed
+  push:
+    branches:
+      - gh-pages-build
       - gh-pages
   workflow_dispatch:
 
