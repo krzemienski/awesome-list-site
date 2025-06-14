@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Switch, Route, useLocation } from "wouter";
+import { Switch, Route, useLocation, Router as WouterRouter } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { initGA } from "./lib/analytics";
 import { useAnalytics } from "./hooks/use-analytics";
@@ -107,8 +107,13 @@ function App() {
     }
   }, []);
 
+  // Get base path from Vite
+  const base = import.meta.env.BASE_URL || '/';
+
   return (
-    <Router />
+    <WouterRouter base={base}>
+      <Router />
+    </WouterRouter>
   );
 }
 
