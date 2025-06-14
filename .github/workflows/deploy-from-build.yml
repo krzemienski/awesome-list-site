@@ -1,13 +1,9 @@
-name: Deploy to GitHub Pages
+# DISABLED - Use deploy-clean.yml instead
+name: DISABLED - Deploy to GitHub Pages
 
 on:
-  workflow_run:
-    workflows: ["Build React Assets"]
-    types:
-      - completed
-  push:
-    branches:
-      - gh-pages-build
+  # Disabled to prevent conflicts
+  workflow_dispatch:
       - gh-pages
   workflow_dispatch:
 

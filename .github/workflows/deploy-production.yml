@@ -1,8 +1,8 @@
-name: Deploy to GitHub Pages
+# DISABLED - Use deploy-clean.yml instead
+name: DISABLED - Deploy to GitHub Pages
 
 on:
-  push:
-    branches: [ main ]
+  # Disabled to prevent conflicts
   workflow_dispatch:
 
 permissions:
