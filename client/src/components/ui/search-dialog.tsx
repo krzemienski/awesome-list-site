@@ -1,12 +1,12 @@
 import { useState, useEffect, useMemo, useRef } from "react";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "../ui/command";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
+import { Button } from "../ui/button";
 import { Search } from "lucide-react";
 import { useLocation } from "wouter";
 import Fuse from "fuse.js";
-import { Resource } from "@/types/awesome-list";
-import { trackSearch, trackResourceClick, trackPerformance } from "@/lib/analytics";
+import { Resource } from "../../types/awesome-list";
+import { trackSearch, trackResourceClick, trackPerformance } from "../../lib/analytics";
 
 interface SearchDialogProps {
   isOpen: boolean;

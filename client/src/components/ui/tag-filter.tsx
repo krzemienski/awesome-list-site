@@ -1,10 +1,10 @@
 import { useState, useMemo } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Checkbox } from "../ui/checkbox";
 import { Filter, X } from "lucide-react";
-import { Resource } from "@/types/awesome-list";
+import { Resource } from "../../types/awesome-list";
 
 interface TagFilterProps {
   resources: Resource[];

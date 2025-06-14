@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Input } from "@/components/ui/input";
-import ResourceCard from "@/components/ui/resource-card";
-import MobileResourcePopover from "@/components/ui/mobile-resource-popover";
-import LayoutSwitcher from "@/components/ui/layout-switcher";
-import Pagination from "@/components/ui/pagination";
-import { AwesomeList } from "@/types/awesome-list";
+import { Skeleton } from "../components/ui/skeleton";
+import { Input } from "../components/ui/input";
+import ResourceCard from "../components/ui/resource-card";
+import MobileResourcePopover from "../components/ui/mobile-resource-popover";
+import LayoutSwitcher from "../components/ui/layout-switcher";
+import Pagination from "../components/ui/pagination";
+import { AwesomeList } from "../types/awesome-list";
 import { Helmet } from "react-helmet";
 import { Filter, Search } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { trackCategoryView, trackFilterUsage, trackSortChange } from "@/lib/analytics";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
+import { trackCategoryView, trackFilterUsage, trackSortChange } from "../lib/analytics";
 
 interface HomeProps {
   awesomeList?: AwesomeList;

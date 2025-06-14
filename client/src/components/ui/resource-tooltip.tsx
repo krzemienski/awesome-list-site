@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "../ui/badge";
+import { Card, CardContent } from "../ui/card";
 import { ExternalLink, Star, GitFork, Calendar, User, Tag } from "lucide-react";
-import { Resource } from "@/types/awesome-list";
+import { Resource } from "../../types/awesome-list";
 
 interface ResourceTooltipProps {
   resource: Resource;

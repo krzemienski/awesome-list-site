@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Button } from "../ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { Grid3X3, List, LayoutGrid, MoreVertical } from "lucide-react";
-import { trackLayoutChange } from "@/lib/analytics";
+import { trackLayoutChange } from "../../lib/analytics";
 
 export type LayoutType = "cards" | "list" | "compact";
 

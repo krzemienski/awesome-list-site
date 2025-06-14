@@ -6,18 +6,18 @@ import { useAnalytics } from "./hooks/use-analytics";
 import { useSessionAnalytics } from "./hooks/use-session-analytics";
 import { trackKeyboardShortcut } from "./lib/analytics";
 
-import MainLayout from "@/components/layout/new/MainLayout";
-import ErrorPage from "@/pages/ErrorPage";
-import Home from "@/pages/Home";
-import Category from "@/pages/Category";
-import Subcategory from "@/pages/Subcategory";
-import About from "@/pages/About";
-import Advanced from "@/pages/Advanced";
-import NotFound from "@/pages/not-found";
+import MainLayout from "./components/layout/new/MainLayout";
+import ErrorPage from "./pages/ErrorPage";
+import Home from "./pages/Home";
+import Category from "./pages/Category";
+import Subcategory from "./pages/Subcategory";
+import About from "./pages/About";
+import Advanced from "./pages/Advanced";
+import NotFound from "./pages/not-found";
 
-import { AwesomeList } from "@/types/awesome-list";
-import { processAwesomeListData } from "@/lib/parser";
-import { fetchStaticAwesomeList } from "@/lib/static-data";
+import { AwesomeList } from "./types/awesome-list";
+import { processAwesomeListData } from "./lib/parser";
+import { fetchStaticAwesomeList } from "./lib/static-data";
 
 function Router() {
   // Track page views when routes change

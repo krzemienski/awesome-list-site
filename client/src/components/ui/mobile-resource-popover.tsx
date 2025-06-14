@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { ExternalLink, Star, GitFork, Calendar, Tag } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { trackPopoverView, trackResourceClick, trackMobileInteraction, trackTagInteraction } from '@/lib/analytics';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './dialog';
+import { Button } from './button';
+import { Badge } from './badge';
+import { trackPopoverView, trackResourceClick, trackMobileInteraction, trackTagInteraction } from '../../lib/analytics';
 
 interface Resource {
   id?: string;
