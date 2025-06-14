@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { Skeleton } from "../components/ui/skeleton";
 import { Input } from "../components/ui/input";
-import { Badge } from "../components/ui/badge";
-import { Button } from "../components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
-import { AwesomeList, Resource } from "../types/awesome-list";
+import ResourceCard from "../components/ui/resource-card";
+import MobileResourcePopover from "../components/ui/mobile-resource-popover";
+import LayoutSwitcher from "../components/ui/layout-switcher";
+import Pagination from "../components/ui/pagination";
+import { AwesomeList } from "../types/awesome-list";
 import { Helmet } from "react-helmet";
-import { Filter, Search, ExternalLink, Grid, List, LayoutGrid } from "lucide-react";
+import { Filter, Search } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 
 interface HomeProps {
@@ -23,23 +24,6 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
   const [sortBy, setSortBy] = useState("category");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-
-  // Handle category change
-  const handleCategoryChange = (category: string) => {
-    setSelectedCategory(category);
-    setCurrentPage(1);
-  };
-
-  // Handle sort change
-  const handleSortChange = (sort: string) => {
-    setSortBy(sort);
-  };
-
-  // Handle search
-  const handleSearchChange = (search: string) => {
-    setSearchTerm(search);
-    setCurrentPage(1);
-  };
   
   // Use all resources for home page display
   const allResources = awesomeList?.resources || [];
@@ -198,7 +182,15 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
           </div>
           
           {/* Resources Display */}
-          {layout === "list" ? (
+          {layout === "cards" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+              {paginatedResources.map((resource, index) => (
+                <ResourceCard key={`${resource.title}-${resource.url}`} resource={resource} index={index} />
+              ))}
+            </div>
+          )}
+          
+          {layout === "list" && (
             <div className="space-y-1 mb-8">
               {paginatedResources.map((resource, index) => (
                 <MobileResourcePopover key={`${resource.title}-${resource.url}`} resource={resource}>
@@ -218,7 +210,9 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                 </MobileResourcePopover>
               ))}
             </div>
-          ) : layout === "compact" ? (
+          )}
+          
+          {layout === "compact" && (
             <div className="grid grid-cols-2 gap-2 mb-8">
               {paginatedResources.map((resource, index) => (
                 <MobileResourcePopover key={`${resource.title}-${resource.url}`} resource={resource}>
@@ -232,47 +226,6 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                     <span className="text-xs px-1.5 py-1 bg-muted text-muted-foreground rounded mt-2 self-start">
                       {resource.category}
                     </span>
-                  </div>
-                </MobileResourcePopover>
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-4 mb-8">
-              {paginatedResources.map((resource, index) => (
-                <MobileResourcePopover key={`${resource.title}-${resource.url}`} resource={resource}>
-                  <div className="p-6 border border-border rounded-xl bg-card shadow-sm hover:shadow-md transition-all">
-                    <div className="space-y-3">
-                      <h3 className="text-lg font-semibold text-foreground">
-                        {resource.title}
-                      </h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        {resource.description}
-                      </p>
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs px-3 py-1 bg-primary/10 text-primary rounded-full font-medium">
-                            {resource.category}
-                          </span>
-                        </div>
-                        {resource.tags && resource.tags.length > 0 && (
-                          <div className="flex flex-wrap gap-1">
-                            {resource.tags.slice(0, 4).map((tag, tagIndex) => (
-                              <span
-                                key={tagIndex}
-                                className="text-xs px-2 py-1 bg-secondary text-secondary-foreground rounded"
-                              >
-                                {tag}
-                              </span>
-                            ))}
-                            {resource.tags.length > 4 && (
-                              <span className="text-xs text-muted-foreground">
-                                +{resource.tags.length - 4} more
-                              </span>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
                   </div>
                 </MobileResourcePopover>
               ))}

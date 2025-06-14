@@ -126,11 +126,11 @@ The application is configured for deployment on Replit:
 - **Analytics**: Google Analytics 4 integration for tracking user interactions
 - **Theme**: Dark theme with red accent color (#dc2626)
 
-## Recent Changes (January 14, 2025)
+## Recent Changes (June 14, 2025)
 
-✓ **Project Structure Cleanup**: Removed all deprecated GitHub Actions workflows and build scripts
-✓ **Single Deployment Workflow**: Created `deploy-clean.yml` as the only deployment method
-✓ **Documentation Updates**: Updated README.md with clear deployment architecture and usage instructions
-✓ **Simplified Build Process**: Eliminated complex React build dependencies in favor of static site generation
-✓ **Zero Maintenance Deployment**: Automated GitHub Pages deployment with authentic data fetching
-✓ **Clean Architecture**: Streamlined project structure focusing on core functionality
+✓ **Site Functionality Restored**: Fixed broken local development version by restoring missing UI components
+✓ **Component Architecture**: Recreated ResourceCard, LayoutSwitcher, MobileResourcePopover, and Pagination components
+✓ **Working Interface**: Local site now properly displays 2011 authentic awesome-video resources with full functionality
+✓ **Deployment Ready**: Single `deploy-static-site.yml` workflow builds exactly what runs locally
+✓ **Clean Build Process**: Deployment uses `npm run build` outputting to `dist/public` for GitHub Pages
+✓ **User Experience**: Restored search, filtering, layout switching, and pagination features
