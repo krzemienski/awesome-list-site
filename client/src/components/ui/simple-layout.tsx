@@ -124,14 +124,14 @@ export default function SimpleLayout({ resources, title, description }: SimpleLa
               <CardContent>
                 <div className="flex flex-wrap gap-2">
                   <Badge variant="secondary">{resource.category}</Badge>
-                  {resource.tags.slice(0, 3).map(tag => (
+                  {(resource.tags || []).slice(0, 3).map(tag => (
                     <Badge key={tag} variant="outline" className="text-xs">
                       {tag}
                     </Badge>
                   ))}
-                  {resource.tags.length > 3 && (
+                  {(resource.tags || []).length > 3 && (
                     <Badge variant="outline" className="text-xs">
-                      +{resource.tags.length - 3}
+                      +{(resource.tags || []).length - 3}
                     </Badge>
                   )}
                 </div>
