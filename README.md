@@ -1,6 +1,16 @@
 # Awesome List Static Site Generator
 
-Transform any GitHub awesome list into a beautiful, SEO-optimized static website with search, categorization, and optional AI enhancements.
+Transform any GitHub awesome list into a beautiful, SEO-optimized static website with search, categorization, and analytics.
+
+## 🚀 Features
+
+- **Static Site Generation**: Convert awesome lists to fast, SEO-friendly websites
+- **Beautiful UI**: Modern dark theme with responsive design
+- **Advanced Search**: Filter by categories, tags, and keywords
+- **Analytics Ready**: Google Analytics integration
+- **GitHub Pages Deployment**: Automated deployment via GitHub Actions
+- **Multiple Layouts**: Card, list, and compact views
+- **Mobile Optimized**: Fully responsive design
 
 ## Quick Start
 
@@ -9,20 +19,23 @@ Transform any GitHub awesome list into a beautiful, SEO-optimized static website
    ```yaml
    site:
      title: "Your Awesome List"
+     description: "A curated list of awesome resources"
+   deployment:
      url: "https://yourusername.github.io/awesome-list-site"
-   source:
-     url: "https://raw.githubusercontent.com/username/awesome-list/main/README.md"
-     format: "markdown"  # or "json" for structured data
-   features:
-     ai_tags: true       # Requires ANTHROPIC_API_KEY
+   analytics:
+     enabled: true
+     googleAnalyticsId: "G-XXXXXXXXXX"  # Optional
    ```
-3. **Set environment variables** (for AI features):
+3. **Build and test locally**:
    ```bash
-   export ANTHROPIC_API_KEY="sk-ant-your-key-here"
+   npm install
+   npm run dev
+   # Visit http://localhost:5001
    ```
-4. **Deploy**:
+4. **Deploy to GitHub Pages**:
    ```bash
-   npx tsx scripts/build-and-deploy.ts
+   npm run build
+   npx tsx scripts/deploy-simple.ts
    ```
 5. **Enable GitHub Pages** in repository settings → Pages → Source: GitHub Actions
 
@@ -32,9 +45,16 @@ Your site will be live at: `https://yourusername.github.io/awesome-list-site`
 
 ```bash
 npm install
-export ANTHROPIC_API_KEY="sk-ant-your-key-here"  # Optional, for AI features
 npm run dev
-# Visit http://localhost:5000
+# Visit http://localhost:5001
+```
+
+### Building for Production
+
+```bash
+npm run build
+# Test the static build locally
+npx serve dist/public -p 8080 -s
 ```
 
 ## Environment Variables

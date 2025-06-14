@@ -11,7 +11,7 @@ This is a static site generator that transforms GitHub "awesome lists" into SEO-
 ```bash
 # Development
 npm install          # Install dependencies
-npm run dev         # Start dev server (http://localhost:5000)
+npm run dev         # Start dev server (http://localhost:5001)
 
 # Build & Deploy
 npm run build       # Build client and server
@@ -49,12 +49,41 @@ Main config: `awesome-list.config.yaml`
 - Analytics settings
 - Deployment configuration
 
+## Data Format Compatibility
+
+The parser (`client/src/lib/parser.ts`) handles two data formats:
+
+1. **API Format** (from development server):
+   - `resources` array
+   - `category` as string
+   - `url` field for links
+
+2. **Static Format** (from JSON files):
+   - `projects` array
+   - `category` as array (uses first element)
+   - `homepage` field for links
+
 ## Development Guidelines
+
+### Port Configuration
+- Development server runs on port 5001 (changed from 5000 to avoid conflicts)
+- Static preview server runs on port 8080
 
 ### Adding Features
 - Components go in `client/src/components/`
 - Use existing Shadcn/ui components when possible
 - Follow TypeScript types in `client/src/types/`
+
+### Building for Production
+```bash
+npm run build
+cp client/public/data/* dist/public/data/  # Copy data files
+```
+
+### Testing Static Site Locally
+```bash
+npx serve dist/public -p 8080 -s  # Serve with SPA mode
+```
 
 ### Deployment
 The site deploys to GitHub Pages via:
@@ -62,8 +91,16 @@ The site deploys to GitHub Pages via:
 2. GitHub Actions workflow handles deployment
 3. Analytics automatically integrated if configured
 
+### Common Issues & Fixes
+1. **Parser errors**: Check data format (API vs static)
+2. **Missing resources**: Ensure flat `resources` array exists in AwesomeList
+3. **Category issues**: Handle both string and array formats
+4. **Port conflicts**: Dev server uses 5001, static preview uses 8080
+
 ### Testing Changes
 Always verify:
 1. `npm run build` succeeds
 2. No TypeScript errors
-3. Site works at http://localhost:5000 in dev mode
+3. Dev server works at http://localhost:5001
+4. Static build works when served locally
+5. Both show the same content and functionality
