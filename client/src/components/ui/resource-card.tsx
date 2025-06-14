@@ -2,8 +2,6 @@ import { Card, CardContent } from "../ui/card";
 import { ExternalLink } from "lucide-react";
 import { Resource } from "../../types/awesome-list";
 import { motion } from "framer-motion";
-import { trackResourceClick, trackPopoverView, trackMobileInteraction } from "../../lib/analytics";
-import ResourceTooltip from "../ui/resource-tooltip";
 
 interface ResourceCardProps {
   resource: Resource;
@@ -38,60 +36,57 @@ export default function ResourceCard({ resource, index }: ResourceCardProps) {
       animate="visible"
       variants={fadeInVariants}
     >
-      <ResourceTooltip resource={resource}>
-        <Card className="h-full transition-all hover:shadow-md">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between gap-x-2 mb-2">
-              <h3 className="text-lg font-semibold leading-none tracking-tight">
-                <a
-                  href={resource.url}
-                  className="text-primary hover:text-primary/80 underline inline-flex items-center gap-1.5 touch-manipulation"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ 
-                    touchAction: 'manipulation',
-                    minHeight: '44px',
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    trackResourceClick(resource.title, resource.url, resource.category);
-                    console.log('Resource card clicked:', resource.title, resource.url);
-                  }}
-                >
-                  {resource.title}
-                  <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
-                </a>
-              </h3>
+      <Card className="h-full transition-all hover:shadow-md">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between gap-x-2 mb-2">
+            <h3 className="text-lg font-semibold leading-none tracking-tight">
+              <a
+                href={resource.url}
+                className="text-primary hover:text-primary/80 underline inline-flex items-center gap-1.5 touch-manipulation"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ 
+                  touchAction: 'manipulation',
+                  minHeight: '44px',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  console.log('Resource card clicked:', resource.title, resource.url);
+                }}
+              >
+                {resource.title}
+                <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
+              </a>
+            </h3>
+          </div>
+          
+          <p className="text-sm text-muted-foreground">
+            {resource.description}
+          </p>
+          
+          {(resource.subcategory || (resource.tags && resource.tags.length > 0)) && (
+            <div className="mt-3 flex items-center gap-1 flex-wrap">
+              {resource.subcategory && (
+                <span className="text-xs px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground">
+                  {resource.subcategory}
+                </span>
+              )}
+              {resource.tags?.slice(0, 3).map((tag, index) => (
+                <span key={index} className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                  {tag}
+                </span>
+              ))}
+              {resource.tags && resource.tags.length > 3 && (
+                <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                  +{resource.tags.length - 3}
+                </span>
+              )}
             </div>
-            
-            <p className="text-sm text-muted-foreground">
-              {resource.description}
-            </p>
-            
-            {(resource.subcategory || (resource.tags && resource.tags.length > 0)) && (
-              <div className="mt-3 flex items-center gap-1 flex-wrap">
-                {resource.subcategory && (
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground">
-                    {resource.subcategory}
-                  </span>
-                )}
-                {resource.tags?.slice(0, 3).map((tag, index) => (
-                  <span key={index} className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
-                    {tag}
-                  </span>
-                ))}
-                {resource.tags && resource.tags.length > 3 && (
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-                    +{resource.tags.length - 3}
-                  </span>
-                )}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </ResourceTooltip>
+          )}
+        </CardContent>
+      </Card>
     </motion.div>
   );
 }
