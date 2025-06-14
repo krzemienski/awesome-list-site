@@ -1,8 +1,8 @@
-name: Deploy Simple Static Site
+# DISABLED - Use deploy-clean.yml instead
+name: DISABLED - Deploy Simple Static Site
 
 on:
-  push:
-    branches: [ main ]
+  # Disabled to prevent conflicts
   workflow_dispatch:
 
 permissions:

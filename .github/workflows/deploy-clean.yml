@@ -4,6 +4,9 @@ on:
   push:
     branches: [ main ]
   workflow_dispatch:
+  schedule:
+    # Run daily at 6 AM UTC to refresh data
+    - cron: '0 6 * * *'
 
 permissions:
   contents: read
@@ -139,6 +142,7 @@ jobs:
               margin-bottom: 16px;
               font-weight: 800;
               letter-spacing: -0.02em;
+              text-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);
             }
             
             .subtitle {
