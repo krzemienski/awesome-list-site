@@ -122,7 +122,7 @@ ${entries.map(entry => `  <url>
 }
 
 // Run if called directly
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   generateSitemap().catch(console.error);
 }
 
