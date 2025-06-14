@@ -1,0 +1,100 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Create static data
+      run: |
+        mkdir -p client/public/data
+        node -e "
+        const https = require('https');
+        const fs = require('fs');
+        const url = 'https://raw.githubusercontent.com/krzemienski/awesome-video/master/contents.json';
+        
+        https.get(url, (res) => {
+          let data = '';
+          res.on('data', chunk => data += chunk);
+          res.on('end', () => {
+            try {
+              const json = JSON.parse(data);
+              const resources = json.projects.map((project, index) => ({
+                id: index + 1,
+                title: project.title,
+                url: project.homepage,
+                description: project.description || 'Video tool or resource',
+                category: Array.isArray(project.category) ? project.category[0] : (project.category || 'Tools'),
+                subcategory: Array.isArray(project.category) && project.category[1] ? project.category[1] : undefined,
+                tags: project.tags || []
+              }));
+              
+              const awesomeList = {
+                title: 'Awesome Video',
+                description: 'A curated list of awesome video tools and resources',
+                repoUrl: 'https://github.com/krzemienski/awesome-video',
+                resources: resources
+              };
+              
+              fs.writeFileSync('client/public/data/awesome-list.json', JSON.stringify(awesomeList, null, 2));
+              console.log('✅ Generated static data with', resources.length, 'resources');
+            } catch (error) {
+              console.error('❌ Error processing data:', error);
+              process.exit(1);
+            }
+          });
+        }).on('error', (error) => {
+          console.error('❌ Error fetching data:', error);
+          process.exit(1);
+        });
+        "
+        
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+      
+    - name: Build with static data
+      run: |
+        cd client
+        VITE_STATIC_BUILD=true npm run build
+        
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: ./client/dist
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
