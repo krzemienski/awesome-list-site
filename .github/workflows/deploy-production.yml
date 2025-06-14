@@ -1,9 +1,5 @@
-# DISABLED - Use deploy-clean.yml instead
-name: DISABLED - Deploy to GitHub Pages
-
-on:
-  # Disabled to prevent conflicts
-  workflow_dispatch:
+# DISABLED
+name: DISABLED
 
 permissions:
   contents: read

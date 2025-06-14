@@ -1,5 +1,5 @@
-# DISABLED - Use deploy-clean.yml instead
-name: DISABLED - Build React Assets
+# DISABLED
+name: DISABLED
 
 on:
   # Disabled to prevent conflicts

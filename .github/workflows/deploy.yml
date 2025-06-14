@@ -1,11 +1,5 @@
-# DEPRECATED - Use deploy-clean.yml instead
-# This file is kept for reference but should not be used
-
-name: DEPRECATED - Deploy to GitHub Pages
-
-on:
-  # Disabled - use deploy-clean.yml instead
-  workflow_dispatch:
+# This file is disabled - use deploy-static-site.yml
+name: DISABLED
 
 permissions:
   contents: read

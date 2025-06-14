@@ -1,4 +1,5 @@
-name: Force Deploy Modern Site
+# DISABLED
+name: DISABLED
 
 on:
   workflow_dispatch:

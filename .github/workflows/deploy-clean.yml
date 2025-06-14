@@ -1,4 +1,5 @@
-name: Deploy Awesome Video Site
+# DISABLED
+name: DISABLED
 
 on:
   push:
