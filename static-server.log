@@ -1,0 +1,73 @@
+ INFO  Accepting connections at http://localhost:57316
+ HTTP  6/14/2025 10:11:32 AM ::1 GET /
+ HTTP  6/14/2025 10:11:32 AM ::1 Returned 200 in 10 ms
+ HTTP  6/14/2025 10:11:32 AM ::1 GET /assets/index-C1Iko6Oa.js
+ HTTP  6/14/2025 10:11:32 AM ::1 GET /assets/index-D-ArMTUm.css
+ HTTP  6/14/2025 10:11:32 AM ::1 Returned 200 in 0 ms
+ HTTP  6/14/2025 10:11:32 AM ::1 Returned 200 in 3 ms
+ HTTP  6/14/2025 10:11:32 AM ::1 GET /data/awesome-list.json
+ HTTP  6/14/2025 10:11:32 AM ::1 Returned 200 in 2 ms
+ HTTP  6/14/2025 10:12:14 AM ::1 GET /assets/index-C1Iko6Oa.js
+ HTTP  6/14/2025 10:12:14 AM ::1 Returned 304 in 1 ms
+ HTTP  6/14/2025 10:12:21 AM ::1 GET /?t=123
+ HTTP  6/14/2025 10:12:21 AM ::1 Returned 200 in 1 ms
+ HTTP  6/14/2025 10:12:21 AM ::1 GET /assets/index-C1Iko6Oa.js
+ HTTP  6/14/2025 10:12:21 AM ::1 Returned 304 in 1 ms
+ HTTP  6/14/2025 10:12:21 AM ::1 GET /assets/index-D-ArMTUm.css
+ HTTP  6/14/2025 10:12:21 AM ::1 Returned 304 in 0 ms
+ HTTP ::1 - - [14/Jun/2025 10:21:26] "HEAD / HTTP/1.1" 200 -
+::1 - - [14/Jun/2025 10:21:32] "GET / HTTP/1.1" 200 -
+::1 - - [14/Jun/2025 10:21:32] "GET /assets/index-D-ArMTUm.css HTTP/1.1" 200 -
+::1 - - [14/Jun/2025 10:21:32] "GET /assets/index-C1Iko6Oa.js HTTP/1.1" 200 -
+::1 - - [14/Jun/2025 10:21:32] "GET /data/awesome-list.json HTTP/1.1" 200 -
+::1 - - [14/Jun/2025 10:23:16] "GET / HTTP/1.1" 200 -
+::1 - - [14/Jun/2025 10:23:16] "GET /assets/index-D-ArMTUm.css HTTP/1.1" 200 -
+::1 - - [14/Jun/2025 10:23:16] "GET /assets/index-C1Iko6Oa.js HTTP/1.1" 200 -
+::1 - - [14/Jun/2025 10:23:16] "GET /data/awesome-list.json HTTP/1.1" 200 -
+AM ::1 Returned 304 in 1 ms
+ HTTP  6/14/2025 10:15:14 AM ::1 GET /assets/index-C1Iko6Oa.js
+ HTTP  6/14/2025 10:15:14 AM ::1 Returned 304 in 1 ms
+ HTTP  6/14/2025 10:15:14 AM ::1 GET /assets/index-D-ArMTUm.css
+ HTTP  6/14/2025 10:15:14 AM ::1 Returned 304 in 0 ms
+ HTTP  6/14/2025 10:15:14 AM ::1 GET /data/awesome-list.json
+ HTTP  6/14/2025 10:15:14 AM ::1 Returned 304 in 0 ms
+ HTTP  6/14/2025 10:15:19 AM ::1 GET /
+ HTTP  6/14/2025 10:15:19 AM ::1 Returned 304 in 1 ms
+ HTTP  6/14/2025 10:15:19 AM ::1 GET /assets/index-D-ArMTUm.css
+ HTTP  6/14/2025 10:15:19 AM ::1 GET /assets/index-C1Iko6Oa.js
+ HTTP  6/14/2025 10:15:19 AM ::1 Returned 304 in 1 ms
+ HTTP  6/14/2025 10:15:19 AM ::1 Returned 304 in 0 ms
+ HTTP  6/14/2025 10:15:19 AM ::1 GET /data/awesome-list.json
+ HTTP  6/14/2025 10:15:19 AM ::1 Returned 304 in 0 ms
+ HTTP  6/14/2025 10:16:57 AM ::1 HEAD /
+ HTTP  6/14/2025 10:16:57 AM ::1 Returned 200 in 0 ms
+ HTTP  6/14/2025 10:17:45 AM ::1 GET /
+ HTTP  6/14/2025 10:17:45 AM ::1 Returned 304 in 1 ms
+ HTTP  6/14/2025 10:17:45 AM ::1 GET /assets/index-C1Iko6Oa.js
+ HTTP  6/14/2025 10:17:45 AM ::1 Returned 304 in 1 ms
+ HTTP  6/14/2025 10:17:45 AM ::1 GET /assets/index-D-ArMTUm.css
+ HTTP  6/14/2025 10:17:45 AM ::1 Returned 304 in 0 ms
+ HTTP  6/14/2025 10:17:45 AM ::1 GET /data/awesome-list.json
+ HTTP  6/14/2025 10:17:45 AM ::1 Returned 304 in 0 ms
+ HTTP  6/14/2025 10:18:23 AM ::1 GET /
+ HTTP  6/14/2025 10:18:23 AM ::1 Returned 304 in 0 ms
+ HTTP  6/14/2025 10:18:23 AM ::1 GET /assets/index-C1Iko6Oa.js
+ HTTP  6/14/2025 10:18:23 AM ::1 Returned 304 in 0 ms
+ HTTP  6/14/2025 10:18:23 AM ::1 GET /assets/index-D-ArMTUm.css
+ HTTP  6/14/2025 10:18:23 AM ::1 Returned 304 in 0 ms
+ HTTP  6/14/2025 10:18:23 AM ::1 GET /data/awesome-list.json
+ HTTP  6/14/2025 10:18:23 AM ::1 Returned 304 in 1 ms
+ HTTP  6/14/2025 10:18:56 AM ::1 GET /assets/index-C1Iko6Oa.js
+ HTTP  6/14/2025 10:18:56 AM ::1 Returned 200 in 0 ms
+ HTTP  6/14/2025 10:19:06 AM ::1 GET /api/awesome-list
+ HTTP  6/14/2025 10:19:06 AM ::1 Returned 404 in 1 ms
+ HTTP  6/14/2025 10:19:57 AM ::1 GET /
+ HTTP  6/14/2025 10:19:57 AM ::1 Returned 304 in 1 ms
+ HTTP  6/14/2025 10:19:57 AM ::1 GET /assets/index-C1Iko6Oa.js
+ HTTP  6/14/2025 10:19:57 AM ::1 Returned 304 in 0 ms
+ HTTP  6/14/2025 10:19:57 AM ::1 GET /assets/index-D-ArMTUm.css
+ HTTP  6/14/2025 10:19:57 AM ::1 Returned 304 in 0 ms
+ HTTP  6/14/2025 10:19:57 AM ::1 GET /data/awesome-list.json
+ HTTP  6/14/2025 10:19:57 AM ::1 Returned 304 in 1 ms
+
+ INFO  Gracefully shutting down. Please wait...

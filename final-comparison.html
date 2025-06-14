@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Final Site Comparison - Dev vs Static</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+        .site-container {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .site-header {
+            background: #333;
+            color: white;
+            padding: 15px 20px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .status {
+            font-size: 14px;
+            padding: 4px 12px;
+            border-radius: 4px;
+            background: #4CAF50;
+        }
+        .status.loading {
+            background: #FF9800;
+        }
+        .status.error {
+            background: #F44336;
+        }
+        iframe {
+            width: 100%;
+            height: 700px;
+            border: none;
+            display: block;
+        }
+        .info {
+            background: #2196F3;
+            color: white;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Awesome Video - Development vs Static Site</h1>
+    
+    <div class="info">
+        Both sites should display identical content. The dev server fetches data from the API, while the static site loads from pre-built JSON files.
+    </div>
+    
+    <div class="comparison">
+        <div class="site-container">
+            <div class="site-header">
+                <span>Development Server (Port 5001)</span>
+                <span class="status" id="dev-status">Loading...</span>
+            </div>
+            <iframe 
+                id="dev-frame" 
+                src="http://localhost:5001/"
+                onload="updateStatus('dev-status', 'Live')"
+                onerror="updateStatus('dev-status', 'Error', true)"
+            ></iframe>
+        </div>
+        
+        <div class="site-container">
+            <div class="site-header">
+                <span>Static Site (Port 8080)</span>
+                <span class="status" id="static-status">Loading...</span>
+            </div>
+            <iframe 
+                id="static-frame" 
+                src="http://localhost:8080/"
+                onload="updateStatus('static-status', 'Live')"
+                onerror="updateStatus('static-status', 'Error', true)"
+            ></iframe>
+        </div>
+    </div>
+    
+    <script>
+        function updateStatus(id, text, isError = false) {
+            const element = document.getElementById(id);
+            element.textContent = text;
+            element.className = 'status' + (isError ? ' error' : '');
+        }
+        
+        // Check if sites are actually loading content
+        setTimeout(() => {
+            ['dev-frame', 'static-frame'].forEach(frameId => {
+                try {
+                    const frame = document.getElementById(frameId);
+                    const doc = frame.contentDocument || frame.contentWindow.document;
+                    const root = doc.getElementById('root');
+                    const statusId = frameId.replace('-frame', '-status');
+                    
+                    if (root && root.innerHTML.length > 100) {
+                        updateStatus(statusId, '✓ Running');
+                    } else {
+                        updateStatus(statusId, 'No Content', true);
+                    }
+                } catch (e) {
+                    console.error(`Error checking ${frameId}:`, e);
+                }
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+
+> rest-express@1.0.0 dev
+> NODE_ENV=development tsx server/index.ts
+
+Fetching awesome-video data from JSON source
+Fetching awesome-video JSON from: https://raw.githubusercontent.com/krzemienski/awesome-video/master/contents.json
+✅ JSON data fetched successfully
+✅ Parsed 2011 video resources
+Successfully fetched awesome-video with 2011 resources
+10:16:33 AM [express] serving on port 5001
+Browserslist: browsers data (caniuse-lite) is 8 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+10:17:13 AM [express] GET /api/awesome-list 304 in 20ms :: {"title":"Awesome Video ","description":"A…
+10:25:22 AM [vite] hmr update /src/App.tsx?v=TpzRAww6hgWqEQJ6KHDtx, /src/index.css?v=TpzRAww6hgWqEQJ6KHDtx
+10:31:32 AM [vite] hmr update /src/App.tsx?v=TpzRAww6hgWqEQJ6KHDtx, /src/index.css?v=TpzRAww6hgWqEQJ6KHDtx
+10:33:24 AM [vite] page reload index.html
+10:43:51 AM [vite] hmr update /src/App.tsx?v=TpzRAww6hgWqEQJ6KHDtx, /src/index.css?v=TpzRAww6hgWqEQJ6KHDtx, /src/pages/Category.tsx
+10:43:58 AM [vite] hmr update /src/App.tsx?v=TpzRAww6hgWqEQJ6KHDtx, /src/index.css?v=TpzRAww6hgWqEQJ6KHDtx, /src/pages/Category.tsx
+10:44:16 AM [vite] hmr update /src/App.tsx?v=TpzRAww6hgWqEQJ6KHDtx, /src/index.css?v=TpzRAww6hgWqEQJ6KHDtx, /src/pages/Category.tsx
+10:44:49 AM [vite] hmr update /src/App.tsx?v=TpzRAww6hgWqEQJ6KHDtx, /src/index.css?v=TpzRAww6hgWqEQJ6KHDtx, /src/pages/Category.tsx
+10:44:58 AM [vite] hmr update /src/App.tsx?v=TpzRAww6hgWqEQJ6KHDtx, /src/index.css?v=TpzRAww6hgWqEQJ6KHDtx, /src/pages/Category.tsx
+10:44:58 AM [vite] hmr update /src/App.tsx?v=TpzRAww6hgWqEQJ6KHDtx, /src/index.css?v=TpzRAww6hgWqEQJ6KHDtx, /src/pages/Category.tsx
+10:45:19 AM [vite] hmr update /src/App.tsx?v=TpzRAww6hgWqEQJ6KHDtx, /src/index.css?v=TpzRAww6hgWqEQJ6KHDtx, /src/pages/Category.tsx
+11:23:07 AM [express] GET /api/awesome-list 200 in 120ms :: {"title":"Awesome Video ","description":"…
+12:18:18 PM [vite] hmr update /src/App.tsx?v=TpzRAww6hgWqEQJ6KHDtx, /src/index.css?v=TpzRAww6hgWqEQJ6KHDtx, /src/pages/Category.tsx
+1:49:49 PM [express] GET /api/awesome-list 200 in 39ms :: {"title":"Awesome Video ","description":"A…

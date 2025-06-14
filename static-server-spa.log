@@ -1,0 +1,87 @@
+ INFO  Accepting connections at http://localhost:8080
+ HTTP  6/14/2025 10:40:17 AM ::1 GET /
+ HTTP  6/14/2025 10:40:17 AM ::1 Returned 200 in 10 ms
+ HTTP  6/14/2025 10:40:17 AM ::1 GET /assets/index-DgCZxNEo.js
+ HTTP  6/14/2025 10:40:17 AM ::1 GET /assets/index-D-ArMTUm.css
+ HTTP  6/14/2025 10:40:17 AM ::1 Returned 200 in 1 ms
+ HTTP  6/14/2025 10:40:17 AM ::1 Returned 200 in 3 ms
+ HTTP  6/14/2025 10:40:17 AM ::1 GET /data/awesome-list.json
+ HTTP  6/14/2025 10:40:17 AM ::1 Returned 200 in 2 ms
+ HTTP  6/14/2025 10:41:33 AM ::1 GET /?v=rebuilt
+ HTTP  6/14/2025 10:41:33 AM ::1 Returned 200 in 1 ms
+ HTTP  6/14/2025 10:41:33 AM ::1 GET /assets/index-DgCZxNEo.js
+ HTTP  6/14/2025 10:41:33 AM ::1 GET /assets/index-D-ArMTUm.css
+ HTTP  6/14/2025 10:41:33 AM ::1 Returned 304 in 1 ms
+ HTTP  6/14/2025 10:41:33 AM ::1 Returned 304 in 3 ms
+ HTTP  6/14/2025 10:41:33 AM ::1 GET /data/awesome-list.json
+ HTTP  6/14/2025 10:41:33 AM ::1 Returned 304 in 2 ms
+ HTTP  6/14/2025 10:42:29 AM ::1 GET /test-js.html
+ HTTP  6/14/2025 10:42:29 AM ::1 Returned 301 in 1 ms
+ HTTP  6/14/2025 10:42:29 AM ::1 GET /test-js
+ HTTP  6/14/2025 10:42:29 AM ::1 Returned 200 in 1 ms
+ HTTP  6/14/2025 10:42:29 AM ::1 GET /assets/index-DgCZxNEo.js
+ HTTP  6/14/2025 10:42:29 AM ::1 GET /assets/index-D-ArMTUm.css
+ HTTP  6/14/2025 10:42:29 AM ::1 Returned 304 in 0 ms
+ HTTP  6/14/2025 10:42:29 AM ::1 Returned 304 in 3 ms
+ HTTP  6/14/2025 10:42:29 AM ::1 GET /data/awesome-list.json
+ HTTP  6/14/2025 10:42:29 AM ::1 Returned 304 in 2 ms
+ HTTP  6/14/2025 11:24:28 AM ::1 GET /
+ HTTP  6/14/2025 11:24:28 AM ::1 Returned 200 in 1 ms
+ HTTP  6/14/2025 11:24:28 AM ::1 GET /assets/index-bx6TkoCt.js
+ HTTP  6/14/2025 11:24:28 AM ::1 GET /assets/index-D-ArMTUm.css
+ HTTP  6/14/2025 11:24:28 AM ::1 Returned 200 in 1 ms
+ HTTP  6/14/2025 11:24:28 AM ::1 Returned 200 in 4 ms
+ HTTP  6/14/2025 11:24:28 AM ::1 GET /data/awesome-list.json
+ HTTP  6/14/2025 11:24:28 AM ::1 Returned 200 in 4 ms
+ HTTP  6/14/2025 12:22:32 PM ::1 GET /
+ HTTP  6/14/2025 12:22:32 PM ::1 Returned 200 in 1 ms
+ HTTP  6/14/2025 1:47:58 PM ::1 GET /robots.txt
+ HTTP  6/14/2025 1:47:58 PM ::1 Returned 200 in 46 ms
+ HTTP  6/14/2025 1:47:58 PM ::1 GET /
+ HTTP  6/14/2025 1:47:58 PM ::1 Returned 200 in 1 ms
+ HTTP  6/14/2025 1:48:05 PM ::1 GET /robots.txt
+ HTTP  6/14/2025 1:48:05 PM ::1 Returned 200 in 1 ms
+ HTTP  6/14/2025 1:48:05 PM ::1 GET /
+ HTTP  6/14/2025 1:48:05 PM ::1 Returned 200 in 1 ms
+ HTTP  6/14/2025 1:48:19 PM ::1 GET /
+ HTTP  6/14/2025 1:48:19 PM ::1 Returned 200 in 1 ms
+ HTTP  6/14/2025 1:48:19 PM ::1 GET /assets/index-Bcj3cU8A.js
+ HTTP  6/14/2025 1:48:19 PM ::1 GET /assets/index-D-ArMTUm.css
+ HTTP  6/14/2025 1:48:19 PM ::1 Returned 304 in 2 ms
+ HTTP  6/14/2025 1:48:19 PM ::1 Returned 200 in 5 ms
+ HTTP  6/14/2025 1:48:19 PM ::1 GET /data/awesome-list.json
+ HTTP  6/14/2025 1:48:19 PM ::1 Returned 304 in 3 ms
+ HTTP  6/14/2025 1:48:23 PM ::1 GET /robots.txt
+ HTTP  6/14/2025 1:48:23 PM ::1 Returned 200 in 1 ms
+ HTTP  6/14/2025 1:48:23 PM ::1 GET /assets/index-Bcj3cU8A.js
+ HTTP  6/14/2025 1:48:23 PM ::1 Returned 200 in 0 ms
+ HTTP  6/14/2025 1:48:29 PM ::1 GET /
+ HTTP  6/14/2025 1:48:29 PM ::1 Returned 200 in 1 ms
+ HTTP  6/14/2025 1:48:29 PM ::1 GET /assets/index-Bcj3cU8A.js
+ HTTP  6/14/2025 1:48:29 PM ::1 GET /assets/index-D-ArMTUm.css
+ HTTP  6/14/2025 1:48:29 PM ::1 Returned 200 in 1 ms
+ HTTP  6/14/2025 1:48:29 PM ::1 Returned 200 in 0 ms
+ HTTP  6/14/2025 1:48:30 PM ::1 GET /data/awesome-list.json
+ HTTP  6/14/2025 1:48:30 PM ::1 Returned 200 in 1 ms
+ HTTP  6/14/2025 1:49:42 PM ::1 GET /data/awesome-list.json
+ HTTP  6/14/2025 1:49:42 PM ::1 Returned 200 in 1 ms
+ HTTP  6/14/2025 1:50:19 PM ::1 GET /verify.html
+ HTTP  6/14/2025 1:50:19 PM ::1 Returned 301 in 2 ms
+ HTTP  6/14/2025 1:50:19 PM ::1 GET /verify
+ HTTP  6/14/2025 1:50:19 PM ::1 Returned 200 in 1 ms
+ HTTP  6/14/2025 1:50:19 PM ::1 GET /assets/index-D-ArMTUm.css
+ HTTP  6/14/2025 1:50:19 PM ::1 GET /assets/index-Bcj3cU8A.js
+ HTTP  6/14/2025 1:50:19 PM ::1 Returned 304 in 5 ms
+ HTTP  6/14/2025 1:50:19 PM ::1 Returned 304 in 2 ms
+ HTTP  6/14/2025 1:50:20 PM ::1 GET /data/awesome-list.json
+ HTTP  6/14/2025 1:50:20 PM ::1 Returned 304 in 1 ms
+ HTTP  6/14/2025 1:50:45 PM ::1 GET /
+ HTTP  6/14/2025 1:50:45 PM ::1 Returned 200 in 1 ms
+ HTTP  6/14/2025 1:51:47 PM ::1 GET /
+ HTTP  6/14/2025 1:51:47 PM ::1 Returned 304 in 1 ms
+ HTTP  6/14/2025 1:51:47 PM ::1 GET /assets/index-Bcj3cU8A.js
+ HTTP  6/14/2025 1:51:47 PM ::1 GET /assets/index-D-ArMTUm.css
+ HTTP  6/14/2025 1:51:47 PM ::1 Returned 304 in 1 ms
+ HTTP  6/14/2025 1:51:47 PM ::1 Returned 304 in 2 ms
+ HTTP  6/14/2025 1:51:47 PM ::1 GET /data/awesome-list.json
+ HTTP  6/14/2025 1:51:47 PM ::1 Returned 304 in 6 ms
