@@ -1,7 +1,7 @@
-import { Badge } from "../ui/badge";
+import { Badge } from "@/components/ui/badge";
 import { ExternalLink } from "lucide-react";
 import { Resource } from "../../types/awesome-list";
-import ResourcePreviewTooltip from "../ui/resource-preview-tooltip";
+import ResourcePreviewTooltip from "@/components/ui/resource-preview-tooltip";
 
 interface ResourceCompactItemProps {
   resource: Resource;
