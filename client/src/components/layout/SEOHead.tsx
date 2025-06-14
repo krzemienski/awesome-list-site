@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet";
-import { AwesomeList } from "../../types/awesome-list";
+import { AwesomeList } from "@/types/awesome-list";
 
 interface SEOHeadProps {
   title?: string;

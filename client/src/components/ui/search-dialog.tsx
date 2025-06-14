@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { useLocation } from "wouter";
 import Fuse from "fuse.js";
-import { Resource } from "../../types/awesome-list";
+import { Resource } from "@/types/awesome-list";
 import { trackSearch, trackResourceClick, trackPerformance } from "@/lib/analytics";
 
 interface SearchDialogProps {

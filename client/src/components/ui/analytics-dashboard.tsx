@@ -34,7 +34,7 @@ import {
   Calendar,
   Search
 } from "lucide-react";
-import { Resource } from "../../types/awesome-list";
+import { Resource } from "@/types/awesome-list";
 
 interface AnalyticsData {
   totalResources: number;

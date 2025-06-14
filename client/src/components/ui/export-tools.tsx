@@ -15,7 +15,7 @@ import {
   Filter,
   CheckCircle
 } from "lucide-react";
-import { AwesomeList, Resource, Category } from "../../types/awesome-list";
+import { AwesomeList, Resource, Category } from "@/types/awesome-list";
 
 interface ExportToolsProps {
   awesomeList: AwesomeList;

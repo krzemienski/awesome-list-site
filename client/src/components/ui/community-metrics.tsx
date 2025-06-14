@@ -15,7 +15,7 @@ import {
   Eye,
   MessageSquare
 } from "lucide-react";
-import { Resource, Category } from "../../types/awesome-list";
+import { Resource, Category } from "@/types/awesome-list";
 
 interface CommunityMetricsProps {
   resources: Resource[];

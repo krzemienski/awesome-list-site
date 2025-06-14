@@ -13,7 +13,7 @@ import {
   Zap,
   Target
 } from "lucide-react";
-import { Resource } from "../../types/awesome-list";
+import { Resource } from "@/types/awesome-list";
 
 interface ResourceRecommendationsProps {
   currentResource?: Resource;

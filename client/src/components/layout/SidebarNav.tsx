@@ -5,7 +5,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "..
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "../ui/sheet";
 import { X } from "lucide-react";
 import { slugify, getCategorySlug, getSubcategorySlug, countResourcesByCategory } from "@/lib/utils";
-import { Category, Resource } from "../../types/awesome-list";
+import { Category, Resource } from "@/types/awesome-list";
 import { Skeleton } from "../ui/skeleton";
 
 interface SidebarNavProps {

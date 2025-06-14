@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useLocation } from "wouter";
-import { Category, Resource } from "../../types/awesome-list";
+import { Category, Resource } from "@/types/awesome-list";
 import { cn } from "@/lib/utils";
 
 interface CategoryExplorerProps {

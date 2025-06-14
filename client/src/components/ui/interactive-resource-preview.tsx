@@ -19,7 +19,7 @@ import {
   Clock,
   Activity
 } from "lucide-react";
-import { Resource } from "../../types/awesome-list";
+import { Resource } from "@/types/awesome-list";
 import { useToast } from "@/hooks/use-toast";
 
 interface InteractiveResourcePreviewProps {

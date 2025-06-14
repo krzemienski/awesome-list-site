@@ -15,7 +15,7 @@ import {
   Globe,
   Github
 } from "lucide-react";
-import { Resource } from "../../types/awesome-list";
+import { Resource } from "@/types/awesome-list";
 
 interface ResourcePreviewTooltipProps {
   resource: Resource;
