@@ -12,16 +12,16 @@ import {
   SidebarGroupLabel,
   SidebarGroupContent,
   SidebarFooter
-} from "../../ui/sidebar";
-import { Button } from "../../ui/button";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../../ui/accordion";
-import { Skeleton } from "../../ui/skeleton";
-import { Sheet, SheetContent, SheetTrigger } from "../../ui/sheet";
+} from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Home, Folder, ExternalLink, Menu } from "lucide-react";
-import { slugify, getCategorySlug, getSubcategorySlug } from "../../../lib/utils";
-import { Category } from "../../../types/awesome-list";
-import { cn } from "../../../lib/utils";
-import { useIsMobile } from "../../../hooks/use-mobile";
+import { slugify, getCategorySlug, getSubcategorySlug } from "@/lib/utils";
+import { Category } from "@/types/awesome-list";
+import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ModernSidebarProps {
   title: string;

@@ -9,7 +9,7 @@ import { Checkbox } from "../ui/checkbox";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
 import { useLocation } from "wouter";
 import { Category, Resource } from "../../types/awesome-list";
-import { cn } from "../../lib/utils";
+import { cn } from "@/lib/utils";
 
 interface CategoryExplorerProps {
   categories: Category[];
