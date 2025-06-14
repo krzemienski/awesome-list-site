@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - test-static-site  # Deploy from test branch for now
   workflow_dispatch:
 
 permissions:
