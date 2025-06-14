@@ -1,0 +1,75 @@
+name: Deploy Awesome Video Static Site
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup environment variables
+        env:
+          VITE_GA_MEASUREMENT_ID: ${{ secrets.VITE_GA_MEASUREMENT_ID }}
+          VITE_SITE_TITLE: "Awesome Video"
+          VITE_SITE_DESCRIPTION: "A curated list of awesome video tools, libraries, and resources"
+          VITE_SITE_URL: "https://krzemienski.github.io/awesome-list-site"
+          VITE_DEFAULT_THEME: "dark"
+        run: |
+          echo "VITE_GA_MEASUREMENT_ID=$VITE_GA_MEASUREMENT_ID" >> .env
+          echo "VITE_SITE_TITLE=$VITE_SITE_TITLE" >> .env
+          echo "VITE_SITE_DESCRIPTION=$VITE_SITE_DESCRIPTION" >> .env
+          echo "VITE_SITE_URL=$VITE_SITE_URL" >> .env
+          echo "VITE_DEFAULT_THEME=$VITE_DEFAULT_THEME" >> .env
+
+      - name: Fetch awesome-video data
+        run: |
+          mkdir -p client/public/data
+          curl -L "https://raw.githubusercontent.com/krzemienski/awesome-video/master/contents.json" -o client/public/data/awesome-list.json
+          
+      - name: Generate sitemap
+        run: npm run build:sitemap
+
+      - name: Build React application
+        run: npm run build:client
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './client/dist'
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
