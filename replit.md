@@ -128,9 +128,9 @@ The application is configured for deployment on Replit:
 
 ## Recent Changes (June 14, 2025)
 
-✓ **Site Functionality Restored**: Fixed broken local development version by restoring missing UI components
-✓ **Component Architecture**: Recreated ResourceCard, LayoutSwitcher, MobileResourcePopover, and Pagination components
-✓ **Working Interface**: Local site now properly displays 2011 authentic awesome-video resources with full functionality
-✓ **Deployment Ready**: Single `deploy-static-site.yml` workflow builds exactly what runs locally
-✓ **Clean Build Process**: Deployment uses `npm run build` outputting to `dist/public` for GitHub Pages
-✓ **User Experience**: Restored search, filtering, layout switching, and pagination features
+✓ **Full Application Restoration**: Restored working state from commit `89d17d8934a8cbc024e9f7bb0ce2ca95672c4137` before GitHub Pages work
+✓ **Authentic Data Display**: Site properly displays all 2011 awesome-video resources with complete functionality
+✓ **Component Architecture**: All UI components working with proper `@/` import paths and analytics integration
+✓ **GitHub Pages Ready**: Created clean `deploy-github-pages.yml` workflow that builds exactly what runs locally
+✓ **Production Deployment**: Uses `npm run build` outputting to `dist/public` for seamless GitHub Pages deployment
+✓ **User Experience**: Full functionality restored - search, filtering, layout switching, pagination, tooltips, and animations

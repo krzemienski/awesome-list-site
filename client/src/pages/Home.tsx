@@ -19,12 +19,35 @@ interface HomeProps {
 type LayoutType = "cards" | "list" | "compact";
 
 export default function Home({ awesomeList, isLoading }: HomeProps) {
-  const [layout, setLayout] = useState<LayoutType>("cards");
+  const [layout, setLayout] = useState<LayoutType>("list");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(24);
   const [sortBy, setSortBy] = useState("category");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+
+  // Handle category change with analytics
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category);
+    if (category !== "all") {
+      trackCategoryView(category);
+      trackFilterUsage("category", category, filteredResources.length);
+    }
+  };
+
+  // Handle sort change with analytics
+  const handleSortChange = (sort: string) => {
+    setSortBy(sort);
+    trackSortChange(sort);
+  };
+
+  // Handle search with analytics
+  const handleSearchChange = (search: string) => {
+    setSearchTerm(search);
+    if (search.length >= 2) {
+      trackFilterUsage("search", search, filteredResources.length);
+    }
+  };
   
   // Use all resources for home page display
   const allResources = awesomeList?.resources || [];
@@ -76,61 +99,63 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
         <meta name="description" content={`${awesomeList?.description || "A curated list of awesome resources"} - ${allResources.length} resources across ${categories.length} categories.`} />
         <meta name="keywords" content={`awesome list, ${awesomeList?.title?.toLowerCase() || 'resources'}, developer tools, curated resources, programming`} />
         <meta property="og:title" content={awesomeList?.title || "Awesome List"} />
-        <meta property="og:description" content={`${awesomeList?.description || "A curated list of awesome resources"} - ${allResources.length} resources available.`} />
+        <meta property="og:description" content={awesomeList?.description || "A curated list of awesome resources"} />
         <meta property="og:type" content="website" />
-        <meta property="og:image" content="/og-image.svg" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={awesomeList?.title || "Awesome List"} />
-        <meta name="twitter:description" content={`${awesomeList?.description || "A curated list of awesome resources"} - ${allResources.length} resources available.`} />
-        <link rel="canonical" href="/" />
+        <meta name="twitter:description" content={awesomeList?.description || "A curated list of awesome resources"} />
       </Helmet>
-      
+
       {isLoading ? (
         <>
-          <Skeleton className="h-12 w-3/4 mb-2" />
-          <Skeleton className="h-6 w-full mb-8" />
+          {/* Loading skeletons */}
+          <div className="mb-8 space-y-4">
+            <Skeleton className="h-8 w-64" />
+            <Skeleton className="h-6 w-96" />
+          </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Array(6).fill(0).map((_, i) => (
-              <Skeleton key={i} className="h-32 w-full" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="space-y-3">
+                <Skeleton className="h-6 w-3/4" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-2/3" />
+              </div>
             ))}
           </div>
         </>
       ) : (
         <>
-          <div className="mb-6">
-            <p className="text-muted-foreground mb-4">
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold tracking-tight mb-2">
+              {awesomeList?.title || "Awesome List"}
+            </h1>
+            <p className="text-muted-foreground text-lg">
               {awesomeList?.description || "A curated list of awesome resources"}
             </p>
             
-            {/* Search Bar */}
-            <div className="relative mb-4">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Search resources..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
+            {/* Stats */}
+            <div className="flex items-center gap-4 mt-4 text-sm text-muted-foreground">
+              <span>{allResources.length.toLocaleString()} resources</span>
+              <span>•</span>
+              <span>{categories.length} categories</span>
+              <span>•</span>
+              <span>{filteredResources.length.toLocaleString()} showing</span>
             </div>
           </div>
           
-          {/* Controls */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <span>
-                Showing {filteredResources.length} of {allResources.length} resources
-              </span>
-              {searchTerm && (
-                <span className="text-blue-600">
-                  for "{searchTerm}"
-                </span>
-              )}
-              {selectedCategory !== "all" && (
-                <span className="text-green-600">
-                  in {selectedCategory}
-                </span>
-              )}
+          {/* Filters */}
+          <div className="mb-8 space-y-4">
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search resources..."
+                value={searchTerm}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                className="pl-10"
+              />
             </div>
             
             <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
@@ -140,7 +165,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                 <span className="text-sm text-muted-foreground">Category:</span>
                 <Select
                   value={selectedCategory}
-                  onValueChange={setSelectedCategory}
+                  onValueChange={handleCategoryChange}
                 >
                   <SelectTrigger className="w-40">
                     <SelectValue />
@@ -167,7 +192,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                 <span className="text-sm text-muted-foreground">Sort:</span>
                 <Select
                   value={sortBy}
-                  onValueChange={setSortBy}
+                  onValueChange={handleSortChange}
                 >
                   <SelectTrigger className="w-32">
                     <SelectValue />
