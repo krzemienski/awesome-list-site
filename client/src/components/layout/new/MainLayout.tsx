@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import ModernSidebar from "./ModernSidebar";
-import { AwesomeList } from "../../types/awesome-list";
+import { AwesomeList } from "../../../types/awesome-list";
 import TopBar from "../TopBar";
 import Footer from "../Footer";
-import SearchDialog from "../ui/search-dialog";
-import ThemeSelector from "../ui/theme-selector";
-import { useIsMobile } from "../../hooks/use-mobile";
+import SearchDialog from "../../ui/search-dialog";
+import ThemeSelector from "../../ui/theme-selector";
+import { useIsMobile } from "../../../hooks/use-mobile";
 
 interface MainLayoutProps {
   awesomeList?: AwesomeList;

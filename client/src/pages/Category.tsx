@@ -16,8 +16,9 @@ import Pagination from "../components/ui/pagination";
 import { Search, Filter } from "lucide-react";
 import { deslugify, slugify } from "../lib/utils";
 import { Resource, AwesomeList } from "../types/awesome-list";
-import NotFound from "@/pages/not-found";
+import NotFound from "./not-found";
 import { processAwesomeListData } from "../lib/parser";
+import { Helmet } from "react-helmet";
 
 // Sample resources for categories
 const sampleResources: Resource[] = [

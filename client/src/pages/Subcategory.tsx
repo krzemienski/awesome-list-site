@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Search, Filter } from "lucide-react";
 import { deslugify } from "../lib/utils";
 import { Resource, AwesomeList } from "../types/awesome-list";
-import NotFound from "@/pages/not-found";
+import NotFound from "./not-found";
 import { Helmet } from "react-helmet";
 
 // Demo subcategory resources

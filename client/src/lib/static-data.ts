@@ -5,7 +5,7 @@
  * In development, data is fetched from the API server
  */
 
-import { AwesomeList } from '@/types/awesome-list';
+import { AwesomeList } from '../types/awesome-list';
 
 export async function fetchStaticAwesomeList(): Promise<any> {
   // In production/static builds, fetch from pre-generated data
