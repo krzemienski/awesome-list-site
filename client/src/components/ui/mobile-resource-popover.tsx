@@ -1,9 +1,19 @@
 import React, { useState } from 'react';
-import { ExternalLink, Tag } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './dialog';
-import { Button } from './button';
-import { Badge } from './badge';
-import { Resource } from '../../types/awesome-list';
+import { ExternalLink, Star, GitFork, Calendar, Tag } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { trackPopoverView, trackResourceClick, trackMobileInteraction, trackTagInteraction } from '@/lib/analytics';
+
+interface Resource {
+  id?: string;
+  title: string;
+  url: string;
+  description: string;
+  category: string;
+  subcategory?: string;
+  tags?: string[];
+}
 
 interface MobileResourcePopoverProps {
   resource: Resource;
@@ -13,13 +23,30 @@ interface MobileResourcePopoverProps {
 export default function MobileResourcePopover({ resource, children }: MobileResourcePopoverProps) {
   const [isOpen, setIsOpen] = useState(false);
 
+  const handlePopoverOpen = () => {
+    trackPopoverView(resource.title, resource.category);
+    trackMobileInteraction('popover_open', 'resource_card');
+  };
+
   const handleOpenResource = () => {
+    trackResourceClick(resource.title, resource.url, resource.category);
+    trackMobileInteraction('resource_click', 'open_button');
     window.open(resource.url, '_blank', 'noopener,noreferrer');
     setIsOpen(false);
   };
 
+  const handleTagClick = (tag: string) => {
+    trackTagInteraction(tag, 'click');
+    trackMobileInteraction('tag_click', tag);
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+      setIsOpen(open);
+      if (open) {
+        handlePopoverOpen();
+      }
+    }}>
       <DialogTrigger asChild>
         <div className="cursor-pointer touch-manipulation">
           {children}
