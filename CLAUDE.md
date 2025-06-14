@@ -100,7 +100,31 @@ The site deploys to GitHub Pages via:
 ### Testing Changes
 Always verify:
 1. `npm run build` succeeds
-2. No TypeScript errors
+2. No TypeScript errors (`npm run check`)
 3. Dev server works at http://localhost:5001
-4. Static build works when served locally
+4. Static build works: `cd dist/public && python -m http.server 8080`
 5. Both show the same content and functionality
+
+## Recent Refactoring (December 2024)
+
+### Removed Dependencies (28 total)
+- Authentication packages (passport, express-session)
+- Database packages (@neondatabase/serverless, connect-pg-simple)
+- Next.js and related packages
+- Unused utilities (date-fns, react-icons, ws, openai)
+
+### Removed Components (21 total)
+- Unused Shadcn/ui components (calendar, carousel, table, etc.)
+- Legacy SidebarNav component
+
+### Cleanup Performed
+- Removed old documentation files (moved essential docs to README and CLAUDE.md)
+- Removed backup directories and temporary files
+- Simplified GitHub Actions to single `deploy.yml` workflow
+- Removed redundant deployment scripts
+
+### Current Structure
+- Minimal dependencies focused on core functionality
+- Clean component library with only used components
+- Single, reliable deployment workflow
+- Clear documentation in README.md and CLAUDE.md
