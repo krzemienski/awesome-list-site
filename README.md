@@ -41,7 +41,21 @@ Transform any GitHub awesome list into a beautiful, SEO-optimized static website
 
 Your site will be live at: `https://yourusername.github.io/awesome-list-site`
 
-## Local Development
+## 📦 Project Structure
+
+```
+├── client/           # React frontend application
+│   ├── public/      # Static assets and data files
+│   └── src/         # React components and logic
+├── server/          # Express backend (dev only)
+├── scripts/         # Build and deployment scripts
+├── docs/            # Documentation
+└── awesome-list.config.yaml  # Site configuration
+```
+
+## 🛠️ Development
+
+### Local Development Server
 
 ```bash
 npm install
@@ -53,92 +67,66 @@ npm run dev
 
 ```bash
 npm run build
-# Test the static build locally
-npx serve dist/public -p 8080 -s
+# Creates optimized build in dist/
 ```
 
-## Environment Variables
-
-### Option 1: Use the Setup Helper (Recommended)
+### Testing Static Build Locally
 
 ```bash
-npx tsx scripts/setup-env.ts
+npm run build
+cd dist/public
+python -m http.server 8080
+# Visit http://localhost:8080
 ```
 
-This creates a `.env` file with your API keys for local development.
+## 📧 Environment Variables
 
-### Option 2: Manual Setup
-
-Set environment variables before running the development server:
-
-```bash
-export ANTHROPIC_API_KEY="sk-ant-your-key-here"  # For AI features
-export VITE_GA_MEASUREMENT_ID="G-XXXXXXXXXX"     # For analytics
-npm run dev
-```
-
-### GitHub Deployment
-
-Add secrets in repository settings for production deployment:
+For AI-powered features (optional), you'll need:
 - `ANTHROPIC_API_KEY` - Get from [console.anthropic.com](https://console.anthropic.com)
-- `GA_MEASUREMENT_ID` - From Google Analytics dashboard
 
-## Configuration
+For analytics (optional):
+- `VITE_GA_MEASUREMENT_ID` - From Google Analytics dashboard
 
-Edit `awesome-list.config.yaml` to configure your site:
+## ⚙️ Configuration
 
-```yaml
-# Basic configuration
-site:
-  title: "Your Awesome List"
-  description: "Description of your awesome list"
-  url: "https://username.github.io/awesome-list-site"
-  author: "Your Name"
+Edit `awesome-list.config.yaml` to customize your site. The configuration wizard (`npx tsx scripts/setup-wizard.ts`) will help you set this up interactively.
 
-source:
-  url: "https://raw.githubusercontent.com/username/awesome-list/main/README.md"
-  format: "markdown"  # or "json"
-  refresh_interval: 24
-
-theme:
-  default: "red"  # red, blue, green, purple
-  primary_color: "#ef4444"
-
-features:
-  search: true
-  categories: true
-  ai_tags: false      # Requires ANTHROPIC_API_KEY
-  ai_descriptions: false
-  ai_categories: false
-
-analytics:
-  google_analytics: "G-XXXXXXXXXX"  # Optional
-```
-
-## Commands
+## 💻 Commands
 
 ```bash
-# Setup
-npx tsx scripts/setup-wizard.ts      # Complete configuration wizard
-npx tsx scripts/setup-env.ts         # Environment variables helper
+# Initial Setup
+npm install
+npx tsx scripts/setup-wizard.ts    # Interactive configuration
 
 # Development
-npm install
-npm run dev                           # Start development server
+npm run dev                         # Start dev server (http://localhost:5001)
+npm run build                       # Build for production
+npm run check                       # TypeScript type checking
 
-# Deployment  
-npx tsx scripts/deploy-simple.ts     # Reliable deployment (recommended)
-npx tsx scripts/build-and-deploy.ts  # Advanced deployment with local build
+# Deployment
+npx tsx scripts/deploy-simple.ts    # Deploy to GitHub Pages
 ```
 
-**Note**: The deployment branch (`gh-pages-build`) is fixed to ensure GitHub Actions workflow compatibility.
+## 🎯 Deployment
 
-## Troubleshooting
+### GitHub Pages (Recommended)
 
-**Configuration errors**: Ensure YAML syntax is correct and all required fields are present
+1. Push your code to GitHub
+2. Run deployment: `npx tsx scripts/deploy-simple.ts`
+3. Enable GitHub Pages: Repository Settings → Pages → Source: GitHub Actions
+4. Your site will be live at `https://[username].github.io/[repo-name]`
 
-**Data not loading**: Verify the awesome list URL is accessible and points to raw content
+### GitHub Actions
 
-**AI features not working**: Set ANTHROPIC_API_KEY environment variable locally
+The repository includes a GitHub Actions workflow that automatically deploys to GitHub Pages when you push to the main branch.
 
-**Build failures**: Check logs for specific errors and ensure all dependencies are installed
+## 🔧 Troubleshooting
+
+- **Black screen on static site**: Ensure data files exist in `client/public/data/`
+- **Port already in use**: The dev server runs on port 5001 by default
+- **Build failures**: Run `npm run check` to find TypeScript errors
+- **Deployment issues**: Check GitHub Actions logs for specific errors
+
+## 📄 License
+
+MIT - See LICENSE file for details
