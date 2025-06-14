@@ -13,15 +13,27 @@ export function processAwesomeListData(data: any): AwesomeList {
   }
 
   // Map resources with fallbacks for different field names
-  const resources: Resource[] = items.map((resource: any, index: number) => ({
-    id: resource.id || `resource-${index}`,
-    title: resource.title || resource.name || "Untitled",
-    url: resource.url || resource.homepage || "",
-    description: resource.description || "",
-    category: resource.category || "Uncategorized",
-    subcategory: resource.subcategory || undefined,
-    tags: resource.tags || [],
-  }));
+  const resources: Resource[] = items.map((resource: any, index: number) => {
+    // Handle category - could be string or array
+    let categoryName = "Uncategorized";
+    if (resource.category) {
+      if (Array.isArray(resource.category)) {
+        categoryName = resource.category[0] || "Uncategorized";
+      } else {
+        categoryName = resource.category;
+      }
+    }
+    
+    return {
+      id: resource.id || `resource-${index}`,
+      title: resource.title || resource.name || "Untitled",
+      url: resource.url || resource.homepage || "",
+      description: resource.description || "",
+      category: categoryName,
+      subcategory: resource.subcategory || undefined,
+      tags: resource.tags || [],
+    };
+  });
 
   // Create categories with their resources
   const categoryMap = new Map<string, Category>();
@@ -32,7 +44,7 @@ export function processAwesomeListData(data: any): AwesomeList {
     if (!categoryMap.has(categoryName)) {
       categoryMap.set(categoryName, {
         name: categoryName,
-        description: "",
+        slug: categoryName.toLowerCase().replace(/\s+/g, '-'),
         resources: [],
         subcategories: [],
       });
@@ -50,7 +62,7 @@ export function processAwesomeListData(data: any): AwesomeList {
       if (!subcategory) {
         subcategory = {
           name: subcategoryName,
-          description: "",
+          slug: subcategoryName.toLowerCase().replace(/\s+/g, '-'),
           resources: [],
         };
         category.subcategories.push(subcategory);
@@ -78,12 +90,23 @@ export function processAwesomeListData(data: any): AwesomeList {
     }
   });
 
-  return {
+  const result = {
     title: data.title || "Awesome List",
     description: data.description || data.header || "",
+    repoUrl: data.repoUrl || "https://github.com/sindresorhus/awesome",
+    resources, // Include flat resources array
     categories,
     totalResources: resources.length,
   };
+  
+  console.log("Parsed awesome list:", {
+    title: result.title,
+    totalResources: result.totalResources,
+    totalCategories: result.categories.length,
+    categoryNames: result.categories.map(c => `${c.name} (${c.resources.length} resources)`),
+  });
+  
+  return result;
 }
 
 /**

@@ -115,7 +115,7 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
               .filter(cat => 
                 cat.resources.length > 0 && 
                 cat.name !== "Table of contents" && 
-                !cat.name.startsWith("List of") &&
+                cat.name && !cat.name.startsWith("List of") &&
                 !["Contributing", "License", "External Links", "Anti-features"].includes(cat.name)
               )
               .map(category => (

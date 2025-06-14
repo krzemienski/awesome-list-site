@@ -24,7 +24,8 @@ export interface Category {
 export interface AwesomeList {
   title: string;
   description: string;
-  repoUrl: string;
+  repoUrl?: string;
   resources: Resource[];
   categories: Category[];
+  totalResources?: number;
 }
