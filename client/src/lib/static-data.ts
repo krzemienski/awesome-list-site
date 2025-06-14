@@ -8,26 +8,19 @@
 import { AwesomeList } from '@/types/awesome-list';
 
 export async function fetchStaticAwesomeList(): Promise<any> {
-  // In production/static builds, fetch from pre-generated data
-  if (import.meta.env.MODE === 'production' || import.meta.env.VITE_STATIC_BUILD === 'true') {
-    try {
-      const response = await fetch('/data/awesome-list.json');
-      if (!response.ok) {
-        throw new Error(`Failed to fetch static data: ${response.status}`);
-      }
-      return await response.json();
-    } catch (error) {
-      console.error('Failed to load static data, falling back to API:', error);
-      // Fallback to API if static data is not available
+  // For static builds, always use the pre-generated JSON data
+  try {
+    const response = await fetch('/data/awesome-list.json');
+    if (!response.ok) {
+      throw new Error(`Failed to load data: ${response.status} ${response.statusText}`);
     }
+    const data = await response.json();
+    console.log('Successfully loaded static awesome list data');
+    return data;
+  } catch (error) {
+    console.error('Failed to load awesome list data:', error);
+    throw new Error(`Unable to load awesome list data: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
-  
-  // Development mode or fallback - fetch from API
-  const response = await fetch('/api/awesome-list');
-  if (!response.ok) {
-    throw new Error(`Failed to fetch from API: ${response.status}`);
-  }
-  return await response.json();
 }
 
 export async function fetchSitemapData(): Promise<any> {
