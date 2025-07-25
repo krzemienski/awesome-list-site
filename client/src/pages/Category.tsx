@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
+import { Helmet } from "react-helmet";
 import { Skeleton } from "@/components/ui/skeleton";
 import ResourceCard from "@/components/ui/resource-card";
 import ResourcePreviewTooltip from "@/components/ui/resource-preview-tooltip";
