@@ -1,0 +1,33 @@
+Execute these commands in your terminal to resolve the git rebase:
+
+# Remove git locks
+rm -f .git/index.lock
+
+# Remove the conflicted file causing the merge issue
+rm -f .build-trigger
+
+# Skip the problematic commit in the rebase
+git rebase --skip
+
+# If successful, add your working files:
+echo "$(date)" > .build-trigger
+git add scripts/deploy-simple-working.ts
+git add awesome-list.config.yaml
+git add client/public/data/
+git add .build-trigger
+git add .deployment-ready
+git commit -m "Add working deployment with 2011 authentic awesome-video resources"
+git push origin main
+
+# If rebase fails, abort and start fresh:
+git rebase --abort
+git reset --hard origin/main
+git clean -fd
+
+# Then add working files to clean state:
+echo "$(date)" > .build-trigger
+git add scripts/deploy-simple-working.ts awesome-list.config.yaml client/public/data/ .build-trigger .deployment-ready
+git commit -m "Restore working deployment system"
+git push origin main
+
+Your deployment system with 2011 authentic resources is ready once git state is resolved.

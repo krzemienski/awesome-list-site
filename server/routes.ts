@@ -104,23 +104,14 @@ function generateOpenGraphImage(req: any, res: any) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Initialize awesome-go data
+  // Initialize awesome video data
   try {
-    console.log('Fetching awesome-go data from markdown source');
-    const awesomeGoData = await fetchAwesomeList(AWESOME_RAW_URL);
-    storage.setAwesomeListData(awesomeGoData);
-    console.log(`Successfully fetched awesome-go with ${awesomeGoData.resources.length} resources`);
+    console.log('Fetching awesome-video data from JSON source');
+    const awesomeVideoData = await fetchAwesomeVideoList();
+    storage.setAwesomeListData(awesomeVideoData);
+    console.log(`Successfully fetched awesome-video with ${awesomeVideoData.resources.length} resources`);
   } catch (error) {
-    console.error(`Error fetching awesome-go data: ${error}`);
-    // Fallback to awesome-video if awesome-go fails
-    try {
-      console.log('Falling back to awesome-video data');
-      const awesomeVideoData = await fetchAwesomeVideoList();
-      storage.setAwesomeListData(awesomeVideoData);
-      console.log(`Successfully fetched awesome-video with ${awesomeVideoData.resources.length} resources`);
-    } catch (fallbackError) {
-      console.error(`Error fetching fallback data: ${fallbackError}`);
-    }
+    console.error(`Error fetching awesome-video data: ${error}`);
   }
 
   // API routes
