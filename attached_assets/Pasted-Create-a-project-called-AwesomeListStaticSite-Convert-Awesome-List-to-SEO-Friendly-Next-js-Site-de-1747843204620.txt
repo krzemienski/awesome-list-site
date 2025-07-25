@@ -1,0 +1,346 @@
+Create a project called AwesomeListStaticSite: Convert Awesome-List to SEO-Friendly Next.js Site, description: # AwesomeListStaticSite — Condensed Requirement Spec (v2.0‑c, ≤ 9 999 chars)
+
+> **Scope** — A succinct version (≈ 8 k chars) of the full v2.0 spec, retaining every functional, UX, and technical mandate for quick reference or AI ingestion.
+
+---
+
+## 1 Mission
+
+Convert any Awesome‑List `README.md` (raw URL) into an SEO‑friendly, mobile‑first website built on **Next.js 14**, **Tailwind CSS v3/shadcn‑ui**, **TypeScript 5**, all containerised.
+
+## 2 High‑Level Goals
+
+1. Zero‑config (single env var).
+2. WCAG 2.1 AA.
+3. Lighthouse ≥ 95.
+4. JSON data layer.
+5. Docker‑first (no host Node).
+6. AI‑ready structure.
+7. **Runtime theme switch** (all palettes at [https://ui.shadcn.com/themes](https://ui.shadcn.com/themes)).
+8. Collapsible sidebar at every breakpoint.
+
+## 3 Core Features
+
+| Area       | Requirement                                                                                                          |
+| ---------- | -------------------------------------------------------------------------------------------------------------------- |
+| Input      | `AWESOME_RAW_URL`, fetched at build.                                                                                 |
+| Parsing    | `remark` → JSON; keep order; strip badges.                                                                           |
+| Static Gen | `getStaticProps` + ISR; build search index (Fuse 7).                                                                 |
+| UI         | shadcn primitives; **Sheet** (mobile), **ResizablePanel** (desktop); **FAB Theme Selector** (`Popover` + `Command`). |
+| Search     | Fuzzy (`/` shortcut) across title + desc.                                                                            |
+| Routing    | `/`, `/category/[slug]`, `/subcategory/[slug]`.                                                                      |
+| Theme      | CSS‑var tokens per palette; selection persisted in `localStorage`, fallback `prefers‑color‑scheme`.                  |
+| Quality    | `npm run lint`, `awesome-lint`, tests, Lighthouse CI inside container.                                               |
+
+## 4 Tech Stack
+
+* **Next.js 14** (App Router)
+* **React 18 + TS 5**
+* **Tailwind v3** + **shadcn/ui v4**
+* Fuse.js 7 · remark/unified · Zod
+* **radix‑ui Popover, Command**
+* **Framer Motion** animations
+* Docker 24 (multi‑stage → Nginx)
+
+## 5 System Overview
+
+````mermaid
+graph LR;MD[RAW README]-->P[remark parser];P-->J[JSON];J-->S[Next Static Build];S-->A[Static Assets];A-->N[Nginx];subgraph UI;SB[Sidebar];TS[Theme Selector];end```
+
+**Logging** — ISO‑8601 lines in `logs/build‑<UTC>.log`.
+
+## 6 Data Model (Zod)
+```ts
+interface Resource {id:string;title:string;url:string;description:string;category:string;subcategory?:string;}
+````
+
+JSON schema published under `schema/awesome-list.schema.json`.
+
+## 7 CLI Scripts
+
+* `./build-and-run.sh` — clean → lint → test → build → serve.
+* `pnpm dev` in container for HMR.
+
+## 8 AI Workflow (Cursor/Agents)
+
+Plan → Think (context7) → Execute (branch `feat/*`) → Review (lint + Lighthouse) → Done.
+
+## 9 Acceptance Criteria
+
+1. Builds pass for **awesome-python**, **awesome‑selfhosted**, **awesome‑go**.
+2. UI: toggle sidebar, theme switch (Default, Red, Rose, Orange, Green, Blue, Yellow, Violet).
+3. `awesome‑lint` 0; Lighthouse ≥ 95; Docker ≤ 200 MB.
+4. README onboarding < 60 s.
+
+## 10 UI Design Summary
+
+### 10.1 Layout
+
+* **TopBar** — logo/title, search, GitHub link, light/dark toggle.
+* **SidebarNav** — collapsible tree; icon‑only state (56 px).
+* **Main Grid** — responsive cards.
+* **FAB Theme Selector** bottom‑right.
+* **Footer** minimal.
+
+### 10.2 Components
+
+| Name          | Primitive         | Highlights            |
+| ------------- | ----------------- | --------------------- |
+| TopBar        | `div+Button`      | sticky, backdrop blur |
+| SidebarNav    | `Sheet/Accordion` | keyboard nav          |
+| ResourceCard  | `Card`            | link icon, tags       |
+| SearchDialog  | `Dialog+Command`  | CTRL/CMD+K            |
+| ThemeSelector | `Popover+Command` | hover open            |
+| ThemeToggle   | `Button`          | sun/moon              |
+
+### 10.3 Interaction Specs
+
+* Sidebar slide (`x:-100%↔0`) on mobile; width tween desktop.
+* FAB popover fade‑scale (120 ms).
+* Stagger cards (‑40 ms).
+* Search dialog drop‑in; backdrop blur.
+* Honour `prefers‑reduced‑motion`.
+
+### 10.4 Accessibility
+
+Visible focus (`ring‑2 ring‑primary`), `aria-expanded`, `aria-selected`, contrast ≥ 4.5:1.
+
+### 10.5 Performance
+
+FCP < 1.5 s (4G); CLS < 0.1; bundle ≤ 180 KB; lazy images; `next/font`.
+
+### 10.6 Wireframe References (ASCII in full spec)
+
+States covered: Home (open/closed), Category, Search, Theme popover, Mobile sheet (open/closed), Empty.
+
+## 11 Future Enhancements
+
+Multi‑list switcher, tag analytics, RSS, user‑imported themes.
+
+---
+
+*End of Condensed Specification*
+, refer to the following documentation:
+
+# Unified Project Documentation
+
+## Project Requirements Document
+
+### 1. Project Overview
+
+The AwesomeListStaticSite project converts any public Awesome-List `README.md` into a fully static, SEO-friendly, mobile-first website. The site is built with Next.js 14, Tailwind CSS v3 with shadcn-ui, and TypeScript 5, all running inside a Docker container. By reading a single environment variable (`AWESOME_RAW_URL`), it fetches and parses the raw Markdown, turns it into a JSON data layer, and renders a high-performance static site with search, theme switching, and accessible navigation.
+
+We aim for zero configuration, delivering WCAG 2.1 AA accessibility and a Lighthouse score of at least 95. Key objectives include a collapsible sidebar at all breakpoints, a floating theme selector with runtime palette switching, fuzzy client-side search, and build-time error handling with friendly fallbacks. Success means the site builds and runs for sample lists like awesome-python and awesome-go, passes linting and tests, and stays under 200 MB in its Docker image.
+
+### 2. In-Scope vs. Out-of-Scope
+
+In-Scope:
+
+*   Fetching the raw Markdown from `AWESOME_RAW_URL` at build time.
+*   Parsing with remark/unified, stripping badges, preserving order, validating via Zod.
+*   JSON data layer and Fuse.js index built during `getStaticProps` with ISR (24 h revalidate).
+*   Responsive UI: TopBar, collapsible SidebarNav (Sheet on mobile, resizable panel on desktop), Resource cards grid.
+*   Fuzzy search overlay (`/` and Ctrl/Cmd+K) using radix-ui Command.
+*   Theme selector FAB with all shadcn palettes, persisted to localStorage, fallback to system scheme.
+*   SEO metadata (page titles, descriptions, Open Graph) based on list name and description.
+*   Accessibility to WCAG 2.1 AA, visible focus rings, ARIA attributes.
+*   Quality gates: ESLint, awesome-lint, unit/snapshot/E2E tests, Lighthouse CI.
+*   Docker multi-stage build → Nginx with HTTP/2, cache-control, HSTS, HTTP→HTTPS redirects.
+*   Friendly error page on fetch or parse failure, with retry link and contact info.
+*   ISO-8601 logging in `logs/build-<UTC>.log` with rotation.
+
+Out-of-Scope:
+
+*   Exposing the parsed JSON as a public API endpoint.
+*   User accounts, authentication, or dynamic backend features.
+*   Multi-list switching, RSS feeds, or analytics dashboards.
+*   PWA offline support or service workers.
+*   Custom branding assets beyond a simple text title.
+*   Advanced log aggregation (external services) unless added later.
+
+### 3. User Flow
+
+A first-time visitor lands on the home page by navigating to the deployed URL. There is no account or sign-in; the site is fully public. The TopBar shows the site title, search input, GitHub link, and a light/dark toggle. A collapsible sidebar lists all categories and subcategories. The main area displays resource cards for the selected category (or all resources on home). The footer includes a brief credit, and there is an “About” page link for full attribution.
+
+From here, the user can click a category or subcategory in the sidebar to filter resources, press `/` or Ctrl/Cmd+K to open search, or use the floating theme selector to change the color palette. If the underlying Markdown fetch fails at build time, visitors see a friendly error page with a retry button and support link. Throughout, simple animations and transitions adapt to prefers-reduced-motion settings.
+
+### 4. Core Features
+
+*   Input Fetching and Parsing: fetch RAW README, parse to JSON via remark/unified, strip badges, validate with Zod.
+*   Data Layer & ISR: build a Fuse.js search index, use `getStaticProps` with 24h revalidation.
+*   Responsive UI: TopBar, collapsible SidebarNav (Sheet on mobile, panel on desktop), ResourceCard grid layout.
+*   Search Overlay: fuzzy search over title+description, keyboard shortcuts `/` and Ctrl/Cmd+K, real-time results.
+*   Theme Management: Runtime palette switcher with radix-ui Popover+Command, CSS-var tokens, localStorage persistence, system fallback.
+*   Routing: static routes for `/`, `/category/[slug]`, `/subcategory/[slug]`.
+*   SEO & Metadata: dynamic page titles, descriptions, Open Graph tags derived from list name and description.
+*   Accessibility: WCAG 2.1 AA compliance, ARIA roles, focus states, contrast ratios ≥ 4.5:1.
+*   Quality Assurance: ESLint, awesome-lint, Vitest unit tests, snapshot/UI tests, Playwright end-to-end tests, Lighthouse CI.
+*   Containerization & Deployment: Docker multi-stage → minimal image < 200 MB, Nginx with HTTP/2, cache-control, HSTS, HTTP→HTTPS.
+*   Logging & Error Handling: build logs in ISO-8601 format, log rotation, friendly error page.
+
+### 5. Tech Stack & Tools
+
+*   Next.js 14 with App Router for static generation and ISR.
+*   React 18 and TypeScript 5 for type safety.
+*   Tailwind CSS v3 and shadcn/ui v4 for utility-first and design primitives.
+*   remark/unified for Markdown parsing; Zod for schema validation.
+*   Fuse.js 7 for client-side fuzzy search.
+*   radix-ui Popover and Command for dialogs and menus.
+*   Framer Motion for subtle animations, honoring `prefers-reduced-motion`.
+*   Docker 24 (multi-stage) and Nginx for serving static assets.
+*   pnpm as package manager.
+*   ESLint, awesome-lint for code quality.
+*   Vitest for unit and snapshot tests; Playwright for end-to-end.
+*   Lighthouse CI inside container for performance and SEO checks.
+
+### 6. Non-Functional Requirements
+
+*   Performance: FCP < 1.5 s on 4G, CLS < 0.1, bundle size ≤ 180 KB.
+*   Accessibility: WCAG 2.1 AA, visible focus rings, ARIA attributes, contrast ≥ 4.5:1.
+*   SEO: dynamic metadata, Open Graph tags, friendly URLs.
+*   Security: HSTS, HTTPS redirects, secure headers via Nginx.
+*   Reliability: ISR revalidation every 24 h, friendly error fallback.
+*   Container Image: ≤ 200 MB, multi-stage build.
+*   Logging: ISO-8601 time stamps, log rotation via `logrotate`.
+
+### 7. Constraints & Assumptions
+
+*   Single env var (`AWESOME_RAW_URL`) drives content.
+*   Build-time parsing only; no server runtime beyond static serving.
+*   Relative links converted to absolute; badges stripped; code blocks and images rendered.
+*   JSON data used internally; no public API.
+*   No custom branding assets supplied; default site title in TopBar.
+*   Users may prefer reduced motion—complex animations are disabled, subtle transitions kept.
+*   Basic log persistence and rotation assumed; external aggregation not required initially.
+
+### 8. Known Issues & Potential Pitfalls
+
+*   Complex Markdown (nested lists, custom syntax) may break parsing; mitigate with strict Zod schema and unit tests.
+*   Large lists could inflate bundle size; use dynamic imports and code splitting.
+*   Downtime or slow fetch of raw URL at build—implement retries and friendly error page.
+*   Version mismatches in shadcn-ui or Tailwind—pin versions and test upgrades in a branch.
+*   ISR stale content window; document revalidation policy in README and allow manual rebuilds.
+
+## App Flow Document
+
+### Onboarding and Sign-In/Sign-Up
+
+When a user visits the site, they land directly on the home page without any sign-in or account creation. There is no authentication flow—everyone sees the same public content. If the site rebuild fails upstream, they see a clear error page with a retry button and contact link. Password recovery and user profiles are not part of this static site.
+
+### Main Dashboard or Home Page
+
+After loading, the user sees a TopBar across the top with the text-based site title “AwesomeListStaticSite,” a search input, a GitHub link, and a light/dark toggle. On desktop, a collapsible sidebar on the left shows the list of categories and subcategories; on mobile, a sheet component slides in when tapped. The main area displays responsive cards showing each resource’s title, description, and link icon. A minimal footer credits the original list authors and links to an About page.
+
+### Detailed Feature Flows and Page Transitions
+
+To browse, the user clicks a category name in the sidebar, which routes client-side to `/category/[slug]` and animates the main grid’s resource cards with a Framer Motion stagger. Clicking a subcategory refines the view at `/subcategory/[slug]`. At any time, pressing `/` or Ctrl/Cmd+K opens a fuzzy search dialog anchored by a backdrop blur; as the user types, results appear instantly, and selecting one closes the dialog and navigates to the matching category or external resource. Users can open the theme selector FAB in the bottom-right corner to switch color palettes; CSS variables update immediately, the choice saves to localStorage, and the popover closes with a fade-scale effect. Mobile interactions mirror desktop, with the sidebar as a sheet and theme selector as a popover.
+
+### Settings and Account Management
+
+There is no user account to manage, but the site stores theme preferences in localStorage. If the user clears storage or visits from another device, the site falls back to the system `prefers-color-scheme`. The About page provides attribution and license information; after reading it, users can click a link back to the home page or click any category in the sidebar.
+
+### Error States and Alternate Paths
+
+If the raw README fetch or parsing fails at build time, a static error page is served. This page explains that content could not load and offers a Retry button to reload the home page and a Contact link for support. During navigation, invalid routes show a 404 page with a link back to home. If the user’s network drops while the site is already loaded, browser fallback handles it, and the UI prompts them to retry actions.
+
+### Conclusion and Overall App Journey
+
+Overall, the user’s journey is simple: land on home, explore categories via sidebar or search, view resource cards, switch themes, and read About for credits. There is no login or user data, making the experience seamless and focused on discovering curated links with high performance and accessibility.
+
+## Tech Stack Document
+
+### Frontend Technologies
+
+*   Next.js 14 (App Router) for static pages, ISR, dynamic metadata.
+*   React 18 and TypeScript 5 for component-based UI and type safety.
+*   Tailwind CSS v3 with shadcn/ui v4 for utility-first styling and reusable primitives.
+*   radix-ui Popover and Command for accessible dialogs and menus.
+*   Framer Motion for animations, honoring `prefers-reduced-motion`.
+
+### Backend Technologies
+
+*   remark/unified for Markdown parsing into an AST.
+*   Zod for validating and shaping the data model.
+*   Fuse.js 7 for building a client-side search index.
+*   Next.js API routes are not used; the site is fully static after build.
+
+### Infrastructure and Deployment
+
+*   Docker 24 multi-stage builds to create a minimal production image under 200 MB.
+*   Nginx serves static assets over HTTP/2 with `Cache-Control: public, max-age=31536000, immutable`.
+*   HSTS and HTTPS redirects configured in Nginx.
+*   CI/CD via a simple shell script (`./build-and-run.sh`) orchestrating lint, test, build, and serve.
+*   Version control and code reviews in Git, branch naming for features (e.g., `feat/*`).
+
+### Third-Party Integrations
+
+*   GitHub link in TopBar for easy repository access.
+*   no external analytics or payment services in v1.
+*   shadcn UI theme library for consistent theming.
+
+### Security and Performance Considerations
+
+*   HTTP Strict Transport Security (HSTS) with `max-age=31536000; includeSubDomains; preload`.
+*   Redirect all HTTP traffic to HTTPS.
+*   Bundle size kept small through code splitting, lazy loading, and `next/font`.
+*   Static assets cached for one year and immutable.
+*   Logging build errors in ISO-8601 format with rotation to avoid disk exhaustion.
+
+### Conclusion and Overall Tech Stack Summary
+
+The chosen stack leverages Next.js for best-in-class static site generation and ISR, React and TypeScript for a robust UI codebase, and Tailwind/shadcn for rapid styling. Parsing and validation happen at build time for speed and reliability, while Docker and Nginx ensure a secure, performant deployment. This combination meets the project’s goals of zero config, high accessibility, and a Lighthouse score ≥ 95.
+
+## Frontend Guidelines Document
+
+### Frontend Architecture
+
+We use Next.js 14’s App Router to organize pages and layouts. Each top-level folder under `/app` maps to a route, with `layout.tsx` wrapping shared UI like the TopBar and SidebarNav. Components live under `/components` grouped by feature (e.g., `TopBar`, `Sidebar`, `ResourceCard`). This structure supports scalability—new pages or UI blocks slot in easily—and performance through server-side rendering at build time and incremental updates.
+
+### Design Principles
+
+Our UI focuses on usability, accessibility, and responsiveness. We follow WCAG 2.1 AA: all interactive elements have visible focus rings, proper ARIA attributes, and color contrast ratios ≥ 4.5:1. The layout adapts from mobile to desktop, using fluid grids and the shadcn Sheet component on small screens. Animations are subtle and disabled if the user prefers reduced motion.
+
+### Styling and Theming
+
+We use Tailwind CSS v3 combined with shadcn/ui v4 for a utility-first approach. Styling follows the BEM-inspired atomic classes from Tailwind. Themes are managed with CSS custom properties: each palette from [shadcn themes](https://ui.shadcn.com/themes) maps to a set of color tokens. The theme selector updates these variables at runtime. Our default typography uses system fonts (e.g., `ui-sans-serif, system-ui`) for performance and consistency.
+
+### Component Structure
+
+Components are atomic and reusable. Each component folder contains its `.tsx`, optional `.test.tsx`, and a readme if complex. For example, `components/ResourceCard` holds the card UI, while `components/SearchDialog` composes radix-ui primitives. This modularity reduces duplication and makes maintenance straightforward.
+
+### State Management
+
+State is local or lifted minimally. Theme selection lives in a React context that reads/writes localStorage. The search query and results are handled in a component-level hook using Fuse.js. Routing state is managed by Next.js; no global state library (like Redux) is needed.
+
+### Routing and Navigation
+
+Next.js App Router handles routing via file-based conventions. We have `/`, `/category/[slug]`, and `/subcategory/[slug]`. Links use `<Link>` for client-side transitions. The sidebar uses `usePathname` to highlight the active route, and the search dialog uses `router.push` on selection.
+
+### Performance Optimization
+
+We apply lazy loading for noncritical components (e.g., ThemeSelector), code splitting via dynamic imports, and optimize images with `next/image`. Fonts are loaded with `next/font` for automatic subsets. We keep bundle size under 180 KB and defer heavy scripts.
+
+### Testing and Quality Assurance
+
+We use Vitest for unit tests of parser logic and component snapshots. Playwright drives end-to-end tests for core flows: home, category navigation, search, and theme switching. ESLint and awesome-lint run on every commit. Lighthouse CI runs in the container to verify performance, accessibility, best practices, and SEO.
+
+### Conclusion and Overall Frontend Summary
+
+Our front end is built for clarity and speed: modular components, utility-first styling, accessible design, and theme flexibility. By combining Next.js, Tailwind, shadcn primitives, and rigorous testing, we ensure a maintainable codebase that delivers a polished user experience aligned with project goals.
+
+## Implementation Plan
+
+1.  **Project Setup**: Initialize a new Git repo; scaffold Next.js 14 with TypeScript and Tailwind CSS; install shadcn/ui, ESLint, Vitest, Playwright, Lighthouse CI.
+2.  **Markdown Parsing**: Add remark/unified pipeline and Zod schema; write and test the parser to convert raw README to JSON.
+3.  **Data Layer & ISR**: Create `getStaticProps` logic to fetch, parse, validate data; build Fuse.js index; configure revalidate=86400.
+4.  **Core UI Components**: Build TopBar, SidebarNav (Sheet/ResizablePanel), ResourceCard, Footer, About page, and Error page.
+5.  **Search Flow**: Implement SearchDialog with radix-ui Command; integrate Fuse.js; add keyboard shortcuts.
+6.  **Theme Selector**: Create FAB popover using radix-ui Popover+Command; map palettes to CSS variables; persist to localStorage; respect system preference.
+7.  **Routing & Layout**: Set up `/`, `/category/[slug]`, `/subcategory/[slug]` pages; apply shared layout with TopBar and SidebarNav.
+8.  **SEO Metadata**: Add dynamic `<Head>` tags for titles, descriptions, and Open Graph based on list data.
+9.  **Accessibility Enhancements**: Add ARIA attributes, focus states, and test with keyboard and screen readers.
+10. **Testing & CI**: Write Vitest unit tests, snapshot tests, Playwright E2E. Configure GitHub Actions or equivalent for lint, test, build, and Lighthouse CI.
+11. **Docker & Deployment**: Write multi-stage Dockerfile; configure Nginx with cache-control, HSTS, redirects; test container locally.
+12. **Logging & Error Handling**: Integrate build log output to `logs/build-<UTC>.log`; set up `logrotate`; test error fallback page.
+13. **Documentation & README**: Draft onboarding instructions under 60 s read; document environment variables, scripts, and contribution guidelines.
+14. **Final Review & Release**: Run full CI pipeline; verify Lighthouse scores and bundle size; tag release and deploy to hosting of choice.
