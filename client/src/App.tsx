@@ -1,23 +1,24 @@
 import { useState, useEffect } from "react";
-import { Switch, Route, useLocation } from "wouter";
+import { Switch, Route, useLocation, Router as WouterRouter } from "wouter";
+import { useHashLocation } from "wouter/use-hash-location";
 import { useQuery } from "@tanstack/react-query";
 import { initGA } from "./lib/analytics";
 import { useAnalytics } from "./hooks/use-analytics";
 import { useSessionAnalytics } from "./hooks/use-session-analytics";
 import { trackKeyboardShortcut } from "./lib/analytics";
 
-import MainLayout from "./components/layout/new/MainLayout";
-import ErrorPage from "./pages/ErrorPage";
-import Home from "./pages/Home";
-import Category from "./pages/Category";
-import Subcategory from "./pages/Subcategory";
-import About from "./pages/About";
-import Advanced from "./pages/Advanced";
-import NotFound from "./pages/not-found";
+import MainLayout from "@/components/layout/new/MainLayout";
+import ErrorPage from "@/pages/ErrorPage";
+import Home from "@/pages/Home";
+import Category from "@/pages/Category";
+import Subcategory from "@/pages/Subcategory";
+import About from "@/pages/About";
+import Advanced from "@/pages/Advanced";
+import NotFound from "@/pages/not-found";
 
-import { AwesomeList } from "./types/awesome-list";
-import { processAwesomeListData } from "./lib/parser";
-import { fetchStaticAwesomeList } from "./lib/static-data";
+import { AwesomeList } from "@/types/awesome-list";
+import { processAwesomeListData } from "@/lib/parser";
+import { fetchStaticAwesomeList } from "@/lib/static-data";
 
 function Router() {
   // Track page views when routes change
@@ -107,9 +108,19 @@ function App() {
     }
   }, []);
 
-  return (
-    <Router />
-  );
+  // Use hash routing for GitHub Pages compatibility
+  const isProduction = import.meta.env.PROD;
+  
+  if (isProduction) {
+    return (
+      <WouterRouter hook={useHashLocation}>
+        <Router />
+      </WouterRouter>
+    );
+  }
+  
+  // Use regular routing for development
+  return <Router />;
 }
 
 export default App;

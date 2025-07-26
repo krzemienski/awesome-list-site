@@ -1,5 +1,5 @@
 import Fuse from "fuse.js";
-import { Resource } from "../types/awesome-list";
+import { Resource } from "@/types/awesome-list";
 
 // Configure Fuse.js options for search
 const fuseOptions = {

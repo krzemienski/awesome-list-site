@@ -1,8 +1,8 @@
-# Awesome List Viewer Application
+# Awesome List Static Site Generator
 
 ## Overview
 
-This is a full-stack web application that displays curated resources from GitHub's "Awesome" lists. It features a React frontend with Tailwind CSS and shadcn/ui components, and a Node.js/Express backend. The application uses Drizzle ORM for database operations and follows a modern architecture with shared schemas between frontend and backend.
+This is a sophisticated static site generator that transforms GitHub "awesome lists" into beautiful, SEO-optimized websites. The application is currently configured for "Awesome Video" - a curated collection of video-related tools and resources. The system provides a modern, searchable interface with advanced features like analytics, theming, and deployment automation.
 
 ## User Preferences
 
@@ -10,127 +10,96 @@ Preferred communication style: Simple, everyday language.
 
 ## System Architecture
 
-The application follows a typical client-server architecture:
+### Frontend Architecture
+- **Framework**: React 18.3 with TypeScript for type safety and modern development
+- **Build Tool**: Vite 5.4 for fast development and optimized builds
+- **Styling**: TailwindCSS for utility-first styling with Shadcn/ui component library
+- **Routing**: Wouter for lightweight client-side routing
+- **State Management**: TanStack Query for server state and data fetching
+- **Animations**: Framer Motion for smooth UI transitions
 
-1. **Frontend**: React-based single-page application built with Vite, using shadcn/ui components, Tailwind CSS, and React Query for data fetching.
+### Backend Architecture
+- **Development Server**: Express.js for local development features
+- **AI Integration**: Anthropic Claude API for intelligent resource tagging and categorization
+- **Data Processing**: Custom parsers for awesome list markdown and JSON formats
+- **Static Generation**: Build-time data processing for GitHub Pages deployment
 
-2. **Backend**: Express.js server that provides API endpoints for fetching and managing resources.
-
-3. **Database**: Uses Drizzle ORM with PostgreSQL (currently configured but not fully implemented). The schema includes resources, categories, and subcategories.
-
-4. **Integration**: The frontend communicates with the backend via RESTful API endpoints. The backend fetches and parses GitHub's Awesome list content.
+### Data Storage Solutions
+- **Database**: Drizzle ORM with PostgreSQL support (optional, with memory fallback)
+- **Static Data**: JSON files in `client/public/data/` for production builds
+- **Schema**: Defined in `shared/schema.ts` with proper TypeScript types
 
 ## Key Components
 
-### Frontend
+### Data Processing Pipeline
+1. **Data Sources**: Supports both markdown parsing and direct JSON consumption
+2. **Parser System**: Custom parsers for different awesome list formats
+3. **AI Enhancement**: Optional AI-powered tagging and categorization using Anthropic Claude
+4. **Static Generation**: Build-time data processing for optimized delivery
 
-- **React with TypeScript**: The frontend is built using React 18+ with TypeScript.
-- **Vite**: Used for development server and build process.
-- **Tailwind CSS**: Provides styling with utility classes.
-- **shadcn/ui**: A collection of reusable UI components.
-- **React Query**: Manages server state and data fetching.
-- **Wouter**: Lightweight routing solution.
-- **Theme System**: Supports light, dark, and system themes.
+### User Interface Components
+- **Search System**: Fuse.js-powered fuzzy search across all resources
+- **Category Browser**: Hierarchical navigation with subcategory support
+- **Resource Cards**: Multiple layout options (cards, list, compact)
+- **Theme System**: Custom theme manager with Shadcn/ui theme variants
+- **Analytics Dashboard**: Comprehensive usage tracking and metrics
 
-### Backend
-
-- **Express.js**: Handles HTTP requests and API routes.
-- **Drizzle ORM**: Type-safe database operations.
-- **Node Fetch**: Used to fetch Awesome list content from GitHub.
-- **Remark**: Markdown parser for processing GitHub content.
-
-### Data Storage
-
-- **PostgreSQL**: Database for storing resources, categories, and subcategories.
-- **Drizzle Schema**: Defines database tables and relationships.
-- **Data Models**: 
-  - Resources (id, title, url, description, category, subcategory)
-  - Categories (id, name, slug)
-  - Subcategories (id, name, slug, categoryId)
+### Deployment System
+- **GitHub Actions**: Automated deployment workflows
+- **Static Builds**: Optimized for GitHub Pages hosting
+- **SEO Optimization**: Dynamic meta tags, sitemaps, and social sharing
 
 ## Data Flow
 
-1. **Initialization**:
-   - Server starts and attempts to fetch the Awesome list data from GitHub.
-   - Parsed resources are stored in memory and can be persisted to the database.
+1. **Development Mode**:
+   - Data fetched from GitHub APIs or local sources
+   - Express server handles API requests and AI processing
+   - Hot module replacement for fast development
 
-2. **User Interaction**:
-   - User visits the site and frontend makes API requests to the backend.
-   - Backend responds with Awesome list data.
-   - Resources can be filtered by category or subcategory.
-   - Search functionality allows users to find specific resources.
+2. **Production Build**:
+   - Static data generation via `scripts/build-static.ts`
+   - Vite builds optimized React application
+   - Static files deployed to GitHub Pages
 
-3. **Data Management**:
-   - Current implementation uses in-memory storage.
-   - Database schema is defined but persistence is not fully implemented.
+3. **User Interaction**:
+   - Client-side routing with Wouter
+   - TanStack Query manages data fetching and caching
+   - Analytics tracking for user behavior insights
 
 ## External Dependencies
 
-### Frontend Dependencies
+### Required Services
+- **GitHub**: Source data from awesome list repositories
+- **Anthropic Claude API**: AI-powered features (optional)
+- **Google Analytics**: User behavior tracking (optional)
 
-- React ecosystem (React, React DOM)
-- TanStack Query (React Query v5)
-- shadcn/ui components (based on Radix UI primitives)
-- Tailwind CSS
-- Lucide icons
-- Various UI libraries (Accordion, Dialog, Popover, etc.)
+### Build Dependencies
+- **Node.js**: Runtime environment
+- **Vite**: Build tool and development server
+- **TypeScript**: Type checking and compilation
+- **PostCSS**: CSS processing with TailwindCSS
 
-### Backend Dependencies
-
-- Express.js
-- Drizzle ORM
-- Node Fetch
-- Remark (Markdown parser)
-
-### Development Dependencies
-
-- TypeScript
-- Vite
-- ESBuild
-- TSX (TypeScript execute)
+### Runtime Dependencies
+- **Fuse.js**: Client-side search functionality
+- **Framer Motion**: Animation library
+- **React Query**: Data fetching and caching
 
 ## Deployment Strategy
 
-The application is configured for deployment on Replit:
+### Development Workflow
+1. Local development with `npm run dev`
+2. Data fetching from APIs or static files
+3. Hot module replacement for rapid iteration
 
-1. **Development Mode**:
-   - `npm run dev` starts both server and client in development mode.
-   - Vite provides hot module replacement for the frontend.
+### Production Deployment
+1. **Data Generation**: Run `npx tsx scripts/build-static.ts` to fetch and process data
+2. **Build Process**: `npm run build` creates optimized static files
+3. **GitHub Pages**: Automated deployment via GitHub Actions
+4. **CDN Distribution**: Static files served from GitHub's CDN
 
-2. **Production Build**:
-   - `npm run build` creates optimized production builds for both frontend and backend.
-   - Frontend is built into static assets.
-   - Backend is bundled with ESBuild.
+### Configuration Management
+- **awesome-list.config.yaml**: Main configuration file
+- **Environment Variables**: API keys and deployment settings
+- **Build Scripts**: Automated setup and deployment tools
 
-3. **Database Setup**:
-   - The application expects a PostgreSQL database and `DATABASE_URL` environment variable.
-   - Drizzle migrations can be pushed with `npm run db:push`.
-
-4. **Runtime**:
-   - The production server serves both the API and static frontend assets.
-   - The server listens on port 5000 by default.
-
-## Current Status
-
-✅ **Data Processing**: Successfully fetches and processes 2011 authentic awesome-video resources from GitHub JSON source
-✅ **GitHub Actions Deployment**: Automated deployment pipeline configured for GitHub Pages at krzemienski.github.io/awesome-list-site
-✅ **Configuration**: Complete site configuration with Google Analytics (G-383541848) and customizable themes
-✅ **Build System**: Streamlined build process that generates static data and deploys automatically
-✅ **Import Path Resolution**: Fixed complex import path issues that were blocking production builds
-
-## Deployment Architecture
-
-- **Source Data**: krzemienski/awesome-video repository (JSON format, 2011 resources)
-- **Deployment Target**: krzemienski.github.io/awesome-list-site
-- **Build Process**: GitHub Actions automatically fetches data, builds static site, and deploys to GitHub Pages
-- **Analytics**: Google Analytics 4 integration for tracking user interactions
-- **Theme**: Dark theme with red accent color (#dc2626)
-
-## Recent Changes (June 14, 2025)
-
-✓ **Full Application Restoration**: Restored working state from commit `89d17d8934a8cbc024e9f7bb0ce2ca95672c4137` before GitHub Pages work
-✓ **Authentic Data Display**: Site properly displays all 2011 awesome-video resources with complete functionality
-✓ **Component Architecture**: All UI components working with proper `@/` import paths and analytics integration
-✓ **GitHub Pages Ready**: Created clean `deploy-github-pages.yml` workflow that builds exactly what runs locally
-✓ **Production Deployment**: Uses `npm run build` outputting to `dist/public` for seamless GitHub Pages deployment
-✓ **User Experience**: Full functionality restored - search, filtering, layout switching, pagination, tooltips, and animations
+The architecture prioritizes performance, SEO, and maintainability while providing a rich user experience for browsing curated resources. The system supports both simple static deployments and advanced features like AI enhancement and analytics tracking.

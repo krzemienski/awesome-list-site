@@ -1,145 +1,132 @@
-# Awesome Video Site
+# Awesome List Static Site Generator
 
-A modern, fast static site that showcases the curated awesome-video collection with powerful search and filtering capabilities.
+Transform any GitHub awesome list into a beautiful, SEO-optimized static website with search, categorization, and analytics.
 
-## Overview
+## 🚀 Features
 
-This project transforms the [krzemienski/awesome-video](https://github.com/krzemienski/awesome-video) repository into an interactive web experience, deployed automatically to GitHub Pages at [krzemienski.github.io/awesome-list-site](https://krzemienski.github.io/awesome-list-site).
+- **Static Site Generation**: Convert awesome lists to fast, SEO-friendly websites
+- **Beautiful UI**: Modern dark theme with responsive design
+- **Advanced Search**: Filter by categories, tags, and keywords
+- **Analytics Ready**: Google Analytics integration
+- **GitHub Pages Deployment**: Automated deployment via GitHub Actions
+- **Multiple Layouts**: Card, list, and compact views
+- **Mobile Optimized**: Fully responsive design
 
-## Features
+## Quick Start
 
-- **Authentic Data**: Fetches real-time data from awesome-video repository (2011+ resources)
-- **Advanced Search**: Real-time search across titles, descriptions, and categories
-- **Smart Filtering**: Dynamic category filtering with visual feedback
-- **Modern Design**: Dark theme with responsive design optimized for all devices
-- **Analytics Integration**: Google Analytics tracking for user engagement
-- **Zero Maintenance**: Automated deployment with no manual builds required
+1. **Fork this repository**
+2. **Configure your awesome list** in `awesome-list.config.yaml`:
+   ```yaml
+   site:
+     title: "Your Awesome List"
+     description: "A curated list of awesome resources"
+   deployment:
+     url: "https://yourusername.github.io/awesome-list-site"
+   analytics:
+     enabled: true
+     googleAnalyticsId: "G-XXXXXXXXXX"  # Optional
+   ```
+3. **Build and test locally**:
+   ```bash
+   npm install
+   npm run dev
+   # Visit http://localhost:5001
+   ```
+4. **Deploy to GitHub Pages**:
+   ```bash
+   npm run build
+   npx tsx scripts/deploy-simple.ts
+   ```
+5. **Enable GitHub Pages** in repository settings → Pages → Source: GitHub Actions
 
-## Live Site
+Your site will be live at: `https://yourusername.github.io/awesome-list-site`
 
-Visit the deployed site: **https://krzemienski.github.io/awesome-list-site**
+## 📦 Project Structure
 
-## Deployment Architecture
-
-The site uses a streamlined GitHub Actions workflow that:
-
-1. **Fetches** latest data from awesome-video repository JSON source
-2. **Processes** 2011+ video resources into optimized format
-3. **Generates** a static site with embedded search and filtering
-4. **Deploys** automatically to GitHub Pages
-
-### Deployment Workflow
-
-The single deployment workflow (`.github/workflows/deploy-clean.yml`) handles everything:
-
-```yaml
-# Triggers on push to main branch or manual dispatch
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
-
-# Processes authentic data and deploys static site
-jobs:
-  build:
-    - Fetch awesome-video JSON data
-    - Transform into site format
-    - Generate static HTML with embedded functionality
-    - Deploy to GitHub Pages
+```
+├── client/           # React frontend application
+│   ├── public/      # Static assets and data files
+│   └── src/         # React components and logic
+├── server/          # Express backend (dev only)
+├── scripts/         # Build and deployment scripts
+├── docs/            # Documentation
+└── awesome-list.config.yaml  # Site configuration
 ```
 
-## Local Development
+## 🛠️ Development
 
-For local development and testing:
+### Local Development Server
 
 ```bash
-# Install dependencies
 npm install
-
-# Start development server
 npm run dev
-
-# Access at http://localhost:5000
+# Visit http://localhost:5001
 ```
 
-The development server fetches live data from the awesome-video repository and provides the same functionality as the deployed site.
+### Building for Production
 
-## Configuration
-
-Site configuration is managed in `awesome-list.config.yaml`:
-
-```yaml
-site:
-  title: "Awesome Video"
-  description: "A curated list of awesome video tools and resources"
-  url: "https://krzemienski.github.io/awesome-list-site"
-
-source:
-  url: "https://raw.githubusercontent.com/krzemienski/awesome-video/master/contents.json"
-  format: "json"
-
-analytics:
-  google_analytics: "G-383541848"
-
-theme:
-  default: "dark"
-  primary_color: "#dc2626"
+```bash
+npm run build
+# Creates optimized build in dist/
 ```
 
-## Project Structure
+### Testing Static Build Locally
 
-```
-├── .github/workflows/
-│   └── deploy-clean.yml     # Single deployment workflow
-├── client/                  # Development environment
-├── awesome-list.config.yaml # Site configuration
-├── README.md               # This file
-└── replit.md              # Project documentation
+```bash
+npm run build
+cd dist/public
+python -m http.server 8080
+# Visit http://localhost:8080
 ```
 
-## Data Flow
+## 📧 Environment Variables
 
-1. **Source**: awesome-video repository (JSON format, 2011+ resources)
-2. **Processing**: GitHub Actions transforms data into site format
-3. **Generation**: Static HTML created with embedded search/filter functionality
-4. **Deployment**: Automatic deployment to GitHub Pages
-5. **Analytics**: Google Analytics tracks user interactions
+For AI-powered features (optional), you'll need:
+- `ANTHROPIC_API_KEY` - Get from [console.anthropic.com](https://console.anthropic.com)
 
-## Key Technologies
+For analytics (optional):
+- `VITE_GA_MEASUREMENT_ID` - From Google Analytics dashboard
 
-- **Static Site Generation**: No complex build dependencies
-- **GitHub Actions**: Automated deployment pipeline
-- **Authentic Data**: Real-time fetching from source repository
-- **Modern JavaScript**: Vanilla JS with optimized performance
-- **Responsive Design**: Mobile-first CSS with dark theme
+## ⚙️ Configuration
 
-## Maintenance
+Edit `awesome-list.config.yaml` to customize your site. The configuration wizard (`npx tsx scripts/setup-wizard.ts`) will help you set this up interactively.
 
-The site requires zero maintenance:
-- Data updates automatically when awesome-video repository changes
-- Deployment triggers on any push to main branch
-- No local builds or manual deployments needed
-- Analytics provide insights into usage patterns
+## 💻 Commands
 
-## Contributing
+```bash
+# Initial Setup
+npm install
+npx tsx scripts/setup-wizard.ts    # Interactive configuration
 
-To modify the site:
+# Development
+npm run dev                         # Start dev server (http://localhost:5001)
+npm run build                       # Build for production
+npm run check                       # TypeScript type checking
 
-1. Update configuration in `awesome-list.config.yaml`
-2. Modify deployment workflow if needed
-3. Push changes to main branch
-4. GitHub Actions handles the rest
+# Deployment
+npx tsx scripts/deploy-simple.ts    # Deploy to GitHub Pages
+```
 
-## Analytics
+## 🎯 Deployment
 
-The site includes Google Analytics (G-383541848) tracking:
-- Resource views and clicks
-- Search queries and patterns
-- Category filter usage
-- Performance metrics
+### GitHub Pages (Recommended)
 
-## Support
+1. Push your code to GitHub
+2. Run deployment: `npx tsx scripts/deploy-simple.ts`
+3. Enable GitHub Pages: Repository Settings → Pages → Source: GitHub Actions
+4. Your site will be live at `https://[username].github.io/[repo-name]`
 
-- Source data: [awesome-video repository](https://github.com/krzemienski/awesome-video)
-- Live site: [krzemienski.github.io/awesome-list-site](https://krzemienski.github.io/awesome-list-site)
-- Issues: Create GitHub issues for bugs or feature requests
+### GitHub Actions
+
+The repository includes a GitHub Actions workflow that automatically deploys to GitHub Pages when you push to the main branch.
+
+## 🔧 Troubleshooting
+
+- **Black screen on static site**: Ensure data files exist in `client/public/data/`
+- **Port already in use**: The dev server runs on port 5001 by default
+- **Build failures**: Run `npm run check` to find TypeScript errors
+- **Deployment issues**: Check GitHub Actions logs for specific errors
+
+## 📄 License
+
+MIT - See LICENSE file for details

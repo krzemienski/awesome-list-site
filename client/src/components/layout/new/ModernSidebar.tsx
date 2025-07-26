@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { 
   Sidebar, 
   SidebarProvider, 
@@ -12,16 +12,16 @@ import {
   SidebarGroupLabel,
   SidebarGroupContent,
   SidebarFooter
-} from "../../ui/sidebar";
-import { Button } from "../../ui/button";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../../ui/accordion";
-import { Skeleton } from "../../ui/skeleton";
-import { Sheet, SheetContent, SheetTrigger } from "../../ui/sheet";
+} from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Home, Folder, ExternalLink, Menu } from "lucide-react";
-import { slugify, getCategorySlug, getSubcategorySlug } from "../../../lib/utils";
-import { Category } from "../../../types/awesome-list";
-import { cn } from "../../../lib/utils";
-import { useIsMobile } from "../../../hooks/use-mobile";
+import { slugify, getCategorySlug, getSubcategorySlug } from "@/lib/utils";
+import { Category } from "@/types/awesome-list";
+import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ModernSidebarProps {
   title: string;
@@ -74,8 +74,7 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
   };
 
   // Navigation helper to close mobile sidebar after clicking
-  const navigate = (path: string) => {
-    window.location.href = path;
+  const handleNavClick = () => {
     if (isMobile) {
       setIsOpen(false);
     }
@@ -85,17 +84,18 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
   const sidebarContent = (
     <>
       <div className="flex-1 overflow-auto p-3">
-        <Button
-          variant="ghost"
-          className={cn(
-            "w-full justify-start font-normal mb-3",
-            location === "/" ? "bg-accent text-accent-foreground" : ""
-          )}
-          onClick={() => navigate('/')}
-        >
-          <Home className="mr-2 h-4 w-4" />
-          Home
-        </Button>
+        <Link href="/" onClick={handleNavClick}>
+          <Button
+            variant="ghost"
+            className={cn(
+              "w-full justify-start font-normal mb-3",
+              location === "/" ? "bg-accent text-accent-foreground" : ""
+            )}
+          >
+            <Home className="mr-2 h-4 w-4" />
+            Home
+          </Button>
+        </Link>
         
         {isLoading ? (
           <div className="space-y-3">
@@ -115,7 +115,7 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
               .filter(cat => 
                 cat.resources.length > 0 && 
                 cat.name !== "Table of contents" && 
-                !cat.name.startsWith("List of") &&
+                cat.name && !cat.name.startsWith("List of") &&
                 !["Contributing", "License", "External Links", "Anti-features"].includes(cat.name)
               )
               .map(category => (
@@ -137,18 +137,19 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
                   </AccordionTrigger>
                   
                   <AccordionContent className="pb-1 pl-4">
-                    <Button
-                      variant="ghost"
-                      className={cn(
-                        "w-full justify-start font-normal text-sm mb-1",
-                        location === `/category/${getCategorySlug(category.name)}` 
-                          ? "bg-accent text-accent-foreground" 
-                          : ""
-                      )}
-                      onClick={() => navigate(`/category/${getCategorySlug(category.name)}`)}
-                    >
-                      All ({category.resources.length})
-                    </Button>
+                    <Link href={`/category/${getCategorySlug(category.name)}`} onClick={handleNavClick}>
+                      <Button
+                        variant="ghost"
+                        className={cn(
+                          "w-full justify-start font-normal text-sm mb-1",
+                          location === `/category/${getCategorySlug(category.name)}` 
+                            ? "bg-accent text-accent-foreground" 
+                            : ""
+                        )}
+                      >
+                        All ({category.resources.length})
+                      </Button>
+                    </Link>
                     
                     {/* We would add subcategories here if needed */}
                   </AccordionContent>
