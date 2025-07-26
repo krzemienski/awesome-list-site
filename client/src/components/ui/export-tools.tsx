@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Button } from "../ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { Checkbox } from "../ui/checkbox";
-import { Badge } from "../ui/badge";
-import { useToast } from "../../hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Download, 
   FileText, 
@@ -15,7 +15,7 @@ import {
   Filter,
   CheckCircle
 } from "lucide-react";
-import { AwesomeList, Resource, Category } from "../../types/awesome-list";
+import { AwesomeList, Resource, Category } from "@/types/awesome-list";
 
 interface ExportToolsProps {
   awesomeList: AwesomeList;

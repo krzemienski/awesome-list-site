@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
-import CategoryExplorer from "../components/ui/category-explorer";
-import CommunityMetrics from "../components/ui/community-metrics";
-import ExportTools from "../components/ui/export-tools";
-import ResourceRecommendations from "../components/ui/resource-recommendations";
-import { Skeleton } from "../components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import CategoryExplorer from "@/components/ui/category-explorer";
+import CommunityMetrics from "@/components/ui/community-metrics";
+import ExportTools from "@/components/ui/export-tools";
+import ResourceRecommendations from "@/components/ui/resource-recommendations";
+import { Skeleton } from "@/components/ui/skeleton";
 import { 
   Zap, 
   Compass, 
@@ -16,7 +16,7 @@ import {
   Lightbulb,
   Sparkles
 } from "lucide-react";
-import { AwesomeList, Resource } from "../types/awesome-list";
+import { AwesomeList, Resource } from "@/types/awesome-list";
 
 export default function Advanced() {
   const [selectedResource, setSelectedResource] = useState<Resource | undefined>();

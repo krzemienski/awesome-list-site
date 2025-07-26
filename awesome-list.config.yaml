@@ -3,17 +3,17 @@
 
 # Site Configuration
 site:
-  title: "Awesome Video"
-  description: "A curated list of awesome video frameworks, libraries, and tools"
+  title: "Awesome Go"
+  description: "A curated list of awesome Go frameworks, libraries, and software"
   url: "https://krzemienski.github.io/awesome-list-site"
-  author: "krzemienski"
+  author: "avelino"
   
 # Source Configuration
 source:
   # Primary awesome list to parse
-  url: "https://raw.githubusercontent.com/krzemienski/awesome-video/master/contents.json"
+  url: "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md"
   # Format of the source data
-  format: "json"
+  format: "markdown"
   # Auto-refresh interval in hours
   refresh_interval: 24
 

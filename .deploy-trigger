@@ -1,7 +1,0 @@
-DEPLOY_TIMESTAMP=2025-01-14T04:47:00Z
-DEPLOYMENT_READY=true
-SITE_CONFIG=awesome-list.config.yaml
-DATA_SOURCE=https://raw.githubusercontent.com/krzemienski/awesome-video/master/contents.json
-TARGET_REPOSITORY=krzemienski/awesome-list-site
-GITHUB_PAGES_BRANCH=gh-pages
-BUILD_STATUS=ready

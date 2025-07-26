@@ -1,5 +1,0 @@
-DEPLOYMENT_STATUS=ready
-SINGLE_WORKFLOW=deploy-static-site.yml
-BUILD_COMMAND=npm run build
-OUTPUT_DIR=dist/public
-TIMESTAMP=2025-01-14T06:00:00Z

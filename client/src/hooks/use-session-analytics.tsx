@@ -5,7 +5,7 @@ import {
   trackSessionQuality,
   trackPerformance,
   trackError
-} from '../lib/analytics';
+} from '@/lib/analytics';
 
 export function useSessionAnalytics() {
   const [sessionData, setSessionData] = useState({

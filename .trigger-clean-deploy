@@ -1,4 +1,0 @@
-DEPLOY_TRIGGER=2025-01-14T05:50:00Z
-FORCE_CLEAN_DEPLOYMENT=true
-WORKFLOW=deploy-clean.yml
-STATUS=ready_for_deployment
