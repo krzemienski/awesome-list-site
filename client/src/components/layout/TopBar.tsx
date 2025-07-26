@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "../ui/button";
 import { Link } from "wouter";
 import { Menu, Search, Github, Sun, Moon, Palette, List, BarChart3 } from "lucide-react";
-import { useTheme } from "@/hooks/use-theme";
-import { useIsMobile } from "@/hooks/use-mobile";
-import CustomThemeManager, { CustomTheme } from "@/components/ui/custom-theme-manager";
-import AwesomeListExplorer from "@/components/ui/awesome-list-explorer";
-import AnalyticsDashboard from "@/components/ui/analytics-dashboard";
+import { useTheme } from "../../hooks/use-theme";
+import { useIsMobile } from "../../hooks/use-mobile";
+import CustomThemeManager, { CustomTheme } from "../ui/custom-theme-manager";
+import AwesomeListExplorer from "../ui/awesome-list-explorer";
+import AnalyticsDashboard from "../ui/analytics-dashboard";
 
 interface TopBarProps {
   isSidebarOpen: boolean;

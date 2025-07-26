@@ -1,0 +1,646 @@
+# DISABLED
+name: DISABLED
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+  schedule:
+    # Run daily at 6 AM UTC to refresh data
+    - cron: '0 6 * * *'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Fetch and process awesome-video data
+      run: |
+        # Create build directory structure
+        mkdir -p build/data
+        
+        # Fetch latest awesome-video data from JSON source
+        echo "Fetching awesome-video data..."
+        curl -s "https://raw.githubusercontent.com/krzemienski/awesome-video/master/contents.json" > raw-data.json
+        
+        # Process and transform data into site format
+        node -e "
+        const fs = require('fs');
+        console.log('Processing awesome-video data...');
+        
+        try {
+          const rawData = JSON.parse(fs.readFileSync('raw-data.json', 'utf8'));
+          
+          const resources = rawData.projects.map((project, index) => ({
+            id: index + 1,
+            title: project.title || 'Untitled Resource',
+            url: project.homepage || '#',
+            description: project.description || 'Video tool or resource',
+            category: Array.isArray(project.category) ? project.category[0] : (project.category || 'Tools'),
+            subcategory: Array.isArray(project.category) && project.category[1] ? project.category[1] : undefined,
+            tags: project.tags || []
+          }));
+          
+          const siteData = {
+            title: 'Awesome Video',
+            description: 'A curated list of awesome video tools and resources',
+            repoUrl: 'https://github.com/krzemienski/awesome-video',
+            resources: resources,
+            lastUpdated: new Date().toISOString(),
+            totalResources: resources.length,
+            categories: [...new Set(resources.map(r => r.category))].sort()
+          };
+          
+          fs.writeFileSync('build/data/awesome-list.json', JSON.stringify(siteData, null, 2));
+          console.log('✅ Successfully processed', resources.length, 'video resources');
+          console.log('📊 Found', siteData.categories.length, 'categories');
+          
+        } catch (error) {
+          console.error('❌ Error processing data:', error.message);
+          process.exit(1);
+        }
+        "
+        
+    - name: Generate static site
+      run: |
+        # Create the main index.html with embedded styles and functionality
+        cat > build/index.html << 'EOF'
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Awesome Video - Curated Video Tools & Resources</title>
+          <meta name="description" content="A curated list of awesome video tools, frameworks, libraries, and resources for developers and creators">
+          <meta name="keywords" content="video, tools, awesome, curated, list, ffmpeg, streaming, encoding, development">
+          <link rel="canonical" href="https://krzemienski.github.io/awesome-list-site/">
+          
+          <!-- Open Graph / Facebook -->
+          <meta property="og:type" content="website">
+          <meta property="og:url" content="https://krzemienski.github.io/awesome-list-site/">
+          <meta property="og:title" content="Awesome Video - Curated Video Tools & Resources">
+          <meta property="og:description" content="A curated list of awesome video tools, frameworks, libraries, and resources">
+          
+          <!-- Twitter -->
+          <meta property="twitter:card" content="summary_large_image">
+          <meta property="twitter:url" content="https://krzemienski.github.io/awesome-list-site/">
+          <meta property="twitter:title" content="Awesome Video - Curated Video Tools & Resources">
+          <meta property="twitter:description" content="A curated list of awesome video tools, frameworks, libraries, and resources">
+          
+          <style>
+            :root {
+              --primary: #dc2626;
+              --primary-hover: #b91c1c;
+              --bg: #0f0f0f;
+              --card-bg: #1a1a1a;
+              --text: #ffffff;
+              --text-secondary: #a3a3a3;
+              --border: #333;
+              --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            }
+            
+            * { 
+              margin: 0; 
+              padding: 0; 
+              box-sizing: border-box; 
+            }
+            
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+              background: var(--bg);
+              color: var(--text);
+              line-height: 1.6;
+              min-height: 100vh;
+            }
+            
+            .container {
+              max-width: 1400px;
+              margin: 0 auto;
+              padding: 20px;
+            }
+            
+            header {
+              text-align: center;
+              margin-bottom: 50px;
+              padding: 60px 0;
+            }
+            
+            h1 {
+              font-size: clamp(2.5rem, 5vw, 4rem);
+              color: var(--primary);
+              margin-bottom: 16px;
+              font-weight: 800;
+              letter-spacing: -0.02em;
+              text-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);
+            }
+            
+            .subtitle {
+              font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+              color: var(--text-secondary);
+              margin-bottom: 30px;
+              max-width: 600px;
+              margin-left: auto;
+              margin-right: auto;
+            }
+            
+            .stats {
+              display: flex;
+              justify-content: center;
+              gap: 30px;
+              margin-top: 30px;
+              flex-wrap: wrap;
+            }
+            
+            .stat {
+              background: var(--card-bg);
+              padding: 20px 30px;
+              border-radius: 12px;
+              border: 1px solid var(--border);
+              min-width: 160px;
+            }
+            
+            .stat-number {
+              font-size: 2rem;
+              font-weight: 700;
+              color: var(--primary);
+              display: block;
+            }
+            
+            .stat-label {
+              font-size: 0.9rem;
+              color: var(--text-secondary);
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+            }
+            
+            .search-section {
+              margin: 60px 0;
+            }
+            
+            .search-container {
+              max-width: 800px;
+              margin: 0 auto;
+            }
+            
+            .search-box {
+              position: relative;
+              margin-bottom: 30px;
+            }
+            
+            #searchInput {
+              width: 100%;
+              padding: 20px 60px 20px 24px;
+              font-size: 18px;
+              background: var(--card-bg);
+              border: 2px solid var(--border);
+              border-radius: 16px;
+              color: var(--text);
+              outline: none;
+              transition: all 0.3s ease;
+            }
+            
+            #searchInput:focus {
+              border-color: var(--primary);
+              box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+            }
+            
+            .search-icon {
+              position: absolute;
+              right: 20px;
+              top: 50%;
+              transform: translateY(-50%);
+              color: var(--text-secondary);
+              pointer-events: none;
+            }
+            
+            .filters {
+              display: flex;
+              gap: 12px;
+              justify-content: center;
+              flex-wrap: wrap;
+              margin: 30px 0;
+            }
+            
+            .filter-btn {
+              padding: 12px 24px;
+              background: var(--card-bg);
+              border: 2px solid var(--border);
+              border-radius: 25px;
+              color: var(--text);
+              cursor: pointer;
+              transition: all 0.2s ease;
+              font-size: 14px;
+              font-weight: 500;
+              white-space: nowrap;
+            }
+            
+            .filter-btn:hover {
+              background: var(--primary);
+              border-color: var(--primary);
+              transform: translateY(-1px);
+            }
+            
+            .filter-btn.active {
+              background: var(--primary);
+              border-color: var(--primary);
+              box-shadow: var(--shadow);
+            }
+            
+            .results-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin: 40px 0 20px;
+              flex-wrap: wrap;
+              gap: 20px;
+            }
+            
+            .results-count {
+              color: var(--text-secondary);
+              font-size: 1.1rem;
+            }
+            
+            .grid {
+              display: grid;
+              grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+              gap: 24px;
+              margin-top: 30px;
+            }
+            
+            .card {
+              background: var(--card-bg);
+              border: 2px solid var(--border);
+              border-radius: 16px;
+              padding: 28px;
+              transition: all 0.3s ease;
+              position: relative;
+              overflow: hidden;
+            }
+            
+            .card::before {
+              content: '';
+              position: absolute;
+              top: 0;
+              left: 0;
+              right: 0;
+              height: 4px;
+              background: var(--primary);
+              transform: scaleX(0);
+              transition: transform 0.3s ease;
+            }
+            
+            .card:hover {
+              border-color: var(--primary);
+              transform: translateY(-4px);
+              box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+            }
+            
+            .card:hover::before {
+              transform: scaleX(1);
+            }
+            
+            .card-category {
+              background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+              color: white;
+              padding: 6px 16px;
+              border-radius: 20px;
+              font-size: 12px;
+              font-weight: 600;
+              display: inline-block;
+              margin-bottom: 20px;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+            }
+            
+            .card h3 {
+              font-size: 1.4rem;
+              margin-bottom: 16px;
+              color: var(--text);
+              font-weight: 600;
+              line-height: 1.3;
+            }
+            
+            .card p {
+              color: var(--text-secondary);
+              margin-bottom: 24px;
+              line-height: 1.6;
+              display: -webkit-box;
+              -webkit-line-clamp: 3;
+              -webkit-box-orient: vertical;
+              overflow: hidden;
+            }
+            
+            .card-link {
+              color: var(--primary);
+              text-decoration: none;
+              font-weight: 600;
+              display: inline-flex;
+              align-items: center;
+              gap: 8px;
+              transition: all 0.2s ease;
+              font-size: 1rem;
+            }
+            
+            .card-link:hover {
+              color: var(--primary-hover);
+              transform: translateX(4px);
+            }
+            
+            .no-results, .loading {
+              text-align: center;
+              padding: 80px 20px;
+              color: var(--text-secondary);
+            }
+            
+            .no-results h3 {
+              color: var(--text);
+              margin-bottom: 16px;
+              font-size: 1.5rem;
+            }
+            
+            footer {
+              margin-top: 100px;
+              padding: 60px 0;
+              text-align: center;
+              border-top: 2px solid var(--border);
+              color: var(--text-secondary);
+            }
+            
+            footer a {
+              color: var(--primary);
+              text-decoration: none;
+              font-weight: 600;
+            }
+            
+            footer a:hover {
+              text-decoration: underline;
+            }
+            
+            @media (max-width: 768px) {
+              .container { padding: 15px; }
+              .grid { grid-template-columns: 1fr; gap: 20px; }
+              .stats { flex-direction: column; align-items: center; gap: 15px; }
+              .results-header { flex-direction: column; text-align: center; }
+              .filters { justify-content: center; }
+              #searchInput { font-size: 16px; padding: 16px 50px 16px 20px; }
+            }
+            
+            @media (max-width: 480px) {
+              .card { padding: 20px; }
+              .filters { gap: 8px; }
+              .filter-btn { padding: 10px 16px; font-size: 13px; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <header>
+              <h1>🎥 Awesome Video</h1>
+              <p class="subtitle">A curated list of awesome video tools, frameworks, libraries, and resources for developers and creators</p>
+              <div class="stats">
+                <div class="stat">
+                  <span class="stat-number" id="totalCount">Loading...</span>
+                  <span class="stat-label">Resources</span>
+                </div>
+                <div class="stat">
+                  <span class="stat-number" id="categoryCount">0</span>
+                  <span class="stat-label">Categories</span>
+                </div>
+              </div>
+            </header>
+            
+            <div class="search-section">
+              <div class="search-container">
+                <div class="search-box">
+                  <input type="text" id="searchInput" placeholder="Search video tools, frameworks, libraries..." onkeyup="filterResources()">
+                  <div class="search-icon">🔍</div>
+                </div>
+                <div class="filters" id="categoryFilters"></div>
+              </div>
+            </div>
+            
+            <div id="loadingState" class="loading">
+              <h3>Loading awesome video resources...</h3>
+              <p>Fetching the latest curated video tools and resources</p>
+            </div>
+            
+            <div class="results-header" id="resultsHeader" style="display: none;">
+              <div class="results-count" id="resultsCount"></div>
+            </div>
+            
+            <div class="grid" id="resourceGrid" style="display: none;"></div>
+            
+            <div id="noResults" class="no-results" style="display: none;">
+              <h3>No resources found</h3>
+              <p>Try adjusting your search terms or category filters to find what you're looking for</p>
+            </div>
+            
+            <footer>
+              <p>Data sourced from <a href="https://github.com/krzemienski/awesome-video" target="_blank" rel="noopener">krzemienski/awesome-video</a></p>
+              <p>Built with ❤️ for the video development community</p>
+            </footer>
+          </div>
+          
+          <script>
+            let allResources = [];
+            let filteredResources = [];
+            let activeCategory = 'all';
+            
+            async function loadResources() {
+              try {
+                const response = await fetch('./data/awesome-list.json');
+                if (!response.ok) {
+                  throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                allResources = data.resources || [];
+                filteredResources = [...allResources];
+                
+                updateStats(data);
+                createCategoryFilters();
+                displayResources(filteredResources);
+                
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('resultsHeader').style.display = 'flex';
+                document.getElementById('resourceGrid').style.display = 'grid';
+                
+                // Track successful load
+                if (window.gtag) {
+                  gtag('event', 'resources_loaded', {
+                    'event_category': 'data',
+                    'value': allResources.length
+                  });
+                }
+                
+              } catch (error) {
+                console.error('Error loading resources:', error);
+                document.getElementById('loadingState').innerHTML = 
+                  '<h3 style="color: var(--primary);">Error loading resources</h3><p>Please refresh the page to try again</p>';
+              }
+            }
+            
+            function updateStats(data) {
+              document.getElementById('totalCount').textContent = data.totalResources || allResources.length;
+              document.getElementById('categoryCount').textContent = data.categories?.length || 0;
+            }
+            
+            function createCategoryFilters() {
+              const categories = [...new Set(allResources.map(r => r.category))].sort();
+              const filtersContainer = document.getElementById('categoryFilters');
+              filtersContainer.innerHTML = '';
+              
+              // Add "All" filter
+              const allBtn = document.createElement('button');
+              allBtn.className = 'filter-btn active';
+              allBtn.textContent = 'All';
+              allBtn.onclick = () => filterByCategory('all');
+              filtersContainer.appendChild(allBtn);
+              
+              // Add category filters
+              categories.forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'filter-btn';
+                btn.textContent = category;
+                btn.onclick = () => filterByCategory(category);
+                filtersContainer.appendChild(btn);
+              });
+            }
+            
+            function filterByCategory(category) {
+              activeCategory = category;
+              
+              // Update active button
+              document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if ((category === 'all' && btn.textContent === 'All') || btn.textContent === category) {
+                  btn.classList.add('active');
+                }
+              });
+              
+              // Track category filter usage
+              if (window.gtag && category !== 'all') {
+                gtag('event', 'category_filter', {
+                  'event_category': 'navigation',
+                  'event_label': category
+                });
+              }
+              
+              filterResources();
+            }
+            
+            function filterResources() {
+              const query = document.getElementById('searchInput').value.toLowerCase().trim();
+              
+              filteredResources = allResources.filter(resource => {
+                const matchesCategory = activeCategory === 'all' || resource.category === activeCategory;
+                const matchesSearch = !query || 
+                  resource.title.toLowerCase().includes(query) ||
+                  resource.description.toLowerCase().includes(query) ||
+                  resource.category.toLowerCase().includes(query) ||
+                  (resource.tags && resource.tags.some(tag => tag.toLowerCase().includes(query)));
+                
+                return matchesCategory && matchesSearch;
+              });
+              
+              // Track search usage
+              if (window.gtag && query) {
+                gtag('event', 'search', {
+                  'event_category': 'engagement',
+                  'search_term': query
+                });
+              }
+              
+              displayResources(filteredResources);
+            }
+            
+            function displayResources(resources) {
+              const grid = document.getElementById('resourceGrid');
+              const noResults = document.getElementById('noResults');
+              const resultsCount = document.getElementById('resultsCount');
+              
+              // Update results count
+              resultsCount.textContent = `Showing ${resources.length} of ${allResources.length} resources`;
+              
+              if (resources.length === 0) {
+                grid.style.display = 'none';
+                noResults.style.display = 'block';
+                return;
+              }
+              
+              grid.style.display = 'grid';
+              noResults.style.display = 'none';
+              
+              grid.innerHTML = resources.map(resource => `
+                <div class="card">
+                  <div class="card-category">${resource.category}</div>
+                  <h3>${resource.title}</h3>
+                  <p>${resource.description}</p>
+                  <a href="${resource.url}" target="_blank" rel="noopener" class="card-link" onclick="trackResourceClick('${resource.title}', '${resource.category}')">
+                    View Resource →
+                  </a>
+                </div>
+              `).join('');
+            }
+            
+            function trackResourceClick(title, category) {
+              if (window.gtag) {
+                gtag('event', 'resource_click', {
+                  'event_category': 'engagement',
+                  'event_label': title,
+                  'custom_parameter_1': category
+                });
+              }
+            }
+            
+            // Initialize the application
+            loadResources();
+          </script>
+          
+          <!-- Google Analytics -->
+          <script async src="https://www.googletagmanager.com/gtag/js?id=G-383541848"></script>
+          <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-383541848', {
+              page_title: 'Awesome Video - Curated Resources',
+              page_location: window.location.href
+            });
+          </script>
+        </body>
+        </html>
+        EOF
+        
+        echo "✅ Generated static site successfully"
+        
+    - name: Setup GitHub Pages
+      uses: actions/configure-pages@v4
+      
+    - name: Upload Pages artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: ./build
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
