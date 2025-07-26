@@ -1,23 +1,24 @@
 import { useEffect, useState } from "react";
 import { useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { Skeleton } from "@/components/ui/skeleton";
-import ResourceCard from "@/components/ui/resource-card";
-import ResourcePreviewTooltip from "@/components/ui/resource-preview-tooltip";
-import SEOHead from "@/components/layout/SEOHead";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import TagFilter from "@/components/ui/tag-filter";
-import LayoutSwitcher, { LayoutType } from "@/components/ui/layout-switcher";
-import ResourceListItem from "@/components/ui/resource-list-item";
-import ResourceCompactItem from "@/components/ui/resource-compact-item";
-import Pagination from "@/components/ui/pagination";
+import { Skeleton } from "../components/ui/skeleton";
+import ResourceCard from "../components/ui/resource-card";
+import ResourcePreviewTooltip from "../components/ui/resource-preview-tooltip";
+import SEOHead from "../components/layout/SEOHead";
+import { Input } from "../components/ui/input";
+import { Button } from "../components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
+import TagFilter from "../components/ui/tag-filter";
+import LayoutSwitcher, { LayoutType } from "../components/ui/layout-switcher";
+import ResourceListItem from "../components/ui/resource-list-item";
+import ResourceCompactItem from "../components/ui/resource-compact-item";
+import Pagination from "../components/ui/pagination";
 import { Search, Filter } from "lucide-react";
-import { deslugify, slugify } from "@/lib/utils";
-import { Resource, AwesomeList } from "@/types/awesome-list";
-import NotFound from "@/pages/not-found";
-import { processAwesomeListData } from "@/lib/parser";
+import { deslugify, slugify } from "../lib/utils";
+import { Resource, AwesomeList } from "../types/awesome-list";
+import NotFound from "./not-found";
+import { processAwesomeListData } from "../lib/parser";
+import { Helmet } from "react-helmet";
 
 // Sample resources for categories
 const sampleResources: Resource[] = [

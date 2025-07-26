@@ -1,8 +1,5 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Grid3X3, List, LayoutGrid, MoreVertical } from "lucide-react";
-import { trackLayoutChange } from "@/lib/analytics";
+import { Button } from "../ui/button";
+import { Grid3X3, List, LayoutGrid } from "lucide-react";
 
 export type LayoutType = "cards" | "list" | "compact";
 
@@ -12,17 +9,12 @@ interface LayoutSwitcherProps {
 }
 
 export default function LayoutSwitcher({ currentLayout, onLayoutChange }: LayoutSwitcherProps) {
-  const handleLayoutChange = (layout: LayoutType) => {
-    trackLayoutChange(layout);
-    onLayoutChange(layout);
-  };
-
   return (
     <div className="flex items-center gap-1">
       <Button
         variant={currentLayout === "cards" ? "default" : "ghost"}
         size="sm"
-        onClick={() => handleLayoutChange("cards")}
+        onClick={() => onLayoutChange("cards")}
         className="h-8 w-8 p-0"
         title="Card View"
       >
@@ -32,7 +24,7 @@ export default function LayoutSwitcher({ currentLayout, onLayoutChange }: Layout
       <Button
         variant={currentLayout === "list" ? "default" : "ghost"}
         size="sm"
-        onClick={() => handleLayoutChange("list")}
+        onClick={() => onLayoutChange("list")}
         className="h-8 w-8 p-0"
         title="List View"
       >
@@ -42,7 +34,7 @@ export default function LayoutSwitcher({ currentLayout, onLayoutChange }: Layout
       <Button
         variant={currentLayout === "compact" ? "default" : "ghost"}
         size="sm"
-        onClick={() => handleLayoutChange("compact")}
+        onClick={() => onLayoutChange("compact")}
         className="h-8 w-8 p-0"
         title="Compact Grid"
       >

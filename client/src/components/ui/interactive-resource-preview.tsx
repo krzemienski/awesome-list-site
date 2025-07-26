@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
+import { Separator } from "../ui/separator";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "../ui/hover-card";
 import { 
   ExternalLink, 
   Star, 
@@ -19,8 +19,8 @@ import {
   Clock,
   Activity
 } from "lucide-react";
-import { Resource } from "@/types/awesome-list";
-import { useToast } from "@/hooks/use-toast";
+import { Resource } from "../../types/awesome-list";
+import { useToast } from "../../hooks/use-toast";
 
 interface InteractiveResourcePreviewProps {
   resource: Resource;

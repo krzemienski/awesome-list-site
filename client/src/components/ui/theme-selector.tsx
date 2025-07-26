@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "../ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Palette } from "lucide-react";
-import { useTheme } from "@/hooks/use-theme";
-import { shadcnThemes, applyTheme } from "@/lib/shadcn-themes";
-import { trackThemeChange } from "@/lib/analytics";
+import { useTheme } from "../../hooks/use-theme";
+import { shadcnThemes, applyTheme } from "../../lib/shadcn-themes";
+import { trackThemeChange } from "../../lib/analytics";
 
 export default function ThemeSelector() {
   const [open, setOpen] = useState(false);
