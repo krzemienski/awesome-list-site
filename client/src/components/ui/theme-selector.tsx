@@ -9,17 +9,24 @@ import { trackThemeChange } from "@/lib/analytics";
 export default function ThemeSelector() {
   const [open, setOpen] = useState(false);
   const { setTheme: setMode } = useTheme();
-  const [themeVariant, setThemeVariant] = useState("red");
+  const [themeVariant, setThemeVariant] = useState("rose");
   
   // Force dark mode and initialize theme variant from localStorage
   useEffect(() => {
     setMode("dark"); // Always set to dark mode
-    const storedTheme = localStorage.getItem("theme-variant") || "red";
+    
+    // Clear any old theme-variant in localStorage if it's "red" and set to "rose" 
+    const currentStored = localStorage.getItem("theme-variant");
+    if (currentStored === "red" || !currentStored) {
+      localStorage.setItem("theme-variant", "rose");
+    }
+    
+    const storedTheme = localStorage.getItem("theme-variant") || "rose";
     setThemeVariant(storedTheme);
     
-    // Apply the red theme immediately
-    const redTheme = shadcnThemes.find((t) => t.value === "red") || shadcnThemes[0];
-    applyTheme(redTheme, "dark");
+    // Apply the rose theme immediately
+    const roseTheme = shadcnThemes.find((t) => t.value === "rose") || shadcnThemes[0];
+    applyTheme(roseTheme, "dark");
   }, [setMode]);
 
   // Apply theme when variant changes (always dark)
