@@ -1,9 +1,7 @@
-name: Deploy to GitHub Pages
+name: Deploy Awesome Video Viewer to GitHub Pages
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
     branches: [ main ]
   workflow_dispatch:
 
@@ -39,17 +37,14 @@ jobs:
         VITE_STATIC_BUILD: 'true'
         
     - name: Build React application
-      timeout-minutes: 15
+      timeout-minutes: 20
       run: |
-        # Optimize build environment
-        export NODE_OPTIONS="--max-old-space-size=8192 --max-semi-space-size=1024"
+        # Optimize build environment for large React app
+        export NODE_OPTIONS="--max-old-space-size=8192 --max-semi-space-size=2048"
         export VITE_BUILD_TARGET="github-pages"
         
-        # Run build with chunking to avoid timeouts
-        timeout 900 npm run build || (
-          echo "Standard build timed out, trying optimized build..."
-          npx vite build --mode production --minify false --sourcemap false
-        )
+        # Build with optimizations
+        npm run build
       env:
         NODE_ENV: 'production'
         VITE_STATIC_BUILD: 'true'
