@@ -19,7 +19,7 @@ interface HomeProps {
 type LayoutType = "cards" | "list" | "compact";
 
 export default function Home({ awesomeList, isLoading }: HomeProps) {
-  const [layout, setLayout] = useState<LayoutType>("cards");
+  const [layout, setLayout] = useState<LayoutType>("list");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(24);
   const [sortBy, setSortBy] = useState("category");
@@ -121,12 +121,9 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
         </>
       ) : (
         <>
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent mb-4">
-              {awesomeList?.title?.replace("Awesome ", "") || "Video Resources"}
-            </h1>
-            <p className="text-lg text-muted-foreground mb-6">
-              {awesomeList?.description || "A curated collection of amazing video tools and resources"}
+          <div className="mb-6">
+            <p className="text-muted-foreground mb-4">
+              {awesomeList?.description || "A curated list of awesome resources"}
             </p>
             
             {/* Search Bar */}
@@ -248,9 +245,44 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 gap-4 mb-8">
               {paginatedResources.map((resource, index) => (
-                <ResourceCard key={`${resource.title}-${resource.url}`} resource={resource} index={index} />
+                <MobileResourcePopover key={`${resource.title}-${resource.url}`} resource={resource}>
+                  <div className="p-6 border border-border rounded-xl bg-card shadow-sm hover:shadow-md transition-all">
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-semibold text-foreground">
+                        {resource.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {resource.description}
+                      </p>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs px-3 py-1 bg-primary/10 text-primary rounded-full font-medium">
+                            {resource.category}
+                          </span>
+                        </div>
+                        {resource.tags && resource.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1">
+                            {resource.tags.slice(0, 4).map((tag, tagIndex) => (
+                              <span
+                                key={tagIndex}
+                                className="text-xs px-2 py-1 bg-secondary text-secondary-foreground rounded"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                            {resource.tags.length > 4 && (
+                              <span className="text-xs text-muted-foreground">
+                                +{resource.tags.length - 4} more
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </MobileResourcePopover>
               ))}
             </div>
           )}

@@ -1,132 +1,146 @@
-# Awesome List Static Site Generator
+# Awesome Video Dashboard
 
-Transform any GitHub awesome list into a beautiful, SEO-optimized static website with search, categorization, and analytics.
+A modern, interactive web application that transforms the [awesome-video](https://github.com/krzemienski/awesome-video) curated list into a searchable, filterable dashboard with advanced analytics and mobile-optimized design.
 
-## 🚀 Features
+## Features
 
-- **Static Site Generation**: Convert awesome lists to fast, SEO-friendly websites
-- **Beautiful UI**: Modern dark theme with responsive design
-- **Advanced Search**: Filter by categories, tags, and keywords
-- **Analytics Ready**: Google Analytics integration
-- **GitHub Pages Deployment**: Automated deployment via GitHub Actions
-- **Multiple Layouts**: Card, list, and compact views
-- **Mobile Optimized**: Fully responsive design
+- **2,011+ Video Resources** - Comprehensive collection of video tools, libraries, and technologies
+- **Advanced Search & Filtering** - Find resources by name, category, or description
+- **Mobile-Optimized Design** - Touch-friendly interface with popover interactions
+- **Dark Theme Interface** - Professional red-accented dark theme
+- **Real-time Analytics** - Google Analytics integration with detailed user behavior tracking
+- **Static Site Generation** - Fast loading with pre-generated data
+- **Responsive Categories** - Organized by video processing, streaming, codecs, and more
+- **Keyboard Shortcuts** - Quick navigation with `/` for search, `Ctrl+K` shortcuts
+
+## Live Demo
+
+Visit the live dashboard: [https://krzemienski.github.io/awesome-list-site](https://krzemienski.github.io/awesome-list-site)
 
 ## Quick Start
 
-1. **Fork this repository**
-2. **Configure your awesome list** in `awesome-list.config.yaml`:
-   ```yaml
-   site:
-     title: "Your Awesome List"
-     description: "A curated list of awesome resources"
-   deployment:
-     url: "https://yourusername.github.io/awesome-list-site"
-   analytics:
-     enabled: true
-     googleAnalyticsId: "G-XXXXXXXXXX"  # Optional
-   ```
-3. **Build and test locally**:
+### For Repository Owner
+
+1. **Configure Repository Settings**:
+   - Go to Settings > Pages > Set source to "GitHub Actions"
+   - Add repository variables and secrets (see [REPOSITORY-CONFIG.md](REPOSITORY-CONFIG.md))
+
+2. **Deploy**:
    ```bash
-   npm install
-   npm run dev
-   # Visit http://localhost:5001
+   git push origin main
    ```
-4. **Deploy to GitHub Pages**:
-   ```bash
-   npm run build
-   npx tsx scripts/deploy-simple.ts
-   ```
-5. **Enable GitHub Pages** in repository settings → Pages → Source: GitHub Actions
+   GitHub Actions will automatically build and deploy to GitHub Pages.
 
-Your site will be live at: `https://yourusername.github.io/awesome-list-site`
+### For Fork Users
 
-## 📦 Project Structure
+See [FORK-SETUP.md](FORK-SETUP.md) for complete instructions on customizing this dashboard for your own awesome list.
 
-```
-├── client/           # React frontend application
-│   ├── public/      # Static assets and data files
-│   └── src/         # React components and logic
-├── server/          # Express backend (dev only)
-├── scripts/         # Build and deployment scripts
-├── docs/            # Documentation
-└── awesome-list.config.yaml  # Site configuration
-```
+## Technology Stack
 
-## 🛠️ Development
+- **Frontend**: React 18, TypeScript, Tailwind CSS
+- **UI Components**: Radix UI, Shadcn/ui
+- **Build System**: Vite, ESBuild
+- **Deployment**: GitHub Actions, GitHub Pages
+- **Analytics**: Google Analytics 4
+- **Data Source**: awesome-video JSON API
 
-### Local Development Server
+## Development
 
+### Local Development
 ```bash
 npm install
 npm run dev
-# Visit http://localhost:5001
 ```
 
-### Building for Production
-
+### Static Build Testing
 ```bash
-npm run build
-# Creates optimized build in dist/
+tsx scripts/build-static.ts
+VITE_STATIC_BUILD=true npm run build
+npm run preview
 ```
 
-### Testing Static Build Locally
-
+### Test Deployment System
 ```bash
-npm run build
-cd dist/public
-python -m http.server 8080
-# Visit http://localhost:8080
+tsx scripts/test-deployment.ts
 ```
 
-## 📧 Environment Variables
+## Configuration
 
-For AI-powered features (optional), you'll need:
-- `ANTHROPIC_API_KEY` - Get from [console.anthropic.com](https://console.anthropic.com)
+The dashboard is configured via `awesome-list.config.yaml`:
 
-For analytics (optional):
-- `VITE_GA_MEASUREMENT_ID` - From Google Analytics dashboard
+```yaml
+site:
+  title: "Awesome Video Dashboard"
+  description: "A curated collection of awesome video resources"
+  url: "https://krzemienski.github.io/awesome-list-site"
 
-## ⚙️ Configuration
+source:
+  url: "https://raw.githubusercontent.com/krzemienski/awesome-video/master/contents.json"
+  refresh_interval: 3600
 
-Edit `awesome-list.config.yaml` to customize your site. The configuration wizard (`npx tsx scripts/setup-wizard.ts`) will help you set this up interactively.
-
-## 💻 Commands
-
-```bash
-# Initial Setup
-npm install
-npx tsx scripts/setup-wizard.ts    # Interactive configuration
-
-# Development
-npm run dev                         # Start dev server (http://localhost:5001)
-npm run build                       # Build for production
-npm run check                       # TypeScript type checking
-
-# Deployment
-npx tsx scripts/deploy-simple.ts    # Deploy to GitHub Pages
+features:
+  search: true
+  categories: true
+  analytics_dashboard: true
+  pagination: true
+  items_per_page: 24
 ```
 
-## 🎯 Deployment
+## Analytics Tracking
 
-### GitHub Pages (Recommended)
+Comprehensive analytics implementation tracks:
+- Page views and user sessions
+- Search queries and filter usage
+- Resource clicks and category navigation
+- Mobile interactions and touch events
+- Performance metrics and Core Web Vitals
+- Error tracking and API response times
 
-1. Push your code to GitHub
-2. Run deployment: `npx tsx scripts/deploy-simple.ts`
-3. Enable GitHub Pages: Repository Settings → Pages → Source: GitHub Actions
-4. Your site will be live at `https://[username].github.io/[repo-name]`
+## Deployment
 
-### GitHub Actions
+### Automatic Deployment
+- Pushes to main branch trigger GitHub Actions
+- Fresh data fetched from awesome-video source
+- Static site generated and deployed to GitHub Pages
+- Typically completes in 3-5 minutes
 
-The repository includes a GitHub Actions workflow that automatically deploys to GitHub Pages when you push to the main branch.
+### Manual Deployment
+- Go to Actions tab in GitHub repository
+- Run "Deploy to GitHub Pages" workflow manually
 
-## 🔧 Troubleshooting
+## Documentation
 
-- **Black screen on static site**: Ensure data files exist in `client/public/data/`
-- **Port already in use**: The dev server runs on port 5001 by default
-- **Build failures**: Run `npm run check` to find TypeScript errors
-- **Deployment issues**: Check GitHub Actions logs for specific errors
+- [DEPLOYMENT.md](DEPLOYMENT.md) - Complete deployment guide
+- [FORK-SETUP.md](FORK-SETUP.md) - Fork and customization instructions
+- [REPOSITORY-CONFIG.md](REPOSITORY-CONFIG.md) - Repository-specific configuration
 
-## 📄 License
+## Data Source
 
-MIT - See LICENSE file for details
+This dashboard uses the [awesome-video](https://github.com/krzemienski/awesome-video) curated list, which contains video-related tools and resources organized by:
+
+- Video Processing Libraries
+- Streaming Technologies
+- Codecs and Formats
+- Players and Frameworks
+- APIs and Services
+- Learning Resources
+
+Data is automatically refreshed on each deployment to ensure the latest resources are always available.
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test with `tsx scripts/test-deployment.ts`
+5. Submit a pull request
+
+## License
+
+MIT License - see LICENSE file for details
+
+## Acknowledgments
+
+- [awesome-video](https://github.com/krzemienski/awesome-video) - Data source and curation
+- [Sindre Sorhus](https://github.com/sindresorhus/awesome) - Awesome list format
+- Shadcn/ui and Radix UI - Component libraries

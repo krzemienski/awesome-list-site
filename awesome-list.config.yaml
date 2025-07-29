@@ -1,21 +1,33 @@
-# Awesome List Static Site Configuration
-# Configure your awesome list static site deployment
+# Awesome List Generator Configuration
+# This file configures your self-hosted awesome list site
 
 # Site Configuration
 site:
-  title: "Awesome Go"
-  description: "A curated list of awesome Go frameworks, libraries, and software"
+  title: "Awesome Video Dashboard"
+  description: "A curated collection of awesome video resources, tools, and technologies for developers and content creators"
   url: "https://krzemienski.github.io/awesome-list-site"
-  author: "avelino"
+  author: "krzemienski"
   
 # Source Configuration
 source:
   # Primary awesome list to parse
-  url: "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md"
-  # Format of the source data
-  format: "markdown"
-  # Auto-refresh interval in hours
-  refresh_interval: 24
+  url: "https://raw.githubusercontent.com/krzemienski/awesome-video/master/README.md"
+  # Auto-refresh interval in minutes (0 to disable)
+  refresh_interval: 60
+  # Additional lists for multi-list switching
+  additional_lists:
+    - name: "Awesome Go"
+      url: "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md"
+      category: "Programming"
+      icon: "🐹"
+    - name: "Awesome Python"
+      url: "https://raw.githubusercontent.com/vinta/awesome-python/master/README.md"
+      category: "Programming"
+      icon: "🐍"
+    - name: "Awesome JavaScript"
+      url: "https://raw.githubusercontent.com/sorrycc/awesome-javascript/master/README.md"
+      category: "Programming"
+      icon: "💛"
 
 # Theme Configuration
 theme:
@@ -56,6 +68,7 @@ features:
   categories: true
   analytics_dashboard: true
   theme_switcher: true
+  list_switcher: true
   resource_previews: true
   # Pagination settings
   pagination: true
@@ -64,10 +77,9 @@ features:
   # Default layout configuration
   default_layout: "list"  # Options: "cards", "list", "compact"
   allow_layout_switching: true
-  # AI-powered features (requires ANTHROPIC_API_KEY environment variable)
-  ai_tags: true           # Generate smart tags using AI analysis
-  ai_descriptions: true   # Enhance descriptions for better searchability
-  ai_categories: true     # Intelligent auto-categorization
+  # AI-powered features (requires Anthropic API key)
+  ai_tags: true
+  ai_descriptions: true
 
 # Build Configuration
 build:
