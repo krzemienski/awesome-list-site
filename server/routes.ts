@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { fetchAwesomeList } from "./parser";
 import { fetchAwesomeVideoList } from "./awesome-video-parser";
+import { RecommendationEngine, UserProfile } from "./recommendation-engine";
 import { processAwesomeListData } from "../client/src/lib/parser";
 import { fetchAwesomeLists, searchAwesomeLists } from "./github-api";
 
@@ -188,6 +189,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SEO routes
   app.get("/sitemap.xml", generateSitemap);
   app.get("/og-image.svg", generateOpenGraphImage);
+
+  // Recommendation engine routes
+  let recommendationEngine: RecommendationEngine | null = null;
+
+  // Initialize recommendation engine with current data
+  app.get("/api/recommendations/init", async (req, res) => {
+    try {
+      const awesomeListData = storage.getAwesomeListData();
+      if (!awesomeListData || !awesomeListData.resources) {
+        return res.status(404).json({ error: 'No data available for recommendations' });
+      }
+      
+      recommendationEngine = new RecommendationEngine(awesomeListData.resources);
+      res.json({ 
+        status: "initialized", 
+        resourceCount: awesomeListData.resources.length 
+      });
+    } catch (error) {
+      console.error('Error initializing recommendation engine:', error);
+      res.status(500).json({ error: 'Failed to initialize recommendation engine' });
+    }
+  });
+
+  // Get personalized recommendations
+  app.post("/api/recommendations", async (req, res) => {
+    try {
+      if (!recommendationEngine) {
+        return res.status(400).json({ error: 'Recommendation engine not initialized' });
+      }
+
+      const userProfile: UserProfile = req.body;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const excludeViewed = req.query.exclude_viewed !== 'false';
+
+      const recommendations = recommendationEngine.generateRecommendations(
+        userProfile, 
+        limit, 
+        excludeViewed
+      );
+
+      res.json(recommendations);
+    } catch (error) {
+      console.error('Error generating recommendations:', error);
+      res.status(500).json({ error: 'Failed to generate recommendations' });
+    }
+  });
+
+  // Get learning path suggestions
+  app.post("/api/learning-paths", async (req, res) => {
+    try {
+      if (!recommendationEngine) {
+        return res.status(400).json({ error: 'Recommendation engine not initialized' });
+      }
+
+      const userProfile: UserProfile = req.body;
+      const limit = parseInt(req.query.limit as string) || 5;
+
+      const learningPaths = recommendationEngine.generateLearningPaths(userProfile, limit);
+
+      res.json(learningPaths);
+    } catch (error) {
+      console.error('Error generating learning paths:', error);
+      res.status(500).json({ error: 'Failed to generate learning paths' });
+    }
+  });
+
+  // Track user interaction for improving recommendations
+  app.post("/api/interactions", async (req, res) => {
+    try {
+      const { userId, resourceId, interactionType, interactionValue, metadata } = req.body;
+      
+      // Store interaction data (in a real app, this would go to database)
+      // For now, we'll just acknowledge the interaction
+      console.log(`User interaction: ${userId} ${interactionType} ${resourceId}`);
+      
+      res.json({ status: "recorded" });
+    } catch (error) {
+      console.error('Error recording interaction:', error);
+      res.status(500).json({ error: 'Failed to record interaction' });
+    }
+  });
 
   // Health check
   app.get("/api/health", (req, res) => {

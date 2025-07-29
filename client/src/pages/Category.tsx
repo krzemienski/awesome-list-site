@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
+import { Helmet } from "react-helmet";
 import { Skeleton } from "@/components/ui/skeleton";
 import ResourceCard from "@/components/ui/resource-card";
 import ResourcePreviewTooltip from "@/components/ui/resource-preview-tooltip";
@@ -214,10 +215,10 @@ export default function Category() {
     <div className="flex flex-col">
       {/* SEO Head */}
       <Helmet>
-        <title>{categoryName} Resources - Awesome Selfhosted</title>
+        <title>{categoryName} Resources - Awesome Video</title>
         <meta 
           name="description" 
-          content={`Browse ${filteredResources.length} self-hosted resources in the ${categoryName} category.`} 
+          content={`Browse ${filteredResources.length} video development resources in the ${categoryName} category.`} 
         />
       </Helmet>
       

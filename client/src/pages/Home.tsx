@@ -5,11 +5,17 @@ import ResourceCard from "@/components/ui/resource-card";
 import MobileResourcePopover from "@/components/ui/mobile-resource-popover";
 import LayoutSwitcher from "@/components/ui/layout-switcher";
 import Pagination from "@/components/ui/pagination";
+import RecommendationPanel from "@/components/ui/recommendation-panel";
+import UserPreferences from "@/components/ui/user-preferences";
 import { AwesomeList } from "@/types/awesome-list";
 import { Helmet } from "react-helmet";
-import { Filter, Search } from "lucide-react";
+import { Filter, Search, Brain } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trackCategoryView, trackFilterUsage, trackSortChange } from "@/lib/analytics";
+import { useUserProfile } from "@/hooks/use-user-profile";
 
 interface HomeProps {
   awesomeList?: AwesomeList;
@@ -25,6 +31,18 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
   const [sortBy, setSortBy] = useState("category");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [showRecommendations, setShowRecommendations] = useState(false);
+
+  // User profile management
+  const { 
+    userProfile, 
+    isLoaded, 
+    updateProfile, 
+    addToViewHistory, 
+    toggleBookmark,
+    markCompleted,
+    rateResource
+  } = useUserProfile();
 
   // Handle category change with analytics
   const handleCategoryChange = (category: string) => {
@@ -90,21 +108,31 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
   
   // Get unique categories for filter
   const categories = awesomeList?.categories?.map(cat => cat.name).sort() || [];
+
+  // Handle resource interactions
+  const handleResourceClick = (resourceId: string) => {
+    addToViewHistory(resourceId);
+  };
+
+  const handleLearningPathStart = (pathId: string) => {
+    console.log(`Starting learning path: ${pathId}`);
+    // Could navigate to a dedicated learning path page
+  };
   
   return (
     <div className="flex flex-col">
       {/* SEO Head */}
       <Helmet>
-        <title>{awesomeList?.title || "Awesome List"}</title>
-        <meta name="description" content={`${awesomeList?.description || "A curated list of awesome resources"} - ${allResources.length} resources across ${categories.length} categories.`} />
-        <meta name="keywords" content={`awesome list, ${awesomeList?.title?.toLowerCase() || 'resources'}, developer tools, curated resources, programming`} />
-        <meta property="og:title" content={awesomeList?.title || "Awesome List"} />
-        <meta property="og:description" content={`${awesomeList?.description || "A curated list of awesome resources"} - ${allResources.length} resources available.`} />
+        <title>{awesomeList?.title || "Awesome Video"}</title>
+        <meta name="description" content={`${awesomeList?.description || "A curated list of awesome video resources"} - ${allResources.length} resources across ${categories.length} categories.`} />
+        <meta name="keywords" content={`awesome video, ${awesomeList?.title?.toLowerCase() || 'video resources'}, video development, FFmpeg, streaming, video tools`} />
+        <meta property="og:title" content={awesomeList?.title || "Awesome Video"} />
+        <meta property="og:description" content={`${awesomeList?.description || "A curated list of awesome video resources"} - ${allResources.length} resources available.`} />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="/og-image.svg" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={awesomeList?.title || "Awesome List"} />
-        <meta name="twitter:description" content={`${awesomeList?.description || "A curated list of awesome resources"} - ${allResources.length} resources available.`} />
+        <meta name="twitter:title" content={awesomeList?.title || "Awesome Video"} />
+        <meta name="twitter:description" content={`${awesomeList?.description || "A curated list of awesome video resources"} - ${allResources.length} resources available.`} />
         <link rel="canonical" href="/" />
       </Helmet>
       
@@ -157,27 +185,51 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
             </div>
             
             <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+              {/* AI Recommendations Toggle */}
+              {isLoaded && (
+                <div className="flex gap-2 items-center">
+                  <Button
+                    variant={showRecommendations ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setShowRecommendations(!showRecommendations)}
+                    className="flex items-center gap-2"
+                  >
+                    <Brain className="h-4 w-4" />
+                    AI Recommendations
+                  </Button>
+                  {userProfile && (
+                    <UserPreferences
+                      userProfile={userProfile}
+                      onProfileUpdate={updateProfile}
+                      availableCategories={categories}
+                    />
+                  )}
+                </div>
+              )}
+
               {/* Category Filter */}
-              <div className="flex gap-2 items-center">
-                <Filter className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">Category:</span>
-                <Select
-                  value={selectedCategory}
-                  onValueChange={setSelectedCategory}
-                >
-                  <SelectTrigger className="w-40">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Categories</SelectItem>
-                    {categories.map(category => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              {!showRecommendations && (
+                <div className="flex gap-2 items-center">
+                  <Filter className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">Category:</span>
+                  <Select
+                    value={selectedCategory}
+                    onValueChange={handleCategoryChange}
+                  >
+                    <SelectTrigger className="w-40">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Categories</SelectItem>
+                      {categories.map(category => (
+                        <SelectItem key={category} value={category}>
+                          {category}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               {/* Layout Switcher */}
               <LayoutSwitcher
@@ -205,8 +257,17 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
             </div>
           </div>
           
-          {/* Resources Display */}
-          {layout === "list" ? (
+          {/* AI Recommendations or Regular Resources */}
+          {showRecommendations && userProfile ? (
+            <RecommendationPanel
+              userProfile={userProfile}
+              onResourceClick={handleResourceClick}
+              onStartLearningPath={handleLearningPathStart}
+            />
+          ) : (
+            <>
+              {/* Regular Resources Display */}
+              {layout === "list" ? (
             <div className="space-y-1 mb-8">
               {paginatedResources.map((resource, index) => (
                 <MobileResourcePopover key={`${resource.title}-${resource.url}`} resource={resource}>
@@ -298,6 +359,8 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
               totalItems={sortedResources.length}
               pageSizeOptions={[12, 24, 48, 96]}
             />
+          )}
+            </>
           )}
         </>
       )}
