@@ -1,223 +1,255 @@
 #!/usr/bin/env tsx
-
 /**
- * Simplified Deployment Script
- * 
- * This script provides a reliable deployment process without complex git operations
- * that can fail in restricted environments.
+ * Simplified deployment script that creates a basic static site
+ * without complex bundling that causes timeouts
  */
 
-import { createInterface } from 'readline';
-import { execSync } from 'child_process';
-import * as fs from 'fs';
-import * as yaml from 'js-yaml';
+import { writeFileSync, mkdirSync, existsSync, readFileSync, copyFileSync } from 'fs';
+import { join } from 'path';
+import { fetchAwesomeVideoList } from '../server/awesome-video-parser';
 
-interface DeployConfig {
-  site: {
-    title: string;
-    description: string;
-    url: string;
-    author: string;
-  };
-  source: {
-    url: string;
-    format: string;
-    refresh_interval: number;
-  };
-  theme: {
-    default: string;
-    primary_color: string;
-  };
-  features: {
-    ai_tags: boolean;
-    ai_descriptions: boolean;
-    ai_categories: boolean;
-    search: boolean;
-    categories: boolean;
-  };
-  analytics?: {
-    google_analytics?: string;
-  };
-}
-
-const rl = createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
-
-function log(message: string, level: 'info' | 'success' | 'error' | 'warn' = 'info'): void {
-  const colors = {
-    info: '\x1b[36m',
-    success: '\x1b[32m',
-    error: '\x1b[31m',
-    warn: '\x1b[33m'
-  };
-  const reset = '\x1b[0m';
-  const prefix = level === 'success' ? '✅' : level === 'error' ? '❌' : level === 'warn' ? '⚠️' : 'ℹ️';
-  console.log(`${colors[level]}${prefix} ${message}${reset}`);
-}
-
-function prompt(question: string): Promise<string> {
-  return new Promise((resolve) => {
-    rl.question(question, resolve);
-  });
-}
-
-function header(title: string): void {
-  console.log('\n' + '='.repeat(50));
-  console.log(`🚀 ${title}`);
-  console.log('='.repeat(50));
-}
-
-async function loadConfiguration(): Promise<DeployConfig> {
-  if (!fs.existsSync('awesome-list.config.yaml')) {
-    throw new Error('Configuration file not found. Run: npx tsx scripts/setup-wizard.ts');
-  }
+async function createSimpleDeployment() {
+  console.log('🚀 Creating simplified deployment...');
   
   try {
-    const configContent = fs.readFileSync('awesome-list.config.yaml', 'utf8');
-    const config = yaml.load(configContent) as DeployConfig;
-    return config;
-  } catch (error) {
-    throw new Error(`Failed to parse configuration: ${error instanceof Error ? error.message : 'Unknown error'}`);
-  }
-}
-
-async function showConfiguration(config: DeployConfig): Promise<boolean> {
-  console.log('\n📋 Configuration Summary:');
-  console.log(`  Site: ${config.site.title}`);
-  console.log(`  URL: ${config.site.url}`);
-  console.log(`  Source: ${config.source.url}`);
-  console.log(`  Format: ${config.source.format}`);
-  console.log(`  Theme: ${config.theme.default}`);
-  
-  if (config.features.ai_tags || config.features.ai_descriptions) {
-    console.log(`  AI Features: Enabled`);
-  }
-  
-  if (config.analytics?.google_analytics) {
-    console.log(`  Analytics: ${config.analytics.google_analytics}`);
-  }
-  
-  const answer = await prompt('\n❓ Deploy with this configuration? (y/n): ');
-  return answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes';
-}
-
-async function checkEnvironment(): Promise<void> {
-  const envVars = [
-    { name: 'ANTHROPIC_API_KEY', description: 'AI features' },
-    { name: 'VITE_GA_MEASUREMENT_ID', description: 'Google Analytics' }
-  ];
-  
-  console.log('\n🔧 Environment Variables:');
-  
-  for (const envVar of envVars) {
-    const value = process.env[envVar.name];
-    if (value) {
-      log(`${envVar.name}: Found`, 'success');
-    } else {
-      log(`${envVar.name}: Missing (${envVar.description})`, 'warn');
+    // Create output directory
+    const outputDir = join(process.cwd(), 'dist', 'public');
+    if (!existsSync(outputDir)) {
+      mkdirSync(outputDir, { recursive: true });
     }
-  }
-  
-  const hasAIFeatures = process.env.ANTHROPIC_API_KEY;
-  if (!hasAIFeatures) {
-    console.log(`
-ℹ️ To enable AI features:
-  export ANTHROPIC_API_KEY="sk-ant-your-key"
-  
-For GitHub deployment, add as repository secret.
-    `);
-  }
-}
 
-async function fetchData(): Promise<void> {
-  log('Fetching awesome list data...');
-  
-  try {
-    execSync('npx tsx scripts/build-static.ts', { stdio: 'inherit' });
-    log('Data fetched successfully', 'success');
-  } catch (error) {
-    throw new Error('Failed to fetch data. Check your internet connection and source URL.');
-  }
-}
-
-async function createTriggerForGitHub(): Promise<void> {
-  log('Creating GitHub Actions trigger...');
-  
-  const triggerData = {
-    timestamp: new Date().toISOString(),
-    trigger: 'deployment-request',
-    message: 'Deploy awesome list static site'
-  };
-  
-  fs.writeFileSync('.deploy-trigger', JSON.stringify(triggerData, null, 2));
-  
-  try {
-    execSync('git add .deploy-trigger', { stdio: 'pipe' });
-    execSync('git commit -m "Trigger deployment"', { stdio: 'pipe' });
+    // Fetch and generate static data
+    console.log('📡 Fetching awesome-video data...');
+    const awesomeListData = await fetchAwesomeVideoList();
     
-    const pushAnswer = await prompt('❓ Push trigger to GitHub? (y/n): ');
-    if (pushAnswer.toLowerCase() === 'y' || pushAnswer.toLowerCase() === 'yes') {
-      execSync('git push origin main', { stdio: 'inherit' });
-      log('Trigger pushed to GitHub', 'success');
-    } else {
-      log('Trigger created locally but not pushed', 'info');
-    }
-  } catch (error) {
-    log('Could not commit trigger file. Ensure git is properly configured.', 'warn');
-    log('You can manually commit and push the .deploy-trigger file', 'info');
-  }
-}
-
-async function main(): Promise<void> {
-  try {
-    header('Simple Deployment');
-    
-    // Step 1: Load configuration
-    const config = await loadConfiguration();
-    log('Configuration loaded', 'success');
-    
-    // Step 2: Show configuration and confirm
-    const confirmed = await showConfiguration(config);
-    if (!confirmed) {
-      log('Deployment cancelled', 'info');
-      return;
+    // Create data directory
+    const dataDir = join(outputDir, 'data');
+    if (!existsSync(dataDir)) {
+      mkdirSync(dataDir, { recursive: true });
     }
     
-    // Step 3: Check environment
-    await checkEnvironment();
+    // Write static data
+    writeFileSync(
+      join(dataDir, 'awesome-list.json'),
+      JSON.stringify(awesomeListData, null, 2)
+    );
+
+    // Create sitemap
+    const sitemapData = {
+      lastBuild: new Date().toISOString(),
+      totalResources: awesomeListData.resources.length,
+      categories: [...new Set(awesomeListData.resources.map(r => r.category))],
+      urls: ['/']
+    };
     
-    // Step 4: Fetch data
-    await fetchData();
+    writeFileSync(
+      join(dataDir, 'sitemap.json'),
+      JSON.stringify(sitemapData, null, 2)
+    );
+
+    // Create a simple HTML page
+    const htmlContent = `<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Awesome Video Dashboard</title>
+    <meta name="description" content="A curated collection of awesome video resources, tools, and technologies for developers and content creators">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: system-ui, -apple-system, sans-serif; 
+            background: #0a0a0a; 
+            color: #ffffff; 
+            line-height: 1.6; 
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .header { 
+            background: #1a1a1a; 
+            padding: 2rem; 
+            border-bottom: 1px solid #333; 
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 0 1rem; 
+        }
+        h1 { 
+            color: #ef4444; 
+            font-size: 2.5rem; 
+            margin-bottom: 0.5rem; 
+        }
+        .subtitle { 
+            color: #888; 
+            font-size: 1.1rem; 
+        }
+        .main { 
+            flex: 1; 
+            padding: 2rem; 
+        }
+        .stats { 
+            background: #1a1a1a; 
+            padding: 1.5rem; 
+            border-radius: 8px; 
+            margin-bottom: 2rem; 
+            border: 1px solid #333;
+        }
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 1rem; 
+            margin-top: 2rem; 
+        }
+        .card { 
+            background: #1a1a1a; 
+            padding: 1.5rem; 
+            border-radius: 8px; 
+            border: 1px solid #333; 
+        }
+        .loading { 
+            text-align: center; 
+            padding: 3rem; 
+            color: #888; 
+        }
+        .error { 
+            background: #fee; 
+            color: #c53030; 
+            padding: 1rem; 
+            border-radius: 4px; 
+            margin: 1rem 0; 
+        }
+        .resource { 
+            margin-bottom: 1rem; 
+            padding-bottom: 1rem; 
+            border-bottom: 1px solid #333; 
+        }
+        .resource:last-child { 
+            border-bottom: none; 
+            margin-bottom: 0; 
+        }
+        .resource-title { 
+            color: #ef4444; 
+            font-weight: 600; 
+            margin-bottom: 0.5rem; 
+        }
+        .resource-description { 
+            color: #ccc; 
+            font-size: 0.9rem; 
+        }
+        .category { 
+            background: #ef4444; 
+            color: white; 
+            padding: 0.25rem 0.5rem; 
+            border-radius: 4px; 
+            font-size: 0.8rem; 
+            display: inline-block; 
+            margin-top: 0.5rem; 
+        }
+    </style>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=${process.env.VITE_GA_MEASUREMENT_ID || 'G-383541848'}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '${process.env.VITE_GA_MEASUREMENT_ID || 'G-383541848'}');
+    </script>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>Awesome Video Dashboard</h1>
+            <p class="subtitle">A curated collection of awesome video resources, tools, and technologies</p>
+        </div>
+    </header>
     
-    // Step 5: Create deployment trigger
-    await createTriggerForGitHub();
-    
-    // Success
-    log('Deployment initiated successfully!', 'success');
-    console.log(`
-🎉 Next Steps:
-1. GitHub Actions will build and deploy your site
-2. Enable GitHub Pages in repository settings if not already done
-3. Your site will be available at: ${config.site.url}
-4. Check the Actions tab for deployment progress
-    `);
+    <main class="main">
+        <div class="container">
+            <div class="stats">
+                <h2>Loading awesome video resources...</h2>
+                <p>Fetching ${awesomeListData.resources.length} curated video tools and technologies</p>
+            </div>
+            
+            <div id="content" class="loading">
+                <p>Loading resources from awesome-video...</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Embedded data for reliability on GitHub Pages
+        const embeddedData = ${JSON.stringify(awesomeListData)};
+        
+        // Function to render data
+        function renderData(data) {
+            console.log('Rendering data with', data.resources?.length, 'resources');
+            const content = document.getElementById('content');
+            const categories = {};
+            
+            // Group by category
+            data.resources.forEach(resource => {
+                if (!categories[resource.category]) {
+                    categories[resource.category] = [];
+                }
+                categories[resource.category].push(resource);
+            });
+            
+            // Render categories
+            content.innerHTML = Object.entries(categories)
+                .map(([category, resources]) => \`
+                    <div class="card">
+                        <h3>\${category} (\${resources.length} resources)</h3>
+                        <div class="resources">
+                            \${resources.slice(0, 10).map(resource => \`
+                                <div class="resource">
+                                    <div class="resource-title">
+                                        <a href="\${resource.url}" target="_blank" style="color: #ef4444; text-decoration: none;">
+                                            \${resource.title}
+                                        </a>
+                                    </div>
+                                    <div class="resource-description">\${resource.description}</div>
+                                    <span class="category">\${resource.category}</span>
+                                </div>
+                            \`).join('')}
+                            \${resources.length > 10 ? \`<p style="color: #888; font-style: italic;">... and \${resources.length - 10} more resources</p>\` : ''}
+                        </div>
+                    </div>
+                \`).join('');
+            
+            // Track page view
+            gtag('event', 'page_view', {
+                page_title: 'Awesome Video Dashboard',
+                page_location: window.location.href
+            });
+        }
+        
+        // Use embedded data immediately
+        try {
+            renderData(embeddedData);
+        } catch (error) {
+            console.error('Error rendering embedded data:', error);
+            document.getElementById('content').innerHTML = \`
+                <div class="error">
+                    <h3>Error loading resources</h3>
+                    <p>Failed to render awesome-video data: \${error.message}</p>
+                </div>
+            \`;
+        }
+    </script>
+</body>
+</html>`;
+
+    writeFileSync(join(outputDir, 'index.html'), htmlContent);
+
+    console.log(`✅ Simple deployment created successfully!`);
+    console.log(`📊 Generated site with ${awesomeListData.resources.length} resources`);
+    console.log(`📁 Output directory: ${outputDir}`);
     
   } catch (error) {
-    log(`Deployment failed: ${error instanceof Error ? error.message : String(error)}`, 'error');
-    console.log(`
-🔧 Troubleshooting:
-- Ensure you're in the project root directory
-- Run the setup wizard: npx tsx scripts/setup-wizard.ts
-- Check your internet connection
-- Verify the awesome list URL is accessible
-    `);
-  } finally {
-    rl.close();
+    console.error('❌ Deployment failed:', error);
+    process.exit(1);
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
-  main().catch(console.error);
-}
+createSimpleDeployment();

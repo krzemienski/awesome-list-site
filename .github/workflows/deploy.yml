@@ -2,8 +2,9 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
 
 permissions:
@@ -18,29 +19,53 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build project
-        run: npm run build
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./dist/public
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Generate static data
+      run: npx tsx scripts/build-static.ts
+      env:
+        VITE_STATIC_BUILD: 'true'
+        
+    - name: Build React application
+      timeout-minutes: 15
+      run: |
+        # Optimize build environment
+        export NODE_OPTIONS="--max-old-space-size=8192 --max-semi-space-size=1024"
+        export VITE_BUILD_TARGET="github-pages"
+        
+        # Run build with chunking to avoid timeouts
+        timeout 900 npm run build || (
+          echo "Standard build timed out, trying optimized build..."
+          npx vite build --mode production --minify false --sourcemap false
+        )
+      env:
+        NODE_ENV: 'production'
+        VITE_STATIC_BUILD: 'true'
+        VITE_GA_MEASUREMENT_ID: ${{ secrets.GA_MEASUREMENT_ID }}
+        VITE_SITE_TITLE: ${{ vars.SITE_TITLE || 'Awesome Video Dashboard' }}
+        VITE_SITE_DESCRIPTION: ${{ vars.SITE_DESCRIPTION || 'A curated collection of awesome video resources and tools' }}
+        VITE_SITE_URL: ${{ vars.SITE_URL || 'https://krzemienski.github.io/awesome-list-site' }}
+        VITE_DEFAULT_THEME: ${{ vars.DEFAULT_THEME || 'red' }}
+        
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+      
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: './dist/public'
 
   deploy:
     environment:

@@ -14,10 +14,6 @@ run = ["npm", "run", "start"]
 localPort = 5000
 externalPort = 80
 
-[[ports]]
-localPort = 5001
-externalPort = 3000
-
 [workflows]
 runButton = "Project"
 
@@ -38,6 +34,3 @@ author = "agent"
 task = "shell.exec"
 args = "npm run dev"
 waitForPort = 5000
-
-[agent]
-integrations = ["javascript_anthropic==1.0.0", "javascript_google_analytics==1.0.0"]

@@ -24,7 +24,6 @@ export default defineConfig({
     },
   },
   root: path.resolve(import.meta.dirname, "client"),
-  base: process.env.NODE_ENV === "production" ? "/awesome-list-site/" : "/",
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
