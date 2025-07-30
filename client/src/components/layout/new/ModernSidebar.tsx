@@ -35,6 +35,129 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
   const [location] = useLocation();
   const [openCategories, setOpenCategories] = useState<string[]>([]);
   const isMobile = useIsMobile();
+
+  // Organize categories with proper hierarchy for media/streaming tech
+  const getOrganizedCategories = (categories: Category[]) => {
+    const filteredCategories = categories.filter(cat => 
+      cat.resources.length > 0 && 
+      cat.name !== "Table of contents" && 
+      !cat.name.startsWith("List of") &&
+      !["Contributing", "License", "External Links", "Anti-features"].includes(cat.name)
+    );
+
+    // Define the proper hierarchical order for media streaming tech
+    const hierarchyOrder = [
+      // Core Infrastructure
+      "FFMPEG",
+      "Encoding Tools", 
+      "Codecs",
+      "AV1",
+      "VP9",
+      
+      // Streaming & Delivery
+      "Adaptive Streaming",
+      "Streaming Servers",
+      "Protocols & Transport",
+      "Cloud & CDN",
+      "CDN Integration",
+      "Infrastructure & Delivery",
+      
+      // Players & Clients
+      "Players & Clients",
+      "Web Players",
+      "Mobile & Web Players",
+      
+      // Learning & Standards
+      "Intro & Learning",
+      "Tutorials & Case Studies",
+      "Official Specs",
+      "Standards & Industry",
+      
+      // Everything else
+      "Other"
+    ];
+
+    // Group categories by their hierarchical position
+    const organizedCategories: Category[] = [];
+    const processedNames = new Set<string>();
+
+    // Process categories in hierarchical order
+    hierarchyOrder.forEach(orderName => {
+      const matchingCategories = filteredCategories.filter(cat => 
+        cat.name === orderName && !processedNames.has(cat.name)
+      );
+      
+      matchingCategories.forEach(cat => {
+        // Special handling for codec categories - merge VP9 and AV1 into Codecs
+        if (orderName === "Codecs") {
+          const codecsCategory = { ...cat };
+          
+          // Add VP9 and AV1 resources to Codecs subcategories
+          const vp9Cat = filteredCategories.find(c => c.name === "VP9");
+          const av1Cat = filteredCategories.find(c => c.name === "AV1");
+          
+          if (vp9Cat) {
+            codecsCategory.subcategories.push({
+              name: "VP9",
+              slug: getCategorySlug("VP9"),
+              resources: vp9Cat.resources
+            });
+            processedNames.add("VP9");
+          }
+          
+          if (av1Cat) {
+            codecsCategory.subcategories.push({
+              name: "AV1", 
+              slug: getCategorySlug("AV1"),
+              resources: av1Cat.resources
+            });
+            processedNames.add("AV1");
+          }
+          
+          organizedCategories.push(codecsCategory);
+        }
+        // Special handling for Cloud & CDN - consolidate duplicates
+        else if (orderName === "Cloud & CDN") {
+          const cloudCategories = filteredCategories.filter(c => 
+            (c.name === "Cloud & CDN" || c.name === "CDN Integration") && 
+            !processedNames.has(c.name)
+          );
+          
+          if (cloudCategories.length > 0) {
+            const consolidatedCategory: Category = {
+              name: "Cloud & CDN",
+              slug: getCategorySlug("Cloud & CDN"),
+              resources: [],
+              subcategories: []
+            };
+            
+            cloudCategories.forEach(cloudCat => {
+              consolidatedCategory.resources.push(...cloudCat.resources);
+              consolidatedCategory.subcategories.push(...cloudCat.subcategories);
+              processedNames.add(cloudCat.name);
+            });
+            
+            organizedCategories.push(consolidatedCategory);
+          }
+        }
+        // Normal category processing
+        else if (!["VP9", "AV1", "CDN Integration"].includes(orderName)) {
+          organizedCategories.push(cat);
+        }
+        
+        processedNames.add(cat.name);
+      });
+    });
+
+    // Add any remaining categories that weren't in the hierarchy order
+    filteredCategories.forEach(cat => {
+      if (!processedNames.has(cat.name)) {
+        organizedCategories.push(cat);
+      }
+    });
+
+    return organizedCategories;
+  };
   
   // Set initially open categories based on URL
   useEffect(() => {
@@ -110,14 +233,8 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
           </div>
         ) : (
           <div className="space-y-1">
-            {/* Real categories from awesome-selfhosted data */}
-            {categories
-              .filter(cat => 
-                cat.resources.length > 0 && 
-                cat.name !== "Table of contents" && 
-                !cat.name.startsWith("List of") &&
-                !["Contributing", "License", "External Links", "Anti-features"].includes(cat.name)
-              )
+            {/* Real categories with proper hierarchical organization */}
+            {getOrganizedCategories(categories)
               .map(category => (
               <Accordion
                 key={category.name}
@@ -212,9 +329,12 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
     );
   }
 
-  // Desktop sidebar
+  // Desktop sidebar with regular div
   return (
-    <div className="hidden md:flex flex-col w-64 border-r border-border shrink-0">
+    <div className={cn(
+      "fixed inset-y-0 left-0 z-40 w-64 bg-background border-r border-border flex flex-col transition-transform duration-300 ease-in-out",
+      isOpen ? "translate-x-0" : "-translate-x-full"
+    )}>
       {sidebarContent}
     </div>
   );

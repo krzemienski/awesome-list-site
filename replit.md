@@ -146,6 +146,15 @@ The application is configured for deployment on Replit:
 - ✅ Fixed mobile responsiveness with proper sidebar handling
 - ✅ Applied rose theme consistently across all page types
 
+### Hierarchical Navigation Fixes (January 2025)
+- ✅ Reorganized media streaming technology hierarchy with proper logical structure
+- ✅ Positioned FFMPEG as core infrastructure with encoding tools properly nested
+- ✅ Consolidated VP9 and AV1 codecs under the main Codecs category as subcategories
+- ✅ Merged duplicate Cloud & CDN categories into single consolidated category
+- ✅ Implemented proper hierarchical ordering: Core Infrastructure → Streaming/Delivery → Players/Clients → Learning/Standards
+- ✅ Fixed "reversed" category relationships so parent-child structure follows logical technology stack
+- ✅ Added visual nesting with dots and proper indentation for subcategories
+
 ### Deployment Configuration
 - Target: GitHub Pages at krzemienski.github.io/awesome-list-site
 - Build process optimized for large React applications
