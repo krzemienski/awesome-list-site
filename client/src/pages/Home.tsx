@@ -140,14 +140,6 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
         </>
       ) : (
         <>
-          <div className="mb-6">
-            <p className="text-muted-foreground mb-4">
-              {awesomeList?.description || "A curated list of awesome resources"}
-            </p>
-            
-
-          </div>
-          
           {/* Controls */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
