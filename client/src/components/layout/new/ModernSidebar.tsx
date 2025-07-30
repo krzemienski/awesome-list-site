@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
+import { useLocation, useRoute } from "wouter";
 import { 
   Sidebar, 
   SidebarProvider, 
@@ -150,7 +150,32 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
                       All ({category.resources.length})
                     </Button>
                     
-                    {/* We would add subcategories here if needed */}
+                    {/* Render subcategories if they exist */}
+                    {category.subcategories && category.subcategories.length > 0 && (
+                      <div className="mt-1 space-y-1">
+                        {category.subcategories.map(subcategory => (
+                          <Button
+                            key={subcategory.name}
+                            variant="ghost"
+                            className={cn(
+                              "w-full justify-start font-normal text-xs pl-4",
+                              location === `/subcategory/${getSubcategorySlug(category.name, subcategory.name)}` 
+                                ? "bg-accent text-accent-foreground" 
+                                : "text-muted-foreground hover:text-foreground"
+                            )}
+                            onClick={() => navigate(`/subcategory/${getSubcategorySlug(category.name, subcategory.name)}`)}
+                          >
+                            <div className="flex items-center gap-2 w-full">
+                              <div className="w-2 h-2 rounded-full bg-muted-foreground/40 flex-shrink-0" />
+                              <span className="truncate">{subcategory.name}</span>
+                              <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded ml-auto">
+                                {subcategory.resources.length}
+                              </span>
+                            </div>
+                          </Button>
+                        ))}
+                      </div>
+                    )}
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
