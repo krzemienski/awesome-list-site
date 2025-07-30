@@ -322,7 +322,7 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
                           ? "bg-accent text-accent-foreground" 
                           : ""
                       )}
-                      onClick={() => navigate(`/category/${getCategorySlug(category.name)}`)}
+                      onClick={() => navigateAndClose(`/category/${getCategorySlug(category.name)}`)}
                     >
                       All ({category.resources.length})
                     </Button>
@@ -332,7 +332,7 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
                       <div className="mt-1 space-y-1">
                         {category.subcategories.map(subcategory => (
                           <Button
-                            key={subcategory.name}
+                            key={`${category.name}-${subcategory.name}`}
                             variant="ghost"
                             className={cn(
                               "w-full justify-start font-normal text-xs pl-4",
@@ -340,7 +340,7 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
                                 ? "bg-accent text-accent-foreground" 
                                 : "text-muted-foreground hover:text-foreground"
                             )}
-                            onClick={() => navigate(`/subcategory/${getSubcategorySlug(category.name, subcategory.name)}`)}
+                            onClick={() => navigateAndClose(`/subcategory/${getSubcategorySlug(category.name, subcategory.name)}`)}
                           >
                             <div className="flex items-center gap-2 w-full">
                               <div className="w-2 h-2 rounded-full bg-muted-foreground/40 flex-shrink-0" />
