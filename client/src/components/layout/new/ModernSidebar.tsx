@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Home, Folder, ExternalLink, Menu, Palette } from "lucide-react";
+import { Home, Folder, ExternalLink, Menu } from "lucide-react";
 import { slugify, getCategorySlug, getSubcategorySlug } from "@/lib/utils";
 import { Category } from "@/types/awesome-list";
 import { cn } from "@/lib/utils";
@@ -379,15 +379,6 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
             onSettingsChange={updateSettings}
           />
         </div>
-        
-        <Button 
-          variant="ghost" 
-          className="w-full justify-start" 
-          onClick={() => navigateAndClose('/color-palette')}
-        >
-          <Palette className="mr-2 h-4 w-4" />
-          Color Palette Generator
-        </Button>
       </div>
     </>
   );
