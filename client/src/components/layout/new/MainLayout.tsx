@@ -64,7 +64,9 @@ export default function MainLayout({ awesomeList, isLoading, children }: MainLay
           isLoading={isLoading}
         />
         
-        <main className="flex-1 py-4 px-4 sm:py-6 sm:px-6">
+        <main className={`flex-1 py-4 px-4 sm:py-6 sm:px-6 transition-all duration-300 ease-in-out ${
+          isSidebarOpen && !isMobile ? 'ml-64' : 'ml-0'
+        }`}>
           {children}
         </main>
       </div>
