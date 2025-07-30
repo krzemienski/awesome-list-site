@@ -2,7 +2,9 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { Badge } from "@/components/ui/badge";
+import { Search, ExternalLink, Star, Github, Globe } from "lucide-react";
 import { useLocation } from "wouter";
 import Fuse from "fuse.js";
 import { Resource } from "@/types/awesome-list";
@@ -85,6 +87,66 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
     window.open(resource.url, '_blank', 'noopener,noreferrer');
   };
 
+  // Get platform icon based on URL
+  const getPlatformIcon = (url: string) => {
+    if (url.includes('github.com')) {
+      return <Github className="h-3 w-3" />;
+    } else if (url.includes('gitlab.com')) {
+      return <Globe className="h-3 w-3" />;
+    } else {
+      return <Globe className="h-3 w-3" />;
+    }
+  };
+
+  // Preview tooltip content
+  const PreviewTooltip = ({ resource }: { resource: Resource }) => (
+    <HoverCardContent className="w-80 p-4" side="right" align="start">
+      <div className="space-y-3">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1 min-w-0">
+            <h4 className="font-semibold text-sm truncate">{resource.title}</h4>
+            <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
+              {getPlatformIcon(resource.url)}
+              <span className="truncate">{resource.url.replace(/^https?:\/\//, '').split('/')[0]}</span>
+            </div>
+          </div>
+          <ExternalLink className="h-3 w-3 text-muted-foreground shrink-0 mt-0.5" />
+        </div>
+        
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          {resource.description}
+        </p>
+        
+        <div className="flex flex-wrap gap-1.5">
+          <Badge variant="secondary" className="text-xs">
+            {resource.category}
+          </Badge>
+          {resource.subcategory && (
+            <Badge variant="outline" className="text-xs">
+              {resource.subcategory}
+            </Badge>
+          )}
+          {resource.tags?.slice(0, 3).map((tag, index) => (
+            <Badge key={index} variant="outline" className="text-xs">
+              {tag}
+            </Badge>
+          ))}
+          {resource.tags && resource.tags.length > 3 && (
+            <Badge variant="outline" className="text-xs">
+              +{resource.tags.length - 3} more
+            </Badge>
+          )}
+        </div>
+        
+        <div className="pt-2 border-t border-border">
+          <p className="text-xs text-muted-foreground">
+            Click to open in new tab
+          </p>
+        </div>
+      </div>
+    </HoverCardContent>
+  );
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-lg">
@@ -116,19 +178,26 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
               results.length > 0 ? (
                 <div className="p-2">
                   {results.map((resource, index) => (
-                    <div
-                      key={`${resource.title}-${resource.url}-${index}`}
-                      onClick={() => handleSelect(resource)}
-                      className="p-3 hover:bg-accent hover:text-accent-foreground cursor-pointer rounded border-b border-border last:border-b-0"
-                    >
-                      <div className="font-medium text-sm">{resource.title}</div>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        {resource.category} {resource.subcategory ? `→ ${resource.subcategory}` : ''} 
-                      </div>
-                      <div className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                        {resource.description}
-                      </div>
-                    </div>
+                    <HoverCard key={`${resource.title}-${resource.url}-${index}`} openDelay={300} closeDelay={100}>
+                      <HoverCardTrigger asChild>
+                        <div
+                          onClick={() => handleSelect(resource)}
+                          className="p-3 hover:bg-accent hover:text-accent-foreground cursor-pointer rounded border-b border-border last:border-b-0 transition-colors"
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="font-medium text-sm truncate flex-1">{resource.title}</div>
+                            <ExternalLink className="h-3 w-3 text-muted-foreground shrink-0" />
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            {resource.category} {resource.subcategory ? `→ ${resource.subcategory}` : ''} 
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                            {resource.description}
+                          </div>
+                        </div>
+                      </HoverCardTrigger>
+                      <PreviewTooltip resource={resource} />
+                    </HoverCard>
                   ))}
                 </div>
               ) : (
