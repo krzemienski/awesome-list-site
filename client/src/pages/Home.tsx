@@ -8,7 +8,7 @@ import Pagination from "@/components/ui/pagination";
 import RecommendationPanel from "@/components/ui/recommendation-panel";
 import UserPreferences from "@/components/ui/user-preferences";
 import { AwesomeList } from "@/types/awesome-list";
-import { Helmet } from "react-helmet";
+import SEOHead from "@/components/layout/SEOHead";
 import { Filter, Search, Brain } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
@@ -122,19 +122,10 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
   return (
     <div className="flex flex-col">
       {/* SEO Head */}
-      <Helmet>
-        <title>{awesomeList?.title || "Awesome Video"}</title>
-        <meta name="description" content={`${awesomeList?.description || "A curated list of awesome video resources"} - ${allResources.length} resources across ${categories.length} categories.`} />
-        <meta name="keywords" content={`awesome video, ${awesomeList?.title?.toLowerCase() || 'video resources'}, video development, FFmpeg, streaming, video tools`} />
-        <meta property="og:title" content={awesomeList?.title || "Awesome Video"} />
-        <meta property="og:description" content={`${awesomeList?.description || "A curated list of awesome video resources"} - ${allResources.length} resources available.`} />
-        <meta property="og:type" content="website" />
-        <meta property="og:image" content="/og-image.svg" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={awesomeList?.title || "Awesome Video"} />
-        <meta name="twitter:description" content={`${awesomeList?.description || "A curated list of awesome video resources"} - ${allResources.length} resources available.`} />
-        <link rel="canonical" href="/" />
-      </Helmet>
+      <SEOHead 
+        title={`${awesomeList?.title || "Awesome Video"}${searchTerm ? ` - "${searchTerm}"` : ""}${selectedCategory !== "all" ? ` - ${selectedCategory}` : ""}`}
+        description={`${awesomeList?.description || "A curated list of awesome video resources"} - Browse ${sortedResources.length} curated resources${selectedCategory !== "all" ? ` in ${selectedCategory}` : ""}${searchTerm ? ` matching "${searchTerm}"` : ""}.`}
+      />
       
       {isLoading ? (
         <>
