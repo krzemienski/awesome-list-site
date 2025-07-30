@@ -138,6 +138,7 @@ export default function ColorPalette() {
           })}
         </div>
       ),
+      className: "fixed top-20 left-1/2 transform -translate-x-1/2 z-[110] max-w-md",
     });
   };
 
