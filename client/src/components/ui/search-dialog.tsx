@@ -4,11 +4,12 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Button } from "@/components/ui/button";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Badge } from "@/components/ui/badge";
-import { Search, ExternalLink, Star, Github, Globe } from "lucide-react";
+import { Search, ExternalLink, Star, Github, Globe, History, X, Clock } from "lucide-react";
 import { useLocation } from "wouter";
 import Fuse from "fuse.js";
 import { Resource } from "@/types/awesome-list";
 import { trackSearch, trackResourceClick, trackPerformance } from "@/lib/analytics";
+import { useSearchHistory } from "@/hooks/use-search-history";
 
 interface SearchDialogProps {
   isOpen: boolean;
@@ -19,8 +20,10 @@ interface SearchDialogProps {
 export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDialogProps) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Resource[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
   const [, navigate] = useLocation();
   const inputRef = useRef<HTMLInputElement>(null);
+  const { history, addToHistory, clearHistory, removeFromHistory, getRecentQueries } = useSearchHistory();
 
   // Debug: Log resources to see if they're being passed correctly
   console.log(`Search dialog has ${resources?.length || 0} resources`);
@@ -43,9 +46,11 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
     
     if (!query || query.length < 2 || !fuse) {
       setResults([]);
+      setShowHistory(query.length === 0);
       return;
     }
 
+    setShowHistory(false);
     const startTime = performance.now();
     const searchResults = fuse!.search(query);
     const endTime = performance.now();
@@ -56,7 +61,15 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
     trackSearch(query, searchResults.length);
     trackPerformance('search_time', endTime - startTime);
     
-    setResults(searchResults.slice(0, 15).map(result => result.item));
+    const searchResultItems = searchResults.slice(0, 15).map(result => result.item);
+    setResults(searchResultItems);
+    
+    // Add to search history if we have results - use a timeout to prevent immediate re-render
+    if (searchResultItems.length > 0) {
+      setTimeout(() => {
+        addToHistory(query, searchResultItems.length);
+      }, 0);
+    }
   }, [query, fuse]);
 
   // Focus input when dialog opens
@@ -73,8 +86,18 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
     if (!isOpen) {
       setQuery("");
       setResults([]);
+      setShowHistory(false);
     }
   }, [isOpen]);
+
+  // Show history when input is focused and empty
+  useEffect(() => {
+    if (isOpen && query.length === 0) {
+      setShowHistory(true);
+    } else {
+      setShowHistory(false);
+    }
+  }, [query, isOpen]);
 
   // Handle resource selection
   const handleSelect = (resource: Resource) => {
@@ -85,6 +108,18 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
     
     // Open the resource URL in a new tab
     window.open(resource.url, '_blank', 'noopener,noreferrer');
+  };
+
+  // Handle history item selection
+  const handleHistorySelect = (historyQuery: string) => {
+    setQuery(historyQuery);
+    setShowHistory(false);
+  };
+
+  // Handle removing item from history
+  const handleRemoveFromHistory = (historyQuery: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    removeFromHistory(historyQuery);
   };
 
   // Get platform icon based on URL
@@ -174,7 +209,52 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
           </div>
           
           <div className="max-h-[300px] overflow-y-auto border border-border rounded-md">
-            {query.length >= 2 ? (
+            {showHistory && history.length > 0 ? (
+              <div className="p-2">
+                <div className="flex items-center justify-between mb-2 px-2">
+                  <div className="flex items-center gap-2">
+                    <History className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm font-medium text-muted-foreground">Recent Searches</span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={clearHistory}
+                    className="h-6 text-xs text-muted-foreground hover:text-foreground"
+                  >
+                    Clear all
+                  </Button>
+                </div>
+                {getRecentQueries(5).map((historyQuery, index) => {
+                  const historyItem = history.find(h => h.query === historyQuery);
+                  return (
+                    <div
+                      key={`${historyQuery}-${index}`}
+                      onClick={() => handleHistorySelect(historyQuery)}
+                      className="flex items-center justify-between p-2 hover:bg-accent hover:text-accent-foreground cursor-pointer rounded transition-colors group"
+                    >
+                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                        <Clock className="h-3 w-3 text-muted-foreground shrink-0" />
+                        <span className="text-sm truncate">{historyQuery}</span>
+                        {historyItem && (
+                          <span className="text-xs text-muted-foreground">
+                            ({historyItem.resultCount} results)
+                          </span>
+                        )}
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => handleRemoveFromHistory(historyQuery, e)}
+                        className="h-5 w-5 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : query.length >= 2 ? (
               results.length > 0 ? (
                 <div className="p-2">
                   {results.map((resource, index) => (
@@ -216,6 +296,9 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
                 </div>
                 <h3 className="mt-4 text-sm font-semibold">Start typing to search</h3>
                 <p className="mt-2 text-xs text-muted-foreground">Type at least 2 characters</p>
+                {history.length > 0 && (
+                  <p className="mt-1 text-xs text-muted-foreground">Or select from recent searches above</p>
+                )}
               </div>
             )}
           </div>
