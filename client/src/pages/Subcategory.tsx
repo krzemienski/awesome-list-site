@@ -3,261 +3,294 @@ import { useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import ResourceCard from "@/components/ui/resource-card";
+import ResourceListItem from "@/components/ui/resource-list-item";
+import ResourceCompactItem from "@/components/ui/resource-compact-item";
+import LayoutSwitcher, { LayoutType } from "@/components/ui/layout-switcher";
+import Pagination from "@/components/ui/pagination";
+import SEOHead from "@/components/layout/SEOHead";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Filter } from "lucide-react";
-import { deslugify } from "@/lib/utils";
+import { Search, ArrowLeft } from "lucide-react";
+import { Link } from "wouter";
+import { deslugify, slugify, getCategorySlug, getSubcategorySlug } from "@/lib/utils";
 import { Resource, AwesomeList } from "@/types/awesome-list";
 import NotFound from "@/pages/not-found";
-import { Helmet } from "react-helmet";
-
-// Demo subcategory resources
-const demoSubcategoryResources: Resource[] = [
-  // Web Analytics subcategory
-  {
-    id: "wa1",
-    title: "Matomo",
-    url: "https://matomo.org",
-    description: "Google Analytics alternative that protects your data and your customers' privacy.",
-    category: "Analytics",
-    subcategory: "Web Analytics"
-  },
-  {
-    id: "wa2",
-    title: "Plausible Analytics",
-    url: "https://plausible.io",
-    description: "Simple, lightweight (< 1 KB) and privacy-friendly analytics alternative to Google Analytics.",
-    category: "Analytics",
-    subcategory: "Web Analytics"
-  },
-  {
-    id: "wa3",
-    title: "Umami",
-    url: "https://umami.is",
-    description: "Simple, fast, privacy-focused alternative to Google Analytics.",
-    category: "Analytics",
-    subcategory: "Web Analytics"
-  },
-  {
-    id: "wa4",
-    title: "Shynet",
-    url: "https://github.com/milesmcc/shynet",
-    description: "Modern, privacy-friendly, and detailed web analytics that works without cookies or JS.",
-    category: "Analytics",
-    subcategory: "Web Analytics"
-  },
-  
-  // Video Streaming subcategory
-  {
-    id: "vs1",
-    title: "Jellyfin",
-    url: "https://jellyfin.org",
-    description: "Media system that puts you in control of managing and streaming your media.",
-    category: "Media Streaming",
-    subcategory: "Video Streaming"
-  },
-  {
-    id: "vs2",
-    title: "Kodi",
-    url: "https://kodi.tv",
-    description: "Free and Open Source home theater software.",
-    category: "Media Streaming",
-    subcategory: "Video Streaming"
-  },
-  {
-    id: "vs3",
-    title: "Dim",
-    url: "https://github.com/Dusk-Labs/dim",
-    description: "Self-hosted media manager powered by dark forces.",
-    category: "Media Streaming",
-    subcategory: "Video Streaming"
-  },
-  {
-    id: "vs4",
-    title: "Gerbera",
-    url: "https://gerbera.io/",
-    description: "UPnP Media Server for 2023.",
-    category: "Media Streaming",
-    subcategory: "Video Streaming"
-  }
-];
+import { processAwesomeListData } from "@/lib/parser";
+import { fetchStaticAwesomeList } from "@/lib/static-data";
+import { trackCategoryView, trackFilterUsage, trackSortChange } from "@/lib/analytics";
 
 export default function Subcategory() {
   const { slug } = useParams<{ slug: string }>();
-  const [filteredResources, setFilteredResources] = useState<Resource[]>([]);
-  const [allResources, setAllResources] = useState<Resource[]>([]);
-  const [categoryName, setCategoryName] = useState("");
-  const [subcategoryName, setSubcategoryName] = useState("");
+  const [layout, setLayout] = useState<LayoutType>("list"); // Match homepage default
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(24);
+  const [sortBy, setSortBy] = useState("category"); // Match homepage default
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState("name-asc");
   
-  // Fetch awesome list data
+  // Fetch awesome list data - use same query as homepage
   const { data: rawData, isLoading, error } = useQuery({
-    queryKey: ["/api/awesome-list"],
+    queryKey: ["awesome-list-data"],
+    queryFn: fetchStaticAwesomeList,
     staleTime: 1000 * 60 * 60, // 1 hour
   });
   
-  // Set up subcategory resources from demo data
-  useEffect(() => {
-    if (slug) {
-      // For demo purposes, we'll check if the slug matches any of our demo subcategories
-      const decodedName = deslugify(slug);
-      let matchedSubcategory = "";
-      let matchedCategory = "";
-      let resources: Resource[] = [];
-      
-      // Look for matching subcategory in our demo data
-      if (decodedName.toLowerCase().includes("web") && decodedName.toLowerCase().includes("analytics")) {
-        matchedSubcategory = "Web Analytics";
-        matchedCategory = "Analytics";
-        resources = demoSubcategoryResources.filter(r => r.subcategory === "Web Analytics");
-      } else if (decodedName.toLowerCase().includes("video") && decodedName.toLowerCase().includes("streaming")) {
-        matchedSubcategory = "Video Streaming";
-        matchedCategory = "Media Streaming";
-        resources = demoSubcategoryResources.filter(r => r.subcategory === "Video Streaming");
-      } else {
-        // Default to show all resources if no match
-        const firstSubcategory = demoSubcategoryResources[0].subcategory || "";
-        matchedSubcategory = firstSubcategory;
-        matchedCategory = demoSubcategoryResources[0].category;
-        resources = demoSubcategoryResources.filter(r => r.subcategory === firstSubcategory);
-      }
-      
-      setSubcategoryName(matchedSubcategory);
-      setCategoryName(matchedCategory);
-      setAllResources(resources);
-    }
-  }, [slug]);
+  const awesomeList = rawData ? processAwesomeListData(rawData) : undefined;
   
-  // Apply filters and sorting
-  useEffect(() => {
-    let filtered = [...allResources];
-    
-    // Apply search filter
-    if (searchTerm) {
-      filtered = filtered.filter(
-        resource => 
-          resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          resource.description.toLowerCase().includes(searchTerm.toLowerCase())
+  // Find the current subcategory and its resources
+  let currentSubcategory = null;
+  let parentCategory = null;
+  let baseResources: Resource[] = [];
+  
+  if (awesomeList && slug) {
+    // Find matching subcategory across all categories
+    for (const category of awesomeList.categories) {
+      const subcategory = category.subcategories.find(sub => 
+        getSubcategorySlug(category.name, sub.name) === slug
       );
+      if (subcategory) {
+        currentSubcategory = subcategory;
+        parentCategory = category;
+        baseResources = subcategory.resources;
+        break;
+      }
     }
-    
-    // Apply sorting
-    switch(sortBy) {
-      case "name-asc":
-        filtered.sort((a, b) => a.title.localeCompare(b.title));
-        break;
-      case "name-desc":
-        filtered.sort((a, b) => b.title.localeCompare(a.title));
-        break;
-      case "newest":
-        // For demo purposes, we'll just randomize the order
-        filtered.sort(() => Math.random() - 0.5);
-        break;
-      default:
-        break;
-    }
-    
-    setFilteredResources(filtered);
-  }, [allResources, searchTerm, sortBy]);
+  }
   
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
+  const subcategoryName = currentSubcategory ? currentSubcategory.name : deslugify(slug || "");
+  const categoryName = parentCategory ? parentCategory.name : "";
+  
+  // Track subcategory view
+  useEffect(() => {
+    if (subcategoryName && !isLoading) {
+      trackCategoryView(`${categoryName} > ${subcategoryName}`);
+    }
+  }, [subcategoryName, categoryName, isLoading]);
+
+  // Handle sort change with analytics
+  const handleSortChange = (sort: string) => {
+    setSortBy(sort);
+    trackSortChange(sort);
+  };
+
+  // Handle search with analytics
+  const handleSearchChange = (search: string) => {
+    setSearchTerm(search);
+    if (search.length >= 2) {
+      trackFilterUsage("search", search, filteredResources.length);
+    }
+  };
+  
+  // Filter resources by search term
+  const filteredResources = baseResources.filter(resource => {
+    const matchesSearch = searchTerm === "" || 
+      resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      resource.description.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    return matchesSearch;
+  });
+  
+  // Sort resources
+  const sortedResources = [...filteredResources].sort((a, b) => {
+    switch (sortBy) {
+      case "name-asc":
+        return a.title.localeCompare(b.title);
+      case "name-desc":
+        return b.title.localeCompare(a.title);
+      case "category":
+        return a.category.localeCompare(b.category);
+      default:
+        return 0;
+    }
+  });
+  
+  // Calculate pagination
+  const totalPages = Math.ceil(sortedResources.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedResources = sortedResources.slice(startIndex, endIndex);
+
+  // Handle page changes
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setItemsPerPage(newPageSize);
+    setCurrentPage(1);
   };
   
   if (isLoading) {
     return (
-      <div className="flex flex-col">
-        <Skeleton className="h-12 w-1/2 mb-2" />
-        <Skeleton className="h-6 w-3/4 mb-8" />
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-64" />
+          <Skeleton className="h-5 w-48" />
+        </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array(6).fill(0).map((_, i) => (
-            <Skeleton key={i} className="h-32 w-full" />
-          ))}
+        <div className="space-y-4">
+          <div className="flex gap-4">
+            <Skeleton className="h-10 flex-1" />
+            <Skeleton className="h-10 w-32" />
+            <Skeleton className="h-10 w-32" />
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Array(9).fill(0).map((_, i) => (
+              <Skeleton key={i} className="h-32 w-full" />
+            ))}
+          </div>
         </div>
       </div>
     );
   }
   
-  if (!subcategoryName && !isLoading) {
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <h2 className="text-xl font-semibold mb-2">Error Loading Subcategory</h2>
+        <p className="text-muted-foreground">There was an error loading the subcategory data.</p>
+      </div>
+    );
+  }
+  
+  if (!currentSubcategory && !isLoading) {
     return <NotFound />;
   }
   
   return (
-    <div className="flex flex-col">
+    <div className="space-y-6">
       {/* SEO Head */}
-      <Helmet>
-        <title>{subcategoryName} - {categoryName} - Awesome Selfhosted</title>
-        <meta 
-          name="description" 
-          content={`Browse ${filteredResources.length} ${subcategoryName} resources in the ${categoryName} category of Awesome Selfhosted.`} 
-        />
-      </Helmet>
+      <SEOHead 
+        title={`${subcategoryName} Resources - ${categoryName} - Awesome Video`}
+        description={`Browse ${sortedResources.length} ${subcategoryName} resources in the ${categoryName} category.`}
+      />
       
-      <div className="flex flex-col items-start gap-1 mb-4">
-        <h1 className="text-3xl font-bold tracking-tight">
-          {subcategoryName}
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Category: {categoryName}
+      {/* Header */}
+      <div className="space-y-2">
+        <div className="flex items-center gap-3">
+          <Link href={`/category/${getCategorySlug(categoryName)}`}>
+            <Button variant="ghost" size="sm" className="gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Back to {categoryName}
+            </Button>
+          </Link>
+        </div>
+        
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold tracking-tight">
+            {subcategoryName}
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Category: {categoryName}
+          </p>
+        </div>
+        <p className="text-muted-foreground">
+          Showing {sortedResources.length} of {sortedResources.length} resources
         </p>
       </div>
-      <p className="text-muted-foreground mb-6">
-        {filteredResources.length} {filteredResources.length === 1 ? 'resource' : 'resources'} in this subcategory
-      </p>
       
-      {/* Search and filter bar */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-8">
-        <form onSubmit={handleSearch} className="flex-1">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+      {/* Search and Controls - Match homepage layout */}
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Search in this subcategory..."
-              className="pl-8"
+              placeholder="Search resources..."
+              className="pl-10"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
             />
           </div>
-        </form>
+        </div>
         
-        <div className="flex gap-2 items-center">
-          <Filter className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm text-muted-foreground">Sort:</span>
-          <Select
-            value={sortBy}
-            onValueChange={setSortBy}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="name-asc">Name (A-Z)</SelectItem>
-              <SelectItem value="name-desc">Name (Z-A)</SelectItem>
-              <SelectItem value="newest">Newest first</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            {/* Layout Switcher */}
+            <LayoutSwitcher
+              currentLayout={layout}
+              onLayoutChange={setLayout}
+            />
+            
+            {/* Sort */}
+            <div className="flex gap-2 items-center">
+              <span className="text-sm text-muted-foreground">Sort:</span>
+              <Select
+                value={sortBy}
+                onValueChange={handleSortChange}
+              >
+                <SelectTrigger className="w-32">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="category">Category</SelectItem>
+                  <SelectItem value="name-asc">Name (A-Z)</SelectItem>
+                  <SelectItem value="name-desc">Name (Z-A)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </div>
       </div>
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredResources.map((resource, index) => (
-          <ResourceCard 
-            key={`${resource.title}-${index}`} 
-            resource={resource}
-            index={index}
-          />
-        ))}
-      </div>
-      
-      {filteredResources.length === 0 && !isLoading && (
-        <div className="flex flex-col items-center justify-center py-12 text-center">
+      {/* Resources Display - Match homepage layout */}
+      {sortedResources.length === 0 ? (
+        <div className="text-center py-12">
           <h3 className="text-lg font-semibold mb-2">No resources found</h3>
           <p className="text-muted-foreground">
             {searchTerm ? `No resources matching "${searchTerm}" in this subcategory.` : 'There are no resources in this subcategory.'}
           </p>
         </div>
+      ) : (
+        <>
+          {/* Regular Resources Display */}
+          {layout === "list" ? (
+            <div className="space-y-1 mb-8">
+              {paginatedResources.map((resource, index) => (
+                <ResourceListItem 
+                  key={`${resource.url}-${index}`} 
+                  resource={resource}
+                  index={startIndex + index}
+                />
+              ))}
+            </div>
+          ) : layout === "cards" ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              {paginatedResources.map((resource, index) => (
+                <ResourceCard 
+                  key={`${resource.url}-${index}`} 
+                  resource={resource}
+                  index={startIndex + index}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8">
+              {paginatedResources.map((resource, index) => (
+                <ResourceCompactItem 
+                  key={`${resource.url}-${index}`} 
+                  resource={resource}
+                  index={startIndex + index}
+                />
+              ))}
+            </div>
+          )}
+          
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              itemsPerPage={itemsPerPage}
+              onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
+              totalItems={sortedResources.length}
+              pageSizeOptions={[12, 24, 48, 96]}
+            />
+          )}
+        </>
       )}
     </div>
   );
