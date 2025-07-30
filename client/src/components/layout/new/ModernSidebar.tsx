@@ -38,25 +38,35 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
 
   // Organize categories with proper hierarchy for media/streaming tech
   const getOrganizedCategories = (categories: Category[]) => {
+    console.log("🏗️ ORGANIZING NAVIGATION HIERARCHY");
+    console.log("📊 Original categories count:", categories.length);
+    
     const filteredCategories = categories.filter(cat => 
       cat.resources.length > 0 && 
       cat.name !== "Table of contents" && 
       !cat.name.startsWith("List of") &&
       !["Contributing", "License", "External Links", "Anti-features"].includes(cat.name)
     );
+    
+    console.log("✅ Filtered categories count:", filteredCategories.length);
+    console.log("📝 Available categories:", filteredCategories.map(c => `${c.name} (${c.resources.length} resources)`));
 
-    // Define the proper hierarchical order for media streaming tech
+    // Define the proper hierarchical order for media streaming tech based on production screenshots
     const hierarchyOrder = [
-      // Core Infrastructure
-      "FFMPEG",
+      // Learning & Introduction (top level as shown in screenshots)
+      "Intro & Learning",
+      "Tutorials & Case Studies",
+      
+      // Core Infrastructure (as shown: Encoding Tools contains FFMPEG)
       "Encoding Tools", 
+      "FFMPEG",
       "Codecs",
-      "AV1",
       "VP9",
+      "AV1",
       
       // Streaming & Delivery
       "Adaptive Streaming",
-      "Streaming Servers",
+      "Streaming Servers", 
       "Protocols & Transport",
       "Cloud & CDN",
       "CDN Integration",
@@ -67,9 +77,7 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
       "Web Players",
       "Mobile & Web Players",
       
-      // Learning & Standards
-      "Intro & Learning",
-      "Tutorials & Case Studies",
+      // Standards & Documentation
       "Official Specs",
       "Standards & Industry",
       
@@ -82,14 +90,40 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
     const processedNames = new Set<string>();
 
     // Process categories in hierarchical order
+    console.log("🔄 Processing hierarchy order...");
     hierarchyOrder.forEach(orderName => {
       const matchingCategories = filteredCategories.filter(cat => 
         cat.name === orderName && !processedNames.has(cat.name)
       );
       
+      if (matchingCategories.length > 0) {
+        console.log(`🎯 Processing "${orderName}" - found ${matchingCategories.length} matching categories`);
+      }
+      
       matchingCategories.forEach(cat => {
+        // Special handling for Encoding Tools - make FFMPEG a subcategory 
+        if (orderName === "Encoding Tools") {
+          console.log("🔧 SPECIAL PROCESSING: Encoding Tools category");
+          const encodingCategory = { ...cat };
+          
+          // Add FFMPEG as subcategory under Encoding Tools
+          const ffmpegCat = filteredCategories.find(c => c.name === "FFMPEG");
+          if (ffmpegCat) {
+            console.log(`  ├── Adding FFMPEG as subcategory (${ffmpegCat.resources.length} resources)`);
+            encodingCategory.subcategories.push({
+              name: "FFMPEG",
+              slug: getCategorySlug("FFMPEG"),
+              resources: ffmpegCat.resources
+            });
+            processedNames.add("FFMPEG");
+          }
+          
+          console.log(`  └── Total Encoding Tools: ${encodingCategory.resources.length} direct + ${encodingCategory.subcategories.length} subcategories`);
+          organizedCategories.push(encodingCategory);
+        }
         // Special handling for codec categories - merge VP9 and AV1 into Codecs
-        if (orderName === "Codecs") {
+        else if (orderName === "Codecs") {
+          console.log("🎬 SPECIAL PROCESSING: Codecs category");
           const codecsCategory = { ...cat };
           
           // Add VP9 and AV1 resources to Codecs subcategories
@@ -97,6 +131,7 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
           const av1Cat = filteredCategories.find(c => c.name === "AV1");
           
           if (vp9Cat) {
+            console.log(`  ├── Adding VP9 as subcategory (${vp9Cat.resources.length} resources)`);
             codecsCategory.subcategories.push({
               name: "VP9",
               slug: getCategorySlug("VP9"),
@@ -106,6 +141,7 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
           }
           
           if (av1Cat) {
+            console.log(`  ├── Adding AV1 as subcategory (${av1Cat.resources.length} resources)`);
             codecsCategory.subcategories.push({
               name: "AV1", 
               slug: getCategorySlug("AV1"),
@@ -114,16 +150,19 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
             processedNames.add("AV1");
           }
           
+          console.log(`  └── Total Codecs: ${codecsCategory.resources.length} direct + ${codecsCategory.subcategories.length} subcategories`);
           organizedCategories.push(codecsCategory);
         }
         // Special handling for Cloud & CDN - consolidate duplicates
         else if (orderName === "Cloud & CDN") {
+          console.log("☁️ SPECIAL PROCESSING: Cloud & CDN consolidation");
           const cloudCategories = filteredCategories.filter(c => 
             (c.name === "Cloud & CDN" || c.name === "CDN Integration") && 
             !processedNames.has(c.name)
           );
           
           if (cloudCategories.length > 0) {
+            console.log(`  ├── Found ${cloudCategories.length} cloud categories to consolidate:`, cloudCategories.map(c => c.name));
             const consolidatedCategory: Category = {
               name: "Cloud & CDN",
               slug: getCategorySlug("Cloud & CDN"),
@@ -132,16 +171,19 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
             };
             
             cloudCategories.forEach(cloudCat => {
+              console.log(`  ├── Merging ${cloudCat.name} (${cloudCat.resources.length} resources, ${cloudCat.subcategories.length} subcategories)`);
               consolidatedCategory.resources.push(...cloudCat.resources);
               consolidatedCategory.subcategories.push(...cloudCat.subcategories);
               processedNames.add(cloudCat.name);
             });
             
+            console.log(`  └── Consolidated Cloud & CDN: ${consolidatedCategory.resources.length} total resources`);
             organizedCategories.push(consolidatedCategory);
           }
         }
         // Normal category processing
-        else if (!["VP9", "AV1", "CDN Integration"].includes(orderName)) {
+        else if (!["VP9", "AV1", "CDN Integration", "FFMPEG"].includes(orderName)) {
+          console.log(`  ├── Adding "${cat.name}" (${cat.resources.length} resources, ${cat.subcategories.length} subcategories)`);
           organizedCategories.push(cat);
         }
         
@@ -150,11 +192,25 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
     });
 
     // Add any remaining categories that weren't in the hierarchy order
-    filteredCategories.forEach(cat => {
-      if (!processedNames.has(cat.name)) {
+    const remainingCategories = filteredCategories.filter(cat => !processedNames.has(cat.name));
+    if (remainingCategories.length > 0) {
+      console.log("📌 Adding remaining categories:", remainingCategories.map(c => c.name));
+      remainingCategories.forEach(cat => {
+        console.log(`  ├── "${cat.name}" (${cat.resources.length} resources)`);
         organizedCategories.push(cat);
+      });
+    }
+
+    console.log("🎉 FINAL HIERARCHY RESULT:");
+    organizedCategories.forEach((cat, index) => {
+      console.log(`${index + 1}. 📁 ${cat.name} (${cat.resources.length} resources)`);
+      if (cat.subcategories.length > 0) {
+        cat.subcategories.forEach((sub, subIndex) => {
+          console.log(`   ${subIndex + 1}. 📄 ${sub.name} (${sub.resources.length} resources)`);
+        });
       }
     });
+    console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
     return organizedCategories;
   };
