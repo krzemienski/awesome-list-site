@@ -74,6 +74,8 @@ export function countResourcesByCategory(
   return resources.filter(r => r.category === category).length;
 }
 
+
+
 export function getCategorySlug(category: string): string {
   return slugify(category);
 }
