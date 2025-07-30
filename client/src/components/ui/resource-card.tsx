@@ -40,9 +40,9 @@ export default function ResourceCard({ resource, index }: ResourceCardProps) {
     >
       <ResourceTooltip resource={resource}>
         <Card className="h-full transition-all hover:shadow-md">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between gap-x-2 mb-2">
-              <h3 className="text-lg font-semibold leading-none tracking-tight">
+              <h3 className="text-base sm:text-lg font-semibold leading-none tracking-tight">
                 <a
                   href={resource.url}
                   className="text-primary hover:text-primary/80 underline inline-flex items-center gap-1.5 touch-manipulation"

@@ -64,7 +64,7 @@ export default function MainLayout({ awesomeList, isLoading, children }: MainLay
           isLoading={isLoading}
         />
         
-        <main className="flex-1 py-6 px-4 md:px-6">
+        <main className="flex-1 py-4 px-4 sm:py-6 sm:px-6">
           {children}
         </main>
       </div>

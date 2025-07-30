@@ -126,23 +126,23 @@ export default function ColorPalette() {
   ];
 
   return (
-    <MainLayout>
-      <div className="container mx-auto px-6 py-8 max-w-6xl">
+    <MainLayout isLoading={false}>
+      <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-8 max-w-6xl">
         {/* Header */}
-        <div className="mb-8 text-center">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <Palette className="h-8 w-8 text-rose-500" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">
+        <div className="mb-6 sm:mb-8 text-center">
+          <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+            <Palette className="h-6 w-6 sm:h-8 sm:w-8 text-rose-500" />
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">
               AI Color Palette Generator
             </h1>
           </div>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base lg:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
             Create stunning, accessible color palettes using advanced AI and color theory principles.
             Perfect for brands, websites, and design projects.
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-2 gap-4 sm:gap-8">
           {/* Input Section */}
           <Card>
             <CardHeader>
@@ -251,7 +251,7 @@ export default function ColorPalette() {
                   </div>
 
                   {/* Color Swatches */}
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {generatedPalette.palette.colors.map((color, index) => (
                       <div
                         key={index}
@@ -259,7 +259,7 @@ export default function ColorPalette() {
                         onClick={() => copyToClipboard(color.hex, 'hex')}
                       >
                         <div
-                          className="h-16 w-full rounded-lg border shadow-sm mb-2"
+                          className="h-12 sm:h-16 w-full rounded-lg border shadow-sm mb-2"
                           style={{ backgroundColor: color.hex }}
                         />
                         <div className="space-y-1">
@@ -285,8 +285,8 @@ export default function ColorPalette() {
                   </div>
 
                   {/* Actions */}
-                  <div className="flex gap-2">
-                    <Button variant="outline" onClick={exportPalette} size="sm">
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Button variant="outline" onClick={exportPalette} size="sm" className="w-full sm:w-auto">
                       <Download className="mr-2 h-4 w-4" />
                       Export JSON
                     </Button>
@@ -294,6 +294,7 @@ export default function ColorPalette() {
                       variant="outline" 
                       onClick={() => copyToClipboard(generateCSS(), 'css')}
                       size="sm"
+                      className="w-full sm:w-auto"
                     >
                       <Copy className="mr-2 h-4 w-4" />
                       Copy CSS

@@ -17,16 +17,17 @@ export default function ResourceListItem({ resource }: ResourceListItemProps) {
   return (
     <ResourcePreviewTooltip resource={resource} side="right" align="start">
       <div 
-        className="flex items-center justify-between p-4 border-b border-border hover:bg-accent/50 cursor-pointer transition-colors"
+        className="flex items-center justify-between p-3 sm:p-4 border-b border-border hover:bg-accent/50 cursor-pointer transition-colors touch-manipulation"
         onClick={handleClick}
+        style={{ minHeight: '44px' }}
       >
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <h3 className="font-medium text-sm truncate">{resource.title}</h3>
+            <h3 className="font-medium text-sm sm:text-base truncate">{resource.title}</h3>
             <ExternalLink className="h-3 w-3 text-muted-foreground shrink-0" />
           </div>
           
-          <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
+          <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 mb-2">
             {resource.description}
           </p>
           

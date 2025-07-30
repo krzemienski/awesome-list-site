@@ -54,8 +54,51 @@ export default function ThemeSelector() {
     // Track theme change
     trackThemeChange(themeName);
     
+    // Show toast notification for better user feedback
+    showToast("Palette Applied", `Applied "${selectedTheme.name}" to your theme`);
+    
     setOpen(false);
   }
+
+  // Enhanced toast notification function
+  const showToast = (title: string, message: string) => {
+    // Create and show a temporary toast notification
+    const toast = document.createElement('div');
+    toast.className = 'fixed top-4 right-4 z-50 bg-background border border-border rounded-lg p-4 shadow-lg min-w-[300px] max-w-[400px]';
+    toast.innerHTML = `
+      <div class="flex items-start gap-3">
+        <div class="flex-shrink-0 w-5 h-5 bg-primary/20 rounded-full flex items-center justify-center mt-0.5">
+          <svg class="w-3 h-3 text-primary" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+          </svg>
+        </div>
+        <div class="flex-1">
+          <h4 class="font-medium text-sm text-foreground">${title}</h4>
+          <p class="text-sm text-muted-foreground mt-1">${message}</p>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Animate in
+    requestAnimationFrame(() => {
+      toast.style.transform = 'translateX(0)';
+      toast.style.opacity = '1';
+      toast.style.transition = 'all 0.3s ease-out';
+    });
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+      toast.style.transform = 'translateX(100%)';
+      toast.style.opacity = '0';
+      setTimeout(() => {
+        if (toast.parentNode) {
+          document.body.removeChild(toast);
+        }
+      }, 300);
+    }, 3000);
+  };
 
   return (
     <div className="fixed bottom-4 right-4 z-40">
@@ -63,9 +106,9 @@ export default function ThemeSelector() {
         <PopoverTrigger asChild>
           <Button
             size="icon"
-            className="rounded-full h-10 w-10 bg-primary text-primary-foreground shadow-md hover:bg-primary/90"
+            className="rounded-full h-12 w-12 sm:h-10 sm:w-10 bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 hover:scale-105 transition-all duration-200"
           >
-            <Palette className="h-5 w-5" />
+            <Palette className="h-6 w-6 sm:h-5 sm:w-5" />
             <span className="sr-only">Select theme</span>
           </Button>
         </PopoverTrigger>

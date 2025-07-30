@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import ResourceCard from "@/components/ui/resource-card";
 import ResourceListItem from "@/components/ui/resource-list-item";
 import ResourceCompactItem from "@/components/ui/resource-compact-item";
-import LayoutSwitcher, { LayoutType } from "@/components/ui/layout-switcher";
+import LayoutSwitcher from "@/components/ui/layout-switcher";
 import Pagination from "@/components/ui/pagination";
 import SEOHead from "@/components/layout/SEOHead";
 import { Input } from "@/components/ui/input";
@@ -175,7 +175,7 @@ export default function Category() {
           </Link>
         </div>
         
-        <h1 className="text-3xl font-bold tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
           {categoryName}
         </h1>
         <p className="text-muted-foreground">
