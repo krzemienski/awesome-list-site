@@ -145,16 +145,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
               {awesomeList?.description || "A curated list of awesome resources"}
             </p>
             
-            {/* Search Bar */}
-            <div className="relative mb-4">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Search resources..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
+
           </div>
           
           {/* Controls */}
