@@ -17,11 +17,12 @@ import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Home, Folder, ExternalLink, Menu } from "lucide-react";
+import { Home, Folder, ExternalLink, Menu, Palette } from "lucide-react";
 import { slugify, getCategorySlug, getSubcategorySlug } from "@/lib/utils";
 import { Category } from "@/types/awesome-list";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
+import SidebarCustomizer, { useSidebarSettings } from "@/components/sidebar/SidebarCustomizer";
 
 interface ModernSidebarProps {
   title: string;
@@ -32,9 +33,12 @@ interface ModernSidebarProps {
 }
 
 export default function ModernSidebar({ title, categories, isLoading, isOpen, setIsOpen }: ModernSidebarProps) {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const [openCategories, setOpenCategories] = useState<string[]>([]);
   const isMobile = useIsMobile();
+  
+  // Sidebar customization settings
+  const { settings, updateSettings, getOrganizedCategories: applySidebarSettings } = useSidebarSettings(categories);
 
   // Organize categories with proper hierarchy for media/streaming tech
   const getOrganizedCategories = (categories: Category[]) => {
@@ -253,8 +257,8 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
   };
 
   // Navigation helper to close mobile sidebar after clicking
-  const navigate = (path: string) => {
-    window.location.href = path;
+  const navigateAndClose = (path: string) => {
+    setLocation(path);
     if (isMobile) {
       setIsOpen(false);
     }
@@ -270,7 +274,7 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
             "w-full justify-start font-normal mb-3",
             location === "/" ? "bg-accent text-accent-foreground" : ""
           )}
-          onClick={() => navigate('/')}
+          onClick={() => navigateAndClose('/')}
         >
           <Home className="mr-2 h-4 w-4" />
           Home
@@ -289,8 +293,8 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
           </div>
         ) : (
           <div className="space-y-1">
-            {/* Real categories with proper hierarchical organization */}
-            {getOrganizedCategories(categories)
+            {/* Real categories with proper hierarchical organization and user customization */}
+            {applySidebarSettings(getOrganizedCategories(categories))
               .map(category => (
               <Accordion
                 key={category.name}
@@ -357,16 +361,32 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
         )}
       </div>
       
-      <div className="border-t border-border p-3">
-        <Button variant="ghost" className="w-full justify-start" asChild>
-          <a href={title.includes("Selfhosted") 
-              ? "https://github.com/awesome-selfhosted/awesome-selfhosted" 
-              : "https://github.com/krzemienski/awesome-video"} 
-             target="_blank" 
-             rel="noopener noreferrer">
-            <ExternalLink className="mr-2 h-4 w-4" />
-            GitHub Repository
-          </a>
+      <div className="border-t border-border p-3 space-y-2">
+        <div className="flex items-center justify-between">
+          <Button variant="ghost" className="flex-1 justify-start" asChild>
+            <a href={title.includes("Selfhosted") 
+                ? "https://github.com/awesome-selfhosted/awesome-selfhosted" 
+                : "https://github.com/krzemienski/awesome-video"} 
+               target="_blank" 
+               rel="noopener noreferrer">
+              <ExternalLink className="mr-2 h-4 w-4" />
+              GitHub Repository
+            </a>
+          </Button>
+          <SidebarCustomizer 
+            categories={categories}
+            settings={settings}
+            onSettingsChange={updateSettings}
+          />
+        </div>
+        
+        <Button 
+          variant="ghost" 
+          className="w-full justify-start" 
+          onClick={() => navigateAndClose('/color-palette')}
+        >
+          <Palette className="mr-2 h-4 w-4" />
+          Color Palette Generator
         </Button>
       </div>
     </>

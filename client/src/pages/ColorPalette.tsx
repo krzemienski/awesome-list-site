@@ -1,336 +1,358 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Palette, Copy, Download, RefreshCw, Sparkles } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
+import { 
+  Sparkles, 
+  Copy, 
+  Download, 
+  RefreshCw, 
+  Palette, 
+  Eye,
+  CheckCircle,
+  Info,
+  AlertCircle,
+  Lightbulb
+} from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useMutation } from "@tanstack/react-query";
+import MainLayout from "@/components/layout/new/MainLayout";
 
-interface ColorPalette {
+interface ColorInfo {
+  hex: string;
   name: string;
-  description: string;
-  colors: {
-    hex: string;
-    name: string;
-    usage: string;
-  }[];
-  theme: 'light' | 'dark' | 'mixed';
+  usage: string;
 }
 
 interface GeneratedPalette {
-  palette: ColorPalette;
+  name: string;
+  description: string;
+  theme: 'light' | 'dark' | 'mixed';
+  colors: ColorInfo[];
+}
+
+interface PaletteResponse {
+  palette: GeneratedPalette;
   reasoning: string;
 }
 
 export default function ColorPalette() {
   const [prompt, setPrompt] = useState("");
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedPalette, setGeneratedPalette] = useState<GeneratedPalette | null>(null);
-  const [savedPalettes, setSavedPalettes] = useState<ColorPalette[]>([]);
-  const { toast } = useToast();
+  const [generatedPalette, setGeneratedPalette] = useState<PaletteResponse | null>(null);
+  const [copiedColor, setCopiedColor] = useState<string | null>(null);
 
-  // Load saved palettes from localStorage on mount
-  useEffect(() => {
-    const saved = localStorage.getItem('color-palettes');
-    if (saved) {
-      try {
-        setSavedPalettes(JSON.parse(saved));
-      } catch (error) {
-        console.error('Failed to load saved palettes:', error);
-      }
-    }
-  }, []);
-
-  // Generate color palette using AI
-  const generatePalette = async () => {
-    if (!prompt.trim()) {
-      toast({
-        title: "Input required",
-        description: "Please describe the color palette you want to generate.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsGenerating(true);
-    try {
+  const generatePalette = useMutation({
+    mutationFn: async (prompt: string): Promise<PaletteResponse> => {
       const response = await fetch('/api/generate-palette', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ prompt: prompt.trim() }),
+        body: JSON.stringify({ prompt }),
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        const error = await response.json();
+        throw new Error(error.details || error.error || 'Failed to generate palette');
       }
 
-      const data = await response.json();
+      return response.json();
+    },
+    onSuccess: (data) => {
       setGeneratedPalette(data);
-      
-      toast({
-        title: "Palette generated!",
-        description: "Your AI-generated color palette is ready.",
-      });
-    } catch (error) {
-      console.error('Failed to generate palette:', error);
-      toast({
-        title: "Generation failed",
-        description: "Failed to generate color palette. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsGenerating(false);
-    }
+    },
+  });
+
+  const handleGenerate = () => {
+    if (!prompt.trim()) return;
+    generatePalette.mutate(prompt);
   };
 
-  // Save palette to library
-  const savePalette = (palette: ColorPalette) => {
-    const updated = [...savedPalettes, { ...palette, name: palette.name || `Palette ${savedPalettes.length + 1}` }];
-    setSavedPalettes(updated);
-    localStorage.setItem('color-palettes', JSON.stringify(updated));
-    
-    toast({
-      title: "Palette saved",
-      description: "Added to your palette library.",
-    });
-  };
-
-  // Copy color to clipboard
-  const copyColor = async (color: string) => {
+  const copyToClipboard = async (text: string, type: string) => {
     try {
-      await navigator.clipboard.writeText(color);
-      toast({
-        title: "Copied!",
-        description: `Color ${color} copied to clipboard.`,
-      });
-    } catch (error) {
-      console.error('Failed to copy:', error);
+      await navigator.clipboard.writeText(text);
+      setCopiedColor(text);
+      setTimeout(() => setCopiedColor(null), 2000);
+    } catch (err) {
+      console.error('Failed to copy to clipboard:', err);
     }
   };
 
-  // Export palette as CSS variables
-  const exportAsCSSVariables = (palette: ColorPalette) => {
-    const cssVars = palette.colors.map((color, index) => 
-      `  --color-${color.name.toLowerCase().replace(/\s+/g, '-')}: ${color.hex};`
-    ).join('\n');
-    
-    const css = `:root {\n${cssVars}\n}`;
-    
-    const blob = new Blob([css], { type: 'text/css' });
+  const exportPalette = () => {
+    if (!generatedPalette) return;
+
+    const paletteData = {
+      ...generatedPalette,
+      exportedAt: new Date().toISOString(),
+    };
+
+    const blob = new Blob([JSON.stringify(paletteData, null, 2)], {
+      type: 'application/json',
+    });
+
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${palette.name.toLowerCase().replace(/\s+/g, '-')}-palette.css`;
+    a.download = `${generatedPalette.palette.name.toLowerCase().replace(/\s+/g, '-')}-palette.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    
-    toast({
-      title: "Exported!",
-      description: "CSS variables downloaded successfully.",
-    });
   };
 
-  // Pre-defined example prompts
-  const examplePrompts = [
-    "Modern fintech app with trust and professionalism",
-    "Vibrant gaming interface with neon accents",
-    "Minimalist productivity app with calm focus",
-    "E-commerce site with warm, inviting tones",
-    "Creative agency portfolio with bold contrasts"
+  const generateCSS = () => {
+    if (!generatedPalette) return '';
+
+    return generatedPalette.palette.colors.map((color, index) => 
+      `  --color-${color.name.toLowerCase().replace(/\s+/g, '-')}: ${color.hex};`
+    ).join('\n');
+  };
+
+  const predefinedPrompts = [
+    "Modern tech startup with trust and innovation",
+    "Calming wellness app for meditation",
+    "Bold e-commerce fashion brand",
+    "Professional financial dashboard",
+    "Creative design agency portfolio",
+    "Gaming platform with dark theme",
+    "Educational platform for children",
+    "Sustainable eco-friendly brand"
   ];
 
   return (
-    <div className="container mx-auto p-6 space-y-8">
-      <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold flex items-center justify-center gap-3">
-          <Palette className="h-8 w-8 text-rose-500" />
-          AI Color Palette Generator
-        </h1>
-        <p className="text-muted-foreground max-w-2xl mx-auto">
-          Generate beautiful, harmonious color palettes using AI. Describe your project or mood, 
-          and get mathematically balanced colors with usage suggestions.
-        </p>
-      </div>
-
-      {/* Generation Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5" />
-            Generate New Palette
-          </CardTitle>
-          <CardDescription>
-            Describe your project, brand, or desired mood to generate a custom color palette
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="prompt" className="text-sm font-medium">
-              Description
-            </label>
-            <Textarea
-              id="prompt"
-              placeholder="e.g., 'Modern SaaS dashboard with professional blue tones and high contrast for accessibility'"
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              className="min-h-[100px]"
-            />
+    <MainLayout>
+      <div className="container mx-auto px-6 py-8 max-w-6xl">
+        {/* Header */}
+        <div className="mb-8 text-center">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <Palette className="h-8 w-8 text-rose-500" />
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">
+              AI Color Palette Generator
+            </h1>
           </div>
-          
-          <div className="space-y-2">
-            <p className="text-sm font-medium">Example prompts:</p>
-            <div className="flex flex-wrap gap-2">
-              {examplePrompts.map((example, index) => (
-                <Button
-                  key={index}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setPrompt(example)}
-                  className="text-xs"
-                >
-                  {example}
-                </Button>
-              ))}
-            </div>
-          </div>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Create stunning, accessible color palettes using advanced AI and color theory principles.
+            Perfect for brands, websites, and design projects.
+          </p>
+        </div>
 
-          <Button 
-            onClick={generatePalette} 
-            disabled={isGenerating || !prompt.trim()}
-            className="w-full"
-          >
-            {isGenerating ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Generating...
-              </>
-            ) : (
-              <>
-                <Sparkles className="mr-2 h-4 w-4" />
-                Generate Palette
-              </>
-            )}
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* Generated Palette Display */}
-      {generatedPalette && (
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* Input Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-rose-500" />
+                Describe Your Vision
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
               <div>
-                <CardTitle>{generatedPalette.palette.name}</CardTitle>
-                <CardDescription>{generatedPalette.palette.description}</CardDescription>
+                <Label htmlFor="prompt" className="text-sm font-medium">
+                  What kind of palette do you need?
+                </Label>
+                <Textarea
+                  id="prompt"
+                  placeholder="e.g., 'A modern tech startup focused on AI and machine learning, conveying trust, innovation, and professionalism'"
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  className="mt-2 min-h-[100px]"
+                />
               </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => savePalette(generatedPalette.palette)}
-                >
-                  Save Palette
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => exportAsCSSVariables(generatedPalette.palette)}
-                >
-                  <Download className="mr-2 h-4 w-4" />
-                  Export CSS
-                </Button>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Color Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-              {generatedPalette.palette.colors.map((color, index) => (
-                <div key={index} className="space-y-2">
-                  <div
-                    className="w-full h-20 rounded-lg border-2 border-border cursor-pointer transition-transform hover:scale-105"
-                    style={{ backgroundColor: color.hex }}
-                    onClick={() => copyColor(color.hex)}
-                    title={`Click to copy ${color.hex}`}
-                  />
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium text-sm">{color.name}</span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => copyColor(color.hex)}
-                        className="h-6 w-6 p-0"
-                      >
-                        <Copy className="h-3 w-3" />
-                      </Button>
-                    </div>
-                    <p className="text-xs text-muted-foreground font-mono">{color.hex}</p>
-                    <p className="text-xs text-muted-foreground">{color.usage}</p>
-                  </div>
+
+              <div>
+                <Label className="text-sm font-medium mb-2 block">
+                  <Lightbulb className="h-4 w-4 inline mr-1" />
+                  Quick Start Ideas
+                </Label>
+                <div className="grid gap-2">
+                  {predefinedPrompts.map((suggestion, index) => (
+                    <Button
+                      key={index}
+                      variant="outline"
+                      size="sm"
+                      className="justify-start text-left h-auto py-2 px-3"
+                      onClick={() => setPrompt(suggestion)}
+                    >
+                      {suggestion}
+                    </Button>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
 
-            {/* AI Reasoning */}
-            <div className="bg-muted/50 p-4 rounded-lg">
-              <h4 className="font-medium mb-2">AI Design Reasoning</h4>
-              <p className="text-sm text-muted-foreground">{generatedPalette.reasoning}</p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+              <Button 
+                onClick={handleGenerate}
+                disabled={!prompt.trim() || generatePalette.isPending}
+                className="w-full"
+              >
+                {generatePalette.isPending ? (
+                  <>
+                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                    Generating Palette...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Generate AI Palette
+                  </>
+                )}
+              </Button>
 
-      {/* Saved Palettes Library */}
-      {savedPalettes.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Your Palette Library</CardTitle>
-            <CardDescription>Previously generated and saved palettes</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-4 md:grid-cols-2">
-              {savedPalettes.map((palette, index) => (
-                <div key={index} className="border rounded-lg p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium">{palette.name}</h4>
-                      <p className="text-sm text-muted-foreground">{palette.description}</p>
-                    </div>
-                    <Badge variant="outline">{palette.theme}</Badge>
-                  </div>
-                  <div className="flex gap-1">
-                    {palette.colors.map((color, colorIndex) => (
-                      <div
-                        key={colorIndex}
-                        className="w-8 h-8 rounded cursor-pointer"
-                        style={{ backgroundColor: color.hex }}
-                        onClick={() => copyColor(color.hex)}
-                        title={`${color.name}: ${color.hex}`}
-                      />
+              {generatePalette.error && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    {generatePalette.error.message}
+                  </AlertDescription>
+                </Alert>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Results Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Eye className="h-5 w-5 text-rose-500" />
+                Generated Palette
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {generatePalette.isPending ? (
+                <div className="space-y-4">
+                  <Skeleton className="h-8 w-3/4" />
+                  <Skeleton className="h-4 w-full" />
+                  <div className="grid grid-cols-4 gap-2">
+                    {[...Array(6)].map((_, i) => (
+                      <Skeleton key={i} className="h-16 w-full" />
                     ))}
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => exportAsCSSVariables(palette)}
-                    className="w-full"
-                  >
-                    <Download className="mr-2 h-4 w-4" />
-                    Export CSS
-                  </Button>
                 </div>
-              ))}
+              ) : generatedPalette ? (
+                <div className="space-y-6">
+                  {/* Palette Header */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-xl font-semibold">
+                        {generatedPalette.palette.name}
+                      </h3>
+                      <Badge variant="secondary">
+                        {generatedPalette.palette.theme}
+                      </Badge>
+                    </div>
+                    <p className="text-muted-foreground">
+                      {generatedPalette.palette.description}
+                    </p>
+                  </div>
+
+                  {/* Color Swatches */}
+                  <div className="grid grid-cols-2 gap-3">
+                    {generatedPalette.palette.colors.map((color, index) => (
+                      <div
+                        key={index}
+                        className="group cursor-pointer transition-all duration-200 hover:scale-105"
+                        onClick={() => copyToClipboard(color.hex, 'hex')}
+                      >
+                        <div
+                          className="h-16 w-full rounded-lg border shadow-sm mb-2"
+                          style={{ backgroundColor: color.hex }}
+                        />
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium text-sm">{color.name}</span>
+                            <div className="flex items-center gap-1">
+                              <code className="text-xs bg-muted px-1 rounded">
+                                {color.hex}
+                              </code>
+                              {copiedColor === color.hex ? (
+                                <CheckCircle className="h-3 w-3 text-green-500" />
+                              ) : (
+                                <Copy className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                              )}
+                            </div>
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            {color.usage}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={exportPalette} size="sm">
+                      <Download className="mr-2 h-4 w-4" />
+                      Export JSON
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => copyToClipboard(generateCSS(), 'css')}
+                      size="sm"
+                    >
+                      <Copy className="mr-2 h-4 w-4" />
+                      Copy CSS
+                    </Button>
+                  </div>
+
+                  {/* AI Reasoning */}
+                  <div>
+                    <Separator className="mb-4" />
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium flex items-center gap-2">
+                        <Info className="h-4 w-4" />
+                        Color Theory & Reasoning
+                      </Label>
+                      <div className="text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg">
+                        {generatedPalette.reasoning}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-12 text-muted-foreground">
+                  <Palette className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>Enter a description and generate your first AI palette!</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Additional Information */}
+        <Card className="mt-8">
+          <CardHeader>
+            <CardTitle>How It Works</CardTitle>
+          </CardHeader>
+          <CardContent className="prose prose-sm max-w-none dark:prose-invert">
+            <div className="grid md:grid-cols-3 gap-6">
+              <div>
+                <h4 className="font-semibold mb-2">AI-Powered Generation</h4>
+                <p className="text-muted-foreground">
+                  Advanced AI analyzes your description and generates palettes using professional color theory principles.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-2">Accessibility First</h4>
+                <p className="text-muted-foreground">
+                  All palettes are designed with WCAG AA accessibility standards in mind for optimal contrast and readability.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-2">Export Ready</h4>
+                <p className="text-muted-foreground">
+                  Export your palettes as JSON or copy CSS variables for immediate use in your projects.
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
-      )}
-    </div>
+      </div>
+    </MainLayout>
   );
 }
