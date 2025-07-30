@@ -151,9 +151,6 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
           {/* Controls */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <span>
-                Showing {filteredResources.length} of {allResources.length} resources
-              </span>
               {searchTerm && (
                 <span className="text-blue-600">
                   for "{searchTerm}"
