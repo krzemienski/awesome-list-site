@@ -13,6 +13,7 @@ import Category from "@/pages/Category";
 import Subcategory from "@/pages/Subcategory";
 import About from "@/pages/About";
 import Advanced from "@/pages/Advanced";
+import ColorPalette from "@/pages/ColorPalette";
 import NotFound from "@/pages/not-found";
 
 import { AwesomeList } from "@/types/awesome-list";
@@ -90,6 +91,7 @@ function Router() {
         <Route path="/subcategory/:slug" component={Subcategory} />
         <Route path="/about" component={About} />
         <Route path="/advanced" component={Advanced} />
+        <Route path="/color-palette" component={ColorPalette} />
         <Route component={NotFound} />
       </Switch>
     </MainLayout>

@@ -155,6 +155,15 @@ The application is configured for deployment on Replit:
 - ✅ Fixed "reversed" category relationships so parent-child structure follows logical technology stack
 - ✅ Added visual nesting with dots and proper indentation for subcategories
 
+### AI-Powered Features (January 2025)
+- ✅ Implemented AI Color Palette Generator with Anthropic Claude 4.0 Sonnet integration
+- ✅ Created comprehensive color theory-based palette generation with accessibility standards
+- ✅ Added user-customizable sidebar layout with drag-and-drop category reordering
+- ✅ Built sidebar personalization settings with visibility controls and pinned categories
+- ✅ Integrated palette export functionality (JSON, CSS variables) with copy-to-clipboard
+- ✅ Added predefined prompt suggestions for quick palette generation
+- ✅ Implemented comprehensive error handling and loading states for AI features
+
 ### Deployment Configuration
 - Target: GitHub Pages at krzemienski.github.io/awesome-list-site
 - Build process optimized for large React applications
