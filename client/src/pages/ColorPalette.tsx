@@ -18,10 +18,16 @@ import {
   CheckCircle,
   Info,
   AlertCircle,
-  Lightbulb
+  Lightbulb,
+  Settings,
+  Sun,
+  Moon,
+  Monitor
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
+import { useTheme } from "next-themes";
+import { useToast } from "@/hooks/use-toast";
 import MainLayout from "@/components/layout/new/MainLayout";
 
 interface ColorInfo {
@@ -46,6 +52,8 @@ export default function ColorPalette() {
   const [prompt, setPrompt] = useState("");
   const [generatedPalette, setGeneratedPalette] = useState<PaletteResponse | null>(null);
   const [copiedColor, setCopiedColor] = useState<string | null>(null);
+  const { theme, setTheme } = useTheme();
+  const { toast } = useToast();
 
   const generatePalette = useMutation({
     mutationFn: async (prompt: string): Promise<PaletteResponse> => {
@@ -74,14 +82,63 @@ export default function ColorPalette() {
     generatePalette.mutate(prompt);
   };
 
-  const copyToClipboard = async (text: string, type: string) => {
+  const copyToClipboard = async (text: string, type: 'hex' | 'css') => {
     try {
       await navigator.clipboard.writeText(text);
-      setCopiedColor(text);
-      setTimeout(() => setCopiedColor(null), 2000);
+      if (type === 'hex') {
+        setCopiedColor(text);
+        setTimeout(() => setCopiedColor(null), 2000);
+      } else {
+        toast({
+          title: "CSS Copied!",
+          description: "Color palette CSS variables copied to clipboard.",
+        });
+      }
     } catch (err) {
-      console.error('Failed to copy to clipboard:', err);
+      console.error('Failed to copy: ', err);
+      toast({
+        title: "Copy Failed",
+        description: "Failed to copy to clipboard. Please try again.",
+        variant: "destructive"
+      });
     }
+  };
+
+  const showThemeToast = () => {
+    const themes = [
+      { key: 'light', label: 'Light', icon: Sun },
+      { key: 'dark', label: 'Dark', icon: Moon },
+      { key: 'system', label: 'System', icon: Monitor }
+    ];
+
+    toast({
+      title: "Theme Settings",
+      description: (
+        <div className="flex items-center gap-2 mt-2">
+          {themes.map((themeOption) => {
+            const IconComponent = themeOption.icon;
+            return (
+              <Button
+                key={themeOption.key}
+                variant={theme === themeOption.key ? "default" : "outline"}
+                size="sm"
+                onClick={() => {
+                  setTheme(themeOption.key);
+                  toast({
+                    title: "Theme Updated",
+                    description: `Switched to ${themeOption.label} theme`,
+                  });
+                }}
+                className="flex items-center gap-1"
+              >
+                <IconComponent className="h-3 w-3" />
+                {themeOption.label}
+              </Button>
+            );
+          })}
+        </div>
+      ),
+    });
   };
 
   const exportPalette = () => {
@@ -135,6 +192,14 @@ export default function ColorPalette() {
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">
               AI Color Palette Generator
             </h1>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={showThemeToast}
+              className="ml-2 p-2"
+            >
+              <Settings className="h-4 w-4" />
+            </Button>
           </div>
           <p className="text-sm sm:text-base lg:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
             Create stunning, accessible color palettes using advanced AI and color theory principles.
