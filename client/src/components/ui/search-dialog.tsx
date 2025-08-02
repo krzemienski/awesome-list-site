@@ -197,14 +197,24 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
               ref={inputRef}
-              type="text"
+              type="search"
               placeholder="Search packages, libraries, and tools..."
               value={query}
               onChange={(e) => {
                 console.log(`Input value changed to: "${e.target.value}"`);
                 setQuery(e.target.value);
               }}
-              className="w-full pl-10 pr-4 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+              onInput={(e) => {
+                // Additional handler for mobile compatibility
+                const target = e.target as HTMLInputElement;
+                console.log(`Input event: "${target.value}"`);
+                setQuery(target.value);
+              }}
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck={false}
+              className="w-full pl-10 pr-4 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-base md:text-sm"
             />
           </div>
           
