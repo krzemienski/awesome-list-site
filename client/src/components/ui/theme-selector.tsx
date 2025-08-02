@@ -2,17 +2,20 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Palette, Wand2 } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { Palette, Wand2, Sun, Moon, Monitor } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
-import { shadcnThemes, applyTheme } from "@/lib/shadcn-themes";
+import { shadcnThemes, applyTheme, applyThemeWithTransition, loadThemePreferences, saveThemePreferences } from "@/lib/shadcn-themes";
 import { trackThemeChange } from "@/lib/analytics";
 import ColorPaletteGenerator from "@/components/ui/color-palette-generator";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ThemeSelector() {
   const [open, setOpen] = useState(false);
   const [showPaletteGenerator, setShowPaletteGenerator] = useState(false);
-  const { setTheme: setMode } = useTheme();
+  const { theme, actualTheme, setTheme } = useTheme();
   const [themeVariant, setThemeVariant] = useState("rose");
+  const { toast } = useToast();
   
   // Handle color palette application
   const handlePaletteGenerated = (palette: any) => {
@@ -21,83 +24,77 @@ export default function ThemeSelector() {
     setShowPaletteGenerator(false);
   };
   
-  // Force dark mode and initialize theme variant from localStorage
+  // Initialize theme variant from localStorage with improved persistence
   useEffect(() => {
-    setMode("dark"); // Always set to dark mode
+    // Load preferences using new utility function
+    const preferences = loadThemePreferences();
     
-    // Clear any old theme-variant in localStorage if it's "red" and set to "rose" 
-    const currentStored = localStorage.getItem("theme-variant");
-    if (currentStored === "red" || !currentStored) {
-      localStorage.setItem("theme-variant", "rose");
+    if (preferences) {
+      setThemeVariant(preferences.theme);
+    } else {
+      // Migration from old storage format
+      const oldThemeVariant = localStorage.getItem("theme-variant");
+      const migratedTheme = oldThemeVariant === "red" ? "rose" : (oldThemeVariant || "rose");
+      setThemeVariant(migratedTheme);
+      
+      // Clean up old storage
+      localStorage.removeItem("theme-variant");
     }
     
-    const storedTheme = localStorage.getItem("theme-variant") || "rose";
-    setThemeVariant(storedTheme);
-    
-    // Apply the rose theme immediately
-    const roseTheme = shadcnThemes.find((t) => t.value === "rose") || shadcnThemes[0];
-    applyTheme(roseTheme, "dark");
-  }, [setMode]);
+    // Apply the stored theme with current actual theme mode
+    const selectedTheme = shadcnThemes.find((t) => t.value === themeVariant) || shadcnThemes[0];
+    applyTheme(selectedTheme, actualTheme);
+  }, [actualTheme, themeVariant]);
 
-  // Apply theme when variant changes (always dark)
+  // Apply theme when variant changes
   useEffect(() => {
     const selectedTheme = shadcnThemes.find((t) => t.value === themeVariant) || shadcnThemes[0];
-    applyTheme(selectedTheme, "dark");
-  }, [themeVariant]);
+    applyTheme(selectedTheme, actualTheme);
+  }, [themeVariant, actualTheme]);
 
   function changeTheme(themeName: string) {
     setThemeVariant(themeName);
-    localStorage.setItem("theme-variant", themeName);
     const selectedTheme = shadcnThemes.find((t) => t.value === themeName) || shadcnThemes[0];
-    applyTheme(selectedTheme, "dark");
+    
+    // Apply theme with smooth transition and save preferences
+    applyThemeWithTransition(selectedTheme, actualTheme, true);
     
     // Track theme change
     trackThemeChange(themeName);
     
-    // Show toast notification for better user feedback
-    showToast("Palette Applied", `Applied "${selectedTheme.name}" to your theme`);
+    // Show improved toast notification
+    toast({
+      title: "Theme Applied",
+      description: `Applied "${selectedTheme.name}" color palette`,
+    });
     
     setOpen(false);
   }
-
-  // Enhanced toast notification function
-  const showToast = (title: string, message: string) => {
-    // Create and show a temporary toast notification
-    const toast = document.createElement('div');
-    toast.className = 'fixed top-4 right-4 z-50 bg-background border border-border rounded-lg p-4 shadow-lg min-w-[300px] max-w-[400px]';
-    toast.innerHTML = `
-      <div class="flex items-start gap-3">
-        <div class="flex-shrink-0 w-5 h-5 bg-primary/20 rounded-full flex items-center justify-center mt-0.5">
-          <svg class="w-3 h-3 text-primary" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-          </svg>
-        </div>
-        <div class="flex-1">
-          <h4 class="font-medium text-sm text-foreground">${title}</h4>
-          <p class="text-sm text-muted-foreground mt-1">${message}</p>
-        </div>
-      </div>
-    `;
+  
+  function changeModeTheme(mode: "light" | "dark" | "system") {
+    setTheme(mode);
     
-    document.body.appendChild(toast);
+    // Save the combined theme and mode preferences
+    saveThemePreferences(themeVariant, mode);
     
-    // Animate in
-    requestAnimationFrame(() => {
-      toast.style.transform = 'translateX(0)';
-      toast.style.opacity = '1';
-      toast.style.transition = 'all 0.3s ease-out';
+    toast({
+      title: "Theme Mode Changed",
+      description: `Switched to ${mode} mode`,
     });
-    
-    // Remove after 3 seconds
-    setTimeout(() => {
-      toast.style.transform = 'translateX(100%)';
-      toast.style.opacity = '0';
-      setTimeout(() => {
-        if (toast.parentNode) {
-          document.body.removeChild(toast);
-        }
-      }, 300);
-    }, 3000);
+  }
+
+  // Get theme mode icon
+  const getModeIcon = (mode: string) => {
+    switch (mode) {
+      case "light":
+        return <Sun className="h-4 w-4" />;
+      case "dark":
+        return <Moon className="h-4 w-4" />;
+      case "system":
+        return <Monitor className="h-4 w-4" />;
+      default:
+        return <Monitor className="h-4 w-4" />;
+    }
   };
 
   return (
@@ -120,7 +117,28 @@ export default function ThemeSelector() {
         >
           <div className="space-y-4">
             <div>
-              <p className="text-sm font-medium mb-3">Color Theme</p>
+              <p className="text-sm font-medium mb-3">Theme Mode</p>
+              <div className="grid grid-cols-3 gap-2 mb-4">
+                {["light", "dark", "system"].map((mode) => (
+                  <button
+                    key={mode}
+                    onClick={() => changeModeTheme(mode as "light" | "dark" | "system")}
+                    className={`p-2 rounded-md border-2 transition-all hover:scale-105 flex items-center justify-center gap-2 ${
+                      theme === mode
+                        ? "border-primary ring-2 ring-primary/20 bg-primary/10"
+                        : "border-border hover:border-primary/50"
+                    }`}
+                    title={`${mode.charAt(0).toUpperCase() + mode.slice(1)} mode`}
+                  >
+                    {getModeIcon(mode)}
+                    <span className="text-xs capitalize">{mode}</span>
+                  </button>
+                ))}
+              </div>
+              <Separator className="my-3" />
+            </div>
+            <div>
+              <p className="text-sm font-medium mb-3">Color Palette</p>
               <div className="grid grid-cols-4 gap-2">
                 {shadcnThemes.map((theme) => (
                   <button
