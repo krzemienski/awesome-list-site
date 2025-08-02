@@ -387,10 +387,18 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
   if (isMobile) {
     return (
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetContent side="left" className="p-0 w-[280px] sm:w-[320px]">
-          <div className="flex flex-col h-full">
+        <SheetContent 
+          side="left" 
+          className="p-0 w-[280px] sm:w-[320px]"
+          data-state={isOpen ? "open" : "closed"}
+        >
+          <aside 
+            role="navigation"
+            data-state={isOpen ? "open" : "closed"}
+            className="flex flex-col h-full"
+          >
             {sidebarContent}
-          </div>
+          </aside>
         </SheetContent>
       </Sheet>
     );
@@ -398,11 +406,15 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
 
   // Desktop sidebar with regular div
   return (
-    <div className={cn(
-      "fixed inset-y-0 left-0 z-40 w-64 bg-background border-r border-border flex flex-col transition-transform duration-300 ease-in-out",
-      isOpen ? "translate-x-0" : "-translate-x-full"
-    )}>
+    <aside 
+      role="navigation"
+      data-state={isOpen ? "open" : "closed"}
+      className={cn(
+        "fixed inset-y-0 left-0 z-40 w-64 bg-background border-r border-border flex flex-col transition-transform duration-300 ease-in-out",
+        isOpen ? "translate-x-0" : "-translate-x-full"
+      )}
+    >
       {sidebarContent}
-    </div>
+    </aside>
   );
 }
