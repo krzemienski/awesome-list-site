@@ -19,6 +19,8 @@ import NotFound from "@/pages/not-found";
 import { processAwesomeListData } from "@/lib/parser";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
 import { trackCategoryView, trackFilterUsage, trackSortChange } from "@/lib/analytics";
+import TagFilter from "@/components/ui/tag-filter";
+import SubcategoryFilter from "@/components/ui/subcategory-filter";
 
 type LayoutType = "cards" | "list" | "compact";
 
@@ -30,6 +32,8 @@ export default function Category() {
   const [sortBy, setSortBy] = useState("category"); // Match homepage default
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
   
   // Fetch awesome list data - use same query as homepage
   const { data: rawData, isLoading, error } = useQuery({
@@ -46,6 +50,7 @@ export default function Category() {
   );
   
   const categoryName = currentCategory ? currentCategory.name : deslugify(slug || "");
+  const subcategories = currentCategory ? currentCategory.subcategories : [];
   const baseResources = currentCategory ? currentCategory.resources : [];
   
   // Track category view
@@ -78,13 +83,35 @@ export default function Category() {
     }
   };
   
-  // Filter resources by search term
+  // Handle tag filter change with analytics
+  const handleTagsChange = (tags: string[]) => {
+    setSelectedTags(tags);
+    if (tags.length > 0) {
+      trackFilterUsage("tags", tags.join(","), filteredResources.length);
+    }
+  };
+
+  // Handle subcategory filter change with analytics
+  const handleSubcategoriesChange = (subcats: string[]) => {
+    setSelectedSubcategories(subcats);
+    if (subcats.length > 0) {
+      trackFilterUsage("subcategories", subcats.join(","), filteredResources.length);
+    }
+  };
+
+  // Filter resources by search term, tags, and subcategories
   const filteredResources = baseResources.filter(resource => {
     const matchesSearch = searchTerm === "" || 
       resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       resource.description.toLowerCase().includes(searchTerm.toLowerCase());
     
-    return matchesSearch;
+    const matchesTags = selectedTags.length === 0 || 
+      (resource.tags && selectedTags.some(tag => resource.tags?.includes(tag)));
+
+    const matchesSubcategory = selectedSubcategories.length === 0 ||
+      selectedSubcategories.includes(resource.subcategory);
+    
+    return matchesSearch && matchesTags && matchesSubcategory;
   });
   
   // Sort resources
@@ -185,31 +212,53 @@ export default function Category() {
       
       {/* Controls */}
       <div className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            {/* Layout Switcher */}
-            <LayoutSwitcher
-              currentLayout={layout}
-              onLayoutChange={setLayout}
+        <div className="flex flex-col gap-4">
+          {/* Layout and Sort Row */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              {/* Layout Switcher */}
+              <LayoutSwitcher
+                currentLayout={layout}
+                onLayoutChange={setLayout}
+              />
+              
+              {/* Sort */}
+              <div className="flex gap-2 items-center">
+                <span className="text-sm text-muted-foreground">Sort:</span>
+                <Select
+                  value={sortBy}
+                  onValueChange={handleSortChange}
+                >
+                  <SelectTrigger className="w-32">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="category">Category</SelectItem>
+                    <SelectItem value="name-asc">Name (A-Z)</SelectItem>
+                    <SelectItem value="name-desc">Name (Z-A)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+          
+          {/* Filters Row */}
+          <div className="flex flex-wrap gap-4">
+            {/* Tag Filter */}
+            <TagFilter
+              resources={baseResources}
+              selectedTags={selectedTags}
+              onTagsChange={handleTagsChange}
             />
             
-            {/* Sort */}
-            <div className="flex gap-2 items-center">
-              <span className="text-sm text-muted-foreground">Sort:</span>
-              <Select
-                value={sortBy}
-                onValueChange={handleSortChange}
-              >
-                <SelectTrigger className="w-32">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="category">Category</SelectItem>
-                  <SelectItem value="name-asc">Name (A-Z)</SelectItem>
-                  <SelectItem value="name-desc">Name (Z-A)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            {/* Subcategory Filter - only show if there are subcategories */}
+            {subcategories.length > 0 && (
+              <SubcategoryFilter
+                subcategories={subcategories}
+                selectedSubcategories={selectedSubcategories}
+                onSubcategoriesChange={handleSubcategoriesChange}
+              />
+            )}
           </div>
         </div>
       </div>

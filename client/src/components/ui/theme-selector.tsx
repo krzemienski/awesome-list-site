@@ -14,7 +14,7 @@ export default function ThemeSelector() {
   const [open, setOpen] = useState(false);
   const [showPaletteGenerator, setShowPaletteGenerator] = useState(false);
   const { theme, actualTheme, setTheme } = useTheme();
-  const [themeVariant, setThemeVariant] = useState("rose");
+  const [themeVariant, setThemeVariant] = useState("violet");
   const { toast } = useToast();
   
   // Handle color palette application
@@ -34,7 +34,7 @@ export default function ThemeSelector() {
     } else {
       // Migration from old storage format
       const oldThemeVariant = localStorage.getItem("theme-variant");
-      const migratedTheme = oldThemeVariant === "red" ? "rose" : (oldThemeVariant || "rose");
+      const migratedTheme = oldThemeVariant === "red" ? "violet" : (oldThemeVariant || "violet");
       setThemeVariant(migratedTheme);
       
       // Clean up old storage

@@ -474,7 +474,7 @@ export function loadThemePreferences(): { theme: string; mode: "light" | "dark" 
     if (stored) {
       const preferences = JSON.parse(stored);
       return {
-        theme: preferences.theme || 'rose',
+        theme: preferences.theme || 'violet',
         mode: preferences.mode || 'system'
       };
     }

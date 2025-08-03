@@ -19,6 +19,7 @@ import NotFound from "@/pages/not-found";
 import { processAwesomeListData } from "@/lib/parser";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
 import { trackCategoryView, trackFilterUsage, trackSortChange } from "@/lib/analytics";
+import TagFilter from "@/components/ui/tag-filter";
 
 export default function Subcategory() {
   const { slug } = useParams<{ slug: string }>();
@@ -27,6 +28,7 @@ export default function Subcategory() {
   const [itemsPerPage, setItemsPerPage] = useState(24);
   const [sortBy, setSortBy] = useState("category"); // Match homepage default
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   
   // Fetch awesome list data - use same query as homepage
   const { data: rawData, isLoading, error } = useQuery({
@@ -80,14 +82,25 @@ export default function Subcategory() {
       trackFilterUsage("search", search, filteredResources.length);
     }
   };
+
+  // Handle tag filter change with analytics
+  const handleTagsChange = (tags: string[]) => {
+    setSelectedTags(tags);
+    if (tags.length > 0) {
+      trackFilterUsage("tags", tags.join(","), filteredResources.length);
+    }
+  };
   
-  // Filter resources by search term
+  // Filter resources by search term and tags
   const filteredResources = baseResources.filter(resource => {
     const matchesSearch = searchTerm === "" || 
       resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       resource.description.toLowerCase().includes(searchTerm.toLowerCase());
     
-    return matchesSearch;
+    const matchesTags = selectedTags.length === 0 || 
+      (resource.tags && selectedTags.some(tag => resource.tags?.includes(tag)));
+    
+    return matchesSearch && matchesTags;
   });
   
   // Sort resources
@@ -193,31 +206,43 @@ export default function Subcategory() {
       
       {/* Controls */}
       <div className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            {/* Layout Switcher */}
-            <LayoutSwitcher
-              currentLayout={layout}
-              onLayoutChange={setLayout}
-            />
-            
-            {/* Sort */}
-            <div className="flex gap-2 items-center">
-              <span className="text-sm text-muted-foreground">Sort:</span>
-              <Select
-                value={sortBy}
-                onValueChange={handleSortChange}
-              >
-                <SelectTrigger className="w-32">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="category">Category</SelectItem>
-                  <SelectItem value="name-asc">Name (A-Z)</SelectItem>
-                  <SelectItem value="name-desc">Name (Z-A)</SelectItem>
-                </SelectContent>
-              </Select>
+        <div className="flex flex-col gap-4">
+          {/* Layout and Sort Row */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              {/* Layout Switcher */}
+              <LayoutSwitcher
+                currentLayout={layout}
+                onLayoutChange={setLayout}
+              />
+              
+              {/* Sort */}
+              <div className="flex gap-2 items-center">
+                <span className="text-sm text-muted-foreground">Sort:</span>
+                <Select
+                  value={sortBy}
+                  onValueChange={handleSortChange}
+                >
+                  <SelectTrigger className="w-32">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="category">Category</SelectItem>
+                    <SelectItem value="name-asc">Name (A-Z)</SelectItem>
+                    <SelectItem value="name-desc">Name (Z-A)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
+          </div>
+          
+          {/* Tag Filter */}
+          <div className="flex flex-wrap gap-4">
+            <TagFilter
+              resources={baseResources}
+              selectedTags={selectedTags}
+              onTagsChange={handleTagsChange}
+            />
           </div>
         </div>
       </div>
