@@ -1,0 +1,57 @@
+
+> rest-express@1.0.0 dev
+> NODE_ENV=development tsx server/index.ts
+
+Fetching awesome-video data from JSON source
+Fetching awesome-video JSON from: https://raw.githubusercontent.com/krzemienski/awesome-video/master/contents.json
+✅ JSON data fetched successfully
+✅ Parsed 2011 video resources
+Successfully fetched awesome-video with 2011 resources
+6:18:54 PM [express] serving on port 5000
+Browserslist: browsers data (caniuse-lite) is 10 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+[vite:css] @import must precede all other statements (besides @charset or empty @layer)
+4  |  
+5  |  /* Mobile improvements */
+6  |  @import './styles/mobile-improvements.css';
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+7  |  
+8  |  html {
+6:19:09 PM [express] GET /api/awesome-list 304 in 26ms :: {"title":"Awesome Video ","description":"A…
+6:24:30 PM [express] GET /api/awesome-list 200 in 24ms :: {"title":"Awesome Video ","description":"A…
+6:25:38 PM [express] GET /api/awesome-list 200 in 23ms :: {"title":"Awesome Video ","description":"A…
+6:27:09 PM [vite] hmr update /src/components/ui/pagination.tsx, /src/index.css?v=q-fzxRm-ybxzaLW2aGRTL
+[vite:css] @import must precede all other statements (besides @charset or empty @layer)
+4  |  
+5  |  /* Mobile improvements */
+6  |  @import './styles/mobile-improvements.css';
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+7  |  
+8  |  html {
+6:27:17 PM [vite] hmr update /src/components/ui/pagination.tsx, /src/index.css?v=q-fzxRm-ybxzaLW2aGRTL
+[vite:css] @import must precede all other statements (besides @charset or empty @layer)
+4  |  
+5  |  /* Mobile improvements */
+6  |  @import './styles/mobile-improvements.css';
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+7  |  
+8  |  html {
+6:27:27 PM [vite] hmr update /src/components/ui/pagination.tsx, /src/index.css?v=q-fzxRm-ybxzaLW2aGRTL
+[vite:css] @import must precede all other statements (besides @charset or empty @layer)
+4  |  
+5  |  /* Mobile improvements */
+6  |  @import './styles/mobile-improvements.css';
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+7  |  
+8  |  html {
+6:27:40 PM [vite] hmr update /src/components/ui/pagination.tsx, /src/index.css?v=q-fzxRm-ybxzaLW2aGRTL
+[vite:css] @import must precede all other statements (besides @charset or empty @layer)
+4  |  
+5  |  /* Mobile improvements */
+6  |  @import './styles/mobile-improvements.css';
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+7  |  
+8  |  html {
+6:28:16 PM [express] GET /api/awesome-list 200 in 21ms :: {"title":"Awesome Video ","description":"A…
+6:28:35 PM [express] GET /api/awesome-list 200 in 20ms :: {"title":"Awesome Video ","description":"A…

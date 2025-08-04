@@ -1,0 +1,21 @@
+
+> rest-express@1.0.0 dev
+> NODE_ENV=development tsx server/index.ts
+
+Fetching awesome-video data from JSON source
+Fetching awesome-video JSON from: https://raw.githubusercontent.com/krzemienski/awesome-video/master/contents.json
+✅ JSON data fetched successfully
+✅ Parsed 2011 video resources
+Successfully fetched awesome-video with 2011 resources
+5:35:26 PM [express] serving on port 5000
+Browserslist: browsers data (caniuse-lite) is 10 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+[vite:css] @import must precede all other statements (besides @charset or empty @layer)
+4  |  
+5  |  /* Mobile improvements */
+6  |  @import './styles/mobile-improvements.css';
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+7  |  
+8  |  html {
+5:35:36 PM [express] GET /api/awesome-list 200 in 20ms :: {"title":"Awesome Video ","description":"A…

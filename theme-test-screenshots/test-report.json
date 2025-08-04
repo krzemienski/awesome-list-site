@@ -1,0 +1,285 @@
+{
+  "timestamp": "2025-08-03T20:32:23.251Z",
+  "totalTests": 23,
+  "passed": 17,
+  "failed": 6,
+  "themes": {
+    "violet": {
+      "light": {
+        "applied": true,
+        "colors": {
+          "primary": "hsl(263.4 70% 50.4%)",
+          "background": "hsl(224 71.4% 4.1%)",
+          "foreground": "hsl(210 20% 98%)",
+          "card": "hsl(224 71.4% 4.1%)",
+          "muted": "hsl(215 27.9% 16.9%)",
+          "dataTheme": "violet",
+          "classList": "light"
+        },
+        "screenshot": "theme-test-screenshots/theme-violet-light.png"
+      },
+      "dark": {
+        "applied": true,
+        "colors": {
+          "primary": "hsl(263.4 70% 50.4%)",
+          "background": "hsl(224 71.4% 4.1%)",
+          "foreground": "hsl(210 20% 98%)",
+          "card": "hsl(224 71.4% 4.1%)",
+          "muted": "hsl(215 27.9% 16.9%)",
+          "dataTheme": "violet",
+          "classList": "dark"
+        },
+        "screenshot": "theme-test-screenshots/theme-violet-dark.png"
+      }
+    },
+    "red": {
+      "light": {
+        "applied": true,
+        "colors": {
+          "primary": "hsl(263.4 70% 50.4%)",
+          "background": "hsl(224 71.4% 4.1%)",
+          "foreground": "hsl(210 20% 98%)",
+          "card": "hsl(224 71.4% 4.1%)",
+          "muted": "hsl(215 27.9% 16.9%)",
+          "dataTheme": "red",
+          "classList": "light"
+        },
+        "screenshot": "theme-test-screenshots/theme-red-light.png"
+      },
+      "dark": {
+        "applied": true,
+        "colors": {
+          "primary": "hsl(0 72.2% 50.6%)",
+          "background": "hsl(0 0% 3.9%)",
+          "foreground": "hsl(0 0% 98%)",
+          "card": "hsl(0 0% 3.9%)",
+          "muted": "hsl(0 0% 14.9%)",
+          "dataTheme": "red",
+          "classList": "dark"
+        },
+        "screenshot": "theme-test-screenshots/theme-red-dark.png"
+      }
+    },
+    "rose": {
+      "light": {
+        "applied": true,
+        "colors": {
+          "primary": "hsl(0 72.2% 50.6%)",
+          "background": "hsl(0 0% 3.9%)",
+          "foreground": "hsl(0 0% 98%)",
+          "card": "hsl(0 0% 3.9%)",
+          "muted": "hsl(0 0% 14.9%)",
+          "dataTheme": "rose",
+          "classList": "light"
+        },
+        "screenshot": "theme-test-screenshots/theme-rose-light.png"
+      },
+      "dark": {
+        "applied": true,
+        "colors": {
+          "primary": "hsl(346.8 77.2% 49.8%)",
+          "background": "hsl(20 14.3% 4.1%)",
+          "foreground": "hsl(0 0% 95%)",
+          "card": "hsl(24 9.8% 10%)",
+          "muted": "hsl(0 0% 15%)",
+          "dataTheme": "rose",
+          "classList": "dark"
+        },
+        "screenshot": "theme-test-screenshots/theme-rose-dark.png"
+      }
+    },
+    "orange": {
+      "light": {
+        "applied": true,
+        "colors": {
+          "primary": "hsl(346.8 77.2% 49.8%)",
+          "background": "hsl(20 14.3% 4.1%)",
+          "foreground": "hsl(0 0% 95%)",
+          "card": "hsl(24 9.8% 10%)",
+          "muted": "hsl(0 0% 15%)",
+          "dataTheme": "orange",
+          "classList": "light"
+        },
+        "screenshot": "theme-test-screenshots/theme-orange-light.png"
+      },
+      "dark": {
+        "applied": true,
+        "colors": {
+          "primary": "hsl(20.5 90.2% 48.2%)",
+          "background": "hsl(20 14.3% 4.1%)",
+          "foreground": "hsl(60 9.1% 97.8%)",
+          "card": "hsl(20 14.3% 4.1%)",
+          "muted": "hsl(12 6.5% 15.1%)",
+          "dataTheme": "orange",
+          "classList": "dark"
+        },
+        "screenshot": "theme-test-screenshots/theme-orange-dark.png"
+      }
+    },
+    "green": {
+      "light": {
+        "applied": true,
+        "colors": {
+          "primary": "hsl(20.5 90.2% 48.2%)",
+          "background": "hsl(20 14.3% 4.1%)",
+          "foreground": "hsl(60 9.1% 97.8%)",
+          "card": "hsl(20 14.3% 4.1%)",
+          "muted": "hsl(12 6.5% 15.1%)",
+          "dataTheme": "green",
+          "classList": "light"
+        },
+        "screenshot": "theme-test-screenshots/theme-green-light.png"
+      },
+      "dark": {
+        "applied": true,
+        "colors": {
+          "primary": "hsl(142.1 70.6% 45.3%)",
+          "background": "hsl(20 14.3% 4.1%)",
+          "foreground": "hsl(0 0% 95%)",
+          "card": "hsl(24 9.8% 10%)",
+          "muted": "hsl(0 0% 15%)",
+          "dataTheme": "green",
+          "classList": "dark"
+        },
+        "screenshot": "theme-test-screenshots/theme-green-dark.png"
+      }
+    },
+    "blue": {
+      "light": {
+        "applied": true,
+        "colors": {
+          "primary": "hsl(142.1 70.6% 45.3%)",
+          "background": "hsl(20 14.3% 4.1%)",
+          "foreground": "hsl(0 0% 95%)",
+          "card": "hsl(24 9.8% 10%)",
+          "muted": "hsl(0 0% 15%)",
+          "dataTheme": "blue",
+          "classList": "light"
+        },
+        "screenshot": "theme-test-screenshots/theme-blue-light.png"
+      },
+      "dark": {
+        "applied": true,
+        "colors": {
+          "primary": "hsl(217.2 91.2% 59.8%)",
+          "background": "hsl(222.2 84% 4.9%)",
+          "foreground": "hsl(210 40% 98%)",
+          "card": "hsl(222.2 84% 4.9%)",
+          "muted": "hsl(217.2 32.6% 17.5%)",
+          "dataTheme": "blue",
+          "classList": "dark"
+        },
+        "screenshot": "theme-test-screenshots/theme-blue-dark.png"
+      }
+    },
+    "yellow": {
+      "light": {
+        "applied": true,
+        "colors": {
+          "primary": "hsl(217.2 91.2% 59.8%)",
+          "background": "hsl(222.2 84% 4.9%)",
+          "foreground": "hsl(210 40% 98%)",
+          "card": "hsl(222.2 84% 4.9%)",
+          "muted": "hsl(217.2 32.6% 17.5%)",
+          "dataTheme": "yellow",
+          "classList": "light"
+        },
+        "screenshot": "theme-test-screenshots/theme-yellow-light.png"
+      },
+      "dark": {
+        "applied": true,
+        "colors": {
+          "primary": "hsl(47.9 95.8% 53.1%)",
+          "background": "hsl(20 14.3% 4.1%)",
+          "foreground": "hsl(60 9.1% 97.8%)",
+          "card": "hsl(20 14.3% 4.1%)",
+          "muted": "hsl(12 6.5% 15.1%)",
+          "dataTheme": "yellow",
+          "classList": "dark"
+        },
+        "screenshot": "theme-test-screenshots/theme-yellow-dark.png"
+      }
+    },
+    "zinc": {
+      "light": {
+        "applied": true,
+        "colors": {
+          "primary": "hsl(47.9 95.8% 53.1%)",
+          "background": "hsl(20 14.3% 4.1%)",
+          "foreground": "hsl(60 9.1% 97.8%)",
+          "card": "hsl(20 14.3% 4.1%)",
+          "muted": "hsl(12 6.5% 15.1%)",
+          "dataTheme": "zinc",
+          "classList": "light"
+        },
+        "screenshot": "theme-test-screenshots/theme-zinc-light.png"
+      },
+      "dark": {
+        "applied": true,
+        "colors": {
+          "primary": "hsl(0 0% 98%)",
+          "background": "hsl(240 10% 3.9%)",
+          "foreground": "hsl(0 0% 98%)",
+          "card": "hsl(240 10% 3.9%)",
+          "muted": "hsl(240 3.7% 15.9%)",
+          "dataTheme": "zinc",
+          "classList": "dark"
+        },
+        "screenshot": "theme-test-screenshots/theme-zinc-dark.png"
+      }
+    }
+  },
+  "mobile": {
+    "mobile-small": {
+      "screenshot": "theme-test-screenshots/mobile-mobile-small-home.png",
+      "mobileMenuExists": false,
+      "touchTargetsOk": false,
+      "viewport": {
+        "width": 320,
+        "height": 568,
+        "isMobile": true
+      }
+    },
+    "mobile-medium": {
+      "screenshot": "theme-test-screenshots/mobile-mobile-medium-home.png",
+      "mobileMenuExists": false,
+      "touchTargetsOk": false,
+      "viewport": {
+        "width": 375,
+        "height": 667,
+        "isMobile": true
+      }
+    },
+    "mobile-large": {
+      "screenshot": "theme-test-screenshots/mobile-mobile-large-home.png",
+      "mobileMenuExists": false,
+      "touchTargetsOk": false,
+      "viewport": {
+        "width": 414,
+        "height": 896,
+        "isMobile": true
+      }
+    },
+    "tablet": {
+      "screenshot": "theme-test-screenshots/mobile-tablet-home.png",
+      "mobileMenuExists": false,
+      "touchTargetsOk": false,
+      "viewport": {
+        "width": 768,
+        "height": 1024,
+        "isMobile": true
+      }
+    },
+    "desktop": {
+      "screenshot": "theme-test-screenshots/mobile-desktop-home.png",
+      "mobileMenuExists": false,
+      "touchTargetsOk": false,
+      "viewport": {
+        "width": 1920,
+        "height": 1080,
+        "isMobile": false
+      }
+    }
+  },
+  "errors": []
+}
