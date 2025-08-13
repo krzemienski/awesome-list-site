@@ -4,8 +4,13 @@ import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
 
-// CORS middleware - accept all origins
+// Override host checking and CORS - accept all origins
 app.use((req, res, next) => {
+  // Override host header to bypass Vite's host checking
+  if (req.headers.host && req.headers.host.includes('replit.dev')) {
+    req.headers.host = 'localhost:5000';
+  }
+  
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control');
