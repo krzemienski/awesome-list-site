@@ -24,7 +24,12 @@ export function processAwesomeListData(data: any): AwesomeList {
         subcategories: (cat.subcategories || []).map((sub: any) => ({
           name: sub.name,
           slug: sub.slug,
-          resources: sub.resources || []
+          resources: sub.resources || [],
+          subSubcategories: (sub.subSubcategories || []).map((subSub: any) => ({
+            name: subSub.name,
+            slug: subSub.slug,
+            resources: subSub.resources || []
+          }))
         }))
       }))
     };
