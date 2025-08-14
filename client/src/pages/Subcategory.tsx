@@ -61,16 +61,6 @@ export default function Subcategory() {
   const subcategoryName = currentSubcategory ? currentSubcategory.name : deslugify(slug || "");
   const categoryName = parentCategory ? parentCategory.name : "";
   
-  // Debug logging
-  if (process.env.NODE_ENV === 'development') {
-    console.log('Subcategory Debug:', {
-      slug,
-      currentSubcategory: currentSubcategory?.name,
-      parentCategory: parentCategory?.name,
-      baseResourcesLength: baseResources.length
-    });
-  }
-  
   // Track subcategory view
   useEffect(() => {
     if (subcategoryName && !isLoading) {
