@@ -22,7 +22,6 @@ import { slugify, getCategorySlug, getSubcategorySlug } from "@/lib/utils";
 import { Category } from "@/types/awesome-list";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
-import SidebarCustomizer, { useSidebarSettings } from "@/components/sidebar/SidebarCustomizer";
 
 interface ModernSidebarProps {
   title: string;
@@ -33,12 +32,9 @@ interface ModernSidebarProps {
 }
 
 export default function ModernSidebar({ title, categories, isLoading, isOpen, setIsOpen }: ModernSidebarProps) {
-  const [location, setLocation] = useLocation();
+  const [location] = useLocation();
   const [openCategories, setOpenCategories] = useState<string[]>([]);
   const isMobile = useIsMobile();
-  
-  // Sidebar customization settings
-  const { settings, updateSettings, getOrganizedCategories: applySidebarSettings } = useSidebarSettings(categories);
 
   // Organize categories with proper hierarchy for media/streaming tech
   const getOrganizedCategories = (categories: Category[]) => {
@@ -257,8 +253,8 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
   };
 
   // Navigation helper to close mobile sidebar after clicking
-  const navigateAndClose = (path: string) => {
-    setLocation(path);
+  const navigate = (path: string) => {
+    window.location.href = path;
     if (isMobile) {
       setIsOpen(false);
     }
@@ -274,7 +270,7 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
             "w-full justify-start font-normal mb-3",
             location === "/" ? "bg-accent text-accent-foreground" : ""
           )}
-          onClick={() => navigateAndClose('/')}
+          onClick={() => navigate('/')}
         >
           <Home className="mr-2 h-4 w-4" />
           Home
@@ -293,8 +289,8 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
           </div>
         ) : (
           <div className="space-y-1">
-            {/* Real categories with proper hierarchical organization and user customization */}
-            {applySidebarSettings(getOrganizedCategories(categories))
+            {/* Real categories with proper hierarchical organization */}
+            {getOrganizedCategories(categories)
               .map(category => (
               <Accordion
                 key={category.name}
@@ -322,7 +318,7 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
                           ? "bg-accent text-accent-foreground" 
                           : ""
                       )}
-                      onClick={() => navigateAndClose(`/category/${getCategorySlug(category.name)}`)}
+                      onClick={() => navigate(`/category/${getCategorySlug(category.name)}`)}
                     >
                       All ({category.resources.length})
                     </Button>
@@ -332,7 +328,7 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
                       <div className="mt-1 space-y-1">
                         {category.subcategories.map(subcategory => (
                           <Button
-                            key={`${category.name}-${subcategory.name}`}
+                            key={subcategory.name}
                             variant="ghost"
                             className={cn(
                               "w-full justify-start font-normal text-xs pl-4",
@@ -340,7 +336,7 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
                                 ? "bg-accent text-accent-foreground" 
                                 : "text-muted-foreground hover:text-foreground"
                             )}
-                            onClick={() => navigateAndClose(`/subcategory/${getSubcategorySlug(category.name, subcategory.name)}`)}
+                            onClick={() => navigate(`/subcategory/${getSubcategorySlug(category.name, subcategory.name)}`)}
                           >
                             <div className="flex items-center gap-2 w-full">
                               <div className="w-2 h-2 rounded-full bg-muted-foreground/40 flex-shrink-0" />
@@ -361,24 +357,17 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
         )}
       </div>
       
-      <div className="border-t p-3 space-y-2">
-        <div className="flex items-center justify-between">
-          <Button variant="ghost" className="flex-1 justify-start" asChild>
-            <a href={title.includes("Selfhosted") 
-                ? "https://github.com/awesome-selfhosted/awesome-selfhosted" 
-                : "https://github.com/krzemienski/awesome-video"} 
-               target="_blank" 
-               rel="noopener noreferrer">
-              <ExternalLink className="mr-2 h-4 w-4" />
-              GitHub Repository
-            </a>
-          </Button>
-          <SidebarCustomizer 
-            categories={categories}
-            settings={settings}
-            onSettingsChange={updateSettings}
-          />
-        </div>
+      <div className="border-t border-border p-3">
+        <Button variant="ghost" className="w-full justify-start" asChild>
+          <a href={title.includes("Selfhosted") 
+              ? "https://github.com/awesome-selfhosted/awesome-selfhosted" 
+              : "https://github.com/krzemienski/awesome-video"} 
+             target="_blank" 
+             rel="noopener noreferrer">
+            <ExternalLink className="mr-2 h-4 w-4" />
+            GitHub Repository
+          </a>
+        </Button>
       </div>
     </>
   );
@@ -387,18 +376,10 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
   if (isMobile) {
     return (
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetContent 
-          side="left" 
-          className="p-0 w-[280px] sm:w-[320px]"
-          data-state={isOpen ? "open" : "closed"}
-        >
-          <aside 
-            role="navigation"
-            data-state={isOpen ? "open" : "closed"}
-            className="flex flex-col h-full"
-          >
+        <SheetContent side="left" className="p-0 w-[280px] sm:w-[320px]">
+          <div className="flex flex-col h-full">
             {sidebarContent}
-          </aside>
+          </div>
         </SheetContent>
       </Sheet>
     );
@@ -406,15 +387,11 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
 
   // Desktop sidebar with regular div
   return (
-    <aside 
-      role="navigation"
-      data-state={isOpen ? "open" : "closed"}
-      className={cn(
-        "fixed inset-y-0 left-0 z-40 w-64 bg-background border-r flex flex-col transition-transform duration-300 ease-in-out",
-        isOpen ? "translate-x-0" : "-translate-x-full"
-      )}
-    >
+    <div className={cn(
+      "fixed inset-y-0 left-0 z-40 w-64 bg-background border-r border-border flex flex-col transition-transform duration-300 ease-in-out",
+      isOpen ? "translate-x-0" : "-translate-x-full"
+    )}>
       {sidebarContent}
-    </aside>
+    </div>
   );
 }

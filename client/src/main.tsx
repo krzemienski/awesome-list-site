@@ -7,7 +7,7 @@ import { queryClient } from "./lib/queryClient";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
 
-// Force dark theme with official shadcn/ui violet theme immediately
+// Force dark theme immediately
 document.documentElement.classList.add('dark');
 
 createRoot(document.getElementById("root")!).render(

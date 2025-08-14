@@ -147,7 +147,7 @@ export default function ResourceTooltip({ resource, children }: ResourceTooltipP
               </div>
 
               {/* Footer */}
-              <div className="pt-2 border-t">
+              <div className="pt-2 border-t border-border">
                 <div className="text-xs text-muted-foreground">
                   Click to visit {isRepository ? 'repository' : 'website'}
                 </div>
