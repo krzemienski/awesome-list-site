@@ -11,6 +11,7 @@ import ErrorPage from "@/pages/ErrorPage";
 import Home from "@/pages/Home";
 import Category from "@/pages/Category";
 import Subcategory from "@/pages/Subcategory";
+import SubSubcategory from "@/pages/SubSubcategory";
 import About from "@/pages/About";
 import Advanced from "@/pages/Advanced";
 import NotFound from "@/pages/not-found";
@@ -88,6 +89,7 @@ function Router() {
         } />
         <Route path="/category/:slug" component={Category} />
         <Route path="/subcategory/:slug" component={Subcategory} />
+        <Route path="/sub-subcategory/:slug" component={SubSubcategory} />
         <Route path="/about" component={About} />
         <Route path="/advanced" component={Advanced} />
         <Route component={NotFound} />
