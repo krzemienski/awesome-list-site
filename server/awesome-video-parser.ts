@@ -43,7 +43,7 @@ interface AwesomeListData {
  */
 export async function fetchAwesomeVideoList(): Promise<AwesomeListData> {
   try {
-    const jsonUrl = "https://raw.githubusercontent.com/krzemienski/awesome-video/master/contents.json";
+    const jsonUrl = "https://hack-ski.s3.us-east-1.amazonaws.com/av/recategorized_with_researchers_2010_projects.json";
     
     console.log(`Fetching awesome-video JSON from: ${jsonUrl}`);
     const response = await fetch(jsonUrl);

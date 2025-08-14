@@ -170,14 +170,16 @@ The application is configured for deployment on Replit:
 ### JSON-CSV Hierarchy Alignment (January 2025)
 - ✅ Fixed server-side JSON parsing to build proper 3-level category hierarchy
 - ✅ Achieved exactly 9 top-level categories (reduced from 23 flattened categories)
-- ✅ Implemented perfect resource count alignment with CSV structure:
+- ✅ Updated data source to correct S3 JSON: `https://hack-ski.s3.us-east-1.amazonaws.com/av/recategorized_with_researchers_2010_projects.json`
+- ✅ Confirmed proper JSON data structure with 60 categories and 2,011 projects
+- ✅ Implemented resource count alignment with CSV structure:
   - Community & Events: 91 resources (matches CSV)
   - Encoding & Codecs: 392 resources (matches CSV)
   - General Tools: 97 resources (matches CSV)
-  - Infrastructure & Delivery: 190 resources (close to CSV 134)
+  - Infrastructure & Delivery: 190 resources (working towards CSV 134)
   - Intro & Learning: 229 resources (matches CSV)
   - Media Tools: 317 resources (matches CSV)
-  - Players & Clients: 269 resources (close to CSV 425)
+  - Players & Clients: 269 resources (working towards CSV 425)
   - Protocols & Transport: 252 resources (matches CSV)
   - Standards & Industry: 174 resources (matches CSV)
 - ✅ Fixed Category and Subcategory page filtering to use proper slug-based matching
