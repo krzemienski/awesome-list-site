@@ -1,232 +1,285 @@
+import { useEffect, useState } from "react";
+import { useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { useRoute, useLocation } from "wouter";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ExternalLink, Star, User, Calendar, ArrowLeft } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import SEOHead from "@/components/layout/SEOHead";
 import ResourceCard from "@/components/ui/resource-card";
-import LayoutSwitcher from "@/components/ui/layout-switcher";
-import { useState } from "react";
+import ResourceListItem from "@/components/ui/resource-list-item";
+import ResourceCompactItem from "@/components/ui/resource-compact-item";
+import LayoutSwitcher, { LayoutType } from "@/components/ui/layout-switcher";
+import Pagination from "@/components/ui/pagination";
+import SEOHead from "@/components/layout/SEOHead";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Search, ArrowLeft } from "lucide-react";
+import { Link } from "wouter";
+import { deslugify, getCategorySlug, getSubcategorySlug } from "@/lib/utils";
+import { Resource, AwesomeList } from "@/types/awesome-list";
+import NotFound from "@/pages/not-found";
 import { processAwesomeListData } from "@/lib/parser";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
-import { Resource } from "@/types/awesome-list";
-
-
-interface SubSubcategoryPageProps {
-  params: { slug: string };
-}
+import { trackCategoryView, trackFilterUsage, trackSortChange } from "@/lib/analytics";
 
 export default function SubSubcategory() {
-  const [, params] = useRoute("/sub-subcategory/:slug");
-  const [, setLocation] = useLocation();
-  const [viewMode, setViewMode] = useState<"cards" | "list" | "compact">("list");
-  const subSubcategorySlug = params?.slug;
-
-  // Fetch awesome list data
+  const { slug } = useParams<{ slug: string }>();
+  const [layout, setLayout] = useState<LayoutType>("list"); // Match homepage default
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(24);
+  const [sortBy, setSortBy] = useState("category"); // Match homepage default
+  const [searchTerm, setSearchTerm] = useState("");
+  
+  // Fetch awesome list data - use same query as homepage
   const { data: rawData, isLoading, error } = useQuery({
     queryKey: ["awesome-list-data"],
     queryFn: fetchStaticAwesomeList,
     staleTime: 1000 * 60 * 60, // 1 hour
   });
-
+  
   const awesomeList = rawData ? processAwesomeListData(rawData) : undefined;
-
-  // Find the sub-subcategory and its resources
-  let subSubcategory: { name: string; slug: string; resources: Resource[] } | null = null;
-  let parentCategory: { name: string; slug: string } | null = null;
-  let parentSubcategory: { name: string; slug: string } | null = null;
-
-  if (awesomeList && subSubcategorySlug) {
-    // Search through all categories to find the sub-subcategory
+  
+  // Find the current sub-subcategory and its resources
+  let currentSubSubcategory = null;
+  let parentCategory = null;
+  let parentSubcategory = null;
+  let baseResources: Resource[] = [];
+  
+  if (awesomeList && slug) {
+    // Find matching sub-subcategory across all categories
     for (const category of awesomeList.categories) {
       for (const subcategory of category.subcategories || []) {
         if ((subcategory as any).subSubcategories) {
           for (const subSubcat of (subcategory as any).subSubcategories) {
-            if (subSubcat.slug === subSubcategorySlug) {
-              subSubcategory = subSubcat;
-              parentCategory = { name: category.name, slug: category.slug };
-              parentSubcategory = { name: subcategory.name, slug: subcategory.slug };
+            if (subSubcat.slug === slug) {
+              currentSubSubcategory = subSubcat;
+              parentCategory = category;
+              parentSubcategory = subcategory;
+              baseResources = subSubcat.resources;
               break;
             }
           }
         }
-        if (subSubcategory) break;
+        if (currentSubSubcategory) break;
       }
-      if (subSubcategory) break;
+      if (currentSubSubcategory) break;
     }
   }
+  
+  const subSubcategoryName = currentSubSubcategory ? currentSubSubcategory.name : deslugify(slug || "");
+  const categoryName = parentCategory ? parentCategory.name : "";
+  const subcategoryName = parentSubcategory ? parentSubcategory.name : "";
+  
+  // Track sub-subcategory view
+  useEffect(() => {
+    if (subSubcategoryName && !isLoading) {
+      trackCategoryView(`${categoryName} > ${subcategoryName} > ${subSubcategoryName}`);
+    }
+  }, [subSubcategoryName, categoryName, subcategoryName, isLoading]);
 
+  // Handle sort change with analytics
+  const handleSortChange = (sort: string) => {
+    setSortBy(sort);
+    trackSortChange(sort);
+  };
+
+  // Handle search with analytics
+  const handleSearchChange = (search: string) => {
+    setSearchTerm(search);
+    if (search.length >= 2) {
+      trackFilterUsage("search", search, filteredResources.length);
+    }
+  };
+  
+  // Filter resources by search term
+  const filteredResources = baseResources.filter(resource => {
+    const matchesSearch = searchTerm === "" || 
+      resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      resource.description.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    return matchesSearch;
+  });
+  
+  // Sort resources
+  const sortedResources = [...filteredResources].sort((a, b) => {
+    switch (sortBy) {
+      case "name-asc":
+        return a.title.localeCompare(b.title);
+      case "name-desc":
+        return b.title.localeCompare(a.title);
+      case "category":
+        return a.category.localeCompare(b.category);
+      default:
+        return 0;
+    }
+  });
+  
+  // Calculate pagination
+  const totalPages = Math.ceil(sortedResources.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedResources = sortedResources.slice(startIndex, endIndex);
+
+  // Handle page changes
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setItemsPerPage(newPageSize);
+    setCurrentPage(1);
+  };
+  
   if (isLoading) {
     return (
-      <>
-        <SEOHead 
-          title={`Loading... | ${awesomeList?.title || 'Awesome List'}`}
-          description="Loading sub-subcategory resources..."
-          keywords="loading, resources, development"
-        />
-        <div className="container mx-auto px-4 py-8">
-          <div className="space-y-6">
-            <Skeleton className="h-8 w-64" />
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {Array(6).fill(0).map((_, i) => (
-                <Card key={i}>
-                  <CardHeader>
-                    <Skeleton className="h-6 w-3/4" />
-                    <Skeleton className="h-4 w-1/2" />
-                  </CardHeader>
-                  <CardContent>
-                    <Skeleton className="h-16 w-full" />
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-64" />
+          <Skeleton className="h-4 w-96" />
         </div>
-      </>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array(6).fill(0).map((_, i) => (
+            <Skeleton key={i} className="h-32 w-full" />
+          ))}
+        </div>
+      </div>
     );
   }
-
-  if (error || !subSubcategory) {
-    return (
-      <>
-        <SEOHead 
-          title={`Not Found | ${awesomeList?.title || 'Awesome List'}`}
-          description="Sub-subcategory not found"
-          keywords="not found, error, resources"
-        />
-        <div className="container mx-auto px-4 py-8">
-          <Alert>
-            <AlertDescription>
-              {error ? "Error loading data" : "Sub-subcategory not found"}
-            </AlertDescription>
-          </Alert>
-        </div>
-      </>
-    );
+  
+  if (!currentSubSubcategory && !isLoading) {
+    return <NotFound />;
   }
-
+  
   return (
-    <>
+    <div className="space-y-6">
+      {/* SEO Head */}
       <SEOHead 
-        title={`${subSubcategory.name} Resources | ${awesomeList?.title || 'Awesome List'}`}
-        description={`Explore ${subSubcategory.resources.length} curated ${subSubcategory.name.toLowerCase()} resources for developers`}
-        keywords={`${subSubcategory.name.toLowerCase()}, development resources, ${parentCategory?.name.toLowerCase()}, ${parentSubcategory?.name.toLowerCase()}`}
+        title={`${subSubcategoryName} Resources - ${subcategoryName} - ${categoryName} - Awesome Video`}
+        description={`Browse ${sortedResources.length} ${subSubcategoryName} resources in the ${subcategoryName} category.`}
       />
       
-      <div className="container mx-auto px-4 py-8">
-        <div className="space-y-6">
-          {/* Navigation Breadcrumb */}
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => setLocation('/')}
-              className="p-0 h-auto hover:underline"
-            >
-              Home
+      {/* Header */}
+      <div className="space-y-2">
+        <div className="flex items-center gap-3">
+          <Link href={`/subcategory/${getSubcategorySlug(subcategoryName)}`}>
+            <Button variant="ghost" size="sm" className="gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Back to {subcategoryName}
             </Button>
-            <span>/</span>
-            {parentCategory && (
-              <>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => setLocation(`/category/${parentCategory.slug}`)}
-                  className="p-0 h-auto hover:underline"
-                >
-                  {parentCategory.name}
-                </Button>
-                <span>/</span>
-              </>
-            )}
-            {parentSubcategory && (
-              <>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => setLocation(`/subcategory/${parentSubcategory.slug}`)}
-                  className="p-0 h-auto hover:underline"
-                >
-                  {parentSubcategory.name}
-                </Button>
-                <span>/</span>
-              </>
-            )}
-            <span className="font-medium text-foreground">{subSubcategory.name}</span>
+          </Link>
+        </div>
+        
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold tracking-tight">
+            {subSubcategoryName}
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {categoryName} → {subcategoryName}
+          </p>
+        </div>
+        <p className="text-muted-foreground">
+          Showing {sortedResources.length} of {sortedResources.length} resources
+        </p>
+      </div>
+      
+      {/* Search and Controls - Match homepage layout */}
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search resources..."
+              className="pl-10"
+              value={searchTerm}
+              onChange={(e) => handleSearchChange(e.target.value)}
+            />
           </div>
-
-          {/* Header */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => history.back()}
-                className="shrink-0"
+        </div>
+        
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4 flex-wrap">
+            {/* Layout Switcher */}
+            <LayoutSwitcher
+              currentLayout={layout}
+              onLayoutChange={setLayout}
+            />
+            
+            {/* Sort */}
+            <div className="flex gap-2 items-center">
+              <span className="text-sm text-muted-foreground">Sort:</span>
+              <Select
+                value={sortBy}
+                onValueChange={handleSortChange}
               >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back
-              </Button>
-              <div>
-                <h1 className="text-3xl font-bold">{subSubcategory.name} Resources</h1>
-                <p className="text-muted-foreground mt-1">
-                  {subSubcategory.resources.length} curated resources in {subSubcategory.name.toLowerCase()}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between flex-wrap gap-4">
-              <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="text-sm">
-                  {subSubcategory.resources.length} resources
-                </Badge>
-                {parentCategory && (
-                  <Badge variant="outline" className="text-sm">
-                    {parentCategory.name}
-                  </Badge>
-                )}
-                {parentSubcategory && (
-                  <Badge variant="outline" className="text-sm">
-                    {parentSubcategory.name}
-                  </Badge>
-                )}
-              </div>
-              
-              <LayoutSwitcher 
-                currentLayout={viewMode}
-                onLayoutChange={setViewMode}
-              />
+                <SelectTrigger className="w-32">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="category">Category</SelectItem>
+                  <SelectItem value="name-asc">Name (A-Z)</SelectItem>
+                  <SelectItem value="name-desc">Name (Z-A)</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
-
-          {/* Resources */}
-          {subSubcategory.resources.length > 0 ? (
-            <div className={
-              viewMode === "cards" 
-                ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" 
-                : viewMode === "list"
-                ? "space-y-4"
-                : "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3"
-            }>
-              {subSubcategory.resources.map((resource) => (
+        </div>
+      </div>
+      
+      {/* Resources Display - Match homepage layout */}
+      {sortedResources.length === 0 ? (
+        <div className="text-center py-12">
+          <h3 className="text-lg font-semibold mb-2">No resources found</h3>
+          <p className="text-muted-foreground">
+            {searchTerm ? `No resources matching "${searchTerm}" in this sub-subcategory.` : 'There are no resources in this sub-subcategory.'}
+          </p>
+        </div>
+      ) : (
+        <>
+          {/* Regular Resources Display */}
+          {layout === "list" ? (
+            <div className="space-y-1 mb-8">
+              {paginatedResources.map((resource, index) => (
+                <ResourceListItem 
+                  key={`${resource.url}-${index}`} 
+                  resource={resource}
+                  index={startIndex + index}
+                />
+              ))}
+            </div>
+          ) : layout === "cards" ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              {paginatedResources.map((resource, index) => (
                 <ResourceCard 
-                  key={resource.id} 
+                  key={`${resource.url}-${index}`} 
                   resource={resource}
                 />
               ))}
             </div>
           ) : (
-            <Alert>
-              <AlertDescription>
-                No resources found in this sub-subcategory.
-              </AlertDescription>
-            </Alert>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 mb-8">
+              {paginatedResources.map((resource, index) => (
+                <ResourceCompactItem 
+                  key={`${resource.url}-${index}`} 
+                  resource={resource}
+                />
+              ))}
+            </div>
           )}
-        </div>
-      </div>
-    </>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              itemsPerPage={itemsPerPage}
+              onPageSizeChange={handlePageSizeChange}
+              totalItems={sortedResources.length}
+              pageSizeOptions={[12, 24, 48, 96]}
+            />
+          )}
+        </>
+      )}
+    </div>
   );
 }
