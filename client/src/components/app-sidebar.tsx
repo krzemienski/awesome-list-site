@@ -10,7 +10,8 @@ import {
   Server,
   Layers,
   Users,
-  Home
+  Home,
+  Palette
 } from "lucide-react"
 import { useState, useEffect } from "react"
 import { Link, useLocation } from "wouter"
@@ -35,6 +36,7 @@ import {
   SidebarTrigger
 } from "@/components/ui/sidebar"
 import { Category, Subcategory, SubSubcategory } from "@/types/awesome-list"
+import ThemeSelectorSidebar from "@/components/ui/theme-selector-sidebar"
 
 // Icons mapping for categories
 const categoryIcons: { [key: string]: any } = {
@@ -72,7 +74,7 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
     if (pathParts[1] === 'category') {
       const activeCategory = filteredCategories.find(cat => cat.slug === pathParts[2])
       if (activeCategory) {
-        setExpandedItems(prev => [...new Set([...prev, activeCategory.slug])])
+        setExpandedItems(prev => Array.from(new Set([...prev, activeCategory.slug])))
       }
     } else if (pathParts[1] === 'subcategory') {
       const activeSubcategory = pathParts[2]
@@ -80,7 +82,7 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
         cat.subcategories?.some(sub => sub.slug === activeSubcategory)
       )
       if (parentCategory) {
-        setExpandedItems(prev => [...new Set([...prev, parentCategory.slug])])
+        setExpandedItems(prev => Array.from(new Set([...prev, parentCategory.slug])))
       }
     } else if (pathParts[1] === 'sub-subcategory') {
       const activeSubSubcategory = pathParts[2]
@@ -97,7 +99,7 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
       })
       
       if (parentCategory && parentSubcategory) {
-        setExpandedItems(prev => [...new Set([...prev, parentCategory!.slug, `${parentCategory!.slug}-${parentSubcategory!.slug}`])])
+        setExpandedItems(prev => Array.from(new Set([...prev, parentCategory!.slug, `${parentCategory!.slug}-${parentSubcategory!.slug}`])))
       }
     }
   }, [location, filteredCategories])
@@ -330,6 +332,9 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
 
       <SidebarFooter>
         <SidebarMenu>
+          <SidebarMenuItem>
+            <ThemeSelectorSidebar />
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <a
