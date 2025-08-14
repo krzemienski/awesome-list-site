@@ -3,10 +3,31 @@ import { slugify } from "@/lib/utils";
 
 /**
  * Process the raw JSON data from the API into a structured AwesomeList
+ * If the server already provides categories, use those instead of recalculating
  */
 export function processAwesomeListData(data: any): AwesomeList {
   if (!data || !data.resources || !Array.isArray(data.resources)) {
     throw new Error("Invalid awesome list data format");
+  }
+  
+  // If the server already provides a properly structured categories array, use it
+  if (data.categories && Array.isArray(data.categories)) {
+    return {
+      title: data.title,
+      description: data.description,
+      repoUrl: data.repoUrl,
+      resources: data.resources,
+      categories: data.categories.map((cat: any) => ({
+        name: cat.name,
+        slug: cat.slug,
+        resources: cat.resources || [],
+        subcategories: (cat.subcategories || []).map((sub: any) => ({
+          name: sub.name,
+          slug: sub.slug,
+          resources: sub.resources || []
+        }))
+      }))
+    };
   }
   
   const resources: Resource[] = data.resources.map((resource: any) => ({

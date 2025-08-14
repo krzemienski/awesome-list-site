@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { fetchAwesomeList } from "./parser";
 import { fetchAwesomeVideoList } from "./awesome-video-parser";
 import { RecommendationEngine, UserProfile } from "./recommendation-engine";
-import { processAwesomeListData } from "../client/src/lib/parser";
+// Client-side parser not needed on server - server-side parser provides correct format
 import { fetchAwesomeLists, searchAwesomeLists } from "./github-api";
 
 const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md";
@@ -124,9 +124,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(500).json({ error: 'No awesome list data available' });
       }
       
-      // Process the data to match the expected frontend format
-      const processedData = processAwesomeListData(data);
-      res.json(processedData);
+      // Server-side parser already provides the correct format with accurate hierarchical totals
+      res.json(data);
     } catch (error) {
       console.error('Error processing awesome list:', error);
       res.status(500).json({ error: 'Failed to process awesome list' });
@@ -146,9 +145,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const data = await fetchAwesomeList(rawUrl);
       storage.setAwesomeListData(data);
       
-      const processedData = processAwesomeListData(data);
       console.log(`Successfully switched to list with ${data.resources.length} resources`);
-      res.json(processedData);
+      res.json(data);
     } catch (error) {
       console.error('Error switching list:', error);
       res.status(500).json({ error: 'Failed to switch list' });
