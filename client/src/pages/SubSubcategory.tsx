@@ -264,6 +264,7 @@ export default function SubSubcategory() {
                 <ResourceCard 
                   key={`${resource.url}-${index}`} 
                   resource={resource}
+                  index={startIndex + index}
                 />
               ))}
             </div>
