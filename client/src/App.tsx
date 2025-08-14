@@ -6,6 +6,7 @@ import { useAnalytics } from "./hooks/use-analytics";
 import { useSessionAnalytics } from "./hooks/use-session-analytics";
 import { trackKeyboardShortcut } from "./lib/analytics";
 
+import Dashboard from "@/pages/Dashboard";
 import MainLayoutNew from "@/components/layout/MainLayoutNew";
 import ErrorPage from "@/pages/ErrorPage";
 import Home from "@/pages/Home";
@@ -76,31 +77,25 @@ function Router() {
   }
 
   return (
-    <MainLayoutNew 
-      awesomeList={awesomeList} 
-      isLoading={isLoading}
-    >
-      <Switch>
-        <Route path="/" component={() => 
-          <Home 
-            awesomeList={awesomeList} 
-            isLoading={isLoading} 
-          />
-        } />
-        <Route path="/category/:slug" component={Category} />
-        <Route path="/subcategory/:slug" component={Subcategory} />
-        <Route path="/about" component={About} />
-        <Route path="/advanced" component={Advanced} />
-        <Route path="/color-palette" component={ColorPalette} />
-        <Route component={NotFound} />
-      </Switch>
-    </MainLayoutNew>
+    <Switch>
+      <Route path="/" component={Dashboard} />
+      <Route path="/dashboard" component={Dashboard} />
+      <Route path="/category/:slug" component={Category} />
+      <Route path="/subcategory/:slug" component={Subcategory} />
+      <Route path="/about" component={About} />
+      <Route path="/advanced" component={Advanced} />
+      <Route path="/color-palette" component={ColorPalette} />
+      <Route component={NotFound} />
+    </Switch>
   );
 }
 
 function App() {
-  // Initialize Google Analytics when app loads
+  // Initialize Google Analytics and dark mode when app loads
   useEffect(() => {
+    // Set dark mode as default
+    document.documentElement.classList.add('dark');
+    
     // Verify required environment variable is present
     if (!import.meta.env.VITE_GA_MEASUREMENT_ID) {
       console.warn('Missing required Google Analytics key: VITE_GA_MEASUREMENT_ID');
