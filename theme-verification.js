@@ -1,67 +1,51 @@
-// Theme verification script
-import puppeteer from 'puppeteer';
-import fs from 'fs';
+// Simple theme verification script
+const puppeteer = require('puppeteer');
 
-(async () => {
-  console.log('🚀 Starting theme verification...');
-  
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
-  });
-  
-  const page = await browser.newPage();
-  await page.setViewport({ width: 1280, height: 720 });
-  
+async function verifyTheme() {
   try {
-    // Test 1: Homepage with default rose dark theme
-    console.log('📸 Testing homepage with default rose dark theme...');
-    await page.goto('http://localhost:5000/', { waitUntil: 'networkidle2', timeout: 30000 });
-    
-    // Wait for content to load
-    await page.waitForSelector('body', { timeout: 5000 });
-    
-    // Check theme attributes
-    const themeData = await page.evaluate(() => {
-      const html = document.documentElement;
-      return {
-        hasDataTheme: html.getAttribute('data-theme'),
-        hasDarkClass: html.classList.contains('dark'),
-        primaryColor: getComputedStyle(document.body).getPropertyValue('--primary').trim(),
-        backgroundColor: getComputedStyle(document.body).backgroundColor
-      };
+    const browser = await puppeteer.launch({ 
+      headless: false,  // Show browser for visual verification
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-web-security']
     });
     
-    console.log('🎨 Theme data:', themeData);
-    await page.screenshot({ path: '/tmp/homepage-rose-dark.png', fullPage: false });
+    const page = await browser.newPage();
+    await page.setViewport({ width: 1200, height: 800 });
     
-    // Test 2: Color Palette page
-    console.log('📸 Testing Color Palette page...');
-    await page.goto('http://localhost:5000/color-palette', { waitUntil: 'networkidle2', timeout: 30000 });
-    await page.screenshot({ path: '/tmp/color-palette-rose-dark.png', fullPage: false });
+    console.log('Navigating to application...');
+    await page.goto('http://localhost:5000', { waitUntil: 'networkidle0' });
     
-    // Test 3: Try to find and click theme switcher (if available)
-    console.log('🔄 Looking for theme switcher...');
-    try {
-      const settingsButton = await page.$('button[aria-label*="Settings"], button:has(svg[data-lucide="settings"])');
-      if (settingsButton) {
-        console.log('⚙️ Found settings button, clicking...');
-        await settingsButton.click();
-        await page.waitForTimeout(1000); // Wait for dropdown/modal
-        await page.screenshot({ path: '/tmp/theme-settings-modal.png', fullPage: false });
-      } else {
-        console.log('⚠️ Settings button not found, checking for other theme controls...');
-      }
-    } catch (e) {
-      console.log('⚠️ Theme switcher interaction failed:', e.message);
+    // Take screenshot of homepage
+    await page.screenshot({ path: 'test-screenshots/01-homepage.png', fullPage: true });
+    console.log('Homepage screenshot saved');
+    
+    // Navigate to Color Palette page
+    await page.click('a[href="/color-palette"]');
+    await page.waitForSelector('h1', { timeout: 5000 });
+    
+    // Take screenshot of Color Palette page
+    await page.screenshot({ path: 'test-screenshots/02-color-palette.png', fullPage: true });
+    console.log('Color Palette page screenshot saved');
+    
+    // Check for Settings button and click it
+    const settingsButton = await page.$('button svg[class*="lucide-settings"], button[aria-label*="Settings"]');
+    if (settingsButton) {
+      await settingsButton.click();
+      await page.waitForTimeout(1000);
+      await page.screenshot({ path: 'test-screenshots/03-theme-settings.png', fullPage: true });
+      console.log('Theme settings screenshot saved');
     }
     
-    console.log('✅ Theme verification completed successfully');
-    console.log('📁 Screenshots saved to /tmp/');
-    
-  } catch (error) {
-    console.error('❌ Error during theme verification:', error.message);
-  } finally {
+    console.log('Theme verification complete - check test-screenshots folder');
     await browser.close();
+    
+    return true;
+  } catch (error) {
+    console.error('Theme verification failed:', error.message);
+    return false;
   }
-})();
+}
+
+// Run verification
+verifyTheme().then(success => {
+  process.exit(success ? 0 : 1);
+});
