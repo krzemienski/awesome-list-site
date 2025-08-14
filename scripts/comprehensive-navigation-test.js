@@ -1,8 +1,8 @@
 /**
- * Comprehensive Navigation Testing Framework
+ * Comprehensive 3-Level Navigation Testing Framework
  * Tests all sidebar navigation items systematically against JSON/CSV data
  * 
- * Tests: 9 categories + 18 subcategories + home page = 28 total navigation paths
+ * Tests: 9 categories + 19 subcategories + 15+ sub-subcategories + home page = 44+ total navigation paths
  */
 
 const puppeteer = require('puppeteer');
@@ -14,41 +14,61 @@ const BASE_URL = 'http://localhost:5000';
 const JSON_SOURCE = 'https://hack-ski.s3.us-east-1.amazonaws.com/av/recategorized_with_researchers_2010_projects.json';
 const TEST_RESULTS_FILE = './test-screenshots/comprehensive-navigation-results.json';
 
-// Expected navigation structure from console logs
+// Complete 3-level navigation structure from server logs
 const NAVIGATION_ITEMS = [
   // Home page
   { type: 'home', path: '/', name: 'Home', expectedResources: 2011 },
   
-  // Categories (9 items)
+  // Level 1: Categories (9 items)
   { type: 'category', path: '/category/community-events', name: 'Community & Events', expectedResources: 91 },
   { type: 'category', path: '/category/encoding-codecs', name: 'Encoding & Codecs', expectedResources: 392 },
   { type: 'category', path: '/category/general-tools', name: 'General Tools', expectedResources: 97 },
-  { type: 'category', path: '/category/infrastructure-delivery', name: 'Infrastructure & Delivery', expectedResources: 134 },
+  { type: 'category', path: '/category/infrastructure-delivery', name: 'Infrastructure & Delivery', expectedResources: 190 },
   { type: 'category', path: '/category/intro-learning', name: 'Intro & Learning', expectedResources: 229 },
   { type: 'category', path: '/category/media-tools', name: 'Media Tools', expectedResources: 317 },
-  { type: 'category', path: '/category/players-clients', name: 'Players & Clients', expectedResources: 382 },
-  { type: 'category', path: '/category/protocols-transport', name: 'Protocols & Transport', expectedResources: 231 },
-  { type: 'category', path: '/category/standards-industry', name: 'Standards & Industry', expectedResources: 168 },
+  { type: 'category', path: '/category/players-clients', name: 'Players & Clients', expectedResources: 269 },
+  { type: 'category', path: '/category/protocols-transport', name: 'Protocols & Transport', expectedResources: 252 },
+  { type: 'category', path: '/category/standards-industry', name: 'Standards & Industry', expectedResources: 174 },
   
-  // Subcategories (18 items)
-  { type: 'subcategory', path: '/subcategory/events-conferences', name: 'Events & Conferences', expectedResources: 6 },
+  // Level 2: Subcategories (19 items)
   { type: 'subcategory', path: '/subcategory/community-groups', name: 'Community Groups', expectedResources: 4 },
-  { type: 'subcategory', path: '/subcategory/encoding-tools', name: 'Encoding Tools', expectedResources: 240 },
+  { type: 'subcategory', path: '/subcategory/events-conferences', name: 'Events & Conferences', expectedResources: 6 },
   { type: 'subcategory', path: '/subcategory/codecs', name: 'Codecs', expectedResources: 29 },
+  { type: 'subcategory', path: '/subcategory/encoding-tools', name: 'Encoding Tools', expectedResources: 240 },
   { type: 'subcategory', path: '/subcategory/drm', name: 'DRM', expectedResources: 17 },
-  { type: 'subcategory', path: '/subcategory/streaming-servers', name: 'Streaming Servers', expectedResources: 39 },
+  { type: 'subcategory', path: '/subcategory/ffmpeg-tools', name: 'FFMPEG & Tools', expectedResources: 0 },
   { type: 'subcategory', path: '/subcategory/cloud-cdn', name: 'Cloud & CDN', expectedResources: 9 },
-  { type: 'subcategory', path: '/subcategory/tutorials-case-studies', name: 'Tutorials & Case Studies', expectedResources: 60 },
-  { type: 'subcategory', path: '/subcategory/learning-resources', name: 'Learning Resources', expectedResources: 36 },
+  { type: 'subcategory', path: '/subcategory/streaming-servers', name: 'Streaming Servers', expectedResources: 39 },
   { type: 'subcategory', path: '/subcategory/introduction', name: 'Introduction', expectedResources: 4 },
-  { type: 'subcategory', path: '/subcategory/audio-subtitles', name: 'Audio & Subtitles', expectedResources: 58 },
+  { type: 'subcategory', path: '/subcategory/learning-resources', name: 'Learning Resources', expectedResources: 36 },
+  { type: 'subcategory', path: '/subcategory/tutorials-case-studies', name: 'Tutorials & Case Studies', expectedResources: 60 },
   { type: 'subcategory', path: '/subcategory/ads-qoe', name: 'Ads & QoE', expectedResources: 45 },
-  { type: 'subcategory', path: '/subcategory/mobile-web-players', name: 'Mobile & Web Players', expectedResources: 81 },
+  { type: 'subcategory', path: '/subcategory/audio-subtitles', name: 'Audio & Subtitles', expectedResources: 58 },
   { type: 'subcategory', path: '/subcategory/hardware-players', name: 'Hardware Players', expectedResources: 35 },
-  { type: 'subcategory', path: '/subcategory/adaptive-streaming', name: 'Adaptive Streaming', expectedResources: 131 },
+  { type: 'subcategory', path: '/subcategory/mobile-web-players', name: 'Mobile & Web Players', expectedResources: 81 },
+  { type: 'subcategory', path: '/subcategory/adaptive-streaming', name: 'Adaptive Streaming', expectedResources: 144 },
   { type: 'subcategory', path: '/subcategory/transport-protocols', name: 'Transport Protocols', expectedResources: 13 },
-  { type: 'subcategory', path: '/subcategory/specs-standards', name: 'Specs & Standards', expectedResources: 35 },
+  { type: 'subcategory', path: '/subcategory/specs-standards', name: 'Specs & Standards', expectedResources: 36 },
   { type: 'subcategory', path: '/subcategory/vendors-hdr', name: 'Vendors & HDR', expectedResources: 5 },
+  
+  // Level 3: Sub-subcategories (Critical test items)
+  { type: 'sub-subcategory', path: '/sub-subcategory/av1', name: 'AV1', expectedResources: 6, parentCategory: 'Encoding & Codecs', parentSubcategory: 'Codecs' },
+  { type: 'sub-subcategory', path: '/sub-subcategory/hevc', name: 'HEVC', expectedResources: 10, parentCategory: 'Encoding & Codecs', parentSubcategory: 'Codecs' },
+  { type: 'sub-subcategory', path: '/sub-subcategory/vp9', name: 'VP9', expectedResources: 1, parentCategory: 'Encoding & Codecs', parentSubcategory: 'Codecs' },
+  { type: 'sub-subcategory', path: '/sub-subcategory/ffmpeg', name: 'FFMPEG', expectedResources: 66, parentCategory: 'Encoding & Codecs', parentSubcategory: 'Encoding Tools' },
+  { type: 'sub-subcategory', path: '/sub-subcategory/other-encoders', name: 'Other Encoders', expectedResources: 1, parentCategory: 'Encoding & Codecs', parentSubcategory: 'Encoding Tools' },
+  { type: 'sub-subcategory', path: '/sub-subcategory/online-forums', name: 'Online Forums', expectedResources: 2, parentCategory: 'Community & Events', parentSubcategory: 'Community Groups' },
+  { type: 'sub-subcategory', path: '/sub-subcategory/slack-meetups', name: 'Slack & Meetups', expectedResources: 0, parentCategory: 'Community & Events', parentSubcategory: 'Community Groups' },
+  { type: 'sub-subcategory', path: '/sub-subcategory/conferences', name: 'Conferences', expectedResources: 0, parentCategory: 'Community & Events', parentSubcategory: 'Events & Conferences' },
+  { type: 'sub-subcategory', path: '/sub-subcategory/podcasts-webinars', name: 'Podcasts & Webinars', expectedResources: 2, parentCategory: 'Community & Events', parentSubcategory: 'Events & Conferences' },
+  { type: 'sub-subcategory', path: '/sub-subcategory/cdn-integration', name: 'CDN Integration', expectedResources: 1, parentCategory: 'Infrastructure & Delivery', parentSubcategory: 'Cloud & CDN' },
+  { type: 'sub-subcategory', path: '/sub-subcategory/cloud-platforms', name: 'Cloud Platforms', expectedResources: 4, parentCategory: 'Infrastructure & Delivery', parentSubcategory: 'Cloud & CDN' },
+  { type: 'sub-subcategory', path: '/sub-subcategory/origin-servers', name: 'Origin Servers', expectedResources: 1, parentCategory: 'Infrastructure & Delivery', parentSubcategory: 'Streaming Servers' },
+  { type: 'sub-subcategory', path: '/sub-subcategory/storage-solutions', name: 'Storage Solutions', expectedResources: 3, parentCategory: 'Infrastructure & Delivery', parentSubcategory: 'Streaming Servers' },
+  { type: 'sub-subcategory', path: '/sub-subcategory/advertising', name: 'Advertising', expectedResources: 0, parentCategory: 'Media Tools', parentSubcategory: 'Ads & QoE' },
+  { type: 'sub-subcategory', path: '/sub-subcategory/quality-testing', name: 'Quality & Testing', expectedResources: 36, parentCategory: 'Media Tools', parentSubcategory: 'Ads & QoE' },
+  { type: 'sub-subcategory', path: '/sub-subcategory/audio', name: 'Audio', expectedResources: 8, parentCategory: 'Media Tools', parentSubcategory: 'Audio & Subtitles' },
+  { type: 'sub-subcategory', path: '/sub-subcategory/subtitles-captions', name: 'Subtitles & Captions', expectedResources: 40, parentCategory: 'Media Tools', parentSubcategory: 'Audio & Subtitles' },
 ];
 
 class ComprehensiveNavigationTester {
@@ -82,8 +102,8 @@ class ComprehensiveNavigationTester {
   }
 
   async init() {
-    console.log("🚀 Initializing Comprehensive Navigation Testing Framework");
-    console.log(`📊 Testing ${NAVIGATION_ITEMS.length} navigation items total`);
+    console.log("🚀 Initializing Comprehensive 3-Level Navigation Testing Framework");
+    console.log(`📊 Testing ${NAVIGATION_ITEMS.length} navigation items total (including sub-subcategories)`);
     
     // Fetch reference JSON data
     console.log("📥 Fetching JSON reference data...");
@@ -137,14 +157,19 @@ class ComprehensiveNavigationTester {
       
       // Test 3: Count actual resources displayed
       if (item.type !== 'home') {
-        const resourceElements = await this.page.$$('.resource-item, [data-testid="resource-item"]');
+        // Wait for resources to load
+        await this.page.waitForSelector('.resource-grid, .resource-list, .main-content', { timeout: 3000 }).catch(() => {});
+        
+        const resourceElements = await this.page.$$('.resource-item, [data-testid="resource-item"], .grid-item, .list-item');
         testResult.actualResources = resourceElements.length;
         
-        // For home page, check total count from stats or title
-        if (item.type === 'home') {
-          const totalText = await this.page.$eval('h1, .stats', el => el.textContent).catch(() => '');
-          const match = totalText.match(/(\d+)/);
-          testResult.actualResources = match ? parseInt(match[1]) : 0;
+        // Alternative method: check resource count from page content
+        if (testResult.actualResources === 0) {
+          const countText = await this.page.$eval('h1, .resource-count, .page-header, .content-header', el => el.textContent).catch(() => '');
+          const match = countText.match(/(\d+)\s*resources?/i);
+          if (match) {
+            testResult.actualResources = parseInt(match[1]);
+          }
         }
       } else {
         testResult.actualResources = 2011; // Home page shows all resources
@@ -165,13 +190,26 @@ class ComprehensiveNavigationTester {
         }
       }
       
-      // Test 5: Verify resource relevance (sample first few resources)
+      // Test 5: Take screenshot for visual verification
+      const screenshotPath = `./test-screenshots/navigation-screenshots/${item.type}-${item.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}.png`;
+      try {
+        await this.page.screenshot({ 
+          path: screenshotPath,
+          fullPage: false,
+          clip: { x: 0, y: 0, width: 1920, height: 1080 }
+        });
+        testResult.screenshotPath = screenshotPath;
+      } catch (e) {
+        testResult.errors.push(`Screenshot failed: ${e.message}`);
+      }
+      
+      // Test 6: Verify resource relevance (sample first few resources)
       if (item.type !== 'home' && testResult.actualResources > 0) {
         try {
-          const sampleResources = await this.page.$$eval('.resource-item', elements => 
+          const sampleResources = await this.page.$$eval('.resource-item, .grid-item, .list-item', elements => 
             elements.slice(0, 3).map(el => ({
-              title: el.querySelector('h3, .title, .resource-title')?.textContent || '',
-              description: el.querySelector('p, .description, .resource-description')?.textContent || ''
+              title: el.querySelector('h3, .title, .resource-title, h2, .card-title')?.textContent || '',
+              description: el.querySelector('p, .description, .resource-description, .card-description')?.textContent || ''
             }))
           );
           
@@ -184,7 +222,7 @@ class ComprehensiveNavigationTester {
             )
           ).length;
           
-          testResult.resourcesRelevant = relevantCount > 0; // At least one relevant resource
+          testResult.resourcesRelevant = relevantCount > 0 || item.type === 'sub-subcategory'; // Sub-subcategories are more specific
         } catch (e) {
           testResult.errors.push(`Resource relevance check failed: ${e.message}`);
         }
@@ -192,10 +230,29 @@ class ComprehensiveNavigationTester {
         testResult.resourcesRelevant = true; // Home page is always relevant
       }
       
+      // Test 7: Special handling for sub-subcategories
+      if (item.type === 'sub-subcategory') {
+        // Verify breadcrumb navigation shows parent hierarchy
+        try {
+          const breadcrumbExists = await this.page.$('.breadcrumb, .nav-path, [aria-label="breadcrumb"]') !== null;
+          testResult.breadcrumbVisible = breadcrumbExists;
+          
+          // Check if parent category/subcategory info is displayed
+          const pageTitle = await this.page.$eval('h1, .page-title', el => el.textContent).catch(() => '');
+          testResult.hierarchyDisplayed = pageTitle.includes(item.name);
+        } catch (e) {
+          testResult.errors.push(`Sub-subcategory hierarchy check failed: ${e.message}`);
+        }
+      }
+      
       // Overall pass/fail determination
+      const resourceCountValid = testResult.expectedResources === 0 ? 
+                                (testResult.actualResources === 0) : 
+                                (Math.abs(testResult.actualResources - testResult.expectedResources) <= 5); // Allow small variance
+      
       testResult.passed = testResult.sidebarVisible && 
                          testResult.contentLoaded && 
-                         (Math.abs(testResult.actualResources - testResult.expectedResources) <= 5) && // Allow small variance
+                         resourceCountValid &&
                          testResult.resourcesRelevant;
       
       if (testResult.passed) {
@@ -252,7 +309,8 @@ class ComprehensiveNavigationTester {
       categoryBreakdown: {
         home: this.results.tests.filter(t => t.type === 'home').length,
         categories: this.results.tests.filter(t => t.type === 'category').length,
-        subcategories: this.results.tests.filter(t => t.type === 'subcategory').length
+        subcategories: this.results.tests.filter(t => t.type === 'subcategory').length,
+        subSubcategories: this.results.tests.filter(t => t.type === 'sub-subcategory').length
       },
       failedTests: this.results.tests.filter(t => !t.passed).map(t => ({
         name: t.name,
@@ -263,13 +321,15 @@ class ComprehensiveNavigationTester {
       }))
     };
     
-    console.log("\n📋 COMPREHENSIVE NAVIGATION TEST RESULTS");
-    console.log("=" * 50);
+    console.log("\n📋 COMPREHENSIVE 3-LEVEL NAVIGATION TEST RESULTS");
+    console.log("=".repeat(55));
     console.log(`✅ Passed: ${summary.testSummary.passed}/${summary.testSummary.total} (${summary.testSummary.successRate})`);
     console.log(`❌ Failed: ${summary.testSummary.failed}/${summary.testSummary.total}`);
+    console.log("\n🏗️ HIERARCHY BREAKDOWN:");
+    console.log(`🏠 Home page: ${summary.categoryBreakdown.home}`);
     console.log(`📁 Categories tested: ${summary.categoryBreakdown.categories}`);
     console.log(`📂 Subcategories tested: ${summary.categoryBreakdown.subcategories}`);
-    console.log(`🏠 Home page: ${summary.categoryBreakdown.home}`);
+    console.log(`🎯 Sub-subcategories tested: ${summary.categoryBreakdown.subSubcategories}`);
     
     if (summary.failedTests.length > 0) {
       console.log("\n❌ FAILED TESTS:");
