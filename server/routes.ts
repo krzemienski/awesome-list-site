@@ -104,6 +104,85 @@ function generateOpenGraphImage(req: any, res: any) {
   }
 }
 
+// Helper functions to convert slugs back to original titles
+function getCategoryTitleFromSlug(slug: string): string {
+  const categoryMap: { [key: string]: string } = {
+    'community-events': 'Community & Events',
+    'encoding-codecs': 'Encoding & Codecs',
+    'general-tools': 'General Tools',
+    'infrastructure-delivery': 'Infrastructure & Delivery',
+    'intro-learning': 'Intro & Learning',
+    'media-tools': 'Media Tools',
+    'players-clients': 'Players & Clients',
+    'protocols-transport': 'Protocols & Transport',
+    'standards-industry': 'Standards & Industry'
+  };
+  return categoryMap[slug] || slug;
+}
+
+function getSubcategoryTitleFromSlug(slug: string): string {
+  const subcategoryMap: { [key: string]: string } = {
+    'community-groups': 'Community Groups',
+    'events-conferences': 'Events & Conferences',
+    'codecs': 'Codecs',
+    'encoding-tools': 'Encoding Tools',
+    'drm': 'DRM',
+    'ffmpeg-tools': 'FFMPEG & Tools',
+    'cloud-cdn': 'Cloud & CDN',
+    'streaming-servers': 'Streaming Servers',
+    'introduction': 'Introduction',
+    'learning-resources': 'Learning Resources',
+    'tutorials-case-studies': 'Tutorials & Case Studies',
+    'ads-qoe': 'Ads & QoE',
+    'audio-subtitles': 'Audio & Subtitles',
+    'hardware-players': 'Hardware Players',
+    'mobile-web-players': 'Mobile & Web Players',
+    'adaptive-streaming': 'Adaptive Streaming',
+    'transport-protocols': 'Transport Protocols',
+    'specs-standards': 'Specs & Standards',
+    'vendors-hdr': 'Vendors & HDR'
+  };
+  return subcategoryMap[slug] || slug;
+}
+
+function getSubSubcategoryTitleFromSlug(slug: string): string {
+  const subSubcategoryMap: { [key: string]: string } = {
+    'online-forums': 'Online Forums',
+    'slack-meetups': 'Slack & Meetups',
+    'conferences': 'Conferences',
+    'podcasts-webinars': 'Podcasts & Webinars',
+    'av1': 'AV1',
+    'hevc': 'HEVC',
+    'vp9': 'VP9',
+    'ffmpeg': 'FFMPEG',
+    'other-encoders': 'Other Encoders',
+    'cdn-integration': 'CDN Integration',
+    'cloud-platforms': 'Cloud Platforms',
+    'origin-servers': 'Origin Servers',
+    'storage-solutions': 'Storage Solutions',
+    'advertising': 'Advertising',
+    'quality-testing': 'Quality & Testing',
+    'audio': 'Audio',
+    'subtitles-captions': 'Subtitles & Captions',
+    'chromecast': 'Chromecast',
+    'roku': 'Roku',
+    'smart-tv': 'Smart TVs',
+    'android': 'Android',
+    'ios-tvos': 'iOS/tvOS',
+    'web-players': 'Web Players',
+    'dash': 'DASH',
+    'hls': 'HLS',
+    'rist': 'RIST',
+    'rtmp': 'RTMP',
+    'srt': 'SRT',
+    'mpeg-forums': 'MPEG & Forums',
+    'official-specs': 'Official Specs',
+    'hdr-guidelines': 'HDR Guidelines',
+    'vendor-docs': 'Vendor Docs'
+  };
+  return subSubcategoryMap[slug] || slug;
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize awesome video data
   try {
@@ -123,9 +202,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!data) {
         return res.status(500).json({ error: 'No awesome list data available' });
       }
+
+      // Extract query parameters for filtering
+      const { category, subcategory, subSubcategory } = req.query;
       
-      // Server-side parser already provides the correct format with accurate hierarchical totals
-      res.json(data);
+      let filteredResources = data.resources;
+
+      // Apply filtering based on query parameters
+      if (category) {
+        // Convert category slug back to title for filtering
+        const categoryTitle = getCategoryTitleFromSlug(category as string);
+        filteredResources = filteredResources.filter((resource: any) => 
+          resource.category === categoryTitle
+        );
+        console.log(`📁 Filtered by category "${categoryTitle}": ${filteredResources.length} resources`);
+      }
+
+      if (subcategory) {
+        // Convert subcategory slug back to title for filtering
+        const subcategoryTitle = getSubcategoryTitleFromSlug(subcategory as string);
+        filteredResources = filteredResources.filter((resource: any) => 
+          resource.subcategory === subcategoryTitle
+        );
+        console.log(`📂 Filtered by subcategory "${subcategoryTitle}": ${filteredResources.length} resources`);
+      }
+
+      if (subSubcategory) {
+        // Convert sub-subcategory slug back to title for filtering
+        const subSubcategoryTitle = getSubSubcategoryTitleFromSlug(subSubcategory as string);
+        filteredResources = filteredResources.filter((resource: any) => 
+          resource.subSubcategory === subSubcategoryTitle
+        );
+        console.log(`🎯 Filtered by sub-subcategory "${subSubcategoryTitle}": ${filteredResources.length} resources`);
+      }
+
+      // Return filtered data
+      const filteredData = {
+        ...data,
+        resources: filteredResources
+      };
+      
+      res.json(filteredData);
     } catch (error) {
       console.error('Error processing awesome list:', error);
       res.status(500).json({ error: 'Failed to process awesome list' });
