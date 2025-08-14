@@ -1,0 +1,411 @@
+/* COMPREHENSIVE MOBILE FIX - PRODUCTION READY */
+
+/* =================================================================
+   CRITICAL FIX 1: FORCE OPAQUE BACKGROUNDS ON ALL ELEMENTS
+   ================================================================= */
+
+/* Light mode backgrounds */
+:root {
+  --solid-background: #ffffff;
+  --solid-card: #ffffff;
+  --solid-popover: #ffffff;
+  --solid-primary: #8b5cf6;
+  --solid-secondary: #f4f4f5;
+  --solid-border: #e4e4e7;
+}
+
+/* Dark mode backgrounds */
+.dark {
+  --solid-background: #0a0a0b;
+  --solid-card: #18181b;
+  --solid-popover: #18181b;
+  --solid-primary: #8b5cf6;
+  --solid-secondary: #27272a;
+  --solid-border: rgba(255, 255, 255, 0.1);
+}
+
+/* Force opaque backgrounds on ALL interactive elements */
+button,
+[role="button"],
+[role="combobox"],
+[role="menu"],
+[role="listbox"],
+.bg-popover,
+.bg-background,
+.bg-card {
+  background-color: var(--solid-card) !important;
+  opacity: 1 !important;
+}
+
+/* Dark mode specific */
+.dark button,
+.dark [role="button"],
+.dark [role="combobox"],
+.dark [role="menu"],
+.dark [role="listbox"] {
+  background-color: var(--solid-card) !important;
+  border: 1px solid var(--solid-border) !important;
+}
+
+/* Primary buttons */
+button.bg-primary,
+.dark button.bg-primary {
+  background-color: var(--solid-primary) !important;
+  color: white !important;
+}
+
+/* Dropdown content */
+[data-radix-popper-content-wrapper] > div,
+[data-state="open"][role="menu"],
+.z-50[role="listbox"] {
+  background-color: var(--solid-popover) !important;
+  border: 2px solid var(--solid-border) !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+}
+
+.dark [data-radix-popper-content-wrapper] > div,
+.dark [data-state="open"][role="menu"],
+.dark .z-50[role="listbox"] {
+  background-color: var(--solid-popover) !important;
+  border: 2px solid var(--solid-border) !important;
+}
+
+/* =================================================================
+   CRITICAL FIX 2: MOBILE LAYOUT RESTRUCTURING
+   ================================================================= */
+
+@media (max-width: 768px) {
+  /* Fix header */
+  header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 100 !important;
+    background-color: var(--solid-background) !important;
+    border-bottom: 1px solid var(--solid-border) !important;
+  }
+
+  /* Fix main container */
+  .container,
+  main {
+    padding: 12px !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Fix search bar */
+  input[type="search"],
+  input[type="text"],
+  [role="combobox"] {
+    width: 100% !important;
+    min-height: 48px !important;
+    font-size: 16px !important; /* Prevents zoom on iOS */
+    padding: 12px !important;
+    background-color: var(--solid-background) !important;
+    border: 2px solid var(--solid-border) !important;
+  }
+
+  /* Category/Sort dropdowns */
+  select,
+  [role="combobox"] button {
+    min-height: 48px !important;
+    padding: 12px !important;
+    background-color: var(--solid-card) !important;
+    border: 2px solid var(--solid-border) !important;
+    font-size: 14px !important;
+  }
+
+  /* =================================================================
+     CRITICAL FIX 3: RESOURCE CARDS TEXT OVERLAP
+     ================================================================= */
+  
+  /* Resource cards container */
+  .grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+    padding: 0 !important;
+  }
+
+  /* Resource card */
+  [data-testid="resource-card"] {
+    width: 100% !important;
+    margin: 0 !important;
+  }
+
+  /* Card content */
+  [data-testid="resource-card"] .p-4,
+  [data-testid="resource-card"] .p-6 {
+    padding: 16px !important;
+  }
+
+  /* Title - prevent overlap */
+  [data-testid="resource-card"] h3 {
+    font-size: 16px !important;
+    line-height: 1.4 !important;
+    margin-bottom: 8px !important;
+    max-width: 100% !important;
+  }
+
+  [data-testid="resource-card"] h3 a {
+    display: block !important;
+    word-break: break-word !important;
+    hyphens: auto !important;
+    overflow-wrap: break-word !important;
+  }
+
+  /* Description - prevent overlap */
+  [data-testid="resource-card"] p {
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+    word-break: break-word !important;
+    hyphens: auto !important;
+    margin-bottom: 8px !important;
+  }
+
+  /* Line clamp fixes */
+  .line-clamp-2 {
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-height: 3em !important;
+  }
+
+  /* Tags/badges */
+  [data-testid="resource-card"] .text-xs {
+    font-size: 11px !important;
+    padding: 4px 8px !important;
+    max-width: 100px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  /* =================================================================
+     CRITICAL FIX 4: BUTTON AND INTERACTIVE ELEMENTS
+     ================================================================= */
+
+  /* All buttons must be visible and touchable */
+  button,
+  a[role="button"],
+  [role="button"] {
+    min-height: 44px !important;
+    min-width: 44px !important;
+    padding: 8px 16px !important;
+    font-size: 14px !important;
+    background-color: var(--solid-card) !important;
+    border: 1px solid var(--solid-border) !important;
+    cursor: pointer !important;
+    touch-action: manipulation !important;
+  }
+
+  /* Icon buttons */
+  button[aria-label],
+  button.h-10.w-10,
+  button.h-9.w-9 {
+    width: 44px !important;
+    height: 44px !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* Layout switcher buttons */
+  [role="group"] button {
+    min-width: 44px !important;
+    min-height: 44px !important;
+    background-color: var(--solid-card) !important;
+    border: 1px solid var(--solid-border) !important;
+  }
+
+  /* Active/selected state */
+  button[aria-pressed="true"],
+  button.bg-accent {
+    background-color: var(--solid-primary) !important;
+    color: white !important;
+  }
+
+  /* =================================================================
+     CRITICAL FIX 5: NAVIGATION AND HEADER
+     ================================================================= */
+
+  /* Top bar */
+  .h-14 {
+    height: 56px !important;
+    padding: 8px 12px !important;
+  }
+
+  /* Logo and title */
+  .font-bold {
+    font-size: 16px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 120px !important;
+  }
+
+  /* Search button in header */
+  button[aria-label="Search"] {
+    flex: 1 !important;
+    max-width: none !important;
+    justify-content: flex-start !important;
+    padding-left: 12px !important;
+    background-color: var(--solid-background) !important;
+  }
+
+  /* =================================================================
+     CRITICAL FIX 6: SIDEBAR AND MODALS
+     ================================================================= */
+
+  /* Mobile sidebar overlay */
+  .fixed.inset-0.bg-black\/50 {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    backdrop-filter: blur(4px) !important;
+  }
+
+  /* Sidebar content */
+  [role="dialog"][data-state="open"] {
+    background-color: var(--solid-background) !important;
+    border-right: 1px solid var(--solid-border) !important;
+  }
+
+  /* Theme selector button */
+  .fixed.bottom-4.right-4 {
+    bottom: 20px !important;
+    right: 20px !important;
+    z-index: 90 !important;
+  }
+
+  /* =================================================================
+     CRITICAL FIX 7: FORMS AND INPUTS
+     ================================================================= */
+
+  /* All form inputs */
+  input,
+  textarea,
+  select {
+    min-height: 48px !important;
+    font-size: 16px !important;
+    padding: 12px !important;
+    background-color: var(--solid-background) !important;
+    border: 2px solid var(--solid-border) !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+  }
+
+  /* Checkbox and radio */
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-width: 24px !important;
+    min-height: 24px !important;
+  }
+
+  /* =================================================================
+     CRITICAL FIX 8: SPACING AND OVERFLOW
+     ================================================================= */
+
+  /* Prevent horizontal scroll */
+  html,
+  body {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+  }
+
+  /* Fix flex containers */
+  .flex {
+    flex-wrap: wrap !important;
+  }
+
+  .flex.items-center.justify-between {
+    gap: 8px !important;
+  }
+
+  /* Space between elements */
+  .space-y-4 > * + * {
+    margin-top: 16px !important;
+  }
+
+  .gap-2 {
+    gap: 8px !important;
+  }
+
+  .gap-4 {
+    gap: 16px !important;
+  }
+}
+
+/* =================================================================
+   TABLET SPECIFIC (768px - 1024px)
+   ================================================================= */
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .container {
+    padding: 20px !important;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 20px !important;
+  }
+
+  button {
+    min-height: 40px !important;
+    min-width: 40px !important;
+  }
+}
+
+/* =================================================================
+   ACCESSIBILITY AND PERFORMANCE
+   ================================================================= */
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  button,
+  [role="button"],
+  [role="menu"],
+  input,
+  select {
+    border: 3px solid currentColor !important;
+  }
+}
+
+/* Focus states */
+*:focus-visible {
+  outline: 3px solid var(--solid-primary) !important;
+  outline-offset: 2px !important;
+  z-index: 999 !important;
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Touch feedback */
+@media (hover: none) and (pointer: coarse) {
+  button:active,
+  a:active,
+  [role="button"]:active {
+    transform: scale(0.98) !important;
+    opacity: 0.9 !important;
+  }
+}
+
+/* Performance optimization for mobile */
+@media (max-width: 768px) {
+  * {
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+  }
+  
+  img,
+  video {
+    will-change: auto !important;
+  }
+}
