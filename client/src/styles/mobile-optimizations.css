@@ -98,8 +98,48 @@
   [data-radix-dialog-content] {
     max-width: calc(100vw - 1rem);
     max-height: 95vh;
-    margin: 0.5rem;
+    width: 95vw;
+    margin: auto;
     overflow-y: auto;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+  
+  /* Ensure mobile-optimized dialogs are properly centered */
+  [data-radix-dialog-content][data-mobile-optimized="true"] {
+    left: 50% !important;
+    right: auto !important;
+    transform: translate(-50%, -50%) !important;
+    max-width: min(95vw, 28rem) !important;
+  }
+  
+  /* Fix for all dialogs on mobile to prevent off-screen rendering */
+  [data-radix-dialog-content] {
+    --dialog-width: calc(100vw - 2rem);
+    width: var(--dialog-width) !important;
+    max-width: min(var(--dialog-width), 32rem) !important;
+    left: 50% !important;
+    transform: translateX(-50%) translateY(-50%) !important;
+  }
+  
+  /* Sidebar fixes for mobile */
+  [data-sidebar] {
+    z-index: 50;
+  }
+  
+  /* Ensure content doesn't overflow on mobile */
+  .grid {
+    width: 100%;
+    overflow-x: hidden;
+  }
+  
+  /* Resource cards should be touch-friendly */
+  [data-testid="resource-card"] {
+    min-height: 60px;
+    padding: 0.75rem;
+    touch-action: manipulation;
   }
 
   /* Improve sheet behavior on mobile */
@@ -159,6 +199,22 @@ button,
       left: 0.5rem !important;
       right: 0.5rem !important;
       transform: none !important;
+    }
+    
+    /* Fix dialog positioning on mobile */
+    [data-radix-dialog-overlay] {
+      position: fixed;
+      inset: 0;
+    }
+    
+    [data-radix-dialog-content] {
+      position: fixed !important;
+      left: 50% !important;
+      top: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      width: calc(100vw - 1rem) !important;
+      max-width: 28rem !important;
+      margin: 0 !important;
     }
   }
 
