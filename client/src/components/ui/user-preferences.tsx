@@ -128,12 +128,16 @@ export default function UserPreferences({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="flex items-center gap-2">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="flex items-center gap-2 touch-optimized min-h-[44px] sm:min-h-auto"
+        >
           <Settings className="h-4 w-4" />
           Preferences
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden">
+      <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden touch-optimized">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Brain className="h-5 w-5" />
@@ -147,19 +151,19 @@ export default function UserPreferences({
         <ScrollArea className="h-[60vh] pr-4">
           <Tabs defaultValue="profile" className="w-full">
             <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="profile" className="flex items-center gap-1">
+              <TabsTrigger value="profile" className="flex items-center gap-1 touch-optimized min-h-[44px] sm:min-h-auto">
                 <User className="h-3 w-3" />
                 Profile
               </TabsTrigger>
-              <TabsTrigger value="categories" className="flex items-center gap-1">
+              <TabsTrigger value="categories" className="flex items-center gap-1 touch-optimized min-h-[44px] sm:min-h-auto">
                 <BookOpen className="h-3 w-3" />
                 Interests
               </TabsTrigger>
-              <TabsTrigger value="goals" className="flex items-center gap-1">
+              <TabsTrigger value="goals" className="flex items-center gap-1 touch-optimized min-h-[44px] sm:min-h-auto">
                 <Target className="h-3 w-3" />
                 Goals
               </TabsTrigger>
-              <TabsTrigger value="preferences" className="flex items-center gap-1">
+              <TabsTrigger value="preferences" className="flex items-center gap-1 touch-optimized min-h-[44px] sm:min-h-auto">
                 <Clock className="h-3 w-3" />
                 Style
               </TabsTrigger>

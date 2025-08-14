@@ -1,0 +1,171 @@
+/* Mobile Touch Optimizations */
+
+/* Prevent touch callouts and text selection on interactive elements */
+.touch-optimized {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Improve touch targets for mobile */
+@media (max-width: 768px) {
+  /* Larger touch targets for buttons */
+  button:not(.btn-compact) {
+    min-height: 44px !important;
+    min-width: 44px !important;
+    padding: 0.5rem 1rem !important;
+    touch-action: manipulation;
+  }
+
+  /* Larger touch targets for select triggers */
+  [data-radix-select-trigger] {
+    min-height: 44px !important;
+    touch-action: manipulation;
+  }
+
+  /* Larger touch targets for tabs */
+  [data-radix-tabs-trigger] {
+    min-height: 44px !important;
+    padding: 0.5rem 1rem !important;
+    touch-action: manipulation;
+  }
+
+  /* Prevent zoom on input focus */
+  input[type="text"],
+  input[type="search"],
+  input[type="email"],
+  input[type="password"],
+  textarea,
+  select {
+    font-size: 16px !important;
+    touch-action: manipulation;
+  }
+
+  /* Improve scroll behavior for popovers and dropdowns */
+  [data-radix-popover-content],
+  [data-radix-dropdown-menu-content] {
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Prevent popovers from closing on scroll inside content */
+  [data-radix-popover-content] {
+    touch-action: pan-y;
+  }
+
+  /* Better spacing for mobile resource cards */
+  .mobile-resource-card {
+    min-height: 60px;
+    padding: 1rem;
+    touch-action: manipulation;
+  }
+
+  /* Improve mobile layout for control buttons */
+  .mobile-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  .mobile-controls > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  /* Better mobile navigation */
+  .mobile-nav-button {
+    min-height: 48px;
+    min-width: 48px;
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+  }
+
+  /* Improve popover positioning on mobile */
+  [data-radix-popover-content] {
+    max-width: calc(100vw - 2rem);
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+
+  /* Better dialog sizing on mobile */
+  [data-radix-dialog-content] {
+    max-width: calc(100vw - 1rem);
+    max-height: 95vh;
+    margin: 0.5rem;
+    overflow-y: auto;
+  }
+
+  /* Improve sheet behavior on mobile */
+  [data-radix-dialog-content][data-state="open"] {
+    animation-duration: 0.3s;
+  }
+}
+
+/* Prevent text selection on buttons and interactive elements */
+button,
+[role="button"],
+[data-radix-select-trigger],
+[data-radix-dropdown-menu-trigger],
+[data-radix-popover-trigger],
+[data-radix-tabs-trigger] {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Better focus states for mobile */
+@media (max-width: 768px) {
+  *:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  /* Remove hover states on mobile */
+  @media (hover: none) {
+    .hover\:bg-accent:hover {
+      background-color: transparent;
+    }
+    
+    .hover\:bg-accent\/50:hover {
+      background-color: transparent;
+    }
+  }
+}
+
+/* Scroll lock for mobile modals */
+.scroll-lock {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
+/* Mobile-specific popover improvements */
+@media (max-width: 768px) {
+  /* Make popovers full-width on very small screens */
+  @media (max-width: 480px) {
+    [data-radix-popover-content] {
+      width: calc(100vw - 1rem);
+      margin: 0.5rem;
+      left: 0.5rem !important;
+      right: 0.5rem !important;
+      transform: none !important;
+    }
+  }
+
+  /* Improve touch scrolling */
+  .scroll-area,
+  [data-radix-scroll-area-viewport] {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+}
