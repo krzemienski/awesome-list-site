@@ -1,78 +1,88 @@
 {
-  "timestamp": "2025-08-14T06:14:59.485Z",
+  "timestamp": "2025-08-14T06:20:30.944Z",
   "totalTests": 60,
   "passed": 35,
   "failed": 25,
   "discrepancies": [
     {
-      "type": "category",
-      "name": "Infrastructure & Delivery",
-      "expected": 134,
-      "actual": 190,
-      "difference": 56
-    },
-    {
-      "type": "category",
-      "name": "Players & Clients",
-      "expected": 425,
-      "actual": 269,
-      "difference": -156
-    },
-    {
       "type": "subcategory",
       "name": "Cloud & CDN",
       "parent": "Infrastructure & Delivery",
       "expected": 54,
-      "actual": 9,
-      "difference": -45
+      "actual": 69,
+      "difference": 15
+    },
+    {
+      "type": "subcategory",
+      "name": "Streaming Servers",
+      "parent": "Infrastructure & Delivery",
+      "expected": 39,
+      "actual": 65,
+      "difference": 26
+    },
+    {
+      "type": "subcategory",
+      "name": "Ads & QoE",
+      "parent": "Media Tools",
+      "expected": 45,
+      "actual": 181,
+      "difference": 136
+    },
+    {
+      "type": "subcategory",
+      "name": "Audio & Subtitles",
+      "parent": "Media Tools",
+      "expected": 58,
+      "actual": 136,
+      "difference": 78
     },
     {
       "type": "subcategory",
       "name": "Hardware Players",
       "parent": "Players & Clients",
       "expected": 63,
-      "actual": 35,
-      "difference": -28
+      "actual": 140,
+      "difference": 77
     },
     {
       "type": "subcategory",
       "name": "Mobile & Web Players",
       "parent": "Players & Clients",
       "expected": 148,
-      "actual": 81,
-      "difference": -67
+      "actual": 285,
+      "difference": 137
     },
     {
       "type": "subcategory",
       "name": "Adaptive Streaming",
       "parent": "Protocols & Transport",
       "expected": 77,
-      "actual": 144,
-      "difference": 67
+      "actual": 182,
+      "difference": 105
     },
     {
       "type": "subcategory",
       "name": "Transport Protocols",
       "parent": "Protocols & Transport",
       "expected": 92,
-      "actual": 13,
-      "difference": -79
+      "actual": 70,
+      "difference": -22
     },
     {
       "type": "subcategory",
       "name": "Specs & Standards",
       "parent": "Standards & Industry",
       "expected": 87,
-      "actual": 36,
-      "difference": -51
+      "actual": 127,
+      "difference": 40
     },
     {
       "type": "subcategory",
       "name": "Vendors & HDR",
       "parent": "Standards & Industry",
       "expected": 71,
-      "actual": 5,
-      "difference": -66
+      "actual": 47,
+      "difference": -24
     },
     {
       "type": "sub-subcategory",
@@ -92,67 +102,59 @@
     },
     {
       "type": "sub-subcategory",
-      "name": "Chromecast",
-      "parent": "Hardware Players",
-      "expected": 2,
-      "actual": 1,
-      "difference": -1
-    },
-    {
-      "type": "sub-subcategory",
       "name": "Roku",
       "parent": "Hardware Players",
       "expected": 24,
-      "actual": 26,
-      "difference": 2
+      "actual": 27,
+      "difference": 3
     },
     {
       "type": "sub-subcategory",
       "name": "Smart TVs",
       "parent": "Hardware Players",
       "expected": 12,
-      "actual": 3,
-      "difference": -9
+      "actual": 15,
+      "difference": 3
     },
     {
       "type": "sub-subcategory",
       "name": "Android",
       "parent": "Mobile & Web Players",
       "expected": 4,
-      "actual": 10,
-      "difference": 6
+      "actual": 54,
+      "difference": 50
     },
     {
       "type": "sub-subcategory",
       "name": "iOS/tvOS",
       "parent": "Mobile & Web Players",
       "expected": 19,
-      "actual": 31,
-      "difference": 12
+      "actual": 34,
+      "difference": 15
     },
     {
       "type": "sub-subcategory",
       "name": "Web Players",
       "parent": "Mobile & Web Players",
       "expected": 27,
-      "actual": 25,
-      "difference": -2
+      "actual": 85,
+      "difference": 58
     },
     {
       "type": "sub-subcategory",
       "name": "DASH",
       "parent": "Adaptive Streaming",
       "expected": 8,
-      "actual": 50,
-      "difference": 42
+      "actual": 69,
+      "difference": 61
     },
     {
       "type": "sub-subcategory",
       "name": "HLS",
       "parent": "Adaptive Streaming",
       "expected": 9,
-      "actual": 63,
-      "difference": 54
+      "actual": 71,
+      "difference": 62
     },
     {
       "type": "sub-subcategory",
@@ -183,8 +185,8 @@
       "name": "Official Specs",
       "parent": "Specs & Standards",
       "expected": 4,
-      "actual": 3,
-      "difference": -1
+      "actual": 2,
+      "difference": -2
     },
     {
       "type": "sub-subcategory",
@@ -240,8 +242,8 @@
         "slug": "infrastructure-delivery",
         "level": 1,
         "expected": 134,
-        "actual": 190,
-        "status": "FAIL",
+        "actual": 134,
+        "status": "PASS",
         "error": null,
         "apiEndpoint": "/api/awesome-list?category=infrastructure-delivery"
       },
@@ -270,8 +272,8 @@
         "slug": "players-clients",
         "level": 1,
         "expected": 425,
-        "actual": 269,
-        "status": "FAIL",
+        "actual": 425,
+        "status": "PASS",
         "error": null,
         "apiEndpoint": "/api/awesome-list?category=players-clients"
       },
@@ -369,7 +371,7 @@
         "parent": "Infrastructure & Delivery",
         "level": 2,
         "expected": 54,
-        "actual": 9,
+        "actual": 69,
         "status": "FAIL",
         "error": null,
         "apiEndpoint": "/api/awesome-list?subcategory=cloud-cdn"
@@ -380,8 +382,8 @@
         "parent": "Infrastructure & Delivery",
         "level": 2,
         "expected": 39,
-        "actual": 39,
-        "status": "PASS",
+        "actual": 65,
+        "status": "FAIL",
         "error": null,
         "apiEndpoint": "/api/awesome-list?subcategory=streaming-servers"
       },
@@ -424,8 +426,8 @@
         "parent": "Media Tools",
         "level": 2,
         "expected": 45,
-        "actual": 45,
-        "status": "PASS",
+        "actual": 181,
+        "status": "FAIL",
         "error": null,
         "apiEndpoint": "/api/awesome-list?subcategory=ads-qoe"
       },
@@ -435,8 +437,8 @@
         "parent": "Media Tools",
         "level": 2,
         "expected": 58,
-        "actual": 58,
-        "status": "PASS",
+        "actual": 136,
+        "status": "FAIL",
         "error": null,
         "apiEndpoint": "/api/awesome-list?subcategory=audio-subtitles"
       },
@@ -446,7 +448,7 @@
         "parent": "Players & Clients",
         "level": 2,
         "expected": 63,
-        "actual": 35,
+        "actual": 140,
         "status": "FAIL",
         "error": null,
         "apiEndpoint": "/api/awesome-list?subcategory=hardware-players"
@@ -457,7 +459,7 @@
         "parent": "Players & Clients",
         "level": 2,
         "expected": 148,
-        "actual": 81,
+        "actual": 285,
         "status": "FAIL",
         "error": null,
         "apiEndpoint": "/api/awesome-list?subcategory=mobile-web-players"
@@ -468,7 +470,7 @@
         "parent": "Protocols & Transport",
         "level": 2,
         "expected": 77,
-        "actual": 144,
+        "actual": 182,
         "status": "FAIL",
         "error": null,
         "apiEndpoint": "/api/awesome-list?subcategory=adaptive-streaming"
@@ -479,7 +481,7 @@
         "parent": "Protocols & Transport",
         "level": 2,
         "expected": 92,
-        "actual": 13,
+        "actual": 70,
         "status": "FAIL",
         "error": null,
         "apiEndpoint": "/api/awesome-list?subcategory=transport-protocols"
@@ -490,7 +492,7 @@
         "parent": "Standards & Industry",
         "level": 2,
         "expected": 87,
-        "actual": 36,
+        "actual": 127,
         "status": "FAIL",
         "error": null,
         "apiEndpoint": "/api/awesome-list?subcategory=specs-standards"
@@ -501,7 +503,7 @@
         "parent": "Standards & Industry",
         "level": 2,
         "expected": 71,
-        "actual": 5,
+        "actual": 47,
         "status": "FAIL",
         "error": null,
         "apiEndpoint": "/api/awesome-list?subcategory=vendors-hdr"
@@ -701,8 +703,8 @@
         "parent": "Hardware Players",
         "level": 3,
         "expected": 2,
-        "actual": 1,
-        "status": "FAIL",
+        "actual": 2,
+        "status": "PASS",
         "error": null,
         "apiEndpoint": "/api/awesome-list?subSubcategory=chromecast"
       },
@@ -712,7 +714,7 @@
         "parent": "Hardware Players",
         "level": 3,
         "expected": 24,
-        "actual": 26,
+        "actual": 27,
         "status": "FAIL",
         "error": null,
         "apiEndpoint": "/api/awesome-list?subSubcategory=roku"
@@ -723,7 +725,7 @@
         "parent": "Hardware Players",
         "level": 3,
         "expected": 12,
-        "actual": 3,
+        "actual": 15,
         "status": "FAIL",
         "error": null,
         "apiEndpoint": "/api/awesome-list?subSubcategory=smart-tv"
@@ -734,7 +736,7 @@
         "parent": "Mobile & Web Players",
         "level": 3,
         "expected": 4,
-        "actual": 10,
+        "actual": 54,
         "status": "FAIL",
         "error": null,
         "apiEndpoint": "/api/awesome-list?subSubcategory=android"
@@ -745,7 +747,7 @@
         "parent": "Mobile & Web Players",
         "level": 3,
         "expected": 19,
-        "actual": 31,
+        "actual": 34,
         "status": "FAIL",
         "error": null,
         "apiEndpoint": "/api/awesome-list?subSubcategory=ios-tvos"
@@ -756,7 +758,7 @@
         "parent": "Mobile & Web Players",
         "level": 3,
         "expected": 27,
-        "actual": 25,
+        "actual": 85,
         "status": "FAIL",
         "error": null,
         "apiEndpoint": "/api/awesome-list?subSubcategory=web-players"
@@ -767,7 +769,7 @@
         "parent": "Adaptive Streaming",
         "level": 3,
         "expected": 8,
-        "actual": 50,
+        "actual": 69,
         "status": "FAIL",
         "error": null,
         "apiEndpoint": "/api/awesome-list?subSubcategory=dash"
@@ -778,7 +780,7 @@
         "parent": "Adaptive Streaming",
         "level": 3,
         "expected": 9,
-        "actual": 63,
+        "actual": 71,
         "status": "FAIL",
         "error": null,
         "apiEndpoint": "/api/awesome-list?subSubcategory=hls"
@@ -833,7 +835,7 @@
         "parent": "Specs & Standards",
         "level": 3,
         "expected": 4,
-        "actual": 3,
+        "actual": 2,
         "status": "FAIL",
         "error": null,
         "apiEndpoint": "/api/awesome-list?subSubcategory=official-specs"
