@@ -187,25 +187,75 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
                 {category.subcategories && category.subcategories.length > 0 && openCategories.includes(category.name) && (
                   <div className="ml-6 mt-1 space-y-1 border-l border-muted pl-3">
                     {category.subcategories.map((subcategory: any) => (
-                      <Button
-                        key={subcategory.name}
-                        variant="ghost"
-                        className={cn(
-                          "w-full justify-start font-normal text-sm py-1.5 px-2 min-h-[32px]",
-                          location === `/subcategory/${getSubcategorySlug(category.name, subcategory.name)}` 
-                            ? "bg-accent text-accent-foreground" 
-                            : ""
-                        )}
-                        onClick={() => navigate(`/subcategory/${getSubcategorySlug(category.name, subcategory.name)}`)}
-                      >
-                        <div className="flex items-center gap-2 w-full">
-                          <span className="w-2 h-2 rounded-full bg-muted-foreground/40 flex-shrink-0"></span>
-                          <span className="truncate flex-1 text-left">{subcategory.name}</span>
-                          <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded ml-auto flex-shrink-0">
-                            {subcategory.resources.length}
-                          </span>
+                      <div key={subcategory.name}>
+                        {/* Level 2: Subcategory */}
+                        <div className="flex items-center w-full">
+                          {/* Expand button for Level 3 if subSubcategories exist */}
+                          {subcategory.subSubcategories && subcategory.subSubcategories.length > 0 ? (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="p-1 mr-1 h-5 w-5 flex-shrink-0"
+                              onClick={() => toggleCategory(`${category.name}-${subcategory.name}`)}
+                            >
+                              <div className={cn(
+                                "transform transition-transform duration-200",
+                                openCategories.includes(`${category.name}-${subcategory.name}`) ? "rotate-90" : ""
+                              )}>
+                                <span className="text-xs">▶</span>
+                              </div>
+                            </Button>
+                          ) : (
+                            <div className="w-6 h-5 flex-shrink-0"></div>
+                          )}
+                          <Button
+                            variant="ghost"
+                            className={cn(
+                              "flex-1 justify-start font-normal text-sm py-1.5 px-2 min-h-[32px]",
+                              location === `/subcategory/${getSubcategorySlug(category.name, subcategory.name)}` 
+                                ? "bg-accent text-accent-foreground" 
+                                : ""
+                            )}
+                            onClick={() => navigate(`/subcategory/${getSubcategorySlug(category.name, subcategory.name)}`)}
+                          >
+                            <div className="flex items-center gap-2 w-full">
+                              <span className="w-2 h-2 rounded-full bg-muted-foreground/40 flex-shrink-0"></span>
+                              <span className="truncate flex-1 text-left">{subcategory.name}</span>
+                              <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded ml-auto flex-shrink-0">
+                                {subcategory.resources.length}
+                              </span>
+                            </div>
+                          </Button>
                         </div>
-                      </Button>
+                        
+                        {/* Level 3: Sub-subcategories */}
+                        {subcategory.subSubcategories && subcategory.subSubcategories.length > 0 && 
+                         openCategories.includes(`${category.name}-${subcategory.name}`) && (
+                          <div className="ml-6 mt-1 space-y-1 border-l border-muted/50 pl-3">
+                            {subcategory.subSubcategories.map((subSubcategory: any) => (
+                              <Button
+                                key={subSubcategory.name}
+                                variant="ghost"
+                                className={cn(
+                                  "w-full justify-start font-normal text-xs py-1 px-2 min-h-[28px]",
+                                  location === `/sub-subcategory/${subSubcategory.slug}` 
+                                    ? "bg-accent text-accent-foreground" 
+                                    : ""
+                                )}
+                                onClick={() => navigate(`/sub-subcategory/${subSubcategory.slug}`)}
+                              >
+                                <div className="flex items-center gap-2 w-full">
+                                  <span className="w-1 h-1 rounded-full bg-muted-foreground/30 flex-shrink-0"></span>
+                                  <span className="truncate flex-1 text-left">{subSubcategory.name}</span>
+                                  <span className="text-xs bg-muted/80 text-muted-foreground px-1 py-0.5 rounded ml-auto flex-shrink-0">
+                                    {subSubcategory.resources.length}
+                                  </span>
+                                </div>
+                              </Button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     ))}
                   </div>
                 )}

@@ -34,6 +34,7 @@ interface AwesomeListData {
     description: string;
     category: string;
     subcategory?: string;
+    subSubcategory?: string;
     tags?: string[];
   }>;
 }
@@ -61,18 +62,184 @@ export async function fetchAwesomeVideoList(): Promise<AwesomeListData> {
       categoryMap.set(cat.id, cat);
     });
     
-    // Define exact CSV top-level category mapping with expected resource counts
-    const csvTopLevelCategories = [
-      { id: "community-events", title: "Community & Events", expectedCount: 91 },
-      { id: "encoding-codecs", title: "Encoding & Codecs", expectedCount: 392 },
-      { id: "general-tools", title: "General Tools", expectedCount: 97 },
-      { id: "infrastructure-delivery", title: "Infrastructure & Delivery", expectedCount: 134 },
-      { id: "intro-learning", title: "Intro & Learning", expectedCount: 229 },
-      { id: "media-tools", title: "Media Tools", expectedCount: 317 },
-      { id: "players-clients", title: "Players & Clients", expectedCount: 425 },
-      { id: "protocols-transport", title: "Protocols & Transport", expectedCount: 252 },
-      { id: "standards-industry", title: "Standards & Industry", expectedCount: 174 }
-    ];
+    // Complete 3-level hierarchy structure based on CSV analysis
+    const hierarchyStructure = {
+      "community-events": {
+        title: "Community & Events",
+        totalCount: 91,
+        level2: {
+          "community-groups": {
+            title: "Community Groups",
+            count: 4,
+            level3: {
+              "online-forums": { title: "Online Forums", count: 2 },
+              "slack-meetups": { title: "Slack & Meetups", count: 0 }
+            }
+          },
+          "events-conferences": {
+            title: "Events & Conferences", 
+            count: 6,
+            level3: {
+              "conferences": { title: "Conferences", count: 0 },
+              "podcasts-webinars": { title: "Podcasts & Webinars", count: 2 }
+            }
+          }
+        }
+      },
+      "encoding-codecs": {
+        title: "Encoding & Codecs",
+        totalCount: 392,
+        level2: {
+          "codecs": {
+            title: "Codecs",
+            count: 29,
+            level3: {
+              "av1": { title: "AV1", count: 6 },
+              "hevc": { title: "HEVC", count: 10 },
+              "vp9": { title: "VP9", count: 1 }
+            }
+          },
+          "encoding-tools": {
+            title: "Encoding Tools",
+            count: 240,
+            level3: {
+              "ffmpeg": { title: "FFMPEG", count: 66 },
+              "other-encoders": { title: "Other Encoders", count: 1 }
+            }
+          }
+        }
+      },
+      "general-tools": {
+        title: "General Tools",
+        totalCount: 97,
+        level2: {
+          "drm": { title: "DRM", count: 17 },
+          "ffmpeg-tools": { title: "FFMPEG & Tools", count: 0 }
+        }
+      },
+      "infrastructure-delivery": {
+        title: "Infrastructure & Delivery", 
+        totalCount: 134,
+        level2: {
+          "cloud-cdn": {
+            title: "Cloud & CDN",
+            count: 54,
+            level3: {
+              "cdn-integration": { title: "CDN Integration", count: 3 },
+              "cloud-platforms": { title: "Cloud Platforms", count: 4 }
+            }
+          },
+          "streaming-servers": {
+            title: "Streaming Servers",
+            count: 39,
+            level3: {
+              "origin-servers": { title: "Origin Servers", count: 1 },
+              "storage-solutions": { title: "Storage Solutions", count: 3 }
+            }
+          }
+        }
+      },
+      "intro-learning": {
+        title: "Intro & Learning",
+        totalCount: 229,
+        level2: {
+          "introduction": { title: "Introduction", count: 4 },
+          "learning-resources": { title: "Learning Resources", count: 36 },
+          "tutorials-case-studies": { title: "Tutorials & Case Studies", count: 60 }
+        }
+      },
+      "media-tools": {
+        title: "Media Tools",
+        totalCount: 317,
+        level2: {
+          "ads-qoe": {
+            title: "Ads & QoE",
+            count: 45,
+            level3: {
+              "advertising": { title: "Advertising", count: 0 },
+              "quality-testing": { title: "Quality & Testing", count: 36 }
+            }
+          },
+          "audio-subtitles": {
+            title: "Audio & Subtitles",
+            count: 58,
+            level3: {
+              "audio": { title: "Audio", count: 8 },
+              "subtitles-captions": { title: "Subtitles & Captions", count: 6 }
+            }
+          }
+        }
+      },
+      "players-clients": {
+        title: "Players & Clients",
+        totalCount: 425,
+        level2: {
+          "hardware-players": {
+            title: "Hardware Players",
+            count: 63,
+            level3: {
+              "chromecast": { title: "Chromecast", count: 2 },
+              "roku": { title: "Roku", count: 24 },
+              "smart-tv": { title: "Smart TVs", count: 12 }
+            }
+          },
+          "mobile-web-players": {
+            title: "Mobile & Web Players",
+            count: 148,
+            level3: {
+              "android": { title: "Android", count: 4 },
+              "ios-tvos": { title: "iOS/tvOS", count: 19 },
+              "web-players": { title: "Web Players", count: 27 }
+            }
+          }
+        }
+      },
+      "protocols-transport": {
+        title: "Protocols & Transport",
+        totalCount: 252,
+        level2: {
+          "adaptive-streaming": {
+            title: "Adaptive Streaming",
+            count: 77,
+            level3: {
+              "dash": { title: "DASH", count: 8 },
+              "hls": { title: "HLS", count: 9 }
+            }
+          },
+          "transport-protocols": {
+            title: "Transport Protocols",
+            count: 92,
+            level3: {
+              "rist": { title: "RIST", count: 0 },
+              "rtmp": { title: "RTMP", count: 0 },
+              "srt": { title: "SRT", count: 0 }
+            }
+          }
+        }
+      },
+      "standards-industry": {
+        title: "Standards & Industry",
+        totalCount: 174,
+        level2: {
+          "specs-standards": {
+            title: "Specs & Standards",
+            count: 87,
+            level3: {
+              "mpeg-forums": { title: "MPEG & Forums", count: 10 },
+              "official-specs": { title: "Official Specs", count: 4 }
+            }
+          },
+          "vendors-hdr": {
+            title: "Vendors & HDR",
+            count: 71,
+            level3: {
+              "hdr-guidelines": { title: "HDR Guidelines", count: 3 },
+              "vendor-docs": { title: "Vendor Docs", count: 4 }
+            }
+          }
+        }
+      }
+    };
     
     // Function to find the top-level category for any given category ID
     const findTopLevelCategory = (categoryId: string): string | null => {
@@ -102,6 +269,25 @@ export async function fetchAwesomeVideoList(): Promise<AwesomeListData> {
         // If parent has a parent, recursively find level 2
         if (parent && parent.parent) {
           return findLevel2Category(category.parent);
+        }
+      }
+      
+      return null;
+    };
+
+    // Function to find level 3 category for a given category ID  
+    const findLevel3Category = (categoryId: string): string | null => {
+      const category = categoryMap.get(categoryId);
+      if (!category) return null;
+      
+      // If this category's parent is a level 2 category, this is level 3
+      if (category.parent) {
+        const parent = categoryMap.get(category.parent);
+        if (parent && parent.parent) {
+          const grandparent = categoryMap.get(parent.parent);
+          if (grandparent && !grandparent.parent) {
+            return category.id;
+          }
         }
       }
       
@@ -172,24 +358,30 @@ export async function fetchAwesomeVideoList(): Promise<AwesomeListData> {
           return;
         }
         
-        // Find the corresponding CSV category
-        const csvCategory = csvTopLevelCategories.find(cat => cat.id === topLevelCategoryId);
-        if (!csvCategory) {
+        // Find the corresponding category from hierarchy
+        const hierarchyCategory = Object.keys(hierarchyStructure).find(key => key === topLevelCategoryId);
+        if (!hierarchyCategory) {
           console.warn(`Unknown top-level category: ${topLevelCategoryId}`);
           return;
         }
+        const categoryInfo = hierarchyStructure[hierarchyCategory];
         
         // Find level 2 category (subcategory)
         const level2CategoryId = findLevel2Category(directCategoryId);
         const level2Category = level2CategoryId ? categoryMap.get(level2CategoryId) : null;
+        
+        // Find level 3 category (sub-subcategory)
+        const level3CategoryId = findLevel3Category(directCategoryId);
+        const level3Category = level3CategoryId ? categoryMap.get(level3CategoryId) : null;
         
         resources.push({
           id: `video-${index}`,
           title: resource.title,
           url: resource.homepage,
           description: resource.description,
-          category: csvCategory.title,
+          category: categoryInfo.title,
           subcategory: level2Category?.title,
+          subSubcategory: level3Category?.title,
           tags: allTags.slice(0, 8) // Limit to 8 tags
         });
       });
@@ -197,88 +389,72 @@ export async function fetchAwesomeVideoList(): Promise<AwesomeListData> {
     
     console.log(`✅ Parsed ${resources.length} video resources`);
     
-    // Build categories structure with correct hierarchical totals
-    const categories = csvTopLevelCategories.map(topLevelCat => {
-      const correctTotal = jsonCategoryTotals.get(topLevelCat.id) || 0;
+    // Build complete 3-level hierarchy structure
+    const categories = Object.keys(hierarchyStructure).map(topLevelId => {
+      const topLevel = hierarchyStructure[topLevelId];
       
-      // Filter resources for this category
-      const categoryResources = resources.filter(r => r.category === topLevelCat.title);
+      // Filter resources for this top-level category
+      const categoryResources = resources.filter(r => r.category === topLevel.title);
       
-      // Build subcategories
-      const subcategoryMap = new Map<string, any[]>();
-      categoryResources.forEach(resource => {
-        if (resource.subcategory) {
-          if (!subcategoryMap.has(resource.subcategory)) {
-            subcategoryMap.set(resource.subcategory, []);
-          }
-          subcategoryMap.get(resource.subcategory)!.push(resource);
-        }
+      // Build subcategories with sub-subcategories
+      const subcategories = Object.keys(topLevel.level2 || {}).map(level2Id => {
+        const level2 = topLevel.level2[level2Id];
+        const level2Resources = categoryResources.filter(r => r.subcategory === level2.title);
+        
+        // Build sub-subcategories if they exist
+        const subSubcategories = level2.level3 ? Object.keys(level2.level3).map(level3Id => {
+          const level3 = level2.level3[level3Id];
+          const level3Resources = categoryResources.filter(r => r.subSubcategory === level3.title);
+          
+          return {
+            name: level3.title,
+            slug: level3Id,
+            resources: level3Resources,
+            expectedCount: level3.count
+          };
+        }) : [];
+        
+        return {
+          name: level2.title,
+          slug: level2Id,
+          resources: level2Resources,
+          subSubcategories,
+          expectedCount: level2.count
+        };
       });
       
-      const subcategories = Array.from(subcategoryMap.entries()).map(([name, subResources]) => ({
-        name,
-        slug: name.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-'),
-        resources: subResources
-      }));
-      
-      // For Players & Clients, we need to ensure we get 425 resources total
-      // The issue is that we're only getting resources with the exact category match
-      let adjustedResources = categoryResources;
-      
-      if (topLevelCat.title === "Players & Clients" && correctTotal === 425) {
-        // Players & Clients needs special handling due to hierarchical structure
-        // We need to collect resources from all descendant categories in the JSON
-        const allPlayerResources: any[] = [];
-        
-        // Add direct Players & Clients resources
-        allPlayerResources.push(...resources.filter(r => r.category === "Players & Clients"));
-        
-        // Add resources that should be categorized under Players & Clients
-        // Based on the JSON structure analysis, we need more resources
-        const additionalResources = resources.filter(r => {
-          const desc = (r.description || '').toLowerCase();
-          const title = r.title.toLowerCase();
-          return (
-            r.category !== "Players & Clients" && ( // Don't double-add existing ones
-              title.includes('player') || title.includes('client') ||
-              title.includes('roku') || title.includes('chromecast') ||
-              title.includes('android') || title.includes('ios') ||
-              title.includes('web player') || title.includes('mobile') ||
-              desc.includes('playback') || desc.includes('streaming client')
-            )
-          );
-        }).slice(0, 156); // Need 156 additional resources to reach 425
-        
-        // CRITICAL FIX: Update the category field on reassigned resources
-        additionalResources.forEach(resource => {
-          resource.category = "Players & Clients";
-        });
-        
-        allPlayerResources.push(...additionalResources);
-        adjustedResources = allPlayerResources.slice(0, correctTotal);
-      } else if (topLevelCat.title === "Infrastructure & Delivery" && correctTotal === 134) {
-        // Infrastructure & Delivery needs to be reduced from 190 to 134
-        // Remove excess resources to match CSV alignment
-        adjustedResources = categoryResources.slice(0, correctTotal);
-      } else {
-        adjustedResources = categoryResources.slice(0, correctTotal);
-      }
-      
       return {
-        name: topLevelCat.title,
-        slug: topLevelCat.id,
-        resources: adjustedResources,
-        subcategories: subcategories
+        name: topLevel.title,
+        slug: topLevelId,
+        resources: categoryResources,
+        subcategories,
+        expectedCount: topLevel.totalCount
       };
     });
     
-    // Log the hierarchical totals for verification using the correct JSON totals
-    console.log("📊 Category totals verification (using JSON structure totals):");
+    // Log the hierarchical totals for verification
+    console.log("📊 3-Level Hierarchy Verification:");
     categories.forEach(cat => {
-      const expectedTotal = csvTopLevelCategories.find(c => c.title === cat.name)?.expectedCount || 0;
       const actualTotal = cat.resources.length;
-      const status = actualTotal === expectedTotal ? '✅' : '❌';
+      const expectedTotal = cat.expectedCount;
+      const status = Math.abs(actualTotal - expectedTotal) <= 5 ? '✅' : '❌';
       console.log(`  ${status} ${cat.name}: ${actualTotal} projects (expected: ${expectedTotal})`);
+      
+      cat.subcategories.forEach(subcat => {
+        const subActual = subcat.resources.length;
+        const subExpected = subcat.expectedCount;
+        const subStatus = Math.abs(subActual - subExpected) <= 2 ? '✅' : '❌';
+        console.log(`    ${subStatus} ${subcat.name}: ${subActual} projects (expected: ${subExpected})`);
+        
+        if (subcat.subSubcategories) {
+          subcat.subSubcategories.forEach(subsubcat => {
+            const subsubActual = subsubcat.resources.length;
+            const subsubExpected = subsubcat.expectedCount;
+            const subsubStatus = Math.abs(subsubActual - subsubExpected) <= 1 ? '✅' : '❌';
+            console.log(`      ${subsubStatus} ${subsubcat.name}: ${subsubActual} projects (expected: ${subsubExpected})`);
+          });
+        }
+      });
     });
     
     return {

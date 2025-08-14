@@ -10,6 +10,7 @@ export const resources = pgTable("resources", {
   description: text("description").notNull().default(""),
   category: text("category").notNull(),
   subcategory: text("subcategory"),
+  subSubcategory: text("sub_subcategory"),
 });
 
 export const insertResourceSchema = createInsertSchema(resources).pick({
@@ -18,6 +19,7 @@ export const insertResourceSchema = createInsertSchema(resources).pick({
   description: true,
   category: true,
   subcategory: true,
+  subSubcategory: true,
 });
 
 export type InsertResource = z.infer<typeof insertResourceSchema>;
@@ -54,6 +56,23 @@ export const insertSubcategorySchema = createInsertSchema(subcategories).pick({
 
 export type InsertSubcategory = z.infer<typeof insertSubcategorySchema>;
 export type Subcategory = typeof subcategories.$inferSelect;
+
+// Sub-subcategory schema (Level 3)
+export const subSubcategories = pgTable("sub_subcategories", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  slug: text("slug").notNull(),
+  subcategoryId: serial("subcategory_id").references(() => subcategories.id),
+});
+
+export const insertSubSubcategorySchema = createInsertSchema(subSubcategories).pick({
+  name: true,
+  slug: true,
+  subcategoryId: true,
+});
+
+export type InsertSubSubcategory = z.infer<typeof insertSubSubcategorySchema>;
+export type SubSubcategory = typeof subSubcategories.$inferSelect;
 
 // AwesomeList schema
 export const awesomeLists = pgTable("awesome_lists", {
