@@ -126,7 +126,7 @@ export default function ThemeSelector() {
                     className={`p-2 rounded-md border-2 transition-all hover:scale-105 flex items-center justify-center gap-2 ${
                       theme === mode
                         ? "border-primary ring-2 ring-primary/20 bg-primary/10"
-                        : "border-border hover:border-primary/50"
+                        : "border hover:border-primary/50"
                     }`}
                     title={`${mode.charAt(0).toUpperCase() + mode.slice(1)} mode`}
                   >
@@ -147,7 +147,7 @@ export default function ThemeSelector() {
                     className={`p-2 rounded-md border-2 transition-all hover:scale-105 ${
                       themeVariant === theme.value
                         ? "border-primary ring-2 ring-primary/20"
-                        : "border-border hover:border-primary/50"
+                        : "border hover:border-primary/50"
                     }`}
                     title={theme.name}
                   >

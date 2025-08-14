@@ -361,7 +361,7 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
         )}
       </div>
       
-      <div className="border-t border-border p-3 space-y-2">
+      <div className="border-t p-3 space-y-2">
         <div className="flex items-center justify-between">
           <Button variant="ghost" className="flex-1 justify-start" asChild>
             <a href={title.includes("Selfhosted") 
@@ -410,7 +410,7 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
       role="navigation"
       data-state={isOpen ? "open" : "closed"}
       className={cn(
-        "fixed inset-y-0 left-0 z-40 w-64 bg-background border-r border-border flex flex-col transition-transform duration-300 ease-in-out",
+        "fixed inset-y-0 left-0 z-40 w-64 bg-background border-r flex flex-col transition-transform duration-300 ease-in-out",
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}
     >
