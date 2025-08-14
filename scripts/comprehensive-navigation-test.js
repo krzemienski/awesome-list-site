@@ -5,74 +5,121 @@
  * Tests: 9 categories + 19 subcategories + 15+ sub-subcategories + home page = 44+ total navigation paths
  */
 
-const puppeteer = require('puppeteer');
-const fs = require('fs').promises;
-const https = require('https');
+import puppeteer from 'puppeteer';
+import { promises as fs } from 'fs';
+import https from 'https';
+import fetch from 'node-fetch';
 
 // Test configuration
 const BASE_URL = 'http://localhost:5000';
 const JSON_SOURCE = 'https://hack-ski.s3.us-east-1.amazonaws.com/av/recategorized_with_researchers_2010_projects.json';
 const TEST_RESULTS_FILE = './test-screenshots/comprehensive-navigation-results.json';
 
-// Complete 3-level navigation structure from server logs
-const NAVIGATION_ITEMS = [
-  // Home page
-  { type: 'home', path: '/', name: 'Home', expectedResources: 2011 },
-  
-  // Level 1: Categories (9 items)
-  { type: 'category', path: '/category/community-events', name: 'Community & Events', expectedResources: 91 },
-  { type: 'category', path: '/category/encoding-codecs', name: 'Encoding & Codecs', expectedResources: 392 },
-  { type: 'category', path: '/category/general-tools', name: 'General Tools', expectedResources: 97 },
-  { type: 'category', path: '/category/infrastructure-delivery', name: 'Infrastructure & Delivery', expectedResources: 190 },
-  { type: 'category', path: '/category/intro-learning', name: 'Intro & Learning', expectedResources: 229 },
-  { type: 'category', path: '/category/media-tools', name: 'Media Tools', expectedResources: 317 },
-  { type: 'category', path: '/category/players-clients', name: 'Players & Clients', expectedResources: 269 },
-  { type: 'category', path: '/category/protocols-transport', name: 'Protocols & Transport', expectedResources: 252 },
-  { type: 'category', path: '/category/standards-industry', name: 'Standards & Industry', expectedResources: 174 },
-  
-  // Level 2: Subcategories (19 items)
-  { type: 'subcategory', path: '/subcategory/community-groups', name: 'Community Groups', expectedResources: 4 },
-  { type: 'subcategory', path: '/subcategory/events-conferences', name: 'Events & Conferences', expectedResources: 6 },
-  { type: 'subcategory', path: '/subcategory/codecs', name: 'Codecs', expectedResources: 29 },
-  { type: 'subcategory', path: '/subcategory/encoding-tools', name: 'Encoding Tools', expectedResources: 240 },
-  { type: 'subcategory', path: '/subcategory/drm', name: 'DRM', expectedResources: 17 },
-  { type: 'subcategory', path: '/subcategory/ffmpeg-tools', name: 'FFMPEG & Tools', expectedResources: 0 },
-  { type: 'subcategory', path: '/subcategory/cloud-cdn', name: 'Cloud & CDN', expectedResources: 9 },
-  { type: 'subcategory', path: '/subcategory/streaming-servers', name: 'Streaming Servers', expectedResources: 39 },
-  { type: 'subcategory', path: '/subcategory/introduction', name: 'Introduction', expectedResources: 4 },
-  { type: 'subcategory', path: '/subcategory/learning-resources', name: 'Learning Resources', expectedResources: 36 },
-  { type: 'subcategory', path: '/subcategory/tutorials-case-studies', name: 'Tutorials & Case Studies', expectedResources: 60 },
-  { type: 'subcategory', path: '/subcategory/ads-qoe', name: 'Ads & QoE', expectedResources: 45 },
-  { type: 'subcategory', path: '/subcategory/audio-subtitles', name: 'Audio & Subtitles', expectedResources: 58 },
-  { type: 'subcategory', path: '/subcategory/hardware-players', name: 'Hardware Players', expectedResources: 35 },
-  { type: 'subcategory', path: '/subcategory/mobile-web-players', name: 'Mobile & Web Players', expectedResources: 81 },
-  { type: 'subcategory', path: '/subcategory/adaptive-streaming', name: 'Adaptive Streaming', expectedResources: 144 },
-  { type: 'subcategory', path: '/subcategory/transport-protocols', name: 'Transport Protocols', expectedResources: 13 },
-  { type: 'subcategory', path: '/subcategory/specs-standards', name: 'Specs & Standards', expectedResources: 36 },
-  { type: 'subcategory', path: '/subcategory/vendors-hdr', name: 'Vendors & HDR', expectedResources: 5 },
-  
-  // Level 3: Sub-subcategories (Critical test items)
-  { type: 'sub-subcategory', path: '/sub-subcategory/av1', name: 'AV1', expectedResources: 6, parentCategory: 'Encoding & Codecs', parentSubcategory: 'Codecs' },
-  { type: 'sub-subcategory', path: '/sub-subcategory/hevc', name: 'HEVC', expectedResources: 10, parentCategory: 'Encoding & Codecs', parentSubcategory: 'Codecs' },
-  { type: 'sub-subcategory', path: '/sub-subcategory/vp9', name: 'VP9', expectedResources: 1, parentCategory: 'Encoding & Codecs', parentSubcategory: 'Codecs' },
-  { type: 'sub-subcategory', path: '/sub-subcategory/ffmpeg', name: 'FFMPEG', expectedResources: 66, parentCategory: 'Encoding & Codecs', parentSubcategory: 'Encoding Tools' },
-  { type: 'sub-subcategory', path: '/sub-subcategory/other-encoders', name: 'Other Encoders', expectedResources: 1, parentCategory: 'Encoding & Codecs', parentSubcategory: 'Encoding Tools' },
-  { type: 'sub-subcategory', path: '/sub-subcategory/online-forums', name: 'Online Forums', expectedResources: 2, parentCategory: 'Community & Events', parentSubcategory: 'Community Groups' },
-  { type: 'sub-subcategory', path: '/sub-subcategory/slack-meetups', name: 'Slack & Meetups', expectedResources: 0, parentCategory: 'Community & Events', parentSubcategory: 'Community Groups' },
-  { type: 'sub-subcategory', path: '/sub-subcategory/conferences', name: 'Conferences', expectedResources: 0, parentCategory: 'Community & Events', parentSubcategory: 'Events & Conferences' },
-  { type: 'sub-subcategory', path: '/sub-subcategory/podcasts-webinars', name: 'Podcasts & Webinars', expectedResources: 2, parentCategory: 'Community & Events', parentSubcategory: 'Events & Conferences' },
-  { type: 'sub-subcategory', path: '/sub-subcategory/cdn-integration', name: 'CDN Integration', expectedResources: 1, parentCategory: 'Infrastructure & Delivery', parentSubcategory: 'Cloud & CDN' },
-  { type: 'sub-subcategory', path: '/sub-subcategory/cloud-platforms', name: 'Cloud Platforms', expectedResources: 4, parentCategory: 'Infrastructure & Delivery', parentSubcategory: 'Cloud & CDN' },
-  { type: 'sub-subcategory', path: '/sub-subcategory/origin-servers', name: 'Origin Servers', expectedResources: 1, parentCategory: 'Infrastructure & Delivery', parentSubcategory: 'Streaming Servers' },
-  { type: 'sub-subcategory', path: '/sub-subcategory/storage-solutions', name: 'Storage Solutions', expectedResources: 3, parentCategory: 'Infrastructure & Delivery', parentSubcategory: 'Streaming Servers' },
-  { type: 'sub-subcategory', path: '/sub-subcategory/advertising', name: 'Advertising', expectedResources: 0, parentCategory: 'Media Tools', parentSubcategory: 'Ads & QoE' },
-  { type: 'sub-subcategory', path: '/sub-subcategory/quality-testing', name: 'Quality & Testing', expectedResources: 36, parentCategory: 'Media Tools', parentSubcategory: 'Ads & QoE' },
-  { type: 'sub-subcategory', path: '/sub-subcategory/audio', name: 'Audio', expectedResources: 8, parentCategory: 'Media Tools', parentSubcategory: 'Audio & Subtitles' },
-  { type: 'sub-subcategory', path: '/sub-subcategory/subtitles-captions', name: 'Subtitles & Captions', expectedResources: 40, parentCategory: 'Media Tools', parentSubcategory: 'Audio & Subtitles' },
-];
+// Dynamic navigation items - will be populated from live API data
+let NAVIGATION_ITEMS = [];
 
 class ComprehensiveNavigationTester {
   constructor() {
+    this.navigationItems = [];
+  }
+
+  // Generate slug from title
+  generateSlug(title) {
+    return title
+      .toLowerCase()
+      .replace(/&/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/[^\w-]/g, '')
+      .replace(/--+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
+
+  // Fetch all navigation data dynamically from API
+  async fetchNavigationData() {
+    console.log("📡 Fetching live navigation data from API...");
+    
+    try {
+      // Get the awesome list data
+      const response = await fetch(`${BASE_URL}/api/awesome-list`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch API data: ${response.status}`);
+      }
+      const data = await response.json();
+      
+      console.log(`✅ Fetched data with ${data.resources.length} total resources`);
+      console.log(`📊 Found ${data.categories.length} categories`);
+      
+      // Build navigation items dynamically
+      this.navigationItems = [];
+      
+      // Add home page
+      this.navigationItems.push({
+        type: 'home',
+        path: '/',
+        name: 'Home',
+        expectedResources: data.resources.length
+      });
+      
+      // Process all categories
+      data.categories.forEach(category => {
+        const categorySlug = this.generateSlug(category.title);
+        
+        // Add category
+        this.navigationItems.push({
+          type: 'category',
+          path: `/category/${categorySlug}`,
+          name: category.title,
+          expectedResources: category.resourceCount || 0,
+          id: category.id
+        });
+        
+        // Add subcategories
+        if (category.subcategories) {
+          category.subcategories.forEach(subcategory => {
+            const subcategorySlug = this.generateSlug(subcategory.title);
+            
+            this.navigationItems.push({
+              type: 'subcategory',
+              path: `/subcategory/${subcategorySlug}`,
+              name: subcategory.title,
+              expectedResources: subcategory.resourceCount || 0,
+              parentCategory: category.title,
+              id: subcategory.id
+            });
+            
+            // Add sub-subcategories
+            if (subcategory.subSubcategories) {
+              subcategory.subSubcategories.forEach(subSubcategory => {
+                const subSubcategorySlug = this.generateSlug(subSubcategory.title);
+                
+                this.navigationItems.push({
+                  type: 'sub-subcategory',
+                  path: `/sub-subcategory/${subSubcategorySlug}`,
+                  name: subSubcategory.title,
+                  expectedResources: subSubcategory.resourceCount || 0,
+                  parentCategory: category.title,
+                  parentSubcategory: subcategory.title,
+                  id: subSubcategory.id
+                });
+              });
+            }
+          });
+        }
+      });
+      
+      console.log(`🎯 Built ${this.navigationItems.length} total navigation items:`);
+      console.log(`   - ${this.navigationItems.filter(i => i.type === 'category').length} categories`);
+      console.log(`   - ${this.navigationItems.filter(i => i.type === 'subcategory').length} subcategories`);
+      console.log(`   - ${this.navigationItems.filter(i => i.type === 'sub-subcategory').length} sub-subcategories`);
+      
+      return this.navigationItems;
+    } catch (error) {
+      console.error(`❌ Failed to fetch navigation data: ${error.message}`);
+      throw error;
+    }
+  }
+
+  async init() {
     this.browser = null;
     this.page = null;
     this.jsonData = null;
