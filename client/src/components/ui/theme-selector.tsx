@@ -58,7 +58,7 @@ export default function ThemeSelector() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-40">
+    <div className="relative">
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button

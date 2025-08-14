@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/sidebar"
 import { AwesomeList } from "@/types/awesome-list"
 import SearchDialog from "@/components/ui/search-dialog"
-import ThemeSelector from "@/components/ui/theme-selector"
 import Footer from "@/components/layout/Footer"
 import { Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -47,8 +46,6 @@ export function AppLayout({ awesomeList, isLoading, children }: AppLayoutProps) 
                 </kbd>
               </Button>
             </div>
-            
-            <ThemeSelector />
           </div>
         </header>
 

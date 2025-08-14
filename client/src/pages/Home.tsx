@@ -27,7 +27,7 @@ interface HomeProps {
 type LayoutType = "cards" | "list" | "compact";
 
 export default function Home({ awesomeList, isLoading }: HomeProps) {
-  const [layout, setLayout] = useState<LayoutType>("list");
+  const [layout, setLayout] = useState<LayoutType>("compact");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(24);
   const [sortBy, setSortBy] = useState("category");
@@ -75,7 +75,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
     setSelectedSubSubcategory("all");
     setCurrentPage(1);
     if (subcategory !== "all") {
-      trackFilterUsage("subcategory", subcategory);
+      trackFilterUsage("subcategory", subcategory, 1);
     }
   };
 
@@ -84,7 +84,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
     setSelectedSubSubcategory(subSubcategory);
     setCurrentPage(1);
     if (subSubcategory !== "all") {
-      trackFilterUsage("sub-subcategory", subSubcategory);
+      trackFilterUsage("sub-subcategory", subSubcategory, 1);
     }
   };
 
@@ -294,7 +294,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                       <SelectContent className="touch-optimized">
                         <SelectItem value="all">All Subcategories</SelectItem>
                         {availableSubcategories.map(subcategory => (
-                          <SelectItem key={subcategory} value={subcategory}>
+                          <SelectItem key={subcategory} value={subcategory || ""}>
                             {subcategory}
                           </SelectItem>
                         ))}
@@ -317,7 +317,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                       <SelectContent className="touch-optimized">
                         <SelectItem value="all">All Sub-subcategories</SelectItem>
                         {availableSubSubcategories.map(subSubcategory => (
-                          <SelectItem key={subSubcategory} value={subSubcategory}>
+                          <SelectItem key={subSubcategory} value={subSubcategory || ""}>
                             {subSubcategory}
                           </SelectItem>
                         ))}
