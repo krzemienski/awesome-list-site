@@ -133,11 +133,11 @@ export default function ResourcePreviewTooltip({
   const getPlatformColor = (platform: ResourceMetadata["platform"]) => {
     switch (platform) {
       case "github":
-        return "text-gray-800 dark:text-gray-200";
+        return "text-foreground";
       case "gitlab":
-        return "text-orange-600";
+        return "text-orange-600 dark:text-orange-400";
       default:
-        return "text-blue-600";
+        return "text-blue-600 dark:text-blue-400";
     }
   };
 

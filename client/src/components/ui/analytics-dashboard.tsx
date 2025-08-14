@@ -469,7 +469,7 @@ export default function AnalyticsDashboard({
                               <div className="text-sm text-muted-foreground">{term.count} searches</div>
                             </div>
                             <div className={`text-sm font-medium ${
-                              term.growth > 0 ? 'text-green-600' : term.growth < 0 ? 'text-red-600' : 'text-gray-600'
+                              term.growth > 0 ? 'text-emerald-600 dark:text-emerald-400' : term.growth < 0 ? 'text-destructive' : 'text-muted-foreground'
                             }`}>
                               {term.growth > 0 ? '+' : ''}{term.growth}%
                             </div>

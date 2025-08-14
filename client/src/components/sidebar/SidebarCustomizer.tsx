@@ -139,11 +139,11 @@ export default function SidebarCustomizer({ categories, settings, onSettingsChan
 
   // Color scheme options
   const colorSchemes = [
-    { value: 'default', label: 'Default', color: 'bg-gray-500' },
-    { value: 'blue', label: 'Blue', color: 'bg-blue-500' },
-    { value: 'green', label: 'Green', color: 'bg-green-500' },
-    { value: 'purple', label: 'Purple', color: 'bg-purple-500' },
-    { value: 'rose', label: 'Rose', color: 'bg-rose-500' },
+    { value: 'default', label: 'Default', color: 'bg-muted-foreground' },
+    { value: 'blue', label: 'Blue', color: 'bg-blue-500/90 dark:bg-blue-400/90' },
+    { value: 'green', label: 'Green', color: 'bg-emerald-500/90 dark:bg-emerald-400/90' },
+    { value: 'purple', label: 'Purple', color: 'bg-violet-500/90 dark:bg-violet-400/90' },
+    { value: 'rose', label: 'Rose', color: 'bg-rose-500/90 dark:bg-rose-400/90' },
   ];
 
   const visibleCategories = categories.filter(cat => 
