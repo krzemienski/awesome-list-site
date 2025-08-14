@@ -1,5 +1,7 @@
 /* Import mobile styles first */
 @import './styles/mobile-improvements.css';
+@import './styles/mobile-fixes.css';
+@import './styles/comprehensive-mobile-fix.css';
 
 @tailwind base;
 @tailwind components;
