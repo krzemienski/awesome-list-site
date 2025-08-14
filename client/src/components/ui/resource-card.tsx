@@ -1,16 +1,21 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ExternalLink } from "lucide-react";
 import { Resource } from "@/types/awesome-list";
 import { motion } from "framer-motion";
 import { trackResourceClick, trackPopoverView, trackMobileInteraction } from "@/lib/analytics";
 import ResourceTooltip from "@/components/ui/resource-tooltip";
+import { cn } from "@/lib/utils";
 
 interface ResourceCardProps {
   resource: Resource;
   index: number;
+  isSelectionMode?: boolean;
+  isSelected?: boolean;
+  onSelectionToggle?: (resource: Resource) => void;
 }
 
-export default function ResourceCard({ resource, index }: ResourceCardProps) {
+export default function ResourceCard({ resource, index, isSelectionMode, isSelected, onSelectionToggle }: ResourceCardProps) {
   // Check if reduced motion is preferred
   const prefersReducedMotion = 
     typeof window !== 'undefined' ? 
@@ -39,8 +44,21 @@ export default function ResourceCard({ resource, index }: ResourceCardProps) {
       variants={fadeInVariants}
     >
       <ResourceTooltip resource={resource}>
-        <Card className="h-full transition-all hover:shadow-md">
+        <Card className={cn(
+          "h-full transition-all hover:shadow-md",
+          isSelected && "ring-2 ring-primary border-primary"
+        )}>
           <CardContent className="p-6">
+            {/* Selection checkbox */}
+            {isSelectionMode && (
+              <div className="flex justify-end mb-2">
+                <Checkbox
+                  checked={isSelected}
+                  onCheckedChange={() => onSelectionToggle?.(resource)}
+                  aria-label={`Select ${resource.title}`}
+                />
+              </div>
+            )}
             <div className="flex items-center justify-between gap-x-2 mb-2">
               <h3 className="text-lg font-semibold leading-none tracking-tight">
                 <a
