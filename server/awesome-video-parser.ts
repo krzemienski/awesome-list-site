@@ -61,7 +61,29 @@ export async function fetchAwesomeVideoList(): Promise<AwesomeListData> {
       categoryMap.set(cat.id, cat);
     });
     
-    // Parse resources
+    // Build category hierarchy tree
+    const topLevelCategories = data.categories?.filter((cat: VideoCategory) => !cat.parent) || [];
+    const categoryHierarchy = new Map<string, {
+      category: VideoCategory;
+      level2: Map<string, { category: VideoCategory; level3: VideoCategory[] }>;
+    }>();
+    
+    // Build 3-level hierarchy
+    topLevelCategories.forEach((level1: VideoCategory) => {
+      const level2Map = new Map<string, { category: VideoCategory; level3: VideoCategory[] }>();
+      
+      // Find level 2 categories
+      const level2Categories = data.categories?.filter((cat: VideoCategory) => cat.parent === level1.id) || [];
+      level2Categories.forEach((level2: VideoCategory) => {
+        // Find level 3 categories
+        const level3Categories = data.categories?.filter((cat: VideoCategory) => cat.parent === level2.id) || [];
+        level2Map.set(level2.id, { category: level2, level3: level3Categories });
+      });
+      
+      categoryHierarchy.set(level1.id, { category: level1, level2: level2Map });
+    });
+    
+    // Parse resources and map them to the hierarchy
     const resources: Array<{
       id: string;
       title: string;
@@ -81,22 +103,48 @@ export async function fetchAwesomeVideoList(): Promise<AwesomeListData> {
         const generatedTags = generateVideoTags(resource.title, resource.description || '', resource.homepage);
         const allTags = Array.from(new Set([...existingTags, ...generatedTags])); // Remove duplicates
         
-        // Determine category from the resource's category array
-        const categoryId = resource.category?.[0] || 'video-tools';
-        const categoryInfo = categoryMap.get(categoryId);
-        const parentCategoryInfo = categoryInfo?.parent ? categoryMap.get(categoryInfo.parent) : null;
+        // Determine category hierarchy from the resource's category array
+        const leafCategoryId = resource.category?.[0] || 'video-tools';
+        const leafCategory = categoryMap.get(leafCategoryId);
         
-        // Fix hierarchy: Use parent as main category, direct as subcategory
-        const mainCategory = parentCategoryInfo?.title || categoryInfo?.title || 'Video Tools';
-        const subCategory = parentCategoryInfo ? categoryInfo?.title : undefined;
+        if (!leafCategory) {
+          console.warn(`Unknown category ID: ${leafCategoryId}`);
+          return;
+        }
+        
+        // Find the hierarchy path: leaf -> level2 -> level1
+        let level1Title = leafCategory.title;
+        let level2Title: string | undefined = undefined;
+        let leafTitle = leafCategory.title;
+        
+        if (leafCategory.parent) {
+          const parentCategory = categoryMap.get(leafCategory.parent);
+          if (parentCategory) {
+            if (parentCategory.parent) {
+              // This is a level 3 category
+              const grandParentCategory = categoryMap.get(parentCategory.parent);
+              if (grandParentCategory) {
+                level1Title = grandParentCategory.title;
+                level2Title = parentCategory.title;
+                leafTitle = leafCategory.title;
+              }
+            } else {
+              // This is a level 2 category
+              level1Title = parentCategory.title;
+              level2Title = leafCategory.title;
+              leafTitle = leafCategory.title;
+            }
+          }
+        }
+        // If no parent, it's a top-level category (shouldn't happen for resources, but handle it)
         
         resources.push({
           id: `video-${index}`,
           title: resource.title,
           url: resource.homepage,
           description: resource.description,
-          category: mainCategory,
-          subcategory: subCategory,
+          category: level1Title,
+          subcategory: level2Title,
           tags: allTags.slice(0, 8) // Limit to 8 tags
         });
       });
