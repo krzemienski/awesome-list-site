@@ -31,6 +31,8 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
   const [sortBy, setSortBy] = useState("category");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string>("all");
+  const [selectedSubSubcategory, setSelectedSubSubcategory] = useState<string>("all");
   const [showRecommendations, setShowRecommendations] = useState(false);
 
   // User profile management
@@ -47,9 +49,31 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
   // Handle category change with analytics
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
+    setSelectedSubcategory("all"); // Reset subcategory when category changes
+    setSelectedSubSubcategory("all"); // Reset sub-subcategory when category changes
+    setCurrentPage(1); // Reset pagination
     if (category !== "all") {
       trackCategoryView(category);
       trackFilterUsage("category", category, filteredResources.length);
+    }
+  };
+
+  // Handle subcategory change
+  const handleSubcategoryChange = (subcategory: string) => {
+    setSelectedSubcategory(subcategory);
+    setSelectedSubSubcategory("all"); // Reset sub-subcategory when subcategory changes
+    setCurrentPage(1); // Reset pagination
+    if (subcategory !== "all") {
+      trackFilterUsage("subcategory", subcategory, filteredResources.length);
+    }
+  };
+
+  // Handle sub-subcategory change
+  const handleSubSubcategoryChange = (subSubcategory: string) => {
+    setSelectedSubSubcategory(subSubcategory);
+    setCurrentPage(1); // Reset pagination
+    if (subSubcategory !== "all") {
+      trackFilterUsage("sub-subcategory", subSubcategory, filteredResources.length);
     }
   };
 
@@ -70,15 +94,17 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
   // Use all resources for home page display
   const allResources = awesomeList?.resources || [];
   
-  // Filter resources by search and category
+  // Filter resources by search, category, subcategory, and sub-subcategory
   const filteredResources = allResources.filter(resource => {
     const matchesSearch = searchTerm === "" || 
       resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       resource.description.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesCategory = selectedCategory === "all" || resource.category === selectedCategory;
+    const matchesSubcategory = selectedSubcategory === "all" || resource.subcategory === selectedSubcategory;
+    const matchesSubSubcategory = selectedSubSubcategory === "all" || resource.subSubcategory === selectedSubSubcategory;
     
-    return matchesSearch && matchesCategory;
+    return matchesSearch && matchesCategory && matchesSubcategory && matchesSubSubcategory;
   });
   
   // Sort resources
@@ -104,10 +130,23 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [itemsPerPage, searchTerm, selectedCategory]);
+  }, [itemsPerPage, searchTerm, selectedCategory, selectedSubcategory, selectedSubSubcategory]);
   
   // Get unique categories for filter
   const categories = awesomeList?.categories?.map(cat => cat.name).sort() || [];
+  
+  // Get available subcategories based on selected category
+  const availableSubcategories = selectedCategory === "all" 
+    ? [] 
+    : awesomeList?.categories.find(cat => cat.name === selectedCategory)?.subcategories?.map(sub => sub.name).sort() || [];
+  
+  // Get available sub-subcategories based on selected category and subcategory
+  const availableSubSubcategories = selectedCategory === "all" || selectedSubcategory === "all"
+    ? []
+    : awesomeList?.categories
+        .find(cat => cat.name === selectedCategory)
+        ?.subcategories.find(sub => sub.name === selectedSubcategory)
+        ?.subSubcategories?.map(subSub => subSub.name).sort() || [];
 
   // Handle resource interactions
   const handleResourceClick = (resourceId: string) => {
@@ -198,27 +237,77 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                 </div>
               )}
 
-              {/* Category Filter */}
+              {/* Hierarchical Filters */}
               {!showRecommendations && (
-                <div className="flex gap-2 items-center flex-wrap">
+                <div className="flex gap-4 items-center flex-wrap">
                   <Filter className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Category:</span>
-                  <Select
-                    value={selectedCategory}
-                    onValueChange={handleCategoryChange}
-                  >
-                    <SelectTrigger className="w-40 min-h-[44px] sm:min-h-auto touch-optimized">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="touch-optimized">
-                      <SelectItem value="all">All Categories</SelectItem>
-                      {categories.map(category => (
-                        <SelectItem key={category} value={category}>
-                          {category}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  
+                  {/* Category Filter */}
+                  <div className="flex gap-2 items-center">
+                    <span className="text-sm text-muted-foreground">Category:</span>
+                    <Select
+                      value={selectedCategory}
+                      onValueChange={handleCategoryChange}
+                    >
+                      <SelectTrigger className="w-40 min-h-[44px] sm:min-h-auto touch-optimized">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="touch-optimized">
+                        <SelectItem value="all">All Categories</SelectItem>
+                        {categories.map(category => (
+                          <SelectItem key={category} value={category}>
+                            {category}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Subcategory Filter */}
+                  {availableSubcategories.length > 0 && (
+                    <div className="flex gap-2 items-center">
+                      <span className="text-sm text-muted-foreground">Subcategory:</span>
+                      <Select
+                        value={selectedSubcategory}
+                        onValueChange={handleSubcategoryChange}
+                      >
+                        <SelectTrigger className="w-44 min-h-[44px] sm:min-h-auto touch-optimized">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="touch-optimized">
+                          <SelectItem value="all">All Subcategories</SelectItem>
+                          {availableSubcategories.map(subcategory => (
+                            <SelectItem key={subcategory} value={subcategory}>
+                              {subcategory}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  {/* Sub-subcategory Filter */}
+                  {availableSubSubcategories.length > 0 && (
+                    <div className="flex gap-2 items-center">
+                      <span className="text-sm text-muted-foreground">Sub-subcategory:</span>
+                      <Select
+                        value={selectedSubSubcategory}
+                        onValueChange={handleSubSubcategoryChange}
+                      >
+                        <SelectTrigger className="w-48 min-h-[44px] sm:min-h-auto touch-optimized">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="touch-optimized">
+                          <SelectItem value="all">All Sub-subcategories</SelectItem>
+                          {availableSubSubcategories.map(subSubcategory => (
+                            <SelectItem key={subSubcategory} value={subSubcategory}>
+                              {subSubcategory}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
                 </div>
               )}
 

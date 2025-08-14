@@ -207,6 +207,16 @@ The application is configured for deployment on Replit:
 - ✅ Sidebar navigation supports expand/collapse for all 3 levels
 - ✅ Critical requirement fulfilled: Perfect filtering for AV1, HEVC, VP9 under Codecs
 
+### Comprehensive Hierarchical Filtering System (August 2025)
+- ✅ **Home page**: Added full hierarchical filtering (category → subcategory → sub-subcategory)
+- ✅ **Category pages**: Added subcategory filtering with resource counts
+- ✅ **Subcategory pages**: Added sub-subcategory filtering with resource counts
+- ✅ **Sub-subcategory pages**: Added search functionality, layout switching, and pagination
+- ✅ **Consistent UX**: All filtering resets pagination and includes analytics tracking
+- ✅ **Mobile optimization**: All filter dropdowns are touch-friendly and responsive
+- ✅ **Progressive disclosure**: Filters only appear when relevant options are available
+- ✅ **Cross-level filtering**: Users can now drill down through all 3 hierarchy levels seamlessly
+
 ### Deployment Configuration
 - Target: GitHub Pages at krzemienski.github.io/awesome-list-site
 - Build process optimized for large React applications
