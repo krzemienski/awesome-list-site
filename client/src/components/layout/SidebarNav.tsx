@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { X } from "lucide-react";
-import { slugify, getCategorySlug, getSubcategorySlug, countResourcesByCategory } from "@/lib/utils";
+import { slugify, getCategorySlug, countResourcesByCategory } from "@/lib/utils";
 import { Category, Resource } from "@/types/awesome-list";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -34,7 +34,7 @@ export default function SidebarNav({
         const slug = path[2];
         const matchingCategory = categories.find(cat => 
           getCategorySlug(cat.name) === slug || 
-          cat.subcategories?.some(sub => getSubcategorySlug(cat.name, sub.name) === slug)
+          cat.subcategories?.some(sub => sub.slug === slug)
         );
         
         if (matchingCategory) {
@@ -165,11 +165,11 @@ export default function SidebarNav({
                           <div 
                             key={subcategory.name}
                             className={`rounded-md px-3 py-2 text-sm font-medium ${
-                              location === `/subcategory/${getSubcategorySlug(category.name, subcategory.name)}` 
+                              location === `/subcategory/${subcategory.slug}` 
                                 ? "bg-accent text-accent-foreground" 
                                 : "hover:bg-accent hover:text-accent-foreground"
                             }`}
-                            onClick={() => window.location.href = `/subcategory/${getSubcategorySlug(category.name, subcategory.name)}`}
+                            onClick={() => window.location.href = `/subcategory/${subcategory.slug}`}
                             role="button"
                             tabIndex={0}
                           >
@@ -315,13 +315,13 @@ export default function SidebarNav({
                               <div 
                                 key={subcategory.name}
                                 className={`rounded-md px-3 py-2 text-sm font-medium cursor-pointer ${
-                                  location === `/subcategory/${getSubcategorySlug(category.name, subcategory.name)}` 
+                                  location === `/subcategory/${subcategory.slug}` 
                                     ? "bg-accent text-accent-foreground" 
                                     : "hover:bg-accent hover:text-accent-foreground"
                                 }`}
                                 onClick={() => {
                                   setIsOpen(false);
-                                  window.location.href = `/subcategory/${getSubcategorySlug(category.name, subcategory.name)}`;
+                                  window.location.href = `/subcategory/${subcategory.slug}`;
                                 }}
                                 role="button"
                                 tabIndex={0}
