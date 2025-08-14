@@ -36,10 +36,10 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
   const [openCategories, setOpenCategories] = useState<string[]>([]);
   const isMobile = useIsMobile();
 
-  // Build hierarchical categories based on CSV structure with accurate project counts
+  // Use original categories but organize them visually in hierarchical structure
   const getHierarchicalCategories = (categories: Category[]) => {
-    console.log("🏗️ BUILDING HIERARCHICAL STRUCTURE FROM CSV DATA");
-    console.log("📊 Original flat categories count:", categories.length);
+    console.log("🏗️ ORGANIZING ORIGINAL CATEGORIES IN HIERARCHICAL DISPLAY");
+    console.log("📊 Original categories count:", categories.length);
     
     const filteredCategories = categories.filter(cat => 
       cat.resources.length > 0 && 
@@ -51,160 +51,88 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
     console.log("✅ Filtered categories count:", filteredCategories.length);
     console.log("📝 Available categories:", filteredCategories.map(c => `${c.name} (${c.resources.length} resources)`));
 
-    // CSV-based hierarchical structure with 9 main categories
-    const hierarchicalStructure = [
+    // Define visual grouping based on CSV structure but use original categories
+    const hierarchicalGroups = [
       {
-        name: "Community & Events",
-        subcategories: [
-          { name: "Community Groups", children: ["Online Forums", "Slack & Meetups"] },
-          { name: "Events & Conferences", children: ["Conferences", "Podcasts & Webinars"] }
-        ]
+        name: "🎓 Learning & Introduction",
+        categories: ["Introduction", "Learning Resources"]
       },
       {
-        name: "Encoding & Codecs", 
-        subcategories: [
-          { name: "Codecs", children: ["AV1", "HEVC", "VP9"] },
-          { name: "Encoding Tools", children: ["FFMPEG", "Other Encoders"] }
-        ]
+        name: "🔧 Encoding & Codecs", 
+        categories: ["FFMPEG", "Encoding Tools", "Codecs", "AV1", "HEVC", "VP9"]
       },
       {
-        name: "General Tools",
-        subcategories: [
-          { name: "DRM" },
-          { name: "FFMPEG & Tools" }
-        ]
+        name: "🎯 Streaming & Protocols",
+        categories: ["Adaptive Streaming", "DASH", "HLS", "Transport Protocols", "RIST", "SRT", "RTMP"]
       },
       {
-        name: "Infrastructure & Delivery",
-        subcategories: [
-          { name: "Cloud & CDN", children: ["CDN Integration", "Cloud Platforms"] },
-          { name: "Streaming Servers", children: ["Origin Servers", "Storage Solutions"] }
-        ]
+        name: "📱 Players & Clients",
+        categories: ["Players & Clients", "Web Players", "Mobile & Web Players", "Android", "iOS/tvOS", "Hardware Players", "Chromecast", "Roku", "Smart TVs"]
       },
       {
-        name: "Intro & Learning",
-        subcategories: [
-          { name: "Introduction" },
-          { name: "Learning Resources" },
-          { name: "Tutorials & Case Studies" }
-        ]
+        name: "☁️ Infrastructure & Delivery",
+        categories: ["Streaming Servers", "Cloud & CDN", "CDN Integration", "Cloud Platforms", "Origin Servers", "Storage Solutions"]
       },
       {
-        name: "Media Tools",
-        subcategories: [
-          { name: "Ads & QoE", children: ["Advertising", "Quality & Testing"] },
-          { name: "Audio & Subtitles", children: ["Audio", "Subtitles & Captions"] }
-        ]
+        name: "🛡️ Security & Quality",
+        categories: ["DRM", "Quality & Testing", "Advertising", "Ads & QoE"]
       },
       {
-        name: "Players & Clients",
-        subcategories: [
-          { name: "Hardware Players", children: ["Chromecast", "Roku", "Smart TVs"] },
-          { name: "Mobile & Web Players", children: ["Android", "iOS/tvOS", "Web Players"] }
-        ]
+        name: "🎵 Media Processing",
+        categories: ["Media Tools", "Audio & Subtitles", "Audio", "Subtitles & Captions"]
       },
       {
-        name: "Protocols & Transport",
-        subcategories: [
-          { name: "Adaptive Streaming", children: ["DASH", "HLS"] },
-          { name: "Transport Protocols", children: ["RIST", "RTMP", "SRT"] }
-        ]
+        name: "📋 Standards & Documentation", 
+        categories: ["Specs & Standards", "Standards & Industry", "MPEG & Forums", "Official Specs", "Vendors & HDR", "HDR Guidelines", "Vendor Docs"]
       },
       {
-        name: "Standards & Industry",
-        subcategories: [
-          { name: "Specs & Standards", children: ["MPEG & Forums", "Official Specs"] },
-          { name: "Vendors & HDR", children: ["HDR Guidelines", "Vendor Docs"] }
-        ]
+        name: "👥 Community & Events",
+        categories: ["Community & Events", "Community Groups", "Events & Conferences", "Online Forums", "Podcasts & Webinars"]
       }
     ];
 
-    const hierarchicalCategories: Category[] = [];
-    const processedNames = new Set<string>();
-
-    // Build hierarchical categories with accurate project counts
-    console.log("🏗️ Building hierarchical structure from CSV data...");
-    hierarchicalStructure.forEach(mainCat => {
-      const matchingMainCategory = filteredCategories.find(cat => cat.name === mainCat.name);
+    // Group categories visually but keep original data structure
+    const groupedCategories: any[] = [];
+    const usedCategories = new Set<string>();
+    
+    hierarchicalGroups.forEach(group => {
+      const groupCategories: Category[] = [];
       
-      if (matchingMainCategory) {
-        console.log(`📁 Processing: ${mainCat.name}`);
-        
-        // Start with main category resources
-        let totalResources = [...matchingMainCategory.resources];
-        const hierarchicalSubs: any[] = [];
-        
-        // Process level 2 subcategories
-        mainCat.subcategories.forEach(subCat => {
-          const matchingSubCategory = filteredCategories.find(cat => cat.name === subCat.name);
-          
-          if (matchingSubCategory) {
-            console.log(`  📄 Level 2: ${subCat.name} (${matchingSubCategory.resources.length} direct resources)`);
-            
-            // Collect subcategory resources and children
-            let subcategoryResources = [...matchingSubCategory.resources];
-            const subSubcategories: any[] = [];
-            
-            // Process level 3 children if they exist
-            if (subCat.children) {
-              subCat.children.forEach(childName => {
-                const matchingChild = filteredCategories.find(cat => cat.name === childName);
-                if (matchingChild) {
-                  console.log(`    └── Level 3: ${childName} (${matchingChild.resources.length} resources)`);
-                  subcategoryResources = subcategoryResources.concat(matchingChild.resources);
-                  subSubcategories.push({
-                    name: childName,
-                    resources: matchingChild.resources
-                  });
-                  processedNames.add(childName);
-                }
-              });
-            }
-            
-            hierarchicalSubs.push({
-              name: subCat.name,
-              resources: subcategoryResources,
-              subcategories: subSubcategories
-            });
-            
-            // Add subcategory resources to main category total
-            totalResources = totalResources.concat(subcategoryResources);
-            processedNames.add(subCat.name);
-          }
+      group.categories.forEach(categoryName => {
+        const matchingCategory = filteredCategories.find(cat => cat.name === categoryName);
+        if (matchingCategory && !usedCategories.has(categoryName)) {
+          groupCategories.push(matchingCategory);
+          usedCategories.add(categoryName);
+        }
+      });
+      
+      if (groupCategories.length > 0) {
+        groupedCategories.push({
+          groupName: group.name,
+          categories: groupCategories
         });
-        
-        // Create hierarchical category with accurate counts
-        hierarchicalCategories.push({
-          name: mainCat.name,
-          slug: getCategorySlug(mainCat.name),
-          resources: totalResources,
-          subcategories: hierarchicalSubs
-        });
-        
-        processedNames.add(mainCat.name);
-        console.log(`✅ ${mainCat.name}: ${totalResources.length} total resources across ${hierarchicalSubs.length} subcategories`);
       }
     });
 
-    // Add any unprocessed categories
-    const remainingCategories = filteredCategories.filter(cat => !processedNames.has(cat.name));
+    // Add any remaining categories
+    const remainingCategories = filteredCategories.filter(cat => !usedCategories.has(cat.name));
     if (remainingCategories.length > 0) {
-      console.log("📌 Adding remaining categories:", remainingCategories.map(c => c.name));
-      hierarchicalCategories.push(...remainingCategories);
+      groupedCategories.push({
+        groupName: "📦 Other Tools",
+        categories: remainingCategories
+      });
     }
 
-    console.log("🎉 HIERARCHICAL STRUCTURE COMPLETE:");
-    hierarchicalCategories.forEach((cat, index) => {
-      console.log(`${index + 1}. 📁 ${cat.name} (${cat.resources.length} total resources)`);
-      if (cat.subcategories && cat.subcategories.length > 0) {
-        cat.subcategories.forEach((sub, subIndex) => {
-          console.log(`   ${subIndex + 1}. 📄 ${sub.name} (${sub.resources.length} resources)`);
-        });
-      }
+    console.log("🎉 GROUPED CATEGORIES STRUCTURE:");
+    groupedCategories.forEach(group => {
+      console.log(`📁 ${group.groupName} (${group.categories.length} categories)`);
+      group.categories.forEach(cat => {
+        console.log(`  └── ${cat.name} (${cat.resources.length} resources)`);
+      });
     });
     console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
-    return hierarchicalCategories;
+    return groupedCategories;
   };
   
   // Set initially open categories based on URL
@@ -281,49 +209,45 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
           </div>
         ) : (
           <div className="space-y-1">
-            {/* Real categories with proper hierarchical organization */}
+            {/* Grouped categories with original data structure */}
             {getHierarchicalCategories(categories)
-              .map(category => (
-              <Accordion
-                key={category.name}
-                type="multiple"
-                value={openCategories}
-                className="w-full"
-              >
-                <AccordionItem value={category.name} className="border-0">
-                  <AccordionTrigger
-                    onClick={() => toggleCategory(category.name)}
-                    className="py-2 px-2 text-sm hover:bg-accent hover:text-accent-foreground rounded-md"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Folder className="h-4 w-4" />
-                      <span>{category.name}</span>
-                    </div>
-                  </AccordionTrigger>
-                  
-                  <AccordionContent className="pb-1 pl-4">
-                    <Button
-                      variant="ghost"
-                      className={cn(
-                        "w-full justify-start font-normal text-sm mb-1",
-                        location === `/category/${getCategorySlug(category.name)}` 
-                          ? "bg-accent text-accent-foreground" 
-                          : ""
-                      )}
-                      onClick={() => navigate(`/category/${getCategorySlug(category.name)}`)}
-                    >
-                      All ({category.resources.length})
-                    </Button>
-                    
-                    {/* Render subcategories if they exist - Level 2 */}
-                    {category.subcategories && category.subcategories.length > 0 && (
-                      <div className="mt-1 space-y-1">
-                        {category.subcategories.map(subcategory => (
-                          <div key={subcategory.name}>
+              .map(group => (
+              <div key={group.groupName} className="mb-4">
+                <h3 className="px-2 mb-2 text-xs font-semibold text-muted-foreground/70 uppercase tracking-wider">
+                  {group.groupName}
+                </h3>
+                <div className="space-y-1">
+                  {group.categories.map((category: Category) => (
+                    <div key={category.name}>
+                      {/* Main Category */}
+                      <Button
+                        variant="ghost"
+                        className={cn(
+                          "w-full justify-start font-normal text-sm mb-1",
+                          location === `/category/${getCategorySlug(category.name)}` 
+                            ? "bg-accent text-accent-foreground" 
+                            : ""
+                        )}
+                        onClick={() => navigate(`/category/${getCategorySlug(category.name)}`)}
+                      >
+                        <div className="flex items-center gap-2 w-full">
+                          <Folder className="h-4 w-4 flex-shrink-0" />
+                          <span className="truncate">{category.name}</span>
+                          <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded ml-auto">
+                            {category.resources.length}
+                          </span>
+                        </div>
+                      </Button>
+                      
+                      {/* Subcategories */}
+                      {category.subcategories && category.subcategories.length > 0 && (
+                        <div className="ml-4 space-y-1">
+                          {category.subcategories.map((subcategory: any) => (
                             <Button
+                              key={subcategory.name}
                               variant="ghost"
                               className={cn(
-                                "w-full justify-start font-normal text-xs pl-4",
+                                "w-full justify-start font-normal text-xs pl-2",
                                 location === `/subcategory/${getSubcategorySlug(category.name, subcategory.name)}` 
                                   ? "bg-accent text-accent-foreground" 
                                   : "text-muted-foreground hover:text-foreground"
@@ -338,40 +262,13 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
                                 </span>
                               </div>
                             </Button>
-                            
-                            {/* Render sub-subcategories if they exist - Level 3 */}
-                            {subcategory.subcategories && subcategory.subcategories.length > 0 && (
-                              <div className="mt-1 space-y-1 pl-6">
-                                {subcategory.subcategories.map(subSubcategory => (
-                                  <Button
-                                    key={subSubcategory.name}
-                                    variant="ghost"
-                                    className={cn(
-                                      "w-full justify-start font-normal text-xs pl-2",
-                                      location === `/subcategory/${getSubcategorySlug(subcategory.name, subSubcategory.name)}` 
-                                        ? "bg-accent text-accent-foreground" 
-                                        : "text-muted-foreground/70 hover:text-foreground"
-                                    )}
-                                    onClick={() => navigate(`/subcategory/${getSubcategorySlug(subcategory.name, subSubcategory.name)}`)}
-                                  >
-                                    <div className="flex items-center gap-2 w-full">
-                                      <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30 flex-shrink-0" />
-                                      <span className="truncate text-[11px]">{subSubcategory.name}</span>
-                                      <span className="text-[10px] bg-muted/50 text-muted-foreground px-1 py-0.5 rounded ml-auto">
-                                        {subSubcategory.resources.length}
-                                      </span>
-                                    </div>
-                                  </Button>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         )}
