@@ -16,7 +16,7 @@ export default function ResourceCompactItem({ resource }: ResourceCompactItemPro
   return (
     <ResourcePreviewTooltip resource={resource} side="top" align="center">
       <div 
-        className="p-3 border rounded-md hover:bg-accent/50 cursor-pointer transition-colors"
+        className="p-3 border border-border rounded-md hover:bg-accent/50 cursor-pointer transition-colors"
         onClick={handleClick}
       >
         <div className="flex items-start justify-between gap-2 mb-2">

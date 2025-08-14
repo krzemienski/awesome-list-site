@@ -64,19 +64,7 @@ export default function MainLayout({ awesomeList, isLoading, children }: MainLay
           isLoading={isLoading}
         />
         
-        {/* Mobile overlay */}
-        {isMobile && isSidebarOpen && (
-          <div 
-            className="fixed inset-0 bg-black/50 z-40 md:hidden"
-            data-testid="sidebar-overlay"
-            onClick={() => setIsSidebarOpen(false)}
-            aria-hidden="true"
-          />
-        )}
-        
-        <main className={`flex-1 py-4 px-4 sm:py-6 sm:px-6 transition-all duration-300 ease-in-out ${
-          isSidebarOpen && !isMobile ? 'ml-64' : 'ml-0'
-        }`}>
+        <main className="flex-1 py-6 px-4 md:px-6">
           {children}
         </main>
       </div>

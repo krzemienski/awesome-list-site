@@ -140,9 +140,29 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
         </>
       ) : (
         <>
+          <div className="mb-6">
+            <p className="text-muted-foreground mb-4">
+              {awesomeList?.description || "A curated list of awesome resources"}
+            </p>
+            
+            {/* Search Bar */}
+            <div className="relative mb-4">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Search resources..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
+          
           {/* Controls */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <span>
+                Showing {filteredResources.length} of {allResources.length} resources
+              </span>
               {searchTerm && (
                 <span className="text-blue-600">
                   for "{searchTerm}"
@@ -262,7 +282,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
             <div className="grid grid-cols-2 gap-2 mb-8">
               {paginatedResources.map((resource, index) => (
                 <MobileResourcePopover key={`${resource.title}-${resource.url}`} resource={resource}>
-                  <div className="p-3 border rounded-lg bg-card hover:bg-accent/50 transition-colors min-h-[120px] flex flex-col">
+                  <div className="p-3 border border-border rounded-lg bg-card hover:bg-accent/50 transition-colors min-h-[120px] flex flex-col">
                     <h3 className="text-sm font-medium text-foreground mb-2 line-clamp-2 flex-shrink-0">
                       {resource.title}
                     </h3>
@@ -280,7 +300,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
             <div className="grid grid-cols-1 gap-4 mb-8">
               {paginatedResources.map((resource, index) => (
                 <MobileResourcePopover key={`${resource.title}-${resource.url}`} resource={resource}>
-                  <div className="p-6 border rounded-xl bg-card shadow-sm hover:shadow-md transition-all">
+                  <div className="p-6 border border-border rounded-xl bg-card shadow-sm hover:shadow-md transition-all">
                     <div className="space-y-3">
                       <h3 className="text-lg font-semibold text-foreground">
                         {resource.title}
