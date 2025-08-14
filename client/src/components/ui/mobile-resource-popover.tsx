@@ -58,9 +58,9 @@ export default function MobileResourcePopover({ resource, children }: MobileReso
       </DialogTrigger>
       <DialogContent 
         ref={contentRef}
-        className="w-[95vw] max-w-md mx-auto touch-optimized" 
+        className="w-[95vw] max-w-md touch-optimized" 
         aria-describedby="resource-description"
-        data-mobile-optimized={true}
+        data-mobile-optimized="true"
       >
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold leading-tight text-foreground">
