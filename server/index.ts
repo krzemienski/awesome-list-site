@@ -4,17 +4,20 @@ import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
 
-// CORS middleware - accept all origins
+// Comprehensive CORS middleware - accept all origins and handle all preflight requests
 app.use((req, res, next) => {
+  // Set CORS headers for all requests
   res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control, X-Forwarded-For');
+  res.header('Access-Control-Max-Age', '86400'); // Cache preflight for 24 hours
   
+  // Handle preflight OPTIONS requests immediately
   if (req.method === 'OPTIONS') {
-    res.sendStatus(200);
-  } else {
-    next();
+    return res.status(200).end();
   }
+  
+  next();
 });
 
 app.use(express.json());
