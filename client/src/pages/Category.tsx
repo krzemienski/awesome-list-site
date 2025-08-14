@@ -42,7 +42,7 @@ export default function Category() {
   
   // Find the current category and its resources
   const currentCategory = awesomeList?.categories.find(cat => 
-    slugify(cat.name) === slug
+    cat.slug === slug
   );
   
   const categoryName = currentCategory ? currentCategory.name : deslugify(slug || "");
