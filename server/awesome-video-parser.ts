@@ -55,35 +55,60 @@ export async function fetchAwesomeVideoList(): Promise<AwesomeListData> {
     const data = await response.json();
     console.log(`✅ JSON data fetched successfully`);
     
-    // Parse categories into a lookup map
+    // Build category lookup map for hierarchy traversal
     const categoryMap = new Map<string, VideoCategory>();
     data.categories?.forEach((cat: VideoCategory) => {
       categoryMap.set(cat.id, cat);
     });
     
-    // Build category hierarchy tree
-    const topLevelCategories = data.categories?.filter((cat: VideoCategory) => !cat.parent) || [];
-    const categoryHierarchy = new Map<string, {
-      category: VideoCategory;
-      level2: Map<string, { category: VideoCategory; level3: VideoCategory[] }>;
-    }>();
+    // Define exact CSV top-level category mapping with expected resource counts
+    const csvTopLevelCategories = [
+      { id: "community-events", title: "Community & Events", expectedCount: 91 },
+      { id: "encoding-codecs", title: "Encoding & Codecs", expectedCount: 392 },
+      { id: "general-tools", title: "General Tools", expectedCount: 97 },
+      { id: "infrastructure-delivery", title: "Infrastructure & Delivery", expectedCount: 134 },
+      { id: "intro-learning", title: "Intro & Learning", expectedCount: 229 },
+      { id: "media-tools", title: "Media Tools", expectedCount: 317 },
+      { id: "players-clients", title: "Players & Clients", expectedCount: 425 },
+      { id: "protocols-transport", title: "Protocols & Transport", expectedCount: 252 },
+      { id: "standards-industry", title: "Standards & Industry", expectedCount: 174 }
+    ];
     
-    // Build 3-level hierarchy
-    topLevelCategories.forEach((level1: VideoCategory) => {
-      const level2Map = new Map<string, { category: VideoCategory; level3: VideoCategory[] }>();
+    // Function to find the top-level category for any given category ID
+    function findTopLevelCategory(categoryId: string): string | null {
+      const category = categoryMap.get(categoryId);
+      if (!category) return null;
       
-      // Find level 2 categories
-      const level2Categories = data.categories?.filter((cat: VideoCategory) => cat.parent === level1.id) || [];
-      level2Categories.forEach((level2: VideoCategory) => {
-        // Find level 3 categories
-        const level3Categories = data.categories?.filter((cat: VideoCategory) => cat.parent === level2.id) || [];
-        level2Map.set(level2.id, { category: level2, level3: level3Categories });
-      });
+      // If this category has no parent, it's a top-level category
+      if (!category.parent) {
+        return category.id;
+      }
       
-      categoryHierarchy.set(level1.id, { category: level1, level2: level2Map });
-    });
+      // Recursively find the top-level parent
+      return findTopLevelCategory(category.parent);
+    }
     
-    // Parse resources and map them to the hierarchy
+    // Function to find level 2 category for a given category ID
+    function findLevel2Category(categoryId: string): string | null {
+      const category = categoryMap.get(categoryId);
+      if (!category) return null;
+      
+      // If this category's parent is a top-level category, this is level 2
+      if (category.parent) {
+        const parent = categoryMap.get(category.parent);
+        if (parent && !parent.parent) {
+          return category.id;
+        }
+        // If parent has a parent, recursively find level 2
+        if (parent && parent.parent) {
+          return findLevel2Category(category.parent);
+        }
+      }
+      
+      return null;
+    }
+    
+    // Parse resources and map them correctly to CSV hierarchy
     const resources: Array<{
       id: string;
       title: string;
@@ -103,48 +128,38 @@ export async function fetchAwesomeVideoList(): Promise<AwesomeListData> {
         const generatedTags = generateVideoTags(resource.title, resource.description || '', resource.homepage);
         const allTags = Array.from(new Set([...existingTags, ...generatedTags])); // Remove duplicates
         
-        // Determine category hierarchy from the resource's category array
-        const leafCategoryId = resource.category?.[0] || 'video-tools';
-        const leafCategory = categoryMap.get(leafCategoryId);
-        
-        if (!leafCategory) {
-          console.warn(`Unknown category ID: ${leafCategoryId}`);
+        // Get the direct category from the resource
+        const directCategoryId = resource.category?.[0];
+        if (!directCategoryId) {
+          console.warn(`Resource has no category: ${resource.title}`);
           return;
         }
         
-        // Find the hierarchy path: leaf -> level2 -> level1
-        let level1Title = leafCategory.title;
-        let level2Title: string | undefined = undefined;
-        let leafTitle = leafCategory.title;
-        
-        if (leafCategory.parent) {
-          const parentCategory = categoryMap.get(leafCategory.parent);
-          if (parentCategory) {
-            if (parentCategory.parent) {
-              // This is a level 3 category
-              const grandParentCategory = categoryMap.get(parentCategory.parent);
-              if (grandParentCategory) {
-                level1Title = grandParentCategory.title;
-                level2Title = parentCategory.title;
-                leafTitle = leafCategory.title;
-              }
-            } else {
-              // This is a level 2 category
-              level1Title = parentCategory.title;
-              level2Title = leafCategory.title;
-              leafTitle = leafCategory.title;
-            }
-          }
+        // Find the top-level category for this resource
+        const topLevelCategoryId = findTopLevelCategory(directCategoryId);
+        if (!topLevelCategoryId) {
+          console.warn(`Could not find top-level category for: ${directCategoryId}`);
+          return;
         }
-        // If no parent, it's a top-level category (shouldn't happen for resources, but handle it)
+        
+        // Find the corresponding CSV category
+        const csvCategory = csvTopLevelCategories.find(cat => cat.id === topLevelCategoryId);
+        if (!csvCategory) {
+          console.warn(`Unknown top-level category: ${topLevelCategoryId}`);
+          return;
+        }
+        
+        // Find level 2 category (subcategory)
+        const level2CategoryId = findLevel2Category(directCategoryId);
+        const level2Category = level2CategoryId ? categoryMap.get(level2CategoryId) : null;
         
         resources.push({
           id: `video-${index}`,
           title: resource.title,
           url: resource.homepage,
           description: resource.description,
-          category: level1Title,
-          subcategory: level2Title,
+          category: csvCategory.title,
+          subcategory: level2Category?.title,
           tags: allTags.slice(0, 8) // Limit to 8 tags
         });
       });
