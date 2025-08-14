@@ -62,184 +62,8 @@ export async function fetchAwesomeVideoList(): Promise<AwesomeListData> {
       categoryMap.set(cat.id, cat);
     });
     
-    // Complete 3-level hierarchy structure based on CSV analysis
-    const hierarchyStructure = {
-      "community-events": {
-        title: "Community & Events",
-        totalCount: 91,
-        level2: {
-          "community-groups": {
-            title: "Community Groups",
-            count: 4,
-            level3: {
-              "online-forums": { title: "Online Forums", count: 2 },
-              "slack-meetups": { title: "Slack & Meetups", count: 0 }
-            }
-          },
-          "events-conferences": {
-            title: "Events & Conferences", 
-            count: 6,
-            level3: {
-              "conferences": { title: "Conferences", count: 0 },
-              "podcasts-webinars": { title: "Podcasts & Webinars", count: 2 }
-            }
-          }
-        }
-      },
-      "encoding-codecs": {
-        title: "Encoding & Codecs",
-        totalCount: 392,
-        level2: {
-          "codecs": {
-            title: "Codecs",
-            count: 29,
-            level3: {
-              "av1": { title: "AV1", count: 6 },
-              "hevc": { title: "HEVC", count: 10 },
-              "vp9": { title: "VP9", count: 1 }
-            }
-          },
-          "encoding-tools": {
-            title: "Encoding Tools",
-            count: 240,
-            level3: {
-              "ffmpeg": { title: "FFMPEG", count: 66 },
-              "other-encoders": { title: "Other Encoders", count: 1 }
-            }
-          }
-        }
-      },
-      "general-tools": {
-        title: "General Tools",
-        totalCount: 97,
-        level2: {
-          "drm": { title: "DRM", count: 17 },
-          "ffmpeg-tools": { title: "FFMPEG & Tools", count: 0 }
-        }
-      },
-      "infrastructure-delivery": {
-        title: "Infrastructure & Delivery", 
-        totalCount: 134,
-        level2: {
-          "cloud-cdn": {
-            title: "Cloud & CDN",
-            count: 54,
-            level3: {
-              "cdn-integration": { title: "CDN Integration", count: 3 },
-              "cloud-platforms": { title: "Cloud Platforms", count: 4 }
-            }
-          },
-          "streaming-servers": {
-            title: "Streaming Servers",
-            count: 39,
-            level3: {
-              "origin-servers": { title: "Origin Servers", count: 1 },
-              "storage-solutions": { title: "Storage Solutions", count: 3 }
-            }
-          }
-        }
-      },
-      "intro-learning": {
-        title: "Intro & Learning",
-        totalCount: 229,
-        level2: {
-          "introduction": { title: "Introduction", count: 4 },
-          "learning-resources": { title: "Learning Resources", count: 36 },
-          "tutorials-case-studies": { title: "Tutorials & Case Studies", count: 60 }
-        }
-      },
-      "media-tools": {
-        title: "Media Tools",
-        totalCount: 317,
-        level2: {
-          "ads-qoe": {
-            title: "Ads & QoE",
-            count: 45,
-            level3: {
-              "advertising": { title: "Advertising", count: 0 },
-              "quality-testing": { title: "Quality & Testing", count: 36 }
-            }
-          },
-          "audio-subtitles": {
-            title: "Audio & Subtitles",
-            count: 58,
-            level3: {
-              "audio": { title: "Audio", count: 8 },
-              "subtitles-captions": { title: "Subtitles & Captions", count: 6 }
-            }
-          }
-        }
-      },
-      "players-clients": {
-        title: "Players & Clients",
-        totalCount: 425,
-        level2: {
-          "hardware-players": {
-            title: "Hardware Players",
-            count: 63,
-            level3: {
-              "chromecast": { title: "Chromecast", count: 2 },
-              "roku": { title: "Roku", count: 24 },
-              "smart-tv": { title: "Smart TVs", count: 12 }
-            }
-          },
-          "mobile-web-players": {
-            title: "Mobile & Web Players",
-            count: 148,
-            level3: {
-              "android": { title: "Android", count: 4 },
-              "ios-tvos": { title: "iOS/tvOS", count: 19 },
-              "web-players": { title: "Web Players", count: 27 }
-            }
-          }
-        }
-      },
-      "protocols-transport": {
-        title: "Protocols & Transport",
-        totalCount: 252,
-        level2: {
-          "adaptive-streaming": {
-            title: "Adaptive Streaming",
-            count: 77,
-            level3: {
-              "dash": { title: "DASH", count: 8 },
-              "hls": { title: "HLS", count: 9 }
-            }
-          },
-          "transport-protocols": {
-            title: "Transport Protocols",
-            count: 92,
-            level3: {
-              "rist": { title: "RIST", count: 0 },
-              "rtmp": { title: "RTMP", count: 0 },
-              "srt": { title: "SRT", count: 0 }
-            }
-          }
-        }
-      },
-      "standards-industry": {
-        title: "Standards & Industry",
-        totalCount: 174,
-        level2: {
-          "specs-standards": {
-            title: "Specs & Standards",
-            count: 87,
-            level3: {
-              "mpeg-forums": { title: "MPEG & Forums", count: 10 },
-              "official-specs": { title: "Official Specs", count: 4 }
-            }
-          },
-          "vendors-hdr": {
-            title: "Vendors & HDR",
-            count: 71,
-            level3: {
-              "hdr-guidelines": { title: "HDR Guidelines", count: 3 },
-              "vendor-docs": { title: "Vendor Docs", count: 4 }
-            }
-          }
-        }
-      }
-    };
+    // Build hierarchy dynamically from JSON categories
+    const hierarchyStructure = buildHierarchyFromJSON(data.categories || [], categoryMap);
     
     // Function to find the top-level category for any given category ID
     const findTopLevelCategory = (categoryId: string): string | null => {
@@ -389,12 +213,6 @@ export async function fetchAwesomeVideoList(): Promise<AwesomeListData> {
     
     console.log(`✅ Parsed ${resources.length} video resources`);
     
-    // Apply intelligent redistribution to match CSV structure exactly
-    redistributeResourcesForCSVAlignment(resources, hierarchyStructure);
-    
-    // Apply precise subcategory balancing to match exact target counts
-    enforceExactSubcategoryCounts(resources, hierarchyStructure);
-    
     // Build complete 3-level hierarchy structure
     const categories = Object.keys(hierarchyStructure).map(topLevelId => {
       const topLevel = hierarchyStructure[topLevelId];
@@ -415,8 +233,7 @@ export async function fetchAwesomeVideoList(): Promise<AwesomeListData> {
           return {
             name: level3.title,
             slug: level3Id,
-            resources: level3Resources,
-            expectedCount: level3.count
+            resources: level3Resources
           };
         }) : [];
         
@@ -424,8 +241,7 @@ export async function fetchAwesomeVideoList(): Promise<AwesomeListData> {
           name: level2.title,
           slug: level2Id,
           resources: level2Resources,
-          subSubcategories,
-          expectedCount: level2.count
+          subSubcategories
         };
       });
       
@@ -433,31 +249,21 @@ export async function fetchAwesomeVideoList(): Promise<AwesomeListData> {
         name: topLevel.title,
         slug: topLevelId,
         resources: categoryResources,
-        subcategories,
-        expectedCount: topLevel.totalCount
+        subcategories
       };
     });
     
-    // Log the hierarchical totals for verification
-    console.log("📊 3-Level Hierarchy Verification:");
+    // Log the hierarchical structure built from JSON data
+    console.log("📊 Dynamic Hierarchy Structure:");
     categories.forEach(cat => {
-      const actualTotal = cat.resources.length;
-      const expectedTotal = cat.expectedCount;
-      const status = Math.abs(actualTotal - expectedTotal) <= 5 ? '✅' : '❌';
-      console.log(`  ${status} ${cat.name}: ${actualTotal} projects (expected: ${expectedTotal})`);
+      console.log(`  📁 ${cat.name}: ${cat.resources.length} resources`);
       
       cat.subcategories.forEach(subcat => {
-        const subActual = subcat.resources.length;
-        const subExpected = subcat.expectedCount;
-        const subStatus = Math.abs(subActual - subExpected) <= 2 ? '✅' : '❌';
-        console.log(`    ${subStatus} ${subcat.name}: ${subActual} projects (expected: ${subExpected})`);
+        console.log(`    📂 ${subcat.name}: ${subcat.resources.length} resources`);
         
         if (subcat.subSubcategories) {
           subcat.subSubcategories.forEach(subsubcat => {
-            const subsubActual = subsubcat.resources.length;
-            const subsubExpected = subsubcat.expectedCount;
-            const subsubStatus = Math.abs(subsubActual - subsubExpected) <= 1 ? '✅' : '❌';
-            console.log(`      ${subsubStatus} ${subsubcat.name}: ${subsubActual} projects (expected: ${subsubExpected})`);
+            console.log(`      📄 ${subsubcat.name}: ${subsubcat.resources.length} resources`);
           });
         }
       });
@@ -475,6 +281,68 @@ export async function fetchAwesomeVideoList(): Promise<AwesomeListData> {
     console.error(`❌ Error fetching awesome-video data: ${error.message}`);
     throw error;
   }
+}
+
+/**
+ * Build hierarchy structure dynamically from JSON categories
+ */
+function buildHierarchyFromJSON(categories: VideoCategory[], categoryMap: Map<string, VideoCategory>) {
+  const hierarchy: any = {};
+  
+  // Find all top-level categories (categories without parents)
+  const topLevelCategories = categories.filter(cat => !cat.parent);
+  
+  topLevelCategories.forEach(topCat => {
+    const slug = generateSlug(topCat.title);
+    hierarchy[slug] = {
+      id: topCat.id,
+      title: topCat.title,
+      level2: {}
+    };
+    
+    // Find level 2 categories (children of top-level)
+    const level2Categories = categories.filter(cat => cat.parent === topCat.id);
+    
+    level2Categories.forEach(level2Cat => {
+      const level2Slug = generateSlug(level2Cat.title);
+      hierarchy[slug].level2[level2Slug] = {
+        id: level2Cat.id,
+        title: level2Cat.title,
+        level3: {}
+      };
+      
+      // Find level 3 categories (children of level 2)
+      const level3Categories = categories.filter(cat => cat.parent === level2Cat.id);
+      
+      level3Categories.forEach(level3Cat => {
+        const level3Slug = generateSlug(level3Cat.title);
+        hierarchy[slug].level2[level2Slug].level3[level3Slug] = {
+          id: level3Cat.id,
+          title: level3Cat.title
+        };
+      });
+      
+      // If no level 3 categories, remove the empty level3 object
+      if (Object.keys(hierarchy[slug].level2[level2Slug].level3).length === 0) {
+        delete hierarchy[slug].level2[level2Slug].level3;
+      }
+    });
+  });
+  
+  console.log(`📊 Built dynamic hierarchy with ${topLevelCategories.length} top-level categories`);
+  return hierarchy;
+}
+
+/**
+ * Generate URL-friendly slug from category title
+ */
+function generateSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[&]/g, '')
+    .replace(/[\s\-_]+/g, '-')
+    .replace(/[^a-z0-9\-]/g, '')
+    .replace(/^-+|-+$/g, '');
 }
 
 /**

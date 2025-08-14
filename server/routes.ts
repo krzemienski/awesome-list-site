@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { fetchAwesomeList } from "./parser";
-import { fetchAwesomeVideoList } from "./awesome-video-parser";
+import { fetchAwesomeVideoData } from "./awesome-video-parser-clean";
 import { RecommendationEngine, UserProfile } from "./recommendation-engine";
 // Client-side parser not needed on server - server-side parser provides correct format
 import { fetchAwesomeLists, searchAwesomeLists } from "./github-api";
@@ -187,7 +187,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize awesome video data
   try {
     console.log('Fetching awesome-video data from JSON source');
-    const awesomeVideoData = await fetchAwesomeVideoList();
+    const awesomeVideoData = await fetchAwesomeVideoData();
     storage.setAwesomeListData(awesomeVideoData);
     console.log(`Successfully fetched awesome-video with ${awesomeVideoData.resources.length} resources`);
   } catch (error) {
