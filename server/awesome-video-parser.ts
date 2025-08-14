@@ -86,13 +86,17 @@ export async function fetchAwesomeVideoList(): Promise<AwesomeListData> {
         const categoryInfo = categoryMap.get(categoryId);
         const parentCategoryInfo = categoryInfo?.parent ? categoryMap.get(categoryInfo.parent) : null;
         
+        // Fix hierarchy: Use parent as main category, direct as subcategory
+        const mainCategory = parentCategoryInfo?.title || categoryInfo?.title || 'Video Tools';
+        const subCategory = parentCategoryInfo ? categoryInfo?.title : undefined;
+        
         resources.push({
           id: `video-${index}`,
           title: resource.title,
           url: resource.homepage,
           description: resource.description,
-          category: categoryInfo?.title || 'Video Tools',
-          subcategory: parentCategoryInfo?.title,
+          category: mainCategory,
+          subcategory: subCategory,
           tags: allTags.slice(0, 8) // Limit to 8 tags
         });
       });
