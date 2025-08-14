@@ -143,6 +143,7 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
             
             // Collect subcategory resources and children
             let subcategoryResources = [...matchingSubCategory.resources];
+            const subSubcategories: any[] = [];
             
             // Process level 3 children if they exist
             if (subCat.children) {
@@ -151,6 +152,10 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
                 if (matchingChild) {
                   console.log(`    └── Level 3: ${childName} (${matchingChild.resources.length} resources)`);
                   subcategoryResources = subcategoryResources.concat(matchingChild.resources);
+                  subSubcategories.push({
+                    name: childName,
+                    resources: matchingChild.resources
+                  });
                   processedNames.add(childName);
                 }
               });
@@ -158,7 +163,8 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
             
             hierarchicalSubs.push({
               name: subCat.name,
-              resources: subcategoryResources
+              resources: subcategoryResources,
+              subcategories: subSubcategories
             });
             
             // Add subcategory resources to main category total
@@ -276,7 +282,7 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
         ) : (
           <div className="space-y-1">
             {/* Real categories with proper hierarchical organization */}
-            {getOrganizedCategories(categories)
+            {getHierarchicalCategories(categories)
               .map(category => (
               <Accordion
                 key={category.name}
@@ -309,29 +315,57 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
                       All ({category.resources.length})
                     </Button>
                     
-                    {/* Render subcategories if they exist */}
+                    {/* Render subcategories if they exist - Level 2 */}
                     {category.subcategories && category.subcategories.length > 0 && (
                       <div className="mt-1 space-y-1">
                         {category.subcategories.map(subcategory => (
-                          <Button
-                            key={subcategory.name}
-                            variant="ghost"
-                            className={cn(
-                              "w-full justify-start font-normal text-xs pl-4",
-                              location === `/subcategory/${getSubcategorySlug(category.name, subcategory.name)}` 
-                                ? "bg-accent text-accent-foreground" 
-                                : "text-muted-foreground hover:text-foreground"
+                          <div key={subcategory.name}>
+                            <Button
+                              variant="ghost"
+                              className={cn(
+                                "w-full justify-start font-normal text-xs pl-4",
+                                location === `/subcategory/${getSubcategorySlug(category.name, subcategory.name)}` 
+                                  ? "bg-accent text-accent-foreground" 
+                                  : "text-muted-foreground hover:text-foreground"
+                              )}
+                              onClick={() => navigate(`/subcategory/${getSubcategorySlug(category.name, subcategory.name)}`)}
+                            >
+                              <div className="flex items-center gap-2 w-full">
+                                <div className="w-2 h-2 rounded-full bg-muted-foreground/40 flex-shrink-0" />
+                                <span className="truncate">{subcategory.name}</span>
+                                <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded ml-auto">
+                                  {subcategory.resources.length}
+                                </span>
+                              </div>
+                            </Button>
+                            
+                            {/* Render sub-subcategories if they exist - Level 3 */}
+                            {subcategory.subcategories && subcategory.subcategories.length > 0 && (
+                              <div className="mt-1 space-y-1 pl-6">
+                                {subcategory.subcategories.map(subSubcategory => (
+                                  <Button
+                                    key={subSubcategory.name}
+                                    variant="ghost"
+                                    className={cn(
+                                      "w-full justify-start font-normal text-xs pl-2",
+                                      location === `/subcategory/${getSubcategorySlug(subcategory.name, subSubcategory.name)}` 
+                                        ? "bg-accent text-accent-foreground" 
+                                        : "text-muted-foreground/70 hover:text-foreground"
+                                    )}
+                                    onClick={() => navigate(`/subcategory/${getSubcategorySlug(subcategory.name, subSubcategory.name)}`)}
+                                  >
+                                    <div className="flex items-center gap-2 w-full">
+                                      <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30 flex-shrink-0" />
+                                      <span className="truncate text-[11px]">{subSubcategory.name}</span>
+                                      <span className="text-[10px] bg-muted/50 text-muted-foreground px-1 py-0.5 rounded ml-auto">
+                                        {subSubcategory.resources.length}
+                                      </span>
+                                    </div>
+                                  </Button>
+                                ))}
+                              </div>
                             )}
-                            onClick={() => navigate(`/subcategory/${getSubcategorySlug(category.name, subcategory.name)}`)}
-                          >
-                            <div className="flex items-center gap-2 w-full">
-                              <div className="w-2 h-2 rounded-full bg-muted-foreground/40 flex-shrink-0" />
-                              <span className="truncate">{subcategory.name}</span>
-                              <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded ml-auto">
-                                {subcategory.resources.length}
-                              </span>
-                            </div>
-                          </Button>
+                          </div>
                         ))}
                       </div>
                     )}

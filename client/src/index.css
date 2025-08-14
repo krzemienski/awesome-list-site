@@ -1,9 +1,8 @@
+@import './styles/mobile-optimizations.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Import mobile optimizations */
-@import './styles/mobile-optimizations.css';
 
 html {
   color-scheme: dark;
