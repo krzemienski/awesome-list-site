@@ -30,6 +30,7 @@ export default function Category() {
   const [sortBy, setSortBy] = useState("category"); // Match homepage default
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string>("all");
   
   // Fetch awesome list data - use same query as homepage
   const { data: rawData, isLoading, error } = useQuery({
@@ -77,14 +78,26 @@ export default function Category() {
       trackFilterUsage("search", search, filteredResources.length);
     }
   };
+
+  // Handle subcategory filter change
+  const handleSubcategoryChange = (subcategory: string) => {
+    setSelectedSubcategory(subcategory);
+    setCurrentPage(1); // Reset to first page
+    if (subcategory !== "all") {
+      trackFilterUsage("subcategory", subcategory, filteredResources.length);
+    }
+  };
   
-  // Filter resources by search term
+  // Filter resources by search term and subcategory
   const filteredResources = baseResources.filter(resource => {
     const matchesSearch = searchTerm === "" || 
       resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       resource.description.toLowerCase().includes(searchTerm.toLowerCase());
     
-    return matchesSearch;
+    const matchesSubcategory = selectedSubcategory === "all" || 
+      resource.subcategory === selectedSubcategory;
+    
+    return matchesSearch && matchesSubcategory;
   });
   
   // Sort resources
@@ -199,12 +212,36 @@ export default function Category() {
         </div>
         
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-wrap">
             {/* Layout Switcher */}
             <LayoutSwitcher
               currentLayout={layout}
               onLayoutChange={setLayout}
             />
+
+            {/* Subcategory Filter */}
+            {currentCategory && currentCategory.subcategories.length > 0 && (
+              <div className="flex gap-2 items-center">
+                <Filter className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">Filter:</span>
+                <Select
+                  value={selectedSubcategory}
+                  onValueChange={handleSubcategoryChange}
+                >
+                  <SelectTrigger className="w-40">
+                    <SelectValue placeholder="All subcategories" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All subcategories</SelectItem>
+                    {currentCategory.subcategories.map((subcategory) => (
+                      <SelectItem key={subcategory.slug} value={subcategory.name}>
+                        {subcategory.name} ({subcategory.resources.length})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             
             {/* Sort */}
             <div className="flex gap-2 items-center">

@@ -11,7 +11,7 @@ import SEOHead from "@/components/layout/SEOHead";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, ArrowLeft } from "lucide-react";
+import { Search, ArrowLeft, Filter } from "lucide-react";
 import { Link } from "wouter";
 import { deslugify, slugify, getCategorySlug, getSubcategorySlug } from "@/lib/utils";
 import { Resource, AwesomeList } from "@/types/awesome-list";
@@ -27,6 +27,7 @@ export default function Subcategory() {
   const [itemsPerPage, setItemsPerPage] = useState(24);
   const [sortBy, setSortBy] = useState("category"); // Match homepage default
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedSubSubcategory, setSelectedSubSubcategory] = useState<string>("all");
   
   // Fetch awesome list data - use same query as homepage
   const { data: rawData, isLoading, error } = useQuery({
@@ -80,14 +81,26 @@ export default function Subcategory() {
       trackFilterUsage("search", search, filteredResources.length);
     }
   };
+
+  // Handle sub-subcategory filter change
+  const handleSubSubcategoryChange = (subSubcategory: string) => {
+    setSelectedSubSubcategory(subSubcategory);
+    setCurrentPage(1); // Reset to first page
+    if (subSubcategory !== "all") {
+      trackFilterUsage("sub-subcategory", subSubcategory, filteredResources.length);
+    }
+  };
   
-  // Filter resources by search term
+  // Filter resources by search term and sub-subcategory
   const filteredResources = baseResources.filter(resource => {
     const matchesSearch = searchTerm === "" || 
       resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       resource.description.toLowerCase().includes(searchTerm.toLowerCase());
     
-    return matchesSearch;
+    const matchesSubSubcategory = selectedSubSubcategory === "all" || 
+      resource.subSubcategory === selectedSubSubcategory;
+    
+    return matchesSearch && matchesSubSubcategory;
   });
   
   // Sort resources
@@ -207,12 +220,36 @@ export default function Subcategory() {
         </div>
         
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-wrap">
             {/* Layout Switcher */}
             <LayoutSwitcher
               currentLayout={layout}
               onLayoutChange={setLayout}
             />
+
+            {/* Sub-subcategory Filter */}
+            {currentSubcategory && currentSubcategory.subSubcategories && currentSubcategory.subSubcategories.length > 0 && (
+              <div className="flex gap-2 items-center">
+                <Filter className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">Filter:</span>
+                <Select
+                  value={selectedSubSubcategory}
+                  onValueChange={handleSubSubcategoryChange}
+                >
+                  <SelectTrigger className="w-44">
+                    <SelectValue placeholder="All sub-subcategories" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All sub-subcategories</SelectItem>
+                    {currentSubcategory.subSubcategories?.map((subSubcategory) => (
+                      <SelectItem key={subSubcategory.slug} value={subSubcategory.name}>
+                        {subSubcategory.name} ({subSubcategory.resources.length})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             
             {/* Sort */}
             <div className="flex gap-2 items-center">
