@@ -262,7 +262,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
             <div className="grid grid-cols-2 gap-2 mb-8">
               {paginatedResources.map((resource, index) => (
                 <MobileResourcePopover key={`${resource.title}-${resource.url}`} resource={resource}>
-                  <div className="p-3 border border-border rounded-lg bg-card hover:bg-accent/50 transition-colors min-h-[120px] flex flex-col">
+                  <div className="p-3 border rounded-lg bg-card hover:bg-accent/50 transition-colors min-h-[120px] flex flex-col">
                     <h3 className="text-sm font-medium text-foreground mb-2 line-clamp-2 flex-shrink-0">
                       {resource.title}
                     </h3>
@@ -280,7 +280,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
             <div className="grid grid-cols-1 gap-4 mb-8">
               {paginatedResources.map((resource, index) => (
                 <MobileResourcePopover key={`${resource.title}-${resource.url}`} resource={resource}>
-                  <div className="p-6 border border-border rounded-xl bg-card shadow-sm hover:shadow-md transition-all">
+                  <div className="p-6 border rounded-xl bg-card shadow-sm hover:shadow-md transition-all">
                     <div className="space-y-3">
                       <h3 className="text-lg font-semibold text-foreground">
                         {resource.title}

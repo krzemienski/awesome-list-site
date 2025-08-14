@@ -17,7 +17,7 @@ export default function ResourceListItem({ resource }: ResourceListItemProps) {
   return (
     <ResourcePreviewTooltip resource={resource} side="right" align="start">
       <div 
-        className="flex items-center justify-between p-3 sm:p-4 border-b border-border hover:bg-accent/50 cursor-pointer transition-colors touch-manipulation"
+        className="flex items-center justify-between p-3 sm:p-4 border-b hover:bg-accent/50 cursor-pointer transition-colors touch-manipulation"
         onClick={handleClick}
         style={{ minHeight: '44px' }}
       >

@@ -4,7 +4,16 @@ import {
   SidebarTrigger,
   SidebarInset
 } from '@/components/ui/sidebar';
-import { AppSidebar } from '@/components/app-sidebar';
+import { Separator } from '@/components/ui/separator';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
+import { AppSidebar07 } from '@/components/app-sidebar-07';
 import Footer from './Footer';
 import SearchDialog from '@/components/ui/search-dialog';
 import { AwesomeList } from '@/types/awesome-list';
@@ -26,61 +35,68 @@ export default function MainLayoutNew({ awesomeList, isLoading, children }: Main
   return (
     <SidebarProvider defaultOpen={!isMobile}>
       <div className="flex w-full min-h-screen bg-background">
-        <AppSidebar awesomeList={awesomeList} isLoading={isLoading} />
+        <AppSidebar07 awesomeList={awesomeList} isLoading={isLoading} />
         
         <SidebarInset className="flex-1">
           <div className="flex flex-col h-full">
             {/* Top Bar */}
-            <header className="sticky top-0 z-50 flex h-14 items-center gap-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 sm:px-6">
-              <SidebarTrigger className="-ml-1">
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">Toggle sidebar</span>
-              </SidebarTrigger>
+            <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 border-b">
+              <div className="flex items-center gap-2 px-4">
+                <SidebarTrigger className="-ml-1" />
+                <Separator
+                  orientation="vertical"
+                  className="mr-2 h-4"
+                />
+                <Breadcrumb>
+                  <BreadcrumbList>
+                    <BreadcrumbItem className="hidden md:block">
+                      <BreadcrumbLink href="/">
+                        Awesome Video
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator className="hidden md:block" />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage>Resources</BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </BreadcrumbList>
+                </Breadcrumb>
+              </div>
               
-              <div className="flex-1 flex items-center justify-between">
-                {/* Title - Hidden on mobile when sidebar is open */}
-                <div className="flex items-center gap-2">
-                  <h1 className="text-lg font-semibold hidden sm:block">
-                    {awesomeList?.title || "Awesome Video"}
-                  </h1>
-                </div>
+              <div className="flex items-center gap-2 px-4">
                 
-                {/* Actions */}
-                <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setSearchOpen(true)}
+                  className="h-9 w-9"
+                >
+                  <Search className="h-4 w-4" />
+                  <span className="sr-only">Search</span>
+                </Button>
+                
+                {awesomeList?.repoUrl && (
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => setSearchOpen(true)}
+                    asChild
                     className="h-9 w-9"
                   >
-                    <Search className="h-4 w-4" />
-                    <span className="sr-only">Search</span>
-                  </Button>
-                  
-                  {awesomeList?.repoUrl && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      asChild
-                      className="h-9 w-9"
+                    <a
+                      href={awesomeList.repoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
                     >
-                      <a
-                        href={awesomeList.repoUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <Github className="h-4 w-4" />
-                        <span className="sr-only">GitHub</span>
-                      </a>
-                    </Button>
-                  )}
-                </div>
+                      <Github className="h-4 w-4" />
+                      <span className="sr-only">GitHub</span>
+                    </a>
+                  </Button>
+                )}
               </div>
             </header>
             
             {/* Main Content */}
-            <main className="flex-1 p-4 sm:p-6 overflow-y-auto">
-              <div className="mx-auto max-w-7xl">
+            <main className="flex-1 p-4 pt-0">
+              <div className="mx-auto">
                 {children}
               </div>
             </main>

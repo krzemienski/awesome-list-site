@@ -173,7 +173,7 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
           )}
         </div>
         
-        <div className="pt-2 border-t border-border">
+        <div className="pt-2 border-t">
           <p className="text-xs text-muted-foreground">
             Click to open in new tab
           </p>
@@ -214,11 +214,11 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
               autoCorrect="off"
               autoCapitalize="off"
               spellCheck={false}
-              className="w-full pl-10 pr-4 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-base md:text-sm"
+              className="w-full pl-10 pr-4 py-2 border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-base md:text-sm"
             />
           </div>
           
-          <div className="max-h-[300px] overflow-y-auto border border-border rounded-md">
+          <div className="max-h-[300px] overflow-y-auto border rounded-md">
             {showHistory && history.length > 0 ? (
               <div className="p-2">
                 <div className="flex items-center justify-between mb-2 px-2">
@@ -272,7 +272,7 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
                       <HoverCardTrigger asChild>
                         <div
                           onClick={() => handleSelect(resource)}
-                          className="p-3 hover:bg-accent hover:text-accent-foreground cursor-pointer rounded border-b border-border last:border-b-0 transition-colors"
+                          className="p-3 hover:bg-accent hover:text-accent-foreground cursor-pointer rounded border-b last:border-b-0 transition-colors"
                         >
                           <div className="flex items-center justify-between gap-2">
                             <div className="font-medium text-sm truncate flex-1">{resource.title}</div>

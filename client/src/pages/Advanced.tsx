@@ -328,7 +328,7 @@ export default function Advanced() {
             </a>
             <a 
               href="/category/web-frameworks" 
-              className="inline-flex items-center gap-2 px-4 py-2 border border-border rounded-md hover:bg-accent transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 border rounded-md hover:bg-accent transition-colors"
             >
               Explore Categories
             </a>
