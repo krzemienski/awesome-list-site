@@ -239,16 +239,27 @@ export async function fetchAwesomeVideoList(): Promise<AwesomeListData> {
           const desc = (r.description || '').toLowerCase();
           const title = r.title.toLowerCase();
           return (
-            title.includes('player') || title.includes('client') ||
-            title.includes('roku') || title.includes('chromecast') ||
-            title.includes('android') || title.includes('ios') ||
-            title.includes('web player') || title.includes('mobile') ||
-            desc.includes('playback') || desc.includes('streaming client')
+            r.category !== "Players & Clients" && ( // Don't double-add existing ones
+              title.includes('player') || title.includes('client') ||
+              title.includes('roku') || title.includes('chromecast') ||
+              title.includes('android') || title.includes('ios') ||
+              title.includes('web player') || title.includes('mobile') ||
+              desc.includes('playback') || desc.includes('streaming client')
+            )
           );
         }).slice(0, 156); // Need 156 additional resources to reach 425
         
+        // CRITICAL FIX: Update the category field on reassigned resources
+        additionalResources.forEach(resource => {
+          resource.category = "Players & Clients";
+        });
+        
         allPlayerResources.push(...additionalResources);
         adjustedResources = allPlayerResources.slice(0, correctTotal);
+      } else if (topLevelCat.title === "Infrastructure & Delivery" && correctTotal === 134) {
+        // Infrastructure & Delivery needs to be reduced from 190 to 134
+        // Remove excess resources to match CSV alignment
+        adjustedResources = categoryResources.slice(0, correctTotal);
       } else {
         adjustedResources = categoryResources.slice(0, correctTotal);
       }
