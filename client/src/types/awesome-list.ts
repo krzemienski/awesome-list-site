@@ -5,13 +5,21 @@ export interface Resource {
   description: string;
   category: string;
   subcategory?: string;
+  subSubcategory?: string;
   tags?: string[];
+}
+
+export interface SubSubcategory {
+  name: string;
+  slug: string;
+  resources: Resource[];
 }
 
 export interface Subcategory {
   name: string;
   slug: string;
   resources: Resource[];
+  subSubcategories?: SubSubcategory[];
 }
 
 export interface Category {

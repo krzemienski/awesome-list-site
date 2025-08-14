@@ -51,9 +51,12 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
     console.log("✅ Filtered categories:", filteredCategories.length);
     console.log("📝 Available categories:", filteredCategories.map(c => `${c.name} (${c.resources.length} resources)`));
 
-    // Calculate total navigation items for comprehensive testing
+    // Calculate total navigation items for comprehensive testing (including sub-subcategories)
     const totalSubcategories = filteredCategories.reduce((total, cat) => total + (cat.subcategories?.length || 0), 0);
-    console.log(`🧮 Total navigation items: ${filteredCategories.length} categories + ${totalSubcategories} subcategories = ${filteredCategories.length + totalSubcategories} items`);
+    const totalSubSubcategories = filteredCategories.reduce((total, cat) => 
+      total + (cat.subcategories?.reduce((subTotal, sub) => subTotal + (sub.subSubcategories?.length || 0), 0) || 0), 0
+    );
+    console.log(`🧮 Total navigation items: ${filteredCategories.length} categories + ${totalSubcategories} subcategories + ${totalSubSubcategories} sub-subcategories = ${filteredCategories.length + totalSubcategories + totalSubSubcategories} items`);
 
     console.log("🎯 HIERARCHICAL NAVIGATION STRUCTURE:");
     filteredCategories.forEach(cat => {
@@ -61,6 +64,11 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
       if (cat.subcategories && cat.subcategories.length > 0) {
         cat.subcategories.forEach(sub => {
           console.log(`  ├── ${sub.name} (${sub.resources.length} resources) -> /subcategory/${sub.slug}`);
+          if (sub.subSubcategories && sub.subSubcategories.length > 0) {
+            sub.subSubcategories.forEach(subSub => {
+              console.log(`    ├── ${subSub.name} (${subSub.resources.length} resources) -> /sub-subcategory/${subSub.slug}`);
+            });
+          }
         });
       }
     });
