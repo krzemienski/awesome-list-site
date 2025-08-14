@@ -6,7 +6,7 @@ import { useAnalytics } from "./hooks/use-analytics";
 import { useSessionAnalytics } from "./hooks/use-session-analytics";
 import { trackKeyboardShortcut } from "./lib/analytics";
 
-import MainLayout from "@/components/layout/new/MainLayout";
+import MainLayoutNew from "@/components/layout/MainLayoutNew";
 import ErrorPage from "@/pages/ErrorPage";
 import Home from "@/pages/Home";
 import Category from "@/pages/Category";
@@ -76,7 +76,7 @@ function Router() {
   }
 
   return (
-    <MainLayout 
+    <MainLayoutNew 
       awesomeList={awesomeList} 
       isLoading={isLoading}
     >
@@ -94,7 +94,7 @@ function Router() {
         <Route path="/color-palette" component={ColorPalette} />
         <Route component={NotFound} />
       </Switch>
-    </MainLayout>
+    </MainLayoutNew>
   );
 }
 
