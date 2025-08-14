@@ -36,10 +36,10 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
   const [openCategories, setOpenCategories] = useState<string[]>([]);
   const isMobile = useIsMobile();
 
-  // Use original categories but organize them visually in hierarchical structure
+  // Show true hierarchical structure from JSON data - categories with their actual subcategories
   const getHierarchicalCategories = (categories: Category[]) => {
-    console.log("🏗️ ORGANIZING ORIGINAL CATEGORIES IN HIERARCHICAL DISPLAY");
-    console.log("📊 Original categories count:", categories.length);
+    console.log("🏗️ BUILDING TRUE HIERARCHICAL NAVIGATION FROM JSON DATA");
+    console.log("📊 Total categories:", categories.length);
     
     const filteredCategories = categories.filter(cat => 
       cat.resources.length > 0 && 
@@ -48,91 +48,26 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
       !["Contributing", "License", "External Links", "Anti-features"].includes(cat.name)
     );
     
-    console.log("✅ Filtered categories count:", filteredCategories.length);
+    console.log("✅ Filtered categories:", filteredCategories.length);
     console.log("📝 Available categories:", filteredCategories.map(c => `${c.name} (${c.resources.length} resources)`));
 
-    // Define visual grouping based on CSV structure but use original categories
-    const hierarchicalGroups = [
-      {
-        name: "🎓 Learning & Introduction",
-        categories: ["Introduction", "Learning Resources"]
-      },
-      {
-        name: "🔧 Encoding & Codecs", 
-        categories: ["FFMPEG", "Encoding Tools", "Codecs", "AV1", "HEVC", "VP9"]
-      },
-      {
-        name: "🎯 Streaming & Protocols",
-        categories: ["Adaptive Streaming", "DASH", "HLS", "Transport Protocols", "RIST", "SRT", "RTMP"]
-      },
-      {
-        name: "📱 Players & Clients",
-        categories: ["Players & Clients", "Web Players", "Mobile & Web Players", "Android", "iOS/tvOS", "Hardware Players", "Chromecast", "Roku", "Smart TVs"]
-      },
-      {
-        name: "☁️ Infrastructure & Delivery",
-        categories: ["Streaming Servers", "Cloud & CDN", "CDN Integration", "Cloud Platforms", "Origin Servers", "Storage Solutions"]
-      },
-      {
-        name: "🛡️ Security & Quality",
-        categories: ["DRM", "Quality & Testing", "Advertising", "Ads & QoE"]
-      },
-      {
-        name: "🎵 Media Processing",
-        categories: ["Media Tools", "Audio & Subtitles", "Audio", "Subtitles & Captions"]
-      },
-      {
-        name: "📋 Standards & Documentation", 
-        categories: ["Specs & Standards", "Standards & Industry", "MPEG & Forums", "Official Specs", "Vendors & HDR", "HDR Guidelines", "Vendor Docs"]
-      },
-      {
-        name: "👥 Community & Events",
-        categories: ["Community & Events", "Community Groups", "Events & Conferences", "Online Forums", "Podcasts & Webinars"]
-      }
-    ];
+    // Calculate total navigation items for comprehensive testing
+    const totalSubcategories = filteredCategories.reduce((total, cat) => total + (cat.subcategories?.length || 0), 0);
+    console.log(`🧮 Total navigation items: ${filteredCategories.length} categories + ${totalSubcategories} subcategories = ${filteredCategories.length + totalSubcategories} items`);
 
-    // Group categories visually but keep original data structure
-    const groupedCategories: any[] = [];
-    const usedCategories = new Set<string>();
-    
-    hierarchicalGroups.forEach(group => {
-      const groupCategories: Category[] = [];
-      
-      group.categories.forEach(categoryName => {
-        const matchingCategory = filteredCategories.find(cat => cat.name === categoryName);
-        if (matchingCategory && !usedCategories.has(categoryName)) {
-          groupCategories.push(matchingCategory);
-          usedCategories.add(categoryName);
-        }
-      });
-      
-      if (groupCategories.length > 0) {
-        groupedCategories.push({
-          groupName: group.name,
-          categories: groupCategories
+    console.log("🎯 HIERARCHICAL NAVIGATION STRUCTURE:");
+    filteredCategories.forEach(cat => {
+      console.log(`📁 ${cat.name} (${cat.resources.length} resources) -> /category/${cat.slug}`);
+      if (cat.subcategories && cat.subcategories.length > 0) {
+        cat.subcategories.forEach(sub => {
+          console.log(`  ├── ${sub.name} (${sub.resources.length} resources) -> /subcategory/${sub.slug}`);
         });
       }
     });
-
-    // Add any remaining categories
-    const remainingCategories = filteredCategories.filter(cat => !usedCategories.has(cat.name));
-    if (remainingCategories.length > 0) {
-      groupedCategories.push({
-        groupName: "📦 Other Tools",
-        categories: remainingCategories
-      });
-    }
-
-    console.log("🎉 GROUPED CATEGORIES STRUCTURE:");
-    groupedCategories.forEach(group => {
-      console.log(`📁 ${group.groupName} (${group.categories.length} categories)`);
-      group.categories.forEach(cat => {
-        console.log(`  └── ${cat.name} (${cat.resources.length} resources)`);
-      });
-    });
     console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
-    return groupedCategories;
+    // Return the original categories structure for proper hierarchical display
+    return filteredCategories;
   };
   
   // Set initially open categories based on URL
@@ -209,65 +144,71 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
           </div>
         ) : (
           <div className="space-y-1">
-            {/* Grouped categories with original data structure */}
+            {/* True hierarchical categories with subcategories from JSON data */}
             {getHierarchicalCategories(categories)
-              .map(group => (
-              <div key={group.groupName} className="mb-4">
-                <h3 className="px-2 mb-2 text-xs font-semibold text-muted-foreground/70 uppercase tracking-wider">
-                  {group.groupName}
-                </h3>
-                <div className="space-y-1">
-                  {group.categories.map((category: Category) => (
-                    <div key={category.name}>
-                      {/* Main Category */}
+              .map((category: Category) => (
+              <div key={category.name} className="mb-2">
+                {/* Main Category - Always expandable to show hierarchy */}
+                <div className="flex items-center w-full">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="p-1 mr-1 h-6 w-6 flex-shrink-0"
+                    onClick={() => toggleCategory(category.name)}
+                  >
+                    <div className={cn(
+                      "transform transition-transform duration-200",
+                      openCategories.includes(category.name) ? "rotate-90" : ""
+                    )}>
+                      <span className="text-xs">▶</span>
+                    </div>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className={cn(
+                      "flex-1 justify-start font-normal text-sm py-2 px-2 min-h-[36px]",
+                      location === `/category/${getCategorySlug(category.name)}` 
+                        ? "bg-accent text-accent-foreground" 
+                        : ""
+                    )}
+                    onClick={() => navigate(`/category/${getCategorySlug(category.name)}`)}
+                  >
+                    <div className="flex items-center gap-2 w-full">
+                      <Folder className="h-4 w-4 flex-shrink-0" />
+                      <span className="truncate flex-1 text-left">{category.name}</span>
+                      <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded ml-auto flex-shrink-0">
+                        {category.resources.length}
+                      </span>
+                    </div>
+                  </Button>
+                </div>
+                
+                {/* Subcategories - Show when category is expanded */}
+                {category.subcategories && category.subcategories.length > 0 && openCategories.includes(category.name) && (
+                  <div className="ml-6 mt-1 space-y-1 border-l border-muted pl-3">
+                    {category.subcategories.map((subcategory: any) => (
                       <Button
+                        key={subcategory.name}
                         variant="ghost"
                         className={cn(
-                          "w-full justify-start font-normal text-sm mb-1",
-                          location === `/category/${getCategorySlug(category.name)}` 
+                          "w-full justify-start font-normal text-sm py-1.5 px-2 min-h-[32px]",
+                          location === `/subcategory/${getSubcategorySlug(category.name, subcategory.name)}` 
                             ? "bg-accent text-accent-foreground" 
                             : ""
                         )}
-                        onClick={() => navigate(`/category/${getCategorySlug(category.name)}`)}
+                        onClick={() => navigate(`/subcategory/${getSubcategorySlug(category.name, subcategory.name)}`)}
                       >
                         <div className="flex items-center gap-2 w-full">
-                          <Folder className="h-4 w-4 flex-shrink-0" />
-                          <span className="truncate">{category.name}</span>
-                          <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded ml-auto">
-                            {category.resources.length}
+                          <span className="w-2 h-2 rounded-full bg-muted-foreground/40 flex-shrink-0"></span>
+                          <span className="truncate flex-1 text-left">{subcategory.name}</span>
+                          <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded ml-auto flex-shrink-0">
+                            {subcategory.resources.length}
                           </span>
                         </div>
                       </Button>
-                      
-                      {/* Subcategories */}
-                      {category.subcategories && category.subcategories.length > 0 && (
-                        <div className="ml-4 space-y-1">
-                          {category.subcategories.map((subcategory: any) => (
-                            <Button
-                              key={subcategory.name}
-                              variant="ghost"
-                              className={cn(
-                                "w-full justify-start font-normal text-xs pl-2",
-                                location === `/subcategory/${getSubcategorySlug(category.name, subcategory.name)}` 
-                                  ? "bg-accent text-accent-foreground" 
-                                  : "text-muted-foreground hover:text-foreground"
-                              )}
-                              onClick={() => navigate(`/subcategory/${getSubcategorySlug(category.name, subcategory.name)}`)}
-                            >
-                              <div className="flex items-center gap-2 w-full">
-                                <div className="w-2 h-2 rounded-full bg-muted-foreground/40 flex-shrink-0" />
-                                <span className="truncate">{subcategory.name}</span>
-                                <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded ml-auto">
-                                  {subcategory.resources.length}
-                                </span>
-                              </div>
-                            </Button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </div>
