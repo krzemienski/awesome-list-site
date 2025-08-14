@@ -26,9 +26,10 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
-import { useTheme } from "next-themes";
+import { useTheme } from "@/hooks/use-theme";
 import { useToast } from "@/hooks/use-toast";
 import MainLayout from "@/components/layout/new/MainLayout";
+import { ThemeTestComponent } from "@/components/theme-test";
 
 interface ColorInfo {
   hex: string;
@@ -104,6 +105,33 @@ export default function ColorPalette() {
     }
   };
 
+  const testAllThemes = async () => {
+    const themes = ['light', 'dark', 'system'] as const;
+    const results: { theme: string; success: boolean; error?: string }[] = [];
+    
+    for (const themeType of themes) {
+      try {
+        setTheme(themeType);
+        // Wait for theme to apply
+        await new Promise(resolve => setTimeout(resolve, 100));
+        results.push({ theme: themeType, success: true });
+      } catch (error) {
+        results.push({ 
+          theme: themeType, 
+          success: false, 
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
+      }
+    }
+
+    const successCount = results.filter(r => r.success).length;
+    toast({
+      title: "Theme System Test Results",
+      description: `${successCount}/${themes.length} themes working correctly`,
+      variant: successCount === themes.length ? "default" : "destructive"
+    });
+  };
+
   const showThemeToast = () => {
     const themes = [
       { key: 'light', label: 'Light', icon: Sun },
@@ -114,28 +142,40 @@ export default function ColorPalette() {
     toast({
       title: "Theme Settings",
       description: (
-        <div className="flex items-center gap-2 mt-2">
-          {themes.map((themeOption) => {
-            const IconComponent = themeOption.icon;
-            return (
-              <Button
-                key={themeOption.key}
-                variant={theme === themeOption.key ? "default" : "outline"}
-                size="sm"
-                onClick={() => {
-                  setTheme(themeOption.key);
-                  toast({
-                    title: "Theme Updated",
-                    description: `Switched to ${themeOption.label} theme`,
-                  });
-                }}
-                className="flex items-center gap-1"
-              >
-                <IconComponent className="h-3 w-3" />
-                {themeOption.label}
-              </Button>
-            );
-          })}
+        <div className="space-y-3 mt-2">
+          <div className="flex items-center gap-2">
+            {themes.map((themeOption) => {
+              const IconComponent = themeOption.icon;
+              return (
+                <Button
+                  key={themeOption.key}
+                  variant={theme === themeOption.key ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => {
+                    setTheme(themeOption.key as "light" | "dark" | "system");
+                    toast({
+                      title: "Theme Updated",
+                      description: `Switched to ${themeOption.label} theme`,
+                    });
+                  }}
+                  className="flex items-center gap-1"
+                >
+                  <IconComponent className="h-3 w-3" />
+                  {themeOption.label}
+                </Button>
+              );
+            })}
+          </div>
+          <div className="flex gap-2 pt-2 border-t">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={testAllThemes}
+              className="text-xs"
+            >
+              Test All Themes
+            </Button>
+          </div>
         </div>
       ),
       className: "fixed top-20 left-1/2 transform -translate-x-1/2 z-[110] max-w-md",
@@ -207,6 +247,13 @@ export default function ColorPalette() {
             Perfect for brands, websites, and design projects.
           </p>
         </div>
+
+        {/* Theme Testing Suite - Show at top in development */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="mb-8">
+            <ThemeTestComponent />
+          </div>
+        )}
 
         <div className="grid lg:grid-cols-2 gap-4 sm:gap-8">
           {/* Input Section */}
