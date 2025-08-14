@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .test-container {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin: 10px 0;
+        }
+        .screenshot {
+            max-width: 100%;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>Theme Switching Test for Awesome Video App</h1>
+    
+    <div class="test-container">
+        <h2>Testing Theme Application</h2>
+        <p>Current app URL: <a href="http://localhost:5000" target="_blank">http://localhost:5000</a></p>
+        
+        <h3>Default Rose Theme (Dark)</h3>
+        <p>The app should load with:</p>
+        <ul>
+            <li>Dark background with rose/violet accent colors</li>
+            <li>data-theme="rose" attribute on html element</li>
+            <li>Primary color: hsl(346.8, 77.2%, 49.8%) - rose pink</li>
+        </ul>
+        
+        <h3>Theme Switching Test Steps:</h3>
+        <ol>
+            <li>Navigate to Color Palette page (/color-palette)</li>
+            <li>Click the Settings gear icon in the header</li>
+            <li>Test theme switching between Light, Dark, and System</li>
+            <li>Verify colors change appropriately</li>
+        </ol>
+        
+        <div id="test-results"></div>
+    </div>
+
+    <script>
+        // Simple test to verify theme application
+        function testThemeApplication() {
+            const results = document.getElementById('test-results');
+            
+            // Test if we can access the app
+            fetch('http://localhost:5000')
+                .then(response => {
+                    if (response.ok) {
+                        results.innerHTML += '<p>✅ App is accessible</p>';
+                        return response.text();
+                    } else {
+                        results.innerHTML += '<p>❌ App not accessible</p>';
+                    }
+                })
+                .then(html => {
+                    if (html) {
+                        // Check if theme attributes are present
+                        if (html.includes('data-theme="rose"')) {
+                            results.innerHTML += '<p>✅ Rose theme attribute found</p>';
+                        } else {
+                            results.innerHTML += '<p>⚠️ Rose theme attribute not found in HTML</p>';
+                        }
+                        
+                        if (html.includes('class="dark"') || html.includes('classList.add(\'dark\')')) {
+                            results.innerHTML += '<p>✅ Dark theme class applied</p>';
+                        } else {
+                            results.innerHTML += '<p>⚠️ Dark theme class not found</p>';
+                        }
+                    }
+                })
+                .catch(error => {
+                    results.innerHTML += `<p>❌ Error testing app: ${error.message}</p>`;
+                });
+        }
+        
+        // Run test when page loads
+        window.onload = testThemeApplication;
+    </script>
+</body>
+</html>

@@ -7,8 +7,9 @@ import { queryClient } from "./lib/queryClient";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
 
-// Force dark theme immediately
+// Force dark theme with rose color scheme immediately
 document.documentElement.classList.add('dark');
+document.documentElement.setAttribute('data-theme', 'rose');
 
 createRoot(document.getElementById("root")!).render(
   <ThemeProvider defaultTheme="dark" storageKey="ui-theme">
