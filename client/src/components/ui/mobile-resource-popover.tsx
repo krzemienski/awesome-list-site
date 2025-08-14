@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { ExternalLink, Star, GitFork, Calendar, Tag } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { trackPopoverView, trackResourceClick, trackMobileInteraction, trackTagInteraction } from '@/lib/analytics';
+import { useMobileDialog } from '@/hooks/use-mobile-popover';
 
 interface Resource {
   id?: string;
@@ -21,7 +22,10 @@ interface MobileResourcePopoverProps {
 }
 
 export default function MobileResourcePopover({ resource, children }: MobileResourcePopoverProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const { isOpen, setIsOpen, contentRef, mobileProps } = useMobileDialog({
+    preventScrollClose: true,
+    touchCloseDelay: 200,
+  });
 
   const handlePopoverOpen = () => {
     trackPopoverView(resource.title, resource.category);
@@ -48,11 +52,16 @@ export default function MobileResourcePopover({ resource, children }: MobileReso
       }
     }}>
       <DialogTrigger asChild>
-        <div className="cursor-pointer touch-manipulation">
+        <div className="cursor-pointer touch-manipulation touch-optimized">
           {children}
         </div>
       </DialogTrigger>
-      <DialogContent className="w-[95vw] max-w-md mx-auto" aria-describedby="resource-description">
+      <DialogContent 
+        ref={contentRef}
+        className="w-[95vw] max-w-md mx-auto touch-optimized" 
+        aria-describedby="resource-description"
+        data-mobile-optimized={true}
+      >
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold leading-tight text-foreground">
             {resource.title}
@@ -99,7 +108,7 @@ export default function MobileResourcePopover({ resource, children }: MobileReso
           {/* Action Button */}
           <Button 
             onClick={handleOpenResource}
-            className="w-full touch-manipulation min-h-[48px]"
+            className="w-full touch-manipulation min-h-[48px] touch-optimized"
             size="lg"
           >
             <ExternalLink className="w-4 h-4 mr-2" />

@@ -175,15 +175,15 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
               )}
             </div>
             
-            <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+            <div className="mobile-controls flex-col sm:flex-row gap-3 items-start sm:items-center">
               {/* AI Recommendations Toggle */}
               {isLoaded && (
-                <div className="flex gap-2 items-center">
+                <div className="flex gap-2 items-center flex-wrap">
                   <Button
                     variant={showRecommendations ? "default" : "outline"}
                     size="sm"
                     onClick={() => setShowRecommendations(!showRecommendations)}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 touch-optimized min-h-[44px] sm:min-h-auto"
                   >
                     <Brain className="h-4 w-4" />
                     AI Recommendations
@@ -200,17 +200,17 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
 
               {/* Category Filter */}
               {!showRecommendations && (
-                <div className="flex gap-2 items-center">
+                <div className="flex gap-2 items-center flex-wrap">
                   <Filter className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">Category:</span>
                   <Select
                     value={selectedCategory}
                     onValueChange={handleCategoryChange}
                   >
-                    <SelectTrigger className="w-40">
+                    <SelectTrigger className="w-40 min-h-[44px] sm:min-h-auto touch-optimized">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="touch-optimized">
                       <SelectItem value="all">All Categories</SelectItem>
                       {categories.map(category => (
                         <SelectItem key={category} value={category}>
@@ -229,16 +229,16 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
               />
               
               {/* Sort */}
-              <div className="flex gap-2 items-center">
+              <div className="flex gap-2 items-center flex-wrap">
                 <span className="text-sm text-muted-foreground">Sort:</span>
                 <Select
                   value={sortBy}
-                  onValueChange={setSortBy}
+                  onValueChange={handleSortChange}
                 >
-                  <SelectTrigger className="w-32">
+                  <SelectTrigger className="w-32 min-h-[44px] sm:min-h-auto touch-optimized">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="touch-optimized">
                     <SelectItem value="category">Category</SelectItem>
                     <SelectItem value="name-asc">Name (A-Z)</SelectItem>
                     <SelectItem value="name-desc">Name (Z-A)</SelectItem>
