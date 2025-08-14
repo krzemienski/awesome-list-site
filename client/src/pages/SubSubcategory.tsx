@@ -68,6 +68,18 @@ export default function SubSubcategory() {
   const categoryName = parentCategory ? parentCategory.name : "";
   const subcategoryName = parentSubcategory ? parentSubcategory.name : "";
   
+  // Debug logging
+  if (process.env.NODE_ENV === 'development') {
+    console.log('SubSubcategory Debug:', {
+      slug,
+      currentSubSubcategory: currentSubSubcategory?.name,
+      parentCategory: parentCategory?.name,
+      parentCategorySlug: parentCategory?.slug,
+      parentSubcategory: parentSubcategory?.name,
+      parentSubcategorySlug: parentSubcategory?.slug
+    });
+  }
+  
   // Track sub-subcategory view
   useEffect(() => {
     if (subSubcategoryName && !isLoading) {
@@ -160,10 +172,10 @@ export default function SubSubcategory() {
       {/* Header */}
       <div className="space-y-2">
         <div className="flex items-center gap-3">
-          <Link href={`/subcategory/${getSubcategorySlug(subcategoryName)}`}>
+          <Link href={parentSubcategory?.slug ? `/subcategory/${parentSubcategory.slug}` : "/"}>
             <Button variant="ghost" size="sm" className="gap-2">
               <ArrowLeft className="h-4 w-4" />
-              Back to {subcategoryName}
+              Back to {subcategoryName || "Home"}
             </Button>
           </Link>
         </div>
