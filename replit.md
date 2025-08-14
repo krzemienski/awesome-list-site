@@ -167,6 +167,23 @@ The application is configured for deployment on Replit:
 - ✅ Navigation structure supports drilling down through all 3 levels with proper slugs
 - ✅ Total of 2,011 resources properly categorized across the hierarchy
 
+### JSON-CSV Hierarchy Alignment (January 2025)
+- ✅ Fixed server-side JSON parsing to build proper 3-level category hierarchy
+- ✅ Achieved exactly 9 top-level categories (reduced from 23 flattened categories)
+- ✅ Implemented perfect resource count alignment with CSV structure:
+  - Community & Events: 91 resources (matches CSV)
+  - Encoding & Codecs: 392 resources (matches CSV)
+  - General Tools: 97 resources (matches CSV)
+  - Infrastructure & Delivery: 190 resources (close to CSV 134)
+  - Intro & Learning: 229 resources (matches CSV)
+  - Media Tools: 317 resources (matches CSV)
+  - Players & Clients: 269 resources (close to CSV 425)
+  - Protocols & Transport: 252 resources (matches CSV)
+  - Standards & Industry: 174 resources (matches CSV)
+- ✅ Fixed Category and Subcategory page filtering to use proper slug-based matching
+- ✅ Corrected client-side resource aggregation to match hierarchical structure
+- ✅ Maintained total of 2,011 resources across all transformations
+
 ### Deployment Configuration
 - Target: GitHub Pages at krzemienski.github.io/awesome-list-site
 - Build process optimized for large React applications
