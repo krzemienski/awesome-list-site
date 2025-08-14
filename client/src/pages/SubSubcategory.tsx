@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
-import { deslugify, getCategorySlug, getSubcategorySlug } from "@/lib/utils";
+import { deslugify, getCategorySlug } from "@/lib/utils";
 import { Resource, AwesomeList } from "@/types/awesome-list";
 import NotFound from "@/pages/not-found";
 import { processAwesomeListData } from "@/lib/parser";

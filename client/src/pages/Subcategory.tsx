@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, ArrowLeft, Filter } from "lucide-react";
 import { Link } from "wouter";
-import { deslugify, slugify, getCategorySlug, getSubcategorySlug } from "@/lib/utils";
+import { deslugify, slugify, getCategorySlug } from "@/lib/utils";
 import { Resource, AwesomeList } from "@/types/awesome-list";
 import NotFound from "@/pages/not-found";
 import { processAwesomeListData } from "@/lib/parser";
@@ -60,6 +60,16 @@ export default function Subcategory() {
   
   const subcategoryName = currentSubcategory ? currentSubcategory.name : deslugify(slug || "");
   const categoryName = parentCategory ? parentCategory.name : "";
+  
+  // Debug logging
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Subcategory Debug:', {
+      slug,
+      currentSubcategory: currentSubcategory?.name,
+      parentCategory: parentCategory?.name,
+      baseResourcesLength: baseResources.length
+    });
+  }
   
   // Track subcategory view
   useEffect(() => {

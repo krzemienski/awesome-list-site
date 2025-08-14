@@ -18,7 +18,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Skeleton } from "@/components/ui/skeleton";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Home, Folder, ExternalLink, Menu } from "lucide-react";
-import { slugify, getCategorySlug, getSubcategorySlug } from "@/lib/utils";
+import { slugify, getCategorySlug } from "@/lib/utils";
 import { Category } from "@/types/awesome-list";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -86,7 +86,7 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
         const slug = path[2];
         const matchingCategory = categories.find(cat => 
           getCategorySlug(cat.name) === slug || 
-          cat.subcategories?.some(sub => getSubcategorySlug(cat.name, sub.name) === slug)
+          cat.subcategories?.some(sub => sub.slug === slug)
         );
         
         if (matchingCategory) {
@@ -220,11 +220,11 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
                             variant="ghost"
                             className={cn(
                               "flex-1 justify-start font-normal text-sm py-1.5 px-2 min-h-[32px]",
-                              location === `/subcategory/${getSubcategorySlug(category.name, subcategory.name)}` 
+                              location === `/subcategory/${subcategory.slug}` 
                                 ? "bg-accent text-accent-foreground" 
                                 : ""
                             )}
-                            onClick={() => navigate(`/subcategory/${getSubcategorySlug(category.name, subcategory.name)}`)}
+                            onClick={() => navigate(`/subcategory/${subcategory.slug}`)}
                           >
                             <div className="flex items-center gap-2 w-full">
                               <span className="w-2 h-2 rounded-full bg-muted-foreground/40 flex-shrink-0"></span>
