@@ -200,7 +200,7 @@ export default function Subcategory() {
           </p>
         </div>
         <p className="text-muted-foreground">
-          Showing {sortedResources.length} of {sortedResources.length} resources
+          Showing {sortedResources.length} of {baseResources.length} resources
         </p>
       </div>
       
