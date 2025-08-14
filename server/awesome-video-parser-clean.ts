@@ -134,7 +134,7 @@ export async function fetchAwesomeVideoData() {
     
     console.log(`✅ Parsed ${resources.length} video resources`);
     
-    // Build complete 3-level hierarchy structure
+    // Build complete 3-level hierarchy structure 
     const categories = Object.keys(hierarchyStructure).map(topLevelId => {
       const topLevel = hierarchyStructure[topLevelId];
       
