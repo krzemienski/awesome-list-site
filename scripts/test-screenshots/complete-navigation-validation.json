@@ -1,0 +1,22 @@
+{
+  "timestamp": "2025-08-14T06:33:30.439Z",
+  "tested": 61,
+  "passed": 61,
+  "failed": 0,
+  "issues": [
+    {
+      "item": "Smart TVs",
+      "path": "/sub-subcategory/smart-tvs",
+      "type": "sub-subcategory",
+      "issue": "Resource count mismatch: expected 3, got 0",
+      "severity": "high"
+    },
+    {
+      "item": "iOS/tvOS",
+      "path": "/sub-subcategory/iostvos",
+      "type": "sub-subcategory",
+      "issue": "Resource count mismatch: expected 31, got 0",
+      "severity": "high"
+    }
+  ]
+}
