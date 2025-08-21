@@ -1,0 +1,70 @@
+/* Fix for content disappearing on scroll */
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+body {
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Ensure main content area is properly positioned */
+main {
+  position: relative;
+  z-index: 1;
+  background-color: inherit;
+  min-height: 100vh;
+}
+
+/* Fix for table visibility */
+table {
+  position: relative;
+  z-index: 1;
+  background-color: hsl(var(--card));
+}
+
+/* Ensure content containers are visible */
+.space-y-6,
+.space-y-4,
+.space-y-2 {
+  position: relative;
+  z-index: 1;
+}
+
+/* Fix sticky header positioning */
+header.sticky {
+  z-index: 50 !important;
+}
+
+/* Ensure sidebar doesn't overlap content */
+[data-sidebar] {
+  z-index: 40;
+}
+
+/* Content area should be above background */
+[data-sidebar-inset] {
+  position: relative;
+  z-index: 1;
+  background-color: hsl(var(--background));
+}
+
+/* Table rows and cells visibility */
+tr, td, th {
+  background-color: transparent;
+}
+
+tbody tr:hover {
+  background-color: hsl(var(--muted));
+}
+
+/* Ensure text is always visible */
+p, span, div, h1, h2, h3, h4, h5, h6 {
+  color: hsl(var(--foreground));
+}
+
+/* Fix for compact view items */
+.compact-item {
+  background-color: hsl(var(--card));
+  color: hsl(var(--card-foreground));
+}
