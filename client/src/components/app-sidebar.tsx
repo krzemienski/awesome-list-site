@@ -130,15 +130,13 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
               <Link
                 href={`/sub-subcategory/${subSub.slug}`}
                 className={cn(
-                  "w-full pl-8",
+                  "w-full pl-8 flex items-center gap-2",
                   isActiveRoute(`/sub-subcategory/${subSub.slug}`) && "bg-primary/10 text-primary font-medium"
                 )}
               >
-                <span className="flex items-center justify-between w-full">
-                  <span className="truncate">{subSub.name}</span>
-                  <span className="text-xs text-muted-foreground ml-2 shrink-0">
-                    {subSub.resources.length}
-                  </span>
+                <span className="truncate flex-1">{subSub.name}</span>
+                <span className="text-xs text-muted-foreground shrink-0">
+                  {subSub.resources.length}
                 </span>
               </Link>
             </SidebarMenuSubButton>
@@ -167,9 +165,9 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                     isExpanded={isExpanded}
                   >
                     <SidebarMenuSubButton asChild>
-                      <Link href={`/subcategory/${sub.slug}`} className="w-full">
+                      <Link href={`/subcategory/${sub.slug}`} className="w-full flex items-center gap-2">
                         <span 
-                          className="mr-1 cursor-pointer"
+                          className="shrink-0 cursor-pointer"
                           onClick={(e) => {
                             e.preventDefault()
                             e.stopPropagation()
@@ -178,11 +176,9 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                         >
                           <SidebarToggleMorph isOpen={isExpanded} />
                         </span>
-                        <span className="flex items-center justify-between w-full">
-                          <span className="truncate">{sub.name}</span>
-                          <span className="text-xs text-muted-foreground ml-2 shrink-0">
-                            {sub.resources.length}
-                          </span>
+                        <span className="truncate flex-1">{sub.name}</span>
+                        <span className="text-xs text-muted-foreground shrink-0">
+                          {sub.resources.length}
                         </span>
                       </Link>
                     </SidebarMenuSubButton>
@@ -196,15 +192,13 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                   <Link
                     href={`/subcategory/${sub.slug}`}
                     className={cn(
-                      "w-full",
+                      "w-full flex items-center gap-2",
                       isActiveRoute(`/subcategory/${sub.slug}`) && "bg-primary/10 text-primary font-medium"
                     )}
                   >
-                    <span className="flex items-center justify-between w-full">
-                      <span className="truncate">{sub.name}</span>
-                      <span className="text-xs text-muted-foreground ml-2 shrink-0">
-                        {sub.resources.length}
-                      </span>
+                    <span className="truncate flex-1">{sub.name}</span>
+                    <span className="text-xs text-muted-foreground shrink-0">
+                      {sub.resources.length}
                     </span>
                   </Link>
                 </SidebarMenuSubButton>
@@ -286,10 +280,14 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                             isExpanded={isExpanded}
                           >
                             <SidebarMenuButton asChild>
-                              <Link href={`/category/${category.slug}`} className="w-full">
-                                <Icon className="h-4 w-4" />
+                              <Link href={`/category/${category.slug}`} className="w-full flex items-center gap-2">
+                                <Icon className="h-4 w-4 shrink-0" />
+                                <span className="truncate flex-1">{category.name}</span>
+                                <span className="text-xs text-muted-foreground shrink-0">
+                                  {category.resources.length}
+                                </span>
                                 <span 
-                                  className="ml-auto cursor-pointer"
+                                  className="shrink-0 cursor-pointer"
                                   onClick={(e) => {
                                     e.preventDefault()
                                     e.stopPropagation()
@@ -297,12 +295,6 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                                   }}
                                 >
                                   <SidebarToggleMorph isOpen={isExpanded} />
-                                </span>
-                                <span className="flex items-center justify-between w-full">
-                                  <span className="truncate">{category.name}</span>
-                                  <span className="text-xs text-muted-foreground ml-2 shrink-0">
-                                    {category.resources.length}
-                                  </span>
                                 </span>
                               </Link>
                             </SidebarMenuButton>
@@ -316,16 +308,14 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                           <Link
                             href={`/category/${category.slug}`}
                             className={cn(
-                              "w-full",
+                              "w-full flex items-center gap-2",
                               isActiveRoute(`/category/${category.slug}`) && "bg-primary/10 text-primary font-medium"
                             )}
                           >
-                            <Icon className="h-4 w-4" />
-                            <span className="flex items-center justify-between w-full">
-                              <span className="truncate">{category.name}</span>
-                              <span className="text-xs text-muted-foreground ml-2 shrink-0">
-                                {category.resources.length}
-                              </span>
+                            <Icon className="h-4 w-4 shrink-0" />
+                            <span className="truncate flex-1">{category.name}</span>
+                            <span className="text-xs text-muted-foreground shrink-0">
+                              {category.resources.length}
                             </span>
                           </Link>
                         </SidebarMenuButton>
