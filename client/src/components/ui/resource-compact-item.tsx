@@ -1,6 +1,8 @@
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Bookmark, Share2 } from "lucide-react";
 import { Resource } from "@/types/awesome-list";
 import ResourcePreviewTooltip from "@/components/ui/resource-preview-tooltip";
 import { cn } from "@/lib/utils";
@@ -18,54 +20,95 @@ export default function ResourceCompactItem({ resource, isSelectionMode, isSelec
     window.open(resource.url, '_blank', 'noopener,noreferrer');
   };
 
+  const handleBookmark = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    console.log('Bookmark clicked:', resource.title);
+  };
+
+  const handleShare = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (navigator.share) {
+      navigator.share({
+        title: resource.title,
+        text: resource.description,
+        url: resource.url,
+      });
+    } else {
+      navigator.clipboard.writeText(resource.url);
+    }
+  };
+
   return (
-    <ResourcePreviewTooltip resource={resource} side="top" align="center">
-      <div 
-        className={cn(
-          "p-3 border border-border rounded-md hover:bg-accent/50 cursor-pointer transition-colors",
-          isSelected && "bg-accent/50 border-primary"
-        )}
-        onClick={handleClick}
-      >
-        <div className="flex items-start justify-between gap-2 mb-2">
-          {/* Selection checkbox */}
-          {isSelectionMode && (
-            <div className="mr-2">
+    <Card 
+      className={cn(
+        "hover:shadow-md cursor-pointer transition-all duration-200 hover:scale-[1.01] group",
+        isSelected && "ring-2 ring-primary border-primary"
+      )}
+      onClick={handleClick}
+    >
+      <CardHeader className="pb-2">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1 min-w-0">
+            <CardTitle className="text-sm line-clamp-1 group-hover:text-primary transition-colors">
+              {resource.title}
+            </CardTitle>
+            {isSelectionMode && (
               <Checkbox
                 checked={isSelected}
                 onCheckedChange={() => onSelectionToggle?.(resource)}
                 onClick={(e) => e.stopPropagation()}
                 aria-label={`Select ${resource.title}`}
-                className="mt-0.5"
+                className="mt-1"
               />
-            </div>
-          )}
-          <h3 className="font-medium text-sm line-clamp-1 flex-1">{resource.title}</h3>
-          <ExternalLink className="h-3 w-3 text-muted-foreground shrink-0 mt-0.5" />
+            )}
+          </div>
+          <div className="flex items-center gap-1">
+            <ExternalLink className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={handleBookmark}
+            >
+              <Bookmark className="h-2.5 w-2.5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={handleShare}
+            >
+              <Share2 className="h-2.5 w-2.5" />
+            </Button>
+          </div>
         </div>
-        
-        <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
+        <CardDescription className="line-clamp-2 text-xs">
           {resource.description}
-        </p>
-        
+        </CardDescription>
+      </CardHeader>
+      
+      <CardContent className="pt-0 pb-3">
         <div className="flex gap-1 flex-wrap">
+          <Badge variant="default" className="text-xs h-4 px-1">
+            {resource.category}
+          </Badge>
           {resource.subcategory && (
             <Badge variant="secondary" className="text-xs h-4 px-1">
-              {resource.subcategory.length > 15 ? resource.subcategory.substring(0, 12) + "..." : resource.subcategory}
+              {resource.subcategory.length > 12 ? resource.subcategory.substring(0, 10) + "..." : resource.subcategory}
             </Badge>
           )}
-          {resource.tags?.slice(0, 2).map((tag, index) => (
+          {resource.tags?.slice(0, 1).map((tag, index) => (
             <Badge key={index} variant="outline" className="text-xs h-4 px-1">
-              {tag.length > 10 ? tag.substring(0, 8) + "..." : tag}
+              {tag.length > 8 ? tag.substring(0, 6) + "..." : tag}
             </Badge>
           ))}
-          {resource.tags && resource.tags.length > 2 && (
+          {resource.tags && resource.tags.length > 1 && (
             <Badge variant="outline" className="text-xs h-4 px-1">
-              +{resource.tags.length - 2}
+              +{resource.tags.length - 1}
             </Badge>
           )}
         </div>
-      </div>
-    </ResourcePreviewTooltip>
+      </CardContent>
+    </Card>
   );
 }
