@@ -178,15 +178,20 @@ export default function RecommendationPanel({
   }
 
   return (
-    <div className="space-y-6">
-      <Card>
+    <div className="space-y-6 sticky top-6">
+      <Card className="w-full">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Brain className="h-5 w-5" />
-            Personalized Recommendations
+            AI-Powered Recommendations
+            {recommendations && recommendations.some((r: any) => r.aiGenerated) && (
+              <Badge variant="secondary" className="text-xs">
+                Enhanced by AI
+              </Badge>
+            )}
           </CardTitle>
           <CardDescription>
-            AI-powered suggestions based on your preferences and learning goals
+            Personalized suggestions using Claude AI based on your preferences and learning goals
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -221,6 +226,11 @@ export default function RecommendationPanel({
                                 <Badge variant="outline" className="text-xs">
                                   {rec.category}
                                 </Badge>
+                                {(rec as any).aiGenerated && (
+                                  <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">
+                                    AI Enhanced
+                                  </Badge>
+                                )}
                                 <div className="flex items-center gap-1">
                                   <Star className="h-3 w-3" />
                                   <span className="text-sm font-medium">
@@ -270,7 +280,14 @@ export default function RecommendationPanel({
                           <div className="space-y-3">
                             <div className="flex items-start justify-between">
                               <div>
-                                <h4 className="font-semibold">{path.title}</h4>
+                                <div className="flex items-center gap-2 mb-1">
+                                  <h4 className="font-semibold">{path.title}</h4>
+                                  {(path as any).aiGenerated && (
+                                    <Badge variant="secondary" className="text-xs">
+                                      AI Enhanced
+                                    </Badge>
+                                  )}
+                                </div>
                                 <p className="text-sm text-muted-foreground">
                                   {path.description}
                                 </p>

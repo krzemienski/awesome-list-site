@@ -44,7 +44,11 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>("all");
   const [selectedSubSubcategory, setSelectedSubSubcategory] = useState<string>("all");
-  const [showRecommendations, setShowRecommendations] = useState(false);
+  const [showRecommendations, setShowRecommendations] = useState(() => {
+    // Persist recommendations state to prevent disappearing on scroll
+    const saved = sessionStorage.getItem('awesome-show-recommendations');
+    return saved === 'true';
+  });
   const [isSelectionMode, setIsSelectionMode] = useState(false);
 
   // Resource comparison hook
@@ -253,7 +257,11 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                 <Button
                   variant={showRecommendations ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setShowRecommendations(!showRecommendations)}
+                  onClick={() => {
+                    const newState = !showRecommendations;
+                    setShowRecommendations(newState);
+                    sessionStorage.setItem('awesome-show-recommendations', newState.toString());
+                  }}
                   className="flex items-center gap-2 touch-optimized min-h-[44px] sm:min-h-auto"
                 >
                   <Brain className="h-4 w-4" />

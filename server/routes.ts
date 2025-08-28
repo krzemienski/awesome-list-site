@@ -327,46 +327,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get personalized recommendations
+  // Get personalized recommendations (AI-powered)
   app.post("/api/recommendations", async (req, res) => {
     try {
-      if (!recommendationEngine) {
-        return res.status(400).json({ error: 'Recommendation engine not initialized' });
+      const awesomeListData = storage.getAwesomeListData();
+      if (!awesomeListData || !awesomeListData.resources) {
+        return res.status(404).json({ error: 'No data available for recommendations' });
       }
 
-      const userProfile: UserProfile = req.body;
+      const userProfile = req.body;
       const limit = parseInt(req.query.limit as string) || 10;
-      const excludeViewed = req.query.exclude_viewed !== 'false';
 
-      const recommendations = recommendationEngine.generateRecommendations(
-        userProfile, 
-        limit, 
-        excludeViewed
+      // Import AI recommendations (dynamic import for better error handling)
+      const { generateAIRecommendations } = await import('./ai/recommendations');
+      
+      const recommendations = await generateAIRecommendations(
+        userProfile,
+        awesomeListData.resources,
+        limit
       );
 
       res.json(recommendations);
     } catch (error) {
-      console.error('Error generating recommendations:', error);
-      res.status(500).json({ error: 'Failed to generate recommendations' });
+      console.error('Error generating AI recommendations:', error);
+      
+      // Fallback to rule-based recommendations if available
+      if (recommendationEngine) {
+        try {
+          const userProfile: UserProfile = req.body;
+          const limit = parseInt(req.query.limit as string) || 10;
+          const excludeViewed = req.query.exclude_viewed !== 'false';
+
+          const recommendations = recommendationEngine.generateRecommendations(
+            userProfile, 
+            limit, 
+            excludeViewed
+          );
+
+          res.json(recommendations.map(rec => ({ ...rec, aiGenerated: false })));
+        } catch (fallbackError) {
+          console.error('Fallback recommendation error:', fallbackError);
+          res.status(500).json({ error: 'Failed to generate recommendations' });
+        }
+      } else {
+        res.status(500).json({ error: 'Failed to generate recommendations' });
+      }
     }
   });
 
-  // Get learning path suggestions
+  // Get learning path suggestions (AI-powered)
   app.post("/api/learning-paths", async (req, res) => {
     try {
-      if (!recommendationEngine) {
-        return res.status(400).json({ error: 'Recommendation engine not initialized' });
+      const awesomeListData = storage.getAwesomeListData();
+      if (!awesomeListData || !awesomeListData.resources) {
+        return res.status(404).json({ error: 'No data available for learning paths' });
       }
 
-      const userProfile: UserProfile = req.body;
-      const limit = parseInt(req.query.limit as string) || 5;
+      const userProfile = req.body;
 
-      const learningPaths = recommendationEngine.generateLearningPaths(userProfile, limit);
+      // Import AI learning paths (dynamic import for better error handling)
+      const { generateAILearningPaths } = await import('./ai/recommendations');
+      
+      const learningPaths = await generateAILearningPaths(
+        userProfile,
+        awesomeListData.resources
+      );
 
       res.json(learningPaths);
     } catch (error) {
-      console.error('Error generating learning paths:', error);
-      res.status(500).json({ error: 'Failed to generate learning paths' });
+      console.error('Error generating AI learning paths:', error);
+      
+      // Fallback to rule-based learning paths if available
+      if (recommendationEngine) {
+        try {
+          const userProfile: UserProfile = req.body;
+          const limit = parseInt(req.query.limit as string) || 5;
+          const learningPaths = recommendationEngine.generateLearningPaths(userProfile, limit);
+          res.json(learningPaths.map(path => ({ ...path, aiGenerated: false })));
+        } catch (fallbackError) {
+          console.error('Fallback learning path error:', fallbackError);
+          res.status(500).json({ error: 'Failed to generate learning paths' });
+        }
+      } else {
+        res.status(500).json({ error: 'Failed to generate learning paths' });
+      }
     }
   });
 
