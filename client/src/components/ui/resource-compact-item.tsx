@@ -41,7 +41,7 @@ export default function ResourceCompactItem({ resource, isSelectionMode, isSelec
   return (
     <Card 
       className={cn(
-        "hover:shadow-md cursor-pointer transition-all duration-200 hover:scale-[1.01] group",
+        "hover:shadow-md cursor-pointer transition-all duration-200 group overflow-hidden",
         isSelected && "ring-2 ring-primary border-primary"
       )}
       onClick={handleClick}
@@ -62,12 +62,12 @@ export default function ResourceCompactItem({ resource, isSelectionMode, isSelec
               />
             )}
           </div>
-          <div className="flex items-center gap-1">
-            <ExternalLink className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="flex items-center gap-1 flex-shrink-0">
+            <ExternalLink className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
             <Button
               variant="ghost"
               size="sm"
-              className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+              className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
               onClick={handleBookmark}
             >
               <Bookmark className="h-2.5 w-2.5" />
@@ -75,7 +75,7 @@ export default function ResourceCompactItem({ resource, isSelectionMode, isSelec
             <Button
               variant="ghost"
               size="sm"
-              className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+              className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
               onClick={handleShare}
             >
               <Share2 className="h-2.5 w-2.5" />
@@ -87,18 +87,18 @@ export default function ResourceCompactItem({ resource, isSelectionMode, isSelec
         </CardDescription>
       </CardHeader>
       
-      <CardContent className="pt-0 pb-3">
-        <div className="flex gap-1 flex-wrap">
-          <Badge variant="default" className="text-xs h-4 px-1">
+      <CardContent className="pt-0 pb-3 overflow-hidden">
+        <div className="flex gap-1 flex-wrap overflow-hidden">
+          <Badge variant="default" className="text-xs h-4 px-1 flex-shrink-0">
             {resource.category}
           </Badge>
           {resource.subcategory && (
-            <Badge variant="secondary" className="text-xs h-4 px-1">
+            <Badge variant="secondary" className="text-xs h-4 px-1 flex-shrink-0">
               {resource.subcategory.length > 12 ? resource.subcategory.substring(0, 10) + "..." : resource.subcategory}
             </Badge>
           )}
           {resource.tags?.slice(0, 1).map((tag, index) => (
-            <Badge key={index} variant="outline" className="text-xs h-4 px-1">
+            <Badge key={index} variant="outline" className="text-xs h-4 px-1 flex-shrink-0">
               {tag.length > 8 ? tag.substring(0, 6) + "..." : tag}
             </Badge>
           ))}
