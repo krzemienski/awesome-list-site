@@ -234,8 +234,10 @@ Respond in JSON format:
     return learningPaths;
 
   } catch (error: any) {
-    console.warn('AI learning path generation failed:', error.message);
-    return generateFallbackLearningPaths(userProfile, availableResources);
+    console.warn('AI learning path generation failed:', error.message || error);
+    const fallbackPaths = generateFallbackLearningPaths(userProfile, availableResources);
+    console.log(`Generated ${fallbackPaths.length} fallback paths in AI system`);
+    return fallbackPaths;
   }
 }
 
@@ -302,35 +304,78 @@ function generateFallbackRecommendations(
 /**
  * Fallback learning paths when AI is not available
  */
-function generateFallbackLearningPaths(
+export function generateFallbackLearningPaths(
   userProfile: UserProfile,
   availableResources: Resource[]
 ): AILearningPath[] {
+  console.log(`Generating fallback learning paths for user with ${userProfile.preferredCategories.length} preferred categories`);
   const paths: AILearningPath[] = [];
   
-  // Create paths based on preferred categories
-  userProfile.preferredCategories.slice(0, 3).forEach((category, index) => {
+  // Get available categories from resources
+  const availableCategories = Array.from(new Set(availableResources.map(r => r.category).filter(Boolean)));
+  console.log(`Available categories: ${availableCategories.slice(0, 5).join(', ')}... (${availableCategories.length} total)`);
+  
+  // Use preferred categories first, then popular categories if none are set
+  let categoriesToUse = userProfile.preferredCategories.length > 0 
+    ? userProfile.preferredCategories 
+    : availableCategories.slice(0, 3); // Use first 3 categories if no preferences
+    
+  console.log(`Categories to use for paths: ${categoriesToUse.join(', ')}`);
+  
+  // Create paths based on categories
+  categoriesToUse.slice(0, 3).forEach((category, index) => {
     const categoryResources = availableResources
       .filter(r => r.category === category)
       .slice(0, 6);
       
     if (categoryResources.length > 0) {
+      const isPreferred = userProfile.preferredCategories.includes(category);
       paths.push({
         id: `fallback_path_${category.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}_${index}`,
         title: `${category} Learning Path`,
-        description: `Comprehensive learning path for ${category}`,
+        description: isPreferred 
+          ? `Comprehensive learning path for ${category} based on your interests`
+          : `Popular learning path for ${category} - great for ${userProfile.skillLevel} developers`,
         category,
         skillLevel: userProfile.skillLevel,
-        estimatedHours: 25,
+        estimatedHours: userProfile.timeCommitment === 'daily' ? 15 : userProfile.timeCommitment === 'weekly' ? 25 : 20,
         resources: categoryResources,
-        prerequisites: [],
-        learningObjectives: [`Master ${category} concepts`, `Apply ${category} in practice`],
-        matchScore: 0.7,
-        matchReasons: [`Matches your interest in ${category}`],
+        prerequisites: userProfile.skillLevel === 'beginner' ? ['Basic programming knowledge'] : [],
+        learningObjectives: [
+          `Master ${category} concepts and fundamentals`,
+          `Apply ${category} in practical projects`,
+          `Understand best practices in ${category}`
+        ],
+        matchScore: isPreferred ? 0.9 : 0.6,
+        matchReasons: isPreferred 
+          ? [`Matches your interest in ${category}`, `Aligned with your ${userProfile.skillLevel} skill level`]
+          : [`Popular category for ${userProfile.skillLevel} developers`, `Good foundation for video development`],
         aiGenerated: false
       });
     }
   });
+  
+  // If still no paths (shouldn't happen with available resources), create a general path
+  if (paths.length === 0 && availableResources.length > 0) {
+    paths.push({
+      id: `fallback_general_path_${Date.now()}`,
+      title: 'Video Development Fundamentals',
+      description: 'Essential resources for video development and streaming technologies',
+      category: 'General',
+      skillLevel: userProfile.skillLevel,
+      estimatedHours: 20,
+      resources: availableResources.slice(0, 8),
+      prerequisites: userProfile.skillLevel === 'beginner' ? ['Basic programming knowledge'] : [],
+      learningObjectives: [
+        'Understand video development basics',
+        'Learn key video technologies',
+        'Build practical skills'
+      ],
+      matchScore: 0.5,
+      matchReasons: ['Comprehensive introduction to video development'],
+      aiGenerated: false
+    });
+  }
   
   return paths;
 }

@@ -393,23 +393,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
         awesomeListData.resources
       );
 
+      console.log(`Generated ${learningPaths.length} AI learning paths`);
       res.json(learningPaths);
     } catch (error) {
       console.error('Error generating AI learning paths:', error);
       
+      // Try AI fallback system first
+      try {
+        console.log('Trying AI fallback learning paths...');
+        const { generateFallbackLearningPaths } = await import('./ai/recommendations');
+        const awesomeListData = storage.getAwesomeListData();
+        
+        if (awesomeListData && awesomeListData.resources) {
+          const fallbackPaths = generateFallbackLearningPaths(req.body, awesomeListData.resources);
+          console.log(`Generated ${fallbackPaths.length} fallback learning paths from AI system`);
+          if (fallbackPaths.length > 0) {
+            return res.json(fallbackPaths);
+          }
+        }
+      } catch (aiFallbackError) {
+        console.error('AI fallback learning paths error:', aiFallbackError);
+      }
+      
       // Fallback to rule-based learning paths if available
       if (recommendationEngine) {
         try {
+          console.log('Trying recommendation engine learning paths...');
           const userProfile: UserProfile = req.body;
           const limit = parseInt(req.query.limit as string) || 5;
           const learningPaths = recommendationEngine.generateLearningPaths(userProfile, limit);
+          console.log(`Generated ${learningPaths.length} learning paths from recommendation engine`);
           res.json(learningPaths.map(path => ({ ...path, aiGenerated: false })));
         } catch (fallbackError) {
           console.error('Fallback learning path error:', fallbackError);
           res.status(500).json({ error: 'Failed to generate learning paths' });
         }
       } else {
-        res.status(500).json({ error: 'Failed to generate learning paths' });
+        console.error('No recommendation engine available');
+        res.status(500).json({ error: 'Failed to generate learning paths - no fallback available' });
       }
     }
   });
