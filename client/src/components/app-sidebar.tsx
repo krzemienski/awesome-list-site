@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/sidebar"
 import { Category, Subcategory, SubSubcategory } from "@/types/awesome-list"
 import ThemeSelectorSidebar from "@/components/ui/theme-selector-sidebar"
+import { SidebarItemMorph, SidebarExpandableMorph, SidebarToggleMorph } from "@/components/animations/sidebar-morphing"
 
 // Icons mapping for categories
 const categoryIcons: { [key: string]: any } = {
@@ -159,32 +160,32 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
             <SidebarMenuSubItem key={sub.slug}>
               {hasSubSubcategories ? (
                 <>
-                  <SidebarMenuSubButton
-                    onClick={() => toggleExpand(subId)}
-                    className={cn(
-                      "w-full",
-                      isActiveRoute(`/subcategory/${sub.slug}`) && "bg-primary/10 text-primary font-medium"
-                    )}
+                  <SidebarItemMorph
+                    isActive={isActiveRoute(`/subcategory/${sub.slug}`)}
+                    isExpanded={isExpanded}
                   >
-                    {isExpanded ? (
-                      <ChevronDown className="h-3 w-3 mr-1" />
-                    ) : (
-                      <ChevronRight className="h-3 w-3 mr-1" />
-                    )}
-                    <span className="flex items-center justify-between w-full">
-                      <Link
-                        href={`/subcategory/${sub.slug}`}
-                        className="truncate hover:underline"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        {sub.name}
-                      </Link>
-                      <span className="text-xs text-muted-foreground ml-2 shrink-0">
-                        {sub.resources.length}
+                    <SidebarMenuSubButton
+                      onClick={() => toggleExpand(subId)}
+                      className="w-full"
+                    >
+                      <SidebarToggleMorph isOpen={isExpanded} />
+                      <span className="flex items-center justify-between w-full">
+                        <Link
+                          href={`/subcategory/${sub.slug}`}
+                          className="truncate hover:underline"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {sub.name}
+                        </Link>
+                        <span className="text-xs text-muted-foreground ml-2 shrink-0">
+                          {sub.resources.length}
+                        </span>
                       </span>
-                    </span>
-                  </SidebarMenuSubButton>
-                  {isExpanded && renderSubSubcategories(category, sub, sub.subSubcategories)}
+                    </SidebarMenuSubButton>
+                  </SidebarItemMorph>
+                  <SidebarExpandableMorph isExpanded={isExpanded}>
+                    {renderSubSubcategories(category, sub, sub.subSubcategories)}
+                  </SidebarExpandableMorph>
                 </>
               ) : (
                 <SidebarMenuSubButton asChild>
@@ -275,33 +276,33 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                   <SidebarMenuItem key={category.slug}>
                     {hasSubcategories ? (
                       <>
-                        <SidebarMenuButton
-                          onClick={() => toggleExpand(category.slug)}
-                          className={cn(
-                            "w-full",
-                            isActiveRoute(`/category/${category.slug}`) && "bg-primary/10 text-primary font-medium"
-                          )}
+                        <SidebarItemMorph
+                          isActive={isActiveRoute(`/category/${category.slug}`)}
+                          isExpanded={isExpanded}
                         >
-                          <Icon className="h-4 w-4" />
-                          {isExpanded ? (
-                            <ChevronDown className="h-3 w-3 ml-auto mr-1" />
-                          ) : (
-                            <ChevronRight className="h-3 w-3 ml-auto mr-1" />
-                          )}
-                          <span className="flex items-center justify-between w-full">
-                            <Link
-                              href={`/category/${category.slug}`}
-                              className="truncate hover:underline"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              {category.name}
-                            </Link>
-                            <span className="text-xs text-muted-foreground ml-2 shrink-0">
-                              {category.resources.length}
+                          <SidebarMenuButton
+                            onClick={() => toggleExpand(category.slug)}
+                            className="w-full"
+                          >
+                            <Icon className="h-4 w-4" />
+                            <SidebarToggleMorph isOpen={isExpanded} />
+                            <span className="flex items-center justify-between w-full">
+                              <Link
+                                href={`/category/${category.slug}`}
+                                className="truncate hover:underline"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                {category.name}
+                              </Link>
+                              <span className="text-xs text-muted-foreground ml-2 shrink-0">
+                                {category.resources.length}
+                              </span>
                             </span>
-                          </span>
-                        </SidebarMenuButton>
-                        {isExpanded && renderSubcategories(category, category.subcategories)}
+                          </SidebarMenuButton>
+                        </SidebarItemMorph>
+                        <SidebarExpandableMorph isExpanded={isExpanded}>
+                          {renderSubcategories(category, category.subcategories)}
+                        </SidebarExpandableMorph>
                       </>
                     ) : (
                       <SidebarMenuButton asChild>

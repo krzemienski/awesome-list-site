@@ -20,6 +20,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trackCategoryView, trackFilterUsage, trackSortChange } from "@/lib/analytics";
 import { useUserProfile } from "@/hooks/use-user-profile";
 import { useResourceComparison } from "@/hooks/use-resource-comparison";
+import { motion } from "framer-motion";
+import { PageTransition, CategoryTransition } from "@/components/animations/page-transition";
+import { GridMorphing, containerStaggerVariants } from "@/components/animations/card-morphing";
 
 interface HomeProps {
   awesomeList?: AwesomeList;
@@ -407,50 +410,80 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
           />
         ) : (
           <>
-            {/* Regular Resources Display */}
+            {/* Regular Resources Display with Smooth Morphing */}
             {layout === 'cards' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 overflow-visible">
-                {paginatedResources.map((resource, index) => (
-                  <ResourceCard
-                    key={`${resource.title}-${resource.url}`}
-                    resource={resource}
-                    index={index}
-                    isSelectionMode={isSelectionMode}
-                    isSelected={isSelected(resource)}
-                    onSelectionToggle={toggleResource}
-                  />
-                ))}
-              </div>
+              <GridMorphing 
+                categoryId={`${selectedCategory}-${selectedSubcategory}-${selectedSubSubcategory}`}
+                className="mb-8"
+              >
+                <motion.div 
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-visible"
+                  variants={containerStaggerVariants}
+                  initial="hidden"
+                  animate="visible"
+                >
+                  {paginatedResources.map((resource, index) => (
+                    <ResourceCard
+                      key={`${resource.title}-${resource.url}`}
+                      resource={resource}
+                      index={index}
+                      isSelectionMode={isSelectionMode}
+                      isSelected={isSelected(resource)}
+                      onSelectionToggle={toggleResource}
+                    />
+                  ))}
+                </motion.div>
+              </GridMorphing>
             )}
 
             {layout === 'list' && (
-              <div className="space-y-0 border border-border rounded-lg overflow-visible mb-8">
-                {paginatedResources.map((resource, index) => (
-                  <ResourceListItem
-                    key={`${resource.title}-${resource.url}`}
-                    resource={resource}
-                    index={index}
-                    isSelectionMode={isSelectionMode}
-                    isSelected={isSelected(resource)}
-                    onSelectionToggle={toggleResource}
-                  />
-                ))}
-              </div>
+              <GridMorphing 
+                categoryId={`list-${selectedCategory}-${selectedSubcategory}-${selectedSubSubcategory}`}
+                className="mb-8"
+              >
+                <motion.div 
+                  className="space-y-0 border border-border rounded-lg overflow-visible"
+                  variants={containerStaggerVariants}
+                  initial="hidden"
+                  animate="visible"
+                >
+                  {paginatedResources.map((resource, index) => (
+                    <ResourceListItem
+                      key={`${resource.title}-${resource.url}`}
+                      resource={resource}
+                      index={index}
+                      isSelectionMode={isSelectionMode}
+                      isSelected={isSelected(resource)}
+                      onSelectionToggle={toggleResource}
+                    />
+                  ))}
+                </motion.div>
+              </GridMorphing>
             )}
 
             {layout === 'compact' && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 mb-8 overflow-visible">
-                {paginatedResources.map((resource, index) => (
-                  <ResourceCompactItem
-                    key={`${resource.title}-${resource.url}`}
-                    resource={resource}
-                    index={index}
-                    isSelectionMode={isSelectionMode}
-                    isSelected={isSelected(resource)}
-                    onSelectionToggle={toggleResource}
-                  />
-                ))}
-              </div>
+              <GridMorphing 
+                categoryId={`compact-${selectedCategory}-${selectedSubcategory}-${selectedSubSubcategory}`}
+                className="mb-8"
+              >
+                <motion.div 
+                  className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 overflow-visible"
+                  variants={containerStaggerVariants}
+                  initial="hidden"
+                  animate="visible"
+                >
+                  {paginatedResources.map((resource, index) => (
+                    <ResourceCompactItem
+                      key={`${resource.title}-${resource.url}`}
+                      resource={resource}
+                      index={index}
+                      isSelectionMode={isSelectionMode}
+                      isSelected={isSelected(resource)}
+                      onSelectionToggle={toggleResource}
+                    />
+                  ))}
+                </motion.div>
+              </GridMorphing>
             )}
             
             {/* Pagination */}
