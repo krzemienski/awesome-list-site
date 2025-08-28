@@ -47,11 +47,11 @@ export default function ResourceListItem({ resource, isSelectionMode, isSelected
       )}
       onClick={handleClick}
     >
-      <CardContent className="p-4">
+      <CardContent className="p-4 overflow-hidden">
         <div className="flex items-center justify-between">
           {/* Selection checkbox */}
           {isSelectionMode && (
-            <div className="mr-3">
+            <div className="mr-3 flex-shrink-0">
               <Checkbox
                 checked={isSelected}
                 onCheckedChange={() => onSelectionToggle?.(resource)}
@@ -66,29 +66,29 @@ export default function ResourceListItem({ resource, isSelectionMode, isSelected
               <h3 className="font-medium text-sm truncate group-hover:text-primary transition-colors">
                 {resource.title}
               </h3>
-              <ExternalLink className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+              <ExternalLink className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
             </div>
             
             <p className="text-xs text-muted-foreground line-clamp-1 mb-2">
               {resource.description}
             </p>
             
-            <div className="flex items-center gap-1 flex-wrap">
-              <Badge variant="default" className="text-xs h-5">
+            <div className="flex items-center gap-1 flex-wrap overflow-hidden">
+              <Badge variant="default" className="text-xs h-5 flex-shrink-0">
                 {resource.category}
               </Badge>
               {resource.subcategory && (
-                <Badge variant="secondary" className="text-xs h-5">
+                <Badge variant="secondary" className="text-xs h-5 flex-shrink-0">
                   {resource.subcategory}
                 </Badge>
               )}
               {resource.tags?.slice(0, 2).map((tag, index) => (
-                <Badge key={index} variant="outline" className="text-xs h-5">
+                <Badge key={index} variant="outline" className="text-xs h-5 flex-shrink-0">
                   {tag}
                 </Badge>
               ))}
               {resource.tags && resource.tags.length > 2 && (
-                <Badge variant="outline" className="text-xs h-5">
+                <Badge variant="outline" className="text-xs h-5 flex-shrink-0">
                   +{resource.tags.length - 2}
                 </Badge>
               )}
@@ -96,7 +96,7 @@ export default function ResourceListItem({ resource, isSelectionMode, isSelected
           </div>
 
           {/* Action buttons */}
-          <div className="flex items-center gap-1 ml-3">
+          <div className="flex items-center gap-1 ml-3 flex-shrink-0">
             <Button
               variant="ghost"
               size="sm"

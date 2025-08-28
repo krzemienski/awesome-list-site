@@ -20,6 +20,52 @@ body {
   will-change: scroll-position;
 }
 
+/* Fix card content overflow and cutoff issues */
+.card-content-fix {
+  contain: layout style;
+}
+
+/* Ensure card layouts don't clip content */
+[data-radix-aspect-ratio-wrapper],
+.card,
+.grid > div,
+.space-y-0 > div {
+  contain: layout;
+  overflow: visible !important;
+}
+
+/* Fix button and interactive element positioning */
+.flex-shrink-0 {
+  flex-shrink: 0 !important;
+}
+
+/* Prevent content cutoff in card grids */
+.grid {
+  overflow: visible;
+}
+
+.grid > * {
+  overflow: visible;
+}
+
+/* Fix specific card layout issues */
+[data-card] {
+  overflow: visible !important;
+  contain: none !important;
+}
+
+/* Improve badge and content wrapping */
+.flex-wrap {
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+/* Ensure proper spacing in card layouts */
+.card-spacing-fix {
+  margin: 0.25rem;
+  padding: 0.25rem;
+}
+
 /* Ensure main content area is properly positioned */
 main {
   position: relative;

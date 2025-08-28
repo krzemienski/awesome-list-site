@@ -409,7 +409,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
           <>
             {/* Regular Resources Display */}
             {layout === 'cards' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 overflow-hidden">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 overflow-visible">
                 {paginatedResources.map((resource, index) => (
                   <ResourceCard
                     key={`${resource.title}-${resource.url}`}
@@ -424,7 +424,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
             )}
 
             {layout === 'list' && (
-              <div className="space-y-0 border border-border rounded-lg overflow-hidden mb-8 contain-layout">
+              <div className="space-y-0 border border-border rounded-lg overflow-visible mb-8">
                 {paginatedResources.map((resource, index) => (
                   <ResourceListItem
                     key={`${resource.title}-${resource.url}`}
@@ -439,7 +439,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
             )}
 
             {layout === 'compact' && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 mb-8 overflow-hidden">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 mb-8 overflow-visible">
                 {paginatedResources.map((resource, index) => (
                   <ResourceCompactItem
                     key={`${resource.title}-${resource.url}`}

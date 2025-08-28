@@ -70,7 +70,7 @@ export default function ResourceCard({ resource, index, isSelectionMode, isSelec
       variants={fadeInVariants}
     >
       <Card className={cn(
-        "h-full transition-all duration-200 hover:shadow-lg hover:scale-[1.02] cursor-pointer group",
+        "h-full transition-all duration-200 hover:shadow-lg cursor-pointer group overflow-hidden",
         isSelected && "ring-2 ring-primary border-primary"
       )}
       onClick={handleResourceClick}
@@ -98,27 +98,27 @@ export default function ResourceCard({ resource, index, isSelectionMode, isSelec
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="py-0">
-          <div className="flex items-center gap-1 mb-3 flex-wrap">
-            <Badge variant="default" className="text-xs">
+        <CardContent className="py-0 overflow-hidden">
+          <div className="flex items-center gap-1 mb-3 flex-wrap overflow-hidden">
+            <Badge variant="default" className="text-xs flex-shrink-0">
               {resource.category}
             </Badge>
             {resource.subcategory && (
-              <Badge variant="secondary" className="text-xs">
+              <Badge variant="secondary" className="text-xs flex-shrink-0">
                 {resource.subcategory}
               </Badge>
             )}
           </div>
           
           {resource.tags && resource.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1">
+            <div className="flex flex-wrap gap-1 overflow-hidden">
               {resource.tags.slice(0, 2).map((tag, idx) => (
-                <Badge key={idx} variant="outline" className="text-xs h-5">
+                <Badge key={idx} variant="outline" className="text-xs h-5 flex-shrink-0">
                   {tag}
                 </Badge>
               ))}
               {resource.tags.length > 2 && (
-                <Badge variant="outline" className="text-xs h-5">
+                <Badge variant="outline" className="text-xs h-5 flex-shrink-0">
                   +{resource.tags.length - 2}
                 </Badge>
               )}
@@ -126,18 +126,18 @@ export default function ResourceCard({ resource, index, isSelectionMode, isSelec
           )}
         </CardContent>
 
-        <CardFooter className="pt-3 pb-4">
+        <CardFooter className="pt-3 pb-4 overflow-hidden">
           <Separator className="mb-3" />
           <div className="flex items-center justify-between w-full">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <span>{resource.category}</span>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground min-w-0 flex-1">
+              <span className="truncate">{resource.category}</span>
             </div>
             
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 flex-shrink-0">
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
                 onClick={handleBookmark}
               >
                 <Bookmark className="h-3 w-3" />
@@ -145,7 +145,7 @@ export default function ResourceCard({ resource, index, isSelectionMode, isSelec
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
                 onClick={handleShare}
               >
                 <Share2 className="h-3 w-3" />

@@ -21,7 +21,7 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Debug: Log resources to see if they're being passed correctly
-  console.log(`Search dialog has ${resources?.length || 0} resources`);
+  // Search dialog initialized with ${resources?.length || 0} resources
 
   // Create Fuse.js instance for search
   const fuse = useMemo(() => {
@@ -37,8 +37,6 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
 
   // Search when query changes
   useEffect(() => {
-    console.log(`Searching for: "${query}", query length: ${query.length}, fuse exists: ${!!fuse}`);
-    
     if (!query || query.length < 2 || !fuse) {
       setResults([]);
       return;
@@ -47,8 +45,6 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
     const startTime = performance.now();
     const searchResults = fuse!.search(query);
     const endTime = performance.now();
-    
-    console.log(`Search results for "${query}":`, searchResults.length);
     
     // Track search analytics
     trackSearch(query, searchResults.length);
