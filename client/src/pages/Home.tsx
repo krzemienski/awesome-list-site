@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import ResourceCard from "@/components/ui/resource-card";
+import ResourceListItem from "@/components/ui/resource-list-item";
+import ResourceCompactItem from "@/components/ui/resource-compact-item";
 import MobileResourcePopover from "@/components/ui/mobile-resource-popover";
 import LayoutSwitcher from "@/components/ui/layout-switcher";
 import Pagination from "@/components/ui/pagination";
@@ -27,7 +29,7 @@ interface HomeProps {
 type LayoutType = "cards" | "list" | "compact";
 
 export default function Home({ awesomeList, isLoading }: HomeProps) {
-  const [layout, setLayout] = useState<LayoutType>("compact");
+  const [layout, setLayout] = useState<LayoutType>("cards");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(24);
   const [sortBy, setSortBy] = useState("category");
@@ -396,18 +398,50 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
         ) : (
           <>
             {/* Regular Resources Display */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-              {paginatedResources.map((resource, index) => (
-                <ResourceCard
-                  key={`${resource.title}-${resource.url}`}
-                  resource={resource}
-                  index={index}
-                  isSelectionMode={isSelectionMode}
-                  isSelected={isSelected(resource)}
-                  onSelectionToggle={toggleResource}
-                />
-              ))}
-            </div>
+            {layout === 'cards' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 overflow-hidden">
+                {paginatedResources.map((resource, index) => (
+                  <ResourceCard
+                    key={`${resource.title}-${resource.url}`}
+                    resource={resource}
+                    index={index}
+                    isSelectionMode={isSelectionMode}
+                    isSelected={isSelected(resource)}
+                    onSelectionToggle={toggleResource}
+                  />
+                ))}
+              </div>
+            )}
+
+            {layout === 'list' && (
+              <div className="space-y-0 border border-border rounded-lg overflow-hidden mb-8 contain-layout">
+                {paginatedResources.map((resource, index) => (
+                  <ResourceListItem
+                    key={`${resource.title}-${resource.url}`}
+                    resource={resource}
+                    index={index}
+                    isSelectionMode={isSelectionMode}
+                    isSelected={isSelected(resource)}
+                    onSelectionToggle={toggleResource}
+                  />
+                ))}
+              </div>
+            )}
+
+            {layout === 'compact' && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 mb-8 overflow-hidden">
+                {paginatedResources.map((resource, index) => (
+                  <ResourceCompactItem
+                    key={`${resource.title}-${resource.url}`}
+                    resource={resource}
+                    index={index}
+                    isSelectionMode={isSelectionMode}
+                    isSelected={isSelected(resource)}
+                    onSelectionToggle={toggleResource}
+                  />
+                ))}
+              </div>
+            )}
             
             {/* Pagination */}
             {totalPages > 1 && (
