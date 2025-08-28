@@ -68,89 +68,84 @@ export default function ResourceCard({ resource, index, isSelectionMode, isSelec
       initial="hidden"
       animate="visible"
       variants={fadeInVariants}
+      className="h-full"
     >
       <Card className={cn(
-        "h-full transition-all duration-200 hover:shadow-lg cursor-pointer group overflow-hidden",
+        "h-full transition-all duration-200 hover:shadow-lg cursor-pointer group",
         isSelected && "ring-2 ring-primary border-primary"
       )}
       onClick={handleResourceClick}
       >
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between">
-            <div className="space-y-1 flex-1">
-              <CardTitle className="text-base leading-tight flex items-center gap-2 group-hover:text-primary transition-colors">
+        <CardHeader>
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex-1 min-w-0">
+              <CardTitle className="text-lg font-semibold leading-tight group-hover:text-primary transition-colors">
                 {resource.title}
-                <ExternalLink className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
               </CardTitle>
+              <CardDescription className="mt-2 line-clamp-2">
+                {resource.description}
+              </CardDescription>
+            </div>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <ExternalLink className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
               {isSelectionMode && (
                 <Checkbox
                   checked={isSelected}
                   onCheckedChange={() => onSelectionToggle?.(resource)}
                   onClick={(e) => e.stopPropagation()}
                   aria-label={`Select ${resource.title}`}
-                  className="mt-2"
                 />
               )}
             </div>
           </div>
-          <CardDescription className="line-clamp-3 text-xs leading-relaxed">
-            {resource.description}
-          </CardDescription>
         </CardHeader>
 
-        <CardContent className="py-0 overflow-hidden">
-          <div className="flex items-center gap-1 mb-3 flex-wrap overflow-hidden">
-            <Badge variant="default" className="text-xs flex-shrink-0">
+        <CardContent>
+          <div className="flex flex-wrap gap-2 mb-4">
+            <Badge variant="default">
               {resource.category}
             </Badge>
             {resource.subcategory && (
-              <Badge variant="secondary" className="text-xs flex-shrink-0">
+              <Badge variant="secondary">
                 {resource.subcategory}
               </Badge>
             )}
           </div>
           
           {resource.tags && resource.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1 overflow-hidden">
-              {resource.tags.slice(0, 2).map((tag, idx) => (
-                <Badge key={idx} variant="outline" className="text-xs h-5 flex-shrink-0">
+            <div className="flex flex-wrap gap-1">
+              {resource.tags.slice(0, 3).map((tag, idx) => (
+                <Badge key={idx} variant="outline" className="text-xs">
                   {tag}
                 </Badge>
               ))}
-              {resource.tags.length > 2 && (
-                <Badge variant="outline" className="text-xs h-5 flex-shrink-0">
-                  +{resource.tags.length - 2}
+              {resource.tags.length > 3 && (
+                <Badge variant="outline" className="text-xs">
+                  +{resource.tags.length - 3}
                 </Badge>
               )}
             </div>
           )}
         </CardContent>
 
-        <CardFooter className="pt-3 pb-4 overflow-hidden">
-          <Separator className="mb-3" />
-          <div className="flex items-center justify-between w-full">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground min-w-0 flex-1">
-              <span className="truncate">{resource.category}</span>
-            </div>
-            
-            <div className="flex items-center gap-1 flex-shrink-0">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
-                onClick={handleBookmark}
-              >
-                <Bookmark className="h-3 w-3" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
-                onClick={handleShare}
-              >
-                <Share2 className="h-3 w-3" />
-              </Button>
-            </div>
+        <CardFooter className="pt-0">
+          <div className="flex items-center justify-end w-full gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleBookmark}
+            >
+              <Bookmark className="h-4 w-4 mr-1" />
+              Bookmark
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleShare}
+            >
+              <Share2 className="h-4 w-4 mr-1" />
+              Share
+            </Button>
           </div>
         </CardFooter>
       </Card>
