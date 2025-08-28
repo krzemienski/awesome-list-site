@@ -9,6 +9,17 @@ body {
   min-height: 100vh;
 }
 
+/* Prevent layout shifts during scroll */
+* {
+  box-sizing: border-box;
+}
+
+/* Improve scroll performance */
+.scroll-smooth {
+  scroll-behavior: smooth;
+  will-change: scroll-position;
+}
+
 /* Ensure main content area is properly positioned */
 main {
   position: relative;
