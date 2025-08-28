@@ -11,14 +11,13 @@ export function SidebarItemMorph({ children, isActive, isExpanded }: {
     <motion.div
       animate={{
         scale: isActive ? 1.02 : 1,
-        backgroundColor: isActive ? "hsl(var(--sidebar-accent))" : "rgba(0, 0, 0, 0)",
         borderRadius: isActive ? "0.375rem" : "0rem"
       }}
       whileHover={{
         scale: 1.01,
-        backgroundColor: "hsl(var(--sidebar-accent))",
         borderRadius: "0.375rem"
       }}
+      className={isActive ? "bg-sidebar-accent" : "hover:bg-sidebar-accent"}
       transition={{
         type: "spring",
         stiffness: 400,
@@ -81,7 +80,7 @@ export function SidebarToggleMorph({ isOpen }: { isOpen: boolean }) {
   return (
     <motion.div
       animate={{
-        rotate: isOpen ? 0 : 180
+        rotate: isOpen ? 90 : 0
       }}
       transition={{
         type: "spring",
