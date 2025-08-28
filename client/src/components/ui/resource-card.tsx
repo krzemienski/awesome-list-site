@@ -5,7 +5,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { ExternalLink, Bookmark, Share2 } from "lucide-react";
 import { Resource } from "@/types/awesome-list";
-import { motion } from "framer-motion";
+import { motion } from "framer-motion"
+import { CardMorphingContainer, cardStaggerVariants } from "@/components/animations/card-morphing";
 import { trackResourceClick } from "@/lib/analytics";
 import ResourceTooltip from "@/components/ui/resource-tooltip";
 import { cn } from "@/lib/utils";
@@ -64,17 +65,20 @@ export default function ResourceCard({ resource, index, isSelectionMode, isSelec
   };
 
   return (
-    <motion.div
-      initial="hidden"
-      animate="visible"
-      variants={fadeInVariants}
+    <CardMorphingContainer
+      layoutId={`resource-${resource.url}`}
       className="h-full"
     >
-      <Card className={cn(
-        "h-full transition-all duration-200 hover:shadow-lg cursor-pointer group",
-        isSelected && "ring-2 ring-primary border-primary"
-      )}
-      onClick={handleResourceClick}
+      <motion.div
+        variants={cardStaggerVariants}
+        className="h-full"
+      >
+        <Card className={cn(
+          "h-full transition-all duration-300 hover:shadow-lg cursor-pointer group",
+          "hover:scale-[1.02] hover:-translate-y-1",
+          isSelected && "ring-2 ring-primary border-primary scale-[1.01]"
+        )}
+        onClick={handleResourceClick}
       >
         <CardHeader>
           <div className="flex items-start justify-between gap-2">
@@ -148,7 +152,8 @@ export default function ResourceCard({ resource, index, isSelectionMode, isSelec
             </Button>
           </div>
         </CardFooter>
-      </Card>
-    </motion.div>
+        </Card>
+      </motion.div>
+    </CardMorphingContainer>
   );
 }
