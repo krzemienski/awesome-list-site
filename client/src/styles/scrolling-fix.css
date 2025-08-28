@@ -26,10 +26,7 @@ body {
 }
 
 /* Ensure card layouts don't clip content */
-[data-radix-aspect-ratio-wrapper],
-.card,
-.grid > div,
-.space-y-0 > div {
+[data-radix-aspect-ratio-wrapper] {
   contain: layout;
   overflow: visible !important;
 }
@@ -48,11 +45,7 @@ body {
   overflow: visible;
 }
 
-/* Fix specific card layout issues */
-[data-card] {
-  overflow: visible !important;
-  contain: none !important;
-}
+/* Remove problematic card overrides */
 
 /* Improve badge and content wrapping */
 .flex-wrap {
