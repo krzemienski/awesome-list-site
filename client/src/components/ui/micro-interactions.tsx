@@ -66,7 +66,7 @@ export function AnimatedButton({
       <Button
         ref={buttonRef}
         variant={variant}
-        size={size}
+        size={size === "md" ? "sm" : size}
         onClick={handleClick}
         disabled={disabled}
         className={`relative overflow-hidden ${className}`}
@@ -198,13 +198,6 @@ export function AnimatedResourceCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ 
-        duration: 0.4, 
-        delay: index * 0.1,
-        ease: "easeOut"
-      }}
       whileHover={{ y: -2 }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
@@ -355,13 +348,6 @@ export function AnimatedListItem({
 }: AnimatedListItemProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ 
-        duration: 0.3, 
-        delay: index * 0.05,
-        ease: "easeOut"
-      }}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
     >
@@ -516,18 +502,9 @@ export function StaggeredList({
   return (
     <div className={className}>
       {children.map((child, index) => (
-        <motion.div
-          key={index}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ 
-            duration: 0.4,
-            delay: index * staggerDelay,
-            ease: "easeOut"
-          }}
-        >
+        <div key={index}>
           {child}
-        </motion.div>
+        </div>
       ))}
     </div>
   );
