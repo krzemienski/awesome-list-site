@@ -164,23 +164,25 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                     isActive={isActiveRoute(`/subcategory/${sub.slug}`)}
                     isExpanded={isExpanded}
                   >
-                    <SidebarMenuSubButton
-                      onClick={() => toggleExpand(subId)}
-                      className="w-full"
-                    >
-                      <SidebarToggleMorph isOpen={isExpanded} />
-                      <span className="flex items-center justify-between w-full">
-                        <Link
-                          href={`/subcategory/${sub.slug}`}
-                          className="truncate hover:underline"
-                          onClick={(e) => e.stopPropagation()}
+                    <SidebarMenuSubButton asChild>
+                      <Link href={`/subcategory/${sub.slug}`} className="w-full">
+                        <span 
+                          className="mr-1 cursor-pointer"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            toggleExpand(subId)
+                          }}
                         >
-                          {sub.name}
-                        </Link>
-                        <span className="text-xs text-muted-foreground ml-2 shrink-0">
-                          {sub.resources.length}
+                          <SidebarToggleMorph isOpen={isExpanded} />
                         </span>
-                      </span>
+                        <span className="flex items-center justify-between w-full">
+                          <span className="truncate">{sub.name}</span>
+                          <span className="text-xs text-muted-foreground ml-2 shrink-0">
+                            {sub.resources.length}
+                          </span>
+                        </span>
+                      </Link>
                     </SidebarMenuSubButton>
                   </SidebarItemMorph>
                   <SidebarExpandableMorph isExpanded={isExpanded}>
@@ -280,24 +282,26 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                           isActive={isActiveRoute(`/category/${category.slug}`)}
                           isExpanded={isExpanded}
                         >
-                          <SidebarMenuButton
-                            onClick={() => toggleExpand(category.slug)}
-                            className="w-full"
-                          >
-                            <Icon className="h-4 w-4" />
-                            <SidebarToggleMorph isOpen={isExpanded} />
-                            <span className="flex items-center justify-between w-full">
-                              <Link
-                                href={`/category/${category.slug}`}
-                                className="truncate hover:underline"
-                                onClick={(e) => e.stopPropagation()}
+                          <SidebarMenuButton asChild>
+                            <Link href={`/category/${category.slug}`} className="w-full">
+                              <Icon className="h-4 w-4" />
+                              <span 
+                                className="ml-auto cursor-pointer"
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  e.stopPropagation()
+                                  toggleExpand(category.slug)
+                                }}
                               >
-                                {category.name}
-                              </Link>
-                              <span className="text-xs text-muted-foreground ml-2 shrink-0">
-                                {category.resources.length}
+                                <SidebarToggleMorph isOpen={isExpanded} />
                               </span>
-                            </span>
+                              <span className="flex items-center justify-between w-full">
+                                <span className="truncate">{category.name}</span>
+                                <span className="text-xs text-muted-foreground ml-2 shrink-0">
+                                  {category.resources.length}
+                                </span>
+                              </span>
+                            </Link>
                           </SidebarMenuButton>
                         </SidebarItemMorph>
                         <SidebarExpandableMorph isExpanded={isExpanded}>
