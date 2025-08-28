@@ -13,7 +13,7 @@ import {
   Home,
   Palette
 } from "lucide-react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { Link, useLocation } from "wouter"
 import { cn } from "@/lib/utils"
 
@@ -35,6 +35,7 @@ import {
   SidebarRail,
   SidebarTrigger
 } from "@/components/ui/sidebar"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { Category, Subcategory, SubSubcategory } from "@/types/awesome-list"
 import ThemeSelectorSidebar from "@/components/ui/theme-selector-sidebar"
 import { SidebarItemMorph, SidebarExpandableMorph, SidebarToggleMorph } from "@/components/animations/sidebar-morphing"
@@ -61,13 +62,14 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
   const [location] = useLocation()
   const [expandedItems, setExpandedItems] = useState<string[]>([])
 
-  // Filter out unwanted categories
-  const filteredCategories = categories.filter(cat => 
-    cat.resources.length > 0 && 
-    cat.name !== "Table of contents" && 
-    !cat.name.startsWith("List of") &&
-    !["Contributing", "License", "External Links", "Anti-features"].includes(cat.name)
-  )
+  // Filter out unwanted categories (memoized to prevent infinite useEffect loops)
+  const filteredCategories = useMemo(() => 
+    categories.filter(cat => 
+      cat.resources.length > 0 && 
+      cat.name !== "Table of contents" && 
+      !cat.name.startsWith("List of") &&
+      !["Contributing", "License", "External Links", "Anti-features"].includes(cat.name)
+    ), [categories])
 
   // Expand active category based on current location
   useEffect(() => {
@@ -249,90 +251,92 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
       </SidebarHeader>
       
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/" className={cn(isActiveRoute("/") && "bg-primary/10 text-primary font-medium")}>
-                    <Home className="h-4 w-4" />
-                    <span>Home</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        <ScrollArea className="flex-1">
+          <SidebarGroup>
+            <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <Link href="/" className={cn(isActiveRoute("/") && "bg-primary/10 text-primary font-medium")}>
+                      <Home className="h-4 w-4" />
+                      <span>Home</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
 
-        <SidebarGroup>
-          <SidebarGroupLabel>Categories</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {filteredCategories.map(category => {
-                const Icon = categoryIcons[category.name] || FileText
-                const hasSubcategories = category.subcategories && category.subcategories.length > 0
-                const isExpanded = expandedItems.includes(category.slug)
+          <SidebarGroup>
+            <SidebarGroupLabel>Categories</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {filteredCategories.map(category => {
+                  const Icon = categoryIcons[category.name] || FileText
+                  const hasSubcategories = category.subcategories && category.subcategories.length > 0
+                  const isExpanded = expandedItems.includes(category.slug)
 
-                return (
-                  <SidebarMenuItem key={category.slug}>
-                    {hasSubcategories ? (
-                      <>
-                        <SidebarItemMorph
-                          isActive={isActiveRoute(`/category/${category.slug}`)}
-                          isExpanded={isExpanded}
-                        >
-                          <SidebarMenuButton asChild>
-                            <Link href={`/category/${category.slug}`} className="w-full">
-                              <Icon className="h-4 w-4" />
-                              <span 
-                                className="ml-auto cursor-pointer"
-                                onClick={(e) => {
-                                  e.preventDefault()
-                                  e.stopPropagation()
-                                  toggleExpand(category.slug)
-                                }}
-                              >
-                                <SidebarToggleMorph isOpen={isExpanded} />
-                              </span>
-                              <span className="flex items-center justify-between w-full">
-                                <span className="truncate">{category.name}</span>
-                                <span className="text-xs text-muted-foreground ml-2 shrink-0">
-                                  {category.resources.length}
+                  return (
+                    <SidebarMenuItem key={category.slug}>
+                      {hasSubcategories ? (
+                        <>
+                          <SidebarItemMorph
+                            isActive={isActiveRoute(`/category/${category.slug}`)}
+                            isExpanded={isExpanded}
+                          >
+                            <SidebarMenuButton asChild>
+                              <Link href={`/category/${category.slug}`} className="w-full">
+                                <Icon className="h-4 w-4" />
+                                <span 
+                                  className="ml-auto cursor-pointer"
+                                  onClick={(e) => {
+                                    e.preventDefault()
+                                    e.stopPropagation()
+                                    toggleExpand(category.slug)
+                                  }}
+                                >
+                                  <SidebarToggleMorph isOpen={isExpanded} />
                                 </span>
+                                <span className="flex items-center justify-between w-full">
+                                  <span className="truncate">{category.name}</span>
+                                  <span className="text-xs text-muted-foreground ml-2 shrink-0">
+                                    {category.resources.length}
+                                  </span>
+                                </span>
+                              </Link>
+                            </SidebarMenuButton>
+                          </SidebarItemMorph>
+                          <SidebarExpandableMorph isExpanded={isExpanded}>
+                            {renderSubcategories(category, category.subcategories)}
+                          </SidebarExpandableMorph>
+                        </>
+                      ) : (
+                        <SidebarMenuButton asChild>
+                          <Link
+                            href={`/category/${category.slug}`}
+                            className={cn(
+                              "w-full",
+                              isActiveRoute(`/category/${category.slug}`) && "bg-primary/10 text-primary font-medium"
+                            )}
+                          >
+                            <Icon className="h-4 w-4" />
+                            <span className="flex items-center justify-between w-full">
+                              <span className="truncate">{category.name}</span>
+                              <span className="text-xs text-muted-foreground ml-2 shrink-0">
+                                {category.resources.length}
                               </span>
-                            </Link>
-                          </SidebarMenuButton>
-                        </SidebarItemMorph>
-                        <SidebarExpandableMorph isExpanded={isExpanded}>
-                          {renderSubcategories(category, category.subcategories)}
-                        </SidebarExpandableMorph>
-                      </>
-                    ) : (
-                      <SidebarMenuButton asChild>
-                        <Link
-                          href={`/category/${category.slug}`}
-                          className={cn(
-                            "w-full",
-                            isActiveRoute(`/category/${category.slug}`) && "bg-primary/10 text-primary font-medium"
-                          )}
-                        >
-                          <Icon className="h-4 w-4" />
-                          <span className="flex items-center justify-between w-full">
-                            <span className="truncate">{category.name}</span>
-                            <span className="text-xs text-muted-foreground ml-2 shrink-0">
-                              {category.resources.length}
                             </span>
-                          </span>
-                        </Link>
-                      </SidebarMenuButton>
-                    )}
-                  </SidebarMenuItem>
-                )
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+                          </Link>
+                        </SidebarMenuButton>
+                      )}
+                    </SidebarMenuItem>
+                  )
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </ScrollArea>
       </SidebarContent>
 
       <SidebarFooter>
