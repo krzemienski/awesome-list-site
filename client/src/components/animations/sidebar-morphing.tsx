@@ -11,12 +11,12 @@ export function SidebarItemMorph({ children, isActive, isExpanded }: {
     <motion.div
       animate={{
         scale: isActive ? 1.02 : 1,
-        backgroundColor: isActive ? "var(--sidebar-accent)" : "transparent",
+        backgroundColor: isActive ? "hsl(var(--sidebar-accent))" : "rgba(0, 0, 0, 0)",
         borderRadius: isActive ? "0.375rem" : "0rem"
       }}
       whileHover={{
         scale: 1.01,
-        backgroundColor: "var(--sidebar-accent)",
+        backgroundColor: "hsl(var(--sidebar-accent))",
         borderRadius: "0.375rem"
       }}
       transition={{
