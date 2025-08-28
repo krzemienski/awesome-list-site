@@ -33,12 +33,6 @@ export function useMobilePopover(options: UseMobilePopoverOptions = {}) {
     };
 
     const handleScroll = (event: Event) => {
-      // Only close on scroll if we're not actively touching
-      if (isTouching) {
-        event.preventDefault();
-        return;
-      }
-      
       // Check if scroll is happening inside the popover content
       const content = contentRef.current;
       if (content && content.contains(event.target as Node)) {
@@ -46,14 +40,16 @@ export function useMobilePopover(options: UseMobilePopoverOptions = {}) {
         return;
       }
       
-      // Close popover on external scroll
-      setIsOpen(false);
+      // Only close on scroll if we're not actively touching and it's external scroll
+      if (!isTouching) {
+        setIsOpen(false);
+      }
     };
 
     if (isOpen) {
       document.addEventListener('touchstart', handleTouchStart, { passive: true });
       document.addEventListener('touchend', handleTouchEnd, { passive: true });
-      document.addEventListener('scroll', handleScroll, { passive: false });
+      document.addEventListener('scroll', handleScroll, { passive: true });
     }
 
     return () => {

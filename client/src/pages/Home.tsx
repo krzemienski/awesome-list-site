@@ -29,7 +29,11 @@ interface HomeProps {
 type LayoutType = "cards" | "list" | "compact";
 
 export default function Home({ awesomeList, isLoading }: HomeProps) {
-  const [layout, setLayout] = useState<LayoutType>("cards");
+  const [layout, setLayout] = useState<LayoutType>(() => {
+    // Persist layout preference in sessionStorage
+    const saved = sessionStorage.getItem('awesome-layout');
+    return (saved as LayoutType) || "cards";
+  });
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(24);
   const [sortBy, setSortBy] = useState("category");
@@ -113,6 +117,12 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
   // Handle learning path start
   const handleLearningPathStart = (path: any) => {
     console.log("Starting learning path:", path);
+  };
+
+  // Handle layout change with persistence
+  const handleLayoutChange = (newLayout: LayoutType) => {
+    setLayout(newLayout);
+    sessionStorage.setItem('awesome-layout', newLayout);
   };
 
   // Loading state
@@ -333,7 +343,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
             {/* Layout Switcher */}
             <LayoutSwitcher
               currentLayout={layout}
-              onLayoutChange={setLayout}
+              onLayoutChange={handleLayoutChange}
             />
             
             {/* Comparison Controls */}
