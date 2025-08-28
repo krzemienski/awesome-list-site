@@ -73,7 +73,11 @@ export default function UserPreferences({
 }: UserPreferencesProps) {
   const [localProfile, setLocalProfile] = useState<UserProfile>(userProfile);
   const [newGoal, setNewGoal] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(() => {
+    // Persist dialog state to prevent disappearing on scroll
+    const saved = sessionStorage.getItem('awesome-user-preferences-open');
+    return saved === 'true';
+  });
 
   useEffect(() => {
     setLocalProfile(userProfile);
@@ -82,6 +86,12 @@ export default function UserPreferences({
   const handleSave = () => {
     onProfileUpdate(localProfile);
     setIsOpen(false);
+    sessionStorage.setItem('awesome-user-preferences-open', 'false');
+  };
+
+  const handleDialogOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    sessionStorage.setItem('awesome-user-preferences-open', open.toString());
   };
 
   const handleCategoryToggle = (category: string) => {
@@ -126,7 +136,7 @@ export default function UserPreferences({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={handleDialogOpenChange}>
       <DialogTrigger asChild>
         <Button 
           variant="outline" 
@@ -137,14 +147,14 @@ export default function UserPreferences({
           Preferences
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden touch-optimized">
+      <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden touch-optimized w-[calc(100vw-2rem)] sm:w-full">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Brain className="h-5 w-5" />
             Personalization Settings
           </DialogTitle>
           <DialogDescription>
-            Customize your learning preferences to get better recommendations
+            Customize your learning preferences to get personalized AI-powered recommendations
           </DialogDescription>
         </DialogHeader>
 
@@ -416,7 +426,10 @@ export default function UserPreferences({
         </ScrollArea>
 
         <div className="flex justify-end gap-2 pt-4 border-t">
-          <Button variant="outline" onClick={() => setIsOpen(false)}>
+          <Button variant="outline" onClick={() => {
+            setIsOpen(false);
+            sessionStorage.setItem('awesome-user-preferences-open', 'false');
+          }}>
             Cancel
           </Button>
           <Button onClick={handleSave}>
