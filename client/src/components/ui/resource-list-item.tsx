@@ -11,12 +11,9 @@ import { cn } from "@/lib/utils";
 interface ResourceListItemProps {
   resource: Resource;
   index?: number;
-  isSelectionMode?: boolean;
-  isSelected?: boolean;
-  onSelectionToggle?: (resource: Resource) => void;
 }
 
-export default function ResourceListItem({ resource, isSelectionMode, isSelected, onSelectionToggle }: ResourceListItemProps) {
+export default function ResourceListItem({ resource }: ResourceListItemProps) {
   const handleClick = () => {
     window.open(resource.url, '_blank', 'noopener,noreferrer');
   };
@@ -42,8 +39,7 @@ export default function ResourceListItem({ resource, isSelectionMode, isSelected
   return (
     <Card 
       className={cn(
-        "hover:shadow-sm cursor-pointer transition-all duration-200 group border-0 border-b rounded-none hover:bg-accent/30",
-        isSelected && "bg-accent/50 border-l-4 border-l-primary"
+        "hover:shadow-sm cursor-pointer transition-all duration-200 group border-0 border-b rounded-none hover:bg-accent/30"
       )}
       onClick={handleClick}
     >
