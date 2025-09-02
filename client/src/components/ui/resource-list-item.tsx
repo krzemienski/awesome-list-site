@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+
 import { Separator } from "@/components/ui/separator";
 import { ExternalLink, Bookmark, Share2 } from "lucide-react";
 import { Resource } from "@/types/awesome-list";
@@ -45,18 +45,6 @@ export default function ResourceListItem({ resource }: ResourceListItemProps) {
     >
       <CardContent className="p-4 overflow-hidden">
         <div className="flex items-center justify-between">
-          {/* Selection checkbox */}
-          {isSelectionMode && (
-            <div className="mr-3 flex-shrink-0">
-              <Checkbox
-                checked={isSelected}
-                onCheckedChange={() => onSelectionToggle?.(resource)}
-                onClick={(e) => e.stopPropagation()}
-                aria-label={`Select ${resource.title}`}
-              />
-            </div>
-          )}
-          
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <h3 className="font-medium text-sm truncate group-hover:text-primary transition-colors">
