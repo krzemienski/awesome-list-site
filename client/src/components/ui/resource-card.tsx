@@ -69,8 +69,7 @@ export default function ResourceCard({ resource, index, isSelectionMode, isSelec
       layoutId={`resource-${resource.url}`}
       className="h-full"
     >
-      <motion.div
-        variants={cardStaggerVariants}
+      <div
         className="h-full"
       >
         <Card className={cn(
@@ -153,7 +152,7 @@ export default function ResourceCard({ resource, index, isSelectionMode, isSelec
           </div>
         </CardFooter>
         </Card>
-      </motion.div>
+      </div>
     </CardMorphingContainer>
   );
 }

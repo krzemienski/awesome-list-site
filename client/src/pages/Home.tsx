@@ -424,11 +424,8 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                 categoryId={`${selectedCategory}-${selectedSubcategory}-${selectedSubSubcategory}`}
                 className="mb-8"
               >
-                <motion.div 
+                <div 
                   className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-visible"
-                  variants={containerStaggerVariants}
-                  initial="hidden"
-                  animate="visible"
                 >
                   {paginatedResources.map((resource, index) => (
                     <ResourceCard
@@ -440,7 +437,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                       onSelectionToggle={toggleResource}
                     />
                   ))}
-                </motion.div>
+                </div>
               </GridMorphing>
             )}
 
@@ -449,11 +446,8 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                 categoryId={`list-${selectedCategory}-${selectedSubcategory}-${selectedSubSubcategory}`}
                 className="mb-8"
               >
-                <motion.div 
+                <div 
                   className="space-y-0 border border-border rounded-lg overflow-visible"
-                  variants={containerStaggerVariants}
-                  initial="hidden"
-                  animate="visible"
                 >
                   {paginatedResources.map((resource, index) => (
                     <ResourceListItem
@@ -465,7 +459,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                       onSelectionToggle={toggleResource}
                     />
                   ))}
-                </motion.div>
+                </div>
               </GridMorphing>
             )}
 
@@ -474,11 +468,8 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                 categoryId={`compact-${selectedCategory}-${selectedSubcategory}-${selectedSubSubcategory}`}
                 className="mb-8"
               >
-                <motion.div 
+                <div 
                   className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 overflow-visible"
-                  variants={containerStaggerVariants}
-                  initial="hidden"
-                  animate="visible"
                 >
                   {paginatedResources.map((resource, index) => (
                     <ResourceCompactItem
@@ -490,7 +481,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                       onSelectionToggle={toggleResource}
                     />
                   ))}
-                </motion.div>
+                </div>
               </GridMorphing>
             )}
             

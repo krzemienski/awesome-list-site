@@ -37,51 +37,17 @@ const pageTransition = {
 
 export function PageTransition({ children, className = "" }: PageTransitionProps) {
   return (
-    <motion.div
-      initial="initial"
-      animate="in"
-      exit="out"
-      variants={pageVariants}
-      transition={pageTransition}
-      className={className}
-    >
+    <div className={className}>
       {children}
-    </motion.div>
+    </div>
   )
 }
 
 // Category-specific transition with morphing effects
 export function CategoryTransition({ children, categoryKey }: { children: ReactNode, categoryKey: string }) {
   return (
-    <motion.div
-      key={categoryKey}
-      initial={{ 
-        opacity: 0, 
-        scale: 0.9,
-        rotateX: -15,
-        transformPerspective: 1000
-      }}
-      animate={{ 
-        opacity: 1, 
-        scale: 1,
-        rotateX: 0,
-        transformPerspective: 1000
-      }}
-      exit={{ 
-        opacity: 0, 
-        scale: 1.1,
-        rotateX: 15,
-        transformPerspective: 1000
-      }}
-      transition={{
-        type: "spring",
-        stiffness: 400,
-        damping: 25,
-        mass: 0.6
-      }}
-      style={{ transformStyle: "preserve-3d" }}
-    >
+    <div key={categoryKey}>
       {children}
-    </motion.div>
+    </div>
   )
 }
