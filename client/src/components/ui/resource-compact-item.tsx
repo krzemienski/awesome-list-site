@@ -10,12 +10,9 @@ import { cn } from "@/lib/utils";
 interface ResourceCompactItemProps {
   resource: Resource;
   index?: number;
-  isSelectionMode?: boolean;
-  isSelected?: boolean;
-  onSelectionToggle?: (resource: Resource) => void;
 }
 
-export default function ResourceCompactItem({ resource, isSelectionMode, isSelected, onSelectionToggle }: ResourceCompactItemProps) {
+export default function ResourceCompactItem({ resource }: ResourceCompactItemProps) {
   const handleClick = () => {
     window.open(resource.url, '_blank', 'noopener,noreferrer');
   };
@@ -41,8 +38,7 @@ export default function ResourceCompactItem({ resource, isSelectionMode, isSelec
   return (
     <Card 
       className={cn(
-        "hover:shadow-md cursor-pointer transition-all duration-200 group overflow-hidden",
-        isSelected && "ring-2 ring-primary border-primary"
+        "hover:shadow-md cursor-pointer transition-all duration-200 group overflow-hidden"
       )}
       onClick={handleClick}
     >

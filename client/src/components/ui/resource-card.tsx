@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+
 import { Separator } from "@/components/ui/separator";
 import { ExternalLink, Bookmark, Share2 } from "lucide-react";
 import { Resource } from "@/types/awesome-list";
@@ -14,12 +14,9 @@ import { cn } from "@/lib/utils";
 interface ResourceCardProps {
   resource: Resource;
   index: number;
-  isSelectionMode?: boolean;
-  isSelected?: boolean;
-  onSelectionToggle?: (resource: Resource) => void;
 }
 
-export default function ResourceCard({ resource, index, isSelectionMode, isSelected, onSelectionToggle }: ResourceCardProps) {
+export default function ResourceCard({ resource, index }: ResourceCardProps) {
   // Check if reduced motion is preferred
   const prefersReducedMotion = 
     typeof window !== 'undefined' ? 
@@ -74,8 +71,7 @@ export default function ResourceCard({ resource, index, isSelectionMode, isSelec
       >
         <Card className={cn(
           "h-full transition-all duration-300 hover:shadow-lg cursor-pointer group",
-          "hover:scale-[1.02] hover:-translate-y-1",
-          isSelected && "ring-2 ring-primary border-primary scale-[1.01]"
+          "hover:scale-[1.02] hover:-translate-y-1"
         )}
         onClick={handleResourceClick}
       >
@@ -91,14 +87,6 @@ export default function ResourceCard({ resource, index, isSelectionMode, isSelec
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
               <ExternalLink className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-              {isSelectionMode && (
-                <Checkbox
-                  checked={isSelected}
-                  onCheckedChange={() => onSelectionToggle?.(resource)}
-                  onClick={(e) => e.stopPropagation()}
-                  aria-label={`Select ${resource.title}`}
-                />
-              )}
             </div>
           </div>
         </CardHeader>

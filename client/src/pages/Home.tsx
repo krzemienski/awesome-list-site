@@ -9,18 +9,18 @@ import LayoutSwitcher from "@/components/ui/layout-switcher";
 import Pagination from "@/components/ui/pagination";
 import RecommendationPanel from "@/components/ui/recommendation-panel";
 import UserPreferences from "@/components/ui/user-preferences";
-import ResourceComparison from "@/components/ui/resource-comparison";
+
 import { SkeletonGrid } from "@/components/ui/skeleton-card";
 import { AwesomeList } from "@/types/awesome-list";
 import SEOHead from "@/components/layout/SEOHead";
-import { Filter, Search, Brain, GitCompare } from "lucide-react";
+import { Filter, Search, Brain } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trackCategoryView, trackFilterUsage, trackSortChange } from "@/lib/analytics";
 import { useUserProfile } from "@/hooks/use-user-profile";
-import { useResourceComparison } from "@/hooks/use-resource-comparison";
+
 import { motion } from "framer-motion";
 import { PageTransition, CategoryTransition } from "@/components/animations/page-transition";
 import { GridMorphing, containerStaggerVariants } from "@/components/animations/card-morphing";
@@ -50,19 +50,9 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
     const saved = sessionStorage.getItem('awesome-show-recommendations');
     return saved === 'true';
   });
-  const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [resourcesLoading, setResourcesLoading] = useState(false);
   const [loadedResourceIds, setLoadedResourceIds] = useState<Set<string>>(new Set());
   const [lastLoadTrigger, setLastLoadTrigger] = useState("");
-
-  // Resource comparison hook
-  const {
-    selectedResources,
-    toggleResource,
-    clearAll: clearComparison,
-    isSelected,
-    count: comparisonCount
-  } = useResourceComparison();
 
 
 
@@ -407,38 +397,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
               onLayoutChange={handleLayoutChange}
             />
             
-            {/* Comparison Controls */}
-            <div className="flex gap-2 items-center">
-              <Button
-                variant={isSelectionMode ? "default" : "outline"}
-                size="sm"
-                onClick={() => setIsSelectionMode(!isSelectionMode)}
-                className="flex items-center gap-2 touch-optimized min-h-[44px] sm:min-h-auto"
-              >
-                <GitCompare className="h-4 w-4" />
-                Select to Compare
-              </Button>
-              
-              {isSelectionMode && (
-                <ResourceComparison
-                  selectedResources={selectedResources}
-                  onRemoveResource={toggleResource}
-                  onClearAll={clearComparison}
-                  trigger={
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      disabled={comparisonCount === 0}
-                      className="gap-2 touch-optimized min-h-[44px] sm:min-h-auto"
-                    >
-                      <GitCompare className="h-4 w-4" />
-                      Compare ({comparisonCount})
-                    </Button>
-                  }
-                />
-              )}
-            </div>
-            
+
             {/* Sort */}
             <div className="flex gap-2 items-center flex-wrap">
               <span className="text-sm text-muted-foreground">Sort:</span>
@@ -494,9 +453,6 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                           <ResourceCard
                             resource={resource}
                             index={index}
-                            isSelectionMode={isSelectionMode}
-                            isSelected={isSelected(resource)}
-                            onSelectionToggle={toggleResource}
                           />
                         </div>
                       );
@@ -531,9 +487,6 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                           <ResourceListItem
                             resource={resource}
                             index={index}
-                            isSelectionMode={isSelectionMode}
-                            isSelected={isSelected(resource)}
-                            onSelectionToggle={toggleResource}
                           />
                         </div>
                       );
@@ -568,9 +521,6 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                           <ResourceCompactItem
                             resource={resource}
                             index={index}
-                            isSelectionMode={isSelectionMode}
-                            isSelected={isSelected(resource)}
-                            onSelectionToggle={toggleResource}
                           />
                         </div>
                       );
