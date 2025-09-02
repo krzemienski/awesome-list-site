@@ -37,7 +37,7 @@ export default function ResourceCompactItem({ resource }: ResourceCompactItemPro
 
   return (
     <Card 
-      className="hover:shadow-md cursor-pointer group overflow-hidden"
+      className="cursor-pointer group overflow-hidden"
       onClick={handleClick}
     >
       <CardHeader className="pb-2">

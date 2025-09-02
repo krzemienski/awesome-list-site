@@ -38,7 +38,7 @@ export default function ResourceListItem({ resource }: ResourceListItemProps) {
 
   return (
     <Card 
-      className="hover:shadow-sm cursor-pointer group border-0 border-b rounded-none hover:bg-accent/30"
+      className="cursor-pointer group border-0 border-b rounded-none"
       onClick={handleClick}
     >
       <CardContent className="p-4 overflow-hidden">
