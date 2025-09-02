@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+
 import { ExternalLink, Bookmark, Share2 } from "lucide-react";
 import { Resource } from "@/types/awesome-list";
 import ResourcePreviewTooltip from "@/components/ui/resource-preview-tooltip";
@@ -48,15 +48,6 @@ export default function ResourceCompactItem({ resource }: ResourceCompactItemPro
             <CardTitle className="text-sm line-clamp-1 group-hover:text-primary transition-colors">
               {resource.title}
             </CardTitle>
-            {isSelectionMode && (
-              <Checkbox
-                checked={isSelected}
-                onCheckedChange={() => onSelectionToggle?.(resource)}
-                onClick={(e) => e.stopPropagation()}
-                aria-label={`Select ${resource.title}`}
-                className="mt-1"
-              />
-            )}
           </div>
           <div className="flex items-center gap-1 flex-shrink-0">
             <ExternalLink className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
