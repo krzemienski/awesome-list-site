@@ -1,0 +1,96 @@
+/* Skeleton Loading Animations */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+/* Shimmer effect for skeleton cards */
+.skeleton-shimmer {
+  animation: shimmer 2s infinite;
+  background: linear-gradient(
+    to right,
+    var(--skeleton-base) 0%,
+    var(--skeleton-shine) 50%,
+    var(--skeleton-base) 100%
+  );
+  background-size: 1000px 100%;
+}
+
+/* Skeleton color variables */
+:root {
+  --skeleton-base: hsl(var(--muted));
+  --skeleton-shine: hsl(var(--muted) / 0.5);
+}
+
+.dark {
+  --skeleton-base: hsl(var(--muted));
+  --skeleton-shine: hsl(var(--muted) / 0.3);
+}
+
+/* Progressive fade-in animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+/* Staggered loading effect */
+.stagger-fade-in {
+  opacity: 0;
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+.stagger-fade-in:nth-child(1) { animation-delay: 0ms; }
+.stagger-fade-in:nth-child(2) { animation-delay: 50ms; }
+.stagger-fade-in:nth-child(3) { animation-delay: 100ms; }
+.stagger-fade-in:nth-child(4) { animation-delay: 150ms; }
+.stagger-fade-in:nth-child(5) { animation-delay: 200ms; }
+.stagger-fade-in:nth-child(6) { animation-delay: 250ms; }
+.stagger-fade-in:nth-child(7) { animation-delay: 300ms; }
+.stagger-fade-in:nth-child(8) { animation-delay: 350ms; }
+.stagger-fade-in:nth-child(9) { animation-delay: 400ms; }
+
+/* Pulse animation for skeleton elements */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.skeleton-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Loading indicator dots */
+@keyframes loading-dots {
+  0%, 20% {
+    content: '.';
+  }
+  40% {
+    content: '..';
+  }
+  60%, 100% {
+    content: '...';
+  }
+}
+
+.loading-dots::after {
+  content: '';
+  animation: loading-dots 1.5s infinite;
+}
