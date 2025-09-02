@@ -21,9 +21,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trackCategoryView, trackFilterUsage, trackSortChange } from "@/lib/analytics";
 import { useUserProfile } from "@/hooks/use-user-profile";
 
-import { motion } from "framer-motion";
-import { PageTransition, CategoryTransition } from "@/components/animations/page-transition";
-import { GridMorphing, containerStaggerVariants } from "@/components/animations/card-morphing";
+import { GridMorphing } from "@/components/animations/card-morphing";
 
 interface HomeProps {
   awesomeList?: AwesomeList;
