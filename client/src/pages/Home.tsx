@@ -217,7 +217,11 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
 
   // Progressive loading only when explicitly triggered by category/page changes
   useEffect(() => {
-    if (lastLoadTrigger && paginatedResources.length > 0) {
+    // Generate a stable key for current view to check if we've already loaded these resources
+    const viewKey = `${selectedCategory}-${selectedSubcategory}-${selectedSubSubcategory}-${currentPage}-${sortBy}`;
+    
+    if (lastLoadTrigger && lastLoadTrigger !== "" && paginatedResources.length > 0) {
+      // Only trigger loading animation for actual changes
       setResourcesLoading(true);
       setLoadedResourceIds(new Set());
       
@@ -240,7 +244,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
           if (currentIndex >= resourceIds.length) {
             clearInterval(loadInterval);
             setResourcesLoading(false);
-            setLastLoadTrigger(""); // Reset trigger
+            setLastLoadTrigger(""); // Reset trigger after loading completes
           }
           
           return newSet;
@@ -248,13 +252,12 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
       }, 100); // Load batch every 100ms
 
       return () => clearInterval(loadInterval);
-    } else {
-      // No loading trigger or initial load - show all resources immediately
+    } else if (!resourcesLoading) {
+      // If not loading and no trigger, ensure all current resources are marked as loaded
       const allIds = paginatedResources.map(r => `${r.title}-${r.url}`);
       setLoadedResourceIds(new Set(allIds));
-      setResourcesLoading(false);
     }
-  }, [lastLoadTrigger, paginatedResources]);
+  }, [lastLoadTrigger, selectedCategory, selectedSubcategory, selectedSubSubcategory, currentPage, sortBy]);
 
   return (
     <div className="space-y-6">
@@ -433,7 +436,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                 categoryId={`${selectedCategory}-${selectedSubcategory}-${selectedSubSubcategory}`}
                 className="mb-8"
               >
-                {resourcesLoading && loadedResourceIds.size === 0 ? (
+                {resourcesLoading && lastLoadTrigger !== "" ? (
                   <SkeletonGrid count={paginatedResources.length || 6} variant="default" />
                 ) : (
                   <div 
@@ -441,7 +444,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                   >
                     {paginatedResources.map((resource, index) => {
                       const resourceKey = `${resource.title}-${resource.url}`;
-                      const isLoaded = loadedResourceIds.has(resourceKey);
+                      const isLoaded = !resourcesLoading || loadedResourceIds.has(resourceKey);
                       
                       return (
                         <div
@@ -467,7 +470,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                 categoryId={`list-${selectedCategory}-${selectedSubcategory}-${selectedSubSubcategory}`}
                 className="mb-8"
               >
-                {resourcesLoading && loadedResourceIds.size === 0 ? (
+                {resourcesLoading && lastLoadTrigger !== "" ? (
                   <SkeletonGrid count={paginatedResources.length || 6} variant="list" />
                 ) : (
                   <div 
@@ -475,7 +478,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                   >
                     {paginatedResources.map((resource, index) => {
                       const resourceKey = `${resource.title}-${resource.url}`;
-                      const isLoaded = loadedResourceIds.has(resourceKey);
+                      const isLoaded = !resourcesLoading || loadedResourceIds.has(resourceKey);
                       
                       return (
                         <div
@@ -501,7 +504,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                 categoryId={`compact-${selectedCategory}-${selectedSubcategory}-${selectedSubSubcategory}`}
                 className="mb-8"
               >
-                {resourcesLoading && loadedResourceIds.size === 0 ? (
+                {resourcesLoading && lastLoadTrigger !== "" ? (
                   <SkeletonGrid count={paginatedResources.length || 10} variant="compact" />
                 ) : (
                   <div 
@@ -509,7 +512,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                   >
                     {paginatedResources.map((resource, index) => {
                       const resourceKey = `${resource.title}-${resource.url}`;
-                      const isLoaded = loadedResourceIds.has(resourceKey);
+                      const isLoaded = !resourcesLoading || loadedResourceIds.has(resourceKey);
                       
                       return (
                         <div
