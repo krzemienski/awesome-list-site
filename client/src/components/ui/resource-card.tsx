@@ -69,7 +69,7 @@ export default function ResourceCard({ resource, index }: ResourceCardProps) {
       <div
         className="h-full"
       >
-        <Card className="h-full hover:shadow-lg cursor-pointer group"
+        <Card className="h-full cursor-pointer group"
         onClick={handleResourceClick}
       >
         <CardHeader>

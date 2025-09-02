@@ -1,6 +1,7 @@
 /* Fix for content disappearing on scroll */
 html {
-  scroll-behavior: smooth;
+  /* Removed smooth scroll to prevent movement during scroll */
+  /* scroll-behavior: smooth; */
   overflow-x: hidden;
 }
 
@@ -16,8 +17,9 @@ body {
 
 /* Improve scroll performance */
 .scroll-smooth {
-  scroll-behavior: smooth;
-  will-change: scroll-position;
+  /* Removed smooth scroll and will-change to prevent movement */
+  /* scroll-behavior: smooth; */
+  /* will-change: scroll-position; */
 }
 
 /* Fix card content overflow and cutoff issues */

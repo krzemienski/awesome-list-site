@@ -8,16 +8,11 @@
   }
 }
 
-/* Shimmer effect for skeleton cards */
+/* Shimmer effect for skeleton cards - DISABLED */
 .skeleton-shimmer {
-  animation: shimmer 2s infinite;
-  background: linear-gradient(
-    to right,
-    var(--skeleton-base) 0%,
-    var(--skeleton-shine) 50%,
-    var(--skeleton-base) 100%
-  );
-  background-size: 1000px 100%;
+  /* animation: shimmer 2s infinite; */
+  background: var(--skeleton-base);
+  /* Removed animated gradient to prevent movement */
 }
 
 /* Skeleton color variables */
@@ -44,13 +39,14 @@
 }
 
 .fade-in-up {
-  animation: fadeInUp 0.5s ease-out forwards;
+  /* animation: fadeInUp 0.5s ease-out forwards; */
+  opacity: 1; /* Show immediately without animation */
 }
 
-/* Staggered loading effect */
+/* Staggered loading effect - DISABLED */
 .stagger-fade-in {
-  opacity: 0;
-  animation: fadeInUp 0.5s ease-out forwards;
+  opacity: 1; /* Show immediately */
+  /* animation: fadeInUp 0.5s ease-out forwards; */
 }
 
 .stagger-fade-in:nth-child(1) { animation-delay: 0ms; }
@@ -74,7 +70,8 @@
 }
 
 .skeleton-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  /* animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; */
+  opacity: 0.5; /* Static opacity instead of pulsing */
 }
 
 /* Loading indicator dots */
@@ -91,6 +88,6 @@
 }
 
 .loading-dots::after {
-  content: '';
-  animation: loading-dots 1.5s infinite;
+  content: '...'; /* Static dots instead of animated */
+  /* animation: loading-dots 1.5s infinite; */
 }
