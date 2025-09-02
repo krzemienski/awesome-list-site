@@ -113,10 +113,7 @@ export function AnimatedCategoryItem({
   isActive = false
 }: AnimatedCategoryItemProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
+    <div
       className="w-full"
     >
       <motion.button
@@ -139,33 +136,25 @@ export function AnimatedCategoryItem({
           <span className="font-medium">{name}</span>
         </div>
         
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.1 }}
-        >
+        <div>
           <Badge variant="secondary" className="text-xs">
             {count}
           </Badge>
-        </motion.div>
+        </div>
       </motion.button>
       
       <AnimatePresence>
         {isOpen && children && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
+          <div
             className="overflow-hidden"
           >
             <div className="pl-8 pt-2 space-y-1">
               {children}
             </div>
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
-    </motion.div>
+    </div>
   );
 }
 
@@ -472,18 +461,9 @@ interface PageTransitionProps {
 
 export function PageTransition({ children, className = "" }: PageTransitionProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ 
-        duration: 0.4,
-        ease: "easeInOut"
-      }}
-      className={className}
-    >
+    <div className={className}>
       {children}
-    </motion.div>
+    </div>
   );
 }
 
