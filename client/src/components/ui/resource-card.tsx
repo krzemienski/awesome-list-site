@@ -69,16 +69,13 @@ export default function ResourceCard({ resource, index }: ResourceCardProps) {
       <div
         className="h-full"
       >
-        <Card className={cn(
-          "h-full transition-all duration-300 hover:shadow-lg cursor-pointer group",
-          "hover:scale-[1.02] hover:-translate-y-1"
-        )}
+        <Card className="h-full hover:shadow-lg cursor-pointer group"
         onClick={handleResourceClick}
       >
         <CardHeader>
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
-              <CardTitle className="text-lg font-semibold leading-tight group-hover:text-primary transition-colors">
+              <CardTitle className="text-lg font-semibold leading-tight group-hover:text-primary">
                 {resource.title}
               </CardTitle>
               <CardDescription className="mt-2 line-clamp-2">
@@ -86,7 +83,7 @@ export default function ResourceCard({ resource, index }: ResourceCardProps) {
               </CardDescription>
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
-              <ExternalLink className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+              <ExternalLink className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100" />
             </div>
           </div>
         </CardHeader>
@@ -120,7 +117,7 @@ export default function ResourceCard({ resource, index }: ResourceCardProps) {
         </CardContent>
 
         <CardFooter className="pt-0">
-          <div className="flex items-center justify-end w-full gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex items-center justify-end w-full gap-2 opacity-0 group-hover:opacity-100">
             <Button
               variant="ghost"
               size="sm"

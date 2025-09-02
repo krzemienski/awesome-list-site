@@ -38,19 +38,17 @@ export default function ResourceListItem({ resource }: ResourceListItemProps) {
 
   return (
     <Card 
-      className={cn(
-        "hover:shadow-sm cursor-pointer transition-all duration-200 group border-0 border-b rounded-none hover:bg-accent/30"
-      )}
+      className="hover:shadow-sm cursor-pointer group border-0 border-b rounded-none hover:bg-accent/30"
       onClick={handleClick}
     >
       <CardContent className="p-4 overflow-hidden">
         <div className="flex items-center justify-between">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <h3 className="font-medium text-sm truncate group-hover:text-primary transition-colors">
+              <h3 className="font-medium text-sm truncate group-hover:text-primary">
                 {resource.title}
               </h3>
-              <ExternalLink className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+              <ExternalLink className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 flex-shrink-0" />
             </div>
             
             <p className="text-xs text-muted-foreground line-clamp-1 mb-2">
@@ -84,7 +82,7 @@ export default function ResourceListItem({ resource }: ResourceListItemProps) {
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+              className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100"
               onClick={handleBookmark}
             >
               <Bookmark className="h-3 w-3" />
@@ -92,7 +90,7 @@ export default function ResourceListItem({ resource }: ResourceListItemProps) {
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+              className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100"
               onClick={handleShare}
             >
               <Share2 className="h-3 w-3" />
