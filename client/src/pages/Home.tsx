@@ -10,7 +10,7 @@ import Pagination from "@/components/ui/pagination";
 import RecommendationPanel from "@/components/ui/recommendation-panel";
 import UserPreferences from "@/components/ui/user-preferences";
 
-import { SkeletonGrid } from "@/components/ui/skeleton-card";
+
 import { AwesomeList } from "@/types/awesome-list";
 import SEOHead from "@/components/layout/SEOHead";
 import { Filter, Search, Brain } from "lucide-react";
@@ -50,9 +50,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
     const saved = sessionStorage.getItem('awesome-show-recommendations');
     return saved === 'true';
   });
-  const [resourcesLoading, setResourcesLoading] = useState(false);
-  const [loadedResourceIds, setLoadedResourceIds] = useState<Set<string>>(new Set());
-  const [lastLoadTrigger, setLastLoadTrigger] = useState("");
+  // Remove progressive loading states - causes issues on mobile
 
 
 
@@ -73,7 +71,6 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
     setSelectedSubcategory("all");
     setSelectedSubSubcategory("all");
     setCurrentPage(1);
-    setLastLoadTrigger(`category-${category}`);
     if (category !== "all") {
       trackCategoryView(category);
     }
@@ -84,7 +81,6 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
     setSelectedSubcategory(subcategory);
     setSelectedSubSubcategory("all");
     setCurrentPage(1);
-    setLastLoadTrigger(`subcategory-${subcategory}`);
     if (subcategory !== "all") {
       trackFilterUsage("subcategory", subcategory, 1);
     }
@@ -94,7 +90,6 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
   const handleSubSubcategoryChange = (subSubcategory: string) => {
     setSelectedSubSubcategory(subSubcategory);
     setCurrentPage(1);
-    setLastLoadTrigger(`subsubcategory-${subSubcategory}`);
     if (subSubcategory !== "all") {
       trackFilterUsage("sub-subcategory", subSubcategory, 1);
     }
@@ -215,49 +210,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
     currentPage * itemsPerPage
   );
 
-  // Progressive loading only when explicitly triggered by category/page changes
-  useEffect(() => {
-    // Generate a stable key for current view to check if we've already loaded these resources
-    const viewKey = `${selectedCategory}-${selectedSubcategory}-${selectedSubSubcategory}-${currentPage}-${sortBy}`;
-    
-    if (lastLoadTrigger && lastLoadTrigger !== "" && paginatedResources.length > 0) {
-      // Only trigger loading animation for actual changes
-      setResourcesLoading(true);
-      setLoadedResourceIds(new Set());
-      
-      // Progressively load resources
-      const resourceIds = paginatedResources.map(r => `${r.title}-${r.url}`);
-      let currentIndex = 0;
-      
-      const loadInterval = setInterval(() => {
-        setLoadedResourceIds((prev) => {
-          const newSet = new Set(prev);
-          
-          // Load 3 resources at a time
-          const endIndex = Math.min(currentIndex + 3, resourceIds.length);
-          for (let i = currentIndex; i < endIndex; i++) {
-            newSet.add(resourceIds[i]);
-          }
-          
-          currentIndex = endIndex;
-          
-          if (currentIndex >= resourceIds.length) {
-            clearInterval(loadInterval);
-            setResourcesLoading(false);
-            setLastLoadTrigger(""); // Reset trigger after loading completes
-          }
-          
-          return newSet;
-        });
-      }, 100); // Load batch every 100ms
 
-      return () => clearInterval(loadInterval);
-    } else if (!resourcesLoading) {
-      // If not loading and no trigger, ensure all current resources are marked as loaded
-      const allIds = paginatedResources.map(r => `${r.title}-${r.url}`);
-      setLoadedResourceIds(new Set(allIds));
-    }
-  }, [lastLoadTrigger, selectedCategory, selectedSubcategory, selectedSubSubcategory, currentPage, sortBy]);
 
   return (
     <div className="space-y-6">
@@ -430,38 +383,23 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
           />
         ) : (
           <>
-            {/* Regular Resources Display with Progressive Loading */}
+            {/* Regular Resources Display - No Progressive Loading */}
             {layout === 'cards' && (
               <GridMorphing 
                 categoryId={`${selectedCategory}-${selectedSubcategory}-${selectedSubSubcategory}`}
                 className="mb-8"
               >
-                {resourcesLoading && lastLoadTrigger !== "" ? (
-                  <SkeletonGrid count={paginatedResources.length || 6} variant="default" />
-                ) : (
-                  <div 
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-visible"
-                  >
-                    {paginatedResources.map((resource, index) => {
-                      const resourceKey = `${resource.title}-${resource.url}`;
-                      const isLoaded = !resourcesLoading || loadedResourceIds.has(resourceKey);
-                      
-                      return (
-                        <div
-                          key={resourceKey}
-                          className={`transition-all duration-500 ${
-                            isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-                          }`}
-                        >
-                          <ResourceCard
-                            resource={resource}
-                            index={index}
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+                <div 
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-visible"
+                >
+                  {paginatedResources.map((resource, index) => (
+                    <ResourceCard
+                      key={`${resource.title}-${resource.url}`}
+                      resource={resource}
+                      index={index}
+                    />
+                  ))}
+                </div>
               </GridMorphing>
             )}
 
@@ -470,32 +408,17 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                 categoryId={`list-${selectedCategory}-${selectedSubcategory}-${selectedSubSubcategory}`}
                 className="mb-8"
               >
-                {resourcesLoading && lastLoadTrigger !== "" ? (
-                  <SkeletonGrid count={paginatedResources.length || 6} variant="list" />
-                ) : (
-                  <div 
-                    className="space-y-0 border border-border rounded-lg overflow-visible"
-                  >
-                    {paginatedResources.map((resource, index) => {
-                      const resourceKey = `${resource.title}-${resource.url}`;
-                      const isLoaded = !resourcesLoading || loadedResourceIds.has(resourceKey);
-                      
-                      return (
-                        <div
-                          key={resourceKey}
-                          className={`transition-all duration-500 ${
-                            isLoaded ? 'opacity-100' : 'opacity-0'
-                          }`}
-                        >
-                          <ResourceListItem
-                            resource={resource}
-                            index={index}
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+                <div 
+                  className="space-y-0 border border-border rounded-lg overflow-visible"
+                >
+                  {paginatedResources.map((resource, index) => (
+                    <ResourceListItem
+                      key={`${resource.title}-${resource.url}`}
+                      resource={resource}
+                      index={index}
+                    />
+                  ))}
+                </div>
               </GridMorphing>
             )}
 
@@ -504,32 +427,17 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                 categoryId={`compact-${selectedCategory}-${selectedSubcategory}-${selectedSubSubcategory}`}
                 className="mb-8"
               >
-                {resourcesLoading && lastLoadTrigger !== "" ? (
-                  <SkeletonGrid count={paginatedResources.length || 10} variant="compact" />
-                ) : (
-                  <div 
-                    className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 overflow-visible"
-                  >
-                    {paginatedResources.map((resource, index) => {
-                      const resourceKey = `${resource.title}-${resource.url}`;
-                      const isLoaded = !resourcesLoading || loadedResourceIds.has(resourceKey);
-                      
-                      return (
-                        <div
-                          key={resourceKey}
-                          className={`transition-all duration-500 ${
-                            isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-                          }`}
-                        >
-                          <ResourceCompactItem
-                            resource={resource}
-                            index={index}
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+                <div 
+                  className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 overflow-visible"
+                >
+                  {paginatedResources.map((resource, index) => (
+                    <ResourceCompactItem
+                      key={`${resource.title}-${resource.url}`}
+                      resource={resource}
+                      index={index}
+                    />
+                  ))}
+                </div>
               </GridMorphing>
             )}
             
@@ -541,12 +449,10 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                 itemsPerPage={itemsPerPage}
                 onPageChange={(page) => {
                   setCurrentPage(page);
-                  setLastLoadTrigger(`page-${page}`);
                 }}
                 onPageSizeChange={(size) => {
                   setItemsPerPage(size);
                   setCurrentPage(1);
-                  setLastLoadTrigger(`pagesize-${size}`);
                 }}
                 totalItems={sortedResources.length}
                 pageSizeOptions={[12, 24, 48, 96]}
