@@ -53,6 +53,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [resourcesLoading, setResourcesLoading] = useState(false);
   const [loadedResourceIds, setLoadedResourceIds] = useState<Set<string>>(new Set());
+  const [lastLoadTrigger, setLastLoadTrigger] = useState("");
 
   // Resource comparison hook
   const {
@@ -82,6 +83,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
     setSelectedSubcategory("all");
     setSelectedSubSubcategory("all");
     setCurrentPage(1);
+    setLastLoadTrigger(`category-${category}`);
     if (category !== "all") {
       trackCategoryView(category);
     }
@@ -92,6 +94,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
     setSelectedSubcategory(subcategory);
     setSelectedSubSubcategory("all");
     setCurrentPage(1);
+    setLastLoadTrigger(`subcategory-${subcategory}`);
     if (subcategory !== "all") {
       trackFilterUsage("subcategory", subcategory, 1);
     }
@@ -101,6 +104,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
   const handleSubSubcategoryChange = (subSubcategory: string) => {
     setSelectedSubSubcategory(subSubcategory);
     setCurrentPage(1);
+    setLastLoadTrigger(`subsubcategory-${subSubcategory}`);
     if (subSubcategory !== "all") {
       trackFilterUsage("sub-subcategory", subSubcategory, 1);
     }
@@ -221,9 +225,9 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
     currentPage * itemsPerPage
   );
 
-  // Simulate progressive loading when category/filter changes
+  // Progressive loading only when explicitly triggered by category/page changes
   useEffect(() => {
-    if (paginatedResources.length > 0) {
+    if (lastLoadTrigger && paginatedResources.length > 0) {
       setResourcesLoading(true);
       setLoadedResourceIds(new Set());
       
@@ -246,6 +250,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
           if (currentIndex >= resourceIds.length) {
             clearInterval(loadInterval);
             setResourcesLoading(false);
+            setLastLoadTrigger(""); // Reset trigger
           }
           
           return newSet;
@@ -253,8 +258,13 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
       }, 100); // Load batch every 100ms
 
       return () => clearInterval(loadInterval);
+    } else {
+      // No loading trigger or initial load - show all resources immediately
+      const allIds = paginatedResources.map(r => `${r.title}-${r.url}`);
+      setLoadedResourceIds(new Set(allIds));
+      setResourcesLoading(false);
     }
-  }, [selectedCategory, selectedSubcategory, selectedSubSubcategory, currentPage, sortBy, searchTerm, itemsPerPage]);
+  }, [lastLoadTrigger, paginatedResources]);
 
   return (
     <div className="space-y-6">
@@ -576,8 +586,15 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                 currentPage={currentPage}
                 totalPages={totalPages}
                 itemsPerPage={itemsPerPage}
-                onPageChange={setCurrentPage}
-                onPageSizeChange={setItemsPerPage}
+                onPageChange={(page) => {
+                  setCurrentPage(page);
+                  setLastLoadTrigger(`page-${page}`);
+                }}
+                onPageSizeChange={(size) => {
+                  setItemsPerPage(size);
+                  setCurrentPage(1);
+                  setLastLoadTrigger(`pagesize-${size}`);
+                }}
                 totalItems={sortedResources.length}
                 pageSizeOptions={[12, 24, 48, 96]}
               />
