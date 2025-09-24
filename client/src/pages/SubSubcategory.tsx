@@ -74,8 +74,8 @@ export default function SubSubcategory() {
   const categoryName = parentCategory ? parentCategory.name : "";
   const subcategoryName = parentSubcategory ? parentSubcategory.name : "";
   
-  // Initialize lazy loading for resources
-  const { visibleItems, registerItem } = useBatchLazyLoading(itemsPerPage);
+  // Initialize lazy loading for resources using stable IDs
+  const { visibleIds, registerItem } = useBatchLazyLoading(itemsPerPage);
   
   // Effect to handle initial loading state
   useEffect(() => {
@@ -150,6 +150,11 @@ export default function SubSubcategory() {
         return 0;
     }
   });
+  
+  // Generate stable resource IDs for tracking
+  const generateResourceId = (resource: any) => {
+    return `${resource.url}|${resource.title}`.replace(/[^a-zA-Z0-9|]/g, '-');
+  };
   
   // Calculate pagination
   const totalPages = Math.ceil(sortedResources.length / itemsPerPage);
@@ -302,68 +307,78 @@ export default function SubSubcategory() {
             <>
               {layout === "list" ? (
                 <div className="space-y-1 mb-8">
-                  {paginatedResources.map((resource, index) => (
-                    <div
-                      key={`${resource.title}-${resource.url}-${index}`}
-                      ref={(el) => registerItem(index, el)}
-                      className={cn(
-                        "transition-opacity duration-300",
-                        visibleItems.has(index) ? "opacity-100" : "opacity-0"
-                      )}
-                    >
-                      {visibleItems.has(index) ? (
-                        <ResourceListItem 
-                          resource={resource}
-                          index={startIndex + index}
-                        />
-                      ) : (
-                        <div className="h-16" />
-                      )}
-                    </div>
-                  ))}
+                  {paginatedResources.map((resource, index) => {
+                    const resourceId = generateResourceId(resource);
+                    return (
+                      <div
+                        key={resourceId}
+                        ref={(el) => registerItem(resourceId, el)}
+                        className={cn(
+                          "transition-opacity duration-300",
+                          visibleIds.has(resourceId) ? "opacity-100" : "opacity-0"
+                        )}
+                      >
+                        {visibleIds.has(resourceId) ? (
+                          <ResourceListItem 
+                            resource={resource}
+                            index={startIndex + index}
+                          />
+                        ) : (
+                          <div className="h-16 bg-muted rounded-lg animate-pulse" />
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               ) : layout === "cards" ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                  {paginatedResources.map((resource, index) => (
-                    <div
-                      key={`${resource.title}-${resource.url}-${index}`}
-                      ref={(el) => registerItem(index, el)}
-                      className={cn(
-                        "transition-opacity duration-300",
-                        visibleItems.has(index) ? "opacity-100" : "opacity-0"
-                      )}
-                    >
-                      {visibleItems.has(index) ? (
-                        <ResourceCard 
-                          resource={resource}
-                          index={startIndex + index}
-                        />
-                      ) : (
-                        <div className="h-32" />
-                      )}
-                    </div>
-                  ))}
+                  {paginatedResources.map((resource, index) => {
+                    const resourceId = generateResourceId(resource);
+                    return (
+                      <div
+                        key={resourceId}
+                        ref={(el) => registerItem(resourceId, el)}
+                        className={cn(
+                          "transition-opacity duration-300",
+                          visibleIds.has(resourceId) ? "opacity-100" : "opacity-0"
+                        )}
+                      >
+                        {visibleIds.has(resourceId) ? (
+                          <ResourceCard 
+                            resource={resource}
+                            index={startIndex + index}
+                          />
+                        ) : (
+                          <div className="h-32 bg-muted rounded-lg animate-pulse" />
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8">
-                  {paginatedResources.map((resource, index) => (
-                    <div
-                      key={`${resource.title}-${resource.url}-${index}`}
-                      ref={(el) => registerItem(index, el)}
-                      className={cn(
-                        "transition-opacity duration-300",
-                        visibleItems.has(index) ? "opacity-100" : "opacity-0"
-                      )}
-                    >
-                      {visibleItems.has(index) ? (
-                        <ResourceCompactItem 
-                          resource={resource}
-                        />
-                      ) : (
-                        <div className="h-24" />
-                      )}
-                    </div>
-                  ))}
+                  {paginatedResources.map((resource, index) => {
+                    const resourceId = generateResourceId(resource);
+                    return (
+                      <div
+                        key={resourceId}
+                        ref={(el) => registerItem(resourceId, el)}
+                        className={cn(
+                          "transition-opacity duration-300",
+                          visibleIds.has(resourceId) ? "opacity-100" : "opacity-0"
+                        )}
+                      >
+                        {visibleIds.has(resourceId) ? (
+                          <ResourceCompactItem 
+                            resource={resource}
+                            index={index}
+                          />
+                        ) : (
+                          <div className="h-24 bg-muted rounded-lg animate-pulse" />
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </>
