@@ -34,8 +34,6 @@ export default function Subcategory() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSubSubcategory, setSelectedSubSubcategory] = useState<string>("all");
   const [isInitialLoading, setIsInitialLoading] = useState(true);
-  const [isPageChanging, setIsPageChanging] = useState(false);
-  const [isFilterChanging, setIsFilterChanging] = useState(false);
   
   // Fetch awesome list data - use same query as homepage
   const { data: rawData, isLoading, error } = useQuery({
@@ -154,10 +152,8 @@ export default function Subcategory() {
 
   // Handle page changes
   const handlePageChange = (page: number) => {
-    setIsPageChanging(true);
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    setTimeout(() => setIsPageChanging(false), 300);
   };
 
   const handlePageSizeChange = (newPageSize: number) => {
@@ -331,7 +327,7 @@ export default function Subcategory() {
       ) : (
         <>
           {/* Regular Resources Display with Loading States */}
-          {(isInitialLoading || isPageChanging) ? (
+          {isInitialLoading ? (
             <AnimatedResourceSkeleton
               count={Math.min(itemsPerPage, paginatedResources.length || itemsPerPage)}
               showTags={true}

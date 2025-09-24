@@ -53,8 +53,6 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
   });
   // Manage loading states for smooth transitions
   const [isInitialLoading, setIsInitialLoading] = useState(true);
-  const [isPageChanging, setIsPageChanging] = useState(false);
-  const [isFilterChanging, setIsFilterChanging] = useState(false);
 
   // Effect to handle initial loading state
   useEffect(() => {
@@ -407,7 +405,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
         ) : (
           <>
             {/* Regular Resources Display with Loading States */}
-            {(isInitialLoading || isPageChanging) ? (
+            {isInitialLoading ? (
               <AnimatedResourceSkeleton
                 count={Math.min(itemsPerPage, paginatedResources.length || itemsPerPage)}
                 showTags={true}
@@ -446,7 +444,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
               )
             )}
 
-            {!isInitialLoading && !isPageChanging && layout === 'list' && (
+            {!isInitialLoading && layout === 'list' && (
               <GridMorphing 
                 categoryId={`list-${selectedCategory}-${selectedSubcategory}-${selectedSubSubcategory}`}
                 className="mb-8"
@@ -465,7 +463,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
               </GridMorphing>
             )}
 
-            {!isInitialLoading && !isPageChanging && layout === 'compact' && (
+            {!isInitialLoading && layout === 'compact' && (
               <GridMorphing 
                 categoryId={`compact-${selectedCategory}-${selectedSubcategory}-${selectedSubSubcategory}`}
                 className="mb-8"
@@ -491,10 +489,8 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                 totalPages={totalPages}
                 itemsPerPage={itemsPerPage}
                 onPageChange={(page) => {
-                  setIsPageChanging(true);
                   setCurrentPage(page);
                   window.scrollTo({ top: 0, behavior: 'smooth' });
-                  setTimeout(() => setIsPageChanging(false), 300);
                 }}
                 onPageSizeChange={(size) => {
                   setItemsPerPage(size);
