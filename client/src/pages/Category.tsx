@@ -14,24 +14,35 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Filter, ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
-import { deslugify, slugify } from "@/lib/utils";
+import { deslugify, slugify, cn } from "@/lib/utils";
 import { Resource, AwesomeList } from "@/types/awesome-list";
 import NotFound from "@/pages/not-found";
 import { processAwesomeListData } from "@/lib/parser";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
 import { trackCategoryView, trackFilterUsage, trackSortChange } from "@/lib/analytics";
+import { useBatchLazyLoading } from "@/hooks/use-lazy-loading";
 
 type LayoutType = "cards" | "list" | "compact";
 
 export default function Category() {
   const { slug } = useParams<{ slug: string }>();
-  const [layout, setLayout] = useState<LayoutType>("list"); // Match homepage default
+  const [layout, setLayout] = useState<LayoutType>(() => {
+    // Persist layout preference in sessionStorage
+    const saved = sessionStorage.getItem('awesome-layout');
+    return (saved as LayoutType) || "cards";
+  });
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(24);
+  const [itemsPerPage, setItemsPerPage] = useState(() => {
+    const savedLayout = sessionStorage.getItem('awesome-layout') || "cards";
+    if (savedLayout === 'cards') return 24;
+    if (savedLayout === 'list') return 50;
+    return 40;
+  });
   const [sortBy, setSortBy] = useState("category"); // Match homepage default
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>("all");
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isPageChanging, setIsPageChanging] = useState(false);
   const [isFilterChanging, setIsFilterChanging] = useState(false);
   
@@ -51,6 +62,16 @@ export default function Category() {
   
   const categoryName = currentCategory ? currentCategory.name : deslugify(slug || "");
   const baseResources = currentCategory ? currentCategory.resources : [];
+  
+  // Initialize lazy loading for resources
+  const { visibleItems, registerItem } = useBatchLazyLoading(itemsPerPage);
+  
+  // Effect to handle initial loading state
+  useEffect(() => {
+    if (!isLoading && awesomeList) {
+      setTimeout(() => setIsInitialLoading(false), 150);
+    }
+  }, [isLoading, awesomeList]);
   
   // Track category view
   useEffect(() => {
@@ -88,11 +109,13 @@ export default function Category() {
 
   // Handle subcategory filter change
   const handleSubcategoryChange = (subcategory: string) => {
+    setIsFilterChanging(true);
     setSelectedSubcategory(subcategory);
     setCurrentPage(1); // Reset to first page
     if (subcategory !== "all") {
       trackFilterUsage("subcategory", subcategory, filteredResources.length);
     }
+    setTimeout(() => setIsFilterChanging(false), 200);
   };
   
   // Filter resources by search term and subcategory
@@ -136,8 +159,29 @@ export default function Category() {
   };
 
   const handlePageSizeChange = (newPageSize: number) => {
+    setIsPageChanging(true);
     setItemsPerPage(newPageSize);
     setCurrentPage(1);
+    setTimeout(() => setIsPageChanging(false), 300);
+  };
+  
+  // Handle layout change with persistence
+  const handleLayoutChange = (newLayout: LayoutType) => {
+    setIsFilterChanging(true);
+    setLayout(newLayout);
+    sessionStorage.setItem('awesome-layout', newLayout);
+    
+    // Adjust items per page based on layout
+    if (newLayout === 'cards') {
+      setItemsPerPage(24);
+    } else if (newLayout === 'list') {
+      setItemsPerPage(50);
+    } else {
+      setItemsPerPage(40);
+    }
+    
+    setCurrentPage(1); // Reset to first page when changing layout
+    setTimeout(() => setIsFilterChanging(false), 200);
   };
   
   if (isLoading) {
@@ -225,19 +269,7 @@ export default function Category() {
             {/* Layout Switcher */}
             <LayoutSwitcher
               currentLayout={layout}
-              onLayoutChange={(newLayout) => {
-                setIsFilterChanging(true);
-                setLayout(newLayout);
-                // Adjust items per page based on layout
-                if (newLayout === 'cards') {
-                  setItemsPerPage(24);
-                } else if (newLayout === 'list') {
-                  setItemsPerPage(50);
-                } else {
-                  setItemsPerPage(40);
-                }
-                setTimeout(() => setIsFilterChanging(false), 200);
-              }}
+              onLayoutChange={handleLayoutChange}
             />
 
             {/* Subcategory Filter */}
@@ -296,7 +328,7 @@ export default function Category() {
       ) : (
         <>
           {/* Regular Resources Display with Loading States */}
-          {(isPageChanging || isFilterChanging) ? (
+          {(isInitialLoading || isPageChanging || isFilterChanging) ? (
             <AnimatedResourceSkeleton
               count={Math.min(itemsPerPage, paginatedResources.length || itemsPerPage)}
               showTags={true}
@@ -307,31 +339,67 @@ export default function Category() {
               {layout === "list" ? (
                 <div className="space-y-1 mb-8">
                   {paginatedResources.map((resource, index) => (
-                    <ResourceListItem 
-                      key={`${resource.url}-${index}`} 
-                      resource={resource}
-                      index={startIndex + index}
-                    />
+                    <div
+                      key={`${resource.title}-${resource.url}-${index}`}
+                      ref={(el) => registerItem(index, el)}
+                      className={cn(
+                        "transition-opacity duration-300",
+                        visibleItems.has(index) ? "opacity-100" : "opacity-0"
+                      )}
+                    >
+                      {visibleItems.has(index) ? (
+                        <ResourceListItem 
+                          resource={resource}
+                          index={startIndex + index}
+                        />
+                      ) : (
+                        <div className="h-16" />
+                      )}
+                    </div>
                   ))}
                 </div>
               ) : layout === "cards" ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                   {paginatedResources.map((resource, index) => (
-                    <ResourceCard 
-                      key={`${resource.url}-${index}`} 
-                      resource={resource}
-                      index={startIndex + index}
-                    />
+                    <div
+                      key={`${resource.title}-${resource.url}-${index}`}
+                      ref={(el) => registerItem(index, el)}
+                      className={cn(
+                        "transition-opacity duration-300",
+                        visibleItems.has(index) ? "opacity-100" : "opacity-0"
+                      )}
+                    >
+                      {visibleItems.has(index) ? (
+                        <ResourceCard 
+                          resource={resource}
+                          index={startIndex + index}
+                        />
+                      ) : (
+                        <div className="h-32" />
+                      )}
+                    </div>
                   ))}
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8">
                   {paginatedResources.map((resource, index) => (
-                    <ResourceCompactItem 
-                      key={`${resource.url}-${index}`} 
-                      resource={resource}
-                      index={startIndex + index}
-                    />
+                    <div
+                      key={`${resource.title}-${resource.url}-${index}`}
+                      ref={(el) => registerItem(index, el)}
+                      className={cn(
+                        "transition-opacity duration-300",
+                        visibleItems.has(index) ? "opacity-100" : "opacity-0"
+                      )}
+                    >
+                      {visibleItems.has(index) ? (
+                        <ResourceCompactItem 
+                          resource={resource}
+                          index={startIndex + index}
+                        />
+                      ) : (
+                        <div className="h-24" />
+                      )}
+                    </div>
                   ))}
                 </div>
               )}
