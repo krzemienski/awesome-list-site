@@ -144,7 +144,7 @@ export default function Category() {
   
   // Generate stable resource IDs for tracking
   const generateResourceId = (resource: any) => {
-    return `${resource.url}|${resource.title}`.replace(/[^a-zA-Z0-9|]/g, '-');
+    return resource.url;
   };
   
   // Calculate pagination
