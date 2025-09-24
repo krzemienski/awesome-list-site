@@ -74,14 +74,30 @@ export function useLazyLoading(options: UseLazyLoadingOptions = {}) {
   return { ref, isVisible };
 }
 
+// Global cache for pagination state preservation
+const paginationCache = new Map<string, Set<string>>();
+
 // Hook for batch lazy loading multiple items
-export function useBatchLazyLoading(itemCount: number) {
-  const [visibleIds, setVisibleIds] = useState<Set<string>>(new Set());
+export function useBatchLazyLoading(itemCount: number, cacheKey?: string) {
+  // Initialize with cached state if available
+  const [visibleIds, setVisibleIds] = useState<Set<string>>(() => {
+    if (cacheKey && paginationCache.has(cacheKey)) {
+      return new Set(paginationCache.get(cacheKey));
+    }
+    return new Set();
+  });
   const observerRef = useRef<IntersectionObserver | null>(null);
   const itemRefs = useRef<Map<string, HTMLElement>>(new Map());
   const isUnmountingRef = useRef(false);
   const hasInitializedRef = useRef(false);
   const previousItemCountRef = useRef(0);
+
+  // Save state to cache whenever it changes
+  useEffect(() => {
+    if (cacheKey && visibleIds.size > 0) {
+      paginationCache.set(cacheKey, new Set(visibleIds));
+    }
+  }, [visibleIds, cacheKey]);
 
   // Initialize observer once and keep it stable
   useEffect(() => {
@@ -208,5 +224,12 @@ export function useBatchLazyLoading(itemCount: number) {
     };
   }, []);
 
-  return { visibleIds, registerItem };
+  // Clear cache method for when component unmounts or needs reset
+  const clearCache = () => {
+    if (cacheKey) {
+      paginationCache.delete(cacheKey);
+    }
+  };
+
+  return { visibleIds, registerItem, clearCache };
 }
