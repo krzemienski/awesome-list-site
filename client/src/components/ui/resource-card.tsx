@@ -70,6 +70,7 @@ export default function ResourceCard({ resource, index }: ResourceCardProps) {
         className="h-full"
       >
         <Card className="h-full cursor-pointer group"
+        data-testid={`resource-card-${resource.title.replace(/\s+/g, '-').toLowerCase()}`}
         onClick={handleResourceClick}
       >
         <CardHeader>
