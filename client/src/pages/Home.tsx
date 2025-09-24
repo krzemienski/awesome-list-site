@@ -115,6 +115,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
     setCurrentPage(1);
+    if (clearCache) clearCache(); // Clear cache when search changes
   };
 
   // Handle resource click for user profile
@@ -233,8 +234,9 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
     currentPage * itemsPerPage
   );
 
-  // Lazy loading for resource cards using stable IDs
-  const { visibleIds, registerItem } = useBatchLazyLoading(paginatedResources.length);
+  // Lazy loading for resource cards using stable IDs with caching
+  const cacheKey = `home-${selectedCategory}-${selectedSubcategory}-${selectedSubSubcategory}-${sortBy}-page${currentPage}`;
+  const { visibleIds, registerItem, clearCache } = useBatchLazyLoading(paginatedResources.length, cacheKey);
 
 
 

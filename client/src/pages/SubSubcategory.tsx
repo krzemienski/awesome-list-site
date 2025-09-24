@@ -74,8 +74,9 @@ export default function SubSubcategory() {
   const categoryName = parentCategory ? parentCategory.name : "";
   const subcategoryName = parentSubcategory ? parentSubcategory.name : "";
   
-  // Initialize lazy loading for resources using stable IDs
-  const { visibleIds, registerItem } = useBatchLazyLoading(itemsPerPage);
+  // Initialize lazy loading for resources using stable IDs with caching
+  const cacheKey = `subsubcategory-${slug}-${sortBy}-page${currentPage}`;
+  const { visibleIds, registerItem, clearCache } = useBatchLazyLoading(itemsPerPage, cacheKey);
   
   // Effect to handle initial loading state
   useEffect(() => {
@@ -126,6 +127,7 @@ export default function SubSubcategory() {
     if (search.length >= 2) {
       trackFilterUsage("search", search, filteredResources.length);
     }
+    if (clearCache) clearCache(); // Clear cache when search changes
   };
   
   // Filter resources by search term
