@@ -94,8 +94,8 @@
     overflow-y: auto;
   }
 
-  /* Better dialog sizing on mobile */
-  [data-radix-dialog-content] {
+  /* Better dialog sizing on mobile - but not sheets */
+  [data-radix-dialog-content]:not([data-side]) {
     max-width: calc(100vw - 1rem);
     max-height: 95vh;
     width: 95vw;
@@ -115,13 +115,25 @@
     max-width: min(95vw, 28rem) !important;
   }
   
-  /* Fix for all dialogs on mobile to prevent off-screen rendering */
-  [data-radix-dialog-content] {
+  /* Fix for all dialogs on mobile to prevent off-screen rendering - but not sheets */
+  [data-radix-dialog-content]:not([data-side]) {
     --dialog-width: calc(100vw - 2rem);
     width: var(--dialog-width) !important;
     max-width: min(var(--dialog-width), 32rem) !important;
     left: 50% !important;
     transform: translateX(-50%) translateY(-50%) !important;
+  }
+  
+  /* Exception for sheets - don't center them */
+  [data-radix-dialog-content][data-side] {
+    left: 0 !important;
+    right: auto !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    transform: none !important;
+    width: var(--sidebar-width, 18rem) !important;
+    max-width: 85vw !important;
+    padding-left: env(safe-area-inset-left);
   }
   
   /* Sidebar fixes for mobile */
@@ -207,13 +219,25 @@ button,
       inset: 0;
     }
     
-    [data-radix-dialog-content] {
+    [data-radix-dialog-content]:not([data-side]) {
       position: fixed !important;
       left: 50% !important;
       top: 50% !important;
       transform: translate(-50%, -50%) !important;
       width: calc(100vw - 1rem) !important;
       max-width: 28rem !important;
+      margin: 0 !important;
+    }
+    
+    /* Keep sheets on the side even on very small screens */
+    [data-radix-dialog-content][data-side] {
+      position: fixed !important;
+      left: 0 !important;
+      top: 0 !important;
+      transform: none !important;
+      width: var(--sidebar-width, 18rem) !important;
+      max-width: 80vw !important;
+      height: 100% !important;
       margin: 0 !important;
     }
   }
