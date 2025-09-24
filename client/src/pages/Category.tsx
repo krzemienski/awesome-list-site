@@ -64,7 +64,7 @@ export default function Category() {
   // Effect to handle initial loading state
   useEffect(() => {
     if (!isLoading && awesomeList) {
-      setTimeout(() => setIsInitialLoading(false), 150);
+      setIsInitialLoading(false);
     }
   }, [isLoading, awesomeList]);
   
@@ -88,21 +88,17 @@ export default function Category() {
 
   // Handle category change with analytics
   const handleCategoryChange = (category: string) => {
-    setIsFilterChanging(true);
     setSelectedCategory(category);
     if (category !== "all") {
       trackCategoryView(category);
       trackFilterUsage("category", category, filteredResources.length);
     }
-    setTimeout(() => setIsFilterChanging(false), 200);
   };
 
   // Handle sort change with analytics
   const handleSortChange = (sort: string) => {
-    setIsFilterChanging(true);
     setSortBy(sort);
     trackSortChange(sort);
-    setTimeout(() => setIsFilterChanging(false), 200);
   };
 
   // Handle search with analytics
@@ -115,13 +111,11 @@ export default function Category() {
 
   // Handle subcategory filter change
   const handleSubcategoryChange = (subcategory: string) => {
-    setIsFilterChanging(true);
     setSelectedSubcategory(subcategory);
     setCurrentPage(1); // Reset to first page
     if (subcategory !== "all") {
       trackFilterUsage("subcategory", subcategory, filteredResources.length);
     }
-    setTimeout(() => setIsFilterChanging(false), 200);
   };
   
   // Filter resources by search term and subcategory
@@ -165,15 +159,12 @@ export default function Category() {
   };
 
   const handlePageSizeChange = (newPageSize: number) => {
-    setIsPageChanging(true);
     setItemsPerPage(newPageSize);
     setCurrentPage(1);
-    setTimeout(() => setIsPageChanging(false), 300);
   };
   
   // Handle layout change with persistence
   const handleLayoutChange = (newLayout: LayoutType) => {
-    setIsFilterChanging(true);
     setLayout(newLayout);
     sessionStorage.setItem('awesome-layout', newLayout);
     
@@ -187,7 +178,6 @@ export default function Category() {
     }
     
     setCurrentPage(1); // Reset to first page when changing layout
-    setTimeout(() => setIsFilterChanging(false), 200);
   };
   
   if (isLoading) {
@@ -334,7 +324,7 @@ export default function Category() {
       ) : (
         <>
           {/* Regular Resources Display with Loading States */}
-          {(isInitialLoading || isPageChanging || isFilterChanging) ? (
+          {(isInitialLoading || isPageChanging) ? (
             <AnimatedResourceSkeleton
               count={Math.min(itemsPerPage, paginatedResources.length || itemsPerPage)}
               showTags={true}

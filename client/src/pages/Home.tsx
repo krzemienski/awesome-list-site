@@ -59,7 +59,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
   // Effect to handle initial loading state
   useEffect(() => {
     if (!isLoading && awesomeList) {
-      setTimeout(() => setIsInitialLoading(false), 150);
+      setIsInitialLoading(false);
     }
   }, [isLoading, awesomeList]);
 
@@ -78,7 +78,6 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
 
   // Handle category change with analytics
   const handleCategoryChange = (category: string) => {
-    setIsFilterChanging(true);
     setSelectedCategory(category);
     setSelectedSubcategory("all");
     setSelectedSubSubcategory("all");
@@ -86,39 +85,32 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
     if (category !== "all") {
       trackCategoryView(category);
     }
-    setTimeout(() => setIsFilterChanging(false), 200);
   };
 
   // Handle subcategory change
   const handleSubcategoryChange = (subcategory: string) => {
-    setIsFilterChanging(true);
     setSelectedSubcategory(subcategory);
     setSelectedSubSubcategory("all");
     setCurrentPage(1);
     if (subcategory !== "all") {
       trackFilterUsage("subcategory", subcategory, 1);
     }
-    setTimeout(() => setIsFilterChanging(false), 200);
   };
 
   // Handle sub-subcategory change
   const handleSubSubcategoryChange = (subSubcategory: string) => {
-    setIsFilterChanging(true);
     setSelectedSubSubcategory(subSubcategory);
     setCurrentPage(1);
     if (subSubcategory !== "all") {
       trackFilterUsage("sub-subcategory", subSubcategory, 1);
     }
-    setTimeout(() => setIsFilterChanging(false), 200);
   };
 
   // Handle sort change with analytics
   const handleSortChange = (value: string) => {
-    setIsFilterChanging(true);
     setSortBy(value);
     setCurrentPage(1);
     trackSortChange(value);
-    setTimeout(() => setIsFilterChanging(false), 200);
   };
 
   // Handle search with debounce
@@ -141,7 +133,6 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
 
   // Handle layout change with persistence
   const handleLayoutChange = (newLayout: LayoutType) => {
-    setIsFilterChanging(true);
     setLayout(newLayout);
     sessionStorage.setItem('awesome-layout', newLayout);
     
@@ -153,8 +144,6 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
     } else {
       setItemsPerPage(40);
     }
-    
-    setTimeout(() => setIsFilterChanging(false), 200);
   };
 
   // Loading state
@@ -418,7 +407,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
         ) : (
           <>
             {/* Regular Resources Display with Loading States */}
-            {(isInitialLoading || isPageChanging || isFilterChanging) ? (
+            {(isInitialLoading || isPageChanging) ? (
               <AnimatedResourceSkeleton
                 count={Math.min(itemsPerPage, paginatedResources.length || itemsPerPage)}
                 showTags={true}
@@ -457,7 +446,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
               )
             )}
 
-            {!isInitialLoading && !isPageChanging && !isFilterChanging && layout === 'list' && (
+            {!isInitialLoading && !isPageChanging && layout === 'list' && (
               <GridMorphing 
                 categoryId={`list-${selectedCategory}-${selectedSubcategory}-${selectedSubSubcategory}`}
                 className="mb-8"
@@ -476,7 +465,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
               </GridMorphing>
             )}
 
-            {!isInitialLoading && !isPageChanging && !isFilterChanging && layout === 'compact' && (
+            {!isInitialLoading && !isPageChanging && layout === 'compact' && (
               <GridMorphing 
                 categoryId={`compact-${selectedCategory}-${selectedSubcategory}-${selectedSubSubcategory}`}
                 className="mb-8"

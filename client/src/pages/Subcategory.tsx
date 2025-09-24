@@ -75,7 +75,7 @@ export default function Subcategory() {
   // Effect to handle initial loading state
   useEffect(() => {
     if (!isLoading && awesomeList) {
-      setTimeout(() => setIsInitialLoading(false), 150);
+      setIsInitialLoading(false);
     }
   }, [isLoading, awesomeList]);
   
@@ -99,10 +99,8 @@ export default function Subcategory() {
 
   // Handle sort change with analytics
   const handleSortChange = (sort: string) => {
-    setIsFilterChanging(true);
     setSortBy(sort);
     trackSortChange(sort);
-    setTimeout(() => setIsFilterChanging(false), 200);
   };
 
   // Handle search with analytics
@@ -115,13 +113,11 @@ export default function Subcategory() {
 
   // Handle sub-subcategory filter change
   const handleSubSubcategoryChange = (subSubcategory: string) => {
-    setIsFilterChanging(true);
     setSelectedSubSubcategory(subSubcategory);
     setCurrentPage(1); // Reset to first page
     if (subSubcategory !== "all") {
       trackFilterUsage("sub-subcategory", subSubcategory, filteredResources.length);
     }
-    setTimeout(() => setIsFilterChanging(false), 200);
   };
   
   // Filter resources by search term and sub-subcategory
@@ -165,15 +161,12 @@ export default function Subcategory() {
   };
 
   const handlePageSizeChange = (newPageSize: number) => {
-    setIsPageChanging(true);
     setItemsPerPage(newPageSize);
     setCurrentPage(1);
-    setTimeout(() => setIsPageChanging(false), 300);
   };
   
   // Handle layout change with persistence
   const handleLayoutChange = (newLayout: LayoutType) => {
-    setIsFilterChanging(true);
     setLayout(newLayout);
     sessionStorage.setItem('awesome-layout', newLayout);
     
@@ -187,7 +180,6 @@ export default function Subcategory() {
     }
     
     setCurrentPage(1); // Reset to first page when changing layout
-    setTimeout(() => setIsFilterChanging(false), 200);
   };
   
   if (isLoading) {
@@ -339,7 +331,7 @@ export default function Subcategory() {
       ) : (
         <>
           {/* Regular Resources Display with Loading States */}
-          {(isInitialLoading || isPageChanging || isFilterChanging) ? (
+          {(isInitialLoading || isPageChanging) ? (
             <AnimatedResourceSkeleton
               count={Math.min(itemsPerPage, paginatedResources.length || itemsPerPage)}
               showTags={true}
