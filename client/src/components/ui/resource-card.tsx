@@ -1,12 +1,9 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-
 import { Separator } from "@/components/ui/separator";
 import { ExternalLink, Bookmark, Share2 } from "lucide-react";
 import { Resource } from "@/types/awesome-list";
-import { motion } from "framer-motion"
-import { CardMorphingContainer, cardStaggerVariants } from "@/components/animations/card-morphing";
 import { trackResourceClick } from "@/lib/analytics";
 import ResourceTooltip from "@/components/ui/resource-tooltip";
 import { cn } from "@/lib/utils";
@@ -17,26 +14,6 @@ interface ResourceCardProps {
 }
 
 export default function ResourceCard({ resource, index }: ResourceCardProps) {
-  // Check if reduced motion is preferred
-  const prefersReducedMotion = 
-    typeof window !== 'undefined' ? 
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches : false;
-  
-  const fadeInVariants = {
-    hidden: { 
-      opacity: prefersReducedMotion ? 1 : 0,
-      y: prefersReducedMotion ? 0 : 20 
-    },
-    visible: { 
-      opacity: 1, 
-      y: 0, 
-      transition: { 
-        duration: 0.3,
-        delay: prefersReducedMotion ? 0 : index * 0.04, // 40ms stagger
-        ease: "easeOut" 
-      } 
-    }
-  };
   
   const handleResourceClick = () => {
     trackResourceClick(resource.title, resource.url, resource.category);
@@ -62,14 +39,9 @@ export default function ResourceCard({ resource, index }: ResourceCardProps) {
   };
 
   return (
-    <CardMorphingContainer
-      layoutId={`resource-${resource.url}`}
-      className="h-full"
-    >
-      <div
-        className="h-full"
-      >
-        <Card className="h-full cursor-pointer group"
+    <div className="h-full quick-fade hw-accelerated">
+      <Card 
+        className="h-full cursor-pointer group transition-all duration-200 hover:shadow-lg hover:scale-[1.02] transform-gpu"
         data-testid={`resource-card-${resource.title.replace(/\s+/g, '-').toLowerCase()}`}
         onClick={handleResourceClick}
       >
@@ -84,7 +56,7 @@ export default function ResourceCard({ resource, index }: ResourceCardProps) {
               </CardDescription>
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
-              <ExternalLink className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100" />
+              <ExternalLink className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
             </div>
           </div>
         </CardHeader>
@@ -118,7 +90,7 @@ export default function ResourceCard({ resource, index }: ResourceCardProps) {
         </CardContent>
 
         <CardFooter className="pt-0">
-          <div className="flex items-center justify-end w-full gap-2 opacity-0 group-hover:opacity-100">
+          <div className="flex items-center justify-end w-full gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
             <Button
               variant="ghost"
               size="sm"
@@ -137,8 +109,7 @@ export default function ResourceCard({ resource, index }: ResourceCardProps) {
             </Button>
           </div>
         </CardFooter>
-        </Card>
-      </div>
-    </CardMorphingContainer>
+      </Card>
+    </div>
   );
 }

@@ -9,6 +9,8 @@ import LayoutSwitcher from "@/components/ui/layout-switcher";
 import Pagination from "@/components/ui/pagination";
 import RecommendationPanel from "@/components/ui/recommendation-panel";
 import UserPreferences from "@/components/ui/user-preferences";
+import AnimatedResourceSkeleton from "@/components/ui/animated-resource-skeleton";
+import { useBatchLazyLoading } from "@/hooks/use-lazy-loading";
 
 
 import { AwesomeList } from "@/types/awesome-list";
@@ -20,6 +22,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trackCategoryView, trackFilterUsage, trackSortChange } from "@/lib/analytics";
 import { useUserProfile } from "@/hooks/use-user-profile";
+import { cn } from "@/lib/utils";
 
 import { GridMorphing } from "@/components/animations/card-morphing";
 
@@ -48,7 +51,17 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
     const saved = sessionStorage.getItem('awesome-show-recommendations');
     return saved === 'true';
   });
-  // Remove progressive loading states - causes issues on mobile
+  // Manage loading states for smooth transitions
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isPageChanging, setIsPageChanging] = useState(false);
+  const [isFilterChanging, setIsFilterChanging] = useState(false);
+
+  // Effect to handle initial loading state
+  useEffect(() => {
+    if (!isLoading && awesomeList) {
+      setTimeout(() => setIsInitialLoading(false), 150);
+    }
+  }, [isLoading, awesomeList]);
 
 
 
@@ -65,6 +78,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
 
   // Handle category change with analytics
   const handleCategoryChange = (category: string) => {
+    setIsFilterChanging(true);
     setSelectedCategory(category);
     setSelectedSubcategory("all");
     setSelectedSubSubcategory("all");
@@ -72,32 +86,39 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
     if (category !== "all") {
       trackCategoryView(category);
     }
+    setTimeout(() => setIsFilterChanging(false), 200);
   };
 
   // Handle subcategory change
   const handleSubcategoryChange = (subcategory: string) => {
+    setIsFilterChanging(true);
     setSelectedSubcategory(subcategory);
     setSelectedSubSubcategory("all");
     setCurrentPage(1);
     if (subcategory !== "all") {
       trackFilterUsage("subcategory", subcategory, 1);
     }
+    setTimeout(() => setIsFilterChanging(false), 200);
   };
 
   // Handle sub-subcategory change
   const handleSubSubcategoryChange = (subSubcategory: string) => {
+    setIsFilterChanging(true);
     setSelectedSubSubcategory(subSubcategory);
     setCurrentPage(1);
     if (subSubcategory !== "all") {
       trackFilterUsage("sub-subcategory", subSubcategory, 1);
     }
+    setTimeout(() => setIsFilterChanging(false), 200);
   };
 
   // Handle sort change with analytics
   const handleSortChange = (value: string) => {
+    setIsFilterChanging(true);
     setSortBy(value);
     setCurrentPage(1);
     trackSortChange(value);
+    setTimeout(() => setIsFilterChanging(false), 200);
   };
 
   // Handle search with debounce
@@ -120,8 +141,20 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
 
   // Handle layout change with persistence
   const handleLayoutChange = (newLayout: LayoutType) => {
+    setIsFilterChanging(true);
     setLayout(newLayout);
     sessionStorage.setItem('awesome-layout', newLayout);
+    
+    // Adjust items per page based on layout
+    if (newLayout === 'cards') {
+      setItemsPerPage(24);
+    } else if (newLayout === 'list') {
+      setItemsPerPage(50);
+    } else {
+      setItemsPerPage(40);
+    }
+    
+    setTimeout(() => setIsFilterChanging(false), 200);
   };
 
   // Loading state
@@ -207,6 +240,9 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  // Lazy loading for resource cards
+  const { visibleItems, registerItem } = useBatchLazyLoading(paginatedResources.length);
 
 
 
@@ -381,27 +417,47 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
           />
         ) : (
           <>
-            {/* Regular Resources Display - No Progressive Loading */}
-            {layout === 'cards' && (
-              <GridMorphing 
-                categoryId={`${selectedCategory}-${selectedSubcategory}-${selectedSubSubcategory}`}
-                className="mb-8"
-              >
-                <div 
-                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-visible"
+            {/* Regular Resources Display with Loading States */}
+            {(isInitialLoading || isPageChanging || isFilterChanging) ? (
+              <AnimatedResourceSkeleton
+                count={layout === 'cards' ? 6 : (layout === 'list' ? 10 : 15)}
+                showTags={true}
+                showMetrics={true}
+              />
+            ) : (
+              layout === 'cards' && (
+                <GridMorphing 
+                  categoryId={`${selectedCategory}-${selectedSubcategory}-${selectedSubSubcategory}`}
+                  className="mb-8"
                 >
-                  {paginatedResources.map((resource, index) => (
-                    <ResourceCard
-                      key={`${resource.title}-${resource.url}`}
-                      resource={resource}
-                      index={index}
-                    />
-                  ))}
-                </div>
-              </GridMorphing>
+                  <div 
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-visible"
+                  >
+                    {paginatedResources.map((resource, index) => (
+                      <div
+                        key={`${resource.title}-${resource.url}`}
+                        ref={(el) => registerItem(index, el)}
+                        className={cn(
+                          "transition-opacity duration-300",
+                          visibleItems.has(index) ? "opacity-100" : "opacity-0"
+                        )}
+                      >
+                        {visibleItems.has(index) ? (
+                          <ResourceCard
+                            resource={resource}
+                            index={index}
+                          />
+                        ) : (
+                          <div className="h-48 bg-muted rounded-lg animate-pulse" />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </GridMorphing>
+              )
             )}
 
-            {layout === 'list' && (
+            {!isInitialLoading && !isPageChanging && !isFilterChanging && layout === 'list' && (
               <GridMorphing 
                 categoryId={`list-${selectedCategory}-${selectedSubcategory}-${selectedSubSubcategory}`}
                 className="mb-8"
@@ -420,7 +476,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
               </GridMorphing>
             )}
 
-            {layout === 'compact' && (
+            {!isInitialLoading && !isPageChanging && !isFilterChanging && layout === 'compact' && (
               <GridMorphing 
                 categoryId={`compact-${selectedCategory}-${selectedSubcategory}-${selectedSubSubcategory}`}
                 className="mb-8"
@@ -446,7 +502,10 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                 totalPages={totalPages}
                 itemsPerPage={itemsPerPage}
                 onPageChange={(page) => {
+                  setIsPageChanging(true);
                   setCurrentPage(page);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  setTimeout(() => setIsPageChanging(false), 300);
                 }}
                 onPageSizeChange={(size) => {
                   setItemsPerPage(size);
