@@ -298,9 +298,9 @@ export default function Category() {
           {/* Regular Resources Display with Loading States */}
           {(isPageChanging || isFilterChanging) ? (
             <AnimatedResourceSkeleton
-              count={layout === 'cards' ? 6 : (layout === 'list' ? 10 : 15)}
+              count={Math.min(itemsPerPage, paginatedResources.length || itemsPerPage)}
               showTags={true}
-              showMetrics={true}
+              showMetrics={false}
             />
           ) : (
             <>

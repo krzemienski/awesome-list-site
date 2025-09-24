@@ -9,8 +9,6 @@ html {
 body {
   overflow-x: hidden;
   min-height: 100vh;
-  /* Smooth scroll on iOS */
-  -webkit-overflow-scrolling: touch;
   /* Prevent overscroll bounce */
   overscroll-behavior: none;
 }
@@ -23,26 +21,22 @@ body {
 /* Improve scroll performance with passive events */
 .scroll-container {
   scroll-behavior: smooth;
-  /* Optimize for touch scrolling */
+  /* Optimize for touch scrolling - iOS momentum scrolling */
   -webkit-overflow-scrolling: touch;
-  /* GPU acceleration */
+  /* Direct touch action for better performance */
+  touch-action: pan-y;
+  /* GPU acceleration - minimal usage */
   transform: translateZ(0);
   backface-visibility: hidden;
-}
-
-/* Passive scroll optimization */
-@supports (passive: true) {
-  .scroll-container {
-    touch-action: pan-y;
-  }
+  /* Ensure scrollable */
+  overflow-y: auto;
 }
 
 /* Fix card content overflow and cutoff issues */
 .card-content-fix {
   contain: layout style;
-  /* Hardware acceleration for cards */
+  /* Minimal GPU usage - removed will-change */
   transform: translateZ(0);
-  will-change: transform;
 }
 
 /* Ensure card layouts don't clip content */
@@ -56,8 +50,7 @@ body {
   /* GPU acceleration */
   transform: translateZ(0);
   backface-visibility: hidden;
-  /* Prevent paint thrashing */
-  will-change: auto;
+  /* Removed will-change for better performance */
 }
 
 /* Fix button and interactive element positioning */
@@ -161,7 +154,7 @@ p, span, div, h1, h2, h3, h4, h5, h6 {
 /* Content containment improvements */
 .contain-layout {
   contain: layout;
-  /* Hardware acceleration */
+  /* Minimal hardware acceleration */
   transform: translateZ(0);
 }
 
@@ -169,7 +162,7 @@ p, span, div, h1, h2, h3, h4, h5, h6 {
 .grid {
   contain: layout;
   width: 100%;
-  /* GPU acceleration for grid */
+  /* Minimal GPU usage */
   transform: translateZ(0);
   backface-visibility: hidden;
 }
@@ -177,13 +170,17 @@ p, span, div, h1, h2, h3, h4, h5, h6 {
 /* Mobile-specific scroll optimizations */
 @media (max-width: 768px) {
   /* Optimize mobile scrolling */
-  .grid,
-  .card,
   .scroll-container {
-    /* Reduce paint area on mobile */
-    will-change: auto;
-    /* Enable momentum scrolling */
+    /* Enable momentum scrolling for scrollable containers */
     -webkit-overflow-scrolling: touch;
+    /* Ensure proper touch handling */
+    touch-action: pan-y;
+  }
+  
+  .grid,
+  .card {
+    /* Remove will-change for better performance */
+    will-change: auto;
   }
   
   /* Prevent scroll jank on mobile */
