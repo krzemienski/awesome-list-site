@@ -37,7 +37,7 @@ export default function ResourceCompactItem({ resource }: ResourceCompactItemPro
 
   return (
     <Card 
-      className="cursor-pointer group overflow-hidden"
+      className="cursor-pointer group overflow-hidden quick-fade transition-all duration-200 hover:shadow-md hover:scale-[1.03] transform-gpu"
       data-testid={`resource-compact-item-${resource.title.replace(/\s+/g, '-').toLowerCase()}`}
       onClick={handleClick}
     >
@@ -49,11 +49,11 @@ export default function ResourceCompactItem({ resource }: ResourceCompactItemPro
             </CardTitle>
           </div>
           <div className="flex items-center gap-1 flex-shrink-0">
-            <ExternalLink className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 flex-shrink-0" />
+            <ExternalLink className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 flex-shrink-0 transition-opacity duration-200" />
             <Button
               variant="ghost"
               size="sm"
-              className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 flex-shrink-0"
+              className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 flex-shrink-0 transition-opacity duration-200"
               onClick={handleBookmark}
             >
               <Bookmark className="h-2.5 w-2.5" />
@@ -61,7 +61,7 @@ export default function ResourceCompactItem({ resource }: ResourceCompactItemPro
             <Button
               variant="ghost"
               size="sm"
-              className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 flex-shrink-0"
+              className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 flex-shrink-0 transition-opacity duration-200"
               onClick={handleShare}
             >
               <Share2 className="h-2.5 w-2.5" />

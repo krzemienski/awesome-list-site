@@ -1,18 +1,25 @@
 /* Skeleton Loading Animations */
 @keyframes shimmer {
   0% {
-    background-position: -1000px 0;
+    background-position: -468px 0;
   }
   100% {
-    background-position: 1000px 0;
+    background-position: 468px 0;
   }
 }
 
-/* Shimmer effect for skeleton cards - DISABLED */
-.skeleton-shimmer {
-  /* animation: shimmer 2s infinite; */
-  background: var(--skeleton-base);
-  /* Removed animated gradient to prevent movement */
+/* Shimmer effect for skeleton cards - optimized for performance */
+.animate-shimmer {
+  animation: shimmer 1.5s ease-in-out infinite;
+  background: linear-gradient(
+    90deg,
+    var(--skeleton-base) 0px,
+    var(--skeleton-shine) 20px,
+    var(--skeleton-base) 40px
+  );
+  background-size: 468px 100%;
+  will-change: background-position;
+  transform: translateZ(0); /* Hardware acceleration */
 }
 
 /* Skeleton color variables */
@@ -26,68 +33,110 @@
   --skeleton-shine: hsl(var(--muted) / 0.3);
 }
 
-/* Progressive fade-in animation */
-@keyframes fadeInUp {
+/* Progressive fade-in animation - optimized */
+@keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
-.fade-in-up {
-  /* animation: fadeInUp 0.5s ease-out forwards; */
-  opacity: 1; /* Show immediately without animation */
+.fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+  will-change: opacity;
 }
 
-/* Staggered loading effect - DISABLED */
-.stagger-fade-in {
-  opacity: 1; /* Show immediately */
-  /* animation: fadeInUp 0.5s ease-out forwards; */
+/* Fast fade for content switching */
+@keyframes quickFade {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
-.stagger-fade-in:nth-child(1) { animation-delay: 0ms; }
-.stagger-fade-in:nth-child(2) { animation-delay: 50ms; }
-.stagger-fade-in:nth-child(3) { animation-delay: 100ms; }
-.stagger-fade-in:nth-child(4) { animation-delay: 150ms; }
-.stagger-fade-in:nth-child(5) { animation-delay: 200ms; }
-.stagger-fade-in:nth-child(6) { animation-delay: 250ms; }
-.stagger-fade-in:nth-child(7) { animation-delay: 300ms; }
-.stagger-fade-in:nth-child(8) { animation-delay: 350ms; }
-.stagger-fade-in:nth-child(9) { animation-delay: 400ms; }
+.quick-fade {
+  animation: quickFade 0.2s ease-out forwards;
+  will-change: opacity, transform;
+  transform: translateZ(0);
+}
 
-/* Pulse animation for skeleton elements */
+/* Content fade-in on load - no stagger to prevent jitter */
+.content-fade-in {
+  animation: fadeIn 0.2s ease-out forwards;
+  will-change: opacity;
+  transform: translateZ(0); /* Hardware acceleration */
+}
+
+/* Smooth transition for visibility changes */
+.smooth-transition {
+  transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+  will-change: opacity, transform;
+}
+
+/* Optimize mobile performance */
+@media (max-width: 768px) {
+  .content-fade-in {
+    animation-duration: 0.15s;
+  }
+  
+  .smooth-transition {
+    transition-duration: 0.15s;
+  }
+}
+
+/* Disable animations for reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Subtle pulse animation for skeleton elements */
 @keyframes pulse {
   0%, 100% {
     opacity: 1;
   }
   50% {
-    opacity: 0.5;
+    opacity: 0.7;
   }
 }
 
 .skeleton-pulse {
-  /* animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; */
-  opacity: 0.5; /* Static opacity instead of pulsing */
+  animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  will-change: opacity;
+  transform: translateZ(0); /* Hardware acceleration */
 }
 
-/* Loading indicator dots */
-@keyframes loading-dots {
-  0%, 20% {
-    content: '.';
-  }
-  40% {
-    content: '..';
-  }
-  60%, 100% {
-    content: '...';
-  }
+/* Optimized loading transition */
+.loading-transition-enter {
+  opacity: 0;
+  transform: scale(0.95);
 }
 
-.loading-dots::after {
-  content: '...'; /* Static dots instead of animated */
-  /* animation: loading-dots 1.5s infinite; */
+.loading-transition-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+  will-change: opacity, transform;
+}
+
+/* Prevent layout shift during loading */
+.skeleton-container {
+  min-height: inherit;
+  contain: layout;
+}
+
+/* Hardware accelerated transitions */
+.hw-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
 }

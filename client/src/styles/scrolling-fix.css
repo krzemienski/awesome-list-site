@@ -1,13 +1,18 @@
-/* Fix for content disappearing on scroll */
+/* Fix for content disappearing on scroll - optimized */
 html {
-  /* Removed smooth scroll to prevent movement during scroll */
-  /* scroll-behavior: smooth; */
+  scroll-behavior: smooth;
   overflow-x: hidden;
+  /* Optimize scroll performance */
+  scroll-padding-top: 80px;
 }
 
 body {
   overflow-x: hidden;
   min-height: 100vh;
+  /* Smooth scroll on iOS */
+  -webkit-overflow-scrolling: touch;
+  /* Prevent overscroll bounce */
+  overscroll-behavior: none;
 }
 
 /* Prevent layout shifts during scroll */
@@ -15,22 +20,44 @@ body {
   box-sizing: border-box;
 }
 
-/* Improve scroll performance */
-.scroll-smooth {
-  /* Removed smooth scroll and will-change to prevent movement */
-  /* scroll-behavior: smooth; */
-  /* will-change: scroll-position; */
+/* Improve scroll performance with passive events */
+.scroll-container {
+  scroll-behavior: smooth;
+  /* Optimize for touch scrolling */
+  -webkit-overflow-scrolling: touch;
+  /* GPU acceleration */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Passive scroll optimization */
+@supports (passive: true) {
+  .scroll-container {
+    touch-action: pan-y;
+  }
 }
 
 /* Fix card content overflow and cutoff issues */
 .card-content-fix {
   contain: layout style;
+  /* Hardware acceleration for cards */
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 /* Ensure card layouts don't clip content */
 [data-radix-aspect-ratio-wrapper] {
   contain: layout;
   overflow: visible !important;
+}
+
+/* Optimize card rendering performance */
+.card {
+  /* GPU acceleration */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  /* Prevent paint thrashing */
+  will-change: auto;
 }
 
 /* Fix button and interactive element positioning */
@@ -59,6 +86,16 @@ body {
 .card-spacing-fix {
   margin: 0.25rem;
   padding: 0.25rem;
+}
+
+/* Intersection observer optimization for lazy loading */
+.lazy-load {
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+}
+
+.lazy-load-visible {
+  opacity: 1;
 }
 
 /* Ensure main content area is properly positioned */
@@ -124,12 +161,41 @@ p, span, div, h1, h2, h3, h4, h5, h6 {
 /* Content containment improvements */
 .contain-layout {
   contain: layout;
+  /* Hardware acceleration */
+  transform: translateZ(0);
 }
 
-/* Grid container improvements */
+/* Grid container improvements with GPU optimization */
 .grid {
   contain: layout;
   width: 100%;
+  /* GPU acceleration for grid */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Mobile-specific scroll optimizations */
+@media (max-width: 768px) {
+  /* Optimize mobile scrolling */
+  .grid,
+  .card,
+  .scroll-container {
+    /* Reduce paint area on mobile */
+    will-change: auto;
+    /* Enable momentum scrolling */
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Prevent scroll jank on mobile */
+  * {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
+  
+  /* Optimize touch scrolling */
+  .scroll-container {
+    touch-action: pan-y;
+  }
 }
 
 /* Ensure all cards maintain proper boundaries */

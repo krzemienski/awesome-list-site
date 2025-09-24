@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
+import AnimatedResourceSkeleton from "@/components/ui/animated-resource-skeleton";
 import ResourceCard from "@/components/ui/resource-card";
 import ResourceListItem from "@/components/ui/resource-list-item";
 import ResourceCompactItem from "@/components/ui/resource-compact-item";
@@ -31,6 +32,8 @@ export default function Category() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>("all");
+  const [isPageChanging, setIsPageChanging] = useState(false);
+  const [isFilterChanging, setIsFilterChanging] = useState(false);
   
   // Fetch awesome list data - use same query as homepage
   const { data: rawData, isLoading, error } = useQuery({
@@ -58,17 +61,21 @@ export default function Category() {
 
   // Handle category change with analytics
   const handleCategoryChange = (category: string) => {
+    setIsFilterChanging(true);
     setSelectedCategory(category);
     if (category !== "all") {
       trackCategoryView(category);
       trackFilterUsage("category", category, filteredResources.length);
     }
+    setTimeout(() => setIsFilterChanging(false), 200);
   };
 
   // Handle sort change with analytics
   const handleSortChange = (sort: string) => {
+    setIsFilterChanging(true);
     setSortBy(sort);
     trackSortChange(sort);
+    setTimeout(() => setIsFilterChanging(false), 200);
   };
 
   // Handle search with analytics
@@ -122,8 +129,10 @@ export default function Category() {
 
   // Handle page changes
   const handlePageChange = (page: number) => {
+    setIsPageChanging(true);
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => setIsPageChanging(false), 300);
   };
 
   const handlePageSizeChange = (newPageSize: number) => {
@@ -216,7 +225,19 @@ export default function Category() {
             {/* Layout Switcher */}
             <LayoutSwitcher
               currentLayout={layout}
-              onLayoutChange={setLayout}
+              onLayoutChange={(newLayout) => {
+                setIsFilterChanging(true);
+                setLayout(newLayout);
+                // Adjust items per page based on layout
+                if (newLayout === 'cards') {
+                  setItemsPerPage(24);
+                } else if (newLayout === 'list') {
+                  setItemsPerPage(50);
+                } else {
+                  setItemsPerPage(40);
+                }
+                setTimeout(() => setIsFilterChanging(false), 200);
+              }}
             />
 
             {/* Subcategory Filter */}
@@ -274,37 +295,47 @@ export default function Category() {
         </div>
       ) : (
         <>
-          {/* Regular Resources Display */}
-          {layout === "list" ? (
-            <div className="space-y-1 mb-8">
-              {paginatedResources.map((resource, index) => (
-                <ResourceListItem 
-                  key={`${resource.url}-${index}`} 
-                  resource={resource}
-                  index={startIndex + index}
-                />
-              ))}
-            </div>
-          ) : layout === "cards" ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {paginatedResources.map((resource, index) => (
-                <ResourceCard 
-                  key={`${resource.url}-${index}`} 
-                  resource={resource}
-                  index={startIndex + index}
-                />
-              ))}
-            </div>
+          {/* Regular Resources Display with Loading States */}
+          {(isPageChanging || isFilterChanging) ? (
+            <AnimatedResourceSkeleton
+              count={layout === 'cards' ? 6 : (layout === 'list' ? 10 : 15)}
+              showTags={true}
+              showMetrics={true}
+            />
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8">
-              {paginatedResources.map((resource, index) => (
-                <ResourceCompactItem 
-                  key={`${resource.url}-${index}`} 
-                  resource={resource}
-                  index={startIndex + index}
-                />
-              ))}
-            </div>
+            <>
+              {layout === "list" ? (
+                <div className="space-y-1 mb-8">
+                  {paginatedResources.map((resource, index) => (
+                    <ResourceListItem 
+                      key={`${resource.url}-${index}`} 
+                      resource={resource}
+                      index={startIndex + index}
+                    />
+                  ))}
+                </div>
+              ) : layout === "cards" ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                  {paginatedResources.map((resource, index) => (
+                    <ResourceCard 
+                      key={`${resource.url}-${index}`} 
+                      resource={resource}
+                      index={startIndex + index}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8">
+                  {paginatedResources.map((resource, index) => (
+                    <ResourceCompactItem 
+                      key={`${resource.url}-${index}`} 
+                      resource={resource}
+                      index={startIndex + index}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
           )}
           
           {/* Pagination */}
