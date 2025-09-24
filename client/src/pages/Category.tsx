@@ -32,12 +32,7 @@ export default function Category() {
     return (saved as LayoutType) || "cards";
   });
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(() => {
-    const savedLayout = sessionStorage.getItem('awesome-layout') || "cards";
-    if (savedLayout === 'cards') return 24;
-    if (savedLayout === 'list') return 50;
-    return 40;
-  });
+  const [itemsPerPage, setItemsPerPage] = useState(24);
   const [sortBy, setSortBy] = useState("category"); // Match homepage default
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -72,6 +67,17 @@ export default function Category() {
       setTimeout(() => setIsInitialLoading(false), 150);
     }
   }, [isLoading, awesomeList]);
+  
+  // Effect to set itemsPerPage based on saved layout
+  useEffect(() => {
+    if (layout === 'cards') {
+      setItemsPerPage(24);
+    } else if (layout === 'list') {
+      setItemsPerPage(50);
+    } else {
+      setItemsPerPage(40);
+    }
+  }, [layout]);
   
   // Track category view
   useEffect(() => {
