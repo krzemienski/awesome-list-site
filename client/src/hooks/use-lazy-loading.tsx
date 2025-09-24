@@ -76,9 +76,9 @@ export function useLazyLoading(options: UseLazyLoadingOptions = {}) {
 
 // Hook for batch lazy loading multiple items
 export function useBatchLazyLoading(itemCount: number) {
-  const [visibleItems, setVisibleItems] = useState<Set<number>>(new Set());
+  const [visibleIds, setVisibleIds] = useState<Set<string>>(new Set());
   const observerRef = useRef<IntersectionObserver | null>(null);
-  const itemRefs = useRef<Map<number, HTMLElement>>(new Map());
+  const itemRefs = useRef<Map<string, HTMLElement>>(new Map());
   const isUnmountingRef = useRef(false);
   const hasInitializedRef = useRef(false);
   const previousItemCountRef = useRef(0);
@@ -92,8 +92,8 @@ export function useBatchLazyLoading(itemCount: number) {
     
     // Skip in SSR or if not supported
     if (typeof window === 'undefined' || !window.IntersectionObserver) {
-      // Make all items visible immediately
-      setVisibleItems(new Set(Array.from({ length: itemCount }, (_, i) => i)));
+      // In SSR, we can't pre-populate IDs since we don't know them yet
+      // Items will be made visible as they register
       return;
     }
 
@@ -103,12 +103,12 @@ export function useBatchLazyLoading(itemCount: number) {
         if (isUnmountingRef.current) return;
         
         entries.forEach((entry) => {
-          const index = parseInt(entry.target.getAttribute('data-index') || '0');
+          const id = entry.target.getAttribute('data-id');
           
-          if (entry.isIntersecting) {
-            setVisibleItems((prev) => {
+          if (entry.isIntersecting && id) {
+            setVisibleIds((prev) => {
               const newSet = new Set(prev);
-              newSet.add(index);
+              newSet.add(id);
               return newSet;
             });
             
@@ -120,7 +120,7 @@ export function useBatchLazyLoading(itemCount: number) {
         });
       },
       {
-        rootMargin: '400px', // Increased for better pre-rendering
+        rootMargin: '500px', // Further increased for better mobile pre-rendering
         threshold: 0.01, // Low threshold for faster triggering
       }
     );
@@ -133,9 +133,16 @@ export function useBatchLazyLoading(itemCount: number) {
     
     // Skip in SSR or if not supported
     if (typeof window === 'undefined' || !window.IntersectionObserver) {
-      // Update all items to be visible when count increases
+      // In SSR, make all currently registered items visible
       if (itemCount > previousItemCountRef.current) {
-        setVisibleItems(new Set(Array.from({ length: itemCount }, (_, i) => i)));
+        setVisibleIds((prev) => {
+          const newSet = new Set(prev);
+          // Add all currently registered item IDs
+          itemRefs.current.forEach((_, id) => {
+            newSet.add(id);
+          });
+          return newSet;
+        });
       }
       previousItemCountRef.current = itemCount;
       return;
@@ -145,10 +152,9 @@ export function useBatchLazyLoading(itemCount: number) {
     // but don't touch existing visible items or the observer itself
     if (itemCount > previousItemCountRef.current && observerRef.current) {
       // Re-observe any elements that might have been added
-      itemRefs.current.forEach((element, index) => {
+      itemRefs.current.forEach((element, id) => {
         // Only observe elements that haven't been made visible yet
-        // and are within the new item count range
-        if (!visibleItems.has(index) && observerRef.current && !isUnmountingRef.current) {
+        if (!visibleIds.has(id) && observerRef.current && !isUnmountingRef.current) {
           observerRef.current.observe(element);
         }
       });
@@ -157,24 +163,34 @@ export function useBatchLazyLoading(itemCount: number) {
     previousItemCountRef.current = itemCount;
   }, [itemCount]); // Only itemCount as dependency
 
-  const registerItem = (index: number, element: HTMLElement | null) => {
+  const registerItem = (id: string, element: HTMLElement | null) => {
     if (isUnmountingRef.current) return;
     
     if (!element) {
       // Unobserve before removing
-      const existing = itemRefs.current.get(index);
+      const existing = itemRefs.current.get(id);
       if (existing && observerRef.current) {
         observerRef.current.unobserve(existing);
       }
-      itemRefs.current.delete(index);
+      itemRefs.current.delete(id);
       return;
     }
 
-    element.setAttribute('data-index', index.toString());
-    itemRefs.current.set(index, element);
+    element.setAttribute('data-id', id);
+    itemRefs.current.set(id, element);
+    
+    // In SSR or if no IntersectionObserver, make item visible immediately
+    if (typeof window === 'undefined' || !window.IntersectionObserver) {
+      setVisibleIds((prev) => {
+        const newSet = new Set(prev);
+        newSet.add(id);
+        return newSet;
+      });
+      return;
+    }
     
     // Only observe if the item isn't already visible and observer exists
-    if (observerRef.current && !isUnmountingRef.current && !visibleItems.has(index)) {
+    if (observerRef.current && !isUnmountingRef.current && !visibleIds.has(id)) {
       observerRef.current.observe(element);
     }
   };
@@ -192,5 +208,5 @@ export function useBatchLazyLoading(itemCount: number) {
     };
   }, []);
 
-  return { visibleItems, registerItem };
+  return { visibleIds, registerItem };
 }

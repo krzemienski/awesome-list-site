@@ -221,6 +221,11 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
     }
   });
 
+  // Generate stable resource IDs for tracking
+  const generateResourceId = (resource: any) => {
+    return `${resource.url}|${resource.title}`.replace(/[^a-zA-Z0-9|]/g, '-');
+  };
+
   // Pagination
   const totalPages = Math.ceil(sortedResources.length / itemsPerPage);
   const paginatedResources = sortedResources.slice(
@@ -228,8 +233,8 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
     currentPage * itemsPerPage
   );
 
-  // Lazy loading for resource cards
-  const { visibleItems, registerItem } = useBatchLazyLoading(paginatedResources.length);
+  // Lazy loading for resource cards using stable IDs
+  const { visibleIds, registerItem } = useBatchLazyLoading(paginatedResources.length);
 
 
 
@@ -420,25 +425,28 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                   <div 
                     className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-visible"
                   >
-                    {paginatedResources.map((resource, index) => (
-                      <div
-                        key={`${resource.title}-${resource.url}`}
-                        ref={(el) => registerItem(index, el)}
-                        className={cn(
-                          "transition-opacity duration-300",
-                          visibleItems.has(index) ? "opacity-100" : "opacity-0"
-                        )}
-                      >
-                        {visibleItems.has(index) ? (
-                          <ResourceCard
-                            resource={resource}
-                            index={index}
-                          />
-                        ) : (
-                          <div className="h-48 bg-muted rounded-lg animate-pulse" />
-                        )}
-                      </div>
-                    ))}
+                    {paginatedResources.map((resource, index) => {
+                      const resourceId = generateResourceId(resource);
+                      return (
+                        <div
+                          key={resourceId}
+                          ref={(el) => registerItem(resourceId, el)}
+                          className={cn(
+                            "transition-opacity duration-300",
+                            visibleIds.has(resourceId) ? "opacity-100" : "opacity-0"
+                          )}
+                        >
+                          {visibleIds.has(resourceId) ? (
+                            <ResourceCard
+                              resource={resource}
+                              index={index}
+                            />
+                          ) : (
+                            <div className="h-48 bg-muted rounded-lg animate-pulse" />
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </GridMorphing>
               )
@@ -452,13 +460,28 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                 <div 
                   className="space-y-0 border border-border rounded-lg overflow-visible"
                 >
-                  {paginatedResources.map((resource, index) => (
-                    <ResourceListItem
-                      key={`${resource.title}-${resource.url}`}
-                      resource={resource}
-                      index={index}
-                    />
-                  ))}
+                  {paginatedResources.map((resource, index) => {
+                    const resourceId = generateResourceId(resource);
+                    return (
+                      <div
+                        key={resourceId}
+                        ref={(el) => registerItem(resourceId, el)}
+                        className={cn(
+                          "transition-opacity duration-300",
+                          visibleIds.has(resourceId) ? "opacity-100" : "opacity-0"
+                        )}
+                      >
+                        {visibleIds.has(resourceId) ? (
+                          <ResourceListItem
+                            resource={resource}
+                            index={index}
+                          />
+                        ) : (
+                          <div className="h-16 bg-muted rounded-lg animate-pulse" />
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </GridMorphing>
             )}
@@ -471,13 +494,28 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                 <div 
                   className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 overflow-visible"
                 >
-                  {paginatedResources.map((resource, index) => (
-                    <ResourceCompactItem
-                      key={`${resource.title}-${resource.url}`}
-                      resource={resource}
-                      index={index}
-                    />
-                  ))}
+                  {paginatedResources.map((resource, index) => {
+                    const resourceId = generateResourceId(resource);
+                    return (
+                      <div
+                        key={resourceId}
+                        ref={(el) => registerItem(resourceId, el)}
+                        className={cn(
+                          "transition-opacity duration-300",
+                          visibleIds.has(resourceId) ? "opacity-100" : "opacity-0"
+                        )}
+                      >
+                        {visibleIds.has(resourceId) ? (
+                          <ResourceCompactItem
+                            resource={resource}
+                            index={index}
+                          />
+                        ) : (
+                          <div className="h-24 bg-muted rounded-lg animate-pulse" />
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </GridMorphing>
             )}
