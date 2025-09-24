@@ -82,7 +82,7 @@ export default function SubSubcategory() {
   // Effect to handle initial loading state
   useEffect(() => {
     if (!isLoading && awesomeList) {
-      setTimeout(() => setIsInitialLoading(false), 150);
+      setIsInitialLoading(false);
     }
   }, [isLoading, awesomeList]);
   
@@ -118,10 +118,8 @@ export default function SubSubcategory() {
 
   // Handle sort change with analytics
   const handleSortChange = (sort: string) => {
-    setIsFilterChanging(true);
     setSortBy(sort);
     trackSortChange(sort);
-    setTimeout(() => setIsFilterChanging(false), 200);
   };
 
   // Handle search with analytics
@@ -170,15 +168,12 @@ export default function SubSubcategory() {
   };
 
   const handlePageSizeChange = (newPageSize: number) => {
-    setIsPageChanging(true);
     setItemsPerPage(newPageSize);
     setCurrentPage(1);
-    setTimeout(() => setIsPageChanging(false), 300);
   };
   
   // Handle layout change with persistence
   const handleLayoutChange = (newLayout: LayoutType) => {
-    setIsFilterChanging(true);
     setLayout(newLayout);
     sessionStorage.setItem('awesome-layout', newLayout);
     
@@ -192,7 +187,6 @@ export default function SubSubcategory() {
     }
     
     setCurrentPage(1); // Reset to first page when changing layout
-    setTimeout(() => setIsFilterChanging(false), 200);
   };
   
   if (isLoading) {
@@ -302,7 +296,7 @@ export default function SubSubcategory() {
       ) : (
         <>
           {/* Regular Resources Display with Loading States */}
-          {(isInitialLoading || isPageChanging || isFilterChanging) ? (
+          {(isInitialLoading || isPageChanging) ? (
             <AnimatedResourceSkeleton
               count={Math.min(itemsPerPage, paginatedResources.length || itemsPerPage)}
               showTags={true}
