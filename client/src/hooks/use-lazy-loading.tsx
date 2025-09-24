@@ -80,9 +80,15 @@ export function useBatchLazyLoading(itemCount: number) {
   const observerRef = useRef<IntersectionObserver | null>(null);
   const itemRefs = useRef<Map<number, HTMLElement>>(new Map());
   const isUnmountingRef = useRef(false);
+  const hasInitializedRef = useRef(false);
+  const previousItemCountRef = useRef(0);
 
+  // Initialize observer once and keep it stable
   useEffect(() => {
+    if (hasInitializedRef.current) return;
+    
     isUnmountingRef.current = false;
+    hasInitializedRef.current = true;
     
     // Skip in SSR or if not supported
     if (typeof window === 'undefined' || !window.IntersectionObserver) {
@@ -91,12 +97,7 @@ export function useBatchLazyLoading(itemCount: number) {
       return;
     }
 
-    // Disconnect existing observer before creating new one
-    if (observerRef.current) {
-      observerRef.current.disconnect();
-    }
-
-    // Create observer with optimized settings
+    // Create observer with optimized settings - only once
     observerRef.current = new IntersectionObserver(
       (entries) => {
         if (isUnmountingRef.current) return;
@@ -123,23 +124,38 @@ export function useBatchLazyLoading(itemCount: number) {
         threshold: 0.01, // Low threshold for faster triggering
       }
     );
+  }, []); // Empty dependency array - initialize once
 
-    // Observe all registered items
-    itemRefs.current.forEach((element) => {
-      if (observerRef.current && !isUnmountingRef.current) {
-        observerRef.current.observe(element);
+  // Handle itemCount changes without recreating observer
+  useEffect(() => {
+    // Skip initial setup
+    if (!hasInitializedRef.current) return;
+    
+    // Skip in SSR or if not supported
+    if (typeof window === 'undefined' || !window.IntersectionObserver) {
+      // Update all items to be visible when count increases
+      if (itemCount > previousItemCountRef.current) {
+        setVisibleItems(new Set(Array.from({ length: itemCount }, (_, i) => i)));
       }
-    });
+      previousItemCountRef.current = itemCount;
+      return;
+    }
 
-    return () => {
-      isUnmountingRef.current = true;
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-        observerRef.current = null;
-      }
-      itemRefs.current.clear();
-    };
-  }, [itemCount]);
+    // If itemCount increased, observe any new elements that got registered
+    // but don't touch existing visible items or the observer itself
+    if (itemCount > previousItemCountRef.current && observerRef.current) {
+      // Re-observe any elements that might have been added
+      itemRefs.current.forEach((element, index) => {
+        // Only observe elements that haven't been made visible yet
+        // and are within the new item count range
+        if (!visibleItems.has(index) && observerRef.current && !isUnmountingRef.current) {
+          observerRef.current.observe(element);
+        }
+      });
+    }
+
+    previousItemCountRef.current = itemCount;
+  }, [itemCount]); // Only itemCount as dependency
 
   const registerItem = (index: number, element: HTMLElement | null) => {
     if (isUnmountingRef.current) return;
@@ -157,11 +173,24 @@ export function useBatchLazyLoading(itemCount: number) {
     element.setAttribute('data-index', index.toString());
     itemRefs.current.set(index, element);
     
-    // Observe the new element if observer exists
-    if (observerRef.current && !isUnmountingRef.current) {
+    // Only observe if the item isn't already visible and observer exists
+    if (observerRef.current && !isUnmountingRef.current && !visibleItems.has(index)) {
       observerRef.current.observe(element);
     }
   };
+
+  // Cleanup observer on unmount only
+  useEffect(() => {
+    return () => {
+      isUnmountingRef.current = true;
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+        observerRef.current = null;
+      }
+      itemRefs.current.clear();
+      hasInitializedRef.current = false;
+    };
+  }, []);
 
   return { visibleItems, registerItem };
 }
