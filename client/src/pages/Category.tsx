@@ -250,13 +250,13 @@ export default function Category() {
                 value={sortBy}
                 onValueChange={handleSortChange}
               >
-                <SelectTrigger className="w-32">
+                <SelectTrigger className="w-32" data-testid="sort-select-trigger">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="category">Category</SelectItem>
-                  <SelectItem value="name-asc">Name (A-Z)</SelectItem>
-                  <SelectItem value="name-desc">Name (Z-A)</SelectItem>
+                <SelectContent data-testid="sort-select-content">
+                  <SelectItem value="category" data-testid="sort-option-category">Category</SelectItem>
+                  <SelectItem value="name-asc" data-testid="sort-option-name-asc">Name (A-Z)</SelectItem>
+                  <SelectItem value="name-desc" data-testid="sort-option-name-desc">Name (Z-A)</SelectItem>
                 </SelectContent>
               </Select>
             </div>

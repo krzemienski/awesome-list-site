@@ -39,6 +39,7 @@ export default function ResourceListItem({ resource }: ResourceListItemProps) {
   return (
     <Card 
       className="cursor-pointer group border-0 border-b rounded-none"
+      data-testid={`resource-list-item-${resource.title.replace(/\s+/g, '-').toLowerCase()}`}
       onClick={handleClick}
     >
       <CardContent className="p-4 overflow-hidden">

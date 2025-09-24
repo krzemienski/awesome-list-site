@@ -38,6 +38,7 @@ export default function ResourceCompactItem({ resource }: ResourceCompactItemPro
   return (
     <Card 
       className="cursor-pointer group overflow-hidden"
+      data-testid={`resource-compact-item-${resource.title.replace(/\s+/g, '-').toLowerCase()}`}
       onClick={handleClick}
     >
       <CardHeader className="pb-2">

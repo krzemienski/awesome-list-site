@@ -283,10 +283,10 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                     value={selectedCategory}
                     onValueChange={handleCategoryChange}
                   >
-                    <SelectTrigger className="w-40 min-h-[44px] sm:min-h-auto touch-optimized">
+                    <SelectTrigger className="w-40 min-h-[44px] sm:min-h-auto touch-optimized" data-testid="category-select-trigger">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="touch-optimized">
+                    <SelectContent className="touch-optimized" data-testid="category-select-content">
                       <SelectItem value="all">All Categories</SelectItem>
                       {categories.map(category => (
                         <SelectItem key={category.name} value={category.name}>
@@ -305,10 +305,10 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                       value={selectedSubcategory}
                       onValueChange={handleSubcategoryChange}
                     >
-                      <SelectTrigger className="w-44 min-h-[44px] sm:min-h-auto touch-optimized">
+                      <SelectTrigger className="w-44 min-h-[44px] sm:min-h-auto touch-optimized" data-testid="subcategory-select-trigger">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="touch-optimized">
+                      <SelectContent className="touch-optimized" data-testid="subcategory-select-content">
                         <SelectItem value="all">All Subcategories</SelectItem>
                         {availableSubcategories.map(subcategory => (
                           <SelectItem key={subcategory} value={subcategory || ""}>
@@ -328,10 +328,10 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                       value={selectedSubSubcategory}
                       onValueChange={handleSubSubcategoryChange}
                     >
-                      <SelectTrigger className="w-48 min-h-[44px] sm:min-h-auto touch-optimized">
+                      <SelectTrigger className="w-48 min-h-[44px] sm:min-h-auto touch-optimized" data-testid="sub-subcategory-select-trigger">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="touch-optimized">
+                      <SelectContent className="touch-optimized" data-testid="sub-subcategory-select-content">
                         <SelectItem value="all">All Sub-subcategories</SelectItem>
                         {availableSubSubcategories.map(subSubcategory => (
                           <SelectItem key={subSubcategory} value={subSubcategory || ""}>
@@ -359,13 +359,13 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                 value={sortBy}
                 onValueChange={handleSortChange}
               >
-                <SelectTrigger className="w-32 min-h-[44px] sm:min-h-auto touch-optimized">
+                <SelectTrigger className="w-32 min-h-[44px] sm:min-h-auto touch-optimized" data-testid="sort-select-trigger">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="touch-optimized">
-                  <SelectItem value="category">Category</SelectItem>
-                  <SelectItem value="name-asc">Name (A-Z)</SelectItem>
-                  <SelectItem value="name-desc">Name (Z-A)</SelectItem>
+                <SelectContent className="touch-optimized" data-testid="sort-select-content">
+                  <SelectItem value="category" data-testid="sort-option-category">Category</SelectItem>
+                  <SelectItem value="name-asc" data-testid="sort-option-name-asc">Name (A-Z)</SelectItem>
+                  <SelectItem value="name-desc" data-testid="sort-option-name-desc">Name (Z-A)</SelectItem>
                 </SelectContent>
               </Select>
             </div>

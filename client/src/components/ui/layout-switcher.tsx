@@ -25,6 +25,7 @@ export default function LayoutSwitcher({ currentLayout, onLayoutChange }: Layout
         onClick={() => handleLayoutChange("cards")}
         className="h-8 w-8 p-0"
         title="Card View"
+        data-testid="layout-cards-button"
       >
         <LayoutGrid className="h-4 w-4" />
       </Button>
@@ -35,6 +36,7 @@ export default function LayoutSwitcher({ currentLayout, onLayoutChange }: Layout
         onClick={() => handleLayoutChange("list")}
         className="h-8 w-8 p-0"
         title="List View"
+        data-testid="layout-list-button"
       >
         <List className="h-4 w-4" />
       </Button>
@@ -45,6 +47,7 @@ export default function LayoutSwitcher({ currentLayout, onLayoutChange }: Layout
         onClick={() => handleLayoutChange("compact")}
         className="h-8 w-8 p-0"
         title="Compact Grid"
+        data-testid="layout-compact-button"
       >
         <Grid3X3 className="h-4 w-4" />
       </Button>

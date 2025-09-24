@@ -37,6 +37,7 @@ export function AppLayout({ awesomeList, isLoading, children }: AppLayoutProps) 
                 variant="outline"
                 className="relative h-9 w-full justify-start text-sm text-muted-foreground sm:pr-12 md:w-64"
                 onClick={() => setSearchOpen(true)}
+                data-testid="search-button"
               >
                 <Search className="mr-2 h-4 w-4" />
                 <span className="hidden lg:inline-flex">Search resources...</span>
