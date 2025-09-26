@@ -33,7 +33,8 @@ import {
   SidebarMenuSubItem,
   SidebarProvider,
   SidebarRail,
-  SidebarTrigger
+  SidebarTrigger,
+  useSidebar
 } from "@/components/ui/sidebar"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Category, Subcategory, SubSubcategory } from "@/types/awesome-list"
@@ -61,6 +62,17 @@ interface AppSidebarProps {
 export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
   const [location] = useLocation()
   const [expandedItems, setExpandedItems] = useState<string[]>([])
+  
+  // Safe access to sidebar context - it may not exist outside provider
+  let isMobile = false;
+  let setOpenMobile = (_: boolean) => {};
+  try {
+    const sidebarContext = useSidebar();
+    isMobile = sidebarContext.isMobile;
+    setOpenMobile = sidebarContext.setOpenMobile;
+  } catch (e) {
+    // Context not available, using defaults
+  }
 
   // Filter out unwanted categories (memoized to prevent infinite useEffect loops)
   const filteredCategories = useMemo(() => 
@@ -70,6 +82,13 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
       !cat.name.startsWith("List of") &&
       !["Contributing", "License", "External Links", "Anti-features"].includes(cat.name)
     ), [categories])
+
+  // Auto-close sidebar on mobile when location changes
+  useEffect(() => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  }, [location, isMobile, setOpenMobile]);
 
   // Expand active category based on current location
   useEffect(() => {
@@ -133,6 +152,7 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                   "w-full pl-8 flex items-center gap-2",
                   isActiveRoute(`/sub-subcategory/${subSub.slug}`) && "bg-primary/10 text-primary font-medium"
                 )}
+                onClick={() => isMobile && setOpenMobile(false)}
               >
                 <span className="truncate flex-1">{subSub.name}</span>
                 <span className="text-xs text-muted-foreground shrink-0">
@@ -165,7 +185,11 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                     isExpanded={isExpanded}
                   >
                     <SidebarMenuSubButton asChild>
-                      <Link href={`/subcategory/${sub.slug}`} className="w-full flex items-center gap-2">
+                      <Link 
+                        href={`/subcategory/${sub.slug}`} 
+                        className="w-full flex items-center gap-2"
+                        onClick={() => isMobile && setOpenMobile(false)}
+                      >
                         <span 
                           className="shrink-0 cursor-pointer"
                           onClick={(e) => {
@@ -195,6 +219,7 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                       "w-full flex items-center gap-2",
                       isActiveRoute(`/subcategory/${sub.slug}`) && "bg-primary/10 text-primary font-medium"
                     )}
+                    onClick={() => isMobile && setOpenMobile(false)}
                   >
                     <span className="truncate flex-1">{sub.name}</span>
                     <span className="text-xs text-muted-foreground shrink-0">
@@ -230,7 +255,7 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link href="/">
+              <Link href="/" onClick={() => isMobile && setOpenMobile(false)}>
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                   <Video className="size-4" />
                 </div>
@@ -252,7 +277,11 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
               <SidebarMenu>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild>
-                    <Link href="/" className={cn(isActiveRoute("/") && "bg-primary/10 text-primary font-medium")}>
+                    <Link 
+                      href="/" 
+                      className={cn(isActiveRoute("/") && "bg-primary/10 text-primary font-medium")}
+                      onClick={() => isMobile && setOpenMobile(false)}
+                    >
                       <Home className="h-4 w-4" />
                       <span>Home</span>
                     </Link>
@@ -280,7 +309,11 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                             isExpanded={isExpanded}
                           >
                             <SidebarMenuButton asChild>
-                              <Link href={`/category/${category.slug}`} className="w-full flex items-center gap-2">
+                              <Link 
+                                href={`/category/${category.slug}`} 
+                                className="w-full flex items-center gap-2"
+                                onClick={() => isMobile && setOpenMobile(false)}
+                              >
                                 <Icon className="h-4 w-4 shrink-0" />
                                 <span className="truncate flex-1">{category.name}</span>
                                 <span className="text-xs text-muted-foreground shrink-0">
@@ -311,6 +344,7 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                               "w-full flex items-center gap-2",
                               isActiveRoute(`/category/${category.slug}`) && "bg-primary/10 text-primary font-medium"
                             )}
+                            onClick={() => isMobile && setOpenMobile(false)}
                           >
                             <Icon className="h-4 w-4 shrink-0" />
                             <span className="truncate flex-1">{category.name}</span>
