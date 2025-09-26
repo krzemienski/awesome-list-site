@@ -120,14 +120,41 @@ const SidebarProvider = React.forwardRef<
     // This makes it easier to style the sidebar with Tailwind classes.
     const state = open ? "expanded" : "collapsed"
 
-    // Add scroll lock when mobile sidebar is open
+    // Enhanced scroll lock when mobile sidebar is open
     React.useEffect(() => {
       if (isMobile && openMobile) {
+        // Store current scroll position
+        const scrollY = window.scrollY;
+        document.documentElement.style.setProperty('--scroll-top', `-${scrollY}px`);
+        
+        // Apply scroll lock to both body and html
         document.body.classList.add('scroll-lock');
+        document.documentElement.classList.add('scroll-lock');
+        
+        // Prevent touchmove events on background
+        const preventScroll = (e: TouchEvent) => {
+          const target = e.target as HTMLElement;
+          // Allow scrolling inside the sidebar
+          if (!target?.closest('[data-sidebar]')) {
+            e.preventDefault();
+          }
+        };
+        
+        document.addEventListener('touchmove', preventScroll, { passive: false });
+        
+        return () => {
+          // Remove scroll lock
+          document.body.classList.remove('scroll-lock');
+          document.documentElement.classList.remove('scroll-lock');
+          document.removeEventListener('touchmove', preventScroll);
+          
+          // Restore scroll position
+          window.scrollTo(0, scrollY);
+        };
       } else {
         document.body.classList.remove('scroll-lock');
+        document.documentElement.classList.remove('scroll-lock');
       }
-      return () => document.body.classList.remove('scroll-lock');
     }, [isMobile, openMobile]);
 
     // Add auto-close on scroll/swipe gestures

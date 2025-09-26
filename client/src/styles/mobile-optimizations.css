@@ -193,11 +193,19 @@ button,
   }
 }
 
-/* Scroll lock for mobile modals */
-body.scroll-lock {
+/* Enhanced scroll lock for mobile */
+body.scroll-lock,
+html.scroll-lock {
   overflow: hidden !important;
   position: fixed !important;
   width: 100% !important;
+  height: 100% !important;
+  touch-action: none !important;
+}
+
+/* Maintain scroll position when lock is removed */
+body.scroll-lock {
+  top: var(--scroll-top, 0) !important;
 }
 
 /* Ensure sidebar overlay and content are above page content */
