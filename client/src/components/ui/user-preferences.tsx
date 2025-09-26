@@ -36,7 +36,7 @@ interface UserProfile {
 
 interface UserPreferencesProps {
   userProfile: UserProfile;
-  onProfileUpdate: (profile: UserProfile) => void;
+  onProfileUpdate: (profile: Partial<UserProfile>) => void;
   availableCategories: string[];
 }
 
@@ -84,7 +84,14 @@ export default function UserPreferences({
   }, [userProfile]);
 
   const handleSave = () => {
-    onProfileUpdate(localProfile);
+    // Pass only the fields we want to update to avoid overwriting other fields
+    onProfileUpdate({
+      preferredCategories: localProfile.preferredCategories,
+      skillLevel: localProfile.skillLevel,
+      learningGoals: localProfile.learningGoals,
+      preferredResourceTypes: localProfile.preferredResourceTypes,
+      timeCommitment: localProfile.timeCommitment
+    });
     setIsOpen(false);
     sessionStorage.setItem('awesome-user-preferences-open', 'false');
   };
@@ -186,9 +193,9 @@ export default function UserPreferences({
                   <Select 
                     data-testid="skill-level-select"
                     value={localProfile.skillLevel} 
-                    onValueChange={(value: 'beginner' | 'intermediate' | 'advanced') => 
-                      setLocalProfile(prev => ({ ...prev, skillLevel: value }))
-                    }
+                    onValueChange={(value: 'beginner' | 'intermediate' | 'advanced') => {
+                      setLocalProfile(prev => ({ ...prev, skillLevel: value }));
+                    }}
                   >
                     <SelectTrigger>
                       <SelectValue />
