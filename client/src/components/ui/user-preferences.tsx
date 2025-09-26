@@ -184,6 +184,7 @@ export default function UserPreferences({
                 <div>
                   <Label htmlFor="skillLevel">Skill Level</Label>
                   <Select 
+                    data-testid="skill-level-select"
                     value={localProfile.skillLevel} 
                     onValueChange={(value: 'beginner' | 'intermediate' | 'advanced') => 
                       setLocalProfile(prev => ({ ...prev, skillLevel: value }))
@@ -203,6 +204,7 @@ export default function UserPreferences({
                 <div>
                   <Label htmlFor="timeCommitment">Learning Schedule</Label>
                   <Select 
+                    data-testid="learning-schedule-select"
                     value={localProfile.timeCommitment} 
                     onValueChange={(value: 'daily' | 'weekly' | 'flexible') => 
                       setLocalProfile(prev => ({ ...prev, timeCommitment: value }))
