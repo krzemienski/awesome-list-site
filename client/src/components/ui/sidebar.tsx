@@ -120,6 +120,43 @@ const SidebarProvider = React.forwardRef<
     // This makes it easier to style the sidebar with Tailwind classes.
     const state = open ? "expanded" : "collapsed"
 
+    // Add scroll lock when mobile sidebar is open
+    React.useEffect(() => {
+      if (isMobile && openMobile) {
+        document.body.classList.add('scroll-lock');
+      } else {
+        document.body.classList.remove('scroll-lock');
+      }
+      return () => document.body.classList.remove('scroll-lock');
+    }, [isMobile, openMobile]);
+
+    // Add auto-close on scroll/swipe gestures
+    React.useEffect(() => {
+      if (!isMobile || !openMobile) return;
+      
+      let startY = 0;
+      const handleTouchStart = (e: TouchEvent) => {
+        startY = e.touches[0].clientY;
+      };
+      
+      const handleTouchMove = (e: TouchEvent) => {
+        const deltaY = Math.abs(e.touches[0].clientY - startY);
+        // If scrolling more than 50px and not inside sidebar, close it
+        const target = e.target as HTMLElement;
+        if (deltaY > 50 && !target?.closest('[data-sidebar]')) {
+          setOpenMobile(false);
+        }
+      };
+      
+      window.addEventListener('touchstart', handleTouchStart, { passive: true });
+      window.addEventListener('touchmove', handleTouchMove, { passive: true });
+      
+      return () => {
+        window.removeEventListener('touchstart', handleTouchStart);
+        window.removeEventListener('touchmove', handleTouchMove);
+      };
+    }, [isMobile, openMobile]);
+
     const contextValue = React.useMemo<SidebarContextProps>(
       () => ({
         state,
@@ -202,7 +239,7 @@ const Sidebar = React.forwardRef<
           <SheetContent
             data-sidebar="sidebar"
             data-mobile="true"
-            className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
+            className="z-[80] w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
             style={
               {
                 "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
