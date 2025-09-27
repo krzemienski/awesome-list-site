@@ -1,0 +1,87 @@
+{
+  "timestamp": "2025-09-27T07:23:13.430Z",
+  "summary": {
+    "total": 12,
+    "passed": 12,
+    "failed": 0,
+    "passRate": "100%"
+  },
+  "results": {
+    "mobile": {
+      "viewport": {
+        "passed": true,
+        "details": "390x844"
+      },
+      "touchTargets": {
+        "passed": true,
+        "details": "Min touch target: 44px"
+      },
+      "viewportMeta": {
+        "passed": true,
+        "details": "width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes"
+      },
+      "landscape": {
+        "passed": true,
+        "details": "Landscape tested"
+      }
+    },
+    "preferences": {},
+    "layout": {
+      "listView": {
+        "passed": true,
+        "details": "9 list items"
+      },
+      "compactView": {
+        "passed": true,
+        "details": "9 compact items"
+      },
+      "cardsView": {
+        "passed": true,
+        "details": "9 card items"
+      },
+      "persistence": {
+        "passed": true,
+        "details": "Layout persisted across navigation"
+      }
+    },
+    "navigation": {
+      "encodingCodecs": {
+        "passed": true,
+        "details": "13 resources in encoding-codecs"
+      },
+      "av1": {
+        "passed": true,
+        "details": "6 resources in AV1 (expected 6)"
+      },
+      "hevc": {
+        "passed": true,
+        "details": "10 resources in HEVC (expected 10)"
+      },
+      "vp9": {
+        "passed": true,
+        "details": "1 resources in VP9 (expected 1)"
+      }
+    },
+    "resourceCards": {},
+    "screenshots": [
+      "mobile-landscape",
+      "layout-list",
+      "layout-compact",
+      "layout-cards",
+      "nav-encoding-codecs",
+      "nav-av1",
+      "nav-hevc",
+      "nav-vp9"
+    ]
+  },
+  "screenshots": [
+    "mobile-landscape",
+    "layout-list",
+    "layout-compact",
+    "layout-cards",
+    "nav-encoding-codecs",
+    "nav-av1",
+    "nav-hevc",
+    "nav-vp9"
+  ]
+}
