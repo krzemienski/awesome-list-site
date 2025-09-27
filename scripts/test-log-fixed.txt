@@ -1,0 +1,10 @@
+🚀 Initializing browser...
+✅ Browser initialized
+
+🎯 Testing Resource Card Functionality...
+Page load warning: page.waitForLoadState is not a function
+Found 24 cards using selector: div[class*="grid"] > div
+❌ Resource card tests failed: Node is detached from document
+
+🔍 Testing Advanced Search Features...
+Page load warning: page.waitForLoadState is not a function
