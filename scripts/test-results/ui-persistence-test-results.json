@@ -1,0 +1,135 @@
+{
+  "userPreferences": {
+    "preferencesButtonExists": false
+  },
+  "themeSwitching": {
+    "themeSelectorExists": false
+  },
+  "pagination": {
+    "error": "page.waitForTimeout is not a function"
+  },
+  "textTruncation": {
+    "resourceCardsFound": 15,
+    "titlesTruncated": false,
+    "truncatedTitlesCount": 0,
+    "descriptionsTruncated": false,
+    "truncatedDescriptionsCount": 0,
+    "screenshots": {
+      "truncation": "/home/runner/workspace/test-screenshots/text-truncation.png"
+    },
+    "badgesVisible": 0,
+    "totalBadges": 0,
+    "error": "page.waitForTimeout is not a function"
+  },
+  "responsiveBreakpoints": {
+    "error": "page.waitForTimeout is not a function"
+  },
+  "storage": {
+    "localStorage": {
+      "keys": [
+        "awesome-video-user-profile",
+        "awesome-video-user-id",
+        "theme-variant"
+      ],
+      "hasUserProfile": true,
+      "hasTheme": true,
+      "hasUserId": true
+    },
+    "error": "sessionStorage is not defined"
+  },
+  "accessibility": {
+    "tabbableElements": [
+      {
+        "tagName": "A",
+        "text": "Awesome Video2,011 Resources",
+        "ariaLabel": null,
+        "role": null,
+        "href": "/"
+      },
+      {
+        "tagName": "A",
+        "text": "Home",
+        "ariaLabel": null,
+        "role": null,
+        "href": "/"
+      },
+      {
+        "tagName": "A",
+        "text": "Intro & Learning229",
+        "ariaLabel": null,
+        "role": null,
+        "href": "/category/intro-learning"
+      },
+      {
+        "tagName": "A",
+        "text": "Introduction4",
+        "ariaLabel": null,
+        "role": null,
+        "href": "/subcategory/introduction"
+      },
+      {
+        "tagName": "A",
+        "text": "Learning Resources36",
+        "ariaLabel": null,
+        "role": null,
+        "href": "/subcategory/learning-resources"
+      },
+      {
+        "tagName": "A",
+        "text": "Tutorials & Case Studies60",
+        "ariaLabel": null,
+        "role": null,
+        "href": "/subcategory/tutorials-case-studies"
+      },
+      {
+        "tagName": "A",
+        "text": "Protocols & Transport252",
+        "ariaLabel": null,
+        "role": null,
+        "href": "/category/protocols-transport"
+      },
+      {
+        "tagName": "A",
+        "text": "Adaptive Streaming144",
+        "ariaLabel": null,
+        "role": null,
+        "href": "/subcategory/adaptive-streaming"
+      },
+      {
+        "tagName": "A",
+        "text": "HLS63",
+        "ariaLabel": null,
+        "role": null,
+        "href": "/sub-subcategory/hls"
+      },
+      {
+        "tagName": "A",
+        "text": "DASH50",
+        "ariaLabel": null,
+        "role": null,
+        "href": "/sub-subcategory/dash"
+      }
+    ],
+    "tabNavigationWorks": true,
+    "focusIndicators": {
+      "outline": "",
+      "boxShadow": "",
+      "border": ""
+    },
+    "hasFocusIndicators": true,
+    "error": "Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Preferences\")' is not a valid selector."
+  },
+  "errorHandling": {
+    "has404Page": true,
+    "screenshots": {
+      "error404": "/home/runner/workspace/test-screenshots/error-404.png"
+    },
+    "hasSkeletonLoaders": false,
+    "skeletonCount": 0,
+    "error": "page.waitForTimeout is not a function"
+  },
+  "screenshots": [
+    "/home/runner/workspace/test-screenshots/text-truncation.png",
+    "/home/runner/workspace/test-screenshots/error-404.png"
+  ]
+}
