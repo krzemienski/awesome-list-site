@@ -149,13 +149,13 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
               <Link
                 href={`/sub-subcategory/${subSub.slug}`}
                 className={cn(
-                  "w-full pl-8 flex items-center gap-2",
+                  "w-full pl-8 flex items-center gap-2 pr-3",
                   isActiveRoute(`/sub-subcategory/${subSub.slug}`) && "bg-primary/10 text-primary font-medium"
                 )}
                 onClick={() => isMobile && setOpenMobile(false)}
               >
                 <span className="truncate flex-1">{subSub.name}</span>
-                <span className="text-xs text-muted-foreground shrink-0">
+                <span className="text-xs text-muted-foreground shrink-0 tabular-nums text-right min-w-[2ch] ml-auto">
                   {subSub.resources.length}
                 </span>
               </Link>
@@ -187,7 +187,7 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                     <SidebarMenuSubButton asChild>
                       <Link 
                         href={`/subcategory/${sub.slug}`} 
-                        className="w-full flex items-center gap-2"
+                        className="w-full flex items-center gap-2 pr-3"
                         onClick={() => isMobile && setOpenMobile(false)}
                       >
                         <span 
@@ -201,7 +201,7 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                           <SidebarToggleMorph isOpen={isExpanded} />
                         </span>
                         <span className="truncate flex-1">{sub.name}</span>
-                        <span className="text-xs text-muted-foreground shrink-0">
+                        <span className="text-xs text-muted-foreground shrink-0 tabular-nums text-right min-w-[2ch] ml-auto">
                           {sub.resources.length}
                         </span>
                       </Link>
@@ -216,13 +216,13 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                   <Link
                     href={`/subcategory/${sub.slug}`}
                     className={cn(
-                      "w-full flex items-center gap-2",
+                      "w-full flex items-center gap-2 pr-3",
                       isActiveRoute(`/subcategory/${sub.slug}`) && "bg-primary/10 text-primary font-medium"
                     )}
                     onClick={() => isMobile && setOpenMobile(false)}
                   >
                     <span className="truncate flex-1">{sub.name}</span>
-                    <span className="text-xs text-muted-foreground shrink-0">
+                    <span className="text-xs text-muted-foreground shrink-0 tabular-nums text-right min-w-[2ch] ml-auto">
                       {sub.resources.length}
                     </span>
                   </Link>
@@ -311,16 +311,13 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                             <SidebarMenuButton asChild>
                               <Link 
                                 href={`/category/${category.slug}`} 
-                                className="w-full flex items-center gap-2"
+                                className="w-full flex items-center gap-2 pr-3"
                                 onClick={() => isMobile && setOpenMobile(false)}
                               >
                                 <Icon className="h-4 w-4 shrink-0" />
                                 <span className="truncate flex-1">{category.name}</span>
-                                <span className="text-xs text-muted-foreground shrink-0">
-                                  {category.resources.length}
-                                </span>
                                 <span 
-                                  className="shrink-0 cursor-pointer"
+                                  className="shrink-0 cursor-pointer ml-auto"
                                   onClick={(e) => {
                                     e.preventDefault()
                                     e.stopPropagation()
@@ -328,6 +325,9 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                                   }}
                                 >
                                   <SidebarToggleMorph isOpen={isExpanded} />
+                                </span>
+                                <span className="text-xs text-muted-foreground shrink-0 tabular-nums text-right min-w-[3ch] pl-2">
+                                  {category.resources.length}
                                 </span>
                               </Link>
                             </SidebarMenuButton>
@@ -341,14 +341,14 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                           <Link
                             href={`/category/${category.slug}`}
                             className={cn(
-                              "w-full flex items-center gap-2",
+                              "w-full flex items-center gap-2 pr-3",
                               isActiveRoute(`/category/${category.slug}`) && "bg-primary/10 text-primary font-medium"
                             )}
                             onClick={() => isMobile && setOpenMobile(false)}
                           >
                             <Icon className="h-4 w-4 shrink-0" />
                             <span className="truncate flex-1">{category.name}</span>
-                            <span className="text-xs text-muted-foreground shrink-0">
+                            <span className="text-xs text-muted-foreground shrink-0 tabular-nums text-right min-w-[3ch] ml-auto">
                               {category.resources.length}
                             </span>
                           </Link>
