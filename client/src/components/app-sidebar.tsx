@@ -155,7 +155,7 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                 onClick={() => isMobile && setOpenMobile(false)}
               >
                 <span className="truncate flex-1">{subSub.name}</span>
-                <span className="text-xs text-muted-foreground shrink-0 tabular-nums text-right min-w-[2ch] ml-auto">
+                <span className="text-xs text-muted-foreground shrink-0 tabular-nums text-right min-w-[4ch] ml-auto">
                   {subSub.resources.length}
                 </span>
               </Link>
@@ -190,8 +190,12 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                         className="w-full flex items-center gap-2 pr-3"
                         onClick={() => isMobile && setOpenMobile(false)}
                       >
+                        <span className="truncate flex-1">{sub.name}</span>
+                        <span className="text-xs text-muted-foreground shrink-0 tabular-nums text-right min-w-[4ch] ml-auto">
+                          {sub.resources.length}
+                        </span>
                         <span 
-                          className="shrink-0 cursor-pointer"
+                          className="shrink-0 cursor-pointer ml-2"
                           onClick={(e) => {
                             e.preventDefault()
                             e.stopPropagation()
@@ -199,10 +203,6 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                           }}
                         >
                           <SidebarToggleMorph isOpen={isExpanded} />
-                        </span>
-                        <span className="truncate flex-1">{sub.name}</span>
-                        <span className="text-xs text-muted-foreground shrink-0 tabular-nums text-right min-w-[2ch] ml-auto">
-                          {sub.resources.length}
                         </span>
                       </Link>
                     </SidebarMenuSubButton>
@@ -222,7 +222,7 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                     onClick={() => isMobile && setOpenMobile(false)}
                   >
                     <span className="truncate flex-1">{sub.name}</span>
-                    <span className="text-xs text-muted-foreground shrink-0 tabular-nums text-right min-w-[2ch] ml-auto">
+                    <span className="text-xs text-muted-foreground shrink-0 tabular-nums text-right min-w-[4ch] ml-auto">
                       {sub.resources.length}
                     </span>
                   </Link>
@@ -316,8 +316,11 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                               >
                                 <Icon className="h-4 w-4 shrink-0" />
                                 <span className="truncate flex-1">{category.name}</span>
+                                <span className="text-xs text-muted-foreground shrink-0 tabular-nums text-right min-w-[4ch] ml-auto">
+                                  {category.resources.length}
+                                </span>
                                 <span 
-                                  className="shrink-0 cursor-pointer ml-auto"
+                                  className="shrink-0 cursor-pointer ml-2"
                                   onClick={(e) => {
                                     e.preventDefault()
                                     e.stopPropagation()
@@ -325,9 +328,6 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                                   }}
                                 >
                                   <SidebarToggleMorph isOpen={isExpanded} />
-                                </span>
-                                <span className="text-xs text-muted-foreground shrink-0 tabular-nums text-right min-w-[3ch] pl-2">
-                                  {category.resources.length}
                                 </span>
                               </Link>
                             </SidebarMenuButton>
@@ -348,7 +348,7 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                           >
                             <Icon className="h-4 w-4 shrink-0" />
                             <span className="truncate flex-1">{category.name}</span>
-                            <span className="text-xs text-muted-foreground shrink-0 tabular-nums text-right min-w-[3ch] ml-auto">
+                            <span className="text-xs text-muted-foreground shrink-0 tabular-nums text-right min-w-[4ch] ml-auto">
                               {category.resources.length}
                             </span>
                           </Link>
