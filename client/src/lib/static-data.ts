@@ -8,6 +8,17 @@
 import { AwesomeList } from '@/types/awesome-list';
 
 export async function fetchStaticAwesomeList(): Promise<any> {
+  // Check if we already have data from SSR
+  if (typeof window !== 'undefined') {
+    // Check for SSR injected data
+    if (window.__INITIAL_DATA__) {
+      const data = window.__INITIAL_DATA__;
+      // Clear it after first use to prevent stale data
+      window.__INITIAL_DATA__ = undefined;
+      return data;
+    }
+  }
+
   // In production/static builds, fetch from pre-generated data
   if (import.meta.env.MODE === 'production' || import.meta.env.VITE_STATIC_BUILD === 'true') {
     try {
