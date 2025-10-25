@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { handleSSR } from "./ssr";
 
 const app = express();
 app.use(express.json());
@@ -53,6 +54,8 @@ app.use((req, res, next) => {
   if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {
+    // In production, add SSR handler before serving static files
+    app.use(handleSSR);
     serveStatic(app);
   }
 
