@@ -251,7 +251,11 @@ export default function Subcategory() {
           </p>
         </div>
         <p className="text-muted-foreground">
-          Showing {sortedResources.length} of {baseResources.length} resources
+          {totalPages > 1 ? (
+            <>Showing {startIndex + 1}-{Math.min(endIndex, sortedResources.length)} of {sortedResources.length} resources</>
+          ) : (
+            <>Showing {sortedResources.length} of {baseResources.length} resources</>
+          )}
         </p>
       </div>
       
@@ -421,18 +425,16 @@ export default function Subcategory() {
             </>
           )}
           
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              itemsPerPage={itemsPerPage}
-              onPageChange={handlePageChange}
-              onPageSizeChange={handlePageSizeChange}
-              totalItems={sortedResources.length}
-              pageSizeOptions={[12, 24, 48, 96]}
-            />
-          )}
+          {/* Pagination - Always show for consistency and page size control */}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            itemsPerPage={itemsPerPage}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+            totalItems={sortedResources.length}
+            pageSizeOptions={[12, 24, 48, 96]}
+          />
         </>
       )}
     </div>
