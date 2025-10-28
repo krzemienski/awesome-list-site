@@ -211,7 +211,7 @@ export default function CommunityMetrics({ resources, categories, className }: C
                 <CardContent>
                   <div className="space-y-3">
                     {metrics.popularResources.slice(0, 5).map((resource, index) => (
-                      <div key={resource.resourceId} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div key={resource.resourceId} className="flex items-center justify-between p-3 border">
                         <div className="flex items-center gap-3">
                           <div className="flex items-center gap-2">
                             <span className="text-sm font-medium">#{index + 1}</span>

@@ -102,7 +102,7 @@ export function SkeletonGrid({
 
   if (variant === "list") {
     return (
-      <div className={cn("space-y-0 border border-border rounded-lg overflow-hidden", className)}>
+      <div className={cn("space-y-0 border border-border overflow-hidden", className)}>
         {skeletons.map((index) => (
           <SkeletonCard key={index} variant="list" />
         ))}

@@ -378,7 +378,7 @@ export default function AnalyticsDashboard({
                 <ScrollArea className="h-[500px]">
                   <div className="space-y-4">
                     {analyticsData.popularResources.map((item, index) => (
-                      <div key={item.resource.id} className="flex items-center gap-4 p-4 border rounded-lg">
+                      <div key={item.resource.id} className="flex items-center gap-4 p-4 border">
                         <div className="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
                           <span className="font-bold text-sm">{index + 1}</span>
                         </div>

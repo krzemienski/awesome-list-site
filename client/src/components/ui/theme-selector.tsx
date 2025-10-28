@@ -63,7 +63,7 @@ export default function ThemeSelector() {
         <PopoverTrigger asChild>
           <Button
             size="icon"
-            className="rounded-full h-10 w-10 bg-primary text-primary-foreground shadow-md hover:bg-primary/90"
+            className="h-10 w-10 bg-primary text-primary-foreground shadow-md hover:bg-primary/90"
           >
             <Palette className="h-5 w-5" />
             <span className="sr-only">Select theme</span>
@@ -83,7 +83,7 @@ export default function ThemeSelector() {
                   <button
                     key={theme.value}
                     onClick={() => changeTheme(theme.value)}
-                    className={`p-2 rounded-md border-2 transition-all hover:scale-105 ${
+                    className={`p-2 border-2 transition-all hover:scale-105 ${
                       themeVariant === theme.value
                         ? "border-primary ring-2 ring-primary/20"
                         : "border-border hover:border-primary/50"
@@ -91,7 +91,7 @@ export default function ThemeSelector() {
                     title={theme.name}
                   >
                     <div
-                      className="w-full h-6 rounded-sm"
+                      className="w-full h-6"
                       style={{ backgroundColor: theme.color }}
                     />
                     <p className="text-xs mt-1 truncate">{theme.name}</p>

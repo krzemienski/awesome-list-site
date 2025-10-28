@@ -451,7 +451,7 @@ export default function ListSwitcher({
                 <CardContent>
                   <div className="space-y-3">
                     {customLists.map(list => (
-                      <div key={list.id} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div key={list.id} className="flex items-center justify-between p-3 border">
                         <div className="flex items-center gap-3">
                           <span className="text-xl">{list.icon}</span>
                           <div>

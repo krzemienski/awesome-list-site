@@ -555,7 +555,7 @@ export default function ColorPaletteGenerator({ isOpen, onClose, onPaletteGenera
                   {selectedPalette.colors.map((color, index) => (
                     <div key={index} className="space-y-2">
                       <div
-                        className="w-full h-32 rounded-lg cursor-pointer hover:scale-105 transition-transform shadow-md"
+                        className="w-full h-32 cursor-pointer hover:scale-105 transition-transform shadow-md"
                         style={{ backgroundColor: color }}
                         onClick={() => copyColor(color)}
                         title={`Click to copy ${color}`}
@@ -605,7 +605,7 @@ export default function ColorPaletteGenerator({ isOpen, onClose, onPaletteGenera
 
                     {/* Gradient preview */}
                     <div
-                      className="h-32 rounded-lg flex items-center justify-center text-white font-semibold"
+                      className="h-32 flex items-center justify-center text-white font-semibold"
                       style={{
                         background: `linear-gradient(135deg, ${selectedPalette.colors[0]}, ${selectedPalette.colors[2]}, ${selectedPalette.colors[4] || selectedPalette.colors[1]})`
                       }}

@@ -77,7 +77,7 @@ export function AnimatedButton({
         {ripples.map(ripple => (
           <motion.span
             key={ripple.id}
-            className="absolute bg-white/30 rounded-full pointer-events-none"
+            className="absolute bg-white/30 pointer-events-none"
             style={{
               left: ripple.x - 10,
               top: ripple.y - 10,
@@ -118,7 +118,7 @@ export function AnimatedCategoryItem({
     >
       <motion.button
         onClick={onToggle}
-        className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-colors ${
+        className={`w-full flex items-center justify-between p-3 text-left transition-colors ${
           isActive 
             ? 'bg-primary/10 text-primary' 
             : 'hover:bg-accent hover:text-accent-foreground'
@@ -219,7 +219,7 @@ export function AnimatedResourceCard({
             
             <motion.button
               onClick={() => setIsBookmarked(!isBookmarked)}
-              className="p-2 rounded-full hover:bg-accent transition-colors"
+              className="p-2 hover:bg-accent transition-colors"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
             >
@@ -384,7 +384,7 @@ export function AnimatedListItem({
             </div>
             
             <motion.div
-              className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10"
+              className="flex items-center justify-center w-8 h-8 bg-primary/10"
               whileHover={{ rotate: 90 }}
               transition={{ duration: 0.2 }}
             >
@@ -432,7 +432,7 @@ export function FloatingActionButton({
     >
       <motion.button
         onClick={onClick}
-        className="bg-primary text-primary-foreground p-4 rounded-full shadow-lg hover:shadow-xl transition-shadow"
+        className="bg-primary text-primary-foreground p-4 shadow-lg hover:shadow-xl transition-shadow"
         animate={{ 
           boxShadow: [
             "0 4px 6px -1px rgba(0, 0, 0, 0.1)",

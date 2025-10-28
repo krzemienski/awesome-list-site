@@ -228,7 +228,7 @@ export default function UserPreferences({
                   </Select>
                 </div>
 
-                <div className="p-4 bg-muted rounded-lg">
+                <div className="p-4 bg-muted">
                   <h4 className="font-medium mb-2">Your Learning Profile</h4>
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
@@ -419,7 +419,7 @@ export default function UserPreferences({
 
               <Separator />
 
-              <div className="p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
+              <div className="p-4 bg-blue-50 dark:bg-blue-950">
                 <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-2">
                   How Recommendations Work
                 </h4>

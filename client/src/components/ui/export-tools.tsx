@@ -480,7 +480,7 @@ export default function ExportTools({ awesomeList, selectedCategory, className }
         </div>
 
         {/* Export Summary */}
-        <div className="p-4 bg-muted rounded-lg">
+        <div className="p-4 bg-muted">
           <div className="flex items-center gap-2 mb-2">
             <CheckCircle className="h-4 w-4 text-green-600" />
             <span className="text-sm font-medium">Export Summary</span>
@@ -503,7 +503,7 @@ export default function ExportTools({ awesomeList, selectedCategory, className }
         >
           {isExporting ? (
             <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
+              <div className="animate-spin h-4 w-4 border-b-2 border-current mr-2" />
               Exporting...
             </>
           ) : (
