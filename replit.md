@@ -13,11 +13,13 @@ Preferred communication style: Simple, everyday language.
 The application employs a client-server architecture. The frontend is a React-based single-page application built with Vite, utilizing `shadcn/ui` components, Tailwind CSS, and React Query for data fetching. The backend is an Express.js server providing RESTful API endpoints for resource management and data fetching. Data is stored in a PostgreSQL database using Drizzle ORM, with a defined schema for resources, categories, and subcategories.
 
 ### UI/UX Decisions
-- Modern UI with a "Hyper term pink" cyberpunk theme using OKLCH color space.
-- JetBrains Mono font for a terminal aesthetic.
-- Zero border-radius on most UI elements (sharp, square corners).
-- Supports light, dark, and system themes with localStorage persistence.
-- Mobile-optimized responsive design with touch-friendly elements and a collapsible hierarchical sidebar.
+- **Vibrant "Hyper term pink" cyberpunk theme** using OKLCH color space with high chroma values for vivid, neon-like colors:
+  - Dark mode: Neon pink primary (chroma 0.38), cyan accents (chroma 0.32), purple-tinted backgrounds (chroma 0.06-0.10)
+  - Light mode: Vibrant magenta primary (chroma 0.28), blue accents (chroma 0.24), subtle purple-tinted backgrounds (chroma 0.05-0.06)
+- JetBrains Mono monospace font for terminal aesthetic
+- Zero border-radius enforced throughout (perfectly square corners for cyberpunk look)
+- Supports light, dark, and system theme modes with localStorage persistence via ThemeProvider
+- Mobile-optimized responsive design with touch-friendly elements and collapsible hierarchical sidebar
 
 ### Technical Implementations
 - **Frontend**: React 18+ with TypeScript, Vite, Tailwind CSS, `shadcn/ui`, React Query for state management, Wouter for routing.
