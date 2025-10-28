@@ -256,7 +256,7 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link href="/" onClick={() => isMobile && setOpenMobile(false)}>
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                <div className="flex aspect-square size-8 items-center justify-center bg-primary text-primary-foreground">
                   <Video className="size-4" />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
