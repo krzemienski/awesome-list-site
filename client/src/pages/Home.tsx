@@ -444,7 +444,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                               index={index}
                             />
                           ) : (
-                            <div className="h-48 bg-muted rounded-lg animate-pulse" />
+                            <div className="h-48 bg-muted animate-pulse" />
                           )}
                         </div>
                       );
@@ -460,7 +460,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                 className="mb-8"
               >
                 <div 
-                  className="space-y-0 border border-border rounded-lg overflow-visible"
+                  className="space-y-0 border border-border overflow-visible"
                 >
                   {paginatedResources.map((resource, index) => {
                     const resourceId = generateResourceId(resource);
@@ -479,7 +479,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                             index={index}
                           />
                         ) : (
-                          <div className="h-16 bg-muted rounded-lg animate-pulse" />
+                          <div className="h-16 bg-muted animate-pulse" />
                         )}
                       </div>
                     );
@@ -513,7 +513,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                             index={index}
                           />
                         ) : (
-                          <div className="h-24 bg-muted rounded-lg animate-pulse" />
+                          <div className="h-24 bg-muted animate-pulse" />
                         )}
                       </div>
                     );

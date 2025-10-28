@@ -365,7 +365,7 @@ export default function Subcategory() {
                             index={startIndex + index}
                           />
                         ) : (
-                          <div className="h-16 bg-muted rounded-lg animate-pulse" />
+                          <div className="h-16 bg-muted animate-pulse" />
                         )}
                       </div>
                     );
@@ -390,7 +390,7 @@ export default function Subcategory() {
                             index={startIndex + index}
                           />
                         ) : (
-                          <div className="h-32 bg-muted rounded-lg animate-pulse" />
+                          <div className="h-32 bg-muted animate-pulse" />
                         )}
                       </div>
                     );
@@ -415,7 +415,7 @@ export default function Subcategory() {
                             index={startIndex + index}
                           />
                         ) : (
-                          <div className="h-24 bg-muted rounded-lg animate-pulse" />
+                          <div className="h-24 bg-muted animate-pulse" />
                         )}
                       </div>
                     );
