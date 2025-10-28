@@ -1,18 +1,16 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Palette, Wand2 } from "lucide-react";
+import { Moon, Sun, Wand2 } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
-import { shadcnThemes, applyTheme } from "@/lib/shadcn-themes";
 import { trackThemeChange } from "@/lib/analytics";
 import ColorPaletteGenerator from "@/components/ui/color-palette-generator";
 
 export default function ThemeSelector() {
   const [open, setOpen] = useState(false);
   const [showPaletteGenerator, setShowPaletteGenerator] = useState(false);
-  const { setTheme: setMode } = useTheme();
-  const [themeVariant, setThemeVariant] = useState("rose");
+  const { theme, setTheme } = useTheme();
   
   // Handle color palette application
   const handlePaletteGenerated = (palette: any) => {
@@ -20,40 +18,10 @@ export default function ThemeSelector() {
     console.log('Palette generated:', palette);
     setShowPaletteGenerator(false);
   };
-  
-  // Force dark mode and initialize theme variant from localStorage
-  useEffect(() => {
-    setMode("dark"); // Always set to dark mode
-    
-    // Clear any old theme-variant in localStorage if it's "red" and set to "rose" 
-    const currentStored = localStorage.getItem("theme-variant");
-    if (currentStored === "red" || !currentStored) {
-      localStorage.setItem("theme-variant", "rose");
-    }
-    
-    const storedTheme = localStorage.getItem("theme-variant") || "rose";
-    setThemeVariant(storedTheme);
-    
-    // Apply the rose theme immediately
-    const roseTheme = shadcnThemes.find((t) => t.value === "rose") || shadcnThemes[0];
-    applyTheme(roseTheme, "dark");
-  }, [setMode]);
 
-  // Apply theme when variant changes (always dark)
-  useEffect(() => {
-    const selectedTheme = shadcnThemes.find((t) => t.value === themeVariant) || shadcnThemes[0];
-    applyTheme(selectedTheme, "dark");
-  }, [themeVariant]);
-
-  function changeTheme(themeName: string) {
-    setThemeVariant(themeName);
-    localStorage.setItem("theme-variant", themeName);
-    const selectedTheme = shadcnThemes.find((t) => t.value === themeName) || shadcnThemes[0];
-    applyTheme(selectedTheme, "dark");
-    
-    // Track theme change
-    trackThemeChange(themeName);
-    
+  function changeMode(newMode: "light" | "dark" | "system") {
+    setTheme(newMode);
+    trackThemeChange(newMode);
     setOpen(false);
   }
 
@@ -64,8 +32,13 @@ export default function ThemeSelector() {
           <Button
             size="icon"
             className="h-10 w-10 bg-primary text-primary-foreground shadow-md hover:bg-primary/90"
+            data-testid="popover-theme-toggle"
           >
-            <Palette className="h-5 w-5" />
+            {theme === "dark" ? (
+              <Moon className="h-5 w-5" />
+            ) : (
+              <Sun className="h-5 w-5" />
+            )}
             <span className="sr-only">Select theme</span>
           </Button>
         </PopoverTrigger>
@@ -73,30 +46,47 @@ export default function ThemeSelector() {
           align="end"
           alignOffset={-60}
           sideOffset={10}
-          className="w-80 p-3"
+          className="w-64 p-3"
         >
           <div className="space-y-4">
             <div>
-              <p className="text-sm font-medium mb-3">Color Theme</p>
-              <div className="grid grid-cols-4 gap-2">
-                {shadcnThemes.map((theme) => (
-                  <button
-                    key={theme.value}
-                    onClick={() => changeTheme(theme.value)}
-                    className={`p-2 border-2 transition-all hover:scale-105 ${
-                      themeVariant === theme.value
-                        ? "border-primary ring-2 ring-primary/20"
-                        : "border-border hover:border-primary/50"
-                    }`}
-                    title={theme.name}
-                  >
-                    <div
-                      className="w-full h-6"
-                      style={{ backgroundColor: theme.color }}
-                    />
-                    <p className="text-xs mt-1 truncate">{theme.name}</p>
-                  </button>
-                ))}
+              <p className="text-sm font-medium mb-3">Appearance</p>
+              <div className="space-y-2">
+                <button
+                  onClick={() => changeMode("light")}
+                  className={`w-full p-3 border-2 transition-all hover:scale-[1.02] flex items-center gap-3 ${
+                    theme === "light"
+                      ? "border-primary ring-2 ring-primary/20 bg-accent"
+                      : "border-border hover:border-primary/50"
+                  }`}
+                  data-testid="popover-theme-light"
+                >
+                  <Sun className="h-5 w-5" />
+                  <span className="text-sm font-medium">Light</span>
+                </button>
+                <button
+                  onClick={() => changeMode("dark")}
+                  className={`w-full p-3 border-2 transition-all hover:scale-[1.02] flex items-center gap-3 ${
+                    theme === "dark"
+                      ? "border-primary ring-2 ring-primary/20 bg-accent"
+                      : "border-border hover:border-primary/50"
+                  }`}
+                  data-testid="popover-theme-dark"
+                >
+                  <Moon className="h-5 w-5" />
+                  <span className="text-sm font-medium">Dark</span>
+                </button>
+                <button
+                  onClick={() => changeMode("system")}
+                  className={`w-full p-3 border-2 transition-all hover:scale-[1.02] flex items-center gap-3 ${
+                    theme === "system"
+                      ? "border-primary ring-2 ring-primary/20 bg-accent"
+                      : "border-border hover:border-primary/50"
+                  }`}
+                  data-testid="popover-theme-system"
+                >
+                  <span className="text-sm font-medium ml-8">System</span>
+                </button>
               </div>
             </div>
             
