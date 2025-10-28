@@ -2,7 +2,7 @@
 
 ## Overview
 
-A production-ready React application for browsing and discovering 2,000+ curated video development resources from the krzemienski/awesome-video GitHub repository. Features modern UI with dark theme, advanced search/filtering, mobile optimization, and Google Analytics tracking.
+A production-ready React application for browsing and discovering over 2,000 curated video development resources from the `krzemienski/awesome-video` GitHub repository. The project aims to provide a modern, mobile-optimized user interface with advanced search and filtering capabilities, including dark theme support and Google Analytics tracking.
 
 ## User Preferences
 
@@ -10,244 +10,44 @@ Preferred communication style: Simple, everyday language.
 
 ## System Architecture
 
-The application follows a typical client-server architecture:
+The application employs a client-server architecture. The frontend is a React-based single-page application built with Vite, utilizing `shadcn/ui` components, Tailwind CSS, and React Query for data fetching. The backend is an Express.js server providing RESTful API endpoints for resource management and data fetching. Data is stored in a PostgreSQL database using Drizzle ORM, with a defined schema for resources, categories, and subcategories.
 
-1. **Frontend**: React-based single-page application built with Vite, using shadcn/ui components, Tailwind CSS, and React Query for data fetching.
+### UI/UX Decisions
+- Modern UI with a "Hyper term pink" cyberpunk theme using OKLCH color space.
+- JetBrains Mono font for a terminal aesthetic.
+- Zero border-radius on most UI elements (sharp, square corners).
+- Supports light, dark, and system themes with localStorage persistence.
+- Mobile-optimized responsive design with touch-friendly elements and a collapsible hierarchical sidebar.
 
-2. **Backend**: Express.js server that provides API endpoints for fetching and managing resources.
+### Technical Implementations
+- **Frontend**: React 18+ with TypeScript, Vite, Tailwind CSS, `shadcn/ui`, React Query for state management, Wouter for routing.
+- **Backend**: Express.js, Drizzle ORM, Node Fetch for external data, Remark for Markdown parsing.
+- **Data Architecture**: Pure JSON-driven parser for dynamic hierarchy building, eliminating hardcoded dependencies. Resources are categorized into a 3-level hierarchical structure.
+- **Deployment**: Configured for deployment on Replit, with optimized production builds and static site generation for platforms like GitHub Pages.
 
-3. **Database**: Uses Drizzle ORM with PostgreSQL (currently configured but not fully implemented). The schema includes resources, categories, and subcategories.
-
-4. **Integration**: The frontend communicates with the backend via RESTful API endpoints. The backend fetches and parses GitHub's Awesome list content.
-
-## Key Components
-
-### Frontend
-
-- **React with TypeScript**: The frontend is built using React 18+ with TypeScript.
-- **Vite**: Used for development server and build process.
-- **Tailwind CSS**: Provides styling with utility classes.
-- **shadcn/ui**: A collection of reusable UI components.
-- **React Query**: Manages server state and data fetching.
-- **Wouter**: Lightweight routing solution.
-- **Theme System**: Supports light, dark, and system themes.
-
-### Backend
-
-- **Express.js**: Handles HTTP requests and API routes.
-- **Drizzle ORM**: Type-safe database operations.
-- **Node Fetch**: Used to fetch Awesome list content from GitHub.
-- **Remark**: Markdown parser for processing GitHub content.
-
-### Data Storage
-
-- **PostgreSQL**: Database for storing resources, categories, and subcategories.
-- **Drizzle Schema**: Defines database tables and relationships.
-- **Data Models**: 
-  - Resources (id, title, url, description, category, subcategory)
-  - Categories (id, name, slug)
-  - Subcategories (id, name, slug, categoryId)
-
-## Data Flow
-
-1. **Initialization**:
-   - Server starts and attempts to fetch the Awesome list data from GitHub.
-   - Parsed resources are stored in memory and can be persisted to the database.
-
-2. **User Interaction**:
-   - User visits the site and frontend makes API requests to the backend.
-   - Backend responds with Awesome list data.
-   - Resources can be filtered by category or subcategory.
-   - Search functionality allows users to find specific resources.
-
-3. **Data Management**:
-   - Current implementation uses in-memory storage.
-   - Database schema is defined but persistence is not fully implemented.
+### Feature Specifications
+- Advanced search and filtering by 3-level categories (category, subcategory, sub-subcategory).
+- Comprehensive 3-level hierarchical navigation with accurate resource counts.
+- Mobile-optimized interface with a dedicated sidebar component for navigation.
+- Theme switching (light, dark, system).
 
 ## External Dependencies
 
-### Frontend Dependencies
-
+### Frontend
 - React ecosystem (React, React DOM)
 - TanStack Query (React Query v5)
 - shadcn/ui components (based on Radix UI primitives)
 - Tailwind CSS
 - Lucide icons
-- Various UI libraries (Accordion, Dialog, Popover, etc.)
 
-### Backend Dependencies
+### Backend
+- Express.js
+- Drizzle ORM
+- Node Fetch
+- Remark
 
-- **Express.js**: Handles HTTP requests and API routes.
-- **Drizzle ORM**: Type-safe database operations.
-- **Node Fetch**: Used to fetch Awesome list content from GitHub.
-- **Remark**: Markdown parser for processing GitHub content.
-
-### Development Dependencies
-
+### Development
 - TypeScript
 - Vite
 - ESBuild
 - TSX (TypeScript execute)
-
-## Deployment Strategy
-
-The application is configured for deployment on Replit:
-
-1. **Development Mode**:
-   - `npm run dev` starts both server and client in development mode.
-   - Vite provides hot module replacement for the frontend.
-
-2. **Production Build**:
-   - `npm run build` creates optimized production builds for both frontend and backend.
-   - Frontend is built into static assets.
-   - Backend is bundled with ESBuild.
-
-3. **Database Setup**:
-   - The application expects a PostgreSQL database and `DATABASE_URL` environment variable.
-   - Drizzle migrations can be pushed with `npm run db:push`.
-
-4. **Runtime**:
-   - The production server serves both the API and static frontend assets.
-   - The server listens on port 5000 by default.
-
-## Production Status
-
-### Completed Features
-- ✅ Full React application with 2,011 video resources
-- ✅ Advanced search and filtering by 55+ categories
-- ✅ Mobile-optimized responsive design with dark theme
-- ✅ Google Analytics integration (GA-383541848)
-- ✅ GitHub Actions deployment pipeline
-- ✅ Static site generation for GitHub Pages
-- ✅ Analytics dashboard with resource insights
-- ✅ Clean, consolidated codebase ready for deployment
-- ✅ AI-powered personalized recommendation engine
-- ✅ User preference management and learning profiles
-- ✅ Intelligent learning path suggestions
-- ✅ Content-based and collaborative filtering algorithms
-- ✅ Interactive color palette generator with AI suggestions
-- ✅ Mathematical color theory algorithms for harmonious palettes
-- ✅ AI-powered color generation based on natural language descriptions
-- ✅ Palette library with export capabilities and theme integration
-
-### Repository Cleanup (January 2025)
-- Removed development artifacts and debug files
-- Consolidated deployment scripts to single build-static.ts
-- Optimized GitHub Actions workflow for production
-- Updated documentation and README for clarity
-- Cleaned up package structure for production deployment
-
-### UI Consistency Fixes (January 2025)
-- ✅ Fixed layout inconsistencies between homepage and category pages
-- ✅ Removed all react-helmet dependencies and replaced with SEOHead component
-- ✅ Updated category and subcategory pages to use consistent MainLayout wrapper
-- ✅ Ensured proper responsive design with space-y-6 layout patterns
-- ✅ Standardized data fetching and state management across all pages
-- ✅ Fixed mobile responsiveness with proper sidebar handling
-- ✅ Applied rose theme consistently across all page types
-
-### Comprehensive Mobile Optimization (August 2025)
-- ✅ Replaced legacy sidebar with shadcn/ui sidebar-05 block implementation
-- ✅ Fixed dialog/popover positioning issue - no longer renders off-screen on mobile
-- ✅ Implemented proper mobile viewport handling with responsive breakpoints
-- ✅ Added comprehensive mobile-specific CSS with proper touch targets (44px minimum)
-- ✅ Created AppSidebar component with collapsible hierarchical navigation
-- ✅ Implemented SidebarProvider for consistent state management across mobile/desktop
-- ✅ Fixed dialog centering with calc(100vw - 2rem) width constraint on mobile
-- ✅ Added proper z-index layering to prevent sidebar overlap issues
-- ✅ Touch-optimized all interactive elements with manipulation CSS
-- ✅ Created mobile verification script for testing functionality
-
-### Mobile Touch Optimizations (January 2025)
-- ✅ Created comprehensive mobile-optimizations.css with touch-friendly styles
-- ✅ Fixed AI Recommendations and Preferences buttons for mobile touch interactions
-- ✅ Enhanced touch targets with minimum 44px height for mobile accessibility
-- ✅ Implemented mobile-optimized popover and dialog behavior with useMobileDialog hook
-- ✅ Prevented popovers from closing during scroll events on mobile devices
-- ✅ Added touch-optimized classes throughout the interface
-- ✅ Improved Select components with better mobile touch handling
-- ✅ Enhanced UserPreferences dialog with mobile-friendly tabs and controls
-- ✅ Applied touch-action: manipulation to prevent zoom on double-tap
-
-### Hierarchical Navigation Implementation (January 2025)
-- ✅ Implemented complete 3-level hierarchical sidebar based on CSV taxonomy
-- ✅ Created 9 main categories matching the definitive category structure
-- ✅ Added proper Level 2 subcategories with accurate resource counts
-- ✅ Implemented Level 3 sub-subcategories with visual hierarchy indicators
-- ✅ Visual hierarchy: Main categories → Dots for Level 2 → Smaller dots for Level 3
-- ✅ Each level shows accurate project counts and is fully clickable for filtering
-- ✅ Navigation structure supports drilling down through all 3 levels with proper slugs
-- ✅ Total of 2,011 resources properly categorized across the hierarchy
-
-### Pure JSON-Driven Architecture (August 2025)
-- ✅ Completed migration to pure JSON-driven parser with no hardcoded CSV dependencies
-- ✅ Created `awesome-video-parser-clean.ts` that builds hierarchy dynamically from JSON structure
-- ✅ Removed all CSV redistribution functions and hardcoded counts
-- ✅ Dynamic hierarchy building using JSON parent/child relationships
-- ✅ Natural resource assignment based on actual JSON category references
-- ✅ All 2,011 resources properly categorized across organic 3-level structure:
-  - Intro & Learning: 229 resources
-  - Protocols & Transport: 252 resources  
-  - Encoding & Codecs: 392 resources
-  - Players & Clients: 269 resources
-  - Media Tools: 317 resources
-  - Standards & Industry: 174 resources
-  - Infrastructure & Delivery: 190 resources
-  - General Tools: 97 resources
-  - Community & Events: 91 resources
-- ✅ Perfect filtering maintained for critical navigation paths (AV1: 6, HEVC: 10, VP9: 1)
-- ✅ Clean codebase with categories, subcategories, and sub-subcategories derived organically from JSON
-
-### Mathematical Consistency Achievement (August 2025)
-- ✅ **COMPLETE SUCCESS**: Sidebar totals are mathematically consistent and add up perfectly
-- ✅ **System Total Verification**: 2,011 resources = Category sum of 2,011 resources (exact match)
-- ✅ **Navigation Structure Verified**: 60 total items (9 categories + 19 subcategories + 32 sub-subcategories)
-- ✅ **Critical Paths Validated**: All required navigation paths working (AV1: 6, HEVC: 10, VP9: 1, FFMPEG: 66)
-- ✅ **Hierarchical Logic Implemented**: Parent totals correctly include all children resources
-- ✅ **Verification Framework**: Created comprehensive testing scripts for mathematical consistency
-- ✅ **User Requirement Fulfilled**: Navigation sidebar totals sum to total number of projects (2,011)
-- ✅ **Client-Side Display**: ModernSidebar shows all 60 navigation items with correct resource counts
-
-### Complete 3-Level Navigation Implementation (August 2025)
-- ✅ Successfully implemented complete 3-level hierarchical navigation structure
-- ✅ Added SubSubcategory page component with breadcrumb navigation
-- ✅ Created routing for all 3 levels: /category, /subcategory, /sub-subcategory
-- ✅ Server confirms critical sub-subcategories working: AV1 (6), HEVC (10), VP9 (1)
-- ✅ Updated comprehensive navigation testing framework for 3-level verification
-- ✅ Created 3-level-testing-checklist.json with 35 total navigation items
-- ✅ All critical navigation paths verified accessible via HTTP 200 responses
-- ✅ Sidebar navigation supports expand/collapse for all 3 levels
-- ✅ Critical requirement fulfilled: Perfect filtering for AV1, HEVC, VP9 under Codecs
-
-### Comprehensive Hierarchical Filtering System (August 2025)
-- ✅ **Home page**: Added full hierarchical filtering (category → subcategory → sub-subcategory)
-- ✅ **Category pages**: Added subcategory filtering with resource counts
-- ✅ **Subcategory pages**: Added sub-subcategory filtering with resource counts
-- ✅ **Sub-subcategory pages**: Added search functionality, layout switching, and pagination
-- ✅ **Consistent UX**: All filtering resets pagination and includes analytics tracking
-- ✅ **Mobile optimization**: All filter dropdowns are touch-friendly and responsive
-- ✅ **Progressive disclosure**: Filters only appear when relevant options are available
-- ✅ **Cross-level filtering**: Users can now drill down through all 3 hierarchy levels seamlessly
-
-### Comprehensive Testing Completed (September 2025)
-- ✅ **150 Test Cases Executed**: Comprehensive testing across all functionality areas
-- ✅ **98.7% Test Success Rate**: 148 out of 150 tests passed successfully
-- ✅ **Core Navigation**: All 60 hierarchical paths function correctly
-- ✅ **Mobile Optimization**: Touch targets meet 44px minimum, gestures work
-- ✅ **Performance Metrics**: API responses 20-45ms, stable memory usage
-- ✅ **Security Testing**: XSS prevention verified, input sanitization working
-- ✅ **Accessibility**: Keyboard navigation, focus indicators, ARIA labels present
-- ✅ **Visual Design**: Text truncation, responsive breakpoints, theme switching all working
-- ✅ **User Experience**: Preferences persist, pagination works, deep linking functional
-- ✅ **Test Reports Generated**: Comprehensive documentation of all testing results
-
-### Test Recommendations (September 2025)
-- Medium Priority: Implement CSP headers, add CSRF protection, enhance ARIA labels
-- Low Priority: Add more loading skeletons, clickable breadcrumbs, alt text for images
-
-### Deployment Configuration
-- Target: GitHub Pages at krzemienski.github.io/awesome-list-site
-- Build process optimized for large React applications
-- Static data generation from krzemienski/awesome-video JSON
-- Memory optimizations for GitHub Actions environment
-- **Production Ready**: Application passes all critical tests and is ready for deployment
