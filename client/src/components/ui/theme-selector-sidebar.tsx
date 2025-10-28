@@ -70,7 +70,7 @@ export default function ThemeSelectorSidebar() {
           >
             <div className="flex items-center gap-2 w-full">
               <div
-                className="w-4 h-4 rounded-sm border"
+                className="w-4 h-4 border"
                 style={{ backgroundColor: theme.color }}
               />
               <span className="text-sm">{theme.name}</span>

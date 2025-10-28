@@ -25,9 +25,9 @@ export default function AnimatedResourceSkeleton({
             
             {/* Category badge */}
             <div className="flex items-center gap-2">
-              <Skeleton className="h-6 w-20 rounded-full bg-gradient-to-r from-muted via-muted/50 to-muted animate-shimmer" />
+              <Skeleton className="h-6 w-20 bg-gradient-to-r from-muted via-muted/50 to-muted animate-shimmer" />
               {showTags && (
-                <Skeleton className="h-6 w-16 rounded-full bg-gradient-to-r from-muted via-muted/50 to-muted animate-shimmer" />
+                <Skeleton className="h-6 w-16 bg-gradient-to-r from-muted via-muted/50 to-muted animate-shimmer" />
               )}
             </div>
           </CardHeader>
@@ -79,7 +79,7 @@ export function AnimatedListSkeleton({ count = 10 }: { count?: number }) {
       {Array.from({ length: count }).map((_, index) => (
         <div 
           key={index} 
-          className="flex items-center gap-4 p-4 border rounded-lg animate-pulse"
+          className="flex items-center gap-4 p-4 border animate-pulse"
           style={{ animationDelay: `${index * 100}ms` }}
         >
           {/* Icon skeleton */}
@@ -89,7 +89,7 @@ export function AnimatedListSkeleton({ count = 10 }: { count?: number }) {
           <div className="flex-1 space-y-2">
             <div className="flex items-center gap-2">
               <Skeleton className="h-5 w-48 bg-gradient-to-r from-muted via-muted/50 to-muted animate-shimmer" />
-              <Skeleton className="h-5 w-16 rounded-full bg-gradient-to-r from-muted via-muted/50 to-muted animate-shimmer" />
+              <Skeleton className="h-5 w-16 bg-gradient-to-r from-muted via-muted/50 to-muted animate-shimmer" />
             </div>
             <Skeleton className="h-4 w-3/4 bg-gradient-to-r from-muted via-muted/50 to-muted animate-shimmer" />
           </div>
@@ -118,7 +118,7 @@ export function AnimatedSidebarSkeleton() {
           <div className="flex items-center gap-2 animate-pulse">
             <Skeleton className="h-4 w-4 bg-gradient-to-r from-muted via-muted/50 to-muted animate-shimmer" />
             <Skeleton className="h-5 w-28 bg-gradient-to-r from-muted via-muted/50 to-muted animate-shimmer" />
-            <Skeleton className="h-4 w-8 rounded-full bg-gradient-to-r from-muted via-muted/50 to-muted animate-shimmer" />
+            <Skeleton className="h-4 w-8 bg-gradient-to-r from-muted via-muted/50 to-muted animate-shimmer" />
           </div>
           
           {/* Subcategories */}
@@ -139,7 +139,7 @@ export function AnimatedSearchSkeleton({ count = 5 }: { count?: number }) {
       {Array.from({ length: count }).map((_, index) => (
         <div 
           key={index} 
-          className="p-3 border rounded-lg animate-pulse"
+          className="p-3 border animate-pulse"
           style={{ animationDelay: `${index * 80}ms` }}
         >
           <div className="flex items-start gap-3">

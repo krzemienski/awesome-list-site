@@ -103,11 +103,11 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
                 console.log(`Input value changed to: "${e.target.value}"`);
                 setQuery(e.target.value);
               }}
-              className="w-full pl-10 pr-4 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+              className="w-full pl-10 pr-4 py-2 border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
             />
           </div>
           
-          <div className="max-h-[300px] overflow-y-auto border border-border rounded-md">
+          <div className="max-h-[300px] overflow-y-auto border border-border">
             {query.length >= 2 ? (
               results.length > 0 ? (
                 <div className="p-2">
@@ -129,7 +129,7 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center h-[200px] text-center p-4">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+                  <div className="flex h-16 w-16 items-center justify-center bg-muted">
                     <Search className="h-8 w-8 text-muted-foreground" />
                   </div>
                   <h3 className="mt-4 text-sm font-semibold">No results found</h3>
@@ -138,7 +138,7 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
               )
             ) : (
               <div className="flex flex-col items-center justify-center h-[200px] text-center p-4">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+                <div className="flex h-16 w-16 items-center justify-center bg-muted">
                   <Search className="h-8 w-8 text-muted-foreground" />
                 </div>
                 <h3 className="mt-4 text-sm font-semibold">Start typing to search</h3>

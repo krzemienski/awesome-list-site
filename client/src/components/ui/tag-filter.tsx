@@ -57,7 +57,7 @@ export default function TagFilter({ resources, selectedTags, onTagsChange }: Tag
             <Filter className="h-4 w-4 mr-2" />
             Filter by Tag
             {hasSelectedTags && (
-              <Badge variant="secondary" className="ml-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
+              <Badge variant="secondary" className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs">
                 {selectedTags.length}
               </Badge>
             )}
@@ -89,7 +89,7 @@ export default function TagFilter({ resources, selectedTags, onTagsChange }: Tag
                 {availableTags.map(tag => (
                   <div
                     key={tag}
-                    className="flex items-center space-x-2 p-2 hover:bg-accent rounded-sm cursor-pointer"
+                    className="flex items-center space-x-2 p-2 hover:bg-accent cursor-pointer"
                     onClick={() => toggleTag(tag)}
                   >
                     <Checkbox

@@ -211,7 +211,7 @@ export default function AwesomeListExplorer() {
                   filteredLists.map((list) => (
                     <div
                       key={list.id}
-                      className="border rounded-lg p-4 hover:bg-accent/50 transition-colors cursor-pointer group"
+                      className="border p-4 hover:bg-accent/50 transition-colors cursor-pointer group"
                       onClick={() => handleSwitchList(list)}
                     >
                       <div className="flex items-start gap-3">
