@@ -38,7 +38,7 @@ export default function ResourceListItem({ resource }: ResourceListItemProps) {
 
   return (
     <Card 
-      className="cursor-pointer group border-0 border-b rounded-none quick-fade transition-colors duration-200 hover:bg-accent/50"
+      className="cursor-pointer group border-0 border-b rounded-lg quick-fade transition-colors duration-200 hover:bg-accent/50"
       data-testid={`resource-list-item-${resource.title.replace(/\s+/g, '-').toLowerCase()}`}
       onClick={handleClick}
     >
