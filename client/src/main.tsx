@@ -33,7 +33,7 @@ if (window.__INITIAL_DATA__) {
 
 const rootElement = document.getElementById("root")!;
 const AppComponent = (
-  <ThemeProvider defaultTheme="dark" storageKey="ui-theme">
+  <ThemeProvider>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
