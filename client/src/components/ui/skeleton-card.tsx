@@ -9,7 +9,7 @@ interface SkeletonCardProps {
 export function SkeletonCard({ className, variant = "default" }: SkeletonCardProps) {
   if (variant === "list") {
     return (
-      <Card className={cn("border-0 border-b rounded-none", className)}>
+      <Card className={cn("border-0 border-b rounded-lg", className)}>
         <CardContent className="p-4">
           <div className="flex items-center justify-between skeleton-pulse">
             <div className="flex-1 min-w-0">
