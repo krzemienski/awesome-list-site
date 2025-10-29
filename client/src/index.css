@@ -89,8 +89,9 @@
     @apply border-border;
   }
   
-  body {
-    @apply bg-background text-foreground;
+  html, body {
+    background-color: var(--background);
+    color: var(--foreground);
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
@@ -128,6 +129,29 @@ button:hover,
   box-shadow: 
     0 0 15px rgba(255, 0, 255, 0.5),
     0 0 30px rgba(0, 170, 255, 0.3);
+}
+
+/* Force primary buttons to use magenta */
+.bg-primary,
+[class*="bg-primary"] {
+  background-color: #ff00ff !important;
+}
+
+/* Force accent elements to use cyan */
+.bg-accent,
+[class*="bg-accent"],
+.text-accent {
+  background-color: #00aaff !important;
+}
+
+/* Make links cyan */
+a {
+  color: #00aaff;
+}
+
+a:hover {
+  color: #ff00ff;
+  text-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
 }
 
 /* Custom scrollbar for cyberpunk theme */
