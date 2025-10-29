@@ -4,7 +4,6 @@ import { AwesomeList } from "@/types/awesome-list";
 import TopBar from "../TopBar";
 import Footer from "../Footer";
 import SearchDialog from "@/components/ui/search-dialog";
-import ThemeSelector from "@/components/ui/theme-selector";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface MainLayoutProps {
@@ -77,7 +76,6 @@ export default function MainLayout({ awesomeList, isLoading, children }: MainLay
         resources={awesomeList?.resources || []}
       />
       
-      <ThemeSelector />
     </div>
   );
 }

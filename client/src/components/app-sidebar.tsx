@@ -38,7 +38,6 @@ import {
 } from "@/components/ui/sidebar"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Category, Subcategory, SubSubcategory } from "@/types/awesome-list"
-import ThemeSelectorSidebar from "@/components/ui/theme-selector-sidebar"
 import { SidebarItemMorph, SidebarExpandableMorph, SidebarToggleMorph } from "@/components/animations/sidebar-morphing"
 
 // Icons mapping for categories
@@ -366,7 +365,6 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <ThemeSelectorSidebar />
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
