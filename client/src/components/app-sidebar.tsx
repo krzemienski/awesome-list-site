@@ -1,6 +1,4 @@
 import {
-  ChevronRight,
-  ChevronDown,
   FileText,
   Video,
   Code,
@@ -11,11 +9,15 @@ import {
   Layers,
   Users,
   Home,
+  ChevronRight,
+  Moon,
+  Sun,
   Palette
 } from "lucide-react"
 import { useState, useEffect, useMemo } from "react"
 import { Link, useLocation } from "wouter"
 import { cn } from "@/lib/utils"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@radix-ui/react-collapsible"
 
 import {
   Sidebar,
@@ -31,14 +33,14 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarProvider,
   SidebarRail,
-  SidebarTrigger,
   useSidebar
 } from "@/components/ui/sidebar"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Category, Subcategory, SubSubcategory } from "@/types/awesome-list"
-import { SidebarItemMorph, SidebarExpandableMorph, SidebarToggleMorph } from "@/components/animations/sidebar-morphing"
+import { useTheme } from "@/components/theme-provider-new"
 
 // Icons mapping for categories
 const categoryIcons: { [key: string]: any } = {
@@ -60,7 +62,9 @@ interface AppSidebarProps {
 
 export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
   const [location] = useLocation()
-  const [expandedItems, setExpandedItems] = useState<string[]>([])
+  const [openCategories, setOpenCategories] = useState<Set<string>>(new Set())
+  const [openSubcategories, setOpenSubcategories] = useState<Set<string>>(new Set())
+  const { theme, setTheme } = useTheme()
   
   // Safe access to sidebar context - it may not exist outside provider
   let isMobile = false;
@@ -85,7 +89,6 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
   // Auto-close sidebar on mobile when location changes
   useEffect(() => {
     if (isMobile) {
-      // Add a small delay to allow the navigation animation to complete
       const timer = setTimeout(() => {
         setOpenMobile(false);
       }, 100);
@@ -93,13 +96,13 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
     }
   }, [location, isMobile, setOpenMobile]);
 
-  // Expand active category based on current location
+  // Auto-expand active category based on current location
   useEffect(() => {
     const pathParts = location.split('/')
     if (pathParts[1] === 'category') {
       const activeCategory = filteredCategories.find(cat => cat.slug === pathParts[2])
       if (activeCategory) {
-        setExpandedItems(prev => Array.from(new Set([...prev, activeCategory.slug])))
+        setOpenCategories(prev => new Set([...prev, activeCategory.slug]))
       }
     } else if (pathParts[1] === 'subcategory') {
       const activeSubcategory = pathParts[2]
@@ -107,7 +110,7 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
         cat.subcategories?.some(sub => sub.slug === activeSubcategory)
       )
       if (parentCategory) {
-        setExpandedItems(prev => Array.from(new Set([...prev, parentCategory.slug])))
+        setOpenCategories(prev => new Set([...prev, parentCategory.slug]))
       }
     } else if (pathParts[1] === 'sub-subcategory') {
       const activeSubSubcategory = pathParts[2]
@@ -124,136 +127,31 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
       })
       
       if (parentCategory && parentSubcategory) {
-        setExpandedItems(prev => Array.from(new Set([...prev, parentCategory!.slug, `${parentCategory!.slug}-${parentSubcategory!.slug}`])))
+        setOpenCategories(prev => new Set([...prev, parentCategory!.slug]))
+        setOpenSubcategories(prev => new Set([...prev, `${parentCategory!.slug}-${parentSubcategory!.slug}`]))
       }
     }
   }, [location, filteredCategories])
-
-  const toggleExpand = (itemId: string) => {
-    setExpandedItems(prev => 
-      prev.includes(itemId) 
-        ? prev.filter(id => id !== itemId)
-        : [...prev, itemId]
-    )
-  }
 
   const isActiveRoute = (path: string) => {
     return location === path
   }
 
-  const renderSubSubcategories = (category: Category, subcategory: Subcategory, subSubcategories?: SubSubcategory[]) => {
-    if (!subSubcategories || subSubcategories.length === 0) return null
-
-    return (
-      <SidebarMenuSub>
-        {subSubcategories.map(subSub => (
-          <SidebarMenuSubItem key={subSub.slug}>
-            <SidebarMenuSubButton asChild>
-              <Link
-                href={`/sub-subcategory/${subSub.slug}`}
-                className={cn(
-                  "w-full pl-8 flex items-center gap-2 pr-3",
-                  isActiveRoute(`/sub-subcategory/${subSub.slug}`) && "bg-primary/10 text-primary font-medium"
-                )}
-                onClick={(e) => {
-                  if (isMobile) {
-                    // Prevent immediate close to avoid portal errors
-                    e.stopPropagation();
-                    setTimeout(() => setOpenMobile(false), 150);
-                  }
-                }}
-              >
-                <span className="truncate flex-1">{subSub.name}</span>
-                <span className="text-xs text-muted-foreground shrink-0 tabular-nums text-right min-w-[4ch] ml-auto">
-                  {subSub.resources.length}
-                </span>
-              </Link>
-            </SidebarMenuSubButton>
-          </SidebarMenuSubItem>
-        ))}
-      </SidebarMenuSub>
-    )
+  const handleMobileNavigation = (e: React.MouseEvent) => {
+    if (isMobile) {
+      e.stopPropagation();
+      setTimeout(() => setOpenMobile(false), 150);
+    }
   }
 
-  const renderSubcategories = (category: Category, subcategories?: Subcategory[]) => {
-    if (!subcategories || subcategories.length === 0) return null
-
-    return (
-      <SidebarMenuSub>
-        {subcategories.map(sub => {
-          const hasSubSubcategories = sub.subSubcategories && sub.subSubcategories.length > 0
-          const subId = `${category.slug}-${sub.slug}`
-          const isExpanded = expandedItems.includes(subId)
-
-          return (
-            <SidebarMenuSubItem key={sub.slug}>
-              {hasSubSubcategories ? (
-                <>
-                  <SidebarItemMorph
-                    isActive={isActiveRoute(`/subcategory/${sub.slug}`)}
-                    isExpanded={isExpanded}
-                  >
-                    <SidebarMenuSubButton asChild>
-                      <Link 
-                        href={`/subcategory/${sub.slug}`} 
-                        className="w-full flex items-center gap-2 pr-3"
-                        onClick={(e) => {
-                  if (isMobile) {
-                    // Prevent immediate close to avoid portal errors
-                    e.stopPropagation();
-                    setTimeout(() => setOpenMobile(false), 150);
-                  }
-                }}
-                      >
-                        <span className="truncate flex-1">{sub.name}</span>
-                        <span className="text-xs text-muted-foreground shrink-0 tabular-nums text-right min-w-[4ch] ml-auto">
-                          {sub.resources.length}
-                        </span>
-                        <span 
-                          className="shrink-0 cursor-pointer ml-2"
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            toggleExpand(subId)
-                          }}
-                        >
-                          <SidebarToggleMorph isOpen={isExpanded} />
-                        </span>
-                      </Link>
-                    </SidebarMenuSubButton>
-                  </SidebarItemMorph>
-                  <SidebarExpandableMorph isExpanded={isExpanded}>
-                    {renderSubSubcategories(category, sub, sub.subSubcategories)}
-                  </SidebarExpandableMorph>
-                </>
-              ) : (
-                <SidebarMenuSubButton asChild>
-                  <Link
-                    href={`/subcategory/${sub.slug}`}
-                    className={cn(
-                      "w-full flex items-center gap-2 pr-3",
-                      isActiveRoute(`/subcategory/${sub.slug}`) && "bg-primary/10 text-primary font-medium"
-                    )}
-                    onClick={(e) => {
-                  if (isMobile) {
-                    // Prevent immediate close to avoid portal errors
-                    e.stopPropagation();
-                    setTimeout(() => setOpenMobile(false), 150);
-                  }
-                }}
-                  >
-                    <span className="truncate flex-1">{sub.name}</span>
-                    <span className="text-xs text-muted-foreground shrink-0 tabular-nums text-right min-w-[4ch] ml-auto">
-                      {sub.resources.length}
-                    </span>
-                  </Link>
-                </SidebarMenuSubButton>
-              )}
-            </SidebarMenuSubItem>
-          )
-        })}
-      </SidebarMenuSub>
-    )
+  const toggleTheme = () => {
+    if (theme === "light") {
+      setTheme("dark")
+    } else if (theme === "dark") {
+      setTheme("custom")
+    } else {
+      setTheme("light")
+    }
   }
 
   if (isLoading) {
@@ -276,8 +174,8 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link href="/" onClick={() => isMobile && setOpenMobile(false)}>
-                <div className="flex aspect-square size-8 items-center justify-center bg-primary text-primary-foreground">
+              <Link href="/" onClick={handleMobileNavigation}>
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                   <Video className="size-4" />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
@@ -285,6 +183,18 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                   <span className="text-xs text-muted-foreground">2,011 Resources</span>
                 </div>
               </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton onClick={toggleTheme} className="w-full">
+              {theme === "light" ? (
+                <Sun className="h-4 w-4" />
+              ) : theme === "dark" ? (
+                <Moon className="h-4 w-4" />
+              ) : (
+                <Palette className="h-4 w-4" />
+              )}
+              <span className="capitalize">{theme} Theme</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -297,18 +207,8 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <Link 
-                      href="/" 
-                      className={cn(isActiveRoute("/") && "bg-primary/10 text-primary font-medium")}
-                      onClick={(e) => {
-                  if (isMobile) {
-                    // Prevent immediate close to avoid portal errors
-                    e.stopPropagation();
-                    setTimeout(() => setOpenMobile(false), 150);
-                  }
-                }}
-                    >
+                  <SidebarMenuButton asChild isActive={isActiveRoute("/")}>
+                    <Link href="/" onClick={handleMobileNavigation}>
                       <Home className="h-4 w-4" />
                       <span>Home</span>
                     </Link>
@@ -321,82 +221,163 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
           <SidebarGroup>
             <SidebarGroupLabel>Categories</SidebarGroupLabel>
             <SidebarGroupContent>
-              <SidebarMenu>
-                {filteredCategories.map(category => {
-                  const Icon = categoryIcons[category.name] || FileText
-                  const hasSubcategories = category.subcategories && category.subcategories.length > 0
-                  const isExpanded = expandedItems.includes(category.slug)
+              {filteredCategories.map(category => {
+                const Icon = categoryIcons[category.name] || FileText
+                const hasSubcategories = category.subcategories && category.subcategories.length > 0
+                const isOpen = openCategories.has(category.slug)
 
-                  return (
-                    <SidebarMenuItem key={category.slug}>
-                      {hasSubcategories ? (
-                        <>
-                          <SidebarItemMorph
-                            isActive={isActiveRoute(`/category/${category.slug}`)}
-                            isExpanded={isExpanded}
-                          >
-                            <SidebarMenuButton asChild>
-                              <Link 
-                                href={`/category/${category.slug}`} 
-                                className="w-full flex items-center gap-2 pr-3"
-                                onClick={(e) => {
-                  if (isMobile) {
-                    // Prevent immediate close to avoid portal errors
-                    e.stopPropagation();
-                    setTimeout(() => setOpenMobile(false), 150);
-                  }
-                }}
+                return (
+                  <Collapsible
+                    key={category.slug}
+                    open={isOpen}
+                    onOpenChange={(open) => {
+                      setOpenCategories(prev => {
+                        const next = new Set(prev)
+                        if (open) {
+                          next.add(category.slug)
+                        } else {
+                          next.delete(category.slug)
+                        }
+                        return next
+                      })
+                    }}
+                  >
+                    <SidebarGroup className="p-0">
+                      <SidebarGroupLabel asChild>
+                        <div className="flex items-center">
+                          <SidebarMenuButton asChild isActive={isActiveRoute(`/category/${category.slug}`)}>
+                            <Link 
+                              href={`/category/${category.slug}`} 
+                              className="flex-1"
+                              onClick={handleMobileNavigation}
+                            >
+                              <Icon className="h-4 w-4" />
+                              <span className="flex-1">{category.name}</span>
+                              <Badge variant="secondary" className="ml-auto mr-1">
+                                {category.resources.length}
+                              </Badge>
+                            </Link>
+                          </SidebarMenuButton>
+                          {hasSubcategories && (
+                            <CollapsibleTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-auto w-auto p-1.5 hover:bg-sidebar-accent"
+                                onClick={(e) => e.stopPropagation()}
                               >
-                                <Icon className="h-4 w-4 shrink-0" />
-                                <span className="truncate flex-1">{category.name}</span>
-                                <span className="text-xs text-muted-foreground shrink-0 tabular-nums text-right min-w-[4ch] ml-auto">
-                                  {category.resources.length}
-                                </span>
-                                <span 
-                                  className="shrink-0 cursor-pointer ml-2"
-                                  onClick={(e) => {
-                                    e.preventDefault()
-                                    e.stopPropagation()
-                                    toggleExpand(category.slug)
-                                  }}
-                                >
-                                  <SidebarToggleMorph isOpen={isExpanded} />
-                                </span>
-                              </Link>
-                            </SidebarMenuButton>
-                          </SidebarItemMorph>
-                          <SidebarExpandableMorph isExpanded={isExpanded}>
-                            {renderSubcategories(category, category.subcategories)}
-                          </SidebarExpandableMorph>
-                        </>
-                      ) : (
-                        <SidebarMenuButton asChild>
-                          <Link
-                            href={`/category/${category.slug}`}
-                            className={cn(
-                              "w-full flex items-center gap-2 pr-3",
-                              isActiveRoute(`/category/${category.slug}`) && "bg-primary/10 text-primary font-medium"
-                            )}
-                            onClick={(e) => {
-                  if (isMobile) {
-                    // Prevent immediate close to avoid portal errors
-                    e.stopPropagation();
-                    setTimeout(() => setOpenMobile(false), 150);
-                  }
-                }}
-                          >
-                            <Icon className="h-4 w-4 shrink-0" />
-                            <span className="truncate flex-1">{category.name}</span>
-                            <span className="text-xs text-muted-foreground shrink-0 tabular-nums text-right min-w-[4ch] ml-auto">
-                              {category.resources.length}
-                            </span>
-                          </Link>
-                        </SidebarMenuButton>
+                                <ChevronRight
+                                  className={cn(
+                                    "h-4 w-4 transition-transform",
+                                    isOpen && "rotate-90"
+                                  )}
+                                />
+                                <span className="sr-only">Toggle</span>
+                              </Button>
+                            </CollapsibleTrigger>
+                          )}
+                        </div>
+                      </SidebarGroupLabel>
+                      {hasSubcategories && (
+                        <CollapsibleContent>
+                          <SidebarGroupContent>
+                            <SidebarMenuSub>
+                              {category.subcategories?.map(sub => {
+                                const hasSubSubcategories = sub.subSubcategories && sub.subSubcategories.length > 0
+                                const subId = `${category.slug}-${sub.slug}`
+                                const isSubOpen = openSubcategories.has(subId)
+
+                                return (
+                                  <SidebarMenuSubItem key={sub.slug}>
+                                    {hasSubSubcategories ? (
+                                      <Collapsible
+                                        open={isSubOpen}
+                                        onOpenChange={(open) => {
+                                          setOpenSubcategories(prev => {
+                                            const next = new Set(prev)
+                                            if (open) {
+                                              next.add(subId)
+                                            } else {
+                                              next.delete(subId)
+                                            }
+                                            return next
+                                          })
+                                        }}
+                                      >
+                                        <div className="flex items-center">
+                                          <SidebarMenuSubButton asChild isActive={isActiveRoute(`/subcategory/${sub.slug}`)}>
+                                            <Link 
+                                              href={`/subcategory/${sub.slug}`}
+                                              className="flex-1"
+                                              onClick={handleMobileNavigation}
+                                            >
+                                              <span className="flex-1">{sub.name}</span>
+                                              <Badge variant="secondary" className="ml-auto mr-1 text-[10px] px-1.5 py-0">
+                                                {sub.resources.length}
+                                              </Badge>
+                                            </Link>
+                                          </SidebarMenuSubButton>
+                                          <CollapsibleTrigger asChild>
+                                            <Button
+                                              variant="ghost"
+                                              size="sm"
+                                              className="h-auto w-auto p-1 hover:bg-sidebar-accent"
+                                              onClick={(e) => e.stopPropagation()}
+                                            >
+                                              <ChevronRight
+                                                className={cn(
+                                                  "h-3 w-3 transition-transform",
+                                                  isSubOpen && "rotate-90"
+                                                )}
+                                              />
+                                              <span className="sr-only">Toggle</span>
+                                            </Button>
+                                          </CollapsibleTrigger>
+                                        </div>
+                                        <CollapsibleContent>
+                                          <SidebarMenuSub className="ml-3">
+                                            {sub.subSubcategories?.map(subSub => (
+                                              <SidebarMenuSubItem key={subSub.slug}>
+                                                <SidebarMenuSubButton asChild isActive={isActiveRoute(`/sub-subcategory/${subSub.slug}`)}>
+                                                  <Link
+                                                    href={`/sub-subcategory/${subSub.slug}`}
+                                                    onClick={handleMobileNavigation}
+                                                  >
+                                                    <span className="flex-1">{subSub.name}</span>
+                                                    <Badge variant="secondary" className="ml-auto text-[10px] px-1.5 py-0">
+                                                      {subSub.resources.length}
+                                                    </Badge>
+                                                  </Link>
+                                                </SidebarMenuSubButton>
+                                              </SidebarMenuSubItem>
+                                            ))}
+                                          </SidebarMenuSub>
+                                        </CollapsibleContent>
+                                      </Collapsible>
+                                    ) : (
+                                      <SidebarMenuSubButton asChild isActive={isActiveRoute(`/subcategory/${sub.slug}`)}>
+                                        <Link
+                                          href={`/subcategory/${sub.slug}`}
+                                          onClick={handleMobileNavigation}
+                                        >
+                                          <span className="flex-1">{sub.name}</span>
+                                          <Badge variant="secondary" className="ml-auto text-[10px] px-1.5 py-0">
+                                            {sub.resources.length}
+                                          </Badge>
+                                        </Link>
+                                      </SidebarMenuSubButton>
+                                    )}
+                                  </SidebarMenuSubItem>
+                                )
+                              })}
+                            </SidebarMenuSub>
+                          </SidebarGroupContent>
+                        </CollapsibleContent>
                       )}
-                    </SidebarMenuItem>
-                  )
-                })}
-              </SidebarMenu>
+                    </SidebarGroup>
+                  </Collapsible>
+                )
+              })}
             </SidebarGroupContent>
           </SidebarGroup>
         </ScrollArea>
@@ -405,14 +386,11 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <a
                 href="https://github.com/krzemienski/awesome-video"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs text-muted-foreground hover:text-foreground"
               >
                 <Package className="h-4 w-4" />
                 <span>View on GitHub</span>
