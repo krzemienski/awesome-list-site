@@ -145,9 +145,9 @@ export default function Subcategory() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {allResources.map((resource) => (
+          {allResources.map((resource, index) => (
             <Card 
-              key={resource.url}
+              key={`${resource.url}-${index}`}
               className="hover:bg-accent hover:text-accent-foreground transition-colors border border-border bg-card text-card-foreground"
               data-testid={`card-resource-${resource.url}`}
             >

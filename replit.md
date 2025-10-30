@@ -25,6 +25,7 @@ The application employs a client-server architecture. The frontend is a React-ba
 - **Frontend**: React 18+ with TypeScript, Vite, Tailwind CSS, `shadcn/ui`, React Query for state management, Wouter for routing.
 - **Backend**: Express.js, Drizzle ORM, Node Fetch for external data, Remark for Markdown parsing.
 - **Data Architecture**: Pure JSON-driven parser for dynamic hierarchy building, eliminating hardcoded dependencies. Resources are categorized into a 3-level hierarchical structure.
+- **Sidebar Layout**: CSS Grid-based layout on desktop using `grid-cols-[var(--sidebar-width)_1fr]`, dynamically adjusting to `grid-cols-[var(--sidebar-width-icon)_1fr]` when collapsed. Sidebar width: 26rem (416px) expanded, 3rem (48px) collapsed.
 - **Deployment**: Configured for deployment on Replit, with optimized production builds and static site generation for platforms like GitHub Pages.
 
 ### Feature Specifications
