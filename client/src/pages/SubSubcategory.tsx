@@ -36,8 +36,8 @@ export default function SubSubcategory() {
     // Find matching sub-subcategory across all categories
     for (const category of awesomeList.categories) {
       for (const subcategory of category.subcategories || []) {
-        if ((subcategory as any).subSubcategories) {
-          for (const subSubcat of (subcategory as any).subSubcategories) {
+        if (subcategory.subSubcategories) {
+          for (const subSubcat of subcategory.subSubcategories) {
             if (subSubcat.slug === slug) {
               currentSubSubcategory = subSubcat;
               parentCategory = category;
