@@ -38,6 +38,8 @@ interface UserPreferencesProps {
   userProfile: UserProfile;
   onProfileUpdate: (profile: Partial<UserProfile>) => void;
   availableCategories: string[];
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 const RESOURCE_TYPES = [
@@ -69,15 +71,21 @@ const COMMON_LEARNING_GOALS = [
 export default function UserPreferences({ 
   userProfile, 
   onProfileUpdate, 
-  availableCategories 
+  availableCategories,
+  open: externalOpen,
+  onOpenChange: externalOnOpenChange
 }: UserPreferencesProps) {
   const [localProfile, setLocalProfile] = useState<UserProfile>(userProfile);
   const [newGoal, setNewGoal] = useState("");
-  const [isOpen, setIsOpen] = useState(() => {
+  const [internalOpen, setInternalOpen] = useState(() => {
     // Persist dialog state to prevent disappearing on scroll
     const saved = sessionStorage.getItem('awesome-user-preferences-open');
     return saved === 'true';
   });
+
+  // Use external control if provided, otherwise use internal state
+  const isOpen = externalOpen !== undefined ? externalOpen : internalOpen;
+  const setIsOpen = externalOnOpenChange || setInternalOpen;
 
   useEffect(() => {
     setLocalProfile(userProfile);
@@ -93,12 +101,16 @@ export default function UserPreferences({
       timeCommitment: localProfile.timeCommitment
     });
     setIsOpen(false);
-    sessionStorage.setItem('awesome-user-preferences-open', 'false');
+    if (!externalOnOpenChange) {
+      sessionStorage.setItem('awesome-user-preferences-open', 'false');
+    }
   };
 
   const handleDialogOpenChange = (open: boolean) => {
     setIsOpen(open);
-    sessionStorage.setItem('awesome-user-preferences-open', open.toString());
+    if (!externalOnOpenChange) {
+      sessionStorage.setItem('awesome-user-preferences-open', open.toString());
+    }
   };
 
   const handleCategoryToggle = (category: string) => {
