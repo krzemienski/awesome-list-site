@@ -27,8 +27,15 @@ export function ThemeProvider({
   ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(() => {
-    const storedTheme = localStorage.getItem(storageKey) as Theme | null;
-    return storedTheme || defaultTheme;
+    // SSR-safe: only access localStorage on client
+    if (typeof window === 'undefined') return defaultTheme;
+    
+    try {
+      const saved = localStorage.getItem(storageKey);
+      return (saved as Theme) || defaultTheme;
+    } catch {
+      return defaultTheme;
+    }
   });
 
   useEffect(() => {
@@ -37,7 +44,13 @@ export function ThemeProvider({
   }, [theme]);
 
   useEffect(() => {
-    localStorage.setItem(storageKey, theme);
+    if (typeof window === 'undefined') return;
+    
+    try {
+      localStorage.setItem(storageKey, theme);
+    } catch (e) {
+      console.warn('Failed to save theme to localStorage:', e);
+    }
   }, [theme, storageKey]);
 
   const value = {
