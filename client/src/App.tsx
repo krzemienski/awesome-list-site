@@ -6,6 +6,7 @@ import { useAnalytics } from "./hooks/use-analytics";
 import { useSessionAnalytics } from "./hooks/use-session-analytics";
 import { trackKeyboardShortcut } from "./lib/analytics";
 
+import { ThemeProvider } from "@/components/theme-provider-new";
 import { AppLayout } from "@/components/layout/app-layout";
 import ErrorPage from "@/pages/ErrorPage";
 import Home from "@/pages/Home";
@@ -110,7 +111,9 @@ function App() {
   }, []);
 
   return (
-    <Router />
+    <ThemeProvider defaultTheme="dark" storageKey="awesome-video-theme">
+      <Router />
+    </ThemeProvider>
   );
 }
 
