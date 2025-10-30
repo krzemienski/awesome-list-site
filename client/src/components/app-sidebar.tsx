@@ -85,7 +85,11 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
   // Auto-close sidebar on mobile when location changes
   useEffect(() => {
     if (isMobile) {
-      setOpenMobile(false);
+      // Add a small delay to allow the navigation animation to complete
+      const timer = setTimeout(() => {
+        setOpenMobile(false);
+      }, 100);
+      return () => clearTimeout(timer);
     }
   }, [location, isMobile, setOpenMobile]);
 
@@ -151,7 +155,13 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                   "w-full pl-8 flex items-center gap-2 pr-3",
                   isActiveRoute(`/sub-subcategory/${subSub.slug}`) && "bg-primary/10 text-primary font-medium"
                 )}
-                onClick={() => isMobile && setOpenMobile(false)}
+                onClick={(e) => {
+                  if (isMobile) {
+                    // Prevent immediate close to avoid portal errors
+                    e.stopPropagation();
+                    setTimeout(() => setOpenMobile(false), 150);
+                  }
+                }}
               >
                 <span className="truncate flex-1">{subSub.name}</span>
                 <span className="text-xs text-muted-foreground shrink-0 tabular-nums text-right min-w-[4ch] ml-auto">
@@ -187,7 +197,13 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                       <Link 
                         href={`/subcategory/${sub.slug}`} 
                         className="w-full flex items-center gap-2 pr-3"
-                        onClick={() => isMobile && setOpenMobile(false)}
+                        onClick={(e) => {
+                  if (isMobile) {
+                    // Prevent immediate close to avoid portal errors
+                    e.stopPropagation();
+                    setTimeout(() => setOpenMobile(false), 150);
+                  }
+                }}
                       >
                         <span className="truncate flex-1">{sub.name}</span>
                         <span className="text-xs text-muted-foreground shrink-0 tabular-nums text-right min-w-[4ch] ml-auto">
@@ -218,7 +234,13 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                       "w-full flex items-center gap-2 pr-3",
                       isActiveRoute(`/subcategory/${sub.slug}`) && "bg-primary/10 text-primary font-medium"
                     )}
-                    onClick={() => isMobile && setOpenMobile(false)}
+                    onClick={(e) => {
+                  if (isMobile) {
+                    // Prevent immediate close to avoid portal errors
+                    e.stopPropagation();
+                    setTimeout(() => setOpenMobile(false), 150);
+                  }
+                }}
                   >
                     <span className="truncate flex-1">{sub.name}</span>
                     <span className="text-xs text-muted-foreground shrink-0 tabular-nums text-right min-w-[4ch] ml-auto">
@@ -279,7 +301,13 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                     <Link 
                       href="/" 
                       className={cn(isActiveRoute("/") && "bg-primary/10 text-primary font-medium")}
-                      onClick={() => isMobile && setOpenMobile(false)}
+                      onClick={(e) => {
+                  if (isMobile) {
+                    // Prevent immediate close to avoid portal errors
+                    e.stopPropagation();
+                    setTimeout(() => setOpenMobile(false), 150);
+                  }
+                }}
                     >
                       <Home className="h-4 w-4" />
                       <span>Home</span>
@@ -311,7 +339,13 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                               <Link 
                                 href={`/category/${category.slug}`} 
                                 className="w-full flex items-center gap-2 pr-3"
-                                onClick={() => isMobile && setOpenMobile(false)}
+                                onClick={(e) => {
+                  if (isMobile) {
+                    // Prevent immediate close to avoid portal errors
+                    e.stopPropagation();
+                    setTimeout(() => setOpenMobile(false), 150);
+                  }
+                }}
                               >
                                 <Icon className="h-4 w-4 shrink-0" />
                                 <span className="truncate flex-1">{category.name}</span>
@@ -343,7 +377,13 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                               "w-full flex items-center gap-2 pr-3",
                               isActiveRoute(`/category/${category.slug}`) && "bg-primary/10 text-primary font-medium"
                             )}
-                            onClick={() => isMobile && setOpenMobile(false)}
+                            onClick={(e) => {
+                  if (isMobile) {
+                    // Prevent immediate close to avoid portal errors
+                    e.stopPropagation();
+                    setTimeout(() => setOpenMobile(false), 150);
+                  }
+                }}
                           >
                             <Icon className="h-4 w-4 shrink-0" />
                             <span className="truncate flex-1">{category.name}</span>
