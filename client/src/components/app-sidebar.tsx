@@ -12,7 +12,12 @@ import {
   ChevronRight,
   Moon,
   Sun,
-  Palette
+  Palette,
+  Search,
+  Sparkles,
+  User,
+  Zap,
+  Github
 } from "lucide-react"
 import { useState, useEffect, useMemo } from "react"
 import { Link, useLocation } from "wouter"
@@ -39,8 +44,15 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Category, Subcategory, SubSubcategory } from "@/types/awesome-list"
 import { useTheme } from "@/components/theme-provider-new"
+import SearchDialog from "@/components/ui/search-dialog"
+import RecommendationPanel from "@/components/ui/recommendation-panel"
+import UserPreferences from "@/components/ui/user-preferences"
+import ColorPaletteGenerator from "@/components/ui/color-palette-generator"
+import { useUserProfile } from "@/hooks/use-user-profile"
 
 // Icons mapping for categories
 const categoryIcons: { [key: string]: any } = {
@@ -65,14 +77,23 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
   const [openCategories, setOpenCategories] = useState<Set<string>>(new Set())
   const [openSubcategories, setOpenSubcategories] = useState<Set<string>>(new Set())
   const { theme, setTheme } = useTheme()
+  const { userProfile, updateProfile, isLoaded } = useUserProfile()
+  
+  // Dialog states
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [recommendationsOpen, setRecommendationsOpen] = useState(false)
+  const [preferencesOpen, setPreferencesOpen] = useState(false)
+  const [paletteOpen, setPaletteOpen] = useState(false)
   
   // Safe access to sidebar context - it may not exist outside provider
   let isMobile = false;
   let setOpenMobile = (_: boolean) => {};
+  let state: "expanded" | "collapsed" = "expanded";
   try {
     const sidebarContext = useSidebar();
     isMobile = sidebarContext.isMobile;
     setOpenMobile = sidebarContext.setOpenMobile;
+    state = sidebarContext.state;
   } catch (e) {
     // Context not available, using defaults
   }
@@ -163,6 +184,42 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
     }
   }
 
+  // Flatten all resources for search
+  const allResources = useMemo(() => {
+    const resources: any[] = [];
+    filteredCategories.forEach(category => {
+      // Add category resources
+      category.resources.forEach(res => {
+        resources.push({
+          ...res,
+          category: category.name,
+          subcategory: ''
+        });
+      });
+      // Add subcategory resources
+      category.subcategories?.forEach(sub => {
+        sub.resources.forEach(res => {
+          resources.push({
+            ...res,
+            category: category.name,
+            subcategory: sub.name
+          });
+        });
+        // Add sub-subcategory resources
+        sub.subSubcategories?.forEach(subsub => {
+          subsub.resources.forEach(res => {
+            resources.push({
+              ...res,
+              category: category.name,
+              subcategory: `${sub.name} → ${subsub.name}`
+            });
+          });
+        });
+      });
+    });
+    return resources;
+  }, [filteredCategories]);
+
   const toggleTheme = () => {
     if (theme === "light") {
       setTheme("dark")
@@ -188,36 +245,41 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
   }
 
   return (
-    <Sidebar collapsible="icon">
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <Link href="/" onClick={handleMobileNavigation}>
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                  <Video className="size-4" />
-                </div>
-                <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="font-semibold">Awesome Video</span>
-                  <span className="text-xs text-muted-foreground">2,011 Resources</span>
-                </div>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton onClick={toggleTheme} className="w-full">
-              {theme === "light" ? (
-                <Sun className="h-4 w-4" />
-              ) : theme === "dark" ? (
-                <Moon className="h-4 w-4" />
-              ) : (
-                <Palette className="h-4 w-4" />
-              )}
-              <span className="capitalize">{theme} Theme</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader>
+    <TooltipProvider>
+      <Sidebar collapsible="icon">
+        <SidebarHeader>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton size="lg" asChild>
+                <Link href="/" onClick={handleMobileNavigation}>
+                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                    <Video className="size-4" />
+                  </div>
+                  <div className="flex flex-col gap-0.5 leading-none">
+                    <span className="font-semibold">Awesome Video</span>
+                    <span className="text-xs text-muted-foreground">2,011 Resources</span>
+                  </div>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <SidebarMenuButton onClick={() => setSearchOpen(true)} className="w-full">
+                    <Search className="h-4 w-4" />
+                    <span>Search</span>
+                    <kbd className="ml-auto hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
+                      <span className="text-xs">⌘</span>K
+                    </kbd>
+                  </SidebarMenuButton>
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  <p>Search resources (⌘K)</p>
+                </TooltipContent>
+              </Tooltip>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarHeader>
       
       <SidebarContent>
         <ScrollArea className="flex-1">
@@ -226,12 +288,41 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={isActiveRoute("/")}>
-                    <Link href="/" onClick={handleMobileNavigation}>
-                      <Home className="h-4 w-4" />
-                      <span>Home</span>
-                    </Link>
-                  </SidebarMenuButton>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <SidebarMenuButton asChild isActive={isActiveRoute("/")}>
+                        <Link href="/" onClick={handleMobileNavigation}>
+                          <Home className="h-4 w-4" />
+                          <span>Home</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">Home</TooltipContent>
+                  </Tooltip>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <SidebarMenuButton asChild isActive={isActiveRoute("/advanced")}>
+                        <Link href="/advanced" onClick={handleMobileNavigation}>
+                          <Zap className="h-4 w-4" />
+                          <span>Advanced Features</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">Advanced Features</TooltipContent>
+                  </Tooltip>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <SidebarMenuButton onClick={() => setRecommendationsOpen(true)}>
+                        <Sparkles className="h-4 w-4" />
+                        <span>AI Recommendations</span>
+                      </SidebarMenuButton>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">AI-Powered Recommendations</TooltipContent>
+                  </Tooltip>
                 </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
@@ -406,21 +497,108 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <a
-                href="https://github.com/krzemienski/awesome-video"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Package className="h-4 w-4" />
-                <span>View on GitHub</span>
-              </a>
-            </SidebarMenuButton>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <SidebarMenuButton onClick={() => setPreferencesOpen(true)}>
+                  <User className="h-4 w-4" />
+                  <span>Preferences</span>
+                </SidebarMenuButton>
+              </TooltipTrigger>
+              <TooltipContent side="right">User Preferences</TooltipContent>
+            </Tooltip>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <SidebarMenuButton onClick={toggleTheme}>
+                  {theme === "light" ? (
+                    <Sun className="h-4 w-4" />
+                  ) : theme === "dark" ? (
+                    <Moon className="h-4 w-4" />
+                  ) : (
+                    <Palette className="h-4 w-4" />
+                  )}
+                  <span className="capitalize">{theme} Theme</span>
+                </SidebarMenuButton>
+              </TooltipTrigger>
+              <TooltipContent side="right">Switch Theme</TooltipContent>
+            </Tooltip>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <SidebarMenuButton onClick={() => setPaletteOpen(true)}>
+                  <Palette className="h-4 w-4" />
+                  <span>Customize Colors</span>
+                </SidebarMenuButton>
+              </TooltipTrigger>
+              <TooltipContent side="right">Color Palette Generator</TooltipContent>
+            </Tooltip>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <SidebarMenuButton asChild>
+                  <a
+                    href="https://github.com/krzemienski/awesome-video"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Github className="h-4 w-4" />
+                    <span>View on GitHub</span>
+                  </a>
+                </SidebarMenuButton>
+              </TooltipTrigger>
+              <TooltipContent side="right">View on GitHub</TooltipContent>
+            </Tooltip>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
       
       <SidebarRail />
     </Sidebar>
+    
+    {/* All Dialog Components */}
+    <SearchDialog isOpen={searchOpen} setIsOpen={setSearchOpen} resources={allResources} />
+    
+    <Dialog open={recommendationsOpen} onOpenChange={setRecommendationsOpen}>
+      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5" />
+            AI-Powered Recommendations
+          </DialogTitle>
+        </DialogHeader>
+        {isLoaded && (
+          <RecommendationPanel 
+            userProfile={userProfile}
+            onResourceClick={(resourceId) => {
+              setRecommendationsOpen(false)
+              window.open(resourceId, '_blank')
+            }}
+          />
+        )}
+      </DialogContent>
+    </Dialog>
+    
+    {isLoaded && (
+      <UserPreferences
+        userProfile={userProfile}
+        onProfileUpdate={updateProfile}
+        availableCategories={filteredCategories.map(cat => cat.name)}
+        open={preferencesOpen}
+        onOpenChange={setPreferencesOpen}
+      />
+    )}
+    
+    <ColorPaletteGenerator
+      isOpen={paletteOpen}
+      onClose={() => setPaletteOpen(false)}
+      onPaletteGenerated={(palette) => {
+        console.log('Palette generated:', palette)
+        setPaletteOpen(false)
+      }}
+    />
+  </TooltipProvider>
   )
 }
