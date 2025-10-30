@@ -17,7 +17,7 @@ import {
 import { useState, useEffect, useMemo } from "react"
 import { Link, useLocation } from "wouter"
 import { cn } from "@/lib/utils"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@radix-ui/react-collapsible"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 
 import {
   Sidebar,
@@ -76,6 +76,25 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
   } catch (e) {
     // Context not available, using defaults
   }
+
+  // Calculate total count including all nested resources
+  // This matches the logic used in HomePage for consistency
+  const calculateTotalCount = (category: Category): number => {
+    // Start with direct category resources
+    let total = category.resources.length;
+    
+    // Add subcategory resources
+    category.subcategories?.forEach(sub => {
+      total += sub.resources.length;
+      
+      // Add sub-subcategory resources
+      sub.subSubcategories?.forEach(subsub => {
+        total += subsub.resources.length;
+      });
+    });
+    
+    return total;
+  };
 
   // Filter out unwanted categories (memoized to prevent infinite useEffect loops)
   const filteredCategories = useMemo(() => 
@@ -225,6 +244,7 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                 const Icon = categoryIcons[category.name] || FileText
                 const hasSubcategories = category.subcategories && category.subcategories.length > 0
                 const isOpen = openCategories.has(category.slug)
+                const totalCount = calculateTotalCount(category)
 
                 return (
                   <Collapsible
@@ -254,7 +274,7 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                               <Icon className="h-4 w-4" />
                               <span className="flex-1">{category.name}</span>
                               <Badge variant="secondary" className="ml-auto mr-1">
-                                {category.resources.length}
+                                {totalCount}
                               </Badge>
                             </Link>
                           </SidebarMenuButton>
