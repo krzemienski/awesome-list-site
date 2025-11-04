@@ -103,7 +103,7 @@ main {
 table {
   position: relative;
   z-index: 1;
-  background-color: hsl(var(--card));
+  background-color: var(--card);
 }
 
 /* Ensure content containers are visible */
@@ -128,7 +128,7 @@ header.sticky {
 [data-sidebar-inset] {
   position: relative;
   z-index: 1;
-  background-color: hsl(var(--background));
+  background-color: var(--background);
 }
 
 /* Table rows and cells visibility */
@@ -137,18 +137,15 @@ tr, td, th {
 }
 
 tbody tr:hover {
-  background-color: hsl(var(--muted));
+  background-color: var(--muted);
 }
 
-/* Ensure text is always visible */
-p, span, div, h1, h2, h3, h4, h5, h6 {
-  color: hsl(var(--foreground));
-}
+/* Remove overly broad color rule that breaks components */
 
 /* Fix for compact view items */
 .compact-item {
-  background-color: hsl(var(--card));
-  color: hsl(var(--card-foreground));
+  background-color: var(--card);
+  color: var(--card-foreground);
 }
 
 /* Content containment improvements */
