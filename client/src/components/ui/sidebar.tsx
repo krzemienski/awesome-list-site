@@ -294,7 +294,7 @@ const Sidebar = React.forwardRef<
     return (
       <div
         ref={ref}
-        className="group peer hidden shrink-0 text-sidebar-foreground md:sticky md:top-0 md:block"
+        className="group peer hidden md:block text-sidebar-foreground md:sticky md:top-0"
         data-state={state}
         data-collapsible={state === "collapsed" ? collapsible : ""}
         data-variant={variant}
