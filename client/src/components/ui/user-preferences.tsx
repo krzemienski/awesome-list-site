@@ -77,11 +77,7 @@ export default function UserPreferences({
 }: UserPreferencesProps) {
   const [localProfile, setLocalProfile] = useState<UserProfile>(userProfile);
   const [newGoal, setNewGoal] = useState("");
-  const [internalOpen, setInternalOpen] = useState(() => {
-    // Persist dialog state to prevent disappearing on scroll
-    const saved = sessionStorage.getItem('awesome-user-preferences-open');
-    return saved === 'true';
-  });
+  const [internalOpen, setInternalOpen] = useState(false);
 
   // Use external control if provided, otherwise use internal state
   const isOpen = externalOpen !== undefined ? externalOpen : internalOpen;
@@ -101,16 +97,10 @@ export default function UserPreferences({
       timeCommitment: localProfile.timeCommitment
     });
     setIsOpen(false);
-    if (!externalOnOpenChange) {
-      sessionStorage.setItem('awesome-user-preferences-open', 'false');
-    }
   };
 
   const handleDialogOpenChange = (open: boolean) => {
     setIsOpen(open);
-    if (!externalOnOpenChange) {
-      sessionStorage.setItem('awesome-user-preferences-open', open.toString());
-    }
   };
 
   const handleCategoryToggle = (category: string) => {
