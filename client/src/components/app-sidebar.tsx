@@ -364,7 +364,7 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                             >
                               <Icon className="h-4 w-4" />
                               <span className="flex-1">{category.name}</span>
-                              <Badge variant="secondary" className="ml-auto mr-1">
+                              <Badge variant="secondary" className="ml-auto mr-1 group-data-[collapsible=icon]:hidden">
                                 {totalCount}
                               </Badge>
                             </Link>
@@ -374,7 +374,7 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-auto w-auto p-1.5 hover:bg-sidebar-accent"
+                                className="h-auto w-auto p-1.5 hover:bg-sidebar-accent group-data-[collapsible=icon]:hidden"
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 <ChevronRight
@@ -423,7 +423,7 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                                               onClick={handleMobileNavigation}
                                             >
                                               <span className="flex-1">{sub.name}</span>
-                                              <Badge variant="secondary" className="ml-auto mr-1 text-[10px] px-1.5 py-0">
+                                              <Badge variant="secondary" className="ml-auto mr-1 text-[10px] px-1.5 py-0 group-data-[collapsible=icon]:hidden">
                                                 {sub.resources.length}
                                               </Badge>
                                             </Link>
@@ -432,7 +432,7 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                                             <Button
                                               variant="ghost"
                                               size="sm"
-                                              className="h-auto w-auto p-1 hover:bg-sidebar-accent"
+                                              className="h-auto w-auto p-1 hover:bg-sidebar-accent group-data-[collapsible=icon]:hidden"
                                               onClick={(e) => e.stopPropagation()}
                                             >
                                               <ChevronRight
@@ -455,7 +455,7 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                                                     onClick={handleMobileNavigation}
                                                   >
                                                     <span className="flex-1">{subSub.name}</span>
-                                                    <Badge variant="secondary" className="ml-auto text-[10px] px-1.5 py-0">
+                                                    <Badge variant="secondary" className="ml-auto text-[10px] px-1.5 py-0 group-data-[collapsible=icon]:hidden">
                                                       {subSub.resources.length}
                                                     </Badge>
                                                   </Link>
@@ -472,7 +472,7 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                                           onClick={handleMobileNavigation}
                                         >
                                           <span className="flex-1">{sub.name}</span>
-                                          <Badge variant="secondary" className="ml-auto text-[10px] px-1.5 py-0">
+                                          <Badge variant="secondary" className="ml-auto text-[10px] px-1.5 py-0 group-data-[collapsible=icon]:hidden">
                                             {sub.resources.length}
                                           </Badge>
                                         </Link>
