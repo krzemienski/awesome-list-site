@@ -99,6 +99,11 @@ function Router() {
 }
 
 function App() {
+  // Force dark mode - apply dark class to document root
+  useEffect(() => {
+    document.documentElement.classList.add('dark');
+  }, []);
+
   // Initialize Google Analytics when app loads
   useEffect(() => {
     // Verify required environment variable is present
