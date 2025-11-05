@@ -90,13 +90,17 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
         );
         
         if (matchingCategory) {
-          setOpenCategories(prev => [...prev, matchingCategory.name]);
+          setOpenCategories(prev => {
+            // Only add if not already in the array
+            if (!prev.includes(matchingCategory.name)) {
+              return [...prev, matchingCategory.name];
+            }
+            return prev;
+          });
         }
       } else if (path[1] === '') {
-        // Open first category on home page
-        if (categories[0]) {
-          setOpenCategories([categories[0].name]);
-        }
+        // Don't force open any categories on home page - let user control it
+        // setOpenCategories([]);
       }
     }
   }, [categories, location]);
