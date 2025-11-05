@@ -205,7 +205,7 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
                   >
                     <div className="flex items-center gap-2 w-full">
                       <Folder className="h-4 w-4 flex-shrink-0" />
-                      <span className="truncate flex-1 text-left">{category.name}</span>
+                      <span className="break-words flex-1 text-left">{category.name}</span>
                       <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded ml-auto flex-shrink-0">
                         {category.resources.length}
                       </span>
@@ -253,7 +253,7 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
                           >
                             <div className="flex items-center gap-2 w-full">
                               <span className="w-2 h-2 rounded-full bg-muted-foreground/40 flex-shrink-0"></span>
-                              <span className="truncate flex-1 text-left">{subcategory.name}</span>
+                              <span className="break-words flex-1 text-left">{subcategory.name}</span>
                               <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded ml-auto flex-shrink-0">
                                 {subcategory.resources.length}
                               </span>
@@ -279,7 +279,7 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
                               >
                                 <div className="flex items-center gap-2 w-full">
                                   <span className="w-1 h-1 rounded-full bg-muted-foreground/30 flex-shrink-0"></span>
-                                  <span className="truncate flex-1 text-left">{subSubcategory.name}</span>
+                                  <span className="break-words flex-1 text-left">{subSubcategory.name}</span>
                                   <span className="text-xs bg-muted/80 text-muted-foreground px-1 py-0.5 rounded ml-auto flex-shrink-0">
                                     {subSubcategory.resources.length}
                                   </span>
