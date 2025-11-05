@@ -52,9 +52,9 @@ export function AppLayout({ awesomeList, isLoading, children }: AppLayoutProps) 
 
         {/* Main content */}
         <div className="flex flex-1 flex-col">
-          <main className="flex-1 p-4 md:p-6">
+          <div className="flex-1 p-4 md:p-6">
             {children}
-          </main>
+          </div>
           
           <Footer />
         </div>
