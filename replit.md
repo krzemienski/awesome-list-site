@@ -13,13 +13,15 @@ Preferred communication style: Simple, everyday language.
 The application employs a client-server architecture. The frontend is a React-based single-page application built with Vite, utilizing `shadcn/ui` components, Tailwind CSS, and React Query for data fetching. The backend is an Express.js server providing RESTful API endpoints for resource management and data fetching. Data is stored in a PostgreSQL database using Drizzle ORM, with a defined schema for resources, categories, and subcategories.
 
 ### UI/UX Decisions
-- **Vibrant "Hyper term pink" cyberpunk theme** using OKLCH color space with high chroma values for vivid, neon-like colors:
-  - Dark mode: Neon pink primary (chroma 0.38), cyan accents (chroma 0.32), purple-tinted backgrounds (chroma 0.06-0.10)
-  - Light mode: Vibrant magenta primary (chroma 0.28), blue accents (chroma 0.24), subtle purple-tinted backgrounds (chroma 0.05-0.06)
-- JetBrains Mono monospace font for terminal aesthetic
-- Zero border-radius enforced throughout (perfectly square corners for cyberpunk look)
-- Supports light, dark, and system theme modes with localStorage persistence via ThemeProvider
-- Mobile-optimized responsive design with touch-friendly elements and collapsible hierarchical sidebar
+- **Pure black cyberpunk theme** - Dark mode only, using OKLCH color space with vivid neon accents:
+  - Pure black background: oklch(0 0 0)
+  - Vivid neon pink primary: oklch(0.7017 0.3225 328.3634) - high chroma for intense glow
+  - Cyan accent: oklch(0.7072 0.1679 242.0420) - electric blue highlights
+  - No shadows, no rounded corners, pure terminal aesthetic
+- JetBrains Mono monospace font throughout entire application
+- Zero border-radius enforced (--radius: 0rem) for perfectly sharp, square corners
+- Dark mode only - no light mode support, no theme switching
+- Mobile-optimized responsive design with 44x44px touch targets (WCAG AAA) and collapsible hierarchical sidebar
 
 ### Technical Implementations
 - **Frontend**: React 18+ with TypeScript, Vite, Tailwind CSS, `shadcn/ui`, React Query for state management, Wouter for routing.
@@ -28,10 +30,10 @@ The application employs a client-server architecture. The frontend is a React-ba
 - **Sidebar Layout**: CSS Grid-based layout on desktop using `grid-cols-[var(--sidebar-width)_1fr]`, dynamically adjusting to `grid-cols-[var(--sidebar-width-icon)_1fr]` when collapsed. Sidebar width: 16rem (256px) expanded, 3rem (48px) collapsed.
 - **Sidebar Features**: 
   - **Header**: Logo and Search button with keyboard shortcut (⌘K)
-  - **Navigation**: Home, Advanced Features, AI Recommendations
-  - **Categories**: Collapsible hierarchy with category icons and resource count badges
-  - **Footer**: User Preferences, Theme toggle, Color Palette Generator, GitHub link
-  - **All interactive elements**: Tooltips for enhanced UX in collapsed mode
+  - **Navigation**: Home with hierarchical category navigation
+  - **Categories**: Collapsible 3-level hierarchy (category → subcategory → sub-subcategory) with resource count badges
+  - **Footer**: GitHub repository link
+  - **Mobile**: 44x44px minimum touch targets, smooth scroll-into-view, Sheet component overlay
 - **Deployment**: Configured for deployment on Replit, with optimized production builds and static site generation for platforms like GitHub Pages.
 
 ### Feature Specifications
@@ -41,8 +43,7 @@ The application employs a client-server architecture. The frontend is a React-ba
 - **Color Customization**: Interactive color palette generator for custom theme creation
 - **Advanced Features**: Dedicated page with tabs for Resource Explorer, Analytics & Metrics, Data Export, and AI Recommendations
 - **Hierarchical Navigation**: 3-level category structure (category → subcategory → sub-subcategory) with accurate resource counts and visual hierarchy
-- **Theme System**: Three-theme support (light, dark, custom) with data-theme attributes and localStorage persistence
-- **Mobile-Optimized**: Responsive design with touch-friendly elements and collapsible sidebar for mobile devices
+- **Mobile-Optimized**: Responsive design with WCAG AAA compliant 44x44px touch targets, scroll-into-view behavior, and Sheet-based sidebar overlay
 
 ## External Dependencies
 
