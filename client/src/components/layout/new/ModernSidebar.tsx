@@ -196,17 +196,17 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
                   <Button
                     variant="ghost"
                     className={cn(
-                      "flex-1 justify-start font-normal text-sm py-2 px-2 min-h-[44px] touch-manipulation",
+                      "flex-1 justify-start font-normal text-sm py-2 px-2 min-h-[44px] touch-manipulation overflow-hidden",
                       location === `/category/${getCategorySlug(category.name)}` 
                         ? "bg-accent text-accent-foreground" 
                         : ""
                     )}
                     onClick={() => navigate(`/category/${getCategorySlug(category.name)}`)}
                   >
-                    <div className="flex items-center gap-2 w-full">
-                      <Folder className="h-4 w-4 flex-shrink-0" />
-                      <span className="break-words flex-1 text-left">{category.name}</span>
-                      <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded ml-auto flex-shrink-0">
+                    <div className="flex items-start gap-2 w-full min-w-0">
+                      <Folder className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                      <span className="break-words flex-1 text-left min-w-0 leading-tight">{category.name}</span>
+                      <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded ml-2 flex-shrink-0 self-start">
                         {category.resources.length}
                       </span>
                     </div>
@@ -244,17 +244,17 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
                           <Button
                             variant="ghost"
                             className={cn(
-                              "flex-1 justify-start font-normal text-sm py-1.5 px-2 min-h-[44px] touch-manipulation",
+                              "flex-1 justify-start font-normal text-sm py-1.5 px-2 min-h-[44px] touch-manipulation overflow-hidden",
                               location === `/subcategory/${subcategory.slug}` 
                                 ? "bg-accent text-accent-foreground" 
                                 : ""
                             )}
                             onClick={() => navigate(`/subcategory/${subcategory.slug}`)}
                           >
-                            <div className="flex items-center gap-2 w-full">
-                              <span className="w-2 h-2 rounded-full bg-muted-foreground/40 flex-shrink-0"></span>
-                              <span className="break-words flex-1 text-left">{subcategory.name}</span>
-                              <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded ml-auto flex-shrink-0">
+                            <div className="flex items-start gap-2 w-full min-w-0">
+                              <span className="w-2 h-2 rounded-full bg-muted-foreground/40 flex-shrink-0 mt-1.5"></span>
+                              <span className="break-words flex-1 text-left min-w-0 leading-tight">{subcategory.name}</span>
+                              <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded ml-2 flex-shrink-0 self-start">
                                 {subcategory.resources.length}
                               </span>
                             </div>
@@ -270,17 +270,17 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
                                 key={subSubcategory.name}
                                 variant="ghost"
                                 className={cn(
-                                  "w-full justify-start font-normal text-xs py-1 px-2 min-h-[44px] touch-manipulation",
+                                  "w-full justify-start font-normal text-xs py-1 px-2 min-h-[44px] touch-manipulation overflow-hidden",
                                   location === `/sub-subcategory/${subSubcategory.slug}` 
                                     ? "bg-accent text-accent-foreground" 
                                     : ""
                                 )}
                                 onClick={() => navigate(`/sub-subcategory/${subSubcategory.slug}`)}
                               >
-                                <div className="flex items-center gap-2 w-full">
-                                  <span className="w-1 h-1 rounded-full bg-muted-foreground/30 flex-shrink-0"></span>
-                                  <span className="break-words flex-1 text-left">{subSubcategory.name}</span>
-                                  <span className="text-xs bg-muted/80 text-muted-foreground px-1 py-0.5 rounded ml-auto flex-shrink-0">
+                                <div className="flex items-start gap-2 w-full min-w-0">
+                                  <span className="w-1 h-1 rounded-full bg-muted-foreground/30 flex-shrink-0 mt-1.5"></span>
+                                  <span className="break-words flex-1 text-left min-w-0 leading-tight">{subSubcategory.name}</span>
+                                  <span className="text-xs bg-muted/80 text-muted-foreground px-1 py-0.5 rounded ml-2 flex-shrink-0 self-start">
                                     {subSubcategory.resources.length}
                                   </span>
                                 </div>
@@ -317,7 +317,7 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
   if (isMobile) {
     return (
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetContent side="left" className="p-0 w-[280px] sm:w-[320px]">
+        <SheetContent side="left" className="p-0 w-[85vw] max-w-[380px]">
           <div className="flex flex-col h-full">
             {sidebarContent}
           </div>
