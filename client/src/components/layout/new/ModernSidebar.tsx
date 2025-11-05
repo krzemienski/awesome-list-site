@@ -110,13 +110,28 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
     setIsOpen(!isOpen);
   };
   
-  // Toggle category open state
-  const toggleCategory = (category: string) => {
+  // Toggle category open state with scroll-into-view for mobile
+  const toggleCategory = (category: string, event?: React.MouseEvent) => {
     setOpenCategories(prev => 
       prev.includes(category) 
         ? prev.filter(c => c !== category) 
         : [...prev, category]
     );
+    
+    // On mobile, scroll the clicked element into view
+    // Save reference before setTimeout to avoid React event pooling issues
+    if (isMobile && event?.currentTarget) {
+      const element = event.currentTarget as HTMLElement;
+      setTimeout(() => {
+        if (element) {
+          element.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'nearest',
+            inline: 'nearest'
+          });
+        }
+      }, 100);
+    }
   };
 
   // Navigation helper to close mobile sidebar after clicking
@@ -130,7 +145,7 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
   // Sidebar content to reuse in both mobile and desktop views
   const sidebarContent = (
     <>
-      <div className="flex-1 overflow-auto p-3">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden p-3 scroll-smooth">
         <Button
           variant="ghost"
           className={cn(
@@ -162,23 +177,26 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
               <div key={category.name} className="mb-2">
                 {/* Main Category - Always expandable to show hierarchy */}
                 <div className="flex items-center w-full">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="p-1 mr-1 h-6 w-6 flex-shrink-0"
-                    onClick={() => toggleCategory(category.name)}
+                  <button
+                    className="p-2 mr-1 min-h-[44px] min-w-[44px] flex items-center justify-center flex-shrink-0 touch-manipulation hover:bg-accent/50 rounded active:bg-accent"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleCategory(category.name, e);
+                    }}
+                    aria-label={`${openCategories.includes(category.name) ? 'Collapse' : 'Expand'} ${category.name}`}
                   >
                     <div className={cn(
                       "transform transition-transform duration-200",
                       openCategories.includes(category.name) ? "rotate-90" : ""
                     )}>
-                      <span className="text-xs">▶</span>
+                      <span className="text-sm">▶</span>
                     </div>
-                  </Button>
+                  </button>
                   <Button
                     variant="ghost"
                     className={cn(
-                      "flex-1 justify-start font-normal text-sm py-2 px-2 min-h-[36px]",
+                      "flex-1 justify-start font-normal text-sm py-2 px-2 min-h-[44px] touch-manipulation",
                       location === `/category/${getCategorySlug(category.name)}` 
                         ? "bg-accent text-accent-foreground" 
                         : ""
@@ -204,26 +222,29 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
                         <div className="flex items-center w-full">
                           {/* Expand button for Level 3 if subSubcategories exist */}
                           {subcategory.subSubcategories && subcategory.subSubcategories.length > 0 ? (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="p-1 mr-1 h-5 w-5 flex-shrink-0"
-                              onClick={() => toggleCategory(`${category.name}-${subcategory.name}`)}
+                            <button
+                              className="p-2 mr-1 min-h-[44px] min-w-[44px] flex items-center justify-center flex-shrink-0 touch-manipulation hover:bg-accent/50 rounded active:bg-accent"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                toggleCategory(`${category.name}-${subcategory.name}`, e);
+                              }}
+                              aria-label={`${openCategories.includes(`${category.name}-${subcategory.name}`) ? 'Collapse' : 'Expand'} ${subcategory.name}`}
                             >
                               <div className={cn(
                                 "transform transition-transform duration-200",
                                 openCategories.includes(`${category.name}-${subcategory.name}`) ? "rotate-90" : ""
                               )}>
-                                <span className="text-xs">▶</span>
+                                <span className="text-sm">▶</span>
                               </div>
-                            </Button>
+                            </button>
                           ) : (
-                            <div className="w-6 h-5 flex-shrink-0"></div>
+                            <div className="min-w-[44px] h-[44px] flex-shrink-0"></div>
                           )}
                           <Button
                             variant="ghost"
                             className={cn(
-                              "flex-1 justify-start font-normal text-sm py-1.5 px-2 min-h-[32px]",
+                              "flex-1 justify-start font-normal text-sm py-1.5 px-2 min-h-[44px] touch-manipulation",
                               location === `/subcategory/${subcategory.slug}` 
                                 ? "bg-accent text-accent-foreground" 
                                 : ""
@@ -249,7 +270,7 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
                                 key={subSubcategory.name}
                                 variant="ghost"
                                 className={cn(
-                                  "w-full justify-start font-normal text-xs py-1 px-2 min-h-[28px]",
+                                  "w-full justify-start font-normal text-xs py-1 px-2 min-h-[44px] touch-manipulation",
                                   location === `/sub-subcategory/${subSubcategory.slug}` 
                                     ? "bg-accent text-accent-foreground" 
                                     : ""
