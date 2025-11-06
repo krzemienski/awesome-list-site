@@ -1,7 +1,6 @@
 import { hydrateRoot, createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
-import { ThemeProvider } from "./components/ui/theme-provider";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -33,14 +32,12 @@ if (window.__INITIAL_DATA__) {
 
 const rootElement = document.getElementById("root")!;
 const AppComponent = (
-  <ThemeProvider>
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <App />
-      </TooltipProvider>
-    </QueryClientProvider>
-  </ThemeProvider>
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Toaster />
+      <App />
+    </TooltipProvider>
+  </QueryClientProvider>
 );
 
 // Use hydration if we have server-rendered content, otherwise use client rendering
