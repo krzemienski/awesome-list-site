@@ -6,7 +6,8 @@ const DEFAULT_MODEL_STR = "claude-sonnet-4-20250514";
 // </important_do_not_delete>
 
 const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
+  apiKey: process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY,
+  baseURL: process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL,
 });
 
 export interface UserProfile {
@@ -55,7 +56,7 @@ export async function generateAIRecommendations(
   limit: number = 10
 ): Promise<AIRecommendationResult[]> {
   try {
-    if (!process.env.ANTHROPIC_API_KEY) {
+    if (!process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY) {
       console.warn('Anthropic API key not configured, falling back to rule-based recommendations');
       return generateFallbackRecommendations(userProfile, availableResources, limit);
     }
@@ -155,7 +156,7 @@ export async function generateAILearningPaths(
   availableResources: Resource[]
 ): Promise<AILearningPath[]> {
   try {
-    if (!process.env.ANTHROPIC_API_KEY) {
+    if (!process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY) {
       console.warn('Anthropic API key not configured, falling back to rule-based learning paths');
       return generateFallbackLearningPaths(userProfile, availableResources);
     }
