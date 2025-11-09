@@ -61,15 +61,22 @@ export default function SidebarNav({
   // Desktop sidebar
   const DesktopSidebar = (
     <aside 
-      className="w-[250px] border-r pt-4 hidden md:block transition-all duration-200 ease-in-out"
+      className="w-[250px] border-r pt-4 hidden md:block transition-all duration-200 ease-in-out relative z-10"
       data-state={isOpen ? "open" : "closed"}
+      style={{ pointerEvents: 'auto' }}
     >
       <div className="flex h-[calc(100vh-3.5rem)] flex-col gap-2">
         <nav className="flex-1 px-2 overflow-auto pb-6">
           <div className="space-y-1">
-            <div className={`w-full text-left flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium ${
+            <div 
+              className={`w-full text-left flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium ${
                 location === "/" ? "bg-accent text-accent-foreground" : "hover:bg-accent hover:text-accent-foreground"
-              }`} onClick={() => window.location.href = "/"} role="button" tabIndex={0}>
+              }`} 
+              onClick={() => window.location.href = "/"} 
+              role="button" 
+              tabIndex={0}
+              data-testid="nav-home"
+            >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -86,9 +93,15 @@ export default function SidebarNav({
                 Home
               </div>
               
-            <div className={`w-full text-left flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium ${
+            <div 
+              className={`w-full text-left flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium ${
                 location === "/advanced" ? "bg-accent text-accent-foreground" : "hover:bg-accent hover:text-accent-foreground"
-              }`} onClick={() => window.location.href = "/advanced"} role="button" tabIndex={0}>
+              }`} 
+              onClick={() => window.location.href = "/advanced"} 
+              role="button" 
+              tabIndex={0}
+              data-testid="nav-advanced"
+            >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -124,11 +137,13 @@ export default function SidebarNav({
                   type="multiple"
                   value={openCategories}
                   className="pb-1"
+                  data-testid={`accordion-category-${getCategorySlug(category.name)}`}
                 >
                   <AccordionItem value={category.name} className="border-0">
                     <AccordionTrigger
                       onClick={() => toggleCategory(category.name)}
                       className="py-2 px-3 text-sm hover:bg-accent hover:text-accent-foreground rounded-md"
+                      data-testid={`nav-category-trigger-${getCategorySlug(category.name)}`}
                     >
                       <div className="flex items-center gap-2">
                         <svg
@@ -157,6 +172,7 @@ export default function SidebarNav({
                           onClick={() => window.location.href = `/category/${getCategorySlug(category.name)}`}
                           role="button"
                           tabIndex={0}
+                          data-testid={`nav-category-all-${getCategorySlug(category.name)}`}
                         >
                           All ({category.resources.length})
                         </div>
@@ -172,6 +188,7 @@ export default function SidebarNav({
                             onClick={() => window.location.href = `/subcategory/${subcategory.slug}`}
                             role="button"
                             tabIndex={0}
+                            data-testid={`nav-subcategory-${subcategory.slug}`}
                           >
                             {subcategory.name} ({subcategory.resources.length})
                           </div>
@@ -237,6 +254,7 @@ export default function SidebarNav({
                 }}
                 role="button"
                 tabIndex={0}
+                data-testid="nav-home-mobile"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -271,11 +289,13 @@ export default function SidebarNav({
                       type="multiple"
                       value={openCategories}
                       className="pb-1"
+                      data-testid={`accordion-category-${getCategorySlug(category.name)}-mobile`}
                     >
                       <AccordionItem value={category.name} className="border-0">
                         <AccordionTrigger
                           onClick={() => toggleCategory(category.name)}
                           className="py-2 px-3 text-sm hover:bg-accent hover:text-accent-foreground rounded-md"
+                          data-testid={`nav-category-trigger-${getCategorySlug(category.name)}-mobile`}
                         >
                           <div className="flex items-center gap-2">
                             <svg
@@ -307,6 +327,7 @@ export default function SidebarNav({
                               }}
                               role="button"
                               tabIndex={0}
+                              data-testid={`nav-category-all-${getCategorySlug(category.name)}-mobile`}
                             >
                               All ({category.resources.length})
                             </div>
@@ -325,6 +346,7 @@ export default function SidebarNav({
                                 }}
                                 role="button"
                                 tabIndex={0}
+                                data-testid={`nav-subcategory-${subcategory.slug}-mobile`}
                               >
                                 <span className="truncate">{subcategory.name}</span> <span className="text-muted-foreground">({subcategory.resources.length})</span>
                               </div>

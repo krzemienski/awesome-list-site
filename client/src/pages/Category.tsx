@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import SEOHead from "@/components/layout/SEOHead";
 import TagFilter from "@/components/ui/tag-filter";
 import { ArrowLeft, Search, ExternalLink } from "lucide-react";
-import { deslugify } from "@/lib/utils";
+import { deslugify, slugify } from "@/lib/utils";
 import { Resource } from "@/types/awesome-list";
 import NotFound from "@/pages/not-found";
 import { processAwesomeListData } from "@/lib/parser";
@@ -256,6 +256,8 @@ export default function Category() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredResources.map((resource, index) => {
+            const resourceId = `${slugify(resource.title)}-${index}`;
+            
             const handleResourceClick = () => {
               window.open(resource.url, '_blank', 'noopener,noreferrer');
               toast({
@@ -269,7 +271,7 @@ export default function Category() {
                 key={`${resource.url}-${index}`}
                 className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors border border-border bg-card text-card-foreground"
                 onClick={handleResourceClick}
-                data-testid={`card-resource-${index}`}
+                data-testid={`card-resource-${resourceId}`}
               >
                 <CardHeader>
                   <CardTitle className="text-lg flex items-start gap-2">
