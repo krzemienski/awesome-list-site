@@ -7,6 +7,7 @@ import CategoryExplorer from "@/components/ui/category-explorer";
 import CommunityMetrics from "@/components/ui/community-metrics";
 import ExportTools from "@/components/ui/export-tools";
 import ResourceRecommendations from "@/components/ui/resource-recommendations";
+import AIRecommendationsPanel from "@/components/ui/ai-recommendations-panel";
 import { Skeleton } from "@/components/ui/skeleton";
 import { 
   Zap, 
@@ -246,69 +247,7 @@ export default function Advanced() {
         </TabsContent>
 
         <TabsContent value="recommendations" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Lightbulb className="h-5 w-5" />
-                AI-Powered Resource Recommendations
-              </CardTitle>
-              <CardDescription>
-                Intelligent recommendations based on tags, categories, usage patterns, and community trends
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                {[
-                  { 
-                    title: "Similar Resources", 
-                    desc: "Same category and shared tags",
-                    icon: "🎯",
-                    color: "text-blue-600"
-                  },
-                  { 
-                    title: "Trending Tools", 
-                    desc: "Popular and well-documented",
-                    icon: "📈",
-                    color: "text-green-600"
-                  },
-                  { 
-                    title: "Personal Match", 
-                    desc: "Based on your interests",
-                    icon: "💡",
-                    color: "text-purple-600"
-                  },
-                  { 
-                    title: "Complementary", 
-                    desc: "Tools that work together",
-                    icon: "⚡",
-                    color: "text-orange-600"
-                  }
-                ].map(item => (
-                  <Card key={item.title}>
-                    <CardContent className="p-4 text-center">
-                      <div className="text-2xl mb-2">{item.icon}</div>
-                      <div className={`font-medium text-sm ${item.color}`}>{item.title}</div>
-                      <div className="text-xs text-muted-foreground mt-1">{item.desc}</div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-
-              {featuredResource && (
-                <div className="mb-4 p-4 bg-muted rounded-lg">
-                  <div className="text-sm text-muted-foreground mb-2">Currently showing recommendations for:</div>
-                  <div className="font-medium">{featuredResource.title}</div>
-                  <div className="text-xs text-muted-foreground">{featuredResource.category}</div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <ResourceRecommendations
-            currentResource={selectedResource || featuredResource}
-            allResources={awesomeList.resources}
-            userTags={userInterests}
-          />
+          <AIRecommendationsPanel resources={awesomeList.resources} />
         </TabsContent>
       </Tabs>
 
