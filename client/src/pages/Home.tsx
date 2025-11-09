@@ -121,15 +121,19 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
               key={category.slug} 
               href={`/category/${category.slug}`}
               aria-label={`View ${category.name} category with ${totalCount} resources`}
+              data-testid={`link-category-${category.slug}`}
             >
-              <Card className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors border border-border bg-card text-card-foreground">
+              <Card 
+                className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors border border-border bg-card text-card-foreground"
+                data-testid={`card-category-${category.slug}`}
+              >
                 <CardHeader>
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-3">
                       <Icon className="h-6 w-6" />
                       <CardTitle className="text-lg">{category.name}</CardTitle>
                     </div>
-                    <Badge variant="secondary">{totalCount}</Badge>
+                    <Badge variant="secondary" data-testid={`badge-count-${category.slug}`}>{totalCount}</Badge>
                   </div>
                   {description && (
                     <CardDescription className="text-sm">

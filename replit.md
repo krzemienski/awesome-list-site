@@ -45,6 +45,28 @@ The application employs a client-server architecture. The frontend is a React-ba
 - **Hierarchical Navigation**: 3-level category structure (category → subcategory → sub-subcategory) with accurate resource counts and visual hierarchy
 - **Mobile-Optimized**: Responsive design with WCAG AAA compliant 44x44px touch targets, scroll-into-view behavior, and Sheet-based sidebar overlay
 
+### Category Resource Counts
+Resource counts include all resources at category level, subcategory level, and sub-subcategory level. The `calculateTotalCount` function in Home.tsx aggregates resources across all three hierarchy levels:
+
+**Main Categories (Total Counts):**
+- **Intro & Learning**: 329 resources (229 category + 100 subcategories)
+- **Encoding & Codecs**: 745 resources (392 category + 269 subcategories + 84 sub-subcategories)
+- **Standards & Industry**: 226 resources (174 category + 41 subcategories + 11 sub-subcategories)
+- **Media Tools**: 504 resources (317 category + 103 subcategories + 84 sub-subcategories)
+- **Protocols & Transport**: Direct resources only
+- **Players & Clients**: Direct resources only
+- **Infrastructure & Delivery**: Direct resources only
+- **General Tools**: Direct resources only
+- **Community & Events**: Direct resources only
+
+**Resource Counting Logic:**
+1. Category-level resources: Direct resources under the main category
+2. Subcategory resources: Resources under each subcategory
+3. Sub-subcategory resources: Resources under each sub-subcategory
+4. Total count = Sum of all three levels
+
+This hierarchical counting ensures accurate representation of all available resources within each category's complete tree structure.
+
 ## External Dependencies
 
 ### Frontend
