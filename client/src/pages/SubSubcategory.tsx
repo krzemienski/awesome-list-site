@@ -6,16 +6,18 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import SEOHead from "@/components/layout/SEOHead";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ExternalLink } from "lucide-react";
 import { deslugify } from "@/lib/utils";
 import { Resource } from "@/types/awesome-list";
 import NotFound from "@/pages/not-found";
 import { processAwesomeListData } from "@/lib/parser";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
 import { trackCategoryView } from "@/lib/analytics";
+import { useToast } from "@/hooks/use-toast";
 
 export default function SubSubcategory() {
   const { slug } = useParams<{ slug: string }>();
+  const { toast } = useToast();
   
   // Fetch awesome list data - use same query as homepage
   const { data: rawData, isLoading, error } = useQuery({
@@ -145,32 +147,52 @@ export default function SubSubcategory() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {allResources.map((resource, index) => (
-            <Card 
-              key={`${resource.url}-${index}`}
-              className="hover:bg-accent hover:text-accent-foreground transition-colors border border-border bg-card text-card-foreground"
-              data-testid={`card-resource-${resource.url}`}
-            >
-              <CardHeader>
-                <CardTitle className="text-lg">
-                  <a 
-                    href={resource.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="hover:underline"
-                    data-testid={`link-resource-${resource.title.toLowerCase().replace(/\s+/g, '-')}`}
-                  >
-                    {resource.title}
-                  </a>
-                </CardTitle>
-                {resource.description && (
-                  <CardDescription className="line-clamp-2">
-                    {resource.description}
-                  </CardDescription>
+          {allResources.map((resource, index) => {
+            const handleResourceClick = () => {
+              window.open(resource.url, '_blank', 'noopener,noreferrer');
+              toast({
+                title: "Opening Resource",
+                description: resource.title,
+              });
+            };
+            
+            return (
+              <Card 
+                key={`${resource.url}-${index}`}
+                className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors border border-border bg-card text-card-foreground"
+                onClick={handleResourceClick}
+                data-testid={`card-resource-${index}`}
+              >
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-start gap-2">
+                    <span className="flex-1">{resource.title}</span>
+                    <ExternalLink className="h-4 w-4 flex-shrink-0 mt-1" />
+                  </CardTitle>
+                  {resource.description && (
+                    <CardDescription className="line-clamp-2">
+                      {resource.description}
+                    </CardDescription>
+                  )}
+                </CardHeader>
+                {resource.tags && resource.tags.length > 0 && (
+                  <CardContent>
+                    <div className="flex gap-2 flex-wrap">
+                      {resource.tags.slice(0, 3).map((tag, tagIndex) => (
+                        <Badge key={tagIndex} variant="secondary" className="text-xs">
+                          {tag}
+                        </Badge>
+                      ))}
+                      {resource.tags.length > 3 && (
+                        <Badge variant="secondary" className="text-xs">
+                          +{resource.tags.length - 3}
+                        </Badge>
+                      )}
+                    </div>
+                  </CardContent>
                 )}
-              </CardHeader>
-            </Card>
-          ))}
+              </Card>
+            );
+          })}
         </div>
       )}
     </div>
