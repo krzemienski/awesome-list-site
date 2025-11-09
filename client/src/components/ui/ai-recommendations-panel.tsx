@@ -43,9 +43,9 @@ interface AIRecommendationsPanelProps {
 
 const formSchema = z.object({
   skillLevel: z.enum(['beginner', 'intermediate', 'advanced']),
-  preferredCategories: z.array(z.string()).min(1, "Select at least one category"),
-  learningGoals: z.array(z.string()).min(1, "Select at least one learning goal"),
-  preferredResourceTypes: z.array(z.string()).min(1, "Select at least one resource type"),
+  preferredCategories: z.array(z.string()).default([]),
+  learningGoals: z.array(z.string()).default([]),
+  preferredResourceTypes: z.array(z.string()).default([]),
   timeCommitment: z.enum(['daily', 'weekly', 'flexible']),
 });
 
@@ -131,7 +131,30 @@ export default function AIRecommendationsPanel({ resources }: AIRecommendationsP
   };
 
   const getResourceDetails = (resourceId: string): Resource | undefined => {
-    return resources.find(r => r.url === resourceId);
+    // Debug logging to see what we're searching for
+    console.log('[AI Recommendations] Searching for resourceId:', resourceId);
+    console.log('[AI Recommendations] Sample resources URLs (first 3):', resources.slice(0, 3).map(r => ({
+      url: r.url,
+      title: r.title,
+      id: r.id
+    })));
+    
+    // Try exact URL match first
+    let resource = resources.find(r => r.url === resourceId);
+    
+    // If not found, try matching by ID or title as fallback
+    if (!resource) {
+      resource = resources.find(r => r.id?.toString() === resourceId);
+    }
+    
+    // Additional fallback: try partial URL match
+    if (!resource) {
+      resource = resources.find(r => r.url?.includes(resourceId) || resourceId.includes(r.url || ''));
+    }
+    
+    console.log('[AI Recommendations] Found resource:', resource ? 'Yes' : 'No', resource?.title);
+    
+    return resource;
   };
 
   const getConfidenceColor = (confidence: number) => {
@@ -432,13 +455,32 @@ export default function AIRecommendationsPanel({ resources }: AIRecommendationsP
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Error Generating Recommendations</AlertTitle>
           <AlertDescription>
-            {error instanceof Error ? error.message : 'An unexpected error occurred'}
-            {error?.message?.includes('401') && (
-              <div className="mt-2">
-                <p className="font-semibold">API Key Required</p>
-                <p className="text-sm">This feature requires an Anthropic API key to be configured.</p>
-              </div>
-            )}
+            <div className="space-y-2">
+              <p>{error instanceof Error ? error.message : 'An unexpected error occurred'}</p>
+              
+              {/* Specific error handling for different failure modes */}
+              {error?.message?.includes('401') || error?.message?.includes('Unauthorized') ? (
+                <div className="mt-2 p-2 bg-background/50 rounded border">
+                  <p className="font-semibold">🔑 API Key Issue</p>
+                  <p className="text-sm">The Anthropic API key is missing or invalid. Please configure it in the integration settings.</p>
+                </div>
+              ) : error?.message?.includes('fetch') || error?.message?.includes('network') || error?.message?.includes('Failed to fetch') ? (
+                <div className="mt-2 p-2 bg-background/50 rounded border">
+                  <p className="font-semibold">🌐 Network Error</p>
+                  <p className="text-sm">Unable to connect to the AI service. Please check your internet connection and try again.</p>
+                </div>
+              ) : error?.message?.includes('timeout') ? (
+                <div className="mt-2 p-2 bg-background/50 rounded border">
+                  <p className="font-semibold">⏱️ Request Timeout</p>
+                  <p className="text-sm">The AI service took too long to respond. Please try again.</p>
+                </div>
+              ) : (
+                <div className="mt-2 p-2 bg-background/50 rounded border">
+                  <p className="font-semibold">ℹ️ Error Details</p>
+                  <p className="text-sm">If this persists, try adjusting your preferences or contact support.</p>
+                </div>
+              )}
+            </div>
           </AlertDescription>
         </Alert>
       )}
@@ -466,6 +508,11 @@ export default function AIRecommendationsPanel({ resources }: AIRecommendationsP
 
           {recommendations.map((rec, index) => {
             const resource = getResourceDetails(rec.resourceId);
+            
+            // Fallback display info when resource lookup fails
+            const displayTitle = resource?.title || rec.resourceId.split('/').pop()?.replace(/-/g, ' ') || rec.resourceId;
+            const hasResourceDetails = !!resource;
+            
             return (
               <Card 
                 key={rec.resourceId} 
@@ -477,12 +524,17 @@ export default function AIRecommendationsPanel({ resources }: AIRecommendationsP
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
                         <CardTitle className="text-lg">
-                          {resource?.title || rec.resourceId}
+                          {displayTitle}
                         </CardTitle>
                         {rec.aiGenerated && (
                           <Badge variant="outline" className="text-xs" data-testid={`badge-ai-${index}`}>
                             <Sparkles className="h-3 w-3 mr-1" />
                             AI
+                          </Badge>
+                        )}
+                        {!hasResourceDetails && (
+                          <Badge variant="outline" className="text-xs bg-yellow-500/10">
+                            External
                           </Badge>
                         )}
                       </div>
@@ -518,10 +570,26 @@ export default function AIRecommendationsPanel({ resources }: AIRecommendationsP
                     </p>
                   </div>
 
-                  {/* Resource Description */}
+                  {/* Resource Description - show if available */}
                   {resource?.description && (
                     <p className="text-sm" data-testid={`description-${index}`}>
                       {resource.description}
+                    </p>
+                  )}
+                  
+                  {/* Fallback info when resource details unavailable */}
+                  {!hasResourceDetails && (
+                    <div className="p-3 bg-muted/50 rounded-md border border-dashed">
+                      <p className="text-xs text-muted-foreground">
+                        <span className="font-semibold">URL:</span> {rec.resourceId}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Additional resource metadata if available */}
+                  {resource?.subcategory && (
+                    <p className="text-xs text-muted-foreground">
+                      <span className="font-semibold">Subcategory:</span> {resource.subcategory}
                     </p>
                   )}
 
