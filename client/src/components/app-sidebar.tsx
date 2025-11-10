@@ -98,23 +98,10 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
     // Context not available, using defaults
   }
 
-  // Calculate total count including all nested resources
+  // Calculate total count - category level already includes all nested resources
   // This matches the logic used in HomePage for consistency
   const calculateTotalCount = (category: Category): number => {
-    // Start with direct category resources
-    let total = category.resources.length;
-    
-    // Add subcategory resources
-    category.subcategories?.forEach(sub => {
-      total += sub.resources.length;
-      
-      // Add sub-subcategory resources
-      sub.subSubcategories?.forEach(subsub => {
-        total += subsub.resources.length;
-      });
-    });
-    
-    return total;
+    return category.resources.length;
   };
 
   // Filter out unwanted categories (memoized to prevent infinite useEffect loops)

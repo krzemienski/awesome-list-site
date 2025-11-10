@@ -47,16 +47,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
   }, [awesomeList?.categories]);
 
   const calculateTotalCount = (category: Category): number => {
-    let total = category.resources.length;
-    
-    category.subcategories?.forEach(sub => {
-      total += sub.resources.length;
-      sub.subSubcategories?.forEach(subSub => {
-        total += subSub.resources.length;
-      });
-    });
-    
-    return total;
+    return category.resources.length;
   };
 
   if (isLoading) {
