@@ -43,22 +43,8 @@ export default function Category() {
   
   const categoryName = currentCategory ? currentCategory.name : deslugify(slug || "");
   
-  // Collect all resources from this category and its subcategories
-  const allResources: Resource[] = [];
-  if (currentCategory) {
-    // Add category-level resources
-    allResources.push(...currentCategory.resources);
-    
-    // Add subcategory resources
-    currentCategory.subcategories?.forEach(sub => {
-      allResources.push(...sub.resources);
-      
-      // Add sub-subcategory resources
-      sub.subSubcategories?.forEach(subSub => {
-        allResources.push(...subSub.resources);
-      });
-    });
-  }
+  // Get all resources - category level already includes all nested resources
+  const allResources: Resource[] = currentCategory ? currentCategory.resources : [];
   
   // Extract unique subcategories for filter
   const subcategories = useMemo(() => {

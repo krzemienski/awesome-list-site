@@ -43,13 +43,8 @@ export default function Subcategory() {
         currentSubcategory = subcategory;
         parentCategory = category;
         
-        // Collect all resources from this subcategory and its sub-subcategories
-        allResources.push(...subcategory.resources);
-        
-        // Add sub-subcategory resources
-        subcategory.subSubcategories?.forEach(subSub => {
-          allResources.push(...subSub.resources);
-        });
+        // Get all resources - subcategory level already includes all nested resources
+        allResources = subcategory.resources;
         
         break;
       }
