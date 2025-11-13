@@ -60,6 +60,7 @@ export default function MainLayout({ awesomeList, isLoading, children }: MainLay
           setIsOpen={setIsSidebarOpen}
           title={awesomeList?.title || "Awesome Selfhosted"}
           categories={awesomeList?.categories || []}
+          resources={awesomeList?.resources || []}
           isLoading={isLoading}
         />
         

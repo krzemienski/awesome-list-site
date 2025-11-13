@@ -94,7 +94,7 @@ export default function TagFilter({ resources, selectedTags, onTagsChange }: Tag
                   >
                     <Checkbox
                       checked={selectedTags.includes(tag)}
-                      onChange={() => toggleTag(tag)}
+                      onCheckedChange={() => toggleTag(tag)}
                     />
                     <div className="flex-1 flex items-center justify-between">
                       <span className="text-sm">{tag}</span>
