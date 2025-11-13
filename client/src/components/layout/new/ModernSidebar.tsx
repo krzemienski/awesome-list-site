@@ -284,6 +284,7 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
                                 : ""
                             )}
                             onClick={() => navigate(`/subcategory/${subcategory.slug}`)}
+                            data-testid={`nav-subcategory-${subcategory.slug}`}
                           >
                             <div className="flex items-start gap-2 w-full min-w-0">
                               <span className="w-2 h-2 rounded-full bg-muted-foreground/40 flex-shrink-0 mt-1.5"></span>
@@ -310,6 +311,7 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
                                     : ""
                                 )}
                                 onClick={() => navigate(`/sub-subcategory/${subSubcategory.slug}`)}
+                                data-testid={`nav-sub-subcategory-${subSubcategory.slug}`}
                               >
                                 <div className="flex items-start gap-2 w-full min-w-0">
                                   <span className="w-1 h-1 rounded-full bg-muted-foreground/30 flex-shrink-0 mt-1.5"></span>
