@@ -5,6 +5,7 @@ import TopBar from "../TopBar";
 import Footer from "../Footer";
 import SearchDialog from "@/components/ui/search-dialog";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 
 interface MainLayoutProps {
   awesomeList?: AwesomeList;
@@ -44,7 +45,7 @@ export default function MainLayout({ awesomeList, isLoading, children }: MainLay
   };
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex h-screen flex-col">
       <TopBar 
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
@@ -54,7 +55,7 @@ export default function MainLayout({ awesomeList, isLoading, children }: MainLay
         resources={awesomeList?.resources || []}
       />
       
-      <div className="flex flex-1 w-full">
+      <SidebarProvider className="flex-1 overflow-hidden" open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
         <ModernSidebar 
           isOpen={isSidebarOpen}
           setIsOpen={setIsSidebarOpen}
@@ -64,12 +65,13 @@ export default function MainLayout({ awesomeList, isLoading, children }: MainLay
           isLoading={isLoading}
         />
         
-        <main className="flex-1 py-6 px-4 md:px-6">
-          {children}
-        </main>
-      </div>
-      
-      <Footer />
+        <SidebarInset className="overflow-auto">
+          <div className="flex-1 py-6 px-4 md:px-6">
+            {children}
+          </div>
+          <Footer />
+        </SidebarInset>
+      </SidebarProvider>
       
       <SearchDialog 
         isOpen={searchOpen} 

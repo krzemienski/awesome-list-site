@@ -405,15 +405,33 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
     );
   }
 
-  // Desktop sidebar with regular div
+  // Desktop sidebar using shadcn Sidebar component (in-flow, not fixed)
   return (
     <>
-      <div className={cn(
-        "fixed inset-y-0 left-0 z-40 w-64 bg-background border-r border-border flex flex-col transition-transform duration-300 ease-in-out",
-        isOpen ? "translate-x-0" : "-translate-x-full"
-      )}>
-        {sidebarContent}
-      </div>
+      <Sidebar collapsible="icon" variant="sidebar">
+        <SidebarHeader>
+          <div className="px-2 py-1">
+            <h2 className="font-bold truncate">{title}</h2>
+          </div>
+        </SidebarHeader>
+        <SidebarContent>
+          {sidebarContent}
+        </SidebarContent>
+        <SidebarFooter>
+          <div className="p-2">
+            <Button variant="ghost" className="w-full justify-start text-sm" asChild>
+              <a href={title.includes("Selfhosted") 
+                  ? "https://github.com/awesome-selfhosted/awesome-selfhosted" 
+                  : "https://github.com/krzemienski/awesome-video"} 
+                 target="_blank" 
+                 rel="noopener noreferrer">
+                <ExternalLink className="mr-2 h-4 w-4" />
+                GitHub Repository
+              </a>
+            </Button>
+          </div>
+        </SidebarFooter>
+      </Sidebar>
       
       <Dialog open={recommendationsOpen} onOpenChange={setRecommendationsOpen}>
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
