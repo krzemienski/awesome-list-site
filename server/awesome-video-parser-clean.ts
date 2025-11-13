@@ -126,7 +126,9 @@ export async function fetchAwesomeVideoData() {
     
     // Process resources and assign to natural hierarchy levels
     const resources: any[] = [];
-    let generalToolsDebugCount = 0;
+    
+    // Track category depth distribution for validation
+    const categoryDepthStats = new Map<string, { depth1: number, depth2: number, depth3: number, total: number }>();
     
     if (data.projects) {
       data.projects.forEach((resource: VideoResource, index: number) => {
@@ -139,6 +141,23 @@ export async function fetchAwesomeVideoData() {
         if (!primaryCategoryId) return;
         
         const categoryInfo = categoryMap.get(primaryCategoryId);
+        
+        // Track depth distribution by top-level category
+        const topLevelId = findTopLevelCategory(primaryCategoryId);
+        if (topLevelId) {
+          const topLevelInfo = categoryMap.get(topLevelId);
+          if (topLevelInfo) {
+            if (!categoryDepthStats.has(topLevelInfo.title || topLevelId)) {
+              categoryDepthStats.set(topLevelInfo.title || topLevelId, { depth1: 0, depth2: 0, depth3: 0, total: 0 });
+            }
+            const stats = categoryDepthStats.get(topLevelInfo.title || topLevelId)!;
+            const depth = getCategoryDepth(primaryCategoryId);
+            if (depth === 1) stats.depth1++;
+            else if (depth === 2) stats.depth2++;
+            else if (depth === 3) stats.depth3++;
+            stats.total++;
+          }
+        }
         
         if (!categoryInfo) return;
         
@@ -230,8 +249,23 @@ export async function fetchAwesomeVideoData() {
       };
     });
     
+    // Log category depth distribution analysis
+    console.log("\n🔍 Category Depth Distribution Analysis:");
+    categoryDepthStats.forEach((stats, categoryName) => {
+      const percentDepth1 = ((stats.depth1 / stats.total) * 100).toFixed(1);
+      console.log(`  ${categoryName}: ${stats.total} total`);
+      console.log(`    ├─ Depth 1 (top-level): ${stats.depth1} (${percentDepth1}%)`);
+      console.log(`    ├─ Depth 2 (subcategory): ${stats.depth2}`);
+      console.log(`    └─ Depth 3 (sub-subcategory): ${stats.depth3}`);
+      
+      // Flag categories with high depth-1 percentage (potential nesting issues)
+      if (stats.depth1 > stats.total * 0.8 && stats.total > 20) {
+        console.log(`    ⚠️  WARNING: ${percentDepth1}% resources at depth 1 - potential incomplete nesting!`);
+      }
+    });
+    
     // Log the hierarchical structure built from JSON data
-    console.log("📊 Dynamic Hierarchy Structure from JSON:");
+    console.log("\n📊 Dynamic Hierarchy Structure from JSON:");
     categories.forEach(cat => {
       console.log(`  📁 ${cat.name}: ${cat.resources.length} resources`);
       
