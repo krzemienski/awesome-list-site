@@ -72,12 +72,21 @@ The `calculateTotalCount` function returns ONLY the category-level resource coun
 - Each resource appears only once in the data structure at its most specific level
 - Parent categories aggregate all child resources in their count
 
-**Special: General Tools Auto-Categorization**
-- JSON source data lacks subcategory IDs for General Tools resources
-- Implemented content-based intelligent assignment using keywords:
-  - DRM: drm, widevine, playready, fairplay, encryption, content protection
-  - FFMPEG & Tools: ffmpeg, transcode, encode, convert, video edit, processing
-- Resources not matching either category remain at top level
+**Special: Auto-Categorization for Incomplete JSON Data**
+
+Some categories in the JSON source data lack subcategory IDs for their resources. Implemented intelligent content-based assignment using keyword matching:
+
+**General Tools** (82.5% resources at depth 1 before fix):
+- DRM (51 resources): drm, widevine, playready, fairplay, encryption, content protection
+- FFMPEG & Tools (25 resources): ffmpeg, transcode, encode, convert, video edit, processing
+- Uncategorized: 21 resources remain at top level
+
+**Community & Events** (89.0% resources at depth 1 before fix):
+- Events & Conferences (55 resources): conference, event, webinar, podcast, summit, workshop, talk, presentation
+- Community Groups (33 resources): community, forum, slack, discord, meetup, group, discussion, chat
+- Uncategorized: 3 resources remain at top level
+
+This categorization successfully organized 154 previously uncategorized resources (76 from General Tools + 78 from Community & Events) into appropriate subcategories, improving navigation and discoverability.
 
 ## External Dependencies
 
