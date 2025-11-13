@@ -246,9 +246,16 @@ export default function Category() {
             
             const handleResourceClick = () => {
               window.open(resource.url, '_blank', 'noopener,noreferrer');
+              
+              // Build detailed toast message
+              let description = resource.description || '';
+              if (!description && resource.tags && resource.tags.length > 0) {
+                description = `Tags: ${resource.tags.slice(0, 3).join(', ')}${resource.tags.length > 3 ? ', ...' : ''}`;
+              }
+              
               toast({
-                title: "Opening Resource",
-                description: resource.title,
+                title: resource.title,
+                description: description || 'Opening resource in new tab',
               });
             };
             
