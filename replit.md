@@ -58,7 +58,10 @@ The `calculateTotalCount` function returns ONLY the category-level resource coun
 - **Media Tools**: 317 resources
 - **Standards & Industry**: 174 resources
 - **Infrastructure & Delivery**: 190 resources
-- **General Tools**: 97 resources
+- **General Tools**: 97 resources (with intelligent subcategorization)
+  - FFMPEG & Tools: 25 resources (auto-assigned by content)
+  - DRM: 51 resources (auto-assigned by content)
+  - Uncategorized: 21 resources
 - **Community & Events**: 91 resources
 
 **Total: 2,011 resources across all categories**
@@ -68,6 +71,13 @@ The `calculateTotalCount` function returns ONLY the category-level resource coun
 - Do NOT sum across hierarchy levels (causes double-counting)
 - Each resource appears only once in the data structure at its most specific level
 - Parent categories aggregate all child resources in their count
+
+**Special: General Tools Auto-Categorization**
+- JSON source data lacks subcategory IDs for General Tools resources
+- Implemented content-based intelligent assignment using keywords:
+  - DRM: drm, widevine, playready, fairplay, encryption, content protection
+  - FFMPEG & Tools: ffmpeg, transcode, encode, convert, video edit, processing
+- Resources not matching either category remain at top level
 
 ## External Dependencies
 
