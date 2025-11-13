@@ -88,8 +88,45 @@ export async function fetchAwesomeVideoData() {
       return categoryId;
     };
     
+    // Helper to find the depth of a category
+    const getCategoryDepth = (categoryId: string): number => {
+      const category = categoryMap.get(categoryId);
+      if (!category) return 0;
+      
+      if (!category.parent) return 1; // Top-level category
+      
+      const parent = categoryMap.get(category.parent);
+      if (!parent) return 1;
+      
+      if (!parent.parent) return 2; // Subcategory
+      
+      const grandparent = categoryMap.get(parent.parent);
+      if (!grandparent) return 2;
+      
+      if (!grandparent.parent) return 3; // Sub-subcategory
+      
+      return 3; // Maximum depth
+    };
+    
+    // Helper to find the deepest (most specific) category ID from array
+    const findDeepestCategoryId = (categoryIds: string[]): string | null => {
+      let deepestId: string | null = null;
+      let maxDepth = 0;
+      
+      for (const catId of categoryIds) {
+        const depth = getCategoryDepth(catId);
+        if (depth > maxDepth) {
+          maxDepth = depth;
+          deepestId = catId;
+        }
+      }
+      
+      return deepestId;
+    };
+    
     // Process resources and assign to natural hierarchy levels
     const resources: any[] = [];
+    let generalToolsDebugCount = 0;
     
     if (data.projects) {
       data.projects.forEach((resource: VideoResource, index: number) => {
@@ -97,21 +134,40 @@ export async function fetchAwesomeVideoData() {
           return; // Skip resources without category
         }
         
-        // Use the first category as primary assignment
-        const primaryCategoryId = resource.category[0];
+        // Use the deepest category ID (most specific) for proper nesting
+        const primaryCategoryId = findDeepestCategoryId(resource.category);
+        if (!primaryCategoryId) return;
+        
         const categoryInfo = categoryMap.get(primaryCategoryId);
         
         if (!categoryInfo) return;
         
         // Find the appropriate hierarchy levels
-        const topLevelCategoryId = findTopLevelCategory(primaryCategoryId);
-        const topLevelCategory = topLevelCategoryId ? categoryMap.get(topLevelCategoryId) : null;
+        let topLevelCategoryId = findTopLevelCategory(primaryCategoryId);
+        let topLevelCategory = topLevelCategoryId ? categoryMap.get(topLevelCategoryId) : null;
         
-        const level2CategoryId = findLevel2Category(primaryCategoryId);
-        const level2Category = level2CategoryId ? categoryMap.get(level2CategoryId) : null;
+        let level2CategoryId = findLevel2Category(primaryCategoryId);
+        let level2Category = level2CategoryId ? categoryMap.get(level2CategoryId) : null;
         
-        const level3CategoryId = findLevel3Category(primaryCategoryId);
-        const level3Category = level3CategoryId ? categoryMap.get(level3CategoryId) : null;
+        let level3CategoryId = findLevel3Category(primaryCategoryId);
+        let level3Category = level3CategoryId ? categoryMap.get(level3CategoryId) : null;
+        
+        // SPECIAL FIX FOR GENERAL TOOLS: Assign to subcategories based on content
+        // Since JSON data doesn't include subcategory IDs for General Tools, we assign them programmatically
+        if (topLevelCategory && topLevelCategory.title === "General Tools" && !level2Category) {
+          const text = `${resource.title} ${resource.description}`.toLowerCase();
+          
+          // Assign to DRM subcategory if contains DRM-related keywords
+          if (text.includes('drm') || text.includes('widevine') || text.includes('playready') || 
+              text.includes('fairplay') || text.includes('encryption') || text.includes('content protection')) {
+            level2Category = { id: 'drm', title: 'DRM', parent: topLevelCategory.id };
+          }
+          // Assign to FFMPEG & Tools subcategory if contains FFMPEG-related keywords
+          else if (text.includes('ffmpeg') || text.includes('transcode') || text.includes('encode') || 
+                   text.includes('convert') || text.includes('video edit') || text.includes('processing')) {
+            level2Category = { id: 'ffmpeg-tools', title: 'FFMPEG & Tools', parent: topLevelCategory.id };
+          }
+        }
         
         // If the primary category is at level 1, assign directly
         if (!topLevelCategory) return;
