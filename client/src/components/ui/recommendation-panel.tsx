@@ -60,12 +60,14 @@ interface LearningPathSuggestion {
 
 interface RecommendationPanelProps {
   userProfile: UserProfile;
+  resources?: Resource[];
   onResourceClick?: (resourceId: string) => void;
   onStartLearningPath?: (pathId: string) => void;
 }
 
 export default function RecommendationPanel({ 
   userProfile, 
+  resources,
   onResourceClick,
   onStartLearningPath 
 }: RecommendationPanelProps) {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation, useRoute } from "wouter";
+import { useLocation, useRoute, Link } from "wouter";
 import { 
   Sidebar, 
   SidebarProvider, 
@@ -17,24 +17,35 @@ import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Home, Folder, ExternalLink, Menu } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Home, Folder, ExternalLink, Menu, Sparkles, Zap } from "lucide-react";
 import { slugify, getCategorySlug } from "@/lib/utils";
-import { Category } from "@/types/awesome-list";
+import { Category, Resource } from "@/types/awesome-list";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useUserProfile } from "@/hooks/use-user-profile";
+import RecommendationPanel from "@/components/ui/recommendation-panel";
 
 interface ModernSidebarProps {
   title: string;
   categories: Category[];
+  resources: Resource[];
   isLoading: boolean;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }
 
-export default function ModernSidebar({ title, categories, isLoading, isOpen, setIsOpen }: ModernSidebarProps) {
-  const [location] = useLocation();
+export default function ModernSidebar({ title, categories, resources, isLoading, isOpen, setIsOpen }: ModernSidebarProps) {
+  const [location, setLocation] = useLocation();
   const [openCategories, setOpenCategories] = useState<string[]>([]);
+  const [recommendationsOpen, setRecommendationsOpen] = useState(false);
   const isMobile = useIsMobile();
+  const { userProfile } = useUserProfile();
+
+  // Active route helper for navigation highlighting
+  const isActiveRoute = (path: string) => {
+    return location === path || location.startsWith(path + "/");
+  };
 
   // Show true hierarchical structure from JSON data - categories with their actual subcategories
   const getHierarchicalCategories = (categories: Category[]) => {
@@ -136,7 +147,7 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
 
   // Navigation helper to close mobile sidebar after clicking
   const navigate = (path: string) => {
-    window.location.href = path;
+    setLocation(path);
     if (isMobile) {
       setIsOpen(false);
     }
@@ -146,17 +157,40 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
   const sidebarContent = (
     <>
       <div className="flex-1 overflow-y-auto overflow-x-hidden p-3 scroll-smooth">
-        <Button
-          variant="ghost"
-          className={cn(
-            "w-full justify-start font-normal mb-3",
-            location === "/" ? "bg-accent text-accent-foreground" : ""
-          )}
-          onClick={() => navigate('/')}
-        >
-          <Home className="mr-2 h-4 w-4" />
-          Home
-        </Button>
+        <div className="space-y-1 mb-4 pb-3 border-b border-border">
+          <Button
+            variant="ghost"
+            className={cn(
+              "w-full justify-start font-normal",
+              location === "/" ? "bg-accent text-accent-foreground" : ""
+            )}
+            onClick={() => navigate('/')}
+          >
+            <Home className="mr-2 h-4 w-4" />
+            Home
+          </Button>
+          
+          <Button
+            variant="ghost"
+            className={cn(
+              "w-full justify-start font-normal",
+              isActiveRoute("/advanced") ? "bg-accent text-accent-foreground" : ""
+            )}
+            onClick={() => navigate('/advanced')}
+          >
+            <Zap className="mr-2 h-4 w-4" />
+            Advanced Features
+          </Button>
+          
+          <Button
+            variant="ghost"
+            className="w-full justify-start font-normal"
+            onClick={() => setRecommendationsOpen(true)}
+          >
+            <Sparkles className="mr-2 h-4 w-4" />
+            AI Recommendations
+          </Button>
+        </div>
         
         {isLoading ? (
           <div className="space-y-3">
@@ -316,23 +350,109 @@ export default function ModernSidebar({ title, categories, isLoading, isOpen, se
   // Mobile sidebar with sheet component
   if (isMobile) {
     return (
-      <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetContent side="left" className="p-0 w-[85vw] max-w-[380px]">
-          <div className="flex flex-col h-full">
-            {sidebarContent}
-          </div>
-        </SheetContent>
-      </Sheet>
+      <>
+        <Sheet open={isOpen} onOpenChange={setIsOpen}>
+          <SheetContent side="left" className="p-0 w-[85vw] max-w-[380px]">
+            <div className="flex flex-col h-full">
+              {sidebarContent}
+            </div>
+          </SheetContent>
+        </Sheet>
+        
+        <Dialog open={recommendationsOpen} onOpenChange={setRecommendationsOpen}>
+          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5" />
+                AI-Powered Recommendations
+              </DialogTitle>
+            </DialogHeader>
+            {userProfile ? (
+              <RecommendationPanel 
+                userProfile={userProfile}
+                resources={resources}
+                onResourceClick={(resourceId) => {
+                  setRecommendationsOpen(false);
+                  window.open(resourceId, '_blank');
+                }}
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+                <div className="rounded-full bg-muted p-4 mb-4">
+                  <Sparkles className="h-8 w-8 text-muted-foreground" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">Set Up Your Profile</h3>
+                <p className="text-sm text-muted-foreground mb-6 max-w-md">
+                  Create your personalized profile to get AI-powered recommendations tailored to your learning goals and interests.
+                </p>
+                <Button 
+                  onClick={() => {
+                    setRecommendationsOpen(false);
+                    navigate('/advanced');
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <Zap className="h-4 w-4" />
+                  Go to Preferences
+                </Button>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+      </>
     );
   }
 
   // Desktop sidebar with regular div
   return (
-    <div className={cn(
-      "fixed inset-y-0 left-0 z-40 w-64 bg-background border-r border-border flex flex-col transition-transform duration-300 ease-in-out",
-      isOpen ? "translate-x-0" : "-translate-x-full"
-    )}>
-      {sidebarContent}
-    </div>
+    <>
+      <div className={cn(
+        "fixed inset-y-0 left-0 z-40 w-64 bg-background border-r border-border flex flex-col transition-transform duration-300 ease-in-out",
+        isOpen ? "translate-x-0" : "-translate-x-full"
+      )}>
+        {sidebarContent}
+      </div>
+      
+      <Dialog open={recommendationsOpen} onOpenChange={setRecommendationsOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5" />
+              AI-Powered Recommendations
+            </DialogTitle>
+          </DialogHeader>
+          {userProfile ? (
+            <RecommendationPanel 
+              userProfile={userProfile}
+              resources={resources}
+              onResourceClick={(resourceId) => {
+                setRecommendationsOpen(false);
+                window.open(resourceId, '_blank');
+              }}
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+              <div className="rounded-full bg-muted p-4 mb-4">
+                <Sparkles className="h-8 w-8 text-muted-foreground" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">Set Up Your Profile</h3>
+              <p className="text-sm text-muted-foreground mb-6 max-w-md">
+                Create your personalized profile to get AI-powered recommendations tailored to your learning goals and interests.
+              </p>
+              <Button 
+                onClick={() => {
+                  setRecommendationsOpen(false);
+                  navigate('/advanced');
+                }}
+                className="flex items-center gap-2"
+              >
+                <Zap className="h-4 w-4" />
+                Go to Preferences
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
