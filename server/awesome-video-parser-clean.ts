@@ -171,8 +171,10 @@ export async function fetchAwesomeVideoData() {
         let level3CategoryId = findLevel3Category(primaryCategoryId);
         let level3Category = level3CategoryId ? categoryMap.get(level3CategoryId) : null;
         
-        // SPECIAL FIX FOR GENERAL TOOLS: Assign to subcategories based on content
-        // Since JSON data doesn't include subcategory IDs for General Tools, we assign them programmatically
+        // SPECIAL FIX: Assign resources to subcategories based on content
+        // Some categories in JSON don't include subcategory IDs, so we assign them programmatically
+        
+        // General Tools categorization
         if (topLevelCategory && topLevelCategory.title === "General Tools" && !level2Category) {
           const text = `${resource.title} ${resource.description}`.toLowerCase();
           
@@ -185,6 +187,24 @@ export async function fetchAwesomeVideoData() {
           else if (text.includes('ffmpeg') || text.includes('transcode') || text.includes('encode') || 
                    text.includes('convert') || text.includes('video edit') || text.includes('processing')) {
             level2Category = { id: 'ffmpeg-tools', title: 'FFMPEG & Tools', parent: topLevelCategory.id };
+          }
+        }
+        
+        // Community & Events categorization
+        if (topLevelCategory && topLevelCategory.title === "Community & Events" && !level2Category) {
+          const text = `${resource.title} ${resource.description}`.toLowerCase();
+          
+          // Assign to Events & Conferences subcategory if contains event-related keywords
+          if (text.includes('conference') || text.includes('event') || text.includes('webinar') || 
+              text.includes('podcast') || text.includes('summit') || text.includes('workshop') || 
+              text.includes('talk') || text.includes('presentation')) {
+            level2Category = { id: 'events-conferences', title: 'Events & Conferences', parent: topLevelCategory.id };
+          }
+          // Assign to Community Groups subcategory if contains community-related keywords
+          else if (text.includes('community') || text.includes('forum') || text.includes('slack') || 
+                   text.includes('discord') || text.includes('meetup') || text.includes('group') || 
+                   text.includes('discussion') || text.includes('chat')) {
+            level2Category = { id: 'community-groups', title: 'Community Groups', parent: topLevelCategory.id };
           }
         }
         
