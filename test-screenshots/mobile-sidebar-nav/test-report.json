@@ -1,0 +1,330 @@
+{
+  "testSuite": "Mobile Smoke Tests - Sidebar & Navigation",
+  "viewport": "390x844",
+  "device": "iPhone 12",
+  "timestamp": "2025-11-14T12:49:20.499Z",
+  "paths": [
+    {
+      "name": "Setup",
+      "steps": [
+        {
+          "path": "Setup",
+          "step": "1. Create Mobile Context",
+          "status": "PASS",
+          "message": "Mobile browser context created (390x844)",
+          "timestamp": "2025-11-14T12:49:26.045Z"
+        },
+        {
+          "path": "Setup",
+          "step": "2. Navigate to Homepage",
+          "status": "PASS",
+          "message": "Homepage loaded",
+          "timestamp": "2025-11-14T12:49:34.386Z"
+        },
+        {
+          "path": "Setup",
+          "step": "3. Capture Screenshot",
+          "status": "PASS",
+          "message": "Screenshot: mobile-homepage.png",
+          "timestamp": "2025-11-14T12:49:34.458Z"
+        }
+      ],
+      "status": "running"
+    },
+    {
+      "name": "Path 1",
+      "steps": [
+        {
+          "path": "Path 1",
+          "step": "4. Page Renders",
+          "status": "PASS",
+          "message": "Page body element found",
+          "timestamp": "2025-11-14T12:49:34.515Z"
+        },
+        {
+          "path": "Path 1",
+          "step": "5. No Horizontal Scroll",
+          "status": "PASS",
+          "message": "No horizontal scroll detected",
+          "timestamp": "2025-11-14T12:49:34.518Z"
+        },
+        {
+          "path": "Path 1",
+          "step": "6. Content Stacks Vertically",
+          "status": "PASS",
+          "message": "Resource cards stack in single column",
+          "timestamp": "2025-11-14T12:49:34.521Z"
+        },
+        {
+          "path": "Path 1",
+          "step": "7. Header with Menu Button",
+          "status": "PASS",
+          "message": "Header and menu button visible",
+          "timestamp": "2025-11-14T12:49:34.627Z"
+        }
+      ],
+      "status": "running"
+    },
+    {
+      "name": "Path 2",
+      "steps": [
+        {
+          "path": "Path 2",
+          "step": "8. Open Sidebar",
+          "status": "PASS",
+          "message": "Sidebar menu button clicked",
+          "timestamp": "2025-11-14T12:49:36.405Z"
+        },
+        {
+          "path": "Path 2",
+          "step": "9. Sheet Overlay Opens",
+          "status": "PASS",
+          "message": "Sheet overlay appeared",
+          "timestamp": "2025-11-14T12:49:36.405Z"
+        },
+        {
+          "path": "Path 2",
+          "step": "10. Categories Visible",
+          "status": "PASS",
+          "message": "Found 9 categories in sidebar",
+          "timestamp": "2025-11-14T12:49:36.464Z"
+        },
+        {
+          "path": "Path 2",
+          "step": "11. Resource Counts",
+          "status": "PASS",
+          "message": "9 resource count badges visible",
+          "timestamp": "2025-11-14T12:49:36.513Z"
+        },
+        {
+          "path": "Path 2",
+          "step": "12. Screenshot",
+          "status": "PASS",
+          "message": "Screenshot: mobile-sidebar-open.png",
+          "timestamp": "2025-11-14T12:49:36.559Z"
+        },
+        {
+          "path": "Path 2",
+          "step": "13-14. Close Sheet",
+          "status": "PASS",
+          "message": "Sheet closed successfully",
+          "timestamp": "2025-11-14T12:49:37.835Z"
+        }
+      ],
+      "status": "running"
+    },
+    {
+      "name": "Path 3",
+      "steps": [
+        {
+          "path": "Path 3",
+          "step": "15. Navigate Category",
+          "status": "PASS",
+          "message": "Direct navigation to encoding-codecs successful",
+          "timestamp": "2025-11-14T12:49:43.795Z"
+        },
+        {
+          "path": "Path 3",
+          "step": "16. Resource Count",
+          "status": "INFO",
+          "message": "Resource count shown: 392 resources available",
+          "timestamp": "2025-11-14T12:49:43.800Z"
+        },
+        {
+          "path": "Path 3",
+          "step": "17. Single Column Layout",
+          "status": "PASS",
+          "message": "Resource cards stack in single column",
+          "timestamp": "2025-11-14T12:49:43.805Z"
+        },
+        {
+          "path": "Path 3",
+          "step": "18. Subcategory Filter",
+          "status": "PASS",
+          "message": "Subcategory filter element found",
+          "timestamp": "2025-11-14T12:49:43.846Z"
+        },
+        {
+          "path": "Path 3",
+          "step": "19. Screenshot",
+          "status": "PASS",
+          "message": "Screenshot: mobile-category.png",
+          "timestamp": "2025-11-14T12:49:43.890Z"
+        }
+      ],
+      "status": "running"
+    },
+    {
+      "name": "Path 4",
+      "steps": [
+        {
+          "path": "Path 4",
+          "step": "20-21. Card 1 Opens",
+          "status": "PASS",
+          "message": "Card 1 has external link: https://github.com/krzemienski/awesome-video...",
+          "timestamp": "2025-11-14T12:49:43.924Z"
+        },
+        {
+          "path": "Path 4",
+          "step": "20-21. Card 2 Opens",
+          "status": "PASS",
+          "message": "Card 2 has external link: https://reactjs.org/...",
+          "timestamp": "2025-11-14T12:49:43.927Z"
+        },
+        {
+          "path": "Path 4",
+          "step": "20-21. Card 3 Opens",
+          "status": "PASS",
+          "message": "Card 3 has external link: https://ui.shadcn.com/...",
+          "timestamp": "2025-11-14T12:49:43.929Z"
+        },
+        {
+          "path": "Path 4",
+          "step": "21. External Links",
+          "status": "PASS",
+          "message": "3/3 cards have external links",
+          "timestamp": "2025-11-14T12:49:43.929Z"
+        },
+        {
+          "path": "Path 4",
+          "step": "22. Touch Targets",
+          "status": "WARN",
+          "message": "3 cards below 44x44px minimum",
+          "timestamp": "2025-11-14T12:49:43.933Z"
+        },
+        {
+          "path": "Path 4",
+          "step": "23. External Icons",
+          "status": "PASS",
+          "message": "392 external link icons found",
+          "timestamp": "2025-11-14T12:49:45.548Z"
+        }
+      ],
+      "status": "running"
+    },
+    {
+      "name": "Path 5",
+      "steps": [
+        {
+          "path": "Path 5",
+          "step": "24-25. Search Opens",
+          "status": "PASS",
+          "message": "Search dialog fits viewport (390x435)",
+          "timestamp": "2025-11-14T12:49:47.404Z"
+        },
+        {
+          "path": "Path 5",
+          "step": "26. Type Search",
+          "status": "PASS",
+          "message": "Typed \"hls\" in search input",
+          "timestamp": "2025-11-14T12:49:49.144Z"
+        },
+        {
+          "path": "Path 5",
+          "step": "27. Search Results",
+          "status": "PASS",
+          "message": "15 search results appeared",
+          "timestamp": "2025-11-14T12:49:49.427Z"
+        },
+        {
+          "path": "Path 5",
+          "step": "28. Results Tappable",
+          "status": "PASS",
+          "message": "Search results meet touch target (96px height)",
+          "timestamp": "2025-11-14T12:49:49.455Z"
+        },
+        {
+          "path": "Path 5",
+          "step": "29. Screenshot",
+          "status": "PASS",
+          "message": "Screenshot: mobile-search.png",
+          "timestamp": "2025-11-14T12:49:49.539Z"
+        }
+      ],
+      "status": "running"
+    },
+    {
+      "name": "Path 6",
+      "steps": [
+        {
+          "path": "Path 6",
+          "step": "30. Navigate Subcategory",
+          "status": "PASS",
+          "message": "Subcategory page loaded",
+          "timestamp": "2025-11-14T12:49:55.456Z"
+        },
+        {
+          "path": "Path 6",
+          "step": "31-32. Subcategory Resources",
+          "status": "INFO",
+          "message": "144 resource cards on subcategory page",
+          "timestamp": "2025-11-14T12:49:55.937Z"
+        },
+        {
+          "path": "Path 6",
+          "step": "33. Navigate Sub-Subcategory",
+          "status": "PASS",
+          "message": "Sub-subcategory page loaded",
+          "timestamp": "2025-11-14T12:50:00.768Z"
+        },
+        {
+          "path": "Path 6",
+          "step": "34. Sub-Subcategory Resources",
+          "status": "INFO",
+          "message": "63 resource cards displayed",
+          "timestamp": "2025-11-14T12:50:01.047Z"
+        },
+        {
+          "path": "Path 6",
+          "step": "35. Breadcrumb/Back",
+          "status": "PASS",
+          "message": "Navigation aid found: breadcrumb",
+          "timestamp": "2025-11-14T12:50:01.166Z"
+        }
+      ],
+      "status": "running"
+    },
+    {
+      "name": "Path 7",
+      "steps": [
+        {
+          "path": "Path 7",
+          "step": "36. Text Readable",
+          "status": "PASS",
+          "message": "All text meets minimum readable size (12px+)",
+          "timestamp": "2025-11-14T12:50:06.196Z"
+        },
+        {
+          "path": "Path 7",
+          "step": "37. No Overlaps",
+          "status": "PASS",
+          "message": "No overlapping interactive elements detected",
+          "timestamp": "2025-11-14T12:50:06.203Z"
+        },
+        {
+          "path": "Path 7",
+          "step": "38. Touch Targets",
+          "status": "WARN",
+          "message": "4/17 elements below 44x44px minimum",
+          "timestamp": "2025-11-14T12:50:06.208Z"
+        },
+        {
+          "path": "Path 7",
+          "step": "39-40. Sidebar Footer",
+          "status": "SKIP",
+          "message": "Could not reopen sidebar",
+          "timestamp": "2025-11-14T12:50:06.249Z"
+        }
+      ],
+      "status": "running"
+    }
+  ],
+  "summary": {
+    "total": 38,
+    "passed": 32,
+    "failed": 0,
+    "warnings": 2,
+    "skipped": 1
+  },
+  "infrastructureLimitations": []
+}
