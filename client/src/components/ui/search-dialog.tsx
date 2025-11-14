@@ -24,15 +24,17 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
   // Debug: Log resources to see if they're being passed correctly
   // Search dialog initialized with ${resources?.length || 0} resources
 
-  // Create Fuse.js instance for search
+  // Create Fuse.js instance for search with special character support
   const fuse = useMemo(() => {
     if (!resources || resources.length === 0) return null;
     return new Fuse(resources, {
       keys: ['title', 'description', 'category', 'subcategory'],
-      threshold: 0.3,
+      threshold: 0.4, // More lenient for punctuation (was 0.3)
       includeScore: true,
       ignoreLocation: true,
-      minMatchCharLength: 2
+      minMatchCharLength: 2,
+      shouldSort: true,
+      ignoreFieldNorm: true, // Ignore field length for better special char matching
     });
   }, [resources]);
 
@@ -105,7 +107,7 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
           </DialogDescription>
         </DialogHeader>
         
-        <Command className="overflow-visible">
+        <Command className="overflow-visible" shouldFilter={false}>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none z-10" />
             <CommandInput
@@ -127,29 +129,29 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
                   {results.map((resource, index) => (
                     <CommandItem
                       key={`${resource.title}-${resource.url}-${index}`}
-                      onSelect={() => {
+                      asChild
+                      onSelect={(e) => {
                         // Set flag to prevent dialog from closing
                         linkClickingRef.current = true;
                         trackResourceClick(resource.title, resource.url, resource.category);
                         // Open link in new tab
                         window.open(resource.url, '_blank', 'noopener,noreferrer');
-                        // Reset flag after delay
+                        // Reset flag after longer delay to ensure guard works
                         setTimeout(() => {
                           linkClickingRef.current = false;
-                        }, 100);
+                        }, 500);
                       }}
-                      className="cursor-pointer p-0"
                       data-testid={`search-result-${index}`}
                     >
                       <a
                         href={resource.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        onMouseDown={(e) => {
-                          // Prevent default anchor navigation so onSelect handles it
+                        onClick={(e) => {
+                          // Prevent anchor's default navigation - onSelect handles it
                           e.preventDefault();
                         }}
-                        className="flex flex-col gap-1 w-full p-3 no-underline text-inherit hover:no-underline"
+                        className="flex flex-col gap-1 cursor-pointer p-3 no-underline text-inherit hover:no-underline"
                       >
                         <div className="font-medium text-sm">{resource.title}</div>
                         <div className="text-xs text-muted-foreground">
