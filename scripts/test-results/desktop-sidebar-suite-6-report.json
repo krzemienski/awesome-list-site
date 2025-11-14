@@ -1,0 +1,255 @@
+{
+  "testSuite": "DESKTOP SUITE 6: SIDEBAR NAVIGATION & GITHUB LINK",
+  "timestamp": "2025-11-14T12:24:08.771Z",
+  "passed": 41,
+  "failed": 0,
+  "total": 41,
+  "tests": [
+    {
+      "name": "Create desktop browser context (1920x1080)",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-14T12:24:10.740Z"
+    },
+    {
+      "name": "Navigate to homepage",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-14T12:24:15.594Z"
+    },
+    {
+      "name": "Capture sidebar-desktop.png",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-14T12:24:15.736Z"
+    },
+    {
+      "name": "Sidebar visible on left side",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-14T12:24:15.764Z"
+    },
+    {
+      "name": "Sidebar width approximately 256px (16rem)",
+      "passed": true,
+      "message": "Width: 256px",
+      "timestamp": "2025-11-14T12:24:15.770Z"
+    },
+    {
+      "name": "\"Awesome Video\" title appears ONLY in top bar and main content (2 total, NOT in sidebar)",
+      "passed": true,
+      "message": "Found 6 instances, none in sidebar",
+      "timestamp": "2025-11-14T12:24:15.777Z"
+    },
+    {
+      "name": "First navigation item is \"Home\" button",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-14T12:24:15.780Z"
+    },
+    {
+      "name": "\"Advanced Features\" button visible",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-14T12:24:15.782Z"
+    },
+    {
+      "name": "\"AI Recommendations\" button visible",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-14T12:24:15.784Z"
+    },
+    {
+      "name": "Category: Intro & Learning (229)",
+      "passed": true,
+      "message": "Found with count 229",
+      "timestamp": "2025-11-14T12:24:15.786Z"
+    },
+    {
+      "name": "Category: Protocols & Transport (252)",
+      "passed": true,
+      "message": "Found with count 252",
+      "timestamp": "2025-11-14T12:24:15.786Z"
+    },
+    {
+      "name": "Category: Encoding & Codecs (392)",
+      "passed": true,
+      "message": "Found with count 392",
+      "timestamp": "2025-11-14T12:24:15.787Z"
+    },
+    {
+      "name": "Category: Players & Clients (269)",
+      "passed": true,
+      "message": "Found with count 269",
+      "timestamp": "2025-11-14T12:24:15.787Z"
+    },
+    {
+      "name": "Category: Media Tools (317)",
+      "passed": true,
+      "message": "Found with count 317",
+      "timestamp": "2025-11-14T12:24:15.787Z"
+    },
+    {
+      "name": "Category: Standards & Industry (174)",
+      "passed": true,
+      "message": "Found with count 174",
+      "timestamp": "2025-11-14T12:24:15.787Z"
+    },
+    {
+      "name": "Category: Infrastructure & Delivery (190)",
+      "passed": true,
+      "message": "Found with count 190",
+      "timestamp": "2025-11-14T12:24:15.787Z"
+    },
+    {
+      "name": "Category: General Tools (97)",
+      "passed": true,
+      "message": "Found with count 97",
+      "timestamp": "2025-11-14T12:24:15.787Z"
+    },
+    {
+      "name": "Category: Community & Events (91)",
+      "passed": true,
+      "message": "Found with count 91",
+      "timestamp": "2025-11-14T12:24:15.787Z"
+    },
+    {
+      "name": "Resource counts displayed correctly (no duplicates)",
+      "passed": true,
+      "message": "Found 9 categories",
+      "timestamp": "2025-11-14T12:24:15.787Z"
+    },
+    {
+      "name": "Click \"Protocols & Transport\" to expand",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-14T12:24:16.328Z"
+    },
+    {
+      "name": "Subcategories appear: Adaptive Streaming, Transport Protocols",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-14T12:24:16.330Z"
+    },
+    {
+      "name": "Click \"Adaptive Streaming\" to expand",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-14T12:24:16.859Z"
+    },
+    {
+      "name": "Sub-subcategories appear: HLS, DASH",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-14T12:24:16.862Z"
+    },
+    {
+      "name": "Capture sidebar-expanded.png",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-14T12:24:16.956Z"
+    },
+    {
+      "name": "Click \"Protocols & Transport\" again",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-14T12:24:17.490Z"
+    },
+    {
+      "name": "Subcategories collapse",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-14T12:24:17.492Z"
+    },
+    {
+      "name": "GitHub Repository link visible at bottom of sidebar",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-14T12:24:17.494Z"
+    },
+    {
+      "name": "Opens https://github.com/krzemienski/awesome-video in new tab",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-14T12:24:17.494Z"
+    },
+    {
+      "name": "Capture github-link-clicked.png",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-14T12:24:17.588Z"
+    },
+    {
+      "name": "Click \"Home\" in sidebar",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-14T12:24:18.598Z"
+    },
+    {
+      "name": "Navigates to /",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-14T12:24:18.598Z"
+    },
+    {
+      "name": "Click \"Advanced Features\"",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-14T12:24:19.657Z"
+    },
+    {
+      "name": "Navigates to /advanced",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-14T12:24:19.657Z"
+    },
+    {
+      "name": "Return to home",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-14T12:24:22.664Z"
+    },
+    {
+      "name": "Click a category from sidebar",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-14T12:24:24.318Z"
+    },
+    {
+      "name": "Category page loads correctly",
+      "passed": true,
+      "message": "URL: http://localhost:5000/category/encoding-codecs",
+      "timestamp": "2025-11-14T12:24:24.318Z"
+    },
+    {
+      "name": "Navigate to /category/encoding-codecs",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-14T12:24:27.345Z"
+    },
+    {
+      "name": "Sidebar still visible",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-14T12:24:27.345Z"
+    },
+    {
+      "name": "GitHub link still at bottom",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-14T12:24:27.347Z"
+    },
+    {
+      "name": "Navigate to /subcategory/adaptive-streaming",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-14T12:24:30.374Z"
+    },
+    {
+      "name": "Sidebar persists across all pages",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-14T12:24:30.374Z"
+    }
+  ]
+}

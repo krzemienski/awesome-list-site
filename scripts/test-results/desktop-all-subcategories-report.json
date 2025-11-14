@@ -1,0 +1,908 @@
+{
+  "timestamp": "2025-11-14T12:15:54.881Z",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "summary": {
+    "total": 19,
+    "passed": 0,
+    "failed": 19,
+    "successRate": "0.0%"
+  },
+  "results": [
+    {
+      "slug": "introduction",
+      "expectedCount": 4,
+      "category": "Introduction & Learning",
+      "tests": {
+        "navigation": {
+          "success": true,
+          "status": 200
+        },
+        "heading": {
+          "success": true,
+          "value": "Introduction"
+        },
+        "backButton": {
+          "success": true,
+          "text": "Back to Intro & Learning"
+        },
+        "countBadge": {
+          "success": false,
+          "displayed": null,
+          "expected": 4,
+          "matches": false
+        },
+        "resourceCards": {
+          "success": true,
+          "count": 4,
+          "matches": true
+        },
+        "subSubcategories": {
+          "found": false,
+          "count": 0
+        },
+        "resourceClickable": {
+          "success": true
+        },
+        "layout": {
+          "hasHeader": true,
+          "hasGrid": true,
+          "gridClasses": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        }
+      },
+      "success": false,
+      "errors": [
+        "Resource count mismatch: expected 4, found null"
+      ],
+      "screenshot": "test-screenshots/subcategory-introduction.png"
+    },
+    {
+      "slug": "learning-resources",
+      "expectedCount": 36,
+      "category": "Introduction & Learning",
+      "tests": {
+        "navigation": {
+          "success": true,
+          "status": 200
+        },
+        "heading": {
+          "success": true,
+          "value": "Learning Resources"
+        },
+        "backButton": {
+          "success": true,
+          "text": "Back to Intro & Learning"
+        },
+        "countBadge": {
+          "success": false,
+          "displayed": null,
+          "expected": 36,
+          "matches": false
+        },
+        "resourceCards": {
+          "success": true,
+          "count": 36,
+          "matches": true
+        },
+        "subSubcategories": {
+          "found": false,
+          "count": 0
+        },
+        "resourceClickable": {
+          "success": true
+        },
+        "layout": {
+          "hasHeader": true,
+          "hasGrid": true,
+          "gridClasses": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        }
+      },
+      "success": false,
+      "errors": [
+        "Resource count mismatch: expected 36, found null"
+      ],
+      "screenshot": "test-screenshots/subcategory-learning-resources.png"
+    },
+    {
+      "slug": "tutorials-case-studies",
+      "expectedCount": 60,
+      "category": "Introduction & Learning",
+      "tests": {
+        "navigation": {
+          "success": true,
+          "status": 200
+        },
+        "heading": {
+          "success": true,
+          "value": "Tutorials & Case Studies"
+        },
+        "backButton": {
+          "success": true,
+          "text": "Back to Intro & Learning"
+        },
+        "countBadge": {
+          "success": false,
+          "displayed": null,
+          "expected": 60,
+          "matches": false
+        },
+        "resourceCards": {
+          "success": true,
+          "count": 60,
+          "matches": true
+        },
+        "subSubcategories": {
+          "found": false,
+          "count": 0
+        },
+        "resourceClickable": {
+          "success": true
+        },
+        "layout": {
+          "hasHeader": true,
+          "hasGrid": true,
+          "gridClasses": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        }
+      },
+      "success": false,
+      "errors": [
+        "Resource count mismatch: expected 60, found null"
+      ],
+      "screenshot": "test-screenshots/subcategory-tutorials-case-studies.png"
+    },
+    {
+      "slug": "adaptive-streaming",
+      "expectedCount": 144,
+      "category": "Protocols & Transport",
+      "tests": {
+        "navigation": {
+          "success": true,
+          "status": 200
+        },
+        "heading": {
+          "success": true,
+          "value": "Adaptive Streaming"
+        },
+        "backButton": {
+          "success": true,
+          "text": "Back to Protocols & Transport"
+        },
+        "countBadge": {
+          "success": false,
+          "displayed": null,
+          "expected": 144,
+          "matches": false
+        },
+        "resourceCards": {
+          "success": true,
+          "count": 144,
+          "matches": true
+        },
+        "subSubcategories": {
+          "found": false,
+          "count": 0
+        },
+        "resourceClickable": {
+          "success": true
+        },
+        "layout": {
+          "hasHeader": true,
+          "hasGrid": true,
+          "gridClasses": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        }
+      },
+      "success": false,
+      "errors": [
+        "Resource count mismatch: expected 144, found null"
+      ],
+      "screenshot": "test-screenshots/subcategory-adaptive-streaming.png"
+    },
+    {
+      "slug": "transport-protocols",
+      "expectedCount": 13,
+      "category": "Protocols & Transport",
+      "tests": {
+        "navigation": {
+          "success": true,
+          "status": 200
+        },
+        "heading": {
+          "success": true,
+          "value": "Transport Protocols"
+        },
+        "backButton": {
+          "success": true,
+          "text": "Back to Protocols & Transport"
+        },
+        "countBadge": {
+          "success": false,
+          "displayed": null,
+          "expected": 13,
+          "matches": false
+        },
+        "resourceCards": {
+          "success": true,
+          "count": 13,
+          "matches": true
+        },
+        "subSubcategories": {
+          "found": false,
+          "count": 0
+        },
+        "resourceClickable": {
+          "success": true
+        },
+        "layout": {
+          "hasHeader": true,
+          "hasGrid": true,
+          "gridClasses": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        }
+      },
+      "success": false,
+      "errors": [
+        "Resource count mismatch: expected 13, found null"
+      ],
+      "screenshot": "test-screenshots/subcategory-transport-protocols.png"
+    },
+    {
+      "slug": "encoding-tools",
+      "expectedCount": 240,
+      "category": "Encoding & Codecs",
+      "tests": {
+        "navigation": {
+          "success": true,
+          "status": 200
+        },
+        "heading": {
+          "success": true,
+          "value": "Encoding Tools"
+        },
+        "backButton": {
+          "success": true,
+          "text": "Back to Encoding & Codecs"
+        },
+        "countBadge": {
+          "success": false,
+          "displayed": null,
+          "expected": 240,
+          "matches": false
+        },
+        "resourceCards": {
+          "success": true,
+          "count": 240,
+          "matches": true
+        },
+        "subSubcategories": {
+          "found": false,
+          "count": 0
+        },
+        "resourceClickable": {
+          "success": true
+        },
+        "layout": {
+          "hasHeader": true,
+          "hasGrid": true,
+          "gridClasses": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        }
+      },
+      "success": false,
+      "errors": [
+        "Resource count mismatch: expected 240, found null"
+      ],
+      "screenshot": "test-screenshots/subcategory-encoding-tools.png"
+    },
+    {
+      "slug": "codecs",
+      "expectedCount": 29,
+      "category": "Encoding & Codecs",
+      "tests": {
+        "navigation": {
+          "success": true,
+          "status": 200
+        },
+        "heading": {
+          "success": true,
+          "value": "Codecs"
+        },
+        "backButton": {
+          "success": true,
+          "text": "Back to Encoding & Codecs"
+        },
+        "countBadge": {
+          "success": false,
+          "displayed": null,
+          "expected": 29,
+          "matches": false
+        },
+        "resourceCards": {
+          "success": true,
+          "count": 29,
+          "matches": true
+        },
+        "subSubcategories": {
+          "found": false,
+          "count": 0
+        },
+        "resourceClickable": {
+          "success": true
+        },
+        "layout": {
+          "hasHeader": true,
+          "hasGrid": true,
+          "gridClasses": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        }
+      },
+      "success": false,
+      "errors": [
+        "Resource count mismatch: expected 29, found null"
+      ],
+      "screenshot": "test-screenshots/subcategory-codecs.png"
+    },
+    {
+      "slug": "hardware-players",
+      "expectedCount": 35,
+      "category": "Players & Clients",
+      "tests": {
+        "navigation": {
+          "success": true,
+          "status": 200
+        },
+        "heading": {
+          "success": true,
+          "value": "Hardware Players"
+        },
+        "backButton": {
+          "success": true,
+          "text": "Back to Players & Clients"
+        },
+        "countBadge": {
+          "success": false,
+          "displayed": null,
+          "expected": 35,
+          "matches": false
+        },
+        "resourceCards": {
+          "success": true,
+          "count": 35,
+          "matches": true
+        },
+        "subSubcategories": {
+          "found": false,
+          "count": 0
+        },
+        "resourceClickable": {
+          "success": true
+        },
+        "layout": {
+          "hasHeader": true,
+          "hasGrid": true,
+          "gridClasses": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        }
+      },
+      "success": false,
+      "errors": [
+        "Resource count mismatch: expected 35, found null"
+      ],
+      "screenshot": "test-screenshots/subcategory-hardware-players.png"
+    },
+    {
+      "slug": "mobile-web-players",
+      "expectedCount": 81,
+      "category": "Players & Clients",
+      "tests": {
+        "navigation": {
+          "success": true,
+          "status": 200
+        },
+        "heading": {
+          "success": true,
+          "value": "Mobile & Web Players"
+        },
+        "backButton": {
+          "success": true,
+          "text": "Back to Players & Clients"
+        },
+        "countBadge": {
+          "success": false,
+          "displayed": null,
+          "expected": 81,
+          "matches": false
+        },
+        "resourceCards": {
+          "success": true,
+          "count": 81,
+          "matches": true
+        },
+        "subSubcategories": {
+          "found": false,
+          "count": 0
+        },
+        "resourceClickable": {
+          "success": true
+        },
+        "layout": {
+          "hasHeader": true,
+          "hasGrid": true,
+          "gridClasses": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        }
+      },
+      "success": false,
+      "errors": [
+        "Resource count mismatch: expected 81, found null"
+      ],
+      "screenshot": "test-screenshots/subcategory-mobile-web-players.png"
+    },
+    {
+      "slug": "audio-subtitles",
+      "expectedCount": 58,
+      "category": "Media Tools",
+      "tests": {
+        "navigation": {
+          "success": true,
+          "status": 200
+        },
+        "heading": {
+          "success": true,
+          "value": "Audio & Subtitles"
+        },
+        "backButton": {
+          "success": true,
+          "text": "Back to Media Tools"
+        },
+        "countBadge": {
+          "success": false,
+          "displayed": null,
+          "expected": 58,
+          "matches": false
+        },
+        "resourceCards": {
+          "success": true,
+          "count": 58,
+          "matches": true
+        },
+        "subSubcategories": {
+          "found": false,
+          "count": 0
+        },
+        "resourceClickable": {
+          "success": true
+        },
+        "layout": {
+          "hasHeader": true,
+          "hasGrid": true,
+          "gridClasses": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        }
+      },
+      "success": false,
+      "errors": [
+        "Resource count mismatch: expected 58, found null"
+      ],
+      "screenshot": "test-screenshots/subcategory-audio-subtitles.png"
+    },
+    {
+      "slug": "ads-qoe",
+      "expectedCount": 45,
+      "category": "Media Tools",
+      "tests": {
+        "navigation": {
+          "success": true,
+          "status": 200
+        },
+        "heading": {
+          "success": true,
+          "value": "Ads & QoE"
+        },
+        "backButton": {
+          "success": true,
+          "text": "Back to Media Tools"
+        },
+        "countBadge": {
+          "success": false,
+          "displayed": null,
+          "expected": 45,
+          "matches": false
+        },
+        "resourceCards": {
+          "success": true,
+          "count": 45,
+          "matches": true
+        },
+        "subSubcategories": {
+          "found": false,
+          "count": 0
+        },
+        "resourceClickable": {
+          "success": true
+        },
+        "layout": {
+          "hasHeader": true,
+          "hasGrid": true,
+          "gridClasses": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        }
+      },
+      "success": false,
+      "errors": [
+        "Resource count mismatch: expected 45, found null"
+      ],
+      "screenshot": "test-screenshots/subcategory-ads-qoe.png"
+    },
+    {
+      "slug": "specs-standards",
+      "expectedCount": 36,
+      "category": "Standards & Industry",
+      "tests": {
+        "navigation": {
+          "success": true,
+          "status": 200
+        },
+        "heading": {
+          "success": true,
+          "value": "Specs & Standards"
+        },
+        "backButton": {
+          "success": true,
+          "text": "Back to Standards & Industry"
+        },
+        "countBadge": {
+          "success": false,
+          "displayed": null,
+          "expected": 36,
+          "matches": false
+        },
+        "resourceCards": {
+          "success": true,
+          "count": 36,
+          "matches": true
+        },
+        "subSubcategories": {
+          "found": false,
+          "count": 0
+        },
+        "resourceClickable": {
+          "success": true
+        },
+        "layout": {
+          "hasHeader": true,
+          "hasGrid": true,
+          "gridClasses": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        }
+      },
+      "success": false,
+      "errors": [
+        "Resource count mismatch: expected 36, found null"
+      ],
+      "screenshot": "test-screenshots/subcategory-specs-standards.png"
+    },
+    {
+      "slug": "vendors-hdr",
+      "expectedCount": 5,
+      "category": "Standards & Industry",
+      "tests": {
+        "navigation": {
+          "success": true,
+          "status": 200
+        },
+        "heading": {
+          "success": true,
+          "value": "Vendors & HDR"
+        },
+        "backButton": {
+          "success": true,
+          "text": "Back to Standards & Industry"
+        },
+        "countBadge": {
+          "success": false,
+          "displayed": null,
+          "expected": 5,
+          "matches": false
+        },
+        "resourceCards": {
+          "success": true,
+          "count": 5,
+          "matches": true
+        },
+        "subSubcategories": {
+          "found": false,
+          "count": 0
+        },
+        "resourceClickable": {
+          "success": true
+        },
+        "layout": {
+          "hasHeader": true,
+          "hasGrid": true,
+          "gridClasses": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        }
+      },
+      "success": false,
+      "errors": [
+        "Resource count mismatch: expected 5, found null"
+      ],
+      "screenshot": "test-screenshots/subcategory-vendors-hdr.png"
+    },
+    {
+      "slug": "streaming-servers",
+      "expectedCount": 39,
+      "category": "Infrastructure & Delivery",
+      "tests": {
+        "navigation": {
+          "success": true,
+          "status": 200
+        },
+        "heading": {
+          "success": true,
+          "value": "Streaming Servers"
+        },
+        "backButton": {
+          "success": true,
+          "text": "Back to Infrastructure & Delivery"
+        },
+        "countBadge": {
+          "success": false,
+          "displayed": null,
+          "expected": 39,
+          "matches": false
+        },
+        "resourceCards": {
+          "success": true,
+          "count": 39,
+          "matches": true
+        },
+        "subSubcategories": {
+          "found": false,
+          "count": 0
+        },
+        "resourceClickable": {
+          "success": true
+        },
+        "layout": {
+          "hasHeader": true,
+          "hasGrid": true,
+          "gridClasses": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        }
+      },
+      "success": false,
+      "errors": [
+        "Resource count mismatch: expected 39, found null"
+      ],
+      "screenshot": "test-screenshots/subcategory-streaming-servers.png"
+    },
+    {
+      "slug": "cloud-cdn",
+      "expectedCount": 9,
+      "category": "Infrastructure & Delivery",
+      "tests": {
+        "navigation": {
+          "success": true,
+          "status": 200
+        },
+        "heading": {
+          "success": true,
+          "value": "Cloud & CDN"
+        },
+        "backButton": {
+          "success": true,
+          "text": "Back to Infrastructure & Delivery"
+        },
+        "countBadge": {
+          "success": false,
+          "displayed": null,
+          "expected": 9,
+          "matches": false
+        },
+        "resourceCards": {
+          "success": true,
+          "count": 9,
+          "matches": true
+        },
+        "subSubcategories": {
+          "found": false,
+          "count": 0
+        },
+        "resourceClickable": {
+          "success": true
+        },
+        "layout": {
+          "hasHeader": true,
+          "hasGrid": true,
+          "gridClasses": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        }
+      },
+      "success": false,
+      "errors": [
+        "Resource count mismatch: expected 9, found null"
+      ],
+      "screenshot": "test-screenshots/subcategory-cloud-cdn.png"
+    },
+    {
+      "slug": "ffmpeg-tools",
+      "expectedCount": 25,
+      "category": "General Tools",
+      "tests": {
+        "navigation": {
+          "success": true,
+          "status": 200
+        },
+        "heading": {
+          "success": true,
+          "value": "FFMPEG & Tools"
+        },
+        "backButton": {
+          "success": true,
+          "text": "Back to General Tools"
+        },
+        "countBadge": {
+          "success": false,
+          "displayed": null,
+          "expected": 25,
+          "matches": false
+        },
+        "resourceCards": {
+          "success": true,
+          "count": 25,
+          "matches": true
+        },
+        "subSubcategories": {
+          "found": false,
+          "count": 0
+        },
+        "resourceClickable": {
+          "success": true
+        },
+        "layout": {
+          "hasHeader": true,
+          "hasGrid": true,
+          "gridClasses": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        }
+      },
+      "success": false,
+      "errors": [
+        "Resource count mismatch: expected 25, found null"
+      ],
+      "screenshot": "test-screenshots/subcategory-ffmpeg-tools.png"
+    },
+    {
+      "slug": "drm",
+      "expectedCount": 51,
+      "category": "General Tools",
+      "tests": {
+        "navigation": {
+          "success": true,
+          "status": 200
+        },
+        "heading": {
+          "success": true,
+          "value": "DRM"
+        },
+        "backButton": {
+          "success": true,
+          "text": "Back to General Tools"
+        },
+        "countBadge": {
+          "success": false,
+          "displayed": null,
+          "expected": 51,
+          "matches": false
+        },
+        "resourceCards": {
+          "success": true,
+          "count": 51,
+          "matches": true
+        },
+        "subSubcategories": {
+          "found": false,
+          "count": 0
+        },
+        "resourceClickable": {
+          "success": true
+        },
+        "layout": {
+          "hasHeader": true,
+          "hasGrid": true,
+          "gridClasses": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        }
+      },
+      "success": false,
+      "errors": [
+        "Resource count mismatch: expected 51, found null"
+      ],
+      "screenshot": "test-screenshots/subcategory-drm.png"
+    },
+    {
+      "slug": "community-groups",
+      "expectedCount": 33,
+      "category": "Community & Events",
+      "tests": {
+        "navigation": {
+          "success": true,
+          "status": 200
+        },
+        "heading": {
+          "success": true,
+          "value": "Community Groups"
+        },
+        "backButton": {
+          "success": true,
+          "text": "Back to Community & Events"
+        },
+        "countBadge": {
+          "success": false,
+          "displayed": null,
+          "expected": 33,
+          "matches": false
+        },
+        "resourceCards": {
+          "success": true,
+          "count": 33,
+          "matches": true
+        },
+        "subSubcategories": {
+          "found": false,
+          "count": 0
+        },
+        "resourceClickable": {
+          "success": true
+        },
+        "layout": {
+          "hasHeader": true,
+          "hasGrid": true,
+          "gridClasses": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        }
+      },
+      "success": false,
+      "errors": [
+        "Resource count mismatch: expected 33, found null"
+      ],
+      "screenshot": "test-screenshots/subcategory-community-groups.png"
+    },
+    {
+      "slug": "events-conferences",
+      "expectedCount": 55,
+      "category": "Community & Events",
+      "tests": {
+        "navigation": {
+          "success": true,
+          "status": 200
+        },
+        "heading": {
+          "success": true,
+          "value": "Events & Conferences"
+        },
+        "backButton": {
+          "success": true,
+          "text": "Back to Community & Events"
+        },
+        "countBadge": {
+          "success": false,
+          "displayed": null,
+          "expected": 55,
+          "matches": false
+        },
+        "resourceCards": {
+          "success": true,
+          "count": 55,
+          "matches": true
+        },
+        "subSubcategories": {
+          "found": false,
+          "count": 0
+        },
+        "resourceClickable": {
+          "success": true
+        },
+        "layout": {
+          "hasHeader": true,
+          "hasGrid": true,
+          "gridClasses": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        }
+      },
+      "success": false,
+      "errors": [
+        "Resource count mismatch: expected 55, found null"
+      ],
+      "screenshot": "test-screenshots/subcategory-events-conferences.png"
+    }
+  ]
+}
