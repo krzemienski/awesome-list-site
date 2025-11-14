@@ -408,18 +408,13 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
   // Desktop sidebar using shadcn Sidebar component (in-flow, not fixed)
   return (
     <>
-      <Sidebar collapsible="icon" variant="sidebar">
-        <SidebarHeader>
-          <div className="px-2 py-1">
-            <h2 className="font-bold truncate">{title}</h2>
-          </div>
-        </SidebarHeader>
+      <Sidebar variant="sidebar" style={{ "--sidebar-width": "16rem" } as React.CSSProperties}>
         <SidebarContent>
           {sidebarContent}
         </SidebarContent>
         <SidebarFooter>
-          <div className="p-2">
-            <Button variant="ghost" className="w-full justify-start text-sm" asChild>
+          <div className="border-t border-border p-3">
+            <Button variant="ghost" className="w-full justify-start" asChild>
               <a href={title.includes("Selfhosted") 
                   ? "https://github.com/awesome-selfhosted/awesome-selfhosted" 
                   : "https://github.com/krzemienski/awesome-video"} 
