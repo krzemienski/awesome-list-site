@@ -124,14 +124,14 @@ export default function SubSubcategory() {
         
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">
+            <h1 className="text-3xl font-bold tracking-tight" data-testid="heading-subsubcategory">
               {subSubcategoryName}
             </h1>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-sm text-muted-foreground mt-1" data-testid="text-breadcrumb">
               {categoryName} → {subcategoryName}
             </p>
           </div>
-          <Badge variant="secondary" className="text-lg px-4 py-2">
+          <Badge variant="secondary" className="text-lg px-4 py-2" data-testid="badge-count">
             {allResources.length}
           </Badge>
         </div>
