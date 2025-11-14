@@ -19,6 +19,7 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
   const [results, setResults] = useState<Resource[]>([]);
   const [, navigate] = useLocation();
   const inputRef = useRef<HTMLInputElement>(null);
+  const linkClickingRef = useRef(false);
 
   // Debug: Log resources to see if they're being passed correctly
   // Search dialog initialized with ${resources?.length || 0} resources
@@ -53,6 +54,20 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
     setResults(searchResults.slice(0, 15).map(result => result.item));
   }, [query, fuse]);
 
+  // Global keyboard shortcut listener (Cmd+K, Ctrl+K)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check for Cmd+K (Mac) or Ctrl+K (Windows/Linux)
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsOpen(true);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [setIsOpen]);
+
   // Focus input when dialog opens
   useEffect(() => {
     if (isOpen && inputRef.current) {
@@ -70,19 +85,18 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
     }
   }, [isOpen]);
 
-  // Handle resource selection
-  const handleSelect = (resource: Resource) => {
-    // Track search result click
-    trackResourceClick(resource.title, resource.url, resource.category);
-    
-    setIsOpen(false);
-    
-    // Open the resource URL in a new tab
-    window.open(resource.url, '_blank', 'noopener,noreferrer');
+  // Prevent dialog from closing when clicking search results
+  const handleOpenChange = (open: boolean) => {
+    // If trying to close while clicking a link, prevent it
+    if (!open && linkClickingRef.current) {
+      return;
+    }
+    // Otherwise, allow normal open/close behavior
+    setIsOpen(open);
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Search Resources</DialogTitle>
@@ -91,42 +105,63 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
           </DialogDescription>
         </DialogHeader>
         
-        <div className="space-y-4">
+        <Command className="overflow-visible">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <input
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none z-10" />
+            <CommandInput
               ref={inputRef}
-              type="text"
               placeholder="Search packages, libraries, and tools..."
               value={query}
-              onChange={(e) => {
-                console.log(`Input value changed to: "${e.target.value}"`);
-                setQuery(e.target.value);
+              onValueChange={(value) => {
+                console.log(`Input value changed to: "${value}"`);
+                setQuery(value);
               }}
-              className="w-full pl-10 pr-4 py-2 border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+              className="w-full pl-10 pr-4 py-2"
             />
           </div>
           
-          <div className="max-h-[300px] overflow-y-auto border border-border">
+          <CommandList className="max-h-[300px] overflow-y-auto">
             {query.length >= 2 ? (
               results.length > 0 ? (
-                <div className="p-2">
+                <CommandGroup>
                   {results.map((resource, index) => (
-                    <div
+                    <CommandItem
                       key={`${resource.title}-${resource.url}-${index}`}
-                      onClick={() => handleSelect(resource)}
-                      className="p-3 hover:bg-accent hover:text-accent-foreground cursor-pointer rounded border-b border-border last:border-b-0"
+                      onSelect={() => {
+                        // Set flag to prevent dialog from closing
+                        linkClickingRef.current = true;
+                        trackResourceClick(resource.title, resource.url, resource.category);
+                        // Open link in new tab
+                        window.open(resource.url, '_blank', 'noopener,noreferrer');
+                        // Reset flag after delay
+                        setTimeout(() => {
+                          linkClickingRef.current = false;
+                        }, 100);
+                      }}
+                      className="cursor-pointer p-0"
+                      data-testid={`search-result-${index}`}
                     >
-                      <div className="font-medium text-sm">{resource.title}</div>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        {resource.category} {resource.subcategory ? `→ ${resource.subcategory}` : ''} 
-                      </div>
-                      <div className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                        {resource.description}
-                      </div>
-                    </div>
+                      <a
+                        href={resource.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onMouseDown={(e) => {
+                          // Prevent default anchor navigation so onSelect handles it
+                          e.preventDefault();
+                        }}
+                        className="flex flex-col gap-1 w-full p-3 no-underline text-inherit hover:no-underline"
+                      >
+                        <div className="font-medium text-sm">{resource.title}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {resource.category} {resource.subcategory ? `→ ${resource.subcategory}` : ''} 
+                        </div>
+                        <div className="text-xs text-muted-foreground line-clamp-2">
+                          {resource.description}
+                        </div>
+                      </a>
+                    </CommandItem>
                   ))}
-                </div>
+                </CommandGroup>
               ) : (
                 <div className="flex flex-col items-center justify-center h-[200px] text-center p-4">
                   <div className="flex h-16 w-16 items-center justify-center bg-muted">
@@ -145,8 +180,8 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
                 <p className="mt-2 text-xs text-muted-foreground">Type at least 2 characters</p>
               </div>
             )}
-          </div>
-        </div>
+          </CommandList>
+        </Command>
         
         <DialogFooter>
           <Button
