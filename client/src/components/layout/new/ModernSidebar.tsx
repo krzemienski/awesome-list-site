@@ -52,8 +52,9 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
     console.log("🏗️ BUILDING TRUE HIERARCHICAL NAVIGATION FROM JSON DATA");
     console.log("📊 Total categories:", categories.length);
     
+    // Only filter out unwanted system categories, NOT by resource count
+    // Resources are denormalized to subcategories, so top-level may have 0 resources
     const filteredCategories = categories.filter(cat => 
-      cat.resources.length > 0 && 
       cat.name !== "Table of contents" && 
       !cat.name.startsWith("List of") &&
       !["Contributing", "License", "External Links", "Anti-features"].includes(cat.name)
