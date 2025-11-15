@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams, Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -6,6 +6,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import SEOHead from "@/components/layout/SEOHead";
+import TagFilter from "@/components/ui/tag-filter";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { deslugify, getCategorySlug } from "@/lib/utils";
 import { Resource } from "@/types/awesome-list";
@@ -18,6 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 export default function Subcategory() {
   const { slug } = useParams<{ slug: string }>();
   const { toast } = useToast();
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   
   // Fetch awesome list data - use same query as homepage
   const { data: rawData, isLoading, error } = useQuery({
@@ -53,6 +55,16 @@ export default function Subcategory() {
   
   const subcategoryName = currentSubcategory ? currentSubcategory.name : deslugify(slug || "");
   const categoryName = parentCategory ? parentCategory.name : "";
+  
+  // Filter resources by selected tags
+  const filteredResources = useMemo(() => {
+    if (selectedTags.length === 0) {
+      return allResources;
+    }
+    return allResources.filter(r => 
+      r.tags && r.tags.some(tag => selectedTags.includes(tag))
+    );
+  }, [allResources, selectedTags]);
   
   // Track subcategory view
   useEffect(() => {
@@ -132,6 +144,23 @@ export default function Subcategory() {
         </div>
       </div>
       
+      {/* Tag Filter */}
+      <TagFilter 
+        resources={allResources}
+        selectedTags={selectedTags}
+        onTagsChange={setSelectedTags}
+      />
+      
+      {/* Results Count */}
+      {allResources.length > 0 && (
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-muted-foreground" data-testid="text-results-count">
+            Showing {filteredResources.length} of {allResources.length} resources
+            {selectedTags.length > 0 && ` (filtered by ${selectedTags.length} tag${selectedTags.length > 1 ? 's' : ''})`}
+          </p>
+        </div>
+      )}
+      
       {/* Resources Grid */}
       {allResources.length === 0 ? (
         <div className="text-center py-12">
@@ -140,9 +169,16 @@ export default function Subcategory() {
             There are no resources in this subcategory yet.
           </p>
         </div>
+      ) : filteredResources.length === 0 ? (
+        <div className="text-center py-12">
+          <h3 className="text-lg font-semibold mb-2">No resources found</h3>
+          <p className="text-muted-foreground">
+            Try adjusting your tag filters to see more results.
+          </p>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {allResources.map((resource, index) => {
+          {filteredResources.map((resource, index) => {
             const handleResourceClick = () => {
               window.open(resource.url, '_blank', 'noopener,noreferrer');
               
