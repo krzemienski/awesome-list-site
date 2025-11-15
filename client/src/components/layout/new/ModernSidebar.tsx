@@ -3,7 +3,6 @@ import { useLocation, useRoute, Link } from "wouter";
 import { 
   Sidebar, 
   SidebarProvider, 
-  SidebarTrigger, 
   SidebarHeader, 
   SidebarContent,
   SidebarMenu,

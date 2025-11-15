@@ -40,15 +40,17 @@ export default function TopBar({
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-14 items-center px-2 md:px-4">
         <div className="flex items-center gap-1 md:gap-2 min-w-0 shrink-0">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            aria-label="Toggle sidebar"
-            className="shrink-0"
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
+          {isMobile && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              aria-label="Toggle sidebar"
+              className="shrink-0"
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+          )}
           <Link href="/" className="flex items-center space-x-1 md:space-x-2 min-w-0">
             <svg
               xmlns="http://www.w3.org/2000/svg"

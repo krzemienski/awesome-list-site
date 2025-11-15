@@ -17,32 +17,29 @@ export default function MainLayout({ awesomeList, isLoading, children }: MainLay
   const [searchOpen, setSearchOpen] = useState(false);
   const isMobile = useIsMobile();
   
-  // Initialize sidebar state based on screen size
-  const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return window.innerWidth >= 768; // Open by default on desktop
-    }
-    return false;
-  });
+  // On desktop (>= 1024px), sidebar is ALWAYS expanded (non-collapsible)
+  // On mobile (< 1024px), sidebar is controlled via Sheet component
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // Handle responsive sidebar behavior
+  // Force sidebar to always be expanded on desktop
   useEffect(() => {
     const handleResize = () => {
-      const isDesktop = window.innerWidth >= 768;
-      // On mobile, close sidebar. On desktop, keep current state unless it's closed
-      if (!isDesktop) {
+      const isDesktop = window.innerWidth >= 1024;
+      if (isDesktop) {
+        // Desktop: sidebar is always expanded
+        setIsSidebarOpen(true);
+      } else {
+        // Mobile: sidebar starts closed (controlled by Sheet)
         setIsSidebarOpen(false);
       }
     };
     
+    // Set initial state
+    handleResize();
+    
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-  
-  // Toggle sidebar function with proper state handling
-  const toggleSidebar = () => {
-    setIsSidebarOpen(prev => !prev);
-  };
 
   return (
     <div className="flex h-screen flex-col">
