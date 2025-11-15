@@ -417,7 +417,7 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
   // Desktop sidebar using shadcn Sidebar component (in-flow, not fixed)
   return (
     <>
-      <Sidebar variant="sidebar" style={{ "--sidebar-width": "16rem" } as React.CSSProperties}>
+      <Sidebar variant="sidebar" collapsible="none" style={{ "--sidebar-width": "16rem" } as React.CSSProperties}>
         <SidebarContent>
           {sidebarContent}
         </SidebarContent>
