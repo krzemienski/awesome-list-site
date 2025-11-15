@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useUserProfile } from "@/hooks/use-user-profile";
 import RecommendationPanel from "@/components/ui/recommendation-panel";
+import { getCategoryIcon, getSubcategoryIcon, getSubSubcategoryIcon } from "@/config/navigation-icons";
 
 interface ModernSidebarProps {
   title: string;
@@ -237,7 +238,10 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
                     onClick={() => navigate(`/category/${getCategorySlug(category.name)}`)}
                   >
                     <div className="flex items-start gap-2 w-full min-w-0">
-                      <Folder className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                      {(() => {
+                        const IconComponent = getCategoryIcon(category.name);
+                        return <IconComponent className="h-4 w-4 flex-shrink-0 mt-0.5" />;
+                      })()}
                       <span className="break-words flex-1 text-left min-w-0 leading-tight">{category.name}</span>
                       <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded ml-2 flex-shrink-0 self-start">
                         {category.resources.length}
@@ -286,7 +290,10 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
                             data-testid={`nav-subcategory-${subcategory.slug}`}
                           >
                             <div className="flex items-start gap-2 w-full min-w-0">
-                              <span className="w-2 h-2 rounded-full bg-muted-foreground/40 flex-shrink-0 mt-1.5"></span>
+                              {(() => {
+                                const IconComponent = getSubcategoryIcon(subcategory.name);
+                                return <IconComponent className="h-4 w-4 flex-shrink-0 mt-0.5" />;
+                              })()}
                               <span className="break-words flex-1 text-left min-w-0 leading-tight">{subcategory.name}</span>
                               <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded ml-2 flex-shrink-0 self-start">
                                 {subcategory.resources.length}
@@ -313,7 +320,10 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
                                 data-testid={`nav-sub-subcategory-${subSubcategory.slug}`}
                               >
                                 <div className="flex items-start gap-2 w-full min-w-0">
-                                  <span className="w-1 h-1 rounded-full bg-muted-foreground/30 flex-shrink-0 mt-1.5"></span>
+                                  {(() => {
+                                    const IconComponent = getSubSubcategoryIcon(subSubcategory.name);
+                                    return <IconComponent className="h-3.5 w-3.5 flex-shrink-0 mt-0.5" />;
+                                  })()}
                                   <span className="break-words flex-1 text-left min-w-0 leading-tight">{subSubcategory.name}</span>
                                   <span className="text-xs bg-muted/80 text-muted-foreground px-1 py-0.5 rounded ml-2 flex-shrink-0 self-start">
                                     {subSubcategory.resources.length}
