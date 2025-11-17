@@ -1,0 +1,3797 @@
+{
+  "testSuite": "Tag Filtering Suite - All 60 Pages",
+  "timestamp": "2025-11-17T12:31:27.209Z",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "totalPages": 60,
+  "summary": {
+    "total": 60,
+    "passed": 0,
+    "failed": 60,
+    "warnings": 0
+  },
+  "pages": [
+    {
+      "index": 1,
+      "type": "category",
+      "name": "Intro & Learning",
+      "slug": "intro-learning",
+      "url": "http://localhost:5000/category/intro-learning",
+      "expectedCount": 229,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 2,
+      "type": "category",
+      "name": "Protocols & Transport",
+      "slug": "protocols-transport",
+      "url": "http://localhost:5000/category/protocols-transport",
+      "expectedCount": 252,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 3,
+      "type": "category",
+      "name": "Encoding & Codecs",
+      "slug": "encoding-codecs",
+      "url": "http://localhost:5000/category/encoding-codecs",
+      "expectedCount": 392,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 4,
+      "type": "category",
+      "name": "Players & Clients",
+      "slug": "players-clients",
+      "url": "http://localhost:5000/category/players-clients",
+      "expectedCount": 269,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 5,
+      "type": "category",
+      "name": "Media Tools",
+      "slug": "media-tools",
+      "url": "http://localhost:5000/category/media-tools",
+      "expectedCount": 317,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 6,
+      "type": "category",
+      "name": "Standards & Industry",
+      "slug": "standards-industry",
+      "url": "http://localhost:5000/category/standards-industry",
+      "expectedCount": 174,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 7,
+      "type": "category",
+      "name": "Infrastructure & Delivery",
+      "slug": "infrastructure-delivery",
+      "url": "http://localhost:5000/category/infrastructure-delivery",
+      "expectedCount": 190,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 8,
+      "type": "category",
+      "name": "General Tools",
+      "slug": "general-tools",
+      "url": "http://localhost:5000/category/general-tools",
+      "expectedCount": 97,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 9,
+      "type": "category",
+      "name": "Community & Events",
+      "slug": "community-events",
+      "url": "http://localhost:5000/category/community-events",
+      "expectedCount": 91,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 10,
+      "type": "subcategory",
+      "name": "Introduction",
+      "slug": "introduction",
+      "url": "http://localhost:5000/subcategory/introduction",
+      "expectedCount": 4,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 11,
+      "type": "subcategory",
+      "name": "Learning Resources",
+      "slug": "learning-resources",
+      "url": "http://localhost:5000/subcategory/learning-resources",
+      "expectedCount": 36,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 12,
+      "type": "subcategory",
+      "name": "Tutorials & Case Studies",
+      "slug": "tutorials-case-studies",
+      "url": "http://localhost:5000/subcategory/tutorials-case-studies",
+      "expectedCount": 60,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 13,
+      "type": "subcategory",
+      "name": "Adaptive Streaming",
+      "slug": "adaptive-streaming",
+      "url": "http://localhost:5000/subcategory/adaptive-streaming",
+      "expectedCount": 144,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 14,
+      "type": "subcategory",
+      "name": "Transport Protocols",
+      "slug": "transport-protocols",
+      "url": "http://localhost:5000/subcategory/transport-protocols",
+      "expectedCount": 13,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 15,
+      "type": "subcategory",
+      "name": "Encoding Tools",
+      "slug": "encoding-tools",
+      "url": "http://localhost:5000/subcategory/encoding-tools",
+      "expectedCount": 240,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 16,
+      "type": "subcategory",
+      "name": "Codecs",
+      "slug": "codecs",
+      "url": "http://localhost:5000/subcategory/codecs",
+      "expectedCount": 29,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 17,
+      "type": "subcategory",
+      "name": "Hardware Players",
+      "slug": "hardware-players",
+      "url": "http://localhost:5000/subcategory/hardware-players",
+      "expectedCount": 35,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 18,
+      "type": "subcategory",
+      "name": "Mobile & Web Players",
+      "slug": "mobile-web-players",
+      "url": "http://localhost:5000/subcategory/mobile-web-players",
+      "expectedCount": 81,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 19,
+      "type": "subcategory",
+      "name": "Audio & Subtitles",
+      "slug": "audio-subtitles",
+      "url": "http://localhost:5000/subcategory/audio-subtitles",
+      "expectedCount": 58,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 20,
+      "type": "subcategory",
+      "name": "Ads & QoE",
+      "slug": "ads-qoe",
+      "url": "http://localhost:5000/subcategory/ads-qoe",
+      "expectedCount": 45,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 21,
+      "type": "subcategory",
+      "name": "Specs & Standards",
+      "slug": "specs-standards",
+      "url": "http://localhost:5000/subcategory/specs-standards",
+      "expectedCount": 36,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 22,
+      "type": "subcategory",
+      "name": "Vendors & HDR",
+      "slug": "vendors-hdr",
+      "url": "http://localhost:5000/subcategory/vendors-hdr",
+      "expectedCount": 5,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 23,
+      "type": "subcategory",
+      "name": "Streaming Servers",
+      "slug": "streaming-servers",
+      "url": "http://localhost:5000/subcategory/streaming-servers",
+      "expectedCount": 39,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 24,
+      "type": "subcategory",
+      "name": "Cloud & CDN",
+      "slug": "cloud-cdn",
+      "url": "http://localhost:5000/subcategory/cloud-cdn",
+      "expectedCount": 9,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 25,
+      "type": "subcategory",
+      "name": "FFMPEG Tools",
+      "slug": "ffmpeg-tools",
+      "url": "http://localhost:5000/subcategory/ffmpeg-tools",
+      "expectedCount": 25,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 26,
+      "type": "subcategory",
+      "name": "DRM",
+      "slug": "drm",
+      "url": "http://localhost:5000/subcategory/drm",
+      "expectedCount": 51,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 27,
+      "type": "subcategory",
+      "name": "Community Groups",
+      "slug": "community-groups",
+      "url": "http://localhost:5000/subcategory/community-groups",
+      "expectedCount": 33,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 28,
+      "type": "subcategory",
+      "name": "Events & Conferences",
+      "slug": "events-conferences",
+      "url": "http://localhost:5000/subcategory/events-conferences",
+      "expectedCount": 55,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 29,
+      "type": "sub-subcategory",
+      "name": "HLS",
+      "slug": "hls",
+      "url": "http://localhost:5000/sub-subcategory/hls",
+      "expectedCount": 63,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 30,
+      "type": "sub-subcategory",
+      "name": "DASH",
+      "slug": "dash",
+      "url": "http://localhost:5000/sub-subcategory/dash",
+      "expectedCount": 50,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 31,
+      "type": "sub-subcategory",
+      "name": "RIST",
+      "slug": "rist",
+      "url": "http://localhost:5000/sub-subcategory/rist",
+      "expectedCount": 1,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 32,
+      "type": "sub-subcategory",
+      "name": "SRT",
+      "slug": "srt",
+      "url": "http://localhost:5000/sub-subcategory/srt",
+      "expectedCount": 1,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 33,
+      "type": "sub-subcategory",
+      "name": "RTMP",
+      "slug": "rtmp",
+      "url": "http://localhost:5000/sub-subcategory/rtmp",
+      "expectedCount": 0,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 34,
+      "type": "sub-subcategory",
+      "name": "FFMPEG",
+      "slug": "ffmpeg",
+      "url": "http://localhost:5000/sub-subcategory/ffmpeg",
+      "expectedCount": 66,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 35,
+      "type": "sub-subcategory",
+      "name": "Other Encoders",
+      "slug": "other-encoders",
+      "url": "http://localhost:5000/sub-subcategory/other-encoders",
+      "expectedCount": 1,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 36,
+      "type": "sub-subcategory",
+      "name": "HEVC",
+      "slug": "hevc",
+      "url": "http://localhost:5000/sub-subcategory/hevc",
+      "expectedCount": 10,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 37,
+      "type": "sub-subcategory",
+      "name": "VP9",
+      "slug": "vp9",
+      "url": "http://localhost:5000/sub-subcategory/vp9",
+      "expectedCount": 1,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 38,
+      "type": "sub-subcategory",
+      "name": "AV1",
+      "slug": "av1",
+      "url": "http://localhost:5000/sub-subcategory/av1",
+      "expectedCount": 6,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 39,
+      "type": "sub-subcategory",
+      "name": "Roku",
+      "slug": "roku",
+      "url": "http://localhost:5000/sub-subcategory/roku",
+      "expectedCount": 26,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 40,
+      "type": "sub-subcategory",
+      "name": "Smart TVs",
+      "slug": "smart-tvs",
+      "url": "http://localhost:5000/sub-subcategory/smart-tvs",
+      "expectedCount": 3,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 41,
+      "type": "sub-subcategory",
+      "name": "Chromecast",
+      "slug": "chromecast",
+      "url": "http://localhost:5000/sub-subcategory/chromecast",
+      "expectedCount": 1,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 42,
+      "type": "sub-subcategory",
+      "name": "iOS/tvOS",
+      "slug": "iostvos",
+      "url": "http://localhost:5000/sub-subcategory/iostvos",
+      "expectedCount": 31,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 43,
+      "type": "sub-subcategory",
+      "name": "Android",
+      "slug": "android",
+      "url": "http://localhost:5000/sub-subcategory/android",
+      "expectedCount": 10,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 44,
+      "type": "sub-subcategory",
+      "name": "Web Players",
+      "slug": "web-players",
+      "url": "http://localhost:5000/sub-subcategory/web-players",
+      "expectedCount": 25,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 45,
+      "type": "sub-subcategory",
+      "name": "Audio",
+      "slug": "audio",
+      "url": "http://localhost:5000/sub-subcategory/audio",
+      "expectedCount": 8,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 46,
+      "type": "sub-subcategory",
+      "name": "Subtitles & Captions",
+      "slug": "subtitles-captions",
+      "url": "http://localhost:5000/sub-subcategory/subtitles-captions",
+      "expectedCount": 40,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 47,
+      "type": "sub-subcategory",
+      "name": "Advertising",
+      "slug": "advertising",
+      "url": "http://localhost:5000/sub-subcategory/advertising",
+      "expectedCount": 0,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 48,
+      "type": "sub-subcategory",
+      "name": "Quality & Testing",
+      "slug": "quality-testing",
+      "url": "http://localhost:5000/sub-subcategory/quality-testing",
+      "expectedCount": 36,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 49,
+      "type": "sub-subcategory",
+      "name": "Official Specs",
+      "slug": "official-specs",
+      "url": "http://localhost:5000/sub-subcategory/official-specs",
+      "expectedCount": 3,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 50,
+      "type": "sub-subcategory",
+      "name": "MPEG & Forums",
+      "slug": "mpeg-forums",
+      "url": "http://localhost:5000/sub-subcategory/mpeg-forums",
+      "expectedCount": 6,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 51,
+      "type": "sub-subcategory",
+      "name": "Vendor Docs",
+      "slug": "vendor-docs",
+      "url": "http://localhost:5000/sub-subcategory/vendor-docs",
+      "expectedCount": 1,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 52,
+      "type": "sub-subcategory",
+      "name": "HDR Guidelines",
+      "slug": "hdr-guidelines",
+      "url": "http://localhost:5000/sub-subcategory/hdr-guidelines",
+      "expectedCount": 1,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 53,
+      "type": "sub-subcategory",
+      "name": "Origin Servers",
+      "slug": "origin-servers",
+      "url": "http://localhost:5000/sub-subcategory/origin-servers",
+      "expectedCount": 1,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 54,
+      "type": "sub-subcategory",
+      "name": "Storage Solutions",
+      "slug": "storage-solutions",
+      "url": "http://localhost:5000/sub-subcategory/storage-solutions",
+      "expectedCount": 3,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 55,
+      "type": "sub-subcategory",
+      "name": "Cloud Platforms",
+      "slug": "cloud-platforms",
+      "url": "http://localhost:5000/sub-subcategory/cloud-platforms",
+      "expectedCount": 4,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 56,
+      "type": "sub-subcategory",
+      "name": "CDN Integration",
+      "slug": "cdn-integration",
+      "url": "http://localhost:5000/sub-subcategory/cdn-integration",
+      "expectedCount": 1,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 57,
+      "type": "sub-subcategory",
+      "name": "Online Forums",
+      "slug": "online-forums",
+      "url": "http://localhost:5000/sub-subcategory/online-forums",
+      "expectedCount": 2,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 58,
+      "type": "sub-subcategory",
+      "name": "Slack & Meetups",
+      "slug": "slack-meetups",
+      "url": "http://localhost:5000/sub-subcategory/slack-meetups",
+      "expectedCount": 0,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 59,
+      "type": "sub-subcategory",
+      "name": "Conferences",
+      "slug": "conferences",
+      "url": "http://localhost:5000/sub-subcategory/conferences",
+      "expectedCount": 0,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    },
+    {
+      "index": 60,
+      "type": "sub-subcategory",
+      "name": "Podcasts & Webinars",
+      "slug": "podcasts-webinars",
+      "url": "http://localhost:5000/sub-subcategory/podcasts-webinars",
+      "expectedCount": 2,
+      "tests": {
+        "navigation": {
+          "status": "passed",
+          "message": "Successfully navigated (200)"
+        },
+        "tagFilterVisible": {
+          "status": "pending",
+          "message": ""
+        },
+        "resultsCountVisible": {
+          "status": "pending",
+          "message": "",
+          "initialCount": 0,
+          "totalResources": 0
+        },
+        "tagFilterOpens": {
+          "status": "pending",
+          "message": ""
+        },
+        "tagsListed": {
+          "status": "pending",
+          "message": "",
+          "tagCount": 0
+        },
+        "tagSelection": {
+          "status": "pending",
+          "message": "",
+          "selectedTag": ""
+        },
+        "filteringWorks": {
+          "status": "pending",
+          "message": "",
+          "filteredCount": 0
+        },
+        "countUpdates": {
+          "status": "pending",
+          "message": ""
+        },
+        "clearFilter": {
+          "status": "pending",
+          "message": ""
+        },
+        "allResourcesRestore": {
+          "status": "pending",
+          "message": ""
+        },
+        "noErrors": {
+          "status": "failed",
+          "message": "Test error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+        }
+      },
+      "screenshot": "",
+      "errors": [
+        "SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text(\"Filter by Tag\")' is not a valid selector."
+      ]
+    }
+  ]
+}
