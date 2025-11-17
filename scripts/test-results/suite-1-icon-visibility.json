@@ -1,0 +1,1536 @@
+{
+  "testSuite": "Icon Visibility Suite - All 60 Navigation Items",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "timestamp": "2025-11-17T13:05:55.025Z",
+  "totalExpected": 60,
+  "iconTests": {
+    "categories": [
+      {
+        "name": "Intro & Learning",
+        "type": "category",
+        "tests": {
+          "svgExists": {
+            "status": "passed",
+            "message": "SVG icon rendered"
+          },
+          "iconBeforeText": {
+            "status": "passed",
+            "message": "Icon positioned before label"
+          },
+          "iconStyling": {
+            "status": "passed",
+            "message": "Color: oklch(1 0 0), visible"
+          },
+          "iconSize": {
+            "status": "passed",
+            "message": "16x16px"
+          }
+        },
+        "expectedIcon": "BookOpen",
+        "slug": "intro-learning"
+      },
+      {
+        "name": "Protocols & Transport",
+        "type": "category",
+        "tests": {
+          "svgExists": {
+            "status": "passed",
+            "message": "SVG icon rendered"
+          },
+          "iconBeforeText": {
+            "status": "passed",
+            "message": "Icon positioned before label"
+          },
+          "iconStyling": {
+            "status": "passed",
+            "message": "Color: oklch(1 0 0), visible"
+          },
+          "iconSize": {
+            "status": "passed",
+            "message": "16x16px"
+          }
+        },
+        "expectedIcon": "Radio",
+        "slug": "protocols-transport"
+      },
+      {
+        "name": "Encoding & Codecs",
+        "type": "category",
+        "tests": {
+          "svgExists": {
+            "status": "passed",
+            "message": "SVG icon rendered"
+          },
+          "iconBeforeText": {
+            "status": "passed",
+            "message": "Icon positioned before label"
+          },
+          "iconStyling": {
+            "status": "passed",
+            "message": "Color: oklch(1 0 0), visible"
+          },
+          "iconSize": {
+            "status": "passed",
+            "message": "16x16px"
+          }
+        },
+        "expectedIcon": "Film",
+        "slug": "encoding-codecs"
+      },
+      {
+        "name": "Players & Clients",
+        "type": "category",
+        "tests": {
+          "svgExists": {
+            "status": "passed",
+            "message": "SVG icon rendered"
+          },
+          "iconBeforeText": {
+            "status": "passed",
+            "message": "Icon positioned before label"
+          },
+          "iconStyling": {
+            "status": "passed",
+            "message": "Color: oklch(1 0 0), visible"
+          },
+          "iconSize": {
+            "status": "passed",
+            "message": "16x16px"
+          }
+        },
+        "expectedIcon": "Play",
+        "slug": "players-clients"
+      },
+      {
+        "name": "Media Tools",
+        "type": "category",
+        "tests": {
+          "svgExists": {
+            "status": "passed",
+            "message": "SVG icon rendered"
+          },
+          "iconBeforeText": {
+            "status": "passed",
+            "message": "Icon positioned before label"
+          },
+          "iconStyling": {
+            "status": "passed",
+            "message": "Color: oklch(1 0 0), visible"
+          },
+          "iconSize": {
+            "status": "passed",
+            "message": "16x16px"
+          }
+        },
+        "expectedIcon": "Wrench",
+        "slug": "media-tools"
+      },
+      {
+        "name": "Standards & Industry",
+        "type": "category",
+        "tests": {
+          "svgExists": {
+            "status": "passed",
+            "message": "SVG icon rendered"
+          },
+          "iconBeforeText": {
+            "status": "passed",
+            "message": "Icon positioned before label"
+          },
+          "iconStyling": {
+            "status": "passed",
+            "message": "Color: oklch(1 0 0), visible"
+          },
+          "iconSize": {
+            "status": "passed",
+            "message": "16x16px"
+          }
+        },
+        "expectedIcon": "FileText",
+        "slug": "standards-industry"
+      },
+      {
+        "name": "Infrastructure & Delivery",
+        "type": "category",
+        "tests": {
+          "svgExists": {
+            "status": "passed",
+            "message": "SVG icon rendered"
+          },
+          "iconBeforeText": {
+            "status": "passed",
+            "message": "Icon positioned before label"
+          },
+          "iconStyling": {
+            "status": "passed",
+            "message": "Color: oklch(1 0 0), visible"
+          },
+          "iconSize": {
+            "status": "passed",
+            "message": "16x16px"
+          }
+        },
+        "expectedIcon": "Server",
+        "slug": "infrastructure-delivery"
+      },
+      {
+        "name": "General Tools",
+        "type": "category",
+        "tests": {
+          "svgExists": {
+            "status": "passed",
+            "message": "SVG icon rendered"
+          },
+          "iconBeforeText": {
+            "status": "passed",
+            "message": "Icon positioned before label"
+          },
+          "iconStyling": {
+            "status": "passed",
+            "message": "Color: oklch(1 0 0), visible"
+          },
+          "iconSize": {
+            "status": "passed",
+            "message": "16x16px"
+          }
+        },
+        "expectedIcon": "Settings",
+        "slug": "general-tools"
+      },
+      {
+        "name": "Community & Events",
+        "type": "category",
+        "tests": {
+          "svgExists": {
+            "status": "passed",
+            "message": "SVG icon rendered"
+          },
+          "iconBeforeText": {
+            "status": "passed",
+            "message": "Icon positioned before label"
+          },
+          "iconStyling": {
+            "status": "passed",
+            "message": "Color: oklch(1 0 0), visible"
+          },
+          "iconSize": {
+            "status": "passed",
+            "message": "16x16px"
+          }
+        },
+        "expectedIcon": "Users",
+        "slug": "community-events"
+      }
+    ],
+    "subcategories": [
+      {
+        "name": "Introduction",
+        "type": "subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "passed",
+            "message": "SVG icon rendered"
+          },
+          "iconBeforeText": {
+            "status": "passed",
+            "message": "Icon positioned before label"
+          },
+          "iconStyling": {
+            "status": "passed",
+            "message": "Color: oklch(1 0 0), visible"
+          },
+          "iconSize": {
+            "status": "passed",
+            "message": "16x16px"
+          }
+        },
+        "expectedIcon": "BookOpenCheck",
+        "slug": "introduction",
+        "parent": "Intro & Learning"
+      },
+      {
+        "name": "Learning Resources",
+        "type": "subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "passed",
+            "message": "SVG icon rendered"
+          },
+          "iconBeforeText": {
+            "status": "passed",
+            "message": "Icon positioned before label"
+          },
+          "iconStyling": {
+            "status": "passed",
+            "message": "Color: oklch(1 0 0), visible"
+          },
+          "iconSize": {
+            "status": "passed",
+            "message": "16x16px"
+          }
+        },
+        "expectedIcon": "GraduationCap",
+        "slug": "learning-resources",
+        "parent": "Intro & Learning"
+      },
+      {
+        "name": "Tutorials & Case Studies",
+        "type": "subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "passed",
+            "message": "SVG icon rendered"
+          },
+          "iconBeforeText": {
+            "status": "passed",
+            "message": "Icon positioned before label"
+          },
+          "iconStyling": {
+            "status": "passed",
+            "message": "Color: oklch(1 0 0), visible"
+          },
+          "iconSize": {
+            "status": "passed",
+            "message": "16x16px"
+          }
+        },
+        "expectedIcon": "BookMarked",
+        "slug": "tutorials-case-studies",
+        "parent": "Intro & Learning"
+      },
+      {
+        "name": "Adaptive Streaming",
+        "type": "subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "passed",
+            "message": "SVG icon rendered"
+          },
+          "iconBeforeText": {
+            "status": "passed",
+            "message": "Icon positioned before label"
+          },
+          "iconStyling": {
+            "status": "passed",
+            "message": "Color: oklch(1 0 0), visible"
+          },
+          "iconSize": {
+            "status": "passed",
+            "message": "16x16px"
+          }
+        },
+        "expectedIcon": "Wifi",
+        "slug": "adaptive-streaming",
+        "parent": "Protocols & Transport"
+      },
+      {
+        "name": "Transport Protocols",
+        "type": "subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "passed",
+            "message": "SVG icon rendered"
+          },
+          "iconBeforeText": {
+            "status": "passed",
+            "message": "Icon positioned before label"
+          },
+          "iconStyling": {
+            "status": "passed",
+            "message": "Color: oklch(1 0 0), visible"
+          },
+          "iconSize": {
+            "status": "passed",
+            "message": "16x16px"
+          }
+        },
+        "expectedIcon": "Network",
+        "slug": "transport-protocols",
+        "parent": "Protocols & Transport"
+      },
+      {
+        "name": "Encoding Tools",
+        "type": "subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "passed",
+            "message": "SVG icon rendered"
+          },
+          "iconBeforeText": {
+            "status": "passed",
+            "message": "Icon positioned before label"
+          },
+          "iconStyling": {
+            "status": "passed",
+            "message": "Color: oklch(1 0 0), visible"
+          },
+          "iconSize": {
+            "status": "passed",
+            "message": "16x16px"
+          }
+        },
+        "expectedIcon": "Clapperboard",
+        "slug": "encoding-tools",
+        "parent": "Encoding & Codecs"
+      },
+      {
+        "name": "Codecs",
+        "type": "subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "passed",
+            "message": "SVG icon rendered"
+          },
+          "iconBeforeText": {
+            "status": "passed",
+            "message": "Icon positioned before label"
+          },
+          "iconStyling": {
+            "status": "passed",
+            "message": "Color: oklch(1 0 0), visible"
+          },
+          "iconSize": {
+            "status": "passed",
+            "message": "16x16px"
+          }
+        },
+        "expectedIcon": "Binary",
+        "slug": "codecs",
+        "parent": "Encoding & Codecs"
+      },
+      {
+        "name": "Hardware Players",
+        "type": "subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "passed",
+            "message": "SVG icon rendered"
+          },
+          "iconBeforeText": {
+            "status": "passed",
+            "message": "Icon positioned before label"
+          },
+          "iconStyling": {
+            "status": "passed",
+            "message": "Color: oklch(1 0 0), visible"
+          },
+          "iconSize": {
+            "status": "passed",
+            "message": "16x16px"
+          }
+        },
+        "expectedIcon": "Tv",
+        "slug": "hardware-players",
+        "parent": "Players & Clients"
+      },
+      {
+        "name": "Mobile & Web Players",
+        "type": "subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "passed",
+            "message": "SVG icon rendered"
+          },
+          "iconBeforeText": {
+            "status": "passed",
+            "message": "Icon positioned before label"
+          },
+          "iconStyling": {
+            "status": "passed",
+            "message": "Color: oklch(1 0 0), visible"
+          },
+          "iconSize": {
+            "status": "passed",
+            "message": "16x16px"
+          }
+        },
+        "expectedIcon": "Smartphone",
+        "slug": "mobile-web-players",
+        "parent": "Players & Clients"
+      },
+      {
+        "name": "Audio & Subtitles",
+        "type": "subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "passed",
+            "message": "SVG icon rendered"
+          },
+          "iconBeforeText": {
+            "status": "passed",
+            "message": "Icon positioned before label"
+          },
+          "iconStyling": {
+            "status": "passed",
+            "message": "Color: oklch(1 0 0), visible"
+          },
+          "iconSize": {
+            "status": "passed",
+            "message": "16x16px"
+          }
+        },
+        "expectedIcon": "Volume2",
+        "slug": "audio-subtitles",
+        "parent": "Media Tools"
+      },
+      {
+        "name": "Ads & QoE",
+        "type": "subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "passed",
+            "message": "SVG icon rendered"
+          },
+          "iconBeforeText": {
+            "status": "passed",
+            "message": "Icon positioned before label"
+          },
+          "iconStyling": {
+            "status": "passed",
+            "message": "Color: oklch(1 0 0), visible"
+          },
+          "iconSize": {
+            "status": "passed",
+            "message": "16x16px"
+          }
+        },
+        "expectedIcon": "Target",
+        "slug": "ads-qoe",
+        "parent": "Media Tools"
+      },
+      {
+        "name": "Specs & Standards",
+        "type": "subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "passed",
+            "message": "SVG icon rendered"
+          },
+          "iconBeforeText": {
+            "status": "passed",
+            "message": "Icon positioned before label"
+          },
+          "iconStyling": {
+            "status": "passed",
+            "message": "Color: oklch(1 0 0), visible"
+          },
+          "iconSize": {
+            "status": "passed",
+            "message": "16x16px"
+          }
+        },
+        "expectedIcon": "FileCheck",
+        "slug": "specs-standards",
+        "parent": "Standards & Industry"
+      },
+      {
+        "name": "Vendors & HDR",
+        "type": "subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "passed",
+            "message": "SVG icon rendered"
+          },
+          "iconBeforeText": {
+            "status": "passed",
+            "message": "Icon positioned before label"
+          },
+          "iconStyling": {
+            "status": "passed",
+            "message": "Color: oklch(1 0 0), visible"
+          },
+          "iconSize": {
+            "status": "passed",
+            "message": "16x16px"
+          }
+        },
+        "expectedIcon": "Building",
+        "slug": "vendors-hdr",
+        "parent": "Standards & Industry"
+      },
+      {
+        "name": "Streaming Servers",
+        "type": "subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "passed",
+            "message": "SVG icon rendered"
+          },
+          "iconBeforeText": {
+            "status": "passed",
+            "message": "Icon positioned before label"
+          },
+          "iconStyling": {
+            "status": "passed",
+            "message": "Color: oklch(1 0 0), visible"
+          },
+          "iconSize": {
+            "status": "passed",
+            "message": "16x16px"
+          }
+        },
+        "expectedIcon": "HardDrive",
+        "slug": "streaming-servers",
+        "parent": "Infrastructure & Delivery"
+      },
+      {
+        "name": "Cloud & CDN",
+        "type": "subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "passed",
+            "message": "SVG icon rendered"
+          },
+          "iconBeforeText": {
+            "status": "passed",
+            "message": "Icon positioned before label"
+          },
+          "iconStyling": {
+            "status": "passed",
+            "message": "Color: oklch(1 0 0), visible"
+          },
+          "iconSize": {
+            "status": "passed",
+            "message": "16x16px"
+          }
+        },
+        "expectedIcon": "Cloud",
+        "slug": "cloud-cdn",
+        "parent": "Infrastructure & Delivery"
+      },
+      {
+        "name": "FFMPEG & Tools",
+        "type": "subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "passed",
+            "message": "SVG icon rendered"
+          },
+          "iconBeforeText": {
+            "status": "passed",
+            "message": "Icon positioned before label"
+          },
+          "iconStyling": {
+            "status": "passed",
+            "message": "Color: oklch(1 0 0), visible"
+          },
+          "iconSize": {
+            "status": "passed",
+            "message": "16x16px"
+          }
+        },
+        "expectedIcon": "Video",
+        "slug": "ffmpeg-tools",
+        "parent": "General Tools"
+      },
+      {
+        "name": "DRM",
+        "type": "subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "passed",
+            "message": "SVG icon rendered"
+          },
+          "iconBeforeText": {
+            "status": "passed",
+            "message": "Icon positioned before label"
+          },
+          "iconStyling": {
+            "status": "passed",
+            "message": "Color: oklch(1 0 0), visible"
+          },
+          "iconSize": {
+            "status": "passed",
+            "message": "16x16px"
+          }
+        },
+        "expectedIcon": "Lock",
+        "slug": "drm",
+        "parent": "Media Tools"
+      },
+      {
+        "name": "Community Groups",
+        "type": "subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "passed",
+            "message": "SVG icon rendered"
+          },
+          "iconBeforeText": {
+            "status": "passed",
+            "message": "Icon positioned before label"
+          },
+          "iconStyling": {
+            "status": "passed",
+            "message": "Color: oklch(1 0 0), visible"
+          },
+          "iconSize": {
+            "status": "passed",
+            "message": "16x16px"
+          }
+        },
+        "expectedIcon": "MessageCircle",
+        "slug": "community-groups",
+        "parent": "Community & Events"
+      },
+      {
+        "name": "Events & Conferences",
+        "type": "subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "passed",
+            "message": "SVG icon rendered"
+          },
+          "iconBeforeText": {
+            "status": "passed",
+            "message": "Icon positioned before label"
+          },
+          "iconStyling": {
+            "status": "passed",
+            "message": "Color: oklch(1 0 0), visible"
+          },
+          "iconSize": {
+            "status": "passed",
+            "message": "16x16px"
+          }
+        },
+        "expectedIcon": "Calendar",
+        "slug": "events-conferences",
+        "parent": "Community & Events"
+      }
+    ],
+    "subSubcategories": [
+      {
+        "name": "HLS",
+        "type": "sub-subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconBeforeText": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconStyling": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconSize": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          }
+        },
+        "expectedIcon": "PlayCircle",
+        "slug": "hls",
+        "parent": "Adaptive Streaming"
+      },
+      {
+        "name": "DASH",
+        "type": "sub-subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconBeforeText": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconStyling": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconSize": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          }
+        },
+        "expectedIcon": "Zap",
+        "slug": "dash",
+        "parent": "Adaptive Streaming"
+      },
+      {
+        "name": "RIST",
+        "type": "sub-subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconBeforeText": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconStyling": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconSize": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          }
+        },
+        "expectedIcon": "Signal",
+        "slug": "rist",
+        "parent": "Transport Protocols"
+      },
+      {
+        "name": "RTMP",
+        "type": "sub-subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconBeforeText": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconStyling": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconSize": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          }
+        },
+        "expectedIcon": "Signal",
+        "slug": "rtmp",
+        "parent": "Transport Protocols"
+      },
+      {
+        "name": "SRT",
+        "type": "sub-subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconBeforeText": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconStyling": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconSize": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          }
+        },
+        "expectedIcon": "Signal",
+        "slug": "srt",
+        "parent": "Transport Protocols"
+      },
+      {
+        "name": "FFMPEG",
+        "type": "sub-subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "passed",
+            "message": "SVG icon rendered"
+          },
+          "iconBeforeText": {
+            "status": "passed",
+            "message": "Icon positioned before label"
+          },
+          "iconStyling": {
+            "status": "passed",
+            "message": "Color: oklch(1 0 0), visible"
+          },
+          "iconSize": {
+            "status": "passed",
+            "message": "16x16px"
+          }
+        },
+        "expectedIcon": "FileVideo",
+        "slug": "ffmpeg",
+        "parent": "Encoding Tools"
+      },
+      {
+        "name": "Other Encoders",
+        "type": "sub-subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconBeforeText": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconStyling": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconSize": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          }
+        },
+        "expectedIcon": "Clapperboard",
+        "slug": "other-encoders",
+        "parent": "Encoding Tools"
+      },
+      {
+        "name": "HEVC",
+        "type": "sub-subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconBeforeText": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconStyling": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconSize": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          }
+        },
+        "expectedIcon": "Code",
+        "slug": "hevc",
+        "parent": "Codecs"
+      },
+      {
+        "name": "VP9",
+        "type": "sub-subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconBeforeText": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconStyling": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconSize": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          }
+        },
+        "expectedIcon": "Code",
+        "slug": "vp9",
+        "parent": "Codecs"
+      },
+      {
+        "name": "AV1",
+        "type": "sub-subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconBeforeText": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconStyling": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconSize": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          }
+        },
+        "expectedIcon": "Code",
+        "slug": "av1",
+        "parent": "Codecs"
+      },
+      {
+        "name": "Roku",
+        "type": "sub-subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconBeforeText": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconStyling": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconSize": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          }
+        },
+        "expectedIcon": "MonitorPlay",
+        "slug": "roku",
+        "parent": "Hardware Players"
+      },
+      {
+        "name": "iOS/tvOS",
+        "type": "sub-subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconBeforeText": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconStyling": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconSize": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          }
+        },
+        "expectedIcon": "Apple",
+        "slug": "ios-tvos",
+        "parent": "Mobile & Web Players"
+      },
+      {
+        "name": "Android",
+        "type": "sub-subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconBeforeText": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconStyling": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconSize": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          }
+        },
+        "expectedIcon": "Smartphone",
+        "slug": "android",
+        "parent": "Mobile & Web Players"
+      },
+      {
+        "name": "Web Players",
+        "type": "sub-subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "passed",
+            "message": "SVG icon rendered"
+          },
+          "iconBeforeText": {
+            "status": "passed",
+            "message": "Icon positioned before label"
+          },
+          "iconStyling": {
+            "status": "passed",
+            "message": "Color: oklch(1 0 0), visible"
+          },
+          "iconSize": {
+            "status": "passed",
+            "message": "16x16px"
+          }
+        },
+        "expectedIcon": "Globe",
+        "slug": "web-players",
+        "parent": "Mobile & Web Players"
+      },
+      {
+        "name": "Audio",
+        "type": "sub-subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "passed",
+            "message": "SVG icon rendered"
+          },
+          "iconBeforeText": {
+            "status": "passed",
+            "message": "Icon positioned before label"
+          },
+          "iconStyling": {
+            "status": "passed",
+            "message": "Color: oklch(1 0 0), visible"
+          },
+          "iconSize": {
+            "status": "passed",
+            "message": "16x16px"
+          }
+        },
+        "expectedIcon": "Music",
+        "slug": "audio",
+        "parent": "Audio & Subtitles"
+      },
+      {
+        "name": "Subtitles & Captions",
+        "type": "sub-subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconBeforeText": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconStyling": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconSize": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          }
+        },
+        "expectedIcon": "Type",
+        "slug": "subtitles-captions",
+        "parent": "Audio & Subtitles"
+      },
+      {
+        "name": "Chromecast",
+        "type": "sub-subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconBeforeText": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconStyling": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconSize": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          }
+        },
+        "expectedIcon": "Cast",
+        "slug": "chromecast",
+        "parent": "Hardware Players"
+      },
+      {
+        "name": "Smart TVs",
+        "type": "sub-subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconBeforeText": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconStyling": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconSize": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          }
+        },
+        "expectedIcon": "Tv",
+        "slug": "smart-tvs",
+        "parent": "Hardware Players"
+      },
+      {
+        "name": "CDN Integration",
+        "type": "sub-subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconBeforeText": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconStyling": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconSize": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          }
+        },
+        "expectedIcon": "CloudUpload",
+        "slug": "cdn-integration",
+        "parent": "Cloud & CDN"
+      },
+      {
+        "name": "Cloud Platforms",
+        "type": "sub-subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconBeforeText": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconStyling": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconSize": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          }
+        },
+        "expectedIcon": "Cloud",
+        "slug": "cloud-platforms",
+        "parent": "Cloud & CDN"
+      },
+      {
+        "name": "Origin Servers",
+        "type": "sub-subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconBeforeText": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconStyling": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconSize": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          }
+        },
+        "expectedIcon": "Server",
+        "slug": "origin-servers",
+        "parent": "Streaming Servers"
+      },
+      {
+        "name": "Storage Solutions",
+        "type": "sub-subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconBeforeText": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconStyling": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconSize": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          }
+        },
+        "expectedIcon": "Database",
+        "slug": "storage-solutions",
+        "parent": "Streaming Servers"
+      },
+      {
+        "name": "Advertising",
+        "type": "sub-subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconBeforeText": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconStyling": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconSize": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          }
+        },
+        "expectedIcon": "Megaphone",
+        "slug": "advertising",
+        "parent": "Ads & QoE"
+      },
+      {
+        "name": "Quality & Testing",
+        "type": "sub-subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconBeforeText": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconStyling": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconSize": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          }
+        },
+        "expectedIcon": "TestTube",
+        "slug": "quality-testing",
+        "parent": "Ads & QoE"
+      },
+      {
+        "name": "Online Forums",
+        "type": "sub-subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconBeforeText": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconStyling": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconSize": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          }
+        },
+        "expectedIcon": "MessageCircle",
+        "slug": "online-forums",
+        "parent": "Community Groups"
+      },
+      {
+        "name": "Slack & Meetups",
+        "type": "sub-subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconBeforeText": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconStyling": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconSize": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          }
+        },
+        "expectedIcon": "Users",
+        "slug": "slack-meetups",
+        "parent": "Community Groups"
+      },
+      {
+        "name": "Conferences",
+        "type": "sub-subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "passed",
+            "message": "SVG icon rendered"
+          },
+          "iconBeforeText": {
+            "status": "passed",
+            "message": "Icon positioned before label"
+          },
+          "iconStyling": {
+            "status": "passed",
+            "message": "Color: oklch(1 0 0), visible"
+          },
+          "iconSize": {
+            "status": "passed",
+            "message": "16x16px"
+          }
+        },
+        "expectedIcon": "Presentation",
+        "slug": "conferences",
+        "parent": "Events & Conferences"
+      },
+      {
+        "name": "Podcasts & Webinars",
+        "type": "sub-subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconBeforeText": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconStyling": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconSize": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          }
+        },
+        "expectedIcon": "Podcast",
+        "slug": "podcasts-webinars",
+        "parent": "Events & Conferences"
+      },
+      {
+        "name": "MPEG & Forums",
+        "type": "sub-subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconBeforeText": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconStyling": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconSize": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          }
+        },
+        "expectedIcon": "ScrollText",
+        "slug": "mpeg-forums",
+        "parent": "Specs & Standards"
+      },
+      {
+        "name": "Official Specs",
+        "type": "sub-subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconBeforeText": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconStyling": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconSize": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          }
+        },
+        "expectedIcon": "FileCode",
+        "slug": "official-specs",
+        "parent": "Specs & Standards"
+      },
+      {
+        "name": "HDR Guidelines",
+        "type": "sub-subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconBeforeText": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconStyling": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconSize": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          }
+        },
+        "expectedIcon": "Sparkles",
+        "slug": "hdr-guidelines",
+        "parent": "Vendors & HDR"
+      },
+      {
+        "name": "Vendor Docs",
+        "type": "sub-subcategory",
+        "tests": {
+          "svgExists": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconBeforeText": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconStyling": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          },
+          "iconSize": {
+            "status": "failed",
+            "message": "Navigation item not found"
+          }
+        },
+        "expectedIcon": "BookOpenText",
+        "slug": "vendor-docs",
+        "parent": "Vendors & HDR"
+      }
+    ]
+  },
+  "summary": {
+    "totalTested": 60,
+    "passed": 32,
+    "failed": 28,
+    "warnings": 0
+  },
+  "screenshots": [
+    {
+      "filename": "initial-homepage.png",
+      "path": "/home/runner/workspace/test-screenshots/suite-1/initial-homepage.png"
+    },
+    {
+      "filename": "sidebar-all-expanded.png",
+      "path": "/home/runner/workspace/test-screenshots/suite-1/sidebar-all-expanded.png"
+    },
+    {
+      "filename": "categories-with-icons.png",
+      "path": "/home/runner/workspace/test-screenshots/suite-1/categories-with-icons.png"
+    },
+    {
+      "filename": "subcategories-with-icons.png",
+      "path": "/home/runner/workspace/test-screenshots/suite-1/subcategories-with-icons.png"
+    },
+    {
+      "filename": "final-all-icons-visible.png",
+      "path": "/home/runner/workspace/test-screenshots/suite-1/final-all-icons-visible.png"
+    }
+  ]
+}

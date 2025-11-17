@@ -1,0 +1,809 @@
+🚀 TAG FILTERING ACCURACY TEST SUITE - 60 PAGES
+════════════════════════════════════════════════════════════════════════════════
+📊 Viewport: 1920x1080
+🔗 Base URL: http://localhost:5000
+📁 Screenshot directory: /home/runner/workspace/test-screenshots/tagfilter-suite
+📄 Total pages to test: 56
+   - Categories: 9
+   - Subcategories: 19
+   - Sub-subcategories: 28
+════════════════════════════════════════════════════════════════════════════════
+
+🌐 Launching browser...
+
+[1/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Intro & Learning (category)
+   Slug: intro-learning
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/category/intro-learning
+✅ Page loaded
+✅ TagFilter button visible
+📊 Initial resource count: 229
+✅ Popover opened
+✅ Found 23 tags: adaptive, av1, cdn, cpp, dash
+🏷️  Selecting tag: "adaptive" (6 resources)
+✅ Filtered from 229 to 6 resources
+✅ Results count: "Showing 6 of 229 resources (filtered by 1 tag)"
+✅ Tag badge visible for "adaptive"
+✅ Clear all worked: restored to 229 resources
+🔄 Testing multi-select with 2 tags...
+⚠️  Unexpected count: 229 (expected 8-14)
+📸 Screenshot saved: tagfilter-intro-learning.png
+
+[2/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Protocols & Transport (category)
+   Slug: protocols-transport
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/category/protocols-transport
+✅ Page loaded
+✅ TagFilter button visible
+📊 Initial resource count: 252
+✅ Popover opened
+✅ Found 24 tags: adaptive, av1, cdn, cpp, dash
+🏷️  Selecting tag: "adaptive" (20 resources)
+✅ Filtered from 252 to 20 resources
+✅ Results count: "Showing 20 of 252 resources (filtered by 1 tag)"
+✅ Tag badge visible for "adaptive"
+✅ Clear all worked: restored to 252 resources
+🔄 Testing multi-select with 2 tags...
+⚠️  Unexpected count: 252 (expected 20-21)
+📸 Screenshot saved: tagfilter-protocols-transport.png
+
+[3/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Encoding & Codecs (category)
+   Slug: encoding-codecs
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/category/encoding-codecs
+✅ Page loaded
+✅ TagFilter button visible
+📊 Initial resource count: 392
+✅ Popover opened
+✅ Found 24 tags: adaptive, av1, cdn, cpp, dash
+🏷️  Selecting tag: "adaptive" (4 resources)
+✅ Filtered from 392 to 4 resources
+✅ Results count: "Showing 4 of 392 resources (filtered by 1 tag)"
+✅ Tag badge visible for "adaptive"
+✅ Clear all worked: restored to 392 resources
+🔄 Testing multi-select with 2 tags...
+⚠️  Unexpected count: 392 (expected 24-28)
+📸 Screenshot saved: tagfilter-encoding-codecs.png
+
+[4/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Players & Clients (category)
+   Slug: players-clients
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/category/players-clients
+✅ Page loaded
+✅ TagFilter button visible
+📊 Initial resource count: 269
+✅ Popover opened
+✅ Found 24 tags: adaptive, av1, cdn, cpp, dash
+🏷️  Selecting tag: "adaptive" (15 resources)
+✅ Filtered from 269 to 15 resources
+✅ Results count: "Showing 15 of 269 resources (filtered by 1 tag)"
+✅ Tag badge visible for "adaptive"
+✅ Clear all worked: restored to 269 resources
+🔄 Testing multi-select with 2 tags...
+⚠️  Unexpected count: 269 (expected 15-16)
+📸 Screenshot saved: tagfilter-players-clients.png
+
+[5/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Media Tools (category)
+   Slug: media-tools
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/category/media-tools
+✅ Page loaded
+✅ TagFilter button visible
+📊 Initial resource count: 317
+✅ Popover opened
+✅ Found 18 tags: cpp, dash, editing, encoding, ffmpeg
+🏷️  Selecting tag: "cpp" (6 resources)
+✅ Filtered from 317 to 6 resources
+✅ Results count: "Showing 6 of 317 resources (filtered by 1 tag)"
+✅ Tag badge visible for "cpp"
+✅ Clear all worked: restored to 317 resources
+🔄 Testing multi-select with 2 tags...
+⚠️  Unexpected count: 317 (expected 10-16)
+📸 Screenshot saved: tagfilter-media-tools.png
+
+[6/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Standards & Industry (category)
+   Slug: standards-industry
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/category/standards-industry
+✅ Page loaded
+✅ TagFilter button visible
+📊 Initial resource count: 174
+✅ Popover opened
+✅ Found 21 tags: adaptive, av1, dash, editing, encoding
+🏷️  Selecting tag: "adaptive" (8 resources)
+✅ Filtered from 174 to 8 resources
+✅ Results count: "Showing 8 of 174 resources (filtered by 1 tag)"
+✅ Tag badge visible for "adaptive"
+✅ Clear all worked: restored to 174 resources
+🔄 Testing multi-select with 2 tags...
+⚠️  Unexpected count: 174 (expected 8-13)
+📸 Screenshot saved: tagfilter-standards-industry.png
+
+[7/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Infrastructure & Delivery (category)
+   Slug: infrastructure-delivery
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/category/infrastructure-delivery
+✅ Page loaded
+✅ TagFilter button visible
+📊 Initial resource count: 190
+✅ Popover opened
+✅ Found 24 tags: adaptive, av1, cdn, cpp, dash
+🏷️  Selecting tag: "adaptive" (17 resources)
+✅ Filtered from 190 to 17 resources
+✅ Results count: "Showing 17 of 190 resources (filtered by 1 tag)"
+✅ Tag badge visible for "adaptive"
+✅ Clear all worked: restored to 190 resources
+🔄 Testing multi-select with 2 tags...
+⚠️  Unexpected count: 190 (expected 17-18)
+📸 Screenshot saved: tagfilter-infrastructure-delivery.png
+
+[8/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: General Tools (category)
+   Slug: general-tools
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/category/general-tools
+✅ Page loaded
+✅ TagFilter button visible
+📊 Initial resource count: 97
+✅ Popover opened
+✅ Found 16 tags: adaptive, cpp, dash, editing, encoding
+🏷️  Selecting tag: "adaptive" (2 resources)
+✅ Filtered from 97 to 2 resources
+✅ Results count: "Showing 2 of 97 resources (filtered by 1 tag)"
+✅ Tag badge visible for "adaptive"
+✅ Clear all worked: restored to 97 resources
+🔄 Testing multi-select with 2 tags...
+⚠️  Unexpected count: 97 (expected 2-3)
+📸 Screenshot saved: tagfilter-general-tools.png
+
+[9/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Community & Events (category)
+   Slug: community-events
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/category/community-events
+✅ Page loaded
+✅ TagFilter button visible
+📊 Initial resource count: 91
+✅ Popover opened
+✅ Found 15 tags: adaptive, av1, cdn, dash, editing
+🏷️  Selecting tag: "adaptive" (1 resources)
+✅ Filtered from 91 to 1 resources
+✅ Results count: "Showing 1 of 91 resources (filtered by 1 tag)"
+✅ Tag badge visible for "adaptive"
+✅ Clear all worked: restored to 91 resources
+🔄 Testing multi-select with 2 tags...
+⚠️  Unexpected count: 91 (expected 1-2)
+📸 Screenshot saved: tagfilter-community-events.png
+
+[10/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Introduction (subcategory)
+   Slug: introduction
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subcategory/introduction
+✅ Page loaded
+✅ TagFilter button visible
+📊 Initial resource count: 4
+✅ Popover opened
+✅ Found 3 tags: encoding, go, rust
+🏷️  Selecting tag: "encoding" (1 resources)
+✅ Filtered from 4 to 1 resources
+✅ Results count: "Showing 1 of 4 resources (filtered by 1 tag)"
+✅ Tag badge visible for "encoding"
+✅ Clear all worked: restored to 4 resources
+🔄 Testing multi-select with 2 tags...
+⚠️  Unexpected count: 4 (expected 1-2)
+📸 Screenshot saved: tagfilter-introduction.png
+
+[11/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Learning Resources (subcategory)
+   Slug: learning-resources
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subcategory/learning-resources
+✅ Page loaded
+✅ TagFilter button visible
+📊 Initial resource count: 36
+✅ Popover opened
+✅ Found 19 tags: adaptive, av1, dash, editing, encoding
+🏷️  Selecting tag: "adaptive" (1 resources)
+✅ Filtered from 36 to 1 resources
+✅ Results count: "Showing 1 of 36 resources (filtered by 1 tag)"
+✅ Tag badge visible for "adaptive"
+✅ Clear all worked: restored to 36 resources
+🔄 Testing multi-select with 2 tags...
+⚠️  Unexpected count: 36 (expected 1-2)
+📸 Screenshot saved: tagfilter-learning-resources.png
+
+[12/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Tutorials & Case Studies (subcategory)
+   Slug: tutorials-case-studies
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subcategory/tutorials-case-studies
+✅ Page loaded
+✅ TagFilter button visible
+📊 Initial resource count: 60
+✅ Popover opened
+✅ Found 19 tags: adaptive, av1, cdn, dash, editing
+🏷️  Selecting tag: "adaptive" (3 resources)
+✅ Filtered from 60 to 3 resources
+✅ Results count: "Showing 3 of 60 resources (filtered by 1 tag)"
+✅ Tag badge visible for "adaptive"
+✅ Clear all worked: restored to 60 resources
+🔄 Testing multi-select with 2 tags...
+⚠️  Unexpected count: 60 (expected 3-4)
+📸 Screenshot saved: tagfilter-tutorials-case-studies.png
+
+[13/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Adaptive Streaming (subcategory)
+   Slug: adaptive-streaming
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subcategory/adaptive-streaming
+✅ Page loaded
+✅ TagFilter button visible
+📊 Initial resource count: 144
+✅ Popover opened
+✅ Found 16 tags: adaptive, cdn, dash, editing, encoding
+🏷️  Selecting tag: "adaptive" (11 resources)
+✅ Filtered from 144 to 11 resources
+✅ Results count: "Showing 11 of 144 resources (filtered by 1 tag)"
+✅ Tag badge visible for "adaptive"
+✅ Clear all worked: restored to 144 resources
+🔄 Testing multi-select with 2 tags...
+⚠️  Unexpected count: 144 (expected 11-15)
+📸 Screenshot saved: tagfilter-adaptive-streaming.png
+
+[14/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Transport Protocols (subcategory)
+   Slug: transport-protocols
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subcategory/transport-protocols
+✅ Page loaded
+✅ TagFilter button visible
+📊 Initial resource count: 13
+✅ Popover opened
+✅ Found 8 tags: dash, hls, player, recording, rtmp
+🏷️  Selecting tag: "dash" (1 resources)
+✅ Filtered from 13 to 1 resources
+✅ Results count: "Showing 1 of 13 resources (filtered by 1 tag)"
+✅ Tag badge visible for "dash"
+✅ Clear all worked: restored to 13 resources
+🔄 Testing multi-select with 2 tags...
+⚠️  Unexpected count: 13 (expected 1-2)
+📸 Screenshot saved: tagfilter-transport-protocols.png
+
+[15/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Encoding Tools (subcategory)
+   Slug: encoding-tools
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subcategory/encoding-tools
+✅ Page loaded
+✅ TagFilter button visible
+❌ Error testing Encoding Tools: Protocol error (DOM.describeNode): Cannot find context with specified id
+
+[16/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Codecs (subcategory)
+   Slug: codecs
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subcategory/codecs
+✅ Page loaded
+✅ TagFilter button visible
+❌ Error testing Codecs: Protocol error (DOM.describeNode): Cannot find context with specified id
+
+[17/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Hardware Players (subcategory)
+   Slug: hardware-players
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subcategory/hardware-players
+✅ Page loaded
+✅ TagFilter button visible
+❌ Error testing Hardware Players: Protocol error (DOM.describeNode): Cannot find context with specified id
+
+[18/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Mobile & Web Players (subcategory)
+   Slug: mobile-web-players
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subcategory/mobile-web-players
+✅ Page loaded
+✅ TagFilter button visible
+❌ Error testing Mobile & Web Players: Protocol error (DOM.describeNode): Cannot find context with specified id
+
+[19/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Audio & Subtitles (subcategory)
+   Slug: audio-subtitles
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subcategory/audio-subtitles
+✅ Page loaded
+✅ TagFilter button visible
+❌ Error testing Audio & Subtitles: Protocol error (DOM.describeNode): Cannot find context with specified id
+
+[20/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Ads & QoE (subcategory)
+   Slug: ads-qoe
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subcategory/ads-qoe
+✅ Page loaded
+✅ TagFilter button visible
+❌ Error testing Ads & QoE: Protocol error (DOM.describeNode): Cannot find context with specified id
+
+[21/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Specs & Standards (subcategory)
+   Slug: specs-standards
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subcategory/specs-standards
+✅ Page loaded
+✅ TagFilter button visible
+❌ Error testing Specs & Standards: Protocol error (DOM.describeNode): Cannot find context with specified id
+
+[22/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Vendors & HDR (subcategory)
+   Slug: vendors-hdr
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subcategory/vendors-hdr
+✅ Page loaded
+✅ TagFilter button visible
+❌ Error testing Vendors & HDR: Protocol error (DOM.resolveNode): Node with given id does not belong to the document
+
+[23/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Streaming Servers (subcategory)
+   Slug: streaming-servers
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subcategory/streaming-servers
+✅ Page loaded
+✅ TagFilter button visible
+❌ Error testing Streaming Servers: Protocol error (DOM.describeNode): Cannot find context with specified id
+
+[24/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Cloud & CDN (subcategory)
+   Slug: cloud-cdn
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subcategory/cloud-cdn
+✅ Page loaded
+✅ TagFilter button visible
+❌ Error testing Cloud & CDN: Protocol error (Runtime.callFunctionOn): Argument should belong to the same JavaScript world as target object
+
+[25/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: FFMPEG & Tools (subcategory)
+   Slug: ffmpeg-tools
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subcategory/ffmpeg-tools
+✅ Page loaded
+✅ TagFilter button visible
+❌ Error testing FFMPEG & Tools: Protocol error (Runtime.callFunctionOn): Argument should belong to the same JavaScript world as target object
+
+[26/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: DRM (subcategory)
+   Slug: drm
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subcategory/drm
+✅ Page loaded
+✅ TagFilter button visible
+❌ Error testing DRM: Protocol error (Runtime.getProperties): Cannot find context with specified id
+
+[27/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Community Groups (subcategory)
+   Slug: community-groups
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subcategory/community-groups
+✅ Page loaded
+✅ TagFilter button visible
+❌ Error testing Community Groups: Protocol error (DOM.resolveNode): Node with given id does not belong to the document
+
+[28/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Events & Conferences (subcategory)
+   Slug: events-conferences
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subcategory/events-conferences
+✅ Page loaded
+✅ TagFilter button visible
+❌ Error testing Events & Conferences: Protocol error (DOM.describeNode): Cannot find context with specified id
+
+[29/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: HLS (subsubcategory)
+   Slug: hls
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subsubcategory/hls
+✅ Page loaded
+❌ TagFilter button not visible
+
+[30/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: DASH (subsubcategory)
+   Slug: dash
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subsubcategory/dash
+✅ Page loaded
+❌ TagFilter button not visible
+
+[31/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: RTMP (subsubcategory)
+   Slug: rtmp
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subsubcategory/rtmp
+✅ Page loaded
+❌ TagFilter button not visible
+
+[32/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: RIST (subsubcategory)
+   Slug: rist
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subsubcategory/rist
+✅ Page loaded
+❌ TagFilter button not visible
+
+[33/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: FFMPEG (subsubcategory)
+   Slug: ffmpeg
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subsubcategory/ffmpeg
+✅ Page loaded
+❌ TagFilter button not visible
+
+[34/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Other Encoders (subsubcategory)
+   Slug: other-encoders
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subsubcategory/other-encoders
+✅ Page loaded
+❌ TagFilter button not visible
+
+[35/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: AV1 (subsubcategory)
+   Slug: av1
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subsubcategory/av1
+✅ Page loaded
+❌ TagFilter button not visible
+
+[36/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: HEVC (subsubcategory)
+   Slug: hevc
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subsubcategory/hevc
+✅ Page loaded
+❌ TagFilter button not visible
+
+[37/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: VP9 (subsubcategory)
+   Slug: vp9
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subsubcategory/vp9
+✅ Page loaded
+❌ TagFilter button not visible
+
+[38/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: H.264 (subsubcategory)
+   Slug: h-264
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subsubcategory/h-264
+✅ Page loaded
+❌ TagFilter button not visible
+
+[39/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Roku (subsubcategory)
+   Slug: roku
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subsubcategory/roku
+✅ Page loaded
+❌ TagFilter button not visible
+
+[40/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Chromecast (subsubcategory)
+   Slug: chromecast
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subsubcategory/chromecast
+✅ Page loaded
+❌ TagFilter button not visible
+
+[41/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Android (subsubcategory)
+   Slug: android
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subsubcategory/android
+✅ Page loaded
+❌ TagFilter button not visible
+
+[42/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: iOS/tvOS (subsubcategory)
+   Slug: iostvos
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subsubcategory/iostvos
+✅ Page loaded
+❌ TagFilter button not visible
+
+[43/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Audio (subsubcategory)
+   Slug: audio
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subsubcategory/audio
+✅ Page loaded
+❌ TagFilter button not visible
+
+[44/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Quality Testing (subsubcategory)
+   Slug: quality-testing
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subsubcategory/quality-testing
+✅ Page loaded
+❌ TagFilter button not visible
+
+[45/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Advertising (subsubcategory)
+   Slug: advertising
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subsubcategory/advertising
+✅ Page loaded
+❌ TagFilter button not visible
+
+[46/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Official Specs (subsubcategory)
+   Slug: official-specs
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subsubcategory/official-specs
+✅ Page loaded
+❌ TagFilter button not visible
+
+[47/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: MPEG Forums (subsubcategory)
+   Slug: mpeg-forums
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subsubcategory/mpeg-forums
+✅ Page loaded
+❌ TagFilter button not visible
+
+[48/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: HDR Guidelines (subsubcategory)
+   Slug: hdr-guidelines
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subsubcategory/hdr-guidelines
+✅ Page loaded
+❌ TagFilter button not visible
+
+[49/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Origin Servers (subsubcategory)
+   Slug: origin-servers
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subsubcategory/origin-servers
+✅ Page loaded
+❌ TagFilter button not visible
+
+[50/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Storage Solutions (subsubcategory)
+   Slug: storage-solutions
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subsubcategory/storage-solutions
+✅ Page loaded
+❌ TagFilter button not visible
+
+[51/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Cloud Platforms (subsubcategory)
+   Slug: cloud-platforms
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subsubcategory/cloud-platforms
+✅ Page loaded
+❌ TagFilter button not visible
+
+[52/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: CDN Integration (subsubcategory)
+   Slug: cdn-integration
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subsubcategory/cdn-integration
+✅ Page loaded
+❌ TagFilter button not visible
+
+[53/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Online Forums (subsubcategory)
+   Slug: online-forums
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subsubcategory/online-forums
+✅ Page loaded
+❌ TagFilter button not visible
+
+[54/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Slack & Meetups (subsubcategory)
+   Slug: slack-meetups
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subsubcategory/slack-meetups
+✅ Page loaded
+❌ TagFilter button not visible
+
+[55/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Conferences (subsubcategory)
+   Slug: conferences
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subsubcategory/conferences
+✅ Page loaded
+❌ TagFilter button not visible
+
+[56/56]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 TESTING: Podcasts & Webinars (subsubcategory)
+   Slug: podcasts-webinars
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Navigating to: http://localhost:5000/subsubcategory/podcasts-webinars
+✅ Page loaded
+❌ TagFilter button not visible
+
+════════════════════════════════════════════════════════════════════════════════
+📊 TEST SUMMARY
+════════════════════════════════════════════════════════════════════════════════
+Total pages tested: 56
+✅ Passed: 0
+❌ Failed: 42
+⚠️  Warnings: 14
+
+🏷️  Tag Filter Status:
+   Working filters: 0
+   With issues: 56
+
+📂 By Type:
+   Categories: 9/9 passed
+   Subcategories: 5/19 passed
+   Sub-subcategories: 0/28 passed
+
+💾 Report saved: /home/runner/workspace/scripts/test-results/tag-filtering-suite-report.json
+
+📋 DETAILED FINDINGS:
+
+⚠️  Pages with no tags (42):
+   - Encoding Tools (encoding-tools)
+   - Codecs (codecs)
+   - Hardware Players (hardware-players)
+   - Mobile & Web Players (mobile-web-players)
+   - Audio & Subtitles (audio-subtitles)
+   - Ads & QoE (ads-qoe)
+   - Specs & Standards (specs-standards)
+   - Vendors & HDR (vendors-hdr)
+   - Streaming Servers (streaming-servers)
+   - Cloud & CDN (cloud-cdn)
+   - FFMPEG & Tools (ffmpeg-tools)
+   - DRM (drm)
+   - Community Groups (community-groups)
+   - Events & Conferences (events-conferences)
+   - HLS (hls)
+   - DASH (dash)
+   - RTMP (rtmp)
+   - RIST (rist)
+   - FFMPEG (ffmpeg)
+   - Other Encoders (other-encoders)
+   - AV1 (av1)
+   - HEVC (hevc)
+   - VP9 (vp9)
+   - H.264 (h-264)
+   - Roku (roku)
+   - Chromecast (chromecast)
+   - Android (android)
+   - iOS/tvOS (iostvos)
+   - Audio (audio)
+   - Quality Testing (quality-testing)
+   - Advertising (advertising)
+   - Official Specs (official-specs)
+   - MPEG Forums (mpeg-forums)
+   - HDR Guidelines (hdr-guidelines)
+   - Origin Servers (origin-servers)
+   - Storage Solutions (storage-solutions)
+   - Cloud Platforms (cloud-platforms)
+   - CDN Integration (cdn-integration)
+   - Online Forums (online-forums)
+   - Slack & Meetups (slack-meetups)
+   - Conferences (conferences)
+   - Podcasts & Webinars (podcasts-webinars)
+
+════════════════════════════════════════════════════════════════════════════════
+✅ TAG FILTERING TEST SUITE COMPLETE
+════════════════════════════════════════════════════════════════════════════════

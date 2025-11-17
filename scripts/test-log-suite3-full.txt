@@ -1,0 +1,366 @@
+🧪 TEST SUITE 3: TAG FILTERING ACCURACY SUITE
+════════════════════════════════════════════════════════════════════════════════
+📊 Total Pages to Test: 60 (9 categories + 19 subcategories + 32 sub-subcategories)
+🔬 Functionality Tests: 13 pages (3 categories + 5 subcategories + 5 sub-subcategories)
+🔗 Base URL: http://localhost:5000
+📁 Screenshot directory: /home/runner/workspace/test-screenshots/suite-3
+════════════════════════════════════════════════════════════════════════════════
+
+🌐 Launching browser...
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PHASE 1: TAG FILTER PRESENCE VERIFICATION (60 PAGES)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📁 Testing 9 Category Pages:
+   📄 Testing: http://localhost:5000/category/intro-learning
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/category/protocols-transport
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/category/encoding-codecs
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/category/players-clients
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/category/media-tools
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/category/standards-industry
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/category/infrastructure-delivery
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/category/general-tools
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/category/community-events
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+
+📁 Testing 19 Subcategory Pages:
+   📄 Testing: http://localhost:5000/subcategory/introduction
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/subcategory/learning-resources
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/subcategory/tutorials-case-studies
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/subcategory/adaptive-streaming
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/subcategory/transport-protocols
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/subcategory/encoding-tools
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/subcategory/codecs
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/subcategory/hardware-players
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/subcategory/mobile-web-players
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/subcategory/audio-subtitles
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/subcategory/ads-qoe
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/subcategory/specs-standards
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/subcategory/vendors-hdr
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/subcategory/streaming-servers
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/subcategory/cloud-cdn
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/subcategory/ffmpeg-tools
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/subcategory/drm
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/subcategory/community-groups
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/subcategory/events-conferences
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+
+📁 Testing 32 Sub-Subcategory Pages:
+   📄 Testing: http://localhost:5000/sub-subcategory/hls
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/sub-subcategory/dash
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/sub-subcategory/rist
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/sub-subcategory/srt
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/sub-subcategory/rtmp
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: failed
+      ✓ Resources Visible: warning
+   📄 Testing: http://localhost:5000/sub-subcategory/ffmpeg
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/sub-subcategory/other-encoders
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/sub-subcategory/hevc
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/sub-subcategory/vp9
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/sub-subcategory/av1
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/sub-subcategory/roku
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/sub-subcategory/smart-tvs
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/sub-subcategory/chromecast
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/sub-subcategory/iostvos
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/sub-subcategory/android
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/sub-subcategory/web-players
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/sub-subcategory/audio
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/sub-subcategory/subtitles-captions
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/sub-subcategory/advertising
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: failed
+      ✓ Resources Visible: warning
+   📄 Testing: http://localhost:5000/sub-subcategory/quality-testing
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/sub-subcategory/official-specs
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/sub-subcategory/mpeg-forums
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/sub-subcategory/vendor-docs
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/sub-subcategory/hdr-guidelines
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/sub-subcategory/origin-servers
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/sub-subcategory/storage-solutions
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/sub-subcategory/cloud-platforms
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/sub-subcategory/cdn-integration
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/sub-subcategory/online-forums
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+   📄 Testing: http://localhost:5000/sub-subcategory/slack-meetups
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: failed
+      ✓ Resources Visible: warning
+   📄 Testing: http://localhost:5000/sub-subcategory/conferences
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: failed
+      ✓ Resources Visible: warning
+   📄 Testing: http://localhost:5000/sub-subcategory/podcasts-webinars
+      ✓ Tag Filter Button: passed
+      ✓ Results Count: passed
+      ✓ Resources Visible: passed
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PHASE 2: TAG FILTER FUNCTIONALITY TESTS (13 PAGES)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔬 Testing 3 Category Pages:
+
+   🔬 FUNCTIONALITY TEST: Encoding & Codecs
+      URL: http://localhost:5000/category/encoding-codecs
+      Initial state: Showing 392 of 392 resources (392 cards)
+      Step 1: Opening tag filter...
+      ✗ Error during functionality test: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text("Filter by Tag")' is not a valid selector.
+
+   🔬 FUNCTIONALITY TEST: Media Tools
+      URL: http://localhost:5000/category/media-tools
+      Initial state: Showing 317 of 317 resources (317 cards)
+      Step 1: Opening tag filter...
+      ✗ Error during functionality test: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text("Filter by Tag")' is not a valid selector.
+
+   🔬 FUNCTIONALITY TEST: Protocols & Transport
+      URL: http://localhost:5000/category/protocols-transport
+      Initial state: Showing 252 of 252 resources (252 cards)
+      Step 1: Opening tag filter...
+      ✗ Error during functionality test: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text("Filter by Tag")' is not a valid selector.
+
+🔬 Testing 5 Subcategory Pages:
+
+   🔬 FUNCTIONALITY TEST: Adaptive Streaming
+      URL: http://localhost:5000/subcategory/adaptive-streaming
+      Initial state: Showing 144 of 144 resources (144 cards)
+      Step 1: Opening tag filter...
+      ✗ Error during functionality test: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text("Filter by Tag")' is not a valid selector.
+
+   🔬 FUNCTIONALITY TEST: Encoding Tools
+      URL: http://localhost:5000/subcategory/encoding-tools
+      Initial state: Showing 240 of 240 resources (240 cards)
+      Step 1: Opening tag filter...
+      ✗ Error during functionality test: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text("Filter by Tag")' is not a valid selector.
+
+   🔬 FUNCTIONALITY TEST: Codecs
+      URL: http://localhost:5000/subcategory/codecs
+      Initial state: Showing 29 of 29 resources (29 cards)
+      Step 1: Opening tag filter...
+      ✗ Error during functionality test: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text("Filter by Tag")' is not a valid selector.
+
+   🔬 FUNCTIONALITY TEST: Hardware Players
+      URL: http://localhost:5000/subcategory/hardware-players
+      Initial state: Showing 35 of 35 resources (35 cards)
+      Step 1: Opening tag filter...
+      ✗ Error during functionality test: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text("Filter by Tag")' is not a valid selector.
+
+   🔬 FUNCTIONALITY TEST: Audio & Subtitles
+      URL: http://localhost:5000/subcategory/audio-subtitles
+      Initial state: Showing 58 of 58 resources (58 cards)
+      Step 1: Opening tag filter...
+      ✗ Error during functionality test: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text("Filter by Tag")' is not a valid selector.
+
+🔬 Testing 5 Sub-Subcategory Pages:
+
+   🔬 FUNCTIONALITY TEST: HLS
+      URL: http://localhost:5000/sub-subcategory/hls
+      Initial state: Showing 63 of 63 resources (63 cards)
+      Step 1: Opening tag filter...
+      ✗ Error during functionality test: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text("Filter by Tag")' is not a valid selector.
+
+   🔬 FUNCTIONALITY TEST: FFmpeg
+      URL: http://localhost:5000/sub-subcategory/ffmpeg
+      Initial state: Showing 66 of 66 resources (66 cards)
+      Step 1: Opening tag filter...
+      ✗ Error during functionality test: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text("Filter by Tag")' is not a valid selector.
+
+   🔬 FUNCTIONALITY TEST: HEVC
+      URL: http://localhost:5000/sub-subcategory/hevc
+      Initial state: Showing 10 of 10 resources (10 cards)
+      Step 1: Opening tag filter...
+      ✗ Error during functionality test: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text("Filter by Tag")' is not a valid selector.
+
+   🔬 FUNCTIONALITY TEST: Roku
+      URL: http://localhost:5000/sub-subcategory/roku
+      Initial state: Showing 26 of 26 resources (26 cards)
+      Step 1: Opening tag filter...
+      ✗ Error during functionality test: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text("Filter by Tag")' is not a valid selector.
+
+   🔬 FUNCTIONALITY TEST: Subtitles & Captions
+      URL: http://localhost:5000/sub-subcategory/subtitles-captions
+      Initial state: Showing 40 of 40 resources (40 cards)
+      Step 1: Opening tag filter...
+      ✗ Error during functionality test: SyntaxError: Failed to execute 'querySelector' on 'Document': 'button:has-text("Filter by Tag")' is not a valid selector.
+
+════════════════════════════════════════════════════════════════════════════════
+📊 TEST SUMMARY
+════════════════════════════════════════════════════════════════════════════════
+Total Pages Tested: 60
+  Presence Tests Passed: 56/60
+  Presence Tests Failed: 4/60
+
+Functionality Tests: 13
+  Functionality Tests Passed: 0/13
+  Functionality Tests Failed: 13/13
+
+Overall: 56/73 tests passed
+════════════════════════════════════════════════════════════════════════════════
+
+📄 JSON Report: /home/runner/workspace/test-results/suite-3-tag-filtering.json
+📄 Markdown Report: /home/runner/workspace/test-results/SUITE_3_TAG_FILTERING_REPORT.md
+📁 Screenshots: /home/runner/workspace/test-screenshots/suite-3
+

@@ -164,7 +164,7 @@ export default function Category() {
               {allResources.length} resources available
             </p>
           </div>
-          <Badge variant="secondary" className="text-lg px-4 py-2">
+          <Badge variant="secondary" className="text-lg px-4 py-2" data-testid="badge-count">
             {allResources.length}
           </Badge>
         </div>

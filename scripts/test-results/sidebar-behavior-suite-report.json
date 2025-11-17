@@ -1,0 +1,1293 @@
+{
+  "testSuite": "TEST SUITE 6: Sidebar Behavior - Desktop/Tablet/Mobile",
+  "timestamp": "2025-11-17T12:55:52.640Z",
+  "passed": 15,
+  "failed": 76,
+  "total": 91,
+  "tests": [
+    {
+      "name": "Desktop 1920×1080: Sidebar width is 256px (16rem)",
+      "passed": false,
+      "message": "Expected ~256px, got 0px",
+      "timestamp": "2025-11-17T12:56:00.808Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Desktop 1920×1080: No collapse button visible",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-17T12:56:00.810Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Desktop 1920×1080: CMD+B does nothing (sidebar stays visible)",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:56:01.326Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Desktop 1920×1080: Full text labels visible",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:56:01.328Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Desktop 1920×1080: Icons visible",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:56:01.331Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Desktop 1920×1080: Sidebar persists on Homepage",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:56:04.431Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Desktop 1920×1080: Sidebar persists on Category",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:56:08.825Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Desktop 1920×1080: Sidebar persists on Subcategory",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:56:12.686Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Desktop 1920×1080: Sidebar persists on SubSubcategory",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:56:16.366Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Desktop 1920×1080: Sidebar persists on Advanced",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:56:20.131Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Desktop 1920×1080: Sidebar stays expanded after page refresh",
+      "passed": false,
+      "message": "Sidebar not found",
+      "timestamp": "2025-11-17T12:56:25.826Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Desktop 1440×900: Sidebar width is 256px (16rem)",
+      "passed": false,
+      "message": "Expected ~256px, got 0px",
+      "timestamp": "2025-11-17T12:56:30.748Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Desktop 1440×900: No collapse button visible",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-17T12:56:30.751Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Desktop 1440×900: CMD+B does nothing (sidebar stays visible)",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:56:31.279Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Desktop 1440×900: Full text labels visible",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:56:31.284Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Desktop 1440×900: Icons visible",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:56:31.288Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Desktop 1440×900: Sidebar persists on Homepage",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:56:34.335Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Desktop 1440×900: Sidebar persists on Category",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:56:38.565Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Desktop 1440×900: Sidebar persists on Subcategory",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:56:42.071Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Desktop 1440×900: Sidebar persists on SubSubcategory",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:56:45.545Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Desktop 1440×900: Sidebar persists on Advanced",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:56:49.338Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Desktop 1440×900: Sidebar stays expanded after page refresh",
+      "passed": false,
+      "message": "Sidebar not found",
+      "timestamp": "2025-11-17T12:56:55.021Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Desktop 1280×720: Sidebar width is 256px (16rem)",
+      "passed": false,
+      "message": "Expected ~256px, got 0px",
+      "timestamp": "2025-11-17T12:56:59.769Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Desktop 1280×720: No collapse button visible",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-17T12:56:59.771Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Desktop 1280×720: CMD+B does nothing (sidebar stays visible)",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:57:00.298Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Desktop 1280×720: Full text labels visible",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:57:00.304Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Desktop 1280×720: Icons visible",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:57:00.313Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Desktop 1280×720: Sidebar persists on Homepage",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:57:03.361Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Desktop 1280×720: Sidebar persists on Category",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:57:07.941Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Desktop 1280×720: Sidebar persists on Subcategory",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:57:11.812Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Desktop 1280×720: Sidebar persists on SubSubcategory",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:57:15.482Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Desktop 1280×720: Sidebar persists on Advanced",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:57:19.324Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Desktop 1280×720: Sidebar stays expanded after page refresh",
+      "passed": false,
+      "message": "Sidebar not found",
+      "timestamp": "2025-11-17T12:57:25.005Z",
+      "category": "desktop"
+    },
+    {
+      "name": "Tablet 1024×768 (exact breakpoint): Sidebar behavior appropriate for screen size",
+      "passed": true,
+      "message": "Mobile mode: false, Width: 0px",
+      "timestamp": "2025-11-17T12:57:29.683Z",
+      "category": "tablet"
+    },
+    {
+      "name": "Tablet 1024×768 (exact breakpoint): Navigation available on Homepage",
+      "passed": false,
+      "message": "Mobile mode: false",
+      "timestamp": "2025-11-17T12:57:32.761Z",
+      "category": "tablet"
+    },
+    {
+      "name": "Tablet 1024×768 (exact breakpoint): Navigation available on Category",
+      "passed": false,
+      "message": "Mobile mode: false",
+      "timestamp": "2025-11-17T12:57:37.073Z",
+      "category": "tablet"
+    },
+    {
+      "name": "Tablet 1024×768 (exact breakpoint): Navigation available on Subcategory",
+      "passed": false,
+      "message": "Mobile mode: false",
+      "timestamp": "2025-11-17T12:57:40.756Z",
+      "category": "tablet"
+    },
+    {
+      "name": "Tablet 1024×768 (exact breakpoint): Navigation available on Advanced",
+      "passed": false,
+      "message": "Mobile mode: false",
+      "timestamp": "2025-11-17T12:57:44.369Z",
+      "category": "tablet"
+    },
+    {
+      "name": "Tablet 820×1180 (portrait): Sidebar behavior appropriate for screen size",
+      "passed": true,
+      "message": "Mobile mode: true, Width: 0px",
+      "timestamp": "2025-11-17T12:57:49.107Z",
+      "category": "tablet"
+    },
+    {
+      "name": "Tablet 820×1180 (portrait): Navigation available on Homepage",
+      "passed": false,
+      "message": "Mobile mode: true",
+      "timestamp": "2025-11-17T12:57:52.107Z",
+      "category": "tablet"
+    },
+    {
+      "name": "Tablet 820×1180 (portrait): Navigation available on Category",
+      "passed": false,
+      "message": "Mobile mode: true",
+      "timestamp": "2025-11-17T12:57:56.357Z",
+      "category": "tablet"
+    },
+    {
+      "name": "Tablet 820×1180 (portrait): Navigation available on Subcategory",
+      "passed": false,
+      "message": "Mobile mode: true",
+      "timestamp": "2025-11-17T12:58:00.123Z",
+      "category": "tablet"
+    },
+    {
+      "name": "Tablet 820×1180 (portrait): Navigation available on Advanced",
+      "passed": false,
+      "message": "Mobile mode: true",
+      "timestamp": "2025-11-17T12:58:03.968Z",
+      "category": "tablet"
+    },
+    {
+      "name": "Tablet 768×1024 (exact breakpoint): Sidebar behavior appropriate for screen size",
+      "passed": true,
+      "message": "Mobile mode: true, Width: 0px",
+      "timestamp": "2025-11-17T12:58:09.081Z",
+      "category": "tablet"
+    },
+    {
+      "name": "Tablet 768×1024 (exact breakpoint): Navigation available on Homepage",
+      "passed": false,
+      "message": "Mobile mode: true",
+      "timestamp": "2025-11-17T12:58:11.872Z",
+      "category": "tablet"
+    },
+    {
+      "name": "Tablet 768×1024 (exact breakpoint): Navigation available on Category",
+      "passed": false,
+      "message": "Mobile mode: true",
+      "timestamp": "2025-11-17T12:58:16.235Z",
+      "category": "tablet"
+    },
+    {
+      "name": "Tablet 768×1024 (exact breakpoint): Navigation available on Subcategory",
+      "passed": false,
+      "message": "Mobile mode: true",
+      "timestamp": "2025-11-17T12:58:19.891Z",
+      "category": "tablet"
+    },
+    {
+      "name": "Tablet 768×1024 (exact breakpoint): Navigation available on Advanced",
+      "passed": false,
+      "message": "Mobile mode: true",
+      "timestamp": "2025-11-17T12:58:23.653Z",
+      "category": "tablet"
+    },
+    {
+      "name": "Tablet 900×1200: Sidebar behavior appropriate for screen size",
+      "passed": true,
+      "message": "Mobile mode: true, Width: 0px",
+      "timestamp": "2025-11-17T12:58:28.588Z",
+      "category": "tablet"
+    },
+    {
+      "name": "Tablet 900×1200: Navigation available on Homepage",
+      "passed": false,
+      "message": "Mobile mode: true",
+      "timestamp": "2025-11-17T12:58:31.615Z",
+      "category": "tablet"
+    },
+    {
+      "name": "Tablet 900×1200: Navigation available on Category",
+      "passed": false,
+      "message": "Mobile mode: true",
+      "timestamp": "2025-11-17T12:58:35.885Z",
+      "category": "tablet"
+    },
+    {
+      "name": "Tablet 900×1200: Navigation available on Subcategory",
+      "passed": false,
+      "message": "Mobile mode: true",
+      "timestamp": "2025-11-17T12:58:39.644Z",
+      "category": "tablet"
+    },
+    {
+      "name": "Tablet 900×1200: Navigation available on Advanced",
+      "passed": false,
+      "message": "Mobile mode: true",
+      "timestamp": "2025-11-17T12:58:43.404Z",
+      "category": "tablet"
+    },
+    {
+      "name": "Mobile iPhone 14 Pro (390×844): Sidebar NOT visible by default",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-17T12:58:48.141Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Mobile iPhone 14 Pro (390×844): Hamburger menu button visible",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:58:48.144Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Mobile iPhone 14 Pro (390×844): Tap hamburger opens Sheet",
+      "passed": false,
+      "message": "Sheet did not open",
+      "timestamp": "2025-11-17T12:58:49.206Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Mobile iPhone 14 Pro (390×844): All categories visible in Sheet",
+      "passed": false,
+      "message": "Found 0 categories",
+      "timestamp": "2025-11-17T12:58:49.208Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Mobile iPhone 14 Pro (390×844): Sheet has overlay",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:58:49.265Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Mobile iPhone 14 Pro (390×844): Sheet closes after category selection",
+      "passed": false,
+      "message": "Could not click",
+      "timestamp": "2025-11-17T12:58:50.773Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Mobile iPhone 14 Pro (390×844): Hamburger menu on Homepage",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:58:53.525Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Mobile iPhone 14 Pro (390×844): Hamburger menu on Category",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:58:57.865Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Mobile iPhone 14 Pro (390×844): Hamburger menu on Subcategory",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:59:01.531Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Mobile iPhone 14 Pro (390×844): Sheet can be reopened",
+      "passed": null,
+      "message": "",
+      "timestamp": "2025-11-17T12:59:06.536Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Mobile iPhone 14 Pro (390×844): Sheet closes with Escape key",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-17T12:59:07.047Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Mobile iPhone SE (375×667): Sidebar NOT visible by default",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-17T12:59:12.083Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Mobile iPhone SE (375×667): Hamburger menu button visible",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:59:12.087Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Mobile iPhone SE (375×667): Tap hamburger opens Sheet",
+      "passed": false,
+      "message": "Sheet did not open",
+      "timestamp": "2025-11-17T12:59:13.164Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Mobile iPhone SE (375×667): All categories visible in Sheet",
+      "passed": false,
+      "message": "Found 0 categories",
+      "timestamp": "2025-11-17T12:59:13.169Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Mobile iPhone SE (375×667): Sheet has overlay",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:59:13.222Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Mobile iPhone SE (375×667): Sheet closes after category selection",
+      "passed": false,
+      "message": "Could not click",
+      "timestamp": "2025-11-17T12:59:14.732Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Mobile iPhone SE (375×667): Hamburger menu on Homepage",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:59:17.603Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Mobile iPhone SE (375×667): Hamburger menu on Category",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:59:21.880Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Mobile iPhone SE (375×667): Hamburger menu on Subcategory",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:59:25.460Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Mobile iPhone SE (375×667): Sheet can be reopened",
+      "passed": null,
+      "message": "",
+      "timestamp": "2025-11-17T12:59:29.920Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Mobile iPhone SE (375×667): Sheet closes with Escape key",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-17T12:59:30.448Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Mobile Android (360×800): Sidebar NOT visible by default",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-17T12:59:34.908Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Mobile Android (360×800): Hamburger menu button visible",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:59:34.914Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Mobile Android (360×800): Tap hamburger opens Sheet",
+      "passed": false,
+      "message": "Sheet did not open",
+      "timestamp": "2025-11-17T12:59:35.996Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Mobile Android (360×800): All categories visible in Sheet",
+      "passed": false,
+      "message": "Found 0 categories",
+      "timestamp": "2025-11-17T12:59:35.999Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Mobile Android (360×800): Sheet has overlay",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:59:36.054Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Mobile Android (360×800): Sheet closes after category selection",
+      "passed": false,
+      "message": "Could not click",
+      "timestamp": "2025-11-17T12:59:37.561Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Mobile Android (360×800): Hamburger menu on Homepage",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:59:40.326Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Mobile Android (360×800): Hamburger menu on Category",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:59:44.600Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Mobile Android (360×800): Hamburger menu on Subcategory",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T12:59:48.649Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Mobile Android (360×800): Sheet can be reopened",
+      "passed": null,
+      "message": "",
+      "timestamp": "2025-11-17T12:59:52.785Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Mobile Android (360×800): Sheet closes with Escape key",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-17T12:59:53.298Z",
+      "category": "mobile"
+    },
+    {
+      "name": "Edge Case: Resize desktop → mobile → desktop maintains state",
+      "passed": false,
+      "message": "Desktop1: 0px, Mobile: false, Desktop2: 0px",
+      "timestamp": "2025-11-17T12:59:59.597Z",
+      "category": "edge"
+    },
+    {
+      "name": "Edge Case: Desktop ignores collapse cookie (always expanded)",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T13:00:05.529Z",
+      "category": "edge"
+    },
+    {
+      "name": "Edge Case: Mobile sheet closed after page refresh",
+      "passed": true,
+      "message": "",
+      "timestamp": "2025-11-17T13:00:11.312Z",
+      "category": "edge"
+    },
+    {
+      "name": "Edge Case: Sidebar stable after rapid resizing",
+      "passed": false,
+      "message": "",
+      "timestamp": "2025-11-17T13:00:16.402Z",
+      "category": "edge"
+    },
+    {
+      "name": "Edge Case: Orientation change (portrait → landscape) works correctly",
+      "passed": true,
+      "message": "Portrait: {\"hasSidebar\":false,\"hasTrigger\":false}, Landscape: {\"hasSidebar\":false,\"hasTrigger\":false}",
+      "timestamp": "2025-11-17T13:00:20.562Z",
+      "category": "edge"
+    }
+  ],
+  "behaviorMatrix": {
+    "desktop": [
+      {
+        "name": "Desktop 1920×1080: Sidebar width is 256px (16rem)",
+        "passed": false,
+        "message": "Expected ~256px, got 0px",
+        "timestamp": "2025-11-17T12:56:00.808Z",
+        "category": "desktop"
+      },
+      {
+        "name": "Desktop 1920×1080: No collapse button visible",
+        "passed": true,
+        "message": "",
+        "timestamp": "2025-11-17T12:56:00.810Z",
+        "category": "desktop"
+      },
+      {
+        "name": "Desktop 1920×1080: CMD+B does nothing (sidebar stays visible)",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:56:01.326Z",
+        "category": "desktop"
+      },
+      {
+        "name": "Desktop 1920×1080: Full text labels visible",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:56:01.328Z",
+        "category": "desktop"
+      },
+      {
+        "name": "Desktop 1920×1080: Icons visible",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:56:01.331Z",
+        "category": "desktop"
+      },
+      {
+        "name": "Desktop 1920×1080: Sidebar persists on Homepage",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:56:04.431Z",
+        "category": "desktop"
+      },
+      {
+        "name": "Desktop 1920×1080: Sidebar persists on Category",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:56:08.825Z",
+        "category": "desktop"
+      },
+      {
+        "name": "Desktop 1920×1080: Sidebar persists on Subcategory",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:56:12.686Z",
+        "category": "desktop"
+      },
+      {
+        "name": "Desktop 1920×1080: Sidebar persists on SubSubcategory",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:56:16.366Z",
+        "category": "desktop"
+      },
+      {
+        "name": "Desktop 1920×1080: Sidebar persists on Advanced",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:56:20.131Z",
+        "category": "desktop"
+      },
+      {
+        "name": "Desktop 1920×1080: Sidebar stays expanded after page refresh",
+        "passed": false,
+        "message": "Sidebar not found",
+        "timestamp": "2025-11-17T12:56:25.826Z",
+        "category": "desktop"
+      },
+      {
+        "name": "Desktop 1440×900: Sidebar width is 256px (16rem)",
+        "passed": false,
+        "message": "Expected ~256px, got 0px",
+        "timestamp": "2025-11-17T12:56:30.748Z",
+        "category": "desktop"
+      },
+      {
+        "name": "Desktop 1440×900: No collapse button visible",
+        "passed": true,
+        "message": "",
+        "timestamp": "2025-11-17T12:56:30.751Z",
+        "category": "desktop"
+      },
+      {
+        "name": "Desktop 1440×900: CMD+B does nothing (sidebar stays visible)",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:56:31.279Z",
+        "category": "desktop"
+      },
+      {
+        "name": "Desktop 1440×900: Full text labels visible",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:56:31.284Z",
+        "category": "desktop"
+      },
+      {
+        "name": "Desktop 1440×900: Icons visible",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:56:31.288Z",
+        "category": "desktop"
+      },
+      {
+        "name": "Desktop 1440×900: Sidebar persists on Homepage",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:56:34.335Z",
+        "category": "desktop"
+      },
+      {
+        "name": "Desktop 1440×900: Sidebar persists on Category",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:56:38.565Z",
+        "category": "desktop"
+      },
+      {
+        "name": "Desktop 1440×900: Sidebar persists on Subcategory",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:56:42.071Z",
+        "category": "desktop"
+      },
+      {
+        "name": "Desktop 1440×900: Sidebar persists on SubSubcategory",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:56:45.545Z",
+        "category": "desktop"
+      },
+      {
+        "name": "Desktop 1440×900: Sidebar persists on Advanced",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:56:49.338Z",
+        "category": "desktop"
+      },
+      {
+        "name": "Desktop 1440×900: Sidebar stays expanded after page refresh",
+        "passed": false,
+        "message": "Sidebar not found",
+        "timestamp": "2025-11-17T12:56:55.021Z",
+        "category": "desktop"
+      },
+      {
+        "name": "Desktop 1280×720: Sidebar width is 256px (16rem)",
+        "passed": false,
+        "message": "Expected ~256px, got 0px",
+        "timestamp": "2025-11-17T12:56:59.769Z",
+        "category": "desktop"
+      },
+      {
+        "name": "Desktop 1280×720: No collapse button visible",
+        "passed": true,
+        "message": "",
+        "timestamp": "2025-11-17T12:56:59.771Z",
+        "category": "desktop"
+      },
+      {
+        "name": "Desktop 1280×720: CMD+B does nothing (sidebar stays visible)",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:57:00.298Z",
+        "category": "desktop"
+      },
+      {
+        "name": "Desktop 1280×720: Full text labels visible",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:57:00.304Z",
+        "category": "desktop"
+      },
+      {
+        "name": "Desktop 1280×720: Icons visible",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:57:00.313Z",
+        "category": "desktop"
+      },
+      {
+        "name": "Desktop 1280×720: Sidebar persists on Homepage",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:57:03.361Z",
+        "category": "desktop"
+      },
+      {
+        "name": "Desktop 1280×720: Sidebar persists on Category",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:57:07.941Z",
+        "category": "desktop"
+      },
+      {
+        "name": "Desktop 1280×720: Sidebar persists on Subcategory",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:57:11.812Z",
+        "category": "desktop"
+      },
+      {
+        "name": "Desktop 1280×720: Sidebar persists on SubSubcategory",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:57:15.482Z",
+        "category": "desktop"
+      },
+      {
+        "name": "Desktop 1280×720: Sidebar persists on Advanced",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:57:19.324Z",
+        "category": "desktop"
+      },
+      {
+        "name": "Desktop 1280×720: Sidebar stays expanded after page refresh",
+        "passed": false,
+        "message": "Sidebar not found",
+        "timestamp": "2025-11-17T12:57:25.005Z",
+        "category": "desktop"
+      }
+    ],
+    "tablet": [
+      {
+        "name": "Tablet 1024×768 (exact breakpoint): Sidebar behavior appropriate for screen size",
+        "passed": true,
+        "message": "Mobile mode: false, Width: 0px",
+        "timestamp": "2025-11-17T12:57:29.683Z",
+        "category": "tablet"
+      },
+      {
+        "name": "Tablet 1024×768 (exact breakpoint): Navigation available on Homepage",
+        "passed": false,
+        "message": "Mobile mode: false",
+        "timestamp": "2025-11-17T12:57:32.761Z",
+        "category": "tablet"
+      },
+      {
+        "name": "Tablet 1024×768 (exact breakpoint): Navigation available on Category",
+        "passed": false,
+        "message": "Mobile mode: false",
+        "timestamp": "2025-11-17T12:57:37.073Z",
+        "category": "tablet"
+      },
+      {
+        "name": "Tablet 1024×768 (exact breakpoint): Navigation available on Subcategory",
+        "passed": false,
+        "message": "Mobile mode: false",
+        "timestamp": "2025-11-17T12:57:40.756Z",
+        "category": "tablet"
+      },
+      {
+        "name": "Tablet 1024×768 (exact breakpoint): Navigation available on Advanced",
+        "passed": false,
+        "message": "Mobile mode: false",
+        "timestamp": "2025-11-17T12:57:44.369Z",
+        "category": "tablet"
+      },
+      {
+        "name": "Tablet 820×1180 (portrait): Sidebar behavior appropriate for screen size",
+        "passed": true,
+        "message": "Mobile mode: true, Width: 0px",
+        "timestamp": "2025-11-17T12:57:49.107Z",
+        "category": "tablet"
+      },
+      {
+        "name": "Tablet 820×1180 (portrait): Navigation available on Homepage",
+        "passed": false,
+        "message": "Mobile mode: true",
+        "timestamp": "2025-11-17T12:57:52.107Z",
+        "category": "tablet"
+      },
+      {
+        "name": "Tablet 820×1180 (portrait): Navigation available on Category",
+        "passed": false,
+        "message": "Mobile mode: true",
+        "timestamp": "2025-11-17T12:57:56.357Z",
+        "category": "tablet"
+      },
+      {
+        "name": "Tablet 820×1180 (portrait): Navigation available on Subcategory",
+        "passed": false,
+        "message": "Mobile mode: true",
+        "timestamp": "2025-11-17T12:58:00.123Z",
+        "category": "tablet"
+      },
+      {
+        "name": "Tablet 820×1180 (portrait): Navigation available on Advanced",
+        "passed": false,
+        "message": "Mobile mode: true",
+        "timestamp": "2025-11-17T12:58:03.968Z",
+        "category": "tablet"
+      },
+      {
+        "name": "Tablet 768×1024 (exact breakpoint): Sidebar behavior appropriate for screen size",
+        "passed": true,
+        "message": "Mobile mode: true, Width: 0px",
+        "timestamp": "2025-11-17T12:58:09.081Z",
+        "category": "tablet"
+      },
+      {
+        "name": "Tablet 768×1024 (exact breakpoint): Navigation available on Homepage",
+        "passed": false,
+        "message": "Mobile mode: true",
+        "timestamp": "2025-11-17T12:58:11.872Z",
+        "category": "tablet"
+      },
+      {
+        "name": "Tablet 768×1024 (exact breakpoint): Navigation available on Category",
+        "passed": false,
+        "message": "Mobile mode: true",
+        "timestamp": "2025-11-17T12:58:16.235Z",
+        "category": "tablet"
+      },
+      {
+        "name": "Tablet 768×1024 (exact breakpoint): Navigation available on Subcategory",
+        "passed": false,
+        "message": "Mobile mode: true",
+        "timestamp": "2025-11-17T12:58:19.891Z",
+        "category": "tablet"
+      },
+      {
+        "name": "Tablet 768×1024 (exact breakpoint): Navigation available on Advanced",
+        "passed": false,
+        "message": "Mobile mode: true",
+        "timestamp": "2025-11-17T12:58:23.653Z",
+        "category": "tablet"
+      },
+      {
+        "name": "Tablet 900×1200: Sidebar behavior appropriate for screen size",
+        "passed": true,
+        "message": "Mobile mode: true, Width: 0px",
+        "timestamp": "2025-11-17T12:58:28.588Z",
+        "category": "tablet"
+      },
+      {
+        "name": "Tablet 900×1200: Navigation available on Homepage",
+        "passed": false,
+        "message": "Mobile mode: true",
+        "timestamp": "2025-11-17T12:58:31.615Z",
+        "category": "tablet"
+      },
+      {
+        "name": "Tablet 900×1200: Navigation available on Category",
+        "passed": false,
+        "message": "Mobile mode: true",
+        "timestamp": "2025-11-17T12:58:35.885Z",
+        "category": "tablet"
+      },
+      {
+        "name": "Tablet 900×1200: Navigation available on Subcategory",
+        "passed": false,
+        "message": "Mobile mode: true",
+        "timestamp": "2025-11-17T12:58:39.644Z",
+        "category": "tablet"
+      },
+      {
+        "name": "Tablet 900×1200: Navigation available on Advanced",
+        "passed": false,
+        "message": "Mobile mode: true",
+        "timestamp": "2025-11-17T12:58:43.404Z",
+        "category": "tablet"
+      }
+    ],
+    "mobile": [
+      {
+        "name": "Mobile iPhone 14 Pro (390×844): Sidebar NOT visible by default",
+        "passed": true,
+        "message": "",
+        "timestamp": "2025-11-17T12:58:48.141Z",
+        "category": "mobile"
+      },
+      {
+        "name": "Mobile iPhone 14 Pro (390×844): Hamburger menu button visible",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:58:48.144Z",
+        "category": "mobile"
+      },
+      {
+        "name": "Mobile iPhone 14 Pro (390×844): Tap hamburger opens Sheet",
+        "passed": false,
+        "message": "Sheet did not open",
+        "timestamp": "2025-11-17T12:58:49.206Z",
+        "category": "mobile"
+      },
+      {
+        "name": "Mobile iPhone 14 Pro (390×844): All categories visible in Sheet",
+        "passed": false,
+        "message": "Found 0 categories",
+        "timestamp": "2025-11-17T12:58:49.208Z",
+        "category": "mobile"
+      },
+      {
+        "name": "Mobile iPhone 14 Pro (390×844): Sheet has overlay",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:58:49.265Z",
+        "category": "mobile"
+      },
+      {
+        "name": "Mobile iPhone 14 Pro (390×844): Sheet closes after category selection",
+        "passed": false,
+        "message": "Could not click",
+        "timestamp": "2025-11-17T12:58:50.773Z",
+        "category": "mobile"
+      },
+      {
+        "name": "Mobile iPhone 14 Pro (390×844): Hamburger menu on Homepage",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:58:53.525Z",
+        "category": "mobile"
+      },
+      {
+        "name": "Mobile iPhone 14 Pro (390×844): Hamburger menu on Category",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:58:57.865Z",
+        "category": "mobile"
+      },
+      {
+        "name": "Mobile iPhone 14 Pro (390×844): Hamburger menu on Subcategory",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:59:01.531Z",
+        "category": "mobile"
+      },
+      {
+        "name": "Mobile iPhone 14 Pro (390×844): Sheet can be reopened",
+        "passed": null,
+        "message": "",
+        "timestamp": "2025-11-17T12:59:06.536Z",
+        "category": "mobile"
+      },
+      {
+        "name": "Mobile iPhone 14 Pro (390×844): Sheet closes with Escape key",
+        "passed": true,
+        "message": "",
+        "timestamp": "2025-11-17T12:59:07.047Z",
+        "category": "mobile"
+      },
+      {
+        "name": "Mobile iPhone SE (375×667): Sidebar NOT visible by default",
+        "passed": true,
+        "message": "",
+        "timestamp": "2025-11-17T12:59:12.083Z",
+        "category": "mobile"
+      },
+      {
+        "name": "Mobile iPhone SE (375×667): Hamburger menu button visible",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:59:12.087Z",
+        "category": "mobile"
+      },
+      {
+        "name": "Mobile iPhone SE (375×667): Tap hamburger opens Sheet",
+        "passed": false,
+        "message": "Sheet did not open",
+        "timestamp": "2025-11-17T12:59:13.164Z",
+        "category": "mobile"
+      },
+      {
+        "name": "Mobile iPhone SE (375×667): All categories visible in Sheet",
+        "passed": false,
+        "message": "Found 0 categories",
+        "timestamp": "2025-11-17T12:59:13.169Z",
+        "category": "mobile"
+      },
+      {
+        "name": "Mobile iPhone SE (375×667): Sheet has overlay",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:59:13.222Z",
+        "category": "mobile"
+      },
+      {
+        "name": "Mobile iPhone SE (375×667): Sheet closes after category selection",
+        "passed": false,
+        "message": "Could not click",
+        "timestamp": "2025-11-17T12:59:14.732Z",
+        "category": "mobile"
+      },
+      {
+        "name": "Mobile iPhone SE (375×667): Hamburger menu on Homepage",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:59:17.603Z",
+        "category": "mobile"
+      },
+      {
+        "name": "Mobile iPhone SE (375×667): Hamburger menu on Category",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:59:21.880Z",
+        "category": "mobile"
+      },
+      {
+        "name": "Mobile iPhone SE (375×667): Hamburger menu on Subcategory",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:59:25.460Z",
+        "category": "mobile"
+      },
+      {
+        "name": "Mobile iPhone SE (375×667): Sheet can be reopened",
+        "passed": null,
+        "message": "",
+        "timestamp": "2025-11-17T12:59:29.920Z",
+        "category": "mobile"
+      },
+      {
+        "name": "Mobile iPhone SE (375×667): Sheet closes with Escape key",
+        "passed": true,
+        "message": "",
+        "timestamp": "2025-11-17T12:59:30.448Z",
+        "category": "mobile"
+      },
+      {
+        "name": "Mobile Android (360×800): Sidebar NOT visible by default",
+        "passed": true,
+        "message": "",
+        "timestamp": "2025-11-17T12:59:34.908Z",
+        "category": "mobile"
+      },
+      {
+        "name": "Mobile Android (360×800): Hamburger menu button visible",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:59:34.914Z",
+        "category": "mobile"
+      },
+      {
+        "name": "Mobile Android (360×800): Tap hamburger opens Sheet",
+        "passed": false,
+        "message": "Sheet did not open",
+        "timestamp": "2025-11-17T12:59:35.996Z",
+        "category": "mobile"
+      },
+      {
+        "name": "Mobile Android (360×800): All categories visible in Sheet",
+        "passed": false,
+        "message": "Found 0 categories",
+        "timestamp": "2025-11-17T12:59:35.999Z",
+        "category": "mobile"
+      },
+      {
+        "name": "Mobile Android (360×800): Sheet has overlay",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:59:36.054Z",
+        "category": "mobile"
+      },
+      {
+        "name": "Mobile Android (360×800): Sheet closes after category selection",
+        "passed": false,
+        "message": "Could not click",
+        "timestamp": "2025-11-17T12:59:37.561Z",
+        "category": "mobile"
+      },
+      {
+        "name": "Mobile Android (360×800): Hamburger menu on Homepage",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:59:40.326Z",
+        "category": "mobile"
+      },
+      {
+        "name": "Mobile Android (360×800): Hamburger menu on Category",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:59:44.600Z",
+        "category": "mobile"
+      },
+      {
+        "name": "Mobile Android (360×800): Hamburger menu on Subcategory",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T12:59:48.649Z",
+        "category": "mobile"
+      },
+      {
+        "name": "Mobile Android (360×800): Sheet can be reopened",
+        "passed": null,
+        "message": "",
+        "timestamp": "2025-11-17T12:59:52.785Z",
+        "category": "mobile"
+      },
+      {
+        "name": "Mobile Android (360×800): Sheet closes with Escape key",
+        "passed": true,
+        "message": "",
+        "timestamp": "2025-11-17T12:59:53.298Z",
+        "category": "mobile"
+      }
+    ],
+    "edgeCases": [
+      {
+        "name": "Edge Case: Resize desktop → mobile → desktop maintains state",
+        "passed": false,
+        "message": "Desktop1: 0px, Mobile: false, Desktop2: 0px",
+        "timestamp": "2025-11-17T12:59:59.597Z",
+        "category": "edge"
+      },
+      {
+        "name": "Edge Case: Desktop ignores collapse cookie (always expanded)",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T13:00:05.529Z",
+        "category": "edge"
+      },
+      {
+        "name": "Edge Case: Mobile sheet closed after page refresh",
+        "passed": true,
+        "message": "",
+        "timestamp": "2025-11-17T13:00:11.312Z",
+        "category": "edge"
+      },
+      {
+        "name": "Edge Case: Sidebar stable after rapid resizing",
+        "passed": false,
+        "message": "",
+        "timestamp": "2025-11-17T13:00:16.402Z",
+        "category": "edge"
+      },
+      {
+        "name": "Edge Case: Orientation change (portrait → landscape) works correctly",
+        "passed": true,
+        "message": "Portrait: {\"hasSidebar\":false,\"hasTrigger\":false}, Landscape: {\"hasSidebar\":false,\"hasTrigger\":false}",
+        "timestamp": "2025-11-17T13:00:20.562Z",
+        "category": "edge"
+      }
+    ]
+  }
+}

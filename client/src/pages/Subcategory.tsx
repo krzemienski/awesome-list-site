@@ -138,7 +138,7 @@ export default function Subcategory() {
               Category: {categoryName}
             </p>
           </div>
-          <Badge variant="secondary" className="text-lg px-4 py-2">
+          <Badge variant="secondary" className="text-lg px-4 py-2" data-testid="badge-count">
             {allResources.length}
           </Badge>
         </div>
