@@ -226,6 +226,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.error(`Error fetching awesome-video data: ${error}`);
   }
 
+  // Auto-seed database on first startup
+  try {
+    console.log('Checking if database needs seeding...');
+    const categories = await storage.listCategories();
+    
+    if (categories.length === 0) {
+      console.log('📦 Database is empty. Starting automatic seeding...');
+      const seedResult = await seedDatabase({ clearExisting: false });
+      
+      console.log('✅ Auto-seeding completed successfully:');
+      console.log(`   - Categories: ${seedResult.categoriesInserted}`);
+      console.log(`   - Subcategories: ${seedResult.subcategoriesInserted}`);
+      console.log(`   - Sub-subcategories: ${seedResult.subSubcategoriesInserted}`);
+      console.log(`   - Resources: ${seedResult.resourcesInserted}`);
+      
+      if (seedResult.errors.length > 0) {
+        console.warn(`⚠️  Seeding completed with ${seedResult.errors.length} errors`);
+      }
+    } else {
+      console.log(`✓ Database already populated with ${categories.length} categories`);
+    }
+  } catch (error) {
+    console.error('❌ Error during auto-seeding (non-fatal):', error);
+    console.log('Server will continue without seeding. You can manually seed via /api/admin/seed-database');
+  }
+
   // ============= Auth Routes (from Replit Auth blueprint) =============
   
   // GET /api/auth/user - Get current user
@@ -938,10 +964,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // POST /api/admin/seed-database - Populate database from awesome-video JSON
+  // POST /api/admin/seed-database - Manual database seeding (optional)
+  // Note: Database is automatically seeded on first startup. This endpoint is for:
+  // - Re-seeding after data changes
+  // - Clearing and rebuilding the database
+  // - Manual admin intervention when needed
   app.post('/api/admin/seed-database', isAuthenticated, isAdmin, async (req, res) => {
     try {
-      console.log('Starting database seeding...');
+      console.log('Starting manual database seeding...');
       
       // Get options from request body
       const { clearExisting = false } = req.body;
