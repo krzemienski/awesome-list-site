@@ -46,7 +46,7 @@ export class AwesomeListFormatter {
 
     // Add table of contents
     const categoryGroups = this.groupResourcesByCategory();
-    if (categoryGroups.size > 3) { // Only add TOC if we have more than 3 categories
+    if (categoryGroups.size > 0) { // Always add TOC for consistency
       sections.push(this.generateTableOfContents(categoryGroups));
     }
 
@@ -63,7 +63,8 @@ export class AwesomeListFormatter {
       sections.push(this.generateLicenseSection());
     }
 
-    return sections.join('\n\n');
+    // Ensure file ends with a single newline (awesome-lint requirement)
+    return sections.filter(s => s.trim()).join('\n\n') + '\n';
   }
 
   /**
@@ -72,29 +73,37 @@ export class AwesomeListFormatter {
   private generateHeader(): string {
     const lines: string[] = [];
 
-    // Title with Awesome prefix
+    // Title with Awesome prefix (awesome-lint requires "Awesome" prefix)
     const title = this.options.title.startsWith('Awesome') 
       ? this.options.title 
       : `Awesome ${this.options.title}`;
     lines.push(`# ${title}`);
+    
+    // Awesome badge must be on the line directly after the title with no blank line
     lines.push('');
-
-    // Add the awesome badge (required for awesome lists)
     lines.push('[![Awesome](https://awesome.re/badge.svg)](https://awesome.re)');
     
     // Add additional badges if needed
     if (this.options.repoUrl) {
       const repoPath = this.extractRepoPath(this.options.repoUrl);
       if (repoPath) {
+        lines.push('');
         lines.push(`[![GitHub stars](https://img.shields.io/github/stars/${repoPath})](${this.options.repoUrl})`);
         lines.push(`[![License: CC0-1.0](https://img.shields.io/badge/License-CC0%201.0-lightgrey.svg)](http://creativecommons.org/publicdomain/zero/1.0/)`);
       }
     }
+    
+    // Add blank line before description
     lines.push('');
 
     // Add description
     if (this.options.description) {
-      lines.push(`> ${this.options.description}`);
+      // Ensure description starts with capital letter
+      let description = this.options.description.trim();
+      if (description && description[0] !== description[0].toUpperCase()) {
+        description = description[0].toUpperCase() + description.slice(1);
+      }
+      lines.push(`> ${description}`);
       lines.push('');
     }
 
@@ -187,18 +196,80 @@ export class AwesomeListFormatter {
    * Format: - [Name](url) - Description.
    */
   private formatResource(resource: Resource): string {
-    let line = `- [${resource.title}](${resource.url})`;
+    // Ensure proper capitalization in title
+    const title = this.ensureProperCapitalization(resource.title);
+    
+    // Remove trailing slashes from URLs (awesome-lint requirement)
+    let url = resource.url.trim();
+    if (url.endsWith('/') && url !== '/') {
+      url = url.slice(0, -1);
+    }
+    
+    let line = `- [${title}](${url})`;
     
     if (resource.description && resource.description.trim()) {
-      // Ensure description ends with a period
       let description = resource.description.trim();
+      
+      // Ensure description starts with capital letter
+      if (description && description[0] !== description[0].toUpperCase()) {
+        description = description[0].toUpperCase() + description.slice(1);
+      }
+      
+      // Ensure description ends with a period
       if (!description.endsWith('.') && !description.endsWith('!') && !description.endsWith('?')) {
         description += '.';
       }
+      
+      // Apply proper capitalizations in description
+      description = this.ensureProperCapitalization(description);
+      
       line += ` - ${description}`;
     }
     
     return line;
+  }
+  
+  /**
+   * Ensure proper capitalization for common terms (awesome-lint requirement)
+   */
+  private ensureProperCapitalization(text: string): string {
+    const replacements: { [key: string]: string } = {
+      'nodejs': 'Node.js',
+      'node.js': 'Node.js',
+      'github': 'GitHub',
+      'gitlab': 'GitLab',
+      'typescript': 'TypeScript',
+      'javascript': 'JavaScript',
+      'mongodb': 'MongoDB',
+      'postgresql': 'PostgreSQL',
+      'mysql': 'MySQL',
+      'graphql': 'GraphQL',
+      'api': 'API',
+      'rest': 'REST',
+      'json': 'JSON',
+      'xml': 'XML',
+      'html': 'HTML',
+      'css': 'CSS',
+      'svg': 'SVG',
+      'http': 'HTTP',
+      'https': 'HTTPS',
+      'tcp': 'TCP',
+      'udp': 'UDP',
+      'ios': 'iOS',
+      'macos': 'macOS',
+      'ipv4': 'IPv4',
+      'ipv6': 'IPv6'
+    };
+    
+    let result = text;
+    
+    // Apply replacements with word boundary checks
+    for (const [wrong, correct] of Object.entries(replacements)) {
+      const regex = new RegExp(`\\b${wrong}\\b`, 'gi');
+      result = result.replace(regex, correct);
+    }
+    
+    return result;
   }
 
   /**
