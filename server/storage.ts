@@ -105,6 +105,7 @@ export interface IStorage {
   
   // Journey Steps
   listJourneySteps(journeyId: number): Promise<JourneyStep[]>;
+  listJourneyStepsBatch(journeyIds: number[]): Promise<Map<number, JourneyStep[]>>;
   createJourneyStep(step: InsertJourneyStep): Promise<JourneyStep>;
   updateJourneyStep(id: number, step: Partial<InsertJourneyStep>): Promise<JourneyStep>;
   deleteJourneyStep(id: number): Promise<void>;
@@ -599,6 +600,29 @@ export class DatabaseStorage implements IStorage {
     await db.delete(journeySteps).where(eq(journeySteps.id, id));
   }
   
+  async listJourneyStepsBatch(journeyIds: number[]): Promise<Map<number, JourneyStep[]>> {
+    if (journeyIds.length === 0) {
+      return new Map();
+    }
+    
+    const steps = await db
+      .select()
+      .from(journeySteps)
+      .where(inArray(journeySteps.journeyId, journeyIds))
+      .orderBy(asc(journeySteps.stepNumber));
+    
+    // Group steps by journeyId
+    const grouped = new Map<number, JourneyStep[]>();
+    for (const step of steps) {
+      if (!grouped.has(step.journeyId)) {
+        grouped.set(step.journeyId, []);
+      }
+      grouped.get(step.journeyId)!.push(step);
+    }
+    
+    return grouped;
+  }
+  
   // User Favorites
   async addFavorite(userId: string, resourceId: number): Promise<void> {
     await db
@@ -747,15 +771,26 @@ export class DatabaseStorage implements IStorage {
         )
       );
     
+    // Normalize completedSteps to numbers
+    if (progress && progress.completedSteps) {
+      progress.completedSteps = progress.completedSteps.map(id => Number(id));
+    }
+    
     return progress;
   }
   
   async listUserJourneyProgress(userId: string): Promise<UserJourneyProgress[]> {
-    return await db
+    const progressList = await db
       .select()
       .from(userJourneyProgress)
       .where(eq(userJourneyProgress.userId, userId))
       .orderBy(desc(userJourneyProgress.lastAccessedAt));
+    
+    // Normalize completedSteps to numbers for each progress entry
+    return progressList.map(progress => ({
+      ...progress,
+      completedSteps: progress.completedSteps ? progress.completedSteps.map(id => Number(id)) : []
+    }));
   }
   
   // Resource Audit Log
@@ -1234,6 +1269,9 @@ export class MemStorage implements IStorage {
   async deleteLearningJourney(id: number): Promise<void> {}
   
   async listJourneySteps(journeyId: number): Promise<JourneyStep[]> { return []; }
+  async listJourneyStepsBatch(journeyIds: number[]): Promise<Map<number, JourneyStep[]>> {
+    return new Map();
+  }
   async createJourneyStep(step: InsertJourneyStep): Promise<JourneyStep> {
     throw new Error("Not implemented in memory storage");
   }
