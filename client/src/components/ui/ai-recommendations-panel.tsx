@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useAIRecommendations, type AIRecommendationResult } from "@/hooks/useAIRecommendations";
+import { useAIRecommendations, type RecommendationResult } from "@/hooks/useAIRecommendations";
 import { useUserProfile } from "@/hooks/use-user-profile";
 import { Resource } from "@/types/awesome-list";
 import {
@@ -94,7 +94,7 @@ export default function AIRecommendationsPanel({ resources }: AIRecommendationsP
     isError,
     error,
     isSuccess,
-  } = useAIRecommendations({ limit: 10 });
+  } = useAIRecommendations(undefined, { limit: 10 });
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -130,9 +130,9 @@ export default function AIRecommendationsPanel({ resources }: AIRecommendationsP
     generateRecommendations(payload);
   };
 
-  const getResourceDetails = (resourceId: string): Resource | undefined => {
+  const getResourceDetails = (resourceUrl: string): Resource | undefined => {
     // Debug logging to see what we're searching for
-    console.log('[AI Recommendations] Searching for resourceId:', resourceId);
+    console.log('[AI Recommendations] Searching for resourceUrl:', resourceUrl);
     console.log('[AI Recommendations] Sample resources URLs (first 3):', resources.slice(0, 3).map(r => ({
       url: r.url,
       title: r.title,
@@ -140,16 +140,16 @@ export default function AIRecommendationsPanel({ resources }: AIRecommendationsP
     })));
     
     // Try exact URL match first
-    let resource = resources.find(r => r.url === resourceId);
+    let resource = resources.find(r => r.url === resourceUrl);
     
     // If not found, try matching by ID or title as fallback
     if (!resource) {
-      resource = resources.find(r => r.id?.toString() === resourceId);
+      resource = resources.find(r => r.id?.toString() === resourceUrl);
     }
     
     // Additional fallback: try partial URL match
     if (!resource) {
-      resource = resources.find(r => r.url?.includes(resourceId) || resourceId.includes(r.url || ''));
+      resource = resources.find(r => r.url?.includes(resourceUrl) || resourceUrl.includes(r.url || ''));
     }
     
     console.log('[AI Recommendations] Found resource:', resource ? 'Yes' : 'No', resource?.title);
@@ -496,7 +496,7 @@ export default function AIRecommendationsPanel({ resources }: AIRecommendationsP
               </CardTitle>
               <CardDescription>
                 {recommendations.length} resources selected specifically for your learning journey
-                {recommendations.some(r => r.aiGenerated) && (
+                {recommendations.some(r => r.type === 'ai_powered') && (
                   <Badge variant="outline" className="ml-2">
                     <Sparkles className="h-3 w-3 mr-1" />
                     AI-Powered
@@ -507,15 +507,15 @@ export default function AIRecommendationsPanel({ resources }: AIRecommendationsP
           </Card>
 
           {recommendations.map((rec, index) => {
-            const resource = getResourceDetails(rec.resourceId);
+            const resource = getResourceDetails(rec.resource.url);
             
             // Fallback display info when resource lookup fails
-            const displayTitle = resource?.title || rec.resourceId.split('/').pop()?.replace(/-/g, ' ') || rec.resourceId;
+            const displayTitle = resource?.title || rec.resource.title || rec.resource.url.split('/').pop()?.replace(/-/g, ' ') || rec.resource.url;
             const hasResourceDetails = !!resource;
             
             return (
               <Card 
-                key={rec.resourceId} 
+                key={rec.resource.url} 
                 className="hover:border-primary transition-colors"
                 data-testid={`recommendation-${index}`}
               >
@@ -526,7 +526,7 @@ export default function AIRecommendationsPanel({ resources }: AIRecommendationsP
                         <CardTitle className="text-lg">
                           {displayTitle}
                         </CardTitle>
-                        {rec.aiGenerated && (
+                        {rec.type === 'ai_powered' && (
                           <Badge variant="outline" className="text-xs" data-testid={`badge-ai-${index}`}>
                             <Sparkles className="h-3 w-3 mr-1" />
                             AI
@@ -539,23 +539,27 @@ export default function AIRecommendationsPanel({ resources }: AIRecommendationsP
                         )}
                       </div>
                       <CardDescription className="flex flex-wrap items-center gap-2">
-                        <Badge variant="secondary" data-testid={`badge-category-${index}`}>
-                          {rec.category}
-                        </Badge>
+                        {rec.resource.category && (
+                          <Badge variant="secondary" data-testid={`badge-category-${index}`}>
+                            {rec.resource.category}
+                          </Badge>
+                        )}
                         <Badge 
-                          variant={getConfidenceBadgeVariant(rec.confidenceLevel)}
-                          className={getConfidenceColor(rec.confidenceLevel)}
+                          variant={getConfidenceBadgeVariant(rec.confidence)}
+                          className={getConfidenceColor(rec.confidence)}
                           data-testid={`badge-confidence-${index}`}
                         >
                           <TrendingUp className="h-3 w-3 mr-1" />
-                          {Math.round(rec.confidenceLevel * 100)}% match
+                          {Math.round(rec.confidence)}% match
                         </Badge>
-                        <Badge 
-                          variant="outline"
-                          data-testid={`badge-score-${index}`}
-                        >
-                          Score: {rec.score.toFixed(2)}
-                        </Badge>
+                        {rec.score !== undefined && (
+                          <Badge 
+                            variant="outline"
+                            data-testid={`badge-score-${index}`}
+                          >
+                            Score: {rec.score.toFixed(2)}
+                          </Badge>
+                        )}
                       </CardDescription>
                     </div>
                   </div>
@@ -571,9 +575,9 @@ export default function AIRecommendationsPanel({ resources }: AIRecommendationsP
                   </div>
 
                   {/* Resource Description - show if available */}
-                  {resource?.description && (
+                  {(resource?.description || rec.resource.description) && (
                     <p className="text-sm" data-testid={`description-${index}`}>
-                      {resource.description}
+                      {resource?.description || rec.resource.description}
                     </p>
                   )}
                   
@@ -581,15 +585,15 @@ export default function AIRecommendationsPanel({ resources }: AIRecommendationsP
                   {!hasResourceDetails && (
                     <div className="p-3 bg-muted/50 rounded-md border border-dashed">
                       <p className="text-xs text-muted-foreground">
-                        <span className="font-semibold">URL:</span> {rec.resourceId}
+                        <span className="font-semibold">URL:</span> {rec.resource.url}
                       </p>
                     </div>
                   )}
 
                   {/* Additional resource metadata if available */}
-                  {resource?.subcategory && (
+                  {(resource?.subcategory || rec.resource.subcategory) && (
                     <p className="text-xs text-muted-foreground">
-                      <span className="font-semibold">Subcategory:</span> {resource.subcategory}
+                      <span className="font-semibold">Subcategory:</span> {resource?.subcategory || rec.resource.subcategory}
                     </p>
                   )}
 
@@ -601,7 +605,7 @@ export default function AIRecommendationsPanel({ resources }: AIRecommendationsP
                     data-testid={`button-view-${index}`}
                   >
                     <a
-                      href={rec.resourceId}
+                      href={rec.resource.url}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center justify-center gap-2"
