@@ -30,10 +30,18 @@ export default function Subcategory() {
   
   const awesomeList = rawData ? processAwesomeListData(rawData) : undefined;
   
+  // Fetch approved database resources
+  const { data: dbData } = useQuery<{resources: any[], total: number}>({
+    queryKey: ['/api/resources', { status: 'approved' }],
+    enabled: !!awesomeList,
+  });
+  
+  const dbResources = dbData?.resources || [];
+  
   // Find the current subcategory and its resources
   let currentSubcategory = null;
   let parentCategory = null;
-  let allResources: Resource[] = [];
+  let staticResources: Resource[] = [];
   
   if (awesomeList && slug) {
     // Find matching subcategory across all categories
@@ -46,7 +54,7 @@ export default function Subcategory() {
         parentCategory = category;
         
         // Get all resources - subcategory level already includes all nested resources
-        allResources = subcategory.resources;
+        staticResources = subcategory.resources;
         
         break;
       }
@@ -55,6 +63,31 @@ export default function Subcategory() {
   
   const subcategoryName = currentSubcategory ? currentSubcategory.name : deslugify(slug || "");
   const categoryName = parentCategory ? parentCategory.name : "";
+  
+  // Merge static and database resources for this subcategory
+  const allResources: Resource[] = useMemo(() => {
+    // Filter database resources for this subcategory and map to Resource type (defensive: match by name OR slug)
+    const subcategoryDbResources = dbResources
+      .filter(r => {
+        // Match by display name OR slug
+        const matchesName = r.subcategory === subcategoryName;
+        const matchesSlug = r.subcategory?.toLowerCase().replace(/\s+&\s+/g, '-').replace(/\s+/g, '-') === slug;
+        return matchesName || matchesSlug;
+      })
+      .map(r => ({
+        id: `db-${r.id}`,
+        title: r.title,
+        description: r.description || '',
+        url: r.url,
+        tags: r.metadata?.tags || [],
+        category: r.category,
+        subcategory: r.subcategory || undefined,
+        subSubcategory: r.subSubcategory || undefined,
+      }));
+    
+    // Merge and return
+    return [...staticResources, ...subcategoryDbResources];
+  }, [staticResources, dbResources, subcategoryName]);
   
   // Filter resources by selected tags
   const filteredResources = useMemo(() => {
