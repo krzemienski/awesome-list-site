@@ -24,6 +24,8 @@ import AdminGuard from "@/components/auth/AdminGuard";
 import AuthGuard from "@/components/auth/AuthGuard";
 import NotFound from "@/pages/not-found";
 import SubmitResource from "@/pages/SubmitResource";
+import Journeys from "@/pages/Journeys";
+import JourneyDetail from "@/pages/JourneyDetail";
 
 import { AwesomeList } from "@/types/awesome-list";
 import { processAwesomeListData } from "@/lib/parser";
@@ -122,6 +124,8 @@ function Router() {
         <Route path="/about" component={About} />
         <Route path="/advanced" component={Advanced} />
         <Route path="/submit" component={SubmitResource} />
+        <Route path="/journeys" component={Journeys} />
+        <Route path="/journey/:id" component={JourneyDetail} />
         <Route path="/profile" component={() => (
           <AuthGuard>
             <Profile user={user} />

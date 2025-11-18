@@ -852,11 +852,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= Learning Journey Routes =============
   
   // GET /api/journeys - List all journeys
-  app.get('/api/journeys', async (req, res) => {
+  app.get('/api/journeys', async (req: any, res) => {
     try {
       const category = req.query.category as string;
       const journeys = await storage.listLearningJourneys(category);
-      res.json(journeys);
+      
+      // Early return if no journeys
+      if (journeys.length === 0) {
+        return res.json([]);
+      }
+      
+      // BATCH FETCH: Single query for all steps
+      const journeyIds = journeys.map(j => j.id);
+      const stepsMap = await storage.listJourneyStepsBatch(journeyIds);
+      
+      // If user is authenticated, batch fetch all progress
+      if (req.user?.claims?.sub) {
+        const userId = req.user.claims.sub;
+        const allProgress = await storage.listUserJourneyProgress(userId);
+        
+        // Create progress map for O(1) lookup
+        const progressMap = new Map();
+        allProgress.forEach(p => {
+          progressMap.set(p.journeyId, p);
+        });
+        
+        // Enrich journeys with steps and progress
+        const enrichedJourneys = journeys.map(journey => {
+          const steps = stepsMap.get(journey.id) || [];
+          const progress = progressMap.get(journey.id);
+          
+          return {
+            ...journey,
+            stepCount: steps.length,
+            completedStepCount: progress?.completedSteps?.length || 0,
+            isEnrolled: !!progress
+          };
+        });
+        
+        res.json(enrichedJourneys);
+      } else {
+        // For unauthenticated users
+        const enrichedJourneys = journeys.map(journey => {
+          const steps = stepsMap.get(journey.id) || [];
+          
+          return {
+            ...journey,
+            stepCount: steps.length,
+            completedStepCount: 0,
+            isEnrolled: false
+          };
+        });
+        
+        res.json(enrichedJourneys);
+      }
     } catch (error) {
       console.error('Error fetching journeys:', error);
       res.status(500).json({ message: 'Failed to fetch journeys' });
@@ -864,7 +913,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // GET /api/journeys/:id - Get journey details
-  app.get('/api/journeys/:id', async (req, res) => {
+  app.get('/api/journeys/:id', async (req: any, res) => {
     try {
       const id = parseInt(req.params.id);
       const journey = await storage.getLearningJourney(id);
@@ -873,10 +922,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'Journey not found' });
       }
       
-      // Get journey steps
       const steps = await storage.listJourneySteps(id);
       
-      res.json({ ...journey, steps });
+      // If user is authenticated, get their progress
+      let progress = null;
+      if (req.user?.claims?.sub) {
+        progress = await storage.getUserJourneyProgress(req.user.claims.sub, id);
+      }
+      
+      res.json({
+        ...journey,
+        steps,
+        progress: progress ? {
+          completedSteps: progress.completedSteps || [],
+          currentStepId: progress.currentStepId,
+          completedAt: progress.completedAt
+        } : null
+      });
     } catch (error) {
       console.error('Error fetching journey:', error);
       res.status(500).json({ message: 'Failed to fetch journey' });

@@ -17,7 +17,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Skeleton } from "@/components/ui/skeleton";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Home, Folder, ExternalLink, Menu, Sparkles, Zap, Shield, Plus } from "lucide-react";
+import { Home, Folder, ExternalLink, Menu, Sparkles, Zap, Shield, Plus, BookOpen } from "lucide-react";
 import { slugify, getCategorySlug } from "@/lib/utils";
 import { Category, Resource } from "@/types/awesome-list";
 import { cn } from "@/lib/utils";
@@ -183,6 +183,19 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
           >
             <Plus className="mr-2 h-4 w-4" />
             Submit Resource
+          </Button>
+          
+          <Button
+            variant="ghost"
+            className={cn(
+              "w-full justify-start font-normal",
+              isActiveRoute("/journeys") ? "bg-accent text-accent-foreground" : ""
+            )}
+            onClick={() => navigate('/journeys')}
+            data-testid="nav-learning-journeys"
+          >
+            <BookOpen className="mr-2 h-4 w-4" />
+            Learning Journeys
           </Button>
           
           <Button
