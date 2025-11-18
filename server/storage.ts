@@ -16,6 +16,8 @@ import {
   githubSyncQueue,
   githubSyncHistory,
   resourceEdits,
+  enrichmentJobs,
+  enrichmentQueue,
   type User,
   type UpsertUser,
   type Resource,
@@ -41,6 +43,10 @@ import {
   type ResourceEdit,
   type InsertResourceEdit,
   type UserPreferences,
+  type EnrichmentJob,
+  type InsertEnrichmentJob,
+  type EnrichmentQueueItem,
+  type InsertEnrichmentQueue,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql, desc, asc, inArray, like, or, isNull, isNotNull } from "drizzle-orm";
@@ -159,6 +165,19 @@ export interface IStorage {
   getAllApprovedResources(): Promise<Resource[]>;
   storeValidationResult(result: ValidationStorageItem): Promise<void>;
   getLatestValidationResults(): Promise<ValidationResults>;
+  
+  // Enrichment Jobs
+  createEnrichmentJob(data: InsertEnrichmentJob): Promise<EnrichmentJob>;
+  getEnrichmentJob(id: number): Promise<EnrichmentJob | undefined>;
+  listEnrichmentJobs(limit?: number): Promise<EnrichmentJob[]>;
+  updateEnrichmentJob(id: number, data: Partial<EnrichmentJob>): Promise<EnrichmentJob>;
+  cancelEnrichmentJob(id: number): Promise<void>;
+  
+  // Enrichment Queue
+  createEnrichmentQueueItem(data: InsertEnrichmentQueue): Promise<EnrichmentQueueItem>;
+  getEnrichmentQueueItemsByJob(jobId: number): Promise<EnrichmentQueueItem[]>;
+  getPendingEnrichmentQueueItems(jobId: number, limit?: number): Promise<EnrichmentQueueItem[]>;
+  updateEnrichmentQueueItem(id: number, data: Partial<EnrichmentQueueItem>): Promise<EnrichmentQueueItem>;
   
   // Legacy methods for awesome list (in-memory)
   setAwesomeListData(data: any): void;
@@ -1138,6 +1157,94 @@ export class DatabaseStorage implements IStorage {
   getResources(): any[] {
     return this.awesomeListData?.resources || [];
   }
+  
+  // Enrichment Jobs
+  async createEnrichmentJob(data: InsertEnrichmentJob): Promise<EnrichmentJob> {
+    const [job] = await db
+      .insert(enrichmentJobs)
+      .values(data)
+      .returning();
+    return job;
+  }
+  
+  async getEnrichmentJob(id: number): Promise<EnrichmentJob | undefined> {
+    const [job] = await db
+      .select()
+      .from(enrichmentJobs)
+      .where(eq(enrichmentJobs.id, id));
+    return job;
+  }
+  
+  async listEnrichmentJobs(limit: number = 50): Promise<EnrichmentJob[]> {
+    const jobs = await db
+      .select()
+      .from(enrichmentJobs)
+      .orderBy(desc(enrichmentJobs.createdAt))
+      .limit(limit);
+    return jobs;
+  }
+  
+  async updateEnrichmentJob(id: number, data: Partial<EnrichmentJob>): Promise<EnrichmentJob> {
+    const [job] = await db
+      .update(enrichmentJobs)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(enrichmentJobs.id, id))
+      .returning();
+    return job;
+  }
+  
+  async cancelEnrichmentJob(id: number): Promise<void> {
+    await db
+      .update(enrichmentJobs)
+      .set({ 
+        status: 'cancelled', 
+        completedAt: new Date(),
+        updatedAt: new Date() 
+      })
+      .where(eq(enrichmentJobs.id, id));
+  }
+  
+  // Enrichment Queue
+  async createEnrichmentQueueItem(data: InsertEnrichmentQueue): Promise<EnrichmentQueueItem> {
+    const [item] = await db
+      .insert(enrichmentQueue)
+      .values(data)
+      .returning();
+    return item;
+  }
+  
+  async getEnrichmentQueueItemsByJob(jobId: number): Promise<EnrichmentQueueItem[]> {
+    const items = await db
+      .select()
+      .from(enrichmentQueue)
+      .where(eq(enrichmentQueue.jobId, jobId))
+      .orderBy(asc(enrichmentQueue.id));
+    return items;
+  }
+  
+  async getPendingEnrichmentQueueItems(jobId: number, limit: number = 10): Promise<EnrichmentQueueItem[]> {
+    const items = await db
+      .select()
+      .from(enrichmentQueue)
+      .where(
+        and(
+          eq(enrichmentQueue.jobId, jobId),
+          eq(enrichmentQueue.status, 'pending')
+        )
+      )
+      .orderBy(asc(enrichmentQueue.id))
+      .limit(limit);
+    return items;
+  }
+  
+  async updateEnrichmentQueueItem(id: number, data: Partial<EnrichmentQueueItem>): Promise<EnrichmentQueueItem> {
+    const [item] = await db
+      .update(enrichmentQueue)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(enrichmentQueue.id, id))
+      .returning();
+    return item;
+  }
 }
 
 // For backward compatibility, export both MemStorage and DatabaseStorage
@@ -1417,6 +1524,35 @@ export class MemStorage implements IStorage {
 
   getResources(): any[] {
     return this.awesomeListData?.resources || [];
+  }
+  
+  // Enrichment Jobs - Not implemented for MemStorage
+  async createEnrichmentJob(data: InsertEnrichmentJob): Promise<EnrichmentJob> {
+    throw new Error("Enrichment not implemented in memory storage");
+  }
+  async getEnrichmentJob(id: number): Promise<EnrichmentJob | undefined> { 
+    return undefined; 
+  }
+  async listEnrichmentJobs(limit?: number): Promise<EnrichmentJob[]> { 
+    return []; 
+  }
+  async updateEnrichmentJob(id: number, data: Partial<EnrichmentJob>): Promise<EnrichmentJob> {
+    throw new Error("Enrichment not implemented in memory storage");
+  }
+  async cancelEnrichmentJob(id: number): Promise<void> {}
+  
+  // Enrichment Queue - Not implemented for MemStorage
+  async createEnrichmentQueueItem(data: InsertEnrichmentQueue): Promise<EnrichmentQueueItem> {
+    throw new Error("Enrichment not implemented in memory storage");
+  }
+  async getEnrichmentQueueItemsByJob(jobId: number): Promise<EnrichmentQueueItem[]> { 
+    return []; 
+  }
+  async getPendingEnrichmentQueueItems(jobId: number, limit?: number): Promise<EnrichmentQueueItem[]> { 
+    return []; 
+  }
+  async updateEnrichmentQueueItem(id: number, data: Partial<EnrichmentQueueItem>): Promise<EnrichmentQueueItem> {
+    throw new Error("Enrichment not implemented in memory storage");
   }
 }
 

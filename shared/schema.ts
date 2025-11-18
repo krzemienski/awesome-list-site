@@ -486,3 +486,83 @@ export const insertGithubSyncHistorySchema = createInsertSchema(githubSyncHistor
 
 export type InsertGithubSyncHistory = z.infer<typeof insertGithubSyncHistorySchema>;
 export type GithubSyncHistory = typeof githubSyncHistory.$inferSelect;
+
+// Enrichment Jobs - Batch AI metadata enrichment tracking
+export const enrichmentJobs = pgTable(
+  "enrichment_jobs",
+  {
+    id: serial("id").primaryKey(),
+    status: text("status").notNull().default("pending"), // pending, processing, completed, failed, cancelled
+    filter: text("filter").default("all"), // all, unenriched
+    batchSize: integer("batch_size").default(10),
+    totalResources: integer("total_resources").default(0),
+    processedResources: integer("processed_resources").default(0),
+    successfulResources: integer("successful_resources").default(0),
+    failedResources: integer("failed_resources").default(0),
+    skippedResources: integer("skipped_resources").default(0),
+    processedResourceIds: jsonb("processed_resource_ids").$type<number[]>().default([]),
+    failedResourceIds: jsonb("failed_resource_ids").$type<number[]>().default([]),
+    errorMessage: text("error_message"),
+    metadata: jsonb("metadata").$type<Record<string, any>>().default({}),
+    startedBy: varchar("started_by").references(() => users.id),
+    startedAt: timestamp("started_at"),
+    completedAt: timestamp("completed_at"),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) => [
+    index("idx_enrichment_jobs_status").on(table.status),
+    index("idx_enrichment_jobs_started_by").on(table.startedBy),
+  ]
+);
+
+export const insertEnrichmentJobSchema = createInsertSchema(enrichmentJobs).pick({
+  filter: true,
+  batchSize: true,
+  startedBy: true,
+});
+
+export type InsertEnrichmentJob = z.infer<typeof insertEnrichmentJobSchema>;
+export type EnrichmentJob = typeof enrichmentJobs.$inferSelect;
+
+// Enrichment Queue - Individual resource enrichment tasks
+export const enrichmentQueue = pgTable(
+  "enrichment_queue",
+  {
+    id: serial("id").primaryKey(),
+    jobId: integer("job_id").references(() => enrichmentJobs.id, { onDelete: "cascade" }).notNull(),
+    resourceId: integer("resource_id").references(() => resources.id, { onDelete: "cascade" }).notNull(),
+    status: text("status").notNull().default("pending"), // pending, processing, completed, failed, skipped
+    retryCount: integer("retry_count").default(0),
+    maxRetries: integer("max_retries").default(3),
+    errorMessage: text("error_message"),
+    aiMetadata: jsonb("ai_metadata").$type<{
+      suggestedTitle?: string;
+      suggestedDescription?: string;
+      suggestedTags?: string[];
+      suggestedCategory?: string;
+      suggestedSubcategory?: string;
+      confidence?: number;
+      keyTopics?: string[];
+    }>(),
+    processedAt: timestamp("processed_at"),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) => [
+    index("idx_enrichment_queue_job_id").on(table.jobId),
+    index("idx_enrichment_queue_resource_id").on(table.resourceId),
+    index("idx_enrichment_queue_status").on(table.status),
+  ]
+);
+
+export const insertEnrichmentQueueSchema = createInsertSchema(enrichmentQueue).pick({
+  jobId: true,
+  resourceId: true,
+  status: true,
+  retryCount: true,
+  maxRetries: true,
+});
+
+export type InsertEnrichmentQueue = z.infer<typeof insertEnrichmentQueueSchema>;
+export type EnrichmentQueueItem = typeof enrichmentQueue.$inferSelect;
