@@ -21,7 +21,8 @@ import {
   RefreshCw,
   FileCheck,
   AlertTriangle,
-  Database
+  Database,
+  Sparkles
 } from "lucide-react";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useToast } from "@/hooks/use-toast";
@@ -29,6 +30,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import PendingResources from "@/components/admin/PendingResources";
 import PendingEdits from "@/components/admin/PendingEdits";
+import BatchEnrichmentPanel from "@/components/admin/BatchEnrichmentPanel";
 
 interface ValidationResult {
   valid: boolean;
@@ -324,12 +326,16 @@ export default function AdminDashboard() {
       {/* Admin Tabs */}
       <Tabs defaultValue="approvals" className="space-y-4">
         <ScrollArea className="w-full">
-          <TabsList className="inline-flex w-auto min-w-full lg:grid lg:grid-cols-9 lg:w-full bg-black border border-pink-500/20">
+          <TabsList className="inline-flex w-auto min-w-full lg:grid lg:grid-cols-10 lg:w-full bg-black border border-pink-500/20">
             <TabsTrigger value="approvals" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap" data-testid="tab-approvals">
               Approvals {stats?.pendingApprovals ? <Badge variant="destructive" className="ml-2">{stats.pendingApprovals}</Badge> : null}
             </TabsTrigger>
             <TabsTrigger value="edits" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap" data-testid="tab-edits">
               Edits
+            </TabsTrigger>
+            <TabsTrigger value="enrichment" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap" data-testid="tab-enrichment">
+              <Sparkles className="h-4 w-4 mr-2" />
+              Batch Enrichment
             </TabsTrigger>
             <TabsTrigger value="export" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap">
               Export
@@ -363,6 +369,11 @@ export default function AdminDashboard() {
         {/* Edits Tab */}
         <TabsContent value="edits" data-testid="content-edits">
           <PendingEdits />
+        </TabsContent>
+
+        {/* Enrichment Tab */}
+        <TabsContent value="enrichment" data-testid="content-enrichment">
+          <BatchEnrichmentPanel />
         </TabsContent>
 
         {/* Export Tab */}

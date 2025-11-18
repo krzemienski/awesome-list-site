@@ -104,32 +104,40 @@ export class GitHubClient {
   async fetchFile(repoUrl: string, path: string, branch?: string): Promise<string> {
     const { owner, repo } = this.parseRepoUrl(repoUrl);
     
-    try {
-      const { data } = await this.octokit.repos.getContent({
-        owner,
-        repo,
-        path,
-        ref: branch || 'main'
-      });
-
-      await this.updateRateLimits();
-
-      if ('content' in data && typeof data.content === 'string') {
-        // Decode base64 content
-        return Buffer.from(data.content, 'base64').toString('utf-8');
-      }
-
-      throw new Error('File content not found');
-    } catch (error: any) {
-      if (error.status === 404) {
-        // Try 'master' branch if 'main' fails
-        if (!branch || branch === 'main') {
-          return this.fetchFile(repoUrl, path, 'master');
+    // Try main branch first, then master as fallback
+    const branches = branch ? [branch] : ['main', 'master'];
+    
+    for (const branchName of branches) {
+      try {
+        // Use raw.githubusercontent.com for direct file access (no auth needed for public repos)
+        const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/refs/heads/${branchName}/${path}`;
+        console.log(`Fetching from: ${rawUrl}`);
+        
+        const response = await fetch(rawUrl);
+        
+        if (response.ok) {
+          const content = await response.text();
+          console.log(`✅ Successfully fetched ${path} from ${branchName} branch`);
+          return content;
         }
-        throw new Error(`File not found: ${path} in ${repoUrl}`);
+        
+        if (response.status === 404 && !branch) {
+          // Try next branch
+          continue;
+        }
+        
+        throw new Error(`Failed to fetch file: ${response.status} ${response.statusText}`);
+      } catch (error: any) {
+        if (branches.indexOf(branchName) === branches.length - 1) {
+          // Last branch, throw error
+          throw new Error(`File not found: ${path} in ${repoUrl} (tried branches: ${branches.join(', ')})`);
+        }
+        // Try next branch
+        continue;
       }
-      throw error;
     }
+    
+    throw new Error(`File not found: ${path} in ${repoUrl}`);
   }
 
   /**

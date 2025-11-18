@@ -44,7 +44,7 @@ Respond with JSON in this format:
 }`;
 
     const response = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022', // the newest Anthropic model is "claude-3-5-sonnet-20241022" which was released October 22, 2024
+      model: 'claude-3-5-sonnet-20240620', // Claude 3.5 Sonnet (June 2024 release)
       system: "You are an expert at categorizing and tagging video/multimedia software tools and applications. Focus on video processing, streaming, codecs, and multimedia technologies. Provide accurate, useful tags that help users discover video-related resources.",
       messages: [
         {
