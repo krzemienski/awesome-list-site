@@ -14,6 +14,7 @@ import {
   resourceAuditLog,
   githubSyncQueue,
   githubSyncHistory,
+  resourceEdits,
   type User,
   type UpsertUser,
   type Resource,
@@ -36,6 +37,8 @@ import {
   type InsertGithubSyncQueue,
   type GithubSyncHistory,
   type InsertGithubSyncHistory,
+  type ResourceEdit,
+  type InsertResourceEdit,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql, desc, asc, inArray, like, or, isNull, isNotNull } from "drizzle-orm";
@@ -123,6 +126,14 @@ export interface IStorage {
   // Resource Audit Log
   logResourceAudit(resourceId: number | null, action: string, performedBy?: string, changes?: any, notes?: string): Promise<void>;
   getResourceAuditLog(resourceId: number, limit?: number): Promise<any[]>;
+  
+  // Resource Edits
+  createResourceEdit(data: InsertResourceEdit): Promise<ResourceEdit>;
+  getResourceEdit(id: number): Promise<ResourceEdit | undefined>;
+  getResourceEditsByResource(resourceId: number): Promise<ResourceEdit[]>;
+  getPendingResourceEdits(): Promise<ResourceEdit[]>;
+  approveResourceEdit(editId: number, adminId: string): Promise<void>;
+  rejectResourceEdit(editId: number, adminId: string, reason: string): Promise<void>;
   
   // GitHub Sync Queue
   addToGithubSyncQueue(item: InsertGithubSyncQueue): Promise<GithubSyncQueue>;
@@ -754,6 +765,130 @@ export class DatabaseStorage implements IStorage {
       .where(eq(resourceAuditLog.resourceId, resourceId))
       .orderBy(desc(resourceAuditLog.createdAt))
       .limit(limit);
+  }
+  
+  // Resource Edits
+  async createResourceEdit(data: InsertResourceEdit): Promise<ResourceEdit> {
+    const [edit] = await db.insert(resourceEdits).values(data).returning();
+    
+    await this.logResourceAudit(
+      data.resourceId,
+      'edit_suggested',
+      data.submittedBy,
+      { proposedChanges: data.proposedChanges },
+      'User submitted edit suggestion'
+    );
+    
+    return edit;
+  }
+  
+  async getResourceEdit(id: number): Promise<ResourceEdit | undefined> {
+    const [edit] = await db.select().from(resourceEdits).where(eq(resourceEdits.id, id));
+    return edit;
+  }
+  
+  async getResourceEditsByResource(resourceId: number): Promise<ResourceEdit[]> {
+    return await db
+      .select()
+      .from(resourceEdits)
+      .where(eq(resourceEdits.resourceId, resourceId))
+      .orderBy(desc(resourceEdits.createdAt));
+  }
+  
+  async getPendingResourceEdits(): Promise<ResourceEdit[]> {
+    return await db
+      .select()
+      .from(resourceEdits)
+      .where(eq(resourceEdits.status, 'pending'))
+      .orderBy(asc(resourceEdits.createdAt));
+  }
+  
+  async approveResourceEdit(editId: number, adminId: string): Promise<void> {
+    const edit = await this.getResourceEdit(editId);
+    if (!edit || edit.status !== 'pending') {
+      throw new Error('Edit not found or already processed');
+    }
+    
+    // SECURITY FIX: Re-fetch CURRENT resource state (not cached) (ISSUE 2)
+    const currentResource = await this.getResource(edit.resourceId);
+    if (!currentResource) {
+      throw new Error('Resource not found');
+    }
+    
+    // CONFLICT CHECK: Compare timestamps
+    const editTimestamp = new Date(edit.originalResourceUpdatedAt).getTime();
+    const currentTimestamp = new Date(currentResource.updatedAt).getTime();
+    
+    if (editTimestamp < currentTimestamp) {
+      // Resource was modified after edit was created - REJECT merge
+      throw new Error('Merge conflict detected: Resource was modified after this edit was submitted. Please review and resubmit.');
+    }
+    
+    // SAFE MERGE: Only update whitelisted fields from proposedData
+    const EDITABLE_FIELDS = ['title', 'description', 'url', 'tags', 'category', 'subcategory', 'subSubcategory'];
+    const updates: Record<string, any> = {};
+    
+    const proposedData = edit.proposedData as any;
+    for (const field of EDITABLE_FIELDS) {
+      if (proposedData && field in proposedData) {
+        updates[field] = proposedData[field];
+      }
+    }
+    
+    // Apply vetted updates only
+    await this.updateResource(edit.resourceId, updates);
+    
+    await db
+      .update(resourceEdits)
+      .set({
+        status: 'approved',
+        handledBy: adminId,
+        handledAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(resourceEdits.id, editId));
+    
+    await this.logResourceAudit(
+      edit.resourceId,
+      'edit_approved',
+      adminId,
+      { changes: edit.proposedChanges },
+      `Edit #${editId} approved and merged`
+    );
+  }
+  
+  async rejectResourceEdit(editId: number, adminId: string, reason: string): Promise<void> {
+    const edit = await this.getResourceEdit(editId);
+    if (!edit) {
+      throw new Error('Edit not found');
+    }
+    
+    if (edit.status !== 'pending') {
+      throw new Error('Edit is not pending');
+    }
+    
+    if (!reason || reason.trim().length < 10) {
+      throw new Error('Rejection reason must be at least 10 characters');
+    }
+    
+    await db
+      .update(resourceEdits)
+      .set({
+        status: 'rejected',
+        handledBy: adminId,
+        handledAt: new Date(),
+        rejectionReason: reason,
+        updatedAt: new Date(),
+      })
+      .where(eq(resourceEdits.id, editId));
+    
+    await this.logResourceAudit(
+      edit.resourceId,
+      'edit_rejected',
+      adminId,
+      { reason },
+      `Edit #${editId} rejected: ${reason}`
+    );
   }
   
   // GitHub Sync Queue

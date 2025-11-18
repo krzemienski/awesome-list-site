@@ -448,28 +448,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // POST /api/resources/:id/edit - Suggest edit to existing resource (authenticated)
-  app.post('/api/resources/:id/edit', isAuthenticated, async (req: any, res) => {
+  // POST /api/resources/:id/edits - Submit edit suggestion for a resource (authenticated)
+  app.post('/api/resources/:id/edits', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const id = parseInt(req.params.id);
-      const resourceData = insertResourceSchema.parse(req.body);
+      const resourceId = parseInt(req.params.id);
+      const { proposedChanges, proposedData, claudeMetadata, triggerClaudeAnalysis } = req.body;
       
-      // Create a new pending resource with the edit suggestions
-      const resource = await storage.createResource({
-        ...resourceData,
+      if (isNaN(resourceId)) {
+        return res.status(400).json({ message: 'Invalid resource ID' });
+      }
+      
+      const resource = await storage.getResource(resourceId);
+      if (!resource) {
+        return res.status(404).json({ message: 'Resource not found' });
+      }
+      
+      if (!proposedChanges || !proposedData) {
+        return res.status(400).json({ message: 'proposedChanges and proposedData are required' });
+      }
+      
+      // SECURITY FIX: Whitelist of editable fields only (ISSUE 1)
+      const EDITABLE_FIELDS = ['title', 'description', 'url', 'tags', 'category', 'subcategory', 'subSubcategory'];
+      
+      // Sanitize proposedData - only allow whitelisted fields
+      const sanitizedProposedData: Record<string, any> = {};
+      for (const field of EDITABLE_FIELDS) {
+        if (proposedData && field in proposedData) {
+          sanitizedProposedData[field] = proposedData[field];
+        }
+      }
+      
+      // Sanitize proposedChanges
+      const sanitizedChanges: Record<string, any> = {};
+      for (const field of EDITABLE_FIELDS) {
+        if (proposedChanges && field in proposedChanges) {
+          sanitizedChanges[field] = proposedChanges[field];
+        }
+      }
+      
+      // SECURITY FIX: Validate field sizes (ISSUE 5)
+      if (sanitizedProposedData.title && sanitizedProposedData.title.length > 200) {
+        return res.status(400).json({ message: 'Title too long (max 200 characters)' });
+      }
+      
+      if (sanitizedProposedData.description && sanitizedProposedData.description.length > 2000) {
+        return res.status(400).json({ message: 'Description too long (max 2000 characters)' });
+      }
+      
+      if (sanitizedProposedData.tags && Array.isArray(sanitizedProposedData.tags) && sanitizedProposedData.tags.length > 20) {
+        return res.status(400).json({ message: 'Too many tags (max 20)' });
+      }
+      
+      let aiMetadata = claudeMetadata;
+      if (triggerClaudeAnalysis && resource.url) {
+        try {
+          aiMetadata = await claudeService.analyzeURL(resource.url);
+        } catch (error) {
+          console.error('Error analyzing URL with Claude:', error);
+        }
+      }
+      
+      // Use sanitized versions in createResourceEdit call
+      const edit = await storage.createResourceEdit({
+        resourceId,
         submittedBy: userId,
         status: 'pending',
-        metadata: {
-          editOf: id,
-          editType: 'suggestion'
-        } as Record<string, any>
+        originalResourceUpdatedAt: resource.updatedAt,
+        proposedChanges: sanitizedChanges,
+        proposedData: sanitizedProposedData,
+        claudeMetadata: aiMetadata,
+        claudeAnalyzedAt: aiMetadata ? new Date() : undefined,
       });
       
-      res.status(201).json(resource);
+      res.status(201).json(edit);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: 'Invalid resource data', errors: error.errors });
+        return res.status(400).json({ message: 'Invalid edit data', errors: error.errors });
       }
       console.error('Error creating edit suggestion:', error);
       res.status(500).json({ message: 'Failed to create edit suggestion' });
@@ -872,6 +927,110 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error rejecting resource:', error);
       res.status(500).json({ message: 'Failed to reject resource' });
+    }
+  });
+  
+  // ============= Resource Edit Management Routes =============
+  
+  // GET /api/admin/resource-edits - Get all pending resource edits (admin only)
+  app.get('/api/admin/resource-edits', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const edits = await storage.getPendingResourceEdits();
+      
+      const editsWithResources = await Promise.all(
+        edits.map(async (edit) => {
+          const resource = await storage.getResource(edit.resourceId);
+          return {
+            ...edit,
+            resource
+          };
+        })
+      );
+      
+      res.json(editsWithResources);
+    } catch (error) {
+      console.error('Error fetching pending edits:', error);
+      res.status(500).json({ message: 'Failed to fetch pending edits' });
+    }
+  });
+  
+  // POST /api/admin/resource-edits/:id/approve - Approve an edit (admin only)
+  app.post('/api/admin/resource-edits/:id/approve', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const editId = parseInt(req.params.id);
+      const userId = req.user.claims.sub;
+      
+      if (isNaN(editId)) {
+        return res.status(400).json({ message: 'Invalid edit ID' });
+      }
+      
+      await storage.approveResourceEdit(editId, userId);
+      
+      res.json({ message: 'Edit approved and merged successfully' });
+    } catch (error: any) {
+      console.error('Error approving edit:', error);
+      
+      if (error.message && error.message.includes('Conflict detected')) {
+        return res.status(409).json({ 
+          message: error.message,
+          conflict: true
+        });
+      }
+      
+      res.status(500).json({ message: error.message || 'Failed to approve edit' });
+    }
+  });
+  
+  // POST /api/admin/resource-edits/:id/reject - Reject an edit (admin only)
+  app.post('/api/admin/resource-edits/:id/reject', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const editId = parseInt(req.params.id);
+      const userId = req.user.claims.sub;
+      const { reason } = req.body;
+      
+      if (isNaN(editId)) {
+        return res.status(400).json({ message: 'Invalid edit ID' });
+      }
+      
+      if (!reason || reason.trim().length < 10) {
+        return res.status(400).json({ message: 'Rejection reason is required (minimum 10 characters)' });
+      }
+      
+      await storage.rejectResourceEdit(editId, userId, reason);
+      
+      res.json({ message: 'Edit rejected successfully' });
+    } catch (error: any) {
+      console.error('Error rejecting edit:', error);
+      res.status(500).json({ message: error.message || 'Failed to reject edit' });
+    }
+  });
+  
+  // POST /api/claude/analyze - Analyze URL with Claude AI (authenticated)
+  app.post('/api/claude/analyze', isAuthenticated, async (req, res) => {
+    try {
+      const { url } = req.body;
+      
+      if (!url) {
+        return res.status(400).json({ message: 'URL is required' });
+      }
+      
+      if (!claudeService.isAvailable()) {
+        return res.status(503).json({ 
+          message: 'Claude AI service is not available',
+          available: false
+        });
+      }
+      
+      const analysis = await claudeService.analyzeURL(url);
+      
+      if (!analysis) {
+        return res.status(500).json({ message: 'Failed to analyze URL' });
+      }
+      
+      res.json(analysis);
+    } catch (error) {
+      console.error('Error analyzing URL:', error);
+      res.status(500).json({ message: 'Failed to analyze URL' });
     }
   });
 

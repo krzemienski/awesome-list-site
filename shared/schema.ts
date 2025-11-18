@@ -73,6 +73,59 @@ export const insertResourceSchema = createInsertSchema(resources).pick({
 export type InsertResource = z.infer<typeof insertResourceSchema>;
 export type Resource = typeof resources.$inferSelect;
 
+// Resource Edits - Suggest edit workflow
+export const resourceEdits = pgTable(
+  "resource_edits",
+  {
+    id: serial("id").primaryKey(),
+    resourceId: integer("resource_id").references(() => resources.id).notNull(),
+    submittedBy: varchar("submitted_by").references(() => users.id).notNull(),
+    status: text("status").$type<"pending" | "approved" | "rejected">().default("pending").notNull(),
+    
+    originalResourceUpdatedAt: timestamp("original_resource_updated_at").notNull(),
+    
+    proposedChanges: jsonb("proposed_changes").$type<Record<string, { old: any; new: any }>>().notNull(),
+    proposedData: jsonb("proposed_data").$type<Partial<Resource>>().notNull(),
+    
+    claudeMetadata: jsonb("claude_metadata").$type<{
+      suggestedTitle?: string;
+      suggestedDescription?: string;
+      suggestedTags?: string[];
+      suggestedCategory?: string;
+      suggestedSubcategory?: string;
+      confidence?: number;
+      keyTopics?: string[];
+    }>(),
+    claudeAnalyzedAt: timestamp("claude_analyzed_at"),
+    
+    handledBy: varchar("handled_by").references(() => users.id),
+    handledAt: timestamp("handled_at"),
+    rejectionReason: text("rejection_reason"),
+    
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_resource_edits_resource_id").on(table.resourceId),
+    index("idx_resource_edits_status").on(table.status),
+    index("idx_resource_edits_submitted_by").on(table.submittedBy),
+  ]
+);
+
+export const insertResourceEditSchema = createInsertSchema(resourceEdits).pick({
+  resourceId: true,
+  submittedBy: true,
+  status: true,
+  originalResourceUpdatedAt: true,
+  proposedChanges: true,
+  proposedData: true,
+  claudeMetadata: true,
+  claudeAnalyzedAt: true,
+});
+
+export type InsertResourceEdit = z.infer<typeof insertResourceEditSchema>;
+export type ResourceEdit = typeof resourceEdits.$inferSelect;
+
 // Category schema
 export const categories = pgTable("categories", {
   id: serial("id").primaryKey(),
