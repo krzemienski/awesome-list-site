@@ -798,23 +798,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // GET /api/github/history - Get sync history for a repository
-  app.get('/api/github/history', isAuthenticated, isAdmin, async (req, res) => {
+  // GET /api/github/sync-history - Get all sync history
+  app.get('/api/github/sync-history', isAuthenticated, isAdmin, async (req, res) => {
     try {
-      const { repositoryUrl } = req.query;
+      const history = await storage.getSyncHistory();
       
-      if (!repositoryUrl) {
-        return res.status(400).json({ message: 'Repository URL is required' });
-      }
-      
-      const history = await syncService.getSyncHistory(repositoryUrl as string);
-      
-      res.json({
-        total: history.length,
-        history: history.sort((a, b) => 
-          new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
-        )
-      });
+      res.json(history.sort((a, b) => 
+        new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
+      ));
     } catch (error) {
       console.error('Error fetching sync history:', error);
       res.status(500).json({ message: 'Failed to fetch sync history' });
