@@ -12,6 +12,9 @@ import { syncService } from "./github/syncService";
 import { recommendationEngine, UserProfile as AIUserProfile } from "./ai/recommendationEngine";
 import { learningPathGenerator } from "./ai/learningPathGenerator";
 import { claudeService } from "./ai/claudeService";
+import { AwesomeListFormatter } from "./github/formatter";
+import { validateAwesomeList, formatValidationReport } from "./validation/awesomeLint";
+import { checkResourceLinks, formatLinkCheckReport } from "./validation/linkChecker";
 
 const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md";
 
@@ -741,6 +744,168 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error starting queue processing:', error);
       res.status(500).json({ message: 'Failed to start queue processing' });
+    }
+  });
+
+  // ============= Awesome List Export & Validation Routes =============
+
+  // POST /api/admin/export - Generate and download awesome list markdown
+  app.post('/api/admin/export', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      // Get all approved resources
+      const resources = await storage.getAllApprovedResources();
+      
+      // Get export options from request body
+      const {
+        title = 'Awesome Video',
+        description = 'A curated list of awesome video resources, tools, frameworks, and learning materials.',
+        includeContributing = true,
+        includeLicense = true,
+        websiteUrl = req.protocol + '://' + req.get('host'),
+        repoUrl = process.env.GITHUB_REPO_URL
+      } = req.body;
+
+      // Create formatter with options
+      const formatter = new AwesomeListFormatter(resources, {
+        title,
+        description,
+        includeContributing,
+        includeLicense,
+        websiteUrl,
+        repoUrl
+      });
+
+      // Generate the markdown
+      const markdown = formatter.generate();
+      
+      // Set headers for file download
+      res.setHeader('Content-Type', 'text/markdown');
+      res.setHeader('Content-Disposition', 'attachment; filename="awesome-list.md"');
+      
+      res.send(markdown);
+    } catch (error) {
+      console.error('Error generating awesome list export:', error);
+      res.status(500).json({ message: 'Failed to generate awesome list export' });
+    }
+  });
+
+  // POST /api/admin/validate - Run awesome-lint validation on current data
+  app.post('/api/admin/validate', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      // Get all approved resources
+      const resources = await storage.getAllApprovedResources();
+      
+      // Get export options from request body
+      const {
+        title = 'Awesome Video',
+        description = 'A curated list of awesome video resources, tools, frameworks, and learning materials.',
+        includeContributing = true,
+        includeLicense = true,
+        websiteUrl = req.protocol + '://' + req.get('host'),
+        repoUrl = process.env.GITHUB_REPO_URL
+      } = req.body;
+
+      // Create formatter and generate markdown
+      const formatter = new AwesomeListFormatter(resources, {
+        title,
+        description,
+        includeContributing,
+        includeLicense,
+        websiteUrl,
+        repoUrl
+      });
+
+      const markdown = formatter.generate();
+      
+      // Validate the generated markdown
+      const validationResult = validateAwesomeList(markdown);
+      
+      // Store validation result for later retrieval
+      await storage.storeValidationResult({
+        type: 'awesome-lint',
+        result: validationResult,
+        markdown,
+        timestamp: new Date().toISOString()
+      });
+      
+      // Return validation results
+      res.json({
+        valid: validationResult.valid,
+        errors: validationResult.errors,
+        warnings: validationResult.warnings,
+        stats: validationResult.stats,
+        report: formatValidationReport(validationResult)
+      });
+    } catch (error) {
+      console.error('Error validating awesome list:', error);
+      res.status(500).json({ message: 'Failed to validate awesome list' });
+    }
+  });
+
+  // POST /api/admin/check-links - Run link checker on all resources
+  app.post('/api/admin/check-links', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      // Get all approved resources
+      const resources = await storage.getAllApprovedResources();
+      
+      // Get check options from request body
+      const {
+        timeout = 10000,
+        concurrent = 5,
+        retryCount = 1
+      } = req.body;
+
+      // Prepare resources for link checking
+      const resourcesToCheck = resources.map(r => ({
+        id: r.id,
+        title: r.title,
+        url: r.url
+      }));
+
+      // Check links
+      const linkCheckReport = await checkResourceLinks(resourcesToCheck, {
+        timeout,
+        concurrent,
+        retryCount
+      });
+      
+      // Store link check result for later retrieval
+      await storage.storeValidationResult({
+        type: 'link-check',
+        result: linkCheckReport,
+        timestamp: linkCheckReport.timestamp
+      });
+      
+      // Return link check results
+      res.json({
+        totalLinks: linkCheckReport.totalLinks,
+        validLinks: linkCheckReport.validLinks,
+        brokenLinks: linkCheckReport.brokenLinks,
+        redirects: linkCheckReport.redirects,
+        errors: linkCheckReport.errors,
+        summary: linkCheckReport.summary,
+        report: formatLinkCheckReport(linkCheckReport),
+        brokenResources: linkCheckReport.results.filter(r => !r.valid && r.status >= 400)
+      });
+    } catch (error) {
+      console.error('Error checking links:', error);
+      res.status(500).json({ message: 'Failed to check links' });
+    }
+  });
+
+  // GET /api/admin/validation-status - Get last validation results
+  app.get('/api/admin/validation-status', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const validationResults = await storage.getLatestValidationResults();
+      
+      res.json({
+        awesomeLint: validationResults.awesomeLint || null,
+        linkCheck: validationResults.linkCheck || null,
+        lastUpdated: validationResults.lastUpdated || null
+      });
+    } catch (error) {
+      console.error('Error fetching validation status:', error);
+      res.status(500).json({ message: 'Failed to fetch validation status' });
     }
   });
 

@@ -129,6 +129,11 @@ export interface IStorage {
   // Admin Statistics
   getAdminStats(): Promise<AdminStats>;
   
+  // Validation and Export
+  getAllApprovedResources(): Promise<Resource[]>;
+  storeValidationResult(result: ValidationStorageItem): Promise<void>;
+  getLatestValidationResults(): Promise<ValidationResults>;
+  
   // Legacy methods for awesome list (in-memory)
   setAwesomeListData(data: any): void;
   getAwesomeListData(): any | null;
@@ -158,6 +163,19 @@ interface AdminStats {
   totalCategories: number;
   totalJourneys: number;
   activeUsers: number;
+}
+
+interface ValidationStorageItem {
+  type: 'awesome-lint' | 'link-check';
+  result: any;
+  markdown?: string;
+  timestamp: string;
+}
+
+interface ValidationResults {
+  awesomeLint?: any;
+  linkCheck?: any;
+  lastUpdated?: string;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -779,6 +797,32 @@ export class DatabaseStorage implements IStorage {
     };
   }
   
+  // Validation and Export implementations
+  async getAllApprovedResources(): Promise<Resource[]> {
+    return await db
+      .select()
+      .from(resources)
+      .where(eq(resources.status, 'approved'))
+      .orderBy(resources.category, resources.subcategory, resources.title);
+  }
+  
+  private validationResults: Map<string, ValidationStorageItem> = new Map();
+  
+  async storeValidationResult(result: ValidationStorageItem): Promise<void> {
+    this.validationResults.set(result.type, result);
+  }
+  
+  async getLatestValidationResults(): Promise<ValidationResults> {
+    const awesomeLint = this.validationResults.get('awesome-lint');
+    const linkCheck = this.validationResults.get('link-check');
+    
+    return {
+      awesomeLint: awesomeLint?.result,
+      linkCheck: linkCheck?.result,
+      lastUpdated: awesomeLint?.timestamp || linkCheck?.timestamp || null
+    };
+  }
+  
   // Legacy methods for awesome list (in-memory)
   setAwesomeListData(data: any): void {
     this.awesomeListData = data;
@@ -1001,6 +1045,29 @@ export class MemStorage implements IStorage {
       totalCategories: 0,
       totalJourneys: 0,
       activeUsers: 0
+    };
+  }
+  
+  // Validation and Export implementations
+  async getAllApprovedResources(): Promise<Resource[]> {
+    // Return empty array for memory storage
+    return [];
+  }
+  
+  private validationResults: Map<string, ValidationStorageItem> = new Map();
+  
+  async storeValidationResult(result: ValidationStorageItem): Promise<void> {
+    this.validationResults.set(result.type, result);
+  }
+  
+  async getLatestValidationResults(): Promise<ValidationResults> {
+    const awesomeLint = this.validationResults.get('awesome-lint');
+    const linkCheck = this.validationResults.get('link-check');
+    
+    return {
+      awesomeLint: awesomeLint?.result,
+      linkCheck: linkCheck?.result,
+      lastUpdated: awesomeLint?.timestamp || linkCheck?.timestamp || null
     };
   }
   
