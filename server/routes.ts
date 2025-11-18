@@ -1,13 +1,34 @@
-import type { Express } from "express";
+import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 import { fetchAwesomeList } from "./parser";
 import { fetchAwesomeVideoData } from "./awesome-video-parser-clean";
 import { RecommendationEngine, UserProfile } from "./recommendation-engine";
-// Client-side parser not needed on server - server-side parser provides correct format
 import { fetchAwesomeLists, searchAwesomeLists } from "./github-api";
+import { insertResourceSchema } from "@shared/schema";
+import { z } from "zod";
 
 const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md";
+
+// Middleware to check if user is admin
+const isAdmin = async (req: any, res: Response, next: any) => {
+  try {
+    const userId = req.user?.claims?.sub;
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    const user = await storage.getUser(userId);
+    if (!user || user.role !== 'admin') {
+      return res.status(403).json({ message: "Forbidden: Admin access required" });
+    }
+    
+    next();
+  } catch (error) {
+    res.status(500).json({ message: "Error checking admin status" });
+  }
+};
 
 // SEO route handlers
 function generateSitemap(req: any, res: any) {
@@ -184,6 +205,9 @@ function getSubSubcategoryTitleFromSlug(slug: string): string {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Set up authentication
+  await setupAuth(app);
+
   // Initialize awesome video data
   try {
     console.log('Fetching awesome-video data from JSON source');
@@ -194,7 +218,352 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.error(`Error fetching awesome-video data: ${error}`);
   }
 
-  // API routes
+  // ============= Auth Routes (from Replit Auth blueprint) =============
+  
+  // GET /api/auth/user - Get current user
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+  
+  // Note: /api/login, /api/callback, /api/logout are set up in setupAuth()
+
+  // ============= Resource Routes =============
+  
+  // GET /api/resources - List approved resources (public)
+  app.get('/api/resources', async (req, res) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 20;
+      const category = req.query.category as string;
+      const subcategory = req.query.subcategory as string;
+      const search = req.query.search as string;
+      
+      const result = await storage.listResources({
+        page,
+        limit,
+        status: 'approved',
+        category,
+        subcategory,
+        search
+      });
+      
+      res.json(result);
+    } catch (error) {
+      console.error('Error fetching resources:', error);
+      res.status(500).json({ message: 'Failed to fetch resources' });
+    }
+  });
+  
+  // GET /api/resources/:id - Get single resource
+  app.get('/api/resources/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const resource = await storage.getResource(id);
+      
+      if (!resource) {
+        return res.status(404).json({ message: 'Resource not found' });
+      }
+      
+      res.json(resource);
+    } catch (error) {
+      console.error('Error fetching resource:', error);
+      res.status(500).json({ message: 'Failed to fetch resource' });
+    }
+  });
+  
+  // POST /api/resources - Submit new resource (authenticated)
+  app.post('/api/resources', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const resourceData = insertResourceSchema.parse(req.body);
+      
+      const resource = await storage.createResource({
+        ...resourceData,
+        submittedBy: userId,
+        status: 'pending'
+      });
+      
+      res.status(201).json(resource);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: 'Invalid resource data', errors: error.errors });
+      }
+      console.error('Error creating resource:', error);
+      res.status(500).json({ message: 'Failed to create resource' });
+    }
+  });
+  
+  // GET /api/resources/pending - List pending resources (admin only)
+  app.get('/api/resources/pending', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 20;
+      
+      const result = await storage.listResources({
+        page,
+        limit,
+        status: 'pending'
+      });
+      
+      res.json(result);
+    } catch (error) {
+      console.error('Error fetching pending resources:', error);
+      res.status(500).json({ message: 'Failed to fetch pending resources' });
+    }
+  });
+  
+  // PUT /api/resources/:id/approve - Approve resource (admin)
+  app.put('/api/resources/:id/approve', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const userId = req.user.claims.sub;
+      
+      const resource = await storage.updateResourceStatus(id, 'approved', userId);
+      res.json(resource);
+    } catch (error) {
+      console.error('Error approving resource:', error);
+      res.status(500).json({ message: 'Failed to approve resource' });
+    }
+  });
+  
+  // PUT /api/resources/:id/reject - Reject resource (admin)
+  app.put('/api/resources/:id/reject', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const userId = req.user.claims.sub;
+      
+      const resource = await storage.updateResourceStatus(id, 'rejected', userId);
+      res.json(resource);
+    } catch (error) {
+      console.error('Error rejecting resource:', error);
+      res.status(500).json({ message: 'Failed to reject resource' });
+    }
+  });
+
+  // ============= User Interaction Routes =============
+  
+  // POST /api/favorites/:resourceId - Add favorite
+  app.post('/api/favorites/:resourceId', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const resourceId = parseInt(req.params.resourceId);
+      
+      await storage.addFavorite(userId, resourceId);
+      res.json({ message: 'Favorite added successfully' });
+    } catch (error) {
+      console.error('Error adding favorite:', error);
+      res.status(500).json({ message: 'Failed to add favorite' });
+    }
+  });
+  
+  // DELETE /api/favorites/:resourceId - Remove favorite
+  app.delete('/api/favorites/:resourceId', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const resourceId = parseInt(req.params.resourceId);
+      
+      await storage.removeFavorite(userId, resourceId);
+      res.json({ message: 'Favorite removed successfully' });
+    } catch (error) {
+      console.error('Error removing favorite:', error);
+      res.status(500).json({ message: 'Failed to remove favorite' });
+    }
+  });
+  
+  // GET /api/favorites - Get user's favorites
+  app.get('/api/favorites', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const favorites = await storage.getUserFavorites(userId);
+      res.json(favorites);
+    } catch (error) {
+      console.error('Error fetching favorites:', error);
+      res.status(500).json({ message: 'Failed to fetch favorites' });
+    }
+  });
+  
+  // POST /api/bookmarks/:resourceId - Add bookmark
+  app.post('/api/bookmarks/:resourceId', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const resourceId = parseInt(req.params.resourceId);
+      const { notes } = req.body;
+      
+      await storage.addBookmark(userId, resourceId, notes);
+      res.json({ message: 'Bookmark added successfully' });
+    } catch (error) {
+      console.error('Error adding bookmark:', error);
+      res.status(500).json({ message: 'Failed to add bookmark' });
+    }
+  });
+  
+  // DELETE /api/bookmarks/:resourceId - Remove bookmark
+  app.delete('/api/bookmarks/:resourceId', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const resourceId = parseInt(req.params.resourceId);
+      
+      await storage.removeBookmark(userId, resourceId);
+      res.json({ message: 'Bookmark removed successfully' });
+    } catch (error) {
+      console.error('Error removing bookmark:', error);
+      res.status(500).json({ message: 'Failed to remove bookmark' });
+    }
+  });
+  
+  // GET /api/bookmarks - Get user's bookmarks
+  app.get('/api/bookmarks', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const bookmarks = await storage.getUserBookmarks(userId);
+      res.json(bookmarks);
+    } catch (error) {
+      console.error('Error fetching bookmarks:', error);
+      res.status(500).json({ message: 'Failed to fetch bookmarks' });
+    }
+  });
+
+  // ============= Learning Journey Routes =============
+  
+  // GET /api/journeys - List all journeys
+  app.get('/api/journeys', async (req, res) => {
+    try {
+      const category = req.query.category as string;
+      const journeys = await storage.listLearningJourneys(category);
+      res.json(journeys);
+    } catch (error) {
+      console.error('Error fetching journeys:', error);
+      res.status(500).json({ message: 'Failed to fetch journeys' });
+    }
+  });
+  
+  // GET /api/journeys/:id - Get journey details
+  app.get('/api/journeys/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const journey = await storage.getLearningJourney(id);
+      
+      if (!journey) {
+        return res.status(404).json({ message: 'Journey not found' });
+      }
+      
+      // Get journey steps
+      const steps = await storage.listJourneySteps(id);
+      
+      res.json({ ...journey, steps });
+    } catch (error) {
+      console.error('Error fetching journey:', error);
+      res.status(500).json({ message: 'Failed to fetch journey' });
+    }
+  });
+  
+  // POST /api/journeys/:id/start - Start journey
+  app.post('/api/journeys/:id/start', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const journeyId = parseInt(req.params.id);
+      
+      const progress = await storage.startUserJourney(userId, journeyId);
+      res.json(progress);
+    } catch (error) {
+      console.error('Error starting journey:', error);
+      res.status(500).json({ message: 'Failed to start journey' });
+    }
+  });
+  
+  // PUT /api/journeys/:id/progress - Update progress
+  app.put('/api/journeys/:id/progress', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const journeyId = parseInt(req.params.id);
+      const { stepId } = req.body;
+      
+      if (!stepId) {
+        return res.status(400).json({ message: 'Step ID is required' });
+      }
+      
+      const progress = await storage.updateUserJourneyProgress(userId, journeyId, stepId);
+      res.json(progress);
+    } catch (error) {
+      console.error('Error updating journey progress:', error);
+      res.status(500).json({ message: 'Failed to update journey progress' });
+    }
+  });
+  
+  // GET /api/journeys/:id/progress - Get user's progress
+  app.get('/api/journeys/:id/progress', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const journeyId = parseInt(req.params.id);
+      
+      const progress = await storage.getUserJourneyProgress(userId, journeyId);
+      
+      if (!progress) {
+        return res.status(404).json({ message: 'Progress not found' });
+      }
+      
+      res.json(progress);
+    } catch (error) {
+      console.error('Error fetching journey progress:', error);
+      res.status(500).json({ message: 'Failed to fetch journey progress' });
+    }
+  });
+
+  // ============= Admin Routes =============
+  
+  // GET /api/admin/stats - Dashboard statistics
+  app.get('/api/admin/stats', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const stats = await storage.getAdminStats();
+      res.json(stats);
+    } catch (error) {
+      console.error('Error fetching admin stats:', error);
+      res.status(500).json({ message: 'Failed to fetch admin statistics' });
+    }
+  });
+  
+  // GET /api/admin/users - List users
+  app.get('/api/admin/users', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 20;
+      
+      const result = await storage.listUsers(page, limit);
+      res.json(result);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      res.status(500).json({ message: 'Failed to fetch users' });
+    }
+  });
+  
+  // PUT /api/admin/users/:id/role - Change user role
+  app.put('/api/admin/users/:id/role', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const userId = req.params.id;
+      const { role } = req.body;
+      
+      if (!role || !['user', 'admin', 'moderator'].includes(role)) {
+        return res.status(400).json({ message: 'Invalid role' });
+      }
+      
+      const user = await storage.updateUserRole(userId, role);
+      res.json(user);
+    } catch (error) {
+      console.error('Error updating user role:', error);
+      res.status(500).json({ message: 'Failed to update user role' });
+    }
+  });
+
+  // ============= Legacy Routes (from existing code) =============
+
+  // API routes for awesome list (legacy)
   app.get("/api/awesome-list", (req, res) => {
     try {
       const data = storage.getAwesomeListData();
