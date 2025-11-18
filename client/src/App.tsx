@@ -5,15 +5,18 @@ import { initGA } from "./lib/analytics";
 import { useAnalytics } from "./hooks/use-analytics";
 import { useSessionAnalytics } from "./hooks/use-session-analytics";
 import { trackKeyboardShortcut } from "./lib/analytics";
+import { useAuth } from "./hooks/useAuth";
 
 import MainLayout from "@/components/layout/new/MainLayout";
 import ErrorPage from "@/pages/ErrorPage";
+import Landing from "@/pages/Landing";
 import Home from "@/pages/Home";
 import Category from "@/pages/Category";
 import Subcategory from "@/pages/Subcategory";
 import SubSubcategory from "@/pages/SubSubcategory";
 import About from "@/pages/About";
 import Advanced from "@/pages/Advanced";
+import Profile from "@/pages/Profile";
 import NotFound from "@/pages/not-found";
 
 import { AwesomeList } from "@/types/awesome-list";
@@ -26,6 +29,9 @@ function Router() {
   
   // Track comprehensive session analytics
   const sessionAnalytics = useSessionAnalytics();
+  
+  // Authentication hook
+  const { user, isAuthenticated, isLoading: authLoading, logout } = useAuth();
   
   const [searchOpen, setSearchOpen] = useState(false);
   const [location] = useLocation();
