@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { pgTable, text, serial, varchar, timestamp, integer, boolean, jsonb, index, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, varchar, timestamp, integer, boolean, jsonb, index, uuid, primaryKey, unique } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -30,24 +30,32 @@ export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
 
 // Resource schema (enhanced with approval workflow)
-export const resources = pgTable("resources", {
-  id: serial("id").primaryKey(),
-  title: text("title").notNull(),
-  url: text("url").notNull(),
-  description: text("description").notNull().default(""),
-  category: text("category").notNull(),
-  subcategory: text("subcategory"),
-  subSubcategory: text("sub_subcategory"),
-  status: text("status").default("approved"), // pending, approved, rejected, archived
-  submittedBy: varchar("submitted_by").references(() => users.id),
-  approvedBy: varchar("approved_by").references(() => users.id),
-  approvedAt: timestamp("approved_at"),
-  githubSynced: boolean("github_synced").default(false),
-  lastSyncedAt: timestamp("last_synced_at"),
-  metadata: jsonb("metadata").$type<Record<string, any>>().default({}),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+export const resources = pgTable(
+  "resources",
+  {
+    id: serial("id").primaryKey(),
+    title: text("title").notNull(),
+    url: text("url").notNull(),
+    description: text("description").notNull().default(""),
+    category: text("category").notNull(),
+    subcategory: text("subcategory"),
+    subSubcategory: text("sub_subcategory"),
+    status: text("status").default("approved"), // pending, approved, rejected, archived
+    submittedBy: varchar("submitted_by").references(() => users.id, { onDelete: "cascade" }),
+    approvedBy: varchar("approved_by").references(() => users.id),
+    approvedAt: timestamp("approved_at"),
+    githubSynced: boolean("github_synced").default(false),
+    lastSyncedAt: timestamp("last_synced_at"),
+    metadata: jsonb("metadata").$type<Record<string, any>>().default({}),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) => [
+    index("idx_resources_status").on(table.status),
+    index("idx_resources_status_category").on(table.status, table.category),
+    index("idx_resources_category").on(table.category),
+  ]
+);
 
 export const insertResourceSchema = createInsertSchema(resources).pick({
   title: true,
@@ -84,7 +92,7 @@ export const subcategories = pgTable("subcategories", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   slug: text("slug").notNull(),
-  categoryId: serial("category_id").references(() => categories.id),
+  categoryId: integer("category_id").references(() => categories.id, { onDelete: "cascade" }),
 });
 
 export const insertSubcategorySchema = createInsertSchema(subcategories).pick({
@@ -101,7 +109,7 @@ export const subSubcategories = pgTable("sub_subcategories", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   slug: text("slug").notNull(),
-  subcategoryId: serial("subcategory_id").references(() => subcategories.id),
+  subcategoryId: integer("subcategory_id").references(() => subcategories.id, { onDelete: "cascade" }),
 });
 
 export const insertSubSubcategorySchema = createInsertSchema(subSubcategories).pick({
@@ -149,12 +157,16 @@ export type InsertTag = z.infer<typeof insertTagSchema>;
 export type Tag = typeof tags.$inferSelect;
 
 // Resource Tags (many-to-many)
-export const resourceTags = pgTable("resource_tags", {
-  resourceId: integer("resource_id").references(() => resources.id).notNull(),
-  tagId: integer("tag_id").references(() => tags.id).notNull(),
-}, (table) => ({
-  pk: index("resource_tags_pk").on(table.resourceId, table.tagId),
-}));
+export const resourceTags = pgTable(
+  "resource_tags",
+  {
+    resourceId: integer("resource_id").references(() => resources.id, { onDelete: "cascade" }).notNull(),
+    tagId: integer("tag_id").references(() => tags.id, { onDelete: "cascade" }).notNull(),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.resourceId, table.tagId] }),
+  })
+);
 
 // Learning Journeys (structured learning paths)
 export const learningJourneys = pgTable("learning_journeys", {
@@ -186,16 +198,23 @@ export type InsertLearningJourney = z.infer<typeof insertLearningJourneySchema>;
 export type LearningJourney = typeof learningJourneys.$inferSelect;
 
 // Journey Steps
-export const journeySteps = pgTable("journey_steps", {
-  id: serial("id").primaryKey(),
-  journeyId: integer("journey_id").references(() => learningJourneys.id).notNull(),
-  resourceId: integer("resource_id").references(() => resources.id),
-  stepNumber: integer("step_number").notNull(),
-  title: text("title").notNull(),
-  description: text("description"),
-  isOptional: boolean("is_optional").default(false),
-  createdAt: timestamp("created_at").defaultNow(),
-});
+export const journeySteps = pgTable(
+  "journey_steps",
+  {
+    id: serial("id").primaryKey(),
+    journeyId: integer("journey_id").references(() => learningJourneys.id, { onDelete: "cascade" }).notNull(),
+    resourceId: integer("resource_id").references(() => resources.id, { onDelete: "cascade" }),
+    stepNumber: integer("step_number").notNull(),
+    title: text("title").notNull(),
+    description: text("description"),
+    isOptional: boolean("is_optional").default(false),
+    createdAt: timestamp("created_at").defaultNow(),
+  },
+  (table) => [
+    index("idx_journey_steps_journey_id").on(table.journeyId),
+    index("idx_journey_steps_resource_id").on(table.resourceId),
+  ]
+);
 
 export const insertJourneyStepSchema = createInsertSchema(journeySteps).pick({
   journeyId: true,
@@ -210,37 +229,51 @@ export type InsertJourneyStep = z.infer<typeof insertJourneyStepSchema>;
 export type JourneyStep = typeof journeySteps.$inferSelect;
 
 // User Favorites
-export const userFavorites = pgTable("user_favorites", {
-  userId: varchar("user_id").references(() => users.id).notNull(),
-  resourceId: integer("resource_id").references(() => resources.id).notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
-}, (table) => ({
-  pk: index("user_favorites_pk").on(table.userId, table.resourceId),
-}));
+export const userFavorites = pgTable(
+  "user_favorites",
+  {
+    userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+    resourceId: integer("resource_id").references(() => resources.id, { onDelete: "cascade" }).notNull(),
+    createdAt: timestamp("created_at").defaultNow(),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.userId, table.resourceId] }),
+  })
+);
 
 // User Bookmarks
-export const userBookmarks = pgTable("user_bookmarks", {
-  userId: varchar("user_id").references(() => users.id).notNull(),
-  resourceId: integer("resource_id").references(() => resources.id).notNull(),
-  notes: text("notes"),
-  createdAt: timestamp("created_at").defaultNow(),
-}, (table) => ({
-  pk: index("user_bookmarks_pk").on(table.userId, table.resourceId),
-}));
+export const userBookmarks = pgTable(
+  "user_bookmarks",
+  {
+    userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+    resourceId: integer("resource_id").references(() => resources.id, { onDelete: "cascade" }).notNull(),
+    notes: text("notes"),
+    createdAt: timestamp("created_at").defaultNow(),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.userId, table.resourceId] }),
+  })
+);
 
 // User Journey Progress
-export const userJourneyProgress = pgTable("user_journey_progress", {
-  id: serial("id").primaryKey(),
-  userId: varchar("user_id").references(() => users.id).notNull(),
-  journeyId: integer("journey_id").references(() => learningJourneys.id).notNull(),
-  currentStepId: integer("current_step_id").references(() => journeySteps.id),
-  completedSteps: jsonb("completed_steps").$type<number[]>().default([]),
-  startedAt: timestamp("started_at").defaultNow(),
-  lastAccessedAt: timestamp("last_accessed_at").defaultNow(),
-  completedAt: timestamp("completed_at"),
-}, (table) => ({
-  unique: index("user_journey_unique").on(table.userId, table.journeyId),
-}));
+export const userJourneyProgress = pgTable(
+  "user_journey_progress",
+  {
+    id: serial("id").primaryKey(),
+    userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+    journeyId: integer("journey_id").references(() => learningJourneys.id, { onDelete: "cascade" }).notNull(),
+    currentStepId: integer("current_step_id").references(() => journeySteps.id),
+    completedSteps: jsonb("completed_steps").$type<number[]>().default([]),
+    startedAt: timestamp("started_at").defaultNow(),
+    lastAccessedAt: timestamp("last_accessed_at").defaultNow(),
+    completedAt: timestamp("completed_at"),
+  },
+  (table) => [
+    unique("user_journey_unique").on(table.userId, table.journeyId),
+    index("idx_user_journey_progress_user_id").on(table.userId),
+    index("idx_user_journey_progress_journey_id").on(table.journeyId),
+  ]
+);
 
 export const insertUserJourneyProgressSchema = createInsertSchema(userJourneyProgress).pick({
   userId: true,
@@ -255,27 +288,33 @@ export type UserJourneyProgress = typeof userJourneyProgress.$inferSelect;
 // Resource Audit Log
 export const resourceAuditLog = pgTable("resource_audit_log", {
   id: serial("id").primaryKey(),
-  resourceId: integer("resource_id").references(() => resources.id),
+  resourceId: integer("resource_id").references(() => resources.id, { onDelete: "cascade" }),
   action: text("action").notNull(), // created, updated, approved, rejected, synced
-  performedBy: varchar("performed_by").references(() => users.id),
+  performedBy: varchar("performed_by").references(() => users.id, { onDelete: "cascade" }),
   changes: jsonb("changes").$type<Record<string, any>>(),
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
 // GitHub Sync Queue
-export const githubSyncQueue = pgTable("github_sync_queue", {
-  id: serial("id").primaryKey(),
-  repositoryUrl: text("repository_url").notNull(),
-  branch: text("branch").default("main"),
-  resourceIds: jsonb("resource_ids").$type<number[]>().default([]),
-  action: text("action").notNull(), // import, export
-  status: text("status").default("pending"), // pending, processing, completed, failed
-  errorMessage: text("error_message"),
-  metadata: jsonb("metadata").$type<Record<string, any>>().default({}),
-  createdAt: timestamp("created_at").defaultNow(),
-  processedAt: timestamp("processed_at"),
-});
+export const githubSyncQueue = pgTable(
+  "github_sync_queue",
+  {
+    id: serial("id").primaryKey(),
+    repositoryUrl: text("repository_url").notNull(),
+    branch: text("branch").default("main"),
+    resourceIds: jsonb("resource_ids").$type<number[]>().default([]),
+    action: text("action").notNull(), // import, export
+    status: text("status").default("pending"), // pending, processing, completed, failed
+    errorMessage: text("error_message"),
+    metadata: jsonb("metadata").$type<Record<string, any>>().default({}),
+    createdAt: timestamp("created_at").defaultNow(),
+    processedAt: timestamp("processed_at"),
+  },
+  (table) => [
+    index("idx_github_sync_queue_status").on(table.status),
+  ]
+);
 
 export const insertGithubSyncQueueSchema = createInsertSchema(githubSyncQueue).pick({
   repositoryUrl: true,
@@ -290,17 +329,24 @@ export type InsertGithubSyncQueue = z.infer<typeof insertGithubSyncQueueSchema>;
 export type GithubSyncQueue = typeof githubSyncQueue.$inferSelect;
 
 // User preferences schema for personalization
-export const userPreferences = pgTable("user_preferences", {
-  id: serial("id").primaryKey(),
-  userId: text("user_id").notNull(), // Using session ID for anonymous users
-  preferredCategories: jsonb("preferred_categories").$type<string[]>().default([]),
-  skillLevel: text("skill_level").notNull().default("beginner"), // beginner, intermediate, advanced
-  learningGoals: jsonb("learning_goals").$type<string[]>().default([]),
-  preferredResourceTypes: jsonb("preferred_resource_types").$type<string[]>().default([]),
-  timeCommitment: text("time_commitment").default("flexible"), // daily, weekly, flexible
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+export const userPreferences = pgTable(
+  "user_preferences",
+  {
+    id: serial("id").primaryKey(),
+    userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+    preferredCategories: jsonb("preferred_categories").$type<string[]>().default([]),
+    skillLevel: text("skill_level").notNull().default("beginner"), // beginner, intermediate, advanced
+    learningGoals: jsonb("learning_goals").$type<string[]>().default([]),
+    preferredResourceTypes: jsonb("preferred_resource_types").$type<string[]>().default([]),
+    timeCommitment: text("time_commitment").default("flexible"), // daily, weekly, flexible
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) => [
+    index("idx_user_preferences_user_id").on(table.userId),
+    unique("user_preferences_user_id_unique").on(table.userId),
+  ]
+);
 
 export const insertUserPreferencesSchema = createInsertSchema(userPreferences).pick({
   userId: true,
@@ -315,15 +361,23 @@ export type InsertUserPreferences = z.infer<typeof insertUserPreferencesSchema>;
 export type UserPreferences = typeof userPreferences.$inferSelect;
 
 // User interactions schema for tracking behavior
-export const userInteractions = pgTable("user_interactions", {
-  id: serial("id").primaryKey(),
-  userId: text("user_id").notNull(),
-  resourceId: text("resource_id").notNull(),
-  interactionType: text("interaction_type").notNull(), // view, click, bookmark, rate, complete
-  interactionValue: integer("interaction_value"), // rating (1-5) or time spent
-  metadata: jsonb("metadata").$type<Record<string, any>>().default({}),
-  timestamp: timestamp("timestamp").defaultNow(),
-});
+export const userInteractions = pgTable(
+  "user_interactions",
+  {
+    id: serial("id").primaryKey(),
+    userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+    resourceId: integer("resource_id").references(() => resources.id, { onDelete: "cascade" }).notNull(),
+    interactionType: text("interaction_type").notNull(), // view, click, bookmark, rate, complete
+    interactionValue: integer("interaction_value"), // rating (1-5) or time spent
+    metadata: jsonb("metadata").$type<Record<string, any>>().default({}),
+    timestamp: timestamp("timestamp").defaultNow(),
+  },
+  (table) => [
+    index("idx_user_interactions_user_id").on(table.userId),
+    index("idx_user_interactions_resource_id").on(table.resourceId),
+    index("idx_user_interactions_type").on(table.interactionType),
+  ]
+);
 
 export const insertUserInteractionSchema = createInsertSchema(userInteractions).pick({
   userId: true,
@@ -335,58 +389,3 @@ export const insertUserInteractionSchema = createInsertSchema(userInteractions).
 
 export type InsertUserInteraction = z.infer<typeof insertUserInteractionSchema>;
 export type UserInteraction = typeof userInteractions.$inferSelect;
-
-// Learning paths schema
-export const learningPaths = pgTable("learning_paths", {
-  id: serial("id").primaryKey(),
-  title: text("title").notNull(),
-  description: text("description").notNull(),
-  category: text("category").notNull(),
-  skillLevel: text("skill_level").notNull(),
-  estimatedHours: integer("estimated_hours").default(0),
-  resourceIds: jsonb("resource_ids").$type<string[]>().default([]),
-  prerequisites: jsonb("prerequisites").$type<string[]>().default([]),
-  learningObjectives: jsonb("learning_objectives").$type<string[]>().default([]),
-  isPublic: boolean("is_public").default(true),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-
-export const insertLearningPathSchema = createInsertSchema(learningPaths).pick({
-  title: true,
-  description: true,
-  category: true,
-  skillLevel: true,
-  estimatedHours: true,
-  resourceIds: true,
-  prerequisites: true,
-  learningObjectives: true,
-  isPublic: true,
-});
-
-export type InsertLearningPath = z.infer<typeof insertLearningPathSchema>;
-export type LearningPath = typeof learningPaths.$inferSelect;
-
-// User learning path progress
-export const userLearningProgress = pgTable("user_learning_progress", {
-  id: serial("id").primaryKey(),
-  userId: text("user_id").notNull(),
-  learningPathId: integer("learning_path_id").references(() => learningPaths.id),
-  completedResourceIds: jsonb("completed_resource_ids").$type<string[]>().default([]),
-  currentResourceId: text("current_resource_id"),
-  progressPercentage: integer("progress_percentage").default(0),
-  startedAt: timestamp("started_at").defaultNow(),
-  lastAccessedAt: timestamp("last_accessed_at").defaultNow(),
-  completedAt: timestamp("completed_at"),
-});
-
-export const insertUserLearningProgressSchema = createInsertSchema(userLearningProgress).pick({
-  userId: true,
-  learningPathId: true,
-  completedResourceIds: true,
-  currentResourceId: true,
-  progressPercentage: true,
-});
-
-export type InsertUserLearningProgress = z.infer<typeof insertUserLearningProgressSchema>;
-export type UserLearningProgress = typeof userLearningProgress.$inferSelect;
