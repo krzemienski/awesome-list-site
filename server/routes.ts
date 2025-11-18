@@ -230,9 +230,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   try {
     console.log('Checking if database needs seeding...');
     const categories = await storage.listCategories();
+    const resourcesResult = await storage.listResources({ page: 1, limit: 1, status: 'approved' });
     
-    if (categories.length === 0) {
-      console.log('📦 Database is empty. Starting automatic seeding...');
+    if (categories.length === 0 || resourcesResult.total === 0) {
+      console.log('📦 Database needs seeding (categories: ${categories.length}, resources: ${resourcesResult.total})...');
       const seedResult = await seedDatabase({ clearExisting: false });
       
       console.log('✅ Auto-seeding completed successfully:');
@@ -245,7 +246,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.warn(`⚠️  Seeding completed with ${seedResult.errors.length} errors`);
       }
     } else {
-      console.log(`✓ Database already populated with ${categories.length} categories`);
+      console.log(`✓ Database already populated: ${categories.length} categories, ${resourcesResult.total} resources`);
     }
   } catch (error) {
     console.error('❌ Error during auto-seeding (non-fatal):', error);
@@ -254,19 +255,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ============= Auth Routes (from Replit Auth blueprint) =============
   
-  // GET /api/auth/user - Get current user
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+  // GET /api/auth/user - Get current user (public endpoint)
+  app.get('/api/auth/user', async (req: any, res) => {
     try {
+      // Check if user is authenticated
+      if (!req.isAuthenticated() || !req.user?.claims?.sub) {
+        return res.json({ user: null, isAuthenticated: false });
+      }
+
       const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      res.json(user);
+      const dbUser = await storage.getUser(userId);
+      
+      if (!dbUser) {
+        return res.json({ user: null, isAuthenticated: false });
+      }
+
+      // Map database fields to frontend-expected format
+      const user = {
+        id: dbUser.id,
+        email: dbUser.email,
+        name: dbUser.firstName && dbUser.lastName 
+          ? `${dbUser.firstName} ${dbUser.lastName}` 
+          : dbUser.firstName || dbUser.email?.split('@')[0] || 'User',
+        avatar: dbUser.profileImageUrl,
+        role: dbUser.role,
+        createdAt: dbUser.createdAt,
+      };
+
+      res.json({ user, isAuthenticated: true });
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
     }
   });
   
-  // Note: /api/login, /api/callback, /api/logout are set up in setupAuth()
+  // POST /api/auth/logout - Logout user
+  app.post('/api/auth/logout', async (req: any, res) => {
+    try {
+      req.logout(() => {
+        res.json({ success: true });
+      });
+    } catch (error) {
+      console.error("Error logging out:", error);
+      res.status(500).json({ message: "Failed to logout" });
+    }
+  });
+  
+  // Note: /api/login, /api/callback are set up in setupAuth()
 
   // ============= Resource Routes =============
   
@@ -584,7 +619,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/admin/stats', isAuthenticated, isAdmin, async (req, res) => {
     try {
       const stats = await storage.getAdminStats();
-      res.json(stats);
+      // Map backend property names to frontend expectations
+      res.json({
+        users: stats.totalUsers,
+        resources: stats.totalResources,
+        journeys: stats.totalJourneys,
+        pendingApprovals: stats.pendingResources,
+      });
     } catch (error) {
       console.error('Error fetching admin stats:', error);
       res.status(500).json({ message: 'Failed to fetch admin statistics' });
@@ -997,6 +1038,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ 
         success: false,
         message: 'Failed to seed database',
+        error: error.message 
+      });
+    }
+  });
+
+  // POST /api/admin/import-github - Import awesome list from GitHub URL
+  app.post('/api/admin/import-github', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const { repoUrl, dryRun = false } = req.body;
+      
+      if (!repoUrl) {
+        return res.status(400).json({ message: 'Repository URL is required' });
+      }
+
+      console.log(`Starting GitHub import from: ${repoUrl}`);
+      
+      // Use the sync service to import
+      const result = await syncService.importFromGitHub(repoUrl, { dryRun });
+      
+      console.log(`GitHub import completed: ${result.imported} imported, ${result.updated} updated, ${result.skipped} skipped`);
+      
+      res.json({
+        success: true,
+        imported: result.imported,
+        updated: result.updated,
+        skipped: result.skipped,
+        errors: result.errors,
+        message: `Successfully imported ${result.imported} resources from ${repoUrl}`
+      });
+    } catch (error: any) {
+      console.error('Error importing from GitHub:', error);
+      res.status(500).json({ 
+        success: false,
+        message: 'Failed to import from GitHub',
         error: error.message 
       });
     }
