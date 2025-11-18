@@ -1,38 +1,33 @@
-import { useEffect } from "react";
-import { useLocation } from "wouter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Shield, Users, GitBranch, FileText, Activity } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
 import { useAdmin } from "@/hooks/useAdmin";
 
 export default function AdminDashboard() {
-  const { user, isLoading: authLoading } = useAuth();
-  const [, setLocation] = useLocation();
-  const { stats, isLoading } = useAdmin();
+  const { stats, isLoading, error } = useAdmin();
 
-  // Redirect if not admin
-  useEffect(() => {
-    if (!authLoading && user && (user as any).role !== "admin") {
-      setLocation("/");
-    }
-  }, [user, authLoading, setLocation]);
-
-  // Don't render anything until we verify admin role
-  if (authLoading) {
+  // AdminGuard already verified role, but show loading for stats
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Verifying admin access...</p>
+          <p className="text-muted-foreground">Loading admin dashboard...</p>
         </div>
       </div>
     );
   }
 
-  // Double-check admin role before rendering
-  if (!user || (user as any).role !== "admin") {
-    return null; // Return nothing while redirect happens
+  // Show error if stats failed to load
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <Shield className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <p className="text-red-500">Error loading admin dashboard</p>
+        </div>
+      </div>
+    );
   }
 
   return (
