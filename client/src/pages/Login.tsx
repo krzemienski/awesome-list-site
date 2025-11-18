@@ -35,8 +35,12 @@ export default function Login() {
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
-      const response = await apiRequest("/api/auth/local/login", {
+      const response = await fetch("/api/auth/local/login", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
         body: JSON.stringify(data),
       });
 
@@ -45,14 +49,14 @@ export default function Login() {
         
         toast({
           title: "Login successful",
-          description: `Welcome back, ${result.user.firstName || result.user.email}!`,
+          description: `Welcome back, ${result.user.email}!`,
         });
 
         setTimeout(() => {
           setLocation("/admin");
         }, 500);
       } else {
-        const error = await response.json();
+        const error = await response.json().catch(() => ({ message: "Invalid email or password" }));
         toast({
           title: "Login failed",
           description: error.message || "Invalid email or password",
