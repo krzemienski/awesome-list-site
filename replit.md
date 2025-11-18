@@ -101,11 +101,42 @@ Transform Awesome Video Resources application into a full-featured AI-powered le
 
 ### Implementation Progress
 - **Database Schema**: Complete with 11+ tables (users, resources, categories, tags, learning journeys, favorites, bookmarks, audit logs, GitHub sync queue)
-- **Authentication**: Replit Auth integrated with session management
+- **Authentication**: Dual authentication system - Replit OAuth (GitHub/Google/Apple/X) and local email/password
 - **Backend APIs**: Routes defined but require complete DatabaseStorage implementation
 - **Frontend Components**: AI recommendations panel and UI components created
 - **GitHub Sync**: Services created (parser, formatter, syncService) but need completion
 - **Testing**: Not yet implemented (target: 300+ functional tests)
+
+### Authentication System
+
+The application supports **dual authentication**:
+
+1. **OAuth via Replit Auth** (recommended for production):
+   - GitHub, Google, Apple, X/Twitter login
+   - Automatic session management
+   - Secure token refresh
+   - Use `/api/login` to initiate OAuth flow
+
+2. **Local Email/Password Authentication** (for development and admin access):
+   - Direct email/password login
+   - Session-based authentication
+   - Password hashing with bcrypt (10 salt rounds)
+   - Use `/api/auth/local/login` endpoint
+
+**Default Admin Credentials** (created on first database seed):
+```
+Email:    admin@example.com
+Password: admin123
+```
+⚠️ **IMPORTANT**: Change the admin password after first login!
+
+**Security Features**:
+- Email validation (RFC 5322 compliant)
+- Minimum password length: 8 characters
+- Password hashing with bcrypt
+- Session management via express-session
+- HTTPS-only cookies in production
+- Note: Rate limiting recommended for production (not yet implemented)
 
 ### Recent Changes (November 18, 2025)
 

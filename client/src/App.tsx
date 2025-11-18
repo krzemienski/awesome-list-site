@@ -10,6 +10,7 @@ import { useAuth } from "./hooks/useAuth";
 import MainLayout from "@/components/layout/new/MainLayout";
 import ErrorPage from "@/pages/ErrorPage";
 import Landing from "@/pages/Landing";
+import Login from "@/pages/Login";
 import Home from "@/pages/Home";
 import Category from "@/pages/Category";
 import Subcategory from "@/pages/Subcategory";
@@ -114,6 +115,7 @@ function Router() {
             isLoading={isLoading} 
           />
         } />
+        <Route path="/login" component={Login} />
         <Route path="/category/:slug" component={Category} />
         <Route path="/subcategory/:slug" component={Subcategory} />
         <Route path="/sub-subcategory/:slug" component={SubSubcategory} />

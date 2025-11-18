@@ -2,6 +2,8 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupLocalAuth } from "./localAuth";
+import passport from "passport";
 import { fetchAwesomeList } from "./parser";
 import { fetchAwesomeVideoData } from "./awesome-video-parser-clean";
 import { RecommendationEngine, UserProfile } from "./recommendation-engine";
@@ -213,8 +215,38 @@ function getSubSubcategoryTitleFromSlug(slug: string): string {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Set up authentication
+  // Set up authentication (OAuth and local)
   await setupAuth(app);
+  setupLocalAuth();
+
+  // Local authentication routes
+  app.post("/api/auth/local/login", (req, res, next) => {
+    passport.authenticate('local', (err: any, user: any, info: any) => {
+      if (err) {
+        return res.status(500).json({ message: "Internal server error" });
+      }
+      
+      if (!user) {
+        return res.status(401).json({ message: info?.message || "Invalid credentials" });
+      }
+      
+      req.logIn(user, (err) => {
+        if (err) {
+          return res.status(500).json({ message: "Login failed" });
+        }
+        
+        return res.json({
+          user: {
+            id: user.claims.sub,
+            email: user.claims.email,
+            firstName: user.claims.first_name,
+            lastName: user.claims.last_name,
+            profileImageUrl: user.claims.profile_image_url,
+          }
+        });
+      });
+    })(req, res, next);
+  });
 
   // Initialize awesome video data
   try {
@@ -742,6 +774,104 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error updating user role:', error);
       res.status(500).json({ message: 'Failed to update user role' });
+    }
+  });
+  
+  // ============= Resource Approval Routes =============
+  
+  // GET /api/admin/pending-resources - Get all pending resources for approval
+  app.get('/api/admin/pending-resources', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 50;
+      
+      const result = await storage.listResources({
+        page,
+        limit,
+        status: 'pending'
+      });
+      
+      res.json(result);
+    } catch (error) {
+      console.error('Error fetching pending resources:', error);
+      res.status(500).json({ message: 'Failed to fetch pending resources' });
+    }
+  });
+  
+  // POST /api/admin/resources/:id/approve - Approve a pending resource
+  app.post('/api/admin/resources/:id/approve', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const resourceId = parseInt(req.params.id);
+      const userId = req.user.claims.sub;
+      
+      if (isNaN(resourceId)) {
+        return res.status(400).json({ message: 'Invalid resource ID' });
+      }
+      
+      const resource = await storage.getResource(resourceId);
+      if (!resource) {
+        return res.status(404).json({ message: 'Resource not found' });
+      }
+      
+      if (resource.status !== 'pending') {
+        return res.status(400).json({ message: 'Resource is not pending approval' });
+      }
+      
+      const updatedResource = await storage.updateResourceStatus(resourceId, 'approved', userId);
+      
+      await storage.logResourceAudit(
+        resourceId,
+        'approved',
+        userId,
+        { status: { from: 'pending', to: 'approved' } },
+        'Resource approved by admin'
+      );
+      
+      res.json(updatedResource);
+    } catch (error) {
+      console.error('Error approving resource:', error);
+      res.status(500).json({ message: 'Failed to approve resource' });
+    }
+  });
+  
+  // POST /api/admin/resources/:id/reject - Reject a pending resource
+  app.post('/api/admin/resources/:id/reject', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const resourceId = parseInt(req.params.id);
+      const userId = req.user.claims.sub;
+      const { reason } = req.body;
+      
+      if (isNaN(resourceId)) {
+        return res.status(400).json({ message: 'Invalid resource ID' });
+      }
+      
+      if (!reason || reason.trim().length < 10) {
+        return res.status(400).json({ message: 'Rejection reason is required (minimum 10 characters)' });
+      }
+      
+      const resource = await storage.getResource(resourceId);
+      if (!resource) {
+        return res.status(404).json({ message: 'Resource not found' });
+      }
+      
+      if (resource.status !== 'pending') {
+        return res.status(400).json({ message: 'Resource is not pending approval' });
+      }
+      
+      const updatedResource = await storage.updateResourceStatus(resourceId, 'rejected', userId);
+      
+      await storage.logResourceAudit(
+        resourceId,
+        'rejected',
+        userId,
+        { status: { from: 'pending', to: 'rejected' } },
+        reason
+      );
+      
+      res.json(updatedResource);
+    } catch (error) {
+      console.error('Error rejecting resource:', error);
+      res.status(500).json({ message: 'Failed to reject resource' });
     }
   });
 

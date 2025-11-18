@@ -27,6 +27,7 @@ import { useAdmin } from "@/hooks/useAdmin";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import PendingResources from "@/components/admin/PendingResources";
 
 interface ValidationResult {
   valid: boolean;
@@ -320,9 +321,12 @@ export default function AdminDashboard() {
       </div>
 
       {/* Admin Tabs */}
-      <Tabs defaultValue="export" className="space-y-4">
+      <Tabs defaultValue="approvals" className="space-y-4">
         <ScrollArea className="w-full">
-          <TabsList className="inline-flex w-auto min-w-full lg:grid lg:grid-cols-7 lg:w-full bg-black border border-pink-500/20">
+          <TabsList className="inline-flex w-auto min-w-full lg:grid lg:grid-cols-8 lg:w-full bg-black border border-pink-500/20">
+            <TabsTrigger value="approvals" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap" data-testid="tab-approvals">
+              Approvals {stats?.pendingApprovals ? <Badge variant="destructive" className="ml-2">{stats.pendingApprovals}</Badge> : null}
+            </TabsTrigger>
             <TabsTrigger value="export" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap">
               Export
             </TabsTrigger>
@@ -346,6 +350,11 @@ export default function AdminDashboard() {
             </TabsTrigger>
           </TabsList>
         </ScrollArea>
+
+        {/* Approvals Tab */}
+        <TabsContent value="approvals" data-testid="content-approvals">
+          <PendingResources />
+        </TabsContent>
 
         {/* Export Tab */}
         <TabsContent value="export">

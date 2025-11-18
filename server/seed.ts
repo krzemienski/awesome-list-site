@@ -1,8 +1,9 @@
 import fetch from 'node-fetch';
 import { storage } from "./storage";
 import { db } from "./db";
-import { categories, subcategories, subSubcategories, resources } from "@shared/schema";
+import { categories, subcategories, subSubcategories, resources, users } from "@shared/schema";
 import { eq } from "drizzle-orm";
+import { hashPassword } from "./passwordUtils";
 
 /**
  * Helper function to generate slugs from category names
@@ -128,7 +129,45 @@ export interface SeedResult {
   subcategoriesInserted: number;
   subSubcategoriesInserted: number;
   resourcesInserted: number;
+  adminUserCreated: boolean;
   errors: string[];
+}
+
+async function seedAdminUser(): Promise<boolean> {
+  try {
+    const adminEmail = "admin@example.com";
+    const adminPassword = "admin123";
+    
+    const existingAdmin = await db.select().from(users).where(eq(users.email, adminEmail)).limit(1);
+    
+    if (existingAdmin.length > 0) {
+      console.log(`ℹ️  Default admin user already exists (${adminEmail})`);
+      return false;
+    }
+    
+    const hashedPassword = await hashPassword(adminPassword);
+    
+    await db.insert(users).values({
+      email: adminEmail,
+      password: hashedPassword,
+      firstName: "Admin",
+      lastName: "User",
+      role: "admin",
+    });
+    
+    console.log(`\n${'='.repeat(60)}`);
+    console.log(`🔐 DEFAULT ADMIN USER CREATED`);
+    console.log(`${'='.repeat(60)}`);
+    console.log(`Email:    ${adminEmail}`);
+    console.log(`Password: ${adminPassword}`);
+    console.log(`⚠️  IMPORTANT: Change this password after first login!`);
+    console.log(`${'='.repeat(60)}\n`);
+    
+    return true;
+  } catch (error: any) {
+    console.error(`❌ Failed to create admin user: ${error.message}`);
+    return false;
+  }
 }
 
 /**
@@ -141,11 +180,14 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
     subcategoriesInserted: 0,
     subSubcategoriesInserted: 0,
     resourcesInserted: 0,
+    adminUserCreated: false,
     errors: [],
   };
 
   try {
     console.log("🌱 Starting database seeding...");
+    
+    result.adminUserCreated = await seedAdminUser();
 
     // Optional: Clear existing data
     if (options.clearExisting) {
@@ -379,6 +421,7 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
 
     console.log("\n✅ Database seeding completed!");
     console.log(`📊 Summary:`);
+    console.log(`  - Admin user: ${result.adminUserCreated ? 'created' : 'already exists'}`);
     console.log(`  - Categories: ${result.categoriesInserted} inserted`);
     console.log(`  - Subcategories: ${result.subcategoriesInserted} inserted`);
     console.log(`  - Sub-subcategories: ${result.subSubcategoriesInserted} inserted`);
