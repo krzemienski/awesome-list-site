@@ -354,6 +354,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: 'Failed to reject resource' });
     }
   });
+  
+  // POST /api/resources/:id/edit - Suggest edit to existing resource (authenticated)
+  app.post('/api/resources/:id/edit', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const id = parseInt(req.params.id);
+      const resourceData = insertResourceSchema.parse(req.body);
+      
+      // Create a new pending resource with the edit suggestions
+      const resource = await storage.createResource({
+        ...resourceData,
+        submittedBy: userId,
+        status: 'pending',
+        metadata: {
+          editOf: id,
+          editType: 'suggestion'
+        }
+      });
+      
+      res.status(201).json(resource);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: 'Invalid resource data', errors: error.errors });
+      }
+      console.error('Error creating edit suggestion:', error);
+      res.status(500).json({ message: 'Failed to create edit suggestion' });
+    }
+  });
 
   // ============= User Interaction Routes =============
   
