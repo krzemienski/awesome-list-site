@@ -63,14 +63,43 @@ export class RecommendationEngine {
     recommendations: RecommendationResult[];
     learningPaths: LearningPathRecommendation[];
   }> {
-    const cacheKey = `${userProfile.userId}_${limit}`;
+    // FIXED: Clone profile before merging (done early so cache hit also uses enriched profile)
+    const enrichedProfile: UserProfile = { ...userProfile };
+
+    // Get user preferences from database and enrich the profile
+    try {
+      const dbPreferences = await storage.getUserPreferences(userProfile.userId);
+      if (dbPreferences) {
+        // Merge DB preferences with provided profile (provided profile takes precedence)
+        enrichedProfile.preferredCategories = userProfile.preferredCategories.length > 0 
+          ? userProfile.preferredCategories 
+          : dbPreferences.preferredCategories || [];
+        
+        enrichedProfile.skillLevel = userProfile.skillLevel || dbPreferences.skillLevel || 'beginner';
+        
+        enrichedProfile.learningGoals = userProfile.learningGoals.length > 0
+          ? userProfile.learningGoals
+          : dbPreferences.learningGoals || [];
+        
+        enrichedProfile.preferredResourceTypes = userProfile.preferredResourceTypes.length > 0
+          ? userProfile.preferredResourceTypes
+          : dbPreferences.preferredResourceTypes || [];
+        
+        enrichedProfile.timeCommitment = userProfile.timeCommitment || dbPreferences.timeCommitment || 'flexible';
+      }
+    } catch (error) {
+      console.error('Error fetching user preferences, using provided profile:', error);
+      // enrichedProfile already has a copy of userProfile
+    }
+
+    const cacheKey = `${enrichedProfile.userId}_${limit}`;
     
     // Check cache if not forcing refresh
     if (!forceRefresh) {
       const cached = this.recommendationCache.get(cacheKey);
       if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
-        // Also get learning paths
-        const learningPaths = await this.generateLearningPathRecommendations(userProfile);
+        // Also get learning paths using enriched profile
+        const learningPaths = await this.generateLearningPathRecommendations(enrichedProfile);
         return {
           recommendations: cached.recommendations,
           learningPaths
@@ -106,17 +135,17 @@ export class RecommendationEngine {
 
       // Fetch user's favorites and bookmarks for better personalization
       const [favorites, bookmarks] = await Promise.all([
-        this.getUserFavorites(userProfile.userId),
-        this.getUserBookmarks(userProfile.userId)
+        this.getUserFavorites(enrichedProfile.userId),
+        this.getUserBookmarks(enrichedProfile.userId)
       ]);
 
-      // Update user profile with actual data
-      userProfile.bookmarks = bookmarks.map(r => r.url);
+      // Update enriched profile with actual data
+      enrichedProfile.bookmarks = bookmarks.map(r => r.url);
       
       // Filter out already viewed/completed resources
       const eligibleResources = resources.filter(resource => 
-        !userProfile.viewHistory.includes(resource.url) &&
-        !userProfile.completedResources.includes(resource.url)
+        !enrichedProfile.viewHistory.includes(resource.url) &&
+        !enrichedProfile.completedResources.includes(resource.url)
       );
 
       let recommendations: RecommendationResult[] = [];
@@ -125,7 +154,7 @@ export class RecommendationEngine {
       if (claudeService.isAvailable()) {
         try {
           const aiRecommendations = await generateClaudeRecommendations(
-            userProfile,
+            enrichedProfile,
             eligibleResources,
             Math.ceil(limit * 0.7) // Get 70% from AI
           );
@@ -151,7 +180,7 @@ export class RecommendationEngine {
       const remainingSlots = limit - recommendations.length;
       if (remainingSlots > 0) {
         const ruleBasedRecs = this.generateRuleBasedRecommendations(
-          userProfile,
+          enrichedProfile,
           eligibleResources,
           favorites,
           bookmarks,
@@ -178,7 +207,7 @@ export class RecommendationEngine {
       });
 
       // Generate learning path recommendations
-      const learningPaths = await this.generateLearningPathRecommendations(userProfile);
+      const learningPaths = await this.generateLearningPathRecommendations(enrichedProfile);
 
       return {
         recommendations,
@@ -435,7 +464,7 @@ export class RecommendationEngine {
       );
 
       // Clear cache to refresh recommendations
-      for (const [key] of this.recommendationCache) {
+      for (const [key] of Array.from(this.recommendationCache.entries())) {
         if (key.startsWith(userId)) {
           this.recommendationCache.delete(key);
         }
