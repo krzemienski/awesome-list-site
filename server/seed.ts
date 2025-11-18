@@ -304,17 +304,24 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
     // Insert Resources
     console.log("📄 Inserting resources...");
     let resourceCount = 0;
+    let skippedNoCategory = 0;
+    let skippedNoDeepest = 0;
+    let skippedNoCategoryName = 0;
+    let skippedDuplicate = 0;
     
     for (const project of awesomeData.projects) {
       try {
         // Skip if no category
         if (!project.category || project.category.length === 0) {
+          skippedNoCategory++;
           continue;
         }
 
         // Find the deepest category for this resource
         const deepest = findDeepestCategory(project.category, categoryMap);
         if (!deepest) {
+          skippedNoDeepest++;
+          result.errors.push(`No deepest category found for "${project.title}" with categories: ${project.category.join(', ')}`);
           continue;
         }
 
@@ -327,6 +334,8 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
         const subSubcategoryName = ancestors.level3?.title || null;
 
         if (!categoryName) {
+          skippedNoCategoryName++;
+          result.errors.push(`No valid category name for "${project.title}" with deepest category: ${deepest.id}`);
           continue; // Skip if no valid category
         }
 
@@ -336,7 +345,7 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
           .limit(1);
         
         if (existing.length > 0) {
-          console.log(`  ⏭️  Resource "${project.title}" already exists`);
+          skippedDuplicate++;
           continue;
         }
 
@@ -374,6 +383,10 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
     console.log(`  - Subcategories: ${result.subcategoriesInserted} inserted`);
     console.log(`  - Sub-subcategories: ${result.subSubcategoriesInserted} inserted`);
     console.log(`  - Resources: ${result.resourcesInserted} inserted`);
+    console.log(`  - Resources skipped (no category): ${skippedNoCategory}`);
+    console.log(`  - Resources skipped (no deepest category): ${skippedNoDeepest}`);
+    console.log(`  - Resources skipped (no category name): ${skippedNoCategoryName}`);
+    console.log(`  - Resources skipped (duplicates): ${skippedDuplicate}`);
     console.log(`  - Errors: ${result.errors.length}`);
 
     return result;
