@@ -13,6 +13,7 @@ import {
   userJourneyProgress,
   resourceAuditLog,
   githubSyncQueue,
+  githubSyncHistory,
   type User,
   type UpsertUser,
   type Resource,
@@ -33,6 +34,8 @@ import {
   type InsertUserJourneyProgress,
   type GithubSyncQueue,
   type InsertGithubSyncQueue,
+  type GithubSyncHistory,
+  type InsertGithubSyncHistory,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql, desc, asc, inArray, like, or, isNull, isNotNull } from "drizzle-orm";
@@ -126,6 +129,10 @@ export interface IStorage {
   getGithubSyncQueue(status?: string): Promise<GithubSyncQueue[]>;
   updateGithubSyncStatus(id: number, status: string, errorMessage?: string): Promise<void>;
   
+  // GitHub Sync History
+  getLastSyncHistory(repositoryUrl: string, direction: 'export' | 'import'): Promise<GithubSyncHistory | undefined>;
+  saveSyncHistory(item: InsertGithubSyncHistory): Promise<GithubSyncHistory>;
+  
   // Admin Statistics
   getAdminStats(): Promise<AdminStats>;
   
@@ -216,7 +223,8 @@ export class DatabaseStorage implements IStorage {
     
     // Log when first admin is created
     if (isFirstUser) {
-      console.log(`🔐 First user created as admin: ${user.email || user.username || user.id}`);
+      const displayName = user.email || (user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.firstName) || user.id;
+      console.log(`🔐 First user created as admin: ${displayName}`);
     }
     
     return user;
@@ -301,8 +309,8 @@ export class DatabaseStorage implements IStorage {
     }
     
     if (conditions.length > 0) {
-      query = query.where(and(...conditions));
-      countQuery = countQuery.where(and(...conditions));
+      query = query.where(and(...conditions)) as any;
+      countQuery = countQuery.where(and(...conditions)) as any;
     }
     
     const [totalResult] = await countQuery;
@@ -324,7 +332,7 @@ export class DatabaseStorage implements IStorage {
     const [newResource] = await db.insert(resources).values(resource).returning();
     
     // Log the creation
-    await this.logResourceAudit(newResource.id, 'created', resource.submittedBy);
+    await this.logResourceAudit(newResource.id, 'created', resource.submittedBy ?? undefined);
     
     return newResource;
   }
@@ -337,7 +345,7 @@ export class DatabaseStorage implements IStorage {
       .returning();
     
     // Log the update
-    await this.logResourceAudit(id, 'updated', resource.submittedBy, resource);
+    await this.logResourceAudit(id, 'updated', resource.submittedBy ?? undefined, resource);
     
     return updatedResource;
   }
@@ -399,7 +407,7 @@ export class DatabaseStorage implements IStorage {
     let query = db.select().from(subcategories);
     
     if (categoryId) {
-      query = query.where(eq(subcategories.categoryId, categoryId));
+      query = query.where(eq(subcategories.categoryId, categoryId)) as any;
     }
     
     return await query.orderBy(asc(subcategories.name));
@@ -433,7 +441,7 @@ export class DatabaseStorage implements IStorage {
     let query = db.select().from(subSubcategories);
     
     if (subcategoryId) {
-      query = query.where(eq(subSubcategories.subcategoryId, subcategoryId));
+      query = query.where(eq(subSubcategories.subcategoryId, subcategoryId)) as any;
     }
     
     return await query.orderBy(asc(subSubcategories.name));
@@ -515,7 +523,7 @@ export class DatabaseStorage implements IStorage {
     let query = db.select().from(learningJourneys);
     
     if (category) {
-      query = query.where(eq(learningJourneys.category, category));
+      query = query.where(eq(learningJourneys.category, category)) as any;
     }
     
     return await query
@@ -749,7 +757,7 @@ export class DatabaseStorage implements IStorage {
   
   // GitHub Sync Queue
   async addToGithubSyncQueue(item: InsertGithubSyncQueue): Promise<GithubSyncQueue> {
-    const [queueItem] = await db.insert(githubSyncQueue).values(item).returning();
+    const [queueItem] = await db.insert(githubSyncQueue).values(item as any).returning();
     return queueItem;
   }
   
@@ -757,7 +765,7 @@ export class DatabaseStorage implements IStorage {
     let query = db.select().from(githubSyncQueue);
     
     if (status) {
-      query = query.where(eq(githubSyncQueue.status, status));
+      query = query.where(eq(githubSyncQueue.status, status)) as any;
     }
     
     return await query.orderBy(asc(githubSyncQueue.createdAt));
@@ -772,6 +780,28 @@ export class DatabaseStorage implements IStorage {
         processedAt: status === 'completed' || status === 'failed' ? new Date() : null
       })
       .where(eq(githubSyncQueue.id, id));
+  }
+  
+  // GitHub Sync History
+  async getLastSyncHistory(repositoryUrl: string, direction: 'export' | 'import'): Promise<GithubSyncHistory | undefined> {
+    const results = await db
+      .select()
+      .from(githubSyncHistory)
+      .where(
+        and(
+          eq(githubSyncHistory.repositoryUrl, repositoryUrl),
+          eq(githubSyncHistory.direction, direction)
+        )
+      )
+      .orderBy(desc(githubSyncHistory.createdAt))
+      .limit(1);
+    
+    return results[0];
+  }
+  
+  async saveSyncHistory(item: InsertGithubSyncHistory): Promise<GithubSyncHistory> {
+    const [historyItem] = await db.insert(githubSyncHistory).values(item).returning();
+    return historyItem;
   }
   
   // Admin Statistics
@@ -838,7 +868,7 @@ export class DatabaseStorage implements IStorage {
     return {
       awesomeLint: awesomeLint?.result,
       linkCheck: linkCheck?.result,
-      lastUpdated: awesomeLint?.timestamp || linkCheck?.timestamp || null
+      lastUpdated: awesomeLint?.timestamp || linkCheck?.timestamp || undefined
     };
   }
   
@@ -1056,6 +1086,13 @@ export class MemStorage implements IStorage {
   async getGithubSyncQueue(status?: string): Promise<GithubSyncQueue[]> { return []; }
   async updateGithubSyncStatus(id: number, status: string, errorMessage?: string): Promise<void> {}
   
+  async getLastSyncHistory(repositoryUrl: string, direction: 'export' | 'import'): Promise<GithubSyncHistory | undefined> {
+    return undefined;
+  }
+  async saveSyncHistory(item: InsertGithubSyncHistory): Promise<GithubSyncHistory> {
+    throw new Error("Not implemented in memory storage");
+  }
+  
   async getAdminStats(): Promise<AdminStats> {
     return {
       totalUsers: 0,
@@ -1086,7 +1123,7 @@ export class MemStorage implements IStorage {
     return {
       awesomeLint: awesomeLint?.result,
       linkCheck: linkCheck?.result,
-      lastUpdated: awesomeLint?.timestamp || linkCheck?.timestamp || null
+      lastUpdated: awesomeLint?.timestamp || linkCheck?.timestamp || undefined
     };
   }
   

@@ -389,3 +389,46 @@ export const insertUserInteractionSchema = createInsertSchema(userInteractions).
 
 export type InsertUserInteraction = z.infer<typeof insertUserInteractionSchema>;
 export type UserInteraction = typeof userInteractions.$inferSelect;
+
+// GitHub Sync History - Track version changes and diffs
+export const githubSyncHistory = pgTable(
+  "github_sync_history",
+  {
+    id: serial("id").primaryKey(),
+    repositoryUrl: text("repository_url").notNull(),
+    direction: text("direction").notNull(), // export, import
+    commitSha: text("commit_sha"),
+    commitMessage: text("commit_message"),
+    commitUrl: text("commit_url"),
+    resourcesAdded: integer("resources_added").default(0),
+    resourcesUpdated: integer("resources_updated").default(0),
+    resourcesRemoved: integer("resources_removed").default(0),
+    totalResources: integer("total_resources").default(0),
+    performedBy: varchar("performed_by").references(() => users.id),
+    snapshot: jsonb("snapshot").$type<Record<string, any>>().default({}), // Resource snapshot
+    metadata: jsonb("metadata").$type<Record<string, any>>().default({}),
+    createdAt: timestamp("created_at").defaultNow(),
+  },
+  (table) => [
+    index("idx_github_sync_history_repo").on(table.repositoryUrl),
+    index("idx_github_sync_history_direction").on(table.direction),
+  ]
+);
+
+export const insertGithubSyncHistorySchema = createInsertSchema(githubSyncHistory).pick({
+  repositoryUrl: true,
+  direction: true,
+  commitSha: true,
+  commitMessage: true,
+  commitUrl: true,
+  resourcesAdded: true,
+  resourcesUpdated: true,
+  resourcesRemoved: true,
+  totalResources: true,
+  performedBy: true,
+  snapshot: true,
+  metadata: true,
+});
+
+export type InsertGithubSyncHistory = z.infer<typeof insertGithubSyncHistorySchema>;
+export type GithubSyncHistory = typeof githubSyncHistory.$inferSelect;
