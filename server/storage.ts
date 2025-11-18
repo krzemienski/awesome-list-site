@@ -11,6 +11,7 @@ import {
   userFavorites,
   userBookmarks,
   userJourneyProgress,
+  userPreferences,
   resourceAuditLog,
   githubSyncQueue,
   githubSyncHistory,
@@ -39,6 +40,7 @@ import {
   type InsertGithubSyncHistory,
   type ResourceEdit,
   type InsertResourceEdit,
+  type UserPreferences,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql, desc, asc, inArray, like, or, isNull, isNotNull } from "drizzle-orm";
@@ -110,12 +112,12 @@ export interface IStorage {
   // User Favorites
   addFavorite(userId: string, resourceId: number): Promise<void>;
   removeFavorite(userId: string, resourceId: number): Promise<void>;
-  getUserFavorites(userId: string): Promise<Resource[]>;
+  getUserFavorites(userId: string): Promise<Array<Resource & { favoritedAt: Date }>>;
   
   // User Bookmarks
   addBookmark(userId: string, resourceId: number, notes?: string): Promise<void>;
   removeBookmark(userId: string, resourceId: number): Promise<void>;
-  getUserBookmarks(userId: string): Promise<Array<Resource & { notes?: string }>>;
+  getUserBookmarks(userId: string): Promise<Array<Resource & { notes?: string; bookmarkedAt: Date }>>;
   
   // User Journey Progress
   startUserJourney(userId: string, journeyId: number): Promise<UserJourneyProgress>;
@@ -131,9 +133,13 @@ export interface IStorage {
   createResourceEdit(data: InsertResourceEdit): Promise<ResourceEdit>;
   getResourceEdit(id: number): Promise<ResourceEdit | undefined>;
   getResourceEditsByResource(resourceId: number): Promise<ResourceEdit[]>;
+  getResourceEditsByUser(userId: string): Promise<ResourceEdit[]>;
   getPendingResourceEdits(): Promise<ResourceEdit[]>;
   approveResourceEdit(editId: number, adminId: string): Promise<void>;
   rejectResourceEdit(editId: number, adminId: string, reason: string): Promise<void>;
+  
+  // User Preferences
+  getUserPreferences(userId: string): Promise<any | undefined>;
   
   // GitHub Sync Queue
   addToGithubSyncQueue(item: InsertGithubSyncQueue): Promise<GithubSyncQueue>;
@@ -612,15 +618,21 @@ export class DatabaseStorage implements IStorage {
       );
   }
   
-  async getUserFavorites(userId: string): Promise<Resource[]> {
+  async getUserFavorites(userId: string): Promise<Array<Resource & { favoritedAt: Date }>> {
     const result = await db
-      .select({ resource: resources })
+      .select({
+        resource: resources,
+        favoritedAt: userFavorites.createdAt
+      })
       .from(userFavorites)
       .innerJoin(resources, eq(userFavorites.resourceId, resources.id))
       .where(eq(userFavorites.userId, userId))
       .orderBy(desc(userFavorites.createdAt));
     
-    return result.map(r => r.resource);
+    return result.map(r => ({ 
+      ...r.resource, 
+      favoritedAt: r.favoritedAt 
+    }));
   }
   
   // User Bookmarks
@@ -645,18 +657,23 @@ export class DatabaseStorage implements IStorage {
       );
   }
   
-  async getUserBookmarks(userId: string): Promise<Array<Resource & { notes?: string }>> {
+  async getUserBookmarks(userId: string): Promise<Array<Resource & { notes?: string; bookmarkedAt: Date }>> {
     const result = await db
       .select({
         resource: resources,
-        notes: userBookmarks.notes
+        notes: userBookmarks.notes,
+        bookmarkedAt: userBookmarks.createdAt
       })
       .from(userBookmarks)
       .innerJoin(resources, eq(userBookmarks.resourceId, resources.id))
       .where(eq(userBookmarks.userId, userId))
       .orderBy(desc(userBookmarks.createdAt));
     
-    return result.map(r => ({ ...r.resource, notes: r.notes || undefined }));
+    return result.map(r => ({ 
+      ...r.resource, 
+      notes: r.notes || undefined,
+      bookmarkedAt: r.bookmarkedAt
+    }));
   }
   
   // User Journey Progress
@@ -889,6 +906,23 @@ export class DatabaseStorage implements IStorage {
       { reason },
       `Edit #${editId} rejected: ${reason}`
     );
+  }
+
+  async getResourceEditsByUser(userId: string): Promise<ResourceEdit[]> {
+    return await db
+      .select()
+      .from(resourceEdits)
+      .where(eq(resourceEdits.submittedBy, userId))
+      .orderBy(desc(resourceEdits.createdAt));
+  }
+
+  // User Preferences
+  async getUserPreferences(userId: string): Promise<UserPreferences | undefined> {
+    const [prefs] = await db
+      .select()
+      .from(userPreferences)
+      .where(eq(userPreferences.userId, userId));
+    return prefs;
   }
   
   // GitHub Sync Queue

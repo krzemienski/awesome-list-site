@@ -20,7 +20,13 @@ import {
   Mail,
   Calendar,
   ExternalLink,
-  Star
+  Star,
+  FileText,
+  Edit,
+  BookOpen,
+  CheckCircle,
+  XCircle,
+  AlertCircle
 } from "lucide-react";
 import FavoriteButton from "@/components/resource/FavoriteButton";
 import BookmarkButton from "@/components/resource/BookmarkButton";
@@ -59,6 +65,47 @@ interface LearningProgress {
   skillLevel: string;
 }
 
+interface SubmittedResource {
+  id: number;
+  title: string;
+  url: string;
+  description: string;
+  category: string;
+  status: string;
+  createdAt: string;
+}
+
+interface ResourceEdit {
+  id: number;
+  resourceId: number;
+  status: string;
+  proposedChanges: Record<string, { old: any; new: any }>;
+  createdAt: string;
+}
+
+interface UserSubmissions {
+  resources: SubmittedResource[];
+  edits: ResourceEdit[];
+  totalResources: number;
+  totalEdits: number;
+}
+
+interface UserJourney {
+  id: number;
+  journeyId: number;
+  userId: string;
+  currentStepId?: number;
+  completedAt?: string;
+  lastAccessedAt: string;
+  journey?: {
+    id: number;
+    title: string;
+    description: string;
+    difficulty: string;
+    estimatedDuration?: string;
+  };
+}
+
 export default function Profile({ user }: ProfileProps) {
   const [activeTab, setActiveTab] = useState("overview");
   const { logout } = useAuth();
@@ -78,6 +125,18 @@ export default function Profile({ user }: ProfileProps) {
   // Fetch learning progress
   const { data: progress, isLoading: progressLoading } = useQuery<LearningProgress>({
     queryKey: ['/api/user/progress'],
+    enabled: !!user
+  });
+
+  // Fetch user submissions
+  const { data: submissions, isLoading: submissionsLoading } = useQuery<UserSubmissions>({
+    queryKey: ['/api/user/submissions'],
+    enabled: !!user
+  });
+
+  // Fetch user's learning journeys
+  const { data: userJourneys, isLoading: journeysLoading } = useQuery<UserJourney[]>({
+    queryKey: ['/api/user/journeys'],
     enabled: !!user
   });
 
@@ -187,10 +246,11 @@ export default function Profile({ user }: ProfileProps) {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="favorites">Favorites</TabsTrigger>
           <TabsTrigger value="bookmarks">Bookmarks</TabsTrigger>
+          <TabsTrigger value="submissions">Submissions</TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}
@@ -252,18 +312,71 @@ export default function Profile({ user }: ProfileProps) {
             </CardContent>
           </Card>
 
-          {/* Recent Activity */}
-          <Card>
+          {/* Learning Journeys */}
+          <Card data-testid="card-learning-journeys">
             <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <BookOpen className="h-5 w-5" />
+                Learning Journeys
+              </CardTitle>
               <CardDescription>
-                Your latest interactions with resources
+                Your enrolled learning paths and progress
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-sm text-muted-foreground text-center py-8">
-                No recent activity to show
-              </div>
+              {journeysLoading ? (
+                <div className="space-y-3">
+                  <Skeleton className="h-20 w-full" />
+                  <Skeleton className="h-20 w-full" />
+                </div>
+              ) : userJourneys && userJourneys.length > 0 ? (
+                <div className="space-y-3">
+                  {userJourneys.map((userJourney) => (
+                    <div
+                      key={userJourney.id}
+                      className="p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                      data-testid={`journey-${userJourney.journeyId}`}
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex-1">
+                          <h4 className="font-medium">{userJourney.journey?.title || 'Learning Journey'}</h4>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {userJourney.journey?.description}
+                          </p>
+                        </div>
+                        {userJourney.completedAt && (
+                          <Badge variant="default" className="bg-green-500">
+                            <CheckCircle className="h-3 w-3 mr-1" />
+                            Completed
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground mt-3">
+                        {userJourney.journey?.difficulty && (
+                          <Badge variant="secondary" className="capitalize">
+                            {userJourney.journey.difficulty}
+                          </Badge>
+                        )}
+                        {userJourney.journey?.estimatedDuration && (
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {userJourney.journey.estimatedDuration}
+                          </span>
+                        )}
+                        <span className="ml-auto">
+                          Last accessed {formatDistanceToNow(new Date(userJourney.lastAccessedAt), { addSuffix: true })}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 text-muted-foreground">
+                  <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>No learning journeys started yet</p>
+                  <p className="text-sm mt-2">Start a learning path to track your progress!</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -415,6 +528,193 @@ export default function Profile({ user }: ProfileProps) {
               </ScrollArea>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Submissions Tab */}
+        <TabsContent value="submissions" data-testid="tab-submissions">
+          <div className="space-y-4">
+            {/* Submitted Resources */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-pink-500" />
+                  Submitted Resources
+                </CardTitle>
+                <CardDescription>
+                  Resources you've submitted for review
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ScrollArea className="h-[300px] pr-4">
+                  {submissionsLoading ? (
+                    <div className="space-y-3">
+                      {Array(2).fill(0).map((_, i) => (
+                        <Skeleton key={i} className="h-24 w-full" />
+                      ))}
+                    </div>
+                  ) : submissions && submissions.resources.length > 0 ? (
+                    <div className="space-y-3">
+                      {submissions.resources.map((resource) => (
+                        <div
+                          key={resource.id}
+                          className="p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                          data-testid={`submitted-resource-${resource.id}`}
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h4 className="font-medium truncate">{resource.title}</h4>
+                                {resource.status === 'pending' && (
+                                  <Badge variant="outline" className="text-yellow-500 border-yellow-500">
+                                    <AlertCircle className="h-3 w-3 mr-1" />
+                                    Pending
+                                  </Badge>
+                                )}
+                                {resource.status === 'approved' && (
+                                  <Badge variant="outline" className="text-green-500 border-green-500">
+                                    <CheckCircle className="h-3 w-3 mr-1" />
+                                    Approved
+                                  </Badge>
+                                )}
+                                {resource.status === 'rejected' && (
+                                  <Badge variant="outline" className="text-red-500 border-red-500">
+                                    <XCircle className="h-3 w-3 mr-1" />
+                                    Rejected
+                                  </Badge>
+                                )}
+                              </div>
+                              <p className="text-sm text-muted-foreground line-clamp-2">
+                                {resource.description}
+                              </p>
+                              <div className="flex items-center gap-2 mt-2">
+                                <Badge variant="secondary" className="text-xs">
+                                  {resource.category}
+                                </Badge>
+                                <span className="text-xs text-muted-foreground">
+                                  Submitted {formatDistanceToNow(new Date(resource.createdAt), { addSuffix: true })}
+                                </span>
+                              </div>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              asChild
+                              data-testid={`button-view-resource-${resource.id}`}
+                            >
+                              <a href={resource.url} target="_blank" rel="noopener noreferrer">
+                                <ExternalLink className="h-4 w-4" />
+                              </a>
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                      <p>No submitted resources</p>
+                      <p className="text-sm mt-2">Submit a resource to get started!</p>
+                    </div>
+                  )}
+                </ScrollArea>
+              </CardContent>
+            </Card>
+
+            {/* Suggested Edits */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Edit className="h-5 w-5 text-cyan-500" />
+                  Suggested Edits
+                </CardTitle>
+                <CardDescription>
+                  Your edit suggestions for existing resources
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ScrollArea className="h-[300px] pr-4">
+                  {submissionsLoading ? (
+                    <div className="space-y-3">
+                      {Array(2).fill(0).map((_, i) => (
+                        <Skeleton key={i} className="h-24 w-full" />
+                      ))}
+                    </div>
+                  ) : submissions && submissions.edits.length > 0 ? (
+                    <div className="space-y-3">
+                      {submissions.edits.map((edit) => (
+                        <div
+                          key={edit.id}
+                          className="p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                          data-testid={`suggested-edit-${edit.id}`}
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-2">
+                                <span className="text-sm font-medium">Edit #{edit.id}</span>
+                                {edit.status === 'pending' && (
+                                  <Badge variant="outline" className="text-yellow-500 border-yellow-500">
+                                    <AlertCircle className="h-3 w-3 mr-1" />
+                                    Pending
+                                  </Badge>
+                                )}
+                                {edit.status === 'approved' && (
+                                  <Badge variant="outline" className="text-green-500 border-green-500">
+                                    <CheckCircle className="h-3 w-3 mr-1" />
+                                    Approved
+                                  </Badge>
+                                )}
+                                {edit.status === 'rejected' && (
+                                  <Badge variant="outline" className="text-red-500 border-red-500">
+                                    <XCircle className="h-3 w-3 mr-1" />
+                                    Rejected
+                                  </Badge>
+                                )}
+                              </div>
+                              <div className="text-sm space-y-1">
+                                {edit.proposedChanges && (
+                                  <div className="mt-2 space-y-1">
+                                    <p className="text-xs text-muted-foreground font-medium">Changes:</p>
+                                    {Object.entries(edit.proposedChanges as Record<string, any>).map(([field, changeData]) => {
+                                      // Handle both formats: direct values or {old, new} objects
+                                      const isObjectFormat = changeData && typeof changeData === 'object' && ('old' in changeData || 'new' in changeData);
+                                      
+                                      if (!isObjectFormat) return null;
+                                      
+                                      const change = changeData as { old?: any; new?: any };
+                                      const oldValue = Array.isArray(change.old) ? change.old.join(', ') : String(change.old ?? '');
+                                      const newValue = Array.isArray(change.new) ? change.new.join(', ') : String(change.new ?? '');
+                                      
+                                      return (
+                                        <div key={field} className="text-xs pl-2">
+                                          <span className="text-pink-500">{field}:</span>{' '}
+                                          <span className="line-through opacity-60">{oldValue}</span>
+                                          {' → '}
+                                          <span className="text-cyan-500">{newValue}</span>
+                                        </div>
+                                      );
+                                    }).filter(Boolean)}
+                                  </div>
+                                )}
+                                <p className="text-xs text-muted-foreground">
+                                  Submitted {formatDistanceToNow(new Date(edit.createdAt), { addSuffix: true })}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <Edit className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                      <p>No suggested edits</p>
+                      <p className="text-sm mt-2">Help improve resources by suggesting edits!</p>
+                    </div>
+                  )}
+                </ScrollArea>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

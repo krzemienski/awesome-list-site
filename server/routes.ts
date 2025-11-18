@@ -695,6 +695,160 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ============= User Profile & Progress Routes =============
+
+  // GET /api/user/progress - Get user's learning progress
+  app.get('/api/user/progress', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+
+      // Get total resources in catalog
+      const totalResourcesResult = await storage.listResources({ status: 'approved', limit: 1 });
+      const totalResources = totalResourcesResult.total;
+
+      // Get user's journey progress to count completed resources
+      const journeyProgress = await storage.listUserJourneyProgress(userId);
+      const completedResources = journeyProgress.filter(p => p.completedAt !== null).length;
+
+      // Get current learning path (most recently accessed journey)
+      let currentPath: string | undefined;
+      if (journeyProgress.length > 0) {
+        const latestJourney = journeyProgress[0];
+        const journey = await storage.getLearningJourney(latestJourney.journeyId);
+        currentPath = journey?.title;
+      }
+
+      // Calculate streak days from favorites and bookmarks
+      const favorites = await storage.getUserFavorites(userId);
+      const bookmarks = await storage.getUserBookmarks(userId);
+      
+      // Debug: Log sample data to verify timestamps are available
+      if (favorites.length > 0) {
+        console.log('Favorites sample:', favorites[0]);
+      }
+      if (bookmarks.length > 0) {
+        console.log('Bookmarks sample:', bookmarks[0]);
+      }
+      
+      // Get all activity dates from favorites and bookmarks
+      const activityDates: Date[] = [];
+      
+      // Add favorite dates (now using favoritedAt from junction table)
+      favorites.forEach(f => {
+        if (f.favoritedAt) activityDates.push(new Date(f.favoritedAt));
+      });
+      
+      // Add bookmark dates (now using bookmarkedAt from junction table)
+      bookmarks.forEach(b => {
+        if (b.bookmarkedAt) activityDates.push(new Date(b.bookmarkedAt));
+      });
+
+      // Calculate streak
+      let streakDays = 0;
+      if (activityDates.length > 0) {
+        // Sort dates descending
+        activityDates.sort((a, b) => b.getTime() - a.getTime());
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        let currentDate = new Date(today);
+        streakDays = 0;
+        
+        for (const activityDate of activityDates) {
+          const activity = new Date(activityDate);
+          activity.setHours(0, 0, 0, 0);
+          
+          const diffDays = Math.floor((currentDate.getTime() - activity.getTime()) / (1000 * 60 * 60 * 24));
+          
+          if (diffDays === 0) {
+            streakDays = Math.max(streakDays, 1);
+          } else if (diffDays === streakDays) {
+            streakDays++;
+          }
+        }
+      }
+
+      // Get skill level from user preferences
+      let skillLevel = 'beginner';
+      try {
+        const userPrefs = await storage.getUserPreferences(userId);
+        if (userPrefs?.skillLevel) {
+          skillLevel = userPrefs.skillLevel;
+        }
+      } catch (error) {
+        console.log('User preferences not found, using default skill level');
+      }
+
+      const progressData = {
+        totalResources,
+        completedResources,
+        currentPath,
+        streakDays,
+        totalTimeSpent: '0h 0m',
+        skillLevel
+      };
+
+      res.json(progressData);
+    } catch (error) {
+      console.error('Error fetching user progress:', error);
+      res.status(500).json({ message: 'Failed to fetch user progress' });
+    }
+  });
+
+  // GET /api/user/submissions - Get user's submitted resources and edits
+  app.get('/api/user/submissions', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+
+      // Get user's submitted resources
+      const submittedResources = await storage.listResources({
+        userId,
+        page: 1,
+        limit: 100
+      });
+
+      // Get user's suggested edits
+      const resourceEdits = await storage.getResourceEditsByUser(userId);
+
+      res.json({
+        resources: submittedResources.resources,
+        edits: resourceEdits,
+        totalResources: submittedResources.total,
+        totalEdits: resourceEdits.length
+      });
+    } catch (error) {
+      console.error('Error fetching user submissions:', error);
+      res.status(500).json({ message: 'Failed to fetch user submissions' });
+    }
+  });
+
+  // GET /api/user/journeys - Get user's learning journeys with details
+  app.get('/api/user/journeys', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+
+      // Get user's journey progress
+      const journeyProgress = await storage.listUserJourneyProgress(userId);
+
+      // Fetch journey details for each progress entry
+      const journeysWithDetails = await Promise.all(
+        journeyProgress.map(async (progress) => {
+          const journey = await storage.getLearningJourney(progress.journeyId);
+          return {
+            ...progress,
+            journey
+          };
+        })
+      );
+
+      res.json(journeysWithDetails);
+    } catch (error) {
+      console.error('Error fetching user journeys:', error);
+      res.status(500).json({ message: 'Failed to fetch user journeys' });
+    }
+  });
+
   // ============= Learning Journey Routes =============
   
   // GET /api/journeys - List all journeys
