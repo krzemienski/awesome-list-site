@@ -234,8 +234,8 @@ export default function JourneyDetail() {
               )}
             </div>
           </div>
-          <CardTitle className="text-3xl mb-2">{journey.title}</CardTitle>
-          <CardDescription className="text-base">{journey.description}</CardDescription>
+          <CardTitle className="text-2xl sm:text-3xl mb-2">{journey.title}</CardTitle>
+          <CardDescription className="text-sm sm:text-base">{journey.description}</CardDescription>
         </CardHeader>
 
         <CardContent>
@@ -277,7 +277,7 @@ export default function JourneyDetail() {
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
                 Please <button 
-                  className="underline font-medium"
+                  className="underline font-medium min-h-[44px] px-2 inline-flex items-center"
                   onClick={() => setLocation('/login')}
                 >
                   log in
@@ -306,7 +306,7 @@ export default function JourneyDetail() {
 
       {/* Journey Steps */}
       <div className="space-y-4">
-        <h2 className="text-2xl font-bold mb-4">Learning Path</h2>
+        <h2 className="text-xl sm:text-2xl font-bold mb-4">Learning Path</h2>
         
         {journey.steps && journey.steps.length > 0 ? (
           journey.steps
@@ -325,11 +325,11 @@ export default function JourneyDetail() {
                   )}
                   data-testid={`card-step-${step.id}`}
                 >
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-4">
+                  <CardContent className="p-4 sm:p-6">
+                    <div className="flex items-start gap-3 sm:gap-4">
                       {/* Step Number/Status */}
                       <div className={cn(
-                        "flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm",
+                        "flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center font-bold text-sm",
                         isStepCompleted 
                           ? "bg-green-500 text-white" 
                           : "bg-muted text-muted-foreground"
@@ -345,7 +345,7 @@ export default function JourneyDetail() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-4 mb-2">
                           <div className="flex-1">
-                            <h3 className="text-lg font-semibold mb-1">
+                            <h3 className="text-base sm:text-lg font-semibold mb-1">
                               {step.title}
                               {step.isOptional && (
                                 <Badge variant="outline" className="ml-2 text-xs">
@@ -368,7 +368,7 @@ export default function JourneyDetail() {
                               href={step.resource.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex items-center gap-2 text-sm hover:text-pink-500 transition-colors"
+                              className="flex items-center gap-2 text-sm hover:text-pink-500 transition-colors min-h-[44px] py-2"
                               data-testid={`link-resource-${step.id}`}
                             >
                               <ExternalLink className="h-4 w-4 flex-shrink-0" />
@@ -386,7 +386,7 @@ export default function JourneyDetail() {
                         {isEnrolled && !isStepCompleted && (
                           <Button 
                             variant="outline"
-                            size="sm"
+                            className="min-h-[44px]"
                             onClick={() => completeStepMutation.mutate(step.id)}
                             disabled={completeStepMutation.isPending}
                             data-testid={`button-complete-step-${step.id}`}

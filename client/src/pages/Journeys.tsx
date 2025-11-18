@@ -99,21 +99,21 @@ export default function Journeys() {
       
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-2 flex items-center gap-3">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 flex items-center gap-3">
           <BookOpen className="h-8 w-8 text-pink-500" />
           Learning Journeys
         </h1>
-        <p className="text-muted-foreground text-lg">
+        <p className="text-muted-foreground text-base md:text-lg">
           Explore structured learning paths to master new skills step by step
         </p>
       </div>
 
       {/* Filters */}
       <div className="mb-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
           <span className="text-sm text-muted-foreground">Filter by category:</span>
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-[200px]" data-testid="select-category-filter">
+            <SelectTrigger className="w-full sm:w-[200px]" data-testid="select-category-filter">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -184,7 +184,7 @@ export default function Journeys() {
                       {journey.difficulty}
                     </Badge>
                   </div>
-                  <CardTitle className="text-xl leading-tight">
+                  <CardTitle className="text-lg sm:text-xl leading-tight">
                     {journey.title}
                   </CardTitle>
                   <CardDescription className="line-clamp-3">
