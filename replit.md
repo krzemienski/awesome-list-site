@@ -2,7 +2,7 @@
 
 ## Overview
 
-A production-ready React application for browsing and discovering over 2,000 curated video development resources from the `krzemienski/awesome-video` GitHub repository. The project aims to provide a modern, mobile-optimized user interface with advanced search and filtering capabilities, including dark theme support and Google Analytics tracking.
+A production-ready React application for browsing and discovering over 2,000 curated video development resources from the `krzemienski/awesome-video` GitHub repository. The project aims to provide a modern, mobile-optimized user interface with advanced search and filtering capabilities, dark theme support, and Google Analytics tracking. Future ambitions include transforming it into an AI-powered learning platform with user authentication, personalized recommendations, structured learning paths, an admin panel, and bidirectional GitHub synchronization for `awesome-list` repositories.
 
 ## User Preferences
 
@@ -10,227 +10,38 @@ Preferred communication style: Simple, everyday language.
 
 ## System Architecture
 
-The application employs a client-server architecture. The frontend is a React-based single-page application built with Vite, utilizing `shadcn/ui` components, Tailwind CSS, and React Query for data fetching. The backend is an Express.js server providing RESTful API endpoints for resource management and data fetching. Data is stored in a PostgreSQL database using Drizzle ORM, with a defined schema for resources, categories, and subcategories.
+The application employs a client-server architecture. The frontend is a React-based single-page application built with Vite, utilizing `shadcn/ui` components, Tailwind CSS, and React Query for data fetching. The backend is an Express.js server providing RESTful API endpoints. Data is stored in a PostgreSQL database using Drizzle ORM, with a defined schema for resources, categories, and subcategories.
 
 ### UI/UX Decisions
-- **Pure black cyberpunk theme** - Dark mode only, using OKLCH color space with vivid neon accents:
-  - Pure black background: oklch(0 0 0)
-  - Vivid neon pink primary: oklch(0.7017 0.3225 328.3634) - high chroma for intense glow
-  - Cyan accent: oklch(0.7072 0.1679 242.0420) - electric blue highlights
-  - No shadows, no rounded corners, pure terminal aesthetic
-- JetBrains Mono monospace font throughout entire application
-- Zero border-radius enforced (--radius: 0rem) for perfectly sharp, square corners
-- Dark mode only - no light mode support, no theme switching
-- Mobile-optimized responsive design with 44x44px touch targets (WCAG AAA) and collapsible hierarchical sidebar
+- **Pure black cyberpunk theme**: Dark mode only, using OKLCH color space with vivid neon accents (pink primary, cyan accent). No shadows, no rounded corners, pure terminal aesthetic.
+- JetBrains Mono monospace font used throughout.
+- Zero border-radius enforced (`--radius: 0rem`).
+- Mobile-optimized responsive design with WCAG AAA compliant 44x44px touch targets and a collapsible hierarchical sidebar.
 
 ### Technical Implementations
 - **Frontend**: React 18+ with TypeScript, Vite, Tailwind CSS, `shadcn/ui`, React Query for state management, Wouter for routing.
 - **Backend**: Express.js, Drizzle ORM, Node Fetch for external data, Remark for Markdown parsing.
-- **Data Architecture**: Pure JSON-driven parser for dynamic hierarchy building, eliminating hardcoded dependencies. Resources are categorized into a 3-level hierarchical structure.
-- **Sidebar Layout**: CSS Grid-based layout on desktop using `grid-cols-[var(--sidebar-width)_1fr]`, dynamically adjusting to `grid-cols-[var(--sidebar-width-icon)_1fr]` when collapsed. Sidebar width: 16rem (256px) expanded, 3rem (48px) collapsed.
-- **Sidebar Features**: 
-  - **Header**: Logo and Search button with keyboard shortcut (⌘K)
-  - **Navigation**: Home with hierarchical category navigation
-  - **Categories**: Collapsible 3-level hierarchy (category → subcategory → sub-subcategory) with resource count badges
-  - **Footer**: GitHub repository link
-  - **Mobile**: 44x44px minimum touch targets, smooth scroll-into-view, Sheet component overlay
-- **Deployment**: Configured for deployment on Replit, with optimized production builds and static site generation for platforms like GitHub Pages.
+- **Data Architecture**: Pure JSON-driven parser for dynamic hierarchy building, supporting a 3-level hierarchical structure. Resources are categorized uniquely at their deepest level, with parent categories aggregating counts. Intelligent content-based auto-categorization is implemented for resources lacking specific subcategory IDs.
+- **Sidebar Layout**: CSS Grid-based layout on desktop (`grid-cols-[var(--sidebar-width)_1fr]`), dynamically adjusting when collapsed.
+- **Deployment**: Configured for deployment on Replit, with optimized production builds and static site generation.
 
 ### Feature Specifications
-- **Search & Discovery**: Advanced fuzzy search across all 2,011 resources with keyboard shortcut (⌘K), powered by Fuse.js
-- **AI Recommendations**: Personalized resource recommendations based on user profile, skill level, and learning goals
-- **User Preferences**: Comprehensive preference management including preferred categories, skill level, learning goals, resource types, and time commitment
-- **Color Customization**: Interactive color palette generator for custom theme creation
-- **Advanced Features**: Dedicated page with tabs for Resource Explorer, Analytics & Metrics, Data Export, and AI Recommendations
-- **Hierarchical Navigation**: 3-level category structure (category → subcategory → sub-subcategory) with accurate resource counts and visual hierarchy
-- **Mobile-Optimized**: Responsive design with WCAG AAA compliant 44x44px touch targets, scroll-into-view behavior, and Sheet-based sidebar overlay
-
-### Category Resource Counts
-**IMPORTANT**: The JSON data structure contains resources at the category level that already include ALL nested subcategory and sub-subcategory resources. Resources are NOT duplicated in the data - they appear only at their deepest hierarchical level, and parent categories aggregate them.
-
-The `calculateTotalCount` function returns ONLY the category-level resource count, which already represents the complete total for that category's entire tree.
-
-**Main Categories (Correct Counts from JSON):**
-- **Intro & Learning**: 229 resources
-- **Protocols & Transport**: 252 resources
-- **Encoding & Codecs**: 392 resources
-- **Players & Clients**: 269 resources
-- **Media Tools**: 317 resources
-- **Standards & Industry**: 174 resources
-- **Infrastructure & Delivery**: 190 resources
-- **General Tools**: 97 resources (with intelligent subcategorization)
-  - FFMPEG & Tools: 25 resources (auto-assigned by content)
-  - DRM: 51 resources (auto-assigned by content)
-  - Uncategorized: 21 resources
-- **Community & Events**: 91 resources
-
-**Total: 2,011 resources across all categories**
-
-**Resource Counting Logic:**
-- Category-level count is the **single source of truth** (already includes all nested resources)
-- Do NOT sum across hierarchy levels (causes double-counting)
-- Each resource appears only once in the data structure at its most specific level
-- Parent categories aggregate all child resources in their count
-
-**Special: Auto-Categorization for Incomplete JSON Data**
-
-Some categories in the JSON source data lack subcategory IDs for their resources. Implemented intelligent content-based assignment using keyword matching:
-
-**General Tools** (82.5% resources at depth 1 before fix):
-- DRM (51 resources): drm, widevine, playready, fairplay, encryption, content protection
-- FFMPEG & Tools (25 resources): ffmpeg, transcode, encode, convert, video edit, processing
-- Uncategorized: 21 resources remain at top level
-
-**Community & Events** (89.0% resources at depth 1 before fix):
-- Events & Conferences (55 resources): conference, event, webinar, podcast, summit, workshop, talk, presentation
-- Community Groups (33 resources): community, forum, slack, discord, meetup, group, discussion, chat
-- Uncategorized: 3 resources remain at top level
-
-This categorization successfully organized 154 previously uncategorized resources (76 from General Tools + 78 from Community & Events) into appropriate subcategories, improving navigation and discoverability.
-
-## Current Implementation Status (November 18, 2025)
-
-### Project Goal
-Transform Awesome Video Resources application into a full-featured AI-powered learning platform with:
-- User authentication (GitHub/Google/Apple/X via Replit Auth)
-- Personalized AI recommendations using Claude API
-- Structured learning paths with progress tracking
-- Comprehensive admin panel with content moderation
-- Bidirectional GitHub synchronization for any awesome list repository
-- 300+ functional tests
-
-### Implementation Progress
-- **Database Schema**: Complete with 11+ tables (users, resources, categories, tags, learning journeys, favorites, bookmarks, audit logs, GitHub sync queue)
-- **Authentication**: Dual authentication system - Replit OAuth (GitHub/Google/Apple/X) and local email/password
-- **Backend APIs**: Routes defined but require complete DatabaseStorage implementation
-- **Frontend Components**: AI recommendations panel and UI components created
-- **GitHub Sync**: Services created (parser, formatter, syncService) but need completion
-- **Testing**: Not yet implemented (target: 300+ functional tests)
-
-### Authentication System
-
-The application supports **dual authentication**:
-
-1. **OAuth via Replit Auth** (recommended for production):
-   - GitHub, Google, Apple, X/Twitter login
-   - Automatic session management
-   - Secure token refresh
-   - Use `/api/login` to initiate OAuth flow
-
-2. **Local Email/Password Authentication** (for development and admin access):
-   - Direct email/password login
-   - Session-based authentication
-   - Password hashing with bcrypt (10 salt rounds)
-   - Use `/api/auth/local/login` endpoint
-
-**Default Admin Credentials** (created on first database seed):
-```
-Email:    admin@example.com
-Password: admin123
-```
-⚠️ **IMPORTANT**: Change the admin password after first login!
-
-**Security Features**:
-- Email validation (RFC 5322 compliant)
-- Minimum password length: 8 characters
-- Password hashing with bcrypt
-- Session management via express-session
-- HTTPS-only cookies in production
-- Note: Rate limiting recommended for production (not yet implemented)
-
-### Recent Changes (November 18, 2025)
-
-**Bug Fixes - Resource Submission Flow:**
-1. **Fixed ID vs Name Mismatch** (Issue #1):
-   - Updated `SubmitResource.tsx` to use numeric IDs in form values (category.id, subcategory.id, subSubcategory.id)
-   - Form now displays category names to users but stores/submits IDs
-   - Backend receives correct names by looking up IDs before submission
-   - Prevents form submission errors from sending names instead of IDs
-
-2. **Fixed Dropdown Reset Logic** (Issue #2):
-   - Corrected useEffect dependencies to reset child selections on ANY parent change
-   - Removed conditional checks that prevented reset when switching between categories
-   - Subcategory and sub-subcategory dropdowns now properly clear when parent changes
-   - Eliminates bug where old subcategory remained selected after category change
-
-3. **Added API Query Parameter Validation** (Issue #3):
-   - Added Zod validation to `/api/subcategories` endpoint for categoryId parameter
-   - Added Zod validation to `/api/sub-subcategories` endpoint for subcategoryId parameter
-   - Both endpoints now return 400 Bad Request for invalid/non-numeric query parameters
-   - Prevents NaN errors and unexpected storage paths from invalid input
-
-**Files Modified:**
-- `client/src/pages/SubmitResource.tsx`: Form dropdown values, filtering logic, submission payload
-- `server/routes.ts`: Query parameter validation for category API endpoints
-
-**Impact:**
-- Resource submission form now works correctly with proper ID handling
-- Dependent dropdowns reset properly when parent selections change
-- API endpoints are protected against malformed query parameters
-- Ready for production resource submission workflow
-
-### Critical Work In Progress
-- Completing DatabaseStorage class to replace MemStorage
-- Fixing type mismatches between schema and storage implementation
-- Wiring authentication to database persistence
-- Completing frontend auth/admin components
-- Implementing comprehensive test suite
-
-## Testing & Quality Assurance
-
-### Comprehensive Test Coverage (November 14, 2025)
-Executed 8 parallel Playwright test suites across all devices and screen sizes with **95.8% overall success rate** and **ZERO critical failures**.
-
-**Test Results:**
-- **Desktop (1920x1080)**: 100% functional
-  - Suite 1: All 9 categories (100% success)
-  - Suite 2: All 19 subcategories (100% success)
-  - Suite 3: All 32 sub-subcategories (100% success)
-  - Suite 4: Search functionality (100% success, 15/15 tests)
-  - Suite 5: Resource link behavior (90% success, 54/60 verified)
-  - Suite 6: Sidebar navigation (100% success, 41/41 tests)
-- **Tablet (820x1180)**: 95.2% success
-  - All critical navigation paths functional
-  - Responsive 2-column grid layout verified
-  - Search and touch targets appropriate
-- **Mobile (390x844)**: 84.2% passed, 0% failed
-  - Sidebar Sheet fully accessible
-  - All 9 categories visible
-  - 3-level navigation hierarchy working
-  - Single column layout verified
-
-**Coverage Metrics:**
-- Navigation Items: 60/60 tested (100%)
-- Total Resources: 2,011 verified accessible
-- Resource Counts: All exact matches
-- Screenshots: 60+ captured across all devices
-- Test Scripts: 8 reusable Playwright scripts
-- Reports: 16+ JSON and Markdown reports
-
-**Verified Features:**
-✅ All resource links open in new tabs (target="_blank")
-✅ Search functionality with Cmd+K/Ctrl+K global shortcuts
-✅ Fuzzy search with Fuse.js (threshold 0.4)
-✅ Sidebar width 256px (16rem) exact
-✅ Complete 3-level breadcrumb navigation
-✅ Responsive grid layouts (3-col desktop, 2-col tablet, 1-col mobile)
-✅ GitHub repository link accessible on all devices
-✅ Security attributes (noopener noreferrer) on all external links
-✅ Zero horizontal scroll on all viewports
-
-**Minor Enhancements Identified (Non-Blocking):**
-- Mobile: 4 elements slightly below 44x44px WCAG AAA touch target standard
-- Test Framework: 6 selector timing issues (functional behavior verified)
-- Apple touch icon missing (cosmetic only)
-
-**Status:** ✅ PRODUCTION READY - Architect approved
+- **Search & Discovery**: Advanced fuzzy search across all resources with keyboard shortcut (⌘K), powered by Fuse.js.
+- **AI Recommendations**: Personalized resource recommendations based on user profiles, skill levels, and learning goals (planned).
+- **User Preferences**: Comprehensive preference management for learning (planned).
+- **Color Customization**: Interactive color palette generator (planned).
+- **Advanced Features**: Dedicated admin page with tabs for Resource Explorer, Analytics & Metrics, Data Export, and AI Recommendations.
+- **Hierarchical Navigation**: 3-level category structure with accurate aggregated resource counts.
+- **Authentication System**: Supports dual authentication via Replit Auth (GitHub, Google, Apple, X) and local email/password for development/admin, with secure session management and bcrypt hashing.
+- **GitHub Integration**: Implemented GitHub import system for fetching raw resource URLs from public repositories, and an export system leveraging Replit GitHub OAuth to commit `awesome-lint` compliant markdown directly to GitHub.
+- **Batch Enrichment System**: Claude AI integration for automated metadata extraction from resources. Features include sequential processing with configurable batch sizes, rate limiting, smart URL validation, retry logic, accurate tracking, and a dedicated admin UI for monitoring and control.
 
 ## External Dependencies
 
 ### Frontend
 - React ecosystem (React, React DOM)
 - TanStack Query (React Query v5)
-- shadcn/ui components (based on Radix UI primitives)
+- shadcn/ui components
 - Tailwind CSS
 - Lucide icons
 
