@@ -19,6 +19,7 @@ import Advanced from "@/pages/Advanced";
 import Profile from "@/pages/Profile";
 import AdminDashboard from "@/pages/AdminDashboard";
 import AdminGuard from "@/components/auth/AdminGuard";
+import AuthGuard from "@/components/auth/AuthGuard";
 import NotFound from "@/pages/not-found";
 
 import { AwesomeList } from "@/types/awesome-list";
@@ -95,12 +96,8 @@ function Router() {
     );
   }
 
-  // Show landing page for unauthenticated users
-  if (!isAuthenticated) {
-    return <Landing />;
-  }
-
-  // Show main app for authenticated users
+  // Show main app for all users (authenticated and guests)
+  // Guest users can browse all resources, authenticated users get additional features
   return (
     <MainLayout 
       awesomeList={awesomeList} 
@@ -120,7 +117,11 @@ function Router() {
         <Route path="/sub-subcategory/:slug" component={SubSubcategory} />
         <Route path="/about" component={About} />
         <Route path="/advanced" component={Advanced} />
-        <Route path="/profile" component={() => <Profile user={user} />} />
+        <Route path="/profile" component={() => (
+          <AuthGuard>
+            <Profile user={user} />
+          </AuthGuard>
+        )} />
         <Route path="/admin" component={() => (
           <AdminGuard>
             <AdminDashboard />

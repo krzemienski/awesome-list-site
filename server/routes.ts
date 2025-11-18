@@ -15,6 +15,7 @@ import { claudeService } from "./ai/claudeService";
 import { AwesomeListFormatter } from "./github/formatter";
 import { validateAwesomeList, formatValidationReport } from "./validation/awesomeLint";
 import { checkResourceLinks, formatLinkCheckReport } from "./validation/linkChecker";
+import { seedDatabase } from "./seed";
 
 const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md";
 
@@ -906,6 +907,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching validation status:', error);
       res.status(500).json({ message: 'Failed to fetch validation status' });
+    }
+  });
+
+  // POST /api/admin/seed-database - Populate database from awesome-video JSON
+  app.post('/api/admin/seed-database', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      console.log('Starting database seeding...');
+      
+      // Get options from request body
+      const { clearExisting = false } = req.body;
+      
+      // Run seeding
+      const result = await seedDatabase({ clearExisting });
+      
+      // Return results
+      res.json({
+        success: true,
+        message: 'Database seeding completed successfully',
+        counts: {
+          categoriesInserted: result.categoriesInserted,
+          subcategoriesInserted: result.subcategoriesInserted,
+          subSubcategoriesInserted: result.subSubcategoriesInserted,
+          resourcesInserted: result.resourcesInserted,
+        },
+        errors: result.errors,
+        totalErrors: result.errors.length
+      });
+    } catch (error: any) {
+      console.error('Error seeding database:', error);
+      res.status(500).json({ 
+        success: false,
+        message: 'Failed to seed database',
+        error: error.message 
+      });
     }
   });
 
