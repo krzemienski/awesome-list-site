@@ -233,7 +233,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const resourcesResult = await storage.listResources({ page: 1, limit: 1, status: 'approved' });
     
     if (categories.length === 0 || resourcesResult.total === 0) {
-      console.log('📦 Database needs seeding (categories: ${categories.length}, resources: ${resourcesResult.total})...');
+      console.log(`📦 Database needs seeding (categories: ${categories.length}, resources: ${resourcesResult.total})...`);
       const seedResult = await seedDatabase({ clearExisting: false });
       
       console.log('✅ Auto-seeding completed successfully:');
