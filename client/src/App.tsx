@@ -17,6 +17,7 @@ import SubSubcategory from "@/pages/SubSubcategory";
 import About from "@/pages/About";
 import Advanced from "@/pages/Advanced";
 import Profile from "@/pages/Profile";
+import Bookmarks from "@/pages/Bookmarks";
 import AdminDashboard from "@/pages/AdminDashboard";
 import AdminGuard from "@/components/auth/AdminGuard";
 import AuthGuard from "@/components/auth/AuthGuard";
@@ -120,6 +121,11 @@ function Router() {
         <Route path="/profile" component={() => (
           <AuthGuard>
             <Profile user={user} />
+          </AuthGuard>
+        )} />
+        <Route path="/bookmarks" component={() => (
+          <AuthGuard>
+            <Bookmarks />
           </AuthGuard>
         )} />
         <Route path="/admin" component={() => (
