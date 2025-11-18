@@ -132,6 +132,7 @@ export interface IStorage {
   // GitHub Sync History
   getLastSyncHistory(repositoryUrl: string, direction: 'export' | 'import'): Promise<GithubSyncHistory | undefined>;
   saveSyncHistory(item: InsertGithubSyncHistory): Promise<GithubSyncHistory>;
+  getSyncHistory(repositoryUrl?: string, limit?: number): Promise<GithubSyncHistory[]>;
   
   // Admin Statistics
   getAdminStats(): Promise<AdminStats>;
@@ -804,6 +805,18 @@ export class DatabaseStorage implements IStorage {
     return historyItem;
   }
   
+  async getSyncHistory(repositoryUrl?: string, limit: number = 20): Promise<GithubSyncHistory[]> {
+    let query = db.select().from(githubSyncHistory);
+    
+    if (repositoryUrl) {
+      query = query.where(eq(githubSyncHistory.repositoryUrl, repositoryUrl)) as any;
+    }
+    
+    return await query
+      .orderBy(desc(githubSyncHistory.createdAt))
+      .limit(limit);
+  }
+  
   // Admin Statistics
   async getAdminStats(): Promise<AdminStats> {
     const [userCount] = await db
@@ -1091,6 +1104,10 @@ export class MemStorage implements IStorage {
   }
   async saveSyncHistory(item: InsertGithubSyncHistory): Promise<GithubSyncHistory> {
     throw new Error("Not implemented in memory storage");
+  }
+  
+  async getSyncHistory(repositoryUrl?: string, limit: number = 20): Promise<GithubSyncHistory[]> {
+    return [];
   }
   
   async getAdminStats(): Promise<AdminStats> {
