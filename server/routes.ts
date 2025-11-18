@@ -463,7 +463,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         metadata: {
           editOf: id,
           editType: 'suggestion'
-        }
+        } as Record<string, any>
       });
       
       res.status(201).json(resource);
