@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +36,13 @@ const categoryIcons: { [key: string]: any } = {
 };
 
 export default function Home({ awesomeList, isLoading }: HomeProps) {
+  // Fetch approved database resources (always fetch, React Query handles caching)
+  const { data: dbData } = useQuery<{resources: any[], total: number}>({
+    queryKey: ['/api/resources', { status: 'approved' }],
+  });
+  
+  const dbResources = dbData?.resources || [];
+  
   const filteredCategories = useMemo(() => {
     if (!awesomeList?.categories) return [];
     
@@ -47,8 +55,21 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
   }, [awesomeList?.categories]);
 
   const calculateTotalCount = (category: Category): number => {
-    return category.resources.length;
+    const staticCount = category.resources.length;
+    // Defensive: match by display name OR slug
+    const dbCount = dbResources.filter(r => {
+      const matchesName = r.category === category.name;
+      const matchesSlug = r.category?.toLowerCase().replace(/\s+&\s+/g, '-').replace(/\s+/g, '-') === category.slug;
+      return matchesName || matchesSlug;
+    }).length;
+    return staticCount + dbCount;
   };
+  
+  const totalResourceCount = useMemo(() => {
+    const staticCount = awesomeList?.resources.length || 0;
+    const dbCount = dbResources.length;
+    return staticCount + dbCount;
+  }, [awesomeList?.resources.length, dbResources.length]);
 
   if (isLoading) {
     return (
@@ -91,7 +112,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
           Awesome Video Resources
         </h1>
         <p className="text-muted-foreground">
-          Explore {filteredCategories.length} categories with {awesomeList.resources.length} curated resources
+          Explore {filteredCategories.length} categories with {totalResourceCount} curated resources
         </p>
       </div>
 

@@ -30,11 +30,19 @@ export default function SubSubcategory() {
   
   const awesomeList = rawData ? processAwesomeListData(rawData) : undefined;
   
+  // Fetch approved database resources
+  const { data: dbData } = useQuery<{resources: any[], total: number}>({
+    queryKey: ['/api/resources', { status: 'approved' }],
+    enabled: !!awesomeList,
+  });
+  
+  const dbResources = dbData?.resources || [];
+  
   // Find the current sub-subcategory and its resources
   let currentSubSubcategory = null;
   let parentCategory = null;
   let parentSubcategory = null;
-  let allResources: Resource[] = [];
+  let staticResources: Resource[] = [];
   
   if (awesomeList && slug) {
     // Find matching sub-subcategory across all categories
@@ -46,7 +54,7 @@ export default function SubSubcategory() {
               currentSubSubcategory = subSubcat;
               parentCategory = category;
               parentSubcategory = subcategory;
-              allResources = subSubcat.resources;
+              staticResources = subSubcat.resources;
               break;
             }
           }
@@ -60,6 +68,31 @@ export default function SubSubcategory() {
   const subSubcategoryName = currentSubSubcategory ? currentSubSubcategory.name : deslugify(slug || "");
   const categoryName = parentCategory ? parentCategory.name : "";
   const subcategoryName = parentSubcategory ? parentSubcategory.name : "";
+  
+  // Merge static and database resources for this sub-subcategory
+  const allResources: Resource[] = useMemo(() => {
+    // Filter database resources for this sub-subcategory and map to Resource type (defensive: match by name OR slug)
+    const subSubcategoryDbResources = dbResources
+      .filter(r => {
+        // Match by display name OR slug
+        const matchesName = r.subSubcategory === subSubcategoryName;
+        const matchesSlug = r.subSubcategory?.toLowerCase().replace(/\s+&\s+/g, '-').replace(/\s+/g, '-') === slug;
+        return matchesName || matchesSlug;
+      })
+      .map(r => ({
+        id: `db-${r.id}`,
+        title: r.title,
+        description: r.description || '',
+        url: r.url,
+        tags: r.metadata?.tags || [],
+        category: r.category,
+        subcategory: r.subcategory || undefined,
+        subSubcategory: r.subSubcategory || undefined,
+      }));
+    
+    // Merge and return
+    return [...staticResources, ...subSubcategoryDbResources];
+  }, [staticResources, dbResources, subSubcategoryName]);
   
   // Filter resources by selected tags
   const filteredResources = useMemo(() => {

@@ -36,6 +36,14 @@ export default function Category() {
   
   const awesomeList = rawData ? processAwesomeListData(rawData) : undefined;
   
+  // Fetch approved database resources
+  const { data: dbData } = useQuery<{resources: any[], total: number}>({
+    queryKey: ['/api/resources', { status: 'approved' }],
+    enabled: !!awesomeList,
+  });
+  
+  const dbResources = dbData?.resources || [];
+  
   // Find the current category and its resources
   const currentCategory = awesomeList?.categories.find(cat => 
     cat.slug === slug
@@ -43,8 +51,35 @@ export default function Category() {
   
   const categoryName = currentCategory ? currentCategory.name : deslugify(slug || "");
   
-  // Get all resources - category level already includes all nested resources
-  const allResources: Resource[] = currentCategory ? currentCategory.resources : [];
+  // Merge static and database resources for this category
+  const allResources: Resource[] = useMemo(() => {
+    if (!currentCategory) return [];
+    
+    // Start with static resources
+    const staticResources = currentCategory.resources;
+    
+    // Filter database resources for this category and map to Resource type (defensive: match by name OR slug)
+    const categoryDbResources = dbResources
+      .filter(r => {
+        // Match by display name OR slug
+        const matchesName = r.category === categoryName;
+        const matchesSlug = r.category?.toLowerCase().replace(/\s+&\s+/g, '-').replace(/\s+/g, '-') === slug;
+        return matchesName || matchesSlug;
+      })
+      .map(r => ({
+        id: `db-${r.id}`,
+        title: r.title,
+        description: r.description || '',
+        url: r.url,
+        tags: r.metadata?.tags || [],
+        category: r.category,
+        subcategory: r.subcategory || undefined,
+        subSubcategory: r.subSubcategory || undefined,
+      }));
+    
+    // Merge and return
+    return [...staticResources, ...categoryDbResources];
+  }, [currentCategory, dbResources, categoryName]);
   
   // Extract unique subcategories for filter
   const subcategories = useMemo(() => {

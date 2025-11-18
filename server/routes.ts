@@ -882,8 +882,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const steps = stepsMap.get(journey.id) || [];
           const progress = progressMap.get(journey.id);
           
-          // Count distinct stepNumbers instead of total database rows
-          const uniqueStepNumbers = new Set(steps.map(s => s.stepNumber));
+          // Count distinct stepNumbers instead of total database rows (defensive: handle both strings and numbers)
+          const uniqueStepNumbers = new Set(
+            steps
+              .map(s => typeof s.stepNumber === 'number' ? s.stepNumber : parseInt(s.stepNumber, 10))
+              .filter(n => !isNaN(n))
+          );
           
           return {
             ...journey,
@@ -899,8 +903,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const enrichedJourneys = journeys.map(journey => {
           const steps = stepsMap.get(journey.id) || [];
           
-          // Count distinct stepNumbers instead of total database rows
-          const uniqueStepNumbers = new Set(steps.map(s => s.stepNumber));
+          // Count distinct stepNumbers instead of total database rows (defensive: handle both strings and numbers)
+          const uniqueStepNumbers = new Set(
+            steps
+              .map(s => typeof s.stepNumber === 'number' ? s.stepNumber : parseInt(s.stepNumber, 10))
+              .filter(n => !isNaN(n))
+          );
           
           return {
             ...journey,
@@ -930,8 +938,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const steps = await storage.listJourneySteps(id);
       
-      // Count distinct stepNumbers for accurate step count
-      const uniqueStepNumbers = new Set(steps.map(s => s.stepNumber));
+      // Count distinct stepNumbers for accurate step count (defensive: handle both strings and numbers)
+      const uniqueStepNumbers = new Set(
+        steps
+          .map(s => typeof s.stepNumber === 'number' ? s.stepNumber : parseInt(s.stepNumber, 10))
+          .filter(n => !isNaN(n))
+      );
       const stepCount = uniqueStepNumbers.size;
       
       // If user is authenticated, get their progress
