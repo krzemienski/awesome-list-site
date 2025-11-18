@@ -81,10 +81,30 @@ function Router() {
     return <ErrorPage error={error} />;
   }
 
+  // Show loading state while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show landing page for unauthenticated users
+  if (!isAuthenticated) {
+    return <Landing />;
+  }
+
+  // Show main app for authenticated users
   return (
     <MainLayout 
       awesomeList={awesomeList} 
       isLoading={isLoading}
+      user={user}
+      onLogout={logout}
     >
       <Switch>
         <Route path="/" component={() => 
@@ -98,6 +118,7 @@ function Router() {
         <Route path="/sub-subcategory/:slug" component={SubSubcategory} />
         <Route path="/about" component={About} />
         <Route path="/advanced" component={Advanced} />
+        <Route path="/profile" component={() => <Profile user={user} />} />
         <Route component={NotFound} />
       </Switch>
     </MainLayout>
