@@ -107,6 +107,37 @@ Transform Awesome Video Resources application into a full-featured AI-powered le
 - **GitHub Sync**: Services created (parser, formatter, syncService) but need completion
 - **Testing**: Not yet implemented (target: 300+ functional tests)
 
+### Recent Changes (November 18, 2025)
+
+**Bug Fixes - Resource Submission Flow:**
+1. **Fixed ID vs Name Mismatch** (Issue #1):
+   - Updated `SubmitResource.tsx` to use numeric IDs in form values (category.id, subcategory.id, subSubcategory.id)
+   - Form now displays category names to users but stores/submits IDs
+   - Backend receives correct names by looking up IDs before submission
+   - Prevents form submission errors from sending names instead of IDs
+
+2. **Fixed Dropdown Reset Logic** (Issue #2):
+   - Corrected useEffect dependencies to reset child selections on ANY parent change
+   - Removed conditional checks that prevented reset when switching between categories
+   - Subcategory and sub-subcategory dropdowns now properly clear when parent changes
+   - Eliminates bug where old subcategory remained selected after category change
+
+3. **Added API Query Parameter Validation** (Issue #3):
+   - Added Zod validation to `/api/subcategories` endpoint for categoryId parameter
+   - Added Zod validation to `/api/sub-subcategories` endpoint for subcategoryId parameter
+   - Both endpoints now return 400 Bad Request for invalid/non-numeric query parameters
+   - Prevents NaN errors and unexpected storage paths from invalid input
+
+**Files Modified:**
+- `client/src/pages/SubmitResource.tsx`: Form dropdown values, filtering logic, submission payload
+- `server/routes.ts`: Query parameter validation for category API endpoints
+
+**Impact:**
+- Resource submission form now works correctly with proper ID handling
+- Dependent dropdowns reset properly when parent selections change
+- API endpoints are protected against malformed query parameters
+- Ready for production resource submission workflow
+
 ### Critical Work In Progress
 - Completing DatabaseStorage class to replace MemStorage
 - Fixing type mismatches between schema and storage implementation

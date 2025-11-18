@@ -22,6 +22,7 @@ import AdminDashboard from "@/pages/AdminDashboard";
 import AdminGuard from "@/components/auth/AdminGuard";
 import AuthGuard from "@/components/auth/AuthGuard";
 import NotFound from "@/pages/not-found";
+import SubmitResource from "@/pages/SubmitResource";
 
 import { AwesomeList } from "@/types/awesome-list";
 import { processAwesomeListData } from "@/lib/parser";
@@ -118,6 +119,7 @@ function Router() {
         <Route path="/sub-subcategory/:slug" component={SubSubcategory} />
         <Route path="/about" component={About} />
         <Route path="/advanced" component={Advanced} />
+        <Route path="/submit" component={SubmitResource} />
         <Route path="/profile" component={() => (
           <AuthGuard>
             <Profile user={user} />
