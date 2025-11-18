@@ -84,6 +84,9 @@ export default function AdminDashboard() {
   const [isExporting, setIsExporting] = useState(false);
   const [isValidating, setIsValidating] = useState(false);
   const [isCheckingLinks, setIsCheckingLinks] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+  const [importResult, setImportResult] = useState<{imported: number; updated: number; skipped: number; errors: string[]} | null>(null);
+  const [importError, setImportError] = useState<string | null>(null);
   
   // Fetch validation status
   const { data: validationStatus } = useQuery<ValidationStatus>({
@@ -318,29 +321,31 @@ export default function AdminDashboard() {
 
       {/* Admin Tabs */}
       <Tabs defaultValue="export" className="space-y-4">
-        <TabsList className="grid grid-cols-7 w-full lg:w-auto lg:inline-grid bg-black border border-pink-500/20">
-          <TabsTrigger value="export" className="data-[state=active]:bg-pink-500/20">
-            Export
-          </TabsTrigger>
-          <TabsTrigger value="database" className="data-[state=active]:bg-pink-500/20">
-            Database
-          </TabsTrigger>
-          <TabsTrigger value="validation" className="data-[state=active]:bg-pink-500/20">
-            Validation
-          </TabsTrigger>
-          <TabsTrigger value="resources" className="data-[state=active]:bg-pink-500/20">
-            Resources
-          </TabsTrigger>
-          <TabsTrigger value="users" className="data-[state=active]:bg-pink-500/20">
-            Users
-          </TabsTrigger>
-          <TabsTrigger value="github" className="data-[state=active]:bg-pink-500/20">
-            GitHub
-          </TabsTrigger>
-          <TabsTrigger value="audit" className="data-[state=active]:bg-pink-500/20">
-            Audit
-          </TabsTrigger>
-        </TabsList>
+        <ScrollArea className="w-full">
+          <TabsList className="inline-flex w-auto min-w-full lg:grid lg:grid-cols-7 lg:w-full bg-black border border-pink-500/20">
+            <TabsTrigger value="export" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap">
+              Export
+            </TabsTrigger>
+            <TabsTrigger value="database" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap">
+              Database
+            </TabsTrigger>
+            <TabsTrigger value="validation" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap">
+              Validation
+            </TabsTrigger>
+            <TabsTrigger value="resources" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap">
+              Resources
+            </TabsTrigger>
+            <TabsTrigger value="users" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap">
+              Users
+            </TabsTrigger>
+            <TabsTrigger value="github" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap">
+              GitHub
+            </TabsTrigger>
+            <TabsTrigger value="audit" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap">
+              Audit
+            </TabsTrigger>
+          </TabsList>
+        </ScrollArea>
 
         {/* Export Tab */}
         <TabsContent value="export">
@@ -813,14 +818,170 @@ export default function AdminDashboard() {
         </TabsContent>
 
         <TabsContent value="github">
-          <Card className="border-pink-500/20 bg-black">
-            <CardHeader>
-              <CardTitle>GitHub Sync</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-400">Configure and manage GitHub repository synchronization.</p>
-            </CardContent>
-          </Card>
+          <div className="space-y-4">
+            <Card className="border-pink-500/20 bg-black">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Link className="h-5 w-5" />
+                  Import from GitHub URL
+                </CardTitle>
+                <CardDescription>
+                  Import awesome lists from any GitHub repository URL or raw markdown URL
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Alert className="border-cyan-500/20 bg-cyan-500/5" data-testid="alert-github-import-info">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle data-testid="text-github-import-title">GitHub Import</AlertTitle>
+                  <AlertDescription className="space-y-2">
+                    <p data-testid="text-import-description">You can import from either:</p>
+                    <ul className="list-disc list-inside space-y-1 text-sm" data-testid="list-import-options">
+                      <li data-testid="text-import-option-repo"><strong>Repository URL</strong>: https://github.com/krzemienski/awesome-video</li>
+                      <li data-testid="text-import-option-raw"><strong>Raw Markdown URL</strong>: https://raw.githubusercontent.com/krzemienski/awesome-video/refs/heads/master/README.md</li>
+                    </ul>
+                    <p className="text-xs mt-2" data-testid="text-import-auto-parse">The system will automatically parse the README.md and import all resources.</p>
+                  </AlertDescription>
+                </Alert>
+
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-300">
+                      GitHub Repository URL
+                    </label>
+                    <input
+                      type="url"
+                      placeholder="https://github.com/username/awesome-list"
+                      className="w-full px-3 py-2 bg-black border border-pink-500/20 rounded-md text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500 font-mono text-sm"
+                      id="github-repo-url"
+                      data-testid="input-github-url"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <Button 
+                      onClick={async () => {
+                        const input = document.getElementById('github-repo-url') as HTMLInputElement;
+                        const url = input?.value?.trim();
+                        
+                        // Clear previous states
+                        setImportResult(null);
+                        setImportError(null);
+                        
+                        if (!url) {
+                          setImportError("Please enter a GitHub URL");
+                          toast({
+                            title: "Error",
+                            description: "Please enter a GitHub URL",
+                            variant: "destructive"
+                          });
+                          return;
+                        }
+
+                        setIsImporting(true);
+                        try {
+                          const response = await apiRequest('/api/admin/import-github', {
+                            method: 'POST',
+                            body: JSON.stringify({ repoUrl: url, dryRun: false }),
+                            headers: { 'Content-Type': 'application/json' }
+                          });
+
+                          // Set success state
+                          setImportResult({
+                            imported: response.imported,
+                            updated: response.updated,
+                            skipped: response.skipped,
+                            errors: response.errors || []
+                          });
+                          
+                          // Clear error state on success
+                          setImportError(null);
+
+                          // Use backend message in toast
+                          toast({
+                            title: "Import Successful",
+                            description: response.message || `Imported ${response.imported} resources, updated ${response.updated}, skipped ${response.skipped}`,
+                          });
+
+                          queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
+                        } catch (error: any) {
+                          // Clear success state on error
+                          setImportResult(null);
+                          setImportError(error.message || "Failed to import from GitHub");
+                          
+                          toast({
+                            title: "Import Failed",
+                            description: error.message || "Failed to import from GitHub",
+                            variant: "destructive"
+                          });
+                        } finally {
+                          setIsImporting(false);
+                        }
+                      }}
+                      className="bg-pink-500 hover:bg-pink-600"
+                      disabled={isImporting}
+                      data-testid="button-import-github"
+                    >
+                      {isImporting ? (
+                        <>
+                          <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                          Importing...
+                        </>
+                      ) : (
+                        <>
+                          <Download className="mr-2 h-4 w-4" />
+                          Import from URL
+                        </>
+                      )}
+                    </Button>
+                    <span className="text-sm text-gray-400" data-testid="text-import-help">
+                      Parses README.md and imports all resources
+                    </span>
+                  </div>
+
+                  {/* Import Result Status */}
+                  {importResult && (
+                    <Alert className="border-green-500/20 bg-green-500/5" data-testid="alert-import-success">
+                      <CheckCircle2 className="h-4 w-4" />
+                      <AlertTitle data-testid="text-import-success-title">Import Successful</AlertTitle>
+                      <AlertDescription>
+                        <div className="space-y-1 text-sm">
+                          <div data-testid="text-import-imported">Imported: <span className="font-mono font-bold text-green-400" data-testid="count-import-imported">{importResult.imported}</span></div>
+                          <div data-testid="text-import-updated">Updated: <span className="font-mono font-bold text-cyan-400" data-testid="count-import-updated">{importResult.updated}</span></div>
+                          <div data-testid="text-import-skipped">Skipped: <span className="font-mono font-bold text-gray-400" data-testid="count-import-skipped">{importResult.skipped}</span></div>
+                          {importResult.errors.length > 0 && (
+                            <div className="mt-2 text-xs text-yellow-400" data-testid="text-import-errors">
+                              Errors: {importResult.errors.length}
+                            </div>
+                          )}
+                        </div>
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
+                  {importError && (
+                    <Alert className="border-red-500/20 bg-red-500/5" data-testid="alert-import-error">
+                      <XCircle className="h-4 w-4" />
+                      <AlertTitle data-testid="text-import-error-title">Import Failed</AlertTitle>
+                      <AlertDescription data-testid="text-import-error-message">
+                        {importError}
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </div>
+
+                <Separator className="bg-pink-500/10" />
+
+                <div className="space-y-2" data-testid="section-example-urls">
+                  <h3 className="text-sm font-medium text-gray-300" data-testid="text-example-urls-title">Example URLs</h3>
+                  <div className="space-y-1 text-xs font-mono">
+                    <div className="text-cyan-400" data-testid="text-example-url-1">https://github.com/krzemienski/awesome-video</div>
+                    <div className="text-cyan-400" data-testid="text-example-url-2">https://github.com/avelino/awesome-go</div>
+                    <div className="text-cyan-400" data-testid="text-example-url-3">https://raw.githubusercontent.com/sindresorhus/awesome/main/readme.md</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         <TabsContent value="audit">
