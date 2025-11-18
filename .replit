@@ -97,4 +97,4 @@ args = "npm run dev"
 waitForPort = 5000
 
 [agent]
-integrations = ["javascript_google_analytics:1.0.0", "javascript_anthropic:1.0.0", "javascript_anthropic_ai_integrations:1.0.0", "javascript_log_in_with_replit:1.0.0"]
+integrations = ["javascript_google_analytics:1.0.0", "javascript_anthropic:1.0.0", "javascript_anthropic_ai_integrations:1.0.0", "javascript_log_in_with_replit:1.0.0", "github:1.0.0"]

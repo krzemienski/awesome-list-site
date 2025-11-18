@@ -3,6 +3,7 @@ import { parseAwesomeList, convertToDbResources } from "./parser";
 import { AwesomeListFormatter, generateContributingMd } from "./formatter";
 import { storage } from "../storage";
 import { Resource, InsertResource, GithubSyncQueue } from "@shared/schema";
+import { getGitHubClient } from "./replitConnection";
 
 /**
  * Service for synchronizing awesome lists with GitHub
@@ -183,30 +184,46 @@ export class GitHubSyncService {
     };
 
     try {
-      // Check write access
-      const hasAccess = await this.client.hasWriteAccess(repoUrl);
-      if (!hasAccess) {
-        throw new Error('No write access to repository. Please check your GitHub token permissions.');
+      // Get fresh Octokit client with Replit GitHub connection
+      const octokit = await getGitHubClient();
+      
+      // Parse repo info from URL
+      const repoMatch = repoUrl.match(/github\.com\/([^\/]+)\/([^\/\?#]+)/);
+      if (!repoMatch) {
+        throw new Error(`Invalid GitHub repository URL: ${repoUrl}`);
       }
+      const [, owner, repoName] = repoMatch;
+      const repo = repoName.replace(/\.git$/, '');
 
       // Get repository info
-      const repoInfo = await this.client.getRepository(repoUrl);
+      const { data: repoInfo } = await octokit.repos.get({ owner, repo });
       const repoTitle = repoInfo.name.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
 
-      // Fetch approved resources
-      const { resources } = await storage.listResources({
-        status: 'approved',
-        limit: 10000 // Get all approved resources
-      });
+      // Fetch all approved resources using storage method
+      const currentResources = await storage.getAllApprovedResources();
 
-      if (resources.length === 0) {
+      if (currentResources.length === 0) {
         throw new Error('No approved resources to export');
       }
 
-      console.log(`Exporting ${resources.length} approved resources...`);
+      console.log(`Exporting ${currentResources.length} approved resources...`);
 
-      // Generate README content
-      const formatter = new AwesomeListFormatter(resources, {
+      // Get last sync history to calculate diff
+      const lastSync = await storage.getLastSyncHistory(repoUrl, 'export');
+      const lastSnapshot = lastSync?.snapshot?.resources as Resource[] || [];
+
+      // Calculate diff: added, updated, removed
+      const { added, updated, removed } = this.calculateDiff(lastSnapshot, currentResources);
+
+      console.log(`Diff: ${added} added, ${updated} updated, ${removed} removed`);
+
+      // Generate smart commit message
+      const commitMessage = lastSync 
+        ? `Added ${added} resources, updated ${updated}, removed ${removed}`
+        : 'Initial awesome list export';
+
+      // Generate README and CONTRIBUTING content
+      const formatter = new AwesomeListFormatter(currentResources, {
         title: repoTitle,
         description: repoInfo.description || `A curated list of ${repoTitle.toLowerCase()} resources`,
         includeContributing: true,
@@ -218,69 +235,92 @@ export class GitHubSyncService {
       const readmeContent = formatter.generate();
       const contributingContent = generateContributingMd(this.websiteUrl, repoUrl);
 
-      // Prepare files to commit
-      const files = [
-        {
-          path: 'README.md',
-          content: readmeContent,
-          message: 'Update README with approved resources'
-        },
-        {
-          path: 'CONTRIBUTING.md',
-          content: contributingContent,
-          message: 'Update contributing guidelines'
-        }
-      ];
-
       if (options.dryRun) {
         console.log('Dry run - would update:');
         console.log('- README.md');
         console.log('- CONTRIBUTING.md');
-        result.exported = resources.length;
+        console.log(`Commit message: ${commitMessage}`);
+        result.exported = currentResources.length;
         return result;
       }
 
-      // Create a branch if requested
-      const targetBranch = options.branchName || (options.createPullRequest ? `sync-${Date.now()}` : undefined);
-      
-      if (targetBranch && options.createPullRequest) {
-        await this.client.createBranch(repoUrl, targetBranch);
-        console.log(`Created branch: ${targetBranch}`);
-      }
+      // Get current commit SHA for main branch
+      const { data: refData } = await octokit.git.getRef({
+        owner,
+        repo,
+        ref: 'heads/main'
+      });
+      const currentCommitSha = refData.object.sha;
 
-      // Commit the files
-      const commitResult = await this.client.commitMultipleFiles(
-        repoUrl,
-        files,
-        targetBranch
-      );
+      // Get the tree SHA of the current commit
+      const { data: commitData } = await octokit.git.getCommit({
+        owner,
+        repo,
+        commit_sha: currentCommitSha
+      });
+      const currentTreeSha = commitData.tree.sha;
 
-      result.commitSha = commitResult.sha;
-      result.commitUrl = commitResult.url;
-      result.exported = resources.length;
+      // Create blobs for README and CONTRIBUTING files
+      const readmeBlob = await octokit.git.createBlob({
+        owner,
+        repo,
+        content: Buffer.from(readmeContent).toString('base64'),
+        encoding: 'base64'
+      });
 
-      console.log(`✓ Committed changes: ${commitResult.sha}`);
+      const contributingBlob = await octokit.git.createBlob({
+        owner,
+        repo,
+        content: Buffer.from(contributingContent).toString('base64'),
+        encoding: 'base64'
+      });
 
-      // Create pull request if requested
-      if (options.createPullRequest && targetBranch) {
-        const pr = await this.client.createPullRequest(
-          repoUrl,
-          targetBranch,
-          'main',
-          `Sync approved resources from ${this.websiteUrl}`,
-          `This PR updates the awesome list with ${resources.length} approved resources from the website.\n\n` +
-          `- Resources have been reviewed and approved\n` +
-          `- Format follows awesome-list guidelines\n` +
-          `- Contributing guidelines updated\n\n` +
-          `Generated by automatic sync from ${this.websiteUrl}`
-        );
+      // Create a new tree with both files
+      const { data: treeData } = await octokit.git.createTree({
+        owner,
+        repo,
+        base_tree: currentTreeSha,
+        tree: [
+          {
+            path: 'README.md',
+            mode: '100644' as const,
+            type: 'blob' as const,
+            sha: readmeBlob.data.sha
+          },
+          {
+            path: 'CONTRIBUTING.md',
+            mode: '100644' as const,
+            type: 'blob' as const,
+            sha: contributingBlob.data.sha
+          }
+        ]
+      });
 
-        result.pullRequestUrl = pr.url;
-        console.log(`✓ Created pull request: ${pr.url}`);
-      }
+      // Create a commit
+      const { data: newCommit } = await octokit.git.createCommit({
+        owner,
+        repo,
+        message: commitMessage,
+        tree: treeData.sha,
+        parents: [currentCommitSha]
+      });
+
+      // Update the reference to point to the new commit (commit directly to main)
+      await octokit.git.updateRef({
+        owner,
+        repo,
+        ref: 'heads/main',
+        sha: newCommit.sha
+      });
+
+      result.commitSha = newCommit.sha;
+      result.commitUrl = newCommit.html_url;
+      result.exported = currentResources.length;
+
+      console.log(`✓ Committed changes: ${newCommit.sha}`);
 
       // Update resources as synced
-      const resourceIds = resources.map(r => r.id);
+      const resourceIds = currentResources.map(r => r.id);
       await Promise.all(
         resourceIds.map(id => 
           storage.updateResource(id, { 
@@ -290,6 +330,33 @@ export class GitHubSyncService {
         )
       );
 
+      // Store sync history with snapshot and diff counts
+      await storage.saveSyncHistory({
+        repositoryUrl: repoUrl,
+        direction: 'export',
+        commitSha: newCommit.sha,
+        commitMessage,
+        commitUrl: newCommit.html_url,
+        resourcesAdded: added,
+        resourcesUpdated: updated,
+        resourcesRemoved: removed,
+        totalResources: currentResources.length,
+        snapshot: {
+          resources: currentResources.map(r => ({
+            id: r.id,
+            url: r.url,
+            title: r.title,
+            description: r.description,
+            category: r.category,
+            subcategory: r.subcategory,
+            subSubcategory: r.subSubcategory
+          }))
+        } as any,
+        metadata: {
+          diff: { added, updated, removed }
+        } as any
+      });
+
       // Log the export
       await storage.logResourceAudit(
         null,
@@ -297,10 +364,13 @@ export class GitHubSyncService {
         undefined,
         { 
           repository: repoUrl,
-          count: resources.length,
-          commitSha: result.commitSha
+          count: currentResources.length,
+          commitSha: result.commitSha,
+          added,
+          updated,
+          removed
         },
-        `Exported ${resources.length} resources to GitHub`
+        commitMessage
       );
 
       // Add to sync queue
@@ -308,12 +378,13 @@ export class GitHubSyncService {
         repositoryUrl: repoUrl,
         action: 'export',
         status: 'completed',
-        resourceIds,
+        resourceIds: resourceIds as any,
         metadata: {
           exported: result.exported,
           commitSha: result.commitSha,
-          pullRequestUrl: result.pullRequestUrl
-        }
+          commitMessage,
+          diff: { added, updated, removed }
+        } as any
       });
 
     } catch (error: any) {
@@ -321,17 +392,65 @@ export class GitHubSyncService {
       result.errors.push(errorMsg);
       console.error(errorMsg);
 
-      // Log failed export
+      // Log failed export via updateGithubSyncStatus if queue item exists
+      // Or log in metadata if creating new queue item
       await storage.addToGithubSyncQueue({
         repositoryUrl: repoUrl,
         action: 'export',
         status: 'failed',
-        errorMessage: error.message,
-        resourceIds: []
+        resourceIds: [] as any,
+        metadata: { 
+          error: error.message 
+        } as any
       });
     }
 
     return result;
+  }
+
+  /**
+   * Calculate diff between last snapshot and current resources
+   */
+  private calculateDiff(
+    lastSnapshot: Resource[],
+    currentResources: Resource[]
+  ): { added: number; updated: number; removed: number } {
+    // Create maps using URL as unique identifier
+    const lastMap = new Map(lastSnapshot.map(r => [r.url, r]));
+    const currentMap = new Map(currentResources.map(r => [r.url, r]));
+
+    let added = 0;
+    let updated = 0;
+    let removed = 0;
+
+    // Check for added and updated resources
+    for (const [url, current] of Array.from(currentMap.entries())) {
+      const last = lastMap.get(url);
+      if (!last) {
+        // Resource is in current but not in snapshot -> added
+        added++;
+      } else {
+        // Resource exists in both, check if updated
+        if (
+          last.title !== current.title ||
+          last.description !== current.description ||
+          last.category !== current.category ||
+          last.subcategory !== current.subcategory ||
+          last.subSubcategory !== current.subSubcategory
+        ) {
+          updated++;
+        }
+      }
+    }
+
+    // Check for removed resources (in snapshot but not in current)
+    for (const url of Array.from(lastMap.keys())) {
+      if (!currentMap.has(url)) {
+        removed++;
+      }
+    }
+
+    return { added, updated, removed };
   }
 
   /**
