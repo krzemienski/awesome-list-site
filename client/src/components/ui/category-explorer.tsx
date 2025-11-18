@@ -146,7 +146,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
               <Checkbox
                 id="subcategories"
                 checked={showSubcategories}
-                onCheckedChange={setShowSubcategories}
+                onCheckedChange={(checked) => setShowSubcategories(checked === true)}
               />
               <label htmlFor="subcategories" className="text-sm text-muted-foreground">
                 Show subcategories

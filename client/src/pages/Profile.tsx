@@ -160,7 +160,7 @@ export default function Profile({ user }: ProfileProps) {
             <Settings className="h-4 w-4 mr-2" />
             Settings
           </Button>
-          <Button variant="outline" size="sm" onClick={logout}>
+          <Button variant="outline" size="sm" onClick={() => logout()}>
             <LogOut className="h-4 w-4 mr-2" />
             Logout
           </Button>

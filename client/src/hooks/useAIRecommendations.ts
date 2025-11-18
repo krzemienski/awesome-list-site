@@ -33,8 +33,7 @@ export function useAIRecommendations(options: UseAIRecommendationsOptions = {}) 
   const mutation = useMutation({
     mutationFn: async (userProfile: UserProfile): Promise<AIRecommendationResult[]> => {
       const url = `/api/recommendations?limit=${limit}`;
-      const response = await apiRequest('POST', url, userProfile);
-      return response.json();
+      return await apiRequest(url, { method: 'POST', body: JSON.stringify(userProfile) });
     },
   });
 

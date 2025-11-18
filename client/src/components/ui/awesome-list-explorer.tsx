@@ -54,7 +54,7 @@ export default function AwesomeListExplorer() {
   // Switch to a different awesome list
   const switchListMutation = useMutation({
     mutationFn: async (rawUrl: string) => {
-      return apiRequest('/api/switch-list', 'POST', { rawUrl });
+      return apiRequest('/api/switch-list', { method: 'POST', body: JSON.stringify({ rawUrl }) });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/awesome-list'] });

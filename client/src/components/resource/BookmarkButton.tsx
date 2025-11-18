@@ -108,7 +108,7 @@ export default function BookmarkButton({
       setNotesDialogOpen(true);
     } else {
       // Toggle bookmark directly
-      bookmarkMutation.mutate();
+      bookmarkMutation.mutate(undefined);
     }
   };
 
@@ -117,7 +117,7 @@ export default function BookmarkButton({
   };
 
   const handleSaveWithoutNotes = () => {
-    bookmarkMutation.mutate();
+    bookmarkMutation.mutate(undefined);
   };
 
   const iconSize = size === "sm" ? "h-4 w-4" : size === "lg" ? "h-6 w-6" : "h-5 w-5";

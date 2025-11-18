@@ -129,7 +129,7 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
     if (pathParts[1] === 'category') {
       const activeCategory = filteredCategories.find(cat => cat.slug === pathParts[2])
       if (activeCategory) {
-        setOpenCategories(prev => new Set([...prev, activeCategory.slug]))
+        setOpenCategories(prev => new Set([...Array.from(prev), activeCategory.slug]))
       }
     } else if (pathParts[1] === 'subcategory') {
       const activeSubcategory = pathParts[2]
@@ -137,7 +137,7 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
         cat.subcategories?.some(sub => sub.slug === activeSubcategory)
       )
       if (parentCategory) {
-        setOpenCategories(prev => new Set([...prev, parentCategory.slug]))
+        setOpenCategories(prev => new Set([...Array.from(prev), parentCategory.slug]))
       }
     } else if (pathParts[1] === 'sub-subcategory') {
       const activeSubSubcategory = pathParts[2]
@@ -154,8 +154,8 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
       })
       
       if (parentCategory && parentSubcategory) {
-        setOpenCategories(prev => new Set([...prev, parentCategory!.slug]))
-        setOpenSubcategories(prev => new Set([...prev, `${parentCategory!.slug}-${parentSubcategory!.slug}`]))
+        setOpenCategories(prev => new Set([...Array.from(prev), parentCategory!.slug]))
+        setOpenSubcategories(prev => new Set([...Array.from(prev), `${parentCategory!.slug}-${parentSubcategory!.slug}`]))
       }
     }
   }, [location, filteredCategories])

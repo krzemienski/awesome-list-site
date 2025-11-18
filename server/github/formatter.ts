@@ -115,13 +115,13 @@ export class AwesomeListFormatter {
     lines.push('## Contents');
     lines.push('');
 
-    for (const [category, group] of categoryGroups) {
+    for (const [category, group] of Array.from(categoryGroups)) {
       const anchor = this.toAnchor(category);
       lines.push(`- [${category}](#${anchor})`);
 
       // Add subcategories if they exist
       if (group.subcategories.size > 0) {
-        for (const [subcategory] of group.subcategories) {
+        for (const [subcategory] of Array.from(group.subcategories)) {
           const subAnchor = this.toAnchor(subcategory);
           lines.push(`  - [${subcategory}](#${subAnchor})`);
         }
@@ -137,7 +137,7 @@ export class AwesomeListFormatter {
   private generateResourceSections(categoryGroups: Map<string, CategoryGroup>): string {
     const sections: string[] = [];
 
-    for (const [category, group] of categoryGroups) {
+    for (const [category, group] of Array.from(categoryGroups)) {
       // Category header
       sections.push(`## ${category}`);
       sections.push('');
@@ -149,7 +149,7 @@ export class AwesomeListFormatter {
       }
 
       // Add subcategories
-      for (const [subcategory, subgroup] of group.subcategories) {
+      for (const [subcategory, subgroup] of Array.from(group.subcategories)) {
         sections.push(`### ${subcategory}`);
         sections.push('');
 
@@ -160,7 +160,7 @@ export class AwesomeListFormatter {
         }
 
         // Add sub-subcategories
-        for (const [subSubcategory, resources] of subgroup.subSubcategories) {
+        for (const [subSubcategory, resources] of Array.from(subgroup.subSubcategories)) {
           sections.push(`#### ${subSubcategory}`);
           sections.push('');
           sections.push(this.formatResourceList(resources));

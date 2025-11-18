@@ -143,9 +143,9 @@ export class GitHubSyncService {
           status: 'completed',
           resourceIds: result.resources.map(r => r.id),
           metadata: {
-            imported: result.imported,
-            updated: result.updated,
-            skipped: result.skipped
+            imported: [result.imported] as [any, ...any[]],
+            updated: [result.updated] as [any, ...any[]],
+            skipped: [result.skipped] as [any, ...any[]]
           }
         });
       }
@@ -161,8 +161,8 @@ export class GitHubSyncService {
           repositoryUrl: repoUrl,
           action: 'import',
           status: 'failed',
-          errorMessage: error.message,
-          resourceIds: []
+          resourceIds: [],
+          metadata: { error: error.message }
         });
       }
     }
@@ -191,7 +191,7 @@ export class GitHubSyncService {
 
       // Get repository info
       const repoInfo = await this.client.getRepository(repoUrl);
-      const repoTitle = repoInfo.name.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+      const repoTitle = repoInfo.name.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
 
       // Fetch approved resources
       const { resources } = await storage.listResources({
