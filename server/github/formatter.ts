@@ -83,18 +83,14 @@ export class AwesomeListFormatter {
     lines.push('');
     lines.push('[![Awesome](https://awesome.re/badge.svg)](https://awesome.re)');
     
-    // Add additional badges if needed
+    // Add additional badges on same line to avoid double blank lines
     if (this.options.repoUrl) {
       const repoPath = this.extractRepoPath(this.options.repoUrl);
       if (repoPath) {
-        lines.push('');
         lines.push(`[![GitHub stars](https://img.shields.io/github/stars/${repoPath})](${this.options.repoUrl})`);
         lines.push(`[![License: CC0-1.0](https://img.shields.io/badge/License-CC0%201.0-lightgrey.svg)](http://creativecommons.org/publicdomain/zero/1.0/)`);
       }
     }
-    
-    // Add blank line before description
-    lines.push('');
 
     // Add description
     if (this.options.description) {
@@ -103,14 +99,14 @@ export class AwesomeListFormatter {
       if (description && description[0] !== description[0].toUpperCase()) {
         description = description[0].toUpperCase() + description.slice(1);
       }
-      lines.push(`> ${description}`);
       lines.push('');
+      lines.push(`> ${description}`);
     }
 
     // Add website link if available
     if (this.options.websiteUrl) {
-      lines.push(`**[View on Website](${this.options.websiteUrl})** - Submit new resources and browse the curated collection with advanced filtering.`);
       lines.push('');
+      lines.push(`**[View on Website](${this.options.websiteUrl})** - Submit new resources and browse the curated collection with advanced filtering.`);
     }
 
     return lines.join('\n');
@@ -196,8 +192,12 @@ export class AwesomeListFormatter {
    * Format: - [Name](url) - Description.
    */
   private formatResource(resource: Resource): string {
+    // Replace brackets in title with parentheses to avoid breaking markdown link syntax
+    // Titles with brackets break the [title](url) pattern in awesome-lint validator
+    let title = resource.title.replace(/\[/g, '(').replace(/\]/g, ')');
+    
     // Ensure proper capitalization in title
-    const title = this.ensureProperCapitalization(resource.title);
+    title = this.ensureProperCapitalization(title);
     
     // Remove trailing slashes from URLs (awesome-lint requirement)
     let url = resource.url.trim();
@@ -205,10 +205,23 @@ export class AwesomeListFormatter {
       url = url.slice(0, -1);
     }
     
+    // Escape parentheses in URLs to avoid breaking markdown link syntax
+    // URLs with unescaped parentheses break markdown parsing
+    url = url.replace(/\(/g, '%28').replace(/\)/g, '%29');
+    
     let line = `- [${title}](${url})`;
     
     if (resource.description && resource.description.trim()) {
       let description = resource.description.trim();
+      
+      // Remove raw HTML/shortcodes from descriptions (e.g., [vc_row...])
+      // These break markdown parsing and are not useful in README
+      description = description.replace(/\[vc_[^\]]+\]/g, '');
+      description = description.replace(/\[\/vc_[^\]]+\]/g, '');
+      description = description.trim();
+      
+      // Replace remaining brackets in description with parentheses
+      description = description.replace(/\[/g, '(').replace(/\]/g, ')');
       
       // Ensure description starts with capital letter
       if (description && description[0] !== description[0].toUpperCase()) {
