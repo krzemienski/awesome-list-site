@@ -184,12 +184,13 @@ export class AwesomeLintValidator {
    * Validate category structure and nesting
    */
   private validateCategories(): void {
-    let lastCategoryLevel = 0;
+    // Start at 1 because all awesome lists have a # Title header
+    let lastCategoryLevel = 1;
 
     for (let i = 0; i < this.lines.length; i++) {
       const line = this.lines[i];
       
-      if (line.startsWith('##')) {
+      if (line.startsWith('#')) {
         const level = line.match(/^#+/)?.[0].length || 0;
         
         // Check for proper nesting
