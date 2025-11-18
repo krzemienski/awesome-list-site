@@ -1,11 +1,14 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Edit } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import FavoriteButton from "./FavoriteButton";
 import BookmarkButton from "./BookmarkButton";
+import { SuggestEditDialog } from "@/components/ui/suggest-edit-dialog";
 import { cn } from "@/lib/utils";
+import type { Resource } from "@shared/schema";
 
 interface ResourceCardProps {
   resource: {
@@ -20,16 +23,19 @@ interface ResourceCardProps {
     favoriteCount?: number;
     bookmarkNotes?: string;
   };
+  fullResource?: Resource;
   className?: string;
   onClick?: () => void;
 }
 
 export default function ResourceCard({ 
   resource, 
+  fullResource,
   className,
   onClick 
 }: ResourceCardProps) {
   const { isAuthenticated } = useAuth();
+  const [suggestEditOpen, setSuggestEditOpen] = useState(false);
 
   const handleCardClick = () => {
     if (onClick) {
@@ -40,6 +46,30 @@ export default function ResourceCard({
   const handleResourceClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     window.open(resource.url, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleSuggestEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSuggestEditOpen(true);
+  };
+
+  const resourceForDialog: Resource = fullResource || {
+    id: parseInt(resource.id),
+    title: resource.name,
+    url: resource.url,
+    description: resource.description || "",
+    category: resource.category || "",
+    subcategory: null,
+    subSubcategory: null,
+    status: "approved",
+    submittedBy: null,
+    approvedBy: null,
+    approvedAt: null,
+    githubSynced: false,
+    lastSyncedAt: null,
+    metadata: {},
+    createdAt: new Date(),
+    updatedAt: new Date(),
   };
 
   return (
@@ -104,16 +134,37 @@ export default function ResourceCard({
           )}
         </div>
         
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="w-full border-cyan-500/50 hover:bg-cyan-500/10 hover:border-cyan-500"
-          onClick={handleResourceClick}
-        >
-          <ExternalLink className="h-4 w-4 mr-2" />
-          Visit Resource
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex-1 border-cyan-500/50 hover:bg-cyan-500/10 hover:border-cyan-500"
+            onClick={handleResourceClick}
+            data-testid={`button-visit-${resource.id}`}
+          >
+            <ExternalLink className="h-4 w-4 mr-2" />
+            Visit Resource
+          </Button>
+          {isAuthenticated && (
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={handleSuggestEdit}
+              data-testid={`button-suggest-edit-${resource.id}`}
+            >
+              <Edit className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
       </CardContent>
+
+      {isAuthenticated && (
+        <SuggestEditDialog 
+          resource={resourceForDialog}
+          open={suggestEditOpen}
+          onOpenChange={setSuggestEditOpen}
+        />
+      )}
     </Card>
   );
 }

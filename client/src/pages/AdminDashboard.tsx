@@ -28,6 +28,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import PendingResources from "@/components/admin/PendingResources";
+import PendingEdits from "@/components/admin/PendingEdits";
 
 interface ValidationResult {
   valid: boolean;
@@ -323,9 +324,12 @@ export default function AdminDashboard() {
       {/* Admin Tabs */}
       <Tabs defaultValue="approvals" className="space-y-4">
         <ScrollArea className="w-full">
-          <TabsList className="inline-flex w-auto min-w-full lg:grid lg:grid-cols-8 lg:w-full bg-black border border-pink-500/20">
+          <TabsList className="inline-flex w-auto min-w-full lg:grid lg:grid-cols-9 lg:w-full bg-black border border-pink-500/20">
             <TabsTrigger value="approvals" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap" data-testid="tab-approvals">
               Approvals {stats?.pendingApprovals ? <Badge variant="destructive" className="ml-2">{stats.pendingApprovals}</Badge> : null}
+            </TabsTrigger>
+            <TabsTrigger value="edits" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap" data-testid="tab-edits">
+              Edits
             </TabsTrigger>
             <TabsTrigger value="export" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap">
               Export
@@ -354,6 +358,11 @@ export default function AdminDashboard() {
         {/* Approvals Tab */}
         <TabsContent value="approvals" data-testid="content-approvals">
           <PendingResources />
+        </TabsContent>
+
+        {/* Edits Tab */}
+        <TabsContent value="edits" data-testid="content-edits">
+          <PendingEdits />
         </TabsContent>
 
         {/* Export Tab */}
@@ -578,17 +587,11 @@ export default function AdminDashboard() {
 
                 <div className="pt-4 border-t border-gray-800">
                   <h4 className="text-sm font-semibold text-gray-300 mb-2">Current Database Stats</h4>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div className="space-y-1">
                       <div className="text-xs text-gray-400">Resources</div>
                       <div className="text-xl font-mono font-bold text-pink-400">
                         {stats?.resources || 0}
-                      </div>
-                    </div>
-                    <div className="space-y-1">
-                      <div className="text-xs text-gray-400">Categories</div>
-                      <div className="text-xl font-mono font-bold text-cyan-400">
-                        {stats?.categories || 0}
                       </div>
                     </div>
                     <div className="space-y-1">

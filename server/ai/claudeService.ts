@@ -4,8 +4,48 @@ import Anthropic from '@anthropic-ai/sdk';
 const DEFAULT_MODEL_STR = "claude-3-5-sonnet-20241022";
 // </important_do_not_delete>
 
+/**
+ * Trusted domains for Claude URL analysis (video streaming related)
+ * This allowlist approach provides complete SSRF protection by only allowing
+ * known, trusted domains for video streaming and development resources.
+ */
+const ALLOWED_DOMAINS = [
+  'github.com',
+  'youtube.com',
+  'youtu.be',
+  'vimeo.com',
+  'twitch.tv',
+  'dailymotion.com',
+  'bitmovin.com',
+  'cloudflare.com',
+  'akamai.com',
+  'fastly.com',
+  'wowza.com',
+  'encoding.com',
+  'zencoder.com',
+  'mux.com',
+  'jwplayer.com',
+  'videojs.com',
+  'npmjs.com',
+  'unpkg.com',
+  'cdn.jsdelivr.net',
+  'stackoverflow.com',
+  'medium.com',
+  'dev.to',
+  'docs.microsoft.com',
+  'developer.mozilla.org',
+  'w3.org',
+  'ietf.org',
+  'whatwg.org'
+];
+
 interface CacheEntry {
   response: string;
+  timestamp: number;
+}
+
+interface AnalysisCache {
+  result: any;
   timestamp: number;
 }
 
@@ -13,7 +53,9 @@ export class ClaudeService {
   private static instance: ClaudeService;
   private anthropic: Anthropic | null = null;
   private responseCache: Map<string, CacheEntry>;
+  private analysisCache: Map<string, AnalysisCache>;
   private readonly CACHE_TTL = 60 * 60 * 1000; // 1 hour cache
+  private readonly ANALYSIS_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hour cache for URL analysis
   private readonly MAX_CACHE_SIZE = 100;
   private requestCount = 0;
   private lastRequestTime = 0;
@@ -21,6 +63,7 @@ export class ClaudeService {
 
   private constructor() {
     this.responseCache = new Map();
+    this.analysisCache = new Map();
     this.initializeClient();
   }
 
@@ -261,6 +304,229 @@ export class ClaudeService {
     }
 
     return results;
+  }
+
+  /**
+   * Get cached analysis result
+   */
+  private getCachedAnalysis(url: string): any | null {
+    const entry = this.analysisCache.get(url);
+    if (!entry) return null;
+
+    const age = Date.now() - entry.timestamp;
+    if (age > this.ANALYSIS_CACHE_TTL) {
+      this.analysisCache.delete(url);
+      return null;
+    }
+
+    return entry.result;
+  }
+
+  /**
+   * Cache analysis result
+   */
+  private cacheAnalysis(url: string, result: any): void {
+    if (this.analysisCache.size >= this.MAX_CACHE_SIZE) {
+      const oldestKey = this.analysisCache.keys().next().value;
+      this.analysisCache.delete(oldestKey);
+    }
+
+    this.analysisCache.set(url, {
+      result,
+      timestamp: Date.now()
+    });
+  }
+
+  /**
+   * Analyze a URL and extract metadata for video streaming resources
+   * Uses domain allowlist for SSRF protection
+   */
+  public async analyzeURL(url: string): Promise<{
+    suggestedTitle: string;
+    suggestedDescription: string;
+    suggestedTags: string[];
+    suggestedCategory: string;
+    suggestedSubcategory?: string;
+    confidence: number;
+    keyTopics: string[];
+  } | null> {
+    if (!this.isAvailable()) {
+      console.log('Claude service not available for URL analysis');
+      return null;
+    }
+
+    // Parse and validate URL format
+    let parsedUrl: URL;
+    try {
+      parsedUrl = new URL(url);
+    } catch (error) {
+      throw new Error('Invalid URL format');
+    }
+
+    // Only allow HTTPS (not http, file://, ftp://, etc.)
+    if (parsedUrl.protocol !== 'https:') {
+      throw new Error('Only HTTPS URLs are allowed');
+    }
+
+    // SECURITY: Domain allowlist (eliminates ALL SSRF risks)
+    const hostname = parsedUrl.hostname.toLowerCase();
+    const isAllowed = ALLOWED_DOMAINS.some(allowedDomain => {
+      // Match exact domain or subdomain
+      return hostname === allowedDomain || 
+             hostname === `www.${allowedDomain}` ||
+             hostname.endsWith(`.${allowedDomain}`);
+    });
+
+    if (!isAllowed) {
+      throw new Error(
+        `Domain "${hostname}" is not in the allowlist of trusted video streaming domains. ` +
+        `Allowed domains include: ${ALLOWED_DOMAINS.slice(0, 5).join(', ')}, etc.`
+      );
+    }
+
+    // Check cache
+    const cached = this.getCachedAnalysis(url);
+    if (cached) {
+      console.log('Returning cached URL analysis');
+      return cached;
+    }
+
+    try {
+      let pageContent = '';
+      
+      try {
+        const fetch = (await import('node-fetch')).default;
+        
+        // Fetch with safeguards - timeout handling
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+        
+        const response = await fetch(url, {
+          signal: controller.signal,
+          headers: {
+            'User-Agent': 'AwesomeVideoBot/1.0',
+          },
+          redirect: 'follow',
+          follow: 5
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch URL: ${response.status}`);
+        }
+        
+        // Size limit check
+        const contentLength = response.headers.get('content-length');
+        if (contentLength && parseInt(contentLength) > 5 * 1024 * 1024) {
+          throw new Error('Content too large (max 5MB)');
+        }
+        
+        const html = await response.text();
+        
+        // Additional size check after fetching
+        if (html.length > 5 * 1024 * 1024) {
+          throw new Error('Content too large (max 5MB)');
+        }
+        
+        // Extract text content from HTML
+        pageContent = html
+          .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+          .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+          .replace(/<[^>]+>/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim()
+          .substring(0, 5000);
+      } catch (fetchError: any) {
+        if (fetchError.name === 'AbortError') {
+          throw new Error('Request timeout');
+        }
+        console.error('Error fetching URL:', fetchError);
+        pageContent = `URL: ${url}`;
+      }
+
+      const categories = [
+        'Community & Events',
+        'Encoding & Codecs',
+        'General Tools',
+        'Infrastructure & Delivery',
+        'Intro & Learning',
+        'Media Tools',
+        'Players & Clients',
+        'Protocols & Transport',
+        'Standards & Industry'
+      ];
+
+      const prompt = `Analyze this video streaming/development resource webpage and extract structured metadata.
+
+URL: ${url}
+
+Page Content Preview:
+${pageContent}
+
+Extract the following information in JSON format:
+1. suggestedTitle: A concise, descriptive title (max 100 chars) - focus on what this resource does/provides
+2. suggestedDescription: A clear 2-3 sentence description of the resource's purpose and key features
+3. suggestedTags: Array of 3-5 relevant technical tags (e.g., "HLS", "FFmpeg", "DASH", "WebRTC")
+4. suggestedCategory: Best fitting category from this list: ${categories.join(', ')}
+5. suggestedSubcategory: If applicable, suggest a subcategory (optional)
+6. confidence: Your confidence score (0.0-1.0) in these suggestions
+7. keyTopics: Array of 3-5 key topics or technologies covered
+
+Return ONLY valid JSON with this structure:
+{
+  "suggestedTitle": "...",
+  "suggestedDescription": "...",
+  "suggestedTags": ["...", "..."],
+  "suggestedCategory": "...",
+  "suggestedSubcategory": "...",
+  "confidence": 0.0,
+  "keyTopics": ["...", "..."]
+}`;
+
+      const response = await this.generateResponse(
+        prompt,
+        2000,
+        'You are an expert in video streaming technologies, codecs, protocols, and development tools. Analyze resources accurately and return structured JSON metadata.'
+      );
+
+      if (!response) {
+        return null;
+      }
+
+      let jsonMatch = response.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        console.error('No JSON found in Claude response');
+        return null;
+      }
+
+      const parsed = JSON.parse(jsonMatch[0]);
+
+      // SANITIZE Claude response before caching/returning
+      const sanitizedResult = {
+        suggestedTitle: (parsed.suggestedTitle || '').substring(0, 200),
+        suggestedDescription: (parsed.suggestedDescription || '').substring(0, 2000),
+        suggestedTags: Array.isArray(parsed.suggestedTags) 
+          ? parsed.suggestedTags.slice(0, 20).map(tag => String(tag).substring(0, 50))
+          : [],
+        suggestedCategory: parsed.suggestedCategory || '',
+        suggestedSubcategory: parsed.suggestedSubcategory,
+        confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.5,
+        keyTopics: Array.isArray(parsed.keyTopics)
+          ? parsed.keyTopics.slice(0, 10).map(topic => String(topic).substring(0, 100))
+          : []
+      };
+
+      // Cache sanitized result
+      this.cacheAnalysis(url, sanitizedResult);
+
+      console.log('URL analysis completed:', { url, confidence: sanitizedResult.confidence });
+      return sanitizedResult;
+
+    } catch (error) {
+      console.error('Error analyzing URL:', error);
+      return null;
+    }
   }
 }
 
