@@ -1,8 +1,10 @@
 import { createContext, useEffect, ReactNode } from "react";
 
-type Theme = "dark"; // Dark mode only
+type Theme = "dark" | "light" | "system";
 type ThemeProviderProps = {
   children: ReactNode;
+  defaultTheme?: Theme;
+  storageKey?: string;
 };
 
 type ThemeProviderState = {

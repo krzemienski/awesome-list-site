@@ -37,6 +37,7 @@ interface AwesomeListData {
     subSubcategory?: string;
     tags?: string[];
   }>;
+  categories?: any[];
 }
 
 /**
