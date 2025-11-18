@@ -514,7 +514,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         resourceId,
         submittedBy: userId,
         status: 'pending',
-        originalResourceUpdatedAt: resource.updatedAt,
+        originalResourceUpdatedAt: resource.updatedAt ?? new Date(),
         proposedChanges: sanitizedChanges,
         proposedData: sanitizedProposedData,
         claudeMetadata: aiMetadata,
@@ -882,9 +882,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const steps = stepsMap.get(journey.id) || [];
           const progress = progressMap.get(journey.id);
           
+          // Count distinct stepNumbers instead of total database rows
+          const uniqueStepNumbers = new Set(steps.map(s => s.stepNumber));
+          
           return {
             ...journey,
-            stepCount: steps.length,
+            stepCount: uniqueStepNumbers.size,
             completedStepCount: progress?.completedSteps?.length || 0,
             isEnrolled: !!progress
           };
@@ -896,9 +899,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const enrichedJourneys = journeys.map(journey => {
           const steps = stepsMap.get(journey.id) || [];
           
+          // Count distinct stepNumbers instead of total database rows
+          const uniqueStepNumbers = new Set(steps.map(s => s.stepNumber));
+          
           return {
             ...journey,
-            stepCount: steps.length,
+            stepCount: uniqueStepNumbers.size,
             completedStepCount: 0,
             isEnrolled: false
           };
@@ -924,6 +930,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const steps = await storage.listJourneySteps(id);
       
+      // Count distinct stepNumbers for accurate step count
+      const uniqueStepNumbers = new Set(steps.map(s => s.stepNumber));
+      const stepCount = uniqueStepNumbers.size;
+      
       // If user is authenticated, get their progress
       let progress = null;
       if (req.user?.claims?.sub) {
@@ -932,6 +942,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({
         ...journey,
+        stepCount,
         steps,
         progress: progress ? {
           completedSteps: progress.completedSteps || [],

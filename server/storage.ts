@@ -655,7 +655,7 @@ export class DatabaseStorage implements IStorage {
     
     return result.map(r => ({ 
       ...r.resource, 
-      favoritedAt: r.favoritedAt 
+      favoritedAt: r.favoritedAt! 
     }));
   }
   
@@ -696,7 +696,7 @@ export class DatabaseStorage implements IStorage {
     return result.map(r => ({ 
       ...r.resource, 
       notes: r.notes || undefined,
-      bookmarkedAt: r.bookmarkedAt
+      bookmarkedAt: r.bookmarkedAt!
     }));
   }
   
@@ -821,7 +821,7 @@ export class DatabaseStorage implements IStorage {
   
   // Resource Edits
   async createResourceEdit(data: InsertResourceEdit): Promise<ResourceEdit> {
-    const [edit] = await db.insert(resourceEdits).values(data).returning();
+    const [edit] = await db.insert(resourceEdits).values([data as any]).returning();
     
     await this.logResourceAudit(
       data.resourceId,
@@ -869,7 +869,7 @@ export class DatabaseStorage implements IStorage {
     
     // CONFLICT CHECK: Compare timestamps
     const editTimestamp = new Date(edit.originalResourceUpdatedAt).getTime();
-    const currentTimestamp = new Date(currentResource.updatedAt).getTime();
+    const currentTimestamp = new Date(currentResource.updatedAt ? currentResource.updatedAt : new Date()).getTime();
     
     if (editTimestamp < currentTimestamp) {
       // Resource was modified after edit was created - REJECT merge
@@ -1282,11 +1282,11 @@ export class MemStorage implements IStorage {
   
   async addFavorite(userId: string, resourceId: number): Promise<void> {}
   async removeFavorite(userId: string, resourceId: number): Promise<void> {}
-  async getUserFavorites(userId: string): Promise<Resource[]> { return []; }
+  async getUserFavorites(userId: string): Promise<Array<Resource & { favoritedAt: Date }>> { return []; }
   
   async addBookmark(userId: string, resourceId: number, notes?: string): Promise<void> {}
   async removeBookmark(userId: string, resourceId: number): Promise<void> {}
-  async getUserBookmarks(userId: string): Promise<Array<Resource & { notes?: string }>> { return []; }
+  async getUserBookmarks(userId: string): Promise<Array<Resource & { notes?: string; bookmarkedAt: Date }>> { return []; }
   
   async startUserJourney(userId: string, journeyId: number): Promise<UserJourneyProgress> {
     throw new Error("Not implemented in memory storage");
@@ -1301,6 +1301,22 @@ export class MemStorage implements IStorage {
   
   async logResourceAudit(resourceId: number | null, action: string, performedBy?: string, changes?: any, notes?: string): Promise<void> {}
   async getResourceAuditLog(resourceId: number, limit?: number): Promise<any[]> { return []; }
+  
+  async createResourceEdit(data: InsertResourceEdit): Promise<ResourceEdit> {
+    throw new Error("Not implemented in memory storage");
+  }
+  async getResourceEdit(id: number): Promise<ResourceEdit | undefined> { return undefined; }
+  async getResourceEditsByResource(resourceId: number): Promise<ResourceEdit[]> { return []; }
+  async getResourceEditsByUser(userId: string): Promise<ResourceEdit[]> { return []; }
+  async getPendingResourceEdits(): Promise<ResourceEdit[]> { return []; }
+  async approveResourceEdit(editId: number, adminId: string): Promise<void> {
+    throw new Error("Not implemented in memory storage");
+  }
+  async rejectResourceEdit(editId: number, adminId: string, reason: string): Promise<void> {
+    throw new Error("Not implemented in memory storage");
+  }
+  
+  async getUserPreferences(userId: string): Promise<any | undefined> { return undefined; }
   
   async addToGithubSyncQueue(item: InsertGithubSyncQueue): Promise<GithubSyncQueue> {
     throw new Error("Not implemented in memory storage");
