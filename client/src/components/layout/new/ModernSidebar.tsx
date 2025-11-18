@@ -17,7 +17,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Skeleton } from "@/components/ui/skeleton";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Home, Folder, ExternalLink, Menu, Sparkles, Zap, Shield } from "lucide-react";
+import { Home, Folder, ExternalLink, Menu, Sparkles, Zap, Shield, Plus } from "lucide-react";
 import { slugify, getCategorySlug } from "@/lib/utils";
 import { Category, Resource } from "@/types/awesome-list";
 import { cn } from "@/lib/utils";
@@ -170,6 +170,19 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
           >
             <Home className="mr-2 h-4 w-4" />
             Home
+          </Button>
+          
+          <Button
+            variant="ghost"
+            className={cn(
+              "w-full justify-start font-normal bg-pink-500/10 hover:bg-pink-500/20 text-pink-500",
+              isActiveRoute("/submit") ? "bg-pink-500/20" : ""
+            )}
+            onClick={() => navigate('/submit')}
+            data-testid="nav-submit-resource"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Submit Resource
           </Button>
           
           <Button
