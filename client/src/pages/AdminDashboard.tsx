@@ -20,7 +20,8 @@ import {
   Clock,
   RefreshCw,
   FileCheck,
-  AlertTriangle
+  AlertTriangle,
+  Database
 } from "lucide-react";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useToast } from "@/hooks/use-toast";
@@ -197,6 +198,31 @@ export default function AdminDashboard() {
     }
   });
 
+  // Seed database
+  const seedDatabaseMutation = useMutation({
+    mutationFn: async (options: { clearExisting?: boolean } = {}) => {
+      const response = await apiRequest('/api/admin/seed-database', {
+        method: 'POST',
+        body: JSON.stringify(options)
+      });
+      return response;
+    },
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
+      toast({
+        title: "Database Seeded Successfully",
+        description: `Added ${data.counts.resourcesInserted} resources, ${data.counts.categoriesInserted} categories, ${data.counts.subcategoriesInserted} subcategories, and ${data.counts.subSubcategoriesInserted} sub-subcategories.`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Database Seeding Failed",
+        description: error.message || "Failed to seed database. Please try again.",
+        variant: "destructive",
+      });
+    }
+  });
+
   // AdminGuard already verified role, but show loading for stats
   if (isLoading) {
     return (
@@ -292,9 +318,12 @@ export default function AdminDashboard() {
 
       {/* Admin Tabs */}
       <Tabs defaultValue="export" className="space-y-4">
-        <TabsList className="grid grid-cols-6 w-full lg:w-auto lg:inline-grid bg-black border border-pink-500/20">
+        <TabsList className="grid grid-cols-7 w-full lg:w-auto lg:inline-grid bg-black border border-pink-500/20">
           <TabsTrigger value="export" className="data-[state=active]:bg-pink-500/20">
             Export
+          </TabsTrigger>
+          <TabsTrigger value="database" className="data-[state=active]:bg-pink-500/20">
+            Database
           </TabsTrigger>
           <TabsTrigger value="validation" className="data-[state=active]:bg-pink-500/20">
             Validation
@@ -406,6 +435,161 @@ export default function AdminDashboard() {
                       </>
                     )}
                   </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* Database Tab */}
+        <TabsContent value="database">
+          <div className="space-y-4">
+            <Card className="border-cyan-500/20 bg-black">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Database className="h-5 w-5" />
+                  Database Management
+                </CardTitle>
+                <CardDescription>
+                  Seed the database with 2,011 video resources from awesome-video JSON
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Alert className="border-cyan-500/20 bg-cyan-500/5">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Database Seeding</AlertTitle>
+                  <AlertDescription>
+                    This operation will populate the PostgreSQL database with all categories, subcategories, 
+                    sub-subcategories, and resources from the awesome-video JSON source. Resources already 
+                    in the database will be skipped.
+                  </AlertDescription>
+                </Alert>
+
+                <div className="space-y-3">
+                  <div className="flex items-center gap-4">
+                    <Button 
+                      onClick={() => seedDatabaseMutation.mutate({ clearExisting: false })}
+                      disabled={seedDatabaseMutation.isPending}
+                      className="bg-cyan-500 hover:bg-cyan-600"
+                      data-testid="button-seed-database"
+                    >
+                      {seedDatabaseMutation.isPending ? (
+                        <>
+                          <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                          Seeding Database...
+                        </>
+                      ) : (
+                        <>
+                          <Database className="mr-2 h-4 w-4" />
+                          Seed Database
+                        </>
+                      )}
+                    </Button>
+                    <span className="text-sm text-gray-400">
+                      Add new resources without removing existing data
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <Button 
+                      onClick={() => {
+                        if (confirm('Are you sure you want to clear all existing data and re-seed? This action cannot be undone.')) {
+                          seedDatabaseMutation.mutate({ clearExisting: true });
+                        }
+                      }}
+                      disabled={seedDatabaseMutation.isPending}
+                      variant="destructive"
+                      data-testid="button-clear-reseed"
+                    >
+                      {seedDatabaseMutation.isPending ? (
+                        <>
+                          <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                          Clearing & Reseeding...
+                        </>
+                      ) : (
+                        <>
+                          <AlertTriangle className="mr-2 h-4 w-4" />
+                          Clear & Re-seed
+                        </>
+                      )}
+                    </Button>
+                    <span className="text-sm text-gray-400">
+                      Remove all data and re-populate (use with caution)
+                    </span>
+                  </div>
+                </div>
+
+                {seedDatabaseMutation.isSuccess && seedDatabaseMutation.data && (
+                  <Alert className="border-green-500/20 bg-green-500/5">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <AlertTitle>Seeding Completed Successfully</AlertTitle>
+                    <AlertDescription>
+                      <div className="mt-2 space-y-1 text-sm">
+                        <div className="flex justify-between">
+                          <span>Categories inserted:</span>
+                          <span className="font-mono font-semibold text-cyan-400">
+                            {seedDatabaseMutation.data.counts.categoriesInserted}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Subcategories inserted:</span>
+                          <span className="font-mono font-semibold text-cyan-400">
+                            {seedDatabaseMutation.data.counts.subcategoriesInserted}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Sub-subcategories inserted:</span>
+                          <span className="font-mono font-semibold text-cyan-400">
+                            {seedDatabaseMutation.data.counts.subSubcategoriesInserted}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Resources inserted:</span>
+                          <span className="font-mono font-semibold text-pink-400">
+                            {seedDatabaseMutation.data.counts.resourcesInserted}
+                          </span>
+                        </div>
+                        {seedDatabaseMutation.data.totalErrors > 0 && (
+                          <div className="flex justify-between text-yellow-400">
+                            <span>Errors:</span>
+                            <span className="font-mono font-semibold">
+                              {seedDatabaseMutation.data.totalErrors}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                <div className="pt-4 border-t border-gray-800">
+                  <h4 className="text-sm font-semibold text-gray-300 mb-2">Current Database Stats</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="space-y-1">
+                      <div className="text-xs text-gray-400">Resources</div>
+                      <div className="text-xl font-mono font-bold text-pink-400">
+                        {stats?.resources || 0}
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="text-xs text-gray-400">Categories</div>
+                      <div className="text-xl font-mono font-bold text-cyan-400">
+                        {stats?.categories || 0}
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="text-xs text-gray-400">Users</div>
+                      <div className="text-xl font-mono font-bold text-pink-400">
+                        {stats?.users || 0}
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="text-xs text-gray-400">Journeys</div>
+                      <div className="text-xl font-mono font-bold text-cyan-400">
+                        {stats?.journeys || 0}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
