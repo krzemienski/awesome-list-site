@@ -1,13 +1,14 @@
-import { users, type User, type InsertUser, type Resource, type Category, type Subcategory, type AwesomeList } from "@shared/schema";
+import { users, type User, type UpsertUser, type Resource, type Category, type Subcategory, type AwesomeList } from "@shared/schema";
 
 // modify the interface with any CRUD methods
 // you might need
 
 export interface IStorage {
-  // User methods
-  getUser(id: number): Promise<User | undefined>;
+  // User methods (Replit Auth required)
+  getUser(id: string): Promise<User | undefined>;
+  upsertUser(user: UpsertUser): Promise<User>;
   getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  createUser(user: UpsertUser): Promise<User>;
   
   // Awesome List data methods (in-memory only)
   setAwesomeListData(data: any): void;
@@ -17,7 +18,7 @@ export interface IStorage {
 }
 
 export class MemStorage implements IStorage {
-  private users: Map<number, User>;
+  private users: Map<string, User>;
   currentId: number;
 
   constructor() {
@@ -25,20 +26,43 @@ export class MemStorage implements IStorage {
     this.currentId = 1;
   }
 
-  async getUser(id: number): Promise<User | undefined> {
+  async getUser(id: string): Promise<User | undefined> {
     return this.users.get(id);
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    // Legacy method - not used with OAuth
+    return undefined;
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentId++;
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
+  async createUser(insertUser: UpsertUser): Promise<User> {
+    // Legacy method - use upsertUser instead for OAuth
+    const user: User = {
+      id: insertUser.id || String(this.currentId++),
+      email: insertUser.email || null,
+      firstName: insertUser.firstName || null,
+      lastName: insertUser.lastName || null,
+      profileImageUrl: insertUser.profileImageUrl || null,
+      role: 'user',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.users.set(user.id, user);
+    return user;
+  }
+
+  async upsertUser(insertUser: UpsertUser): Promise<User> {
+    const user: User = {
+      id: insertUser.id || String(this.currentId++),
+      email: insertUser.email || null,
+      firstName: insertUser.firstName || null,
+      lastName: insertUser.lastName || null,
+      profileImageUrl: insertUser.profileImageUrl || null,
+      role: 'user',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.users.set(user.id, user);
     return user;
   }
 
