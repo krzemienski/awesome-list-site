@@ -7,7 +7,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { GitBranch, Download, Upload, RefreshCw, CheckCircle2, XCircle, AlertCircle, Clock, ExternalLink } from "lucide-react";
+import { GitBranch, Download, Upload, RefreshCw, CheckCircle2, XCircle, AlertCircle, Clock, ExternalLink, Activity } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
