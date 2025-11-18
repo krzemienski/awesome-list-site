@@ -17,6 +17,7 @@ import SubSubcategory from "@/pages/SubSubcategory";
 import About from "@/pages/About";
 import Advanced from "@/pages/Advanced";
 import Profile from "@/pages/Profile";
+import AdminDashboard from "@/pages/AdminDashboard";
 import NotFound from "@/pages/not-found";
 
 import { AwesomeList } from "@/types/awesome-list";
@@ -119,6 +120,9 @@ function Router() {
         <Route path="/about" component={About} />
         <Route path="/advanced" component={Advanced} />
         <Route path="/profile" component={() => <Profile user={user} />} />
+        <Route path="/admin" component={() => 
+          user && (user as any).role === "admin" ? <AdminDashboard /> : <NotFound />
+        } />
         <Route component={NotFound} />
       </Switch>
     </MainLayout>

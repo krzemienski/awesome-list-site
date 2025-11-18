@@ -17,7 +17,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Skeleton } from "@/components/ui/skeleton";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Home, Folder, ExternalLink, Menu, Sparkles, Zap } from "lucide-react";
+import { Home, Folder, ExternalLink, Menu, Sparkles, Zap, Shield } from "lucide-react";
 import { slugify, getCategorySlug } from "@/lib/utils";
 import { Category, Resource } from "@/types/awesome-list";
 import { cn } from "@/lib/utils";
@@ -33,9 +33,10 @@ interface ModernSidebarProps {
   isLoading: boolean;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
+  user?: any;
 }
 
-export default function ModernSidebar({ title, categories, resources, isLoading, isOpen, setIsOpen }: ModernSidebarProps) {
+export default function ModernSidebar({ title, categories, resources, isLoading, isOpen, setIsOpen, user }: ModernSidebarProps) {
   const [location, setLocation] = useLocation();
   const [openCategories, setOpenCategories] = useState<string[]>([]);
   const [recommendationsOpen, setRecommendationsOpen] = useState(false);
@@ -191,6 +192,20 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
             <Sparkles className="mr-2 h-4 w-4" />
             AI Recommendations
           </Button>
+
+          {user?.role === "admin" && (
+            <Button
+              variant="ghost"
+              className={cn(
+                "w-full justify-start font-normal",
+                isActiveRoute("/admin") ? "bg-accent text-accent-foreground" : ""
+              )}
+              onClick={() => navigate('/admin')}
+            >
+              <Shield className="mr-2 h-4 w-4" />
+              Admin Dashboard
+            </Button>
+          )}
         </div>
         
         {isLoading ? (

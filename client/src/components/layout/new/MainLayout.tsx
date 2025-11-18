@@ -64,6 +64,7 @@ export default function MainLayout({ awesomeList, isLoading, children, user, onL
           categories={awesomeList?.categories || []}
           resources={awesomeList?.resources || []}
           isLoading={isLoading}
+          user={user}
         />
         
         <SidebarInset className="overflow-auto">
