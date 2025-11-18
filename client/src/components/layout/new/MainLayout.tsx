@@ -11,9 +11,11 @@ interface MainLayoutProps {
   awesomeList?: AwesomeList;
   isLoading: boolean;
   children: React.ReactNode;
+  user?: any;
+  onLogout?: () => void;
 }
 
-export default function MainLayout({ awesomeList, isLoading, children }: MainLayoutProps) {
+export default function MainLayout({ awesomeList, isLoading, children, user, onLogout }: MainLayoutProps) {
   const [searchOpen, setSearchOpen] = useState(false);
   const isMobile = useIsMobile();
   
@@ -50,6 +52,8 @@ export default function MainLayout({ awesomeList, isLoading, children }: MainLay
         title={awesomeList?.title || "Awesome Selfhosted"}
         repoUrl={awesomeList?.repoUrl}
         resources={awesomeList?.resources || []}
+        user={user}
+        onLogout={onLogout}
       />
       
       <SidebarProvider className="flex-1 overflow-hidden" open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>

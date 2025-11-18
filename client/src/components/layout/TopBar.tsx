@@ -1,12 +1,22 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { Menu, Search, Github, Sun, Moon, Palette, List, BarChart3 } from "lucide-react";
+import { Menu, Search, Github, Sun, Moon, Palette, List, BarChart3, User, LogIn, LogOut } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
 import { useIsMobile } from "@/hooks/use-mobile";
 import CustomThemeManager, { CustomTheme } from "@/components/ui/custom-theme-manager";
 import AwesomeListExplorer from "@/components/ui/awesome-list-explorer";
 import AnalyticsDashboard from "@/components/ui/analytics-dashboard";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useLocation } from "wouter";
 
 interface TopBarProps {
   isSidebarOpen: boolean;
@@ -15,6 +25,8 @@ interface TopBarProps {
   title: string;
   repoUrl?: string;
   resources?: any[];
+  user?: any;
+  onLogout?: () => void;
 }
 
 export default function TopBar({
@@ -23,7 +35,9 @@ export default function TopBar({
   onSearchOpen,
   title,
   repoUrl,
-  resources = []
+  resources = [],
+  user,
+  onLogout
 }: TopBarProps) {
   const { theme, setTheme } = useTheme();
   const isMobile = useIsMobile();
@@ -122,9 +136,53 @@ export default function TopBar({
             <BarChart3 className="h-5 w-5" />
           </Button>
           
-
-          
-
+          {/* User Authentication UI */}
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={user.avatar} alt={user.name} />
+                    <AvatarFallback>
+                      {user.name ? user.name[0].toUpperCase() : 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">{user.name}</p>
+                    <p className="text-xs leading-none text-muted-foreground">
+                      {user.email}
+                    </p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/profile">
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Profile</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={onLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => window.location.href = '/api/login'}
+              className="flex items-center gap-2"
+            >
+              <LogIn className="h-4 w-4" />
+              <span className="hidden sm:inline">Login</span>
+            </Button>
+          )}
         </div>
       </div>
       
