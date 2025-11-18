@@ -9,6 +9,9 @@ import { fetchAwesomeLists, searchAwesomeLists } from "./github-api";
 import { insertResourceSchema } from "@shared/schema";
 import { z } from "zod";
 import { syncService } from "./github/syncService";
+import { recommendationEngine, UserProfile as AIUserProfile } from "./ai/recommendationEngine";
+import { learningPathGenerator } from "./ai/learningPathGenerator";
+import { claudeService } from "./ai/claudeService";
 
 const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md";
 
@@ -854,133 +857,147 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/sitemap.xml", generateSitemap);
   app.get("/og-image.svg", generateOpenGraphImage);
 
-  // Recommendation engine routes
-  let recommendationEngine: RecommendationEngine | null = null;
+  // ============= AI Recommendation Routes =============
 
-  // Initialize recommendation engine with current data
-  app.get("/api/recommendations/init", async (req, res) => {
+  // GET /api/recommendations - Get personalized recommendations (enhanced AI-powered)
+  app.get("/api/recommendations", async (req, res) => {
     try {
-      const awesomeListData = storage.getAwesomeListData();
-      if (!awesomeListData || !awesomeListData.resources) {
-        return res.status(404).json({ error: 'No data available for recommendations' });
-      }
+      const limit = parseInt(req.query.limit as string) || 10;
       
-      recommendationEngine = new RecommendationEngine(awesomeListData.resources);
-      res.json({ 
-        status: "initialized", 
-        resourceCount: awesomeListData.resources.length 
-      });
+      // Create a mock user profile for non-authenticated users
+      // In production, you'd get this from the authenticated user's data
+      const userProfile: AIUserProfile = {
+        userId: 'anonymous',
+        preferredCategories: (req.query.categories as string)?.split(',') || [],
+        skillLevel: (req.query.skillLevel as string || 'intermediate') as 'beginner' | 'intermediate' | 'advanced',
+        learningGoals: (req.query.goals as string)?.split(',') || [],
+        preferredResourceTypes: (req.query.types as string)?.split(',') || [],
+        timeCommitment: (req.query.timeCommitment as string || 'flexible') as 'daily' | 'weekly' | 'flexible',
+        viewHistory: [],
+        bookmarks: [],
+        completedResources: [],
+        ratings: {}
+      };
+
+      const result = await recommendationEngine.generateRecommendations(
+        userProfile,
+        limit,
+        false
+      );
+
+      res.json(result);
     } catch (error) {
-      console.error('Error initializing recommendation engine:', error);
-      res.status(500).json({ error: 'Failed to initialize recommendation engine' });
+      console.error('Error generating recommendations:', error);
+      res.status(500).json({ error: 'Failed to generate recommendations' });
     }
   });
 
-  // Get personalized recommendations (AI-powered)
+  // POST /api/recommendations - Get personalized recommendations for authenticated user
   app.post("/api/recommendations", async (req, res) => {
     try {
-      const awesomeListData = storage.getAwesomeListData();
-      if (!awesomeListData || !awesomeListData.resources) {
-        return res.status(404).json({ error: 'No data available for recommendations' });
-      }
-
-      const userProfile = req.body;
+      const userProfile: AIUserProfile = req.body;
       const limit = parseInt(req.query.limit as string) || 10;
+      const forceRefresh = req.query.refresh === 'true';
 
-      // Import AI recommendations (dynamic import for better error handling)
-      const { generateAIRecommendations } = await import('./ai/recommendations');
-      
-      const recommendations = await generateAIRecommendations(
+      const result = await recommendationEngine.generateRecommendations(
         userProfile,
-        awesomeListData.resources,
-        limit
+        limit,
+        forceRefresh
       );
 
-      res.json(recommendations);
+      res.json(result);
     } catch (error) {
       console.error('Error generating AI recommendations:', error);
-      
-      // Fallback to rule-based recommendations if available
-      if (recommendationEngine) {
-        try {
-          const userProfile: UserProfile = req.body;
-          const limit = parseInt(req.query.limit as string) || 10;
-          const excludeViewed = req.query.exclude_viewed !== 'false';
-
-          const recommendations = recommendationEngine.generateRecommendations(
-            userProfile, 
-            limit, 
-            excludeViewed
-          );
-
-          res.json(recommendations.map(rec => ({ ...rec, aiGenerated: false })));
-        } catch (fallbackError) {
-          console.error('Fallback recommendation error:', fallbackError);
-          res.status(500).json({ error: 'Failed to generate recommendations' });
-        }
-      } else {
-        res.status(500).json({ error: 'Failed to generate recommendations' });
-      }
+      res.status(500).json({ error: 'Failed to generate recommendations' });
     }
   });
 
-  // Get learning path suggestions (AI-powered)
-  app.post("/api/learning-paths", async (req, res) => {
+  // POST /api/recommendations/feedback - Record user feedback on recommendations
+  app.post("/api/recommendations/feedback", async (req, res) => {
     try {
-      const awesomeListData = storage.getAwesomeListData();
-      if (!awesomeListData || !awesomeListData.resources) {
-        return res.status(404).json({ error: 'No data available for learning paths' });
+      const { userId, resourceId, feedback, rating } = req.body;
+      
+      if (!userId || !resourceId || !feedback) {
+        return res.status(400).json({ error: 'userId, resourceId, and feedback are required' });
       }
 
-      const userProfile = req.body;
-
-      // Import AI learning paths (dynamic import for better error handling)
-      const { generateAILearningPaths } = await import('./ai/recommendations');
-      
-      const learningPaths = await generateAILearningPaths(
-        userProfile,
-        awesomeListData.resources
+      // Record the feedback
+      await recommendationEngine.recordFeedback(
+        userId,
+        resourceId,
+        feedback as 'clicked' | 'dismissed' | 'completed',
+        rating
       );
 
-      console.log(`Generated ${learningPaths.length} AI learning paths`);
-      res.json(learningPaths);
+      res.json({ status: 'success', message: 'Feedback recorded' });
+    } catch (error) {
+      console.error('Error recording recommendation feedback:', error);
+      res.status(500).json({ error: 'Failed to record feedback' });
+    }
+  });
+
+  // GET /api/learning-paths/suggested - Get suggested learning paths
+  app.get("/api/learning-paths/suggested", async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 5;
+      
+      // Create a basic user profile from query params
+      const userProfile: AIUserProfile = {
+        userId: req.query.userId as string || 'anonymous',
+        preferredCategories: (req.query.categories as string)?.split(',') || [],
+        skillLevel: (req.query.skillLevel as string || 'intermediate') as 'beginner' | 'intermediate' | 'advanced',
+        learningGoals: (req.query.goals as string)?.split(',') || [],
+        preferredResourceTypes: [],
+        timeCommitment: (req.query.timeCommitment as string || 'flexible') as 'daily' | 'weekly' | 'flexible',
+        viewHistory: [],
+        bookmarks: [],
+        completedResources: [],
+        ratings: {}
+      };
+
+      const paths = await learningPathGenerator.getSuggestedPaths(userProfile, limit);
+      
+      res.json(paths);
+    } catch (error) {
+      console.error('Error generating suggested learning paths:', error);
+      res.status(500).json({ error: 'Failed to generate suggested learning paths' });
+    }
+  });
+
+  // POST /api/learning-paths/generate - Generate custom learning path
+  app.post("/api/learning-paths/generate", async (req, res) => {
+    try {
+      const { userProfile, category, customGoals } = req.body;
+      
+      if (!userProfile) {
+        return res.status(400).json({ error: 'User profile is required' });
+      }
+
+      const path = await learningPathGenerator.generateLearningPath(
+        userProfile,
+        category,
+        customGoals
+      );
+
+      res.json(path);
+    } catch (error) {
+      console.error('Error generating custom learning path:', error);
+      res.status(500).json({ error: 'Failed to generate custom learning path' });
+    }
+  });
+
+  // POST /api/learning-paths - Legacy route for compatibility
+  app.post("/api/learning-paths", async (req, res) => {
+    try {
+      const userProfile: AIUserProfile = req.body;
+      const limit = parseInt(req.query.limit as string) || 5;
+
+      const paths = await learningPathGenerator.getSuggestedPaths(userProfile, limit);
+      
+      res.json(paths);
     } catch (error) {
       console.error('Error generating AI learning paths:', error);
-      
-      // Try AI fallback system first
-      try {
-        console.log('Trying AI fallback learning paths...');
-        const { generateFallbackLearningPaths } = await import('./ai/recommendations');
-        const awesomeListData = storage.getAwesomeListData();
-        
-        if (awesomeListData && awesomeListData.resources) {
-          const fallbackPaths = generateFallbackLearningPaths(req.body, awesomeListData.resources);
-          console.log(`Generated ${fallbackPaths.length} fallback learning paths from AI system`);
-          if (fallbackPaths.length > 0) {
-            return res.json(fallbackPaths);
-          }
-        }
-      } catch (aiFallbackError) {
-        console.error('AI fallback learning paths error:', aiFallbackError);
-      }
-      
-      // Fallback to rule-based learning paths if available
-      if (recommendationEngine) {
-        try {
-          console.log('Trying recommendation engine learning paths...');
-          const userProfile: UserProfile = req.body;
-          const limit = parseInt(req.query.limit as string) || 5;
-          const learningPaths = recommendationEngine.generateLearningPaths(userProfile, limit);
-          console.log(`Generated ${learningPaths.length} learning paths from recommendation engine`);
-          res.json(learningPaths.map(path => ({ ...path, aiGenerated: false })));
-        } catch (fallbackError) {
-          console.error('Fallback learning path error:', fallbackError);
-          res.status(500).json({ error: 'Failed to generate learning paths' });
-        }
-      } else {
-        console.error('No recommendation engine available');
-        res.status(500).json({ error: 'Failed to generate learning paths - no fallback available' });
-      }
+      res.status(500).json({ error: 'Failed to generate learning paths' });
     }
   });
 
