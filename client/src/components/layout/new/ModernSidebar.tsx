@@ -266,13 +266,13 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
                     )}
                     onClick={() => navigate(`/category/${getCategorySlug(category.name)}`)}
                   >
-                    <div className="flex items-start gap-2 w-full min-w-0">
+                    <div className="flex items-center gap-2 w-full">
                       {(() => {
                         const IconComponent = getCategoryIcon(category.name);
-                        return <IconComponent className="h-4 w-4 flex-shrink-0 mt-0.5" />;
+                        return <IconComponent className="h-4 w-4 flex-shrink-0" />;
                       })()}
-                      <span className="break-words flex-1 text-left min-w-0 leading-tight">{category.name}</span>
-                      <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded ml-2 flex-shrink-0 self-start">
+                      <span className="truncate flex-1 text-left leading-tight">{category.name}</span>
+                      <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded ml-auto flex-shrink-0 whitespace-nowrap">
                         {category.resources.length}
                       </span>
                     </div>
@@ -318,13 +318,13 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
                             onClick={() => navigate(`/subcategory/${subcategory.slug}`)}
                             data-testid={`nav-subcategory-${subcategory.slug}`}
                           >
-                            <div className="flex items-start gap-2 w-full min-w-0">
+                            <div className="flex items-center gap-2 w-full">
                               {(() => {
                                 const IconComponent = getSubcategoryIcon(subcategory.name);
-                                return <IconComponent className="h-4 w-4 flex-shrink-0 mt-0.5" />;
+                                return <IconComponent className="h-4 w-4 flex-shrink-0" />;
                               })()}
-                              <span className="break-words flex-1 text-left min-w-0 leading-tight">{subcategory.name}</span>
-                              <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded ml-2 flex-shrink-0 self-start">
+                              <span className="truncate flex-1 text-left leading-tight">{subcategory.name}</span>
+                              <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded ml-auto flex-shrink-0 whitespace-nowrap">
                                 {subcategory.resources.length}
                               </span>
                             </div>
@@ -348,13 +348,13 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
                                 onClick={() => navigate(`/sub-subcategory/${subSubcategory.slug}`)}
                                 data-testid={`nav-sub-subcategory-${subSubcategory.slug}`}
                               >
-                                <div className="flex items-start gap-2 w-full min-w-0">
+                                <div className="flex items-center gap-2 w-full">
                                   {(() => {
                                     const IconComponent = getSubSubcategoryIcon(subSubcategory.name);
-                                    return <IconComponent className="h-3.5 w-3.5 flex-shrink-0 mt-0.5" />;
+                                    return <IconComponent className="h-3.5 w-3.5 flex-shrink-0" />;
                                   })()}
-                                  <span className="break-words flex-1 text-left min-w-0 leading-tight">{subSubcategory.name}</span>
-                                  <span className="text-xs bg-muted/80 text-muted-foreground px-1 py-0.5 rounded ml-2 flex-shrink-0 self-start">
+                                  <span className="truncate flex-1 text-left leading-tight">{subSubcategory.name}</span>
+                                  <span className="text-xs bg-muted/80 text-muted-foreground px-1 py-0.5 rounded ml-auto flex-shrink-0 whitespace-nowrap">
                                     {subSubcategory.resources.length}
                                   </span>
                                 </div>
