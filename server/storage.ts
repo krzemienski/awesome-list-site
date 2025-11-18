@@ -189,9 +189,22 @@ export class DatabaseStorage implements IStorage {
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
+    // Check if this is the first user (bootstrap admin)
+    const [userCountResult] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(users);
+    
+    const isFirstUser = userCountResult.count === 0;
+    
+    // If this is the first user, make them an admin
+    const userDataWithRole = {
+      ...userData,
+      role: isFirstUser ? 'admin' : (userData.role || 'user'),
+    };
+    
     const [user] = await db
       .insert(users)
-      .values(userData)
+      .values(userDataWithRole)
       .onConflictDoUpdate({
         target: users.id,
         set: {
@@ -200,6 +213,12 @@ export class DatabaseStorage implements IStorage {
         },
       })
       .returning();
+    
+    // Log when first admin is created
+    if (isFirstUser) {
+      console.log(`🔐 First user created as admin: ${user.email || user.username || user.id}`);
+    }
+    
     return user;
   }
   
