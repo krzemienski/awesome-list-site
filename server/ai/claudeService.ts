@@ -1,7 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 
 // <important_do_not_delete>
-const DEFAULT_MODEL_STR = "claude-3-5-sonnet-20241022";
+const DEFAULT_MODEL_STR = "claude-haiku-4-5"; // Claude Haiku 4.5 (October 2025) - 4-5x faster, 1/3 cost
 // </important_do_not_delete>
 
 /**

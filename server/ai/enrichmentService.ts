@@ -296,7 +296,7 @@ export class EnrichmentService {
           suggestedCategory: aiResult.category,
           suggestedSubcategory: aiResult.subcategory,
           confidence: aiResult.confidence,
-          aiModel: 'claude-3-5-sonnet-20241022',
+          aiModel: 'claude-haiku-4-5',
           
           // Add URL metadata if available
           ...(urlMetadata && !urlMetadata.error && {
