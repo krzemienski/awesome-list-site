@@ -47,8 +47,17 @@ export default function Login() {
       if (response.ok) {
         const result = await response.json();
         
+        // Invalidate and fetch the user data
         await queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
-        await queryClient.refetchQueries({ queryKey: ['/api/auth/user'] });
+        
+        // Manually set the query data to ensure it's available immediately
+        queryClient.setQueryData(['/api/auth/user'], {
+          user: result.user,
+          isAuthenticated: true
+        });
+        
+        // Also trigger a refetch to ensure fresh data
+        queryClient.refetchQueries({ queryKey: ['/api/auth/user'] });
         
         toast({
           title: "Login successful",
