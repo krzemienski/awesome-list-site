@@ -16,7 +16,7 @@
 
 import { db } from '../server/db';
 import { resources, enrichmentJobs, enrichmentQueue } from '@shared/schema';
-import { sql } from 'drizzle-orm';
+import { sql, inArray, eq } from 'drizzle-orm';
 import { enrichmentService } from '../server/ai/enrichmentService';
 import { storage } from '../server/storage';
 
@@ -32,10 +32,11 @@ class BatchEnrichmentE2ETest {
   private startTime: number = 0;
   private endTime: number = 0;
   private testJobId: number | null = null;
+  private testFixtureIds: number[] = [];
 
   async run() {
     console.log('\n═══════════════════════════════════════════════════════════');
-    console.log('  LAYER 2: Batch Enrichment E2E Test');
+    console.log('  LAYER 2: Batch Enrichment E2E Test (with Test Fixtures)');
     console.log('═══════════════════════════════════════════════════════════\n');
 
     this.startTime = Date.now();
@@ -44,14 +45,20 @@ class BatchEnrichmentE2ETest {
       // Step 1: Check enrichment state before test
       await this.testEnrichmentStateBeforeTest();
 
-      // Step 2: Start enrichment job
+      // Step 2: Create test fixtures (enrichable resources)
+      await this.testCreateFixtures();
+
+      // Step 3: Start enrichment job
       await this.testStartEnrichmentJob();
 
-      // Step 3: Monitor job progress
+      // Step 4: Monitor job progress
       await this.testMonitorJobProgress();
 
-      // Step 4: Verify enrichment results
+      // Step 5: Verify enrichment results (including fixtures)
       await this.testEnrichmentResults();
+
+      // Step 6: Verify test fixtures were enriched
+      await this.testVerifyFixturesEnriched();
 
       this.endTime = Date.now();
       this.printReport();
@@ -60,6 +67,70 @@ class BatchEnrichmentE2ETest {
       this.endTime = Date.now();
       this.printReport();
       process.exit(1);
+    } finally {
+      // Always clean up test fixtures
+      await this.cleanupTestFixtures();
+    }
+  }
+
+  private async testCreateFixtures() {
+    console.log('📝 Step 2: Creating test fixtures for enrichment validation...\n');
+
+    try {
+      // Create 3 test resources WITHOUT descriptions (enrichable)
+      // Using real URLs for URL scraping validation
+      const testFixtures = await db.insert(resources).values([
+        {
+          title: 'E2E Test - HLS.js Player',
+          url: 'https://github.com/video-dev/hls.js',
+          category: 'Players & Clients',
+          subcategory: 'Web Players',
+          status: 'approved',
+          description: '', // Empty description - will be enriched
+          metadata: { testFixture: true, testRun: Date.now() }
+        },
+        {
+          title: 'E2E Test - Shaka Player',
+          url: 'https://github.com/google/shaka-player',
+          category: 'Players & Clients',
+          subcategory: 'Web Players',
+          status: 'approved',
+          description: '', // Empty description - will be enriched
+          metadata: { testFixture: true, testRun: Date.now() }
+        },
+        {
+          title: 'E2E Test - FFmpeg',
+          url: 'https://ffmpeg.org/',
+          category: 'Encoding & Codecs',
+          subcategory: 'Encoding Tools',
+          status: 'approved',
+          description: '', // Empty description - will be enriched
+          metadata: { testFixture: true, testRun: Date.now() }
+        }
+      ]).returning({ id: resources.id });
+
+      this.testFixtureIds = testFixtures.map(r => r.id);
+
+      console.log(`  ✅ Created ${testFixtures.length} test fixtures for enrichment`);
+      console.log(`  Test fixture IDs: [${this.testFixtureIds.join(', ')}]`);
+      console.log(`  All fixtures have empty descriptions (enrichable)\n`);
+
+      this.addResult({
+        testName: 'Create test fixtures',
+        passed: testFixtures.length === 3,
+        message: `Successfully created ${testFixtures.length} test fixtures`,
+        details: {
+          fixtureCount: testFixtures.length,
+          fixtureIds: this.testFixtureIds
+        }
+      });
+    } catch (error: any) {
+      this.addResult({
+        testName: 'Create test fixtures',
+        passed: false,
+        message: `Failed to create test fixtures: ${error.message}`
+      });
+      throw error;
     }
   }
 
@@ -119,8 +190,92 @@ class BatchEnrichmentE2ETest {
     }
   }
 
+  private async testVerifyFixturesEnriched() {
+    console.log('🔍 Step 6: Verifying test fixtures were enriched...\n');
+
+    try {
+      // Query test fixtures to verify enrichment
+      const fixtureResults = await db.select()
+        .from(resources)
+        .where(inArray(resources.id, this.testFixtureIds));
+
+      console.log(`  Test fixtures retrieved: ${fixtureResults.length}/${this.testFixtureIds.length}\n`);
+
+      let enrichedCount = 0;
+      let urlScrapedCount = 0;
+      let aiTagsCount = 0;
+
+      fixtureResults.forEach((res, idx) => {
+        const metadata = res.metadata as any || {};
+        
+        console.log(`  Fixture ${idx + 1}: ${res.title}`);
+        console.log(`    AI Enriched: ${metadata.aiEnriched ? '✓' : '✗'}`);
+        console.log(`    URL Scraped: ${metadata.urlScraped ? '✓' : '✗'}`);
+        console.log(`    AI Tags: ${metadata.suggestedTags ? metadata.suggestedTags.slice(0, 3).join(', ') : 'N/A'}`);
+        console.log(`    AI Model: ${metadata.aiModel || 'N/A'}`);
+
+        if (metadata.aiEnriched) enrichedCount++;
+        if (metadata.urlScraped) urlScrapedCount++;
+        if (metadata.suggestedTags && metadata.suggestedTags.length > 0) aiTagsCount++;
+      });
+
+      console.log(`\n  📊 Test Fixture Enrichment Results:`);
+      console.log(`    - Enriched: ${enrichedCount}/${fixtureResults.length}`);
+      console.log(`    - URL Scraped: ${urlScrapedCount}/${fixtureResults.length}`);
+      console.log(`    - AI Tags Generated: ${aiTagsCount}/${fixtureResults.length}\n`);
+
+      // Test passes if at least 1 fixture was enriched
+      // This validates that the enrichment service is actually working
+      const testPassed = enrichedCount > 0;
+
+      this.addResult({
+        testName: 'Test fixtures enrichment verification',
+        passed: testPassed,
+        message: testPassed 
+          ? `✅ ${enrichedCount}/${fixtureResults.length} test fixtures enriched successfully`
+          : `❌ No test fixtures enriched - enrichment service may be broken`,
+        details: {
+          totalFixtures: fixtureResults.length,
+          enrichedCount,
+          urlScrapedCount,
+          aiTagsCount,
+          fixtureIds: this.testFixtureIds
+        }
+      });
+
+      if (!testPassed) {
+        console.log(`  ❌ CRITICAL: No test fixtures enriched - this indicates enrichment is broken!\n`);
+      }
+    } catch (error: any) {
+      this.addResult({
+        testName: 'Test fixtures enrichment verification',
+        passed: false,
+        message: `Failed to verify fixture enrichment: ${error.message}`
+      });
+      throw error;
+    }
+  }
+
+  private async cleanupTestFixtures() {
+    if (this.testFixtureIds.length === 0) {
+      return;
+    }
+
+    console.log('\n🧹 Cleaning up test fixtures...\n');
+
+    try {
+      const deleted = await db.delete(resources)
+        .where(inArray(resources.id, this.testFixtureIds))
+        .returning({ id: resources.id });
+
+      console.log(`  ✅ Cleaned up ${deleted.length} test fixtures\n`);
+    } catch (error: any) {
+      console.log(`  ⚠️  Warning: Failed to clean up test fixtures: ${error.message}\n`);
+    }
+  }
+
   private async testStartEnrichmentJob() {
-    console.log('🚀 Step 2: Starting enrichment job...\n');
+    console.log('🚀 Step 3: Starting enrichment job...\n');
 
     try {
       const batchSize = 5;
@@ -174,7 +329,7 @@ class BatchEnrichmentE2ETest {
       throw new Error('No test job ID available');
     }
 
-    console.log('⏳ Step 3: Monitoring job progress...\n');
+    console.log('⏳ Step 4: Monitoring job progress...\n');
 
     try {
       let attempts = 0;
@@ -236,7 +391,7 @@ class BatchEnrichmentE2ETest {
   }
 
   private async testEnrichmentResults() {
-    console.log('✅ Step 4: Verifying enrichment results...\n');
+    console.log('✅ Step 5: Verifying enrichment results...\n');
 
     try {
       // Get enriched resources

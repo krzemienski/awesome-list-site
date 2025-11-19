@@ -21,7 +21,7 @@
 
 import { db } from '../server/db';
 import { resources, githubSyncHistory, enrichmentJobs } from '@shared/schema';
-import { eq, sql, and } from 'drizzle-orm';
+import { eq, sql, and, inArray } from 'drizzle-orm';
 import { syncService } from '../server/github/syncService';
 import { enrichmentService } from '../server/ai/enrichmentService';
 import { storage } from '../server/storage';
@@ -46,10 +46,11 @@ class CombinedWorkflowE2ETest {
   private endTime: number = 0;
   private initialSnapshot: StateSnapshot | null = null;
   private testJobId: number | null = null;
+  private testFixtureIds: number[] = [];
 
   async run() {
     console.log('\n═══════════════════════════════════════════════════════════');
-    console.log('  LAYER 3: Combined Workflow E2E Test');
+    console.log('  LAYER 3: Combined Workflow E2E Test (with Test Fixtures)');
     console.log('═══════════════════════════════════════════════════════════');
     console.log('  Testing: GitHub Import → AI Enrichment → End-to-End Verification');
     console.log('═══════════════════════════════════════════════════════════\n');
@@ -63,13 +64,19 @@ class CombinedWorkflowE2ETest {
       // Step 2: Import resources from GitHub (use existing if already imported)
       await this.testGitHubImportPhase();
 
-      // Step 3: Enrich imported resources
+      // Step 3: Create test fixtures (enrichable resources)
+      await this.testCreateFixtures();
+
+      // Step 4: Enrich imported resources
       await this.testEnrichmentPhase();
 
-      // Step 4: Verify end-to-end data flow
+      // Step 5: Verify end-to-end data flow (including fixtures)
       await this.testEndToEndDataFlow();
 
-      // Step 5: Measure performance metrics
+      // Step 6: Verify test fixtures were enriched
+      await this.testVerifyFixturesEnriched();
+
+      // Step 7: Measure performance metrics
       await this.testPerformanceMetrics();
 
       this.endTime = Date.now();
@@ -79,6 +86,9 @@ class CombinedWorkflowE2ETest {
       this.endTime = Date.now();
       this.printReport();
       process.exit(1);
+    } finally {
+      // Always clean up test fixtures
+      await this.cleanupTestFixtures();
     }
   }
 
@@ -135,6 +145,58 @@ class CombinedWorkflowE2ETest {
         testName: 'Initial state snapshot',
         passed: false,
         message: `Failed to capture initial state: ${error.message}`
+      });
+      throw error;
+    }
+  }
+
+  private async testCreateFixtures() {
+    console.log('📝 Step 3: Creating test fixtures for combined workflow validation...\n');
+
+    try {
+      // Create 2 test resources WITHOUT descriptions (enrichable)
+      // These will be enriched after GitHub import to test the combined workflow
+      const testFixtures = await db.insert(resources).values([
+        {
+          title: 'E2E Combined Test - Video.js Player',
+          url: 'https://github.com/videojs/video.js',
+          category: 'Players & Clients',
+          subcategory: 'Web Players',
+          status: 'approved',
+          description: '', // Empty description - will be enriched
+          metadata: { testFixture: true, testRun: Date.now(), testType: 'combined' }
+        },
+        {
+          title: 'E2E Combined Test - x264 Encoder',
+          url: 'https://www.videolan.org/developers/x264.html',
+          category: 'Encoding & Codecs',
+          subcategory: 'Encoding Tools',
+          status: 'approved',
+          description: '', // Empty description - will be enriched
+          metadata: { testFixture: true, testRun: Date.now(), testType: 'combined' }
+        }
+      ]).returning({ id: resources.id });
+
+      this.testFixtureIds = testFixtures.map(r => r.id);
+
+      console.log(`  ✅ Created ${testFixtures.length} test fixtures for combined workflow`);
+      console.log(`  Test fixture IDs: [${this.testFixtureIds.join(', ')}]`);
+      console.log(`  All fixtures have empty descriptions (enrichable)\n`);
+
+      this.addResult({
+        testName: 'Create test fixtures',
+        passed: testFixtures.length === 2,
+        message: `Successfully created ${testFixtures.length} test fixtures for combined workflow`,
+        details: {
+          fixtureCount: testFixtures.length,
+          fixtureIds: this.testFixtureIds
+        }
+      });
+    } catch (error: any) {
+      this.addResult({
+        testName: 'Create test fixtures',
+        passed: false,
+        message: `Failed to create test fixtures: ${error.message}`
       });
       throw error;
     }
@@ -202,8 +264,90 @@ class CombinedWorkflowE2ETest {
     }
   }
 
+  private async testVerifyFixturesEnriched() {
+    console.log('🔍 Step 6: Verifying test fixtures were enriched...\n');
+
+    try {
+      // Query test fixtures to verify enrichment
+      const fixtureResults = await db.select()
+        .from(resources)
+        .where(inArray(resources.id, this.testFixtureIds));
+
+      console.log(`  Test fixtures retrieved: ${fixtureResults.length}/${this.testFixtureIds.length}\n`);
+
+      let enrichedCount = 0;
+      let urlScrapedCount = 0;
+      let aiTagsCount = 0;
+
+      fixtureResults.forEach((res, idx) => {
+        const metadata = res.metadata as any || {};
+        
+        console.log(`  Fixture ${idx + 1}: ${res.title}`);
+        console.log(`    AI Enriched: ${metadata.aiEnriched ? '✓' : '✗'}`);
+        console.log(`    URL Scraped: ${metadata.urlScraped ? '✓' : '✗'}`);
+        console.log(`    AI Tags: ${metadata.suggestedTags ? metadata.suggestedTags.slice(0, 3).join(', ') : 'N/A'}`);
+
+        if (metadata.aiEnriched) enrichedCount++;
+        if (metadata.urlScraped) urlScrapedCount++;
+        if (metadata.suggestedTags && metadata.suggestedTags.length > 0) aiTagsCount++;
+      });
+
+      console.log(`\n  📊 Combined Test Fixture Results:`);
+      console.log(`    - Enriched: ${enrichedCount}/${fixtureResults.length}`);
+      console.log(`    - URL Scraped: ${urlScrapedCount}/${fixtureResults.length}`);
+      console.log(`    - AI Tags Generated: ${aiTagsCount}/${fixtureResults.length}\n`);
+
+      // Test passes if at least 1 fixture was enriched
+      const testPassed = enrichedCount > 0;
+
+      this.addResult({
+        testName: 'Combined test fixtures verification',
+        passed: testPassed,
+        message: testPassed 
+          ? `✅ ${enrichedCount}/${fixtureResults.length} combined test fixtures enriched successfully`
+          : `❌ No combined test fixtures enriched - combined workflow may be broken`,
+        details: {
+          totalFixtures: fixtureResults.length,
+          enrichedCount,
+          urlScrapedCount,
+          aiTagsCount,
+          fixtureIds: this.testFixtureIds
+        }
+      });
+
+      if (!testPassed) {
+        console.log(`  ❌ CRITICAL: No combined test fixtures enriched - workflow may be broken!\n`);
+      }
+    } catch (error: any) {
+      this.addResult({
+        testName: 'Combined test fixtures verification',
+        passed: false,
+        message: `Failed to verify combined fixture enrichment: ${error.message}`
+      });
+      throw error;
+    }
+  }
+
+  private async cleanupTestFixtures() {
+    if (this.testFixtureIds.length === 0) {
+      return;
+    }
+
+    console.log('\n🧹 Cleaning up test fixtures...\n');
+
+    try {
+      const deleted = await db.delete(resources)
+        .where(inArray(resources.id, this.testFixtureIds))
+        .returning({ id: resources.id });
+
+      console.log(`  ✅ Cleaned up ${deleted.length} test fixtures\n`);
+    } catch (error: any) {
+      console.log(`  ⚠️  Warning: Failed to clean up test fixtures: ${error.message}\n`);
+    }
+  }
+
   private async testEnrichmentPhase() {
-    console.log('🤖 Step 3: AI Enrichment Phase...\n');
+    console.log('🤖 Step 4: AI Enrichment Phase...\n');
 
     try {
       // Query how many resources are actually enrichable (no description, not enriched)
@@ -305,7 +449,7 @@ class CombinedWorkflowE2ETest {
   }
 
   private async testEndToEndDataFlow() {
-    console.log('🔍 Step 4: Verifying end-to-end data flow...\n');
+    console.log('🔍 Step 5: Verifying end-to-end data flow...\n');
 
     try {
       // Get resources that are both GitHub-synced AND enriched
@@ -384,7 +528,7 @@ class CombinedWorkflowE2ETest {
   }
 
   private async testPerformanceMetrics() {
-    console.log('📊 Step 5: Measuring performance metrics...\n');
+    console.log('📊 Step 7: Measuring performance metrics...\n');
 
     try {
       const duration = (Date.now() - this.startTime) / 1000;
