@@ -103,7 +103,23 @@ export async function setupAuth(app: Express) {
   };
 
   passport.serializeUser((user: Express.User, cb) => cb(null, user));
-  passport.deserializeUser((user: Express.User, cb) => cb(null, user));
+  passport.deserializeUser(async (user: Express.User, cb) => {
+    try {
+      // Fetch fresh user data from DB to ensure we have the latest role
+      const { storage } = await import('./storage.js');
+      const userId = (user as any).claims?.sub;
+      if (userId) {
+        const dbUser = await storage.getUser(userId);
+        if (dbUser) {
+          // Attach DB user data to session user object
+          (user as any).dbUser = dbUser;
+        }
+      }
+      cb(null, user);
+    } catch (error) {
+      cb(error);
+    }
+  });
 
   app.get("/api/login", (req, res, next) => {
     ensureStrategy(req.hostname);

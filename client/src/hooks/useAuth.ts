@@ -7,6 +7,7 @@ interface User {
   name?: string;
   avatar?: string;
   provider?: string;
+  role?: string;
   createdAt?: string;
 }
 

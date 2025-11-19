@@ -231,10 +231,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: info?.message || "Invalid credentials" });
       }
       
-      req.logIn(user, (err) => {
+      req.logIn(user, async (err) => {
         if (err) {
           return res.status(500).json({ message: "Login failed" });
         }
+        
+        // Fetch user from database to get the role
+        const dbUser = await storage.getUser(user.claims.sub);
         
         return res.json({
           user: {
@@ -243,6 +246,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             firstName: user.claims.first_name,
             lastName: user.claims.last_name,
             profileImageUrl: user.claims.profile_image_url,
+            role: dbUser?.role || 'user', // Include role from database
           }
         });
       });
@@ -291,17 +295,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/auth/user - Get current user (public endpoint)
   app.get('/api/auth/user', async (req: any, res) => {
     try {
+      console.log('[/api/auth/user] Request received');
+      console.log('[/api/auth/user] isAuthenticated:', req.isAuthenticated?.());
+      console.log('[/api/auth/user] req.user?.dbUser:', req.user?.dbUser);
+      console.log('[/api/auth/user] req.user?.claims?.sub:', req.user?.claims?.sub);
+      
       // Check if user is authenticated
       if (!req.isAuthenticated() || !req.user?.claims?.sub) {
+        console.log('[/api/auth/user] User not authenticated, returning null');
         return res.json({ user: null, isAuthenticated: false });
       }
 
-      const userId = req.user.claims.sub;
-      const dbUser = await storage.getUser(userId);
+      // Use DB user from session (populated by deserializeUser) or fetch if not available
+      let dbUser = req.user.dbUser;
+      if (!dbUser) {
+        const userId = req.user.claims.sub;
+        console.log('[/api/auth/user] dbUser not in session, fetching from DB, userId:', userId);
+        dbUser = await storage.getUser(userId);
+      }
       
       if (!dbUser) {
+        console.log('[/api/auth/user] User not found in DB');
         return res.json({ user: null, isAuthenticated: false });
       }
+
+      console.log('[/api/auth/user] DB user found:', {
+        id: dbUser.id,
+        email: dbUser.email,
+        role: dbUser.role
+      });
 
       // Map database fields to frontend-expected format
       const user = {
@@ -315,6 +337,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         createdAt: dbUser.createdAt,
       };
 
+      console.log('[/api/auth/user] Returning user:', user);
       res.json({ user, isAuthenticated: true });
     } catch (error) {
       console.error("Error fetching user:", error);
