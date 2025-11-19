@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -47,14 +47,15 @@ export default function Login() {
       if (response.ok) {
         const result = await response.json();
         
+        await queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+        await queryClient.refetchQueries({ queryKey: ['/api/auth/user'] });
+        
         toast({
           title: "Login successful",
           description: `Welcome back, ${result.user.email}!`,
         });
 
-        setTimeout(() => {
-          setLocation("/admin");
-        }, 500);
+        setLocation("/admin");
       } else {
         const error = await response.json().catch(() => ({ message: "Invalid email or password" }));
         toast({
