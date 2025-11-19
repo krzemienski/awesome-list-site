@@ -48,6 +48,21 @@ The original test assertions contained **false negatives** caused by misundersta
 
 Executed comprehensive end-to-end testing across three layers of the GitHub Sync and Batch Enrichment workflows. After correcting test assertions to match actual service behavior, all workflows are functioning correctly.
 
+### ⚠️ Known Limitation: Combined Workflow Constraint
+
+**Business Logic Constraint**: The enrichment service (by design) only processes resources WITHOUT descriptions (`WHERE description IS NULL`). GitHub-imported resources already contain descriptions extracted from README markdown, so they will NOT be enriched.
+
+**Testing Impact**:
+- ✅ GitHub import validated (Layer 1: 100% pass)
+- ✅ Batch enrichment validated with test fixtures (Layer 2: 100% pass)  
+- ⚠️ Combined GitHub→enrichment workflow cannot be validated end-to-end because imported resources have descriptions
+
+**What This Means**:
+- Both systems work independently: Import ✅, Enrichment ✅
+- Enrichment of GitHub-imported resources is prevented by business logic (not a bug)
+- Test fixtures used in Layer 2 & 3 to validate enrichment service functionality
+- True GitHub→enrichment integration not tested due to description constraint
+
 ### Overall Results (After Corrections)
 
 | Layer | Tests Passed | Tests Failed | Success Rate | Status |
