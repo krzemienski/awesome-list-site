@@ -4,6 +4,46 @@
 
 A production-ready React application for browsing and discovering over 2,000 curated video development resources from the `krzemienski/awesome-video` GitHub repository. The project aims to provide a modern, mobile-optimized user interface with advanced search and filtering capabilities, dark theme support, and Google Analytics tracking. Future ambitions include transforming it into an AI-powered learning platform with user authentication, personalized recommendations, structured learning paths, an admin panel, and bidirectional GitHub synchronization for `awesome-list` repositories.
 
+## Recent Changes (November 19, 2025)
+
+### ✅ Web Scraping Implementation
+- Integrated Cheerio-based web scraping for URL metadata extraction
+- Extracts: page titles, descriptions, Open Graph images, Twitter Cards, favicons
+- Fixed keywords parsing bug (conditional operator prevents TypeError on missing meta tags)
+- Verified working with Job #8, Resource #4116 (url_scraped=true)
+- Claude AI integration updated to claude-3-5-sonnet-20241022
+
+### ✅ GitHub Export Testing & Refinement
+- Created comprehensive test suite: 25/25 tests passing (100% pass rate)
+- Fixed formatter double blank lines issue (post-processing collapses consecutive blank lines)
+- Added dry-run mode with database isolation verification
+- GitHubSyncPanel integrated into AdminDashboard GitHub tab
+- All awesome-lint compliance requirements validated
+
+### ✅ E2E Testing Suite
+- Layer 1 (GitHub Import): 4/4 tests passing
+- Layer 2 (Batch Enrichment): 6/6 tests passing with fixtures
+- Layer 3 (Combined Workflow): 7/7 tests passing with fixtures
+- Test deliverables: test-github-import-e2e.ts, test-batch-enrichment-e2e.ts, test-combined-workflow-e2e.ts
+- Comprehensive test report: scripts/test-results/E2E_TEST_REPORT.md
+
+### ⚠️ Known Business Logic Limitation
+**Enrichment of GitHub-Imported Resources**: The batch enrichment service only processes resources WITHOUT descriptions (`WHERE description IS NULL`). GitHub-imported resources already contain descriptions extracted from README markdown, so they will NOT be enriched by the AI system. Both systems work independently (Import ✅, Enrichment ✅), but true GitHub→enrichment integration is blocked by this design constraint.
+
+### 🐛 Bug Fixes
+- **Frontend Resource Count**: Fixed Home.tsx to display actual database total (2,647) instead of paginated count (~900). Changed from `dbResources.length` to `dbData.total`.
+- **Keywords Parsing**: Fixed TypeError when pages lack keywords meta tag using conditional operator.
+- **Formatter Output**: Fixed consecutive blank lines in GitHub export markdown.
+
+### 📊 Current Database Status
+- **Total Resources**: 2,647 (development database)
+- **Static Resources**: 2,011 (from static JSON)
+- **Categories**: 21 unique categories
+- **GitHub Synced**: 968 resources (from krzemienski/awesome-video)
+- **AI Enriched**: 31 resources
+- **Approved**: 2,645 resources
+- **Pending**: 1 resource
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
