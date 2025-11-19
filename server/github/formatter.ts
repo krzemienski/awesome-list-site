@@ -64,7 +64,12 @@ export class AwesomeListFormatter {
     }
 
     // Ensure file ends with a single newline (awesome-lint requirement)
-    return sections.filter(s => s.trim()).join('\n\n') + '\n';
+    // Post-process to collapse any consecutive blank lines (3+ newlines to 2)
+    return sections
+      .filter(s => s.trim())
+      .join('\n\n')
+      .replace(/\n\n\n+/g, '\n\n') // Collapse 3+ newlines to 2
+      + '\n';
   }
 
   /**
