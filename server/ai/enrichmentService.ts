@@ -1,5 +1,6 @@
 import { storage } from '../storage';
 import { generateResourceTags } from './tagging';
+import { fetchUrlMetadata, type UrlMetadata } from './urlScraper';
 import type { EnrichmentJob } from '@shared/schema';
 
 type EnrichmentOutcome = 'success' | 'skipped' | 'failed';
@@ -264,12 +265,29 @@ export class EnrichmentService {
 
     while (retryCount < maxRetries) {
       try {
+        // Fetch URL metadata first
+        let urlMetadata: UrlMetadata | null = null;
+        try {
+          console.log(`Fetching metadata from URL: ${resource.url}`);
+          urlMetadata = await fetchUrlMetadata(resource.url);
+          
+          if (urlMetadata.error) {
+            console.log(`URL metadata fetch failed: ${urlMetadata.error}`);
+          } else {
+            console.log(`Successfully fetched metadata: ${urlMetadata.title || 'No title'}`);
+          }
+        } catch (error) {
+          console.error(`Error fetching URL metadata:`, error);
+        }
+
+        // Then call Claude AI with existing code
         const aiResult = await generateResourceTags(
           resource.title,
           resource.description,
           resource.url
         );
 
+        // Merge URL metadata with AI results
         const enhancedMetadata = {
           ...metadata,
           aiEnriched: true,
@@ -278,7 +296,23 @@ export class EnrichmentService {
           suggestedCategory: aiResult.category,
           suggestedSubcategory: aiResult.subcategory,
           confidence: aiResult.confidence,
-          aiModel: 'claude-3-5-sonnet-20241022'
+          aiModel: 'claude-3-5-sonnet-20241022',
+          
+          // Add URL metadata if available
+          ...(urlMetadata && !urlMetadata.error && {
+            urlScraped: true,
+            urlScrapedAt: new Date().toISOString(),
+            scrapedTitle: urlMetadata.title,
+            scrapedDescription: urlMetadata.description,
+            ogImage: urlMetadata.ogImage,
+            ogTitle: urlMetadata.ogTitle,
+            ogDescription: urlMetadata.ogDescription,
+            twitterCard: urlMetadata.twitterCard,
+            twitterImage: urlMetadata.twitterImage,
+            favicon: urlMetadata.favicon,
+            author: urlMetadata.author,
+            keywords: urlMetadata.keywords,
+          }),
         };
 
         const updates: any = {
@@ -331,6 +365,8 @@ export class EnrichmentService {
         }
       }
     }
+    
+    return 'failed';
   }
 
   async getJobStatus(jobId: number): Promise<JobStatus> {
