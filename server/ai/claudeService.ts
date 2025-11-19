@@ -231,7 +231,9 @@ export class ClaudeService {
     // Implement LRU cache by removing oldest entries if cache is full
     if (this.responseCache.size >= this.MAX_CACHE_SIZE) {
       const oldestKey = this.responseCache.keys().next().value;
-      this.responseCache.delete(oldestKey);
+      if (oldestKey) {
+        this.responseCache.delete(oldestKey);
+      }
     }
 
     this.responseCache.set(key, {
@@ -328,7 +330,9 @@ export class ClaudeService {
   private cacheAnalysis(url: string, result: any): void {
     if (this.analysisCache.size >= this.MAX_CACHE_SIZE) {
       const oldestKey = this.analysisCache.keys().next().value;
-      this.analysisCache.delete(oldestKey);
+      if (oldestKey) {
+        this.analysisCache.delete(oldestKey);
+      }
     }
 
     this.analysisCache.set(url, {
@@ -507,13 +511,13 @@ Return ONLY valid JSON with this structure:
         suggestedTitle: (parsed.suggestedTitle || '').substring(0, 200),
         suggestedDescription: (parsed.suggestedDescription || '').substring(0, 2000),
         suggestedTags: Array.isArray(parsed.suggestedTags) 
-          ? parsed.suggestedTags.slice(0, 20).map(tag => String(tag).substring(0, 50))
+          ? parsed.suggestedTags.slice(0, 20).map((tag: any) => String(tag).substring(0, 50))
           : [],
         suggestedCategory: parsed.suggestedCategory || '',
         suggestedSubcategory: parsed.suggestedSubcategory,
         confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.5,
         keyTopics: Array.isArray(parsed.keyTopics)
-          ? parsed.keyTopics.slice(0, 10).map(topic => String(topic).substring(0, 100))
+          ? parsed.keyTopics.slice(0, 10).map((topic: any) => String(topic).substring(0, 100))
           : []
       };
 
