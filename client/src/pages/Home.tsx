@@ -56,20 +56,16 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
 
   const calculateTotalCount = (category: Category): number => {
     const staticCount = category.resources.length;
-    // Defensive: match by display name OR slug
-    const dbCount = dbResources.filter(r => {
-      const matchesName = r.category === category.name;
-      const matchesSlug = r.category?.toLowerCase().replace(/\s+&\s+/g, '-').replace(/\s+/g, '-') === category.slug;
-      return matchesName || matchesSlug;
-    }).length;
-    return staticCount + dbCount;
+    // Note: DB resources are fetched with pagination, so we can't accurately count per-category
+    // from the paginated results. Using static count only for category cards.
+    return staticCount;
   };
   
   const totalResourceCount = useMemo(() => {
     const staticCount = awesomeList?.resources.length || 0;
-    const dbCount = dbResources.length;
+    const dbCount = dbData?.total || 0;
     return staticCount + dbCount;
-  }, [awesomeList?.resources.length, dbResources.length]);
+  }, [awesomeList?.resources.length, dbData?.total]);
 
   if (isLoading) {
     return (
