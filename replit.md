@@ -11,7 +11,7 @@ A production-ready React application for browsing and discovering over 2,000 cur
 - Extracts: page titles, descriptions, Open Graph images, Twitter Cards, favicons
 - Fixed keywords parsing bug (conditional operator prevents TypeError on missing meta tags)
 - Verified working with Job #8, Resource #4116 (url_scraped=true)
-- Claude AI integration updated to claude-3-5-sonnet-20241022
+- Claude AI updated to **Haiku 4.5** (claude-haiku-4-5) - 4-5x faster, 1/3 cost vs Sonnet
 
 ### ✅ GitHub Export Testing & Refinement
 - Created comprehensive test suite: 25/25 tests passing (100% pass rate)
