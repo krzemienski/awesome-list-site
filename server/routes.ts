@@ -224,30 +224,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/local/login", (req, res, next) => {
     passport.authenticate('local', (err: any, user: any, info: any) => {
       if (err) {
+        console.log('[local/login] Authentication error:', err);
         return res.status(500).json({ message: "Internal server error" });
       }
       
       if (!user) {
+        console.log('[local/login] Authentication failed:', info?.message);
         return res.status(401).json({ message: info?.message || "Invalid credentials" });
       }
       
+      console.log('[local/login] User authenticated, establishing session for:', user.claims?.sub);
+      
       req.logIn(user, async (err) => {
         if (err) {
+          console.log('[local/login] Login failed:', err);
           return res.status(500).json({ message: "Login failed" });
         }
         
-        // Fetch user from database to get the role
-        const dbUser = await storage.getUser(user.claims.sub);
+        console.log('[local/login] Session established, saving to store...');
         
-        return res.json({
-          user: {
-            id: user.claims.sub,
-            email: user.claims.email,
-            firstName: user.claims.first_name,
-            lastName: user.claims.last_name,
-            profileImageUrl: user.claims.profile_image_url,
-            role: dbUser?.role || 'user', // Include role from database
+        // Explicitly save the session to ensure it's persisted before sending response
+        req.session.save(async (saveErr) => {
+          if (saveErr) {
+            console.log('[local/login] Session save failed:', saveErr);
+            return res.status(500).json({ message: "Failed to save session" });
           }
+          
+          console.log('[local/login] Session saved successfully, session ID:', req.sessionID);
+          
+          // Fetch user from database to get the role
+          const dbUser = await storage.getUser(user.claims.sub);
+          
+          console.log('[local/login] Returning user response with role:', dbUser?.role);
+          
+          return res.json({
+            user: {
+              id: user.claims.sub,
+              email: user.claims.email,
+              firstName: user.claims.first_name,
+              lastName: user.claims.last_name,
+              profileImageUrl: user.claims.profile_image_url,
+              role: dbUser?.role || 'user',
+            }
+          });
         });
       });
     })(req, res, next);
