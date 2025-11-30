@@ -58,10 +58,10 @@ export default function CategoryExplorer({ categories, resources, className }: C
         case "name":
           return a.name.localeCompare(b.name);
         case "count":
-          return b.resources.length - a.resources.length;
+          return b.count - a.count;
         case "activity":
           // Sort by most recent or most popular (using resource count as proxy)
-          return b.resources.length - a.resources.length;
+          return b.count - a.count;
         default:
           return 0;
       }
@@ -91,7 +91,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
   };
 
   const getCategoryStats = (category: Category) => {
-    const totalResources = category.resources.length;
+    const totalResources = category.count;
     const subcategoryCount = category.subcategories?.length || 0;
     const uniqueTags = new Set(
       category.resources.flatMap(r => r.tags || [])
@@ -288,9 +288,9 @@ export default function CategoryExplorer({ categories, resources, className }: C
                       </p>
                     </div>
                   ))}
-                  {category.resources.length > 3 && (
+                  {category.count > 3 && (
                     <p className="text-xs text-muted-foreground">
-                      +{category.resources.length - 3} more resources
+                      +{category.count - 3} more resources
                     </p>
                   )}
                 </div>

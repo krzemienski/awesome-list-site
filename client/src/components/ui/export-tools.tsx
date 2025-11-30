@@ -472,7 +472,7 @@ export default function ExportTools({ awesomeList, selectedCategory, className }
                   onCheckedChange={() => toggleCategory(category.name)}
                 />
                 <label htmlFor={`category-${category.name}`} className="text-sm cursor-pointer">
-                  {category.name} ({category.resources.length})
+                  {category.name} ({category.count})
                 </label>
               </div>
             ))}

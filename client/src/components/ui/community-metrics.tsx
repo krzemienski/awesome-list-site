@@ -109,10 +109,10 @@ export default function CommunityMetrics({ resources, categories, className }: C
     // Generate category metrics
     const categoryMetrics: CategoryMetric[] = categories.map((category, idx) => ({
       name: category.name,
-      resourceCount: category.resources.length,
+      resourceCount: category.count,
       growthRate: ((idx * 13 + 5) % 30) + 5,
       engagement: ((idx * 19 + 50) % 100) + 50,
-      completeness: Math.min(100, (category.resources.length / 20) * 100)
+      completeness: Math.min(100, (category.count / 20) * 100)
     })).sort((a, b) => b.engagement - a.engagement);
 
     return {

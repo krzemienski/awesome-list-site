@@ -101,13 +101,13 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
   // Calculate total count - category level already includes all nested resources
   // This matches the logic used in HomePage for consistency
   const calculateTotalCount = (category: Category): number => {
-    return category.resources.length;
+    return category.count;
   };
 
   // Filter out unwanted categories (memoized to prevent infinite useEffect loops)
   const filteredCategories = useMemo(() => 
     categories.filter(cat => 
-      cat.resources.length > 0 && 
+      cat.count > 0 && 
       cat.name !== "Table of contents" && 
       !cat.name.startsWith("List of") &&
       !["Contributing", "License", "External Links", "Anti-features"].includes(cat.name)
@@ -411,7 +411,7 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                                             >
                                               <span className="flex-1">{sub.name}</span>
                                               <Badge variant="secondary" className="ml-auto mr-1 text-[10px] px-1.5 py-0 group-data-[collapsible=icon]:hidden">
-                                                {sub.resources.length}
+                                                {sub.count}
                                               </Badge>
                                             </Link>
                                           </SidebarMenuSubButton>
@@ -443,7 +443,7 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                                                   >
                                                     <span className="flex-1">{subSub.name}</span>
                                                     <Badge variant="secondary" className="ml-auto text-[10px] px-1.5 py-0 group-data-[collapsible=icon]:hidden">
-                                                      {subSub.resources.length}
+                                                      {subSub.count}
                                                     </Badge>
                                                   </Link>
                                                 </SidebarMenuSubButton>
@@ -460,7 +460,7 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                                         >
                                           <span className="flex-1">{sub.name}</span>
                                           <Badge variant="secondary" className="ml-auto text-[10px] px-1.5 py-0 group-data-[collapsible=icon]:hidden">
-                                            {sub.resources.length}
+                                            {sub.count}
                                           </Badge>
                                         </Link>
                                       </SidebarMenuSubButton>

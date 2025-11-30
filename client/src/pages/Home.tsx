@@ -36,18 +36,18 @@ const categoryIcons: { [key: string]: any } = {
 
 export default function Home({ awesomeList }: HomeProps) {
   const categories = awesomeList?.categories || [];
-  const totalResourceCount = awesomeList?.resources.length || 0;
+  const totalResourceCount = awesomeList?.count || 0;
 
   // Calculate total resources including nested subcategories
   const calculateTotalResources = (category: Category): number => {
-    let total = category.resources.length;
+    let total = category.count;
 
     if (category.subcategories) {
       category.subcategories.forEach(sub => {
-        total += sub.resources.length;
+        total += sub.count;
         if (sub.subSubcategories) {
           sub.subSubcategories.forEach(subsub => {
-            total += subsub.resources.length;
+            total += subsub.count;
           });
         }
       });
@@ -94,13 +94,8 @@ export default function Home({ awesomeList }: HomeProps) {
           const Icon = categoryIcons[category.name] || FileText;
           const totalCount = calculateTotalResources(category);
 
-          // Use first resource's description as category description
-          const firstResource = category.resources[0] || category.subcategories?.[0]?.resources?.[0];
-          const description = firstResource?.description
-            ? firstResource.description.length > 100
-              ? `${firstResource.description.substring(0, 100)}...`
-              : firstResource.description
-            : '';
+          // Category description (resources no longer embedded - optimized for performance)
+          const description = '';
           
           return (
             <Link 

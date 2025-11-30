@@ -552,7 +552,7 @@ export default function Profile({ user }: ProfileProps) {
                         <Skeleton key={i} className="h-24 w-full" />
                       ))}
                     </div>
-                  ) : submissions && submissions.resources.length > 0 ? (
+                  ) : submissions && submissions.count > 0 ? (
                     <div className="space-y-3">
                       {submissions.resources.map((resource) => (
                         <div

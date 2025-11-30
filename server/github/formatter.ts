@@ -58,10 +58,8 @@ export class AwesomeListFormatter {
       sections.push(this.generateContributingSection());
     }
 
-    // Add license section
-    if (this.options.includeLicense) {
-      sections.push(this.generateLicenseSection());
-    }
+    // License section removed - awesome-lint forbids explicit license sections
+    // The CC0 license is already indicated in the badge in the header
 
     // Ensure file ends with a single newline (awesome-lint requirement)
     // Post-process to collapse any consecutive blank lines (3+ newlines to 2)
@@ -143,9 +141,11 @@ export class AwesomeListFormatter {
 
   /**
    * Generate resource sections grouped by category
+   * Uses global URL deduplication to prevent same URL appearing multiple times
    */
   private generateResourceSections(categoryGroups: Map<string, CategoryGroup>): string {
     const sections: string[] = [];
+    const globalSeenUrls = new Set<string>(); // Global deduplication across all categories
 
     for (const [category, group] of Array.from(categoryGroups)) {
       // Category header
@@ -154,7 +154,7 @@ export class AwesomeListFormatter {
 
       // Add resources directly under the category
       if (group.directResources.length > 0) {
-        sections.push(this.formatResourceList(group.directResources));
+        sections.push(this.formatResourceList(group.directResources, globalSeenUrls));
         sections.push('');
       }
 
@@ -165,7 +165,7 @@ export class AwesomeListFormatter {
 
         // Add resources directly under the subcategory
         if (subgroup.directResources.length > 0) {
-          sections.push(this.formatResourceList(subgroup.directResources));
+          sections.push(this.formatResourceList(subgroup.directResources, globalSeenUrls));
           sections.push('');
         }
 
@@ -173,7 +173,7 @@ export class AwesomeListFormatter {
         for (const [subSubcategory, resources] of Array.from(subgroup.subSubcategories)) {
           sections.push(`#### ${subSubcategory}`);
           sections.push('');
-          sections.push(this.formatResourceList(resources));
+          sections.push(this.formatResourceList(resources, globalSeenUrls));
           sections.push('');
         }
       }
@@ -184,9 +184,23 @@ export class AwesomeListFormatter {
 
   /**
    * Format a list of resources following awesome list conventions
+   * @param globalSeenUrls Optional set for global deduplication across all categories
    */
-  private formatResourceList(resources: Resource[]): string {
-    return resources
+  private formatResourceList(resources: Resource[], globalSeenUrls?: Set<string>): string {
+    // Use provided global set or create local one
+    const seenUrls = globalSeenUrls || new Set<string>();
+    
+    // Deduplicate by URL - keep first occurrence only
+    const uniqueResources = resources.filter(resource => {
+      const normalizedUrl = resource.url.trim().toLowerCase();
+      if (seenUrls.has(normalizedUrl)) {
+        return false; // Skip duplicate
+      }
+      seenUrls.add(normalizedUrl);
+      return true;
+    });
+    
+    return uniqueResources
       .sort((a, b) => a.title.localeCompare(b.title)) // Alphabetical sorting
       .map(resource => this.formatResource(resource))
       .join('\n');
@@ -200,53 +214,76 @@ export class AwesomeListFormatter {
     // Replace brackets in title with parentheses to avoid breaking markdown link syntax
     // Titles with brackets break the [title](url) pattern in awesome-lint validator
     let title = resource.title.replace(/\[/g, '(').replace(/\]/g, ')');
-    
+
     // Ensure proper capitalization in title
     title = this.ensureProperCapitalization(title);
-    
-    // Remove trailing slashes from URLs (awesome-lint requirement)
+
+    // Normalize URL (awesome-lint requirements):
     let url = resource.url.trim();
-    if (url.endsWith('/') && url !== '/') {
+
+    // 1. Force HTTPS for http URLs (except localhost)
+    if (url.startsWith('http://') && !url.includes('localhost')) {
+      url = url.replace(/^http:\/\//, 'https://');
+    }
+
+    // 2. Remove trailing slashes (but not for root URLs)
+    while (url.endsWith('/') && url.length > 8 && !url.match(/^https?:\/\/$/)) {
       url = url.slice(0, -1);
     }
-    
-    // Escape parentheses in URLs to avoid breaking markdown link syntax
-    // URLs with unescaped parentheses break markdown parsing
+
+    // 3. Normalize domain casing (lowercase domain only)
+    try {
+      const urlMatch = url.match(/^(https?:\/\/)([^\/\?#]+)(.*)$/);
+      if (urlMatch) {
+        url = urlMatch[1] + urlMatch[2].toLowerCase() + (urlMatch[3] || '');
+      }
+    } catch {
+      // Keep original URL if parsing fails
+    }
+
+    // 4. Escape parentheses in URLs to avoid breaking markdown link syntax
     url = url.replace(/\(/g, '%28').replace(/\)/g, '%29');
-    
+
     let line = `- [${title}](${url})`;
-    
+
     if (resource.description && resource.description.trim()) {
       let description = resource.description.trim();
-      
+
       // Remove raw HTML/shortcodes from descriptions (e.g., [vc_row...])
       // These break markdown parsing and are not useful in README
       description = description.replace(/\[vc_[^\]]+\]/g, '');
       description = description.replace(/\[\/vc_[^\]]+\]/g, '');
       description = description.trim();
-      
+
       // Replace remaining brackets in description with parentheses
       description = description.replace(/\[/g, '(').replace(/\]/g, ')');
-      
+
+      // Replace smart quotes with straight quotes (match-punctuation fix)
+      description = description.replace(/[\u2018\u2019]/g, "'"); // Replace curly single quotes
+      description = description.replace(/[\u201C\u201D]/g, '"'); // Replace curly double quotes
+
       // Ensure description starts with capital letter
       if (description && description[0] !== description[0].toUpperCase()) {
         description = description[0].toUpperCase() + description.slice(1);
       }
-      
-      // Ensure description ends with a period
-      if (!description.endsWith('.') && !description.endsWith('!') && !description.endsWith('?')) {
+
+      // Ensure description ends with exactly one period (no-repeat-punctuation)
+      // Remove any trailing periods first to avoid double periods
+      description = description.replace(/\.{2,}$/g, '.'); // Replace 2+ periods at end with single period
+      description = description.replace(/\.+$/, ''); // Remove all trailing periods
+      if (!description.endsWith('!') && !description.endsWith('?')) {
         description += '.';
       }
-      
+
       // Apply proper capitalizations in description
       description = this.ensureProperCapitalization(description);
-      
+
       line += ` - ${description}`;
     }
-    
+
     return line;
   }
-  
+
   /**
    * Ensure proper capitalization for common terms (awesome-lint requirement)
    */
@@ -278,15 +315,22 @@ export class AwesomeListFormatter {
       'ipv4': 'IPv4',
       'ipv6': 'IPv6'
     };
-    
+
     let result = text;
-    
+
     // Apply replacements with word boundary checks
     for (const [wrong, correct] of Object.entries(replacements)) {
       const regex = new RegExp(`\\b${wrong}\\b`, 'gi');
       result = result.replace(regex, correct);
     }
-    
+
+    // Special cases (case-sensitive replacements)
+    result = result.replace(/\bOS X\b/g, 'macOS');
+    result = result.replace(/\bOSX\b/g, 'macOS');
+    result = result.replace(/\bOsx\b/g, 'macOS');
+    result = result.replace(/\bStackoverflow\b/gi, 'Stack Overflow');
+    result = result.replace(/\bstackoverflow\b/g, 'Stack Overflow');
+
     return result;
   }
 

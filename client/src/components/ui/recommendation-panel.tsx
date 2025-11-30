@@ -306,7 +306,7 @@ export default function RecommendationPanel({
                               </div>
                               <div className="flex items-center gap-1">
                                 <BookOpen className="h-4 w-4" />
-                                {path.resources.length} resources
+                                {path.count} resources
                               </div>
                               <div className="flex items-center gap-1">
                                 <TrendingUp className="h-4 w-4" />
@@ -361,7 +361,7 @@ export default function RecommendationPanel({
                                         <div>
                                           <span className="font-medium">Resources:</span>
                                           <br />
-                                          {selectedPath.resources.length} items
+                                          {selectedPath.count} items
                                         </div>
                                       </div>
 
@@ -393,7 +393,7 @@ export default function RecommendationPanel({
                                       )}
 
                                       <div>
-                                        <h4 className="font-semibold mb-2">Resources ({selectedPath.resources.length})</h4>
+                                        <h4 className="font-semibold mb-2">Resources ({selectedPath.count})</h4>
                                         <ScrollArea className="h-32">
                                           <div className="space-y-2">
                                             {selectedPath.resources.map((resource, i) => (

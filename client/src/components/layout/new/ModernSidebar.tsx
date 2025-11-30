@@ -50,14 +50,14 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
 
   // Calculate total resources including all nested levels
   const calculateTotalResources = (category: Category): number => {
-    let total = category.resources.length;
+    let total = category.count;
 
     if (category.subcategories) {
       category.subcategories.forEach(sub => {
-        total += sub.resources.length;
+        total += sub.count;
         if (sub.subSubcategories) {
           sub.subSubcategories.forEach(subsub => {
-            total += subsub.resources.length;
+            total += subsub.count;
           });
         }
       });
@@ -67,10 +67,10 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
   };
 
   const calculateSubcategoryTotal = (subcategory: any): number => {
-    let total = subcategory.resources.length;
+    let total = subcategory.count;
     if (subcategory.subSubcategories) {
       subcategory.subSubcategories.forEach((subsub: any) => {
-        total += subsub.resources.length;
+        total += subsub.count;
       });
     }
     return total;
@@ -367,7 +367,7 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
                                   })()}
                                   <span className="truncate flex-1 text-left leading-tight">{subSubcategory.name}</span>
                                   <span className="text-xs bg-muted/80 text-muted-foreground px-1 py-0.5 rounded ml-auto flex-shrink-0 whitespace-nowrap">
-                                    {subSubcategory.resources.length}
+                                    {subSubcategory.count}
                                   </span>
                                 </div>
                               </Button>

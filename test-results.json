@@ -1,0 +1,369 @@
+{
+  "config": {
+    "configFile": "/Users/nick/Desktop/awesome-list-site/playwright.config.ts",
+    "rootDir": "/Users/nick/Desktop/awesome-list-site/tests/e2e",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 600000,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 1,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        {
+          "open": "never"
+        }
+      ],
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/Users/nick/Desktop/awesome-list-site/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium-desktop",
+        "name": "chromium-desktop",
+        "testDir": "/Users/nick/Desktop/awesome-list-site/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 120000
+      },
+      {
+        "outputDir": "/Users/nick/Desktop/awesome-list-site/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium-mobile",
+        "name": "chromium-mobile",
+        "testDir": "/Users/nick/Desktop/awesome-list-site/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 120000
+      },
+      {
+        "outputDir": "/Users/nick/Desktop/awesome-list-site/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium-tablet",
+        "name": "chromium-tablet",
+        "testDir": "/Users/nick/Desktop/awesome-list-site/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 120000
+      }
+    ],
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.57.0",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run dev",
+      "url": "http://localhost:3000",
+      "reuseExistingServer": true,
+      "timeout": 120000,
+      "stdout": "ignore",
+      "stderr": "pipe"
+    }
+  },
+  "suites": [
+    {
+      "title": "user-workflows-round2.spec.ts",
+      "file": "user-workflows-round2.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "User Workflows Round 2 - Bug Verification",
+          "file": "user-workflows-round2.spec.ts",
+          "line": 19,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Task 31-40: Search Dialog - Bug #1 Verification",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 11138,
+                      "error": {
+                        "message": "TimeoutError: locator.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"search\"], input[placeholder*=\"search\" i]').first()\u001b[22m\n",
+                        "stack": "TimeoutError: locator.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"search\"], input[placeholder*=\"search\" i]').first()\u001b[22m\n\n    at /Users/nick/Desktop/awesome-list-site/tests/e2e/user-workflows-round2.spec.ts:102:23",
+                        "location": {
+                          "file": "/Users/nick/Desktop/awesome-list-site/tests/e2e/user-workflows-round2.spec.ts",
+                          "column": 23,
+                          "line": 102
+                        },
+                        "snippet": "  100 |     console.log('Task 33: Typing \"ffmpeg\" in search');\n  101 |     const searchInput = page.locator('input[type=\"search\"], input[placeholder*=\"search\" i]').first();\n> 102 |     await searchInput.fill('ffmpeg');\n      |                       ^\n  103 |     await page.waitForTimeout(500); // Debounce delay\n  104 |\n  105 |     await page.screenshot({"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/nick/Desktop/awesome-list-site/tests/e2e/user-workflows-round2.spec.ts",
+                            "column": 23,
+                            "line": 102
+                          },
+                          "message": "TimeoutError: locator.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"search\"], input[placeholder*=\"search\" i]').first()\u001b[22m\n\n\n  100 |     console.log('Task 33: Typing \"ffmpeg\" in search');\n  101 |     const searchInput = page.locator('input[type=\"search\"], input[placeholder*=\"search\" i]').first();\n> 102 |     await searchInput.fill('ffmpeg');\n      |                       ^\n  103 |     await page.waitForTimeout(500); // Debounce delay\n  104 |\n  105 |     await page.screenshot({\n    at /Users/nick/Desktop/awesome-list-site/tests/e2e/user-workflows-round2.spec.ts:102:23"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Task 31: Opening search with / key\n"
+                        },
+                        {
+                          "text": "Task 32: Search dialog visible: false\n"
+                        },
+                        {
+                          "text": "Current URL: http://localhost:3000/\n"
+                        },
+                        {
+                          "text": "Checking if redirected to login...\n"
+                        },
+                        {
+                          "text": "Task 33: Typing \"ffmpeg\" in search\n"
+                        }
+                      ],
+                      "stderr": [
+                        {
+                          "text": "BUG CONFIRMED: Search dialog did not open\n"
+                        }
+                      ],
+                      "retry": 0,
+                      "startTime": "2025-11-30T20:46:40.847Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/user-workflows-round2-User-00713-Dialog---Bug-1-Verification-chromium-desktop/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/user-workflows-round2-User-00713-Dialog---Bug-1-Verification-chromium-desktop/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/user-workflows-round2-User-00713-Dialog---Bug-1-Verification-chromium-desktop/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/nick/Desktop/awesome-list-site/tests/e2e/user-workflows-round2.spec.ts",
+                        "column": 23,
+                        "line": 102
+                      }
+                    },
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 11078,
+                      "error": {
+                        "message": "TimeoutError: locator.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"search\"], input[placeholder*=\"search\" i]').first()\u001b[22m\n",
+                        "stack": "TimeoutError: locator.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"search\"], input[placeholder*=\"search\" i]').first()\u001b[22m\n\n    at /Users/nick/Desktop/awesome-list-site/tests/e2e/user-workflows-round2.spec.ts:102:23",
+                        "location": {
+                          "file": "/Users/nick/Desktop/awesome-list-site/tests/e2e/user-workflows-round2.spec.ts",
+                          "column": 23,
+                          "line": 102
+                        },
+                        "snippet": "  100 |     console.log('Task 33: Typing \"ffmpeg\" in search');\n  101 |     const searchInput = page.locator('input[type=\"search\"], input[placeholder*=\"search\" i]').first();\n> 102 |     await searchInput.fill('ffmpeg');\n      |                       ^\n  103 |     await page.waitForTimeout(500); // Debounce delay\n  104 |\n  105 |     await page.screenshot({"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/nick/Desktop/awesome-list-site/tests/e2e/user-workflows-round2.spec.ts",
+                            "column": 23,
+                            "line": 102
+                          },
+                          "message": "TimeoutError: locator.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"search\"], input[placeholder*=\"search\" i]').first()\u001b[22m\n\n\n  100 |     console.log('Task 33: Typing \"ffmpeg\" in search');\n  101 |     const searchInput = page.locator('input[type=\"search\"], input[placeholder*=\"search\" i]').first();\n> 102 |     await searchInput.fill('ffmpeg');\n      |                       ^\n  103 |     await page.waitForTimeout(500); // Debounce delay\n  104 |\n  105 |     await page.screenshot({\n    at /Users/nick/Desktop/awesome-list-site/tests/e2e/user-workflows-round2.spec.ts:102:23"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Task 31: Opening search with / key\n"
+                        },
+                        {
+                          "text": "Task 32: Search dialog visible: false\n"
+                        },
+                        {
+                          "text": "Current URL: http://localhost:3000/\n"
+                        },
+                        {
+                          "text": "Checking if redirected to login...\n"
+                        },
+                        {
+                          "text": "Task 33: Typing \"ffmpeg\" in search\n"
+                        }
+                      ],
+                      "stderr": [
+                        {
+                          "text": "BUG CONFIRMED: Search dialog did not open\n"
+                        }
+                      ],
+                      "retry": 1,
+                      "startTime": "2025-11-30T20:46:52.672Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/user-workflows-round2-User-00713-Dialog---Bug-1-Verification-chromium-desktop-retry1/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/user-workflows-round2-User-00713-Dialog---Bug-1-Verification-chromium-desktop-retry1/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/user-workflows-round2-User-00713-Dialog---Bug-1-Verification-chromium-desktop-retry1/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/user-workflows-round2-User-00713-Dialog---Bug-1-Verification-chromium-desktop-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/nick/Desktop/awesome-list-site/tests/e2e/user-workflows-round2.spec.ts",
+                        "column": 23,
+                        "line": 102
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e362a0c4cde67fa90693-a202ca7a13cc1b966c6a",
+              "file": "user-workflows-round2.spec.ts",
+              "line": 64,
+              "column": 3
+            },
+            {
+              "title": "Task 41-50: Profile Page - Bug #2 Fix Verification",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "e362a0c4cde67fa90693-6d60eb15c028d1b0271f",
+              "file": "user-workflows-round2.spec.ts",
+              "line": 151,
+              "column": 3
+            },
+            {
+              "title": "Task 51-60: Bookmarks Page",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "e362a0c4cde67fa90693-e81da6b30e085669dd7c",
+              "file": "user-workflows-round2.spec.ts",
+              "line": 244,
+              "column": 3
+            },
+            {
+              "title": "Task 61-70: Learning Journeys",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "e362a0c4cde67fa90693-9176d3dcfd617d9108d7",
+              "file": "user-workflows-round2.spec.ts",
+              "line": 328,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "message": "\u001b[31mTesting stopped early after 1 maximum allowed failures.\u001b[39m"
+    }
+  ],
+  "stats": {
+    "startTime": "2025-11-30T20:46:40.481Z",
+    "duration": 23741.322,
+    "expected": 0,
+    "skipped": 3,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}
