@@ -272,42 +272,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     })(req, res, next);
   });
 
-  // Initialize awesome video data
-  try {
-    console.log('Fetching awesome-video data from JSON source');
-    const awesomeVideoData = await fetchAwesomeVideoData();
-    storage.setAwesomeListData(awesomeVideoData);
-    console.log(`Successfully fetched awesome-video with ${awesomeVideoData.resources.length} resources`);
-  } catch (error) {
-    console.error(`Error fetching awesome-video data: ${error}`);
-  }
-
-  // Auto-seed database on first startup
-  try {
-    console.log('Checking if database needs seeding...');
-    const categories = await storage.listCategories();
-    const resourcesResult = await storage.listResources({ page: 1, limit: 1, status: 'approved' });
-    
-    if (categories.length === 0 || resourcesResult.total === 0) {
-      console.log(`📦 Database needs seeding (categories: ${categories.length}, resources: ${resourcesResult.total})...`);
-      const seedResult = await seedDatabase({ clearExisting: false });
-      
-      console.log('✅ Auto-seeding completed successfully:');
-      console.log(`   - Categories: ${seedResult.categoriesInserted}`);
-      console.log(`   - Subcategories: ${seedResult.subcategoriesInserted}`);
-      console.log(`   - Sub-subcategories: ${seedResult.subSubcategoriesInserted}`);
-      console.log(`   - Resources: ${seedResult.resourcesInserted}`);
-      
-      if (seedResult.errors.length > 0) {
-        console.warn(`⚠️  Seeding completed with ${seedResult.errors.length} errors`);
-      }
-    } else {
-      console.log(`✓ Database already populated: ${categories.length} categories, ${resourcesResult.total} resources`);
-    }
-  } catch (error) {
-    console.error('❌ Error during auto-seeding (non-fatal):', error);
-    console.log('Server will continue without seeding. You can manually seed via /api/admin/seed-database');
-  }
+  // Note: Database seeding and data initialization moved to runBackgroundInitialization()
+  // This ensures the server starts quickly for production deployments
 
   // ============= Auth Routes (from Replit Auth blueprint) =============
   
@@ -2112,4 +2078,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   const httpServer = createServer(app);
   return httpServer;
+}
+
+/**
+ * Run background initialization tasks AFTER the server has started listening.
+ * This ensures fast startup for production deployments.
+ * These tasks are non-blocking and run in the background.
+ */
+export async function runBackgroundInitialization(): Promise<void> {
+  const isProduction = process.env.NODE_ENV === 'production';
+  
+  console.log(`🔄 Running background initialization (${isProduction ? 'production' : 'development'} mode)...`);
+  
+  // ALWAYS initialize awesome video data (required for /api/awesome-list endpoint)
+  // This is fast (just fetching JSON) and needed in both dev and production
+  try {
+    console.log('Fetching awesome-video data from JSON source');
+    const awesomeVideoData = await fetchAwesomeVideoData();
+    storage.setAwesomeListData(awesomeVideoData);
+    console.log(`Successfully fetched awesome-video with ${awesomeVideoData.resources.length} resources`);
+  } catch (error) {
+    console.error(`Error fetching awesome-video data: ${error}`);
+  }
+
+  // In production, skip auto-seeding - database should be pre-populated
+  if (isProduction) {
+    console.log('⚡ Production mode: Skipping database seeding (database should be pre-populated)');
+    console.log('💡 Use /api/admin/seed-database endpoint to seed manually if needed');
+    console.log('✅ Background initialization complete');
+    return;
+  }
+
+  // Development mode: Check and seed database if needed
+  try {
+    console.log('Checking if database needs seeding...');
+    const categories = await storage.listCategories();
+    const resourcesResult = await storage.listResources({ page: 1, limit: 1, status: 'approved' });
+    
+    if (categories.length === 0 || resourcesResult.total === 0) {
+      console.log(`📦 Database needs seeding (categories: ${categories.length}, resources: ${resourcesResult.total})...`);
+      const seedResult = await seedDatabase({ clearExisting: false });
+      
+      console.log('✅ Auto-seeding completed successfully:');
+      console.log(`   - Categories: ${seedResult.categoriesInserted}`);
+      console.log(`   - Subcategories: ${seedResult.subcategoriesInserted}`);
+      console.log(`   - Sub-subcategories: ${seedResult.subSubcategoriesInserted}`);
+      console.log(`   - Resources: ${seedResult.resourcesInserted}`);
+      
+      if (seedResult.errors.length > 0) {
+        console.warn(`⚠️  Seeding completed with ${seedResult.errors.length} errors`);
+      }
+    } else {
+      console.log(`✓ Database already populated: ${categories.length} categories, ${resourcesResult.total} resources`);
+    }
+  } catch (error) {
+    console.error('❌ Error during auto-seeding (non-fatal):', error);
+    console.log('Server will continue without seeding. You can manually seed via /api/admin/seed-database');
+  }
+  
+  console.log('✅ Background initialization complete');
 }

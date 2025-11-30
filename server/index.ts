@@ -1,5 +1,5 @@
 import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./routes";
+import { registerRoutes, runBackgroundInitialization } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { handleSSR } from "./ssr";
 
@@ -69,5 +69,11 @@ app.use((req, res, next) => {
     reusePort: true,
   }, () => {
     log(`serving on port ${port}`);
+    
+    // Run background initialization AFTER server is listening
+    // This ensures fast startup for production deployments
+    runBackgroundInitialization().catch((error) => {
+      console.error('Background initialization error (non-fatal):', error);
+    });
   });
 })();
