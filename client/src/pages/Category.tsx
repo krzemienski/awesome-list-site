@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import SEOHead from "@/components/layout/SEOHead";
 import TagFilter from "@/components/ui/tag-filter";
+import ResourceCard from "@/components/resource/ResourceCard";
 import { ArrowLeft, Search, ExternalLink } from "lucide-react";
 import { deslugify, slugify } from "@/lib/utils";
 import { Resource } from "@/types/awesome-list";
@@ -277,64 +278,25 @@ export default function Category() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredResources.map((resource, index) => {
-            const resourceId = `${slugify(resource.title)}-${index}`;
-            
-            const handleResourceClick = () => {
-              window.open(resource.url, '_blank', 'noopener,noreferrer');
-              
-              // Build detailed toast message
-              let description = resource.description || '';
-              if (!description && resource.tags && resource.tags.length > 0) {
-                description = `Tags: ${resource.tags.slice(0, 3).join(', ')}${resource.tags.length > 3 ? ', ...' : ''}`;
-              }
-              
-              toast({
-                title: resource.title,
-                description: description || 'Opening resource in new tab',
-              });
-            };
-            
+            // Extract actual resource ID from the db- prefix if present
+            const actualId = resource.id?.startsWith('db-')
+              ? resource.id.substring(3)
+              : resource.id || `${slugify(resource.title)}-${index}`;
+
             return (
-              <Card 
+              <ResourceCard
                 key={`${resource.url}-${index}`}
-                className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors border border-border bg-card text-card-foreground"
-                onClick={handleResourceClick}
-                data-testid={`card-resource-${resourceId}`}
-              >
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-start gap-2">
-                    <span className="flex-1">{resource.title}</span>
-                    <ExternalLink className="h-4 w-4 flex-shrink-0 mt-1" />
-                  </CardTitle>
-                  {resource.description && (
-                    <CardDescription className="line-clamp-2">
-                      {resource.description}
-                    </CardDescription>
-                  )}
-                </CardHeader>
-                {(resource.subcategory || resource.subSubcategory || (resource.tags && resource.tags.length > 0)) && (
-                  <CardContent>
-                    <div className="flex gap-2 flex-wrap">
-                      {resource.subcategory && (
-                        <Badge variant="outline">{resource.subcategory}</Badge>
-                      )}
-                      {resource.subSubcategory && (
-                        <Badge variant="outline">{resource.subSubcategory}</Badge>
-                      )}
-                      {resource.tags && resource.tags.slice(0, 3).map((tag, tagIndex) => (
-                        <Badge key={tagIndex} variant="secondary" className="text-xs">
-                          {tag}
-                        </Badge>
-                      ))}
-                      {resource.tags && resource.tags.length > 3 && (
-                        <Badge variant="secondary" className="text-xs">
-                          +{resource.tags.length - 3}
-                        </Badge>
-                      )}
-                    </div>
-                  </CardContent>
-                )}
-              </Card>
+                resource={{
+                  id: actualId,
+                  name: resource.title,
+                  url: resource.url,
+                  description: resource.description,
+                  category: resource.category,
+                  tags: resource.tags || [],
+                  isFavorited: false, // TODO: Fetch from API
+                  isBookmarked: false, // TODO: Fetch from API
+                }}
+              />
             );
           })}
         </div>

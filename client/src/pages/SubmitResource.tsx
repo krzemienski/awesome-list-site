@@ -52,23 +52,23 @@ const submitResourceSchema = z.object({
 type SubmitResourceFormData = z.infer<typeof submitResourceSchema>;
 
 interface Category {
-  id: number;
+  id: string; // UUID
   name: string;
   slug: string;
 }
 
 interface Subcategory {
-  id: number;
+  id: string; // UUID
   name: string;
   slug: string;
-  categoryId: number;
+  categoryId: string; // UUID
 }
 
 interface SubSubcategory {
-  id: number;
+  id: string; // UUID
   name: string;
   slug: string;
-  subcategoryId: number;
+  subcategoryId: string; // UUID
 }
 
 export default function SubmitResource() {
@@ -80,19 +80,25 @@ export default function SubmitResource() {
   // Fetch categories
   const { data: categories = [], isLoading: categoriesLoading } = useQuery<Category[]>({
     queryKey: ['/api/categories'],
+    queryFn: () => apiRequest('/api/categories'),
     enabled: isAuthenticated,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   // Fetch subcategories
   const { data: subcategories = [], isLoading: subcategoriesLoading } = useQuery<Subcategory[]>({
     queryKey: ['/api/subcategories'],
+    queryFn: () => apiRequest('/api/subcategories'),
     enabled: isAuthenticated,
+    staleTime: 5 * 60 * 1000,
   });
 
   // Fetch sub-subcategories
   const { data: subSubcategories = [], isLoading: subSubcategoriesLoading } = useQuery<SubSubcategory[]>({
     queryKey: ['/api/sub-subcategories'],
+    queryFn: () => apiRequest('/api/sub-subcategories'),
     enabled: isAuthenticated,
+    staleTime: 5 * 60 * 1000,
   });
 
   const form = useForm<SubmitResourceFormData>({
@@ -111,20 +117,14 @@ export default function SubmitResource() {
   const selectedCategory = form.watch("category");
   const selectedSubcategory = form.watch("subcategory");
 
-  // Filter subcategories based on selected category ID
+  // Filter subcategories based on selected category ID (UUID)
   const filteredSubcategories = subcategories.filter(
-    (sub) => {
-      const categoryId = selectedCategory ? parseInt(selectedCategory) : null;
-      return categoryId ? sub.categoryId === categoryId : false;
-    }
+    (sub) => selectedCategory ? sub.categoryId === selectedCategory : false
   );
 
-  // Filter sub-subcategories based on selected subcategory ID
+  // Filter sub-subcategories based on selected subcategory ID (UUID)
   const filteredSubSubcategories = subSubcategories.filter(
-    (subSub) => {
-      const subcategoryId = selectedSubcategory ? parseInt(selectedSubcategory) : null;
-      return subcategoryId ? subSub.subcategoryId === subcategoryId : false;
-    }
+    (subSub) => selectedSubcategory ? subSub.subcategoryId === selectedSubcategory : false
   );
 
   // Reset subcategory when category changes
@@ -146,14 +146,10 @@ export default function SubmitResource() {
         ? data.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0).slice(0, 10)
         : [];
 
-      // Find the selected entities to get their names for submission
-      const categoryId = parseInt(data.category);
-      const subcategoryId = data.subcategory ? parseInt(data.subcategory) : null;
-      const subSubcategoryId = data.subSubcategory ? parseInt(data.subSubcategory) : null;
-
-      const category = categories.find(c => c.id === categoryId);
-      const subcategory = subcategoryId ? subcategories.find(s => s.id === subcategoryId) : null;
-      const subSubcategory = subSubcategoryId ? subSubcategories.find(ss => ss.id === subSubcategoryId) : null;
+      // Find the selected entities to get their names for submission (UUIDs)
+      const category = categories.find(c => c.id === data.category);
+      const subcategory = data.subcategory ? subcategories.find(s => s.id === data.subcategory) : null;
+      const subSubcategory = data.subSubcategory ? subSubcategories.find(ss => ss.id === data.subSubcategory) : null;
 
       if (!category) {
         throw new Error("Invalid category selected");

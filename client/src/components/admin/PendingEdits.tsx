@@ -33,7 +33,9 @@ export default function PendingEdits() {
 
   const { data: edits = [], isLoading } = useQuery<ResourceEditWithResource[]>({
     queryKey: ['/api/admin/resource-edits'],
-    refetchInterval: 10000
+    queryFn: () => apiRequest('/api/admin/resource-edits'),
+    refetchInterval: 10000,
+    retry: 1,
   });
 
   const approveMutation = useMutation({
