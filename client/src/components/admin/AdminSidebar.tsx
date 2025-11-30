@@ -77,7 +77,7 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
     },
     {
       label: 'Pending Approvals',
-      href: '/admin/pending',
+      href: '/admin/approvals',
       icon: CheckCircle,
       badge: pendingCount,
     },
@@ -96,21 +96,6 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
       label: 'GitHub Sync',
       href: '/admin/github',
       icon: Github,
-    },
-    {
-      label: 'Users',
-      href: '/admin/users',
-      icon: Users,
-    },
-    {
-      label: 'Settings',
-      href: '/admin/settings',
-      icon: Settings,
-    },
-    {
-      label: 'Audit Log',
-      href: '/admin/audit',
-      icon: FileText,
     },
   ];
 
