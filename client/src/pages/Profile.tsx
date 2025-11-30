@@ -203,7 +203,7 @@ export default function Profile({ user }: ProfileProps) {
             {user.createdAt && (
               <span className="flex items-center gap-1">
                 <Calendar className="h-4 w-4" />
-                Joined {formatDistanceToNow(new Date(user.createdAt), { addSuffix: true })}
+                Joined {user.createdAt ? formatDistanceToNow(new Date(user.createdAt), { addSuffix: true }) : 'recently'}
               </span>
             )}
             {progress?.skillLevel && (
@@ -364,7 +364,7 @@ export default function Profile({ user }: ProfileProps) {
                           </span>
                         )}
                         <span className="ml-auto">
-                          Last accessed {formatDistanceToNow(new Date(userJourney.lastAccessedAt), { addSuffix: true })}
+                          Last accessed {userJourney.lastAccessedAt ? formatDistanceToNow(new Date(userJourney.lastAccessedAt), { addSuffix: true }) : 'never'}
                         </span>
                       </div>
                     </div>
@@ -416,7 +416,7 @@ export default function Profile({ user }: ProfileProps) {
                                 {favorite.category}
                               </Badge>
                               <span className="text-xs text-muted-foreground">
-                                Added {formatDistanceToNow(new Date(favorite.addedAt), { addSuffix: true })}
+                                Added {favorite.addedAt ? formatDistanceToNow(new Date(favorite.addedAt), { addSuffix: true }) : 'recently'}
                               </span>
                             </div>
                           </div>
@@ -493,7 +493,7 @@ export default function Profile({ user }: ProfileProps) {
                                 {bookmark.category}
                               </Badge>
                               <span className="text-xs text-muted-foreground">
-                                Added {formatDistanceToNow(new Date(bookmark.addedAt), { addSuffix: true })}
+                                Added {bookmark.addedAt ? formatDistanceToNow(new Date(bookmark.addedAt), { addSuffix: true }) : 'recently'}
                               </span>
                             </div>
                           </div>
@@ -591,7 +591,7 @@ export default function Profile({ user }: ProfileProps) {
                                   {resource.category}
                                 </Badge>
                                 <span className="text-xs text-muted-foreground">
-                                  Submitted {formatDistanceToNow(new Date(resource.createdAt), { addSuffix: true })}
+                                  Submitted {resource.createdAt ? formatDistanceToNow(new Date(resource.createdAt), { addSuffix: true }) : 'recently'}
                                 </span>
                               </div>
                             </div>
@@ -696,7 +696,7 @@ export default function Profile({ user }: ProfileProps) {
                                   </div>
                                 )}
                                 <p className="text-xs text-muted-foreground">
-                                  Submitted {formatDistanceToNow(new Date(edit.createdAt), { addSuffix: true })}
+                                  Submitted {edit.createdAt ? formatDistanceToNow(new Date(edit.createdAt), { addSuffix: true }) : 'recently'}
                                 </p>
                               </div>
                             </div>
