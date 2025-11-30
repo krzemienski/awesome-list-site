@@ -50,42 +50,13 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
 
   // Show true hierarchical structure from JSON data - categories with their actual subcategories
   const getHierarchicalCategories = (categories: Category[]) => {
-    console.log("🏗️ BUILDING TRUE HIERARCHICAL NAVIGATION FROM JSON DATA");
-    console.log("📊 Total categories:", categories.length);
-    
     // Only filter out unwanted system categories, NOT by resource count
     // Resources are denormalized to subcategories, so top-level may have 0 resources
-    const filteredCategories = categories.filter(cat => 
-      cat.name !== "Table of contents" && 
+    const filteredCategories = categories.filter(cat =>
+      cat.name !== "Table of contents" &&
       !cat.name.startsWith("List of") &&
       !["Contributing", "License", "External Links", "Anti-features"].includes(cat.name)
     );
-    
-    console.log("✅ Filtered categories:", filteredCategories.length);
-    console.log("📝 Available categories:", filteredCategories.map(c => `${c.name} (${c.resources.length} resources)`));
-
-    // Calculate total navigation items for comprehensive testing (including sub-subcategories)
-    const totalSubcategories = filteredCategories.reduce((total, cat) => total + (cat.subcategories?.length || 0), 0);
-    const totalSubSubcategories = filteredCategories.reduce((total, cat) => 
-      total + (cat.subcategories?.reduce((subTotal, sub) => subTotal + (sub.subSubcategories?.length || 0), 0) || 0), 0
-    );
-    console.log(`🧮 Total navigation items: ${filteredCategories.length} categories + ${totalSubcategories} subcategories + ${totalSubSubcategories} sub-subcategories = ${filteredCategories.length + totalSubcategories + totalSubSubcategories} items`);
-
-    console.log("🎯 HIERARCHICAL NAVIGATION STRUCTURE:");
-    filteredCategories.forEach(cat => {
-      console.log(`📁 ${cat.name} (${cat.resources.length} resources) -> /category/${cat.slug}`);
-      if (cat.subcategories && cat.subcategories.length > 0) {
-        cat.subcategories.forEach(sub => {
-          console.log(`  ├── ${sub.name} (${sub.resources.length} resources) -> /subcategory/${sub.slug}`);
-          if (sub.subSubcategories && sub.subSubcategories.length > 0) {
-            sub.subSubcategories.forEach(subSub => {
-              console.log(`    ├── ${subSub.name} (${subSub.resources.length} resources) -> /sub-subcategory/${subSub.slug}`);
-            });
-          }
-        });
-      }
-    });
-    console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
     // Return the original categories structure for proper hierarchical display
     return filteredCategories;

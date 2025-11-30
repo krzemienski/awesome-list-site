@@ -8,11 +8,8 @@ interface AdminGuardProps {
 export default function AdminGuard({ children }: AdminGuardProps) {
   const { user, isLoading, isAdmin } = useAuth();
 
-  console.log('[AdminGuard] Rendering', { isLoading, user, isAdmin });
-
   // Show loading while checking auth
   if (isLoading) {
-    console.log('[AdminGuard] Showing loading state');
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
@@ -24,14 +21,10 @@ export default function AdminGuard({ children }: AdminGuardProps) {
   }
 
   // Use isAdmin flag from useAuth (correctly checks user_metadata.role)
-  console.log('[AdminGuard] isAdmin check:', { user, isAdmin });
-
   if (!isAdmin) {
-    console.log('[AdminGuard] Access denied - returning NotFound');
     return <NotFound />;
   }
 
-  console.log('[AdminGuard] Access granted - rendering admin children');
   // Only render children (AdminDashboard) if confirmed admin
   return <>{children}</>;
 }
