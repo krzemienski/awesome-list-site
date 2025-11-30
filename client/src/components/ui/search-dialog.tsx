@@ -21,12 +21,24 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
   const inputRef = useRef<HTMLInputElement>(null);
   const linkClickingRef = useRef(false);
 
-  // Debug: Log resources to see if they're being passed correctly
-  // Search dialog initialized with ${resources?.length || 0} resources
+  // DIAGNOSTIC: Log resources prop
+  useEffect(() => {
+    console.error('[SEARCH DEBUG] Resources received:', {
+      count: resources?.length || 0,
+      firstResource: resources?.[0] ? {
+        title: resources[0].title,
+        category: resources[0].category
+      } : 'NO RESOURCES'
+    });
+  }, [resources]);
 
   // Create Fuse.js instance for search with special character support
   const fuse = useMemo(() => {
-    if (!resources || resources.length === 0) return null;
+    console.error('[SEARCH DEBUG] Creating Fuse index with', resources?.length || 0, 'resources');
+    if (!resources || resources.length === 0) {
+      console.error('[SEARCH DEBUG] Fuse is NULL - no resources');
+      return null;
+    }
     return new Fuse(resources, {
       keys: ['title', 'description', 'category', 'subcategory'],
       threshold: 0.4, // More lenient for punctuation (was 0.3)
@@ -40,6 +52,8 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
 
   // Search when query changes
   useEffect(() => {
+    console.error('[SEARCH DEBUG] Search triggered:', { query, queryLength: query.length, fuseExists: !!fuse });
+
     if (!query || query.length < 2 || !fuse) {
       setResults([]);
       return;
@@ -48,11 +62,17 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
     const startTime = performance.now();
     const searchResults = fuse!.search(query);
     const endTime = performance.now();
-    
+
+    console.error('[SEARCH DEBUG] Search results:', {
+      query,
+      resultCount: searchResults.length,
+      duration: (endTime - startTime).toFixed(2) + 'ms'
+    });
+
     // Track search analytics
     trackSearch(query, searchResults.length);
     trackPerformance('search_time', endTime - startTime);
-    
+
     setResults(searchResults.slice(0, 15).map(result => result.item));
   }, [query, fuse]);
 
