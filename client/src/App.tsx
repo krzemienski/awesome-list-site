@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { Switch, Route, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { initGA } from "./lib/analytics";
@@ -20,19 +20,31 @@ import About from "@/pages/About";
 import Advanced from "@/pages/Advanced";
 import Profile from "@/pages/Profile";
 import Bookmarks from "@/pages/Bookmarks";
-import AdminDashboard from "@/pages/AdminDashboard";
 import AdminGuard from "@/components/auth/AdminGuard";
 import AuthGuard from "@/components/auth/AuthGuard";
 import NotFound from "@/pages/not-found";
 import SubmitResource from "@/pages/SubmitResource";
 import Journeys from "@/pages/Journeys";
 import JourneyDetail from "@/pages/JourneyDetail";
-import { AdminLayout } from "@/components/admin/AdminLayout";
-import { ResourceBrowser } from "@/components/admin/ResourceBrowser";
-import PendingResources from "@/components/admin/PendingResources";
-import PendingEdits from "@/components/admin/PendingEdits";
-import BatchEnrichmentPanel from "@/components/admin/BatchEnrichmentPanel";
-import GitHubSyncPanel from "@/components/admin/GitHubSyncPanel";
+
+// Lazy load admin components for better initial bundle size
+const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
+const AdminLayout = lazy(() => import("@/components/admin/AdminLayout").then(m => ({ default: m.AdminLayout })));
+const ResourceBrowser = lazy(() => import("@/components/admin/ResourceBrowser").then(m => ({ default: m.ResourceBrowser })));
+const PendingResources = lazy(() => import("@/components/admin/PendingResources"));
+const PendingEdits = lazy(() => import("@/components/admin/PendingEdits"));
+const BatchEnrichmentPanel = lazy(() => import("@/components/admin/BatchEnrichmentPanel"));
+const GitHubSyncPanel = lazy(() => import("@/components/admin/GitHubSyncPanel"));
+
+// Loading fallback component
+const LoadingFallback = () => (
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto mb-4"></div>
+      <p className="text-muted-foreground">Loading...</p>
+    </div>
+  </div>
+);
 
 import { AwesomeList } from "@/types/awesome-list";
 import { processAwesomeListData } from "@/lib/parser";
@@ -146,32 +158,44 @@ function Router() {
         )} />
         <Route path="/admin" component={() => (
           <AdminGuard>
-            <AdminDashboard />
+            <Suspense fallback={<LoadingFallback />}>
+              <AdminDashboard />
+            </Suspense>
           </AdminGuard>
         )} />
         <Route path="/admin/resources" component={() => (
           <AdminGuard>
-            <AdminLayout><ResourceBrowser /></AdminLayout>
+            <Suspense fallback={<LoadingFallback />}>
+              <AdminLayout><ResourceBrowser /></AdminLayout>
+            </Suspense>
           </AdminGuard>
         )} />
         <Route path="/admin/approvals" component={() => (
           <AdminGuard>
-            <AdminLayout><PendingResources /></AdminLayout>
+            <Suspense fallback={<LoadingFallback />}>
+              <AdminLayout><PendingResources /></AdminLayout>
+            </Suspense>
           </AdminGuard>
         )} />
         <Route path="/admin/edits" component={() => (
           <AdminGuard>
-            <AdminLayout><PendingEdits /></AdminLayout>
+            <Suspense fallback={<LoadingFallback />}>
+              <AdminLayout><PendingEdits /></AdminLayout>
+            </Suspense>
           </AdminGuard>
         )} />
         <Route path="/admin/enrichment" component={() => (
           <AdminGuard>
-            <AdminLayout><BatchEnrichmentPanel /></AdminLayout>
+            <Suspense fallback={<LoadingFallback />}>
+              <AdminLayout><BatchEnrichmentPanel /></AdminLayout>
+            </Suspense>
           </AdminGuard>
         )} />
         <Route path="/admin/github" component={() => (
           <AdminGuard>
-            <AdminLayout><GitHubSyncPanel /></AdminLayout>
+            <Suspense fallback={<LoadingFallback />}>
+              <AdminLayout><GitHubSyncPanel /></AdminLayout>
+            </Suspense>
           </AdminGuard>
         )} />
         <Route component={NotFound} />
