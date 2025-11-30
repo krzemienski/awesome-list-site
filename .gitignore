@@ -81,3 +81,6 @@ vite.config.ts.*
 # Deployment artifacts
 logs/
 attached_assets/docs/secrets/
+
+# Serena MCP local memory cache - contains potentially sensitive data
+.serena/
