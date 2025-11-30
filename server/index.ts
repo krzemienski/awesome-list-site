@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express, { type Request, Response, NextFunction } from "express";
+import rateLimit from "express-rate-limit";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { handleSSR } from "./ssr";
@@ -7,6 +8,27 @@ import { handleSSR } from "./ssr";
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// Rate limiting configuration (Bug #8 fix - Session 7)
+const apiLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute window
+  max: 60, // 60 requests per minute per IP
+  message: { message: 'Too many requests, please try again later' },
+  standardHeaders: true, // Return RateLimit-* headers
+  legacyHeaders: false,
+});
+
+const authLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 10, // Stricter: 10 auth attempts per minute
+  message: { message: 'Too many login attempts, please try again later' },
+  standardHeaders: true,
+  skipSuccessfulRequests: true, // Only count failed attempts
+});
+
+// Apply rate limiters
+app.use('/api/', apiLimiter);
+app.use('/api/auth/', authLimiter);
 
 app.use((req, res, next) => {
   const start = Date.now();
