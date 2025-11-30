@@ -31,6 +31,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/lib/supabase';
 import type { Resource } from '@shared/schema';
 
 interface ResourceResponse {
@@ -61,8 +62,16 @@ export function ResourceBrowser() {
         ...(filters.search && { search: filters.search }),
       });
 
+      // Get Supabase session for JWT token
+      const { data: { session } } = await supabase.auth.getSession();
+
+      const headers: HeadersInit = {};
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+      }
+
       const response = await fetch(`/api/admin/resources?${params}`, {
-        credentials: 'include',
+        headers,
       });
 
       if (!response.ok) {
@@ -76,10 +85,17 @@ export function ResourceBrowser() {
   // Update resource mutation
   const updateMutation = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<Resource> }) => {
+      // Get Supabase session for JWT token
+      const { data: { session } } = await supabase.auth.getSession();
+
+      const headers: HeadersInit = { 'Content-Type': 'application/json' };
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+      }
+
       const response = await fetch(`/api/admin/resources/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+        headers,
         body: JSON.stringify(updates),
       });
 
@@ -108,12 +124,19 @@ export function ResourceBrowser() {
 
   // Bulk action mutation
   const bulkMutation = useMutation({
-    mutationFn: async ({ action, ids }: { action: string; ids: string[] }) => {
+    mutationFn: async ({ action, ids, data }: { action: string; ids: string[]; data?: any }) => {
+      // Get Supabase session for JWT token
+      const { data: { session } } = await supabase.auth.getSession();
+
+      const headers: HeadersInit = { 'Content-Type': 'application/json' };
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+      }
+
       const response = await fetch('/api/admin/resources/bulk', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ action, ids }),
+        headers,
+        body: JSON.stringify({ action, resourceIds: ids, data }),
       });
 
       if (!response.ok) {
