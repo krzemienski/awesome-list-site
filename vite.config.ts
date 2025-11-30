@@ -28,40 +28,15 @@ export default defineConfig({
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
     
-    // Code splitting for better performance (Bug #7 fix - Session 7)
+    // Code splitting disabled due to circular dependencies (Bug #10 - Session 8)
+    // Manual chunking of vendor-react + vendor-query caused circular imports:
+    //   vendor-react imports from vendor-query
+    //   vendor-query imports from vendor-react
+    //   Result: React.forwardRef undefined, black screen
+    // Vite's automatic chunking avoids this issue
     rollupOptions: {
       output: {
-        manualChunks: (id) => {
-          // React core
-          if (id.includes('node_modules/react') ||
-              id.includes('node_modules/react-dom')) {
-            return 'vendor-react';
-          }
-
-          // React Query + Supabase
-          if (id.includes('node_modules/@tanstack/react-query') ||
-              id.includes('node_modules/@supabase/supabase-js')) {
-            return 'vendor-query';
-          }
-
-          // Radix UI components
-          if (id.includes('node_modules/@radix-ui')) {
-            return 'vendor-ui';
-          }
-
-          // Admin components (lazy-loaded)
-          if (id.includes('/src/pages/AdminDashboard') ||
-              id.includes('/src/components/admin/')) {
-            return 'admin';
-          }
-
-          // Utility libraries
-          if (id.includes('node_modules/date-fns') ||
-              id.includes('node_modules/clsx') ||
-              id.includes('node_modules/lucide-react')) {
-            return 'vendor-utils';
-          }
-        }
+        // Automatic chunking by Vite (no manual chunks)
       }
     },
     

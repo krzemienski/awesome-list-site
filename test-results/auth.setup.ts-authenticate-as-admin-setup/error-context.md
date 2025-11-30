@@ -1,0 +1,245 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - link "Awesome Video Resources" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - img [ref=e8]
+          - generic [ref=e11]: Awesome Video Resources
+        - button "Search resources... /" [ref=e13]:
+          - img [ref=e14]
+          - generic [ref=e17]: Search resources...
+          - generic [ref=e18]:
+            - generic:
+              - generic: /
+        - generic [ref=e19]:
+          - link "GitHub Repository" [ref=e20] [cursor=pointer]:
+            - /url: https://github.com/krzemienski/awesome-video
+            - img
+          - button "Switch List" [ref=e21]:
+            - img
+            - generic [ref=e22]: Switch List
+          - button "View analytics" [ref=e23]:
+            - img
+          - button "U" [ref=e24]:
+            - generic [ref=e26]: U
+    - generic [ref=e27]:
+      - generic [ref=e28]:
+        - generic [ref=e29]:
+          - generic [ref=e30]:
+            - generic [ref=e31]:
+              - button "Home" [ref=e32]:
+                - img
+                - text: Home
+              - button "Submit Resource" [ref=e33]:
+                - img
+                - text: Submit Resource
+              - button "Learning Journeys" [ref=e34]:
+                - img
+                - text: Learning Journeys
+              - button "Advanced Features" [ref=e35]:
+                - img
+                - text: Advanced Features
+              - button "AI Recommendations" [ref=e36]:
+                - img
+                - text: AI Recommendations
+              - button "Admin Dashboard" [ref=e37]:
+                - img
+                - text: Admin Dashboard
+            - generic [ref=e38]:
+              - generic [ref=e40]:
+                - button "Expand Adaptive Streaming & Manifest Tools" [ref=e41]:
+                  - generic [ref=e42]: ▶
+                - button "Adaptive Streaming & Manifest Tools 749" [ref=e43]:
+                  - generic [ref=e44]:
+                    - img
+                    - generic [ref=e45]: Adaptive Streaming & Manifest Tools
+                    - generic [ref=e46]: "749"
+              - generic [ref=e48]:
+                - button "Expand Build Tools Deployment & Utility Libraries" [ref=e49]:
+                  - generic [ref=e50]: ▶
+                - button "Build Tools Deployment & Utility Libraries 254" [ref=e51]:
+                  - generic [ref=e52]:
+                    - img
+                    - generic [ref=e53]: Build Tools Deployment & Utility Libraries
+                    - generic [ref=e54]: "254"
+              - generic [ref=e56]:
+                - button "Expand Community & Events" [ref=e57]:
+                  - generic [ref=e58]: ▶
+                - button "Community & Events 104" [ref=e59]:
+                  - generic [ref=e60]:
+                    - img
+                    - generic [ref=e61]: Community & Events
+                    - generic [ref=e62]: "104"
+              - generic [ref=e64]:
+                - button "Expand DRM Security & Content Protection" [ref=e65]:
+                  - generic [ref=e66]: ▶
+                - button "DRM Security & Content Protection 186" [ref=e67]:
+                  - generic [ref=e68]:
+                    - img
+                    - generic [ref=e69]: DRM Security & Content Protection
+                    - generic [ref=e70]: "186"
+              - generic [ref=e72]:
+                - button "Expand Encoding & Codecs" [ref=e73]:
+                  - generic [ref=e74]: ▶
+                - button "Encoding & Codecs 462" [ref=e75]:
+                  - generic [ref=e76]:
+                    - img
+                    - generic [ref=e77]: Encoding & Codecs
+                    - generic [ref=e78]: "462"
+              - generic [ref=e80]:
+                - button "Expand General Tools" [ref=e81]:
+                  - generic [ref=e82]: ▶
+                - button "General Tools 109" [ref=e83]:
+                  - generic [ref=e84]:
+                    - img
+                    - generic [ref=e85]: General Tools
+                    - generic [ref=e86]: "109"
+              - generic [ref=e88]:
+                - button "Expand Infrastructure & Delivery" [ref=e89]:
+                  - generic [ref=e90]: ▶
+                - button "Infrastructure & Delivery 192" [ref=e91]:
+                  - generic [ref=e92]:
+                    - img
+                    - generic [ref=e93]: Infrastructure & Delivery
+                    - generic [ref=e94]: "192"
+              - generic [ref=e96]:
+                - button "Expand Intro & Learning" [ref=e97]:
+                  - generic [ref=e98]: ▶
+                - button "Intro & Learning 246" [ref=e99]:
+                  - generic [ref=e100]:
+                    - img
+                    - generic [ref=e101]: Intro & Learning
+                    - generic [ref=e102]: "246"
+              - generic [ref=e104]:
+                - button "Expand Learning Tutorials & Documentation" [ref=e105]:
+                  - generic [ref=e106]: ▶
+                - button "Learning Tutorials & Documentation 245" [ref=e107]:
+                  - generic [ref=e108]:
+                    - img
+                    - generic [ref=e109]: Learning Tutorials & Documentation
+                    - generic [ref=e110]: "245"
+              - generic [ref=e112]:
+                - button "Expand Media Analysis Quality Metrics & AI Tools" [ref=e113]:
+                  - generic [ref=e114]: ▶
+                - button "Media Analysis Quality Metrics & AI Tools 466" [ref=e115]:
+                  - generic [ref=e116]:
+                    - img
+                    - generic [ref=e117]: Media Analysis Quality Metrics & AI Tools
+                    - generic [ref=e118]: "466"
+              - generic [ref=e120]:
+                - button "Expand Media Tools" [ref=e121]:
+                  - generic [ref=e122]: ▶
+                - button "Media Tools 323" [ref=e123]:
+                  - generic [ref=e124]:
+                    - img
+                    - generic [ref=e125]: Media Tools
+                    - generic [ref=e126]: "323"
+              - generic [ref=e128]:
+                - button "Expand Miscellaneous Experimental & Niche Tools" [ref=e129]:
+                  - generic [ref=e130]: ▶
+                - button "Miscellaneous Experimental & Niche Tools 180" [ref=e131]:
+                  - generic [ref=e132]:
+                    - img
+                    - generic [ref=e133]: Miscellaneous Experimental & Niche Tools
+                    - generic [ref=e134]: "180"
+              - generic [ref=e136]:
+                - button "Expand Players & Clients" [ref=e137]:
+                  - generic [ref=e138]: ▶
+                - button "Players & Clients 398" [ref=e139]:
+                  - generic [ref=e140]:
+                    - img
+                    - generic [ref=e141]: Players & Clients
+                    - generic [ref=e142]: "398"
+              - generic [ref=e144]:
+                - button "Expand Protocols & Transport" [ref=e145]:
+                  - generic [ref=e146]: ▶
+                - button "Protocols & Transport 330" [ref=e147]:
+                  - generic [ref=e148]:
+                    - img
+                    - generic [ref=e149]: Protocols & Transport
+                    - generic [ref=e150]: "330"
+              - generic [ref=e152]:
+                - button "Expand Standards & Industry" [ref=e153]:
+                  - generic [ref=e154]: ▶
+                - button "Standards & Industry 168" [ref=e155]:
+                  - generic [ref=e156]:
+                    - img
+                    - generic [ref=e157]: Standards & Industry
+                    - generic [ref=e158]: "168"
+              - generic [ref=e160]:
+                - button "Expand Standards Specifications & Industry Resources" [ref=e161]:
+                  - generic [ref=e162]: ▶
+                - button "Standards Specifications & Industry Resources 434" [ref=e163]:
+                  - generic [ref=e164]:
+                    - img
+                    - generic [ref=e165]: Standards Specifications & Industry Resources
+                    - generic [ref=e166]: "434"
+              - generic [ref=e168]:
+                - button "Expand Transcoding Codecs & Hardware Acceleration" [ref=e169]:
+                  - generic [ref=e170]: ▶
+                - button "Transcoding Codecs & Hardware Acceleration 47" [ref=e171]:
+                  - generic [ref=e172]:
+                    - img
+                    - generic [ref=e173]: Transcoding Codecs & Hardware Acceleration
+                    - generic [ref=e174]: "47"
+              - generic [ref=e176]:
+                - button "Expand Video Editing & Processing Tools" [ref=e177]:
+                  - generic [ref=e178]: ▶
+                - button "Video Editing & Processing Tools 170" [ref=e179]:
+                  - generic [ref=e180]:
+                    - img
+                    - generic [ref=e181]: Video Editing & Processing Tools
+                    - generic [ref=e182]: "170"
+              - generic [ref=e184]:
+                - button "Expand Video Encoding Transcoding & Packaging Tools" [ref=e185]:
+                  - generic [ref=e186]: ▶
+                - button "Video Encoding Transcoding & Packaging Tools 856" [ref=e187]:
+                  - generic [ref=e188]:
+                    - img
+                    - generic [ref=e189]: Video Encoding Transcoding & Packaging Tools
+                    - generic [ref=e190]: "856"
+              - generic [ref=e192]:
+                - button "Expand Video Players & Playback Libraries" [ref=e193]:
+                  - generic [ref=e194]: ▶
+                - button "Video Players & Playback Libraries 439" [ref=e195]:
+                  - generic [ref=e196]:
+                    - img
+                    - generic [ref=e197]: Video Players & Playback Libraries
+                    - generic [ref=e198]: "439"
+              - generic [ref=e200]:
+                - button "Expand Video Streaming & Distribution Solutions" [ref=e201]:
+                  - generic [ref=e202]: ▶
+                - button "Video Streaming & Distribution Solutions 389" [ref=e203]:
+                  - generic [ref=e204]:
+                    - img
+                    - generic [ref=e205]: Video Streaming & Distribution Solutions
+                    - generic [ref=e206]: "389"
+          - link "GitHub Repository" [ref=e208] [cursor=pointer]:
+            - /url: https://github.com/krzemienski/awesome-video
+            - img
+            - text: GitHub Repository
+        - link "GitHub Repository" [ref=e211] [cursor=pointer]:
+          - /url: https://github.com/krzemienski/awesome-video
+          - img
+          - text: GitHub Repository
+      - main [ref=e212]:
+        - paragraph [ref=e217]: Loading admin dashboard...
+        - generic [ref=e219]:
+          - paragraph [ref=e220]:
+            - text: Built with
+            - link "React" [ref=e221] [cursor=pointer]:
+              - /url: https://reactjs.org
+            - text: and
+            - link "shadcn/ui" [ref=e222] [cursor=pointer]:
+              - /url: https://ui.shadcn.com
+            - text: .
+          - paragraph [ref=e223]:
+            - link "About" [ref=e224] [cursor=pointer]:
+              - /url: /about
+```

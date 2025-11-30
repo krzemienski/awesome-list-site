@@ -1,0 +1,22 @@
+{
+  "cookies": [],
+  "origins": [
+    {
+      "origin": "http://localhost:3000",
+      "localStorage": [
+        {
+          "name": "sb-jeyldoypdkgsrfdhdcmm-auth-token",
+          "value": "{\"access_token\":\"eyJhbGciOiJIUzI1NiIsImtpZCI6IkRlOTBodWp6SVpGd2xsZEMiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2pleWxkb3lwZGtnc3JmZGhkY21tLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI1OGM1OTJjNS01NDhiLTQ0MTItYjRlMi1hOWRmNWNhYzUzOTciLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzY0NTQ5Mzc4LCJpYXQiOjE3NjQ1NDU3NzgsImVtYWlsIjoiYWRtaW5AdGVzdC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6e30sInVzZXJfbWV0YWRhdGEiOnsiZnVsbF9uYW1lIjoiVGVzdCBBZG1pbiIsInJvbGUiOiJhZG1pbiJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzY0NTQ1Nzc4fV0sInNlc3Npb25faWQiOiI2NzExNmVkYi1kMjk5LTQ1NGItYTgyZC02NzdjM2JmYTk5M2UiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.CLrG1h5qW5YJbu6Lu1OFzt-Csqe0NJGOSuLPFT-PHQU\",\"token_type\":\"bearer\",\"expires_in\":3600,\"expires_at\":1764549378,\"refresh_token\":\"6pcwlvf7tsda\",\"user\":{\"id\":\"58c592c5-548b-4412-b4e2-a9df5cac5397\",\"aud\":\"authenticated\",\"role\":\"authenticated\",\"email\":\"admin@test.com\",\"email_confirmed_at\":\"2025-11-29T22:36:51.996391Z\",\"phone\":\"\",\"confirmed_at\":\"2025-11-29T22:36:51.996391Z\",\"recovery_sent_at\":\"2025-11-30T20:44:11.033312Z\",\"last_sign_in_at\":\"2025-11-30T23:36:18.556431678Z\",\"app_metadata\":{},\"user_metadata\":{\"full_name\":\"Test Admin\",\"role\":\"admin\"},\"identities\":[],\"created_at\":\"2025-11-29T22:36:51.996391Z\",\"updated_at\":\"2025-11-30T23:36:18.559362Z\",\"is_anonymous\":false},\"weak_password\":null}"
+        },
+        {
+          "name": "awesome-video-user-profile",
+          "value": "{\"userId\":\"user_1764545776017_b8492frs0\",\"preferredCategories\":[],\"skillLevel\":\"beginner\",\"learningGoals\":[],\"preferredResourceTypes\":[],\"timeCommitment\":\"flexible\",\"viewHistory\":[],\"bookmarks\":[],\"completedResources\":[],\"ratings\":{}}"
+        },
+        {
+          "name": "awesome-video-user-id",
+          "value": "user_1764545776017_b8492frs0"
+        }
+      ]
+    }
+  ]
+}

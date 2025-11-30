@@ -10,7 +10,7 @@ import { defineConfig, devices } from '@playwright/test';
  * - Screenshots on failure, traces on first retry
  */
 export default defineConfig({
-  testDir: './tests/e2e',
+  testDir: './tests',  // Include both e2e/ and integration/
 
   // Run tests sequentially to maintain database consistency
   fullyParallel: false,
@@ -56,33 +56,47 @@ export default defineConfig({
   },
 
   projects: [
+    // Setup project - runs auth.setup.ts to create session
+    {
+      name: 'setup',
+      testMatch: /.*\.setup\.ts/,
+      testDir: './tests',  // Look in tests/ not tests/e2e/
+    },
+    
+    // Desktop tests with persistent auth
     {
       name: 'chromium-desktop',
       use: {
         ...devices['Desktop Chrome'],
-        viewport: { width: 1920, height: 1080 }
+        viewport: { width: 1920, height: 1080 },
+        storageState: './tests/fixtures/auth-state.json',  // Use saved auth
       },
+      dependencies: ['setup'],  // Run setup first
     },
+    
+    // Mobile tests with persistent auth
     {
       name: 'chromium-mobile',
       use: {
         ...devices['iPhone 13 Pro'],
+        storageState: './tests/fixtures/auth-state.json',  // Use saved auth
       },
+      dependencies: ['setup'],  // Run setup first
     },
+    
+    // Tablet tests with persistent auth
     {
       name: 'chromium-tablet',
       use: {
         ...devices['iPad Pro'],
+        storageState: './tests/fixtures/auth-state.json',  // Use saved auth
       },
+      dependencies: ['setup'],  // Run setup first
     },
   ],
 
-  webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
-    stdout: 'ignore',
-    stderr: 'pipe',
-  },
+  // webServer disabled - using Docker containers instead
+  // Docker runs: docker-compose up -d (web on port 3000)
+  // Tests connect to existing server
+  webServer: undefined,
 });

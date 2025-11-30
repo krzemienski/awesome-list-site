@@ -1,7 +1,7 @@
 {
   "config": {
     "configFile": "/Users/nick/Desktop/awesome-list-site/playwright.config.ts",
-    "rootDir": "/Users/nick/Desktop/awesome-list-site/tests/e2e",
+    "rootDir": "/Users/nick/Desktop/awesome-list-site/tests",
     "forbidOnly": false,
     "fullyParallel": false,
     "globalSetup": null,
@@ -9,7 +9,7 @@
     "globalTimeout": 600000,
     "grep": {},
     "grepInvert": null,
-    "maxFailures": 1,
+    "maxFailures": 0,
     "metadata": {
       "actualWorkers": 1
     },
@@ -45,14 +45,30 @@
         "metadata": {
           "actualWorkers": 1
         },
+        "id": "setup",
+        "name": "setup",
+        "testDir": "/Users/nick/Desktop/awesome-list-site/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/.*\\.setup\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/nick/Desktop/awesome-list-site/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 1
+        },
         "id": "chromium-desktop",
         "name": "chromium-desktop",
-        "testDir": "/Users/nick/Desktop/awesome-list-site/tests/e2e",
+        "testDir": "/Users/nick/Desktop/awesome-list-site/tests",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 120000
+        "timeout": 30000
       },
       {
         "outputDir": "/Users/nick/Desktop/awesome-list-site/test-results",
@@ -63,12 +79,12 @@
         },
         "id": "chromium-mobile",
         "name": "chromium-mobile",
-        "testDir": "/Users/nick/Desktop/awesome-list-site/tests/e2e",
+        "testDir": "/Users/nick/Desktop/awesome-list-site/tests",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 120000
+        "timeout": 30000
       },
       {
         "outputDir": "/Users/nick/Desktop/awesome-list-site/test-results",
@@ -79,12 +95,12 @@
         },
         "id": "chromium-tablet",
         "name": "chromium-tablet",
-        "testDir": "/Users/nick/Desktop/awesome-list-site/tests/e2e",
+        "testDir": "/Users/nick/Desktop/awesome-list-site/tests",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 120000
+        "timeout": 30000
       }
     ],
     "shard": null,
@@ -93,259 +109,1225 @@
     "updateSourceMethod": "patch",
     "version": "1.57.0",
     "workers": 1,
-    "webServer": {
-      "command": "npm run dev",
-      "url": "http://localhost:3000",
-      "reuseExistingServer": true,
-      "timeout": 120000,
-      "stdout": "ignore",
-      "stderr": "pipe"
-    }
+    "webServer": null
   },
   "suites": [
     {
-      "title": "user-workflows-round2.spec.ts",
-      "file": "user-workflows-round2.spec.ts",
+      "title": "auth.setup.ts",
+      "file": "auth.setup.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "authenticate as admin",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "setup",
+              "projectName": "setup",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 13245,
+                  "error": {
+                    "message": "TimeoutError: page.waitForLoadState: Timeout 10000ms exceeded.",
+                    "stack": "TimeoutError: page.waitForLoadState: Timeout 10000ms exceeded.\n    at /Users/nick/Desktop/awesome-list-site/tests/auth.setup.ts:51:14",
+                    "location": {
+                      "file": "/Users/nick/Desktop/awesome-list-site/tests/auth.setup.ts",
+                      "column": 14,
+                      "line": 51
+                    },
+                    "snippet": "  49 |\n  50 |   // Wait for dashboard to load\n> 51 |   await page.waitForLoadState('networkidle', { timeout: 10000 });\n     |              ^\n  52 |\n  53 |   console.log('📍 Admin page loaded');\n  54 |"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Users/nick/Desktop/awesome-list-site/tests/auth.setup.ts",
+                        "column": 14,
+                        "line": 51
+                      },
+                      "message": "TimeoutError: page.waitForLoadState: Timeout 10000ms exceeded.\n\n  49 |\n  50 |   // Wait for dashboard to load\n> 51 |   await page.waitForLoadState('networkidle', { timeout: 10000 });\n     |              ^\n  52 |\n  53 |   console.log('📍 Admin page loaded');\n  54 |\n    at /Users/nick/Desktop/awesome-list-site/tests/auth.setup.ts:51:14"
+                    }
+                  ],
+                  "stdout": [
+                    {
+                      "text": "🔐 Setting up admin session for tests...\n"
+                    },
+                    {
+                      "text": "📍 Login page loaded\n"
+                    },
+                    {
+                      "text": "📍 Credentials entered\n"
+                    },
+                    {
+                      "text": "✅ Logged in successfully (redirected from /login)\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2025-11-30T23:36:01.900Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/Users/nick/Desktop/awesome-list-site/test-results/auth.setup.ts-authenticate-as-admin-setup/test-failed-1.png"
+                    },
+                    {
+                      "name": "video",
+                      "contentType": "video/webm",
+                      "path": "/Users/nick/Desktop/awesome-list-site/test-results/auth.setup.ts-authenticate-as-admin-setup/video.webm"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Users/nick/Desktop/awesome-list-site/test-results/auth.setup.ts-authenticate-as-admin-setup/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Users/nick/Desktop/awesome-list-site/tests/auth.setup.ts",
+                    "column": 14,
+                    "line": 51
+                  }
+                },
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 10385,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "🔐 Setting up admin session for tests...\n"
+                    },
+                    {
+                      "text": "📍 Login page loaded\n"
+                    },
+                    {
+                      "text": "📍 Credentials entered\n"
+                    },
+                    {
+                      "text": "✅ Logged in successfully (redirected from /login)\n"
+                    },
+                    {
+                      "text": "📍 Admin page loaded\n"
+                    },
+                    {
+                      "text": "✅ Admin dashboard content visible\n"
+                    },
+                    {
+                      "text": "✅ Admin session verified\n"
+                    },
+                    {
+                      "text": "✅ Auth state saved to tests/fixtures/auth-state.json\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 1,
+                  "startTime": "2025-11-30T23:36:15.553Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "/Users/nick/Desktop/awesome-list-site/test-results/auth.setup.ts-authenticate-as-admin-setup-retry1/trace.zip"
+                    }
+                  ]
+                }
+              ],
+              "status": "flaky"
+            }
+          ],
+          "id": "17e3fe6f4d9d8bd79c6b-1580989d32f149e984ed",
+          "file": "auth.setup.ts",
+          "line": 12,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "integration/admin-to-public.spec.ts",
+      "file": "integration/admin-to-public.spec.ts",
       "column": 0,
       "line": 0,
       "specs": [],
       "suites": [
         {
-          "title": "User Workflows Round 2 - Bug Verification",
-          "file": "user-workflows-round2.spec.ts",
-          "line": 19,
+          "title": "Admin Changes → Public Visibility",
+          "file": "integration/admin-to-public.spec.ts",
+          "line": 16,
           "column": 6,
           "specs": [
             {
-              "title": "Task 31-40: Search Dialog - Bug #1 Verification",
+              "title": "Test 1: Admin edits resource title → Anonymous user sees new title",
               "ok": false,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 120000,
+                  "timeout": 30000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium-desktop",
                   "projectName": "chromium-desktop",
                   "results": [
                     {
-                      "workerIndex": 0,
+                      "workerIndex": 2,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 11138,
+                      "duration": 15224,
                       "error": {
-                        "message": "TimeoutError: locator.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"search\"], input[placeholder*=\"search\" i]').first()\u001b[22m\n",
-                        "stack": "TimeoutError: locator.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"search\"], input[placeholder*=\"search\" i]').first()\u001b[22m\n\n    at /Users/nick/Desktop/awesome-list-site/tests/e2e/user-workflows-round2.spec.ts:102:23",
+                        "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[role=\"menuitem\"]:has-text(\"Edit\")')\u001b[22m\n",
+                        "stack": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[role=\"menuitem\"]:has-text(\"Edit\")')\u001b[22m\n\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/admin-to-public.spec.ts:62:26",
                         "location": {
-                          "file": "/Users/nick/Desktop/awesome-list-site/tests/e2e/user-workflows-round2.spec.ts",
-                          "column": 23,
-                          "line": 102
+                          "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/admin-to-public.spec.ts",
+                          "column": 26,
+                          "line": 62
                         },
-                        "snippet": "  100 |     console.log('Task 33: Typing \"ffmpeg\" in search');\n  101 |     const searchInput = page.locator('input[type=\"search\"], input[placeholder*=\"search\" i]').first();\n> 102 |     await searchInput.fill('ffmpeg');\n      |                       ^\n  103 |     await page.waitForTimeout(500); // Debounce delay\n  104 |\n  105 |     await page.screenshot({"
+                        "snippet": "  60 |       // Click Edit in dropdown\n  61 |       const editMenuItem = adminPage.locator('[role=\"menuitem\"]:has-text(\"Edit\")');\n> 62 |       await editMenuItem.click();\n     |                          ^\n  63 |\n  64 |       console.log('  Edit modal opened');\n  65 |"
                       },
                       "errors": [
                         {
                           "location": {
-                            "file": "/Users/nick/Desktop/awesome-list-site/tests/e2e/user-workflows-round2.spec.ts",
-                            "column": 23,
-                            "line": 102
+                            "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/admin-to-public.spec.ts",
+                            "column": 26,
+                            "line": 62
                           },
-                          "message": "TimeoutError: locator.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"search\"], input[placeholder*=\"search\" i]').first()\u001b[22m\n\n\n  100 |     console.log('Task 33: Typing \"ffmpeg\" in search');\n  101 |     const searchInput = page.locator('input[type=\"search\"], input[placeholder*=\"search\" i]').first();\n> 102 |     await searchInput.fill('ffmpeg');\n      |                       ^\n  103 |     await page.waitForTimeout(500); // Debounce delay\n  104 |\n  105 |     await page.screenshot({\n    at /Users/nick/Desktop/awesome-list-site/tests/e2e/user-workflows-round2.spec.ts:102:23"
+                          "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[role=\"menuitem\"]:has-text(\"Edit\")')\u001b[22m\n\n\n  60 |       // Click Edit in dropdown\n  61 |       const editMenuItem = adminPage.locator('[role=\"menuitem\"]:has-text(\"Edit\")');\n> 62 |       await editMenuItem.click();\n     |                          ^\n  63 |\n  64 |       console.log('  Edit modal opened');\n  65 |\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/admin-to-public.spec.ts:62:26"
                         }
                       ],
                       "stdout": [
                         {
-                          "text": "Task 31: Opening search with / key\n"
+                          "text": "Step 1: Admin editing resource title...\n"
                         },
                         {
-                          "text": "Task 32: Search dialog visible: false\n"
+                          "text": "  Admin dashboard loaded\n"
                         },
                         {
-                          "text": "Current URL: http://localhost:3000/\n"
+                          "text": "  Searched for test resource\n"
                         },
                         {
-                          "text": "Checking if redirected to login...\n"
-                        },
-                        {
-                          "text": "Task 33: Typing \"ffmpeg\" in search\n"
+                          "text": "  Found resource row\n"
                         }
                       ],
-                      "stderr": [
-                        {
-                          "text": "BUG CONFIRMED: Search dialog did not open\n"
-                        }
-                      ],
+                      "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-30T20:46:40.847Z",
+                      "startTime": "2025-11-30T23:36:26.326Z",
                       "annotations": [],
                       "attachments": [
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/user-workflows-round2-User-00713-Dialog---Bug-1-Verification-chromium-desktop/test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/user-workflows-round2-User-00713-Dialog---Bug-1-Verification-chromium-desktop/video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/user-workflows-round2-User-00713-Dialog---Bug-1-Verification-chromium-desktop/error-context.md"
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-admin-to-publi-69a69-onymous-user-sees-new-title-chromium-desktop/test-failed-1.png"
                         }
                       ],
                       "errorLocation": {
-                        "file": "/Users/nick/Desktop/awesome-list-site/tests/e2e/user-workflows-round2.spec.ts",
-                        "column": 23,
-                        "line": 102
+                        "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/admin-to-public.spec.ts",
+                        "column": 26,
+                        "line": 62
                       }
                     },
                     {
-                      "workerIndex": 1,
+                      "workerIndex": 3,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 11078,
+                      "duration": 19255,
                       "error": {
-                        "message": "TimeoutError: locator.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"search\"], input[placeholder*=\"search\" i]').first()\u001b[22m\n",
-                        "stack": "TimeoutError: locator.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"search\"], input[placeholder*=\"search\" i]').first()\u001b[22m\n\n    at /Users/nick/Desktop/awesome-list-site/tests/e2e/user-workflows-round2.spec.ts:102:23",
+                        "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[role=\"menuitem\"]:has-text(\"Edit\")')\u001b[22m\n",
+                        "stack": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[role=\"menuitem\"]:has-text(\"Edit\")')\u001b[22m\n\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/admin-to-public.spec.ts:62:26",
                         "location": {
-                          "file": "/Users/nick/Desktop/awesome-list-site/tests/e2e/user-workflows-round2.spec.ts",
-                          "column": 23,
-                          "line": 102
+                          "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/admin-to-public.spec.ts",
+                          "column": 26,
+                          "line": 62
                         },
-                        "snippet": "  100 |     console.log('Task 33: Typing \"ffmpeg\" in search');\n  101 |     const searchInput = page.locator('input[type=\"search\"], input[placeholder*=\"search\" i]').first();\n> 102 |     await searchInput.fill('ffmpeg');\n      |                       ^\n  103 |     await page.waitForTimeout(500); // Debounce delay\n  104 |\n  105 |     await page.screenshot({"
+                        "snippet": "  60 |       // Click Edit in dropdown\n  61 |       const editMenuItem = adminPage.locator('[role=\"menuitem\"]:has-text(\"Edit\")');\n> 62 |       await editMenuItem.click();\n     |                          ^\n  63 |\n  64 |       console.log('  Edit modal opened');\n  65 |"
                       },
                       "errors": [
                         {
                           "location": {
-                            "file": "/Users/nick/Desktop/awesome-list-site/tests/e2e/user-workflows-round2.spec.ts",
-                            "column": 23,
-                            "line": 102
+                            "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/admin-to-public.spec.ts",
+                            "column": 26,
+                            "line": 62
                           },
-                          "message": "TimeoutError: locator.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"search\"], input[placeholder*=\"search\" i]').first()\u001b[22m\n\n\n  100 |     console.log('Task 33: Typing \"ffmpeg\" in search');\n  101 |     const searchInput = page.locator('input[type=\"search\"], input[placeholder*=\"search\" i]').first();\n> 102 |     await searchInput.fill('ffmpeg');\n      |                       ^\n  103 |     await page.waitForTimeout(500); // Debounce delay\n  104 |\n  105 |     await page.screenshot({\n    at /Users/nick/Desktop/awesome-list-site/tests/e2e/user-workflows-round2.spec.ts:102:23"
+                          "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[role=\"menuitem\"]:has-text(\"Edit\")')\u001b[22m\n\n\n  60 |       // Click Edit in dropdown\n  61 |       const editMenuItem = adminPage.locator('[role=\"menuitem\"]:has-text(\"Edit\")');\n> 62 |       await editMenuItem.click();\n     |                          ^\n  63 |\n  64 |       console.log('  Edit modal opened');\n  65 |\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/admin-to-public.spec.ts:62:26"
                         }
                       ],
                       "stdout": [
                         {
-                          "text": "Task 31: Opening search with / key\n"
+                          "text": "Step 1: Admin editing resource title...\n"
                         },
                         {
-                          "text": "Task 32: Search dialog visible: false\n"
+                          "text": "  Admin dashboard loaded\n"
                         },
                         {
-                          "text": "Current URL: http://localhost:3000/\n"
+                          "text": "  Searched for test resource\n"
                         },
                         {
-                          "text": "Checking if redirected to login...\n"
-                        },
-                        {
-                          "text": "Task 33: Typing \"ffmpeg\" in search\n"
+                          "text": "  Found resource row\n"
                         }
                       ],
-                      "stderr": [
-                        {
-                          "text": "BUG CONFIRMED: Search dialog did not open\n"
-                        }
-                      ],
+                      "stderr": [],
                       "retry": 1,
-                      "startTime": "2025-11-30T20:46:52.672Z",
+                      "startTime": "2025-11-30T23:36:41.792Z",
                       "annotations": [],
                       "attachments": [
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/user-workflows-round2-User-00713-Dialog---Bug-1-Verification-chromium-desktop-retry1/test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/user-workflows-round2-User-00713-Dialog---Bug-1-Verification-chromium-desktop-retry1/video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/user-workflows-round2-User-00713-Dialog---Bug-1-Verification-chromium-desktop-retry1/error-context.md"
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-admin-to-publi-69a69-onymous-user-sees-new-title-chromium-desktop-retry1/test-failed-1.png"
                         },
                         {
                           "name": "trace",
                           "contentType": "application/zip",
-                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/user-workflows-round2-User-00713-Dialog---Bug-1-Verification-chromium-desktop-retry1/trace.zip"
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-admin-to-publi-69a69-onymous-user-sees-new-title-chromium-desktop-retry1/trace.zip"
                         }
                       ],
                       "errorLocation": {
-                        "file": "/Users/nick/Desktop/awesome-list-site/tests/e2e/user-workflows-round2.spec.ts",
-                        "column": 23,
-                        "line": 102
+                        "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/admin-to-public.spec.ts",
+                        "column": 26,
+                        "line": 62
                       }
                     }
                   ],
                   "status": "unexpected"
                 }
               ],
-              "id": "e362a0c4cde67fa90693-a202ca7a13cc1b966c6a",
-              "file": "user-workflows-round2.spec.ts",
-              "line": 64,
+              "id": "75a970ddb411ee93584a-0ed5f6ad7e12c42a01bd",
+              "file": "integration/admin-to-public.spec.ts",
+              "line": 17,
               "column": 3
             },
             {
-              "title": "Task 41-50: Profile Page - Bug #2 Fix Verification",
-              "ok": true,
+              "title": "Test 2: Admin edits description → Anonymous user sees updated description",
+              "ok": false,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 120000,
+                  "timeout": 30000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium-desktop",
                   "projectName": "chromium-desktop",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 19970,
+                      "error": {
+                        "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('tr').filter({ has: locator('a[href=\"https://www.ffmpeg.org/\"]') }).locator('button[aria-label*=\"menu\"]')\u001b[22m\n",
+                        "stack": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('tr').filter({ has: locator('a[href=\"https://www.ffmpeg.org/\"]') }).locator('button[aria-label*=\"menu\"]')\u001b[22m\n\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/admin-to-public.spec.ts:166:63",
+                        "location": {
+                          "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/admin-to-public.spec.ts",
+                          "column": 63,
+                          "line": 166
+                        },
+                        "snippet": "  164 |       });\n  165 |\n> 166 |       await resourceRow.locator('button[aria-label*=\"menu\"]').click();\n      |                                                               ^\n  167 |       await adminPage.locator('text=Edit').click();\n  168 |\n  169 |       await adminPage.waitForSelector('[role=\"dialog\"]');"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/admin-to-public.spec.ts",
+                            "column": 63,
+                            "line": 166
+                          },
+                          "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('tr').filter({ has: locator('a[href=\"https://www.ffmpeg.org/\"]') }).locator('button[aria-label*=\"menu\"]')\u001b[22m\n\n\n  164 |       });\n  165 |\n> 166 |       await resourceRow.locator('button[aria-label*=\"menu\"]').click();\n      |                                                               ^\n  167 |       await adminPage.locator('text=Edit').click();\n  168 |\n  169 |       await adminPage.waitForSelector('[role=\"dialog\"]');\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/admin-to-public.spec.ts:166:63"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-30T23:37:01.389Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-admin-to-publi-c19d3-er-sees-updated-description-chromium-desktop/test-failed-1.png"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/admin-to-public.spec.ts",
+                        "column": 63,
+                        "line": 166
+                      }
+                    },
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 17669,
+                      "error": {
+                        "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('tr').filter({ has: locator('a[href=\"https://www.ffmpeg.org/\"]') }).locator('button[aria-label*=\"menu\"]')\u001b[22m\n",
+                        "stack": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('tr').filter({ has: locator('a[href=\"https://www.ffmpeg.org/\"]') }).locator('button[aria-label*=\"menu\"]')\u001b[22m\n\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/admin-to-public.spec.ts:166:63",
+                        "location": {
+                          "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/admin-to-public.spec.ts",
+                          "column": 63,
+                          "line": 166
+                        },
+                        "snippet": "  164 |       });\n  165 |\n> 166 |       await resourceRow.locator('button[aria-label*=\"menu\"]').click();\n      |                                                               ^\n  167 |       await adminPage.locator('text=Edit').click();\n  168 |\n  169 |       await adminPage.waitForSelector('[role=\"dialog\"]');"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/admin-to-public.spec.ts",
+                            "column": 63,
+                            "line": 166
+                          },
+                          "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('tr').filter({ has: locator('a[href=\"https://www.ffmpeg.org/\"]') }).locator('button[aria-label*=\"menu\"]')\u001b[22m\n\n\n  164 |       });\n  165 |\n> 166 |       await resourceRow.locator('button[aria-label*=\"menu\"]').click();\n      |                                                               ^\n  167 |       await adminPage.locator('text=Edit').click();\n  168 |\n  169 |       await adminPage.waitForSelector('[role=\"dialog\"]');\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/admin-to-public.spec.ts:166:63"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2025-11-30T23:37:21.606Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-admin-to-publi-c19d3-er-sees-updated-description-chromium-desktop-retry1/test-failed-1.png"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-admin-to-publi-c19d3-er-sees-updated-description-chromium-desktop-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/admin-to-public.spec.ts",
+                        "column": 63,
+                        "line": 166
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
                 }
               ],
-              "id": "e362a0c4cde67fa90693-6d60eb15c028d1b0271f",
-              "file": "user-workflows-round2.spec.ts",
-              "line": 151,
+              "id": "75a970ddb411ee93584a-56c91b5aca77171bbbe7",
+              "file": "integration/admin-to-public.spec.ts",
+              "line": 143,
               "column": 3
-            },
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "integration/resource-lifecycle.spec.ts",
+      "file": "integration/resource-lifecycle.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Resource Lifecycle Integration",
+          "file": "integration/resource-lifecycle.spec.ts",
+          "line": 11,
+          "column": 6,
+          "specs": [
             {
-              "title": "Task 51-60: Bookmarks Page",
+              "title": "Test 10: Submit → Approve → Visible on public pages",
               "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 120000,
+                  "timeout": 30000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium-desktop",
                   "projectName": "chromium-desktop",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 30055,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "  ✅ Resource submitted, ID: 26c78bc1-cc6b-4fb7-9826-d009e245c477\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-30T23:37:39.597Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-resource-lifec-59d7b-e-→-Visible-on-public-pages-chromium-desktop/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-resource-lifec-59d7b-e-→-Visible-on-public-pages-chromium-desktop/error-context.md"
+                        }
+                      ]
+                    },
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 12677,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "  ✅ Resource submitted, ID: 0f0135fb-96fe-4963-b7ca-4d69234f22ab\n"
+                        },
+                        {
+                          "text": "  ✅ Resource in pending status\n"
+                        },
+                        {
+                          "text": "  ✅ Admin approved resource (API returned \u001b[33m200\u001b[39m )\n"
+                        },
+                        {
+                          "text": "  ✅ Database shows approved\n"
+                        },
+                        {
+                          "text": "  ✅ Anonymous user sees approved resource\n"
+                        },
+                        {
+                          "text": "\n✅ TEST 10 PASSED: Complete lifecycle verified\n\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2025-11-30T23:38:10.148Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-resource-lifec-59d7b-e-→-Visible-on-public-pages-chromium-desktop-retry1/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "flaky"
                 }
               ],
-              "id": "e362a0c4cde67fa90693-e81da6b30e085669dd7c",
-              "file": "user-workflows-round2.spec.ts",
-              "line": 244,
+              "id": "4c3fe6b6837a82afebf6-378c7da6b26d4cec4deb",
+              "file": "integration/resource-lifecycle.spec.ts",
+              "line": 12,
               "column": 3
             },
             {
-              "title": "Task 61-70: Learning Journeys",
+              "title": "Test 11: Submit → Reject → NOT visible on public pages",
               "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 120000,
+                  "timeout": 30000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium-desktop",
                   "projectName": "chromium-desktop",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 15986,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "  ✅ Admin rejected resource\n"
+                        },
+                        {
+                          "text": "  ✅ Database shows rejected\n"
+                        },
+                        {
+                          "text": "  ✅ Rejected resource NOT visible to public\n"
+                        },
+                        {
+                          "text": "\n✅ TEST 11 PASSED: Rejection flow verified\n\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-30T23:38:22.957Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
-              "id": "e362a0c4cde67fa90693-9176d3dcfd617d9108d7",
-              "file": "user-workflows-round2.spec.ts",
-              "line": 328,
+              "id": "4c3fe6b6837a82afebf6-70f347803ca4f8ecbe99",
+              "file": "integration/resource-lifecycle.spec.ts",
+              "line": 111,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "integration/search-and-filters.spec.ts",
+      "file": "integration/search-and-filters.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Search & Filter Integration",
+          "file": "integration/search-and-filters.spec.ts",
+          "line": 11,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Test 13: Edit resource → Search finds new title immediately",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 23987,
+                      "error": {
+                        "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"search\"]')\u001b[22m\n",
+                        "stack": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"search\"]')\u001b[22m\n\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts:50:22",
+                        "location": {
+                          "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts",
+                          "column": 22,
+                          "line": 50
+                        },
+                        "snippet": "  48 |\n  49 |       // Type search query\n> 50 |       await anonPage.fill('input[type=\"search\"]', `Searchable ${TIMESTAMP}`);\n     |                      ^\n  51 |       await anonPage.waitForTimeout(500);  // Debounce\n  52 |\n  53 |       // Verify search results contain new title"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts",
+                            "column": 22,
+                            "line": 50
+                          },
+                          "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"search\"]')\u001b[22m\n\n\n  48 |\n  49 |       // Type search query\n> 50 |       await anonPage.fill('input[type=\"search\"]', `Searchable ${TIMESTAMP}`);\n     |                      ^\n  51 |       await anonPage.waitForTimeout(500);  // Debounce\n  52 |\n  53 |       // Verify search results contain new title\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts:50:22"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-30T23:38:38.953Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-search-and-fil-c5dee-finds-new-title-immediately-chromium-desktop/test-failed-1.png"
+                        },
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-search-and-fil-c5dee-finds-new-title-immediately-chromium-desktop/test-failed-2.png"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts",
+                        "column": 22,
+                        "line": 50
+                      }
+                    },
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 21161,
+                      "error": {
+                        "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"search\"]')\u001b[22m\n",
+                        "stack": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"search\"]')\u001b[22m\n\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts:50:22",
+                        "location": {
+                          "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts",
+                          "column": 22,
+                          "line": 50
+                        },
+                        "snippet": "  48 |\n  49 |       // Type search query\n> 50 |       await anonPage.fill('input[type=\"search\"]', `Searchable ${TIMESTAMP}`);\n     |                      ^\n  51 |       await anonPage.waitForTimeout(500);  // Debounce\n  52 |\n  53 |       // Verify search results contain new title"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts",
+                            "column": 22,
+                            "line": 50
+                          },
+                          "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"search\"]')\u001b[22m\n\n\n  48 |\n  49 |       // Type search query\n> 50 |       await anonPage.fill('input[type=\"search\"]', `Searchable ${TIMESTAMP}`);\n     |                      ^\n  51 |       await anonPage.waitForTimeout(500);  // Debounce\n  52 |\n  53 |       // Verify search results contain new title\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts:50:22"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2025-11-30T23:39:03.242Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-search-and-fil-c5dee-finds-new-title-immediately-chromium-desktop-retry1/test-failed-1.png"
+                        },
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-search-and-fil-c5dee-finds-new-title-immediately-chromium-desktop-retry1/test-failed-2.png"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-search-and-fil-c5dee-finds-new-title-immediately-chromium-desktop-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts",
+                        "column": 22,
+                        "line": 50
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "1ce57d2e5dd704863c0a-13081356e881a24f854e",
+              "file": "integration/search-and-filters.spec.ts",
+              "line": 12,
+              "column": 3
+            },
+            {
+              "title": "Test 14: Filter by status → Shows correct subset",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 14202,
+                      "error": {
+                        "message": "TimeoutError: page.selectOption: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('select:has-text(\"All Statuses\"), [name=\"status\"]')\u001b[22m\n",
+                        "stack": "TimeoutError: page.selectOption: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('select:has-text(\"All Statuses\"), [name=\"status\"]')\u001b[22m\n\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts:92:23",
+                        "location": {
+                          "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts",
+                          "column": 23,
+                          "line": 92
+                        },
+                        "snippet": "  90 |\n  91 |       // Select status filter\n> 92 |       await adminPage.selectOption('select:has-text(\"All Statuses\"), [name=\"status\"]', 'approved');\n     |                       ^\n  93 |       await adminPage.waitForTimeout(1000);\n  94 |\n  95 |       // Count visible rows"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts",
+                            "column": 23,
+                            "line": 92
+                          },
+                          "message": "TimeoutError: page.selectOption: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('select:has-text(\"All Statuses\"), [name=\"status\"]')\u001b[22m\n\n\n  90 |\n  91 |       // Select status filter\n> 92 |       await adminPage.selectOption('select:has-text(\"All Statuses\"), [name=\"status\"]', 'approved');\n     |                       ^\n  93 |       await adminPage.waitForTimeout(1000);\n  94 |\n  95 |       // Count visible rows\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts:92:23"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "  Database has \u001b[33m2661\u001b[39m approved resources\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-30T23:39:24.790Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-search-and-fil-40f00-atus-→-Shows-correct-subset-chromium-desktop/test-failed-1.png"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts",
+                        "column": 23,
+                        "line": 92
+                      }
+                    },
+                    {
+                      "workerIndex": 10,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 14321,
+                      "error": {
+                        "message": "TimeoutError: page.selectOption: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('select:has-text(\"All Statuses\"), [name=\"status\"]')\u001b[22m\n",
+                        "stack": "TimeoutError: page.selectOption: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('select:has-text(\"All Statuses\"), [name=\"status\"]')\u001b[22m\n\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts:92:23",
+                        "location": {
+                          "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts",
+                          "column": 23,
+                          "line": 92
+                        },
+                        "snippet": "  90 |\n  91 |       // Select status filter\n> 92 |       await adminPage.selectOption('select:has-text(\"All Statuses\"), [name=\"status\"]', 'approved');\n     |                       ^\n  93 |       await adminPage.waitForTimeout(1000);\n  94 |\n  95 |       // Count visible rows"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts",
+                            "column": 23,
+                            "line": 92
+                          },
+                          "message": "TimeoutError: page.selectOption: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('select:has-text(\"All Statuses\"), [name=\"status\"]')\u001b[22m\n\n\n  90 |\n  91 |       // Select status filter\n> 92 |       await adminPage.selectOption('select:has-text(\"All Statuses\"), [name=\"status\"]', 'approved');\n     |                       ^\n  93 |       await adminPage.waitForTimeout(1000);\n  94 |\n  95 |       // Count visible rows\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts:92:23"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "  Database has \u001b[33m2661\u001b[39m approved resources\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2025-11-30T23:39:39.236Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-search-and-fil-40f00-atus-→-Shows-correct-subset-chromium-desktop-retry1/test-failed-1.png"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-search-and-fil-40f00-atus-→-Shows-correct-subset-chromium-desktop-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts",
+                        "column": 23,
+                        "line": 92
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "1ce57d2e5dd704863c0a-c8025722ca50c014a830",
+              "file": "integration/search-and-filters.spec.ts",
+              "line": 76,
+              "column": 3
+            },
+            {
+              "title": "Test 15: Filter by category → Shows correct subset",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 11,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 14018,
+                      "error": {
+                        "message": "TimeoutError: page.selectOption: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('select:has-text(\"All Categories\"), [name=\"category\"]')\u001b[22m\n",
+                        "stack": "TimeoutError: page.selectOption: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('select:has-text(\"All Categories\"), [name=\"category\"]')\u001b[22m\n\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts:127:23",
+                        "location": {
+                          "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts",
+                          "column": 23,
+                          "line": 127
+                        },
+                        "snippet": "  125 |       await adminPage.goto('http://localhost:3000/admin/resources');\n  126 |\n> 127 |       await adminPage.selectOption('select:has-text(\"All Categories\"), [name=\"category\"]', 'General Tools');\n      |                       ^\n  128 |       await adminPage.waitForTimeout(1000);\n  129 |\n  130 |       const tableRows = adminPage.locator('tbody tr');"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts",
+                            "column": 23,
+                            "line": 127
+                          },
+                          "message": "TimeoutError: page.selectOption: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('select:has-text(\"All Categories\"), [name=\"category\"]')\u001b[22m\n\n\n  125 |       await adminPage.goto('http://localhost:3000/admin/resources');\n  126 |\n> 127 |       await adminPage.selectOption('select:has-text(\"All Categories\"), [name=\"category\"]', 'General Tools');\n      |                       ^\n  128 |       await adminPage.waitForTimeout(1000);\n  129 |\n  130 |       const tableRows = adminPage.locator('tbody tr');\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts:127:23"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "  Database has \u001b[33m101\u001b[39m General Tools resources\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-30T23:39:53.860Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-search-and-fil-07d88-gory-→-Shows-correct-subset-chromium-desktop/test-failed-1.png"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts",
+                        "column": 23,
+                        "line": 127
+                      }
+                    },
+                    {
+                      "workerIndex": 12,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 14087,
+                      "error": {
+                        "message": "TimeoutError: page.selectOption: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('select:has-text(\"All Categories\"), [name=\"category\"]')\u001b[22m\n",
+                        "stack": "TimeoutError: page.selectOption: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('select:has-text(\"All Categories\"), [name=\"category\"]')\u001b[22m\n\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts:127:23",
+                        "location": {
+                          "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts",
+                          "column": 23,
+                          "line": 127
+                        },
+                        "snippet": "  125 |       await adminPage.goto('http://localhost:3000/admin/resources');\n  126 |\n> 127 |       await adminPage.selectOption('select:has-text(\"All Categories\"), [name=\"category\"]', 'General Tools');\n      |                       ^\n  128 |       await adminPage.waitForTimeout(1000);\n  129 |\n  130 |       const tableRows = adminPage.locator('tbody tr');"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts",
+                            "column": 23,
+                            "line": 127
+                          },
+                          "message": "TimeoutError: page.selectOption: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('select:has-text(\"All Categories\"), [name=\"category\"]')\u001b[22m\n\n\n  125 |       await adminPage.goto('http://localhost:3000/admin/resources');\n  126 |\n> 127 |       await adminPage.selectOption('select:has-text(\"All Categories\"), [name=\"category\"]', 'General Tools');\n      |                       ^\n  128 |       await adminPage.waitForTimeout(1000);\n  129 |\n  130 |       const tableRows = adminPage.locator('tbody tr');\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts:127:23"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "  Database has \u001b[33m101\u001b[39m General Tools resources\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2025-11-30T23:40:08.124Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-search-and-fil-07d88-gory-→-Shows-correct-subset-chromium-desktop-retry1/test-failed-1.png"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-search-and-fil-07d88-gory-→-Shows-correct-subset-chromium-desktop-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts",
+                        "column": 23,
+                        "line": 127
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "1ce57d2e5dd704863c0a-7b061f89072efe2d430c",
+              "file": "integration/search-and-filters.spec.ts",
+              "line": 111,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "integration/simple-admin-to-public.spec.ts",
+      "file": "integration/simple-admin-to-public.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Simple Admin → Public Integration",
+          "file": "integration/simple-admin-to-public.spec.ts",
+          "line": 11,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Simple Test: Update via API → Verify in Database → Check Public Visibility",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 13,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4043,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Step 1: Updating resource via admin API...\n"
+                        },
+                        {
+                          "text": "  Got auth token: YES\n"
+                        },
+                        {
+                          "text": "  API response status: \u001b[33m200\u001b[39m\n"
+                        },
+                        {
+                          "text": "  ✅ API update successful\n"
+                        },
+                        {
+                          "text": "Step 2: Verifying database...\n"
+                        },
+                        {
+                          "text": "  ✅ Database confirmed: Integration Test 1764546022713\n"
+                        },
+                        {
+                          "text": "Step 3: Checking public visibility...\n"
+                        },
+                        {
+                          "text": "  ✅ Anonymous user sees updated title\n"
+                        },
+                        {
+                          "text": "\n✅ TEST PASSED: Complete integration verified\n\n"
+                        },
+                        {
+                          "text": "  Resource reset for next test\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-30T23:40:22.519Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8d50957863153b5f32b1-b5a16521368b35c49954",
+              "file": "integration/simple-admin-to-public.spec.ts",
+              "line": 12,
+              "column": 3
+            },
+            {
+              "title": "Test 2: Update description via API → Verify publicly visible",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 13,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1077,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "✅ TEST 2 PASSED: Description update verified\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-30T23:40:26.568Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8d50957863153b5f32b1-8d2874b964aafeabd6ac",
+              "file": "integration/simple-admin-to-public.spec.ts",
+              "line": 91,
+              "column": 3
+            },
+            {
+              "title": "Test 3: Bulk approve resources → All visible publicly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 13,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2016,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "  Created 3 pending resources\n"
+                        },
+                        {
+                          "text": "✅ TEST 3 PASSED: Bulk approve verified\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-30T23:40:27.649Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8d50957863153b5f32b1-638c43a14e64e1aee2c7",
+              "file": "integration/simple-admin-to-public.spec.ts",
+              "line": 138,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "integration/user-isolation.spec.ts",
+      "file": "integration/user-isolation.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "RLS User Data Isolation",
+          "file": "integration/user-isolation.spec.ts",
+          "line": 11,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Test 6: User A favorites → User B cannot see (UI)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 13,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1872,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "  User A added favorite\n"
+                        },
+                        {
+                          "text": "  Database confirmed User A favorite\n"
+                        },
+                        {
+                          "text": "  ✅ User B cannot see User A favorite (UI)\n"
+                        },
+                        {
+                          "text": "  ✅ User B blocked via API (RLS working)\n"
+                        },
+                        {
+                          "text": "  ✅ Database RLS blocks User B from User A data\n"
+                        },
+                        {
+                          "text": "\n✅ TEST 6 PASSED: User isolation verified at all layers\n\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-30T23:40:29.673Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8b574be17c2bb16299d8-bedb5bb963e813139f60",
+              "file": "integration/user-isolation.spec.ts",
+              "line": 12,
+              "column": 3
+            },
+            {
+              "title": "Test 7: User A bookmarks → User B cannot access (API)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 13,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1662,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "  User A created bookmark with notes\n"
+                        },
+                        {
+                          "text": "  ✅ User B API shows empty (no User A bookmarks)\n"
+                        },
+                        {
+                          "text": "  ✅ Database RLS blocks cross-user bookmark access\n"
+                        },
+                        {
+                          "text": "\n✅ TEST 7 PASSED: Bookmark isolation verified\n\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-30T23:40:31.549Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8b574be17c2bb16299d8-836d3f5b9c480c96c96e",
+              "file": "integration/user-isolation.spec.ts",
+              "line": 92,
               "column": 3
             }
           ]
@@ -353,17 +1335,13 @@
       ]
     }
   ],
-  "errors": [
-    {
-      "message": "\u001b[31mTesting stopped early after 1 maximum allowed failures.\u001b[39m"
-    }
-  ],
+  "errors": [],
   "stats": {
-    "startTime": "2025-11-30T20:46:40.481Z",
-    "duration": 23741.322,
-    "expected": 0,
-    "skipped": 3,
-    "unexpected": 1,
-    "flaky": 0
+    "startTime": "2025-11-30T23:36:01.642Z",
+    "duration": 271577.688,
+    "expected": 6,
+    "skipped": 0,
+    "unexpected": 5,
+    "flaky": 2
   }
 }
