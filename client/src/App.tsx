@@ -45,9 +45,7 @@ const LoadingFallback = () => (
   </div>
 );
 
-import { AwesomeList } from "@/types/awesome-list";
-import { processAwesomeListData } from "@/lib/parser";
-import { fetchStaticAwesomeList } from "@/lib/static-data";
+// Removed static JSON imports - using database-only via /api/categories and /api/resources
 
 function Router() {
   // Track page views when routes change
@@ -62,15 +60,8 @@ function Router() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [location] = useLocation();
 
-  // Fetch awesome list data - use static data in production builds
-  const { data: rawData, isLoading, error } = useQuery({
-    queryKey: ["awesome-list-data"],
-    queryFn: fetchStaticAwesomeList,
-    staleTime: 1000 * 60 * 60, // 1 hour
-  });
-  
-  // Process the raw data into a structured AwesomeList
-  const awesomeList = rawData ? processAwesomeListData(rawData) : undefined;
+  // Removed static awesome-list-data loading - components fetch from database APIs directly
+  // MainLayout and Home now use /api/categories for category listing
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -122,19 +113,12 @@ function Router() {
   // Show main app for all users (authenticated and guests)
   // Guest users can browse all resources, authenticated users get additional features
   return (
-    <MainLayout 
-      awesomeList={awesomeList} 
-      isLoading={isLoading}
+    <MainLayout
       user={user}
       onLogout={logout}
     >
       <Switch>
-        <Route path="/" component={() => 
-          <Home 
-            awesomeList={awesomeList} 
-            isLoading={isLoading} 
-          />
-        } />
+        <Route path="/" component={Home} />
         <Route path="/login" component={Login} />
         <Route path="/auth/callback" component={AuthCallback} />
         <Route path="/category/:slug" component={Category} />

@@ -14,8 +14,6 @@ import { ArrowLeft, Search, ExternalLink } from "lucide-react";
 import { deslugify, slugify } from "@/lib/utils";
 import { Resource } from "@/types/awesome-list";
 import NotFound from "@/pages/not-found";
-import { processAwesomeListData } from "@/lib/parser";
-import { fetchStaticAwesomeList } from "@/lib/static-data";
 import { trackCategoryView } from "@/lib/analytics";
 import { useToast } from "@/hooks/use-toast";
 
@@ -28,60 +26,40 @@ export default function Category() {
   const [sortBy, setSortBy] = useState("category");
   const { toast } = useToast();
   
-  // Fetch awesome list data - use same query as homepage
-  const { data: rawData, isLoading, error } = useQuery({
-    queryKey: ["awesome-list-data"],
-    queryFn: fetchStaticAwesomeList,
-    staleTime: 1000 * 60 * 60, // 1 hour
+  // Fetch category name from database categories
+  const { data: categories } = useQuery<any[]>({
+    queryKey: ['/api/categories'],
+    staleTime: 1000 * 60 * 60,
   });
-  
-  const awesomeList = rawData ? processAwesomeListData(rawData) : undefined;
-  
-  // Fetch approved database resources
-  const { data: dbData } = useQuery<{resources: any[], total: number}>({
-    queryKey: ['/api/resources', { status: 'approved' }],
-    enabled: !!awesomeList,
+
+  const currentCategory = categories?.find(cat => cat.slug === slug);
+  const categoryName = currentCategory?.name || deslugify(slug || "");
+
+  // Fetch approved database resources for this category
+  const { data: dbData, isLoading, error } = useQuery<{resources: any[], total: number}>({
+    queryKey: ['/api/resources', { category: categoryName, status: 'approved' }],
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
-  
+
   const dbResources = dbData?.resources || [];
-  
-  // Find the current category and its resources
-  const currentCategory = awesomeList?.categories.find(cat => 
-    cat.slug === slug
-  );
-  
-  const categoryName = currentCategory ? currentCategory.name : deslugify(slug || "");
-  
-  // Merge static and database resources for this category
+
+  // Use ONLY database resources (no static JSON merging)
+  // Database has all 2,646 resources - no need for static JSON
   const allResources: Resource[] = useMemo(() => {
-    if (!currentCategory) return [];
-    
-    // Start with static resources
-    const staticResources = currentCategory.resources;
-    
-    // Filter database resources for this category and map to Resource type (defensive: match by name OR slug)
-    const categoryDbResources = dbResources
-      .filter(r => {
-        // Match by display name OR slug
-        const matchesName = r.category === categoryName;
-        const matchesSlug = r.category?.toLowerCase().replace(/\s+&\s+/g, '-').replace(/\s+/g, '-') === slug;
-        return matchesName || matchesSlug;
-      })
-      .map(r => ({
-        id: `db-${r.id}`,
-        title: r.title,
-        description: r.description || '',
-        url: r.url,
-        tags: r.metadata?.tags || [],
-        category: r.category,
-        subcategory: r.subcategory || undefined,
-        subSubcategory: r.subSubcategory || undefined,
-      }));
-    
-    // Merge and return
-    return [...staticResources, ...categoryDbResources];
-  }, [currentCategory, dbResources, categoryName]);
-  
+    return dbResources.map(r => ({
+      id: r.id, // Use actual UUID (no "db-" prefix needed)
+      title: r.title,
+      description: r.description || '',
+      url: r.url,
+      tags: r.metadata?.tags || [],
+      category: r.category,
+      subcategory: r.subcategory || undefined,
+      subSubcategory: r.subSubcategory || undefined,
+      isBookmarked: r.isBookmarked,
+      isFavorited: r.isFavorited,
+    }));
+  }, [dbResources]);
+
   // Extract unique subcategories for filter
   const subcategories = useMemo(() => {
     const uniqueSubcategories = new Set<string>();
@@ -134,7 +112,7 @@ export default function Category() {
       trackCategoryView(categoryName);
     }
   }, [categoryName, isLoading]);
-  
+
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -170,7 +148,7 @@ export default function Category() {
     );
   }
   
-  if (!currentCategory && !isLoading) {
+  if (!currentCategory && !isLoading && categories) {
     return <NotFound />;
   }
   

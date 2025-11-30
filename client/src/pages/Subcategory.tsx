@@ -11,8 +11,6 @@ import { ArrowLeft, ExternalLink } from "lucide-react";
 import { deslugify, getCategorySlug } from "@/lib/utils";
 import { Resource } from "@/types/awesome-list";
 import NotFound from "@/pages/not-found";
-import { processAwesomeListData } from "@/lib/parser";
-import { fetchStaticAwesomeList } from "@/lib/static-data";
 import { trackCategoryView } from "@/lib/analytics";
 import { useToast } from "@/hooks/use-toast";
 
@@ -21,73 +19,39 @@ export default function Subcategory() {
   const { toast } = useToast();
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   
-  // Fetch awesome list data - use same query as homepage
-  const { data: rawData, isLoading, error } = useQuery({
-    queryKey: ["awesome-list-data"],
-    queryFn: fetchStaticAwesomeList,
-    staleTime: 1000 * 60 * 60, // 1 hour
+  // Fetch subcategories from database to get name
+  const { data: subcategories } = useQuery<any[]>({
+    queryKey: ['/api/subcategories'],
+    staleTime: 1000 * 60 * 60,
   });
-  
-  const awesomeList = rawData ? processAwesomeListData(rawData) : undefined;
-  
-  // Fetch approved database resources
-  const { data: dbData } = useQuery<{resources: any[], total: number}>({
-    queryKey: ['/api/resources', { status: 'approved' }],
-    enabled: !!awesomeList,
+
+  const currentSubcategory = subcategories?.find(sub => sub.slug === slug);
+  const subcategoryName = currentSubcategory?.name || deslugify(slug || "");
+  const categoryName = currentSubcategory?.category || "";
+
+  // Fetch approved database resources for this subcategory
+  const { data: dbData, isLoading, error } = useQuery<{resources: any[], total: number}>({
+    queryKey: ['/api/resources', { subcategory: subcategoryName, status: 'approved' }],
+    staleTime: 1000 * 60 * 5,
   });
-  
+
   const dbResources = dbData?.resources || [];
   
-  // Find the current subcategory and its resources
-  let currentSubcategory = null;
-  let parentCategory = null;
-  let staticResources: Resource[] = [];
-  
-  if (awesomeList && slug) {
-    // Find matching subcategory across all categories
-    for (const category of awesomeList.categories) {
-      const subcategory = category.subcategories.find(sub => 
-        sub.slug === slug
-      );
-      if (subcategory) {
-        currentSubcategory = subcategory;
-        parentCategory = category;
-        
-        // Get all resources - subcategory level already includes all nested resources
-        staticResources = subcategory.resources;
-        
-        break;
-      }
-    }
-  }
-  
-  const subcategoryName = currentSubcategory ? currentSubcategory.name : deslugify(slug || "");
-  const categoryName = parentCategory ? parentCategory.name : "";
-  
-  // Merge static and database resources for this subcategory
+  // Use ONLY database resources (no static JSON merging)
   const allResources: Resource[] = useMemo(() => {
-    // Filter database resources for this subcategory and map to Resource type (defensive: match by name OR slug)
-    const subcategoryDbResources = dbResources
-      .filter(r => {
-        // Match by display name OR slug
-        const matchesName = r.subcategory === subcategoryName;
-        const matchesSlug = r.subcategory?.toLowerCase().replace(/\s+&\s+/g, '-').replace(/\s+/g, '-') === slug;
-        return matchesName || matchesSlug;
-      })
-      .map(r => ({
-        id: `db-${r.id}`,
-        title: r.title,
-        description: r.description || '',
-        url: r.url,
-        tags: r.metadata?.tags || [],
-        category: r.category,
-        subcategory: r.subcategory || undefined,
-        subSubcategory: r.subSubcategory || undefined,
-      }));
-    
-    // Merge and return
-    return [...staticResources, ...subcategoryDbResources];
-  }, [staticResources, dbResources, subcategoryName]);
+    return dbResources.map(r => ({
+      id: r.id, // Use actual UUID
+      title: r.title,
+      description: r.description || '',
+      url: r.url,
+      tags: r.metadata?.tags || [],
+      category: r.category,
+      subcategory: r.subcategory || undefined,
+      subSubcategory: r.subSubcategory || undefined,
+      isBookmarked: r.isBookmarked,
+      isFavorited: r.isFavorited,
+    }));
+  }, [dbResources]);
   
   // Filter resources by selected tags
   const filteredResources = useMemo(() => {
@@ -141,7 +105,7 @@ export default function Subcategory() {
     );
   }
   
-  if (!currentSubcategory && !isLoading) {
+  if (!currentSubcategory && !isLoading && subcategories) {
     return <NotFound />;
   }
   

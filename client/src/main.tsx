@@ -17,18 +17,8 @@ declare global {
   }
 }
 
-// Pre-populate query cache with SSR data if available
-if (window.__INITIAL_DATA__) {
-  queryClient.setQueryData(["awesome-list-data"], window.__INITIAL_DATA__);
-} else if (window.__DEHYDRATED_STATE__) {
-  // Handle dehydrated state from SSR
-  const dehydratedState = window.__DEHYDRATED_STATE__;
-  if (dehydratedState?.queries) {
-    dehydratedState.queries.forEach((query: any) => {
-      queryClient.setQueryData(query.queryKey, query.state.data);
-    });
-  }
-}
+// Removed static awesome-list-data hydration - using database APIs only
+// Components fetch categories and resources from /api/categories and /api/resources
 
 const rootElement = document.getElementById("root")!;
 const AppComponent = (
@@ -41,7 +31,7 @@ const AppComponent = (
 );
 
 // Use hydration if we have server-rendered content, otherwise use client rendering
-if (rootElement.hasChildNodes() && (window.__INITIAL_DATA__ || window.__DEHYDRATED_STATE__)) {
+if (rootElement.hasChildNodes()) {
   hydrateRoot(rootElement, AppComponent);
 } else {
   createRoot(rootElement).render(AppComponent);
