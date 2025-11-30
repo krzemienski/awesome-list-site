@@ -8,7 +8,9 @@
     "build": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
     "start": "NODE_ENV=production node dist/index.js",
     "check": "tsc",
-    "db:push": "drizzle-kit push"
+    "db:push": "drizzle-kit push",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.37.0",
@@ -47,6 +49,7 @@
     "@supabase/supabase-js": "^2.86.0",
     "@tailwindcss/postcss": "^4.1.11",
     "@tanstack/react-query": "^5.60.5",
+    "@tanstack/react-table": "^8.21.3",
     "@types/bcryptjs": "^2.4.6",
     "@types/ioredis": "^5.0.0",
     "@types/js-yaml": "^4.0.9",
@@ -109,6 +112,9 @@
     "@replit/vite-plugin-cartographer": "^0.4.3",
     "@replit/vite-plugin-runtime-error-modal": "^0.0.3",
     "@tailwindcss/vite": "^4.0.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/connect-pg-simple": "^7.0.3",
     "@types/express": "4.17.21",
     "@types/express-session": "^1.18.0",
@@ -122,10 +128,12 @@
     "autoprefixer": "^10.4.20",
     "drizzle-kit": "^0.30.4",
     "esbuild": "^0.25.0",
+    "happy-dom": "^20.0.11",
     "postcss": "^8.4.47",
     "tsx": "^4.19.1",
     "typescript": "5.6.3",
-    "vite": "^5.4.14"
+    "vite": "^5.4.14",
+    "vitest": "^4.0.14"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.8"

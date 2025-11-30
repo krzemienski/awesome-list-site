@@ -992,7 +992,127 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ============= Admin Routes =============
-  
+
+  // GET /api/admin/resources - List ALL resources with advanced filtering (admin only)
+  app.get('/api/admin/resources', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = Math.min(parseInt(req.query.limit as string) || 50, 100);
+      const status = req.query.status as string;
+      const category = req.query.category as string;
+      const subcategory = req.query.subcategory as string;
+      const search = req.query.search as string;
+      const submittedBy = req.query.submittedBy as string;
+      const dateFrom = req.query.dateFrom as string;
+      const dateTo = req.query.dateTo as string;
+
+      const result = await storage.listAdminResources({
+        page,
+        limit,
+        status: status === 'all' ? undefined : status,
+        category,
+        subcategory,
+        search,
+        dateFrom: dateFrom ? new Date(dateFrom) : undefined,
+        dateTo: dateTo ? new Date(dateTo) : undefined,
+      });
+
+      res.json(result);
+    } catch (error) {
+      console.error('Error fetching admin resources:', error);
+      res.status(500).json({ message: 'Failed to fetch resources' });
+    }
+  });
+
+  // PUT /api/admin/resources/:id - Update any resource field (admin only)
+  app.put('/api/admin/resources/:id', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const id = req.params.id; // UUID string
+      const updates = req.body; // Partial<Resource>
+
+      // Validate allowed fields (prevent updating id, createdAt, etc)
+      const allowedFields = ['title', 'url', 'description', 'category', 'subcategory', 'subSubcategory', 'status', 'metadata'];
+      const sanitized = Object.keys(updates)
+        .filter(key => allowedFields.includes(key))
+        .reduce((obj, key) => ({ ...obj, [key]: updates[key] }), {});
+
+      if (Object.keys(sanitized).length === 0) {
+        return res.status(400).json({ message: 'No valid fields to update' });
+      }
+
+      const updated = await storage.updateResource(id, sanitized);
+
+      if (!updated) {
+        return res.status(404).json({ message: 'Resource not found' });
+      }
+
+      res.json(updated);
+    } catch (error) {
+      console.error('Error updating resource:', error);
+      res.status(500).json({ message: 'Failed to update resource' });
+    }
+  });
+
+  // POST /api/admin/resources/bulk - Bulk update resources (admin only)
+  app.post('/api/admin/resources/bulk', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const { action, resourceIds, data } = req.body;
+      const userId = req.user?.id;
+
+      // Validate input
+      if (!action || !resourceIds || !Array.isArray(resourceIds)) {
+        return res.status(400).json({ message: 'Invalid request body' });
+      }
+
+      if (resourceIds.length === 0 || resourceIds.length > 100) {
+        return res.status(400).json({ message: 'Must select 1-100 resources' });
+      }
+
+      let result;
+      switch (action) {
+        case 'approve':
+          result = await storage.bulkUpdateStatus(resourceIds, 'approved', userId);
+          break;
+        case 'reject':
+          result = await storage.bulkUpdateStatus(resourceIds, 'rejected', userId);
+          break;
+        case 'archive':
+          result = await storage.bulkUpdateStatus(resourceIds, 'archived', userId);
+          break;
+        case 'delete':
+          result = await storage.bulkDeleteResources(resourceIds);
+          break;
+        case 'tag':
+          if (!data?.tags || !Array.isArray(data.tags)) {
+            return res.status(400).json({ message: 'Tags array required for tag action' });
+          }
+          result = await storage.bulkAddTags(resourceIds, data.tags);
+          break;
+        default:
+          return res.status(400).json({ message: 'Invalid action' });
+      }
+
+      res.json({ success: true, ...result });
+    } catch (error) {
+      console.error('Bulk operation failed:', error);
+      res.status(500).json({ message: 'Bulk operation failed' });
+    }
+  });
+
+  // DELETE /api/admin/resources/:id - Archive resource (admin only)
+  app.delete('/api/admin/resources/:id', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const id = req.params.id; // UUID string
+
+      const archived = await storage.bulkDeleteResources([id]);
+
+      res.json({ success: true, resource: archived });
+    } catch (error) {
+      console.error('Error archiving resource:', error);
+      res.status(500).json({ message: 'Failed to archive resource' });
+    }
+  });
+
   // GET /api/admin/stats - Dashboard statistics
   app.get('/api/admin/stats', isAuthenticated, isAdmin, async (req, res) => {
     try {

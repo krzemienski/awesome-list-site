@@ -27,6 +27,12 @@ import NotFound from "@/pages/not-found";
 import SubmitResource from "@/pages/SubmitResource";
 import Journeys from "@/pages/Journeys";
 import JourneyDetail from "@/pages/JourneyDetail";
+import { AdminLayout } from "@/components/admin/AdminLayout";
+import { ResourceBrowser } from "@/components/admin/ResourceBrowser";
+import PendingResources from "@/components/admin/PendingResources";
+import PendingEdits from "@/components/admin/PendingEdits";
+import BatchEnrichmentPanel from "@/components/admin/BatchEnrichmentPanel";
+import GitHubSyncPanel from "@/components/admin/GitHubSyncPanel";
 
 import { AwesomeList } from "@/types/awesome-list";
 import { processAwesomeListData } from "@/lib/parser";
@@ -141,6 +147,31 @@ function Router() {
         <Route path="/admin" component={() => (
           <AdminGuard>
             <AdminDashboard />
+          </AdminGuard>
+        )} />
+        <Route path="/admin/resources" component={() => (
+          <AdminGuard>
+            <AdminLayout><ResourceBrowser /></AdminLayout>
+          </AdminGuard>
+        )} />
+        <Route path="/admin/approvals" component={() => (
+          <AdminGuard>
+            <AdminLayout><PendingResources /></AdminLayout>
+          </AdminGuard>
+        )} />
+        <Route path="/admin/edits" component={() => (
+          <AdminGuard>
+            <AdminLayout><PendingEdits /></AdminLayout>
+          </AdminGuard>
+        )} />
+        <Route path="/admin/enrichment" component={() => (
+          <AdminGuard>
+            <AdminLayout><BatchEnrichmentPanel /></AdminLayout>
+          </AdminGuard>
+        )} />
+        <Route path="/admin/github" component={() => (
+          <AdminGuard>
+            <AdminLayout><GitHubSyncPanel /></AdminLayout>
           </AdminGuard>
         )} />
         <Route component={NotFound} />

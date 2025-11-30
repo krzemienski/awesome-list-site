@@ -6,15 +6,15 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { 
-  Shield, 
-  Users, 
-  GitBranch, 
-  FileText, 
-  Activity, 
-  Download, 
-  CheckCircle2, 
-  XCircle, 
+import {
+  Shield,
+  Users,
+  GitBranch,
+  FileText,
+  Activity,
+  Download,
+  CheckCircle2,
+  XCircle,
   AlertCircle,
   Link,
   Clock,
@@ -32,6 +32,8 @@ import PendingResources from "@/components/admin/PendingResources";
 import PendingEdits from "@/components/admin/PendingEdits";
 import BatchEnrichmentPanel from "@/components/admin/BatchEnrichmentPanel";
 import GitHubSyncPanel from "@/components/admin/GitHubSyncPanel";
+import { AdminLayout } from "@/components/admin/AdminLayout";
+import { DashboardWidgets } from "@/components/admin/DashboardWidgets";
 
 interface ValidationResult {
   valid: boolean;
@@ -256,73 +258,18 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-pink-500 font-mono flex items-center gap-2">
-          <Shield className="h-8 w-8" />
-          Admin Dashboard
-        </h1>
-        <p className="text-gray-400 mt-2">Manage resources, users, and system configuration</p>
-      </div>
+    <AdminLayout>
+      <div className="space-y-6">
+        {/* Page Header */}
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+          <p className="text-muted-foreground">
+            Overview of system activity and statistics
+          </p>
+        </div>
 
-      {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <Card className="border-pink-500/20 bg-black">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-gray-400 flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Total Users
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-pink-500 font-mono">
-              {isLoading ? "..." : stats?.users || 0}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-cyan-500/20 bg-black">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-gray-400 flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              Total Resources
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-cyan-500 font-mono">
-              {isLoading ? "..." : stats?.resources || 0}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-pink-500/20 bg-black">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-gray-400 flex items-center gap-2">
-              <Activity className="h-4 w-4" />
-              Learning Journeys
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-pink-500 font-mono">
-              {isLoading ? "..." : stats?.journeys || 0}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-cyan-500/20 bg-black">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-gray-400 flex items-center gap-2">
-              <GitBranch className="h-4 w-4" />
-              Pending Approvals
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-cyan-500 font-mono">
-              {isLoading ? "..." : stats?.pendingApprovals || 0}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+        {/* Dashboard Widgets */}
+        <DashboardWidgets />
 
       {/* Admin Tabs */}
       <Tabs defaultValue="approvals" className="space-y-4">
@@ -856,6 +803,7 @@ export default function AdminDashboard() {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
+      </div>
+    </AdminLayout>
   );
 }

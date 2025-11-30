@@ -69,6 +69,12 @@ export interface IStorage {
   updateResource(id: string, resource: Partial<InsertResource>): Promise<Resource>;
   updateResourceStatus(id: string, status: string, approvedBy?: string): Promise<Resource>;
   deleteResource(id: string): Promise<void>;
+
+  // Bulk operations
+  bulkUpdateStatus(resourceIds: string[], status: string, approvedBy: string): Promise<{ count: number }>;
+  bulkDeleteResources(resourceIds: string[]): Promise<{ count: number }>;
+  bulkAddTags(resourceIds: string[], tagNames: string[]): Promise<{ count: number; tagsCreated: number }>;
+  listAdminResources(options: AdminResourceListOptions): Promise<{ resources: Resource[]; total: number; page: number; totalPages: number }>;
   
   // Category management
   listCategories(): Promise<Category[]>;
@@ -199,6 +205,17 @@ interface ListResourceOptions {
   subcategory?: string;
   userId?: string;
   search?: string;
+}
+
+export interface AdminResourceListOptions {
+  page: number;
+  limit: number;
+  status?: string;
+  category?: string;
+  subcategory?: string;
+  search?: string;
+  dateFrom?: Date;
+  dateTo?: Date;
 }
 
 interface AdminStats {
@@ -411,7 +428,191 @@ export class DatabaseStorage implements IStorage {
   async deleteResource(id: string): Promise<void> {
     await db.delete(resources).where(eq(resources.id, id));
   }
-  
+
+  // Bulk operations
+  async bulkUpdateStatus(resourceIds: string[], status: string, approvedBy: string): Promise<{ count: number }> {
+    if (!resourceIds || resourceIds.length === 0) {
+      return { count: 0 };
+    }
+
+    return await db.transaction(async (tx) => {
+      const updateData: any = { status, updatedAt: new Date() };
+
+      if (status === 'approved') {
+        updateData.approvedBy = approvedBy;
+        updateData.approvedAt = new Date();
+      }
+
+      // Perform bulk update
+      await tx
+        .update(resources)
+        .set(updateData)
+        .where(inArray(resources.id, resourceIds));
+
+      // Log each resource in audit log
+      for (const resourceId of resourceIds) {
+        await tx.insert(resourceAuditLog).values({
+          resourceId,
+          action: `bulk_status_${status}`,
+          performedBy: approvedBy,
+          changes: { status },
+          notes: `Bulk status update to ${status} (${resourceIds.length} resources)`
+        });
+      }
+
+      return { count: resourceIds.length };
+    });
+  }
+
+  async bulkDeleteResources(resourceIds: string[]): Promise<{ count: number }> {
+    if (!resourceIds || resourceIds.length === 0) {
+      return { count: 0 };
+    }
+
+    return await db.transaction(async (tx) => {
+      // Soft delete - set status to archived
+      await tx
+        .update(resources)
+        .set({ status: 'archived', updatedAt: new Date() })
+        .where(inArray(resources.id, resourceIds));
+
+      // Log the bulk deletion
+      await tx.insert(resourceAuditLog).values({
+        resourceId: null,
+        action: 'bulk_delete',
+        changes: { resourceIds },
+        notes: `Bulk archived ${resourceIds.length} resources`
+      });
+
+      return { count: resourceIds.length };
+    });
+  }
+
+  async bulkAddTags(resourceIds: string[], tagNames: string[]): Promise<{ count: number; tagsCreated: number }> {
+    if (!resourceIds || resourceIds.length === 0 || !tagNames || tagNames.length === 0) {
+      return { count: 0, tagsCreated: 0 };
+    }
+
+    return await db.transaction(async (tx) => {
+      let tagsCreated = 0;
+      const tagIds: string[] = [];
+
+      // Upsert tags (create if they don't exist)
+      for (const tagName of tagNames) {
+        const slug = tagName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+        const [tag] = await tx
+          .insert(tags)
+          .values({ name: tagName, slug })
+          .onConflictDoUpdate({
+            target: tags.name,
+            set: { name: tagName }
+          })
+          .returning();
+
+        // Check if this is a new tag
+        const [existing] = await tx
+          .select()
+          .from(tags)
+          .where(eq(tags.name, tagName))
+          .limit(1);
+
+        if (tag.id !== existing?.id) {
+          tagsCreated++;
+        }
+
+        tagIds.push(tag.id);
+      }
+
+      // Create resource_tags junction entries
+      let junctionCount = 0;
+      for (const resourceId of resourceIds) {
+        for (const tagId of tagIds) {
+          await tx
+            .insert(resourceTags)
+            .values({ resourceId, tagId })
+            .onConflictDoNothing();
+          junctionCount++;
+        }
+      }
+
+      // Log the bulk tag operation
+      await tx.insert(resourceAuditLog).values({
+        resourceId: null,
+        action: 'bulk_add_tags',
+        changes: { resourceIds, tagNames, tagsCreated },
+        notes: `Bulk added ${tagNames.length} tags to ${resourceIds.length} resources`
+      });
+
+      return { count: junctionCount, tagsCreated };
+    });
+  }
+
+  async listAdminResources(options: AdminResourceListOptions): Promise<{
+    resources: Resource[];
+    total: number;
+    page: number;
+    totalPages: number
+  }> {
+    const { page, limit, status, category, subcategory, search, dateFrom, dateTo } = options;
+    const offset = (page - 1) * limit;
+
+    let query = db.select().from(resources);
+    let countQuery = db.select({ count: sql<number>`count(*)::int` }).from(resources);
+
+    const conditions = [];
+
+    if (status) {
+      conditions.push(eq(resources.status, status));
+    }
+
+    if (category) {
+      conditions.push(eq(resources.category, category));
+    }
+
+    if (subcategory) {
+      conditions.push(eq(resources.subcategory, subcategory));
+    }
+
+    if (search) {
+      conditions.push(
+        or(
+          like(resources.title, `%${search}%`),
+          like(resources.description, `%${search}%`),
+          like(resources.url, `%${search}%`)
+        )
+      );
+    }
+
+    if (dateFrom) {
+      conditions.push(sql`${resources.createdAt} >= ${dateFrom}`);
+    }
+
+    if (dateTo) {
+      conditions.push(sql`${resources.createdAt} <= ${dateTo}`);
+    }
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions)) as any;
+      countQuery = countQuery.where(and(...conditions)) as any;
+    }
+
+    const [totalResult] = await countQuery;
+    const totalPages = Math.ceil(totalResult.count / limit);
+
+    const resourceList = await query
+      .orderBy(desc(resources.createdAt))
+      .limit(limit)
+      .offset(offset);
+
+    return {
+      resources: resourceList,
+      total: totalResult.count,
+      page,
+      totalPages
+    };
+  }
+
   // Category management
   async listCategories(): Promise<Category[]> {
     return await db.select().from(categories).orderBy(asc(categories.name));
@@ -1316,7 +1517,26 @@ export class MemStorage implements IStorage {
     throw new Error("Not implemented in memory storage");
   }
   async deleteResource(id: string): Promise<void> {}
-  
+
+  // Bulk operations - Not implemented for MemStorage
+  async bulkUpdateStatus(resourceIds: string[], status: string, approvedBy: string): Promise<{ count: number }> {
+    throw new Error("Bulk operations not implemented in memory storage");
+  }
+  async bulkDeleteResources(resourceIds: string[]): Promise<{ count: number }> {
+    throw new Error("Bulk operations not implemented in memory storage");
+  }
+  async bulkAddTags(resourceIds: string[], tagNames: string[]): Promise<{ count: number; tagsCreated: number }> {
+    throw new Error("Bulk operations not implemented in memory storage");
+  }
+  async listAdminResources(options: AdminResourceListOptions): Promise<{
+    resources: Resource[];
+    total: number;
+    page: number;
+    totalPages: number
+  }> {
+    return { resources: [], total: 0, page: 1, totalPages: 0 };
+  }
+
   async listCategories(): Promise<Category[]> { return []; }
   async getCategory(id: string): Promise<Category | undefined> { return undefined; }
   async createCategory(category: InsertCategory): Promise<Category> {
