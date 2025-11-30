@@ -37,7 +37,7 @@ export default function PendingEdits() {
   });
 
   const approveMutation = useMutation({
-    mutationFn: async (editId: number) => {
+    mutationFn: async (editId: string) => {
       return await apiRequest(`/api/admin/resource-edits/${editId}/approve`, {
         method: 'POST'
       });
@@ -64,7 +64,7 @@ export default function PendingEdits() {
   });
 
   const rejectMutation = useMutation({
-    mutationFn: async ({ editId, reason }: { editId: number; reason: string }) => {
+    mutationFn: async ({ editId, reason }: { editId: string; reason: string }) => {
       return await apiRequest(`/api/admin/resource-edits/${editId}/reject`, {
         method: 'POST',
         body: JSON.stringify({ reason })

@@ -44,7 +44,7 @@ export default function BatchEnrichmentPanel() {
   
   const [filter, setFilter] = useState<'all' | 'unenriched'>('unenriched');
   const [batchSize, setBatchSize] = useState(10);
-  const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   const { data: jobsData, isLoading } = useQuery<JobsResponse>({
@@ -82,7 +82,7 @@ export default function BatchEnrichmentPanel() {
   });
 
   const cancelMutation = useMutation({
-    mutationFn: async (jobId: number) => {
+    mutationFn: async (jobId: string) => {
       return await apiRequest(`/api/enrichment/jobs/${jobId}`, {
         method: 'DELETE'
       });
@@ -119,12 +119,12 @@ export default function BatchEnrichmentPanel() {
     startMutation.mutate({ filter, batchSize });
   };
 
-  const handleViewDetails = (jobId: number) => {
+  const handleViewDetails = (jobId: string) => {
     setSelectedJobId(jobId);
     setIsDetailsModalOpen(true);
   };
 
-  const handleCancelJob = (jobId: number) => {
+  const handleCancelJob = (jobId: string) => {
     if (confirm('Are you sure you want to cancel this enrichment job? This action cannot be undone.')) {
       cancelMutation.mutate(jobId);
     }

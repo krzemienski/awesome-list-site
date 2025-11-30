@@ -237,7 +237,7 @@ User Profile:
 - Time Commitment: ${userProfile.timeCommitment}
 
 Available Resources (${resources.length} total):
-${resources.slice(0, 30).map(r => `- ${r.title}: ${r.description?.slice(0, 100)}`).join('\n')}
+${resources.slice(0, 30).map((r: any) => `- ${r.title}: ${r.description?.slice(0, 100)}`).join('\n')}
 
 Create a structured learning path with:
 1. 3-5 milestones with clear progression
@@ -279,7 +279,7 @@ Response format (JSON):
         description: m.description,
         resourceIds: selectedResources
           .slice(index * 2, (index + 1) * 2)
-          .map(r => r.url),
+          .map((r: any) => r.url),
         estimatedHours: m.estimatedHours || 5,
         order: index + 1
       })) || [];
@@ -338,7 +338,7 @@ Response format (JSON):
       description: `Complete this milestone to progress in your ${category} journey`,
       resourceIds: selectedResources
         .slice(index * 2, (index + 1) * 2)
-        .map(r => r.url),
+        .map((r: any) => r.url),
       estimatedHours: parseInt(template.estimatedDuration) / template.milestones.length,
       order: index + 1
     }));

@@ -127,6 +127,7 @@ export async function fetchAwesomeVideoList(): Promise<AwesomeListData> {
       description: string;
       category: string;
       subcategory?: string;
+      subSubcategory?: string;
       tags?: string[];
     }> = [];
     
@@ -486,17 +487,19 @@ function redistributeResourcesForCSVAlignment(resources: any[], hierarchyStructu
       // If no keyword match, distribute precisely to match target counts
       if (!bestMatch) {
         const subcategoryNames = Object.keys(rules.subcategories);
-        const currentCounts = {};
-        
+        const currentCounts: Record<string, number> = {};
+
         // Count current assignments for each subcategory
         subcategoryNames.forEach(name => {
           currentCounts[name] = updatedCategoryResources.filter(r => r.subcategory === name).length;
         });
-        
+
         // Find subcategory with largest deficit
         let maxDeficit = -1;
         subcategoryNames.forEach(name => {
-          const deficit = rules.subcategories[name].target - currentCounts[name];
+          const subcatInfo = rules.subcategories[name as keyof typeof rules.subcategories];
+          if (!subcatInfo || typeof subcatInfo !== 'object' || !('target' in subcatInfo)) return;
+          const deficit = (subcatInfo as { target: number }).target - currentCounts[name];
           if (deficit > maxDeficit) {
             maxDeficit = deficit;
             bestMatch = name;

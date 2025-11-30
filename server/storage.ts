@@ -64,86 +64,86 @@ export interface IStorage {
   
   // Resource CRUD operations
   listResources(options: ListResourceOptions): Promise<{ resources: Resource[]; total: number }>;
-  getResource(id: number): Promise<Resource | undefined>;
+  getResource(id: string): Promise<Resource | undefined>;
   createResource(resource: InsertResource): Promise<Resource>;
-  updateResource(id: number, resource: Partial<InsertResource>): Promise<Resource>;
-  updateResourceStatus(id: number, status: string, approvedBy?: string): Promise<Resource>;
-  deleteResource(id: number): Promise<void>;
+  updateResource(id: string, resource: Partial<InsertResource>): Promise<Resource>;
+  updateResourceStatus(id: string, status: string, approvedBy?: string): Promise<Resource>;
+  deleteResource(id: string): Promise<void>;
   
   // Category management
   listCategories(): Promise<Category[]>;
-  getCategory(id: number): Promise<Category | undefined>;
+  getCategory(id: string): Promise<Category | undefined>;
   createCategory(category: InsertCategory): Promise<Category>;
-  updateCategory(id: number, category: Partial<InsertCategory>): Promise<Category>;
-  deleteCategory(id: number): Promise<void>;
-  
+  updateCategory(id: string, category: Partial<InsertCategory>): Promise<Category>;
+  deleteCategory(id: string): Promise<void>;
+
   // Subcategory management
-  listSubcategories(categoryId?: number): Promise<Subcategory[]>;
-  getSubcategory(id: number): Promise<Subcategory | undefined>;
+  listSubcategories(categoryId?: string): Promise<Subcategory[]>;
+  getSubcategory(id: string): Promise<Subcategory | undefined>;
   createSubcategory(subcategory: InsertSubcategory): Promise<Subcategory>;
-  updateSubcategory(id: number, subcategory: Partial<InsertSubcategory>): Promise<Subcategory>;
-  deleteSubcategory(id: number): Promise<void>;
-  
+  updateSubcategory(id: string, subcategory: Partial<InsertSubcategory>): Promise<Subcategory>;
+  deleteSubcategory(id: string): Promise<void>;
+
   // Sub-subcategory management
-  listSubSubcategories(subcategoryId?: number): Promise<SubSubcategory[]>;
-  getSubSubcategory(id: number): Promise<SubSubcategory | undefined>;
+  listSubSubcategories(subcategoryId?: string): Promise<SubSubcategory[]>;
+  getSubSubcategory(id: string): Promise<SubSubcategory | undefined>;
   createSubSubcategory(subSubcategory: InsertSubSubcategory): Promise<SubSubcategory>;
-  updateSubSubcategory(id: number, subSubcategory: Partial<InsertSubSubcategory>): Promise<SubSubcategory>;
-  deleteSubSubcategory(id: number): Promise<void>;
-  
+  updateSubSubcategory(id: string, subSubcategory: Partial<InsertSubSubcategory>): Promise<SubSubcategory>;
+  deleteSubSubcategory(id: string): Promise<void>;
+
   // Tag management
   listTags(): Promise<Tag[]>;
-  getTag(id: number): Promise<Tag | undefined>;
+  getTag(id: string): Promise<Tag | undefined>;
   createTag(tag: InsertTag): Promise<Tag>;
-  deleteTag(id: number): Promise<void>;
-  
+  deleteTag(id: string): Promise<void>;
+
   // Resource Tags
-  addTagToResource(resourceId: number, tagId: number): Promise<void>;
-  removeTagFromResource(resourceId: number, tagId: number): Promise<void>;
-  getResourceTags(resourceId: number): Promise<Tag[]>;
+  addTagToResource(resourceId: string, tagId: string): Promise<void>;
+  removeTagFromResource(resourceId: string, tagId: string): Promise<void>;
+  getResourceTags(resourceId: string): Promise<Tag[]>;
   
   // Learning Journeys
   listLearningJourneys(category?: string): Promise<LearningJourney[]>;
-  getLearningJourney(id: number): Promise<LearningJourney | undefined>;
+  getLearningJourney(id: string): Promise<LearningJourney | undefined>;
   createLearningJourney(journey: InsertLearningJourney): Promise<LearningJourney>;
-  updateLearningJourney(id: number, journey: Partial<InsertLearningJourney>): Promise<LearningJourney>;
-  deleteLearningJourney(id: number): Promise<void>;
-  
+  updateLearningJourney(id: string, journey: Partial<InsertLearningJourney>): Promise<LearningJourney>;
+  deleteLearningJourney(id: string): Promise<void>;
+
   // Journey Steps
-  listJourneySteps(journeyId: number): Promise<JourneyStep[]>;
-  listJourneyStepsBatch(journeyIds: number[]): Promise<Map<number, JourneyStep[]>>;
+  listJourneySteps(journeyId: string): Promise<JourneyStep[]>;
+  listJourneyStepsBatch(journeyIds: string[]): Promise<Map<string, JourneyStep[]>>;
   createJourneyStep(step: InsertJourneyStep): Promise<JourneyStep>;
-  updateJourneyStep(id: number, step: Partial<InsertJourneyStep>): Promise<JourneyStep>;
-  deleteJourneyStep(id: number): Promise<void>;
-  
+  updateJourneyStep(id: string, step: Partial<InsertJourneyStep>): Promise<JourneyStep>;
+  deleteJourneyStep(id: string): Promise<void>;
+
   // User Favorites
-  addFavorite(userId: string, resourceId: number): Promise<void>;
-  removeFavorite(userId: string, resourceId: number): Promise<void>;
+  addFavorite(userId: string, resourceId: string): Promise<void>;
+  removeFavorite(userId: string, resourceId: string): Promise<void>;
   getUserFavorites(userId: string): Promise<Array<Resource & { favoritedAt: Date }>>;
-  
+
   // User Bookmarks
-  addBookmark(userId: string, resourceId: number, notes?: string): Promise<void>;
-  removeBookmark(userId: string, resourceId: number): Promise<void>;
+  addBookmark(userId: string, resourceId: string, notes?: string): Promise<void>;
+  removeBookmark(userId: string, resourceId: string): Promise<void>;
   getUserBookmarks(userId: string): Promise<Array<Resource & { notes?: string; bookmarkedAt: Date }>>;
-  
+
   // User Journey Progress
-  startUserJourney(userId: string, journeyId: number): Promise<UserJourneyProgress>;
-  updateUserJourneyProgress(userId: string, journeyId: number, stepId: number): Promise<UserJourneyProgress>;
-  getUserJourneyProgress(userId: string, journeyId: number): Promise<UserJourneyProgress | undefined>;
+  startUserJourney(userId: string, journeyId: string): Promise<UserJourneyProgress>;
+  updateUserJourneyProgress(userId: string, journeyId: string, stepId: string): Promise<UserJourneyProgress>;
+  getUserJourneyProgress(userId: string, journeyId: string): Promise<UserJourneyProgress | undefined>;
   listUserJourneyProgress(userId: string): Promise<UserJourneyProgress[]>;
-  
+
   // Resource Audit Log
-  logResourceAudit(resourceId: number | null, action: string, performedBy?: string, changes?: any, notes?: string): Promise<void>;
-  getResourceAuditLog(resourceId: number, limit?: number): Promise<any[]>;
-  
+  logResourceAudit(resourceId: string | null, action: string, performedBy?: string, changes?: any, notes?: string): Promise<void>;
+  getResourceAuditLog(resourceId: string, limit?: number): Promise<any[]>;
+
   // Resource Edits
   createResourceEdit(data: InsertResourceEdit): Promise<ResourceEdit>;
-  getResourceEdit(id: number): Promise<ResourceEdit | undefined>;
-  getResourceEditsByResource(resourceId: number): Promise<ResourceEdit[]>;
+  getResourceEdit(id: string): Promise<ResourceEdit | undefined>;
+  getResourceEditsByResource(resourceId: string): Promise<ResourceEdit[]>;
   getResourceEditsByUser(userId: string): Promise<ResourceEdit[]>;
   getPendingResourceEdits(): Promise<ResourceEdit[]>;
-  approveResourceEdit(editId: number, adminId: string): Promise<void>;
-  rejectResourceEdit(editId: number, adminId: string, reason: string): Promise<void>;
+  approveResourceEdit(editId: string, adminId: string): Promise<void>;
+  rejectResourceEdit(editId: string, adminId: string, reason: string): Promise<void>;
   
   // User Preferences
   getUserPreferences(userId: string): Promise<any | undefined>;
@@ -151,7 +151,7 @@ export interface IStorage {
   // GitHub Sync Queue
   addToGithubSyncQueue(item: InsertGithubSyncQueue): Promise<GithubSyncQueue>;
   getGithubSyncQueue(status?: string): Promise<GithubSyncQueue[]>;
-  updateGithubSyncStatus(id: number, status: string, errorMessage?: string): Promise<void>;
+  updateGithubSyncStatus(id: string, status: string, errorMessage?: string): Promise<void>;
   
   // GitHub Sync History
   getLastSyncHistory(repositoryUrl: string, direction: 'export' | 'import'): Promise<GithubSyncHistory | undefined>;
@@ -168,16 +168,16 @@ export interface IStorage {
   
   // Enrichment Jobs
   createEnrichmentJob(data: InsertEnrichmentJob): Promise<EnrichmentJob>;
-  getEnrichmentJob(id: number): Promise<EnrichmentJob | undefined>;
+  getEnrichmentJob(id: string): Promise<EnrichmentJob | undefined>;
   listEnrichmentJobs(limit?: number): Promise<EnrichmentJob[]>;
-  updateEnrichmentJob(id: number, data: Partial<EnrichmentJob>): Promise<EnrichmentJob>;
-  cancelEnrichmentJob(id: number): Promise<void>;
-  
+  updateEnrichmentJob(id: string, data: Partial<EnrichmentJob>): Promise<EnrichmentJob>;
+  cancelEnrichmentJob(id: string): Promise<void>;
+
   // Enrichment Queue
   createEnrichmentQueueItem(data: InsertEnrichmentQueue): Promise<EnrichmentQueueItem>;
-  getEnrichmentQueueItemsByJob(jobId: number): Promise<EnrichmentQueueItem[]>;
-  getPendingEnrichmentQueueItems(jobId: number, limit?: number): Promise<EnrichmentQueueItem[]>;
-  updateEnrichmentQueueItem(id: number, data: Partial<EnrichmentQueueItem>): Promise<EnrichmentQueueItem>;
+  getEnrichmentQueueItemsByJob(jobId: string): Promise<EnrichmentQueueItem[]>;
+  getPendingEnrichmentQueueItems(jobId: string, limit?: number): Promise<EnrichmentQueueItem[]>;
+  updateEnrichmentQueueItem(id: string, data: Partial<EnrichmentQueueItem>): Promise<EnrichmentQueueItem>;
   
   // Legacy methods for awesome list (in-memory)
   setAwesomeListData(data: any): void;
@@ -361,7 +361,7 @@ export class DatabaseStorage implements IStorage {
     return { resources: resourceList, total: totalResult.count };
   }
   
-  async getResource(id: number): Promise<Resource | undefined> {
+  async getResource(id: string): Promise<Resource | undefined> {
     const [resource] = await db.select().from(resources).where(eq(resources.id, id));
     return resource;
   }
@@ -375,7 +375,7 @@ export class DatabaseStorage implements IStorage {
     return newResource;
   }
   
-  async updateResource(id: number, resource: Partial<InsertResource>): Promise<Resource> {
+  async updateResource(id: string, resource: Partial<InsertResource>): Promise<Resource> {
     const [updatedResource] = await db
       .update(resources)
       .set({ ...resource, updatedAt: new Date() })
@@ -388,7 +388,7 @@ export class DatabaseStorage implements IStorage {
     return updatedResource;
   }
   
-  async updateResourceStatus(id: number, status: string, approvedBy?: string): Promise<Resource> {
+  async updateResourceStatus(id: string, status: string, approvedBy?: string): Promise<Resource> {
     const updateData: any = { status, updatedAt: new Date() };
     
     if (status === 'approved' && approvedBy) {
@@ -408,7 +408,7 @@ export class DatabaseStorage implements IStorage {
     return updatedResource;
   }
   
-  async deleteResource(id: number): Promise<void> {
+  async deleteResource(id: string): Promise<void> {
     await db.delete(resources).where(eq(resources.id, id));
   }
   
@@ -417,7 +417,7 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(categories).orderBy(asc(categories.name));
   }
   
-  async getCategory(id: number): Promise<Category | undefined> {
+  async getCategory(id: string): Promise<Category | undefined> {
     const [category] = await db.select().from(categories).where(eq(categories.id, id));
     return category;
   }
@@ -427,7 +427,7 @@ export class DatabaseStorage implements IStorage {
     return newCategory;
   }
   
-  async updateCategory(id: number, category: Partial<InsertCategory>): Promise<Category> {
+  async updateCategory(id: string, category: Partial<InsertCategory>): Promise<Category> {
     const [updatedCategory] = await db
       .update(categories)
       .set(category)
@@ -436,12 +436,12 @@ export class DatabaseStorage implements IStorage {
     return updatedCategory;
   }
   
-  async deleteCategory(id: number): Promise<void> {
+  async deleteCategory(id: string): Promise<void> {
     await db.delete(categories).where(eq(categories.id, id));
   }
   
   // Subcategory management
-  async listSubcategories(categoryId?: number): Promise<Subcategory[]> {
+  async listSubcategories(categoryId?: string): Promise<Subcategory[]> {
     let query = db.select().from(subcategories);
     
     if (categoryId) {
@@ -451,7 +451,7 @@ export class DatabaseStorage implements IStorage {
     return await query.orderBy(asc(subcategories.name));
   }
   
-  async getSubcategory(id: number): Promise<Subcategory | undefined> {
+  async getSubcategory(id: string): Promise<Subcategory | undefined> {
     const [subcategory] = await db.select().from(subcategories).where(eq(subcategories.id, id));
     return subcategory;
   }
@@ -461,7 +461,7 @@ export class DatabaseStorage implements IStorage {
     return newSubcategory;
   }
   
-  async updateSubcategory(id: number, subcategory: Partial<InsertSubcategory>): Promise<Subcategory> {
+  async updateSubcategory(id: string, subcategory: Partial<InsertSubcategory>): Promise<Subcategory> {
     const [updatedSubcategory] = await db
       .update(subcategories)
       .set(subcategory)
@@ -470,12 +470,12 @@ export class DatabaseStorage implements IStorage {
     return updatedSubcategory;
   }
   
-  async deleteSubcategory(id: number): Promise<void> {
+  async deleteSubcategory(id: string): Promise<void> {
     await db.delete(subcategories).where(eq(subcategories.id, id));
   }
   
   // Sub-subcategory management
-  async listSubSubcategories(subcategoryId?: number): Promise<SubSubcategory[]> {
+  async listSubSubcategories(subcategoryId?: string): Promise<SubSubcategory[]> {
     let query = db.select().from(subSubcategories);
     
     if (subcategoryId) {
@@ -485,7 +485,7 @@ export class DatabaseStorage implements IStorage {
     return await query.orderBy(asc(subSubcategories.name));
   }
   
-  async getSubSubcategory(id: number): Promise<SubSubcategory | undefined> {
+  async getSubSubcategory(id: string): Promise<SubSubcategory | undefined> {
     const [subSubcategory] = await db.select().from(subSubcategories).where(eq(subSubcategories.id, id));
     return subSubcategory;
   }
@@ -495,7 +495,7 @@ export class DatabaseStorage implements IStorage {
     return newSubSubcategory;
   }
   
-  async updateSubSubcategory(id: number, subSubcategory: Partial<InsertSubSubcategory>): Promise<SubSubcategory> {
+  async updateSubSubcategory(id: string, subSubcategory: Partial<InsertSubSubcategory>): Promise<SubSubcategory> {
     const [updatedSubSubcategory] = await db
       .update(subSubcategories)
       .set(subSubcategory)
@@ -504,7 +504,7 @@ export class DatabaseStorage implements IStorage {
     return updatedSubSubcategory;
   }
   
-  async deleteSubSubcategory(id: number): Promise<void> {
+  async deleteSubSubcategory(id: string): Promise<void> {
     await db.delete(subSubcategories).where(eq(subSubcategories.id, id));
   }
   
@@ -513,7 +513,7 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(tags).orderBy(asc(tags.name));
   }
   
-  async getTag(id: number): Promise<Tag | undefined> {
+  async getTag(id: string): Promise<Tag | undefined> {
     const [tag] = await db.select().from(tags).where(eq(tags.id, id));
     return tag;
   }
@@ -523,19 +523,19 @@ export class DatabaseStorage implements IStorage {
     return newTag;
   }
   
-  async deleteTag(id: number): Promise<void> {
+  async deleteTag(id: string): Promise<void> {
     await db.delete(tags).where(eq(tags.id, id));
   }
   
   // Resource Tags
-  async addTagToResource(resourceId: number, tagId: number): Promise<void> {
+  async addTagToResource(resourceId: string, tagId: string): Promise<void> {
     await db
       .insert(resourceTags)
       .values({ resourceId, tagId })
       .onConflictDoNothing();
   }
   
-  async removeTagFromResource(resourceId: number, tagId: number): Promise<void> {
+  async removeTagFromResource(resourceId: string, tagId: string): Promise<void> {
     await db
       .delete(resourceTags)
       .where(
@@ -546,7 +546,7 @@ export class DatabaseStorage implements IStorage {
       );
   }
   
-  async getResourceTags(resourceId: number): Promise<Tag[]> {
+  async getResourceTags(resourceId: string): Promise<Tag[]> {
     const result = await db
       .select({ tag: tags })
       .from(resourceTags)
@@ -569,7 +569,7 @@ export class DatabaseStorage implements IStorage {
       .orderBy(asc(learningJourneys.orderIndex));
   }
   
-  async getLearningJourney(id: number): Promise<LearningJourney | undefined> {
+  async getLearningJourney(id: string): Promise<LearningJourney | undefined> {
     const [journey] = await db.select().from(learningJourneys).where(eq(learningJourneys.id, id));
     return journey;
   }
@@ -579,7 +579,7 @@ export class DatabaseStorage implements IStorage {
     return newJourney;
   }
   
-  async updateLearningJourney(id: number, journey: Partial<InsertLearningJourney>): Promise<LearningJourney> {
+  async updateLearningJourney(id: string, journey: Partial<InsertLearningJourney>): Promise<LearningJourney> {
     const [updatedJourney] = await db
       .update(learningJourneys)
       .set({ ...journey, updatedAt: new Date() })
@@ -588,12 +588,12 @@ export class DatabaseStorage implements IStorage {
     return updatedJourney;
   }
   
-  async deleteLearningJourney(id: number): Promise<void> {
+  async deleteLearningJourney(id: string): Promise<void> {
     await db.delete(learningJourneys).where(eq(learningJourneys.id, id));
   }
-  
+
   // Journey Steps
-  async listJourneySteps(journeyId: number): Promise<JourneyStep[]> {
+  async listJourneySteps(journeyId: string): Promise<JourneyStep[]> {
     return await db
       .select()
       .from(journeySteps)
@@ -606,7 +606,7 @@ export class DatabaseStorage implements IStorage {
     return newStep;
   }
   
-  async updateJourneyStep(id: number, step: Partial<InsertJourneyStep>): Promise<JourneyStep> {
+  async updateJourneyStep(id: string, step: Partial<InsertJourneyStep>): Promise<JourneyStep> {
     const [updatedStep] = await db
       .update(journeySteps)
       .set(step)
@@ -615,11 +615,11 @@ export class DatabaseStorage implements IStorage {
     return updatedStep;
   }
   
-  async deleteJourneyStep(id: number): Promise<void> {
+  async deleteJourneyStep(id: string): Promise<void> {
     await db.delete(journeySteps).where(eq(journeySteps.id, id));
   }
   
-  async listJourneyStepsBatch(journeyIds: number[]): Promise<Map<number, JourneyStep[]>> {
+  async listJourneyStepsBatch(journeyIds: string[]): Promise<Map<string, JourneyStep[]>> {
     if (journeyIds.length === 0) {
       return new Map();
     }
@@ -631,7 +631,7 @@ export class DatabaseStorage implements IStorage {
       .orderBy(asc(journeySteps.stepNumber));
     
     // Group steps by journeyId
-    const grouped = new Map<number, JourneyStep[]>();
+    const grouped = new Map<string, JourneyStep[]>();
     for (const step of steps) {
       if (!grouped.has(step.journeyId)) {
         grouped.set(step.journeyId, []);
@@ -643,14 +643,14 @@ export class DatabaseStorage implements IStorage {
   }
   
   // User Favorites
-  async addFavorite(userId: string, resourceId: number): Promise<void> {
+  async addFavorite(userId: string, resourceId: string): Promise<void> {
     await db
       .insert(userFavorites)
       .values({ userId, resourceId })
       .onConflictDoNothing();
   }
   
-  async removeFavorite(userId: string, resourceId: number): Promise<void> {
+  async removeFavorite(userId: string, resourceId: string): Promise<void> {
     await db
       .delete(userFavorites)
       .where(
@@ -679,7 +679,7 @@ export class DatabaseStorage implements IStorage {
   }
   
   // User Bookmarks
-  async addBookmark(userId: string, resourceId: number, notes?: string): Promise<void> {
+  async addBookmark(userId: string, resourceId: string, notes?: string): Promise<void> {
     await db
       .insert(userBookmarks)
       .values({ userId, resourceId, notes })
@@ -689,7 +689,7 @@ export class DatabaseStorage implements IStorage {
       });
   }
   
-  async removeBookmark(userId: string, resourceId: number): Promise<void> {
+  async removeBookmark(userId: string, resourceId: string): Promise<void> {
     await db
       .delete(userBookmarks)
       .where(
@@ -720,7 +720,7 @@ export class DatabaseStorage implements IStorage {
   }
   
   // User Journey Progress
-  async startUserJourney(userId: string, journeyId: number): Promise<UserJourneyProgress> {
+  async startUserJourney(userId: string, journeyId: string): Promise<UserJourneyProgress> {
     const [progress] = await db
       .insert(userJourneyProgress)
       .values({
@@ -737,7 +737,7 @@ export class DatabaseStorage implements IStorage {
     return progress;
   }
   
-  async updateUserJourneyProgress(userId: string, journeyId: number, stepId: number): Promise<UserJourneyProgress> {
+  async updateUserJourneyProgress(userId: string, journeyId: string, stepId: string): Promise<UserJourneyProgress> {
     // First get current progress
     const [current] = await db
       .select()
@@ -779,7 +779,7 @@ export class DatabaseStorage implements IStorage {
     return updated;
   }
   
-  async getUserJourneyProgress(userId: string, journeyId: number): Promise<UserJourneyProgress | undefined> {
+  async getUserJourneyProgress(userId: string, journeyId: string): Promise<UserJourneyProgress | undefined> {
     const [progress] = await db
       .select()
       .from(userJourneyProgress)
@@ -789,32 +789,21 @@ export class DatabaseStorage implements IStorage {
           eq(userJourneyProgress.journeyId, journeyId)
         )
       );
-    
-    // Normalize completedSteps to numbers
-    if (progress && progress.completedSteps) {
-      progress.completedSteps = progress.completedSteps.map(id => Number(id));
-    }
-    
+
     return progress;
   }
   
   async listUserJourneyProgress(userId: string): Promise<UserJourneyProgress[]> {
-    const progressList = await db
+    return await db
       .select()
       .from(userJourneyProgress)
       .where(eq(userJourneyProgress.userId, userId))
       .orderBy(desc(userJourneyProgress.lastAccessedAt));
-    
-    // Normalize completedSteps to numbers for each progress entry
-    return progressList.map(progress => ({
-      ...progress,
-      completedSteps: progress.completedSteps ? progress.completedSteps.map(id => Number(id)) : []
-    }));
   }
   
   // Resource Audit Log
   async logResourceAudit(
-    resourceId: number | null,
+    resourceId: string | null,
     action: string,
     performedBy?: string,
     changes?: any,
@@ -829,7 +818,7 @@ export class DatabaseStorage implements IStorage {
     });
   }
   
-  async getResourceAuditLog(resourceId: number, limit = 50): Promise<any[]> {
+  async getResourceAuditLog(resourceId: string, limit = 50): Promise<any[]> {
     return await db
       .select()
       .from(resourceAuditLog)
@@ -853,12 +842,12 @@ export class DatabaseStorage implements IStorage {
     return edit;
   }
   
-  async getResourceEdit(id: number): Promise<ResourceEdit | undefined> {
+  async getResourceEdit(id: string): Promise<ResourceEdit | undefined> {
     const [edit] = await db.select().from(resourceEdits).where(eq(resourceEdits.id, id));
     return edit;
   }
   
-  async getResourceEditsByResource(resourceId: number): Promise<ResourceEdit[]> {
+  async getResourceEditsByResource(resourceId: string): Promise<ResourceEdit[]> {
     return await db
       .select()
       .from(resourceEdits)
@@ -874,7 +863,7 @@ export class DatabaseStorage implements IStorage {
       .orderBy(asc(resourceEdits.createdAt));
   }
   
-  async approveResourceEdit(editId: number, adminId: string): Promise<void> {
+  async approveResourceEdit(editId: string, adminId: string): Promise<void> {
     const edit = await this.getResourceEdit(editId);
     if (!edit || edit.status !== 'pending') {
       throw new Error('Edit not found or already processed');
@@ -928,7 +917,7 @@ export class DatabaseStorage implements IStorage {
     );
   }
   
-  async rejectResourceEdit(editId: number, adminId: string, reason: string): Promise<void> {
+  async rejectResourceEdit(editId: string, adminId: string, reason: string): Promise<void> {
     const edit = await this.getResourceEdit(editId);
     if (!edit) {
       throw new Error('Edit not found');
@@ -995,7 +984,7 @@ export class DatabaseStorage implements IStorage {
     return await query.orderBy(asc(githubSyncQueue.createdAt));
   }
   
-  async updateGithubSyncStatus(id: number, status: string, errorMessage?: string): Promise<void> {
+  async updateGithubSyncStatus(id: string, status: string, errorMessage?: string): Promise<void> {
     await db
       .update(githubSyncQueue)
       .set({
@@ -1042,9 +1031,13 @@ export class DatabaseStorage implements IStorage {
   
   // Admin Statistics
   async getAdminStats(): Promise<AdminStats> {
-    const [userCount] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(users);
+    // Import at top of method for clarity
+    const { supabaseAdmin } = await import('./supabaseAuth.js');
+    
+    // User count from Supabase Auth (not local DB)
+    const { count: userCount } = await supabaseAdmin
+      .from('auth.users')
+      .select('*', { count: 'exact', head: true });
     
     const [resourceCount] = await db
       .select({ count: sql<number>`count(*)::int` })
@@ -1063,22 +1056,22 @@ export class DatabaseStorage implements IStorage {
       .select({ count: sql<number>`count(*)::int` })
       .from(learningJourneys);
     
-    // Active users (those who logged in within last 30 days)
+    // Active users from Supabase Auth (last 30 days)
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     
-    const [activeCount] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(users)
-      .where(sql`${users.updatedAt} > ${thirtyDaysAgo}`);
+    const { count: activeCount } = await supabaseAdmin
+      .from('auth.users')
+      .select('*', { count: 'exact', head: true })
+      .gte('last_sign_in_at', thirtyDaysAgo.toISOString());
     
     return {
-      totalUsers: userCount.count,
+      totalUsers: userCount || 0,
       totalResources: resourceCount.count,
       pendingResources: pendingCount.count,
       totalCategories: categoryCount.count,
       totalJourneys: journeyCount.count,
-      activeUsers: activeCount.count
+      activeUsers: activeCount || 0
     };
   }
   
@@ -1167,7 +1160,7 @@ export class DatabaseStorage implements IStorage {
     return job;
   }
   
-  async getEnrichmentJob(id: number): Promise<EnrichmentJob | undefined> {
+  async getEnrichmentJob(id: string): Promise<EnrichmentJob | undefined> {
     const [job] = await db
       .select()
       .from(enrichmentJobs)
@@ -1184,7 +1177,7 @@ export class DatabaseStorage implements IStorage {
     return jobs;
   }
   
-  async updateEnrichmentJob(id: number, data: Partial<EnrichmentJob>): Promise<EnrichmentJob> {
+  async updateEnrichmentJob(id: string, data: Partial<EnrichmentJob>): Promise<EnrichmentJob> {
     const [job] = await db
       .update(enrichmentJobs)
       .set({ ...data, updatedAt: new Date() })
@@ -1193,7 +1186,7 @@ export class DatabaseStorage implements IStorage {
     return job;
   }
   
-  async cancelEnrichmentJob(id: number): Promise<void> {
+  async cancelEnrichmentJob(id: string): Promise<void> {
     await db
       .update(enrichmentJobs)
       .set({ 
@@ -1213,7 +1206,7 @@ export class DatabaseStorage implements IStorage {
     return item;
   }
   
-  async getEnrichmentQueueItemsByJob(jobId: number): Promise<EnrichmentQueueItem[]> {
+  async getEnrichmentQueueItemsByJob(jobId: string): Promise<EnrichmentQueueItem[]> {
     const items = await db
       .select()
       .from(enrichmentQueue)
@@ -1222,7 +1215,7 @@ export class DatabaseStorage implements IStorage {
     return items;
   }
   
-  async getPendingEnrichmentQueueItems(jobId: number, limit: number = 10): Promise<EnrichmentQueueItem[]> {
+  async getPendingEnrichmentQueueItems(jobId: string, limit: number = 10): Promise<EnrichmentQueueItem[]> {
     const items = await db
       .select()
       .from(enrichmentQueue)
@@ -1237,7 +1230,7 @@ export class DatabaseStorage implements IStorage {
     return items;
   }
   
-  async updateEnrichmentQueueItem(id: number, data: Partial<EnrichmentQueueItem>): Promise<EnrichmentQueueItem> {
+  async updateEnrichmentQueueItem(id: string, data: Partial<EnrichmentQueueItem>): Promise<EnrichmentQueueItem> {
     const [item] = await db
       .update(enrichmentQueue)
       .set({ ...data, updatedAt: new Date() })
@@ -1312,114 +1305,114 @@ export class MemStorage implements IStorage {
   async listResources(options: ListResourceOptions): Promise<{ resources: Resource[]; total: number }> {
     return { resources: [], total: 0 };
   }
-  async getResource(id: number): Promise<Resource | undefined> { return undefined; }
+  async getResource(id: string): Promise<Resource | undefined> { return undefined; }
   async createResource(resource: InsertResource): Promise<Resource> {
     throw new Error("Not implemented in memory storage");
   }
-  async updateResource(id: number, resource: Partial<InsertResource>): Promise<Resource> {
+  async updateResource(id: string, resource: Partial<InsertResource>): Promise<Resource> {
     throw new Error("Not implemented in memory storage");
   }
-  async updateResourceStatus(id: number, status: string, approvedBy?: string): Promise<Resource> {
+  async updateResourceStatus(id: string, status: string, approvedBy?: string): Promise<Resource> {
     throw new Error("Not implemented in memory storage");
   }
-  async deleteResource(id: number): Promise<void> {}
+  async deleteResource(id: string): Promise<void> {}
   
   async listCategories(): Promise<Category[]> { return []; }
-  async getCategory(id: number): Promise<Category | undefined> { return undefined; }
+  async getCategory(id: string): Promise<Category | undefined> { return undefined; }
   async createCategory(category: InsertCategory): Promise<Category> {
     throw new Error("Not implemented in memory storage");
   }
-  async updateCategory(id: number, category: Partial<InsertCategory>): Promise<Category> {
+  async updateCategory(id: string, category: Partial<InsertCategory>): Promise<Category> {
     throw new Error("Not implemented in memory storage");
   }
-  async deleteCategory(id: number): Promise<void> {}
+  async deleteCategory(id: string): Promise<void> {}
   
-  async listSubcategories(categoryId?: number): Promise<Subcategory[]> { return []; }
-  async getSubcategory(id: number): Promise<Subcategory | undefined> { return undefined; }
+  async listSubcategories(categoryId?: string): Promise<Subcategory[]> { return []; }
+  async getSubcategory(id: string): Promise<Subcategory | undefined> { return undefined; }
   async createSubcategory(subcategory: InsertSubcategory): Promise<Subcategory> {
     throw new Error("Not implemented in memory storage");
   }
-  async updateSubcategory(id: number, subcategory: Partial<InsertSubcategory>): Promise<Subcategory> {
+  async updateSubcategory(id: string, subcategory: Partial<InsertSubcategory>): Promise<Subcategory> {
     throw new Error("Not implemented in memory storage");
   }
-  async deleteSubcategory(id: number): Promise<void> {}
+  async deleteSubcategory(id: string): Promise<void> {}
   
-  async listSubSubcategories(subcategoryId?: number): Promise<SubSubcategory[]> { return []; }
-  async getSubSubcategory(id: number): Promise<SubSubcategory | undefined> { return undefined; }
+  async listSubSubcategories(subcategoryId?: string): Promise<SubSubcategory[]> { return []; }
+  async getSubSubcategory(id: string): Promise<SubSubcategory | undefined> { return undefined; }
   async createSubSubcategory(subSubcategory: InsertSubSubcategory): Promise<SubSubcategory> {
     throw new Error("Not implemented in memory storage");
   }
-  async updateSubSubcategory(id: number, subSubcategory: Partial<InsertSubSubcategory>): Promise<SubSubcategory> {
+  async updateSubSubcategory(id: string, subSubcategory: Partial<InsertSubSubcategory>): Promise<SubSubcategory> {
     throw new Error("Not implemented in memory storage");
   }
-  async deleteSubSubcategory(id: number): Promise<void> {}
+  async deleteSubSubcategory(id: string): Promise<void> {}
   
   async listTags(): Promise<Tag[]> { return []; }
-  async getTag(id: number): Promise<Tag | undefined> { return undefined; }
+  async getTag(id: string): Promise<Tag | undefined> { return undefined; }
   async createTag(tag: InsertTag): Promise<Tag> {
     throw new Error("Not implemented in memory storage");
   }
-  async deleteTag(id: number): Promise<void> {}
+  async deleteTag(id: string): Promise<void> {}
   
-  async addTagToResource(resourceId: number, tagId: number): Promise<void> {}
-  async removeTagFromResource(resourceId: number, tagId: number): Promise<void> {}
-  async getResourceTags(resourceId: number): Promise<Tag[]> { return []; }
+  async addTagToResource(resourceId: string, tagId: string): Promise<void> {}
+  async removeTagFromResource(resourceId: string, tagId: string): Promise<void> {}
+  async getResourceTags(resourceId: string): Promise<Tag[]> { return []; }
   
   async listLearningJourneys(category?: string): Promise<LearningJourney[]> { return []; }
-  async getLearningJourney(id: number): Promise<LearningJourney | undefined> { return undefined; }
+  async getLearningJourney(id: string): Promise<LearningJourney | undefined> { return undefined; }
   async createLearningJourney(journey: InsertLearningJourney): Promise<LearningJourney> {
     throw new Error("Not implemented in memory storage");
   }
-  async updateLearningJourney(id: number, journey: Partial<InsertLearningJourney>): Promise<LearningJourney> {
+  async updateLearningJourney(id: string, journey: Partial<InsertLearningJourney>): Promise<LearningJourney> {
     throw new Error("Not implemented in memory storage");
   }
-  async deleteLearningJourney(id: number): Promise<void> {}
+  async deleteLearningJourney(id: string): Promise<void> {}
   
-  async listJourneySteps(journeyId: number): Promise<JourneyStep[]> { return []; }
-  async listJourneyStepsBatch(journeyIds: number[]): Promise<Map<number, JourneyStep[]>> {
+  async listJourneySteps(journeyId: string): Promise<JourneyStep[]> { return []; }
+  async listJourneyStepsBatch(journeyIds: string[]): Promise<Map<string, JourneyStep[]>> {
     return new Map();
   }
   async createJourneyStep(step: InsertJourneyStep): Promise<JourneyStep> {
     throw new Error("Not implemented in memory storage");
   }
-  async updateJourneyStep(id: number, step: Partial<InsertJourneyStep>): Promise<JourneyStep> {
+  async updateJourneyStep(id: string, step: Partial<InsertJourneyStep>): Promise<JourneyStep> {
     throw new Error("Not implemented in memory storage");
   }
-  async deleteJourneyStep(id: number): Promise<void> {}
+  async deleteJourneyStep(id: string): Promise<void> {}
   
-  async addFavorite(userId: string, resourceId: number): Promise<void> {}
-  async removeFavorite(userId: string, resourceId: number): Promise<void> {}
+  async addFavorite(userId: string, resourceId: string): Promise<void> {}
+  async removeFavorite(userId: string, resourceId: string): Promise<void> {}
   async getUserFavorites(userId: string): Promise<Array<Resource & { favoritedAt: Date }>> { return []; }
   
-  async addBookmark(userId: string, resourceId: number, notes?: string): Promise<void> {}
-  async removeBookmark(userId: string, resourceId: number): Promise<void> {}
+  async addBookmark(userId: string, resourceId: string, notes?: string): Promise<void> {}
+  async removeBookmark(userId: string, resourceId: string): Promise<void> {}
   async getUserBookmarks(userId: string): Promise<Array<Resource & { notes?: string; bookmarkedAt: Date }>> { return []; }
   
-  async startUserJourney(userId: string, journeyId: number): Promise<UserJourneyProgress> {
+  async startUserJourney(userId: string, journeyId: string): Promise<UserJourneyProgress> {
     throw new Error("Not implemented in memory storage");
   }
-  async updateUserJourneyProgress(userId: string, journeyId: number, stepId: number): Promise<UserJourneyProgress> {
+  async updateUserJourneyProgress(userId: string, journeyId: string, stepId: string): Promise<UserJourneyProgress> {
     throw new Error("Not implemented in memory storage");
   }
-  async getUserJourneyProgress(userId: string, journeyId: number): Promise<UserJourneyProgress | undefined> {
+  async getUserJourneyProgress(userId: string, journeyId: string): Promise<UserJourneyProgress | undefined> {
     return undefined;
   }
   async listUserJourneyProgress(userId: string): Promise<UserJourneyProgress[]> { return []; }
   
-  async logResourceAudit(resourceId: number | null, action: string, performedBy?: string, changes?: any, notes?: string): Promise<void> {}
-  async getResourceAuditLog(resourceId: number, limit?: number): Promise<any[]> { return []; }
+  async logResourceAudit(resourceId: string | null, action: string, performedBy?: string, changes?: any, notes?: string): Promise<void> {}
+  async getResourceAuditLog(resourceId: string, limit?: number): Promise<any[]> { return []; }
   
   async createResourceEdit(data: InsertResourceEdit): Promise<ResourceEdit> {
     throw new Error("Not implemented in memory storage");
   }
-  async getResourceEdit(id: number): Promise<ResourceEdit | undefined> { return undefined; }
-  async getResourceEditsByResource(resourceId: number): Promise<ResourceEdit[]> { return []; }
+  async getResourceEdit(id: string): Promise<ResourceEdit | undefined> { return undefined; }
+  async getResourceEditsByResource(resourceId: string): Promise<ResourceEdit[]> { return []; }
   async getResourceEditsByUser(userId: string): Promise<ResourceEdit[]> { return []; }
   async getPendingResourceEdits(): Promise<ResourceEdit[]> { return []; }
-  async approveResourceEdit(editId: number, adminId: string): Promise<void> {
+  async approveResourceEdit(editId: string, adminId: string): Promise<void> {
     throw new Error("Not implemented in memory storage");
   }
-  async rejectResourceEdit(editId: number, adminId: string, reason: string): Promise<void> {
+  async rejectResourceEdit(editId: string, adminId: string, reason: string): Promise<void> {
     throw new Error("Not implemented in memory storage");
   }
   
@@ -1429,7 +1422,7 @@ export class MemStorage implements IStorage {
     throw new Error("Not implemented in memory storage");
   }
   async getGithubSyncQueue(status?: string): Promise<GithubSyncQueue[]> { return []; }
-  async updateGithubSyncStatus(id: number, status: string, errorMessage?: string): Promise<void> {}
+  async updateGithubSyncStatus(id: string, status: string, errorMessage?: string): Promise<void> {}
   
   async getLastSyncHistory(repositoryUrl: string, direction: 'export' | 'import'): Promise<GithubSyncHistory | undefined> {
     return undefined;
@@ -1530,28 +1523,28 @@ export class MemStorage implements IStorage {
   async createEnrichmentJob(data: InsertEnrichmentJob): Promise<EnrichmentJob> {
     throw new Error("Enrichment not implemented in memory storage");
   }
-  async getEnrichmentJob(id: number): Promise<EnrichmentJob | undefined> { 
+  async getEnrichmentJob(id: string): Promise<EnrichmentJob | undefined> { 
     return undefined; 
   }
   async listEnrichmentJobs(limit?: number): Promise<EnrichmentJob[]> { 
     return []; 
   }
-  async updateEnrichmentJob(id: number, data: Partial<EnrichmentJob>): Promise<EnrichmentJob> {
+  async updateEnrichmentJob(id: string, data: Partial<EnrichmentJob>): Promise<EnrichmentJob> {
     throw new Error("Enrichment not implemented in memory storage");
   }
-  async cancelEnrichmentJob(id: number): Promise<void> {}
+  async cancelEnrichmentJob(id: string): Promise<void> {}
   
   // Enrichment Queue - Not implemented for MemStorage
   async createEnrichmentQueueItem(data: InsertEnrichmentQueue): Promise<EnrichmentQueueItem> {
     throw new Error("Enrichment not implemented in memory storage");
   }
-  async getEnrichmentQueueItemsByJob(jobId: number): Promise<EnrichmentQueueItem[]> { 
+  async getEnrichmentQueueItemsByJob(jobId: string): Promise<EnrichmentQueueItem[]> { 
     return []; 
   }
-  async getPendingEnrichmentQueueItems(jobId: number, limit?: number): Promise<EnrichmentQueueItem[]> { 
+  async getPendingEnrichmentQueueItems(jobId: string, limit?: number): Promise<EnrichmentQueueItem[]> { 
     return []; 
   }
-  async updateEnrichmentQueueItem(id: number, data: Partial<EnrichmentQueueItem>): Promise<EnrichmentQueueItem> {
+  async updateEnrichmentQueueItem(id: string, data: Partial<EnrichmentQueueItem>): Promise<EnrichmentQueueItem> {
     throw new Error("Enrichment not implemented in memory storage");
   }
 }

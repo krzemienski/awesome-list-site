@@ -14,7 +14,11 @@ export async function handleSSR(req: Request, res: Response, next: NextFunction)
     }
 
     // Load the HTML template
-    const templatePath = path.resolve(import.meta.dirname, "..", "client", "index.html");
+    // In production (Docker): use dist/public/index.html
+    // In development: use client/index.html
+    const templatePath = process.env.NODE_ENV === 'production'
+      ? path.resolve(import.meta.dirname, "..", "dist", "public", "index.html")
+      : path.resolve(import.meta.dirname, "..", "client", "index.html");
     let template = await fs.promises.readFile(templatePath, "utf-8");
 
     // Get the awesome list data from storage

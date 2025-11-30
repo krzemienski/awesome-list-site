@@ -34,7 +34,7 @@ export type User = typeof users.$inferSelect;
 export const resources = pgTable(
   "resources",
   {
-    id: serial("id").primaryKey(),
+    id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
     title: text("title").notNull(),
     url: text("url").notNull(),
     description: text("description").notNull().default(""),
@@ -77,8 +77,8 @@ export type Resource = typeof resources.$inferSelect;
 export const resourceEdits = pgTable(
   "resource_edits",
   {
-    id: serial("id").primaryKey(),
-    resourceId: integer("resource_id").references(() => resources.id).notNull(),
+    id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
+    resourceId: uuid("resource_id").references(() => resources.id).notNull(),
     submittedBy: varchar("submitted_by").references(() => users.id).notNull(),
     status: text("status").$type<"pending" | "approved" | "rejected">().default("pending").notNull(),
     
@@ -128,7 +128,7 @@ export type ResourceEdit = typeof resourceEdits.$inferSelect;
 
 // Category schema
 export const categories = pgTable("categories", {
-  id: serial("id").primaryKey(),
+  id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
   name: text("name").notNull().unique(),
   slug: text("slug").notNull().unique(),
 });
@@ -143,10 +143,10 @@ export type Category = typeof categories.$inferSelect;
 
 // Subcategory schema
 export const subcategories = pgTable("subcategories", {
-  id: serial("id").primaryKey(),
+  id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
   name: text("name").notNull(),
   slug: text("slug").notNull(),
-  categoryId: integer("category_id").references(() => categories.id, { onDelete: "cascade" }),
+  categoryId: uuid("category_id").references(() => categories.id, { onDelete: "cascade" }),
 });
 
 export const insertSubcategorySchema = createInsertSchema(subcategories).pick({
@@ -160,10 +160,10 @@ export type Subcategory = typeof subcategories.$inferSelect;
 
 // Sub-subcategory schema (Level 3)
 export const subSubcategories = pgTable("sub_subcategories", {
-  id: serial("id").primaryKey(),
+  id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
   name: text("name").notNull(),
   slug: text("slug").notNull(),
-  subcategoryId: integer("subcategory_id").references(() => subcategories.id, { onDelete: "cascade" }),
+  subcategoryId: uuid("subcategory_id").references(() => subcategories.id, { onDelete: "cascade" }),
 });
 
 export const insertSubSubcategorySchema = createInsertSchema(subSubcategories).pick({
@@ -177,7 +177,7 @@ export type SubSubcategory = typeof subSubcategories.$inferSelect;
 
 // AwesomeList schema
 export const awesomeLists = pgTable("awesome_lists", {
-  id: serial("id").primaryKey(),
+  id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
   title: text("title").notNull(),
   description: text("description").notNull().default(""),
   repoUrl: text("repo_url").notNull(),
@@ -196,7 +196,7 @@ export type AwesomeList = typeof awesomeLists.$inferSelect;
 
 // Tags table
 export const tags = pgTable("tags", {
-  id: serial("id").primaryKey(),
+  id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
   name: text("name").notNull().unique(),
   slug: text("slug").notNull().unique(),
   createdAt: timestamp("created_at").defaultNow(),
@@ -214,8 +214,8 @@ export type Tag = typeof tags.$inferSelect;
 export const resourceTags = pgTable(
   "resource_tags",
   {
-    resourceId: integer("resource_id").references(() => resources.id, { onDelete: "cascade" }).notNull(),
-    tagId: integer("tag_id").references(() => tags.id, { onDelete: "cascade" }).notNull(),
+    resourceId: uuid("resource_id").references(() => resources.id, { onDelete: "cascade" }).notNull(),
+    tagId: uuid("tag_id").references(() => tags.id, { onDelete: "cascade" }).notNull(),
   },
   (table) => ({
     pk: primaryKey({ columns: [table.resourceId, table.tagId] }),
@@ -224,7 +224,7 @@ export const resourceTags = pgTable(
 
 // Learning Journeys (structured learning paths)
 export const learningJourneys = pgTable("learning_journeys", {
-  id: serial("id").primaryKey(),
+  id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
   title: text("title").notNull(),
   description: text("description").notNull(),
   difficulty: text("difficulty").default("beginner"), // beginner, intermediate, advanced
@@ -255,9 +255,9 @@ export type LearningJourney = typeof learningJourneys.$inferSelect;
 export const journeySteps = pgTable(
   "journey_steps",
   {
-    id: serial("id").primaryKey(),
-    journeyId: integer("journey_id").references(() => learningJourneys.id, { onDelete: "cascade" }).notNull(),
-    resourceId: integer("resource_id").references(() => resources.id, { onDelete: "cascade" }),
+    id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
+    journeyId: uuid("journey_id").references(() => learningJourneys.id, { onDelete: "cascade" }).notNull(),
+    resourceId: uuid("resource_id").references(() => resources.id, { onDelete: "cascade" }),
     stepNumber: integer("step_number").notNull(),
     title: text("title").notNull(),
     description: text("description"),
@@ -287,7 +287,7 @@ export const userFavorites = pgTable(
   "user_favorites",
   {
     userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
-    resourceId: integer("resource_id").references(() => resources.id, { onDelete: "cascade" }).notNull(),
+    resourceId: uuid("resource_id").references(() => resources.id, { onDelete: "cascade" }).notNull(),
     createdAt: timestamp("created_at").defaultNow(),
   },
   (table) => ({
@@ -300,7 +300,7 @@ export const userBookmarks = pgTable(
   "user_bookmarks",
   {
     userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
-    resourceId: integer("resource_id").references(() => resources.id, { onDelete: "cascade" }).notNull(),
+    resourceId: uuid("resource_id").references(() => resources.id, { onDelete: "cascade" }).notNull(),
     notes: text("notes"),
     createdAt: timestamp("created_at").defaultNow(),
   },
@@ -313,11 +313,11 @@ export const userBookmarks = pgTable(
 export const userJourneyProgress = pgTable(
   "user_journey_progress",
   {
-    id: serial("id").primaryKey(),
+    id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
     userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
-    journeyId: integer("journey_id").references(() => learningJourneys.id, { onDelete: "cascade" }).notNull(),
-    currentStepId: integer("current_step_id").references(() => journeySteps.id),
-    completedSteps: jsonb("completed_steps").$type<number[]>().default([]),
+    journeyId: uuid("journey_id").references(() => learningJourneys.id, { onDelete: "cascade" }).notNull(),
+    currentStepId: uuid("current_step_id").references(() => journeySteps.id),
+    completedSteps: jsonb("completed_steps").$type<string[]>().default([]),
     startedAt: timestamp("started_at").defaultNow(),
     lastAccessedAt: timestamp("last_accessed_at").defaultNow(),
     completedAt: timestamp("completed_at"),
@@ -341,8 +341,8 @@ export type UserJourneyProgress = typeof userJourneyProgress.$inferSelect;
 
 // Resource Audit Log
 export const resourceAuditLog = pgTable("resource_audit_log", {
-  id: serial("id").primaryKey(),
-  resourceId: integer("resource_id").references(() => resources.id, { onDelete: "cascade" }),
+  id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
+  resourceId: uuid("resource_id").references(() => resources.id, { onDelete: "cascade" }),
   action: text("action").notNull(), // created, updated, approved, rejected, synced
   performedBy: varchar("performed_by").references(() => users.id, { onDelete: "cascade" }),
   changes: jsonb("changes").$type<Record<string, any>>(),
@@ -354,10 +354,10 @@ export const resourceAuditLog = pgTable("resource_audit_log", {
 export const githubSyncQueue = pgTable(
   "github_sync_queue",
   {
-    id: serial("id").primaryKey(),
+    id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
     repositoryUrl: text("repository_url").notNull(),
     branch: text("branch").default("main"),
-    resourceIds: jsonb("resource_ids").$type<number[]>().default([]),
+    resourceIds: jsonb("resource_ids").$type<string[]>().default([]),
     action: text("action").notNull(), // import, export
     status: text("status").default("pending"), // pending, processing, completed, failed
     errorMessage: text("error_message"),
@@ -386,7 +386,7 @@ export type GithubSyncQueue = typeof githubSyncQueue.$inferSelect;
 export const userPreferences = pgTable(
   "user_preferences",
   {
-    id: serial("id").primaryKey(),
+    id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
     userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
     preferredCategories: jsonb("preferred_categories").$type<string[]>().default([]),
     skillLevel: text("skill_level").notNull().default("beginner"), // beginner, intermediate, advanced
@@ -418,9 +418,9 @@ export type UserPreferences = typeof userPreferences.$inferSelect;
 export const userInteractions = pgTable(
   "user_interactions",
   {
-    id: serial("id").primaryKey(),
+    id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
     userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
-    resourceId: integer("resource_id").references(() => resources.id, { onDelete: "cascade" }).notNull(),
+    resourceId: uuid("resource_id").references(() => resources.id, { onDelete: "cascade" }).notNull(),
     interactionType: text("interaction_type").notNull(), // view, click, bookmark, rate, complete
     interactionValue: integer("interaction_value"), // rating (1-5) or time spent
     metadata: jsonb("metadata").$type<Record<string, any>>().default({}),
@@ -448,7 +448,7 @@ export type UserInteraction = typeof userInteractions.$inferSelect;
 export const githubSyncHistory = pgTable(
   "github_sync_history",
   {
-    id: serial("id").primaryKey(),
+    id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
     repositoryUrl: text("repository_url").notNull(),
     direction: text("direction").notNull(), // export, import
     commitSha: text("commit_sha"),
@@ -491,7 +491,7 @@ export type GithubSyncHistory = typeof githubSyncHistory.$inferSelect;
 export const enrichmentJobs = pgTable(
   "enrichment_jobs",
   {
-    id: serial("id").primaryKey(),
+    id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
     status: text("status").notNull().default("pending"), // pending, processing, completed, failed, cancelled
     filter: text("filter").default("all"), // all, unenriched
     batchSize: integer("batch_size").default(10),
@@ -500,8 +500,8 @@ export const enrichmentJobs = pgTable(
     successfulResources: integer("successful_resources").default(0),
     failedResources: integer("failed_resources").default(0),
     skippedResources: integer("skipped_resources").default(0),
-    processedResourceIds: jsonb("processed_resource_ids").$type<number[]>().default([]),
-    failedResourceIds: jsonb("failed_resource_ids").$type<number[]>().default([]),
+    processedResourceIds: jsonb("processed_resource_ids").$type<string[]>().default([]),
+    failedResourceIds: jsonb("failed_resource_ids").$type<string[]>().default([]),
     errorMessage: text("error_message"),
     metadata: jsonb("metadata").$type<Record<string, any>>().default({}),
     startedBy: varchar("started_by").references(() => users.id),
@@ -529,9 +529,9 @@ export type EnrichmentJob = typeof enrichmentJobs.$inferSelect;
 export const enrichmentQueue = pgTable(
   "enrichment_queue",
   {
-    id: serial("id").primaryKey(),
-    jobId: integer("job_id").references(() => enrichmentJobs.id, { onDelete: "cascade" }).notNull(),
-    resourceId: integer("resource_id").references(() => resources.id, { onDelete: "cascade" }).notNull(),
+    id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
+    jobId: uuid("job_id").references(() => enrichmentJobs.id, { onDelete: "cascade" }).notNull(),
+    resourceId: uuid("resource_id").references(() => resources.id, { onDelete: "cascade" }).notNull(),
     status: text("status").notNull().default("pending"), // pending, processing, completed, failed, skipped
     retryCount: integer("retry_count").default(0),
     maxRetries: integer("max_retries").default(3),

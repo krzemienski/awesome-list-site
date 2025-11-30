@@ -11,6 +11,7 @@ import MainLayout from "@/components/layout/new/MainLayout";
 import ErrorPage from "@/pages/ErrorPage";
 import Landing from "@/pages/Landing";
 import Login from "@/pages/Login";
+import AuthCallback from "@/pages/AuthCallback";
 import Home from "@/pages/Home";
 import Category from "@/pages/Category";
 import Subcategory from "@/pages/Subcategory";
@@ -118,6 +119,7 @@ function Router() {
           />
         } />
         <Route path="/login" component={Login} />
+        <Route path="/auth/callback" component={AuthCallback} />
         <Route path="/category/:slug" component={Category} />
         <Route path="/subcategory/:slug" component={Subcategory} />
         <Route path="/sub-subcategory/:slug" component={SubSubcategory} />

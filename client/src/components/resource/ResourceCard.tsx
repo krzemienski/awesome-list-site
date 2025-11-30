@@ -54,7 +54,7 @@ export default function ResourceCard({
   };
 
   const resourceForDialog: Resource = fullResource || {
-    id: parseInt(resource.id),
+    id: resource.id,
     title: resource.name,
     url: resource.url,
     description: resource.description || "",

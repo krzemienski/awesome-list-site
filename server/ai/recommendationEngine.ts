@@ -449,14 +449,14 @@ export class RecommendationEngine {
    */
   public async recordFeedback(
     userId: string,
-    resourceId: number,
+    resourceId: string,
     feedback: 'clicked' | 'dismissed' | 'completed',
     rating?: number
   ): Promise<void> {
     try {
       // Log feedback for future improvements
       await storage.logResourceAudit(
-        resourceId,
+        resourceId, // UUID string // Already a string UUID
         `recommendation_${feedback}`,
         userId,
         { rating },

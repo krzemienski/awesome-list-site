@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
+import Redis from 'ioredis';
 
 // <important_do_not_delete>
 const DEFAULT_MODEL_STR = "claude-haiku-4-5"; // Claude Haiku 4.5 (October 2025) - 4-5x faster, 1/3 cost
@@ -52,6 +53,7 @@ interface AnalysisCache {
 export class ClaudeService {
   private static instance: ClaudeService;
   private anthropic: Anthropic | null = null;
+  private redis: Redis | null = null;
   private responseCache: Map<string, CacheEntry>;
   private analysisCache: Map<string, AnalysisCache>;
   private readonly CACHE_TTL = 60 * 60 * 1000; // 1 hour cache
@@ -64,7 +66,31 @@ export class ClaudeService {
   private constructor() {
     this.responseCache = new Map();
     this.analysisCache = new Map();
+    this.initializeRedis();
     this.initializeClient();
+  }
+
+  /**
+   * Initialize Redis client if REDIS_URL is available
+   */
+  private initializeRedis(): void {
+    if (process.env.REDIS_URL) {
+      try {
+        this.redis = new Redis(process.env.REDIS_URL);
+        this.redis.on('error', (err) => {
+          console.error('Redis error:', err);
+          this.redis = null; // Fallback to in-memory
+        });
+        this.redis.on('connect', () => {
+          console.log('✅ Redis cache connected for ClaudeService');
+        });
+      } catch (error) {
+        console.error('Failed to initialize Redis:', error);
+        this.redis = null;
+      }
+    } else {
+      console.log('Redis not configured - using in-memory cache only');
+    }
   }
 
   public static getInstance(): ClaudeService {
@@ -121,7 +147,7 @@ export class ClaudeService {
     const cacheKey = this.createCacheKey(prompt + (systemPrompt || ''));
 
     // Check cache first
-    const cached = this.getFromCache(cacheKey);
+    const cached = await this.getFromCache(cacheKey);
     if (cached) {
       console.log('Returning cached Claude response');
       return cached;
@@ -145,10 +171,10 @@ export class ClaudeService {
       });
 
       const responseText = (response.content[0] as any).text || '';
-      
+
       // Cache the response
-      this.addToCache(cacheKey, responseText);
-      
+      await this.addToCache(cacheKey, responseText);
+
       // Update request tracking
       this.requestCount++;
       this.lastRequestTime = Date.now();
@@ -209,9 +235,23 @@ export class ClaudeService {
   }
 
   /**
-   * Get a response from cache if valid
+   * Get a response from cache if valid (tries Redis first, then in-memory)
    */
-  private getFromCache(key: string): string | null {
+  private async getFromCache(key: string): Promise<string | null> {
+    // Try Redis first
+    if (this.redis) {
+      try {
+        const cached = await this.redis.get(`claude:response:${key}`);
+        if (cached) {
+          console.log('Redis cache HIT');
+          return cached;
+        }
+      } catch (error) {
+        console.warn('Redis get failed, falling back to memory:', error);
+      }
+    }
+
+    // Fallback to in-memory
     const entry = this.responseCache.get(key);
     if (!entry) return null;
 
@@ -225,10 +265,23 @@ export class ClaudeService {
   }
 
   /**
-   * Add a response to cache
+   * Add a response to cache (writes to both Redis and in-memory)
    */
-  private addToCache(key: string, response: string): void {
-    // Implement LRU cache by removing oldest entries if cache is full
+  private async addToCache(key: string, response: string): Promise<void> {
+    // Store in Redis with TTL
+    if (this.redis) {
+      try {
+        await this.redis.setex(
+          `claude:response:${key}`,
+          Math.floor(this.CACHE_TTL / 1000), // TTL in seconds
+          response
+        );
+      } catch (error) {
+        console.warn('Redis set failed:', error);
+      }
+    }
+
+    // Also store in memory as fallback
     if (this.responseCache.size >= this.MAX_CACHE_SIZE) {
       const oldestKey = this.responseCache.keys().next().value;
       if (oldestKey) {

@@ -3,7 +3,6 @@ import { parseAwesomeList, convertToDbResources } from "./parser";
 import { AwesomeListFormatter, generateContributingMd } from "./formatter";
 import { storage } from "../storage";
 import { Resource, InsertResource, GithubSyncQueue } from "@shared/schema";
-import { getGitHubClient } from "./replitConnection";
 
 /**
  * Service for synchronizing awesome lists with GitHub
@@ -15,6 +14,7 @@ interface SyncOptions {
   forceOverwrite?: boolean;
   createPullRequest?: boolean;
   branchName?: string;
+  githubToken?: string;
 }
 
 interface ImportResult {
@@ -184,8 +184,9 @@ export class GitHubSyncService {
     };
 
     try {
-      // Get fresh Octokit client with Replit GitHub connection
-      const octokit = await getGitHubClient();
+      // Get GitHub client with direct token (no Replit connector)
+      const githubClient = new GitHubClient(options?.githubToken || process.env.GITHUB_TOKEN);
+      const octokit = (githubClient as any).octokit;
       
       // Parse repo info from URL
       const repoMatch = repoUrl.match(/github\.com\/([^\/]+)\/([^\/\?#]+)/);

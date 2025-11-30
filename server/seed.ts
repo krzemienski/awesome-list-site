@@ -230,9 +230,9 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
     console.log(`📂 Hierarchy: ${hierarchy.level1.size} L1, ${hierarchy.level2.size} L2, ${hierarchy.level3.size} L3`);
 
     // Maps to track database IDs
-    const categoryDbMap = new Map<string, number>(); // JSON ID -> DB ID
-    const subcategoryDbMap = new Map<string, number>();
-    const subSubcategoryDbMap = new Map<string, number>();
+    const categoryDbMap = new Map<string, string>(); // JSON ID -> DB ID
+    const subcategoryDbMap = new Map<string, string>();
+    const subSubcategoryDbMap = new Map<string, string>();
 
     // Insert Level 1 Categories
     console.log("📁 Inserting level 1 categories...");
@@ -243,7 +243,7 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
         // Check if category already exists
         const existing = await db.select().from(categories).where(eq(categories.slug, slug)).limit(1);
         
-        let dbId: number;
+        let dbId: string;
         if (existing.length > 0) {
           dbId = existing[0].id;
           console.log(`  ⏭️  Category "${cat.title}" already exists (ID: ${dbId})`);
@@ -281,7 +281,7 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
           .where(eq(subcategories.slug, slug))
           .limit(1);
         
-        let dbId: number;
+        let dbId: string;
         if (existing.length > 0) {
           dbId = existing[0].id;
           console.log(`  ⏭️  Subcategory "${cat.title}" already exists (ID: ${dbId})`);
@@ -320,7 +320,7 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
           .where(eq(subSubcategories.slug, slug))
           .limit(1);
         
-        let dbId: number;
+        let dbId: string;
         if (existing.length > 0) {
           dbId = existing[0].id;
           console.log(`  ⏭️  Sub-subcategory "${cat.title}" already exists (ID: ${dbId})`);
@@ -328,9 +328,9 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
           const [inserted] = await db.insert(subSubcategories).values({
             name: cat.title,
             slug: slug,
-            subcategoryId: parentDbId,
+            subcategoryId: parentDbId, // UUID string
           }).returning();
-          dbId = inserted.id;
+          dbId = inserted.id; // UUID string
           result.subSubcategoriesInserted++;
           console.log(`  ✅ Inserted sub-subcategory: ${cat.title} (ID: ${dbId})`);
         }

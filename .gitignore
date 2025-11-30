@@ -80,4 +80,4 @@ vite.config.ts.*
 
 # Deployment artifacts
 logs/
-attached_assets/
+attached_assets/docs/secrets/

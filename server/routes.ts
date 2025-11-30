@@ -1,8 +1,7 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
-import { setupLocalAuth } from "./localAuth";
+import { extractUser, isAuthenticated, isAdmin as supabaseIsAdmin } from "./supabaseAuth";
 import passport from "passport";
 import { fetchAwesomeList } from "./parser";
 import { fetchAwesomeVideoData } from "./awesome-video-parser-clean";
@@ -22,24 +21,8 @@ import { enrichmentService } from "./ai/enrichmentService";
 
 const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md";
 
-// Middleware to check if user is admin
-const isAdmin = async (req: any, res: Response, next: any) => {
-  try {
-    const userId = req.user?.claims?.sub;
-    if (!userId) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-    
-    const user = await storage.getUser(userId);
-    if (!user || user.role !== 'admin') {
-      return res.status(403).json({ message: "Forbidden: Admin access required" });
-    }
-    
-    next();
-  } catch (error) {
-    res.status(500).json({ message: "Error checking admin status" });
-  }
-};
+// Use Supabase admin middleware (role checked from JWT metadata)
+const isAdmin = supabaseIsAdmin;
 
 // SEO route handlers
 function generateSitemap(req: any, res: any) {
@@ -216,11 +199,14 @@ function getSubSubcategoryTitleFromSlug(slug: string): string {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Set up authentication (OAuth and local)
-  await setupAuth(app);
-  setupLocalAuth();
+  // Set up Supabase authentication middleware
+  app.use(extractUser);
 
-  // Local authentication routes
+  // Note: Supabase Auth handles login via frontend SDK (supabase.auth.signInWithPassword, signInWithOAuth)
+  // Removing old /api/auth/local/login endpoint - replaced by Supabase Auth
+
+  /*
+  // OLD LOGIN ENDPOINT - REMOVED (Supabase Auth handles this now)
   app.post("/api/auth/local/login", (req, res, next) => {
     passport.authenticate('local', (err: any, user: any, info: any) => {
       if (err) {
@@ -271,6 +257,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     })(req, res, next);
   });
+  */
 
   // Initialize awesome video data
   try {
@@ -315,48 +302,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/auth/user', async (req: any, res) => {
     try {
       console.log('[/api/auth/user] Request received');
-      console.log('[/api/auth/user] isAuthenticated:', req.isAuthenticated?.());
-      console.log('[/api/auth/user] req.user?.dbUser:', req.user?.dbUser);
-      console.log('[/api/auth/user] req.user?.claims?.sub:', req.user?.claims?.sub);
-      
+      console.log('[/api/auth/user] req.user:', req.user);
+
       // Check if user is authenticated
-      if (!req.isAuthenticated() || !req.user?.claims?.sub) {
+      if (!req.user || !req.user.id) {
         console.log('[/api/auth/user] User not authenticated, returning null');
         return res.json({ user: null, isAuthenticated: false });
       }
 
-      // Use DB user from session (populated by deserializeUser) or fetch if not available
-      let dbUser = req.user.dbUser;
-      if (!dbUser) {
-        const userId = req.user.claims.sub;
-        console.log('[/api/auth/user] dbUser not in session, fetching from DB, userId:', userId);
-        dbUser = await storage.getUser(userId);
-      }
-      
-      if (!dbUser) {
-        console.log('[/api/auth/user] User not found in DB');
-        return res.json({ user: null, isAuthenticated: false });
-      }
-
-      console.log('[/api/auth/user] DB user found:', {
-        id: dbUser.id,
-        email: dbUser.email,
-        role: dbUser.role
-      });
-
-      // Map database fields to frontend-expected format
+      // With Supabase Auth, all user data comes from JWT token (already in req.user)
+      // No database query needed - extractUser middleware already populated req.user
       const user = {
-        id: dbUser.id,
-        email: dbUser.email,
-        name: dbUser.firstName && dbUser.lastName 
-          ? `${dbUser.firstName} ${dbUser.lastName}` 
-          : dbUser.firstName || dbUser.email?.split('@')[0] || 'User',
-        avatar: dbUser.profileImageUrl,
-        role: dbUser.role,
-        createdAt: dbUser.createdAt,
+        id: req.user.id,
+        email: req.user.email,
+        name: req.user.metadata?.full_name || req.user.email?.split('@')[0] || 'User',
+        avatar: req.user.metadata?.avatar_url,
+        role: req.user.role,
       };
 
-      console.log('[/api/auth/user] Returning user:', user);
+      console.log('[/api/auth/user] Returning user from JWT:', user);
       res.json({ user, isAuthenticated: true });
     } catch (error) {
       console.error("Error fetching user:", error);
@@ -376,7 +340,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Note: /api/login, /api/callback are set up in setupAuth()
+  // Note: /api/login, /api/callback removed - Supabase Auth handles OAuth via frontend SDK
 
   // ============= Resource Routes =============
   
@@ -408,7 +372,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/resources/:id - Get single resource
   app.get('/api/resources/:id', async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id; // UUID string
       const resource = await storage.getResource(id);
       
       if (!resource) {
@@ -425,7 +389,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/resources - Submit new resource (authenticated)
   app.post('/api/resources', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const resourceData = insertResourceSchema.parse(req.body);
       
       const resource = await storage.createResource({
@@ -466,9 +430,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // PUT /api/resources/:id/approve - Approve resource (admin)
   app.put('/api/resources/:id/approve', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
-      const id = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
-      
+      const id = req.params.id; // UUID string, not integer
+      const userId = req.user.id;
+
       const resource = await storage.updateResourceStatus(id, 'approved', userId);
       res.json(resource);
     } catch (error) {
@@ -476,13 +440,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: 'Failed to approve resource' });
     }
   });
-  
+
   // PUT /api/resources/:id/reject - Reject resource (admin)
   app.put('/api/resources/:id/reject', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
-      const id = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
-      
+      const id = req.params.id; // UUID string, not integer
+      const userId = req.user.id;
+
       const resource = await storage.updateResourceStatus(id, 'rejected', userId);
       res.json(resource);
     } catch (error) {
@@ -494,13 +458,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/resources/:id/edits - Submit edit suggestion for a resource (authenticated)
   app.post('/api/resources/:id/edits', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const resourceId = parseInt(req.params.id);
+      const userId = req.user.id;
+      const resourceId = req.params.id; // UUID string
       const { proposedChanges, proposedData, claudeMetadata, triggerClaudeAnalysis } = req.body;
-      
-      if (isNaN(resourceId)) {
-        return res.status(400).json({ message: 'Invalid resource ID' });
-      }
       
       const resource = await storage.getResource(resourceId);
       if (!resource) {
@@ -590,29 +550,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/subcategories - List all subcategories (public)
   app.get('/api/subcategories', async (req, res) => {
     try {
-      let categoryId: number | undefined = undefined;
-      
+      let categoryId: string | undefined = undefined;
+
       // Validate categoryId query parameter if provided
       if (req.query.categoryId) {
-        const categoryIdSchema = z.string().regex(/^\d+$/, "categoryId must be a valid number");
-        const validation = categoryIdSchema.safeParse(req.query.categoryId);
-        
-        if (!validation.success) {
-          return res.status(400).json({ 
-            message: 'Invalid categoryId parameter', 
-            errors: validation.error.errors 
-          });
-        }
-        
-        categoryId = parseInt(validation.data);
-        
-        if (isNaN(categoryId) || categoryId < 1) {
-          return res.status(400).json({ 
-            message: 'categoryId must be a positive number' 
-          });
-        }
+        categoryId = req.query.categoryId as string; // UUID string
       }
-      
+
       const subcategories = await storage.listSubcategories(categoryId);
       res.json(subcategories);
     } catch (error) {
@@ -624,30 +568,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/sub-subcategories - List all sub-subcategories (public)
   app.get('/api/sub-subcategories', async (req, res) => {
     try {
-      let subcategoryId: number | undefined = undefined;
-      
+      let subcategoryId: string | undefined = undefined;
+
       // Validate subcategoryId query parameter if provided
       if (req.query.subcategoryId) {
-        const subcategoryIdSchema = z.string().regex(/^\d+$/, "subcategoryId must be a valid number");
-        const validation = subcategoryIdSchema.safeParse(req.query.subcategoryId);
-        
-        if (!validation.success) {
-          return res.status(400).json({ 
-            message: 'Invalid subcategoryId parameter', 
-            errors: validation.error.errors 
-          });
-        }
-        
-        subcategoryId = parseInt(validation.data);
-        
-        if (isNaN(subcategoryId) || subcategoryId < 1) {
-          return res.status(400).json({ 
-            message: 'subcategoryId must be a positive number' 
-          });
-        }
+        subcategoryId = req.query.subcategoryId as string; // UUID string
       }
-      
-      const subSubcategories = await storage.listSubSubcategories(subcategoryId);
+
+      const subSubcategories = await storage.listSubcategories(subcategoryId);
       res.json(subSubcategories);
     } catch (error) {
       console.error('Error fetching sub-subcategories:', error);
@@ -660,8 +588,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/favorites/:resourceId - Add favorite
   app.post('/api/favorites/:resourceId', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const resourceId = parseInt(req.params.resourceId);
+      const userId = req.user.id;
+      const resourceId = req.params.resourceId; // UUID string
       
       await storage.addFavorite(userId, resourceId);
       res.json({ message: 'Favorite added successfully' });
@@ -674,8 +602,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // DELETE /api/favorites/:resourceId - Remove favorite
   app.delete('/api/favorites/:resourceId', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const resourceId = parseInt(req.params.resourceId);
+      const userId = req.user.id;
+      const resourceId = req.params.resourceId; // UUID string
       
       await storage.removeFavorite(userId, resourceId);
       res.json({ message: 'Favorite removed successfully' });
@@ -688,7 +616,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/favorites - Get user's favorites
   app.get('/api/favorites', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const favorites = await storage.getUserFavorites(userId);
       res.json(favorites);
     } catch (error) {
@@ -700,8 +628,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/bookmarks/:resourceId - Add bookmark
   app.post('/api/bookmarks/:resourceId', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const resourceId = parseInt(req.params.resourceId);
+      const userId = req.user.id;
+      const resourceId = req.params.resourceId; // UUID string
       const { notes } = req.body;
       
       await storage.addBookmark(userId, resourceId, notes);
@@ -715,8 +643,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // DELETE /api/bookmarks/:resourceId - Remove bookmark
   app.delete('/api/bookmarks/:resourceId', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const resourceId = parseInt(req.params.resourceId);
+      const userId = req.user.id;
+      const resourceId = req.params.resourceId; // UUID string
       
       await storage.removeBookmark(userId, resourceId);
       res.json({ message: 'Bookmark removed successfully' });
@@ -729,7 +657,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/bookmarks - Get user's bookmarks
   app.get('/api/bookmarks', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const bookmarks = await storage.getUserBookmarks(userId);
       res.json(bookmarks);
     } catch (error) {
@@ -743,7 +671,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/user/progress - Get user's learning progress
   app.get('/api/user/progress', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
 
       // Get total resources in catalog
       const totalResourcesResult = await storage.listResources({ status: 'approved', limit: 1 });
@@ -842,7 +770,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/user/submissions - Get user's submitted resources and edits
   app.get('/api/user/submissions', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
 
       // Get user's submitted resources
       const submittedResources = await storage.listResources({
@@ -869,7 +797,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/user/journeys - Get user's learning journeys with details
   app.get('/api/user/journeys', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
 
       // Get user's journey progress
       const journeyProgress = await storage.listUserJourneyProgress(userId);
@@ -911,7 +839,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // If user is authenticated, batch fetch all progress
       if (req.user?.claims?.sub) {
-        const userId = req.user.claims.sub;
+        const userId = req.user.id;
         const allProgress = await storage.listUserJourneyProgress(userId);
         
         // Create progress map for O(1) lookup
@@ -972,7 +900,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/journeys/:id - Get journey details
   app.get('/api/journeys/:id', async (req: any, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id; // UUID string
       const journey = await storage.getLearningJourney(id);
       
       if (!journey) {
@@ -992,7 +920,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // If user is authenticated, get their progress
       let progress = null;
       if (req.user?.claims?.sub) {
-        progress = await storage.getUserJourneyProgress(req.user.claims.sub, id);
+        progress = await storage.getUserJourneyProgress(req.user.id, id);
       }
       
       res.json({
@@ -1014,8 +942,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/journeys/:id/start - Start journey
   app.post('/api/journeys/:id/start', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const journeyId = parseInt(req.params.id);
+      const userId = req.user.id;
+      const journeyId = req.params.id; // UUID string
       
       const progress = await storage.startUserJourney(userId, journeyId);
       res.json(progress);
@@ -1028,8 +956,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // PUT /api/journeys/:id/progress - Update progress
   app.put('/api/journeys/:id/progress', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const journeyId = parseInt(req.params.id);
+      const userId = req.user.id;
+      const journeyId = req.params.id; // UUID string
       const { stepId } = req.body;
       
       if (!stepId) {
@@ -1047,8 +975,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/journeys/:id/progress - Get user's progress
   app.get('/api/journeys/:id/progress', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const journeyId = parseInt(req.params.id);
+      const userId = req.user.id;
+      const journeyId = req.params.id; // UUID string
       
       const progress = await storage.getUserJourneyProgress(userId, journeyId);
       
@@ -1138,13 +1066,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/admin/resources/:id/approve - Approve a pending resource
   app.post('/api/admin/resources/:id/approve', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
-      const resourceId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
-      
-      if (isNaN(resourceId)) {
-        return res.status(400).json({ message: 'Invalid resource ID' });
-      }
-      
+      const resourceId = req.params.id; // UUID string
+      const userId = req.user.id;
+
       const resource = await storage.getResource(resourceId);
       if (!resource) {
         return res.status(404).json({ message: 'Resource not found' });
@@ -1174,14 +1098,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/admin/resources/:id/reject - Reject a pending resource
   app.post('/api/admin/resources/:id/reject', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
-      const resourceId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const resourceId = req.params.id; // UUID string
+      const userId = req.user.id;
       const { reason } = req.body;
-      
-      if (isNaN(resourceId)) {
-        return res.status(400).json({ message: 'Invalid resource ID' });
-      }
-      
+
       if (!reason || reason.trim().length < 10) {
         return res.status(400).json({ message: 'Rejection reason is required (minimum 10 characters)' });
       }
@@ -1239,13 +1159,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/admin/resource-edits/:id/approve - Approve an edit (admin only)
   app.post('/api/admin/resource-edits/:id/approve', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
-      const editId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
-      
-      if (isNaN(editId)) {
-        return res.status(400).json({ message: 'Invalid edit ID' });
-      }
-      
+      const editId = req.params.id; // UUID string
+      const userId = req.user.id;
+
       await storage.approveResourceEdit(editId, userId);
       
       res.json({ message: 'Edit approved and merged successfully' });
@@ -1266,14 +1182,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/admin/resource-edits/:id/reject - Reject an edit (admin only)
   app.post('/api/admin/resource-edits/:id/reject', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
-      const editId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const editId = req.params.id; // UUID string
+      const userId = req.user.id;
       const { reason } = req.body;
-      
-      if (isNaN(editId)) {
-        return res.status(400).json({ message: 'Invalid edit ID' });
-      }
-      
+
       if (!reason || reason.trim().length < 10) {
         return res.status(400).json({ message: 'Rejection reason is required (minimum 10 characters)' });
       }
@@ -1435,7 +1347,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/github/sync-status/:id - Get specific sync item status
   app.get('/api/github/sync-status/:id', isAuthenticated, isAdmin, async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id; // UUID string
       const queueItems = await storage.getGithubSyncQueue();
       const item = queueItems.find(q => q.id === id);
       
@@ -1772,14 +1684,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/enrichment/jobs/:id - Get job status with progress
   app.get('/api/enrichment/jobs/:id', isAuthenticated, isAdmin, async (req, res) => {
     try {
-      const jobId = parseInt(req.params.id);
-      
-      if (isNaN(jobId)) {
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid job ID'
-        });
-      }
+      const jobId = req.params.id; // UUID string
       
       const job = await storage.getEnrichmentJob(jobId);
       
@@ -1807,14 +1712,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // DELETE /api/enrichment/jobs/:id - Cancel a job
   app.delete('/api/enrichment/jobs/:id', isAuthenticated, isAdmin, async (req, res) => {
     try {
-      const jobId = parseInt(req.params.id);
-      
-      if (isNaN(jobId)) {
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid job ID'
-        });
-      }
+      const jobId = req.params.id; // UUID string
       
       await enrichmentService.cancelJob(jobId);
       

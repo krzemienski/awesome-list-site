@@ -12,7 +12,7 @@ interface QueueBatchEnrichmentOptions {
 }
 
 interface JobStatus {
-  id: number;
+  id: string;
   status: string;
   totalResources: number;
   processedResources: number;
@@ -28,7 +28,7 @@ interface JobStatus {
 
 export class EnrichmentService {
   private static instance: EnrichmentService;
-  private processingJobs: Set<number> = new Set();
+  private processingJobs: Set<string> = new Set();
 
   private constructor() {}
 
@@ -39,7 +39,7 @@ export class EnrichmentService {
     return EnrichmentService.instance;
   }
 
-  async queueBatchEnrichment(options: QueueBatchEnrichmentOptions): Promise<number> {
+  async queueBatchEnrichment(options: QueueBatchEnrichmentOptions): Promise<string> {
     const {
       filter = 'unenriched',
       batchSize = 10,
@@ -92,7 +92,7 @@ export class EnrichmentService {
     return job.id;
   }
 
-  private async startProcessing(jobId: number): Promise<void> {
+  private async startProcessing(jobId: string): Promise<void> {
     if (this.processingJobs.has(jobId)) {
       console.log(`Job ${jobId} is already being processed`);
       return;
@@ -137,7 +137,7 @@ export class EnrichmentService {
     }
   }
 
-  private async processJobBatches(jobId: number, batchSize: number): Promise<void> {
+  private async processJobBatches(jobId: string, batchSize: number): Promise<void> {
     while (true) {
       const job = await storage.getEnrichmentJob(jobId);
       if (!job || job.status === 'cancelled') {
@@ -157,7 +157,7 @@ export class EnrichmentService {
     }
   }
 
-  async processBatch(jobId: number, batch: any[]): Promise<void> {
+  async processBatch(jobId: string, batch: any[]): Promise<void> {
     const job = await storage.getEnrichmentJob(jobId);
     if (!job) {
       throw new Error(`Job ${jobId} not found`);
@@ -241,7 +241,7 @@ export class EnrichmentService {
     }
   }
 
-  async enrichResource(resourceId: number, jobId?: number): Promise<EnrichmentOutcome> {
+  async enrichResource(resourceId: string, jobId?: string): Promise<EnrichmentOutcome> {
     const resource = await storage.getResource(resourceId);
     if (!resource) {
       throw new Error(`Resource ${resourceId} not found`);
@@ -369,7 +369,7 @@ export class EnrichmentService {
     return 'failed';
   }
 
-  async getJobStatus(jobId: number): Promise<JobStatus> {
+  async getJobStatus(jobId: string): Promise<JobStatus> {
     const job = await storage.getEnrichmentJob(jobId);
     if (!job) {
       throw new Error(`Job ${jobId} not found`);
@@ -410,7 +410,7 @@ export class EnrichmentService {
     };
   }
 
-  async cancelJob(jobId: number): Promise<void> {
+  async cancelJob(jobId: string): Promise<void> {
     await storage.cancelEnrichmentJob(jobId);
   }
 

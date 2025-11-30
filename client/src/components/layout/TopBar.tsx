@@ -187,15 +187,16 @@ export default function TopBar({
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => window.location.href = '/api/login'}
-              className="flex items-center gap-2"
-            >
+            <Link href="/login">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex items-center gap-2"
+              >
               <LogIn className="h-4 w-4" />
               <span className="hidden sm:inline">Login</span>
             </Button>
+            </Link>
           )}
         </div>
       </div>

@@ -1,0 +1,33 @@
+id,name,slug,subcategory_id
+66,DASH,dash,42
+65,HLS,hls,42
+67,RIST,rist,43
+69,RTMP,rtmp,43
+68,SRT,srt,43
+70,FFMPEG,ffmpeg,44
+71,Other Encoders,other-encoders,44
+74,AV1,av1,45
+72,HEVC,hevc,45
+73,VP9,vp9,45
+77,Chromecast,chromecast,46
+75,Roku,roku,46
+76,Smart TVs,smart-tvs,46
+79,Android,android,47
+80,Web Players,web-players,47
+78,iOS/tvOS,iostvos,47
+81,Audio,audio,48
+82,Subtitles & Captions,subtitles-captions,48
+83,Advertising,advertising,49
+84,Quality & Testing,quality-testing,49
+86,MPEG & Forums,mpeg-forums,50
+85,Official Specs,official-specs,50
+88,HDR Guidelines,hdr-guidelines,51
+87,Vendor Docs,vendor-docs,51
+89,Origin Servers,origin-servers,52
+90,Storage Solutions,storage-solutions,52
+92,CDN Integration,cdn-integration,53
+91,Cloud Platforms,cloud-platforms,53
+93,Online Forums,online-forums,56
+94,Slack & Meetups,slack-meetups,56
+95,Conferences,conferences,57
+96,Podcasts & Webinars,podcasts-webinars,57

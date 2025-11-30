@@ -1,0 +1,20 @@
+id,name,slug,category_id
+39,Introduction,introduction,19
+40,Learning Resources,learning-resources,19
+41,Tutorials & Case Studies,tutorials-case-studies,19
+42,Adaptive Streaming,adaptive-streaming,20
+43,Transport Protocols,transport-protocols,20
+45,Codecs,codecs,21
+44,Encoding Tools,encoding-tools,21
+46,Hardware Players,hardware-players,22
+47,Mobile & Web Players,mobile-web-players,22
+49,Ads & QoE,ads-qoe,23
+48,Audio & Subtitles,audio-subtitles,23
+50,Specs & Standards,specs-standards,24
+51,Vendors & HDR,vendors-hdr,24
+53,Cloud & CDN,cloud-cdn,25
+52,Streaming Servers,streaming-servers,25
+55,DRM,drm,26
+54,FFMPEG & Tools,ffmpeg-tools,26
+56,Community Groups,community-groups,27
+57,Events & Conferences,events-conferences,27

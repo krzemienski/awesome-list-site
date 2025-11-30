@@ -13,7 +13,7 @@ interface GeneratedStep {
   stepNumber: number;
   title: string;
   description: string;
-  resourceIds: number[];
+  resourceIds: string[];
 }
 
 interface GeneratedJourney {
@@ -398,10 +398,10 @@ async function createJourney(journeyData: GeneratedJourney, category: string) {
   if (uniqueStepNumbers.size === 0) {
     console.error(`❌ Journey "${journey.title}" has no valid steps!`);
     console.error(`   Deleting empty journey...`);
-    
+
     // Delete the empty journey
     await storage.deleteLearningJourney(journey.id);
-    
+
     console.error(`   ⚠️  Please review resource selection for this category`);
     throw new Error(`Journey "${journey.title}" has no valid steps and was deleted`);
   }
@@ -409,10 +409,10 @@ async function createJourney(journeyData: GeneratedJourney, category: string) {
   if (uniqueStepNumbers.size < 3) {
     console.error(`❌ Journey "${journey.title}" has only ${uniqueStepNumbers.size} logical steps (minimum 3 required)`);
     console.error(`   Deleting invalid journey...`);
-    
+
     // Delete the invalid journey
     await storage.deleteLearningJourney(journey.id);
-    
+
     console.error(`   ⚠️  Please review resource selection for this category`);
     throw new Error(`Failed to create valid journey: ${journey.title}`);
   }

@@ -1,56 +1,64 @@
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { queryClient } from '@/lib/queryClient';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
+import type { User, Session } from '@supabase/supabase-js';
 
-interface User {
-  id: string;
-  email?: string;
-  name?: string;
-  avatar?: string;
-  provider?: string;
-  role?: string;
-  createdAt?: string;
-}
-
-interface AuthResponse {
+interface AuthState {
   user: User | null;
+  session: Session | null;
+  isLoading: boolean;
   isAuthenticated: boolean;
+  isAdmin: boolean;
 }
 
 export function useAuth() {
-  const { data, isLoading, error } = useQuery<AuthResponse>({
-    queryKey: ['/api/auth/user'],
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: (failureCount, error: any) => {
-      // Don't retry on 401 - user is simply not authenticated
-      if (error?.status === 401) return false;
-      return failureCount < 3;
-    }
+  const [authState, setAuthState] = useState<AuthState>({
+    user: null,
+    session: null,
+    isLoading: true,
+    isAuthenticated: false,
+    isAdmin: false
   });
 
-  const logoutMutation = useMutation({
-    mutationFn: async () => {
-      const response = await fetch('/api/auth/logout', {
-        method: 'POST',
-        credentials: 'include'
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setAuthState({
+        user: session?.user ?? null,
+        session,
+        isLoading: false,
+        isAuthenticated: !!session,
+        isAdmin: session?.user?.user_metadata?.role === 'admin'
       });
-      if (!response.ok) {
-        throw new Error('Logout failed');
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      // Clear auth cache and redirect to home
-      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
-      queryClient.setQueryData(['/api/auth/user'], { user: null, isAuthenticated: false });
-      window.location.href = '/';
-    }
-  });
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setAuthState({
+        user: session?.user ?? null,
+        session,
+        isLoading: false,
+        isAuthenticated: !!session,
+        isAdmin: session?.user?.user_metadata?.role === 'admin'
+      });
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const logout = async () => {
+    await supabase.auth.signOut();
+    window.location.href = '/';
+  };
 
   return {
-    user: data?.user ?? null,
-    isLoading,
-    isAuthenticated: data?.isAuthenticated ?? false,
-    error,
-    logout: logoutMutation.mutate
+    user: authState.user,
+    session: authState.session,
+    isLoading: authState.isLoading,
+    isAuthenticated: authState.isAuthenticated,
+    isAdmin: authState.isAdmin,
+    logout,
+    error: null  // For compatibility with old useAuth interface
   };
 }

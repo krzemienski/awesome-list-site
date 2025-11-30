@@ -14,7 +14,7 @@ export interface LinkCheckResult {
   responseTime: number;
   error?: string;
   resourceTitle?: string;
-  resourceId?: number;
+  resourceId?: string;
 }
 
 export interface LinkCheckReport {
@@ -55,7 +55,7 @@ export class LinkChecker {
   /**
    * Check all links in the provided resources
    */
-  async checkLinks(links: Array<{ url: string; title?: string; id?: number }>): Promise<LinkCheckReport> {
+  async checkLinks(links: Array<{ url: string; title?: string; id?: string }>): Promise<LinkCheckReport> {
     const startTime = Date.now();
     const results: LinkCheckResult[] = [];
     
@@ -102,7 +102,7 @@ export class LinkChecker {
   /**
    * Check a single link
    */
-  private async checkSingleLink(link: { url: string; title?: string; id?: number }): Promise<LinkCheckResult> {
+  private async checkSingleLink(link: { url: string; title?: string; id?: string }): Promise<LinkCheckResult> {
     let attempts = 0;
     let lastError: Error | undefined;
     let result: LinkCheckResult | undefined;
@@ -144,7 +144,7 @@ export class LinkChecker {
   /**
    * Perform the actual HTTP check
    */
-  private async performCheck(link: { url: string; title?: string; id?: number }): Promise<LinkCheckResult> {
+  private async performCheck(link: { url: string; title?: string; id?: string }): Promise<LinkCheckResult> {
     const startTime = Date.now();
     
     try {
@@ -376,7 +376,7 @@ export function formatLinkCheckReport(report: LinkCheckReport): string {
  * Check links from resource objects
  */
 export async function checkResourceLinks(
-  resources: Array<{ id: number; title: string; url: string }>,
+  resources: Array<{ id: string; title: string; url: string }>,
   options?: LinkCheckOptions
 ): Promise<LinkCheckReport> {
   const checker = new LinkChecker(options);

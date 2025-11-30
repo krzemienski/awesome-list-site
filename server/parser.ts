@@ -1,6 +1,6 @@
 import { remark } from 'remark';
 import { visit } from 'unist-util-visit';
-import fetch from 'node-fetch';
+import fetch, { Response as NodeFetchResponse } from 'node-fetch';
 
 interface Resource {
   id: string;
@@ -448,9 +448,9 @@ export async function fetchAwesomeList(rawUrl: string): Promise<AwesomeListData>
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30000);
     
-    let response: Response;
+    let response: NodeFetchResponse;
     try {
-      response = await fetch(rawUrl, { 
+      response = await fetch(rawUrl, {
         signal: controller.signal,
         headers: {
           'User-Agent': 'Awesome-List-Generator/1.0',
