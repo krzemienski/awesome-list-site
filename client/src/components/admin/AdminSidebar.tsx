@@ -22,6 +22,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { supabase } from '@/lib/supabase';
 
 interface AdminSidebarProps {
   collapsed: boolean;
@@ -42,8 +43,16 @@ export function AdminSidebar({ collapsed, onToggle }: AdminSidebarProps) {
   const { data: stats } = useQuery({
     queryKey: ['/api/admin/stats'],
     queryFn: async () => {
+      // Get Supabase session for JWT token
+      const { data: { session } } = await supabase.auth.getSession();
+
+      const headers: HeadersInit = {};
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+      }
+
       const response = await fetch('/api/admin/stats', {
-        credentials: 'include',
+        headers,
       });
       if (!response.ok) throw new Error('Failed to fetch admin stats');
       return response.json();

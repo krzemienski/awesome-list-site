@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Database, Clock, Users, Star, TrendingUp, TrendingDown } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { supabase } from '@/lib/supabase';
 
 interface AdminStats {
   totalResources: number;
@@ -76,8 +77,16 @@ export function DashboardWidgets() {
   const { data: stats, isLoading, error } = useQuery<AdminStats>({
     queryKey: ['/api/admin/stats'],
     queryFn: async () => {
+      // Get Supabase session for JWT token
+      const { data: { session } } = await supabase.auth.getSession();
+
+      const headers: HeadersInit = {};
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+      }
+
       const response = await fetch('/api/admin/stats', {
-        credentials: 'include',
+        headers,
       });
 
       if (!response.ok) {
