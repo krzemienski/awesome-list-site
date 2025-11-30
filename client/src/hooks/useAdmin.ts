@@ -10,8 +10,7 @@ interface AdminStats {
 }
 
 export function useAdmin() {
-  const { user } = useAuth();
-  const isAdmin = Boolean(user && (user as any).role === "admin");
+  const { user, isAdmin } = useAuth();  // Use isAdmin from useAuth (correctly checks user_metadata.role)
   
   const { data: stats, isLoading, error } = useQuery<AdminStats>({
     queryKey: ["/api/admin/stats"],

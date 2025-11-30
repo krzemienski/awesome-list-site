@@ -219,7 +219,7 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
             AI Recommendations
           </Button>
 
-          {user?.role === "admin" && (
+          {user?.user_metadata?.role === "admin" && (
             <Button
               variant="ghost"
               className={cn(

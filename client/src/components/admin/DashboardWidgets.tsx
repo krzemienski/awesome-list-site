@@ -5,15 +5,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { supabase } from '@/lib/supabase';
 
 interface AdminStats {
-  totalResources: number;
-  pendingResources: number;
   users: number;
-  enrichedResources: number;
-  categories: number;
-  recentActivity: {
-    weeklySubmissions: number;
-    weeklyApprovals: number;
-  };
+  resources: number;
+  journeys: number;
+  pendingApprovals: number;
 }
 
 interface StatWidgetProps {
@@ -117,21 +112,19 @@ export function DashboardWidgets() {
     );
   }
 
-  // Calculate quality score (percentage of resources with descriptions)
-  const qualityScore = stats.enrichedResources && stats.totalResources
-    ? Math.round((stats.enrichedResources / stats.totalResources) * 100)
-    : 0;
+  // Calculate quality score (placeholder - will be 0 until enrichment data tracked)
+  const qualityScore = 0;
 
-  // Calculate trends (comparing recent activity)
-  const submissionTrend = stats.recentActivity?.weeklySubmissions || 0;
-  const approvalTrend = stats.recentActivity?.weeklyApprovals || 0;
+  // Calculate trends (placeholder - will be 0 until activity tracking implemented)
+  const submissionTrend = 0;
+  const approvalTrend = 0;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {/* Total Resources */}
       <StatWidget
         title="Total Resources"
-        value={stats.totalResources}
+        value={stats.resources}
         icon={<Database className="h-5 w-5" />}
         change={submissionTrend > 0 ? submissionTrend : undefined}
         trend={submissionTrend > 0 ? 'up' : 'neutral'}
@@ -140,9 +133,9 @@ export function DashboardWidgets() {
       {/* Pending Approvals */}
       <StatWidget
         title="Pending Approvals"
-        value={stats.pendingResources}
+        value={stats.pendingApprovals}
         icon={<Clock className="h-5 w-5" />}
-        colorClass={stats.pendingResources > 0 ? 'text-amber-500' : 'text-primary'}
+        colorClass={stats.pendingApprovals > 0 ? 'text-amber-500' : 'text-primary'}
         change={approvalTrend > 0 ? approvalTrend : undefined}
         trend={approvalTrend > 0 ? 'up' : 'neutral'}
       />

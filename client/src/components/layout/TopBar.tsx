@@ -171,7 +171,7 @@ export default function TopBar({
                     <span>My Bookmarks</span>
                   </Link>
                 </DropdownMenuItem>
-                {user.role === 'admin' && (
+                {user.user_metadata?.role === 'admin' && (
                   <DropdownMenuItem asChild>
                     <Link href="/admin">
                       <Shield className="mr-2 h-4 w-4" />
