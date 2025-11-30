@@ -48,6 +48,34 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
     return location === path || location.startsWith(path + "/");
   };
 
+  // Calculate total resources including all nested levels
+  const calculateTotalResources = (category: Category): number => {
+    let total = category.resources.length;
+
+    if (category.subcategories) {
+      category.subcategories.forEach(sub => {
+        total += sub.resources.length;
+        if (sub.subSubcategories) {
+          sub.subSubcategories.forEach(subsub => {
+            total += subsub.resources.length;
+          });
+        }
+      });
+    }
+
+    return total;
+  };
+
+  const calculateSubcategoryTotal = (subcategory: any): number => {
+    let total = subcategory.resources.length;
+    if (subcategory.subSubcategories) {
+      subcategory.subSubcategories.forEach((subsub: any) => {
+        total += subsub.resources.length;
+      });
+    }
+    return total;
+  };
+
   // Show true hierarchical structure from JSON data - categories with their actual subcategories
   const getHierarchicalCategories = (categories: Category[]) => {
     // Only filter out unwanted system categories, NOT by resource count
@@ -257,7 +285,7 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
                       })()}
                       <span className="truncate flex-1 text-left leading-tight">{category.name}</span>
                       <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded ml-auto flex-shrink-0 whitespace-nowrap">
-                        {category.resources.length}
+                        {calculateTotalResources(category)}
                       </span>
                     </div>
                   </Button>
@@ -309,7 +337,7 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
                               })()}
                               <span className="truncate flex-1 text-left leading-tight">{subcategory.name}</span>
                               <span className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded ml-auto flex-shrink-0 whitespace-nowrap">
-                                {subcategory.resources.length}
+                                {calculateSubcategoryTotal(subcategory)}
                               </span>
                             </div>
                           </Button>

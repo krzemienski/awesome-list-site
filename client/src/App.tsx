@@ -60,8 +60,38 @@ function Router() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [location] = useLocation();
 
-  // Removed static awesome-list-data loading - components fetch from database APIs directly
-  // MainLayout and Home now use /api/categories for category listing
+  // Fetch hierarchical categories for navigation
+  const { data: categoriesData, isLoading: categoriesLoading } = useQuery<any[]>({
+    queryKey: ['/api/categories'],
+    queryFn: async () => {
+      const response = await fetch('/api/categories');
+      if (!response.ok) throw new Error('Failed to fetch categories');
+      return response.json();
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
+  // Fetch all resources for search (flattened array)
+  const { data: resourcesData } = useQuery<{resources: any[], total: number}>({
+    queryKey: ['/api/resources-for-search'],
+    queryFn: async () => {
+      const response = await fetch('/api/resources?status=approved&limit=10000');
+      if (!response.ok) throw new Error('Failed to fetch resources');
+      return response.json();
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+
+  // Construct AwesomeList object matching type definition
+  const awesomeList = categoriesData && resourcesData ? {
+    title: "Awesome Video Resources",
+    description: "Curated video development resources from awesome-video",
+    repoUrl: "https://github.com/krzemienski/awesome-video",
+    resources: resourcesData.resources, // Flat array for search
+    categories: categoriesData // Hierarchical structure for navigation
+  } : undefined;
+
+  const isDataLoading = categoriesLoading || authLoading;
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -94,12 +124,8 @@ function Router() {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [searchOpen]);
 
-  if (error) {
-    return <ErrorPage error={error} />;
-  }
-
-  // Show loading state while checking authentication
-  if (authLoading) {
+  // Show loading state while checking authentication or fetching data
+  if (isDataLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
@@ -114,11 +140,13 @@ function Router() {
   // Guest users can browse all resources, authenticated users get additional features
   return (
     <MainLayout
+      awesomeList={awesomeList}
+      isLoading={isDataLoading}
       user={user}
       onLogout={logout}
     >
       <Switch>
-        <Route path="/" component={Home} />
+        <Route path="/" component={() => <Home awesomeList={awesomeList} />} />
         <Route path="/login" component={Login} />
         <Route path="/auth/callback" component={AuthCallback} />
         <Route path="/category/:slug" component={Category} />

@@ -170,26 +170,9 @@ export class LearningPathGenerator {
         limit: 100
       });
 
-      // If no resources in database, use awesome list data
+      // Database is the single source of truth
       if (!resources || resources.length === 0) {
-        const awesomeListData = storage.getAwesomeListData();
-        if (awesomeListData && awesomeListData.resources) {
-          // Filter by category and convert to database Resource format
-          resources = awesomeListData.resources
-            .filter((r: any) => !targetCategory || r.category === targetCategory)
-            .slice(0, 100)
-            .map((r: any, index: number) => ({
-              id: index + 1,
-              title: r.title || r.name || 'Untitled',
-              url: r.url,
-              description: r.description || '',
-              category: r.category,
-              subcategory: r.subcategory,
-              subSubcategory: r.subSubcategory,
-              status: 'approved',
-              createdAt: new Date()
-            }));
-        }
+        throw new Error('No resources available for learning path generation');
       }
 
       // Try AI generation first if available

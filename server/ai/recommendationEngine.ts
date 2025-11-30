@@ -114,24 +114,7 @@ export class RecommendationEngine {
         limit: 1000 // Get more resources for better recommendations
       });
 
-      // If no resources in database, use awesome list data
-      if (!resources || resources.length === 0) {
-        const awesomeListData = storage.getAwesomeListData();
-        if (awesomeListData && awesomeListData.resources) {
-          // Convert awesome list resources to database Resource format
-          resources = awesomeListData.resources.map((r: any, index: number) => ({
-            id: index + 1,
-            title: r.title || r.name || 'Untitled',
-            url: r.url,
-            description: r.description || '',
-            category: r.category,
-            subcategory: r.subcategory,
-            subSubcategory: r.subSubcategory,
-            status: 'approved',
-            createdAt: new Date()
-          }));
-        }
-      }
+      // Database is the single source of truth - no fallback needed
 
       // Fetch user's favorites and bookmarks for better personalization
       const [favorites, bookmarks] = await Promise.all([

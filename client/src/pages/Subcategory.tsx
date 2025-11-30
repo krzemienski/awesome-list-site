@@ -32,7 +32,18 @@ export default function Subcategory() {
   // Fetch approved database resources for this subcategory
   const { data: dbData, isLoading, error } = useQuery<{resources: any[], total: number}>({
     queryKey: ['/api/resources', { subcategory: subcategoryName, status: 'approved' }],
+    queryFn: async () => {
+      const params = new URLSearchParams({
+        subcategory: subcategoryName,
+        status: 'approved',
+        limit: '1000'
+      });
+      const response = await fetch(`/api/resources?${params}`);
+      if (!response.ok) throw new Error('Failed to fetch resources');
+      return response.json();
+    },
     staleTime: 1000 * 60 * 5,
+    enabled: !!subcategoryName,
   });
 
   const dbResources = dbData?.resources || [];

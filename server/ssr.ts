@@ -21,15 +21,15 @@ export async function handleSSR(req: Request, res: Response, next: NextFunction)
       : path.resolve(import.meta.dirname, "..", "client", "index.html");
     let template = await fs.promises.readFile(templatePath, "utf-8");
 
-    // Get the awesome list data from storage
-    const awesomeListData = storage.getAwesomeListData();
+    // SSR: Client-side fetches data from /api/categories and /api/resources
+    // No server-side data injection needed - React Query handles data fetching
 
     // In production, we need to load the built server bundle
     // In development, this won't be used as Vite handles it
     if (process.env.NODE_ENV === 'production') {
       // For production, we'll need a built server bundle
       // We'll create a simple fallback for now
-      const appHtml = await renderAppWithData(awesomeListData, url);
+      const appHtml = await renderAppWithData(null, url);
       
       // Inject the rendered HTML
       template = template.replace(
@@ -37,11 +37,7 @@ export async function handleSSR(req: Request, res: Response, next: NextFunction)
         `<div id="root">${appHtml}</div>`
       );
 
-      // Inject the initial data
-      template = template.replace(
-        '</head>',
-        `<script>window.__INITIAL_DATA__ = ${JSON.stringify(awesomeListData).replace(/</g, '\\u003c')}</script></head>`
-      );
+      // No server-side data injection - client fetches from APIs
 
       res.status(200).set({ "Content-Type": "text/html" }).send(template);
     } else {

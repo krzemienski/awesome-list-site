@@ -20,7 +20,6 @@ import {
 
 interface HomeProps {
   awesomeList?: AwesomeList;
-  isLoading: boolean;
 }
 
 const categoryIcons: { [key: string]: any } = {
@@ -35,39 +34,29 @@ const categoryIcons: { [key: string]: any } = {
   "Community & Events": Users,
 };
 
-export default function Home({ awesomeList, isLoading }: HomeProps) {
-  // Fetch approved database resources (always fetch, React Query handles caching)
-  const { data: dbData } = useQuery<{resources: any[], total: number}>({
-    queryKey: ['/api/resources', { status: 'approved' }],
-  });
-  
-  const dbResources = dbData?.resources || [];
-  
-  const filteredCategories = useMemo(() => {
-    if (!awesomeList?.categories) return [];
-    
-    return awesomeList.categories.filter(cat => 
-      cat.resources.length > 0 && 
-      cat.name !== "Table of contents" && 
-      !cat.name.startsWith("List of") &&
-      !["Contributing", "License", "External Links", "Anti-features"].includes(cat.name)
-    );
-  }, [awesomeList?.categories]);
+export default function Home({ awesomeList }: HomeProps) {
+  const categories = awesomeList?.categories || [];
+  const totalResourceCount = awesomeList?.resources.length || 0;
 
-  const calculateTotalCount = (category: Category): number => {
-    const staticCount = category.resources.length;
-    // Note: DB resources are fetched with pagination, so we can't accurately count per-category
-    // from the paginated results. Using static count only for category cards.
-    return staticCount;
+  // Calculate total resources including nested subcategories
+  const calculateTotalResources = (category: Category): number => {
+    let total = category.resources.length;
+
+    if (category.subcategories) {
+      category.subcategories.forEach(sub => {
+        total += sub.resources.length;
+        if (sub.subSubcategories) {
+          sub.subSubcategories.forEach(subsub => {
+            total += subsub.resources.length;
+          });
+        }
+      });
+    }
+
+    return total;
   };
-  
-  const totalResourceCount = useMemo(() => {
-    const staticCount = awesomeList?.resources.length || 0;
-    const dbCount = dbData?.total || 0;
-    return staticCount + dbCount;
-  }, [awesomeList?.resources.length, dbData?.total]);
 
-  if (isLoading) {
+  if (!awesomeList) {
     return (
       <div className="space-y-6">
         <SEOHead title="Loading - Awesome Video Resources" />
@@ -79,18 +68,6 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
               <Skeleton key={i} className="h-32 w-full" />
             ))}
           </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!awesomeList) {
-    return (
-      <div className="space-y-6">
-        <SEOHead title="Error - Awesome Video Resources" />
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Error Loading Resources</h1>
-          <p className="text-muted-foreground">Please try refreshing the page.</p>
         </div>
       </div>
     );
@@ -108,19 +85,20 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
           Awesome Video Resources
         </h1>
         <p className="text-muted-foreground">
-          Explore {filteredCategories.length} categories with {totalResourceCount} curated resources
+          Explore {categories.length} categories with {totalResourceCount} curated resources
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredCategories.map((category) => {
+        {categories.map((category) => {
           const Icon = categoryIcons[category.name] || FileText;
-          const totalCount = calculateTotalCount(category);
-          
-          const firstResource = category.resources[0];
-          const description = firstResource?.description 
-            ? firstResource.description.length > 100 
-              ? `${firstResource.description.substring(0, 100)}...` 
+          const totalCount = calculateTotalResources(category);
+
+          // Use first resource's description as category description
+          const firstResource = category.resources[0] || category.subcategories?.[0]?.resources?.[0];
+          const description = firstResource?.description
+            ? firstResource.description.length > 100
+              ? `${firstResource.description.substring(0, 100)}...`
               : firstResource.description
             : '';
           

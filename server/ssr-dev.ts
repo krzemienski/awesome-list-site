@@ -28,14 +28,12 @@ export async function setupSSRDev(vite: ViteDevServer) {
       
       // Load the server entry module
       const { render } = await vite.ssrLoadModule('/src/entry-server.tsx');
-      
-      // Get awesome list data from storage
-      const awesomeListData = storage.getAwesomeListData();
-      
-      // Render the app
+
+      // SSR: Client-side fetches data from APIs - no server-side injection
+      // Render the app without pre-fetched data
       const { html, dehydratedState } = render({
         url,
-        awesomeListData
+        awesomeListData: null
       });
       
       // Replace the HTML placeholder with rendered content

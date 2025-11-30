@@ -38,7 +38,18 @@ export default function Category() {
   // Fetch approved database resources for this category
   const { data: dbData, isLoading, error } = useQuery<{resources: any[], total: number}>({
     queryKey: ['/api/resources', { category: categoryName, status: 'approved' }],
+    queryFn: async () => {
+      const params = new URLSearchParams({
+        category: categoryName,
+        status: 'approved',
+        limit: '1000' // Fetch more to include all resources
+      });
+      const response = await fetch(`/api/resources?${params}`);
+      if (!response.ok) throw new Error('Failed to fetch resources');
+      return response.json();
+    },
     staleTime: 1000 * 60 * 5, // 5 minutes
+    enabled: !!categoryName, // Only fetch if category name exists
   });
 
   const dbResources = dbData?.resources || [];

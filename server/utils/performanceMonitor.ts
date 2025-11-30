@@ -19,7 +19,7 @@ export class PerformanceMonitor {
   /**
    * Start timing an operation
    */
-  startTimer(operation: string): () => void {
+  startTimer(operation: string): (metadata?: Record<string, any>) => void {
     const start = performance.now();
     const timestamp = new Date();
 
@@ -101,7 +101,7 @@ export class PerformanceMonitor {
     const operations = new Set(this.metrics.map(m => m.operation));
     const summary: Record<string, any> = {};
 
-    for (const operation of operations) {
+    for (const operation of Array.from(operations)) {
       const metrics = this.getMetrics(operation);
       const durations = metrics.map(m => m.duration).sort((a, b) => a - b);
 
