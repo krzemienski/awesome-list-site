@@ -179,7 +179,10 @@ export interface IStorage {
   getPendingEnrichmentQueueItems(jobId: number, limit?: number): Promise<EnrichmentQueueItem[]>;
   updateEnrichmentQueueItem(id: number, data: Partial<EnrichmentQueueItem>): Promise<EnrichmentQueueItem>;
   
-  // Legacy methods for awesome list (in-memory)
+  // Database-driven awesome list hierarchy
+  getAwesomeListFromDatabase(): Promise<AwesomeListData>;
+  
+  // Legacy methods for awesome list (in-memory) - TO BE REMOVED
   setAwesomeListData(data: any): void;
   getAwesomeListData(): any | null;
   getCategories(): any[];
@@ -221,6 +224,35 @@ interface ValidationResults {
   awesomeLint?: any;
   linkCheck?: any;
   lastUpdated?: string;
+}
+
+// Hierarchical category structure for frontend
+export interface HierarchicalSubSubcategory {
+  name: string;
+  slug: string;
+  resources: Resource[];
+}
+
+export interface HierarchicalSubcategory {
+  name: string;
+  slug: string;
+  resources: Resource[];
+  subSubcategories: HierarchicalSubSubcategory[];
+}
+
+export interface HierarchicalCategory {
+  name: string;
+  slug: string;
+  resources: Resource[];
+  subcategories: HierarchicalSubcategory[];
+}
+
+export interface AwesomeListData {
+  title: string;
+  description: string;
+  repoUrl: string;
+  resources: Resource[];
+  categories: HierarchicalCategory[];
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1040,6 +1072,97 @@ export class DatabaseStorage implements IStorage {
       .limit(limit);
   }
   
+  // Database-driven awesome list hierarchy - builds complete category tree from database
+  async getAwesomeListFromDatabase(): Promise<AwesomeListData> {
+    // 1. Get all approved resources
+    const allResources = await db
+      .select()
+      .from(resources)
+      .where(eq(resources.status, 'approved'))
+      .orderBy(resources.category, resources.subcategory, resources.subSubcategory, resources.title);
+    
+    // 2. Get all categories, subcategories, and sub-subcategories from database
+    const dbCategories = await db.select().from(categories).orderBy(asc(categories.name));
+    const dbSubcategories = await db.select().from(subcategories).orderBy(asc(subcategories.name));
+    const dbSubSubcategories = await db.select().from(subSubcategories).orderBy(asc(subSubcategories.name));
+    
+    // 3. Group resources by category hierarchy
+    const resourcesByCategory = new Map<string, Resource[]>();
+    const resourcesBySubcategory = new Map<string, Resource[]>();
+    const resourcesBySubSubcategory = new Map<string, Resource[]>();
+    
+    allResources.forEach(resource => {
+      // By category
+      if (resource.category) {
+        if (!resourcesByCategory.has(resource.category)) {
+          resourcesByCategory.set(resource.category, []);
+        }
+        resourcesByCategory.get(resource.category)!.push(resource);
+      }
+      
+      // By subcategory
+      if (resource.subcategory) {
+        if (!resourcesBySubcategory.has(resource.subcategory)) {
+          resourcesBySubcategory.set(resource.subcategory, []);
+        }
+        resourcesBySubcategory.get(resource.subcategory)!.push(resource);
+      }
+      
+      // By sub-subcategory
+      if (resource.subSubcategory) {
+        if (!resourcesBySubSubcategory.has(resource.subSubcategory)) {
+          resourcesBySubSubcategory.set(resource.subSubcategory, []);
+        }
+        resourcesBySubSubcategory.get(resource.subSubcategory)!.push(resource);
+      }
+    });
+    
+    // 4. Build hierarchical structure
+    const hierarchicalCategories: HierarchicalCategory[] = [];
+    
+    for (const dbCategory of dbCategories) {
+      // Get subcategories for this category
+      const catSubcategories = dbSubcategories.filter(sub => sub.categoryId === dbCategory.id);
+      
+      const hierarchicalSubcategories: HierarchicalSubcategory[] = [];
+      
+      for (const dbSubcat of catSubcategories) {
+        // Get sub-subcategories for this subcategory
+        const subcatSubSubcategories = dbSubSubcategories.filter(
+          subSub => subSub.subcategoryId === dbSubcat.id
+        );
+        
+        const hierarchicalSubSubcategories: HierarchicalSubSubcategory[] = subcatSubSubcategories.map(subSub => ({
+          name: subSub.name,
+          slug: subSub.slug,
+          resources: resourcesBySubSubcategory.get(subSub.name) || []
+        }));
+        
+        hierarchicalSubcategories.push({
+          name: dbSubcat.name,
+          slug: dbSubcat.slug,
+          resources: resourcesBySubcategory.get(dbSubcat.name) || [],
+          subSubcategories: hierarchicalSubSubcategories
+        });
+      }
+      
+      hierarchicalCategories.push({
+        name: dbCategory.name,
+        slug: dbCategory.slug,
+        resources: resourcesByCategory.get(dbCategory.name) || [],
+        subcategories: hierarchicalSubcategories
+      });
+    }
+    
+    return {
+      title: "Awesome Video",
+      description: "A curated list of awesome video frameworks, libraries, and software for video processing, streaming, and manipulation",
+      repoUrl: "https://github.com/krzemienski/awesome-video",
+      resources: allResources,
+      categories: hierarchicalCategories
+    };
+  }
+  
   // Admin Statistics
   async getAdminStats(): Promise<AdminStats> {
     const [userCount] = await db
@@ -1476,7 +1599,18 @@ export class MemStorage implements IStorage {
     };
   }
   
-  // Legacy methods for awesome list (in-memory)
+  // Database-driven awesome list hierarchy - returns empty for MemStorage (not supported)
+  async getAwesomeListFromDatabase(): Promise<AwesomeListData> {
+    return {
+      title: "Awesome Video",
+      description: "A curated list of awesome video frameworks, libraries, and software",
+      repoUrl: "https://github.com/krzemienski/awesome-video",
+      resources: [],
+      categories: []
+    };
+  }
+  
+  // Legacy methods for awesome list (in-memory) - TO BE REMOVED
   setAwesomeListData(data: any): void {
     this.awesomeListData = data;
   }
@@ -1488,11 +1622,11 @@ export class MemStorage implements IStorage {
   getCategories(): any[] {
     if (!this.awesomeListData) return [];
     
-    const categories = new Map();
+    const categoriesMap = new Map();
     this.awesomeListData.resources.forEach((resource: any) => {
       if (resource.category) {
-        if (!categories.has(resource.category)) {
-          categories.set(resource.category, {
+        if (!categoriesMap.has(resource.category)) {
+          categoriesMap.set(resource.category, {
             name: resource.category,
             slug: resource.category.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
             resources: [],
@@ -1500,7 +1634,7 @@ export class MemStorage implements IStorage {
           });
         }
         
-        const category = categories.get(resource.category);
+        const category = categoriesMap.get(resource.category);
         category.resources.push(resource);
         
         if (resource.subcategory) {
@@ -1516,7 +1650,7 @@ export class MemStorage implements IStorage {
       }
     });
     
-    return Array.from(categories.values()).map(cat => ({
+    return Array.from(categoriesMap.values()).map(cat => ({
       ...cat,
       subcategories: Array.from(cat.subcategories.values())
     }));

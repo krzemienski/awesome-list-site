@@ -41,13 +41,13 @@ const isAdmin = async (req: any, res: Response, next: any) => {
   }
 };
 
-// SEO route handlers
-function generateSitemap(req: any, res: any) {
+// SEO route handlers - now uses database-driven data
+async function generateSitemap(req: any, res: any) {
   try {
-    const awesomeListData = storage.getAwesomeListData();
+    const awesomeListData = await storage.getAwesomeListFromDatabase();
     
-    if (!awesomeListData) {
-      return res.status(404).send('Sitemap not available - no data loaded');
+    if (!awesomeListData || !awesomeListData.categories.length) {
+      return res.status(404).send('Sitemap not available - database empty');
     }
 
     const baseUrl = `${req.protocol}://${req.get('host')}`;
@@ -68,21 +68,37 @@ function generateSitemap(req: any, res: any) {
     <priority>0.8</priority>
   </url>`;
 
-    const categories = storage.getCategories();
-    categories.forEach(category => {
-      const categorySlug = category.name.toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-')
-        .trim();
-
+    // Add category URLs from database
+    awesomeListData.categories.forEach(category => {
       sitemap += `
   <url>
-    <loc>${baseUrl}/category/${categorySlug}</loc>
+    <loc>${baseUrl}/category/${category.slug}</loc>
     <lastmod>${currentDate}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>`;
+      
+      // Add subcategory URLs
+      category.subcategories?.forEach(subcategory => {
+        sitemap += `
+  <url>
+    <loc>${baseUrl}/subcategory/${subcategory.slug}</loc>
+    <lastmod>${currentDate}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>`;
+        
+        // Add sub-subcategory URLs
+        subcategory.subSubcategories?.forEach(subSubcategory => {
+          sitemap += `
+  <url>
+    <loc>${baseUrl}/sub-subcategory/${subSubcategory.slug}</loc>
+    <lastmod>${currentDate}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>`;
+        });
+      });
     });
 
     sitemap += `
@@ -96,13 +112,24 @@ function generateSitemap(req: any, res: any) {
   }
 }
 
-function generateOpenGraphImage(req: any, res: any) {
+async function generateOpenGraphImage(req: any, res: any) {
   try {
     const { title, category, resourceCount } = req.query;
-    const awesomeListData = storage.getAwesomeListData();
     
-    const pageTitle = title || awesomeListData?.title || 'Awesome List';
-    const count = resourceCount || awesomeListData?.resources?.length || '2750+';
+    // Use database count if not provided in query
+    let count = resourceCount;
+    let pageTitle = title;
+    
+    if (!count || !pageTitle) {
+      try {
+        const awesomeListData = await storage.getAwesomeListFromDatabase();
+        if (!pageTitle) pageTitle = awesomeListData?.title || 'Awesome Video';
+        if (!count) count = awesomeListData?.resources?.length?.toString() || '2600+';
+      } catch {
+        pageTitle = pageTitle || 'Awesome Video';
+        count = count || '2600+';
+      }
+    }
 
     const svg = `<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
   <defs>
@@ -1798,14 +1825,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ============= Legacy Routes (from existing code) =============
+  // ============= Database-Driven Routes =============
 
-  // API routes for awesome list (legacy)
-  app.get("/api/awesome-list", (req, res) => {
+  // API routes for awesome list - NOW SERVED FROM DATABASE
+  app.get("/api/awesome-list", async (req, res) => {
     try {
-      const data = storage.getAwesomeListData();
+      // Use database-driven hierarchy (replaces static JSON)
+      const data = await storage.getAwesomeListFromDatabase();
       
-      if (!data) {
+      if (!data || !data.resources || data.resources.length === 0) {
+        console.warn('⚠️ No resources in database - database may need seeding');
         return res.status(500).json({ error: 'No awesome list data available' });
       }
 
@@ -1848,6 +1877,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         resources: filteredResources
       };
       
+      console.log(`📊 /api/awesome-list: ${filteredResources.length} resources, ${data.categories.length} categories`);
       res.json(filteredData);
     } catch (error) {
       console.error('Error processing awesome list:', error);
@@ -2084,22 +2114,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
  * Run background initialization tasks AFTER the server has started listening.
  * This ensures fast startup for production deployments.
  * These tasks are non-blocking and run in the background.
+ * 
+ * NOTE: /api/awesome-list now serves data from the PostgreSQL database
+ * directly via storage.getAwesomeListFromDatabase(). No static JSON loading required.
  */
 export async function runBackgroundInitialization(): Promise<void> {
   const isProduction = process.env.NODE_ENV === 'production';
   
   console.log(`🔄 Running background initialization (${isProduction ? 'production' : 'development'} mode)...`);
-  
-  // ALWAYS initialize awesome video data (required for /api/awesome-list endpoint)
-  // This is fast (just fetching JSON) and needed in both dev and production
-  try {
-    console.log('Fetching awesome-video data from JSON source');
-    const awesomeVideoData = await fetchAwesomeVideoData();
-    storage.setAwesomeListData(awesomeVideoData);
-    console.log(`Successfully fetched awesome-video with ${awesomeVideoData.resources.length} resources`);
-  } catch (error) {
-    console.error(`Error fetching awesome-video data: ${error}`);
-  }
+  console.log('📊 Note: /api/awesome-list now serves from PostgreSQL database');
 
   // In production, skip auto-seeding - database should be pre-populated
   if (isProduction) {

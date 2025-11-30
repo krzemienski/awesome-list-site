@@ -2,9 +2,18 @@
 
 ## Overview
 
-A production-ready React application for browsing and discovering over 2,000 curated video development resources from the `krzemienski/awesome-video` GitHub repository. The project aims to provide a modern, mobile-optimized user interface with advanced search and filtering capabilities, dark theme support, and Google Analytics tracking. Future ambitions include transforming it into an AI-powered learning platform with user authentication, personalized recommendations, structured learning paths, an admin panel, and bidirectional GitHub synchronization for `awesome-list` repositories.
+A production-ready React application for browsing and discovering over 2,600 curated video development resources. The project uses PostgreSQL as the single source of truth for all data, providing a modern, mobile-optimized user interface with advanced search and filtering capabilities, dark theme support, and Google Analytics tracking. Features include AI-powered learning platform capabilities, user authentication, admin panel, and bidirectional GitHub synchronization for `awesome-list` repositories.
 
 ## Recent Changes (November 30, 2025)
+
+### ✅ DATABASE-DRIVEN ARCHITECTURE (Major Milestone)
+- **Eliminated static JSON dependency** - `/api/awesome-list` now serves directly from PostgreSQL database
+- Added `getAwesomeListFromDatabase()` method to storage interface for complete hierarchical data
+- Removed legacy JSON fetching from background initialization
+- Deleted static JSON files (`client/public/data/awesome-list.json`, `dist/public/data/awesome-list.json`)
+- Simplified `client/src/lib/static-data.ts` to only use API endpoints
+- **Result**: Single source of truth for all resource and category data
+- **Current stats**: 2,646 resources, 9 categories, 60 navigation items (3-level hierarchy)
 
 ### ✅ Deployment Fix - Fast Server Startup
 - **Fixed production deployment timeout issue** - Server now starts listening on port 5000 IMMEDIATELY before any database operations
@@ -57,13 +66,16 @@ A production-ready React application for browsing and discovering over 2,000 cur
 - **Formatter Output**: Fixed consecutive blank lines in GitHub export markdown.
 
 ### 📊 Current Database Status
-- **Total Resources**: 2,647 (development database)
-- **Static Resources**: 2,011 (from static JSON)
-- **Categories**: 21 unique categories
+- **Total Resources**: 2,646 (all from PostgreSQL database)
+- **Categories**: 9 top-level categories
+- **Subcategories**: 19 subcategories
+- **Sub-subcategories**: 32 sub-subcategories
+- **Total Navigation Items**: 60
 - **GitHub Synced**: 968 resources (from krzemienski/awesome-video)
 - **AI Enriched**: 31 resources
 - **Approved**: 2,645 resources
 - **Pending**: 1 resource
+- **Static JSON**: DEPRECATED (no longer used)
 
 ## User Preferences
 
@@ -82,9 +94,9 @@ The application employs a client-server architecture. The frontend is a React-ba
 ### Technical Implementations
 - **Frontend**: React 18+ with TypeScript, Vite, Tailwind CSS, `shadcn/ui`, React Query for state management, Wouter for routing.
 - **Backend**: Express.js, Drizzle ORM, Node Fetch for external data, Remark for Markdown parsing.
-- **Data Architecture**: Pure JSON-driven parser for dynamic hierarchy building, supporting a 3-level hierarchical structure. Resources are categorized uniquely at their deepest level, with parent categories aggregating counts. Intelligent content-based auto-categorization is implemented for resources lacking specific subcategory IDs.
+- **Data Architecture**: PostgreSQL database serves as single source of truth. `getAwesomeListFromDatabase()` method builds complete hierarchical structure from database tables (categories → subcategories → sub-subcategories with LEFT JOINs). Supports 3-level hierarchy with accurate resource counts at each level.
 - **Sidebar Layout**: CSS Grid-based layout on desktop (`grid-cols-[var(--sidebar-width)_1fr]`), dynamically adjusting when collapsed.
-- **Deployment**: Configured for deployment on Replit, with optimized production builds and static site generation.
+- **Deployment**: Configured for deployment on Replit, with optimized production builds. Database must be seeded for production (`/api/admin/seed-database`).
 
 ### Feature Specifications
 - **Search & Discovery**: Advanced fuzzy search across all resources with keyboard shortcut (⌘K), powered by Fuse.js.
