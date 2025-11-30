@@ -3,8 +3,6 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { extractUser, isAuthenticated, isAdmin as supabaseIsAdmin } from "./supabaseAuth";
 import passport from "passport";
-import { fetchAwesomeList } from "./parser";
-import { fetchAwesomeVideoData } from "./awesome-video-parser-clean";
 import { RecommendationEngine, UserProfile } from "./recommendation-engine";
 import { fetchAwesomeLists, searchAwesomeLists } from "./github-api";
 import { insertResourceSchema } from "@shared/schema";
@@ -25,16 +23,13 @@ const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubuserco
 const isAdmin = supabaseIsAdmin;
 
 // SEO route handlers
-function generateSitemap(req: any, res: any) {
+async function generateSitemap(req: any, res: any) {
   try {
-    const awesomeListData = storage.getAwesomeListData();
-    
-    if (!awesomeListData) {
-      return res.status(404).send('Sitemap not available - no data loaded');
-    }
-
     const baseUrl = `${req.protocol}://${req.get('host')}`;
     const currentDate = new Date().toISOString().split('T')[0];
+
+    // Fetch categories from database instead of in-memory cache
+    const categories = await storage.listCategories();
 
     let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -51,17 +46,10 @@ function generateSitemap(req: any, res: any) {
     <priority>0.8</priority>
   </url>`;
 
-    const categories = storage.getCategories();
     categories.forEach(category => {
-      const categorySlug = category.name.toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-')
-        .trim();
-
       sitemap += `
   <url>
-    <loc>${baseUrl}/category/${categorySlug}</loc>
+    <loc>${baseUrl}/category/${category.slug}</loc>
     <lastmod>${currentDate}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -79,13 +67,18 @@ function generateSitemap(req: any, res: any) {
   }
 }
 
-function generateOpenGraphImage(req: any, res: any) {
+async function generateOpenGraphImage(req: any, res: any) {
   try {
     const { title, category, resourceCount } = req.query;
-    const awesomeListData = storage.getAwesomeListData();
-    
-    const pageTitle = title || awesomeListData?.title || 'Awesome List';
-    const count = resourceCount || awesomeListData?.resources?.length || '2750+';
+
+    // Get resource count from database if not provided in query
+    let count = resourceCount;
+    if (!count) {
+      const { total } = await storage.listResources({ page: 1, limit: 1, status: 'approved' });
+      count = total;
+    }
+
+    const pageTitle = title || 'Awesome Video Resources';
 
     const svg = `<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
   <defs>
@@ -259,15 +252,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   */
 
-  // Initialize awesome video data
-  try {
-    console.log('Fetching awesome-video data from JSON source');
-    const awesomeVideoData = await fetchAwesomeVideoData();
-    storage.setAwesomeListData(awesomeVideoData);
-    console.log(`Successfully fetched awesome-video with ${awesomeVideoData.resources.length} resources`);
-  } catch (error) {
-    console.error(`Error fetching awesome-video data: ${error}`);
-  }
+  // Removed static JSON initialization - database is single source of truth
+  // Resources loaded from PostgreSQL via Supabase, seeded via /api/admin/seed-database
 
   // Auto-seed database on first startup
   try {
@@ -537,12 +523,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= Category Routes =============
   
   // GET /api/categories - List all categories (public)
+  // GET /api/categories - Hierarchical categories with nested structure
   app.get('/api/categories', async (req, res) => {
     try {
-      const categories = await storage.listCategories();
-      res.json(categories);
+      // Return complete hierarchical structure with resources at all levels
+      const hierarchical = await storage.getHierarchicalCategories();
+      res.json(hierarchical);
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      console.error('Error fetching hierarchical categories:', error);
       res.status(500).json({ message: 'Failed to fetch categories' });
     }
   });
@@ -1850,83 +1838,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ============= Legacy Routes (from existing code) =============
-
-  // API routes for awesome list (legacy)
-  app.get("/api/awesome-list", (req, res) => {
-    try {
-      const data = storage.getAwesomeListData();
-      
-      if (!data) {
-        return res.status(500).json({ error: 'No awesome list data available' });
-      }
-
-      // Extract query parameters for filtering
-      const { category, subcategory, subSubcategory } = req.query;
-      
-      let filteredResources = data.resources;
-
-      // Apply filtering based on query parameters
-      if (category) {
-        // Convert category slug back to title for filtering
-        const categoryTitle = getCategoryTitleFromSlug(category as string);
-        filteredResources = filteredResources.filter((resource: any) => 
-          resource.category === categoryTitle
-        );
-        console.log(`📁 Filtered by category "${categoryTitle}": ${filteredResources.length} resources`);
-      }
-
-      if (subcategory) {
-        // Convert subcategory slug back to title for filtering
-        const subcategoryTitle = getSubcategoryTitleFromSlug(subcategory as string);
-        filteredResources = filteredResources.filter((resource: any) => 
-          resource.subcategory === subcategoryTitle
-        );
-        console.log(`📂 Filtered by subcategory "${subcategoryTitle}": ${filteredResources.length} resources`);
-      }
-
-      if (subSubcategory) {
-        // Convert sub-subcategory slug back to title for filtering
-        const subSubcategoryTitle = getSubSubcategoryTitleFromSlug(subSubcategory as string);
-        filteredResources = filteredResources.filter((resource: any) => 
-          resource.subSubcategory === subSubcategoryTitle
-        );
-        console.log(`🎯 Filtered by sub-subcategory "${subSubcategoryTitle}": ${filteredResources.length} resources`);
-      }
-
-      // Return filtered data
-      const filteredData = {
-        ...data,
-        resources: filteredResources
-      };
-      
-      res.json(filteredData);
-    } catch (error) {
-      console.error('Error processing awesome list:', error);
-      res.status(500).json({ error: 'Failed to process awesome list' });
-    }
-  });
-
-  // New endpoint to switch lists
-  app.post("/api/switch-list", async (req, res) => {
-    try {
-      const { rawUrl } = req.body;
-      
-      if (!rawUrl) {
-        return res.status(400).json({ error: 'Raw URL is required' });
-      }
-      
-      console.log(`Switching to list: ${rawUrl}`);
-      const data = await fetchAwesomeList(rawUrl);
-      storage.setAwesomeListData(data);
-      
-      console.log(`Successfully switched to list with ${data.resources.length} resources`);
-      res.json(data);
-    } catch (error) {
-      console.error('Error switching list:', error);
-      res.status(500).json({ error: 'Failed to switch list' });
-    }
-  });
+  // ============= Legacy Routes Removed =============
+  // Removed /api/awesome-list - use /api/resources with filters instead
+  // Removed /api/switch-list - database is single source of truth, use GitHub import for new lists
 
   // GitHub awesome lists discovery routes
   app.get("/api/github/awesome-lists", async (req, res) => {

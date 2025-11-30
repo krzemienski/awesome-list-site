@@ -183,13 +183,10 @@ export interface IStorage {
   getEnrichmentQueueItemsByJob(jobId: string): Promise<EnrichmentQueueItem[]>;
   getPendingEnrichmentQueueItems(jobId: string, limit?: number): Promise<EnrichmentQueueItem[]>;
   updateEnrichmentQueueItem(id: string, data: Partial<EnrichmentQueueItem>): Promise<EnrichmentQueueItem>;
-  
-  // Legacy methods for awesome list (in-memory)
-  setAwesomeListData(data: any): void;
-  getAwesomeListData(): any | null;
-  getCategories(): any[];
-  getResources(): any[];
-  
+
+  // Hierarchical categories (for frontend navigation)
+  getHierarchicalCategories(): Promise<any[]>; // Returns Category[] type with nested structure
+
   // Legacy methods - kept for backward compatibility
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: UpsertUser): Promise<User>;
@@ -240,9 +237,6 @@ interface ValidationResults {
 }
 
 export class DatabaseStorage implements IStorage {
-  // In-memory storage for awesome list compatibility
-  private awesomeListData: any = null;
-
   // User operations (using Supabase Admin for auth.users)
   async getUser(id: string): Promise<User | undefined> {
     const { supabaseAdmin } = await import('./supabaseAuth');
@@ -588,6 +582,84 @@ export class DatabaseStorage implements IStorage {
   // Category management
   async listCategories(): Promise<Category[]> {
     return await db.select().from(categories).orderBy(asc(categories.name));
+  }
+
+  /**
+   * Get hierarchical categories with nested subcategories, sub-subcategories, and resources
+   * Returns complete Category[] structure for frontend navigation
+   */
+  async getHierarchicalCategories(): Promise<any[]> {
+    // Fetch all hierarchy data and resources in parallel
+    const [categoriesList, subcategoriesList, subSubcategoriesList, allResources] = await Promise.all([
+      db.select().from(categories).orderBy(asc(categories.name)),
+      db.select().from(subcategories),
+      db.select().from(subSubcategories),
+      db.select().from(resources).where(eq(resources.status, 'approved'))
+    ]);
+
+    // Build lookup maps for O(1) access
+    const subcategoryMap = new Map<string, any[]>();
+    subcategoriesList.forEach(sub => {
+      if (!sub.categoryId) return; // Skip if null
+      if (!subcategoryMap.has(sub.categoryId)) {
+        subcategoryMap.set(sub.categoryId, []);
+      }
+      subcategoryMap.get(sub.categoryId)!.push(sub);
+    });
+
+    const subSubcategoryMap = new Map<string, any[]>();
+    subSubcategoriesList.forEach(subsub => {
+      if (!subsub.subcategoryId) return; // Skip if null
+      if (!subSubcategoryMap.has(subsub.subcategoryId)) {
+        subSubcategoryMap.set(subsub.subcategoryId, []);
+      }
+      subSubcategoryMap.get(subsub.subcategoryId)!.push(subsub);
+    });
+
+    // Build nested structure
+    const result = categoriesList.map(cat => {
+      // Get all resources for this category
+      const categoryResources = allResources.filter(r => r.category === cat.name);
+      
+      // Get subcategories for this category
+      const subs = subcategoryMap.get(cat.id) || [];
+      
+      return {
+        id: cat.id,
+        name: cat.name,
+        slug: cat.slug,
+        // Resources directly under category (no subcategory)
+        resources: categoryResources.filter(r => !r.subcategory),
+        subcategories: subs.map(sub => {
+          // Get resources for this subcategory
+          const subcategoryResources = categoryResources.filter(r => 
+            r.subcategory === sub.name
+          );
+          
+          // Get sub-subcategories for this subcategory
+          const subSubs = subSubcategoryMap.get(sub.id) || [];
+          
+          return {
+            id: sub.id,
+            name: sub.name,
+            slug: sub.slug,
+            // Resources directly under subcategory (no sub-subcategory)
+            resources: subcategoryResources.filter(r => !r.subSubcategory),
+            subSubcategories: subSubs.map(subsub => ({
+              id: subsub.id,
+              name: subsub.name,
+              slug: subsub.slug,
+              // Resources at most specific level
+              resources: subcategoryResources.filter(r => 
+                r.subSubcategory === subsub.name
+              )
+            }))
+          };
+        })
+      };
+    });
+
+    return result;
   }
   
   async getCategory(id: string): Promise<Category | undefined> {
@@ -1273,57 +1345,7 @@ export class DatabaseStorage implements IStorage {
       lastUpdated: awesomeLint?.timestamp || linkCheck?.timestamp || undefined
     };
   }
-  
-  // Legacy methods for awesome list (in-memory)
-  setAwesomeListData(data: any): void {
-    this.awesomeListData = data;
-  }
 
-  getAwesomeListData(): any | null {
-    return this.awesomeListData;
-  }
-
-  getCategories(): any[] {
-    if (!this.awesomeListData) return [];
-    
-    const categories = new Map();
-    this.awesomeListData.resources.forEach((resource: any) => {
-      if (resource.category) {
-        if (!categories.has(resource.category)) {
-          categories.set(resource.category, {
-            name: resource.category,
-            slug: resource.category.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-            resources: [],
-            subcategories: new Map()
-          });
-        }
-        
-        const category = categories.get(resource.category);
-        category.resources.push(resource);
-        
-        if (resource.subcategory) {
-          if (!category.subcategories.has(resource.subcategory)) {
-            category.subcategories.set(resource.subcategory, {
-              name: resource.subcategory,
-              slug: resource.subcategory.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-              resources: []
-            });
-          }
-          category.subcategories.get(resource.subcategory).resources.push(resource);
-        }
-      }
-    });
-    
-    return Array.from(categories.values()).map(cat => ({
-      ...cat,
-      subcategories: Array.from(cat.subcategories.values())
-    }));
-  }
-
-  getResources(): any[] {
-    return this.awesomeListData?.resources || [];
-  }
-  
   // Enrichment Jobs
   async createEnrichmentJob(data: InsertEnrichmentJob): Promise<EnrichmentJob> {
     const [job] = await db
@@ -1416,7 +1438,6 @@ export class DatabaseStorage implements IStorage {
 // For backward compatibility, export both MemStorage and DatabaseStorage
 export class MemStorage implements IStorage {
   private users: Map<string, User>;
-  private awesomeListData: any = null;
   currentId: number;
 
   constructor() {
@@ -1512,6 +1533,11 @@ export class MemStorage implements IStorage {
   }
 
   async listCategories(): Promise<Category[]> { return []; }
+
+  async getHierarchicalCategories(): Promise<any[]> {
+    // MemStorage not used in production (DATABASE_URL always set)
+    return [];
+  }
   async getCategory(id: string): Promise<Category | undefined> { return undefined; }
   async createCategory(category: InsertCategory): Promise<Category> {
     throw new Error("Not implemented in memory storage");
@@ -1662,57 +1688,7 @@ export class MemStorage implements IStorage {
       lastUpdated: awesomeLint?.timestamp || linkCheck?.timestamp || undefined
     };
   }
-  
-  // Legacy methods for awesome list (in-memory)
-  setAwesomeListData(data: any): void {
-    this.awesomeListData = data;
-  }
 
-  getAwesomeListData(): any | null {
-    return this.awesomeListData;
-  }
-
-  getCategories(): any[] {
-    if (!this.awesomeListData) return [];
-    
-    const categories = new Map();
-    this.awesomeListData.resources.forEach((resource: any) => {
-      if (resource.category) {
-        if (!categories.has(resource.category)) {
-          categories.set(resource.category, {
-            name: resource.category,
-            slug: resource.category.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-            resources: [],
-            subcategories: new Map()
-          });
-        }
-        
-        const category = categories.get(resource.category);
-        category.resources.push(resource);
-        
-        if (resource.subcategory) {
-          if (!category.subcategories.has(resource.subcategory)) {
-            category.subcategories.set(resource.subcategory, {
-              name: resource.subcategory,
-              slug: resource.subcategory.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-              resources: []
-            });
-          }
-          category.subcategories.get(resource.subcategory).resources.push(resource);
-        }
-      }
-    });
-    
-    return Array.from(categories.values()).map(cat => ({
-      ...cat,
-      subcategories: Array.from(cat.subcategories.values())
-    }));
-  }
-
-  getResources(): any[] {
-    return this.awesomeListData?.resources || [];
-  }
-  
   // Enrichment Jobs - Not implemented for MemStorage
   async createEnrichmentJob(data: InsertEnrichmentJob): Promise<EnrichmentJob> {
     throw new Error("Enrichment not implemented in memory storage");
