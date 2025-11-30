@@ -184,7 +184,7 @@ describe('ResourceFilters', () => {
     expect(parentBadge).toBeInTheDocument();
 
     // Click the X button within the badge
-    const removeButton = within(parentBadge!).getByRole('button');
+    const removeButton = within(parentBadge! as HTMLElement).getByRole('button');
     await user.click(removeButton);
 
     // Should call onFilterChange with status removed

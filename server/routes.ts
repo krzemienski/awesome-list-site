@@ -296,7 +296,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log('Server will continue without seeding. You can manually seed via /api/admin/seed-database');
   }
 
-  // ============= Auth Routes (from Replit Auth blueprint) =============
+  // ============= Auth Routes =============
   
   // GET /api/auth/user - Get current user (public endpoint)
   app.get('/api/auth/user', async (req: any, res) => {

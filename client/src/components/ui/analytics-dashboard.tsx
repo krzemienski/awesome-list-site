@@ -136,33 +136,33 @@ export default function AnalyticsDashboard({
       .sort((a, b) => b.count - a.count)
       .slice(0, 20);
 
-    // Popular resources (mock data based on actual resources)
+    // Popular resources (deterministic mock data based on resource index)
     const popularResources = resources
       .slice(0, 20)
       .map((resource, index) => ({
         resource,
-        views: Math.floor(Math.random() * 1000) + 100,
-        clicks: Math.floor(Math.random() * 500) + 50,
+        views: ((index * 47 + 123) % 900) + 100,
+        clicks: ((index * 31 + 67) % 450) + 50,
         trending: index < 5,
-        lastViewed: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString()
+        lastViewed: new Date(Date.now() - ((index * 24 * 60 * 60 * 1000) % (7 * 24 * 60 * 60 * 1000))).toISOString()
       }))
       .sort((a, b) => b.views - a.views);
 
-    // Views trend (mock data)
+    // Views trend (deterministic mock data)
     const viewsTrend = Array.from({ length: 30 }, (_, i) => {
       const date = new Date();
       date.setDate(date.getDate() - (29 - i));
       return {
         date: date.toISOString().split('T')[0],
-        views: Math.floor(Math.random() * 500) + 100,
-        clicks: Math.floor(Math.random() * 200) + 50
+        views: ((i * 17 + 123) % 400) + 100,
+        clicks: ((i * 13 + 89) % 150) + 50
       };
     });
 
-    // Time of day usage (mock data)
+    // Time of day usage (deterministic mock data)
     const timeOfDayUsage = Array.from({ length: 24 }, (_, hour) => ({
       hour,
-      usage: Math.floor(Math.random() * 100) + 20
+      usage: ((hour * 7 + 31) % 80) + 20
     }));
 
     // Search terms from history
@@ -172,10 +172,10 @@ export default function AnalyticsDashboard({
     });
 
     const searchTerms = Object.entries(searchTermCount)
-      .map(([term, count]) => ({
+      .map(([term, count], index) => ({
         term,
         count,
-        growth: Math.floor(Math.random() * 40) - 20 // Mock growth percentage
+        growth: ((index * 11 + 13) % 40) - 20 // Mock growth percentage
       }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 10);

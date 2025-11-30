@@ -227,7 +227,7 @@ export default function SubmitResource() {
                 data-testid="button-login"
               >
                 <LogIn className="mr-2 h-4 w-4" />
-                Login with Replit
+                Login
               </Button>
               <Button 
                 variant="outline" 

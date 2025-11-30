@@ -10,7 +10,15 @@
     "check": "tsc",
     "db:push": "drizzle-kit push",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:desktop": "playwright test --project=chromium-desktop",
+    "test:e2e:mobile": "playwright test --project=chromium-mobile",
+    "test:e2e:tablet": "playwright test --project=chromium-tablet",
+    "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.37.0",

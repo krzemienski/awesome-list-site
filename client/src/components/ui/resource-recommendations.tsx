@@ -125,8 +125,9 @@ export default function ResourceRecommendations({
           reasons.push(`Open source on GitHub`);
         }
 
-        // Add some randomness to simulate trending
-        score += Math.random() * 2;
+        // Add deterministic variance to simulate trending
+        const hash = resource.id?.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) || 0;
+        score += (hash % 200) / 100; // Value between 0 and 2
 
         return { resource, score, reasons };
       })

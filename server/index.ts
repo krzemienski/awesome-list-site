@@ -60,8 +60,8 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // Serve on PORT from environment (default 5000 for Replit compatibility)
-  // In Docker: PORT=3000, In Replit: PORT=5000
+  // Serve on PORT from environment (default 5000)
+  // In Docker: PORT=3000
   const port = parseInt(process.env.PORT || '5000');
   server.listen({
     port,

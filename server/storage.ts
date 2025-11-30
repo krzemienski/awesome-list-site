@@ -53,7 +53,7 @@ import { eq, and, sql, desc, asc, inArray, like, or, isNull, isNotNull } from "d
 
 // Interface for storage operations
 export interface IStorage {
-  // User operations (MANDATORY for Replit Auth)
+  // User operations
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
   
@@ -244,7 +244,7 @@ export class DatabaseStorage implements IStorage {
   // In-memory storage for awesome list compatibility
   private awesomeListData: any = null;
 
-  // User operations (MANDATORY for Replit Auth)
+  // User operations
   async getUser(id: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;

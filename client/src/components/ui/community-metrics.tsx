@@ -97,21 +97,21 @@ export default function CommunityMetrics({ resources, categories, className }: C
         title: resource.title,
         category: resource.category,
         url: resource.url,
-        score: 100 - (index * 8) + Math.floor(Math.random() * 15),
+        score: 100 - (index * 8) + ((index * 3 + 7) % 15),
         trends: {
-          clicks: Math.floor(Math.random() * 1000) + 100,
-          searches: Math.floor(Math.random() * 500) + 50,
-          shares: Math.floor(Math.random() * 200) + 20
+          clicks: ((index * 37 + 100) % 900) + 100,
+          searches: ((index * 23 + 50) % 450) + 50,
+          shares: ((index * 17 + 20) % 180) + 20
         }
       }))
       .sort((a, b) => b.score - a.score);
 
     // Generate category metrics
-    const categoryMetrics: CategoryMetric[] = categories.map(category => ({
+    const categoryMetrics: CategoryMetric[] = categories.map((category, idx) => ({
       name: category.name,
       resourceCount: category.resources.length,
-      growthRate: Math.floor(Math.random() * 30) + 5,
-      engagement: Math.floor(Math.random() * 100) + 50,
+      growthRate: ((idx * 13 + 5) % 30) + 5,
+      engagement: ((idx * 19 + 50) % 100) + 50,
       completeness: Math.min(100, (category.resources.length / 20) * 100)
     })).sort((a, b) => b.engagement - a.engagement);
 
@@ -121,7 +121,7 @@ export default function CommunityMetrics({ resources, categories, className }: C
       categoryMetrics,
       totalContributions: resources.length,
       activeContributors: contributors.length,
-      weeklyGrowth: Math.floor(Math.random() * 15) + 5
+      weeklyGrowth: ((categories.length * 11 + 5) % 15) + 5
     };
   }, [resources, categories]);
 

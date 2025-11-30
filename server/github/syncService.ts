@@ -184,7 +184,7 @@ export class GitHubSyncService {
     };
 
     try {
-      // Get GitHub client with direct token (no Replit connector)
+      // Get GitHub client with direct token
       const githubClient = new GitHubClient(options?.githubToken || process.env.GITHUB_TOKEN);
       const octokit = (githubClient as any).octokit;
       
