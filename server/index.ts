@@ -1,11 +1,42 @@
 import 'dotenv/config';
 import express, { type Request, Response, NextFunction } from "express";
 import rateLimit from "express-rate-limit";
+import helmet from "helmet";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { handleSSR } from "./ssr";
 
 const app = express();
+
+// Security headers via helmet (Bug #9 fix - Session 7)
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"], // Vite needs unsafe-inline
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:", "https:", "blob:"],
+      connectSrc: [
+        "'self'",
+        "https://jeyldoypdkgsrfdhdcmm.supabase.co",
+        "https://api.anthropic.com"
+      ],
+      frameSrc: ["'none'"],
+      objectSrc: ["'none'"],
+    }
+  },
+  hsts: {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true
+  },
+  frameguard: { action: 'deny' },
+  noSniff: true,
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+  hidePoweredBy: true
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
