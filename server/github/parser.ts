@@ -243,6 +243,52 @@ export class AwesomeListParser {
   }
 
   /**
+   * Extract hierarchy structure from markdown headers
+   * Returns categories, subcategories with parent mapping, and sub-subcategories with parent mapping
+   */
+  extractHierarchy(): {
+    categories: Set<string>;
+    subcategories: Map<string, string>; // subcategory name → parent category name
+    subSubcategories: Map<string, { parent: string; category: string }>; // sub-subcategory name → {parent subcategory, grandparent category}
+  } {
+    const categories = new Set<string>();
+    const subcategories = new Map<string, string>();
+    const subSubcategories = new Map<string, { parent: string; category: string }>();
+
+    let currentCategory = '';
+    let currentSubcategory = '';
+
+    for (const line of this.lines) {
+      // Skip metadata sections
+      if (this.isMetadataSection(line) || this.isTableOfContents(line)) {
+        continue;
+      }
+
+      // Track category hierarchy from markdown headers
+      if (line.startsWith('## ') && !line.includes('Contents')) {
+        currentCategory = line.replace(/^## /, '').trim();
+        categories.add(currentCategory);
+        currentSubcategory = '';
+      } else if (line.startsWith('### ')) {
+        currentSubcategory = line.replace(/^### /, '').trim();
+        if (currentCategory) {
+          subcategories.set(currentSubcategory, currentCategory);
+        }
+      } else if (line.startsWith('#### ')) {
+        const subSubcategory = line.replace(/^#### /, '').trim();
+        if (currentCategory && currentSubcategory) {
+          subSubcategories.set(subSubcategory, {
+            parent: currentSubcategory,
+            category: currentCategory
+          });
+        }
+      }
+    }
+
+    return { categories, subcategories, subSubcategories };
+  }
+
+  /**
    * Parse YAML front matter if present
    */
   private parseFrontMatter(): Record<string, any> | null {

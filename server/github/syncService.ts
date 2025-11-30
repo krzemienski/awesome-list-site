@@ -70,11 +70,76 @@ export class GitHubSyncService {
       
       // Parse the awesome list
       console.log('Parsing awesome list content...');
-      const parsedList = await parseAwesomeList(readmeContent);
+      const parser = new (await import('./parser')).AwesomeListParser(readmeContent);
+      const parsedList = parser.parse();
+
+      // Extract and create hierarchy structure BEFORE creating resources
+      console.log('Extracting hierarchy structure...');
+      const hierarchy = parser.extractHierarchy();
+
+      console.log(`Found hierarchy: ${hierarchy.categories.size} categories, ${hierarchy.subcategories.size} subcategories, ${hierarchy.subSubcategories.size} sub-subcategories`);
+
+      // Create categories
+      for (const categoryName of Array.from(hierarchy.categories)) {
+        const slug = categoryName.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim();
+        const existing = await storage.listCategories();
+
+        if (!existing.find(c => c.name === categoryName)) {
+          await storage.createCategory({ name: categoryName, slug });
+          console.log(`  ✅ Created category: "${categoryName}"`);
+        }
+      }
+
+      // Create subcategories with parent FKs
+      for (const [subcategoryName, parentCategoryName] of Array.from(hierarchy.subcategories)) {
+        const parentCategory = (await storage.listCategories()).find(c => c.name === parentCategoryName);
+        if (!parentCategory) {
+          console.warn(`  ⚠️  Parent category not found: "${parentCategoryName}"`);
+          continue;
+        }
+
+        const slug = subcategoryName.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim();
+        const existing = await storage.listSubcategories(parentCategory.id);
+
+        if (!existing.find(s => s.name === subcategoryName)) {
+          await storage.createSubcategory({
+            name: subcategoryName,
+            slug,
+            categoryId: parentCategory.id
+          });
+          console.log(`  ✅ Created subcategory: "${subcategoryName}" → "${parentCategoryName}"`);
+        }
+      }
+
+      // Create sub-subcategories with parent FKs
+      for (const [subSubcategoryName, { parent: parentSubcategoryName, category: grandparentCategoryName }] of Array.from(hierarchy.subSubcategories)) {
+        const grandparentCategory = (await storage.listCategories()).find(c => c.name === grandparentCategoryName);
+        if (!grandparentCategory) continue;
+
+        const parentSubcategory = (await storage.listSubcategories(grandparentCategory.id)).find(s => s.name === parentSubcategoryName);
+        if (!parentSubcategory) {
+          console.warn(`  ⚠️  Parent subcategory not found: "${parentSubcategoryName}"`);
+          continue;
+        }
+
+        const slug = subSubcategoryName.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim();
+        const existing = await storage.listSubSubcategories(parentSubcategory.id);
+
+        if (!existing.find(ss => ss.name === subSubcategoryName)) {
+          await storage.createSubSubcategory({
+            name: subSubcategoryName,
+            slug,
+            subcategoryId: parentSubcategory.id
+          });
+          console.log(`  ✅ Created sub-subcategory: "${subSubcategoryName}" → "${parentSubcategoryName}" → "${grandparentCategoryName}"`);
+        }
+      }
+
+      console.log('✅ Hierarchy tables populated from markdown structure');
+
       const dbResources = convertToDbResources(parsedList);
-      
       console.log(`Found ${dbResources.length} resources in the awesome list`);
-      
+
       // Process each resource
       for (const resource of dbResources) {
         try {
