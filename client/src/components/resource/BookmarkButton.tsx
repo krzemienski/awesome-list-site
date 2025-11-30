@@ -33,6 +33,17 @@ export default function BookmarkButton({
   size = "default",
   showNotesDialog = true
 }: BookmarkButtonProps) {
+  // UUID validation: Only allow bookmarking database resources with valid UUIDs
+  // Static resources from awesome-list JSON have IDs like "video-34" which aren't valid UUIDs
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const cleanId = resourceId.startsWith('db-') ? resourceId.slice(3) : resourceId;
+  const isValidDatabaseResource = uuidRegex.test(cleanId);
+
+  // Don't render bookmark button for static resources (can't be bookmarked - PostgreSQL UUID constraint)
+  if (!isValidDatabaseResource) {
+    return null;
+  }
+
   const [isBookmarked, setIsBookmarked] = useState(initialBookmarked);
   const [notes, setNotes] = useState(initialNotes);
   const [notesDialogOpen, setNotesDialogOpen] = useState(false);

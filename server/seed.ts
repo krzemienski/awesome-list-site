@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 import { storage } from "./storage";
 import { db } from "./db";
-import { categories, subcategories, subSubcategories, resources, users } from "@shared/schema";
+import { categories, subcategories, subSubcategories, resources } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import { hashPassword } from "./passwordUtils";
 
@@ -133,20 +133,27 @@ export interface SeedResult {
   errors: string[];
 }
 
+// NOTE: Admin user creation moved to Supabase Auth
+// Create admin users via Supabase Dashboard → Auth → Users → Add User
+// Then promote: UPDATE auth.users SET raw_user_meta_data = jsonb_set(raw_user_meta_data, '{role}', '"admin"') WHERE email = 'admin@test.com';
 async function seedAdminUser(): Promise<boolean> {
   try {
+    console.log(`ℹ️  Admin users now managed via Supabase Auth - use Supabase dashboard or SQL to create/promote admins`);
+    return false;
+
+    /* LEGACY CODE - users table no longer exists
     const adminEmail = "admin@example.com";
     const adminPassword = "admin123";
-    
+
     const existingAdmin = await db.select().from(users).where(eq(users.email, adminEmail)).limit(1);
-    
+
     if (existingAdmin.length > 0) {
       console.log(`ℹ️  Default admin user already exists (${adminEmail})`);
       return false;
     }
-    
+
     const hashedPassword = await hashPassword(adminPassword);
-    
+
     await db.insert(users).values({
       email: adminEmail,
       password: hashedPassword,
@@ -162,10 +169,11 @@ async function seedAdminUser(): Promise<boolean> {
     console.log(`Password: ${adminPassword}`);
     console.log(`⚠️  IMPORTANT: Change this password after first login!`);
     console.log(`${'='.repeat(60)}\n`);
-    
+
     return true;
+    */
   } catch (error: any) {
-    console.error(`❌ Failed to create admin user: ${error.message}`);
+    console.error(`❌ Admin user creation deprecated: ${error.message}`);
     return false;
   }
 }

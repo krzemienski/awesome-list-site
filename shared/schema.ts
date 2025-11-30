@@ -3,32 +3,35 @@ import { pgTable, text, serial, varchar, timestamp, integer, boolean, jsonb, ind
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Session storage table for Replit Auth
-export const sessions = pgTable(
-  "sessions",
-  {
-    sid: varchar("sid").primaryKey(),
-    sess: jsonb("sess").notNull(),
-    expire: timestamp("expire").notNull(),
-  },
-  (table) => [index("IDX_session_expire").on(table.expire)],
-);
+// NOTE: Sessions and Users tables removed - using Supabase Auth (auth.users)
+// User authentication managed by Supabase Auth, not custom users table
+// Foreign keys to auth.users are defined as uuid columns without .references()
+// since auth schema is managed externally by Supabase
 
-// Users table for Replit Auth and local authentication
-export const users = pgTable("users", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  email: varchar("email").unique(),
-  password: varchar("password"), // For local authentication (hashed with bcrypt)
-  firstName: varchar("first_name"),
-  lastName: varchar("last_name"),
-  profileImageUrl: varchar("profile_image_url"),
-  role: text("role").default("user"), // user, admin, moderator
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+// User types for Supabase auth.users (external table, not managed by Drizzle)
+export interface User {
+  id: string; // uuid from Supabase
+  email: string;
+  user_metadata?: {
+    role?: 'user' | 'admin' | 'moderator';
+    first_name?: string;
+    last_name?: string;
+    avatar_url?: string;
+  };
+  created_at?: string;
+  updated_at?: string;
+}
 
-export type UpsertUser = typeof users.$inferInsert;
-export type User = typeof users.$inferSelect;
+export interface UpsertUser {
+  id?: string;
+  email: string;
+  user_metadata?: {
+    role?: 'user' | 'admin' | 'moderator';
+    first_name?: string;
+    last_name?: string;
+    avatar_url?: string;
+  };
+}
 
 // Resource schema (enhanced with approval workflow)
 export const resources = pgTable(
@@ -42,8 +45,8 @@ export const resources = pgTable(
     subcategory: text("subcategory"),
     subSubcategory: text("sub_subcategory"),
     status: text("status").default("approved"), // pending, approved, rejected, archived
-    submittedBy: varchar("submitted_by").references(() => users.id, { onDelete: "cascade" }),
-    approvedBy: varchar("approved_by").references(() => users.id),
+    submittedBy: uuid("submitted_by"), // References auth.users.id (Supabase managed)
+    approvedBy: uuid("approved_by"), // References auth.users.id (Supabase managed)
     approvedAt: timestamp("approved_at"),
     githubSynced: boolean("github_synced").default(false),
     lastSyncedAt: timestamp("last_synced_at"),
@@ -79,7 +82,7 @@ export const resourceEdits = pgTable(
   {
     id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
     resourceId: uuid("resource_id").references(() => resources.id).notNull(),
-    submittedBy: varchar("submitted_by").references(() => users.id).notNull(),
+    submittedBy: uuid("submitted_by").notNull(), // References auth.users.id (Supabase managed)
     status: text("status").$type<"pending" | "approved" | "rejected">().default("pending").notNull(),
     
     originalResourceUpdatedAt: timestamp("original_resource_updated_at").notNull(),
@@ -97,8 +100,8 @@ export const resourceEdits = pgTable(
       keyTopics?: string[];
     }>(),
     claudeAnalyzedAt: timestamp("claude_analyzed_at"),
-    
-    handledBy: varchar("handled_by").references(() => users.id),
+
+    handledBy: uuid("handled_by"), // References auth.users.id (Supabase managed)
     handledAt: timestamp("handled_at"),
     rejectionReason: text("rejection_reason"),
     
@@ -286,7 +289,7 @@ export type JourneyStep = typeof journeySteps.$inferSelect;
 export const userFavorites = pgTable(
   "user_favorites",
   {
-    userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+    userId: uuid("user_id").notNull(), // References auth.users.id (Supabase managed)
     resourceId: uuid("resource_id").references(() => resources.id, { onDelete: "cascade" }).notNull(),
     createdAt: timestamp("created_at").defaultNow(),
   },
@@ -299,7 +302,7 @@ export const userFavorites = pgTable(
 export const userBookmarks = pgTable(
   "user_bookmarks",
   {
-    userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+    userId: uuid("user_id").notNull(), // References auth.users.id (Supabase managed)
     resourceId: uuid("resource_id").references(() => resources.id, { onDelete: "cascade" }).notNull(),
     notes: text("notes"),
     createdAt: timestamp("created_at").defaultNow(),
@@ -314,7 +317,7 @@ export const userJourneyProgress = pgTable(
   "user_journey_progress",
   {
     id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
-    userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+    userId: uuid("user_id").notNull(), // References auth.users.id (Supabase managed)
     journeyId: uuid("journey_id").references(() => learningJourneys.id, { onDelete: "cascade" }).notNull(),
     currentStepId: uuid("current_step_id").references(() => journeySteps.id),
     completedSteps: jsonb("completed_steps").$type<string[]>().default([]),
@@ -344,7 +347,7 @@ export const resourceAuditLog = pgTable("resource_audit_log", {
   id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
   resourceId: uuid("resource_id").references(() => resources.id, { onDelete: "cascade" }),
   action: text("action").notNull(), // created, updated, approved, rejected, synced
-  performedBy: varchar("performed_by").references(() => users.id, { onDelete: "cascade" }),
+  performedBy: uuid("performed_by"), // References auth.users.id (Supabase managed)
   changes: jsonb("changes").$type<Record<string, any>>(),
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow(),
@@ -387,7 +390,7 @@ export const userPreferences = pgTable(
   "user_preferences",
   {
     id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
-    userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+    userId: uuid("user_id").notNull(), // References auth.users.id (Supabase managed)
     preferredCategories: jsonb("preferred_categories").$type<string[]>().default([]),
     skillLevel: text("skill_level").notNull().default("beginner"), // beginner, intermediate, advanced
     learningGoals: jsonb("learning_goals").$type<string[]>().default([]),
@@ -419,7 +422,7 @@ export const userInteractions = pgTable(
   "user_interactions",
   {
     id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
-    userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+    userId: uuid("user_id").notNull(), // References auth.users.id (Supabase managed)
     resourceId: uuid("resource_id").references(() => resources.id, { onDelete: "cascade" }).notNull(),
     interactionType: text("interaction_type").notNull(), // view, click, bookmark, rate, complete
     interactionValue: integer("interaction_value"), // rating (1-5) or time spent
@@ -458,7 +461,7 @@ export const githubSyncHistory = pgTable(
     resourcesUpdated: integer("resources_updated").default(0),
     resourcesRemoved: integer("resources_removed").default(0),
     totalResources: integer("total_resources").default(0),
-    performedBy: varchar("performed_by").references(() => users.id),
+    performedBy: uuid("performed_by"), // References auth.users.id (Supabase managed)
     snapshot: jsonb("snapshot").$type<Record<string, any>>().default({}), // Resource snapshot
     metadata: jsonb("metadata").$type<Record<string, any>>().default({}),
     createdAt: timestamp("created_at").defaultNow(),
@@ -504,7 +507,7 @@ export const enrichmentJobs = pgTable(
     failedResourceIds: jsonb("failed_resource_ids").$type<string[]>().default([]),
     errorMessage: text("error_message"),
     metadata: jsonb("metadata").$type<Record<string, any>>().default({}),
-    startedBy: varchar("started_by").references(() => users.id),
+    startedBy: uuid("started_by"), // References auth.users.id (Supabase managed)
     startedAt: timestamp("started_at"),
     completedAt: timestamp("completed_at"),
     createdAt: timestamp("created_at").defaultNow(),

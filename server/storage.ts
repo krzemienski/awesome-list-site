@@ -1,5 +1,4 @@
 import {
-  users,
   resources,
   categories,
   subcategories,
@@ -244,45 +243,18 @@ export class DatabaseStorage implements IStorage {
   // In-memory storage for awesome list compatibility
   private awesomeListData: any = null;
 
-  // User operations
+  // User operations (using Supabase Admin for auth.users)
   async getUser(id: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user;
+    const { supabaseAdmin } = await import('./supabaseAuth');
+    const { data, error } = await supabaseAdmin.auth.admin.getUserById(id);
+    if (error || !data.user) return undefined;
+    return data.user as User;
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
-    // Check if this is the first user (bootstrap admin)
-    const [userCountResult] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(users);
-    
-    const isFirstUser = userCountResult.count === 0;
-    
-    // If this is the first user, make them an admin
-    const userDataWithRole = {
-      ...userData,
-      role: isFirstUser ? 'admin' : (userData.role || 'user'),
-    };
-    
-    const [user] = await db
-      .insert(users)
-      .values(userDataWithRole)
-      .onConflictDoUpdate({
-        target: users.id,
-        set: {
-          ...userData,
-          updatedAt: new Date(),
-        },
-      })
-      .returning();
-    
-    // Log when first admin is created
-    if (isFirstUser) {
-      const displayName = user.email || (user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.firstName) || user.id;
-      console.log(`🔐 First user created as admin: ${displayName}`);
-    }
-    
-    return user;
+    // Users are managed by Supabase Auth - this method is deprecated
+    // Use Supabase dashboard or Auth API to create/update users
+    throw new Error('upsertUser is deprecated - use Supabase Auth API or dashboard to manage users');
   }
   
   // Legacy methods - kept for backward compatibility
@@ -292,40 +264,40 @@ export class DatabaseStorage implements IStorage {
   }
   
   async createUser(userData: UpsertUser): Promise<User> {
-    // Legacy method - use upsertUser instead for OAuth
-    return this.upsertUser(userData);
+    // Deprecated - use Supabase Auth API
+    throw new Error('createUser is deprecated - use Supabase Auth API to create users');
   }
   
   // Additional user operations
   async getUserByEmail(email: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.email, email));
-    return user;
+    const { supabaseAdmin } = await import('./supabaseAuth');
+    const { data, error } = await supabaseAdmin.auth.admin.listUsers();
+    if (error || !data.users) return undefined;
+    const user = data.users.find(u => u.email === email);
+    return user as User | undefined;
   }
   
   async listUsers(page = 1, limit = 20): Promise<{ users: User[]; total: number }> {
-    const offset = (page - 1) * limit;
-    
-    const [totalResult] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(users);
-    
-    const userList = await db
-      .select()
-      .from(users)
-      .orderBy(desc(users.createdAt))
-      .limit(limit)
-      .offset(offset);
-    
-    return { users: userList, total: totalResult.count };
+    const { supabaseAdmin } = await import('./supabaseAuth');
+    const { data, error } = await supabaseAdmin.auth.admin.listUsers({
+      page,
+      perPage: limit
+    });
+    if (error || !data.users) {
+      return { users: [], total: 0 };
+    }
+    return { users: data.users as User[], total: data.users.length };
   }
-  
+
   async updateUserRole(userId: string, role: string): Promise<User> {
-    const [user] = await db
-      .update(users)
-      .set({ role, updatedAt: new Date() })
-      .where(eq(users.id, userId))
-      .returning();
-    return user;
+    const { supabaseAdmin } = await import('./supabaseAuth');
+    const { data, error } = await supabaseAdmin.auth.admin.updateUserById(userId, {
+      user_metadata: { role }
+    });
+    if (error || !data.user) {
+      throw new Error(`Failed to update user role: ${error?.message}`);
+    }
+    return data.user as User;
   }
   
   // Resource CRUD operations
@@ -1465,14 +1437,15 @@ export class MemStorage implements IStorage {
     // Legacy method - use upsertUser instead for OAuth
     const user: User = {
       id: insertUser.id || String(this.currentId++),
-      email: insertUser.email || null,
-      password: null,
-      firstName: insertUser.firstName || null,
-      lastName: insertUser.lastName || null,
-      profileImageUrl: insertUser.profileImageUrl || null,
-      role: 'user',
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      email: insertUser.email,
+      user_metadata: {
+        role: insertUser.user_metadata?.role || 'user',
+        first_name: insertUser.user_metadata?.first_name,
+        last_name: insertUser.user_metadata?.last_name,
+        avatar_url: insertUser.user_metadata?.avatar_url,
+      },
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     };
     this.users.set(user.id, user);
     return user;
@@ -1481,14 +1454,15 @@ export class MemStorage implements IStorage {
   async upsertUser(insertUser: UpsertUser): Promise<User> {
     const user: User = {
       id: insertUser.id || String(this.currentId++),
-      email: insertUser.email || null,
-      password: null,
-      firstName: insertUser.firstName || null,
-      lastName: insertUser.lastName || null,
-      profileImageUrl: insertUser.profileImageUrl || null,
-      role: 'user',
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      email: insertUser.email,
+      user_metadata: {
+        role: insertUser.user_metadata?.role || 'user',
+        first_name: insertUser.user_metadata?.first_name,
+        last_name: insertUser.user_metadata?.last_name,
+        avatar_url: insertUser.user_metadata?.avatar_url,
+      },
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     };
     this.users.set(user.id, user);
     return user;

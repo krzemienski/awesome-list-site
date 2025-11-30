@@ -1,5 +1,5 @@
 import { storage } from '../storage';
-import { Resource, User } from '@shared/schema';
+import { Resource } from '@shared/schema';
 import { generateAIRecommendations as generateClaudeRecommendations, generateAILearningPaths } from './recommendations';
 import { claudeService } from './claudeService';
 

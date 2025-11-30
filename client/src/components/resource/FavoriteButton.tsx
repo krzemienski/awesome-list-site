@@ -23,6 +23,17 @@ export default function FavoriteButton({
   size = "default",
   showCount = true
 }: FavoriteButtonProps) {
+  // UUID validation: Only allow favoriting database resources with valid UUIDs
+  // Static resources from awesome-list JSON have IDs like "video-34" which aren't valid UUIDs
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const cleanId = resourceId.startsWith('db-') ? resourceId.slice(3) : resourceId;
+  const isValidDatabaseResource = uuidRegex.test(cleanId);
+
+  // Don't render favorite button for static resources (can't be favorited - PostgreSQL UUID constraint)
+  if (!isValidDatabaseResource) {
+    return null;
+  }
+
   const [isFavorited, setIsFavorited] = useState(initialFavorited);
   const [favoriteCount, setFavoriteCount] = useState(initialCount);
   const { toast } = useToast();
