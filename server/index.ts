@@ -55,8 +55,11 @@ app.use((req, res, next) => {
   if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {
-    // In production, add SSR handler before serving static files
-    app.use(handleSSR);
+    // In production, serve static files (pure CSR)
+    // SSR disabled: renderAppWithData(null) returns empty HTML causing hydration errors
+    // React errors #418, #423 corrupt rendering, blocking modals
+    // Removed 2025-11-30 to unblock UI testing
+    // TODO: Implement proper SSR or migrate to Next.js based on SEO metrics
     serveStatic(app);
   }
 
@@ -66,7 +69,6 @@ app.use((req, res, next) => {
   server.listen({
     port,
     host: "0.0.0.0",
-    reusePort: true,
   }, () => {
     log(`serving on port ${port}`);
   });

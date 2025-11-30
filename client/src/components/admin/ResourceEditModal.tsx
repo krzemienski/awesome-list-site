@@ -175,8 +175,9 @@ export default function ResourceEditModal({
         url: data.url,
         description: data.description,
         category: data.category,
-        subcategory: data.subcategory || undefined,
-        subSubcategory: data.subSubcategory || undefined,
+        // Convert "none" sentinel value to undefined
+        subcategory: data.subcategory && data.subcategory !== "none" ? data.subcategory : undefined,
+        subSubcategory: data.subSubcategory && data.subSubcategory !== "none" ? data.subSubcategory : undefined,
         status: data.status,
       });
       onClose();
@@ -335,7 +336,7 @@ export default function ResourceEditModal({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="">None</SelectItem>
+                      <SelectItem value="none">None</SelectItem>
                       {filteredSubcategories.map((subcategory) => (
                         <SelectItem key={subcategory.id} value={subcategory.name}>
                           {subcategory.name}
@@ -366,7 +367,7 @@ export default function ResourceEditModal({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="">None</SelectItem>
+                      <SelectItem value="none">None</SelectItem>
                       {filteredSubSubcategories.map((subSubcategory) => (
                         <SelectItem key={subSubcategory.id} value={subSubcategory.name}>
                           {subSubcategory.name}

@@ -30,9 +30,7 @@ const AppComponent = (
   </QueryClientProvider>
 );
 
-// Use hydration if we have server-rendered content, otherwise use client rendering
-if (rootElement.hasChildNodes()) {
-  hydrateRoot(rootElement, AppComponent);
-} else {
-  createRoot(rootElement).render(AppComponent);
-}
+// Always use client rendering (SSR disabled 2025-11-30)
+// Previously used hydrateRoot() if hasChildNodes(), but <!--app-html--> comment
+// triggered hydration against empty content, causing React errors #418, #423
+createRoot(rootElement).render(AppComponent);
