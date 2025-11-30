@@ -1,0 +1,19 @@
+# Bundle Size Analysis
+# Captured: $(date)
+
+## File Sizes (Sorted by Size)
+
+-rw-r--r--  1 nick  staff   489B Nov 30 15:17 /Users/nick/Desktop/awesome-list-site/dist/public/assets/refresh-cw-Dm-nZ_HL.js
+-rw-r--r--  1 nick  staff   2.6K Nov 30 15:17 /Users/nick/Desktop/awesome-list-site/dist/public/assets/table-BLn8zcBr.js
+-rw-r--r--  1 nick  staff   6.0K Nov 30 15:17 /Users/nick/Desktop/awesome-list-site/dist/public/assets/alert-dialog-I0gzZIpF.js
+-rw-r--r--  1 nick  staff    12K Nov 30 15:17 /Users/nick/Desktop/awesome-list-site/dist/public/assets/AdminLayout-CY3iYcUM.js
+-rw-r--r--  1 nick  staff    23K Nov 30 15:17 /Users/nick/Desktop/awesome-list-site/dist/public/assets/GitHubSyncPanel-fKxboE3O.js
+-rw-r--r--  1 nick  staff    29K Nov 30 15:17 /Users/nick/Desktop/awesome-list-site/dist/public/assets/PendingResources-BzZBiaKe.js
+-rw-r--r--  1 nick  staff    32K Nov 30 15:17 /Users/nick/Desktop/awesome-list-site/dist/public/assets/PendingEdits-DRUM5lnZ.js
+-rw-r--r--  1 nick  staff    38K Nov 30 15:17 /Users/nick/Desktop/awesome-list-site/dist/public/assets/BatchEnrichmentPanel-CMeOWkk9.js
+-rw-r--r--  1 nick  staff    54K Nov 30 15:17 /Users/nick/Desktop/awesome-list-site/dist/public/assets/AdminDashboard-0yCnENaf.js
+-rw-r--r--  1 nick  staff   106K Nov 30 15:17 /Users/nick/Desktop/awesome-list-site/dist/public/assets/ResourceBrowser-B9nWhr67.js
+-rw-r--r--  1 nick  staff   1.9M Nov 30 15:17 /Users/nick/Desktop/awesome-list-site/dist/public/assets/index-DA9qcvTy.js
+
+## Total Bundle Size
+Total: 329.9

@@ -1,0 +1,12 @@
+=== API LOAD TESTING ===
+
+## Test 1: /api/resources (10 connections, 30s)
+
+## Test 2: /api/categories (10 connections, 30s) - THE SLOW ENDPOINT
+
+## Test 3: /api/subcategories (10 connections, 30s)
+
+## Test 4: STRESS TEST - 50 connections, 60s
+
+## Test 5: EXTREME STRESS - 100 connections, 60s
+

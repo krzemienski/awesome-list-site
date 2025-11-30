@@ -1,0 +1,188 @@
+
+Running 4 tests using 1 worker
+
+  ✘  1 [chromium-desktop] › tests/e2e/user-workflows-round2.spec.ts:64:3 › User Workflows Round 2 - Bug Verification › Task 31-40: Search Dialog - Bug #1 Verification (0ms)
+  -  2 [chromium-desktop] › tests/e2e/user-workflows-round2.spec.ts:151:3 › User Workflows Round 2 - Bug Verification › Task 41-50: Profile Page - Bug #2 Fix Verification
+  -  3 [chromium-desktop] › tests/e2e/user-workflows-round2.spec.ts:244:3 › User Workflows Round 2 - Bug Verification › Task 51-60: Bookmarks Page
+  -  4 [chromium-desktop] › tests/e2e/user-workflows-round2.spec.ts:328:3 › User Workflows Round 2 - Bug Verification › Task 61-70: Learning Journeys
+  ✘  5 [chromium-desktop] › tests/e2e/user-workflows-round2.spec.ts:64:3 › User Workflows Round 2 - Bug Verification › Task 31-40: Search Dialog - Bug #1 Verification (retry #1) (0ms)
+  -  6 [chromium-desktop] › tests/e2e/user-workflows-round2.spec.ts:151:3 › User Workflows Round 2 - Bug Verification › Task 41-50: Profile Page - Bug #2 Fix Verification (retry #1)
+  -  7 [chromium-desktop] › tests/e2e/user-workflows-round2.spec.ts:244:3 › User Workflows Round 2 - Bug Verification › Task 51-60: Bookmarks Page (retry #1)
+  -  8 [chromium-desktop] › tests/e2e/user-workflows-round2.spec.ts:328:3 › User Workflows Round 2 - Bug Verification › Task 61-70: Learning Journeys (retry #1)
+
+
+  1) [chromium-desktop] › tests/e2e/user-workflows-round2.spec.ts:64:3 › User Workflows Round 2 - Bug Verification › Task 31-40: Search Dialog - Bug #1 Verification 
+
+    Error: Auth failed: Invalid login credentials
+
+      14 |   });
+      15 |
+    > 16 |   if (error) throw new Error(`Auth failed: ${error.message}`);
+         |                    ^
+      17 |   return data.session;
+      18 | }
+      19 |
+        at getAdminSession (/Users/nick/Desktop/awesome-list-site/tests/e2e/user-workflows-round2.spec.ts:16:20)
+        at /Users/nick/Desktop/awesome-list-site/tests/e2e/user-workflows-round2.spec.ts:26:20
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: Auth failed: Invalid login credentials
+
+      14 |   });
+      15 |
+    > 16 |   if (error) throw new Error(`Auth failed: ${error.message}`);
+         |                    ^
+      17 |   return data.session;
+      18 | }
+      19 |
+        at getAdminSession (/Users/nick/Desktop/awesome-list-site/tests/e2e/user-workflows-round2.spec.ts:16:20)
+        at /Users/nick/Desktop/awesome-list-site/tests/e2e/user-workflows-round2.spec.ts:26:20
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/user-workflows-round2-User-00713-Dialog---Bug-1-Verification-chromium-desktop-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/user-workflows-round2-User-00713-Dialog---Bug-1-Verification-chromium-desktop-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium-desktop] › tests/e2e/user-workflows-round2.spec.ts:64:3 › User Workflows Round 2 - Bug Verification › Task 31-40: Search Dialog - Bug #1 Verification 
+  3 did not run
+
+Running 4 tests using 1 worker
+
+  ✘  1 [chromium-desktop] › tests/e2e/user-workflows-round2.spec.ts:64:3 › User Workflows Round 2 - Bug Verification › Task 31-40: Search Dialog - Bug #1 Verification (0ms)
+  -  2 [chromium-desktop] › tests/e2e/user-workflows-round2.spec.ts:151:3 › User Workflows Round 2 - Bug Verification › Task 41-50: Profile Page - Bug #2 Fix Verification
+  -  3 [chromium-desktop] › tests/e2e/user-workflows-round2.spec.ts:244:3 › User Workflows Round 2 - Bug Verification › Task 51-60: Bookmarks Page
+  -  4 [chromium-desktop] › tests/e2e/user-workflows-round2.spec.ts:328:3 › User Workflows Round 2 - Bug Verification › Task 61-70: Learning Journeys
+  ✘  5 [chromium-desktop] › tests/e2e/user-workflows-round2.spec.ts:64:3 › User Workflows Round 2 - Bug Verification › Task 31-40: Search Dialog - Bug #1 Verification (retry #1) (0ms)
+  -  6 [chromium-desktop] › tests/e2e/user-workflows-round2.spec.ts:151:3 › User Workflows Round 2 - Bug Verification › Task 41-50: Profile Page - Bug #2 Fix Verification (retry #1)
+  -  7 [chromium-desktop] › tests/e2e/user-workflows-round2.spec.ts:244:3 › User Workflows Round 2 - Bug Verification › Task 51-60: Bookmarks Page (retry #1)
+  -  8 [chromium-desktop] › tests/e2e/user-workflows-round2.spec.ts:328:3 › User Workflows Round 2 - Bug Verification › Task 61-70: Learning Journeys (retry #1)
+
+
+  1) [chromium-desktop] › tests/e2e/user-workflows-round2.spec.ts:64:3 › User Workflows Round 2 - Bug Verification › Task 31-40: Search Dialog - Bug #1 Verification 
+
+    Error: Auth failed: Email not confirmed
+
+      14 |   });
+      15 |
+    > 16 |   if (error) throw new Error(`Auth failed: ${error.message}`);
+         |                    ^
+      17 |   return data.session;
+      18 | }
+      19 |
+        at getTestSession (/Users/nick/Desktop/awesome-list-site/tests/e2e/user-workflows-round2.spec.ts:16:20)
+        at /Users/nick/Desktop/awesome-list-site/tests/e2e/user-workflows-round2.spec.ts:26:19
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: Auth failed: Email not confirmed
+
+      14 |   });
+      15 |
+    > 16 |   if (error) throw new Error(`Auth failed: ${error.message}`);
+         |                    ^
+      17 |   return data.session;
+      18 | }
+      19 |
+        at getTestSession (/Users/nick/Desktop/awesome-list-site/tests/e2e/user-workflows-round2.spec.ts:16:20)
+        at /Users/nick/Desktop/awesome-list-site/tests/e2e/user-workflows-round2.spec.ts:26:19
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/user-workflows-round2-User-00713-Dialog---Bug-1-Verification-chromium-desktop-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/user-workflows-round2-User-00713-Dialog---Bug-1-Verification-chromium-desktop-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium-desktop] › tests/e2e/user-workflows-round2.spec.ts:64:3 › User Workflows Round 2 - Bug Verification › Task 31-40: Search Dialog - Bug #1 Verification 
+  3 did not run
+
+Running 4 tests using 1 worker
+
+Task 31: Opening search with / key
+Task 32: Search dialog visible: false
+Current URL: http://localhost:3000/
+BUG CONFIRMED: Search dialog did not open
+Checking if redirected to login...
+Task 33: Typing "ffmpeg" in search
+  ✘  1 [chromium-desktop] › tests/e2e/user-workflows-round2.spec.ts:64:3 › User Workflows Round 2 - Bug Verification › Task 31-40: Search Dialog - Bug #1 Verification (11.1s)
+Task 31: Opening search with / key
+Task 32: Search dialog visible: false
+Current URL: http://localhost:3000/
+BUG CONFIRMED: Search dialog did not open
+Checking if redirected to login...
+Task 33: Typing "ffmpeg" in search
+  ✘  2 [chromium-desktop] › tests/e2e/user-workflows-round2.spec.ts:64:3 › User Workflows Round 2 - Bug Verification › Task 31-40: Search Dialog - Bug #1 Verification (retry #1) (11.1s)
+[31mTesting stopped early after 1 maximum allowed failures.[39m
+
+
+  1) [chromium-desktop] › tests/e2e/user-workflows-round2.spec.ts:64:3 › User Workflows Round 2 - Bug Verification › Task 31-40: Search Dialog - Bug #1 Verification 
+
+    TimeoutError: locator.fill: Timeout 10000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('input[type="search"], input[placeholder*="search" i]').first()[22m
+
+
+      100 |     console.log('Task 33: Typing "ffmpeg" in search');
+      101 |     const searchInput = page.locator('input[type="search"], input[placeholder*="search" i]').first();
+    > 102 |     await searchInput.fill('ffmpeg');
+          |                       ^
+      103 |     await page.waitForTimeout(500); // Debounce delay
+      104 |
+      105 |     await page.screenshot({
+        at /Users/nick/Desktop/awesome-list-site/tests/e2e/user-workflows-round2.spec.ts:102:23
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/user-workflows-round2-User-00713-Dialog---Bug-1-Verification-chromium-desktop/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/user-workflows-round2-User-00713-Dialog---Bug-1-Verification-chromium-desktop/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/user-workflows-round2-User-00713-Dialog---Bug-1-Verification-chromium-desktop/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: locator.fill: Timeout 10000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('input[type="search"], input[placeholder*="search" i]').first()[22m
+
+
+      100 |     console.log('Task 33: Typing "ffmpeg" in search');
+      101 |     const searchInput = page.locator('input[type="search"], input[placeholder*="search" i]').first();
+    > 102 |     await searchInput.fill('ffmpeg');
+          |                       ^
+      103 |     await page.waitForTimeout(500); // Debounce delay
+      104 |
+      105 |     await page.screenshot({
+        at /Users/nick/Desktop/awesome-list-site/tests/e2e/user-workflows-round2.spec.ts:102:23
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/user-workflows-round2-User-00713-Dialog---Bug-1-Verification-chromium-desktop-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/user-workflows-round2-User-00713-Dialog---Bug-1-Verification-chromium-desktop-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/user-workflows-round2-User-00713-Dialog---Bug-1-Verification-chromium-desktop-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/user-workflows-round2-User-00713-Dialog---Bug-1-Verification-chromium-desktop-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/user-workflows-round2-User-00713-Dialog---Bug-1-Verification-chromium-desktop-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium-desktop] › tests/e2e/user-workflows-round2.spec.ts:64:3 › User Workflows Round 2 - Bug Verification › Task 31-40: Search Dialog - Bug #1 Verification 
+  3 did not run
+  1 error was not a part of any test, see above for details

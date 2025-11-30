@@ -1,0 +1,17 @@
+Rate Limiting Test Results
+==========================
+Date: Sun Nov 30 15:44:54 EST 2025
+
+API Endpoint Rate Limiting Test (/api/resources)
+================================================
+Total requests sent: 70
+Successful (200): 70
+Rate limited (429): 0
+Expected behavior: ~60 success, ~10 rate limited
+
+✗ FAIL: No rate limiting detected
+
+Rate Limit Headers
+==================
+No rate limit headers found
+

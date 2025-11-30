@@ -1,0 +1,36 @@
+XSS Prevention Test Results
+============================
+Date: Sun Nov 30 15:44:18 EST 2025
+
+Vector: <script>alert('XSS')</script>
+HTTP Code: 200
+Response contains script tag: NO - Good
+Response contains vector: NO - Sanitized
+---
+Vector: <img src=x onerror=alert('XSS')>
+HTTP Code: 200
+Response contains script tag: NO - Good
+Response contains vector: NO - Sanitized
+---
+Vector: javascript:alert('XSS')
+HTTP Code: 200
+Response contains script tag: NO - Good
+Response contains vector: NO - Sanitized
+---
+Vector: <iframe src="javascript:alert('XSS')"></iframe>
+HTTP Code: 200
+Response contains script tag: NO - Good
+Response contains vector: NO - Sanitized
+---
+
+Category Filter Test
+====================
+{"resources":[],"total":0}
+HTTP:200
+
+Security Headers
+================
+X-XSS-Protection: NOT FOUND
+X-Content-Type-Options: NOT FOUND
+Content-Security-Policy: NOT FOUND
+X-Frame-Options: NOT FOUND

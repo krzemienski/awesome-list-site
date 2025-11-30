@@ -1,0 +1,32 @@
+SSRF (Server-Side Request Forgery) Test Results
+================================================
+Date: Sun Nov 30 15:45:33 EST 2025
+
+Vector: http://localhost/admin
+HTTP Code: 401
+Response: 
+---
+Vector: http://127.0.0.1/admin
+HTTP Code: 401
+Response: 
+---
+Vector: http://169.254.169.254/latest/meta-data/
+HTTP Code: 401
+Response: 
+---
+Vector: http://192.168.1.1
+HTTP Code: 401
+Response: 
+---
+Vector: http://10.0.0.1
+HTTP Code: 401
+Response: 
+---
+Vector: file:///etc/passwd
+HTTP Code: 401
+Response: 
+---
+Vector: http://evil.com
+HTTP Code: 401
+Response: 
+---

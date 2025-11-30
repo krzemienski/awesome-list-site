@@ -1,0 +1,62 @@
+SQL Injection Prevention Test Results
+======================================
+Date: Sun Nov 30 15:44:38 EST 2025
+
+Vector: ' OR '1'='1
+HTTP Code: 200
+SQL Error Detection: No SQL errors
+Resource Count: 
+Full Response (first 200 chars): 
+---
+Vector: '; DROP TABLE resources; --
+HTTP Code: 200
+SQL Error Detection: No SQL errors
+Resource Count: 
+Full Response (first 200 chars): 
+---
+Vector: ' UNION SELECT password FROM users--
+HTTP Code: 200
+SQL Error Detection: No SQL errors
+Resource Count: 
+Full Response (first 200 chars): 
+---
+Vector: ' AND (SELECT COUNT(*) FROM resources) > 0 --
+HTTP Code: 200
+SQL Error Detection: No SQL errors
+Resource Count: 
+Full Response (first 200 chars): 
+---
+Vector: admin'--
+HTTP Code: 200
+SQL Error Detection: No SQL errors
+Resource Count: 
+Full Response (first 200 chars): 
+---
+Vector: 1' OR '1'='1' --
+HTTP Code: 200
+SQL Error Detection: No SQL errors
+Resource Count: 
+Full Response (first 200 chars): 
+---
+Vector: ' OR 1=1--
+HTTP Code: 200
+SQL Error Detection: No SQL errors
+Resource Count: 
+Full Response (first 200 chars): 
+---
+Vector: ') OR ('1'='1
+HTTP Code: 200
+SQL Error Detection: No SQL errors
+Resource Count: 
+Full Response (first 200 chars): 
+---
+
+Category Parameter Test
+=======================
+
+HTTP:000
+
+Resource ID Parameter Test
+==========================
+
+HTTP:000

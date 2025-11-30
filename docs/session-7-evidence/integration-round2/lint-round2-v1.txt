@@ -1,0 +1,85 @@
+- Linting
+✖ Linting
+
+  export-round2-v1.md:517:3
+  ✖     1:1    Missing Awesome badge after the main heading                                                                                                                       remark-lint:awesome-badge
+  ✖     1:1    Missing file contributing.md                                                                                                                                       remark-lint:awesome-contributing
+  ✖     7:3    http://localhost:3000                                                                                                                                              remark-lint:double-link
+  ✖    11:1    ToC item "Adaptive Streaming & Manifest Tools" link "#adaptive-streaming-manifest-tools" not found                                                                 remark-lint:awesome-toc
+  ✖    37:5    #encoding-tools                                                                                                                                                    remark-lint:double-link
+  ✖   108:5    #encoding-tools                                                                                                                                                    remark-lint:double-link
+  ✖   143:3    https:////github.com/matmoi/create-DASH-HLS                                                                                                                        remark-lint:double-link
+  ✖   146:3    https:////github.com/matmoi/create-DASH-HLS                                                                                                                        remark-lint:double-link
+  ✖   153:3    https:////github.com/Eyevinn/dash-validator-js                                                                                                                     remark-lint:double-link
+  ✖   154:3    https:////github.com/Eyevinn/dash-validator-js                                                                                                                     remark-lint:double-link
+  ✖   190:3    https:////www.bento4.com/developers/dash/dash-sample-content                                                                                                       remark-lint:double-link
+  ✖   257:45   List item description must start with valid casing                                                                                                                 remark-lint:awesome-list-item
+  ✖   260:106  List item description must start with valid casing                                                                                                                 remark-lint:awesome-list-item
+  ✖   385:3    https:////forum.doom9.org                                                                                                                                          remark-lint:double-link
+  ✖   386:3    https:////forum.doom9.org                                                                                                                                          remark-lint:double-link
+  ✖   449:3    https:////forum.doom9.org                                                                                                                                          remark-lint:double-link
+  ✖   515:3    https:////aomedia.googlesource.com/aom                                                                                                                             remark-lint:double-link
+  ✖   517:3    Don’t pad link with inner spaces                                                                                                                                   remark-lint:no-inline-padding
+  ✖   536:3    https:////ffmpeg.org                                                                                                                                               remark-lint:double-link
+  ✖   551:3    https:////aomedia.googlesource.com/aom                                                                                                                             remark-lint:double-link
+  ✖   667:3    https:////gstreamer.freedesktop.org                                                                                                                                remark-lint:double-link
+  ✖   699:3    https:////github.com/realeyes-media/demo-encoder                                                                                                                   remark-lint:double-link
+  ✖   708:62   List item description must start with valid casing                                                                                                                 remark-lint:awesome-list-item
+  ✖   738:3    https:////ffmpeg.org                                                                                                                                               remark-lint:double-link
+  ✖   755:96   List item description must start with valid casing                                                                                                                 remark-lint:awesome-list-item
+  ✖   883:29   "’" is used without matching "‘"                                                                                                                                   remark-lint:match-punctuation
+  ✖   986:72   List item description must start with valid casing                                                                                                                 remark-lint:awesome-list-item
+  ✖  1030:14   Should not repeat "."                                                                                                                                              remark-lint:no-repeat-punctuation
+  ✖  1030:15   Should not repeat "."                                                                                                                                              remark-lint:no-repeat-punctuation
+  ✖  1030:101  Should not repeat "."                                                                                                                                              remark-lint:no-repeat-punctuation
+  ✖  1030:102  Should not repeat "."                                                                                                                                              remark-lint:no-repeat-punctuation
+  ✖  1047:3    https:////gstreamer.freedesktop.org                                                                                                                                remark-lint:double-link
+  ✖  1105:3    https:////bitmovin.com/video-encoding-guide                                                                                                                        remark-lint:double-link
+  ✖  1106:3    https:////bitmovin.com/video-encoding-guide                                                                                                                        remark-lint:double-link
+  ✖  1141:77   "’" is used without matching "‘"                                                                                                                                   remark-lint:match-punctuation
+  ✖  1298:188  List item description must start with valid casing                                                                                                                 remark-lint:awesome-list-item
+  ✖  1403:3    https:////developers.google.com/interactive-media-ads                                                                                                              remark-lint:double-link
+  ✖  1405:3    https:////developers.google.com/interactive-media-ads                                                                                                              remark-lint:double-link
+  ✖  1424:3    https:////lives-video.com                                                                                                                                          remark-lint:double-link
+  ✖  1425:3    https:////lives-video.com                                                                                                                                          remark-lint:double-link
+  ✖  1510:117  List item description must start with valid casing                                                                                                                 remark-lint:awesome-list-item
+  ✖  1591:3    Invalid list item link URL                                                                                                                                         remark-lint:awesome-list-item
+  ✖  1596:3    https:////testassets.dashif.org/#testvector/list                                                                                                                   remark-lint:double-link
+  ✖  1684:56   List item description must start with valid casing                                                                                                                 remark-lint:awesome-list-item
+  ✖  1727:3    https:////github.com/videojs/video.js                                                                                                                              remark-lint:double-link
+  ✖  1735:3    https:////github.com/bytedance/xgplayer                                                                                                                            remark-lint:double-link
+  ✖  1738:3    https:////ziggeo.com                                                                                                                                               remark-lint:double-link
+  ✖  1739:3    https:////ziggeo.com                                                                                                                                               remark-lint:double-link
+  ✖  1781:3    https:////github.com/bytedance/xgplayer                                                                                                                            remark-lint:double-link
+  ✖  1788:62   List item description must start with valid casing                                                                                                                 remark-lint:awesome-list-item
+  ✖  1794:3    https:////github.com/videojs/video.js                                                                                                                              remark-lint:double-link
+  ✖  1812:58   List item description must start with valid casing                                                                                                                 remark-lint:awesome-list-item
+  ✖  1843:3    https:////www.videolan.org/projects/dvblast.html                                                                                                                   remark-lint:double-link
+  ✖  1868:3    https:////www.dashif.org                                                                                                                                           remark-lint:double-link
+  ✖  1937:3    https:////testassets.dashif.org/#testvector/groupedList                                                                                                            remark-lint:double-link
+  ✖  1938:3    https:////testassets.dashif.org/#testcase/details/58a5ddaa7459f8cb201b8a6d                                                                                         remark-lint:double-link
+  ✖  1939:3    https:////dashif.org                                                                                                                                               remark-lint:double-link
+  ✖  1947:3    https:////www.bento4.com/developers/dash/dash-sample-content                                                                                                       remark-lint:double-link
+  ✖  1972:3    https:////www.businesswire.com/news/home/20231019229734/en/Streaming-Video-Technology-Alliance-Announces-First-Public-Open-Source-Repository-Common-Media-Library  remark-lint:double-link
+  ✖  2002:3    https:////www.itu.int/rec/R-REC-BT.2100                                                                                                                            remark-lint:double-link
+  ✖  2004:3    https:////www.itu.int/rec/R-REC-BT.2100                                                                                                                            remark-lint:double-link
+  ✖  2060:3    https:////www.businesswire.com/news/home/20231019229734/en/Streaming-Video-Technology-Alliance-Announces-First-Public-Open-Source-Repository-Common-Media-Library  remark-lint:double-link
+  ✖  2074:3    https:////vesa.org                                                                                                                                                 remark-lint:double-link
+  ✖  2076:3    https:////www.vesa.org                                                                                                                                             remark-lint:double-link
+  ✖  2250:106  List item description must start with valid casing                                                                                                                 remark-lint:awesome-list-item
+  ✖  2306:102  List item description must start with valid casing                                                                                                                 remark-lint:awesome-list-item
+  ✖  2307:117  List item description must start with valid casing                                                                                                                 remark-lint:awesome-list-item
+  ✖  2360:66   "’" is used without matching "‘"                                                                                                                                   remark-lint:match-punctuation
+  ✖  2361:3    https:////github.com/realeyes-media/demo-encoder                                                                                                                   remark-lint:double-link
+  ✖  2370:4    Text "Stackoverflow" should be written as "Stack Overflow"                                                                                                         remark-lint:awesome-spell-check
+  ✖  2370:72   Text "stackoverflow" should be written as "Stack Overflow"                                                                                                         remark-lint:awesome-spell-check
+  ✖  2402:102  List item description must start with valid casing                                                                                                                 remark-lint:awesome-list-item
+  ✖  2481:50   List item description must start with valid casing                                                                                                                 remark-lint:awesome-list-item
+  ✖  2489:60   List item description must start with valid casing                                                                                                                 remark-lint:awesome-list-item
+  ✖  2578:3    https:////www.videolan.org/projects/dvblast.html                                                                                                                   remark-lint:double-link
+  ✖  2605:48   List item description must start with valid casing                                                                                                                 remark-lint:awesome-list-item
+  ✖  2607:54   List item description must start with valid casing                                                                                                                 remark-lint:awesome-list-item
+  ✖  2624:7    http://localhost:3000                                                                                                                                              remark-lint:double-link
+
+  78 errors
+

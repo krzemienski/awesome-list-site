@@ -1,0 +1,197 @@
+{
+  "summary": {
+    "total": 31,
+    "passed": 1,
+    "failed": 6,
+    "notImplemented": 23,
+    "timestamp": "2025-11-30T20:55:42.800Z"
+  },
+  "results": {
+    "passed": [
+      {
+        "task": 30,
+        "name": "Navigate to GitHub Sync",
+        "status": "PASS",
+        "notes": "Navigation successful"
+      }
+    ],
+    "failed": [
+      {
+        "task": 2,
+        "name": "Admin Dashboard Loads",
+        "status": "FAIL",
+        "notes": "Received 404 error"
+      },
+      {
+        "task": 3,
+        "name": "JWT Token in localStorage",
+        "status": "FAIL",
+        "notes": "Token missing or invalid"
+      },
+      {
+        "task": 4,
+        "name": "User Role is Admin",
+        "status": "FAIL",
+        "notes": "Expected 'admin', got 'null'"
+      },
+      {
+        "task": 5,
+        "name": "Admin Email Displayed",
+        "status": "FAIL",
+        "notes": "Email not found in UI"
+      },
+      {
+        "task": 6,
+        "name": "Status Filter Dropdown Exists",
+        "status": "FAIL",
+        "notes": "Filter not found"
+      },
+      {
+        "task": 8,
+        "name": "Category Filter Dropdown Exists",
+        "status": "FAIL",
+        "notes": "Filter not found"
+      }
+    ],
+    "notImplemented": [
+      {
+        "task": 7,
+        "name": "Status Filter Opens",
+        "status": "NOT IMPLEMENTED",
+        "notes": "Filter not found"
+      },
+      {
+        "task": 9,
+        "name": "Category Filter Opens",
+        "status": "NOT IMPLEMENTED",
+        "notes": "Filter not found"
+      },
+      {
+        "task": 10,
+        "name": "Filter by Pending Status",
+        "status": "NOT IMPLEMENTED",
+        "notes": "Requires filter implementation"
+      },
+      {
+        "task": 11,
+        "name": "Filter by Approved Status",
+        "status": "NOT IMPLEMENTED",
+        "notes": "Requires filter implementation"
+      },
+      {
+        "task": 12,
+        "name": "Filter by Specific Category",
+        "status": "NOT IMPLEMENTED",
+        "notes": "Requires filter implementation"
+      },
+      {
+        "task": 13,
+        "name": "Combined Filters",
+        "status": "NOT IMPLEMENTED",
+        "notes": "Requires filter implementation"
+      },
+      {
+        "task": 14,
+        "name": "Reset Filters",
+        "status": "NOT IMPLEMENTED",
+        "notes": "Requires filter implementation"
+      },
+      {
+        "task": 15,
+        "name": "Clear All Filters Button",
+        "status": "NOT IMPLEMENTED",
+        "notes": "Clear button not found"
+      },
+      {
+        "task": 16,
+        "name": "Sort by Title (Ascending)",
+        "status": "NOT IMPLEMENTED",
+        "notes": "Title header not found"
+      },
+      {
+        "task": 17,
+        "name": "Sort by Title (Descending)",
+        "status": "NOT IMPLEMENTED",
+        "notes": "Title header not found"
+      },
+      {
+        "task": 18,
+        "name": "Sort by Category",
+        "status": "NOT IMPLEMENTED",
+        "notes": "Category sorting not verified"
+      },
+      {
+        "task": 19,
+        "name": "Sort by Status",
+        "status": "NOT IMPLEMENTED",
+        "notes": "Status sorting not verified"
+      },
+      {
+        "task": 20,
+        "name": "Sort by Last Modified",
+        "status": "NOT IMPLEMENTED",
+        "notes": "Modified sorting not verified"
+      },
+      {
+        "task": 21,
+        "name": "Next Page Button",
+        "status": "NOT IMPLEMENTED",
+        "notes": "Pagination not found"
+      },
+      {
+        "task": 22,
+        "name": "Previous Page Button",
+        "status": "NOT IMPLEMENTED",
+        "notes": "Pagination not found"
+      },
+      {
+        "task": 23,
+        "name": "Bulk Select Checkboxes",
+        "status": "NOT IMPLEMENTED",
+        "notes": "No checkboxes found"
+      },
+      {
+        "task": 24,
+        "name": "Bulk Actions Toolbar Appears",
+        "status": "NOT IMPLEMENTED",
+        "notes": "No checkboxes to test"
+      },
+      {
+        "task": 25,
+        "name": "Select All Resources",
+        "status": "NOT IMPLEMENTED",
+        "notes": "No checkboxes to test"
+      },
+      {
+        "task": 26,
+        "name": "Archive Resource",
+        "status": "NOT IMPLEMENTED",
+        "notes": "No checkboxes to test"
+      },
+      {
+        "task": 27,
+        "name": "Deselect All Resources",
+        "status": "NOT IMPLEMENTED",
+        "notes": "No checkboxes to test"
+      },
+      {
+        "task": 28,
+        "name": "Navigate to Pending Resources",
+        "status": "NOT IMPLEMENTED",
+        "notes": "Link not found"
+      },
+      {
+        "task": 29,
+        "name": "Navigate to Pending Edits",
+        "status": "NOT IMPLEMENTED",
+        "notes": "Link not found"
+      },
+      {
+        "task": 31,
+        "name": "Resource Page Info Display",
+        "status": "NOT IMPLEMENTED",
+        "notes": "Page info not found"
+      }
+    ]
+  }
+}
