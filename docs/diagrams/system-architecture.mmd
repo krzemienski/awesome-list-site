@@ -1,0 +1,74 @@
+graph TB
+    subgraph "Client Layer"
+        Browser[Web Browser]
+        Mobile[Mobile Browser]
+    end
+
+    subgraph "Docker Host"
+        subgraph "Nginx Reverse Proxy :80/:443"
+            Nginx[Nginx<br/>SSL Termination<br/>Rate Limiting<br/>Security Headers]
+        end
+
+        subgraph "Web Container :3000"
+            Express[Express API Server<br/>70 Endpoints<br/>Node.js 20]
+            React[React Build<br/>Static Assets]
+            AI[AI Services<br/>Claude Haiku 4.5]
+            GitHub[GitHub Integration<br/>Import/Export]
+        end
+
+        subgraph "Redis Container :6379"
+            RedisCache[Redis Cache<br/>AI Responses 1hr<br/>URL Analysis 24hr<br/>Recommendations 5min]
+        end
+    end
+
+    subgraph "Supabase Cloud"
+        subgraph "Supabase Auth"
+            Auth[Authentication<br/>Email/Password<br/>GitHub OAuth<br/>Google OAuth<br/>Magic Link]
+        end
+
+        subgraph "PostgreSQL Database"
+            DB[(PostgreSQL<br/>16 Tables<br/>2,647 Resources<br/>Row-Level Security)]
+        end
+
+        subgraph "Storage Future"
+            Storage[File Storage<br/>Avatars<br/>Thumbnails<br/>CDN Delivery]
+        end
+    end
+
+    subgraph "External APIs"
+        Claude[Anthropic Claude API<br/>Model: claude-haiku-4-5]
+        GitHubAPI[GitHub API<br/>Repository Sync]
+        OpenAI[OpenAI API<br/>Optional Learning Paths]
+    end
+
+    Browser --> Nginx
+    Mobile --> Nginx
+    Nginx --> Express
+    Nginx --> React
+
+    Express --> RedisCache
+    Express --> Auth
+    Express --> DB
+    Express --> AI
+    Express --> GitHub
+
+    AI --> Claude
+    GitHub --> GitHubAPI
+    AI --> OpenAI
+
+    Auth --> DB
+
+    style Browser fill:#4a90e2,stroke:#333,stroke-width:2px,color:#fff
+    style Mobile fill:#4a90e2,stroke:#333,stroke-width:2px,color:#fff
+    style Nginx fill:#269f42,stroke:#333,stroke-width:2px,color:#fff
+    style Express fill:#e67e22,stroke:#333,stroke-width:2px,color:#fff
+    style React fill:#61dafb,stroke:#333,stroke-width:2px,color:#000
+    style AI fill:#9b59b6,stroke:#333,stroke-width:2px,color:#fff
+    style GitHub fill:#95a5a6,stroke:#333,stroke-width:2px,color:#fff
+    style RedisCache fill:#dc3545,stroke:#333,stroke-width:2px,color:#fff
+    style Auth fill:#f39c12,stroke:#333,stroke-width:2px,color:#fff
+    style DB fill:#3498db,stroke:#333,stroke-width:2px,color:#fff
+    style Storage fill:#1abc9c,stroke:#333,stroke-width:2px,color:#fff
+    style Claude fill:#9b59b6,stroke:#333,stroke-width:2px,color:#fff
+    style GitHubAPI fill:#24292e,stroke:#333,stroke-width:2px,color:#fff
+    style OpenAI fill:#10a37f,stroke:#333,stroke-width:2px,color:#fff

@@ -1,0 +1,111 @@
+sequenceDiagram
+    autonumber
+    participant User
+    participant Frontend as React Frontend
+    participant Supabase as Supabase Auth
+    participant API as Express API
+    participant DB as PostgreSQL DB
+    participant Redis
+
+    %% Email/Password Login Flow
+    rect rgb(230, 240, 255)
+        Note over User,Supabase: Email/Password Authentication Flow
+        User->>Frontend: Enter email/password
+        Frontend->>Supabase: supabase.auth.signInWithPassword()
+        Supabase->>DB: Verify credentials
+        DB-->>Supabase: User data + metadata
+        Supabase-->>Frontend: JWT tokens (access + refresh)
+        Frontend->>Frontend: Store in localStorage
+        Note over Frontend: supabase.auth.token
+    end
+
+    %% OAuth Login Flow (GitHub/Google)
+    rect rgb(255, 245, 230)
+        Note over User,Supabase: OAuth Authentication Flow
+        User->>Frontend: Click "Login with GitHub"
+        Frontend->>Supabase: supabase.auth.signInWithOAuth({provider: 'github'})
+        Supabase->>User: Redirect to GitHub OAuth
+        User->>Supabase: Approve access
+        Supabase->>DB: Create/update user
+        DB-->>Supabase: User data
+        Supabase->>Frontend: Redirect with JWT tokens
+        Frontend->>Frontend: Store in localStorage
+    end
+
+    %% API Request with Authentication
+    rect rgb(240, 255, 240)
+        Note over User,Redis: Protected API Request Flow
+        User->>Frontend: Click "Bookmark Resource"
+        Frontend->>Frontend: Get token from localStorage
+        Frontend->>API: POST /api/bookmarks/:id<br/>Authorization: Bearer {token}
+
+        API->>Supabase: supabase.auth.getUser(token)
+        Supabase-->>API: User object (id, email, role)
+
+        alt Invalid Token
+            API-->>Frontend: 401 Unauthorized
+            Frontend->>User: Redirect to login
+        else Valid Token
+            API->>API: Attach user to req.user
+
+            alt Admin Route
+                API->>API: Check user.role === 'admin'
+                alt Not Admin
+                    API-->>Frontend: 403 Forbidden
+                else Is Admin
+                    API->>DB: Execute admin operation
+                    DB-->>API: Success
+                end
+            else User Route
+                API->>DB: Execute user operation<br/>RLS enforces user_id = auth.uid()
+                DB-->>API: Success
+            end
+
+            API-->>Frontend: 200 OK + data
+            Frontend->>User: Show success message
+        end
+    end
+
+    %% AI-Powered Request with Caching
+    rect rgb(250, 240, 255)
+        Note over User,Redis: AI Request with Redis Caching
+        User->>Frontend: Request AI recommendations
+        Frontend->>API: GET /api/recommendations?categories=...
+        API->>Redis: Check cache key: userId_limit
+
+        alt Cache Hit
+            Redis-->>API: Cached recommendations
+            API-->>Frontend: 200 OK + cached data
+        else Cache Miss
+            API->>DB: Fetch user preferences + history
+            DB-->>API: User data
+            API->>API: Call Claude AI service
+            Note over API: claudeService.generateRecommendations()
+            API->>Redis: Store result (TTL: 5min)
+            Redis-->>API: OK
+            API-->>Frontend: 200 OK + fresh data
+        end
+
+        Frontend->>User: Display personalized recommendations
+    end
+
+    %% Token Refresh Flow
+    rect rgb(255, 240, 240)
+        Note over Frontend,Supabase: Automatic Token Refresh
+        Frontend->>Frontend: Access token expires (1hr)
+        Frontend->>Supabase: supabase.auth.refreshSession()
+        Supabase->>Supabase: Validate refresh token
+        Supabase-->>Frontend: New access + refresh tokens
+        Frontend->>Frontend: Update localStorage
+        Note over Frontend: Seamless - no user action required
+    end
+
+    %% Logout Flow
+    rect rgb(245, 245, 245)
+        Note over User,Frontend: Logout Flow
+        User->>Frontend: Click "Logout"
+        Frontend->>Supabase: supabase.auth.signOut()
+        Supabase-->>Frontend: Success
+        Frontend->>Frontend: Clear localStorage
+        Frontend->>User: Redirect to homepage
+    end

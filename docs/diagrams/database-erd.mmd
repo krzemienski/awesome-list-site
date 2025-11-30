@@ -1,0 +1,273 @@
+erDiagram
+    %% CORE CONTENT TABLES
+    categories ||--o{ subcategories : "has"
+    subcategories ||--o{ sub_subcategories : "has"
+    categories ||--o{ resources : "categorized by"
+
+    resources ||--o{ resource_tags : "tagged with"
+    tags ||--o{ resource_tags : "applied to"
+
+    %% USER DATA RELATIONSHIPS
+    auth_users ||--o| user_preferences : "has"
+    auth_users ||--o{ user_favorites : "favorites"
+    auth_users ||--o{ user_bookmarks : "bookmarks"
+    auth_users ||--o{ user_interactions : "interacts"
+    auth_users ||--o{ user_journey_progress : "enrolled in"
+
+    resources ||--o{ user_favorites : "favorited by"
+    resources ||--o{ user_bookmarks : "bookmarked by"
+    resources ||--o{ user_interactions : "interacted with"
+
+    %% LEARNING JOURNEY RELATIONSHIPS
+    learning_journeys ||--o{ journey_steps : "contains"
+    journey_steps }o--|| resources : "references"
+    learning_journeys ||--o{ user_journey_progress : "tracked by"
+    journey_steps ||--o{ user_journey_progress : "current step"
+
+    %% AI PROCESSING RELATIONSHIPS
+    enrichment_jobs ||--o{ enrichment_queue : "processes"
+    resources ||--o{ enrichment_queue : "enriched by"
+    auth_users ||--o{ enrichment_jobs : "started by"
+
+    %% RESOURCE EDIT RELATIONSHIPS
+    resources ||--o{ resource_edits : "has edits"
+    auth_users ||--o{ resource_edits : "submitted by"
+    auth_users ||--o{ resource_edits : "handled by"
+
+    %% GITHUB SYNC RELATIONSHIPS
+    github_sync_queue }o--o{ resources : "syncs"
+    auth_users ||--o{ github_sync_history : "performed by"
+
+    %% AUDIT RELATIONSHIPS
+    resources ||--o{ resource_audit_log : "logged"
+    auth_users ||--o{ resource_audit_log : "performed by"
+
+    %% TABLE DEFINITIONS
+    categories {
+        uuid id PK
+        text name UK
+        text slug UK
+        text description
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    subcategories {
+        uuid id PK
+        uuid category_id FK
+        text name
+        text slug
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    sub_subcategories {
+        uuid id PK
+        uuid subcategory_id FK
+        text name
+        text slug
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    resources {
+        uuid id PK
+        text title "NOT NULL"
+        text url "NOT NULL"
+        text description
+        text category
+        text subcategory
+        text sub_subcategory
+        text status "pending|approved|rejected|archived"
+        uuid submitted_by FK
+        uuid approved_by FK
+        timestamp approved_at
+        boolean github_synced
+        timestamp last_synced_at
+        jsonb metadata
+        tsvector search_vector
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    tags {
+        uuid id PK
+        text name UK
+        text slug UK
+        timestamp created_at
+    }
+
+    resource_tags {
+        uuid resource_id FK
+        uuid tag_id FK
+    }
+
+    auth_users {
+        uuid id PK
+        text email UK
+        jsonb user_metadata "role, avatar_url"
+        timestamp created_at
+    }
+
+    user_preferences {
+        uuid id PK
+        uuid user_id FK_UK
+        jsonb preferred_categories
+        text skill_level "beginner|intermediate|advanced"
+        jsonb learning_goals
+        jsonb preferred_resource_types
+        text time_commitment "daily|weekly|flexible"
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    user_favorites {
+        uuid user_id FK
+        uuid resource_id FK
+        timestamp created_at
+    }
+
+    user_bookmarks {
+        uuid user_id FK
+        uuid resource_id FK
+        text notes
+        timestamp created_at
+    }
+
+    user_interactions {
+        uuid id PK
+        uuid user_id FK
+        uuid resource_id FK
+        text interaction_type "view|click|bookmark|rate|complete"
+        integer interaction_value
+        jsonb metadata
+        timestamp timestamp
+    }
+
+    learning_journeys {
+        uuid id PK
+        text title "NOT NULL"
+        text description "NOT NULL"
+        text difficulty "beginner|intermediate|advanced"
+        text estimated_duration
+        text icon
+        integer order_index
+        text category "NOT NULL"
+        text status "draft|published|archived"
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    journey_steps {
+        uuid id PK
+        uuid journey_id FK
+        uuid resource_id FK
+        integer step_number "NOT NULL"
+        text title "NOT NULL"
+        text description
+        boolean is_optional
+        timestamp created_at
+    }
+
+    user_journey_progress {
+        uuid id PK
+        uuid user_id FK
+        uuid journey_id FK
+        uuid current_step_id FK
+        jsonb completed_steps "array of step IDs"
+        timestamp started_at
+        timestamp last_accessed_at
+        timestamp completed_at
+    }
+
+    enrichment_jobs {
+        uuid id PK
+        text status "pending|processing|completed|failed|cancelled"
+        text filter "all|unenriched"
+        integer batch_size
+        integer total_resources
+        integer processed_resources
+        integer successful_resources
+        integer failed_resources
+        integer skipped_resources
+        jsonb processed_resource_ids
+        jsonb failed_resource_ids
+        text error_message
+        jsonb metadata
+        uuid started_by FK
+        timestamp started_at
+        timestamp completed_at
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    enrichment_queue {
+        uuid id PK
+        uuid job_id FK
+        uuid resource_id FK
+        text status "pending|processing|completed|failed|skipped"
+        integer retry_count
+        integer max_retries
+        text error_message
+        jsonb ai_metadata
+        timestamp processed_at
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    resource_edits {
+        uuid id PK
+        uuid resource_id FK
+        uuid submitted_by FK
+        text status "pending|approved|rejected"
+        timestamp original_resource_updated_at
+        jsonb proposed_changes
+        jsonb proposed_data
+        jsonb claude_metadata
+        timestamp claude_analyzed_at
+        uuid handled_by FK
+        timestamp handled_at
+        text rejection_reason
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    github_sync_queue {
+        uuid id PK
+        text repository_url
+        text branch
+        jsonb resource_ids
+        text action "import|export"
+        text status "pending|processing|completed|failed"
+        text error_message
+        jsonb metadata
+        timestamp created_at
+        timestamp processed_at
+    }
+
+    github_sync_history {
+        uuid id PK
+        text repository_url
+        text direction "export|import"
+        text commit_sha
+        text commit_message
+        text commit_url
+        integer resources_added
+        integer resources_updated
+        integer resources_removed
+        integer total_resources
+        uuid performed_by FK
+        jsonb snapshot
+        jsonb metadata
+        timestamp created_at
+    }
+
+    resource_audit_log {
+        uuid id PK
+        uuid resource_id FK
+        text action "created|updated|approved|synced"
+        uuid performed_by FK
+        jsonb changes
+        text notes
+        timestamp created_at
+    }

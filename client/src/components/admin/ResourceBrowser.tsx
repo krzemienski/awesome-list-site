@@ -322,6 +322,7 @@ export function ResourceBrowser() {
       rowSelection,
     },
     onRowSelectionChange: setRowSelection,
+    getRowId: (row) => row.id,  // Use resource ID for stable selection across renders
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
   });
