@@ -25,6 +25,7 @@ import NotFound from "@/pages/not-found";
 import SubmitResource from "@/pages/SubmitResource";
 import Journeys from "@/pages/Journeys";
 import JourneyDetail from "@/pages/JourneyDetail";
+import SearchDialog from "@/components/ui/search-dialog";
 
 // Lazy load admin components for better initial bundle size
 const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
@@ -211,6 +212,13 @@ function Router() {
         )} />
         <Route component={NotFound} />
       </Switch>
+
+      {/* Search Dialog - opens on "/" keyboard shortcut */}
+      <SearchDialog
+        isOpen={searchOpen}
+        setIsOpen={setSearchOpen}
+        resources={awesomeList?.resources || []}
+      />
     </MainLayout>
   );
 }
