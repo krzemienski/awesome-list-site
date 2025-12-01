@@ -35,6 +35,11 @@ interface SyncQueueItem {
   processedAt?: string;
 }
 
+interface SyncQueueResponse {
+  total: number;
+  items: SyncQueueItem[];
+}
+
 export default function GitHubSyncPanel() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -47,7 +52,7 @@ export default function GitHubSyncPanel() {
   });
 
   // Fetch sync queue status
-  const { data: syncQueue } = useQuery<SyncQueueItem[]>({
+  const { data: syncQueueData } = useQuery<SyncQueueResponse>({
     queryKey: ['/api/github/sync-status'],
     refetchInterval: 5000 // Refresh every 5 seconds
   });
@@ -109,7 +114,8 @@ export default function GitHubSyncPanel() {
   });
 
   const lastSync = syncHistory?.[0];
-  const pendingJobs = (syncQueue || []).filter(item => item.status === 'pending' || item.status === 'processing').length;
+  const syncQueue = syncQueueData?.items || [];
+  const pendingJobs = syncQueue.filter(item => item.status === 'pending' || item.status === 'processing').length;
 
   return (
     <div className="space-y-6">
