@@ -109,7 +109,7 @@ export default function GitHubSyncPanel() {
   });
 
   const lastSync = syncHistory?.[0];
-  const pendingJobs = syncQueue?.filter(item => item.status === 'pending' || item.status === 'processing').length || 0;
+  const pendingJobs = (syncQueue || []).filter(item => item.status === 'pending' || item.status === 'processing').length;
 
   return (
     <div className="space-y-6">
