@@ -4,6 +4,7 @@ import { db } from "./db";
 import { categories, subcategories, subSubcategories, resources, users } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import { hashPassword } from "./passwordUtils";
+import { mapCategoryName } from "@shared/categoryMapping";
 
 /**
  * Helper function to generate slugs from category names
@@ -370,14 +371,15 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
         // Get ancestors
         const ancestors = findAncestors(deepest.id, categoryMap);
         
-        // Build category names
-        const categoryName = ancestors.level1?.title || '';
+        // Build category names with normalization to canonical names
+        const rawCategoryName = ancestors.level1?.title || '';
+        const categoryName = mapCategoryName(rawCategoryName);
         const subcategoryName = ancestors.level2?.title || null;
         const subSubcategoryName = ancestors.level3?.title || null;
 
         if (!categoryName) {
           skippedNoCategoryName++;
-          result.errors.push(`No valid category name for "${project.title}" with deepest category: ${deepest.id}`);
+          result.errors.push(`No valid category name for "${project.title}" with deepest category: ${deepest.id} (raw: ${rawCategoryName})`);
           continue; // Skip if no valid category
         }
 

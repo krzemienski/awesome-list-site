@@ -50,6 +50,7 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql, desc, asc, inArray, like, or, isNull, isNotNull } from "drizzle-orm";
+import { mapCategoryName } from "@shared/categoryMapping";
 
 // Interface for storage operations
 export interface IStorage {
@@ -1078,47 +1079,6 @@ export class DatabaseStorage implements IStorage {
       .limit(limit);
   }
   
-  // Map resource categories to canonical categories in the database
-  private mapCategoryName(category: string | null): string | null {
-    if (!category) return null;
-    
-    // Comprehensive mapping of all 21 database category variants to 9 canonical categories
-    const categoryMap: Record<string, string> = {
-      // Variant → Canonical mappings (12 variants)
-      'Video Players & Playback Libraries': 'Players & Clients',
-      'Video Editing & Processing Tools': 'Media Tools',
-      'Video Encoding Transcoding & Packaging Tools': 'Encoding & Codecs',
-      'Transcoding Codecs & Hardware Acceleration': 'Encoding & Codecs',
-      'Learning Tutorials & Documentation': 'Intro & Learning',
-      'Media Analysis Quality Metrics & AI Tools': 'Media Tools',
-      'Adaptive Streaming & Manifest Tools': 'Protocols & Transport',
-      'Build Tools Deployment & Utility Libraries': 'General Tools',
-      'DRM Security & Content Protection': 'General Tools',
-      'Standards Specifications & Industry Resources': 'Standards & Industry',
-      'Miscellaneous Experimental & Niche Tools': 'General Tools',
-      'Video Streaming & Distribution Solutions': 'Infrastructure & Delivery',
-      
-      // Canonical categories (9) - explicit passthrough for clarity
-      'Community & Events': 'Community & Events',
-      'Encoding & Codecs': 'Encoding & Codecs',
-      'General Tools': 'General Tools',
-      'Infrastructure & Delivery': 'Infrastructure & Delivery',
-      'Intro & Learning': 'Intro & Learning',
-      'Media Tools': 'Media Tools',
-      'Players & Clients': 'Players & Clients',
-      'Protocols & Transport': 'Protocols & Transport',
-      'Standards & Industry': 'Standards & Industry',
-    };
-    
-    const mapped = categoryMap[category];
-    
-    // Defensive logging for unmapped categories in production
-    if (!mapped && process.env.NODE_ENV === 'production') {
-      console.warn(`⚠️  Unmapped category found: "${category}" - resource will be dropped!`);
-    }
-    
-    return mapped || category;
-  }
 
   // Database-driven awesome list hierarchy - builds complete category tree from database
   async getAwesomeListFromDatabase(): Promise<AwesomeListData> {
@@ -1141,7 +1101,7 @@ export class DatabaseStorage implements IStorage {
     
     allResources.forEach(resource => {
       // Normalize and group by category
-      const mappedCategory = this.mapCategoryName(resource.category);
+      const mappedCategory = mapCategoryName(resource.category);
       if (mappedCategory) {
         if (!resourcesByCategory.has(mappedCategory)) {
           resourcesByCategory.set(mappedCategory, []);
