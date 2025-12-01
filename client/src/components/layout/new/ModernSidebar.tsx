@@ -48,6 +48,27 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
     return location === path || location.startsWith(path + "/");
   };
 
+  // Helper to count total resources including descendants
+  const getTotalResourceCount = (item: any): number => {
+    let total = item.resources?.length || 0;
+    
+    // Add resources from subcategories
+    if (item.subcategories) {
+      total += item.subcategories.reduce((sum: number, sub: any) => 
+        sum + getTotalResourceCount(sub), 0
+      );
+    }
+    
+    // Add resources from sub-subcategories
+    if (item.subSubcategories) {
+      total += item.subSubcategories.reduce((sum: number, subSub: any) => 
+        sum + getTotalResourceCount(subSub), 0
+      );
+    }
+    
+    return total;
+  };
+
   // Show true hierarchical structure from JSON data - categories with their actual subcategories
   const getHierarchicalCategories = (categories: Category[]) => {
     console.log("🏗️ BUILDING TRUE HIERARCHICAL NAVIGATION FROM JSON DATA");
@@ -60,10 +81,14 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
       !cat.name.startsWith("List of") &&
       !["Contributing", "License", "External Links", "Anti-features"].includes(cat.name)
     ).map(cat => {
-      // Filter out subcategories with 0 resources
-      const filteredSubcategories = cat.subcategories?.filter(sub => sub.resources.length > 0).map(sub => {
-        // Filter out sub-subcategories with 0 resources
-        const filteredSubSubcategories = sub.subSubcategories?.filter(subSub => subSub.resources.length > 0);
+      // Filter subcategories by TOTAL resource count (direct + descendants)
+      const filteredSubcategories = cat.subcategories?.filter(sub => 
+        getTotalResourceCount(sub) > 0
+      ).map(sub => {
+        // Filter sub-subcategories by TOTAL resource count
+        const filteredSubSubcategories = sub.subSubcategories?.filter(subSub => 
+          getTotalResourceCount(subSub) > 0
+        );
         return {
           ...sub,
           subSubcategories: filteredSubSubcategories
