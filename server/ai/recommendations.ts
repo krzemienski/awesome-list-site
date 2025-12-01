@@ -10,6 +10,40 @@ const anthropic = new Anthropic({
   baseURL: process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL,
 });
 
+/**
+ * Extract JSON from Claude's response, handling markdown code fences and extra text
+ */
+function extractJSON(text: string): any {
+  try {
+    text = text.trim();
+    
+    // Remove markdown code fences if present
+    if (text.startsWith('```')) {
+      const lines = text.split('\n');
+      lines.shift(); // Remove opening fence
+      if (lines[lines.length - 1].trim() === '```' || lines[lines.length - 1].trim().startsWith('```')) {
+        lines.pop(); // Remove closing fence
+      }
+      text = lines.join('\n').trim();
+    }
+    
+    // Find the JSON object/array in the text
+    const jsonStart = text.indexOf('{') !== -1 ? text.indexOf('{') : text.indexOf('[');
+    const jsonEnd = text.lastIndexOf('}') !== -1 ? text.lastIndexOf('}') + 1 : text.lastIndexOf(']') + 1;
+    
+    if (jsonStart !== -1 && jsonEnd > jsonStart) {
+      const jsonText = text.substring(jsonStart, jsonEnd);
+      return JSON.parse(jsonText);
+    }
+    
+    // If no JSON markers found, try parsing the whole text
+    return JSON.parse(text);
+  } catch (error) {
+    console.error('JSON extraction failed:', error);
+    throw error;
+  }
+}
+
 export interface UserProfile {
   userId: string;
   preferredCategories: string[];
@@ -126,11 +160,9 @@ Respond in JSON format:
       max_tokens: 2000
     });
 
-    // Extract JSON from response, handling markdown code fences
-    let jsonText = (response.content[0] as any).text || '{}';
-    // Remove markdown code fences if present
-    jsonText = jsonText.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
-    const result = JSON.parse(jsonText);
+    // Extract JSON from response using robust extraction
+    const jsonText = (response.content[0] as any).text || '{}';
+    const result = extractJSON(jsonText);
     
     const recommendations: AIRecommendationResult[] = result.recommendations?.map((rec: any) => {
       const resource = availableResources.find(r => r.url === rec.resourceId);
@@ -211,11 +243,9 @@ Respond in JSON format:
       max_tokens: 2000
     });
 
-    // Extract JSON from response, handling markdown code fences
-    let jsonText = (response.content[0] as any).text || '{}';
-    // Remove markdown code fences if present
-    jsonText = jsonText.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
-    const result = JSON.parse(jsonText);
+    // Extract JSON from response using robust extraction
+    const jsonText = (response.content[0] as any).text || '{}';
+    const result = extractJSON(jsonText);
     
     const learningPaths: AILearningPath[] = result.learningPaths?.map((path: any, index: number) => {
       // Find relevant resources for this path

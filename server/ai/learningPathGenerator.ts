@@ -510,7 +510,8 @@ Response format (JSON):
     const paths: GeneratedLearningPath[] = [];
 
     // Generate paths for preferred categories
-    for (const category of userProfile.preferredCategories.slice(0, limit)) {
+    const preferredCategories = userProfile.preferredCategories || [];
+    for (const category of preferredCategories.slice(0, limit)) {
       try {
         const path = await this.generateLearningPath(userProfile, category);
         paths.push(path);
@@ -523,7 +524,7 @@ Response format (JSON):
     if (paths.length < limit) {
       const popularCategories = ['Encoding & Codecs', 'Protocols & Transport', 'Players & Clients'];
       for (const category of popularCategories) {
-        if (!userProfile.preferredCategories.includes(category) && paths.length < limit) {
+        if (!preferredCategories.includes(category) && paths.length < limit) {
           try {
             const path = await this.generateLearningPath(userProfile, category);
             paths.push(path);

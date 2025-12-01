@@ -64,7 +64,17 @@ export class RecommendationEngine {
     learningPaths: LearningPathRecommendation[];
   }> {
     // FIXED: Clone profile before merging (done early so cache hit also uses enriched profile)
-    const enrichedProfile: UserProfile = { ...userProfile };
+    // Ensure all required fields have default values
+    const enrichedProfile: UserProfile = { 
+      ...userProfile,
+      viewHistory: userProfile.viewHistory || [],
+      bookmarks: userProfile.bookmarks || [],
+      completedResources: userProfile.completedResources || [],
+      preferredCategories: userProfile.preferredCategories || [],
+      learningGoals: userProfile.learningGoals || [],
+      preferredResourceTypes: userProfile.preferredResourceTypes || [],
+      ratings: userProfile.ratings || {}
+    };
 
     // Get user preferences from database and enrich the profile
     try {
