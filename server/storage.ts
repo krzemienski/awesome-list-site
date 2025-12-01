@@ -65,6 +65,7 @@ export interface IStorage {
   // Resource CRUD operations
   listResources(options: ListResourceOptions): Promise<{ resources: Resource[]; total: number }>;
   getResource(id: number): Promise<Resource | undefined>;
+  getResourceCount(): Promise<number>; // Get total count directly from database
   createResource(resource: InsertResource): Promise<Resource>;
   updateResource(id: number, resource: Partial<InsertResource>): Promise<Resource>;
   updateResourceStatus(id: number, status: string, approvedBy?: string): Promise<Resource>;
@@ -396,6 +397,11 @@ export class DatabaseStorage implements IStorage {
   async getResource(id: number): Promise<Resource | undefined> {
     const [resource] = await db.select().from(resources).where(eq(resources.id, id));
     return resource;
+  }
+  
+  async getResourceCount(): Promise<number> {
+    const [result] = await db.select({ count: sql<number>`count(*)::int` }).from(resources);
+    return result.count;
   }
   
   async createResource(resource: InsertResource): Promise<Resource> {
@@ -1459,6 +1465,7 @@ export class MemStorage implements IStorage {
     return { resources: [], total: 0 };
   }
   async getResource(id: number): Promise<Resource | undefined> { return undefined; }
+  async getResourceCount(): Promise<number> { return 0; }
   async createResource(resource: InsertResource): Promise<Resource> {
     throw new Error("Not implemented in memory storage");
   }

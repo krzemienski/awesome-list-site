@@ -2129,17 +2129,20 @@ export async function runBackgroundInitialization(): Promise<void> {
   try {
     console.log('Checking if database needs seeding...');
     const categories = await storage.listCategories();
-    const resourcesResult = await storage.listResources({ page: 1, limit: 1, status: 'approved' });
+    
+    // Query database DIRECTLY for actual resource count (not via API that depends on mapCategoryName)
+    // This prevents false-positive reseeding when category mapping isn't working yet
+    const actualResourceCount = await storage.getResourceCount();
     
     // Force reseed if:
     // 1. Database is empty (categories=0 or resources=0)
     // 2. Resource count is significantly below expected ~2600+ (force reseed if <2000)
-    const needsReseeding = categories.length === 0 || resourcesResult.total === 0 || resourcesResult.total < 2000;
+    const needsReseeding = categories.length === 0 || actualResourceCount === 0 || actualResourceCount < 2000;
     
     if (needsReseeding) {
-      console.log(`📦 Database needs seeding (categories: ${categories.length}, resources: ${resourcesResult.total})...`);
+      console.log(`📦 Database needs seeding (categories: ${categories.length}, resources: ${actualResourceCount})...`);
       console.log(`⚙️  Running database seeding in ${isProduction ? 'production' : 'development'} mode...`);
-      const seedResult = await seedDatabase({ clearExisting: resourcesResult.total > 0 ? true : false });
+      const seedResult = await seedDatabase({ clearExisting: actualResourceCount > 0 ? true : false });
       
       console.log('✅ Auto-seeding completed successfully:');
       console.log(`   - Categories: ${seedResult.categoriesInserted}`);
@@ -2151,7 +2154,7 @@ export async function runBackgroundInitialization(): Promise<void> {
         console.warn(`⚠️  Seeding completed with ${seedResult.errors.length} errors`);
       }
     } else {
-      console.log(`✓ Database already populated: ${categories.length} categories, ${resourcesResult.total} resources`);
+      console.log(`✓ Database already populated: ${categories.length} categories, ${actualResourceCount} resources`);
     }
   } catch (error) {
     console.error('❌ Error during auto-seeding (non-fatal):', error);
