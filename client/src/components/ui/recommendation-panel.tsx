@@ -306,7 +306,7 @@ export default function RecommendationPanel({
                               </div>
                               <div className="flex items-center gap-1">
                                 <BookOpen className="h-4 w-4" />
-                                {path.resources.length} resources
+                                {(path.resources || []).length} resources
                               </div>
                               <div className="flex items-center gap-1">
                                 <TrendingUp className="h-4 w-4" />
@@ -318,7 +318,7 @@ export default function RecommendationPanel({
                               <div className="text-sm">
                                 <span className="font-medium">Why this fits you:</span>
                                 <ul className="mt-1 text-muted-foreground">
-                                  {path.matchReasons.map((reason, i) => (
+                                  {(path.matchReasons || []).map((reason, i) => (
                                     <li key={i} className="text-xs">• {reason}</li>
                                   ))}
                                 </ul>
@@ -361,7 +361,7 @@ export default function RecommendationPanel({
                                         <div>
                                           <span className="font-medium">Resources:</span>
                                           <br />
-                                          {selectedPath.resources.length} items
+                                          {(selectedPath.resources || []).length} items
                                         </div>
                                       </div>
 
@@ -370,7 +370,7 @@ export default function RecommendationPanel({
                                       <div>
                                         <h4 className="font-semibold mb-2">Learning Objectives</h4>
                                         <ul className="space-y-1 text-sm">
-                                          {selectedPath.learningObjectives.map((objective, i) => (
+                                          {(selectedPath.learningObjectives || []).map((objective, i) => (
                                             <li key={i} className="flex items-center gap-2">
                                               <Target className="h-3 w-3 text-muted-foreground" />
                                               {objective}
@@ -379,11 +379,11 @@ export default function RecommendationPanel({
                                         </ul>
                                       </div>
 
-                                      {selectedPath.prerequisites.length > 0 && (
+                                      {(selectedPath.prerequisites || []).length > 0 && (
                                         <div>
                                           <h4 className="font-semibold mb-2">Prerequisites</h4>
                                           <div className="flex flex-wrap gap-2">
-                                            {selectedPath.prerequisites.map((prereq, i) => (
+                                            {(selectedPath.prerequisites || []).map((prereq, i) => (
                                               <Badge key={i} variant="secondary">
                                                 {prereq}
                                               </Badge>
@@ -393,10 +393,10 @@ export default function RecommendationPanel({
                                       )}
 
                                       <div>
-                                        <h4 className="font-semibold mb-2">Resources ({selectedPath.resources.length})</h4>
+                                        <h4 className="font-semibold mb-2">Resources ({(selectedPath.resources || []).length})</h4>
                                         <ScrollArea className="h-32">
                                           <div className="space-y-2">
-                                            {selectedPath.resources.map((resource, i) => (
+                                            {(selectedPath.resources || []).map((resource, i) => (
                                               <div key={i} className="text-sm p-2 border rounded">
                                                 <div className="font-medium">{resource.title}</div>
                                                 <div className="text-muted-foreground text-xs">
