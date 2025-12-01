@@ -241,4 +241,182 @@ test.describe('Simple Admin → Public Integration', () => {
     }
   });
 
+  test('Test 4: Bulk archive resources → Hidden from public', async () => {
+    await new Promise(resolve => setTimeout(resolve, 3000));
+
+    const helper = new MultiContextTestHelper();
+    await helper.init();
+
+    const TIMESTAMP = Date.now();
+
+    try {
+      const { page: adminPage } = await helper.createAdminContext();
+      await adminPage.goto('http://localhost:3000/admin');
+
+      const token = await adminPage.evaluate(() => {
+        const t = localStorage.getItem('sb-jeyldoypdkgsrfdhdcmm-auth-token');
+        return t ? JSON.parse(t).access_token : null;
+      });
+
+      // Create 3 approved resources
+      const resourceIds: string[] = [];
+      for (let i = 1; i <= 3; i++) {
+        const createRes = await adminPage.request.post(
+          'http://localhost:3000/api/resources',
+          {
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            data: {
+              title: `Archive Test ${i} ${TIMESTAMP}`,
+              url: `https://archive-${i}-${TIMESTAMP}.com`,
+              description: 'Will be archived',
+              category: 'General Tools'
+            }
+          }
+        );
+
+        if (createRes.ok()) {
+          const created = await createRes.json();
+          // Auto-approve
+          await adminPage.request.post(
+            `http://localhost:3000/api/admin/resources/${created.id}/approve`,
+            { headers: { 'Authorization': `Bearer ${token}` } }
+          );
+          resourceIds.push(created.id);
+        }
+      }
+
+      console.log('  Created 3 approved resources');
+
+      // Bulk archive
+      const bulkRes = await adminPage.request.post(
+        'http://localhost:3000/api/admin/resources/bulk',
+        {
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          data: { action: 'archive', resourceIds }
+        }
+      );
+
+      expect(bulkRes.status()).toBe(200);
+
+      // Verify all archived
+      for (const id of resourceIds) {
+        const resource = await getResourceById(id);
+        expect(resource.status).toBe('archived');
+      }
+
+      console.log('  ✅ All 3 archived in database');
+
+      // Anonymous should NOT see
+      const { page: anonPage } = await helper.createAnonymousContext();
+      await anonPage.goto('http://localhost:3000/category/general-tools');
+
+      for (const id of resourceIds) {
+        const resource = await getResourceById(id);
+        await expect(anonPage.locator(`text="${resource.title}"`)).not.toBeVisible();
+      }
+
+      console.log('  ✅ Archived resources hidden from public');
+      console.log('✅ TEST 4 PASSED');
+
+      // Cleanup
+      for (const id of resourceIds) {
+        await adminPage.request.delete(
+          `http://localhost:3000/api/admin/resources/${id}`,
+          { headers: { 'Authorization': `Bearer ${token}` } }
+        ).catch(() => {});
+      }
+
+    } finally {
+      await helper.closeAll();
+    }
+  });
+
+  test('Test 5: Bulk reject resources → Hidden from public', async () => {
+    await new Promise(resolve => setTimeout(resolve, 3000));
+
+    const helper = new MultiContextTestHelper();
+    await helper.init();
+
+    const TIMESTAMP = Date.now();
+
+    try {
+      const { page: adminPage } = await helper.createAdminContext();
+      await adminPage.goto('http://localhost:3000/admin');
+
+      const token = await adminPage.evaluate(() => {
+        const t = localStorage.getItem('sb-jeyldoypdkgsrfdhdcmm-auth-token');
+        return t ? JSON.parse(t).access_token : null;
+      });
+
+      // Create 2 pending resources
+      const resourceIds: string[] = [];
+      for (let i = 1; i <= 2; i++) {
+        const createRes = await adminPage.request.post(
+          'http://localhost:3000/api/resources',
+          {
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            data: {
+              title: `Reject Test ${i} ${TIMESTAMP}`,
+              url: `https://reject-${i}-${TIMESTAMP}.com`,
+              description: 'Will be rejected',
+              category: 'General Tools'
+            }
+          }
+        );
+
+        if (createRes.ok()) {
+          resourceIds.push((await createRes.json()).id);
+        }
+      }
+
+      console.log('  Created 2 pending resources');
+
+      // Bulk reject
+      const bulkRes = await adminPage.request.post(
+        'http://localhost:3000/api/admin/resources/bulk',
+        {
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          data: {
+            action: 'reject',
+            resourceIds,
+            data: { reason: 'Bulk rejection test' }
+          }
+        }
+      );
+
+      expect(bulkRes.status()).toBe(200);
+
+      // Verify all rejected
+      for (const id of resourceIds) {
+        const resource = await getResourceById(id);
+        expect(resource.status).toBe('rejected');
+      }
+
+      console.log('  ✅ All 2 rejected in database');
+
+      // Anonymous should NOT see
+      const { page: anonPage } = await helper.createAnonymousContext();
+      await anonPage.goto('http://localhost:3000/category/general-tools');
+
+      for (const id of resourceIds) {
+        const resource = await getResourceById(id);
+        await expect(anonPage.locator(`text="${resource.title}"`)).not.toBeVisible();
+      }
+
+      console.log('  ✅ Rejected resources hidden from public');
+      console.log('✅ TEST 5 PASSED');
+
+      // Cleanup
+      for (const id of resourceIds) {
+        await adminPage.request.delete(
+          `http://localhost:3000/api/admin/resources/${id}`,
+          { headers: { 'Authorization': `Bearer ${token}` } }
+        ).catch(() => {});
+      }
+
+    } finally {
+      await helper.closeAll();
+    }
+  });
+
 });

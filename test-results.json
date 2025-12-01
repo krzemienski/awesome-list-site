@@ -133,74 +133,8 @@
                 {
                   "workerIndex": 0,
                   "parallelIndex": 0,
-                  "status": "failed",
-                  "duration": 13245,
-                  "error": {
-                    "message": "TimeoutError: page.waitForLoadState: Timeout 10000ms exceeded.",
-                    "stack": "TimeoutError: page.waitForLoadState: Timeout 10000ms exceeded.\n    at /Users/nick/Desktop/awesome-list-site/tests/auth.setup.ts:51:14",
-                    "location": {
-                      "file": "/Users/nick/Desktop/awesome-list-site/tests/auth.setup.ts",
-                      "column": 14,
-                      "line": 51
-                    },
-                    "snippet": "  49 |\n  50 |   // Wait for dashboard to load\n> 51 |   await page.waitForLoadState('networkidle', { timeout: 10000 });\n     |              ^\n  52 |\n  53 |   console.log('📍 Admin page loaded');\n  54 |"
-                  },
-                  "errors": [
-                    {
-                      "location": {
-                        "file": "/Users/nick/Desktop/awesome-list-site/tests/auth.setup.ts",
-                        "column": 14,
-                        "line": 51
-                      },
-                      "message": "TimeoutError: page.waitForLoadState: Timeout 10000ms exceeded.\n\n  49 |\n  50 |   // Wait for dashboard to load\n> 51 |   await page.waitForLoadState('networkidle', { timeout: 10000 });\n     |              ^\n  52 |\n  53 |   console.log('📍 Admin page loaded');\n  54 |\n    at /Users/nick/Desktop/awesome-list-site/tests/auth.setup.ts:51:14"
-                    }
-                  ],
-                  "stdout": [
-                    {
-                      "text": "🔐 Setting up admin session for tests...\n"
-                    },
-                    {
-                      "text": "📍 Login page loaded\n"
-                    },
-                    {
-                      "text": "📍 Credentials entered\n"
-                    },
-                    {
-                      "text": "✅ Logged in successfully (redirected from /login)\n"
-                    }
-                  ],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2025-11-30T23:36:01.900Z",
-                  "annotations": [],
-                  "attachments": [
-                    {
-                      "name": "screenshot",
-                      "contentType": "image/png",
-                      "path": "/Users/nick/Desktop/awesome-list-site/test-results/auth.setup.ts-authenticate-as-admin-setup/test-failed-1.png"
-                    },
-                    {
-                      "name": "video",
-                      "contentType": "video/webm",
-                      "path": "/Users/nick/Desktop/awesome-list-site/test-results/auth.setup.ts-authenticate-as-admin-setup/video.webm"
-                    },
-                    {
-                      "name": "error-context",
-                      "contentType": "text/markdown",
-                      "path": "/Users/nick/Desktop/awesome-list-site/test-results/auth.setup.ts-authenticate-as-admin-setup/error-context.md"
-                    }
-                  ],
-                  "errorLocation": {
-                    "file": "/Users/nick/Desktop/awesome-list-site/tests/auth.setup.ts",
-                    "column": 14,
-                    "line": 51
-                  }
-                },
-                {
-                  "workerIndex": 1,
-                  "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 10385,
+                  "duration": 2618,
                   "errors": [],
                   "stdout": [
                     {
@@ -229,19 +163,13 @@
                     }
                   ],
                   "stderr": [],
-                  "retry": 1,
-                  "startTime": "2025-11-30T23:36:15.553Z",
+                  "retry": 0,
+                  "startTime": "2025-12-01T00:22:44.833Z",
                   "annotations": [],
-                  "attachments": [
-                    {
-                      "name": "trace",
-                      "contentType": "application/zip",
-                      "path": "/Users/nick/Desktop/awesome-list-site/test-results/auth.setup.ts-authenticate-as-admin-setup-retry1/trace.zip"
-                    }
-                  ]
+                  "attachments": []
                 }
               ],
-              "status": "flaky"
+              "status": "expected"
             }
           ],
           "id": "17e3fe6f4d9d8bd79c6b-1580989d32f149e984ed",
@@ -277,10 +205,10 @@
                   "projectName": "chromium-desktop",
                   "results": [
                     {
-                      "workerIndex": 2,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 15224,
+                      "duration": 14416,
                       "error": {
                         "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[role=\"menuitem\"]:has-text(\"Edit\")')\u001b[22m\n",
                         "stack": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[role=\"menuitem\"]:has-text(\"Edit\")')\u001b[22m\n\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/admin-to-public.spec.ts:62:26",
@@ -317,7 +245,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-30T23:36:26.326Z",
+                      "startTime": "2025-12-01T00:22:47.838Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -333,10 +261,10 @@
                       }
                     },
                     {
-                      "workerIndex": 3,
+                      "workerIndex": 2,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 19255,
+                      "duration": 14591,
                       "error": {
                         "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[role=\"menuitem\"]:has-text(\"Edit\")')\u001b[22m\n",
                         "stack": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[role=\"menuitem\"]:has-text(\"Edit\")')\u001b[22m\n\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/admin-to-public.spec.ts:62:26",
@@ -373,7 +301,7 @@
                       ],
                       "stderr": [],
                       "retry": 1,
-                      "startTime": "2025-11-30T23:36:41.792Z",
+                      "startTime": "2025-12-01T00:23:02.497Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -415,10 +343,10 @@
                   "projectName": "chromium-desktop",
                   "results": [
                     {
-                      "workerIndex": 4,
+                      "workerIndex": 3,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 19970,
+                      "duration": 12751,
                       "error": {
                         "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('tr').filter({ has: locator('a[href=\"https://www.ffmpeg.org/\"]') }).locator('button[aria-label*=\"menu\"]')\u001b[22m\n",
                         "stack": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('tr').filter({ has: locator('a[href=\"https://www.ffmpeg.org/\"]') }).locator('button[aria-label*=\"menu\"]')\u001b[22m\n\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/admin-to-public.spec.ts:166:63",
@@ -442,7 +370,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-30T23:37:01.389Z",
+                      "startTime": "2025-12-01T00:23:17.419Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -458,10 +386,10 @@
                       }
                     },
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 4,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 17669,
+                      "duration": 12712,
                       "error": {
                         "message": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('tr').filter({ has: locator('a[href=\"https://www.ffmpeg.org/\"]') }).locator('button[aria-label*=\"menu\"]')\u001b[22m\n",
                         "stack": "TimeoutError: locator.click: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('tr').filter({ has: locator('a[href=\"https://www.ffmpeg.org/\"]') }).locator('button[aria-label*=\"menu\"]')\u001b[22m\n\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/admin-to-public.spec.ts:166:63",
@@ -485,7 +413,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 1,
-                      "startTime": "2025-11-30T23:37:21.606Z",
+                      "startTime": "2025-12-01T00:23:30.411Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -519,6 +447,182 @@
       ]
     },
     {
+      "title": "integration/data-persistence.spec.ts",
+      "file": "integration/data-persistence.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Data Persistence",
+          "file": "integration/data-persistence.spec.ts",
+          "line": 11,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Test 21: Bookmark notes persist across logout/login",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 3868,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/data-persistence.spec.ts:40:32",
+                        "location": {
+                          "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/data-persistence.spec.ts",
+                          "column": 32,
+                          "line": 40
+                        },
+                        "snippet": "  38 |       );\n  39 |\n> 40 |       expect(bookmarkRes.ok()).toBeTruthy();\n     |                                ^\n  41 |       console.log('  Bookmark created with notes');\n  42 |\n  43 |       // Close first session"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/data-persistence.spec.ts",
+                            "column": 32,
+                            "line": 40
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n\n  38 |       );\n  39 |\n> 40 |       expect(bookmarkRes.ok()).toBeTruthy();\n     |                                ^\n  41 |       console.log('  Bookmark created with notes');\n  42 |\n  43 |       // Close first session\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/data-persistence.spec.ts:40:32"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-01T00:23:43.423Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-data-persisten-52e5a-persist-across-logout-login-chromium-desktop/test-failed-1.png"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/data-persistence.spec.ts",
+                        "column": 32,
+                        "line": 40
+                      }
+                    },
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 3884,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/data-persistence.spec.ts:40:32",
+                        "location": {
+                          "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/data-persistence.spec.ts",
+                          "column": 32,
+                          "line": 40
+                        },
+                        "snippet": "  38 |       );\n  39 |\n> 40 |       expect(bookmarkRes.ok()).toBeTruthy();\n     |                                ^\n  41 |       console.log('  Bookmark created with notes');\n  42 |\n  43 |       // Close first session"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/data-persistence.spec.ts",
+                            "column": 32,
+                            "line": 40
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n\n  38 |       );\n  39 |\n> 40 |       expect(bookmarkRes.ok()).toBeTruthy();\n     |                                ^\n  41 |       console.log('  Bookmark created with notes');\n  42 |\n  43 |       // Close first session\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/data-persistence.spec.ts:40:32"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2025-12-01T00:23:47.539Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-data-persisten-52e5a-persist-across-logout-login-chromium-desktop-retry1/test-failed-1.png"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-data-persisten-52e5a-persist-across-logout-login-chromium-desktop-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/data-persistence.spec.ts",
+                        "column": 32,
+                        "line": 40
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "a424270ab09ecdfb6b37-f22da4bd74050e51a0c0",
+              "file": "integration/data-persistence.spec.ts",
+              "line": 12,
+              "column": 3
+            },
+            {
+              "title": "Test 22: Archived resource not in search results",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5014,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "  Resource approved and public\n"
+                        },
+                        {
+                          "text": "  Resource archived\n"
+                        },
+                        {
+                          "text": "  ✅ Archived resource not in approved set (database verified)\n"
+                        },
+                        {
+                          "text": "✅ TEST 22 PASSED: Archived resources excluded from public\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-01T00:23:51.674Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "a424270ab09ecdfb6b37-9518086324e4418d6c26",
+              "file": "integration/data-persistence.spec.ts",
+              "line": 76,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
       "title": "integration/resource-lifecycle.spec.ts",
       "file": "integration/resource-lifecycle.spec.ts",
       "column": 0,
@@ -544,50 +648,61 @@
                   "projectName": "chromium-desktop",
                   "results": [
                     {
-                      "workerIndex": 6,
+                      "workerIndex": 7,
                       "parallelIndex": 0,
-                      "status": "timedOut",
-                      "duration": 30055,
+                      "status": "failed",
+                      "duration": 2840,
                       "error": {
-                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
-                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        "message": "Error: Submit failed: 401 - {\"message\":\"Unauthorized\"}",
+                        "stack": "Error: Submit failed: 401 - {\"message\":\"Unauthorized\"}\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/resource-lifecycle.spec.ts:54:15",
+                        "location": {
+                          "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/resource-lifecycle.spec.ts",
+                          "column": 15,
+                          "line": 54
+                        },
+                        "snippet": "  52 |         const errorBody = await submitRes.text();\n  53 |         console.error('  Submit failed:', submitRes.status(), errorBody);\n> 54 |         throw new Error(`Submit failed: ${submitRes.status()} - ${errorBody}`);\n     |               ^\n  55 |       }\n  56 |\n  57 |       const created = await submitRes.json();"
                       },
                       "errors": [
                         {
-                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                          "location": {
+                            "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/resource-lifecycle.spec.ts",
+                            "column": 15,
+                            "line": 54
+                          },
+                          "message": "Error: Submit failed: 401 - {\"message\":\"Unauthorized\"}\n\n  52 |         const errorBody = await submitRes.text();\n  53 |         console.error('  Submit failed:', submitRes.status(), errorBody);\n> 54 |         throw new Error(`Submit failed: ${submitRes.status()} - ${errorBody}`);\n     |               ^\n  55 |       }\n  56 |\n  57 |       const created = await submitRes.json();\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/resource-lifecycle.spec.ts:54:15"
                         }
                       ],
-                      "stdout": [
+                      "stdout": [],
+                      "stderr": [
                         {
-                          "text": "  ✅ Resource submitted, ID: 26c78bc1-cc6b-4fb7-9826-d009e245c477\n"
+                          "text": "  Submit failed: \u001b[33m401\u001b[39m {\"message\":\"Unauthorized\"}\n"
                         }
                       ],
-                      "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-30T23:37:39.597Z",
+                      "startTime": "2025-12-01T00:23:56.698Z",
                       "annotations": [],
                       "attachments": [
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
                           "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-resource-lifec-59d7b-e-→-Visible-on-public-pages-chromium-desktop/test-failed-1.png"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-resource-lifec-59d7b-e-→-Visible-on-public-pages-chromium-desktop/error-context.md"
                         }
-                      ]
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/resource-lifecycle.spec.ts",
+                        "column": 15,
+                        "line": 54
+                      }
                     },
                     {
-                      "workerIndex": 7,
+                      "workerIndex": 8,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 12677,
+                      "duration": 7276,
                       "errors": [],
                       "stdout": [
                         {
-                          "text": "  ✅ Resource submitted, ID: 0f0135fb-96fe-4963-b7ca-4d69234f22ab\n"
+                          "text": "  ✅ Resource submitted, ID: 112e9d62-75e0-42d9-a790-1861be0bcab1\n"
                         },
                         {
                           "text": "  ✅ Resource in pending status\n"
@@ -607,7 +722,7 @@
                       ],
                       "stderr": [],
                       "retry": 1,
-                      "startTime": "2025-11-30T23:38:10.148Z",
+                      "startTime": "2025-12-01T00:23:59.777Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -639,10 +754,58 @@
                   "projectName": "chromium-desktop",
                   "results": [
                     {
-                      "workerIndex": 7,
+                      "workerIndex": 8,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 1355,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/resource-lifecycle.spec.ts:188:30",
+                        "location": {
+                          "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/resource-lifecycle.spec.ts",
+                          "column": 30,
+                          "line": 188
+                        },
+                        "snippet": "  186 |       );\n  187 |\n> 188 |       expect(rejectRes.ok()).toBeTruthy();\n      |                              ^\n  189 |\n  190 |       console.log('  ✅ Admin rejected resource');\n  191 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/resource-lifecycle.spec.ts",
+                            "column": 30,
+                            "line": 188
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n\n  186 |       );\n  187 |\n> 188 |       expect(rejectRes.ok()).toBeTruthy();\n      |                              ^\n  189 |\n  190 |       console.log('  ✅ Admin rejected resource');\n  191 |\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/resource-lifecycle.spec.ts:188:30"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-01T00:24:07.168Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-resource-lifec-241fc-NOT-visible-on-public-pages-chromium-desktop/test-failed-1.png"
+                        },
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-resource-lifec-241fc-NOT-visible-on-public-pages-chromium-desktop/test-failed-2.png"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/resource-lifecycle.spec.ts",
+                        "column": 30,
+                        "line": 188
+                      }
+                    },
+                    {
+                      "workerIndex": 9,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 15986,
+                      "duration": 2371,
                       "errors": [],
                       "stdout": [
                         {
@@ -659,13 +822,19 @@
                         }
                       ],
                       "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-11-30T23:38:22.957Z",
+                      "retry": 1,
+                      "startTime": "2025-12-01T00:24:08.783Z",
                       "annotations": [],
-                      "attachments": []
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-resource-lifec-241fc-NOT-visible-on-public-pages-chromium-desktop-retry1/trace.zip"
+                        }
+                      ]
                     }
                   ],
-                  "status": "expected"
+                  "status": "flaky"
                 }
               ],
               "id": "4c3fe6b6837a82afebf6-70f347803ca4f8ecbe99",
@@ -703,10 +872,10 @@
                   "projectName": "chromium-desktop",
                   "results": [
                     {
-                      "workerIndex": 7,
+                      "workerIndex": 9,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 23987,
+                      "duration": 14991,
                       "error": {
                         "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"search\"]')\u001b[22m\n",
                         "stack": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"search\"]')\u001b[22m\n\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts:50:22",
@@ -730,7 +899,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-30T23:38:38.953Z",
+                      "startTime": "2025-12-01T00:24:11.231Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -751,10 +920,10 @@
                       }
                     },
                     {
-                      "workerIndex": 8,
+                      "workerIndex": 10,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 21161,
+                      "duration": 15123,
                       "error": {
                         "message": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"search\"]')\u001b[22m\n",
                         "stack": "TimeoutError: page.fill: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"search\"]')\u001b[22m\n\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts:50:22",
@@ -778,7 +947,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 1,
-                      "startTime": "2025-11-30T23:39:03.242Z",
+                      "startTime": "2025-12-01T00:24:26.469Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -825,10 +994,10 @@
                   "projectName": "chromium-desktop",
                   "results": [
                     {
-                      "workerIndex": 9,
+                      "workerIndex": 11,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 14202,
+                      "duration": 14002,
                       "error": {
                         "message": "TimeoutError: page.selectOption: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('select:has-text(\"All Statuses\"), [name=\"status\"]')\u001b[22m\n",
                         "stack": "TimeoutError: page.selectOption: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('select:has-text(\"All Statuses\"), [name=\"status\"]')\u001b[22m\n\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts:92:23",
@@ -851,12 +1020,12 @@
                       ],
                       "stdout": [
                         {
-                          "text": "  Database has \u001b[33m2661\u001b[39m approved resources\n"
+                          "text": "  Database has \u001b[33m2663\u001b[39m approved resources\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-30T23:39:24.790Z",
+                      "startTime": "2025-12-01T00:24:41.947Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -872,10 +1041,10 @@
                       }
                     },
                     {
-                      "workerIndex": 10,
+                      "workerIndex": 12,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 14321,
+                      "duration": 14092,
                       "error": {
                         "message": "TimeoutError: page.selectOption: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('select:has-text(\"All Statuses\"), [name=\"status\"]')\u001b[22m\n",
                         "stack": "TimeoutError: page.selectOption: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('select:has-text(\"All Statuses\"), [name=\"status\"]')\u001b[22m\n\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts:92:23",
@@ -898,12 +1067,12 @@
                       ],
                       "stdout": [
                         {
-                          "text": "  Database has \u001b[33m2661\u001b[39m approved resources\n"
+                          "text": "  Database has \u001b[33m2663\u001b[39m approved resources\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 1,
-                      "startTime": "2025-11-30T23:39:39.236Z",
+                      "startTime": "2025-12-01T00:24:56.196Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -945,10 +1114,10 @@
                   "projectName": "chromium-desktop",
                   "results": [
                     {
-                      "workerIndex": 11,
+                      "workerIndex": 13,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 14018,
+                      "duration": 14014,
                       "error": {
                         "message": "TimeoutError: page.selectOption: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('select:has-text(\"All Categories\"), [name=\"category\"]')\u001b[22m\n",
                         "stack": "TimeoutError: page.selectOption: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('select:has-text(\"All Categories\"), [name=\"category\"]')\u001b[22m\n\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts:127:23",
@@ -971,12 +1140,12 @@
                       ],
                       "stdout": [
                         {
-                          "text": "  Database has \u001b[33m101\u001b[39m General Tools resources\n"
+                          "text": "  Database has \u001b[33m103\u001b[39m General Tools resources\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-30T23:39:53.860Z",
+                      "startTime": "2025-12-01T00:25:10.589Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -992,10 +1161,10 @@
                       }
                     },
                     {
-                      "workerIndex": 12,
+                      "workerIndex": 14,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 14087,
+                      "duration": 14058,
                       "error": {
                         "message": "TimeoutError: page.selectOption: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('select:has-text(\"All Categories\"), [name=\"category\"]')\u001b[22m\n",
                         "stack": "TimeoutError: page.selectOption: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('select:has-text(\"All Categories\"), [name=\"category\"]')\u001b[22m\n\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/search-and-filters.spec.ts:127:23",
@@ -1018,12 +1187,12 @@
                       ],
                       "stdout": [
                         {
-                          "text": "  Database has \u001b[33m101\u001b[39m General Tools resources\n"
+                          "text": "  Database has \u001b[33m103\u001b[39m General Tools resources\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 1,
-                      "startTime": "2025-11-30T23:40:08.124Z",
+                      "startTime": "2025-12-01T00:25:24.848Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1057,6 +1226,324 @@
       ]
     },
     {
+      "title": "integration/security.spec.ts",
+      "file": "integration/security.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Security Tests",
+          "file": "integration/security.spec.ts",
+          "line": 10,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Test 24: Security headers present on all responses",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 15,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2571,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "  ✅ All security headers present\n"
+                        },
+                        {
+                          "text": "  Headers: [\n  \u001b[32m'content-security-policy'\u001b[39m,\n  \u001b[32m'cross-origin-opener-policy'\u001b[39m,\n  \u001b[32m'cross-origin-resource-policy'\u001b[39m,\n  \u001b[32m'referrer-policy'\u001b[39m,\n  \u001b[32m'strict-transport-security'\u001b[39m,\n  \u001b[32m'x-content-type-options'\u001b[39m,\n  \u001b[32m'x-dns-prefetch-control'\u001b[39m,\n  \u001b[32m'x-download-options'\u001b[39m,\n  \u001b[32m'x-frame-options'\u001b[39m,\n  \u001b[32m'x-permitted-cross-domain-policies'\u001b[39m,\n  \u001b[32m'x-xss-protection'\u001b[39m\n]\n"
+                        },
+                        {
+                          "text": "✅ TEST 24 PASSED: Security headers verified\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-01T00:25:39.202Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "67c0de2938d6b9e16bd1-93b48df44e6e64fae067",
+              "file": "integration/security.spec.ts",
+              "line": 11,
+              "column": 3
+            },
+            {
+              "title": "Test 25: Anonymous cannot access admin APIs",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 15,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 723,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "  ✅ Admin API blocked for anonymous: \u001b[33m401\u001b[39m\n"
+                        },
+                        {
+                          "text": "  ✅ Admin update blocked for anonymous: \u001b[33m401\u001b[39m\n"
+                        },
+                        {
+                          "text": "✅ TEST 25 PASSED: Anonymous blocked from admin APIs\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-01T00:25:41.779Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "67c0de2938d6b9e16bd1-0508e5b84cefaa6019e3",
+              "file": "integration/security.spec.ts",
+              "line": 42,
+              "column": 3
+            },
+            {
+              "title": "Test 26: Regular user cannot access admin APIs",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 15,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 2898,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m403\u001b[39m\nReceived: \u001b[31m401\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m403\u001b[39m\nReceived: \u001b[31m401\u001b[39m\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/security.spec.ts:106:33",
+                        "location": {
+                          "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/security.spec.ts",
+                          "column": 33,
+                          "line": 106
+                        },
+                        "snippet": "  104 |\n  105 |       // Should be 403 Forbidden (authenticated but not authorized)\n> 106 |       expect(statsRes.status()).toBe(403);\n      |                                 ^\n  107 |\n  108 |       console.log('  ✅ Admin stats blocked for regular user');\n  109 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/security.spec.ts",
+                            "column": 33,
+                            "line": 106
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m403\u001b[39m\nReceived: \u001b[31m401\u001b[39m\n\n  104 |\n  105 |       // Should be 403 Forbidden (authenticated but not authorized)\n> 106 |       expect(statsRes.status()).toBe(403);\n      |                                 ^\n  107 |\n  108 |       console.log('  ✅ Admin stats blocked for regular user');\n  109 |\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/security.spec.ts:106:33"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-01T00:25:42.506Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-security-Secur-92240-er-cannot-access-admin-APIs-chromium-desktop/test-failed-1.png"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/security.spec.ts",
+                        "column": 33,
+                        "line": 106
+                      }
+                    },
+                    {
+                      "workerIndex": 16,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2904,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "  ✅ Admin stats blocked for regular user\n"
+                        },
+                        {
+                          "text": "  ✅ Approve action blocked for regular user\n"
+                        },
+                        {
+                          "text": "✅ TEST 26 PASSED: Regular user blocked from admin actions\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2025-12-01T00:25:45.632Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-security-Secur-92240-er-cannot-access-admin-APIs-chromium-desktop-retry1/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "flaky"
+                }
+              ],
+              "id": "67c0de2938d6b9e16bd1-90fff474ef0c42fa0cce",
+              "file": "integration/security.spec.ts",
+              "line": 74,
+              "column": 3
+            },
+            {
+              "title": "Test 27: Audit log records admin actions",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 16,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 3135,
+                      "error": {
+                        "message": "SyntaxError: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+                        "stack": "SyntaxError: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/security.spec.ts:180:27",
+                        "location": {
+                          "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/security.spec.ts",
+                          "column": 27,
+                          "line": 180
+                        },
+                        "snippet": "  178 |\n  179 |       if (auditRes.ok()) {\n> 180 |         const auditLogs = await auditRes.json();\n      |                           ^\n  181 |         const hasApprovalLog = auditLogs.some((log: any) => log.action === 'approved');\n  182 |\n  183 |         if (hasApprovalLog) {"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/security.spec.ts",
+                            "column": 27,
+                            "line": 180
+                          },
+                          "message": "SyntaxError: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON\n\n  178 |\n  179 |       if (auditRes.ok()) {\n> 180 |         const auditLogs = await auditRes.json();\n      |                           ^\n  181 |         const hasApprovalLog = auditLogs.some((log: any) => log.action === 'approved');\n  182 |\n  183 |         if (hasApprovalLog) {\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/security.spec.ts:180:27"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "  Resource created and approved\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-01T00:25:48.551Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-security-Secur-16132-t-log-records-admin-actions-chromium-desktop/test-failed-1.png"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/security.spec.ts",
+                        "column": 27,
+                        "line": 180
+                      }
+                    },
+                    {
+                      "workerIndex": 17,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 3137,
+                      "error": {
+                        "message": "SyntaxError: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+                        "stack": "SyntaxError: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/security.spec.ts:180:27",
+                        "location": {
+                          "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/security.spec.ts",
+                          "column": 27,
+                          "line": 180
+                        },
+                        "snippet": "  178 |\n  179 |       if (auditRes.ok()) {\n> 180 |         const auditLogs = await auditRes.json();\n      |                           ^\n  181 |         const hasApprovalLog = auditLogs.some((log: any) => log.action === 'approved');\n  182 |\n  183 |         if (hasApprovalLog) {"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/security.spec.ts",
+                            "column": 27,
+                            "line": 180
+                          },
+                          "message": "SyntaxError: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON\n\n  178 |\n  179 |       if (auditRes.ok()) {\n> 180 |         const auditLogs = await auditRes.json();\n      |                           ^\n  181 |         const hasApprovalLog = auditLogs.some((log: any) => log.action === 'approved');\n  182 |\n  183 |         if (hasApprovalLog) {\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/security.spec.ts:180:27"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "  Resource created and approved\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2025-12-01T00:25:51.917Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-security-Secur-16132-t-log-records-admin-actions-chromium-desktop-retry1/test-failed-1.png"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-security-Secur-16132-t-log-records-admin-actions-chromium-desktop-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/security.spec.ts",
+                        "column": 27,
+                        "line": 180
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "67c0de2938d6b9e16bd1-0565924fe7e3e8ba08b6",
+              "file": "integration/security.spec.ts",
+              "line": 112,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
       "title": "integration/simple-admin-to-public.spec.ts",
       "file": "integration/simple-admin-to-public.spec.ts",
       "column": 0,
@@ -1082,10 +1569,10 @@
                   "projectName": "chromium-desktop",
                   "results": [
                     {
-                      "workerIndex": 13,
+                      "workerIndex": 18,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 4043,
+                      "duration": 4957,
                       "errors": [],
                       "stdout": [
                         {
@@ -1104,7 +1591,7 @@
                           "text": "Step 2: Verifying database...\n"
                         },
                         {
-                          "text": "  ✅ Database confirmed: Integration Test 1764546022713\n"
+                          "text": "  ✅ Database confirmed: Integration Test 1764548755495\n"
                         },
                         {
                           "text": "Step 3: Checking public visibility...\n"
@@ -1121,7 +1608,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-30T23:40:22.519Z",
+                      "startTime": "2025-12-01T00:25:55.313Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1147,10 +1634,10 @@
                   "projectName": "chromium-desktop",
                   "results": [
                     {
-                      "workerIndex": 13,
+                      "workerIndex": 18,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1077,
+                      "duration": 996,
                       "errors": [],
                       "stdout": [
                         {
@@ -1159,7 +1646,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-30T23:40:26.568Z",
+                      "startTime": "2025-12-01T00:26:00.276Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1185,10 +1672,10 @@
                   "projectName": "chromium-desktop",
                   "results": [
                     {
-                      "workerIndex": 13,
+                      "workerIndex": 18,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 2016,
+                      "duration": 1761,
                       "errors": [],
                       "stdout": [
                         {
@@ -1200,7 +1687,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-30T23:40:27.649Z",
+                      "startTime": "2025-12-01T00:26:01.277Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1211,6 +1698,100 @@
               "id": "8d50957863153b5f32b1-638c43a14e64e1aee2c7",
               "file": "integration/simple-admin-to-public.spec.ts",
               "line": 138,
+              "column": 3
+            },
+            {
+              "title": "Test 4: Bulk archive resources → Hidden from public",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 18,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5861,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "  Created 3 approved resources\n"
+                        },
+                        {
+                          "text": "  ✅ All 3 archived in database\n"
+                        },
+                        {
+                          "text": "  ✅ Archived resources hidden from public\n"
+                        },
+                        {
+                          "text": "✅ TEST 4 PASSED\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-01T00:26:03.041Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8d50957863153b5f32b1-ca6a8a45106360053cd4",
+              "file": "integration/simple-admin-to-public.spec.ts",
+              "line": 221,
+              "column": 3
+            },
+            {
+              "title": "Test 5: Bulk reject resources → Hidden from public",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 18,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5078,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "  Created 2 pending resources\n"
+                        },
+                        {
+                          "text": "  ✅ All 2 rejected in database\n"
+                        },
+                        {
+                          "text": "  ✅ Rejected resources hidden from public\n"
+                        },
+                        {
+                          "text": "✅ TEST 5 PASSED\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-01T00:26:08.906Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8d50957863153b5f32b1-9a8a1b1f79cf5ab885d5",
+              "file": "integration/simple-admin-to-public.spec.ts",
+              "line": 308,
               "column": 3
             }
           ]
@@ -1227,12 +1808,12 @@
         {
           "title": "RLS User Data Isolation",
           "file": "integration/user-isolation.spec.ts",
-          "line": 11,
+          "line": 13,
           "column": 6,
           "specs": [
             {
               "title": "Test 6: User A favorites → User B cannot see (UI)",
-              "ok": true,
+              "ok": false,
               "tags": [],
               "tests": [
                 {
@@ -1243,48 +1824,219 @@
                   "projectName": "chromium-desktop",
                   "results": [
                     {
-                      "workerIndex": 13,
+                      "workerIndex": 18,
                       "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 1872,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "  User A added favorite\n"
+                      "status": "failed",
+                      "duration": 796,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/user-isolation.spec.ts:45:27",
+                        "location": {
+                          "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/user-isolation.spec.ts",
+                          "column": 27,
+                          "line": 45
                         },
+                        "snippet": "  43 |       );\n  44 |\n> 45 |       expect(favRes.ok()).toBeTruthy();\n     |                           ^\n  46 |       console.log('  User A added favorite');\n  47 |\n  48 |       // === Verify in database ==="
+                      },
+                      "errors": [
                         {
-                          "text": "  Database confirmed User A favorite\n"
-                        },
-                        {
-                          "text": "  ✅ User B cannot see User A favorite (UI)\n"
-                        },
-                        {
-                          "text": "  ✅ User B blocked via API (RLS working)\n"
-                        },
-                        {
-                          "text": "  ✅ Database RLS blocks User B from User A data\n"
-                        },
-                        {
-                          "text": "\n✅ TEST 6 PASSED: User isolation verified at all layers\n\n"
+                          "location": {
+                            "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/user-isolation.spec.ts",
+                            "column": 27,
+                            "line": 45
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n\n  43 |       );\n  44 |\n> 45 |       expect(favRes.ok()).toBeTruthy();\n     |                           ^\n  46 |       console.log('  User A added favorite');\n  47 |\n  48 |       // === Verify in database ===\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/user-isolation.spec.ts:45:27"
                         }
                       ],
+                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-30T23:40:29.673Z",
+                      "startTime": "2025-12-01T00:26:13.993Z",
                       "annotations": [],
-                      "attachments": []
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-user-isolation-320ce-tes-→-User-B-cannot-see-UI--chromium-desktop/test-failed-1.png"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/user-isolation.spec.ts",
+                        "column": 27,
+                        "line": 45
+                      }
+                    },
+                    {
+                      "workerIndex": 19,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 810,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/user-isolation.spec.ts:45:27",
+                        "location": {
+                          "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/user-isolation.spec.ts",
+                          "column": 27,
+                          "line": 45
+                        },
+                        "snippet": "  43 |       );\n  44 |\n> 45 |       expect(favRes.ok()).toBeTruthy();\n     |                           ^\n  46 |       console.log('  User A added favorite');\n  47 |\n  48 |       // === Verify in database ==="
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/user-isolation.spec.ts",
+                            "column": 27,
+                            "line": 45
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n\n  43 |       );\n  44 |\n> 45 |       expect(favRes.ok()).toBeTruthy();\n     |                           ^\n  46 |       console.log('  User A added favorite');\n  47 |\n  48 |       // === Verify in database ===\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/user-isolation.spec.ts:45:27"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2025-12-01T00:26:15.032Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-user-isolation-320ce-tes-→-User-B-cannot-see-UI--chromium-desktop-retry1/test-failed-1.png"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-user-isolation-320ce-tes-→-User-B-cannot-see-UI--chromium-desktop-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/user-isolation.spec.ts",
+                        "column": 27,
+                        "line": 45
+                      }
                     }
                   ],
-                  "status": "expected"
+                  "status": "unexpected"
                 }
               ],
               "id": "8b574be17c2bb16299d8-bedb5bb963e813139f60",
               "file": "integration/user-isolation.spec.ts",
-              "line": 12,
+              "line": 14,
               "column": 3
             },
             {
               "title": "Test 7: User A bookmarks → User B cannot access (API)",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 20,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 781,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/user-isolation.spec.ts:140:32",
+                        "location": {
+                          "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/user-isolation.spec.ts",
+                          "column": 32,
+                          "line": 140
+                        },
+                        "snippet": "  138 |       );\n  139 |\n> 140 |       expect(bookmarkRes.ok()).toBeTruthy();\n      |                                ^\n  141 |       console.log('  User A created bookmark with notes');\n  142 |\n  143 |       // === User B: API should return empty ==="
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/user-isolation.spec.ts",
+                            "column": 32,
+                            "line": 140
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n\n  138 |       );\n  139 |\n> 140 |       expect(bookmarkRes.ok()).toBeTruthy();\n      |                                ^\n  141 |       console.log('  User A created bookmark with notes');\n  142 |\n  143 |       // === User B: API should return empty ===\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/user-isolation.spec.ts:140:32"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-01T00:26:16.106Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-user-isolation-3789b-→-User-B-cannot-access-API--chromium-desktop/test-failed-1.png"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/user-isolation.spec.ts",
+                        "column": 32,
+                        "line": 140
+                      }
+                    },
+                    {
+                      "workerIndex": 21,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 799,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/user-isolation.spec.ts:140:32",
+                        "location": {
+                          "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/user-isolation.spec.ts",
+                          "column": 32,
+                          "line": 140
+                        },
+                        "snippet": "  138 |       );\n  139 |\n> 140 |       expect(bookmarkRes.ok()).toBeTruthy();\n      |                                ^\n  141 |       console.log('  User A created bookmark with notes');\n  142 |\n  143 |       // === User B: API should return empty ==="
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/user-isolation.spec.ts",
+                            "column": 32,
+                            "line": 140
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n\n  138 |       );\n  139 |\n> 140 |       expect(bookmarkRes.ok()).toBeTruthy();\n      |                                ^\n  141 |       console.log('  User A created bookmark with notes');\n  142 |\n  143 |       // === User B: API should return empty ===\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/user-isolation.spec.ts:140:32"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2025-12-01T00:26:17.139Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-user-isolation-3789b-→-User-B-cannot-access-API--chromium-desktop-retry1/test-failed-1.png"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-user-isolation-3789b-→-User-B-cannot-access-API--chromium-desktop-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/user-isolation.spec.ts",
+                        "column": 32,
+                        "line": 140
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "8b574be17c2bb16299d8-836d3f5b9c480c96c96e",
+              "file": "integration/user-isolation.spec.ts",
+              "line": 94,
+              "column": 3
+            },
+            {
+              "title": "Test 8: User A preferences → User B cannot access",
               "ok": true,
               "tags": [],
               "tests": [
@@ -1296,28 +2048,19 @@
                   "projectName": "chromium-desktop",
                   "results": [
                     {
-                      "workerIndex": 13,
+                      "workerIndex": 22,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1662,
+                      "duration": 2895,
                       "errors": [],
                       "stdout": [
                         {
-                          "text": "  User A created bookmark with notes\n"
-                        },
-                        {
-                          "text": "  ✅ User B API shows empty (no User A bookmarks)\n"
-                        },
-                        {
-                          "text": "  ✅ Database RLS blocks cross-user bookmark access\n"
-                        },
-                        {
-                          "text": "\n✅ TEST 7 PASSED: Bookmark isolation verified\n\n"
+                          "text": "✅ TEST 8 PASSED: Preferences isolated (database level)\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-30T23:40:31.549Z",
+                      "startTime": "2025-12-01T00:26:18.190Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1325,9 +2068,121 @@
                   "status": "expected"
                 }
               ],
-              "id": "8b574be17c2bb16299d8-836d3f5b9c480c96c96e",
+              "id": "8b574be17c2bb16299d8-04d939f6a8903870e2fe",
               "file": "integration/user-isolation.spec.ts",
-              "line": 92,
+              "line": 158,
+              "column": 3
+            },
+            {
+              "title": "Test 9: User A submits resource → submission linked to User A only",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 22,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 2833,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/user-isolation.spec.ts:269:30",
+                        "location": {
+                          "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/user-isolation.spec.ts",
+                          "column": 30,
+                          "line": 269
+                        },
+                        "snippet": "  267 |       );\n  268 |\n> 269 |       expect(submitRes.ok()).toBeTruthy();\n      |                              ^\n  270 |       const created = await submitRes.json();\n  271 |       resourceId = created.id;\n  272 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/user-isolation.spec.ts",
+                            "column": 30,
+                            "line": 269
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n\n  267 |       );\n  268 |\n> 269 |       expect(submitRes.ok()).toBeTruthy();\n      |                              ^\n  270 |       const created = await submitRes.json();\n  271 |       resourceId = created.id;\n  272 |\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/user-isolation.spec.ts:269:30"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-01T00:26:21.091Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-user-isolation-afa38-ssion-linked-to-User-A-only-chromium-desktop/test-failed-1.png"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/user-isolation.spec.ts",
+                        "column": 30,
+                        "line": 269
+                      }
+                    },
+                    {
+                      "workerIndex": 23,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 2844,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/user-isolation.spec.ts:269:30",
+                        "location": {
+                          "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/user-isolation.spec.ts",
+                          "column": 30,
+                          "line": 269
+                        },
+                        "snippet": "  267 |       );\n  268 |\n> 269 |       expect(submitRes.ok()).toBeTruthy();\n      |                              ^\n  270 |       const created = await submitRes.json();\n  271 |       resourceId = created.id;\n  272 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/user-isolation.spec.ts",
+                            "column": 30,
+                            "line": 269
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n\n  267 |       );\n  268 |\n> 269 |       expect(submitRes.ok()).toBeTruthy();\n      |                              ^\n  270 |       const created = await submitRes.json();\n  271 |       resourceId = created.id;\n  272 |\n    at /Users/nick/Desktop/awesome-list-site/tests/integration/user-isolation.spec.ts:269:30"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2025-12-01T00:26:24.161Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-user-isolation-afa38-ssion-linked-to-User-A-only-chromium-desktop-retry1/test-failed-1.png"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/integration-user-isolation-afa38-ssion-linked-to-User-A-only-chromium-desktop-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/nick/Desktop/awesome-list-site/tests/integration/user-isolation.spec.ts",
+                        "column": 30,
+                        "line": 269
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "8b574be17c2bb16299d8-49f7e622b1bde9aba148",
+              "file": "integration/user-isolation.spec.ts",
+              "line": 197,
               "column": 3
             }
           ]
@@ -1337,11 +2192,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-11-30T23:36:01.642Z",
-    "duration": 271577.688,
-    "expected": 6,
+    "startTime": "2025-12-01T00:22:44.570Z",
+    "duration": 222456.80299999999,
+    "expected": 10,
     "skipped": 0,
-    "unexpected": 5,
-    "flaky": 2
+    "unexpected": 10,
+    "flaky": 3
   }
 }
