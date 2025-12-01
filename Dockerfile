@@ -17,8 +17,9 @@ RUN npm run build
 
 # Production image
 FROM base AS runner
+ARG PORT=3000
 ENV NODE_ENV=production
-ENV PORT=3000
+ENV PORT=$PORT
 
 # Create non-root user for security
 RUN addgroup --system --gid 1001 nodejs && \
@@ -33,9 +34,9 @@ COPY --chown=nodejs:nodejs server ./server
 
 USER nodejs
 
-EXPOSE 3000
+EXPOSE $PORT
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3000/api/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"
+  CMD node -e "require('http').get('http://localhost:' + process.env.PORT + '/api/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"
 
 CMD ["node", "dist/index.js"]
