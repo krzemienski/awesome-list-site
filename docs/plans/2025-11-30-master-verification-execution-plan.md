@@ -5,6 +5,7 @@
 > - Use superpowers:systematic-debugging for EVERY bug (mandatory 4-phase investigation)
 > - Use superpowers:root-cause-tracing when bugs are deep in call stack
 > - Use superpowers:dispatching-parallel-agents for code audit (Domain 5)
+> - **Use multi-context-integration-testing for ALL testing in Domains 2-5** (created Session 8)
 
 **Goal:** Complete verification of all 33 application features with systematic debugging for every bug, achieving honest 95%+ completion with production deployment
 
@@ -196,6 +197,8 @@
 
 ### Domain 3: User Workflow Validation (10 Features Untested)
 
+**SKILL INVOCATION:** Use multi-context-integration-testing for ALL user workflow testing
+
 **Status:** 10% complete (1/10 user features verified - basic browse/search)
 **Remaining:** 90% (9 features with end-to-end testing)
 **Tasks:** 150 tasks (from SESSION_6_EXECUTION_PLAN.md)
@@ -287,6 +290,8 @@
 ---
 
 ### Domain 4: Admin Workflow Validation (12 Features Untested)
+
+**SKILL INVOCATION:** Use multi-context-integration-testing for admin workflow validation (especially RLS + audit logging)
 
 **Status:** 8% complete (1/12 admin features - dashboard stats working)
 **Remaining:** 92% (11 features including RISKY bulk operations)
@@ -415,6 +420,8 @@
 ---
 
 ### Domain 5: Production Hardening (Security + Performance + Deployment)
+
+**SKILL INVOCATION:** Use multi-context-integration-testing for RLS + XSS + security testing
 
 **Status:** 0% complete (nothing tested)
 **Remaining:** 100% (all security, performance, deployment tasks)
@@ -681,7 +688,28 @@ Passes all 3 layers?
 
 ---
 
+### Phase 1.5: Load Multi-Context Testing Methodology (REQUIRED)
+
+**Before starting Domain 2, invoke the multi-context-integration-testing skill:**
+
+```
+I'm using the multi-context-integration-testing skill for all Domains 2-5 testing.
+```
+
+**This skill provides proven patterns from Session 8:**
+- MultiContextTestHelper for admin/user/anonymous browser contexts
+- 3-layer validation methodology (API + Database + UI)
+- Auth token extraction from localStorage (navigate first!)
+- RLS isolation testing patterns
+- Rate limiting handling between tests
+
+**Why required**: Prevents 4.5 hours of trial-and-error rediscovering these patterns
+
+---
+
 ### Domain 2: API Endpoint Testing (180 tasks, 10-12 hours) - 14% Complete
+
+**SKILL INVOCATION:** Use multi-context-integration-testing for all endpoint tests below
 
 **High Priority Endpoints (60 tasks = 20 endpoints × 3 subtasks)**
 
