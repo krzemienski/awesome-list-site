@@ -22,6 +22,7 @@ export interface RecommendationResult {
   reason: string;
   type: 'ai_powered' | 'rule_based' | 'hybrid';
   score?: number; // Internal score for ranking
+  aiGenerated?: boolean; // Flag to indicate if AI generated
 }
 
 export interface LearningPathRecommendation {
@@ -178,7 +179,8 @@ export class RecommendationEngine {
               confidence: Math.round(rec.confidenceLevel * 100),
               reason: rec.reason,
               type: 'ai_powered' as const,
-              score: rec.score
+              score: rec.score,
+              aiGenerated: true // Preserve AI flag
             };
           }).filter(Boolean) as RecommendationResult[];
         } catch (error) {

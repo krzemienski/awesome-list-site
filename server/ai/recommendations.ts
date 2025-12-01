@@ -122,12 +122,11 @@ USER PROFILE:
 - Recently Rated Highly: ${Object.entries(userProfile.ratings).filter(([_, rating]) => rating >= 4).map(([url, _]) => url).slice(0, 5).join(', ')}
 
 AVAILABLE RESOURCES (JSON format):
-${JSON.stringify(relevantResources.slice(0, 50).map(r => ({
+${JSON.stringify(relevantResources.slice(0, 15).map(r => ({
   url: r.url,
   title: r.title,
-  description: r.description,
-  category: r.category,
-  subcategory: r.subcategory
+  description: r.description?.substring(0, 100) || '', // Truncate descriptions to save tokens
+  category: r.category
 })), null, 2)}
 
 Please provide ${Math.min(limit, 8)} personalized recommendations. For each recommendation, provide:
@@ -179,7 +178,10 @@ Respond in JSON format:
     return recommendations;
 
   } catch (error: any) {
-    console.warn('AI recommendation generation failed:', error.message);
+    console.error('AI recommendation generation failed:', error);
+    if (error.response) {
+      console.error('Claude API error response:', JSON.stringify(error.response, null, 2));
+    }
     return generateFallbackRecommendations(userProfile, availableResources, limit);
   }
 }
