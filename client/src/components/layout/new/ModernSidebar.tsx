@@ -59,7 +59,22 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
       cat.name !== "Table of contents" && 
       !cat.name.startsWith("List of") &&
       !["Contributing", "License", "External Links", "Anti-features"].includes(cat.name)
-    );
+    ).map(cat => {
+      // Filter out subcategories with 0 resources
+      const filteredSubcategories = cat.subcategories?.filter(sub => sub.resources.length > 0).map(sub => {
+        // Filter out sub-subcategories with 0 resources
+        const filteredSubSubcategories = sub.subSubcategories?.filter(subSub => subSub.resources.length > 0);
+        return {
+          ...sub,
+          subSubcategories: filteredSubSubcategories
+        };
+      });
+      
+      return {
+        ...cat,
+        subcategories: filteredSubcategories
+      };
+    });
     
     console.log("✅ Filtered categories:", filteredCategories.length);
     console.log("📝 Available categories:", filteredCategories.map(c => `${c.name} (${c.resources.length} resources)`));

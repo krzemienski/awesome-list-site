@@ -1089,53 +1089,42 @@ export class DatabaseStorage implements IStorage {
       .where(eq(resources.status, 'approved'))
       .orderBy(resources.category, resources.subcategory, resources.subSubcategory, resources.title);
     
+    
     // 2. Get all categories, subcategories, and sub-subcategories from database
     const dbCategories = await db.select().from(categories).orderBy(asc(categories.name));
     const dbSubcategories = await db.select().from(subcategories).orderBy(asc(subcategories.name));
     const dbSubSubcategories = await db.select().from(subSubcategories).orderBy(asc(subSubcategories.name));
     
-    // 3. Group resources by category hierarchy with normalized category names
-    const resourcesByCategory = new Map<string, Resource[]>();
-    const resourcesBySubcategory = new Map<string, Resource[]>();
-    const resourcesBySubSubcategory = new Map<string, Resource[]>();
+    // 3. Helper function to filter resources by hierarchy level
+    // We use filter-based aggregation instead of Maps to avoid losing resources during normalization
+    const getResourcesForCategory = (categoryName: string): Resource[] => {
+      return allResources.filter(r => mapCategoryName(r.category) === categoryName);
+    };
     
-    allResources.forEach(resource => {
-      // Normalize and group by category
-      const mappedCategory = mapCategoryName(resource.category);
-      if (mappedCategory) {
-        if (!resourcesByCategory.has(mappedCategory)) {
-          resourcesByCategory.set(mappedCategory, []);
-        }
-        resourcesByCategory.get(mappedCategory)!.push(resource);
-      }
-      
-      // By subcategory (use as-is)
-      if (resource.subcategory) {
-        if (!resourcesBySubcategory.has(resource.subcategory)) {
-          resourcesBySubcategory.set(resource.subcategory, []);
-        }
-        resourcesBySubcategory.get(resource.subcategory)!.push(resource);
-      }
-      
-      // By sub-subcategory (use as-is)
-      if (resource.subSubcategory) {
-        if (!resourcesBySubSubcategory.has(resource.subSubcategory)) {
-          resourcesBySubSubcategory.set(resource.subSubcategory, []);
-        }
-        resourcesBySubSubcategory.get(resource.subSubcategory)!.push(resource);
-      }
-    });
+    const getResourcesForSubcategory = (subcategoryName: string): Resource[] => {
+      return allResources.filter(r => r.subcategory === subcategoryName);
+    };
     
-    // 4. Build hierarchical structure
+    const getResourcesForSubSubcategory = (subSubcategoryName: string): Resource[] => {
+      return allResources.filter(r => r.subSubcategory === subSubcategoryName);
+    };
+    
+    // 4. Build hierarchical structure using filter-based aggregation
     const hierarchicalCategories: HierarchicalCategory[] = [];
     
     for (const dbCategory of dbCategories) {
+      // Get ALL resources for this category (filter from allResources)
+      const categoryResources = getResourcesForCategory(dbCategory.name);
+      
       // Get subcategories for this category
       const catSubcategories = dbSubcategories.filter(sub => sub.categoryId === dbCategory.id);
       
       const hierarchicalSubcategories: HierarchicalSubcategory[] = [];
       
       for (const dbSubcat of catSubcategories) {
+        // Get ALL resources for this subcategory (filter from allResources)
+        const subcategoryResources = getResourcesForSubcategory(dbSubcat.name);
+        
         // Get sub-subcategories for this subcategory
         const subcatSubSubcategories = dbSubSubcategories.filter(
           subSub => subSub.subcategoryId === dbSubcat.id
@@ -1144,13 +1133,13 @@ export class DatabaseStorage implements IStorage {
         const hierarchicalSubSubcategories: HierarchicalSubSubcategory[] = subcatSubSubcategories.map(subSub => ({
           name: subSub.name,
           slug: subSub.slug,
-          resources: resourcesBySubSubcategory.get(subSub.name) || []
+          resources: getResourcesForSubSubcategory(subSub.name)
         }));
         
         hierarchicalSubcategories.push({
           name: dbSubcat.name,
           slug: dbSubcat.slug,
-          resources: resourcesBySubcategory.get(dbSubcat.name) || [],
+          resources: subcategoryResources,
           subSubcategories: hierarchicalSubSubcategories
         });
       }
@@ -1158,7 +1147,7 @@ export class DatabaseStorage implements IStorage {
       hierarchicalCategories.push({
         name: dbCategory.name,
         slug: dbCategory.slug,
-        resources: resourcesByCategory.get(dbCategory.name) || [],
+        resources: categoryResources,
         subcategories: hierarchicalSubcategories
       });
     }

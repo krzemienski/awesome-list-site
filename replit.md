@@ -6,6 +6,21 @@ A production-ready React application for browsing and discovering over 2,600 cur
 
 ## Recent Changes (December 1, 2025)
 
+### ✅ SIDEBAR FIX - Empty Subcategory Filtering (December 1, 2025 10:25 AM)
+- **Root Cause**: Sidebar displayed all subcategories from database schema, including those with 0 resources
+  - Many resources are assigned directly to top-level categories (58% lack subcategories)
+  - Categories/subcategories tables define full 3-level hierarchy
+  - Sidebar showed all defined subcategories, even empty ones (e.g., "FFMPEG & Tools": 0 resources)
+- **Solution**: Added client-side filtering in `ModernSidebar.tsx` to hide empty hierarchical elements
+  ```typescript
+  const filteredSubcategories = cat.subcategories?.filter(sub => sub.resources.length > 0)
+  const filteredSubSubcategories = sub.subSubcategories?.filter(subSub => subSub.resources.length > 0)
+  ```
+- **Verification**: ✅ E2E test passed (12/12 steps) - empty subcategories correctly hidden from DOM
+- **Result**: Sidebar now shows only populated subcategories with accurate resource counts
+  - Example: "DRM" (17 resources) visible, "FFMPEG & Tools" (0 resources) hidden
+  - Improves UX by eliminating confusing "0" count badges
+
 ### ✅ PRODUCTION FIX - Shared Category Mapping (December 1, 2025 5:04 AM)
 - **Root Cause**: Production showing only 1,949/2,646 resources due to mismatch between seeding and API category mapping
   - Seeding code inserted resources with raw JSON category names (21 variants)
