@@ -126,7 +126,11 @@ Respond in JSON format:
       max_tokens: 2000
     });
 
-    const result = JSON.parse((response.content[0] as any).text || '{}');
+    // Extract JSON from response, handling markdown code fences
+    let jsonText = (response.content[0] as any).text || '{}';
+    // Remove markdown code fences if present
+    jsonText = jsonText.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
+    const result = JSON.parse(jsonText);
     
     const recommendations: AIRecommendationResult[] = result.recommendations?.map((rec: any) => {
       const resource = availableResources.find(r => r.url === rec.resourceId);
@@ -207,7 +211,11 @@ Respond in JSON format:
       max_tokens: 2000
     });
 
-    const result = JSON.parse((response.content[0] as any).text || '{}');
+    // Extract JSON from response, handling markdown code fences
+    let jsonText = (response.content[0] as any).text || '{}';
+    // Remove markdown code fences if present
+    jsonText = jsonText.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
+    const result = JSON.parse(jsonText);
     
     const learningPaths: AILearningPath[] = result.learningPaths?.map((path: any, index: number) => {
       // Find relevant resources for this path

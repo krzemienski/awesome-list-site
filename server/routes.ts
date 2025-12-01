@@ -1953,40 +1953,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // POST /api/learning-paths - Get learning path suggestions
-  app.post("/api/learning-paths", async (req, res) => {
-    try {
-      res.json([]);
-    } catch (error) {
-      console.error('Error generating learning paths:', error);
-      res.status(500).json({ error: 'Failed to generate learning paths' });
-    }
-  });
-
-  // POST /api/interactions - Track user interactions
-  app.post("/api/interactions", async (req, res) => {
-    try {
-      res.json({ status: 'recorded', message: 'Interaction recorded' });
-    } catch (error) {
-      console.error('Error recording interaction:', error);
-      res.status(500).json({ error: 'Failed to record interaction' });
-    }
-  });
-
-  // GET /api/recommendations - Get personalized recommendations (stub)
+  // GET /api/recommendations - Get personalized recommendations
   app.get("/api/recommendations", async (req, res) => {
     try {
-      res.json([]);
+      const limit = parseInt(req.query.limit as string) || 10;
+      
+      // Create a user profile for anonymous users from query params
+      const userProfile: AIUserProfile = {
+        userId: 'anonymous',
+        preferredCategories: (req.query.categories as string)?.split(',').filter(Boolean) || [],
+        skillLevel: (req.query.skillLevel as string || 'intermediate') as 'beginner' | 'intermediate' | 'advanced',
+        learningGoals: (req.query.goals as string)?.split(',').filter(Boolean) || [],
+        preferredResourceTypes: (req.query.types as string)?.split(',').filter(Boolean) || [],
+        timeCommitment: (req.query.timeCommitment as string || 'flexible') as 'daily' | 'weekly' | 'flexible',
+        viewHistory: [],
+        bookmarks: [],
+        completedResources: [],
+        ratings: {}
+      };
+
+      const result = await recommendationEngine.generateRecommendations(
+        userProfile,
+        limit,
+        false
+      );
+
+      res.json(result.recommendations || []);
     } catch (error) {
       console.error('Error generating recommendations:', error);
       res.status(500).json({ error: 'Failed to generate recommendations' });
     }
   });
 
-  // POST /api/recommendations - Get personalized recommendations (stub)
+  // POST /api/recommendations - Get personalized recommendations for authenticated users
   app.post("/api/recommendations", async (req, res) => {
     try {
-      res.json([]);
+      const userProfile: AIUserProfile = req.body;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const forceRefresh = req.query.refresh === 'true';
+
+      const result = await recommendationEngine.generateRecommendations(
+        userProfile,
+        limit,
+        forceRefresh
+      );
+
+      res.json(result.recommendations || []);
     } catch (error) {
       console.error('Error generating AI recommendations:', error);
       res.status(500).json({ error: 'Failed to generate recommendations' });
