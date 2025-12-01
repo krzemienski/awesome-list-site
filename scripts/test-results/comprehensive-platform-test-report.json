@@ -1,0 +1,162 @@
+{
+  "summary": {
+    "total": 15,
+    "passed": 10,
+    "failed": 0,
+    "warnings": 1,
+    "successRate": "66.7"
+  },
+  "results": {
+    "authentication": {
+      "login": {
+        "status": "PASS",
+        "email": "admin@example.com",
+        "role": "admin",
+        "sessionId": "s%3AQOEjEr06mizoNUuO3D-7yBI_u0uL_M5a.TKGE%2BTknJPV2ax2m%2Bwws%2FG8vA4M7fW8C5n8uj6wQjGE"
+      },
+      "session": {
+        "status": "PASS",
+        "user": {
+          "id": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+          "email": "admin@example.com",
+          "name": "Admin User",
+          "avatar": null,
+          "role": "admin",
+          "createdAt": "2025-11-18T16:40:48.993Z"
+        },
+        "isAuthenticated": true
+      },
+      "replitAuth": {
+        "status": "PASS",
+        "loginEndpoint": true,
+        "redirectStatus": 302
+      }
+    },
+    "search": {
+      "databaseCount": 1949,
+      "ffmpeg": {
+        "status": "PASS",
+        "count": 90,
+        "total": 90,
+        "sampleResults": [
+          {
+            "title": "FFmpeg CLI (ffmpeg)",
+            "url": "https://ffmpeg.org/",
+            "category": "Encoding & Codecs"
+          },
+          {
+            "title": "jrottenberg/ffmpeg Docker Images",
+            "url": "https://hub.docker.com/r/jrottenberg/ffmpeg",
+            "category": "Encoding & Codecs"
+          },
+          {
+            "title": "ffmpeg-go",
+            "url": "https://github.com/u2takey/ffmpeg-go",
+            "category": "Encoding & Codecs"
+          },
+          {
+            "title": "xk media library",
+            "url": "https://github.com/chapmanjacobd/library",
+            "category": "Media Tools"
+          },
+          {
+            "title": "linuxserver/docker-ffmpeg",
+            "url": "https://github.com/linuxserver/docker-ffmpeg",
+            "category": "Encoding & Codecs"
+          }
+        ]
+      },
+      "videoPlayer": {
+        "status": "PASS",
+        "count": 72,
+        "total": 72,
+        "sampleResults": [
+          {
+            "title": "Doikki/DKVideoPlayer",
+            "url": "https://github.com/Doikki/DKVideoPlayer",
+            "category": "Players & Clients"
+          },
+          {
+            "title": "OMXPlayer",
+            "url": "https://github.com/popcornmix/omxplayer",
+            "category": "Players & Clients"
+          },
+          {
+            "title": "GNOME Videos (Totem)",
+            "url": "https://apps.gnome.org/Totem/",
+            "category": "Players & Clients"
+          },
+          {
+            "title": "MarcinMoskala/VideoPlayView",
+            "url": "https://github.com/MarcinMoskala/VideoPlayView",
+            "category": "Players & Clients"
+          },
+          {
+            "title": "Vimeo PlayerKit",
+            "url": "https://github.com/vimeo/PlayerKit",
+            "category": "Players & Clients"
+          }
+        ]
+      }
+    },
+    "github": {
+      "import": {
+        "status": "PASS",
+        "imported": 202,
+        "updated": 596,
+        "skipped": 0,
+        "errors": []
+      },
+      "export": {
+        "status": "PASS",
+        "endpoint": "POST /api/github/export",
+        "message": "Export started"
+      }
+    },
+    "enrichment": {
+      "start": {
+        "status": "PASS",
+        "jobId": 17,
+        "message": "Batch enrichment job started successfully"
+      },
+      "status": {
+        "status": "PASS",
+        "job": {
+          "id": 17,
+          "status": "processing",
+          "totalResources": 31,
+          "processedResources": 0,
+          "successfulResources": 0,
+          "failedResources": 0
+        }
+      }
+    },
+    "scraping": {
+      "status": "WARNING",
+      "message": "No scraped resources found - web scraping may not have run yet"
+    },
+    "validation": {
+      "titles": {
+        "status": "WARNING",
+        "suspiciousCount": 1,
+        "suspicious": [
+          {
+            "id": 11565,
+            "title": "tjenkinson/mock-hls-server",
+            "pattern": "Mock",
+            "status": "approved"
+          }
+        ]
+      },
+      "urls": {
+        "status": "PASS",
+        "suspiciousCount": 0
+      },
+      "statistics": {
+        "total": 1949,
+        "approved": 1949,
+        "pending": 0
+      }
+    }
+  }
+}
