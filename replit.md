@@ -6,10 +6,24 @@ A production-ready React application for browsing and discovering over 2,600 cur
 
 ## Recent Changes (December 1, 2025)
 
+### ✅ PRODUCTION FIX - Shared Category Mapping (December 1, 2025 5:04 AM)
+- **Root Cause**: Production showing only 1,949/2,646 resources due to mismatch between seeding and API category mapping
+  - Seeding code inserted resources with raw JSON category names (21 variants)
+  - API code tried to map categories to 9 canonical names at read-time
+  - Mismatch resulted in 697 resources being excluded from API responses
+- **Solution**: Created shared category mapping utility (`shared/categoryMapping.ts`)
+  - Single source of truth for all 21 category variants → 9 canonical categories
+  - `seed.ts` now normalizes categories BEFORE inserting into database
+  - `storage.ts` uses same shared function for API responses
+  - Eliminates duplicate code and ensures consistency across seeding and API layers
+- **Verification**: ✅ Dev shows 2,646/2,646 resources with all categories populated correctly
+- **Production Status**: ⏳ Needs republish + auto-reseed to apply fix
+- **Result**: Both write-time (seeding) and read-time (API) use identical category normalization
+
 ### ✅ CRITICAL FIX - Sidebar Missing 1,169 Resources (December 1, 2025)
 - **Root Cause Identified**: Resources table had 20 different category names, but the categories table only had 9 canonical categories
 - **Problem**: `getAwesomeListFromDatabase()` only included resources from the 9 known categories, losing 1,169 resources
-- **Solution**: Added `mapCategoryName()` function that normalizes all 20 resource category names to the 9 canonical categories:
+- **Solution (SUPERSEDED)**: Added `mapCategoryName()` function that normalizes all 20 resource category names to the 9 canonical categories:
   - "Video Players & Playback Libraries" → "Players & Clients"
   - "Video Encoding Transcoding & Packaging Tools" → "Encoding & Codecs"
   - "Learning Tutorials & Documentation" → "Intro & Learning"
