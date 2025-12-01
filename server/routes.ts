@@ -2124,15 +2124,8 @@ export async function runBackgroundInitialization(): Promise<void> {
   console.log(`🔄 Running background initialization (${isProduction ? 'production' : 'development'} mode)...`);
   console.log('📊 Note: /api/awesome-list now serves from PostgreSQL database');
 
-  // In production, skip auto-seeding - database should be pre-populated
-  if (isProduction) {
-    console.log('⚡ Production mode: Skipping database seeding (database should be pre-populated)');
-    console.log('💡 Use /api/admin/seed-database endpoint to seed manually if needed');
-    console.log('✅ Background initialization complete');
-    return;
-  }
-
-  // Development mode: Check and seed database if needed
+  // Both dev and production: Check and seed database if needed
+  // This ensures data consistency across environments
   try {
     console.log('Checking if database needs seeding...');
     const categories = await storage.listCategories();
@@ -2140,6 +2133,7 @@ export async function runBackgroundInitialization(): Promise<void> {
     
     if (categories.length === 0 || resourcesResult.total === 0) {
       console.log(`📦 Database needs seeding (categories: ${categories.length}, resources: ${resourcesResult.total})...`);
+      console.log(`⚙️  Running database seeding in ${isProduction ? 'production' : 'development'} mode...`);
       const seedResult = await seedDatabase({ clearExisting: false });
       
       console.log('✅ Auto-seeding completed successfully:');
