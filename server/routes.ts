@@ -2131,10 +2131,15 @@ export async function runBackgroundInitialization(): Promise<void> {
     const categories = await storage.listCategories();
     const resourcesResult = await storage.listResources({ page: 1, limit: 1, status: 'approved' });
     
-    if (categories.length === 0 || resourcesResult.total === 0) {
+    // Force reseed if:
+    // 1. Database is empty (categories=0 or resources=0)
+    // 2. Resource count is significantly below expected ~2600+ (force reseed if <2000)
+    const needsReseeding = categories.length === 0 || resourcesResult.total === 0 || resourcesResult.total < 2000;
+    
+    if (needsReseeding) {
       console.log(`📦 Database needs seeding (categories: ${categories.length}, resources: ${resourcesResult.total})...`);
       console.log(`⚙️  Running database seeding in ${isProduction ? 'production' : 'development'} mode...`);
-      const seedResult = await seedDatabase({ clearExisting: false });
+      const seedResult = await seedDatabase({ clearExisting: resourcesResult.total > 0 ? true : false });
       
       console.log('✅ Auto-seeding completed successfully:');
       console.log(`   - Categories: ${seedResult.categoriesInserted}`);
