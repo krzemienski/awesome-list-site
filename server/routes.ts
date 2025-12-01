@@ -1973,53 +1973,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // GET /api/recommendations - Get personalized recommendations (enhanced AI-powered)
+  // GET /api/recommendations - Get personalized recommendations (stub)
   app.get("/api/recommendations", async (req, res) => {
     try {
-      const limit = parseInt(req.query.limit as string) || 10;
-      
-      // Create a mock user profile for non-authenticated users
-      // In production, you'd get this from the authenticated user's data
-      const userProfile: AIUserProfile = {
-        userId: 'anonymous',
-        preferredCategories: (req.query.categories as string)?.split(',') || [],
-        skillLevel: (req.query.skillLevel as string || 'intermediate') as 'beginner' | 'intermediate' | 'advanced',
-        learningGoals: (req.query.goals as string)?.split(',') || [],
-        preferredResourceTypes: (req.query.types as string)?.split(',') || [],
-        timeCommitment: (req.query.timeCommitment as string || 'flexible') as 'daily' | 'weekly' | 'flexible',
-        viewHistory: [],
-        bookmarks: [],
-        completedResources: [],
-        ratings: {}
-      };
-
-      const result = await recommendationEngine.generateRecommendations(
-        userProfile,
-        limit,
-        false
-      );
-
-      res.json(result);
+      res.json([]);
     } catch (error) {
       console.error('Error generating recommendations:', error);
       res.status(500).json({ error: 'Failed to generate recommendations' });
     }
   });
 
-  // POST /api/recommendations - Get personalized recommendations for authenticated user
+  // POST /api/recommendations - Get personalized recommendations (stub)
   app.post("/api/recommendations", async (req, res) => {
     try {
-      const userProfile: AIUserProfile = req.body;
-      const limit = parseInt(req.query.limit as string) || 10;
-      const forceRefresh = req.query.refresh === 'true';
-
-      const result = await recommendationEngine.generateRecommendations(
-        userProfile,
-        limit,
-        forceRefresh
-      );
-
-      res.json(result);
+      res.json([]);
     } catch (error) {
       console.error('Error generating AI recommendations:', error);
       res.status(500).json({ error: 'Failed to generate recommendations' });
