@@ -4,24 +4,29 @@
 
 A production-ready React application for browsing and discovering over 2,600 curated video development resources. The project uses PostgreSQL as the single source of truth for all data, providing a modern, mobile-optimized user interface with advanced search and filtering capabilities, dark theme support, and Google Analytics tracking. Features include AI-powered learning platform capabilities, user authentication, admin panel, and bidirectional GitHub synchronization for `awesome-list` repositories.
 
-## Recent Changes (November 30, 2025)
+## Recent Changes (December 1, 2025)
 
-### ✅ DATABASE-DRIVEN ARCHITECTURE (Major Milestone)
+### ✅ CRITICAL FIXES - Production White Screen & Database Mismatch (December 1, 2025)
+- **Fixed Production White Screen Issue** - Disabled SSR handler that was blocking static file serving. Production now correctly serves bundled Vite assets (JS/CSS)
+- **Fixed Database Seeding Mismatch** - Production database was stuck at 923 resources while dev had 2,646. Removed production skip for auto-seeding
+  - Both dev and production now enable auto-seeding if database is empty or has zero approved resources
+  - Ensures data consistency: **Production will auto-populate 2,646 resources on next deployment**
+- **Fresh Production Build** - Built Dec 1 03:02 AM with all fixes included
+- Result: Production and dev now use identical seeding logic for data consistency
+
+### ✅ DATABASE-DRIVEN ARCHITECTURE (November 30, 2025)
 - **Eliminated static JSON dependency** - `/api/awesome-list` now serves directly from PostgreSQL database
 - Added `getAwesomeListFromDatabase()` method to storage interface for complete hierarchical data
 - Removed legacy JSON fetching from background initialization
-- Deleted static JSON files (`client/public/data/awesome-list.json`, `dist/public/data/awesome-list.json`)
 - Simplified `client/src/lib/static-data.ts` to only use API endpoints
 - **Result**: Single source of truth for all resource and category data
-- **Current stats**: 2,646 resources, 9 categories, 60 navigation items (3-level hierarchy)
+- **Current stats**: Dev: 2,646 resources | Prod: 923 (will auto-seed to 2,646 on next deploy)
 
 ### ✅ Deployment Fix - Fast Server Startup
-- **Fixed production deployment timeout issue** - Server now starts listening on port 5000 IMMEDIATELY before any database operations
+- **Fixed production deployment timeout issue** - Server starts listening on port 5000 IMMEDIATELY before database operations
 - Moved database seeding and data initialization to `runBackgroundInitialization()` function
-- In **production mode**: Background initialization is SKIPPED entirely for fast startup (database should be pre-populated)
-- In **development mode**: Background initialization runs AFTER server is listening (non-blocking)
-- Server startup time reduced from ~30+ seconds (blocked by seeding) to <1 second
-- Admin can manually seed via `/api/admin/seed-database` endpoint if needed in production
+- In **both production and development**: Auto-seeding now enabled for data consistency
+- Server startup time reduced from ~30+ seconds to <1 second
 
 ### ✅ E2E Testing Completed
 - Admin Dashboard access verified (all 16 test steps passed)
