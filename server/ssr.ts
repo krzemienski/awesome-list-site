@@ -5,49 +5,11 @@ import path from "path";
 import { storage } from "./storage";
 
 export async function handleSSR(req: Request, res: Response, next: NextFunction) {
-  try {
-    const url = req.originalUrl;
-    
-    // Skip API routes and static assets
-    if (url.startsWith('/api') || url.includes('.')) {
-      return next();
-    }
-
-    // Load the HTML template
-    const templatePath = path.resolve(import.meta.dirname, "..", "client", "index.html");
-    let template = await fs.promises.readFile(templatePath, "utf-8");
-
-    // Get the awesome list data from storage
-    const awesomeListData = storage.getAwesomeListData();
-
-    // In production, we need to load the built server bundle
-    // In development, this won't be used as Vite handles it
-    if (process.env.NODE_ENV === 'production') {
-      // For production, we'll need a built server bundle
-      // We'll create a simple fallback for now
-      const appHtml = await renderAppWithData(awesomeListData, url);
-      
-      // Inject the rendered HTML
-      template = template.replace(
-        '<div id="root"></div>',
-        `<div id="root">${appHtml}</div>`
-      );
-
-      // Inject the initial data
-      template = template.replace(
-        '</head>',
-        `<script>window.__INITIAL_DATA__ = ${JSON.stringify(awesomeListData).replace(/</g, '\\u003c')}</script></head>`
-      );
-
-      res.status(200).set({ "Content-Type": "text/html" }).send(template);
-    } else {
-      // In development, let Vite handle it
-      next();
-    }
-  } catch (error) {
-    console.error('SSR Error:', error);
-    next();
-  }
+  // CRITICAL FIX: Disable SSR in production until we have proper server bundle
+  // SSR was blocking serveStatic middleware, causing white screen
+  // The client/index.html references /src/main.tsx which doesn't exist in dist/
+  // Let serveStatic serve the actual built Vite assets instead
+  return next();
 }
 
 async function renderAppWithData(awesomeListData: any, url: string): Promise<string> {
