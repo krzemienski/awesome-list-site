@@ -1072,6 +1072,28 @@ export class DatabaseStorage implements IStorage {
       .limit(limit);
   }
   
+  // Map resource categories to canonical categories in the database
+  private mapCategoryName(category: string | null): string | null {
+    if (!category) return null;
+    
+    const categoryMap: Record<string, string> = {
+      'Video Players & Playback Libraries': 'Players & Clients',
+      'Video Editing & Processing Tools': 'Media Tools',
+      'Video Encoding Transcoding & Packaging Tools': 'Encoding & Codecs',
+      'Transcoding Codecs & Hardware Acceleration': 'Encoding & Codecs',
+      'Learning Tutorials & Documentation': 'Intro & Learning',
+      'Media Analysis Quality Metrics & AI Tools': 'Media Tools',
+      'Adaptive Streaming & Manifest Tools': 'Protocols & Transport',
+      'Build Tools Deployment & Utility Libraries': 'General Tools',
+      'DRM Security & Content Protection': 'General Tools',
+      'Standards Specifications & Industry Resources': 'Standards & Industry',
+      'Miscellaneous Experimental & Niche Tools': 'General Tools',
+      'Video Streaming & Distribution Solutions': 'Infrastructure & Delivery',
+    };
+    
+    return categoryMap[category] || category;
+  }
+
   // Database-driven awesome list hierarchy - builds complete category tree from database
   async getAwesomeListFromDatabase(): Promise<AwesomeListData> {
     // 1. Get all approved resources
@@ -1086,21 +1108,22 @@ export class DatabaseStorage implements IStorage {
     const dbSubcategories = await db.select().from(subcategories).orderBy(asc(subcategories.name));
     const dbSubSubcategories = await db.select().from(subSubcategories).orderBy(asc(subSubcategories.name));
     
-    // 3. Group resources by category hierarchy
+    // 3. Group resources by category hierarchy with normalized category names
     const resourcesByCategory = new Map<string, Resource[]>();
     const resourcesBySubcategory = new Map<string, Resource[]>();
     const resourcesBySubSubcategory = new Map<string, Resource[]>();
     
     allResources.forEach(resource => {
-      // By category
-      if (resource.category) {
-        if (!resourcesByCategory.has(resource.category)) {
-          resourcesByCategory.set(resource.category, []);
+      // Normalize and group by category
+      const mappedCategory = this.mapCategoryName(resource.category);
+      if (mappedCategory) {
+        if (!resourcesByCategory.has(mappedCategory)) {
+          resourcesByCategory.set(mappedCategory, []);
         }
-        resourcesByCategory.get(resource.category)!.push(resource);
+        resourcesByCategory.get(mappedCategory)!.push(resource);
       }
       
-      // By subcategory
+      // By subcategory (use as-is)
       if (resource.subcategory) {
         if (!resourcesBySubcategory.has(resource.subcategory)) {
           resourcesBySubcategory.set(resource.subcategory, []);
@@ -1108,7 +1131,7 @@ export class DatabaseStorage implements IStorage {
         resourcesBySubcategory.get(resource.subcategory)!.push(resource);
       }
       
-      // By sub-subcategory
+      // By sub-subcategory (use as-is)
       if (resource.subSubcategory) {
         if (!resourcesBySubSubcategory.has(resource.subSubcategory)) {
           resourcesBySubSubcategory.set(resource.subSubcategory, []);

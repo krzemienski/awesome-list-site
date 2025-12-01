@@ -6,6 +6,24 @@ A production-ready React application for browsing and discovering over 2,600 cur
 
 ## Recent Changes (December 1, 2025)
 
+### ✅ CRITICAL FIX - Sidebar Missing 1,169 Resources (December 1, 2025)
+- **Root Cause Identified**: Resources table had 20 different category names, but the categories table only had 9 canonical categories
+- **Problem**: `getAwesomeListFromDatabase()` only included resources from the 9 known categories, losing 1,169 resources
+- **Solution**: Added `mapCategoryName()` function that normalizes all 20 resource category names to the 9 canonical categories:
+  - "Video Players & Playback Libraries" → "Players & Clients"
+  - "Video Encoding Transcoding & Packaging Tools" → "Encoding & Codecs"
+  - "Learning Tutorials & Documentation" → "Intro & Learning"
+  - "Adaptive Streaming & Manifest Tools" → "Protocols & Transport"
+  - "Build Tools Deployment & Utility Libraries" → "General Tools"
+  - "DRM Security & Content Protection" → "General Tools"
+  - "Standards Specifications & Industry Resources" → "Standards & Industry"
+  - "Miscellaneous Experimental & Niche Tools" → "General Tools"
+  - "Video Editing & Processing Tools" → "Media Tools"
+  - "Media Analysis Quality Metrics & AI Tools" → "Media Tools"
+  - "Transcoding Codecs & Hardware Acceleration" → "Encoding & Codecs"
+  - "Video Streaming & Distribution Solutions" → "Infrastructure & Delivery"
+- **Result**: ✅ **All 2,646 resources now load in sidebar** (was 1,477, now 2,646) - sidebar displays entire database correctly
+
 ### ✅ CRITICAL FIXES - Production White Screen & Database Mismatch (December 1, 2025)
 - **Fixed Production White Screen Issue** - Disabled SSR handler that was blocking static file serving. Production now correctly serves bundled Vite assets (JS/CSS)
 - **Fixed Database Seeding Mismatch** - Production database was stuck at 923 resources while dev had 2,646. Removed production skip for auto-seeding
