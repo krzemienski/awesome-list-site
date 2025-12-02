@@ -30,7 +30,7 @@ test.describe('Resource Lifecycle Integration', () => {
     try {
       // === Step 1: Submit resource (authenticated user) ===
       const { page: userPage } = await helper.createUserContext('A');
-      await userPage.goto('http://localhost:3000');
+      await userPage.goto(`${BASE_URL}`);
 
       const userToken = await userPage.evaluate(() => {
         const token = localStorage.getItem('sb-jeyldoypdkgsrfdhdcmm-auth-token');
@@ -38,7 +38,7 @@ test.describe('Resource Lifecycle Integration', () => {
       });
 
       const submitRes = await userPage.request.post(
-        'http://localhost:3000/api/resources',
+        `${BASE_URL}/api/resources`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -69,7 +69,7 @@ test.describe('Resource Lifecycle Integration', () => {
 
       // === Step 3: Admin approves ===
       const { page: adminPage } = await helper.createAdminContext();
-      await adminPage.goto('http://localhost:3000/admin');
+      await adminPage.goto(`${BASE_URL}/admin`);
 
       const adminToken = await adminPage.evaluate(() => {
         const token = localStorage.getItem('sb-jeyldoypdkgsrfdhdcmm-auth-token');
@@ -77,7 +77,7 @@ test.describe('Resource Lifecycle Integration', () => {
       });
 
       const approveRes = await adminPage.request.post(
-        `http://localhost:3000/api/admin/resources/${createdResourceId}/approve`,
+        `${BASE_URL}/api/admin/resources/${createdResourceId}/approve`,
         {
           headers: { 'Authorization': `Bearer ${adminToken}` }
         }
@@ -105,7 +105,7 @@ test.describe('Resource Lifecycle Integration', () => {
 
       // === Step 5: Anonymous user sees on public page ===
       const { page: anonPage } = await helper.createAnonymousContext();
-      await anonPage.goto('http://localhost:3000/category/general-tools');
+      await anonPage.goto(`${BASE_URL}/category/general-tools`);
       await anonPage.waitForLoadState('networkidle');
 
       const resourceCard = anonPage.locator(`text="${TEST_RESOURCE.title}"`);
@@ -116,7 +116,7 @@ test.describe('Resource Lifecycle Integration', () => {
 
       // Cleanup
       await adminPage.request.delete(
-        `http://localhost:3000/api/admin/resources/${createdResourceId}`,
+        `${BASE_URL}/api/admin/resources/${createdResourceId}`,
         {
           headers: { 'Authorization': `Bearer ${adminToken}` }
         }
@@ -144,7 +144,7 @@ test.describe('Resource Lifecycle Integration', () => {
     try {
       // Submit
       const { page: userPage } = await helper.createUserContext('A');
-      await userPage.goto('http://localhost:3000');
+      await userPage.goto(`${BASE_URL}`);
 
       const userToken = await userPage.evaluate(() => {
         const token = localStorage.getItem('sb-jeyldoypdkgsrfdhdcmm-auth-token');
@@ -152,7 +152,7 @@ test.describe('Resource Lifecycle Integration', () => {
       });
 
       const submitRes = await userPage.request.post(
-        'http://localhost:3000/api/resources',
+        `${BASE_URL}/api/resources`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -167,7 +167,7 @@ test.describe('Resource Lifecycle Integration', () => {
 
       // Admin rejects
       const { page: adminPage } = await helper.createAdminContext();
-      await adminPage.goto('http://localhost:3000/admin');
+      await adminPage.goto(`${BASE_URL}/admin`);
 
       const adminToken = await adminPage.evaluate(() => {
         const token = localStorage.getItem('sb-jeyldoypdkgsrfdhdcmm-auth-token');
@@ -175,7 +175,7 @@ test.describe('Resource Lifecycle Integration', () => {
       });
 
       const rejectRes = await adminPage.request.post(
-        `http://localhost:3000/api/admin/resources/${createdResourceId}/reject`,
+        `${BASE_URL}/api/admin/resources/${createdResourceId}/reject`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -199,7 +199,7 @@ test.describe('Resource Lifecycle Integration', () => {
 
       // Anonymous should NOT see
       const { page: anonPage } = await helper.createAnonymousContext();
-      await anonPage.goto('http://localhost:3000/category/general-tools');
+      await anonPage.goto(`${BASE_URL}/category/general-tools`);
 
       const resourceCard = anonPage.locator(`text="${TEST_RESOURCE.title}"`);
       await expect(resourceCard).not.toBeVisible();
@@ -209,7 +209,7 @@ test.describe('Resource Lifecycle Integration', () => {
 
       // Cleanup
       await adminPage.request.delete(
-        `http://localhost:3000/api/admin/resources/${createdResourceId}`,
+        `${BASE_URL}/api/admin/resources/${createdResourceId}`,
         {
           headers: { 'Authorization': `Bearer ${adminToken}` }
         }

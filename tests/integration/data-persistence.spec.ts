@@ -22,7 +22,7 @@ test.describe('Data Persistence', () => {
     try {
       // Session 1: User A adds bookmark with notes
       const { page: userPage1 } = await helper.createUserContext('A');
-      await userPage1.goto('http://localhost:3000');
+      await userPage1.goto(`${BASE_URL}`);
 
       const token1 = await userPage1.evaluate(() => {
         const t = localStorage.getItem('sb-jeyldoypdkgsrfdhdcmm-auth-token');
@@ -30,7 +30,7 @@ test.describe('Data Persistence', () => {
       });
 
       const bookmarkRes = await userPage1.request.post(
-        `http://localhost:3000/api/bookmarks/${TEST_RESOURCE_ID}`,
+        `${BASE_URL}/api/bookmarks/${TEST_RESOURCE_ID}`,
         {
           headers: { 'Authorization': `Bearer ${token1}`, 'Content-Type': 'application/json' },
           data: { notes: TEST_NOTES }
@@ -45,7 +45,7 @@ test.describe('Data Persistence', () => {
 
       // Session 2: User A logs in again (fresh context)
       const { page: userPage2 } = await helper.createUserContext('A');
-      await userPage2.goto('http://localhost:3000');
+      await userPage2.goto(`${BASE_URL}`);
 
       const token2 = await userPage2.evaluate(() => {
         const t = localStorage.getItem('sb-jeyldoypdkgsrfdhdcmm-auth-token');
@@ -54,7 +54,7 @@ test.describe('Data Persistence', () => {
 
       // Fetch bookmarks
       const bookmarksRes = await userPage2.request.get(
-        'http://localhost:3000/api/bookmarks',
+        `${BASE_URL}/api/bookmarks`,
         {
           headers: { 'Authorization': `Bearer ${token2}` }
         }
@@ -71,7 +71,7 @@ test.describe('Data Persistence', () => {
 
       // Cleanup
       await userPage2.request.delete(
-        `http://localhost:3000/api/bookmarks/${TEST_RESOURCE_ID}`,
+        `${BASE_URL}/api/bookmarks/${TEST_RESOURCE_ID}`,
         {
           headers: { 'Authorization': `Bearer ${token2}` }
         }
@@ -94,7 +94,7 @@ test.describe('Data Persistence', () => {
     try {
       // Create and approve resource
       const { page: adminPage } = await helper.createAdminContext();
-      await adminPage.goto('http://localhost:3000/admin');
+      await adminPage.goto(`${BASE_URL}/admin`);
 
       const token = await adminPage.evaluate(() => {
         const t = localStorage.getItem('sb-jeyldoypdkgsrfdhdcmm-auth-token');
@@ -102,7 +102,7 @@ test.describe('Data Persistence', () => {
       });
 
       const createRes = await adminPage.request.post(
-        'http://localhost:3000/api/resources',
+        `${BASE_URL}/api/resources`,
         {
           headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
           data: {
@@ -119,7 +119,7 @@ test.describe('Data Persistence', () => {
 
       // Approve it
       await adminPage.request.post(
-        `http://localhost:3000/api/admin/resources/${resourceId}/approve`,
+        `${BASE_URL}/api/admin/resources/${resourceId}/approve`,
         {
           headers: { 'Authorization': `Bearer ${token}` }
         }
@@ -129,7 +129,7 @@ test.describe('Data Persistence', () => {
 
       // Archive it
       await adminPage.request.post(
-        'http://localhost:3000/api/admin/resources/bulk',
+        `${BASE_URL}/api/admin/resources/bulk`,
         {
           headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
           data: {
@@ -146,7 +146,7 @@ test.describe('Data Persistence', () => {
 
       // Search for archived resource (anonymous)
       const { page: anonPage } = await helper.createAnonymousContext();
-      await anonPage.goto('http://localhost:3000');
+      await anonPage.goto(`${BASE_URL}`);
 
       // Note: Search implementation may vary, skipping UI search test
       // Database verification sufficient: archived resources excluded from public queries
@@ -156,7 +156,7 @@ test.describe('Data Persistence', () => {
 
       // Cleanup
       await adminPage.request.delete(
-        `http://localhost:3000/api/admin/resources/${resourceId}`,
+        `${BASE_URL}/api/admin/resources/${resourceId}`,
         { headers: { 'Authorization': `Bearer ${token}` } }
       ).catch(() => {});
 

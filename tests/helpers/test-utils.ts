@@ -10,6 +10,11 @@ import { Page, expect } from '@playwright/test';
  */
 
 /**
+ * Base URL for all tests - use port 3003 for integration testing
+ */
+export const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:3003';
+
+/**
  * Admin credentials (must exist in Supabase Auth)
  * Create this user via Supabase dashboard and promote to admin:
  *

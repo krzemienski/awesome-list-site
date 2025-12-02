@@ -26,7 +26,7 @@ export type BulkAction = 'approve' | 'reject' | 'archive' | 'delete' | 'tag' | '
 
 interface BulkActionsToolbarProps {
   selectedIds: string[];
-  onAction: (action: BulkAction, ids: string[]) => Promise<void>;
+  onAction: (action: BulkAction, ids: string[], data?: { tags?: string[] }) => Promise<void>;
   onClearSelection: () => void;
 }
 
@@ -82,8 +82,13 @@ export function BulkActionsToolbar({
     setShowTagDialog(false);
     setIsProcessing(true);
     try {
-      // Pass tags as metadata in the action
-      await onAction('tag', selectedIds);
+      // Parse comma-separated tags and pass to the action
+      const tags = tagInput
+        .split(',')
+        .map(t => t.trim())
+        .filter(t => t.length > 0);
+
+      await onAction('tag', selectedIds, { tags });
       setTagInput('');
       onClearSelection();
     } catch (error) {

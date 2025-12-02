@@ -37,7 +37,7 @@ export default defineConfig({
 
   use: {
     // Base URL for all tests
-    baseURL: 'http://localhost:3000',
+    baseURL: process.env.TEST_BASE_URL || 'http://localhost:3003',
 
     // Collect trace on first retry
     trace: 'on-first-retry',

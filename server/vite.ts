@@ -68,7 +68,10 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  const distPath = path.resolve(import.meta.dirname, "public");
+  // In production (Docker), the built JS runs from dist/index.js
+  // Static files are in dist/public - use process.cwd() + dist/public
+  // as import.meta.dirname in bundled ESM returns cwd, not file location
+  const distPath = path.resolve(process.cwd(), "dist", "public");
 
   if (!fs.existsSync(distPath)) {
     throw new Error(

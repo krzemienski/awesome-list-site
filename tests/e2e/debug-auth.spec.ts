@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = `${BASE_URL}`;
 
 const SESSION_DATA = {
   'sb-jeyldoypdkgsrfdhdcmm-auth-token': JSON.stringify({
@@ -46,7 +46,7 @@ test('Debug Auth State', async ({ page }) => {
   const authCheck = await page.evaluate(async () => {
     try {
       // @ts-ignore
-      const response = await fetch('http://localhost:3000/api/auth/user');
+      const response = await fetch(`${BASE_URL}/api/auth/user`);
       const data = await response.json();
       return { success: true, data };
     } catch (error: any) {

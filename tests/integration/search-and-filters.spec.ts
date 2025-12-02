@@ -23,7 +23,7 @@ test.describe('Search & Filter Integration', () => {
     try {
       // Admin edits title
       const { page: adminPage } = await helper.createAdminContext();
-      await adminPage.goto('http://localhost:3000/admin');
+      await adminPage.goto(`${BASE_URL}/admin`);
 
       const token = await adminPage.evaluate(() => {
         const t = localStorage.getItem('sb-jeyldoypdkgsrfdhdcmm-auth-token');
@@ -31,7 +31,7 @@ test.describe('Search & Filter Integration', () => {
       });
 
       await adminPage.request.put(
-        `http://localhost:3000/api/admin/resources/${TEST_RESOURCE_ID}`,
+        `${BASE_URL}/api/admin/resources/${TEST_RESOURCE_ID}`,
         {
           headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
           data: { title: NEW_TITLE }
@@ -40,7 +40,7 @@ test.describe('Search & Filter Integration', () => {
 
       // Anonymous searches for new title
       const { page: anonPage } = await helper.createAnonymousContext();
-      await anonPage.goto('http://localhost:3000');
+      await anonPage.goto(`${BASE_URL}`);
 
       // Open search (keyboard shortcut)
       await anonPage.keyboard.press('/');
@@ -60,7 +60,7 @@ test.describe('Search & Filter Integration', () => {
 
       // Reset
       await adminPage.request.put(
-        `http://localhost:3000/api/admin/resources/${TEST_RESOURCE_ID}`,
+        `${BASE_URL}/api/admin/resources/${TEST_RESOURCE_ID}`,
         {
           headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
           data: { title: 'INTEGRATION_TEST_RESOURCE_DO_NOT_DELETE' }
@@ -86,7 +86,7 @@ test.describe('Search & Filter Integration', () => {
 
       // Admin filters by approved
       const { page: adminPage } = await helper.createAdminContext();
-      await adminPage.goto('http://localhost:3000/admin/resources');
+      await adminPage.goto(`${BASE_URL}/admin/resources`);
 
       // Select status filter
       await adminPage.selectOption('select:has-text("All Statuses"), [name="status"]', 'approved');
@@ -122,7 +122,7 @@ test.describe('Search & Filter Integration', () => {
 
       // Admin filters
       const { page: adminPage } = await helper.createAdminContext();
-      await adminPage.goto('http://localhost:3000/admin/resources');
+      await adminPage.goto(`${BASE_URL}/admin/resources`);
 
       await adminPage.selectOption('select:has-text("All Categories"), [name="category"]', 'General Tools');
       await adminPage.waitForTimeout(1000);

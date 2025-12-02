@@ -30,7 +30,7 @@ const ADMIN_SESSION_DATA = {
  */
 async function injectAdminSession(page: Page) {
   // Step 1: Visit base domain to establish localStorage origin
-  await page.goto('http://localhost:3000');
+  await page.goto(`${BASE_URL}`);
 
   // Step 2: Inject session data
   const injected = await page.evaluate((sessionData) => {
@@ -51,7 +51,7 @@ async function injectAdminSession(page: Page) {
  * Helper: Navigate to admin with active session
  */
 async function navigateToAdmin(page: Page, path: string = '/admin') {
-  await page.goto(`http://localhost:3000${path}`);
+  await page.goto(`${BASE_URL}${path}`);
   // Wait for admin dashboard to load
   await page.waitForSelector('div[class*="dashboard"]', { timeout: 5000 });
 }

@@ -60,7 +60,7 @@ test.describe('User Workflows Round 2 - Bug Verification', () => {
     ]);
 
     // Set localStorage for Supabase auth
-    await page.goto('http://localhost:3000');
+    await page.goto(`${BASE_URL}`);
     await page.evaluate((session) => {
       localStorage.setItem('supabase.auth.token', JSON.stringify({
         currentSession: session,
@@ -70,7 +70,7 @@ test.describe('User Workflows Round 2 - Bug Verification', () => {
   });
 
   test('Task 31-40: Search Dialog - Bug #1 Verification', async ({ page }) => {
-    await page.goto('http://localhost:3000');
+    await page.goto(`${BASE_URL}`);
 
     // Step 1: Open search with keyboard shortcut
     console.log('Task 31: Opening search with / key');
@@ -170,7 +170,7 @@ test.describe('User Workflows Round 2 - Bug Verification', () => {
       }
     });
 
-    await page.goto('http://localhost:3000/profile');
+    await page.goto(`${BASE_URL}/profile`);
     await page.waitForLoadState('networkidle');
 
     await page.screenshot({
@@ -252,7 +252,7 @@ test.describe('User Workflows Round 2 - Bug Verification', () => {
     console.log('Task 51: Creating test bookmark via API');
 
     // Create bookmark via API
-    const response = await fetch(`http://localhost:3000/api/bookmarks/${testResourceId}`, {
+    const response = await fetch(`${BASE_URL}/api/bookmarks/${testResourceId}`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${testSession.access_token}`,
@@ -264,7 +264,7 @@ test.describe('User Workflows Round 2 - Bug Verification', () => {
     console.log(`Bookmark creation response: ${response.status}`);
 
     console.log('Task 52: Navigating to /bookmarks');
-    await page.goto('http://localhost:3000/bookmarks');
+    await page.goto(`${BASE_URL}/bookmarks`);
     await page.waitForLoadState('networkidle');
 
     await page.screenshot({
@@ -386,7 +386,7 @@ test.describe('User Workflows Round 2 - Bug Verification', () => {
     }
 
     console.log('Task 63: Navigating to /journeys');
-    await page.goto('http://localhost:3000/journeys');
+    await page.goto(`${BASE_URL}/journeys`);
     await page.waitForLoadState('networkidle');
 
     await page.screenshot({

@@ -27,7 +27,7 @@ test.describe('RLS User Data Isolation', () => {
     try {
       // === User A: Add favorite ===
       const { page: userAPage } = await helper.createUserContext('A');
-      await userAPage.goto('http://localhost:3000');
+      await userAPage.goto(`${BASE_URL}`);
 
       const userAToken = await userAPage.evaluate(() => {
         const token = localStorage.getItem('sb-jeyldoypdkgsrfdhdcmm-auth-token');
@@ -36,7 +36,7 @@ test.describe('RLS User Data Isolation', () => {
 
       // Add favorite via API
       const favRes = await userAPage.request.post(
-        `http://localhost:3000/api/favorites/${TEST_RESOURCE_ID}`,
+        `${BASE_URL}/api/favorites/${TEST_RESOURCE_ID}`,
         {
           headers: { 'Authorization': `Bearer ${userAToken}` }
         }
@@ -55,7 +55,7 @@ test.describe('RLS User Data Isolation', () => {
 
       // === User B: Verify cannot see ===
       const { page: userBPage } = await helper.createUserContext('B');
-      await userBPage.goto('http://localhost:3000/profile');
+      await userBPage.goto(`${BASE_URL}/profile`);
 
       // Navigate to favorites tab
       await userBPage.click('button:has-text("Favorites"), [role="tab"]:has-text("Favorites")').catch(() => {});
@@ -75,7 +75,7 @@ test.describe('RLS User Data Isolation', () => {
       });
 
       const userBFavoritesAPI = await userBPage.request.get(
-        'http://localhost:3000/api/favorites',
+        `${BASE_URL}/api/favorites`,
         {
           headers: { 'Authorization': `Bearer ${userBToken}` }
         }
@@ -100,7 +100,7 @@ test.describe('RLS User Data Isolation', () => {
 
       // Cleanup
       await userAPage.request.delete(
-        `http://localhost:3000/api/favorites/${TEST_RESOURCE_ID}`,
+        `${BASE_URL}/api/favorites/${TEST_RESOURCE_ID}`,
         {
           headers: { 'Authorization': `Bearer ${userAToken}` }
         }
@@ -122,7 +122,7 @@ test.describe('RLS User Data Isolation', () => {
     try {
       // === User A: Add bookmark with notes ===
       const { page: userAPage } = await helper.createUserContext('A');
-      await userAPage.goto('http://localhost:3000');
+      await userAPage.goto(`${BASE_URL}`);
 
       const userAToken = await userAPage.evaluate(() => {
         const token = localStorage.getItem('sb-jeyldoypdkgsrfdhdcmm-auth-token');
@@ -130,7 +130,7 @@ test.describe('RLS User Data Isolation', () => {
       });
 
       const bookmarkRes = await userAPage.request.post(
-        `http://localhost:3000/api/bookmarks/${TEST_RESOURCE_ID}`,
+        `${BASE_URL}/api/bookmarks/${TEST_RESOURCE_ID}`,
         {
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${userAToken}` },
           data: { notes: 'User A private notes' }
@@ -142,7 +142,7 @@ test.describe('RLS User Data Isolation', () => {
 
       // === User B: API should return empty ===
       const { page: userBPage } = await helper.createUserContext('B');
-      await userBPage.goto('http://localhost:3000');
+      await userBPage.goto(`${BASE_URL}`);
 
       const userBToken = await userBPage.evaluate(() => {
         const token = localStorage.getItem('sb-jeyldoypdkgsrfdhdcmm-auth-token');
@@ -150,7 +150,7 @@ test.describe('RLS User Data Isolation', () => {
       });
 
       const userBBookmarksAPI = await userBPage.request.get(
-        'http://localhost:3000/api/bookmarks',
+        `${BASE_URL}/api/bookmarks`,
         {
           headers: { 'Authorization': `Bearer ${userBToken}` }
         }
@@ -174,7 +174,7 @@ test.describe('RLS User Data Isolation', () => {
 
       // Cleanup
       await userAPage.request.delete(
-        `http://localhost:3000/api/bookmarks/${TEST_RESOURCE_ID}`,
+        `${BASE_URL}/api/bookmarks/${TEST_RESOURCE_ID}`,
         {
           headers: { 'Authorization': `Bearer ${userAToken}` }
         }
@@ -197,7 +197,7 @@ test.describe('RLS User Data Isolation', () => {
     try {
       // User A sets preferences
       const { page: userAPage } = await helper.createUserContext('A');
-      await userAPage.goto('http://localhost:3000');
+      await userAPage.goto(`${BASE_URL}`);
 
       const userAToken = await userAPage.evaluate(() => {
         const token = localStorage.getItem('sb-jeyldoypdkgsrfdhdcmm-auth-token');
@@ -246,7 +246,7 @@ test.describe('RLS User Data Isolation', () => {
     try {
       // User A submits resource
       const { page: userAPage } = await helper.createUserContext('A');
-      await userAPage.goto('http://localhost:3000');
+      await userAPage.goto(`${BASE_URL}`);
 
       const userAToken = await userAPage.evaluate(() => {
         const token = localStorage.getItem('sb-jeyldoypdkgsrfdhdcmm-auth-token');
@@ -254,7 +254,7 @@ test.describe('RLS User Data Isolation', () => {
       });
 
       const submitRes = await userAPage.request.post(
-        'http://localhost:3000/api/resources',
+        `${BASE_URL}/api/resources`,
         {
           headers: { 'Authorization': `Bearer ${userAToken}`, 'Content-Type': 'application/json' },
           data: {
@@ -280,7 +280,7 @@ test.describe('RLS User Data Isolation', () => {
 
       // User B should NOT see this in their submissions
       const { page: userBPage } = await helper.createUserContext('B');
-      await userBPage.goto('http://localhost:3000/profile');
+      await userBPage.goto(`${BASE_URL}/profile`);
 
       const userBToken = await userBPage.evaluate(() => {
         const token = localStorage.getItem('sb-jeyldoypdkgsrfdhdcmm-auth-token');
@@ -288,7 +288,7 @@ test.describe('RLS User Data Isolation', () => {
       });
 
       const submissionsRes = await userBPage.request.get(
-        'http://localhost:3000/api/user/submissions',
+        `${BASE_URL}/api/user/submissions`,
         {
           headers: { 'Authorization': `Bearer ${userBToken}` }
         }
@@ -304,7 +304,7 @@ test.describe('RLS User Data Isolation', () => {
 
       // Cleanup
       const { page: adminPage } = await helper.createAdminContext();
-      await adminPage.goto('http://localhost:3000/admin');
+      await adminPage.goto(`${BASE_URL}/admin`);
 
       const adminToken = await adminPage.evaluate(() => {
         const token = localStorage.getItem('sb-jeyldoypdkgsrfdhdcmm-auth-token');
@@ -312,7 +312,7 @@ test.describe('RLS User Data Isolation', () => {
       });
 
       await adminPage.request.delete(
-        `http://localhost:3000/api/admin/resources/${resourceId}`,
+        `${BASE_URL}/api/admin/resources/${resourceId}`,
         { headers: { 'Authorization': `Bearer ${adminToken}` } }
       ).catch(() => {});
 

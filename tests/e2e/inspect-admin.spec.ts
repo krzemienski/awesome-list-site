@@ -6,7 +6,7 @@ import fs from 'fs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = `${BASE_URL}`;
 const EVIDENCE_DIR = path.join(__dirname, '../../docs/session-7-evidence/admin-ui');
 
 const SESSION_DATA = {

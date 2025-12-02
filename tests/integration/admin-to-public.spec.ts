@@ -33,7 +33,7 @@ test.describe('Admin Changes → Public Visibility', () => {
       const { page: adminPage } = await helper.createAdminContext();
 
       // Navigate to admin resources page
-      await adminPage.goto('http://localhost:3000/admin/resources');
+      await adminPage.goto(`${BASE_URL}/admin/resources`);
       await adminPage.waitForLoadState('networkidle');
 
       console.log('  Admin dashboard loaded');
@@ -117,7 +117,7 @@ test.describe('Admin Changes → Public Visibility', () => {
       const { page: anonPage } = await helper.createAnonymousContext();
 
       // Navigate to public category page where this resource should appear
-      await anonPage.goto('http://localhost:3000/category/encoding-codecs');
+      await anonPage.goto(`${BASE_URL}/category/encoding-codecs`);
       await anonPage.waitForLoadState('networkidle');
 
       console.log('  Anonymous on category page');
@@ -156,7 +156,7 @@ test.describe('Admin Changes → Public Visibility', () => {
       // Admin edits description
       const { page: adminPage } = await helper.createAdminContext();
 
-      await adminPage.goto('http://localhost:3000/admin/resources');
+      await adminPage.goto(`${BASE_URL}/admin/resources`);
       await adminPage.waitForLoadState('networkidle');
 
       const resourceRow = adminPage.locator('tr').filter({
@@ -193,7 +193,7 @@ test.describe('Admin Changes → Public Visibility', () => {
       // Anonymous verification
       const { page: anonPage } = await helper.createAnonymousContext();
 
-      await anonPage.goto('http://localhost:3000/category/encoding-codecs');
+      await anonPage.goto(`${BASE_URL}/category/encoding-codecs`);
       await anonPage.waitForLoadState('networkidle');
 
       // Find resource and click to see details

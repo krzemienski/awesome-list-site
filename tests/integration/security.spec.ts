@@ -20,12 +20,12 @@ test.describe('Security Tests', () => {
       let headers: any = {};
 
       anonPage.on('response', response => {
-        if (response.url() === 'http://localhost:3000/') {
+        if (response.url() === `${BASE_URL}/`) {
           headers = response.headers();
         }
       });
 
-      await anonPage.goto('http://localhost:3000/');
+      await anonPage.goto(`${BASE_URL}/`);
       await anonPage.waitForLoadState('networkidle');
 
       // Verify critical security headers
@@ -50,10 +50,10 @@ test.describe('Security Tests', () => {
 
     try {
       const { page: anonPage } = await helper.createAnonymousContext();
-      await anonPage.goto('http://localhost:3000');
+      await anonPage.goto(`${BASE_URL}`);
 
       // Try to access admin endpoint without auth
-      const res = await anonPage.request.get('http://localhost:3000/api/admin/stats');
+      const res = await anonPage.request.get(`${BASE_URL}/api/admin/stats`);
 
       // Should be 401 Unauthorized or 403 Forbidden
       expect([401, 403]).toContain(res.status());
@@ -62,7 +62,7 @@ test.describe('Security Tests', () => {
 
       // Try to update resource without admin role
       const updateRes = await anonPage.request.put(
-        'http://localhost:3000/api/admin/resources/00000000-0000-0000-0000-000000000001',
+        `${BASE_URL}/api/admin/resources/00000000-0000-0000-0000-000000000001`,
         {
           headers: { 'Content-Type': 'application/json' },
           data: { title: 'Hacked' }
@@ -87,7 +87,7 @@ test.describe('Security Tests', () => {
 
     try {
       const { page: userPage } = await helper.createUserContext('A');
-      await userPage.goto('http://localhost:3000');
+      await userPage.goto(`${BASE_URL}`);
 
       const userToken = await userPage.evaluate(() => {
         const token = localStorage.getItem('sb-jeyldoypdkgsrfdhdcmm-auth-token');
@@ -96,7 +96,7 @@ test.describe('Security Tests', () => {
 
       // Try to access admin stats with user token
       const statsRes = await userPage.request.get(
-        'http://localhost:3000/api/admin/stats',
+        `${BASE_URL}/api/admin/stats`,
         {
           headers: { 'Authorization': `Bearer ${userToken}` }
         }
@@ -109,7 +109,7 @@ test.describe('Security Tests', () => {
 
       // Try to approve resource (admin-only action)
       const approveRes = await userPage.request.post(
-        'http://localhost:3000/api/admin/resources/00000000-0000-0000-0000-000000000001/approve',
+        `${BASE_URL}/api/admin/resources/00000000-0000-0000-0000-000000000001/approve`,
         {
           headers: { 'Authorization': `Bearer ${userToken}` }
         }
@@ -135,7 +135,7 @@ test.describe('Security Tests', () => {
 
     try {
       const { page: adminPage } = await helper.createAdminContext();
-      await adminPage.goto('http://localhost:3000/admin');
+      await adminPage.goto(`${BASE_URL}/admin`);
 
       const token = await adminPage.evaluate(() => {
         const t = localStorage.getItem('sb-jeyldoypdkgsrfdhdcmm-auth-token');
@@ -144,7 +144,7 @@ test.describe('Security Tests', () => {
 
       // Create resource
       const createRes = await adminPage.request.post(
-        'http://localhost:3000/api/resources',
+        `${BASE_URL}/api/resources`,
         {
           headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
           data: {
@@ -160,7 +160,7 @@ test.describe('Security Tests', () => {
 
       // Approve it (should create audit log)
       await adminPage.request.post(
-        `http://localhost:3000/api/admin/resources/${created.id}/approve`,
+        `${BASE_URL}/api/admin/resources/${created.id}/approve`,
         {
           headers: { 'Authorization': `Bearer ${token}` }
         }
@@ -170,7 +170,7 @@ test.describe('Security Tests', () => {
 
       // Check audit log via API
       const auditRes = await adminPage.request.get(
-        `http://localhost:3000/api/admin/audit-log?resourceId=${created.id}`,
+        `${BASE_URL}/api/admin/audit-log?resourceId=${created.id}`,
         {
           headers: { 'Authorization': `Bearer ${token}` }
         }
@@ -193,7 +193,7 @@ test.describe('Security Tests', () => {
 
       // Cleanup
       await adminPage.request.delete(
-        `http://localhost:3000/api/admin/resources/${created.id}`,
+        `${BASE_URL}/api/admin/resources/${created.id}`,
         { headers: { 'Authorization': `Bearer ${token}` } }
       ).catch(() => {});
 

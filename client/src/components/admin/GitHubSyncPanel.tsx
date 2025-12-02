@@ -35,6 +35,11 @@ interface SyncQueueItem {
   processedAt?: string;
 }
 
+interface SyncQueueResponse {
+  total: number;
+  items: SyncQueueItem[];
+}
+
 export default function GitHubSyncPanel() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -47,10 +52,11 @@ export default function GitHubSyncPanel() {
   });
 
   // Fetch sync queue status
-  const { data: syncQueue } = useQuery<SyncQueueItem[]>({
+  const { data: syncQueueResponse } = useQuery<SyncQueueResponse>({
     queryKey: ['/api/github/sync-status'],
     refetchInterval: 5000 // Refresh every 5 seconds
   });
+  const syncQueue = syncQueueResponse?.items;
 
   // Import mutation
   const importMutation = useMutation({

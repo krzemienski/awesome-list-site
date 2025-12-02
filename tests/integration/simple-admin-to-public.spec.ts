@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { getResourceById } from '../helpers/database';
 import { MultiContextTestHelper } from '../helpers/multi-context';
+import { BASE_URL } from '../helpers/test-utils';
 
 /**
  * Simplified Integration Tests
@@ -25,7 +26,7 @@ test.describe('Simple Admin → Public Integration', () => {
       const { page: adminPage } = await helper.createAdminContext();
 
       // Navigate to establish origin for localStorage
-      await adminPage.goto('http://localhost:3000/admin');
+      await adminPage.goto(`${BASE_URL}/admin`);
       await adminPage.waitForLoadState('networkidle');
 
       // Get auth token from localStorage
@@ -40,7 +41,7 @@ test.describe('Simple Admin → Public Integration', () => {
 
       // Make API request to update resource
       const response = await adminPage.request.put(
-        `http://localhost:3000/api/admin/resources/${TEST_RESOURCE_ID}`,
+        `${BASE_URL}/api/admin/resources/${TEST_RESOURCE_ID}`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -76,7 +77,7 @@ test.describe('Simple Admin → Public Integration', () => {
 
       const { page: anonPage } = await helper.createAnonymousContext();
 
-      await anonPage.goto('http://localhost:3000/category/general-tools');
+      await anonPage.goto(`${BASE_URL}/category/general-tools`);
       await anonPage.waitForLoadState('networkidle');
 
       // Check if new title visible
@@ -89,7 +90,7 @@ test.describe('Simple Admin → Public Integration', () => {
 
       // ===== STEP 4: Reset resource for next test =====
       await adminPage.request.put(
-        `http://localhost:3000/api/admin/resources/${TEST_RESOURCE_ID}`,
+        `${BASE_URL}/api/admin/resources/${TEST_RESOURCE_ID}`,
         {
           data: {
             title: 'INTEGRATION_TEST_RESOURCE_DO_NOT_DELETE',
@@ -115,7 +116,7 @@ test.describe('Simple Admin → Public Integration', () => {
 
     try {
       const { page: adminPage } = await helper.createAdminContext();
-      await adminPage.goto('http://localhost:3000/admin');
+      await adminPage.goto(`${BASE_URL}/admin`);
 
       const authToken = await adminPage.evaluate(() => {
         const token = localStorage.getItem('sb-jeyldoypdkgsrfdhdcmm-auth-token');
@@ -124,7 +125,7 @@ test.describe('Simple Admin → Public Integration', () => {
 
       // Update description
       const response = await adminPage.request.put(
-        `http://localhost:3000/api/admin/resources/${TEST_RESOURCE_ID}`,
+        `${BASE_URL}/api/admin/resources/${TEST_RESOURCE_ID}`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -144,7 +145,7 @@ test.describe('Simple Admin → Public Integration', () => {
 
       // Reset
       await adminPage.request.put(
-        `http://localhost:3000/api/admin/resources/${TEST_RESOURCE_ID}`,
+        `${BASE_URL}/api/admin/resources/${TEST_RESOURCE_ID}`,
         {
           headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
           data: { description: 'This resource is used by integration tests' }
@@ -170,7 +171,7 @@ test.describe('Simple Admin → Public Integration', () => {
 
     try {
       const { page: adminPage } = await helper.createAdminContext();
-      await adminPage.goto('http://localhost:3000/admin');
+      await adminPage.goto(`${BASE_URL}/admin`);
 
       const authToken = await adminPage.evaluate(() => {
         const token = localStorage.getItem('sb-jeyldoypdkgsrfdhdcmm-auth-token');
@@ -181,7 +182,7 @@ test.describe('Simple Admin → Public Integration', () => {
       const createdIds: string[] = [];
       for (const resource of testResources) {
         const createRes = await adminPage.request.post(
-          'http://localhost:3000/api/resources',
+          `${BASE_URL}/api/resources`,
           {
             headers: {
               'Content-Type': 'application/json',
@@ -206,7 +207,7 @@ test.describe('Simple Admin → Public Integration', () => {
 
       // Bulk approve
       const bulkRes = await adminPage.request.post(
-        'http://localhost:3000/api/admin/resources/bulk',
+        `${BASE_URL}/api/admin/resources/bulk`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -231,7 +232,7 @@ test.describe('Simple Admin → Public Integration', () => {
 
       // Cleanup
       for (const id of createdIds) {
-        await adminPage.request.delete(`http://localhost:3000/api/admin/resources/${id}`, {
+        await adminPage.request.delete(`${BASE_URL}/api/admin/resources/${id}`, {
           headers: { 'Authorization': `Bearer ${authToken}` }
         }).catch(() => {});  // Ignore cleanup errors
       }
@@ -251,7 +252,7 @@ test.describe('Simple Admin → Public Integration', () => {
 
     try {
       const { page: adminPage } = await helper.createAdminContext();
-      await adminPage.goto('http://localhost:3000/admin');
+      await adminPage.goto(`${BASE_URL}/admin`);
 
       const token = await adminPage.evaluate(() => {
         const t = localStorage.getItem('sb-jeyldoypdkgsrfdhdcmm-auth-token');
@@ -262,7 +263,7 @@ test.describe('Simple Admin → Public Integration', () => {
       const resourceIds: string[] = [];
       for (let i = 1; i <= 3; i++) {
         const createRes = await adminPage.request.post(
-          'http://localhost:3000/api/resources',
+          `${BASE_URL}/api/resources`,
           {
             headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
             data: {
@@ -278,7 +279,7 @@ test.describe('Simple Admin → Public Integration', () => {
           const created = await createRes.json();
           // Auto-approve
           await adminPage.request.post(
-            `http://localhost:3000/api/admin/resources/${created.id}/approve`,
+            `${BASE_URL}/api/admin/resources/${created.id}/approve`,
             { headers: { 'Authorization': `Bearer ${token}` } }
           );
           resourceIds.push(created.id);
@@ -289,7 +290,7 @@ test.describe('Simple Admin → Public Integration', () => {
 
       // Bulk archive
       const bulkRes = await adminPage.request.post(
-        'http://localhost:3000/api/admin/resources/bulk',
+        `${BASE_URL}/api/admin/resources/bulk`,
         {
           headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
           data: { action: 'archive', resourceIds }
@@ -308,7 +309,7 @@ test.describe('Simple Admin → Public Integration', () => {
 
       // Anonymous should NOT see
       const { page: anonPage } = await helper.createAnonymousContext();
-      await anonPage.goto('http://localhost:3000/category/general-tools');
+      await anonPage.goto(`${BASE_URL}/category/general-tools`);
 
       for (const id of resourceIds) {
         const resource = await getResourceById(id);
@@ -321,7 +322,7 @@ test.describe('Simple Admin → Public Integration', () => {
       // Cleanup
       for (const id of resourceIds) {
         await adminPage.request.delete(
-          `http://localhost:3000/api/admin/resources/${id}`,
+          `${BASE_URL}/api/admin/resources/${id}`,
           { headers: { 'Authorization': `Bearer ${token}` } }
         ).catch(() => {});
       }
@@ -341,7 +342,7 @@ test.describe('Simple Admin → Public Integration', () => {
 
     try {
       const { page: adminPage } = await helper.createAdminContext();
-      await adminPage.goto('http://localhost:3000/admin');
+      await adminPage.goto(`${BASE_URL}/admin`);
 
       const token = await adminPage.evaluate(() => {
         const t = localStorage.getItem('sb-jeyldoypdkgsrfdhdcmm-auth-token');
@@ -352,7 +353,7 @@ test.describe('Simple Admin → Public Integration', () => {
       const resourceIds: string[] = [];
       for (let i = 1; i <= 2; i++) {
         const createRes = await adminPage.request.post(
-          'http://localhost:3000/api/resources',
+          `${BASE_URL}/api/resources`,
           {
             headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
             data: {
@@ -373,7 +374,7 @@ test.describe('Simple Admin → Public Integration', () => {
 
       // Bulk reject
       const bulkRes = await adminPage.request.post(
-        'http://localhost:3000/api/admin/resources/bulk',
+        `${BASE_URL}/api/admin/resources/bulk`,
         {
           headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
           data: {
@@ -396,7 +397,7 @@ test.describe('Simple Admin → Public Integration', () => {
 
       // Anonymous should NOT see
       const { page: anonPage } = await helper.createAnonymousContext();
-      await anonPage.goto('http://localhost:3000/category/general-tools');
+      await anonPage.goto(`${BASE_URL}/category/general-tools`);
 
       for (const id of resourceIds) {
         const resource = await getResourceById(id);
@@ -409,7 +410,7 @@ test.describe('Simple Admin → Public Integration', () => {
       // Cleanup
       for (const id of resourceIds) {
         await adminPage.request.delete(
-          `http://localhost:3000/api/admin/resources/${id}`,
+          `${BASE_URL}/api/admin/resources/${id}`,
           { headers: { 'Authorization': `Bearer ${token}` } }
         ).catch(() => {});
       }

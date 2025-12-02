@@ -124,9 +124,10 @@ export function ResourceBrowser() {
 
   // Bulk action mutation
   const bulkMutation = useMutation({
-    mutationFn: async ({ action, ids, data }: { action: string; ids: string[]; data?: any }) => {
+    mutationFn: async ({ action, ids, data: actionData }: { action: string; ids: string[]; data?: any }) => {
       // Get Supabase session for JWT token
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: sessionData } = await supabase.auth.getSession();
+      const session = sessionData?.session;
 
       const headers: HeadersInit = { 'Content-Type': 'application/json' };
       if (session?.access_token) {
@@ -136,7 +137,7 @@ export function ResourceBrowser() {
       const response = await fetch('/api/admin/resources/bulk', {
         method: 'POST',
         headers,
-        body: JSON.stringify({ action, resourceIds: ids, data }),
+        body: JSON.stringify({ action, resourceIds: ids, data: actionData }),
       });
 
       if (!response.ok) {
@@ -166,7 +167,7 @@ export function ResourceBrowser() {
     updateMutation.mutate({ id: resourceId, updates });
   };
 
-  const handleBulkAction = async (action: BulkAction, ids: string[]) => {
+  const handleBulkAction = async (action: BulkAction, ids: string[], data?: { tags?: string[] }) => {
     if (ids.length === 0) {
       toast({
         title: 'No resources selected',
@@ -176,7 +177,7 @@ export function ResourceBrowser() {
       return;
     }
 
-    bulkMutation.mutate({ action, ids });
+    bulkMutation.mutate({ action, ids, data });
   };
 
   const handleArchive = (resourceId: string) => {

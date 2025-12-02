@@ -84,3 +84,6 @@ attached_assets/docs/secrets/
 
 # Serena MCP local memory cache - contains potentially sensitive data
 .serena/
+/.playwright-mcp
+/test-results
+/test-results

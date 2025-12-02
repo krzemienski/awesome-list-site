@@ -134,7 +134,7 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 3386,
+                  "duration": 6317,
                   "errors": [],
                   "stdout": [
                     {
@@ -160,11 +160,35 @@
                     },
                     {
                       "text": "✅ Auth state saved to tests/fixtures/auth-state.json\n"
+                    },
+                    {
+                      "text": "\n🔐 Setting up user sessions...\n"
+                    },
+                    {
+                      "text": "Authenticating User A...\n"
+                    },
+                    {
+                      "text": "  User A logged in successfully\n"
+                    },
+                    {
+                      "text": "  User A auth saved to ./tests/fixtures/user-a-auth.json\n"
+                    },
+                    {
+                      "text": "Authenticating User B...\n"
+                    },
+                    {
+                      "text": "  User B logged in successfully\n"
+                    },
+                    {
+                      "text": "  User B auth saved to ./tests/fixtures/user-b-auth.json\n"
+                    },
+                    {
+                      "text": "✅ All auth fixtures refreshed\n\n"
                     }
                   ],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2025-12-01T01:21:09.652Z",
+                  "startTime": "2025-12-01T07:56:43.549Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -174,31 +198,286 @@
           ],
           "id": "17e3fe6f4d9d8bd79c6b-1580989d32f149e984ed",
           "file": "auth.setup.ts",
-          "line": 12,
+          "line": 55,
           "column": 1
         }
       ]
     },
     {
-      "title": "api/bookmarks-favorites.spec.ts",
-      "file": "api/bookmarks-favorites.spec.ts",
+      "title": "security/rls-comprehensive.spec.ts",
+      "file": "security/rls-comprehensive.spec.ts",
       "column": 0,
       "line": 0,
       "specs": [],
       "suites": [
         {
-          "title": "Bookmarks + Favorites API Endpoints",
-          "file": "api/bookmarks-favorites.spec.ts",
-          "line": 19,
+          "title": "RLS Comprehensive Tests [CRITICAL SECURITY]",
+          "file": "security/rls-comprehensive.spec.ts",
+          "line": 32,
           "column": 6,
           "specs": [
             {
-              "title": "API 2.1-2.3: Bookmark endpoints (POST, GET, DELETE)",
+              "title": "Test RLS-1: User favorites isolation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7282,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "  User A created/confirmed favorite\n"
+                        },
+                        {
+                          "text": "  Layer 2: User A favorite confirmed in database\n"
+                        },
+                        {
+                          "text": "  Layer 1: User B API does not see User A favorites\n"
+                        },
+                        {
+                          "text": "  Layer 2: Database confirmed User B cannot see User A favorites\n"
+                        },
+                        {
+                          "text": "  RLS TEST-1 PASSED: Favorites isolation verified\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-01T07:56:50.356Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8a3e26046e342023dbc2-d58bc22523ebcdab5e9f",
+              "file": "security/rls-comprehensive.spec.ts",
+              "line": 34,
+              "column": 3
+            },
+            {
+              "title": "Test RLS-2: User bookmarks isolation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6786,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "  User A created bookmark with private notes\n"
+                        },
+                        {
+                          "text": "  Layer 1: User B API does not see User A bookmarks/notes\n"
+                        },
+                        {
+                          "text": "  Layer 2: Database confirmed isolation\n"
+                        },
+                        {
+                          "text": "  RLS TEST-2 PASSED: Bookmarks isolation verified\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-01T07:56:57.645Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8a3e26046e342023dbc2-120f9e6ce47c5ddd32c6",
+              "file": "security/rls-comprehensive.spec.ts",
+              "line": 145,
+              "column": 3
+            },
+            {
+              "title": "Test RLS-3: User preferences isolation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6080,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "  User A preferences set via database\n"
+                        },
+                        {
+                          "text": "  RLS TEST-3 PASSED: Preferences isolation verified\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-01T07:57:04.436Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8a3e26046e342023dbc2-3f8e9831e2cc414fe825",
+              "file": "security/rls-comprehensive.spec.ts",
+              "line": 241,
+              "column": 3
+            },
+            {
+              "title": "Test RLS-4: User journey progress isolation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3294,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "  No published journeys available, skipping test\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-01T07:57:10.523Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8a3e26046e342023dbc2-9771035f06d64644f91e",
+              "file": "security/rls-comprehensive.spec.ts",
+              "line": 339,
+              "column": 3
+            },
+            {
+              "title": "Test RLS-5: User interactions isolation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5500,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "  User A interaction created via database\n"
+                        },
+                        {
+                          "text": "  RLS TEST-5 PASSED: Interactions isolation verified\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-01T07:57:13.820Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8a3e26046e342023dbc2-15b926f966ee13932be0",
+              "file": "security/rls-comprehensive.spec.ts",
+              "line": 430,
+              "column": 3
+            },
+            {
+              "title": "Test RLS-6: Cross-user data access attempt via API manipulation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4379,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "  RLS TEST-6 PASSED: API manipulation attack blocked\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-01T07:57:19.325Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8a3e26046e342023dbc2-fac01872975c882e297a",
+              "file": "security/rls-comprehensive.spec.ts",
+              "line": 536,
+              "column": 3
+            },
+            {
+              "title": "Test RLS-7: Admin can see all data (bypass RLS)",
               "ok": false,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 30000,
+                  "timeout": 120000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium-desktop",
@@ -208,228 +487,100 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 5889,
+                      "duration": 4398,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n    at /Users/nick/Desktop/awesome-list-site/tests/api/bookmarks-favorites.spec.ts:54:30",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n    at /Users/nick/Desktop/awesome-list-site/tests/security/rls-comprehensive.spec.ts:688:29",
                         "location": {
-                          "file": "/Users/nick/Desktop/awesome-list-site/tests/api/bookmarks-favorites.spec.ts",
-                          "column": 30,
-                          "line": 54
+                          "file": "/Users/nick/Desktop/awesome-list-site/tests/security/rls-comprehensive.spec.ts",
+                          "column": 29,
+                          "line": 688
                         },
-                        "snippet": "  52 |\n  53 |       // Layer 1: API\n> 54 |       expect(createRes.ok()).toBeTruthy();\n     |                              ^\n  55 |       console.log('  ✅ POST returned', createRes.status());\n  56 |\n  57 |       // Layer 2: Database"
+                        "snippet": "  686 |       );\n  687 |\n> 688 |       expect(statsRes.ok()).toBeTruthy();\n      |                             ^\n  689 |\n  690 |       const stats = await statsRes.json();\n  691 |       // Admin stats should show data from all users"
                       },
                       "errors": [
                         {
                           "location": {
-                            "file": "/Users/nick/Desktop/awesome-list-site/tests/api/bookmarks-favorites.spec.ts",
-                            "column": 30,
-                            "line": 54
+                            "file": "/Users/nick/Desktop/awesome-list-site/tests/security/rls-comprehensive.spec.ts",
+                            "column": 29,
+                            "line": 688
                           },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n\n  52 |\n  53 |       // Layer 1: API\n> 54 |       expect(createRes.ok()).toBeTruthy();\n     |                              ^\n  55 |       console.log('  ✅ POST returned', createRes.status());\n  56 |\n  57 |       // Layer 2: Database\n    at /Users/nick/Desktop/awesome-list-site/tests/api/bookmarks-favorites.spec.ts:54:30"
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n\n  686 |       );\n  687 |\n> 688 |       expect(statsRes.ok()).toBeTruthy();\n      |                             ^\n  689 |\n  690 |       const stats = await statsRes.json();\n  691 |       // Admin stats should show data from all users\n    at /Users/nick/Desktop/awesome-list-site/tests/security/rls-comprehensive.spec.ts:688:29"
                         }
                       ],
-                      "stdout": [
-                        {
-                          "text": "Testing POST /api/bookmarks/:id...\n"
-                        }
-                      ],
+                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-01T01:21:13.618Z",
+                      "startTime": "2025-12-01T07:57:23.709Z",
                       "annotations": [],
                       "attachments": [
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/api-bookmarks-favorites-Bo-a447f--endpoints-POST-GET-DELETE--chromium-desktop/test-failed-1.png"
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/security-rls-comprehensive-e5d21-an-see-all-data-bypass-RLS--chromium-desktop/test-failed-1.png"
                         }
                       ],
                       "errorLocation": {
-                        "file": "/Users/nick/Desktop/awesome-list-site/tests/api/bookmarks-favorites.spec.ts",
-                        "column": 30,
-                        "line": 54
+                        "file": "/Users/nick/Desktop/awesome-list-site/tests/security/rls-comprehensive.spec.ts",
+                        "column": 29,
+                        "line": 688
                       }
                     },
                     {
                       "workerIndex": 2,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 5961,
+                      "duration": 4376,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n    at /Users/nick/Desktop/awesome-list-site/tests/api/bookmarks-favorites.spec.ts:54:30",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n    at /Users/nick/Desktop/awesome-list-site/tests/security/rls-comprehensive.spec.ts:688:29",
                         "location": {
-                          "file": "/Users/nick/Desktop/awesome-list-site/tests/api/bookmarks-favorites.spec.ts",
-                          "column": 30,
-                          "line": 54
+                          "file": "/Users/nick/Desktop/awesome-list-site/tests/security/rls-comprehensive.spec.ts",
+                          "column": 29,
+                          "line": 688
                         },
-                        "snippet": "  52 |\n  53 |       // Layer 1: API\n> 54 |       expect(createRes.ok()).toBeTruthy();\n     |                              ^\n  55 |       console.log('  ✅ POST returned', createRes.status());\n  56 |\n  57 |       // Layer 2: Database"
+                        "snippet": "  686 |       );\n  687 |\n> 688 |       expect(statsRes.ok()).toBeTruthy();\n      |                             ^\n  689 |\n  690 |       const stats = await statsRes.json();\n  691 |       // Admin stats should show data from all users"
                       },
                       "errors": [
                         {
                           "location": {
-                            "file": "/Users/nick/Desktop/awesome-list-site/tests/api/bookmarks-favorites.spec.ts",
-                            "column": 30,
-                            "line": 54
+                            "file": "/Users/nick/Desktop/awesome-list-site/tests/security/rls-comprehensive.spec.ts",
+                            "column": 29,
+                            "line": 688
                           },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n\n  52 |\n  53 |       // Layer 1: API\n> 54 |       expect(createRes.ok()).toBeTruthy();\n     |                              ^\n  55 |       console.log('  ✅ POST returned', createRes.status());\n  56 |\n  57 |       // Layer 2: Database\n    at /Users/nick/Desktop/awesome-list-site/tests/api/bookmarks-favorites.spec.ts:54:30"
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n\n  686 |       );\n  687 |\n> 688 |       expect(statsRes.ok()).toBeTruthy();\n      |                             ^\n  689 |\n  690 |       const stats = await statsRes.json();\n  691 |       // Admin stats should show data from all users\n    at /Users/nick/Desktop/awesome-list-site/tests/security/rls-comprehensive.spec.ts:688:29"
                         }
                       ],
-                      "stdout": [
-                        {
-                          "text": "Testing POST /api/bookmarks/:id...\n"
-                        }
-                      ],
+                      "stdout": [],
                       "stderr": [],
                       "retry": 1,
-                      "startTime": "2025-12-01T01:21:19.763Z",
+                      "startTime": "2025-12-01T07:57:28.394Z",
                       "annotations": [],
                       "attachments": [
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/api-bookmarks-favorites-Bo-a447f--endpoints-POST-GET-DELETE--chromium-desktop-retry1/test-failed-1.png"
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/security-rls-comprehensive-e5d21-an-see-all-data-bypass-RLS--chromium-desktop-retry1/test-failed-1.png"
                         },
                         {
                           "name": "trace",
                           "contentType": "application/zip",
-                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/api-bookmarks-favorites-Bo-a447f--endpoints-POST-GET-DELETE--chromium-desktop-retry1/trace.zip"
+                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/security-rls-comprehensive-e5d21-an-see-all-data-bypass-RLS--chromium-desktop-retry1/trace.zip"
                         }
                       ],
                       "errorLocation": {
-                        "file": "/Users/nick/Desktop/awesome-list-site/tests/api/bookmarks-favorites.spec.ts",
-                        "column": 30,
-                        "line": 54
+                        "file": "/Users/nick/Desktop/awesome-list-site/tests/security/rls-comprehensive.spec.ts",
+                        "column": 29,
+                        "line": 688
                       }
                     }
                   ],
                   "status": "unexpected"
                 }
               ],
-              "id": "8313ec3d0815c491d770-0b2aa43af93e73e13c81",
-              "file": "api/bookmarks-favorites.spec.ts",
-              "line": 20,
-              "column": 3
-            },
-            {
-              "title": "API 2.4-2.6: Favorite endpoints (POST, GET, DELETE)",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium-desktop",
-                  "projectName": "chromium-desktop",
-                  "results": [
-                    {
-                      "workerIndex": 3,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 5872,
-                      "error": {
-                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n    at /Users/nick/Desktop/awesome-list-site/tests/api/bookmarks-favorites.spec.ts:164:30",
-                        "location": {
-                          "file": "/Users/nick/Desktop/awesome-list-site/tests/api/bookmarks-favorites.spec.ts",
-                          "column": 30,
-                          "line": 164
-                        },
-                        "snippet": "  162 |\n  163 |       // Layer 1: API\n> 164 |       expect(createRes.ok()).toBeTruthy();\n      |                              ^\n  165 |       console.log('  ✅ POST returned', createRes.status());\n  166 |\n  167 |       // Layer 2: Database"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Users/nick/Desktop/awesome-list-site/tests/api/bookmarks-favorites.spec.ts",
-                            "column": 30,
-                            "line": 164
-                          },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n\n  162 |\n  163 |       // Layer 1: API\n> 164 |       expect(createRes.ok()).toBeTruthy();\n      |                              ^\n  165 |       console.log('  ✅ POST returned', createRes.status());\n  166 |\n  167 |       // Layer 2: Database\n    at /Users/nick/Desktop/awesome-list-site/tests/api/bookmarks-favorites.spec.ts:164:30"
-                        }
-                      ],
-                      "stdout": [
-                        {
-                          "text": "Testing POST /api/favorites/:id...\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-12-01T01:21:25.982Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/api-bookmarks-favorites-Bo-ca945--endpoints-POST-GET-DELETE--chromium-desktop/test-failed-1.png"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/Users/nick/Desktop/awesome-list-site/tests/api/bookmarks-favorites.spec.ts",
-                        "column": 30,
-                        "line": 164
-                      }
-                    },
-                    {
-                      "workerIndex": 4,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 5943,
-                      "error": {
-                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n    at /Users/nick/Desktop/awesome-list-site/tests/api/bookmarks-favorites.spec.ts:164:30",
-                        "location": {
-                          "file": "/Users/nick/Desktop/awesome-list-site/tests/api/bookmarks-favorites.spec.ts",
-                          "column": 30,
-                          "line": 164
-                        },
-                        "snippet": "  162 |\n  163 |       // Layer 1: API\n> 164 |       expect(createRes.ok()).toBeTruthy();\n      |                              ^\n  165 |       console.log('  ✅ POST returned', createRes.status());\n  166 |\n  167 |       // Layer 2: Database"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Users/nick/Desktop/awesome-list-site/tests/api/bookmarks-favorites.spec.ts",
-                            "column": 30,
-                            "line": 164
-                          },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n\n  162 |\n  163 |       // Layer 1: API\n> 164 |       expect(createRes.ok()).toBeTruthy();\n      |                              ^\n  165 |       console.log('  ✅ POST returned', createRes.status());\n  166 |\n  167 |       // Layer 2: Database\n    at /Users/nick/Desktop/awesome-list-site/tests/api/bookmarks-favorites.spec.ts:164:30"
-                        }
-                      ],
-                      "stdout": [
-                        {
-                          "text": "Testing POST /api/favorites/:id...\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 1,
-                      "startTime": "2025-12-01T01:21:32.098Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/api-bookmarks-favorites-Bo-ca945--endpoints-POST-GET-DELETE--chromium-desktop-retry1/test-failed-1.png"
-                        },
-                        {
-                          "name": "trace",
-                          "contentType": "application/zip",
-                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/api-bookmarks-favorites-Bo-ca945--endpoints-POST-GET-DELETE--chromium-desktop-retry1/trace.zip"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/Users/nick/Desktop/awesome-list-site/tests/api/bookmarks-favorites.spec.ts",
-                        "column": 30,
-                        "line": 164
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "8313ec3d0815c491d770-16cf18ac6d2fe3e5dabb",
-              "file": "api/bookmarks-favorites.spec.ts",
-              "line": 120,
+              "id": "8a3e26046e342023dbc2-b606ffe4ceea303d712d",
+              "file": "security/rls-comprehensive.spec.ts",
+              "line": 595,
               "column": 3
             }
           ]
@@ -439,11 +590,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-12-01T01:21:09.386Z",
-    "duration": 28684.078,
-    "expected": 1,
+    "startTime": "2025-12-01T07:56:43.268Z",
+    "duration": 49528.448,
+    "expected": 7,
     "skipped": 0,
-    "unexpected": 2,
+    "unexpected": 1,
     "flaky": 0
   }
 }
