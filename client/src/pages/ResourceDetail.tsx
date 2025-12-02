@@ -22,17 +22,13 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { Resource } from "@shared/schema";
 
-interface ResourceDetailData {
-  resource: Resource;
-}
-
 export default function ResourceDetail() {
   const { id } = useParams<{ id: string }>();
   const { user, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data, isLoading, error } = useQuery<ResourceDetailData>({
+  const { data: resource, isLoading, error } = useQuery<Resource>({
     queryKey: ['/api/resources', id],
     queryFn: async () => {
       const response = await fetch(`/api/resources/${id}`, { credentials: 'include' });
@@ -52,8 +48,8 @@ export default function ResourceDetail() {
     enabled: isAuthenticated
   });
 
-  const isFavorite = favorites?.resourceIds?.includes(parseInt(id || '0'));
-  const isBookmarked = bookmarks?.resourceIds?.includes(parseInt(id || '0'));
+  const isFavorite = favorites?.resourceIds?.includes(parseInt(id || '0')) ?? false;
+  const isBookmarked = bookmarks?.resourceIds?.includes(parseInt(id || '0')) ?? false;
 
   const favoriteMutation = useMutation({
     mutationFn: async () => {
@@ -98,7 +94,7 @@ export default function ResourceDetail() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: data?.resource.title,
+          title: resource?.title,
           url: url
         });
       } catch (err) {
@@ -122,7 +118,7 @@ export default function ResourceDetail() {
     );
   }
 
-  if (error || !data?.resource) {
+  if (error || !resource) {
     return (
       <div className="space-y-6 max-w-4xl mx-auto">
         <SEOHead title="Resource Not Found" />
@@ -139,8 +135,6 @@ export default function ResourceDetail() {
       </div>
     );
   }
-
-  const resource = data.resource;
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
