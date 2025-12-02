@@ -1273,17 +1273,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'Resource not found' });
       }
       
-      const resourceSnapshot = { title: resource.title, url: resource.url, category: resource.category };
+      // Capture full resource snapshot for audit history preservation
+      const resourceSnapshot = {
+        id: resource.id,
+        title: resource.title,
+        url: resource.url,
+        description: resource.description,
+        category: resource.category,
+        subcategory: resource.subcategory,
+        subSubcategory: resource.subSubcategory,
+        status: resource.status,
+        metadata: resource.metadata,
+        createdAt: resource.createdAt,
+        updatedAt: resource.updatedAt
+      };
       
-      await storage.deleteResource(resourceId);
-      
+      // Log audit BEFORE deleting - FK now uses SET NULL so audit entry preserved
       await storage.logResourceAudit(
         resourceId,
         'deleted',
         userId,
         resourceSnapshot,
-        'Resource deleted by admin'
+        'Resource deleted by admin - full snapshot preserved'
       );
+      
+      await storage.deleteResource(resourceId);
       
       res.json({ message: 'Resource deleted successfully' });
     } catch (error) {
@@ -2743,8 +2757,10 @@ export async function runBackgroundInitialization(): Promise<void> {
     
     // Force reseed if:
     // 1. Database is empty (categories=0 or resources=0)
-    // 2. Resource count is significantly below expected ~2600+ (force reseed if <2000)
-    const needsReseeding = categories.length === 0 || actualResourceCount === 0 || actualResourceCount < 2000;
+    // 2. Resource count is significantly below minimum threshold indicating data corruption
+    // Note: Normal operation has ~1600-2000 resources; threshold of 1500 catches genuine corruption
+    // while being conservative enough to avoid masking partial data loss
+    const needsReseeding = categories.length === 0 || actualResourceCount === 0 || actualResourceCount < 1500;
     
     if (needsReseeding) {
       console.log(`📦 Database needs seeding (categories: ${categories.length}, resources: ${actualResourceCount})...`);

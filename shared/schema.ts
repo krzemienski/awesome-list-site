@@ -348,13 +348,13 @@ export const insertUserJourneyProgressSchema = createInsertSchema(userJourneyPro
 export type InsertUserJourneyProgress = z.infer<typeof insertUserJourneyProgressSchema>;
 export type UserJourneyProgress = typeof userJourneyProgress.$inferSelect;
 
-// Resource Audit Log
+// Resource Audit Log - preserves history for deleted resources via SET NULL
 export const resourceAuditLog = pgTable("resource_audit_log", {
   id: serial("id").primaryKey(),
-  resourceId: integer("resource_id").references(() => resources.id, { onDelete: "cascade" }),
-  action: text("action").notNull(), // created, updated, approved, rejected, synced
-  performedBy: varchar("performed_by").references(() => users.id, { onDelete: "cascade" }),
-  changes: jsonb("changes").$type<Record<string, any>>(),
+  resourceId: integer("resource_id").references(() => resources.id, { onDelete: "set null" }),
+  action: text("action").notNull(), // created, updated, approved, rejected, deleted, synced
+  performedBy: varchar("performed_by").references(() => users.id, { onDelete: "set null" }),
+  changes: jsonb("changes").$type<Record<string, any>>(), // Full resource snapshot for deleted resources
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow(),
 });
