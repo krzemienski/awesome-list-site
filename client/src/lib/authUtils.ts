@@ -26,7 +26,7 @@ export function redirectToLogin(returnTo?: string) {
   // Store the return path in session storage
   sessionStorage.setItem('authReturnTo', currentPath);
   // Redirect to login page
-  window.location.href = '/api/login';
+  window.location.href = '/login';
 }
 
 export function getReturnPath(): string {

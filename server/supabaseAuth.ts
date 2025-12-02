@@ -52,15 +52,7 @@ export async function extractUser(req: any, res: Response, next: NextFunction) {
         id: user.id,
         email: user.email,
         role: user.user_metadata?.role || 'user',
-        metadata: user.user_metadata,
-        // Add claims structure for backward compatibility with existing code
-        claims: {
-          sub: user.id,
-          email: user.email,
-          first_name: user.user_metadata?.first_name,
-          last_name: user.user_metadata?.last_name,
-          profile_image_url: user.user_metadata?.avatar_url
-        }
+        metadata: user.user_metadata
       };
     }
   } catch (error) {
