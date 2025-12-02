@@ -18,6 +18,7 @@ import {
   bulkOperationSchema,
   updateUserRoleSchema,
   createBookmarkSchema,
+  updateUserPreferencesSchema,
   updateJourneyProgressSchema,
   githubConfigureSchema,
   githubSyncSchema,
@@ -692,6 +693,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching user progress:', error);
       res.status(500).json({ message: 'Failed to fetch user progress' });
+    }
+  });
+
+  // POST /api/user/preferences - Save user preferences
+  app.post('/api/user/preferences', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = req.user.id;
+
+      // Validate request body
+      const validatedPreferences = updateUserPreferencesSchema.parse(req.body);
+
+      // Save preferences
+      const savedPreferences = await storage.saveUserPreferences(userId, validatedPreferences);
+
+      res.json(savedPreferences);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({
+          message: 'Invalid preferences data',
+          errors: error.errors
+        });
+      } else {
+        console.error('Error saving user preferences:', error);
+        res.status(500).json({ message: 'Failed to save preferences' });
+      }
     }
   });
 

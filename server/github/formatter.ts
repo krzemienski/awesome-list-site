@@ -262,16 +262,25 @@ export class AwesomeListFormatter {
       description = description.replace(/[\u2018\u2019]/g, "'"); // Replace curly single quotes
       description = description.replace(/[\u201C\u201D]/g, '"'); // Replace curly double quotes
 
-      // Ensure description starts with capital letter
-      if (description && description[0] !== description[0].toUpperCase()) {
-        description = description[0].toUpperCase() + description.slice(1);
+      // Ensure description starts with capital letter (skip emojis/symbols)
+      // Find first letter character and capitalize it
+      const firstLetterMatch = description.match(/[a-zA-Z]/);
+      if (firstLetterMatch) {
+        const firstLetterIndex = description.indexOf(firstLetterMatch[0]);
+        if (firstLetterIndex >= 0 && description[firstLetterIndex] !== description[firstLetterIndex].toUpperCase()) {
+          description = 
+            description.slice(0, firstLetterIndex) +
+            description[firstLetterIndex].toUpperCase() +
+            description.slice(firstLetterIndex + 1);
+        }
       }
 
       // Ensure description ends with exactly one period (no-repeat-punctuation)
-      // Remove any trailing periods first to avoid double periods
+      // But respect ellipsis (...) as intentional
       description = description.replace(/\.{2,}$/g, '.'); // Replace 2+ periods at end with single period
-      description = description.replace(/\.+$/, ''); // Remove all trailing periods
-      if (!description.endsWith('!') && !description.endsWith('?')) {
+      
+      // Don't add period if already ends with punctuation or ellipsis
+      if (!description.match(/[.!?]$/) && !description.match(/\.\.\./)) {
         description += '.';
       }
 

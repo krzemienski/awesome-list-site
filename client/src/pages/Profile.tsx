@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,11 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 import { 
   User, 
   Heart, 
@@ -248,11 +253,12 @@ export default function Profile({ user }: ProfileProps) {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="favorites">Favorites</TabsTrigger>
           <TabsTrigger value="bookmarks">Bookmarks</TabsTrigger>
           <TabsTrigger value="submissions">Submissions</TabsTrigger>
+          <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}
@@ -718,7 +724,246 @@ export default function Profile({ user }: ProfileProps) {
             </Card>
           </div>
         </TabsContent>
+
+        {/* Settings Tab */}
+        <TabsContent value="settings">
+          <PreferencesSettings user={user} />
+        </TabsContent>
       </Tabs>
     </div>
+  );
+}
+
+// Preferences Settings Component
+function PreferencesSettings({ user }: { user: any }) {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Fetch current preferences
+  const { data: currentPreferences, isLoading: preferencesLoading } = useQuery({
+    queryKey: ["/api/user/preferences"],
+    queryFn: async () => {
+      const res = await fetch("/api/user/preferences", {
+        credentials: "include",
+      });
+      if (!res.ok) {
+        if (res.status === 404) return null; // No preferences yet
+        throw new Error("Failed to fetch preferences");
+      }
+      return res.json();
+    },
+  });
+
+  // Local state for form (initialized from current preferences)
+  const [preferredCategories, setPreferredCategories] = useState<string>("");
+  const [skillLevel, setSkillLevel] = useState<string>("intermediate");
+  const [learningGoals, setLearningGoals] = useState<string>("");
+  const [preferredResourceTypes, setPreferredResourceTypes] = useState<string>("");
+  const [timeCommitment, setTimeCommitment] = useState<string>("flexible");
+
+  // Initialize form when preferences load
+  useState(() => {
+    if (currentPreferences) {
+      if (currentPreferences.preferredCategories) {
+        setPreferredCategories(currentPreferences.preferredCategories.join(", "));
+      }
+      if (currentPreferences.skillLevel) {
+        setSkillLevel(currentPreferences.skillLevel);
+      }
+      if (currentPreferences.learningGoals) {
+        setLearningGoals(currentPreferences.learningGoals.join("\n"));
+      }
+      if (currentPreferences.preferredResourceTypes) {
+        setPreferredResourceTypes(currentPreferences.preferredResourceTypes.join(", "));
+      }
+      if (currentPreferences.timeCommitment) {
+        setTimeCommitment(currentPreferences.timeCommitment);
+      }
+    }
+  });
+
+  // Save mutation
+  const savePreferences = useMutation({
+    mutationFn: async (data: any) => {
+      const res = await fetch("/api/user/preferences", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || "Failed to save preferences");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user/preferences"] });
+      toast({
+        title: "Preferences saved",
+        description: "Your preferences have been updated successfully.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error saving preferences",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const data: any = {
+      skillLevel,
+      timeCommitment,
+    };
+
+    // Parse comma-separated categories
+    if (preferredCategories.trim()) {
+      data.preferredCategories = preferredCategories
+        .split(",")
+        .map((c) => c.trim())
+        .filter(Boolean);
+    }
+
+    // Parse newline-separated goals
+    if (learningGoals.trim()) {
+      data.learningGoals = learningGoals
+        .split("\n")
+        .map((g) => g.trim())
+        .filter(Boolean);
+    }
+
+    // Parse comma-separated resource types
+    if (preferredResourceTypes.trim()) {
+      data.preferredResourceTypes = preferredResourceTypes
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean);
+    }
+
+    savePreferences.mutate(data);
+  };
+
+  if (preferencesLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Settings</CardTitle>
+          <CardDescription>Customize your learning experience</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-96" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Settings</CardTitle>
+        <CardDescription>
+          Customize your learning experience and get personalized recommendations
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Skill Level */}
+          <div className="space-y-2">
+            <Label htmlFor="skillLevel">Skill Level</Label>
+            <Select value={skillLevel} onValueChange={setSkillLevel}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select your skill level" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="beginner">Beginner</SelectItem>
+                <SelectItem value="intermediate">Intermediate</SelectItem>
+                <SelectItem value="advanced">Advanced</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-sm text-muted-foreground">
+              Your current experience level with video development
+            </p>
+          </div>
+
+          {/* Time Commitment */}
+          <div className="space-y-2">
+            <Label htmlFor="timeCommitment">Time Commitment</Label>
+            <Select value={timeCommitment} onValueChange={setTimeCommitment}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select your time commitment" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="daily">Daily</SelectItem>
+                <SelectItem value="weekly">Weekly</SelectItem>
+                <SelectItem value="flexible">Flexible</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-sm text-muted-foreground">
+              How often you plan to learn
+            </p>
+          </div>
+
+          {/* Preferred Categories */}
+          <div className="space-y-2">
+            <Label htmlFor="preferredCategories">Preferred Categories</Label>
+            <Textarea
+              id="preferredCategories"
+              placeholder="Enter categories separated by commas (e.g., Encoding & Codecs, Players & Clients)"
+              value={preferredCategories}
+              onChange={(e) => setPreferredCategories(e.target.value)}
+              rows={3}
+            />
+            <p className="text-sm text-muted-foreground">
+              Topics you're most interested in learning about
+            </p>
+          </div>
+
+          {/* Learning Goals */}
+          <div className="space-y-2">
+            <Label htmlFor="learningGoals">Learning Goals</Label>
+            <Textarea
+              id="learningGoals"
+              placeholder="Enter one goal per line (e.g., Master FFmpeg, Learn HLS streaming)"
+              value={learningGoals}
+              onChange={(e) => setLearningGoals(e.target.value)}
+              rows={4}
+            />
+            <p className="text-sm text-muted-foreground">
+              What you want to achieve with these resources
+            </p>
+          </div>
+
+          {/* Preferred Resource Types */}
+          <div className="space-y-2">
+            <Label htmlFor="preferredResourceTypes">Preferred Resource Types</Label>
+            <Textarea
+              id="preferredResourceTypes"
+              placeholder="Enter types separated by commas (e.g., Documentation, Video Tutorials, Tools)"
+              value={preferredResourceTypes}
+              onChange={(e) => setPreferredResourceTypes(e.target.value)}
+              rows={2}
+            />
+            <p className="text-sm text-muted-foreground">
+              Types of resources you prefer
+            </p>
+          </div>
+
+          {/* Save Button */}
+          <div className="flex justify-end">
+            <Button
+              type="submit"
+              disabled={savePreferences.isPending}
+            >
+              {savePreferences.isPending ? "Saving..." : "Save Preferences"}
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 }

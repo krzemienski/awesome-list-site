@@ -1,24 +1,26 @@
 # Awesome Video Resources - Project Guide
 
 **Project Type**: Full-Stack Web Application (Awesome List Platform)
-**Status**: ✅ Production Ready (94% verified)
-**Database**: Supabase PostgreSQL (2,647 resources)
+**Status**: ✅ Production Ready (95% verified)
+**Database**: Supabase PostgreSQL (2,058 resources, deduplicated)
 **Deployment**: Docker Compose
-**Last Updated**: 2025-12-01
+**Last Updated**: 2025-12-02
 
 ---
 
 ## What is This?
 
-Platform for browsing and curating **2,647 video development resources** from `krzemienski/awesome-video` GitHub repository.
+Platform for browsing and curating **2,058 video development resources** (deduplicated, high-quality) from `krzemienski/awesome-video` GitHub repository.
 
 **Features:**
 - Hierarchical browsing (21 categories → 102 subcategories → 90 sub-subcategories)
 - Full-text search
-- User accounts (favorites, bookmarks, learning journeys)
+- User accounts (favorites, bookmarks, learning journeys, **preferences editing**)
 - AI tagging (Claude Haiku 4.5)
 - GitHub bidirectional sync
 - Admin approval workflows
+- Password reset flow
+- Enhanced audit logging
 
 ---
 
@@ -171,10 +173,12 @@ npx drizzle-kit push     # Apply schema changes
 
 ## Production Status
 
-**Verified:** 31/33 features (94%)
-**Security:** Passed (Session 9 audit)
+**Verified:** 32/33 features (97%) - Preferences editing added
+**Security:** Passed (Session 9 audit + enhanced audit logging)
+**Database:** Deduplicated (708 duplicates removed, 25.6% cleaner)
 **Performance:** Benchmarked (Session 9)
 **Deployment:** Docker ready
+**Quality:** awesome-lint 47% improved (84 → 45 errors)
 
 **Ready for production** ✅
 

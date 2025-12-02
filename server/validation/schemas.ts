@@ -314,6 +314,24 @@ export const skillLevelSchema = z.enum(["beginner", "intermediate", "advanced"])
 // Time commitment enum
 export const timeCommitmentSchema = z.enum(["daily", "weekly", "flexible"]);
 
+// User preferences schema (moved here to use skillLevelSchema and timeCommitmentSchema)
+export const updateUserPreferencesSchema = z.object({
+  preferredCategories: z
+    .array(z.string().max(100))
+    .max(20, "Too many categories (max 20)")
+    .optional(),
+  skillLevel: skillLevelSchema.optional(),
+  learningGoals: z
+    .array(z.string().max(200))
+    .max(10, "Too many goals (max 10)")
+    .optional(),
+  preferredResourceTypes: z
+    .array(z.string().max(50))
+    .max(10, "Too many resource types (max 10)")
+    .optional(),
+  timeCommitment: timeCommitmentSchema.optional(),
+});
+
 // User profile schema for recommendations
 export const userProfileSchema = z.object({
   userId: z.string().max(100).optional().default("anonymous"),
@@ -452,6 +470,7 @@ export const schemas = {
   userRole: userRoleSchema,
   updateUserRole: updateUserRoleSchema,
   createBookmark: createBookmarkSchema,
+  updateUserPreferences: updateUserPreferencesSchema,
 
   // Journeys
   difficulty: difficultySchema,
@@ -492,6 +511,7 @@ export type CreateResourceEditInput = z.infer<typeof createResourceEditSchema>;
 export type BulkOperationInput = z.infer<typeof bulkOperationSchema>;
 export type UpdateUserRoleInput = z.infer<typeof updateUserRoleSchema>;
 export type CreateBookmarkInput = z.infer<typeof createBookmarkSchema>;
+export type UpdateUserPreferencesInput = z.infer<typeof updateUserPreferencesSchema>;
 export type UpdateJourneyProgressInput = z.infer<typeof updateJourneyProgressSchema>;
 export type CreateLearningJourneyInput = z.infer<typeof createLearningJourneySchema>;
 export type GithubConfigureInput = z.infer<typeof githubConfigureSchema>;
