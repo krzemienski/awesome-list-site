@@ -43,54 +43,226 @@ const ALLOWED_DOMAINS = [
 interface CacheEntry {
   response: string;
   timestamp: number;
+  lastAccessed: number;
 }
 
 interface AnalysisCache {
   result: any;
   timestamp: number;
+  lastAccessed: number;
+}
+
+/**
+ * LRU Cache implementation with TTL support
+ * Provides automatic eviction of least-recently-used entries and periodic cleanup
+ */
+class LRUCache<T extends { timestamp: number; lastAccessed: number }> {
+  private cache: Map<string, T>;
+  private readonly maxSize: number;
+  private readonly ttl: number;
+  private cleanupInterval: NodeJS.Timeout | null = null;
+
+  constructor(maxSize: number, ttl: number, cleanupIntervalMs: number = 5 * 60 * 1000) {
+    this.cache = new Map();
+    this.maxSize = maxSize;
+    this.ttl = ttl;
+
+    // Start periodic cleanup
+    this.cleanupInterval = setInterval(() => this.cleanup(), cleanupIntervalMs);
+    // Prevent the interval from keeping the process alive
+    if (this.cleanupInterval.unref) {
+      this.cleanupInterval.unref();
+    }
+  }
+
+  get(key: string): T | undefined {
+    const entry = this.cache.get(key);
+    if (!entry) return undefined;
+
+    // Check if expired
+    if (Date.now() - entry.timestamp > this.ttl) {
+      this.cache.delete(key);
+      return undefined;
+    }
+
+    // Update last accessed time (LRU tracking)
+    entry.lastAccessed = Date.now();
+    return entry;
+  }
+
+  set(key: string, value: T): void {
+    // Evict if at capacity
+    if (this.cache.size >= this.maxSize && !this.cache.has(key)) {
+      this.evictLRU();
+    }
+
+    value.lastAccessed = Date.now();
+    this.cache.set(key, value);
+  }
+
+  delete(key: string): boolean {
+    return this.cache.delete(key);
+  }
+
+  clear(): void {
+    this.cache.clear();
+  }
+
+  get size(): number {
+    return this.cache.size;
+  }
+
+  /**
+   * Evict the least recently used entry
+   */
+  private evictLRU(): void {
+    let oldestKey: string | null = null;
+    let oldestAccess = Infinity;
+
+    // Use Array.from for compatibility
+    const entries = Array.from(this.cache.entries());
+    for (let i = 0; i < entries.length; i++) {
+      const [key, entry] = entries[i];
+      if (entry.lastAccessed < oldestAccess) {
+        oldestAccess = entry.lastAccessed;
+        oldestKey = key;
+      }
+    }
+
+    if (oldestKey) {
+      this.cache.delete(oldestKey);
+    }
+  }
+
+  /**
+   * Remove all expired entries
+   */
+  cleanup(): number {
+    const now = Date.now();
+    let removed = 0;
+
+    // Use Array.from for compatibility (also prevents mutation during iteration)
+    const entries = Array.from(this.cache.entries());
+    for (let i = 0; i < entries.length; i++) {
+      const [key, entry] = entries[i];
+      if (now - entry.timestamp > this.ttl) {
+        this.cache.delete(key);
+        removed++;
+      }
+    }
+
+    if (removed > 0) {
+      console.log(`LRU cache cleanup: removed ${removed} expired entries`);
+    }
+
+    return removed;
+  }
+
+  /**
+   * Stop the cleanup interval (call on shutdown)
+   */
+  destroy(): void {
+    if (this.cleanupInterval) {
+      clearInterval(this.cleanupInterval);
+      this.cleanupInterval = null;
+    }
+  }
 }
 
 export class ClaudeService {
   private static instance: ClaudeService;
   private anthropic: Anthropic | null = null;
   private redis: Redis | null = null;
-  private responseCache: Map<string, CacheEntry>;
-  private analysisCache: Map<string, AnalysisCache>;
+  private redisReady: Promise<boolean> | null = null;
+  private responseCache: LRUCache<CacheEntry>;
+  private analysisCache: LRUCache<AnalysisCache>;
   private readonly CACHE_TTL = 60 * 60 * 1000; // 1 hour cache
   private readonly ANALYSIS_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hour cache for URL analysis
   private readonly MAX_CACHE_SIZE = 100;
+  private readonly CLEANUP_INTERVAL = 5 * 60 * 1000; // 5 minute cleanup interval
   private requestCount = 0;
   private lastRequestTime = 0;
   private readonly RATE_LIMIT_DELAY = 1000; // 1 second between requests
 
   private constructor() {
-    this.responseCache = new Map();
-    this.analysisCache = new Map();
-    this.initializeRedis();
+    // Initialize LRU caches with TTL and periodic cleanup
+    this.responseCache = new LRUCache<CacheEntry>(this.MAX_CACHE_SIZE, this.CACHE_TTL, this.CLEANUP_INTERVAL);
+    this.analysisCache = new LRUCache<AnalysisCache>(this.MAX_CACHE_SIZE, this.ANALYSIS_CACHE_TTL, this.CLEANUP_INTERVAL);
+    this.redisReady = this.initializeRedis();
     this.initializeClient();
   }
 
   /**
    * Initialize Redis client if REDIS_URL is available
+   * Returns a promise that resolves when Redis is ready (or fails)
    */
-  private initializeRedis(): void {
-    if (process.env.REDIS_URL) {
+  private initializeRedis(): Promise<boolean> {
+    if (!process.env.REDIS_URL) {
+      console.log('Redis not configured - using in-memory cache only');
+      return Promise.resolve(false);
+    }
+
+    return new Promise((resolve) => {
       try {
-        this.redis = new Redis(process.env.REDIS_URL);
+        this.redis = new Redis(process.env.REDIS_URL!, {
+          lazyConnect: true,
+          maxRetriesPerRequest: 3,
+          retryStrategy: (times) => {
+            if (times > 3) {
+              console.error('Redis connection failed after 3 retries, using in-memory cache');
+              return null; // Stop retrying
+            }
+            return Math.min(times * 200, 1000);
+          }
+        });
+
         this.redis.on('error', (err) => {
           console.error('Redis error:', err);
-          this.redis = null; // Fallback to in-memory
+          // Don't null out redis here - let it retry
         });
-        this.redis.on('connect', () => {
+
+        this.redis.on('ready', () => {
           console.log('✅ Redis cache connected for ClaudeService');
+          resolve(true);
         });
+
+        this.redis.on('close', () => {
+          console.log('Redis connection closed');
+        });
+
+        // Connect and handle connection failure
+        this.redis.connect().catch((err) => {
+          console.error('Failed to connect to Redis:', err);
+          this.redis = null;
+          resolve(false);
+        });
+
+        // Timeout fallback - don't block forever
+        setTimeout(() => {
+          if (this.redis?.status !== 'ready') {
+            console.warn('Redis connection timeout, falling back to in-memory cache');
+            this.redis?.disconnect();
+            this.redis = null;
+            resolve(false);
+          }
+        }, 5000);
+
       } catch (error) {
         console.error('Failed to initialize Redis:', error);
         this.redis = null;
+        resolve(false);
       }
-    } else {
-      console.log('Redis not configured - using in-memory cache only');
+    });
+  }
+
+  /**
+   * Get Redis client, ensuring it's ready before use
+   */
+  private async getRedis(): Promise<Redis | null> {
+    if (this.redisReady) {
+      await this.redisReady;
     }
+    return this.redis?.status === 'ready' ? this.redis : null;
   }
 
   public static getInstance(): ClaudeService {
@@ -170,7 +342,13 @@ export class ClaudeService {
         max_tokens: maxTokens
       });
 
-      const responseText = (response.content[0] as any).text || '';
+      // Type guard: ensure response has text content
+      const firstBlock = response.content[0];
+      if (!firstBlock || firstBlock.type !== 'text') {
+        console.error('Claude response did not contain expected text block');
+        return null;
+      }
+      const responseText = firstBlock.text;
 
       // Cache the response
       await this.addToCache(cacheKey, responseText);
@@ -235,13 +413,14 @@ export class ClaudeService {
   }
 
   /**
-   * Get a response from cache if valid (tries Redis first, then in-memory)
+   * Get a response from cache if valid (tries Redis first, then in-memory LRU)
    */
   private async getFromCache(key: string): Promise<string | null> {
-    // Try Redis first
-    if (this.redis) {
+    // Try Redis first (with proper await for connection readiness)
+    const redis = await this.getRedis();
+    if (redis) {
       try {
-        const cached = await this.redis.get(`claude:response:${key}`);
+        const cached = await redis.get(`claude:response:${key}`);
         if (cached) {
           console.log('Redis cache HIT');
           return cached;
@@ -251,27 +430,22 @@ export class ClaudeService {
       }
     }
 
-    // Fallback to in-memory
+    // Fallback to in-memory LRU cache (handles TTL and access tracking internally)
     const entry = this.responseCache.get(key);
     if (!entry) return null;
-
-    const age = Date.now() - entry.timestamp;
-    if (age > this.CACHE_TTL) {
-      this.responseCache.delete(key);
-      return null;
-    }
 
     return entry.response;
   }
 
   /**
-   * Add a response to cache (writes to both Redis and in-memory)
+   * Add a response to cache (writes to both Redis and in-memory LRU)
    */
   private async addToCache(key: string, response: string): Promise<void> {
-    // Store in Redis with TTL
-    if (this.redis) {
+    // Store in Redis with TTL (with proper await for connection readiness)
+    const redis = await this.getRedis();
+    if (redis) {
       try {
-        await this.redis.setex(
+        await redis.setex(
           `claude:response:${key}`,
           Math.floor(this.CACHE_TTL / 1000), // TTL in seconds
           response
@@ -281,17 +455,11 @@ export class ClaudeService {
       }
     }
 
-    // Also store in memory as fallback
-    if (this.responseCache.size >= this.MAX_CACHE_SIZE) {
-      const oldestKey = this.responseCache.keys().next().value;
-      if (oldestKey) {
-        this.responseCache.delete(oldestKey);
-      }
-    }
-
+    // Store in LRU cache (handles eviction internally)
     this.responseCache.set(key, {
       response,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      lastAccessed: Date.now()
     });
   }
 
@@ -362,36 +530,66 @@ export class ClaudeService {
   }
 
   /**
-   * Get cached analysis result
+   * Get cached analysis result (LRU cache handles TTL and access tracking)
    */
   private getCachedAnalysis(url: string): any | null {
     const entry = this.analysisCache.get(url);
     if (!entry) return null;
 
-    const age = Date.now() - entry.timestamp;
-    if (age > this.ANALYSIS_CACHE_TTL) {
-      this.analysisCache.delete(url);
-      return null;
-    }
-
     return entry.result;
   }
 
   /**
-   * Cache analysis result
+   * Cache analysis result (LRU cache handles eviction)
    */
   private cacheAnalysis(url: string, result: any): void {
-    if (this.analysisCache.size >= this.MAX_CACHE_SIZE) {
-      const oldestKey = this.analysisCache.keys().next().value;
-      if (oldestKey) {
-        this.analysisCache.delete(oldestKey);
+    this.analysisCache.set(url, {
+      result,
+      timestamp: Date.now(),
+      lastAccessed: Date.now()
+    });
+  }
+
+  /**
+   * Validate that a hostname matches an allowed domain (exact match or subdomain)
+   * Uses proper string matching to prevent bypass attacks
+   */
+  private isAllowedDomain(hostname: string): boolean {
+    // Normalize hostname to lowercase
+    const normalizedHost = hostname.toLowerCase();
+
+    // Block IP addresses (could be internal/private IPs)
+    // IPv4 pattern
+    if (/^(\d{1,3}\.){3}\d{1,3}$/.test(normalizedHost)) {
+      return false;
+    }
+    // IPv6 pattern (bracketed in URLs, but hostname may not have brackets)
+    if (/^[0-9a-f:]+$/i.test(normalizedHost) && normalizedHost.includes(':')) {
+      return false;
+    }
+
+    for (const allowedDomain of ALLOWED_DOMAINS) {
+      const normalizedAllowed = allowedDomain.toLowerCase();
+
+      // Exact match: hostname === allowedDomain
+      if (normalizedHost === normalizedAllowed) {
+        return true;
+      }
+
+      // www prefix: hostname === "www." + allowedDomain
+      if (normalizedHost === `www.${normalizedAllowed}`) {
+        return true;
+      }
+
+      // Subdomain match: hostname ends with "." + allowedDomain
+      // The leading dot ensures we match actual subdomains, not suffix attacks
+      // e.g., "sub.github.com" matches, but "notgithub.com" does not
+      if (normalizedHost.endsWith(`.${normalizedAllowed}`)) {
+        return true;
       }
     }
 
-    this.analysisCache.set(url, {
-      result,
-      timestamp: Date.now()
-    });
+    return false;
   }
 
   /**
@@ -412,6 +610,11 @@ export class ClaudeService {
       return null;
     }
 
+    // Sanitize URL input - reject if contains control characters or whitespace issues
+    if (/[\x00-\x1F\x7F]/.test(url) || url !== url.trim()) {
+      throw new Error('Invalid URL: contains control characters or leading/trailing whitespace');
+    }
+
     // Parse and validate URL format
     let parsedUrl: URL;
     try {
@@ -425,16 +628,15 @@ export class ClaudeService {
       throw new Error('Only HTTPS URLs are allowed');
     }
 
-    // SECURITY: Domain allowlist (eliminates ALL SSRF risks)
-    const hostname = parsedUrl.hostname.toLowerCase();
-    const isAllowed = ALLOWED_DOMAINS.some(allowedDomain => {
-      // Match exact domain or subdomain
-      return hostname === allowedDomain || 
-             hostname === `www.${allowedDomain}` ||
-             hostname.endsWith(`.${allowedDomain}`);
-    });
+    // Reject URLs with credentials (user:pass@host) - potential bypass vector
+    if (parsedUrl.username || parsedUrl.password) {
+      throw new Error('URLs with credentials are not allowed');
+    }
 
-    if (!isAllowed) {
+    // SECURITY: Domain allowlist with proper URL parsing (eliminates ALL SSRF risks)
+    const hostname = parsedUrl.hostname;
+
+    if (!this.isAllowedDomain(hostname)) {
       throw new Error(
         `Domain "${hostname}" is not in the allowlist of trusted video streaming domains. ` +
         `Allowed domains include: ${ALLOWED_DOMAINS.slice(0, 5).join(', ')}, etc.`

@@ -5,13 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import {
   Shield,
-  Users,
-  GitBranch,
-  FileText,
-  Activity,
   Download,
   CheckCircle2,
   XCircle,
@@ -89,11 +84,6 @@ export default function AdminDashboard() {
   const queryClient = useQueryClient();
   
   const [isExporting, setIsExporting] = useState(false);
-  const [isValidating, setIsValidating] = useState(false);
-  const [isCheckingLinks, setIsCheckingLinks] = useState(false);
-  const [isImporting, setIsImporting] = useState(false);
-  const [importResult, setImportResult] = useState<{imported: number; updated: number; skipped: number; errors: string[]} | null>(null);
-  const [importError, setImportError] = useState<string | null>(null);
   
   // Fetch validation status
   const { data: validationStatus } = useQuery<ValidationStatus>({

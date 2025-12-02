@@ -48,7 +48,7 @@ import {
   type InsertEnrichmentQueue,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, sql, desc, asc, inArray, like, or, isNull, isNotNull } from "drizzle-orm";
+import { eq, and, sql, desc, asc, inArray, like, or, isNull, isNotNull, lt } from "drizzle-orm";
 
 // Interface for storage operations
 export interface IStorage {
@@ -64,6 +64,7 @@ export interface IStorage {
   // Resource CRUD operations
   listResources(options: ListResourceOptions): Promise<{ resources: Resource[]; total: number }>;
   getResource(id: string): Promise<Resource | undefined>;
+  getResourcesByIds(ids: string[]): Promise<Resource[]>;
   createResource(resource: InsertResource): Promise<Resource>;
   updateResource(id: string, resource: Partial<InsertResource>): Promise<Resource>;
   updateResourceStatus(id: string, status: string, approvedBy?: string): Promise<Resource>;
@@ -177,6 +178,7 @@ export interface IStorage {
   listEnrichmentJobs(limit?: number): Promise<EnrichmentJob[]>;
   updateEnrichmentJob(id: string, data: Partial<EnrichmentJob>): Promise<EnrichmentJob>;
   cancelEnrichmentJob(id: string): Promise<void>;
+  deleteOldEnrichmentJobs(daysOld?: number): Promise<number>;
 
   // Enrichment Queue
   createEnrichmentQueueItem(data: InsertEnrichmentQueue): Promise<EnrichmentQueueItem>;
@@ -348,7 +350,12 @@ export class DatabaseStorage implements IStorage {
     const [resource] = await db.select().from(resources).where(eq(resources.id, id));
     return resource;
   }
-  
+
+  async getResourcesByIds(ids: string[]): Promise<Resource[]> {
+    if (ids.length === 0) return [];
+    return await db.select().from(resources).where(inArray(resources.id, ids));
+  }
+
   async createResource(resource: InsertResource): Promise<Resource> {
     const [newResource] = await db.insert(resources).values(resource).returning();
     
@@ -358,16 +365,18 @@ export class DatabaseStorage implements IStorage {
     return newResource;
   }
   
-  async updateResource(id: string, resource: Partial<InsertResource>): Promise<Resource> {
+  async updateResource(id: string, resource: Partial<InsertResource>): Promise<Resource | undefined> {
     const [updatedResource] = await db
       .update(resources)
       .set({ ...resource, updatedAt: new Date() })
       .where(eq(resources.id, id))
       .returning();
-    
-    // Log the update
-    await this.logResourceAudit(id, 'updated', resource.submittedBy ?? undefined, resource);
-    
+
+    // Only log if resource existed and was updated
+    if (updatedResource) {
+      await this.logResourceAudit(id, 'updated', resource.submittedBy ?? undefined, resource);
+    }
+
     return updatedResource;
   }
   
@@ -663,7 +672,7 @@ export class DatabaseStorage implements IStorage {
       if (!subcategoryMap.has(sub.categoryId)) {
         subcategoryMap.set(sub.categoryId, []);
       }
-      subcategoryMap.get(sub.categoryId)!.push(sub);
+      (subcategoryMap.get(sub.categoryId) ?? []).push(sub);
     });
 
     // Build sub-subcategory map
@@ -673,7 +682,7 @@ export class DatabaseStorage implements IStorage {
       if (!subSubcategoryMap.has(subsub.subcategoryId)) {
         subSubcategoryMap.set(subsub.subcategoryId, []);
       }
-      subSubcategoryMap.get(subsub.subcategoryId)!.push(subsub);
+      (subSubcategoryMap.get(subsub.subcategoryId) ?? []).push(subsub);
     });
 
     // Build hierarchical structure with counts (no resources)
@@ -926,7 +935,7 @@ export class DatabaseStorage implements IStorage {
       if (!grouped.has(step.journeyId)) {
         grouped.set(step.journeyId, []);
       }
-      grouped.get(step.journeyId)!.push(step);
+      (grouped.get(step.journeyId) ?? []).push(step);
     }
     
     return grouped;
@@ -1028,35 +1037,39 @@ export class DatabaseStorage implements IStorage {
   }
   
   async updateUserJourneyProgress(userId: string, journeyId: string, stepId: string): Promise<UserJourneyProgress> {
-    // First get current progress
-    const [current] = await db
-      .select()
-      .from(userJourneyProgress)
-      .where(
-        and(
-          eq(userJourneyProgress.userId, userId),
-          eq(userJourneyProgress.journeyId, journeyId)
-        )
-      );
-    
-    const completedSteps = current?.completedSteps || [];
-    if (!completedSteps.includes(stepId)) {
-      completedSteps.push(stepId);
-    }
-    
-    // Check if all steps are completed
+    // Get all journey steps first for completion check
     const allSteps = await this.listJourneySteps(journeyId);
-    const allCompleted = allSteps.every(step => 
-      step.isOptional || completedSteps.includes(step.id)
-    );
-    
+    const requiredStepIds = allSteps
+      .filter(step => !step.isOptional)
+      .map(step => step.id);
+
+    // Use atomic SQL array append to prevent race conditions
+    // CASE ensures we don't add duplicates, array_append is atomic
     const [updated] = await db
       .update(userJourneyProgress)
       .set({
         currentStepId: stepId,
-        completedSteps,
+        completedSteps: sql`
+          CASE
+            WHEN ${stepId} = ANY(${userJourneyProgress.completedSteps})
+            THEN ${userJourneyProgress.completedSteps}
+            ELSE array_append(${userJourneyProgress.completedSteps}, ${stepId})
+          END
+        `,
         lastAccessedAt: new Date(),
-        completedAt: allCompleted ? new Date() : null
+        // Check completion atomically: all required steps must be in the updated array
+        completedAt: sql`
+          CASE
+            WHEN ${sql.raw(requiredStepIds.length === 0 ? 'TRUE' : `ARRAY[${requiredStepIds.map(id => `'${id}'`).join(',')}]::text[]`)} <@
+              CASE
+                WHEN ${stepId} = ANY(${userJourneyProgress.completedSteps})
+                THEN ${userJourneyProgress.completedSteps}
+                ELSE array_append(${userJourneyProgress.completedSteps}, ${stepId})
+              END
+            THEN NOW()
+            ELSE NULL
+          END
+        `
       })
       .where(
         and(
@@ -1065,7 +1078,7 @@ export class DatabaseStorage implements IStorage {
         )
       )
       .returning();
-    
+
     return updated;
   }
   
@@ -1429,14 +1442,27 @@ export class DatabaseStorage implements IStorage {
   async cancelEnrichmentJob(id: string): Promise<void> {
     await db
       .update(enrichmentJobs)
-      .set({ 
-        status: 'cancelled', 
+      .set({
+        status: 'cancelled',
         completedAt: new Date(),
-        updatedAt: new Date() 
+        updatedAt: new Date()
       })
       .where(eq(enrichmentJobs.id, id));
   }
-  
+
+  async deleteOldEnrichmentJobs(daysOld: number = 30): Promise<number> {
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - daysOld);
+
+    // Delete jobs older than cutoff date (cascade will delete queue items)
+    const result = await db
+      .delete(enrichmentJobs)
+      .where(lt(enrichmentJobs.createdAt, cutoffDate))
+      .returning({ id: enrichmentJobs.id });
+
+    return result.length;
+  }
+
   // Enrichment Queue
   async createEnrichmentQueueItem(data: InsertEnrichmentQueue): Promise<EnrichmentQueueItem> {
     const [item] = await db
@@ -1547,6 +1573,7 @@ export class MemStorage implements IStorage {
     return { resources: [], total: 0 };
   }
   async getResource(id: string): Promise<Resource | undefined> { return undefined; }
+  async getResourcesByIds(ids: string[]): Promise<Resource[]> { return []; }
   async createResource(resource: InsertResource): Promise<Resource> {
     throw new Error("Not implemented in memory storage");
   }
@@ -1748,7 +1775,10 @@ export class MemStorage implements IStorage {
     throw new Error("Enrichment not implemented in memory storage");
   }
   async cancelEnrichmentJob(id: string): Promise<void> {}
-  
+  async deleteOldEnrichmentJobs(daysOld?: number): Promise<number> {
+    return 0;
+  }
+
   // Enrichment Queue - Not implemented for MemStorage
   async createEnrichmentQueueItem(data: InsertEnrichmentQueue): Promise<EnrichmentQueueItem> {
     throw new Error("Enrichment not implemented in memory storage");

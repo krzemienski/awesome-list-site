@@ -2,7 +2,6 @@ import { useEffect, useState, useMemo } from "react";
 import { useParams, Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,12 +9,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import SEOHead from "@/components/layout/SEOHead";
 import TagFilter from "@/components/ui/tag-filter";
 import ResourceCard from "@/components/resource/ResourceCard";
-import { ArrowLeft, Search, ExternalLink } from "lucide-react";
+import { ArrowLeft, Search } from "lucide-react";
 import { deslugify, slugify } from "@/lib/utils";
 import { Resource } from "@/types/awesome-list";
 import NotFound from "@/pages/not-found";
 import { trackCategoryView } from "@/lib/analytics";
-import { useToast } from "@/hooks/use-toast";
 
 export default function Category() {
   const { slug } = useParams<{ slug: string }>();
@@ -24,7 +22,6 @@ export default function Category() {
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>("all");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("category");
-  const { toast } = useToast();
   
   // Fetch category name from database categories
   const { data: categories } = useQuery<any[]>({

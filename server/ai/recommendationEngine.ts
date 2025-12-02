@@ -40,6 +40,7 @@ export class RecommendationEngine {
   private static instance: RecommendationEngine;
   private recommendationCache: Map<string, { recommendations: RecommendationResult[], timestamp: number }>;
   private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+  private readonly DEFAULT_LEARNING_PATH_RESOURCE_COUNT = 6;
 
   private constructor() {
     this.recommendationCache = new Map();
@@ -379,7 +380,7 @@ export class RecommendationEngine {
           title: path.title,
           difficulty: path.skillLevel,
           duration: path.estimatedHours ? `${path.estimatedHours}h` : '20h',
-          resourceCount: path.resources?.length || 6,
+          resourceCount: path.resources?.length || this.DEFAULT_LEARNING_PATH_RESOURCE_COUNT,
           matchScore: Math.round(path.matchScore * 100),
           category: path.category,
           description: path.description,
@@ -409,7 +410,7 @@ export class RecommendationEngine {
           title: journey.title,
           difficulty: journey.difficulty || 'intermediate',
           duration: journey.estimatedDuration || '20h',
-          resourceCount: 6, // Default
+          resourceCount: this.DEFAULT_LEARNING_PATH_RESOURCE_COUNT,
           matchScore: Math.min(score, 100),
           category: journey.category,
           description: journey.description

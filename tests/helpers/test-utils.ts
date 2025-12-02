@@ -187,7 +187,8 @@ export async function elementExists(page: Page, selector: string): Promise<boole
   try {
     const element = await page.locator(selector).first();
     return await element.isVisible({ timeout: 2000 });
-  } catch {
+  } catch (e) {
+    console.log('[DEBUG] Element not found or timeout:', selector, e instanceof Error ? e.message : e);
     return false;
   }
 }
@@ -229,7 +230,8 @@ export async function getSupabaseToken(page: Page): Promise<string | null> {
     try {
       const parsed = JSON.parse(session);
       return parsed.currentSession?.access_token || null;
-    } catch {
+    } catch (e) {
+      console.log('[DEBUG] Failed to parse Supabase session:', e instanceof Error ? e.message : e);
       return null;
     }
   });

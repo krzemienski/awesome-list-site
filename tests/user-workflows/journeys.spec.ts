@@ -195,7 +195,7 @@ test.describe('Learning Journeys Workflow', () => {
         try {
           await cleanupUserJourneyProgress(USER_A_ID, journeyToTest);
         } catch (e) {
-          // Ignore cleanup errors
+          console.log('[CLEANUP] Journey progress cleanup failed:', e instanceof Error ? e.message : e);
         }
       }
       await helper.closeAll();
@@ -282,7 +282,7 @@ test.describe('Learning Journeys Workflow', () => {
         try {
           await cleanupUserJourneyProgress(USER_A_ID, journeyToTest);
         } catch (e) {
-          // Ignore
+          console.log('[CLEANUP] Journey progress cleanup failed:', e instanceof Error ? e.message : e);
         }
       }
       await helper.closeAll();
@@ -374,7 +374,7 @@ test.describe('Learning Journeys Workflow', () => {
         try {
           await cleanupUserJourneyProgress(USER_A_ID, journeyToTest);
         } catch (e) {
-          // Ignore
+          console.log('[CLEANUP] Journey progress cleanup failed:', e instanceof Error ? e.message : e);
         }
       }
       await helper.closeAll();

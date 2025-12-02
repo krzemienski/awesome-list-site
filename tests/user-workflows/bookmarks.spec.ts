@@ -210,7 +210,7 @@ test.describe('Bookmarks Complete Flow', () => {
         try {
           await cleanupUserBookmark(USER_A_ID, testResourceId);
         } catch (e) {
-          // Already cleaned up
+          console.log('[CLEANUP] Bookmark already removed or cleanup failed:', e instanceof Error ? e.message : e);
         }
       }
       await helper.closeAll();
@@ -292,7 +292,7 @@ test.describe('Bookmarks Complete Flow', () => {
         try {
           await cleanupUserBookmark(USER_A_ID, testResourceId);
         } catch (e) {
-          // Already cleaned up
+          console.log('[CLEANUP] Bookmark already removed or cleanup failed:', e instanceof Error ? e.message : e);
         }
       }
       await helper.closeAll();
@@ -371,7 +371,7 @@ test.describe('Bookmarks Complete Flow', () => {
         try {
           await cleanupUserBookmark(USER_A_ID, testResourceId);
         } catch (e) {
-          // Already cleaned up
+          console.log('[CLEANUP] Bookmark already removed or cleanup failed:', e instanceof Error ? e.message : e);
         }
       }
       await helper.closeAll();
@@ -450,7 +450,7 @@ test.describe('Bookmarks Complete Flow', () => {
         try {
           await cleanupUserBookmark(USER_A_ID, testResourceId);
         } catch (e) {
-          // Already cleaned up
+          console.log('[CLEANUP] Bookmark already removed or cleanup failed:', e instanceof Error ? e.message : e);
         }
       }
       await helper.closeAll();

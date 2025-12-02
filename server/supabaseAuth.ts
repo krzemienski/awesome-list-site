@@ -1,6 +1,42 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Request, Response, NextFunction, RequestHandler } from 'express';
 
+// Type-safe authenticated user attached by extractUser middleware
+export interface AuthenticatedUser {
+  id: string;
+  email: string;
+  role: 'user' | 'admin' | 'moderator';
+  metadata?: {
+    full_name?: string;
+    avatar_url?: string;
+    [key: string]: unknown;
+  };
+  claims?: {
+    sub?: string;
+  };
+}
+
+// Extended Request type for routes that require authentication
+export interface AuthenticatedRequest extends Request {
+  user: AuthenticatedUser;
+}
+
+// Extended Request type for routes where authentication is optional
+export interface OptionalAuthRequest extends Request {
+  user: AuthenticatedUser | null;
+}
+
+// Type assertion helper for route handlers
+export type AuthenticatedHandler = (
+  req: AuthenticatedRequest,
+  res: Response
+) => Promise<Response | void>;
+
+export type OptionalAuthHandler = (
+  req: OptionalAuthRequest,
+  res: Response
+) => Promise<Response | void>;
+
 // Initialize Supabase clients
 const supabaseUrl = process.env.SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -26,11 +62,20 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   }
 });
 
+// Extend Express Request to include user property
+declare global {
+  namespace Express {
+    interface Request {
+      user?: AuthenticatedUser | null;
+    }
+  }
+}
+
 /**
  * Middleware: Extract user from Authorization header JWT token
  * Adds req.user with { id, email, role, metadata } if valid token
  */
-export async function extractUser(req: any, res: Response, next: NextFunction) {
+export async function extractUser(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
 
   if (!authHeader?.startsWith('Bearer ')) {
@@ -41,8 +86,15 @@ export async function extractUser(req: any, res: Response, next: NextFunction) {
   const token = authHeader.substring(7);
 
   try {
-    // Verify JWT token and get user
-    const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
+    // Verify JWT token and get user with 5s timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+    const { data: { user }, error } = await supabaseAdmin.auth.getUser(token, {
+      signal: controller.signal as AbortSignal
+    });
+
+    clearTimeout(timeoutId);
 
     if (error || !user) {
       req.user = null;
@@ -50,7 +102,7 @@ export async function extractUser(req: any, res: Response, next: NextFunction) {
       // Extract user info and role from metadata
       req.user = {
         id: user.id,
-        email: user.email,
+        email: user.email || '',
         role: user.user_metadata?.role || 'user',
         metadata: user.user_metadata
       };
@@ -67,7 +119,7 @@ export async function extractUser(req: any, res: Response, next: NextFunction) {
  * Middleware: Require authentication
  * Returns 401 if user not authenticated
  */
-export const isAuthenticated: RequestHandler = (req: any, res: Response, next: NextFunction) => {
+export const isAuthenticated: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
   if (!req.user || !req.user.id) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
@@ -78,7 +130,7 @@ export const isAuthenticated: RequestHandler = (req: any, res: Response, next: N
  * Middleware: Require admin role
  * Returns 403 if user is not admin
  */
-export const isAdmin: RequestHandler = (req: any, res: Response, next: NextFunction) => {
+export const isAdmin: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
     return res.status(401).json({ message: 'Unauthorized' });
   }

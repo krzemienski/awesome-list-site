@@ -21,22 +21,9 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
   const inputRef = useRef<HTMLInputElement>(null);
   const linkClickingRef = useRef(false);
 
-  // DIAGNOSTIC: Log resources prop
-  useEffect(() => {
-    console.error('[SEARCH DEBUG] Resources received:', {
-      count: resources?.length || 0,
-      firstResource: resources?.[0] ? {
-        title: resources[0].title,
-        category: resources[0].category
-      } : 'NO RESOURCES'
-    });
-  }, [resources]);
-
   // Create Fuse.js instance for search with special character support
   const fuse = useMemo(() => {
-    console.error('[SEARCH DEBUG] Creating Fuse index with', resources?.length || 0, 'resources');
     if (!resources || resources.length === 0) {
-      console.error('[SEARCH DEBUG] Fuse is NULL - no resources');
       return null;
     }
     return new Fuse(resources, {
@@ -52,8 +39,6 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
 
   // Search when query changes
   useEffect(() => {
-    console.error('[SEARCH DEBUG] Search triggered:', { query, queryLength: query.length, fuseExists: !!fuse });
-
     if (!query || query.length < 2 || !fuse) {
       setResults([]);
       return;
@@ -62,12 +47,6 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
     const startTime = performance.now();
     const searchResults = fuse!.search(query);
     const endTime = performance.now();
-
-    console.error('[SEARCH DEBUG] Search results:', {
-      query,
-      resultCount: searchResults.length,
-      duration: (endTime - startTime).toFixed(2) + 'ms'
-    });
 
     // Track search analytics
     trackSearch(query, searchResults.length);
@@ -134,10 +113,7 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
               ref={inputRef}
               placeholder="Search packages, libraries, and tools..."
               value={query}
-              onValueChange={(value) => {
-                console.log(`Input value changed to: "${value}"`);
-                setQuery(value);
-              }}
+              onValueChange={setQuery}
               className="w-full pl-10 pr-4 py-2"
             />
           </div>

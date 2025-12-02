@@ -210,7 +210,7 @@ test.describe('Favorites Complete Flow', () => {
         try {
           await cleanupUserFavorite(USER_A_ID, testResourceId);
         } catch (e) {
-          // Already cleaned up
+          console.log('[CLEANUP] Favorite already removed or cleanup failed:', e instanceof Error ? e.message : e);
         }
       }
       await helper.closeAll();
@@ -305,7 +305,7 @@ test.describe('Favorites Complete Flow', () => {
         try {
           await cleanupUserFavorite(USER_A_ID, testResourceId);
         } catch (e) {
-          // Already cleaned up
+          console.log('[CLEANUP] Favorite already removed or cleanup failed:', e instanceof Error ? e.message : e);
         }
       }
       await helper.closeAll();

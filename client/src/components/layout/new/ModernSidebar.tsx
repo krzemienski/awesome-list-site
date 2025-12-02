@@ -1,25 +1,17 @@
 import { useState, useEffect } from "react";
-import { useLocation, useRoute, Link } from "wouter";
-import { 
-  Sidebar, 
-  SidebarProvider, 
-  SidebarHeader, 
+import { useLocation } from "wouter";
+import {
+  Sidebar,
   SidebarContent,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarGroupContent,
   SidebarFooter
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Home, Folder, ExternalLink, Menu, Sparkles, Zap, Shield, Plus, BookOpen } from "lucide-react";
-import { slugify, getCategorySlug } from "@/lib/utils";
-import { Category, Resource } from "@/types/awesome-list";
+import { Home, ExternalLink, Sparkles, Zap, Shield, Plus, BookOpen } from "lucide-react";
+import { getCategorySlug } from "@/lib/utils";
+import { Category } from "@/types/awesome-list";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useUserProfile } from "@/hooks/use-user-profile";

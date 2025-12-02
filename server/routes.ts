@@ -1,8 +1,12 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
+import rateLimit from "express-rate-limit";
 import { storage } from "./storage";
-import { extractUser, isAuthenticated, isAdmin as supabaseIsAdmin } from "./supabaseAuth";
-import { RecommendationEngine, UserProfile } from "./recommendation-engine";
+import {
+  extractUser,
+  isAuthenticated,
+  isAdmin as supabaseIsAdmin
+} from "./supabaseAuth";
 import { fetchAwesomeLists, searchAwesomeLists } from "./github-api";
 import { insertResourceSchema } from "@shared/schema";
 import { z } from "zod";
@@ -16,13 +20,39 @@ import { checkResourceLinks, formatLinkCheckReport } from "./validation/linkChec
 import { seedDatabase } from "./seed";
 import { enrichmentService } from "./ai/enrichmentService";
 
+// Rate limiting configuration for public endpoints
+const publicApiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  message: {
+    error: 'Too many requests',
+    message: 'You have exceeded the rate limit. Please try again later.',
+    retryAfter: '15 minutes'
+  }
+});
+
+// Stricter rate limit for AI-powered recommendations (more expensive operations)
+const recommendationsLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 30, // Limit each IP to 30 requests per windowMs (AI operations are costly)
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    error: 'Too many requests',
+    message: 'You have exceeded the rate limit for recommendations. Please try again later.',
+    retryAfter: '15 minutes'
+  }
+});
+
 const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md";
 
 // Use Supabase admin middleware (role checked from JWT metadata)
 const isAdmin = supabaseIsAdmin;
 
 // SEO route handlers
-async function generateSitemap(req: any, res: any) {
+async function generateSitemap(req: Request, res: Response) {
   try {
     const baseUrl = `${req.protocol}://${req.get('host')}`;
     const currentDate = new Date().toISOString().split('T')[0];
@@ -66,7 +96,7 @@ async function generateSitemap(req: any, res: any) {
   }
 }
 
-async function generateOpenGraphImage(req: any, res: any) {
+async function generateOpenGraphImage(req: Request, res: Response) {
   try {
     const { title, category, resourceCount } = req.query;
 
@@ -111,85 +141,6 @@ async function generateOpenGraphImage(req: any, res: any) {
   }
 }
 
-// Helper functions to convert slugs back to original titles
-function getCategoryTitleFromSlug(slug: string): string {
-  const categoryMap: { [key: string]: string } = {
-    'community-events': 'Community & Events',
-    'encoding-codecs': 'Encoding & Codecs',
-    'general-tools': 'General Tools',
-    'infrastructure-delivery': 'Infrastructure & Delivery',
-    'intro-learning': 'Intro & Learning',
-    'media-tools': 'Media Tools',
-    'players-clients': 'Players & Clients',
-    'protocols-transport': 'Protocols & Transport',
-    'standards-industry': 'Standards & Industry'
-  };
-  return categoryMap[slug] || slug;
-}
-
-function getSubcategoryTitleFromSlug(slug: string): string {
-  const subcategoryMap: { [key: string]: string } = {
-    'community-groups': 'Community Groups',
-    'events-conferences': 'Events & Conferences',
-    'codecs': 'Codecs',
-    'encoding-tools': 'Encoding Tools',
-    'drm': 'DRM',
-    'ffmpeg-tools': 'FFMPEG & Tools',
-    'cloud-cdn': 'Cloud & CDN',
-    'streaming-servers': 'Streaming Servers',
-    'introduction': 'Introduction',
-    'learning-resources': 'Learning Resources',
-    'tutorials-case-studies': 'Tutorials & Case Studies',
-    'ads-qoe': 'Ads & QoE',
-    'audio-subtitles': 'Audio & Subtitles',
-    'hardware-players': 'Hardware Players',
-    'mobile-web-players': 'Mobile & Web Players',
-    'adaptive-streaming': 'Adaptive Streaming',
-    'transport-protocols': 'Transport Protocols',
-    'specs-standards': 'Specs & Standards',
-    'vendors-hdr': 'Vendors & HDR'
-  };
-  return subcategoryMap[slug] || slug;
-}
-
-function getSubSubcategoryTitleFromSlug(slug: string): string {
-  const subSubcategoryMap: { [key: string]: string } = {
-    'online-forums': 'Online Forums',
-    'slack-meetups': 'Slack & Meetups',
-    'conferences': 'Conferences',
-    'podcasts-webinars': 'Podcasts & Webinars',
-    'av1': 'AV1',
-    'hevc': 'HEVC',
-    'vp9': 'VP9',
-    'ffmpeg': 'FFMPEG',
-    'other-encoders': 'Other Encoders',
-    'cdn-integration': 'CDN Integration',
-    'cloud-platforms': 'Cloud Platforms',
-    'origin-servers': 'Origin Servers',
-    'storage-solutions': 'Storage Solutions',
-    'advertising': 'Advertising',
-    'quality-testing': 'Quality & Testing',
-    'audio': 'Audio',
-    'subtitles-captions': 'Subtitles & Captions',
-    'chromecast': 'Chromecast',
-    'roku': 'Roku',
-    'smart-tv': 'Smart TVs',
-    'android': 'Android',
-    'ios-tvos': 'iOS/tvOS',
-    'web-players': 'Web Players',
-    'dash': 'DASH',
-    'hls': 'HLS',
-    'rist': 'RIST',
-    'rtmp': 'RTMP',
-    'srt': 'SRT',
-    'mpeg-forums': 'MPEG & Forums',
-    'official-specs': 'Official Specs',
-    'hdr-guidelines': 'HDR Guidelines',
-    'vendor-docs': 'Vendor Docs'
-  };
-  return subSubcategoryMap[slug] || slug;
-}
-
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up Supabase authentication middleware
   app.use(extractUser);
@@ -228,10 +179,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= Auth Routes =============
   
   // GET /api/auth/user - Get current user (public endpoint)
-  app.get('/api/auth/user', async (req: any, res) => {
+  app.get('/api/auth/user', async (req: Request, res: Response) => {
     try {
       console.log('[/api/auth/user] Request received');
-      console.log('[/api/auth/user] req.user:', req.user);
+      console.log('[/api/auth/user] req.user:', req.user ? { id: req.user.id, role: req.user.role } : null);
 
       // Check if user is authenticated
       if (!req.user || !req.user.id) {
@@ -249,7 +200,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         role: req.user.role,
       };
 
-      console.log('[/api/auth/user] Returning user from JWT:', user);
+      console.log('[/api/auth/user] Returning user from JWT:', { id: user.id, role: user.role });
       res.json({ user, isAuthenticated: true });
     } catch (error) {
       console.error("Error fetching user:", error);
@@ -261,16 +212,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Note: /api/login, /api/callback removed - Supabase Auth handles OAuth via frontend SDK
 
   // ============= Resource Routes =============
-  
-  // GET /api/resources - List approved resources (public)
-  app.get('/api/resources', async (req, res) => {
+
+  // GET /api/resources - List approved resources (public, rate limited)
+  app.get('/api/resources', publicApiLimiter, async (req, res) => {
     try {
-      const page = parseInt(req.query.page as string) || 1;
+      const page = Math.min(parseInt(req.query.page as string) || 1, 10000);
       const limit = parseInt(req.query.limit as string) || 20;
       const category = req.query.category as string;
       const subcategory = req.query.subcategory as string;
       const search = req.query.search as string;
-      
+
       const result = await storage.listResources({
         page,
         limit,
@@ -305,7 +256,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/resources - Submit new resource (authenticated)
-  app.post('/api/resources', isAuthenticated, async (req: any, res) => {
+  app.post('/api/resources', isAuthenticated, async (req: Request, res: Response) => {
     try {
       const userId = req.user.id;
       const resourceData = insertResourceSchema.parse(req.body);
@@ -329,9 +280,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/resources/pending - List pending resources (admin only)
   app.get('/api/resources/pending', isAuthenticated, isAdmin, async (req, res) => {
     try {
-      const page = parseInt(req.query.page as string) || 1;
+      const page = Math.min(parseInt(req.query.page as string) || 1, 10000);
       const limit = parseInt(req.query.limit as string) || 20;
-      
+
       const result = await storage.listResources({
         page,
         limit,
@@ -346,7 +297,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // PUT /api/resources/:id/approve - Approve resource (admin)
-  app.put('/api/resources/:id/approve', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.put('/api/resources/:id/approve', isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const id = req.params.id; // UUID string, not integer
       const userId = req.user.id;
@@ -360,7 +311,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // PUT /api/resources/:id/reject - Reject resource (admin)
-  app.put('/api/resources/:id/reject', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.put('/api/resources/:id/reject', isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const id = req.params.id; // UUID string, not integer
       const userId = req.user.id;
@@ -374,7 +325,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/resources/:id/edits - Submit edit suggestion for a resource (authenticated)
-  app.post('/api/resources/:id/edits', isAuthenticated, async (req: any, res) => {
+  app.post('/api/resources/:id/edits', isAuthenticated, async (req: Request, res: Response) => {
     try {
       const userId = req.user.id;
       const resourceId = req.params.id; // UUID string
@@ -453,10 +404,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ============= Category Routes =============
-  
-  // GET /api/categories - List all categories (public)
-  // GET /api/categories - Hierarchical categories with nested structure
-  app.get('/api/categories', async (req, res) => {
+
+  // GET /api/categories - Hierarchical categories with nested structure (public, rate limited)
+  app.get('/api/categories', publicApiLimiter, async (req, res) => {
     try {
       // Return complete hierarchical structure with resources at all levels
       const hierarchical = await storage.getHierarchicalCategories();
@@ -495,7 +445,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         subcategoryId = req.query.subcategoryId as string; // UUID string
       }
 
-      const subSubcategories = await storage.listSubcategories(subcategoryId);
+      const subSubcategories = await storage.listSubSubcategories(subcategoryId);
       res.json(subSubcategories);
     } catch (error) {
       console.error('Error fetching sub-subcategories:', error);
@@ -506,7 +456,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= User Interaction Routes =============
   
   // POST /api/favorites/:resourceId - Add favorite
-  app.post('/api/favorites/:resourceId', isAuthenticated, async (req: any, res) => {
+  app.post('/api/favorites/:resourceId', isAuthenticated, async (req: Request, res: Response) => {
     try {
       const userId = req.user.id;
       const resourceId = req.params.resourceId; // UUID string
@@ -520,7 +470,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // DELETE /api/favorites/:resourceId - Remove favorite
-  app.delete('/api/favorites/:resourceId', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/favorites/:resourceId', isAuthenticated, async (req: Request, res: Response) => {
     try {
       const userId = req.user.id;
       const resourceId = req.params.resourceId; // UUID string
@@ -534,7 +484,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // GET /api/favorites - Get user's favorites
-  app.get('/api/favorites', isAuthenticated, async (req: any, res) => {
+  app.get('/api/favorites', isAuthenticated, async (req: Request, res: Response) => {
     try {
       const userId = req.user.id;
       const favorites = await storage.getUserFavorites(userId);
@@ -546,7 +496,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/bookmarks/:resourceId - Add bookmark
-  app.post('/api/bookmarks/:resourceId', isAuthenticated, async (req: any, res) => {
+  app.post('/api/bookmarks/:resourceId', isAuthenticated, async (req: Request, res: Response) => {
     try {
       const userId = req.user.id;
       const resourceId = req.params.resourceId; // UUID string
@@ -561,7 +511,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // DELETE /api/bookmarks/:resourceId - Remove bookmark
-  app.delete('/api/bookmarks/:resourceId', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/bookmarks/:resourceId', isAuthenticated, async (req: Request, res: Response) => {
     try {
       const userId = req.user.id;
       const resourceId = req.params.resourceId; // UUID string
@@ -575,7 +525,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // GET /api/bookmarks - Get user's bookmarks
-  app.get('/api/bookmarks', isAuthenticated, async (req: any, res) => {
+  app.get('/api/bookmarks', isAuthenticated, async (req: Request, res: Response) => {
     try {
       const userId = req.user.id;
       const bookmarks = await storage.getUserBookmarks(userId);
@@ -589,7 +539,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= User Profile & Progress Routes =============
 
   // GET /api/user/progress - Get user's learning progress
-  app.get('/api/user/progress', isAuthenticated, async (req: any, res) => {
+  app.get('/api/user/progress', isAuthenticated, async (req: Request, res: Response) => {
     try {
       const userId = req.user.id;
 
@@ -688,7 +638,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // GET /api/user/submissions - Get user's submitted resources and edits
-  app.get('/api/user/submissions', isAuthenticated, async (req: any, res) => {
+  app.get('/api/user/submissions', isAuthenticated, async (req: Request, res: Response) => {
     try {
       const userId = req.user.id;
 
@@ -715,7 +665,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // GET /api/user/journeys - Get user's learning journeys with details
-  app.get('/api/user/journeys', isAuthenticated, async (req: any, res) => {
+  app.get('/api/user/journeys', isAuthenticated, async (req: Request, res: Response) => {
     try {
       const userId = req.user.id;
 
@@ -743,7 +693,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= Learning Journey Routes =============
   
   // GET /api/journeys - List all journeys
-  app.get('/api/journeys', async (req: any, res) => {
+  app.get('/api/journeys', async (req: Request, res: Response) => {
     try {
       const category = req.query.category as string;
       const journeys = await storage.listLearningJourneys(category);
@@ -818,7 +768,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // GET /api/journeys/:id - Get journey details
-  app.get('/api/journeys/:id', async (req: any, res) => {
+  app.get('/api/journeys/:id', async (req: Request, res: Response) => {
     try {
       const id = req.params.id; // UUID string
       const journey = await storage.getLearningJourney(id);
@@ -860,7 +810,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/journeys/:id/start - Start journey
-  app.post('/api/journeys/:id/start', isAuthenticated, async (req: any, res) => {
+  app.post('/api/journeys/:id/start', isAuthenticated, async (req: Request, res: Response) => {
     try {
       const userId = req.user.id;
       const journeyId = req.params.id; // UUID string
@@ -874,7 +824,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // PUT /api/journeys/:id/progress - Update progress
-  app.put('/api/journeys/:id/progress', isAuthenticated, async (req: any, res) => {
+  app.put('/api/journeys/:id/progress', isAuthenticated, async (req: Request, res: Response) => {
     try {
       const userId = req.user.id;
       const journeyId = req.params.id; // UUID string
@@ -893,7 +843,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // GET /api/journeys/:id/progress - Get user's progress
-  app.get('/api/journeys/:id/progress', isAuthenticated, async (req: any, res) => {
+  app.get('/api/journeys/:id/progress', isAuthenticated, async (req: Request, res: Response) => {
     try {
       const userId = req.user.id;
       const journeyId = req.params.id; // UUID string
@@ -916,7 +866,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/admin/resources - List ALL resources with advanced filtering (admin only)
   app.get('/api/admin/resources', isAuthenticated, isAdmin, async (req, res) => {
     try {
-      const page = parseInt(req.query.page as string) || 1;
+      const page = Math.min(parseInt(req.query.page as string) || 1, 10000);
       const limit = Math.min(parseInt(req.query.limit as string) || 50, 100);
       const status = req.query.status as string;
       const category = req.query.category as string;
@@ -974,7 +924,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // POST /api/admin/resources/bulk - Bulk update resources (admin only)
-  app.post('/api/admin/resources/bulk', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/resources/bulk', isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const { action, resourceIds, data } = req.body;
       const userId = req.user?.id;
@@ -986,6 +936,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (resourceIds.length === 0 || resourceIds.length > 100) {
         return res.status(400).json({ message: 'Must select 1-100 resources' });
+      }
+
+
+      // Validate all resourceIds are valid UUIDs
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      const invalidIds = resourceIds.filter((id: unknown) => typeof id !== 'string' || !uuidRegex.test(id));
+      if (invalidIds.length > 0) {
+        return res.status(400).json({
+          message: 'Invalid resource IDs',
+          invalidIds: invalidIds.slice(0, 5) // Show first 5 invalid IDs
+        });
       }
 
       let result;
@@ -1053,9 +1014,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/admin/users - List users
   app.get('/api/admin/users', isAuthenticated, isAdmin, async (req, res) => {
     try {
-      const page = parseInt(req.query.page as string) || 1;
+      const page = Math.min(parseInt(req.query.page as string) || 1, 10000);
       const limit = parseInt(req.query.limit as string) || 20;
-      
+
       const result = await storage.listUsers(page, limit);
       res.json(result);
     } catch (error) {
@@ -1065,7 +1026,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // PUT /api/admin/users/:id/role - Change user role
-  app.put('/api/admin/users/:id/role', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.put('/api/admin/users/:id/role', isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const userId = req.params.id;
       const { role } = req.body;
@@ -1087,9 +1048,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/admin/pending-resources - Get all pending resources for approval
   app.get('/api/admin/pending-resources', isAuthenticated, isAdmin, async (req, res) => {
     try {
-      const page = parseInt(req.query.page as string) || 1;
+      const page = Math.min(parseInt(req.query.page as string) || 1, 10000);
       const limit = parseInt(req.query.limit as string) || 50;
-      
+
       const result = await storage.listResources({
         page,
         limit,
@@ -1104,7 +1065,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/admin/resources/:id/approve - Approve a pending resource
-  app.post('/api/admin/resources/:id/approve', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/resources/:id/approve', isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const resourceId = req.params.id; // UUID string
       const userId = req.user.id;
@@ -1136,7 +1097,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/admin/resources/:id/reject - Reject a pending resource
-  app.post('/api/admin/resources/:id/reject', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/resources/:id/reject', isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const resourceId = req.params.id; // UUID string
       const userId = req.user.id;
@@ -1178,17 +1139,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/admin/resource-edits', isAuthenticated, isAdmin, async (req, res) => {
     try {
       const edits = await storage.getPendingResourceEdits();
-      
-      const editsWithResources = await Promise.all(
-        edits.map(async (edit) => {
-          const resource = await storage.getResource(edit.resourceId);
-          return {
-            ...edit,
-            resource
-          };
-        })
-      );
-      
+
+      // Batch fetch all resources in a single query (fixes N+1 query bug)
+      const resourceIds = [...new Set(edits.map(edit => edit.resourceId))];
+      const resourcesList = await storage.getResourcesByIds(resourceIds);
+      const resourcesMap = new Map(resourcesList.map(r => [r.id, r]));
+
+      const editsWithResources = edits.map(edit => ({
+        ...edit,
+        resource: resourcesMap.get(edit.resourceId)
+      }));
+
       res.json(editsWithResources);
     } catch (error) {
       console.error('Error fetching pending edits:', error);
@@ -1197,7 +1158,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/admin/resource-edits/:id/approve - Approve an edit (admin only)
-  app.post('/api/admin/resource-edits/:id/approve', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/resource-edits/:id/approve', isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const editId = req.params.id; // UUID string
       const userId = req.user.id;
@@ -1220,7 +1181,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/admin/resource-edits/:id/reject - Reject an edit (admin only)
-  app.post('/api/admin/resource-edits/:id/reject', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/resource-edits/:id/reject', isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const editId = req.params.id; // UUID string
       const userId = req.user.id;
@@ -1271,7 +1232,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= GitHub Sync Routes =============
   
   // POST /api/github/configure - Configure GitHub repository
-  app.post('/api/github/configure', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/github/configure', isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const { repositoryUrl, token } = req.body;
       
@@ -1293,7 +1254,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/github/import - Import resources from GitHub awesome list
-  app.post('/api/github/import', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/github/import', isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const { repositoryUrl, options = {} } = req.body;
       
@@ -1331,7 +1292,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/github/export - Export approved resources to GitHub
-  app.post('/api/github/export', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/github/export', isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const { repositoryUrl, options = {} } = req.body;
       
@@ -1441,7 +1402,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= Awesome List Export & Validation Routes =============
 
   // POST /api/admin/export - Generate and download awesome list markdown
-  app.post('/api/admin/export', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/export', isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       // Get all approved resources
       const resources = await storage.getAllApprovedResources();
@@ -1481,7 +1442,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // POST /api/admin/validate - Run awesome-lint validation on current data
-  app.post('/api/admin/validate', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/validate', isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       // Get all approved resources
       const resources = await storage.getAllApprovedResources();
@@ -1534,7 +1495,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // POST /api/admin/check-links - Run link checker on all resources
-  app.post('/api/admin/check-links', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/check-links', isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       // Get all approved resources
       const resources = await storage.getAllApprovedResources();
@@ -1675,7 +1636,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= Enrichment API Routes =============
   
   // POST /api/enrichment/start - Start batch enrichment job
-  app.post('/api/enrichment/start', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/enrichment/start', isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
       const { filter = 'unenriched', batchSize = 10 } = req.body;
       const userId = req.user?.claims?.sub;
@@ -1753,9 +1714,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete('/api/enrichment/jobs/:id', isAuthenticated, isAdmin, async (req, res) => {
     try {
       const jobId = req.params.id; // UUID string
-      
+
       await enrichmentService.cancelJob(jobId);
-      
+
       res.json({
         success: true,
         message: `Enrichment job ${jobId} cancelled successfully`
@@ -1770,6 +1731,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // POST /api/enrichment/cleanup - Delete old enrichment jobs (default: 30 days)
+  app.post('/api/enrichment/cleanup', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const daysOld = parseInt(req.body.daysOld as string) || 30;
+
+      const deletedCount = await enrichmentService.cleanupOldJobs(daysOld);
+
+      res.json({
+        success: true,
+        deletedCount,
+        message: `Deleted ${deletedCount} enrichment jobs older than ${daysOld} days`
+      });
+    } catch (error: any) {
+      console.error('Error cleaning up old enrichment jobs:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to cleanup old enrichment jobs',
+        error: error.message
+      });
+    }
+  });
+
   // ============= Legacy Routes Removed =============
   // Removed /api/awesome-list - use /api/resources with filters instead
   // Removed /api/switch-list - database is single source of truth, use GitHub import for new lists
@@ -1777,31 +1760,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GitHub awesome lists discovery routes
   app.get("/api/github/awesome-lists", async (req, res) => {
     try {
-      const page = parseInt(req.query.page as string) || 1;
+      const page = Math.min(parseInt(req.query.page as string) || 1, 10000);
       const perPage = parseInt(req.query.per_page as string) || 30;
       
       const result = await fetchAwesomeLists(page, perPage);
       res.json(result);
     } catch (error) {
       console.error('Error fetching awesome lists from GitHub:', error);
-      res.status(500).json({ error: 'Failed to fetch awesome lists' });
+      res.status(500).json({ message: 'Failed to fetch awesome lists' });
     }
   });
 
   app.get("/api/github/search", async (req, res) => {
     try {
       const query = req.query.q as string;
-      const page = parseInt(req.query.page as string) || 1;
-      
+      const page = Math.min(parseInt(req.query.page as string) || 1, 10000);
+
       if (!query) {
-        return res.status(400).json({ error: 'Search query is required' });
+        return res.status(400).json({ message: 'Search query is required' });
       }
       
       const result = await searchAwesomeLists(query, page);
       res.json(result);
     } catch (error) {
       console.error('Error searching awesome lists:', error);
-      res.status(500).json({ error: 'Failed to search awesome lists' });
+      res.status(500).json({ message: 'Failed to search awesome lists' });
     }
   });
 
@@ -1811,8 +1794,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ============= AI Recommendation Routes =============
 
-  // GET /api/recommendations - Get personalized recommendations (enhanced AI-powered)
-  app.get("/api/recommendations", async (req, res) => {
+  // GET /api/recommendations - Get personalized recommendations (enhanced AI-powered, rate limited)
+  app.get("/api/recommendations", recommendationsLimiter, async (req, res) => {
     try {
       const limit = parseInt(req.query.limit as string) || 10;
       
@@ -1840,12 +1823,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(result);
     } catch (error) {
       console.error('Error generating recommendations:', error);
-      res.status(500).json({ error: 'Failed to generate recommendations' });
+      res.status(500).json({ message: 'Failed to generate recommendations' });
     }
   });
 
-  // POST /api/recommendations - Get personalized recommendations for authenticated user
-  app.post("/api/recommendations", async (req, res) => {
+  // POST /api/recommendations - Get personalized recommendations for authenticated user (rate limited)
+  app.post("/api/recommendations", recommendationsLimiter, async (req, res) => {
     try {
       const userProfile: AIUserProfile = req.body;
       const limit = parseInt(req.query.limit as string) || 10;
@@ -1860,7 +1843,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(result);
     } catch (error) {
       console.error('Error generating AI recommendations:', error);
-      res.status(500).json({ error: 'Failed to generate recommendations' });
+      res.status(500).json({ message: 'Failed to generate recommendations' });
     }
   });
 
@@ -1870,7 +1853,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { userId, resourceId, feedback, rating } = req.body;
       
       if (!userId || !resourceId || !feedback) {
-        return res.status(400).json({ error: 'userId, resourceId, and feedback are required' });
+        return res.status(400).json({ message: 'userId, resourceId, and feedback are required' });
       }
 
       // Record the feedback
@@ -1884,7 +1867,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ status: 'success', message: 'Feedback recorded' });
     } catch (error) {
       console.error('Error recording recommendation feedback:', error);
-      res.status(500).json({ error: 'Failed to record feedback' });
+      res.status(500).json({ message: 'Failed to record feedback' });
     }
   });
 
@@ -1912,7 +1895,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(paths);
     } catch (error) {
       console.error('Error generating suggested learning paths:', error);
-      res.status(500).json({ error: 'Failed to generate suggested learning paths' });
+      res.status(500).json({ message: 'Failed to generate suggested learning paths' });
     }
   });
 
@@ -1922,7 +1905,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { userProfile, category, customGoals } = req.body;
       
       if (!userProfile) {
-        return res.status(400).json({ error: 'User profile is required' });
+        return res.status(400).json({ message: 'User profile is required' });
       }
 
       const path = await learningPathGenerator.generateLearningPath(
@@ -1934,7 +1917,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(path);
     } catch (error) {
       console.error('Error generating custom learning path:', error);
-      res.status(500).json({ error: 'Failed to generate custom learning path' });
+      res.status(500).json({ message: 'Failed to generate custom learning path' });
     }
   });
 
@@ -1949,7 +1932,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(paths);
     } catch (error) {
       console.error('Error generating AI learning paths:', error);
-      res.status(500).json({ error: 'Failed to generate learning paths' });
+      res.status(500).json({ message: 'Failed to generate learning paths' });
     }
   });
 
@@ -1965,7 +1948,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ status: "recorded" });
     } catch (error) {
       console.error('Error recording interaction:', error);
-      res.status(500).json({ error: 'Failed to record interaction' });
+      res.status(500).json({ message: 'Failed to record interaction' });
     }
   });
 

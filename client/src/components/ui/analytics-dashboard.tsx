@@ -21,17 +21,15 @@ import {
   Area,
   AreaChart
 } from "recharts";
-import { 
-  TrendingUp, 
-  Eye, 
-  Clock, 
-  Tag, 
-  Star, 
+import {
+  TrendingUp,
+  Eye,
+  Clock,
+  Tag,
+  Star,
   Activity,
-  Users,
   Globe,
   MousePointer,
-  Calendar,
   Search
 } from "lucide-react";
 import { Resource } from "@/types/awesome-list";

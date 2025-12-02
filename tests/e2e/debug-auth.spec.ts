@@ -33,7 +33,8 @@ test('Debug Auth State', async ({ page }) => {
     keys.forEach(key => {
       try {
         data[key] = JSON.parse(localStorage.getItem(key) || '');
-      } catch {
+      } catch (e) {
+        // Non-JSON value in localStorage, store as raw string
         data[key] = localStorage.getItem(key);
       }
     });

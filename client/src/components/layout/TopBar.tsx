@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { Menu, Search, Github, Sun, Moon, Palette, List, BarChart3, User, LogIn, LogOut, Bookmark, Shield } from "lucide-react";
+import { Menu, Search, Github, BarChart3, User, LogIn, LogOut, Bookmark, Shield } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
 import { useIsMobile } from "@/hooks/use-mobile";
 import CustomThemeManager, { CustomTheme } from "@/components/ui/custom-theme-manager";
@@ -16,7 +16,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useLocation } from "wouter";
 
 interface TopBarProps {
   isSidebarOpen: boolean;

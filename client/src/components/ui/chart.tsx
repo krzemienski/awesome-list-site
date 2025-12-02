@@ -67,6 +67,23 @@ const ChartContainer = React.forwardRef<
 })
 ChartContainer.displayName = "Chart"
 
+// Sanitize CSS identifier to prevent XSS - only allow alphanumeric, hyphens, underscores
+const sanitizeCssIdentifier = (str: string): string => {
+  return str.replace(/[^a-zA-Z0-9_-]/g, "")
+}
+
+// Sanitize CSS value to prevent XSS - block dangerous patterns
+const sanitizeCssValue = (value: string): string => {
+  // Remove any potential script injection patterns
+  const dangerous = /[<>{}()"'`\\;]/g
+  const sanitized = value.replace(dangerous, "")
+  // Block url(), expression(), javascript:, etc.
+  if (/(?:url|expression|javascript|behavior|binding)\s*\(/i.test(sanitized)) {
+    return ""
+  }
+  return sanitized
+}
+
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(
     ([, config]) => config.theme || config.color
@@ -76,27 +93,60 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
     return null
   }
 
+  // Generate CSS variables safely using inline styles instead of dangerouslySetInnerHTML
+  const cssVariables = React.useMemo(() => {
+    const vars: Record<string, string> = {}
+    colorConfig.forEach(([key, itemConfig]) => {
+      const sanitizedKey = sanitizeCssIdentifier(key)
+      // For light theme, use the color directly
+      const color = itemConfig.theme?.light || itemConfig.color
+      if (color && sanitizedKey) {
+        const sanitizedColor = sanitizeCssValue(color)
+        if (sanitizedColor) {
+          vars[`--color-${sanitizedKey}`] = sanitizedColor
+        }
+      }
+    })
+    return vars
+  }, [colorConfig])
+
+  // For dark theme support, we need a separate set of variables
+  const darkCssVariables = React.useMemo(() => {
+    const vars: Record<string, string> = {}
+    colorConfig.forEach(([key, itemConfig]) => {
+      const sanitizedKey = sanitizeCssIdentifier(key)
+      if (itemConfig.theme?.dark && sanitizedKey) {
+        const sanitizedColor = sanitizeCssValue(itemConfig.theme.dark)
+        if (sanitizedColor) {
+          vars[`--color-${sanitizedKey}`] = sanitizedColor
+        }
+      }
+    })
+    return vars
+  }, [colorConfig])
+
+  const sanitizedId = sanitizeCssIdentifier(id)
+
+  // Use a combination approach: inline style for light theme,
+  // and a safe CSS string for dark theme override
+  const darkThemeCss = Object.keys(darkCssVariables).length > 0
+    ? `.dark [data-chart=${sanitizedId}] { ${Object.entries(darkCssVariables)
+        .map(([key, value]) => `${key}: ${value}`)
+        .join("; ")} }`
+    : ""
+
   return (
-    <style
-      dangerouslySetInnerHTML={{
-        __html: Object.entries(THEMES)
-          .map(
-            ([theme, prefix]) => `
-${prefix} [data-chart=${id}] {
-${colorConfig
-  .map(([key, itemConfig]) => {
-    const color =
-      itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
-      itemConfig.color
-    return color ? `  --color-${key}: ${color};` : null
-  })
-  .join("\n")}
-}
-`
-          )
-          .join("\n"),
-      }}
-    />
+    <>
+      <style
+        data-chart-style={sanitizedId}
+        // Safe: all values have been sanitized
+        dangerouslySetInnerHTML={{
+          __html: `[data-chart=${sanitizedId}] { ${Object.entries(cssVariables)
+            .map(([key, value]) => `${key}: ${value}`)
+            .join("; ")} }${darkThemeCss ? `\n${darkThemeCss}` : ""}`,
+        }}
+      />
+    </>
   )
 }
 

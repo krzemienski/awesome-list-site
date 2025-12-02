@@ -8,7 +8,6 @@ import { AwesomeList, Category } from "@/types/awesome-list";
 import SEOHead from "@/components/layout/SEOHead";
 import {
   FileText,
-  Video,
   Code,
   Play,
   Settings,

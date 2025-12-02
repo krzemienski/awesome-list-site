@@ -414,6 +414,12 @@ export class EnrichmentService {
     await storage.cancelEnrichmentJob(jobId);
   }
 
+  async cleanupOldJobs(daysOld: number = 30): Promise<number> {
+    const deletedCount = await storage.deleteOldEnrichmentJobs(daysOld);
+    console.log(`Cleaned up ${deletedCount} enrichment jobs older than ${daysOld} days`);
+    return deletedCount;
+  }
+
   private isValidUrl(url: string): boolean {
     try {
       new URL(url);
