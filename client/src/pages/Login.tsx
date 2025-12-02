@@ -47,8 +47,17 @@ export default function Login() {
       if (response.ok) {
         const result = await response.json();
         
-        // Manually set the query data to ensure it's available immediately
-        // This prevents a flash of unauthenticated state
+        // Set the query data BEFORE showing toast or navigating
+        // This ensures the AdminGuard sees the authenticated user immediately
+        queryClient.setQueryData(['/api/auth/user'], {
+          user: result.user,
+          isAuthenticated: true
+        });
+        
+        // Also invalidate any stale queries to force components to re-check
+        await queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+        
+        // Re-set the data after invalidation to ensure it's current
         queryClient.setQueryData(['/api/auth/user'], {
           user: result.user,
           isAuthenticated: true
@@ -59,9 +68,9 @@ export default function Login() {
           description: `Welcome back, ${result.user.email}!`,
         });
 
-        // Navigate to admin - the session cookie is already set
-        // and the cached query data ensures AdminGuard sees the user immediately
-        setLocation("/admin");
+        // Navigate to admin - use window.location to ensure fresh page load
+        // This guarantees the session cookie is sent with subsequent requests
+        window.location.href = "/admin";
       } else {
         const error = await response.json().catch(() => ({ message: "Invalid email or password" }));
         toast({
