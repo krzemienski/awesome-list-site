@@ -1642,7 +1642,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const category = await storage.getCategory(validationResult.data.categoryId);
+      const categoryId = validationResult.data.categoryId;
+      if (!categoryId) {
+        return res.status(400).json({ message: 'Category ID is required' });
+      }
+      
+      const category = await storage.getCategory(categoryId);
       if (!category) {
         return res.status(404).json({ message: 'Parent category not found' });
       }
@@ -1689,7 +1694,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'Subcategory not found' });
       }
       
-      if (validationResult.data.categoryId !== undefined) {
+      if (validationResult.data.categoryId !== undefined && validationResult.data.categoryId !== null) {
         const category = await storage.getCategory(validationResult.data.categoryId);
         if (!category) {
           return res.status(404).json({ message: 'Parent category not found' });
@@ -1788,7 +1793,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const subcategory = await storage.getSubcategory(validationResult.data.subcategoryId);
+      const subcategoryId = validationResult.data.subcategoryId;
+      if (!subcategoryId) {
+        return res.status(400).json({ message: 'Subcategory ID is required' });
+      }
+      
+      const subcategory = await storage.getSubcategory(subcategoryId);
       if (!subcategory) {
         return res.status(404).json({ message: 'Parent subcategory not found' });
       }
@@ -1835,7 +1845,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'Sub-subcategory not found' });
       }
       
-      if (validationResult.data.subcategoryId !== undefined) {
+      if (validationResult.data.subcategoryId !== undefined && validationResult.data.subcategoryId !== null) {
         const subcategory = await storage.getSubcategory(validationResult.data.subcategoryId);
         if (!subcategory) {
           return res.status(404).json({ message: 'Parent subcategory not found' });
