@@ -15,27 +15,19 @@ import Home from "@/pages/Home";
 import Category from "@/pages/Category";
 import Subcategory from "@/pages/Subcategory";
 import SubSubcategory from "@/pages/SubSubcategory";
+import About from "@/pages/About";
+import Advanced from "@/pages/Advanced";
+import Profile from "@/pages/Profile";
+import Bookmarks from "@/pages/Bookmarks";
 import AdminGuard from "@/components/auth/AdminGuard";
 import AuthGuard from "@/components/auth/AuthGuard";
 import NotFound from "@/pages/not-found";
+import SubmitResource from "@/pages/SubmitResource";
+import Journeys from "@/pages/Journeys";
+import JourneyDetail from "@/pages/JourneyDetail";
+import SearchDialog from "@/components/ui/search-dialog";
 
-// Lazy load non-critical pages for better initial bundle size (Session 10 optimization)
-// Critical path: Home, Category, Subcategory, SubSubcategory (browsing flow)
-// Non-critical: User features, admin, search dialog
-
-// User pages - loaded on demand
-const About = lazy(() => import("@/pages/About"));
-const Advanced = lazy(() => import("@/pages/Advanced"));
-const Profile = lazy(() => import("@/pages/Profile"));
-const Bookmarks = lazy(() => import("@/pages/Bookmarks"));
-const SubmitResource = lazy(() => import("@/pages/SubmitResource"));
-const Journeys = lazy(() => import("@/pages/Journeys"));
-const JourneyDetail = lazy(() => import("@/pages/JourneyDetail"));
-
-// Search dialog - lazy loaded since it's only opened on keyboard shortcut
-const SearchDialog = lazy(() => import("@/components/ui/search-dialog"));
-
-// Admin components - lazy loaded (admin-only)
+// Lazy load admin components for better initial bundle size
 const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
 const AdminLayout = lazy(() => import("@/components/admin/AdminLayout").then(m => ({ default: m.AdminLayout })));
 const ResourceBrowser = lazy(() => import("@/components/admin/ResourceBrowser").then(m => ({ default: m.ResourceBrowser })));
@@ -155,52 +147,25 @@ function Router() {
       onLogout={logout}
     >
       <Switch>
-        {/* Critical browsing flow - not lazy loaded */}
         <Route path="/" component={() => <Home awesomeList={awesomeList} />} />
         <Route path="/login" component={Login} />
         <Route path="/auth/callback" component={AuthCallback} />
         <Route path="/category/:slug" component={Category} />
         <Route path="/subcategory/:slug" component={Subcategory} />
         <Route path="/sub-subcategory/:slug" component={SubSubcategory} />
-
-        {/* Lazy-loaded user pages */}
-        <Route path="/about" component={() => (
-          <Suspense fallback={<LoadingFallback />}>
-            <About />
-          </Suspense>
-        )} />
-        <Route path="/advanced" component={() => (
-          <Suspense fallback={<LoadingFallback />}>
-            <Advanced />
-          </Suspense>
-        )} />
-        <Route path="/submit" component={() => (
-          <Suspense fallback={<LoadingFallback />}>
-            <SubmitResource />
-          </Suspense>
-        )} />
-        <Route path="/journeys" component={() => (
-          <Suspense fallback={<LoadingFallback />}>
-            <Journeys />
-          </Suspense>
-        )} />
-        <Route path="/journey/:id" component={() => (
-          <Suspense fallback={<LoadingFallback />}>
-            <JourneyDetail />
-          </Suspense>
-        )} />
+        <Route path="/about" component={About} />
+        <Route path="/advanced" component={Advanced} />
+        <Route path="/submit" component={SubmitResource} />
+        <Route path="/journeys" component={Journeys} />
+        <Route path="/journey/:id" component={JourneyDetail} />
         <Route path="/profile" component={() => (
           <AuthGuard>
-            <Suspense fallback={<LoadingFallback />}>
-              <Profile user={user} />
-            </Suspense>
+            <Profile user={user} />
           </AuthGuard>
         )} />
         <Route path="/bookmarks" component={() => (
           <AuthGuard>
-            <Suspense fallback={<LoadingFallback />}>
-              <Bookmarks />
-            </Suspense>
+            <Bookmarks />
           </AuthGuard>
         )} />
         <Route path="/admin" component={() => (
@@ -248,16 +213,12 @@ function Router() {
         <Route component={NotFound} />
       </Switch>
 
-      {/* Search Dialog - lazy loaded, opens on "/" keyboard shortcut */}
-      {searchOpen && (
-        <Suspense fallback={null}>
-          <SearchDialog
-            isOpen={searchOpen}
-            setIsOpen={setSearchOpen}
-            resources={awesomeList?.resources || []}
-          />
-        </Suspense>
-      )}
+      {/* Search Dialog - opens on "/" keyboard shortcut */}
+      <SearchDialog
+        isOpen={searchOpen}
+        setIsOpen={setSearchOpen}
+        resources={awesomeList?.resources || []}
+      />
     </MainLayout>
   );
 }
