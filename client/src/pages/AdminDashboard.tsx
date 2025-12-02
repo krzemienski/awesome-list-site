@@ -32,6 +32,7 @@ import PendingResources from "@/components/admin/PendingResources";
 import PendingEdits from "@/components/admin/PendingEdits";
 import BatchEnrichmentPanel from "@/components/admin/BatchEnrichmentPanel";
 import GitHubSyncPanel from "@/components/admin/GitHubSyncPanel";
+import ResourceManager from "@/components/admin/ResourceManager";
 
 interface ValidationResult {
   valid: boolean;
@@ -820,14 +821,7 @@ export default function AdminDashboard() {
         </TabsContent>
 
         <TabsContent value="resources">
-          <Card className="border-pink-500/20 bg-black">
-            <CardHeader>
-              <CardTitle>Resource Moderation</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-400">Approve or reject pending resource submissions.</p>
-            </CardContent>
-          </Card>
+          <ResourceManager />
         </TabsContent>
 
         <TabsContent value="users">

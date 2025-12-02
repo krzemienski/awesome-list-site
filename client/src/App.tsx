@@ -26,6 +26,7 @@ import NotFound from "@/pages/not-found";
 import SubmitResource from "@/pages/SubmitResource";
 import Journeys from "@/pages/Journeys";
 import JourneyDetail from "@/pages/JourneyDetail";
+import ResourceDetail from "@/pages/ResourceDetail";
 
 import { AwesomeList } from "@/types/awesome-list";
 import { processAwesomeListData } from "@/lib/parser";
@@ -121,6 +122,7 @@ function Router() {
         <Route path="/category/:slug" component={Category} />
         <Route path="/subcategory/:slug" component={Subcategory} />
         <Route path="/sub-subcategory/:slug" component={SubSubcategory} />
+        <Route path="/resource/:id" component={ResourceDetail} />
         <Route path="/about" component={About} />
         <Route path="/advanced" component={Advanced} />
         <Route path="/submit" component={SubmitResource} />
