@@ -138,7 +138,10 @@ export const insertCategorySchema = createInsertSchema(categories).pick({
   slug: true,
 });
 
+export const updateCategorySchema = insertCategorySchema.partial();
+
 export type InsertCategory = z.infer<typeof insertCategorySchema>;
+export type UpdateCategory = z.infer<typeof updateCategorySchema>;
 export type Category = typeof categories.$inferSelect;
 
 // Subcategory schema
@@ -155,7 +158,10 @@ export const insertSubcategorySchema = createInsertSchema(subcategories).pick({
   categoryId: true,
 });
 
+export const updateSubcategorySchema = insertSubcategorySchema.partial();
+
 export type InsertSubcategory = z.infer<typeof insertSubcategorySchema>;
+export type UpdateSubcategory = z.infer<typeof updateSubcategorySchema>;
 export type Subcategory = typeof subcategories.$inferSelect;
 
 // Sub-subcategory schema (Level 3)
@@ -172,7 +178,10 @@ export const insertSubSubcategorySchema = createInsertSchema(subSubcategories).p
   subcategoryId: true,
 });
 
+export const updateSubSubcategorySchema = insertSubSubcategorySchema.partial();
+
 export type InsertSubSubcategory = z.infer<typeof insertSubSubcategorySchema>;
+export type UpdateSubSubcategory = z.infer<typeof updateSubSubcategorySchema>;
 export type SubSubcategory = typeof subSubcategories.$inferSelect;
 
 // AwesomeList schema
