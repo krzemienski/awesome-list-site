@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -28,7 +28,7 @@ import {
   Save,
   CheckCircle2
 } from "lucide-react";
-import type { Resource } from "@shared/schema";
+import type { Resource, Category, Subcategory, SubSubcategory } from "@shared/schema";
 
 interface ResourcesResponse {
   resources: Resource[];
@@ -37,18 +37,6 @@ interface ResourcesResponse {
   limit: number;
   totalPages: number;
 }
-
-const CATEGORIES = [
-  "Intro & Learning",
-  "Protocols & Transport", 
-  "Encoding & Codecs",
-  "Players & Clients",
-  "Media Tools",
-  "Standards & Industry",
-  "Infrastructure & Delivery",
-  "General Tools",
-  "Community & Events"
-];
 
 const STATUS_OPTIONS = [
   { value: "approved", label: "Approved", color: "bg-green-500" },
@@ -80,6 +68,36 @@ export default function ResourceManager() {
     subSubcategory: "",
     status: "approved"
   });
+
+  const { data: categoriesData } = useQuery<Category[]>({
+    queryKey: ['/api/categories']
+  });
+
+  const { data: subcategoriesData } = useQuery<Subcategory[]>({
+    queryKey: ['/api/subcategories']
+  });
+
+  const { data: subSubcategoriesData } = useQuery<SubSubcategory[]>({
+    queryKey: ['/api/sub-subcategories']
+  });
+
+  const categoryNames = useMemo(() => {
+    return categoriesData?.map(c => c.name) || [];
+  }, [categoriesData]);
+
+  const filteredSubcategories = useMemo(() => {
+    if (!editForm.category || !subcategoriesData || !categoriesData) return [];
+    const selectedCat = categoriesData.find(c => c.name === editForm.category);
+    if (!selectedCat) return [];
+    return subcategoriesData.filter(s => s.categoryId === selectedCat.id);
+  }, [editForm.category, subcategoriesData, categoriesData]);
+
+  const filteredSubSubcategories = useMemo(() => {
+    if (!editForm.subcategory || !subSubcategoriesData || !subcategoriesData) return [];
+    const selectedSub = subcategoriesData.find(s => s.name === editForm.subcategory);
+    if (!selectedSub) return [];
+    return subSubcategoriesData.filter(ss => ss.subcategoryId === selectedSub.id);
+  }, [editForm.subcategory, subSubcategoriesData, subcategoriesData]);
 
   const buildQueryKey = () => {
     const params = new URLSearchParams();
@@ -333,7 +351,7 @@ export default function ResourceManager() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Categories</SelectItem>
-                {CATEGORIES.map(cat => (
+                {categoryNames.map((cat: string) => (
                   <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                 ))}
               </SelectContent>
@@ -508,13 +526,13 @@ export default function ResourceManager() {
                 <Label htmlFor="edit-category">Category</Label>
                 <Select 
                   value={editForm.category} 
-                  onValueChange={(v) => setEditForm(f => ({ ...f, category: v }))}
+                  onValueChange={(v) => setEditForm(f => ({ ...f, category: v, subcategory: "", subSubcategory: "" }))}
                 >
                   <SelectTrigger className="bg-gray-800 border-gray-600" data-testid="select-edit-category">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
-                    {CATEGORIES.map(cat => (
+                    {categoryNames.map((cat: string) => (
                       <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                     ))}
                   </SelectContent>
@@ -540,23 +558,37 @@ export default function ResourceManager() {
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="edit-subcategory">Subcategory</Label>
-                <Input
-                  id="edit-subcategory"
-                  value={editForm.subcategory}
-                  onChange={(e) => setEditForm(f => ({ ...f, subcategory: e.target.value }))}
-                  className="bg-gray-800 border-gray-600"
-                  data-testid="input-edit-subcategory"
-                />
+                <Select 
+                  value={editForm.subcategory} 
+                  onValueChange={(v) => setEditForm(f => ({ ...f, subcategory: v, subSubcategory: "" }))}
+                  disabled={!editForm.category || filteredSubcategories.length === 0}
+                >
+                  <SelectTrigger className="bg-gray-800 border-gray-600" data-testid="select-edit-subcategory">
+                    <SelectValue placeholder={filteredSubcategories.length ? "Select subcategory" : "Select category first"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {filteredSubcategories.map((sub: Subcategory) => (
+                      <SelectItem key={sub.id} value={sub.name}>{sub.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="edit-subsubcategory">Sub-subcategory</Label>
-                <Input
-                  id="edit-subsubcategory"
-                  value={editForm.subSubcategory}
-                  onChange={(e) => setEditForm(f => ({ ...f, subSubcategory: e.target.value }))}
-                  className="bg-gray-800 border-gray-600"
-                  data-testid="input-edit-subsubcategory"
-                />
+                <Select 
+                  value={editForm.subSubcategory} 
+                  onValueChange={(v) => setEditForm(f => ({ ...f, subSubcategory: v }))}
+                  disabled={!editForm.subcategory || filteredSubSubcategories.length === 0}
+                >
+                  <SelectTrigger className="bg-gray-800 border-gray-600" data-testid="select-edit-subsubcategory">
+                    <SelectValue placeholder={filteredSubSubcategories.length ? "Select sub-subcategory" : "Select subcategory first"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {filteredSubSubcategories.map((subSub: SubSubcategory) => (
+                      <SelectItem key={subSub.id} value={subSub.name}>{subSub.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </div>
@@ -634,13 +666,13 @@ export default function ResourceManager() {
                 <Label htmlFor="create-category">Category</Label>
                 <Select 
                   value={editForm.category} 
-                  onValueChange={(v) => setEditForm(f => ({ ...f, category: v }))}
+                  onValueChange={(v) => setEditForm(f => ({ ...f, category: v, subcategory: "", subSubcategory: "" }))}
                 >
                   <SelectTrigger className="bg-gray-800 border-gray-600" data-testid="select-create-category">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
-                    {CATEGORIES.map(cat => (
+                    {categoryNames.map((cat: string) => (
                       <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                     ))}
                   </SelectContent>
@@ -666,23 +698,37 @@ export default function ResourceManager() {
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="create-subcategory">Subcategory</Label>
-                <Input
-                  id="create-subcategory"
-                  value={editForm.subcategory}
-                  onChange={(e) => setEditForm(f => ({ ...f, subcategory: e.target.value }))}
-                  className="bg-gray-800 border-gray-600"
-                  data-testid="input-create-subcategory"
-                />
+                <Select 
+                  value={editForm.subcategory} 
+                  onValueChange={(v) => setEditForm(f => ({ ...f, subcategory: v, subSubcategory: "" }))}
+                  disabled={!editForm.category || filteredSubcategories.length === 0}
+                >
+                  <SelectTrigger className="bg-gray-800 border-gray-600" data-testid="select-create-subcategory">
+                    <SelectValue placeholder={filteredSubcategories.length ? "Select subcategory" : "Select category first"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {filteredSubcategories.map((sub: Subcategory) => (
+                      <SelectItem key={sub.id} value={sub.name}>{sub.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="create-subsubcategory">Sub-subcategory</Label>
-                <Input
-                  id="create-subsubcategory"
-                  value={editForm.subSubcategory}
-                  onChange={(e) => setEditForm(f => ({ ...f, subSubcategory: e.target.value }))}
-                  className="bg-gray-800 border-gray-600"
-                  data-testid="input-create-subsubcategory"
-                />
+                <Select 
+                  value={editForm.subSubcategory} 
+                  onValueChange={(v) => setEditForm(f => ({ ...f, subSubcategory: v }))}
+                  disabled={!editForm.subcategory || filteredSubSubcategories.length === 0}
+                >
+                  <SelectTrigger className="bg-gray-800 border-gray-600" data-testid="select-create-subsubcategory">
+                    <SelectValue placeholder={filteredSubSubcategories.length ? "Select sub-subcategory" : "Select subcategory first"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {filteredSubSubcategories.map((subSub: SubSubcategory) => (
+                      <SelectItem key={subSub.id} value={subSub.name}>{subSub.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </div>

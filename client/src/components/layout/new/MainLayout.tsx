@@ -4,7 +4,7 @@ import { AwesomeList } from "@/types/awesome-list";
 import TopBar from "../TopBar";
 import Footer from "../Footer";
 import SearchDialog from "@/components/ui/search-dialog";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile, useIsTablet, useIsDesktop } from "@/hooks/use-mobile";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 
 interface MainLayoutProps {
@@ -18,25 +18,23 @@ interface MainLayoutProps {
 export default function MainLayout({ awesomeList, isLoading, children, user, onLogout }: MainLayoutProps) {
   const [searchOpen, setSearchOpen] = useState(false);
   const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
+  const isDesktop = useIsDesktop();
   
-  // On desktop (>= 1024px), sidebar is ALWAYS expanded (non-collapsible)
-  // On mobile (< 1024px), sidebar is controlled via Sheet component
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // Force sidebar to always be expanded on desktop
   useEffect(() => {
     const handleResize = () => {
-      const isDesktop = window.innerWidth >= 1024;
-      if (isDesktop) {
-        // Desktop: sidebar is always expanded
+      const width = window.innerWidth;
+      if (width >= 1024) {
+        setIsSidebarOpen(true);
+      } else if (width >= 768) {
         setIsSidebarOpen(true);
       } else {
-        // Mobile: sidebar starts closed (controlled by Sheet)
         setIsSidebarOpen(false);
       }
     };
     
-    // Set initial state
     handleResize();
     
     window.addEventListener('resize', handleResize);

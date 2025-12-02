@@ -17,11 +17,11 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Skeleton } from "@/components/ui/skeleton";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Home, Folder, ExternalLink, Menu, Sparkles, Zap, Shield, Plus, BookOpen } from "lucide-react";
+import { Home, Folder, ExternalLink, Menu, Sparkles, Zap, Shield, Plus, BookOpen, ChevronLeft } from "lucide-react";
 import { slugify, getCategorySlug } from "@/lib/utils";
 import { Category, Resource } from "@/types/awesome-list";
 import { cn } from "@/lib/utils";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile, useIsTablet } from "@/hooks/use-mobile";
 import { useUserProfile } from "@/hooks/use-user-profile";
 import RecommendationPanel from "@/components/ui/recommendation-panel";
 import { getCategoryIcon, getSubcategoryIcon, getSubSubcategoryIcon } from "@/config/navigation-icons";
@@ -41,6 +41,7 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
   const [openCategories, setOpenCategories] = useState<string[]>([]);
   const [recommendationsOpen, setRecommendationsOpen] = useState(false);
   const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
   const { userProfile } = useUserProfile();
 
   // Active route helper for navigation highlighting
@@ -71,8 +72,31 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
 
   // Show true hierarchical structure from JSON data - categories with their actual subcategories
   const getHierarchicalCategories = (categories: Category[]) => {
-    console.log("🏗️ BUILDING TRUE HIERARCHICAL NAVIGATION FROM JSON DATA");
-    console.log("📊 Total categories:", categories.length);
+    // Only log when there's actual data (avoid logging during initial empty render)
+    const hasData = categories.length > 0 && getTotalResourceCount(categories[0]) > 0;
+    
+    if (hasData) {
+      console.log("🏗️ BUILDING TRUE HIERARCHICAL NAVIGATION FROM JSON DATA");
+      console.log("📊 Total categories:", categories.length);
+      console.log("🔍 First category structure:", JSON.stringify({
+        name: categories[0].name,
+        subcategoriesLength: categories[0].subcategories?.length,
+        subcategoryNames: categories[0].subcategories?.map(s => s.name),
+        totalResources: getTotalResourceCount(categories[0])
+      }));
+      
+      // Debug: Check each category's subcategory resources
+      if (categories[0]?.subcategories?.[0]) {
+        const sub = categories[0].subcategories[0];
+        const count = getTotalResourceCount(sub);
+        console.log("🔬 First subcategory debug:", JSON.stringify({
+          name: sub.name,
+          directResources: sub.resources?.length || 0,
+          subSubcats: sub.subSubcategories?.length || 0,
+          totalResourceCount: count
+        }));
+      }
+    }
     
     // Only filter out unwanted system categories, NOT by resource count
     // Resources are denormalized to subcategories, so top-level may have 0 resources
@@ -101,31 +125,34 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
       };
     });
     
-    console.log("✅ Filtered categories:", filteredCategories.length);
-    console.log("📝 Available categories:", filteredCategories.map(c => `${c.name} (${c.resources.length} resources)`));
+    // Only log when there's actual data (avoid logging during initial empty render)
+    if (hasData) {
+      console.log("✅ Filtered categories:", filteredCategories.length);
+      console.log("📝 Available categories:", filteredCategories.map(c => `${c.name} (${c.resources.length} resources)`));
 
-    // Calculate total navigation items for comprehensive testing (including sub-subcategories)
-    const totalSubcategories = filteredCategories.reduce((total, cat) => total + (cat.subcategories?.length || 0), 0);
-    const totalSubSubcategories = filteredCategories.reduce((total, cat) => 
-      total + (cat.subcategories?.reduce((subTotal, sub) => subTotal + (sub.subSubcategories?.length || 0), 0) || 0), 0
-    );
-    console.log(`🧮 Total navigation items: ${filteredCategories.length} categories + ${totalSubcategories} subcategories + ${totalSubSubcategories} sub-subcategories = ${filteredCategories.length + totalSubcategories + totalSubSubcategories} items`);
+      // Calculate total navigation items for comprehensive testing (including sub-subcategories)
+      const totalSubcategories = filteredCategories.reduce((total, cat) => total + (cat.subcategories?.length || 0), 0);
+      const totalSubSubcategories = filteredCategories.reduce((total, cat) => 
+        total + (cat.subcategories?.reduce((subTotal, sub) => subTotal + (sub.subSubcategories?.length || 0), 0) || 0), 0
+      );
+      console.log(`🧮 Total navigation items: ${filteredCategories.length} categories + ${totalSubcategories} subcategories + ${totalSubSubcategories} sub-subcategories = ${filteredCategories.length + totalSubcategories + totalSubSubcategories} items`);
 
-    console.log("🎯 HIERARCHICAL NAVIGATION STRUCTURE:");
-    filteredCategories.forEach(cat => {
-      console.log(`📁 ${cat.name} (${cat.resources.length} resources) -> /category/${cat.slug}`);
-      if (cat.subcategories && cat.subcategories.length > 0) {
-        cat.subcategories.forEach(sub => {
-          console.log(`  ├── ${sub.name} (${sub.resources.length} resources) -> /subcategory/${sub.slug}`);
-          if (sub.subSubcategories && sub.subSubcategories.length > 0) {
-            sub.subSubcategories.forEach(subSub => {
-              console.log(`    ├── ${subSub.name} (${subSub.resources.length} resources) -> /sub-subcategory/${subSub.slug}`);
-            });
-          }
-        });
-      }
-    });
-    console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+      console.log("🎯 HIERARCHICAL NAVIGATION STRUCTURE:");
+      filteredCategories.forEach(cat => {
+        console.log(`📁 ${cat.name} (${cat.resources.length} resources) -> /category/${cat.slug}`);
+        if (cat.subcategories && cat.subcategories.length > 0) {
+          cat.subcategories.forEach(sub => {
+            console.log(`  ├── ${sub.name} (${sub.resources.length} resources) -> /subcategory/${sub.slug}`);
+            if (sub.subSubcategories && sub.subSubcategories.length > 0) {
+              sub.subSubcategories.forEach(subSub => {
+                console.log(`    ├── ${subSub.name} (${subSub.resources.length} resources) -> /sub-subcategory/${subSub.slug}`);
+              });
+            }
+          });
+        }
+      });
+      console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+    }
 
     // Return the original categories structure for proper hierarchical display
     return filteredCategories;
@@ -440,7 +467,7 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
     </>
   );
 
-  // Mobile sidebar with sheet component
+  // Mobile sidebar with sheet component (< 768px)
   if (isMobile) {
     return (
       <>
@@ -496,7 +523,92 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
     );
   }
 
-  // Desktop sidebar using shadcn Sidebar component (in-flow, not fixed)
+  // Tablet sidebar with collapsible sidebar (768px - 1023px)
+  if (isTablet) {
+    return (
+      <>
+        <Sidebar 
+          variant="sidebar" 
+          collapsible="offcanvas"
+          style={{ "--sidebar-width": "14rem" } as React.CSSProperties}
+          className={cn(
+            "transition-all duration-300 ease-in-out",
+            isOpen ? "translate-x-0" : "-translate-x-full"
+          )}
+        >
+          <SidebarContent>
+            {sidebarContent}
+          </SidebarContent>
+          <SidebarFooter>
+            <div className="border-t border-border p-3 flex items-center justify-between">
+              <Button variant="ghost" size="sm" asChild>
+                <a href={title.includes("Selfhosted") 
+                    ? "https://github.com/awesome-selfhosted/awesome-selfhosted" 
+                    : "https://github.com/krzemienski/awesome-video"} 
+                   target="_blank" 
+                   rel="noopener noreferrer">
+                  <ExternalLink className="mr-2 h-4 w-4" />
+                  GitHub
+                </a>
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={() => setIsOpen(false)}
+                className="h-11 w-11"
+                data-testid="button-collapse-sidebar"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </Button>
+            </div>
+          </SidebarFooter>
+        </Sidebar>
+        
+        <Dialog open={recommendationsOpen} onOpenChange={setRecommendationsOpen}>
+          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5" />
+                AI-Powered Recommendations
+              </DialogTitle>
+            </DialogHeader>
+            {userProfile ? (
+              <RecommendationPanel 
+                userProfile={userProfile}
+                resources={resources}
+                onResourceClick={(resourceId) => {
+                  setRecommendationsOpen(false);
+                  window.open(resourceId, '_blank');
+                }}
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+                <div className="rounded-full bg-muted p-4 mb-4">
+                  <Sparkles className="h-8 w-8 text-muted-foreground" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">Set Up Your Profile</h3>
+                <p className="text-sm text-muted-foreground mb-6 max-w-md">
+                  Create your personalized profile to get AI-powered recommendations tailored to your learning goals and interests.
+                </p>
+                <Button 
+                  onClick={() => {
+                    setRecommendationsOpen(false);
+                    navigate('/advanced');
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <Zap className="h-4 w-4" />
+                  Go to Preferences
+                </Button>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+      </>
+    );
+  }
+
+  // Desktop sidebar using shadcn Sidebar component (in-flow, not fixed) (>= 1024px)
   return (
     <>
       <Sidebar variant="sidebar" collapsible="none" style={{ "--sidebar-width": "16rem" } as React.CSSProperties}>
