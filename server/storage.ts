@@ -78,6 +78,7 @@ export interface IStorage {
   createCategory(category: InsertCategory): Promise<Category>;
   updateCategory(id: number, category: Partial<InsertCategory>): Promise<Category>;
   deleteCategory(id: number): Promise<void>;
+  getCategoryResourceCount(categoryName: string): Promise<number>;
   
   // Subcategory management
   listSubcategories(categoryId?: number): Promise<Subcategory[]>;
@@ -85,6 +86,7 @@ export interface IStorage {
   createSubcategory(subcategory: InsertSubcategory): Promise<Subcategory>;
   updateSubcategory(id: number, subcategory: Partial<InsertSubcategory>): Promise<Subcategory>;
   deleteSubcategory(id: number): Promise<void>;
+  getSubcategoryResourceCount(subcategoryName: string): Promise<number>;
   
   // Sub-subcategory management
   listSubSubcategories(subcategoryId?: number): Promise<SubSubcategory[]>;
@@ -92,6 +94,7 @@ export interface IStorage {
   createSubSubcategory(subSubcategory: InsertSubSubcategory): Promise<SubSubcategory>;
   updateSubSubcategory(id: number, subSubcategory: Partial<InsertSubSubcategory>): Promise<SubSubcategory>;
   deleteSubSubcategory(id: number): Promise<void>;
+  getSubSubcategoryResourceCount(subSubcategoryName: string): Promise<number>;
   
   // Tag management
   listTags(): Promise<Tag[]>;
@@ -479,6 +482,14 @@ export class DatabaseStorage implements IStorage {
     await db.delete(categories).where(eq(categories.id, id));
   }
   
+  async getCategoryResourceCount(categoryName: string): Promise<number> {
+    const [result] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(resources)
+      .where(eq(resources.category, categoryName));
+    return result?.count ?? 0;
+  }
+  
   // Subcategory management
   async listSubcategories(categoryId?: number): Promise<Subcategory[]> {
     let query = db.select().from(subcategories);
@@ -513,6 +524,14 @@ export class DatabaseStorage implements IStorage {
     await db.delete(subcategories).where(eq(subcategories.id, id));
   }
   
+  async getSubcategoryResourceCount(subcategoryName: string): Promise<number> {
+    const [result] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(resources)
+      .where(eq(resources.subcategory, subcategoryName));
+    return result?.count ?? 0;
+  }
+  
   // Sub-subcategory management
   async listSubSubcategories(subcategoryId?: number): Promise<SubSubcategory[]> {
     let query = db.select().from(subSubcategories);
@@ -545,6 +564,14 @@ export class DatabaseStorage implements IStorage {
   
   async deleteSubSubcategory(id: number): Promise<void> {
     await db.delete(subSubcategories).where(eq(subSubcategories.id, id));
+  }
+  
+  async getSubSubcategoryResourceCount(subSubcategoryName: string): Promise<number> {
+    const [result] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(resources)
+      .where(eq(resources.subSubcategory, subSubcategoryName));
+    return result?.count ?? 0;
   }
   
   // Tag management
@@ -1455,6 +1482,7 @@ export class MemStorage implements IStorage {
     throw new Error("Not implemented in memory storage");
   }
   async deleteCategory(id: number): Promise<void> {}
+  async getCategoryResourceCount(categoryName: string): Promise<number> { return 0; }
   
   async listSubcategories(categoryId?: number): Promise<Subcategory[]> { return []; }
   async getSubcategory(id: number): Promise<Subcategory | undefined> { return undefined; }
@@ -1465,6 +1493,7 @@ export class MemStorage implements IStorage {
     throw new Error("Not implemented in memory storage");
   }
   async deleteSubcategory(id: number): Promise<void> {}
+  async getSubcategoryResourceCount(subcategoryName: string): Promise<number> { return 0; }
   
   async listSubSubcategories(subcategoryId?: number): Promise<SubSubcategory[]> { return []; }
   async getSubSubcategory(id: number): Promise<SubSubcategory | undefined> { return undefined; }
@@ -1475,6 +1504,7 @@ export class MemStorage implements IStorage {
     throw new Error("Not implemented in memory storage");
   }
   async deleteSubSubcategory(id: number): Promise<void> {}
+  async getSubSubcategoryResourceCount(subSubcategoryName: string): Promise<number> { return 0; }
   
   async listTags(): Promise<Tag[]> { return []; }
   async getTag(id: number): Promise<Tag | undefined> { return undefined; }
