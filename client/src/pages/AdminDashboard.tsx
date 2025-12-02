@@ -33,6 +33,7 @@ import PendingEdits from "@/components/admin/PendingEdits";
 import BatchEnrichmentPanel from "@/components/admin/BatchEnrichmentPanel";
 import GitHubSyncPanel from "@/components/admin/GitHubSyncPanel";
 import ResourceManager from "@/components/admin/ResourceManager";
+import CategoryManager from "@/components/admin/CategoryManager";
 
 interface ValidationResult {
   valid: boolean;
@@ -328,7 +329,7 @@ export default function AdminDashboard() {
       {/* Admin Tabs */}
       <Tabs defaultValue="approvals" className="space-y-4">
         <ScrollArea className="w-full">
-          <TabsList className="inline-flex w-auto min-w-full lg:grid lg:grid-cols-10 lg:w-full bg-black border border-pink-500/20">
+          <TabsList className="inline-flex w-auto min-w-full lg:grid lg:grid-cols-11 lg:w-full bg-black border border-pink-500/20">
             <TabsTrigger value="approvals" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap" data-testid="tab-approvals">
               Approvals {stats?.pendingApprovals ? <Badge variant="destructive" className="ml-2">{stats.pendingApprovals}</Badge> : null}
             </TabsTrigger>
@@ -350,6 +351,9 @@ export default function AdminDashboard() {
             </TabsTrigger>
             <TabsTrigger value="resources" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap">
               Resources
+            </TabsTrigger>
+            <TabsTrigger value="categories" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap" data-testid="tab-categories">
+              Categories
             </TabsTrigger>
             <TabsTrigger value="users" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap">
               Users
@@ -822,6 +826,10 @@ export default function AdminDashboard() {
 
         <TabsContent value="resources">
           <ResourceManager />
+        </TabsContent>
+
+        <TabsContent value="categories" data-testid="content-categories">
+          <CategoryManager />
         </TabsContent>
 
         <TabsContent value="users">
