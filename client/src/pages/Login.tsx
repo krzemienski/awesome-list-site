@@ -12,7 +12,7 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+  const [mode, setMode] = useState<'signin' | 'signup' | 'forgot'>('signin');
   const { toast } = useToast();
 
   const handleEmailAuth = async (e: React.FormEvent) => {
@@ -118,19 +118,61 @@ export default function Login() {
     }
   };
 
+  const handleForgotPassword = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    
+    if (!email) {
+      toast({
+        title: "Email required",
+        description: "Please enter your email to reset password",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Check your email",
+        description: "We sent you a password reset link."
+      });
+      
+      setMode('signin');
+    } catch (error: any) {
+      toast({
+        title: "Password reset failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen p-4 bg-background">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>{mode === 'signin' ? 'Sign In' : 'Sign Up'}</CardTitle>
+          <CardTitle>
+            {mode === 'signin' && 'Sign In'}
+            {mode === 'signup' && 'Sign Up'}
+            {mode === 'forgot' && 'Reset Password'}
+          </CardTitle>
           <CardDescription>
-            {mode === 'signin'
-              ? 'Sign in to access your bookmarks and learning paths'
-              : 'Create an account to get started'}
+            {mode === 'signin' && 'Sign in to access your bookmarks and learning paths'}
+            {mode === 'signup' && 'Create an account to get started'}
+            {mode === 'forgot' && 'Enter your email to receive a password reset link'}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* OAuth Buttons */}
+          {/* OAuth Buttons - only show in signin/signup mode */}
+          {mode !== 'forgot' && (
           <div className="space-y-2">
             <Button
               variant="outline"
@@ -151,7 +193,9 @@ export default function Login() {
               Continue with Google
             </Button>
           </div>
+          )}
 
+          {mode !== 'forgot' && (
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />
@@ -162,9 +206,10 @@ export default function Login() {
               </span>
             </div>
           </div>
+          )}
 
-          {/* Email/Password Form */}
-          <form onSubmit={handleEmailAuth} className="space-y-4">
+          {/* Email/Password Form OR Forgot Password Form */}
+          <form onSubmit={mode === 'forgot' ? handleForgotPassword : handleEmailAuth} className="space-y-4">
             <div className="space-y-2">
               <Input
                 type="email"
@@ -174,6 +219,7 @@ export default function Login() {
                 required
               />
             </div>
+            {mode !== 'forgot' && (
             <div className="space-y-2">
               <Input
                 type="password"
@@ -184,9 +230,13 @@ export default function Login() {
                 minLength={8}
               />
             </div>
+            )}
             <div className="flex gap-2">
               <Button type="submit" className="flex-1" disabled={loading}>
-                {loading ? 'Loading...' : (mode === 'signin' ? 'Sign In' : 'Sign Up')}
+                {loading ? 'Loading...' : 
+                 mode === 'signin' ? 'Sign In' :
+                 mode === 'signup' ? 'Sign Up' :
+                 'Send Reset Link'}
               </Button>
               {mode === 'signin' && (
                 <Button
@@ -202,21 +252,45 @@ export default function Login() {
             </div>
           </form>
 
-          <div className="text-center text-sm">
-            {mode === 'signin' ? (
-              <span>
-                Don't have an account?{' '}
-                <button
-                  type="button"
-                  onClick={() => setMode('signup')}
-                  className="underline hover:text-primary"
-                >
-                  Sign up
-                </button>
-              </span>
-            ) : (
+          <div className="text-center text-sm space-y-2">
+            {mode === 'signin' && (
+              <>
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => setMode('forgot')}
+                    className="underline hover:text-primary text-xs"
+                  >
+                    Forgot password?
+                  </button>
+                </div>
+                <div>
+                  Don't have an account?{' '}
+                  <button
+                    type="button"
+                    onClick={() => setMode('signup')}
+                    className="underline hover:text-primary"
+                  >
+                    Sign up
+                  </button>
+                </div>
+              </>
+            )}
+            {mode === 'signup' && (
               <span>
                 Already have an account?{' '}
+                <button
+                  type="button"
+                  onClick={() => setMode('signin')}
+                  className="underline hover:text-primary"
+                >
+                  Sign in
+                </button>
+              </span>
+            )}
+            {mode === 'forgot' && (
+              <span>
+                Remember your password?{' '}
                 <button
                   type="button"
                   onClick={() => setMode('signin')}

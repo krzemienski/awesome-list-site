@@ -167,6 +167,8 @@ export interface IStorage {
   
   // User Preferences
   getUserPreferences(userId: string): Promise<any | undefined>;
+
+  saveUserPreferences(userId: string, preferences: any): Promise<any>;
   
   // GitHub Sync Queue
   addToGithubSyncQueue(item: InsertGithubSyncQueue): Promise<GithubSyncQueue>;
@@ -1372,6 +1374,24 @@ export class DatabaseStorage implements IStorage {
       .where(eq(userPreferences.userId, userId));
     return prefs;
   }
+
+  async saveUserPreferences(userId: string, preferences: Partial<InsertUserPreferences>): Promise<UserPreferences> {
+    const [saved] = await db
+      .insert(userPreferences)
+      .values({
+        userId,
+        ...preferences,
+      })
+      .onConflictDoUpdate({
+        target: userPreferences.userId,
+        set: {
+          ...preferences,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return saved;
+  }
   
   // GitHub Sync Queue
   async addToGithubSyncQueue(item: InsertGithubSyncQueue): Promise<GithubSyncQueue> {
@@ -1819,6 +1839,8 @@ export class MemStorage implements IStorage {
   }
   
   async getUserPreferences(userId: string): Promise<any | undefined> { return undefined; }
+
+  async saveUserPreferences(userId: string, preferences: any): Promise<any> { return preferences; }
   
   async addToGithubSyncQueue(item: InsertGithubSyncQueue): Promise<GithubSyncQueue> {
     throw new Error("Not implemented in memory storage");

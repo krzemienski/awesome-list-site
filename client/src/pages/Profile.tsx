@@ -215,10 +215,12 @@ export default function Profile({ user }: ProfileProps) {
         </div>
         
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">
+          {/* Settings button removed - preferences editing not implemented yet (Bug fix)
+          <Button variant="outline" size="sm" disabled title="Coming in next release">
             <Settings className="h-4 w-4 mr-2" />
-            Settings
+            Settings (Coming Soon)
           </Button>
+          */}
           <Button variant="outline" size="sm" onClick={() => logout()}>
             <LogOut className="h-4 w-4 mr-2" />
             Logout

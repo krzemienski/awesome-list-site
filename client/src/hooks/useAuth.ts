@@ -48,7 +48,21 @@ export function useAuth() {
   }, []);
 
   const logout = async () => {
+    // Sign out from Supabase (clears session)
     await supabase.auth.signOut();
+    
+    // Explicitly clear all Supabase auth data from localStorage
+    // Fix for BUG_20251201_USER_LOGOUT_TOKEN_NOT_CLEARED
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('sb-')) {
+        localStorage.removeItem(key);
+      }
+    });
+    
+    // Clear session storage as well
+    sessionStorage.clear();
+    
+    // Redirect to homepage
     window.location.href = '/';
   };
 
