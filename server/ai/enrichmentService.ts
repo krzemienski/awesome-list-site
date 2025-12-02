@@ -2,6 +2,7 @@ import { storage } from '../storage';
 import { generateResourceTags } from './tagging';
 import { fetchUrlMetadata, type UrlMetadata } from './urlScraper';
 import type { EnrichmentJob } from '@shared/schema';
+import { createSystemAuditContext } from '../middleware/requestContext';
 
 type EnrichmentOutcome = 'success' | 'skipped' | 'failed';
 
@@ -341,7 +342,8 @@ export class EnrichmentService {
           'ai_enriched',
           undefined,
           { aiResult, updates },
-          `AI enrichment completed with confidence ${aiResult.confidence}`
+          `AI enrichment completed with confidence ${aiResult.confidence}`,
+          createSystemAuditContext('ai-enrichment')
         );
 
         return 'success';
@@ -358,7 +360,8 @@ export class EnrichmentService {
             'ai_enrichment_failed',
             undefined,
             { error: error.message },
-            `AI enrichment failed after ${maxRetries} retries`
+            `AI enrichment failed after ${maxRetries} retries`,
+            createSystemAuditContext('ai-enrichment-failed')
           );
           
           return 'failed';

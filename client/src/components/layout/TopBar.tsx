@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { Menu, Search, Github, BarChart3, User, LogIn, LogOut, Bookmark, Shield } from "lucide-react";
@@ -6,8 +6,10 @@ import { useTheme } from "@/hooks/use-theme";
 import { useIsMobile } from "@/hooks/use-mobile";
 import CustomThemeManager, { CustomTheme } from "@/components/ui/custom-theme-manager";
 import AwesomeListExplorer from "@/components/ui/awesome-list-explorer";
-import AnalyticsDashboard from "@/components/ui/analytics-dashboard";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
+// Lazy load heavy components - Analytics uses recharts (~436KB)
+const AnalyticsDashboard = lazy(() => import("@/components/ui/analytics-dashboard"));
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -200,11 +202,15 @@ export default function TopBar({
         </div>
       </div>
       
-      <AnalyticsDashboard
-        resources={resources}
-        isOpen={isAnalyticsOpen}
-        onClose={() => setIsAnalyticsOpen(false)}
-      />
+      {isAnalyticsOpen && (
+        <Suspense fallback={null}>
+          <AnalyticsDashboard
+            resources={resources}
+            isOpen={isAnalyticsOpen}
+            onClose={() => setIsAnalyticsOpen(false)}
+          />
+        </Suspense>
+      )}
       
       <CustomThemeManager
         isOpen={isThemeManagerOpen}

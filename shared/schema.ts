@@ -58,6 +58,9 @@ export const resources = pgTable(
     index("idx_resources_status").on(table.status),
     index("idx_resources_status_category").on(table.status, table.category),
     index("idx_resources_category").on(table.category),
+    index("idx_resources_subcategory").on(table.subcategory),
+    index("idx_resources_created_at").on(table.createdAt),
+    index("idx_resources_url").on(table.url), // For duplicate detection
   ]
 );
 
@@ -130,11 +133,18 @@ export type InsertResourceEdit = z.infer<typeof insertResourceEditSchema>;
 export type ResourceEdit = typeof resourceEdits.$inferSelect;
 
 // Category schema
-export const categories = pgTable("categories", {
-  id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
-  name: text("name").notNull().unique(),
-  slug: text("slug").notNull().unique(),
-});
+export const categories = pgTable(
+  "categories",
+  {
+    id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
+    name: text("name").notNull().unique(),
+    slug: text("slug").notNull().unique(),
+  },
+  (table) => [
+    index("idx_categories_name").on(table.name),
+    index("idx_categories_slug").on(table.slug),
+  ]
+);
 
 export const insertCategorySchema = createInsertSchema(categories).pick({
   name: true,
@@ -145,12 +155,19 @@ export type InsertCategory = z.infer<typeof insertCategorySchema>;
 export type Category = typeof categories.$inferSelect;
 
 // Subcategory schema
-export const subcategories = pgTable("subcategories", {
-  id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
-  name: text("name").notNull(),
-  slug: text("slug").notNull(),
-  categoryId: uuid("category_id").references(() => categories.id, { onDelete: "cascade" }),
-});
+export const subcategories = pgTable(
+  "subcategories",
+  {
+    id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
+    name: text("name").notNull(),
+    slug: text("slug").notNull(),
+    categoryId: uuid("category_id").references(() => categories.id, { onDelete: "cascade" }),
+  },
+  (table) => [
+    index("idx_subcategories_category_id").on(table.categoryId),
+    index("idx_subcategories_slug").on(table.slug),
+  ]
+);
 
 export const insertSubcategorySchema = createInsertSchema(subcategories).pick({
   name: true,
@@ -162,12 +179,19 @@ export type InsertSubcategory = z.infer<typeof insertSubcategorySchema>;
 export type Subcategory = typeof subcategories.$inferSelect;
 
 // Sub-subcategory schema (Level 3)
-export const subSubcategories = pgTable("sub_subcategories", {
-  id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
-  name: text("name").notNull(),
-  slug: text("slug").notNull(),
-  subcategoryId: uuid("subcategory_id").references(() => subcategories.id, { onDelete: "cascade" }),
-});
+export const subSubcategories = pgTable(
+  "sub_subcategories",
+  {
+    id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
+    name: text("name").notNull(),
+    slug: text("slug").notNull(),
+    subcategoryId: uuid("subcategory_id").references(() => subcategories.id, { onDelete: "cascade" }),
+  },
+  (table) => [
+    index("idx_sub_subcategories_subcategory_id").on(table.subcategoryId),
+    index("idx_sub_subcategories_slug").on(table.slug),
+  ]
+);
 
 export const insertSubSubcategorySchema = createInsertSchema(subSubcategories).pick({
   name: true,
@@ -226,19 +250,27 @@ export const resourceTags = pgTable(
 );
 
 // Learning Journeys (structured learning paths)
-export const learningJourneys = pgTable("learning_journeys", {
-  id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
-  title: text("title").notNull(),
-  description: text("description").notNull(),
-  difficulty: text("difficulty").default("beginner"), // beginner, intermediate, advanced
-  estimatedDuration: text("estimated_duration"), // e.g., "20 hours"
-  icon: text("icon"),
-  orderIndex: integer("order_index"),
-  category: text("category").notNull(),
-  status: text("status").default("published"), // draft, published, archived
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+export const learningJourneys = pgTable(
+  "learning_journeys",
+  {
+    id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
+    title: text("title").notNull(),
+    description: text("description").notNull(),
+    difficulty: text("difficulty").default("beginner"), // beginner, intermediate, advanced
+    estimatedDuration: text("estimated_duration"), // e.g., "20 hours"
+    icon: text("icon"),
+    orderIndex: integer("order_index"),
+    category: text("category").notNull(),
+    status: text("status").default("published"), // draft, published, archived
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) => [
+    index("idx_learning_journeys_status").on(table.status),
+    index("idx_learning_journeys_category").on(table.category),
+    index("idx_learning_journeys_order").on(table.orderIndex),
+  ]
+);
 
 export const insertLearningJourneySchema = createInsertSchema(learningJourneys).pick({
   title: true,
@@ -342,16 +374,44 @@ export const insertUserJourneyProgressSchema = createInsertSchema(userJourneyPro
 export type InsertUserJourneyProgress = z.infer<typeof insertUserJourneyProgressSchema>;
 export type UserJourneyProgress = typeof userJourneyProgress.$inferSelect;
 
-// Resource Audit Log
-export const resourceAuditLog = pgTable("resource_audit_log", {
-  id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
-  resourceId: uuid("resource_id").references(() => resources.id, { onDelete: "cascade" }),
-  action: text("action").notNull(), // created, updated, approved, rejected, synced
-  performedBy: uuid("performed_by"), // References auth.users.id (Supabase managed)
-  changes: jsonb("changes").$type<Record<string, any>>(),
-  notes: text("notes"),
-  createdAt: timestamp("created_at").defaultNow(),
-});
+// Resource Audit Log - Enhanced with request tracking for comprehensive audit trail
+export const resourceAuditLog = pgTable(
+  "resource_audit_log",
+  {
+    id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
+    resourceId: uuid("resource_id").references(() => resources.id, { onDelete: "cascade" }),
+    action: text("action").notNull(), // created, updated, approved, rejected, synced, bulk_status_*, etc.
+    performedBy: uuid("performed_by"), // References auth.users.id (Supabase managed)
+    changes: jsonb("changes").$type<Record<string, any>>(),
+    notes: text("notes"),
+    // Enhanced audit fields for comprehensive tracking
+    requestId: text("request_id"), // Unique request ID for tracing (UUID format)
+    ipAddress: text("ip_address"), // Client IP address (supports IPv4 and IPv6)
+    userAgent: text("user_agent"), // Browser/client user agent string
+    endpoint: text("endpoint"), // API endpoint path (e.g., /api/admin/resources/:id/approve)
+    httpMethod: text("http_method"), // HTTP method (GET, POST, PUT, DELETE, PATCH)
+    sessionId: text("session_id"), // Session identifier for tracking user sessions
+    createdAt: timestamp("created_at").defaultNow(),
+  },
+  (table) => [
+    index("idx_audit_log_resource_id").on(table.resourceId),
+    index("idx_audit_log_created_at").on(table.createdAt),
+    index("idx_audit_log_action").on(table.action),
+    index("idx_audit_log_request_id").on(table.requestId),
+    index("idx_audit_log_ip_address").on(table.ipAddress),
+    index("idx_audit_log_performed_by_created").on(table.performedBy, table.createdAt),
+  ]
+);
+
+// Type for audit context passed from request handlers
+export interface AuditContext {
+  requestId: string;
+  ipAddress: string;
+  userAgent: string;
+  endpoint: string;
+  httpMethod: string;
+  sessionId?: string;
+}
 
 // GitHub Sync Queue
 export const githubSyncQueue = pgTable(

@@ -46,6 +46,7 @@ import {
   type InsertEnrichmentJob,
   type EnrichmentQueueItem,
   type InsertEnrichmentQueue,
+  type AuditContext,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql, desc, asc, inArray, like, or, isNull, isNotNull, lt } from "drizzle-orm";
@@ -54,8 +55,11 @@ import { eq, and, sql, desc, asc, inArray, like, or, isNull, isNotNull, lt } fro
 export interface IStorage {
   // User operations
   getUser(id: string): Promise<User | undefined>;
+  /**
+   * @deprecated Users are managed by Supabase Auth - use Supabase Auth API or dashboard to manage users
+   */
   upsertUser(user: UpsertUser): Promise<User>;
-  
+
   // Additional user operations
   getUserByEmail(email: string): Promise<User | undefined>;
   listUsers(page: number, limit: number): Promise<{ users: User[]; total: number }>;
@@ -138,9 +142,19 @@ export interface IStorage {
   getUserJourneyProgress(userId: string, journeyId: string): Promise<UserJourneyProgress | undefined>;
   listUserJourneyProgress(userId: string): Promise<UserJourneyProgress[]>;
 
-  // Resource Audit Log
-  logResourceAudit(resourceId: string | null, action: string, performedBy?: string, changes?: any, notes?: string): Promise<void>;
+  // Resource Audit Log - Enhanced with request context tracking
+  logResourceAudit(
+    resourceId: string | null,
+    action: string,
+    performedBy?: string,
+    changes?: any,
+    notes?: string,
+    auditContext?: AuditContext
+  ): Promise<void>;
   getResourceAuditLog(resourceId: string, limit?: number): Promise<any[]>;
+  getAuditLogByRequestId(requestId: string): Promise<any[]>;
+  getAuditLogByUser(userId: string, limit?: number): Promise<any[]>;
+  getAuditLogByIp(ipAddress: string, limit?: number): Promise<any[]>;
 
   // Resource Edits
   createResourceEdit(data: InsertResourceEdit): Promise<ResourceEdit>;
@@ -188,6 +202,9 @@ export interface IStorage {
 
   // Hierarchical categories (for frontend navigation)
   getHierarchicalCategories(): Promise<any[]>; // Returns Category[] type with nested structure
+
+  // Cache invalidation (call when resources/categories change)
+  invalidateCategoriesCache(): void;
 
   // Legacy methods - kept for backward compatibility
   getUserByUsername(username: string): Promise<User | undefined>;
@@ -247,20 +264,24 @@ export class DatabaseStorage implements IStorage {
     return data.user as User;
   }
 
+  /**
+   * @deprecated Users are managed by Supabase Auth - use Supabase Auth API or dashboard to manage users
+   */
   async upsertUser(userData: UpsertUser): Promise<User> {
-    // Users are managed by Supabase Auth - this method is deprecated
-    // Use Supabase dashboard or Auth API to create/update users
     throw new Error('upsertUser is deprecated - use Supabase Auth API or dashboard to manage users');
   }
-  
-  // Legacy methods - kept for backward compatibility
+
+  /**
+   * @deprecated Legacy method - not used with OAuth/Supabase Auth
+   */
   async getUserByUsername(username: string): Promise<User | undefined> {
-    // Legacy method - not used with OAuth
     return undefined;
   }
-  
+
+  /**
+   * @deprecated Users are managed by Supabase Auth - use Supabase Auth API to create users
+   */
   async createUser(userData: UpsertUser): Promise<User> {
-    // Deprecated - use Supabase Auth API
     throw new Error('createUser is deprecated - use Supabase Auth API to create users');
   }
   
@@ -358,10 +379,13 @@ export class DatabaseStorage implements IStorage {
 
   async createResource(resource: InsertResource): Promise<Resource> {
     const [newResource] = await db.insert(resources).values(resource).returning();
-    
+
     // Log the creation
     await this.logResourceAudit(newResource.id, 'created', resource.submittedBy ?? undefined);
-    
+
+    // Invalidate categories cache (resource counts may have changed)
+    this.invalidateCategoriesCache();
+
     return newResource;
   }
   
@@ -375,6 +399,11 @@ export class DatabaseStorage implements IStorage {
     // Only log if resource existed and was updated
     if (updatedResource) {
       await this.logResourceAudit(id, 'updated', resource.submittedBy ?? undefined, resource);
+
+      // Invalidate categories cache if category fields changed
+      if (resource.category || resource.subcategory || resource.subSubcategory || resource.status) {
+        this.invalidateCategoriesCache();
+      }
     }
 
     return updatedResource;
@@ -382,26 +411,32 @@ export class DatabaseStorage implements IStorage {
   
   async updateResourceStatus(id: string, status: string, approvedBy?: string): Promise<Resource> {
     const updateData: any = { status, updatedAt: new Date() };
-    
+
     if (status === 'approved' && approvedBy) {
       updateData.approvedBy = approvedBy;
       updateData.approvedAt = new Date();
     }
-    
+
     const [updatedResource] = await db
       .update(resources)
       .set(updateData)
       .where(eq(resources.id, id))
       .returning();
-    
+
     // Log the status change
     await this.logResourceAudit(id, status, approvedBy, { status });
-    
+
+    // Invalidate categories cache (approved count changed)
+    this.invalidateCategoriesCache();
+
     return updatedResource;
   }
-  
+
   async deleteResource(id: string): Promise<void> {
     await db.delete(resources).where(eq(resources.id, id));
+
+    // Invalidate categories cache (resource counts changed)
+    this.invalidateCategoriesCache();
   }
 
   // Bulk operations
@@ -435,6 +470,9 @@ export class DatabaseStorage implements IStorage {
         });
       }
 
+      // Invalidate categories cache (bulk status change affects counts)
+      this.invalidateCategoriesCache();
+
       return { count: resourceIds.length };
     });
   }
@@ -459,6 +497,9 @@ export class DatabaseStorage implements IStorage {
         notes: `Bulk archived ${resourceIds.length} resources`
       });
 
+      // Invalidate categories cache (bulk archive affects counts)
+      this.invalidateCategoriesCache();
+
       return { count: resourceIds.length };
     });
   }
@@ -476,6 +517,13 @@ export class DatabaseStorage implements IStorage {
       for (const tagName of tagNames) {
         const slug = tagName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
+        // Check if tag exists before upsert to track new tags
+        const [existing] = await tx
+          .select()
+          .from(tags)
+          .where(eq(tags.name, tagName))
+          .limit(1);
+
         const [tag] = await tx
           .insert(tags)
           .values({ name: tagName, slug })
@@ -485,14 +533,7 @@ export class DatabaseStorage implements IStorage {
           })
           .returning();
 
-        // Check if this is a new tag
-        const [existing] = await tx
-          .select()
-          .from(tags)
-          .where(eq(tags.name, tagName))
-          .limit(1);
-
-        if (tag.id !== existing?.id) {
+        if (!existing) {
           tagsCreated++;
         }
 
@@ -593,79 +634,95 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(categories).orderBy(asc(categories.name));
   }
 
+  // In-memory cache for hierarchical categories (TTL: 5 minutes)
+  private hierarchicalCategoriesCache: { data: any[] | null; timestamp: number } = { data: null, timestamp: 0 };
+  private readonly CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
   /**
-   * Get hierarchical categories with nested subcategories, sub-subcategories, and resources
+   * Get hierarchical categories with nested subcategories, sub-subcategories, and resource counts
    * Returns complete Category[] structure for frontend navigation
+   *
+   * OPTIMIZATIONS (Session 9 Bug #6 - 1,583ms → <50ms):
+   * 1. Return counts only, not full resources (payload: 3.1MB → ~10KB)
+   * 2. Run all 6 queries in PARALLEL using Promise.all (latency: 6x → 1x)
+   * 3. In-memory cache with 5-minute TTL (subsequent calls: <1ms)
+   * 4. Uses new partial indexes on status='approved' columns
    */
   async getHierarchicalCategories(): Promise<any[]> {
-    // OPTIMIZED: Return counts only, not full resources (Bug #6 fix)
-    // Reduces payload from 3.1MB → ~10KB, latency from 674ms → ~20ms
+    // Check cache first
+    const now = Date.now();
+    if (this.hierarchicalCategoriesCache.data &&
+        (now - this.hierarchicalCategoriesCache.timestamp) < this.CACHE_TTL_MS) {
+      return this.hierarchicalCategoriesCache.data;
+    }
 
-    // Get all categories
-    const categoriesList = await db
-      .select()
-      .from(categories)
-      .orderBy(asc(categories.name));
+    // OPTIMIZATION: Run all 6 queries in PARALLEL instead of sequentially
+    // This reduces latency from ~600ms (6 sequential) to ~100ms (1 parallel batch)
+    const [
+      categoriesList,
+      categoryCountsResult,
+      subcategoriesList,
+      subcategoryCountsResult,
+      subSubcategoriesList,
+      subSubcategoryCountsResult
+    ] = await Promise.all([
+      // Query 1: Get all categories
+      db.select().from(categories).orderBy(asc(categories.name)),
 
-    // Get resource counts per category (OPTIMIZED - no resource objects!)
-    const categoryCountsResult = await db
-      .select({
+      // Query 2: Get resource counts per category
+      db.select({
         category: resources.category,
         count: sql<number>`count(*)::int`
       })
       .from(resources)
       .where(eq(resources.status, 'approved'))
-      .groupBy(resources.category);
+      .groupBy(resources.category),
 
-    const categoryCounts = new Map(
-      categoryCountsResult.map(c => [c.category, c.count])
-    );
+      // Query 3: Get all subcategories
+      db.select().from(subcategories),
 
-    // Get subcategories
-    const subcategoriesList = await db.select().from(subcategories);
-
-    // Get subcategory counts
-    const subcategoryCountsResult = await db
-      .select({
+      // Query 4: Get subcategory counts
+      db.select({
         subcategory: resources.subcategory,
         count: sql<number>`count(*)::int`
       })
       .from(resources)
-      .where(
-        and(
-          eq(resources.status, 'approved'),
-          isNotNull(resources.subcategory)
-        )
-      )
-      .groupBy(resources.subcategory);
+      .where(and(
+        eq(resources.status, 'approved'),
+        isNotNull(resources.subcategory)
+      ))
+      .groupBy(resources.subcategory),
+
+      // Query 5: Get all sub-subcategories
+      db.select().from(subSubcategories),
+
+      // Query 6: Get sub-subcategory counts
+      db.select({
+        subSubcategory: resources.subSubcategory,
+        count: sql<number>`count(*)::int`
+      })
+      .from(resources)
+      .where(and(
+        eq(resources.status, 'approved'),
+        isNotNull(resources.subSubcategory)
+      ))
+      .groupBy(resources.subSubcategory)
+    ]);
+
+    // Build lookup maps for O(1) access
+    const categoryCounts = new Map(
+      categoryCountsResult.map(c => [c.category, c.count])
+    );
 
     const subcategoryCounts = new Map(
       subcategoryCountsResult.map(s => [s.subcategory, s.count])
     );
 
-    // Get sub-subcategories
-    const subSubcategoriesList = await db.select().from(subSubcategories);
-
-    // Get sub-subcategory counts
-    const subSubcategoryCountsResult = await db
-      .select({
-        subSubcategory: resources.subSubcategory,
-        count: sql<number>`count(*)::int`
-      })
-      .from(resources)
-      .where(
-        and(
-          eq(resources.status, 'approved'),
-          isNotNull(resources.subSubcategory)
-        )
-      )
-      .groupBy(resources.subSubcategory);
-
     const subSubcategoryCounts = new Map(
       subSubcategoryCountsResult.map(s => [s.subSubcategory, s.count])
     );
 
-    // Build subcategory map
+    // Build subcategory map (categoryId -> subcategories[])
     const subcategoryMap = new Map<string, any[]>();
     subcategoriesList.forEach(sub => {
       if (!sub.categoryId) return;
@@ -675,7 +732,7 @@ export class DatabaseStorage implements IStorage {
       (subcategoryMap.get(sub.categoryId) ?? []).push(sub);
     });
 
-    // Build sub-subcategory map
+    // Build sub-subcategory map (subcategoryId -> subSubcategories[])
     const subSubcategoryMap = new Map<string, any[]>();
     subSubcategoriesList.forEach(subsub => {
       if (!subsub.subcategoryId) return;
@@ -685,7 +742,7 @@ export class DatabaseStorage implements IStorage {
       (subSubcategoryMap.get(subsub.subcategoryId) ?? []).push(subsub);
     });
 
-    // Build hierarchical structure with counts (no resources)
+    // Build hierarchical structure with counts (no resource objects)
     const result = categoriesList.map(cat => {
       const subs = subcategoryMap.get(cat.id) || [];
 
@@ -713,7 +770,18 @@ export class DatabaseStorage implements IStorage {
       };
     });
 
+    // Update cache
+    this.hierarchicalCategoriesCache = { data: result, timestamp: now };
+
     return result;
+  }
+
+  /**
+   * Invalidate the hierarchical categories cache
+   * Call this when categories, subcategories, sub-subcategories, or resources are modified
+   */
+  invalidateCategoriesCache(): void {
+    this.hierarchicalCategoriesCache = { data: null, timestamp: 0 };
   }
   
   async getCategory(id: string): Promise<Category | undefined> {
@@ -1104,28 +1172,62 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(userJourneyProgress.lastAccessedAt));
   }
   
-  // Resource Audit Log
+  // Resource Audit Log - Enhanced with comprehensive request tracking
   async logResourceAudit(
     resourceId: string | null,
     action: string,
     performedBy?: string,
     changes?: any,
-    notes?: string
+    notes?: string,
+    auditContext?: AuditContext
   ): Promise<void> {
     await db.insert(resourceAuditLog).values({
       resourceId,
       action,
       performedBy,
       changes,
-      notes
+      notes,
+      // Enhanced audit fields from request context
+      requestId: auditContext?.requestId,
+      ipAddress: auditContext?.ipAddress,
+      userAgent: auditContext?.userAgent,
+      endpoint: auditContext?.endpoint,
+      httpMethod: auditContext?.httpMethod,
+      sessionId: auditContext?.sessionId,
     });
   }
-  
+
   async getResourceAuditLog(resourceId: string, limit = 50): Promise<any[]> {
     return await db
       .select()
       .from(resourceAuditLog)
       .where(eq(resourceAuditLog.resourceId, resourceId))
+      .orderBy(desc(resourceAuditLog.createdAt))
+      .limit(limit);
+  }
+
+  async getAuditLogByRequestId(requestId: string): Promise<any[]> {
+    return await db
+      .select()
+      .from(resourceAuditLog)
+      .where(eq(resourceAuditLog.requestId, requestId))
+      .orderBy(desc(resourceAuditLog.createdAt));
+  }
+
+  async getAuditLogByUser(userId: string, limit = 100): Promise<any[]> {
+    return await db
+      .select()
+      .from(resourceAuditLog)
+      .where(eq(resourceAuditLog.performedBy, userId))
+      .orderBy(desc(resourceAuditLog.createdAt))
+      .limit(limit);
+  }
+
+  async getAuditLogByIp(ipAddress: string, limit = 100): Promise<any[]> {
+    return await db
+      .select()
+      .from(resourceAuditLog)
+      .where(eq(resourceAuditLog.ipAddress, ipAddress))
       .orderBy(desc(resourceAuditLog.createdAt))
       .limit(limit);
   }
@@ -1610,6 +1712,11 @@ export class MemStorage implements IStorage {
     // MemStorage not used in production (DATABASE_URL always set)
     return [];
   }
+
+  invalidateCategoriesCache(): void {
+    // No-op for MemStorage
+  }
+
   async getCategory(id: string): Promise<Category | undefined> { return undefined; }
   async createCategory(category: InsertCategory): Promise<Category> {
     throw new Error("Not implemented in memory storage");
@@ -1691,8 +1798,11 @@ export class MemStorage implements IStorage {
   }
   async listUserJourneyProgress(userId: string): Promise<UserJourneyProgress[]> { return []; }
   
-  async logResourceAudit(resourceId: string | null, action: string, performedBy?: string, changes?: any, notes?: string): Promise<void> {}
+  async logResourceAudit(resourceId: string | null, action: string, performedBy?: string, changes?: any, notes?: string, auditContext?: AuditContext): Promise<void> {}
   async getResourceAuditLog(resourceId: string, limit?: number): Promise<any[]> { return []; }
+  async getAuditLogByRequestId(requestId: string): Promise<any[]> { return []; }
+  async getAuditLogByUser(userId: string, limit?: number): Promise<any[]> { return []; }
+  async getAuditLogByIp(ipAddress: string, limit?: number): Promise<any[]> { return []; }
   
   async createResourceEdit(data: InsertResourceEdit): Promise<ResourceEdit> {
     throw new Error("Not implemented in memory storage");

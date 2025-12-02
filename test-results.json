@@ -10,9 +10,7 @@
     "grep": {},
     "grepInvert": null,
     "maxFailures": 0,
-    "metadata": {
-      "actualWorkers": 1
-    },
+    "metadata": {},
     "preserveOutput": "always",
     "reporter": [
       [
@@ -42,9 +40,7 @@
         "outputDir": "/Users/nick/Desktop/awesome-list-site/test-results",
         "repeatEach": 1,
         "retries": 1,
-        "metadata": {
-          "actualWorkers": 1
-        },
+        "metadata": {},
         "id": "setup",
         "name": "setup",
         "testDir": "/Users/nick/Desktop/awesome-list-site/tests",
@@ -58,9 +54,7 @@
         "outputDir": "/Users/nick/Desktop/awesome-list-site/test-results",
         "repeatEach": 1,
         "retries": 1,
-        "metadata": {
-          "actualWorkers": 1
-        },
+        "metadata": {},
         "id": "chromium-desktop",
         "name": "chromium-desktop",
         "testDir": "/Users/nick/Desktop/awesome-list-site/tests",
@@ -74,9 +68,7 @@
         "outputDir": "/Users/nick/Desktop/awesome-list-site/test-results",
         "repeatEach": 1,
         "retries": 1,
-        "metadata": {
-          "actualWorkers": 1
-        },
+        "metadata": {},
         "id": "chromium-mobile",
         "name": "chromium-mobile",
         "testDir": "/Users/nick/Desktop/awesome-list-site/tests",
@@ -90,9 +82,7 @@
         "outputDir": "/Users/nick/Desktop/awesome-list-site/test-results",
         "repeatEach": 1,
         "retries": 1,
-        "metadata": {
-          "actualWorkers": 1
-        },
+        "metadata": {},
         "id": "chromium-tablet",
         "name": "chromium-tablet",
         "testDir": "/Users/nick/Desktop/awesome-list-site/tests",
@@ -129,458 +119,1344 @@
               "expectedStatus": "passed",
               "projectId": "setup",
               "projectName": "setup",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 6317,
-                  "errors": [],
-                  "stdout": [
-                    {
-                      "text": "🔐 Setting up admin session for tests...\n"
-                    },
-                    {
-                      "text": "📍 Login page loaded\n"
-                    },
-                    {
-                      "text": "📍 Credentials entered\n"
-                    },
-                    {
-                      "text": "✅ Logged in successfully (redirected from /login)\n"
-                    },
-                    {
-                      "text": "📍 Admin page loaded\n"
-                    },
-                    {
-                      "text": "✅ Admin dashboard content visible\n"
-                    },
-                    {
-                      "text": "✅ Admin session verified\n"
-                    },
-                    {
-                      "text": "✅ Auth state saved to tests/fixtures/auth-state.json\n"
-                    },
-                    {
-                      "text": "\n🔐 Setting up user sessions...\n"
-                    },
-                    {
-                      "text": "Authenticating User A...\n"
-                    },
-                    {
-                      "text": "  User A logged in successfully\n"
-                    },
-                    {
-                      "text": "  User A auth saved to ./tests/fixtures/user-a-auth.json\n"
-                    },
-                    {
-                      "text": "Authenticating User B...\n"
-                    },
-                    {
-                      "text": "  User B logged in successfully\n"
-                    },
-                    {
-                      "text": "  User B auth saved to ./tests/fixtures/user-b-auth.json\n"
-                    },
-                    {
-                      "text": "✅ All auth fixtures refreshed\n\n"
-                    }
-                  ],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2025-12-01T07:56:43.549Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
+              "results": [],
+              "status": "skipped"
             }
           ],
           "id": "17e3fe6f4d9d8bd79c6b-1580989d32f149e984ed",
           "file": "auth.setup.ts",
-          "line": 55,
+          "line": 56,
           "column": 1
         }
       ]
     },
     {
-      "title": "security/rls-comprehensive.spec.ts",
-      "file": "security/rls-comprehensive.spec.ts",
+      "title": "performance/performance-benchmarks.spec.ts",
+      "file": "performance/performance-benchmarks.spec.ts",
       "column": 0,
       "line": 0,
       "specs": [],
       "suites": [
         {
-          "title": "RLS Comprehensive Tests [CRITICAL SECURITY]",
-          "file": "security/rls-comprehensive.spec.ts",
-          "line": 32,
+          "title": "API Response Time Benchmarks",
+          "file": "performance/performance-benchmarks.spec.ts",
+          "line": 127,
           "column": 6,
           "specs": [
             {
-              "title": "Test RLS-1: User favorites isolation",
+              "title": "health endpoint should respond under 100ms",
               "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 120000,
+                  "timeout": 30000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium-desktop",
                   "projectName": "chromium-desktop",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 7282,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "  User A created/confirmed favorite\n"
-                        },
-                        {
-                          "text": "  Layer 2: User A favorite confirmed in database\n"
-                        },
-                        {
-                          "text": "  Layer 1: User B API does not see User A favorites\n"
-                        },
-                        {
-                          "text": "  Layer 2: Database confirmed User B cannot see User A favorites\n"
-                        },
-                        {
-                          "text": "  RLS TEST-1 PASSED: Favorites isolation verified\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-12-01T07:56:50.356Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
-              "id": "8a3e26046e342023dbc2-d58bc22523ebcdab5e9f",
-              "file": "security/rls-comprehensive.spec.ts",
-              "line": 34,
+              "id": "ff9eaa55db4a79537a8d-5dee8f5a098eeb905ccb",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 128,
               "column": 3
             },
             {
-              "title": "Test RLS-2: User bookmarks isolation",
+              "title": "categories endpoint should respond under 200ms",
               "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 120000,
+                  "timeout": 30000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium-desktop",
                   "projectName": "chromium-desktop",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 6786,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "  User A created bookmark with private notes\n"
-                        },
-                        {
-                          "text": "  Layer 1: User B API does not see User A bookmarks/notes\n"
-                        },
-                        {
-                          "text": "  Layer 2: Database confirmed isolation\n"
-                        },
-                        {
-                          "text": "  RLS TEST-2 PASSED: Bookmarks isolation verified\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-12-01T07:56:57.645Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
-              "id": "8a3e26046e342023dbc2-120f9e6ce47c5ddd32c6",
-              "file": "security/rls-comprehensive.spec.ts",
-              "line": 145,
+              "id": "ff9eaa55db4a79537a8d-0982a4bc13e93b00a65e",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 150,
               "column": 3
             },
             {
-              "title": "Test RLS-3: User preferences isolation",
+              "title": "resources list endpoint should respond under 200ms",
               "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 120000,
+                  "timeout": 30000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium-desktop",
                   "projectName": "chromium-desktop",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 6080,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "  User A preferences set via database\n"
-                        },
-                        {
-                          "text": "  RLS TEST-3 PASSED: Preferences isolation verified\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-12-01T07:57:04.436Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
-              "id": "8a3e26046e342023dbc2-3f8e9831e2cc414fe825",
-              "file": "security/rls-comprehensive.spec.ts",
-              "line": 241,
+              "id": "ff9eaa55db4a79537a8d-4563d54bd7e38a474de1",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 172,
               "column": 3
             },
             {
-              "title": "Test RLS-4: User journey progress isolation",
+              "title": "single resource endpoint should respond under 100ms",
               "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 120000,
+                  "timeout": 30000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium-desktop",
                   "projectName": "chromium-desktop",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 3294,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "  No published journeys available, skipping test\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-12-01T07:57:10.523Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
-              "id": "8a3e26046e342023dbc2-9771035f06d64644f91e",
-              "file": "security/rls-comprehensive.spec.ts",
-              "line": 339,
+              "id": "ff9eaa55db4a79537a8d-2a94aac4e93ba853cca8",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 195,
               "column": 3
             },
             {
-              "title": "Test RLS-5: User interactions isolation",
+              "title": "resources with filters should respond under 500ms",
               "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 120000,
+                  "timeout": 30000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium-desktop",
                   "projectName": "chromium-desktop",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 5500,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "  User A interaction created via database\n"
-                        },
-                        {
-                          "text": "  RLS TEST-5 PASSED: Interactions isolation verified\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-12-01T07:57:13.820Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
-              "id": "8a3e26046e342023dbc2-15b926f966ee13932be0",
-              "file": "security/rls-comprehensive.spec.ts",
-              "line": 430,
+              "id": "ff9eaa55db4a79537a8d-07a2731f81b183e0b9cd",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 226,
               "column": 3
             },
             {
-              "title": "Test RLS-6: Cross-user data access attempt via API manipulation",
+              "title": "subcategories endpoint should respond under 200ms",
               "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 120000,
+                  "timeout": 30000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium-desktop",
                   "projectName": "chromium-desktop",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 4379,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "  RLS TEST-6 PASSED: API manipulation attack blocked\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-12-01T07:57:19.325Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
-              "id": "8a3e26046e342023dbc2-fac01872975c882e297a",
-              "file": "security/rls-comprehensive.spec.ts",
-              "line": 536,
+              "id": "ff9eaa55db4a79537a8d-0d2c240bf85434c57cf3",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 249,
               "column": 3
             },
             {
-              "title": "Test RLS-7: Admin can see all data (bypass RLS)",
-              "ok": false,
+              "title": "journeys list endpoint should respond under 200ms",
+              "ok": true,
               "tags": [],
               "tests": [
                 {
-                  "timeout": 120000,
+                  "timeout": 30000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium-desktop",
                   "projectName": "chromium-desktop",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 4398,
-                      "error": {
-                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n    at /Users/nick/Desktop/awesome-list-site/tests/security/rls-comprehensive.spec.ts:688:29",
-                        "location": {
-                          "file": "/Users/nick/Desktop/awesome-list-site/tests/security/rls-comprehensive.spec.ts",
-                          "column": 29,
-                          "line": 688
-                        },
-                        "snippet": "  686 |       );\n  687 |\n> 688 |       expect(statsRes.ok()).toBeTruthy();\n      |                             ^\n  689 |\n  690 |       const stats = await statsRes.json();\n  691 |       // Admin stats should show data from all users"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Users/nick/Desktop/awesome-list-site/tests/security/rls-comprehensive.spec.ts",
-                            "column": 29,
-                            "line": 688
-                          },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n\n  686 |       );\n  687 |\n> 688 |       expect(statsRes.ok()).toBeTruthy();\n      |                             ^\n  689 |\n  690 |       const stats = await statsRes.json();\n  691 |       // Admin stats should show data from all users\n    at /Users/nick/Desktop/awesome-list-site/tests/security/rls-comprehensive.spec.ts:688:29"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-12-01T07:57:23.709Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/security-rls-comprehensive-e5d21-an-see-all-data-bypass-RLS--chromium-desktop/test-failed-1.png"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/Users/nick/Desktop/awesome-list-site/tests/security/rls-comprehensive.spec.ts",
-                        "column": 29,
-                        "line": 688
-                      }
-                    },
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 4376,
-                      "error": {
-                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n    at /Users/nick/Desktop/awesome-list-site/tests/security/rls-comprehensive.spec.ts:688:29",
-                        "location": {
-                          "file": "/Users/nick/Desktop/awesome-list-site/tests/security/rls-comprehensive.spec.ts",
-                          "column": 29,
-                          "line": 688
-                        },
-                        "snippet": "  686 |       );\n  687 |\n> 688 |       expect(statsRes.ok()).toBeTruthy();\n      |                             ^\n  689 |\n  690 |       const stats = await statsRes.json();\n  691 |       // Admin stats should show data from all users"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Users/nick/Desktop/awesome-list-site/tests/security/rls-comprehensive.spec.ts",
-                            "column": 29,
-                            "line": 688
-                          },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n\n  686 |       );\n  687 |\n> 688 |       expect(statsRes.ok()).toBeTruthy();\n      |                             ^\n  689 |\n  690 |       const stats = await statsRes.json();\n  691 |       // Admin stats should show data from all users\n    at /Users/nick/Desktop/awesome-list-site/tests/security/rls-comprehensive.spec.ts:688:29"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 1,
-                      "startTime": "2025-12-01T07:57:28.394Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/security-rls-comprehensive-e5d21-an-see-all-data-bypass-RLS--chromium-desktop-retry1/test-failed-1.png"
-                        },
-                        {
-                          "name": "trace",
-                          "contentType": "application/zip",
-                          "path": "/Users/nick/Desktop/awesome-list-site/test-results/security-rls-comprehensive-e5d21-an-see-all-data-bypass-RLS--chromium-desktop-retry1/trace.zip"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/Users/nick/Desktop/awesome-list-site/tests/security/rls-comprehensive.spec.ts",
-                        "column": 29,
-                        "line": 688
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
-              "id": "8a3e26046e342023dbc2-b606ffe4ceea303d712d",
-              "file": "security/rls-comprehensive.spec.ts",
-              "line": 595,
+              "id": "ff9eaa55db4a79537a8d-b9fcd390de1a8325eef5",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 272,
+              "column": 3
+            },
+            {
+              "title": "health endpoint should respond under 100ms",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-mobile",
+                  "projectName": "chromium-mobile",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-97f00d4f0d0629f2cb71",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 128,
+              "column": 3
+            },
+            {
+              "title": "categories endpoint should respond under 200ms",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-mobile",
+                  "projectName": "chromium-mobile",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-19dab576521f5e8e91a1",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 150,
+              "column": 3
+            },
+            {
+              "title": "resources list endpoint should respond under 200ms",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-mobile",
+                  "projectName": "chromium-mobile",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-0d32fd269ede52c0e41a",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 172,
+              "column": 3
+            },
+            {
+              "title": "single resource endpoint should respond under 100ms",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-mobile",
+                  "projectName": "chromium-mobile",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-aa9e20e51c8efeb12c78",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 195,
+              "column": 3
+            },
+            {
+              "title": "resources with filters should respond under 500ms",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-mobile",
+                  "projectName": "chromium-mobile",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-1af37b2ba9ccf36543d6",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 226,
+              "column": 3
+            },
+            {
+              "title": "subcategories endpoint should respond under 200ms",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-mobile",
+                  "projectName": "chromium-mobile",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-338f5f51ea99fb3a0206",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 249,
+              "column": 3
+            },
+            {
+              "title": "journeys list endpoint should respond under 200ms",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-mobile",
+                  "projectName": "chromium-mobile",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-271e2b519c90813eb74c",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 272,
+              "column": 3
+            },
+            {
+              "title": "health endpoint should respond under 100ms",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-tablet",
+                  "projectName": "chromium-tablet",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-07a44de3da41592bd3fb",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 128,
+              "column": 3
+            },
+            {
+              "title": "categories endpoint should respond under 200ms",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-tablet",
+                  "projectName": "chromium-tablet",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-8203ec34d9a62c68cbda",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 150,
+              "column": 3
+            },
+            {
+              "title": "resources list endpoint should respond under 200ms",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-tablet",
+                  "projectName": "chromium-tablet",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-c77f44f23242823cda66",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 172,
+              "column": 3
+            },
+            {
+              "title": "single resource endpoint should respond under 100ms",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-tablet",
+                  "projectName": "chromium-tablet",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-eb981657455b683e202d",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 195,
+              "column": 3
+            },
+            {
+              "title": "resources with filters should respond under 500ms",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-tablet",
+                  "projectName": "chromium-tablet",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-d054fe4cf5af871cde37",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 226,
+              "column": 3
+            },
+            {
+              "title": "subcategories endpoint should respond under 200ms",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-tablet",
+                  "projectName": "chromium-tablet",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-43fe1d0ef22786b08c1b",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 249,
+              "column": 3
+            },
+            {
+              "title": "journeys list endpoint should respond under 200ms",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-tablet",
+                  "projectName": "chromium-tablet",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-a79bc6ddcd04e92a70f5",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 272,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Cache Effectiveness",
+          "file": "performance/performance-benchmarks.spec.ts",
+          "line": 295,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should verify cache is available and functioning",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-066ed6a4db0cb3573faa",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 296,
+              "column": 3
+            },
+            {
+              "title": "should demonstrate cache performance improvement",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-bb11fb102b6cebe88196",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 313,
+              "column": 3
+            },
+            {
+              "title": "should report cache hit rate above threshold after warm-up",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-7ef82d1e0fcd86bf2ab4",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 341,
+              "column": 3
+            },
+            {
+              "title": "should verify cache is available and functioning",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-mobile",
+                  "projectName": "chromium-mobile",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-b16fec76f6af48d01692",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 296,
+              "column": 3
+            },
+            {
+              "title": "should demonstrate cache performance improvement",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-mobile",
+                  "projectName": "chromium-mobile",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-e9c4e46766fcc29cf0ae",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 313,
+              "column": 3
+            },
+            {
+              "title": "should report cache hit rate above threshold after warm-up",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-mobile",
+                  "projectName": "chromium-mobile",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-6f9595414914d958bf31",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 341,
+              "column": 3
+            },
+            {
+              "title": "should verify cache is available and functioning",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-tablet",
+                  "projectName": "chromium-tablet",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-e410dee83deea83a5f44",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 296,
+              "column": 3
+            },
+            {
+              "title": "should demonstrate cache performance improvement",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-tablet",
+                  "projectName": "chromium-tablet",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-c022a0dc4e957e4d40d4",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 313,
+              "column": 3
+            },
+            {
+              "title": "should report cache hit rate above threshold after warm-up",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-tablet",
+                  "projectName": "chromium-tablet",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-bb6bdfde466bb96f1332",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 341,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Bundle Size Validation",
+          "file": "performance/performance-benchmarks.spec.ts",
+          "line": 375,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should load homepage with acceptable bundle sizes",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-aa535bddd702fa833a05",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 376,
+              "column": 3
+            },
+            {
+              "title": "should verify code splitting is effective",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-cddc3eb1a07558cf515d",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 407,
+              "column": 3
+            },
+            {
+              "title": "should load homepage with acceptable bundle sizes",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-mobile",
+                  "projectName": "chromium-mobile",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-1c1706c38e5cfba76625",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 376,
+              "column": 3
+            },
+            {
+              "title": "should verify code splitting is effective",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-mobile",
+                  "projectName": "chromium-mobile",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-e0bc155c009acf094582",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 407,
+              "column": 3
+            },
+            {
+              "title": "should load homepage with acceptable bundle sizes",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-tablet",
+                  "projectName": "chromium-tablet",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-03c1c9a31179a71c3a64",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 376,
+              "column": 3
+            },
+            {
+              "title": "should verify code splitting is effective",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-tablet",
+                  "projectName": "chromium-tablet",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-7a8527e6eab6a7998f3b",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 407,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Page Load Performance",
+          "file": "performance/performance-benchmarks.spec.ts",
+          "line": 426,
+          "column": 6,
+          "specs": [
+            {
+              "title": "homepage should load within performance budget",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-06f879d9e29324b42257",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 427,
+              "column": 3
+            },
+            {
+              "title": "category page should load within performance budget",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-892f783dfa05b7da3fe5",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 453,
+              "column": 3
+            },
+            {
+              "title": "search should return results within acceptable time",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-4f559064bb8db361ec1a",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 474,
+              "column": 3
+            },
+            {
+              "title": "homepage should load within performance budget",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-mobile",
+                  "projectName": "chromium-mobile",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-7226fd2fb8de2202c5ae",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 427,
+              "column": 3
+            },
+            {
+              "title": "category page should load within performance budget",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-mobile",
+                  "projectName": "chromium-mobile",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-de5d89796f4007400a5f",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 453,
+              "column": 3
+            },
+            {
+              "title": "search should return results within acceptable time",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-mobile",
+                  "projectName": "chromium-mobile",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-a331f79ab73947417b96",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 474,
+              "column": 3
+            },
+            {
+              "title": "homepage should load within performance budget",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-tablet",
+                  "projectName": "chromium-tablet",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-68314ee9bbb2c249466d",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 427,
+              "column": 3
+            },
+            {
+              "title": "category page should load within performance budget",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-tablet",
+                  "projectName": "chromium-tablet",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-dc0e6abad4883f0c40e4",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 453,
+              "column": 3
+            },
+            {
+              "title": "search should return results within acceptable time",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-tablet",
+                  "projectName": "chromium-tablet",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-fb11eb736d1ca7892c6c",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 474,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Core Web Vitals Simulation",
+          "file": "performance/performance-benchmarks.spec.ts",
+          "line": 501,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should have minimal Cumulative Layout Shift",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-5f71a114e27bbb86521b",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 502,
+              "column": 3
+            },
+            {
+              "title": "should have responsive interaction times",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-64b5781c80eff67dc7e8",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 543,
+              "column": 3
+            },
+            {
+              "title": "should have minimal Cumulative Layout Shift",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-mobile",
+                  "projectName": "chromium-mobile",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-6cfface3fe5c324496a3",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 502,
+              "column": 3
+            },
+            {
+              "title": "should have responsive interaction times",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-mobile",
+                  "projectName": "chromium-mobile",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-d12c58e78577c87c0758",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 543,
+              "column": 3
+            },
+            {
+              "title": "should have minimal Cumulative Layout Shift",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-tablet",
+                  "projectName": "chromium-tablet",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-e9ca0396022b49cfce45",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 502,
+              "column": 3
+            },
+            {
+              "title": "should have responsive interaction times",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-tablet",
+                  "projectName": "chromium-tablet",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-4885d0cba1c2acab9946",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 543,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Concurrent Load Testing",
+          "file": "performance/performance-benchmarks.spec.ts",
+          "line": 566,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should handle multiple concurrent API requests",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-a20baa2006b9f2a93905",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 567,
+              "column": 3
+            },
+            {
+              "title": "should handle multiple concurrent API requests",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-mobile",
+                  "projectName": "chromium-mobile",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-1d94a9db06744b17d897",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 567,
+              "column": 3
+            },
+            {
+              "title": "should handle multiple concurrent API requests",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-tablet",
+                  "projectName": "chromium-tablet",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-8312d418bd6cc83473b1",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 567,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Memory and Resource Usage",
+          "file": "performance/performance-benchmarks.spec.ts",
+          "line": 602,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should not have memory leaks during navigation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-45d70a295ccdf2932583",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 603,
+              "column": 3
+            },
+            {
+              "title": "should track number of network requests per page load",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-67915e5f2668b3301b00",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 647,
+              "column": 3
+            },
+            {
+              "title": "should not have memory leaks during navigation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-mobile",
+                  "projectName": "chromium-mobile",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-ca39618e4c23aac7464e",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 603,
+              "column": 3
+            },
+            {
+              "title": "should track number of network requests per page load",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-mobile",
+                  "projectName": "chromium-mobile",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-7a1b86c641a6821ebd27",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 647,
+              "column": 3
+            },
+            {
+              "title": "should not have memory leaks during navigation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-tablet",
+                  "projectName": "chromium-tablet",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-82dcd1bea12ee1ad01c0",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 603,
+              "column": 3
+            },
+            {
+              "title": "should track number of network requests per page load",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-tablet",
+                  "projectName": "chromium-tablet",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-461f6a35d9e06afdbc11",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 647,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "Performance Report Summary",
+          "file": "performance/performance-benchmarks.spec.ts",
+          "line": 676,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should generate comprehensive performance report",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-64570ce6490d6b6e3ea8",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 677,
+              "column": 3
+            },
+            {
+              "title": "should generate comprehensive performance report",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-mobile",
+                  "projectName": "chromium-mobile",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-c957c487585d43da4cd1",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 677,
+              "column": 3
+            },
+            {
+              "title": "should generate comprehensive performance report",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-tablet",
+                  "projectName": "chromium-tablet",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "ff9eaa55db4a79537a8d-5c4149d109eb15cca9e6",
+              "file": "performance/performance-benchmarks.spec.ts",
+              "line": 677,
               "column": 3
             }
           ]
@@ -590,11 +1466,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-12-01T07:56:43.268Z",
-    "duration": 49528.448,
-    "expected": 7,
-    "skipped": 0,
-    "unexpected": 1,
+    "startTime": "2025-12-02T06:17:37.722Z",
+    "duration": 123.767,
+    "expected": 0,
+    "skipped": 64,
+    "unexpected": 0,
     "flaky": 0
   }
 }

@@ -8,9 +8,33 @@ import {
   isAdmin as supabaseIsAdmin
 } from "./supabaseAuth";
 import { fetchAwesomeLists, searchAwesomeLists } from "./github-api";
-import { insertResourceSchema } from "@shared/schema";
 import { z } from "zod";
 import { syncService } from "./github/syncService";
+// Comprehensive input validation schemas
+import {
+  createResourceSchema,
+  updateResourceSchema,
+  createResourceEditSchema,
+  bulkOperationSchema,
+  updateUserRoleSchema,
+  createBookmarkSchema,
+  updateJourneyProgressSchema,
+  githubConfigureSchema,
+  githubSyncSchema,
+  exportOptionsSchema,
+  linkCheckOptionsSchema,
+  seedDatabaseSchema,
+  userProfileSchema,
+  recommendationFeedbackSchema,
+  generateLearningPathSchema,
+  claudeAnalyzeSchema,
+  userInteractionSchema,
+  startEnrichmentSchema,
+  cleanupEnrichmentSchema,
+  clearCacheSchema,
+  rejectResourceSchema,
+  uuidSchema,
+} from "./validation/schemas";
 import { recommendationEngine, UserProfile as AIUserProfile } from "./ai/recommendationEngine";
 import { learningPathGenerator } from "./ai/learningPathGenerator";
 import { claudeService } from "./ai/claudeService";
@@ -19,6 +43,9 @@ import { validateAwesomeList, formatValidationReport } from "./validation/awesom
 import { checkResourceLinks, formatLinkCheckReport } from "./validation/linkChecker";
 import { seedDatabase } from "./seed";
 import { enrichmentService } from "./ai/enrichmentService";
+import { redisCache, CACHE_TTL, CACHE_KEYS, buildResourcesKey } from "./cache/redisCache";
+import { cachePresets, invalidateRelatedCaches, setBrowserCacheHeaders } from "./middleware/cacheMiddleware";
+import { requestContextMiddleware, getAuditContext } from "./middleware/requestContext";
 
 // Rate limiting configuration for public endpoints
 const publicApiLimiter = rateLimit({
@@ -142,6 +169,9 @@ async function generateOpenGraphImage(req: Request, res: Response) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Set up request context middleware for audit logging (before auth)
+  app.use(requestContextMiddleware);
+
   // Set up Supabase authentication middleware
   app.use(extractUser);
 
@@ -213,8 +243,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ============= Resource Routes =============
 
-  // GET /api/resources - List approved resources (public, rate limited)
-  app.get('/api/resources', publicApiLimiter, async (req, res) => {
+  // GET /api/resources - List approved resources (public, rate limited, cached)
+  app.get('/api/resources', publicApiLimiter, cachePresets.resources, async (req, res) => {
     try {
       const page = Math.min(parseInt(req.query.page as string) || 1, 10000);
       const limit = parseInt(req.query.limit as string) || 20;
@@ -222,15 +252,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const subcategory = req.query.subcategory as string;
       const search = req.query.search as string;
 
-      const result = await storage.listResources({
-        page,
-        limit,
-        status: 'approved',
-        category,
-        subcategory,
-        search
-      });
-      
+      // Build cache key from query parameters
+      const cacheKey = buildResourcesKey({ page, limit, status: 'approved', category, subcategory, search });
+
+      const result = await redisCache.getOrSet(
+        cacheKey,
+        () => storage.listResources({
+          page,
+          limit,
+          status: 'approved',
+          category,
+          subcategory,
+          search
+        }),
+        CACHE_TTL.RESOURCES_LIST
+      );
+
       res.json(result);
     } catch (error) {
       console.error('Error fetching resources:', error);
@@ -238,16 +275,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // GET /api/resources/:id - Get single resource
-  app.get('/api/resources/:id', async (req, res) => {
+  // GET /api/resources/:id - Get single resource (cached)
+  app.get('/api/resources/:id', cachePresets.resource, async (req, res) => {
     try {
       const id = req.params.id; // UUID string
-      const resource = await storage.getResource(id);
-      
+      const cacheKey = `${CACHE_KEYS.RESOURCE}:${id}`;
+
+      const resource = await redisCache.getOrSet(
+        cacheKey,
+        () => storage.getResource(id),
+        CACHE_TTL.RESOURCE_SINGLE
+      );
+
       if (!resource) {
         return res.status(404).json({ message: 'Resource not found' });
       }
-      
+
       res.json(resource);
     } catch (error) {
       console.error('Error fetching resource:', error);
@@ -259,18 +302,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/resources', isAuthenticated, async (req: Request, res: Response) => {
     try {
       const userId = req.user.id;
-      const resourceData = insertResourceSchema.parse(req.body);
-      
+
+      // Validate input with comprehensive schema
+      const resourceData = createResourceSchema.parse(req.body);
+
       const resource = await storage.createResource({
         ...resourceData,
         submittedBy: userId,
         status: 'pending'
       });
-      
+
       res.status(201).json(resource);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: 'Invalid resource data', errors: error.errors });
+        return res.status(400).json({
+          message: 'Invalid resource data',
+          errors: error.errors.map(e => ({
+            field: e.path.join('.'),
+            message: e.message
+          }))
+        });
       }
       console.error('Error creating resource:', error);
       res.status(500).json({ message: 'Failed to create resource' });
@@ -329,74 +380,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.id;
       const resourceId = req.params.id; // UUID string
-      const { proposedChanges, proposedData, claudeMetadata, triggerClaudeAnalysis } = req.body;
-      
-      const resource = await storage.getResource(resourceId);
+
+      // Validate resourceId is a valid UUID
+      const validatedResourceId = uuidSchema.parse(resourceId);
+
+      const resource = await storage.getResource(validatedResourceId);
       if (!resource) {
         return res.status(404).json({ message: 'Resource not found' });
       }
-      
-      if (!proposedChanges || !proposedData) {
-        return res.status(400).json({ message: 'proposedChanges and proposedData are required' });
-      }
-      
-      // SECURITY FIX: Whitelist of editable fields only (ISSUE 1)
-      const EDITABLE_FIELDS = ['title', 'description', 'url', 'tags', 'category', 'subcategory', 'subSubcategory'];
-      
-      // Sanitize proposedData - only allow whitelisted fields
-      const sanitizedProposedData: Record<string, any> = {};
-      for (const field of EDITABLE_FIELDS) {
-        if (proposedData && field in proposedData) {
-          sanitizedProposedData[field] = proposedData[field];
-        }
-      }
-      
-      // Sanitize proposedChanges
-      const sanitizedChanges: Record<string, any> = {};
-      for (const field of EDITABLE_FIELDS) {
-        if (proposedChanges && field in proposedChanges) {
-          sanitizedChanges[field] = proposedChanges[field];
-        }
-      }
-      
-      // SECURITY FIX: Validate field sizes (ISSUE 5)
-      if (sanitizedProposedData.title && sanitizedProposedData.title.length > 200) {
-        return res.status(400).json({ message: 'Title too long (max 200 characters)' });
-      }
-      
-      if (sanitizedProposedData.description && sanitizedProposedData.description.length > 2000) {
-        return res.status(400).json({ message: 'Description too long (max 2000 characters)' });
-      }
-      
-      if (sanitizedProposedData.tags && Array.isArray(sanitizedProposedData.tags) && sanitizedProposedData.tags.length > 20) {
-        return res.status(400).json({ message: 'Too many tags (max 20)' });
-      }
-      
-      let aiMetadata = claudeMetadata;
-      if (triggerClaudeAnalysis && resource.url) {
+
+      // Validate input with comprehensive schema (handles field whitelisting and size limits)
+      const validatedData = createResourceEditSchema.parse(req.body);
+
+      // SECURITY: Schema already validates and constrains all fields
+      // Only whitelisted fields are allowed in proposedData
+
+      let aiMetadata = validatedData.claudeMetadata;
+      if (validatedData.triggerClaudeAnalysis && resource.url) {
         try {
-          aiMetadata = await claudeService.analyzeURL(resource.url);
+          const claudeResult = await claudeService.analyzeURL(resource.url);
+          if (claudeResult) {
+            aiMetadata = claudeResult;
+          }
         } catch (error) {
           console.error('Error analyzing URL with Claude:', error);
         }
       }
-      
-      // Use sanitized versions in createResourceEdit call
+
       const edit = await storage.createResourceEdit({
-        resourceId,
+        resourceId: validatedResourceId,
         submittedBy: userId,
         status: 'pending',
         originalResourceUpdatedAt: resource.updatedAt ?? new Date(),
-        proposedChanges: sanitizedChanges,
-        proposedData: sanitizedProposedData,
+        proposedChanges: validatedData.proposedChanges as Record<string, { old: any; new: any }>,
+        proposedData: validatedData.proposedData,
         claudeMetadata: aiMetadata,
         claudeAnalyzedAt: aiMetadata ? new Date() : undefined,
       });
-      
+
       res.status(201).json(edit);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: 'Invalid edit data', errors: error.errors });
+        return res.status(400).json({
+          message: 'Invalid edit data',
+          errors: error.errors.map(e => ({
+            field: e.path.join('.'),
+            message: e.message
+          }))
+        });
       }
       console.error('Error creating edit suggestion:', error);
       res.status(500).json({ message: 'Failed to create edit suggestion' });
@@ -405,11 +436,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ============= Category Routes =============
 
-  // GET /api/categories - Hierarchical categories with nested structure (public, rate limited)
-  app.get('/api/categories', publicApiLimiter, async (req, res) => {
+  // GET /api/categories - Hierarchical categories with nested structure (public, rate limited, cached)
+  app.get('/api/categories', publicApiLimiter, cachePresets.categories, async (req, res) => {
     try {
-      // Return complete hierarchical structure with resources at all levels
-      const hierarchical = await storage.getHierarchicalCategories();
+      // Use Redis cache with fallback to database
+      const hierarchical = await redisCache.getOrSet(
+        CACHE_KEYS.CATEGORIES,
+        () => storage.getHierarchicalCategories(),
+        CACHE_TTL.CATEGORIES
+      );
       res.json(hierarchical);
     } catch (error) {
       console.error('Error fetching hierarchical categories:', error);
@@ -417,8 +452,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // GET /api/subcategories - List all subcategories (public)
-  app.get('/api/subcategories', async (req, res) => {
+  // GET /api/subcategories - List all subcategories (public, cached)
+  app.get('/api/subcategories', cachePresets.subcategories, async (req, res) => {
     try {
       let categoryId: string | undefined = undefined;
 
@@ -427,7 +462,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         categoryId = req.query.categoryId as string; // UUID string
       }
 
-      const subcategories = await storage.listSubcategories(categoryId);
+      const cacheKey = `${CACHE_KEYS.SUBCATEGORIES}:${categoryId || 'all'}`;
+      const subcategories = await redisCache.getOrSet(
+        cacheKey,
+        () => storage.listSubcategories(categoryId),
+        CACHE_TTL.SUBCATEGORIES
+      );
       res.json(subcategories);
     } catch (error) {
       console.error('Error fetching subcategories:', error);
@@ -435,7 +475,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // GET /api/sub-subcategories - List all sub-subcategories (public)
+  // GET /api/sub-subcategories - List all sub-subcategories (public, cached)
   app.get('/api/sub-subcategories', async (req, res) => {
     try {
       let subcategoryId: string | undefined = undefined;
@@ -445,7 +485,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         subcategoryId = req.query.subcategoryId as string; // UUID string
       }
 
-      const subSubcategories = await storage.listSubSubcategories(subcategoryId);
+      const cacheKey = `${CACHE_KEYS.SUB_SUBCATEGORIES}:${subcategoryId || 'all'}`;
+      const subSubcategories = await redisCache.getOrSet(
+        cacheKey,
+        () => storage.listSubSubcategories(subcategoryId),
+        CACHE_TTL.SUB_SUBCATEGORIES
+      );
       res.json(subSubcategories);
     } catch (error) {
       console.error('Error fetching sub-subcategories:', error);
@@ -499,12 +544,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/bookmarks/:resourceId', isAuthenticated, async (req: Request, res: Response) => {
     try {
       const userId = req.user.id;
-      const resourceId = req.params.resourceId; // UUID string
-      const { notes } = req.body;
-      
+
+      // Validate resourceId is a valid UUID
+      const resourceId = uuidSchema.parse(req.params.resourceId);
+
+      // Validate request body
+      const { notes } = createBookmarkSchema.parse(req.body);
+
       await storage.addBookmark(userId, resourceId, notes);
       res.json({ message: 'Bookmark added successfully' });
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          message: 'Invalid bookmark data',
+          errors: error.errors.map(e => ({
+            field: e.path.join('.'),
+            message: e.message
+          }))
+        });
+      }
       console.error('Error adding bookmark:', error);
       res.status(500).json({ message: 'Failed to add bookmark' });
     }
@@ -827,16 +885,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put('/api/journeys/:id/progress', isAuthenticated, async (req: Request, res: Response) => {
     try {
       const userId = req.user.id;
-      const journeyId = req.params.id; // UUID string
-      const { stepId } = req.body;
-      
-      if (!stepId) {
-        return res.status(400).json({ message: 'Step ID is required' });
-      }
-      
+
+      // Validate journeyId is a valid UUID
+      const journeyId = uuidSchema.parse(req.params.id);
+
+      // Validate request body
+      const { stepId } = updateJourneyProgressSchema.parse(req.body);
+
       const progress = await storage.updateUserJourneyProgress(userId, journeyId, stepId);
       res.json(progress);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          message: 'Invalid progress data',
+          errors: error.errors.map(e => ({
+            field: e.path.join('.'),
+            message: e.message
+          }))
+        });
+      }
       console.error('Error updating journey progress:', error);
       res.status(500).json({ message: 'Failed to update journey progress' });
     }
@@ -897,14 +964,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // PUT /api/admin/resources/:id - Update any resource field (admin only)
   app.put('/api/admin/resources/:id', isAuthenticated, isAdmin, async (req, res) => {
     try {
-      const id = req.params.id; // UUID string
-      const updates = req.body; // Partial<Resource>
+      // Validate resourceId is a valid UUID
+      const id = uuidSchema.parse(req.params.id);
 
-      // Validate allowed fields (prevent updating id, createdAt, etc)
-      const allowedFields = ['title', 'url', 'description', 'category', 'subcategory', 'subSubcategory', 'status', 'metadata'];
-      const sanitized = Object.keys(updates)
-        .filter(key => allowedFields.includes(key))
-        .reduce((obj, key) => ({ ...obj, [key]: updates[key] }), {});
+      // Validate and sanitize input with comprehensive schema
+      const sanitized = updateResourceSchema.parse(req.body);
 
       if (Object.keys(sanitized).length === 0) {
         return res.status(400).json({ message: 'No valid fields to update' });
@@ -916,8 +980,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'Resource not found' });
       }
 
+      // Invalidate caches
+      await redisCache.invalidateResource(id);
+      await redisCache.invalidateResources();
+
       res.json(updated);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          message: 'Invalid resource data',
+          errors: error.errors.map(e => ({
+            field: e.path.join('.'),
+            message: e.message
+          }))
+        });
+      }
       console.error('Error updating resource:', error);
       res.status(500).json({ message: 'Failed to update resource' });
     }
@@ -926,28 +1003,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/admin/resources/bulk - Bulk update resources (admin only)
   app.post('/api/admin/resources/bulk', isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
-      const { action, resourceIds, data } = req.body;
       const userId = req.user?.id;
 
-      // Validate input
-      if (!action || !resourceIds || !Array.isArray(resourceIds)) {
-        return res.status(400).json({ message: 'Invalid request body' });
-      }
-
-      if (resourceIds.length === 0 || resourceIds.length > 100) {
-        return res.status(400).json({ message: 'Must select 1-100 resources' });
-      }
-
-
-      // Validate all resourceIds are valid UUIDs
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-      const invalidIds = resourceIds.filter((id: unknown) => typeof id !== 'string' || !uuidRegex.test(id));
-      if (invalidIds.length > 0) {
-        return res.status(400).json({
-          message: 'Invalid resource IDs',
-          invalidIds: invalidIds.slice(0, 5) // Show first 5 invalid IDs
-        });
-      }
+      // Validate input with comprehensive schema
+      const { action, resourceIds, data } = bulkOperationSchema.parse(req.body);
 
       let result;
       switch (action) {
@@ -964,7 +1023,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           result = await storage.bulkDeleteResources(resourceIds);
           break;
         case 'tag':
-          if (!data?.tags || !Array.isArray(data.tags)) {
+          if (!data?.tags || data.tags.length === 0) {
             return res.status(400).json({ message: 'Tags array required for tag action' });
           }
           result = await storage.bulkAddTags(resourceIds, data.tags);
@@ -973,8 +1032,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(400).json({ message: 'Invalid action' });
       }
 
+      // Invalidate caches after bulk operations
+      await redisCache.invalidateResources();
+      await redisCache.invalidateStats();
+
       res.json({ success: true, ...result });
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          message: 'Invalid bulk operation data',
+          errors: error.errors.map(e => ({
+            field: e.path.join('.'),
+            message: e.message
+          }))
+        });
+      }
       console.error('Bulk operation failed:', error);
       res.status(500).json({ message: 'Bulk operation failed' });
     }
@@ -987,6 +1059,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const archived = await storage.bulkDeleteResources([id]);
 
+      // Invalidate caches
+      await redisCache.invalidateResource(id);
+      await redisCache.invalidateResources();
+
       res.json({ success: true, resource: archived });
     } catch (error) {
       console.error('Error archiving resource:', error);
@@ -994,10 +1070,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // GET /api/admin/stats - Dashboard statistics
+  // GET /api/admin/stats - Dashboard statistics (short cache)
   app.get('/api/admin/stats', isAuthenticated, isAdmin, async (req, res) => {
     try {
-      const stats = await storage.getAdminStats();
+      const stats = await redisCache.getOrSet(
+        CACHE_KEYS.STATS,
+        () => storage.getAdminStats(),
+        CACHE_TTL.ADMIN_STATS
+      );
       // Map backend property names to frontend expectations
       res.json({
         users: stats.totalUsers,
@@ -1028,16 +1108,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // PUT /api/admin/users/:id/role - Change user role
   app.put('/api/admin/users/:id/role', isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
-      const userId = req.params.id;
-      const { role } = req.body;
-      
-      if (!role || !['user', 'admin', 'moderator'].includes(role)) {
-        return res.status(400).json({ message: 'Invalid role' });
-      }
-      
+      // Validate userId is a valid UUID
+      const userId = uuidSchema.parse(req.params.id);
+
+      // Validate request body
+      const { role } = updateUserRoleSchema.parse(req.body);
+
       const user = await storage.updateUserRole(userId, role);
       res.json(user);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          message: 'Invalid role data',
+          errors: error.errors.map(e => ({
+            field: e.path.join('.'),
+            message: e.message
+          }))
+        });
+      }
       console.error('Error updating user role:', error);
       res.status(500).json({ message: 'Failed to update user role' });
     }
@@ -1086,7 +1174,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         'approved',
         userId,
         { status: { from: 'pending', to: 'approved' } },
-        'Resource approved by admin'
+        'Resource approved by admin',
+        getAuditContext(req)
       );
       
       res.json(updatedResource);
@@ -1099,35 +1188,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/admin/resources/:id/reject - Reject a pending resource
   app.post('/api/admin/resources/:id/reject', isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
-      const resourceId = req.params.id; // UUID string
+      // Validate resourceId is a valid UUID
+      const resourceId = uuidSchema.parse(req.params.id);
       const userId = req.user.id;
-      const { reason } = req.body;
 
-      if (!reason || reason.trim().length < 10) {
-        return res.status(400).json({ message: 'Rejection reason is required (minimum 10 characters)' });
-      }
-      
+      // Validate rejection reason
+      const { reason } = rejectResourceSchema.parse(req.body);
+
       const resource = await storage.getResource(resourceId);
       if (!resource) {
         return res.status(404).json({ message: 'Resource not found' });
       }
-      
+
       if (resource.status !== 'pending') {
         return res.status(400).json({ message: 'Resource is not pending approval' });
       }
-      
+
       const updatedResource = await storage.updateResourceStatus(resourceId, 'rejected', userId);
-      
+
       await storage.logResourceAudit(
         resourceId,
         'rejected',
         userId,
         { status: { from: 'pending', to: 'rejected' } },
-        reason
+        reason,
+        getAuditContext(req)
       );
-      
+
       res.json(updatedResource);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          message: 'Invalid rejection data',
+          errors: error.errors.map(e => ({
+            field: e.path.join('.'),
+            message: e.message
+          }))
+        });
+      }
       console.error('Error rejecting resource:', error);
       res.status(500).json({ message: 'Failed to reject resource' });
     }
@@ -1183,18 +1281,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/admin/resource-edits/:id/reject - Reject an edit (admin only)
   app.post('/api/admin/resource-edits/:id/reject', isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
-      const editId = req.params.id; // UUID string
+      // Validate editId is a valid UUID
+      const editId = uuidSchema.parse(req.params.id);
       const userId = req.user.id;
-      const { reason } = req.body;
 
-      if (!reason || reason.trim().length < 10) {
-        return res.status(400).json({ message: 'Rejection reason is required (minimum 10 characters)' });
-      }
-      
+      // Validate rejection reason
+      const { reason } = rejectResourceSchema.parse(req.body);
+
       await storage.rejectResourceEdit(editId, userId, reason);
-      
+
       res.json({ message: 'Edit rejected successfully' });
     } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          message: 'Invalid rejection data',
+          errors: error.errors.map(e => ({
+            field: e.path.join('.'),
+            message: e.message
+          }))
+        });
+      }
       console.error('Error rejecting edit:', error);
       res.status(500).json({ message: error.message || 'Failed to reject edit' });
     }
@@ -1203,27 +1309,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/claude/analyze - Analyze URL with Claude AI (authenticated)
   app.post('/api/claude/analyze', isAuthenticated, async (req, res) => {
     try {
-      const { url } = req.body;
-      
-      if (!url) {
-        return res.status(400).json({ message: 'URL is required' });
-      }
-      
+      // Validate URL format
+      const { url } = claudeAnalyzeSchema.parse(req.body);
+
       if (!claudeService.isAvailable()) {
-        return res.status(503).json({ 
+        return res.status(503).json({
           message: 'Claude AI service is not available',
           available: false
         });
       }
-      
+
       const analysis = await claudeService.analyzeURL(url);
-      
+
       if (!analysis) {
         return res.status(500).json({ message: 'Failed to analyze URL' });
       }
-      
+
       res.json(analysis);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          message: 'Invalid URL',
+          errors: error.errors.map(e => ({
+            field: e.path.join('.'),
+            message: e.message
+          }))
+        });
+      }
       console.error('Error analyzing URL:', error);
       res.status(500).json({ message: 'Failed to analyze URL' });
     }
@@ -1234,20 +1346,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/github/configure - Configure GitHub repository
   app.post('/api/github/configure', isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
-      const { repositoryUrl, token } = req.body;
-      
-      if (!repositoryUrl) {
-        return res.status(400).json({ message: 'Repository URL is required' });
-      }
-      
+      // Validate input
+      const { repositoryUrl, token } = githubConfigureSchema.parse(req.body);
+
       const result = await syncService.configureRepository(repositoryUrl, token);
-      
+
       if (!result.success) {
         return res.status(400).json(result);
       }
-      
+
       res.json(result);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          message: 'Invalid GitHub configuration',
+          errors: error.errors.map(e => ({
+            field: e.path.join('.'),
+            message: e.message
+          }))
+        });
+      }
       console.error('Error configuring GitHub repository:', error);
       res.status(500).json({ message: 'Failed to configure GitHub repository' });
     }
@@ -1256,12 +1374,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/github/import - Import resources from GitHub awesome list
   app.post('/api/github/import', isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
-      const { repositoryUrl, options = {} } = req.body;
-      
-      if (!repositoryUrl) {
-        return res.status(400).json({ message: 'Repository URL is required' });
-      }
-      
+      // Validate input
+      const { repositoryUrl, options } = githubSyncSchema.parse(req.body);
+
       // Add to queue for processing
       const queueItem = await storage.addToGithubSyncQueue({
         repositoryUrl,
@@ -1270,7 +1385,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         resourceIds: [],
         metadata: options
       });
-      
+
       // Process immediately in background
       syncService.importFromGitHub(repositoryUrl, options)
         .then(result => {
@@ -1279,13 +1394,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .catch(error => {
           console.error('GitHub import failed:', error);
         });
-      
+
       res.json({
         message: 'Import started',
         queueId: queueItem.id,
         status: 'processing'
       });
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          message: 'Invalid import configuration',
+          errors: error.errors.map(e => ({
+            field: e.path.join('.'),
+            message: e.message
+          }))
+        });
+      }
       console.error('Error starting GitHub import:', error);
       res.status(500).json({ message: 'Failed to start GitHub import' });
     }
@@ -1294,12 +1418,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/github/export - Export approved resources to GitHub
   app.post('/api/github/export', isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
-      const { repositoryUrl, options = {} } = req.body;
-      
-      if (!repositoryUrl) {
-        return res.status(400).json({ message: 'Repository URL is required' });
-      }
-      
+      // Validate input
+      const { repositoryUrl, options } = githubSyncSchema.parse(req.body);
+
       // Add to queue for processing
       const queueItem = await storage.addToGithubSyncQueue({
         repositoryUrl,
@@ -1308,7 +1429,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         resourceIds: [],
         metadata: options
       });
-      
+
       // Process immediately in background
       syncService.exportToGitHub(repositoryUrl, options)
         .then(result => {
@@ -1317,13 +1438,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .catch(error => {
           console.error('GitHub export failed:', error);
         });
-      
+
       res.json({
         message: 'Export started',
         queueId: queueItem.id,
         status: 'processing'
       });
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          message: 'Invalid export configuration',
+          errors: error.errors.map(e => ({
+            field: e.path.join('.'),
+            message: e.message
+          }))
+        });
+      }
       console.error('Error starting GitHub export:', error);
       res.status(500).json({ message: 'Failed to start GitHub export' });
     }
@@ -1406,8 +1536,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Get all approved resources
       const resources = await storage.getAllApprovedResources();
-      
-      // Get export options from request body
+
+      // Validate and parse export options
+      const options = exportOptionsSchema.parse(req.body);
       const {
         title = 'Awesome Video',
         description = 'A curated list of awesome video resources, tools, frameworks, and learning materials.',
@@ -1415,7 +1546,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         includeLicense = true,
         websiteUrl = req.protocol + '://' + req.get('host'),
         repoUrl = process.env.GITHUB_REPO_URL
-      } = req.body;
+      } = options;
 
       // Create formatter with options
       const formatter = new AwesomeListFormatter(resources, {
@@ -1429,13 +1560,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Generate the markdown
       const markdown = formatter.generate();
-      
+
       // Set headers for file download
       res.setHeader('Content-Type', 'text/markdown');
       res.setHeader('Content-Disposition', 'attachment; filename="awesome-list.md"');
-      
+
       res.send(markdown);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          message: 'Invalid export options',
+          errors: error.errors.map(e => ({
+            field: e.path.join('.'),
+            message: e.message
+          }))
+        });
+      }
       console.error('Error generating awesome list export:', error);
       res.status(500).json({ message: 'Failed to generate awesome list export' });
     }
@@ -1446,8 +1586,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Get all approved resources
       const resources = await storage.getAllApprovedResources();
-      
-      // Get export options from request body
+
+      // Validate and parse export options
+      const options = exportOptionsSchema.parse(req.body);
       const {
         title = 'Awesome Video',
         description = 'A curated list of awesome video resources, tools, frameworks, and learning materials.',
@@ -1455,7 +1596,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         includeLicense = true,
         websiteUrl = req.protocol + '://' + req.get('host'),
         repoUrl = process.env.GITHUB_REPO_URL
-      } = req.body;
+      } = options;
 
       // Create formatter and generate markdown
       const formatter = new AwesomeListFormatter(resources, {
@@ -1468,10 +1609,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       const markdown = formatter.generate();
-      
+
       // Validate the generated markdown
       const validationResult = validateAwesomeList(markdown);
-      
+
       // Store validation result for later retrieval
       await storage.storeValidationResult({
         type: 'awesome-lint',
@@ -1479,7 +1620,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         markdown,
         timestamp: new Date().toISOString()
       });
-      
+
       // Return validation results
       res.json({
         valid: validationResult.valid,
@@ -1489,6 +1630,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         report: formatValidationReport(validationResult)
       });
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          message: 'Invalid validation options',
+          errors: error.errors.map(e => ({
+            field: e.path.join('.'),
+            message: e.message
+          }))
+        });
+      }
       console.error('Error validating awesome list:', error);
       res.status(500).json({ message: 'Failed to validate awesome list' });
     }
@@ -1499,13 +1649,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Get all approved resources
       const resources = await storage.getAllApprovedResources();
-      
-      // Get check options from request body
-      const {
-        timeout = 10000,
-        concurrent = 5,
-        retryCount = 1
-      } = req.body;
+
+      // Validate and parse check options
+      const { timeout, concurrent, retryCount } = linkCheckOptionsSchema.parse(req.body);
 
       // Prepare resources for link checking
       const resourcesToCheck = resources.map(r => ({
@@ -1540,6 +1686,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         brokenResources: linkCheckReport.results.filter(r => !r.valid && r.status >= 400)
       });
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          message: 'Invalid link check options',
+          errors: error.errors.map(e => ({
+            field: e.path.join('.'),
+            message: e.message
+          }))
+        });
+      }
       console.error('Error checking links:', error);
       res.status(500).json({ message: 'Failed to check links' });
     }
@@ -1569,13 +1724,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/admin/seed-database', isAuthenticated, isAdmin, async (req, res) => {
     try {
       console.log('Starting manual database seeding...');
-      
-      // Get options from request body
-      const { clearExisting = false } = req.body;
-      
+
+      // Validate options from request body
+      const { clearExisting } = seedDatabaseSchema.parse(req.body);
+
       // Run seeding
       const result = await seedDatabase({ clearExisting });
-      
+
       // Return results
       res.json({
         success: true,
@@ -1590,11 +1745,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         totalErrors: result.errors.length
       });
     } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          message: 'Invalid seed options',
+          errors: error.errors.map(e => ({
+            field: e.path.join('.'),
+            message: e.message
+          }))
+        });
+      }
       console.error('Error seeding database:', error);
-      res.status(500).json({ 
+      res.status(500).json({
         success: false,
         message: 'Failed to seed database',
-        error: error.message 
+        error: error.message
       });
     }
   });
@@ -1602,11 +1766,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/admin/import-github - Import awesome list from GitHub URL
   app.post('/api/admin/import-github', isAuthenticated, isAdmin, async (req, res) => {
     try {
-      const { repoUrl, dryRun = false } = req.body;
-      
-      if (!repoUrl) {
-        return res.status(400).json({ message: 'Repository URL is required' });
-      }
+      // Validate input
+      const { repositoryUrl: repoUrl, options } = githubSyncSchema.parse(req.body);
+      const dryRun = options.dryRun;
 
       console.log(`Starting GitHub import from: ${repoUrl}`);
       
@@ -1624,35 +1786,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: `Successfully imported ${result.imported} resources from ${repoUrl}`
       });
     } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          message: 'Invalid import configuration',
+          errors: error.errors.map(e => ({
+            field: e.path.join('.'),
+            message: e.message
+          }))
+        });
+      }
       console.error('Error importing from GitHub:', error);
-      res.status(500).json({ 
+      res.status(500).json({
         success: false,
         message: 'Failed to import from GitHub',
-        error: error.message 
+        error: error.message
       });
     }
   });
 
   // ============= Enrichment API Routes =============
-  
+
   // POST /api/enrichment/start - Start batch enrichment job
   app.post('/api/enrichment/start', isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {
-      const { filter = 'unenriched', batchSize = 10 } = req.body;
+      // Validate input
+      const { filter, batchSize } = startEnrichmentSchema.parse(req.body);
       const userId = req.user?.claims?.sub;
-      
+
       const jobId = await enrichmentService.queueBatchEnrichment({
         filter,
         batchSize,
         startedBy: userId
       });
-      
+
       res.json({
         success: true,
         jobId,
         message: 'Batch enrichment job started successfully'
       });
     } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          message: 'Invalid enrichment options',
+          errors: error.errors.map(e => ({
+            field: e.path.join('.'),
+            message: e.message
+          }))
+        });
+      }
       console.error('Error starting enrichment job:', error);
       res.status(500).json({
         success: false,
@@ -1734,7 +1915,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/enrichment/cleanup - Delete old enrichment jobs (default: 30 days)
   app.post('/api/enrichment/cleanup', isAuthenticated, isAdmin, async (req, res) => {
     try {
-      const daysOld = parseInt(req.body.daysOld as string) || 30;
+      // Validate input
+      const { daysOld } = cleanupEnrichmentSchema.parse(req.body);
 
       const deletedCount = await enrichmentService.cleanupOldJobs(daysOld);
 
@@ -1744,6 +1926,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: `Deleted ${deletedCount} enrichment jobs older than ${daysOld} days`
       });
     } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          message: 'Invalid cleanup options',
+          errors: error.errors.map(e => ({
+            field: e.path.join('.'),
+            message: e.message
+          }))
+        });
+      }
       console.error('Error cleaning up old enrichment jobs:', error);
       res.status(500).json({
         success: false,
@@ -1830,7 +2021,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/recommendations - Get personalized recommendations for authenticated user (rate limited)
   app.post("/api/recommendations", recommendationsLimiter, async (req, res) => {
     try {
-      const userProfile: AIUserProfile = req.body;
+      // Validate user profile input
+      const userProfile = userProfileSchema.parse(req.body) as AIUserProfile;
       const limit = parseInt(req.query.limit as string) || 10;
       const forceRefresh = req.query.refresh === 'true';
 
@@ -1842,6 +2034,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json(result);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          message: 'Invalid user profile',
+          errors: error.errors.map(e => ({
+            field: e.path.join('.'),
+            message: e.message
+          }))
+        });
+      }
       console.error('Error generating AI recommendations:', error);
       res.status(500).json({ message: 'Failed to generate recommendations' });
     }
@@ -1850,22 +2051,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/recommendations/feedback - Record user feedback on recommendations
   app.post("/api/recommendations/feedback", async (req, res) => {
     try {
-      const { userId, resourceId, feedback, rating } = req.body;
-      
-      if (!userId || !resourceId || !feedback) {
-        return res.status(400).json({ message: 'userId, resourceId, and feedback are required' });
-      }
+      // Validate feedback input
+      const { userId, resourceId, feedback, rating } = recommendationFeedbackSchema.parse(req.body);
 
       // Record the feedback
       await recommendationEngine.recordFeedback(
         userId,
         resourceId,
-        feedback as 'clicked' | 'dismissed' | 'completed',
+        feedback,
         rating
       );
 
       res.json({ status: 'success', message: 'Feedback recorded' });
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          message: 'Invalid feedback data',
+          errors: error.errors.map(e => ({
+            field: e.path.join('.'),
+            message: e.message
+          }))
+        });
+      }
       console.error('Error recording recommendation feedback:', error);
       res.status(500).json({ message: 'Failed to record feedback' });
     }
@@ -1902,20 +2109,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/learning-paths/generate - Generate custom learning path
   app.post("/api/learning-paths/generate", async (req, res) => {
     try {
-      const { userProfile, category, customGoals } = req.body;
-      
-      if (!userProfile) {
-        return res.status(400).json({ message: 'User profile is required' });
-      }
+      // Validate input
+      const validated = generateLearningPathSchema.parse(req.body);
 
       const path = await learningPathGenerator.generateLearningPath(
-        userProfile,
-        category,
-        customGoals
+        validated.userProfile as AIUserProfile,
+        validated.category,
+        validated.customGoals
       );
 
       res.json(path);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          message: 'Invalid learning path generation request',
+          errors: error.errors.map(e => ({
+            field: e.path.join('.'),
+            message: e.message
+          }))
+        });
+      }
       console.error('Error generating custom learning path:', error);
       res.status(500).json({ message: 'Failed to generate custom learning path' });
     }
@@ -1924,13 +2137,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/learning-paths - Legacy route for compatibility
   app.post("/api/learning-paths", async (req, res) => {
     try {
-      const userProfile: AIUserProfile = req.body;
+      // Validate user profile input
+      const userProfile = userProfileSchema.parse(req.body) as AIUserProfile;
       const limit = parseInt(req.query.limit as string) || 5;
 
       const paths = await learningPathGenerator.getSuggestedPaths(userProfile, limit);
-      
+
       res.json(paths);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          message: 'Invalid user profile',
+          errors: error.errors.map(e => ({
+            field: e.path.join('.'),
+            message: e.message
+          }))
+        });
+      }
       console.error('Error generating AI learning paths:', error);
       res.status(500).json({ message: 'Failed to generate learning paths' });
     }
@@ -1939,22 +2162,89 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Track user interaction for improving recommendations
   app.post("/api/interactions", async (req, res) => {
     try {
-      const { userId, resourceId, interactionType, interactionValue, metadata } = req.body;
-      
+      // Validate interaction input
+      const validated = userInteractionSchema.parse(req.body);
+
       // Store interaction data (in a real app, this would go to database)
       // For now, we'll just acknowledge the interaction
-      console.log(`User interaction: ${userId} ${interactionType} ${resourceId}`);
-      
+      console.log(`User interaction: ${validated.userId} ${validated.interactionType} ${validated.resourceId}`);
+
       res.json({ status: "recorded" });
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          message: 'Invalid interaction data',
+          errors: error.errors.map(e => ({
+            field: e.path.join('.'),
+            message: e.message
+          }))
+        });
+      }
       console.error('Error recording interaction:', error);
       res.status(500).json({ message: 'Failed to record interaction' });
     }
   });
 
   // Health check
-  app.get("/api/health", (req, res) => {
-    res.json({ status: "ok" });
+  app.get("/api/health", async (req, res) => {
+    const cacheStats = await redisCache.getStats();
+    res.json({
+      status: "ok",
+      cache: {
+        available: redisCache.isAvailable(),
+        hits: cacheStats.hits,
+        misses: cacheStats.misses,
+        hitRate: `${cacheStats.hitRate}%`,
+        keys: cacheStats.keysCount,
+        memory: cacheStats.memoryUsage
+      }
+    });
+  });
+
+  // Cache management endpoint (admin only)
+  app.post('/api/admin/cache/clear', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      // Validate input
+      const { type } = clearCacheSchema.parse(req.body);
+
+      if (type === 'all') {
+        await redisCache.clearAll();
+      } else if (type === 'resources') {
+        await redisCache.invalidateResources();
+      } else if (type === 'categories') {
+        await redisCache.invalidateCategories();
+      } else if (type === 'journeys') {
+        await redisCache.invalidateJourneys();
+      } else if (type === 'stats') {
+        await redisCache.invalidateStats();
+      }
+
+      const stats = await redisCache.getStats();
+      res.json({ success: true, message: `Cache ${type} cleared`, stats });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          message: 'Invalid cache type. Use: all, resources, categories, journeys, stats',
+          errors: error.errors.map(e => ({
+            field: e.path.join('.'),
+            message: e.message
+          }))
+        });
+      }
+      console.error('Error clearing cache:', error);
+      res.status(500).json({ message: 'Failed to clear cache' });
+    }
+  });
+
+  // Get cache statistics (admin only)
+  app.get('/api/admin/cache/stats', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const stats = await redisCache.getStats();
+      res.json(stats);
+    } catch (error) {
+      console.error('Error fetching cache stats:', error);
+      res.status(500).json({ message: 'Failed to fetch cache statistics' });
+    }
   });
 
   const httpServer = createServer(app);

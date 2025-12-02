@@ -2,6 +2,7 @@ import { storage } from '../storage';
 import { Resource } from '@shared/schema';
 import { generateAIRecommendations as generateClaudeRecommendations, generateAILearningPaths } from './recommendations';
 import { claudeService } from './claudeService';
+import { createSystemAuditContext } from '../middleware/requestContext';
 
 export interface UserProfile {
   userId: string;
@@ -438,13 +439,14 @@ export class RecommendationEngine {
     rating?: number
   ): Promise<void> {
     try {
-      // Log feedback for future improvements
+      // Log feedback for future improvements with system audit context
       await storage.logResourceAudit(
         resourceId, // UUID string // Already a string UUID
         `recommendation_${feedback}`,
         userId,
         { rating },
-        `User ${feedback} recommendation`
+        `User ${feedback} recommendation`,
+        createSystemAuditContext('recommendation-feedback')
       );
 
       // Clear cache to refresh recommendations

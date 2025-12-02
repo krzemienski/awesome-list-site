@@ -2,40 +2,155 @@ import 'dotenv/config';
 import express, { type Request, Response, NextFunction } from "express";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
+import cors from "cors";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { handleSSR } from "./ssr";
 
 const app = express();
 
-// Security headers via helmet (Bug #9 fix - Session 7)
+// CORS Configuration (SEC-003 fix - Session 10)
+// Origin whitelist for production security
+const allowedOrigins = [
+  'http://localhost:3000',      // Docker production
+  'http://localhost:5000',      // Local development
+  'http://localhost:5173',      // Vite dev server
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:5000',
+  'http://127.0.0.1:5173',
+];
+
+// Add production domain from environment if configured
+if (process.env.PRODUCTION_DOMAIN) {
+  allowedOrigins.push(`https://${process.env.PRODUCTION_DOMAIN}`);
+  allowedOrigins.push(`https://www.${process.env.PRODUCTION_DOMAIN}`);
+}
+
+const corsOptions: cors.CorsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests with no origin (same-origin, mobile apps, curl, etc.)
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      log(`CORS blocked origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true, // Allow cookies and authorization headers
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'Accept',
+    'Origin',
+  ],
+  exposedHeaders: [
+    'RateLimit-Limit',
+    'RateLimit-Remaining',
+    'RateLimit-Reset',
+  ],
+  maxAge: 86400, // Preflight cache: 24 hours (in seconds)
+};
+
+// Apply CORS middleware
+app.use(cors(corsOptions));
+
+// Handle preflight requests explicitly for all routes
+app.options('*', cors(corsOptions));
+
+// Enhanced Security Headers (Session 10 - beyond helmet defaults)
+// Includes: CSP, Permissions-Policy, CORP, COEP, strict helmet config
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"], // Vite needs unsafe-inline
+      scriptSrc: ["'self'", "'unsafe-inline'"], // Vite needs unsafe-inline for dev
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:", "https:", "blob:"],
       connectSrc: [
         "'self'",
         "https://jeyldoypdkgsrfdhdcmm.supabase.co",
+        "wss://jeyldoypdkgsrfdhdcmm.supabase.co", // Supabase realtime
         "https://api.anthropic.com"
       ],
       frameSrc: ["'none'"],
+      frameAncestors: ["'none'"], // Prevent embedding in iframes (clickjacking)
       objectSrc: ["'none'"],
-    }
+      baseUri: ["'self'"], // Prevent base tag hijacking
+      formAction: ["'self'"], // Restrict form submissions
+      upgradeInsecureRequests: [], // Force HTTPS for all resources
+      blockAllMixedContent: [], // Block HTTP resources on HTTPS pages
+      workerSrc: ["'self'", "blob:"], // Service workers
+      manifestSrc: ["'self'"], // Web app manifest
+      mediaSrc: ["'self'"], // Audio/video sources
+    },
+    reportOnly: false
   },
   hsts: {
-    maxAge: 31536000,
+    maxAge: 63072000, // 2 years (increased from 1 year)
     includeSubDomains: true,
     preload: true
   },
   frameguard: { action: 'deny' },
   noSniff: true,
   referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
-  hidePoweredBy: true
+  hidePoweredBy: true,
+  xssFilter: true, // X-XSS-Protection (legacy but harmless)
+  dnsPrefetchControl: { allow: false }, // Prevent DNS prefetching leaks
+  ieNoOpen: true, // Prevent IE from executing downloads
+  permittedCrossDomainPolicies: { permittedPolicies: 'none' }, // Block Adobe cross-domain
+  crossOriginEmbedderPolicy: false, // COEP: Set manually below for flexibility
+  crossOriginOpenerPolicy: { policy: 'same-origin' }, // COOP: Isolate browsing context
+  crossOriginResourcePolicy: { policy: 'same-origin' }, // CORP: Prevent cross-origin reads
+  originAgentCluster: true // Request process isolation
 }));
+
+// Additional security headers not covered by helmet
+app.use((_req, res, next) => {
+  // Permissions-Policy: Restrict browser feature access
+  res.setHeader('Permissions-Policy', [
+    'accelerometer=()',           // Disable accelerometer
+    'ambient-light-sensor=()',    // Disable light sensor
+    'autoplay=(self)',            // Allow autoplay only on same origin
+    'battery=()',                 // Disable battery status
+    'camera=()',                  // Disable camera
+    'display-capture=()',         // Disable screen capture
+    'document-domain=()',         // Disable document.domain
+    'encrypted-media=(self)',     // DRM only on same origin
+    'fullscreen=(self)',          // Fullscreen only on same origin
+    'gamepad=()',                 // Disable gamepad
+    'geolocation=()',             // Disable geolocation
+    'gyroscope=()',               // Disable gyroscope
+    'magnetometer=()',            // Disable magnetometer
+    'microphone=()',              // Disable microphone
+    'midi=()',                    // Disable MIDI
+    'payment=()',                 // Disable payment request
+    'picture-in-picture=(self)',  // PiP only on same origin
+    'publickey-credentials-get=(self)', // WebAuthn only on same origin
+    'screen-wake-lock=()',        // Disable wake lock
+    'speaker-selection=()',       // Disable speaker selection
+    'usb=()',                     // Disable USB
+    'web-share=(self)',           // Web Share only on same origin
+    'xr-spatial-tracking=()'      // Disable XR tracking
+  ].join(', '));
+
+  // Cross-Origin-Embedder-Policy: credentialless for better compatibility
+  // (require-corp is stricter but breaks third-party resources)
+  res.setHeader('Cross-Origin-Embedder-Policy', 'credentialless');
+
+  // Cache-Control for security-sensitive responses
+  if (!res.getHeader('Cache-Control')) {
+    res.setHeader('Cache-Control', 'no-store, max-age=0');
+  }
+
+  next();
+});
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

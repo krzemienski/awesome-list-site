@@ -3,6 +3,7 @@ import { parseAwesomeList, convertToDbResources } from "./parser";
 import { AwesomeListFormatter, generateContributingMd } from "./formatter";
 import { storage } from "../storage";
 import { Resource, InsertResource, GithubSyncQueue } from "@shared/schema";
+import { createSystemAuditContext } from "../middleware/requestContext";
 
 /**
  * Service for synchronizing awesome lists with GitHub
@@ -155,13 +156,14 @@ export class GitHubSyncService {
                 } as InsertResource);
                 result.resources.push(created);
                 
-                // Log the import
+                // Log the import with system audit context
                 await storage.logResourceAudit(
                   created.id,
                   'imported',
                   undefined,
                   { source: repoUrl },
-                  `Imported from GitHub: ${repoUrl}`
+                  `Imported from GitHub: ${repoUrl}`,
+                  createSystemAuditContext('github-sync-import')
                 );
               }
               result.imported++;
@@ -176,13 +178,14 @@ export class GitHubSyncService {
                 );
                 result.resources.push(updated);
                 
-                // Log the update
+                // Log the update with system audit context
                 await storage.logResourceAudit(
                   updated.id,
                   'updated',
                   undefined,
                   { source: repoUrl },
-                  `Updated from GitHub: ${conflict.reason}`
+                  `Updated from GitHub: ${conflict.reason}`,
+                  createSystemAuditContext('github-sync-update')
                 );
               }
               result.updated++;
@@ -423,12 +426,12 @@ export class GitHubSyncService {
         } as any
       });
 
-      // Log the export
+      // Log the export with system audit context
       await storage.logResourceAudit(
         null,
         'exported',
         undefined,
-        { 
+        {
           repository: repoUrl,
           count: currentResources.length,
           commitSha: result.commitSha,
@@ -436,7 +439,8 @@ export class GitHubSyncService {
           updated,
           removed
         },
-        commitMessage
+        commitMessage,
+        createSystemAuditContext('github-sync-export')
       );
 
       // Add to sync queue
