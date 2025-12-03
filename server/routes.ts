@@ -2741,10 +2741,9 @@ export async function runBackgroundInitialization(): Promise<void> {
     // This prevents false-positive reseeding when category mapping isn't working yet
     const actualResourceCount = await storage.getResourceCount();
     
-    // Force reseed if:
-    // 1. Database is empty (categories=0 or resources=0)
-    // 2. Resource count is significantly below expected ~2600+ (force reseed if <2000)
-    const needsReseeding = categories.length === 0 || actualResourceCount === 0 || actualResourceCount < 2000;
+    // Only reseed if database is truly empty (both categories AND resources missing)
+    // Don't reseed just because user added/removed items - preserve user changes
+    const needsReseeding = (categories.length === 0 && actualResourceCount === 0);
     
     if (needsReseeding) {
       console.log(`📦 Database needs seeding (categories: ${categories.length}, resources: ${actualResourceCount})...`);
