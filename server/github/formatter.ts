@@ -287,9 +287,13 @@ export class AwesomeListFormatter {
       // Em dash and en dash → regular hyphen
       description = description.replace(/[\u2013\u2014]/g, '-');
 
-      // Remove leading emojis from descriptions (awesome-lint requires letter start)
-      // Common emoji ranges: 🎬📹🎥📺📇🔥👻🐋📼
-      description = description.replace(/^[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\s]+/u, '');
+      // Remove leading emojis and special chars from descriptions (awesome-lint requires letter start)
+      // Emoji ranges: 🎬📹🎥📺📇🔥👻🐋📼▶️⏯
+      // Also remove emoji shortcodes, markdown syntax, and variation selectors
+      description = description.replace(/^[:*\s]*/, ''); // Remove leading colons, asterisks, spaces
+      description = description.replace(/^[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{25A0}-\u{25FF}\u{2300}-\u{23FF}\uFE00-\uFE0F\s]+/u, ''); // Emoji + variation selectors
+      description = description.replace(/^[A-Za-z][a-z_]*_[a-z_]+:\s*/g, ''); // Remove emoji shortcode text like "Chocolate_bar:"
+      description = description.replace(/^:[a-zA-Z_]+:\s*/, ''); // Remove :emoji: shortcodes
       description = description.trim();
 
       // Ensure description starts with capital letter (skip emojis/symbols)
