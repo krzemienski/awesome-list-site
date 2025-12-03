@@ -192,8 +192,14 @@ export class AwesomeListFormatter {
     // Deduplicate by URL - keep first occurrence only
     const uniqueResources = resources.filter(resource => {
       let normalizedUrl = resource.url.trim().toLowerCase();
+      // Normalize HTTP to HTTPS (matches formatResource() behavior)
+      if (normalizedUrl.startsWith('http://') && !normalizedUrl.includes('localhost')) {
+        normalizedUrl = normalizedUrl.replace(/^http:\/\//, 'https://');
+      }
       // Normalize www. prefix for deduplication (www.site.com == site.com)
       normalizedUrl = normalizedUrl.replace(/^(https?:\/\/)www\./, '$1');
+      // Normalize trailing slash (site.com/ == site.com)
+      normalizedUrl = normalizedUrl.replace(/\/$/, '');
       if (seenUrls.has(normalizedUrl)) {
         return false; // Skip duplicate
       }
