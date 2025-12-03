@@ -173,6 +173,119 @@ export class GitHubSyncService {
   }
 
   /**
+   * Detect the default branch for a repository
+   * Robustly tries repository's actual default branch with retry logic
+   */
+  private async detectDefaultBranch(
+    octokit: any,
+    owner: string,
+    repo: string
+  ): Promise<string> {
+    let defaultBranch: string | null = null;
+    let repoFetchError: any = null;
+
+    // Step 1: Get repository info to find the actual default branch
+    try {
+      const { data: repoInfo } = await octokit.repos.get({ owner, repo });
+      defaultBranch = repoInfo.default_branch;
+      console.log(`Repository default branch: ${defaultBranch}`);
+    } catch (error: any) {
+      console.warn(`Could not fetch repository info: ${error.message} (HTTP ${error.status || 'unknown'})`);
+      repoFetchError = error;
+    }
+
+    // Step 2: Build list of branches to try
+    // Priority: [defaultBranch, fallbacks, retry defaultBranch]
+    const branchesToTry: string[] = [];
+    const defaultLower = defaultBranch?.toLowerCase();
+    
+    // First attempt: actual default branch
+    if (defaultBranch) {
+      branchesToTry.push(defaultBranch);
+    }
+    
+    // Fallbacks: common branch names (case-insensitive check to avoid duplicates)
+    if (defaultLower !== 'main') branchesToTry.push('main');
+    if (defaultLower !== 'master') branchesToTry.push('master');
+    
+    // Retry: default branch again (handles transient errors)
+    if (defaultBranch && branchesToTry.length > 1) {
+      branchesToTry.push(defaultBranch);
+    }
+
+    // Step 3: Try each branch with retry logic for transient errors
+    const errors: { branch: string; error: any; attempt: number }[] = [];
+    const MAX_RETRIES = 3;
+    const RETRY_DELAY_MS = 500;
+    
+    for (const branch of branchesToTry) {
+      const isDefaultBranch = branch === defaultBranch;
+      const maxAttempts = isDefaultBranch ? MAX_RETRIES : 1; // Only retry the actual default branch
+      
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        try {
+          await octokit.git.getRef({
+            owner,
+            repo,
+            ref: `heads/${branch}`
+          });
+          console.log(`✓ Using branch: ${branch}${attempt > 1 ? ` (attempt ${attempt})` : ''}`);
+          return branch;
+        } catch (error: any) {
+          const status = error.status || 'unknown';
+          const isTransient = status === 503 || status === 500 || status === 'unknown';
+          const shouldRetry = isDefaultBranch && attempt < maxAttempts && isTransient;
+          
+          console.warn(
+            `Branch '${branch}' not accessible (attempt ${attempt}/${maxAttempts}): ` +
+            `${error.message} (HTTP ${status})${shouldRetry ? ' - retrying...' : ''}`
+          );
+          
+          errors.push({ branch, error, attempt });
+          
+          if (shouldRetry) {
+            // Wait before retry with simple linear backoff
+            await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS * attempt));
+            continue;
+          }
+          
+          // Fatal error or no more retries - move to next branch
+          break;
+        }
+      }
+    }
+
+    // Step 4: All branches failed - provide detailed diagnostic error
+    const triedBranches = Array.from(new Set(branchesToTry)).join(', '); // Remove duplicates for display
+    const errorDetails = errors
+      .filter((e, i, arr) => 
+        // Keep last attempt for each branch
+        i === arr.findIndex(x => x.branch === e.branch && x.attempt >= e.attempt)
+      )
+      .map(({ branch, error, attempt }) => 
+        `${branch}: ${error.message} (HTTP ${error.status || 'unknown'})${attempt > 1 ? ` after ${attempt} attempts` : ''}`
+      )
+      .join('; ');
+    
+    // Build comprehensive error message
+    let errorMsg = `Could not find an accessible branch in ${owner}/${repo}. ` +
+      `Tried: ${triedBranches}. ` +
+      `Errors: ${errorDetails}.`;
+    
+    if (repoFetchError) {
+      const repoStatus = repoFetchError.status || 'unknown';
+      const repoDetails = repoFetchError.response?.headers 
+        ? ` (request-id: ${repoFetchError.response.headers['x-github-request-id'] || 'unavailable'})` 
+        : '';
+      errorMsg += ` Repository fetch error: ${repoFetchError.message} (HTTP ${repoStatus})${repoDetails}.`;
+    }
+    
+    errorMsg += ` The repository may be empty, private, or you may not have the required permissions.`;
+    
+    throw new Error(errorMsg);
+  }
+
+  /**
    * Export approved resources to a GitHub awesome list repository
    */
   async exportToGitHub(
@@ -261,11 +374,14 @@ export class GitHubSyncService {
         return result;
       }
 
-      // Get current commit SHA for main branch
+      // Detect the default branch (main, master, or repository default)
+      const defaultBranch = await this.detectDefaultBranch(octokit, owner, repo);
+
+      // Get current commit SHA for the default branch
       const { data: refData } = await octokit.git.getRef({
         owner,
         repo,
-        ref: 'heads/main'
+        ref: `heads/${defaultBranch}`
       });
       const currentCommitSha = refData.object.sha;
 
@@ -322,11 +438,11 @@ export class GitHubSyncService {
         parents: [currentCommitSha]
       });
 
-      // Update the reference to point to the new commit (commit directly to main)
+      // Update the reference to point to the new commit (commit directly to default branch)
       await octokit.git.updateRef({
         owner,
         repo,
-        ref: 'heads/main',
+        ref: `heads/${defaultBranch}`,
         sha: newCommit.sha
       });
 
@@ -405,9 +521,24 @@ export class GitHubSyncService {
       });
 
     } catch (error: any) {
-      const errorMsg = `Export failed: ${error.message}`;
+      // Provide user-friendly error messages for common GitHub issues
+      let errorMsg = error.message;
+      
+      if (error.status === 404) {
+        errorMsg = `Repository not found or you don't have access. Please check the repository URL and your permissions.`;
+      } else if (error.status === 403) {
+        errorMsg = `Permission denied. You need write access to this repository. Check your GitHub authentication.`;
+      } else if (error.message.includes('branch')) {
+        errorMsg = `Branch error: ${error.message}. The repository may be empty or you may need to create an initial commit.`;
+      } else if (error.message.includes('awesome-lint')) {
+        // awesome-lint errors are already detailed, keep them as-is
+        errorMsg = error.message;
+      } else {
+        errorMsg = `Export failed: ${error.message}`;
+      }
+      
       result.errors.push(errorMsg);
-      console.error(errorMsg);
+      console.error('GitHub export error:', errorMsg);
 
       // Log failed export via updateGithubSyncStatus if queue item exists
       // Or log in metadata if creating new queue item
@@ -417,7 +548,7 @@ export class GitHubSyncService {
         status: 'failed',
         resourceIds: [] as any,
         metadata: { 
-          error: error.message 
+          error: errorMsg
         } as any
       });
     }
