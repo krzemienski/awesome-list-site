@@ -462,9 +462,7 @@ export class DatabaseStorage implements IStorage {
       throw new Error('Resource not found');
     }
     
-    await db.delete(resources).where(eq(resources.id, id));
-    
-    // Log the deletion
+    // Log the deletion BEFORE deleting (foreign key constraint)
     await this.logResourceAudit(
       id,
       'deleted',
@@ -472,6 +470,8 @@ export class DatabaseStorage implements IStorage {
       { resource: { title: resource.title, url: resource.url, category: resource.category } },
       `Deleted resource: ${resource.title}`
     );
+    
+    await db.delete(resources).where(eq(resources.id, id));
   }
   
   // Category management
