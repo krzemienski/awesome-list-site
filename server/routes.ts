@@ -1112,14 +1112,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/admin/pending-resources - Get all pending resources for approval
   app.get('/api/admin/pending-resources', isAuthenticated, isAdmin, async (req, res) => {
     try {
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 50;
-      
-      const result = await storage.listResources({
-        page,
-        limit,
-        status: 'pending'
-      });
+      const result = await storage.getPendingResources();
       
       res.json(result);
     } catch (error) {
@@ -1138,24 +1131,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Invalid resource ID' });
       }
       
-      const resource = await storage.getResource(resourceId);
-      if (!resource) {
-        return res.status(404).json({ message: 'Resource not found' });
-      }
-      
-      if (resource.status !== 'pending') {
-        return res.status(400).json({ message: 'Resource is not pending approval' });
-      }
-      
-      const updatedResource = await storage.updateResourceStatus(resourceId, 'approved', userId);
-      
-      await storage.logResourceAudit(
-        resourceId,
-        'approved',
-        userId,
-        { status: { from: 'pending', to: 'approved' } },
-        'Resource approved by admin'
-      );
+      const updatedResource = await storage.approveResource(resourceId, userId);
       
       res.json(updatedResource);
     } catch (error) {
@@ -1179,24 +1155,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Rejection reason is required (minimum 10 characters)' });
       }
       
-      const resource = await storage.getResource(resourceId);
-      if (!resource) {
-        return res.status(404).json({ message: 'Resource not found' });
-      }
-      
-      if (resource.status !== 'pending') {
-        return res.status(400).json({ message: 'Resource is not pending approval' });
-      }
-      
-      const updatedResource = await storage.updateResourceStatus(resourceId, 'rejected', userId);
-      
-      await storage.logResourceAudit(
-        resourceId,
-        'rejected',
-        userId,
-        { status: { from: 'pending', to: 'rejected' } },
-        reason
-      );
+      await storage.rejectResource(resourceId, userId, reason);
+      const updatedResource = await storage.getResource(resourceId);
       
       res.json(updatedResource);
     } catch (error) {
