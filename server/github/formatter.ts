@@ -200,6 +200,9 @@ export class AwesomeListFormatter {
       normalizedUrl = normalizedUrl.replace(/^(https?:\/\/)www\./, '$1');
       // Normalize trailing slash (site.com/ == site.com)
       normalizedUrl = normalizedUrl.replace(/\/$/, '');
+      // Strip URL fragments for deduplication (site.com/#foo == site.com/#bar)
+      // This prevents same domain appearing multiple times with different anchors
+      normalizedUrl = normalizedUrl.replace(/#.*$/, '');
       if (seenUrls.has(normalizedUrl)) {
         return false; // Skip duplicate
       }
