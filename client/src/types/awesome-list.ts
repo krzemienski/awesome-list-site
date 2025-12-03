@@ -7,6 +7,20 @@ export interface Resource {
   subcategory?: string;
   subSubcategory?: string;
   tags?: string[];
+  status?: string;
+  submittedBy?: string | null;
+  approvedBy?: string | null;
+  approvedAt?: string | null;
+  githubSynced?: boolean;
+  lastSyncedAt?: string | null;
+  metadata?: {
+    tags?: string[];
+    sourceCategories?: string[];
+    aiEnriched?: boolean;
+    [key: string]: any;
+  };
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface SubSubcategory {

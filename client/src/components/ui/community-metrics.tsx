@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -55,94 +55,135 @@ interface CategoryMetric {
 export default function CommunityMetrics({ resources, categories, className }: CommunityMetricsProps) {
   const [selectedPeriod, setSelectedPeriod] = useState("7d");
 
-  // Calculate metrics based on actual data from resources and categories
+  // Load tracking data from localStorage for real engagement metrics
+  const [trackingData, setTrackingData] = useState<{views: Record<string, number>, clicks: Record<string, number>}>({views: {}, clicks: {}});
+  
+  useEffect(() => {
+    const views = localStorage.getItem('resource-views');
+    const clicks = localStorage.getItem('resource-clicks');
+    setTrackingData({
+      views: views ? JSON.parse(views) : {},
+      clicks: clicks ? JSON.parse(clicks) : {}
+    });
+  }, []);
+
+  // Calculate metrics based on actual resource properties from database
   const metrics = useMemo(() => {
-    // Calculate contributor distribution based on actual resource distribution
-    const totalResources = resources.length;
+    // Count actual resource types by analyzing real properties
+    const githubSyncedResources = resources.filter(r => r.githubSynced === true);
+    const pendingResources = resources.filter(r => r.status === 'pending');
+    const aiEnrichedResources = resources.filter(r => r.metadata?.aiEnriched === true);
+    
+    // Approved resources that are NOT github synced and NOT AI enriched (avoid double-counting)
+    const approvedOnlyResources = resources.filter(r => 
+      r.status === 'approved' && 
+      r.githubSynced !== true && 
+      r.metadata?.aiEnriched !== true
+    );
+    
+    // Group categories by actual resource distribution
+    const githubCategories = [...new Set(githubSyncedResources.map(r => r.category))];
+    const aiEnrichedCategories = [...new Set(aiEnrichedResources.map(r => r.category))];
+    const approvedCategories = [...new Set(approvedOnlyResources.map(r => r.category))];
+    const pendingCategories = [...new Set(pendingResources.map(r => r.category))];
+
     const contributors: ContributorMetric[] = [
       {
         name: "GitHub Synced Resources",
-        contributions: Math.floor(totalResources * 0.35),
-        categories: categories.slice(0, 5).map(c => c.name),
+        contributions: githubSyncedResources.length,
+        categories: githubCategories.length > 0 ? githubCategories : [],
         badge: "Primary Source",
         level: "platinum"
       },
       {
-        name: "Community Submissions", 
-        contributions: Math.floor(totalResources * 0.40),
-        categories: categories.slice(2, 8).map(c => c.name),
-        badge: "Community",
+        name: "Approved Resources", 
+        contributions: approvedOnlyResources.length,
+        categories: approvedCategories.length > 0 ? approvedCategories : [],
+        badge: "Verified",
         level: "gold"
       },
       {
         name: "AI Enriched",
-        contributions: Math.floor(totalResources * 0.15),
-        categories: categories.slice(5, 10).map(c => c.name),
+        contributions: aiEnrichedResources.length,
+        categories: aiEnrichedCategories.length > 0 ? aiEnrichedCategories : [],
         badge: "AI Enhanced",
         level: "silver"
       },
       {
         name: "Pending Review",
-        contributions: Math.floor(totalResources * 0.10),
-        categories: categories.slice(8, 12).map(c => c.name),
+        contributions: pendingResources.length,
+        categories: pendingCategories.length > 0 ? pendingCategories : [],
         badge: "In Review",
         level: "bronze"
       }
-    ];
+    ].filter(c => c.contributions > 0);
 
-    // Calculate popularity based on category resource counts (real data)
-    const maxResourcesInCategory = Math.max(...categories.map(c => c.resources.length), 1);
+    // Calculate popularity based on actual localStorage tracking data
     const popularResources: PopularityMetric[] = resources
       .slice(0, 10)
-      .map((resource, index) => {
-        const categoryData = categories.find(c => c.name === resource.category);
-        const categorySize = categoryData?.resources.length || 1;
-        // Score based on category popularity and resource position
-        const categoryPopularity = Math.round((categorySize / maxResourcesInCategory) * 100);
+      .map((resource) => {
+        // Get real tracking data from localStorage
+        const resourceViews = trackingData.views[resource.url] || trackingData.views[resource.id?.toString() || ''] || 0;
+        const resourceClicks = trackingData.clicks[resource.url] || trackingData.clicks[resource.id?.toString() || ''] || 0;
+        
+        // Calculate score based on actual engagement (views + clicks)
+        const engagementScore = Math.min(100, (resourceViews * 2) + (resourceClicks * 5));
+        
         return {
           resourceId: resource.id,
           title: resource.title,
           category: resource.category,
           url: resource.url,
-          score: Math.min(100, categoryPopularity + (10 - index) * 3),
+          score: engagementScore,
           trends: {
-            clicks: categorySize * 10, // Estimate based on category size
-            searches: categorySize * 5,
-            shares: categorySize * 2
+            clicks: resourceClicks,
+            searches: 0, // No search tracking available
+            shares: 0    // No share tracking available
           }
         };
       })
       .sort((a, b) => b.score - a.score);
 
-    // Calculate category metrics based on real data
+    // Calculate category metrics based on actual resource data
     const totalCategoryResources = categories.reduce((sum, c) => sum + c.resources.length, 0);
     const categoryMetrics: CategoryMetric[] = categories.map(category => {
       const resourceCount = category.resources.length;
       // Engagement based on category's share of total resources
-      const engagement = Math.round((resourceCount / Math.max(totalCategoryResources / categories.length, 1)) * 100);
-      // Growth rate based on category size (larger categories = more activity)
-      const growthRate = Math.min(50, Math.round(resourceCount / 10) + 5);
+      const avgPerCategory = totalCategoryResources / Math.max(categories.length, 1);
+      const engagement = Math.round((resourceCount / Math.max(avgPerCategory, 1)) * 100);
+      // Count how many resources in this category are recent (has createdAt in last 30 days)
+      const now = new Date();
+      const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      const recentResources = category.resources.filter(r => {
+        if (!r.createdAt) return false;
+        return new Date(r.createdAt) > thirtyDaysAgo;
+      }).length;
+      const growthRate = Math.round((recentResources / Math.max(resourceCount, 1)) * 100);
       return {
         name: category.name,
         resourceCount,
-        growthRate,
+        growthRate: Math.min(100, growthRate),
         engagement: Math.min(100, engagement),
         completeness: Math.min(100, (resourceCount / 50) * 100)
       };
     }).sort((a, b) => b.engagement - a.engagement);
 
-    // Calculate actual weekly growth from resource count
-    const estimatedWeeklyGrowth = Math.round(totalResources / 200); // ~1% growth estimate
+    // Calculate actual weekly growth from recent resources
+    const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const recentlyAddedCount = resources.filter(r => {
+      if (!r.createdAt) return false;
+      return new Date(r.createdAt) > oneWeekAgo;
+    }).length;
 
     return {
       contributors,
       popularResources,
       categoryMetrics,
-      totalContributions: totalResources,
-      activeContributors: contributors.length,
-      weeklyGrowth: Math.max(1, estimatedWeeklyGrowth)
+      totalContributions: resources.length,
+      activeContributors: contributors.filter(c => c.contributions > 0).length,
+      weeklyGrowth: recentlyAddedCount
     };
-  }, [resources, categories]);
+  }, [resources, categories, trackingData]);
 
   const getBadgeColor = (level: string) => {
     switch (level) {
