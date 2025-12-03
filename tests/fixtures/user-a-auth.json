@@ -6,15 +6,15 @@
       "localStorage": [
         {
           "name": "sb-jeyldoypdkgsrfdhdcmm-auth-token",
-          "value": "{\"access_token\":\"eyJhbGciOiJIUzI1NiIsImtpZCI6IkRlOTBodWp6SVpGd2xsZEMiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2pleWxkb3lwZGtnc3JmZGhkY21tLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJjYzJiNjlhNS03NTYzLTQ3NzAtODMwYi1kNGNlNWFlYzBkODQiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzY0NjkxMzU1LCJpYXQiOjE3NjQ2ODc3NTUsImVtYWlsIjoidGVzdHVzZXItYUB0ZXN0LmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7fSwidXNlcl9tZXRhZGF0YSI6eyJmdWxsX25hbWUiOiJUZXN0IFVzZXIgQSJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzY0Njg3NzU1fV0sInNlc3Npb25faWQiOiJjZjgyYjcxYi03ZjM0LTQ3M2EtYmZlMS03NWNiYzc2M2Y4OWYiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.SSJZodJBlq-HbQoEKdZ5mK73HOlnoDsLj4iwksGE00g\",\"token_type\":\"bearer\",\"expires_in\":3600,\"expires_at\":1764691355,\"refresh_token\":\"3zl4h33qvmvz\",\"user\":{\"id\":\"cc2b69a5-7563-4770-830b-d4ce5aec0d84\",\"aud\":\"authenticated\",\"role\":\"authenticated\",\"email\":\"testuser-a@test.com\",\"email_confirmed_at\":\"2025-11-30T23:07:37.10619Z\",\"phone\":\"\",\"confirmed_at\":\"2025-11-30T23:07:37.10619Z\",\"last_sign_in_at\":\"2025-12-02T15:02:35.859405324Z\",\"app_metadata\":{},\"user_metadata\":{\"full_name\":\"Test User A\"},\"identities\":[],\"created_at\":\"2025-11-30T23:07:37.10619Z\",\"updated_at\":\"2025-12-02T15:02:35.863259Z\",\"is_anonymous\":false},\"weak_password\":null}"
+          "value": "{\"access_token\":\"eyJhbGciOiJIUzI1NiIsImtpZCI6IkRlOTBodWp6SVpGd2xsZEMiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2pleWxkb3lwZGtnc3JmZGhkY21tLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJjYzJiNjlhNS03NTYzLTQ3NzAtODMwYi1kNGNlNWFlYzBkODQiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzY0NzA3NzQ5LCJpYXQiOjE3NjQ3MDQxNDksImVtYWlsIjoidGVzdHVzZXItYUB0ZXN0LmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7fSwidXNlcl9tZXRhZGF0YSI6eyJmdWxsX25hbWUiOiJUZXN0IFVzZXIgQSJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzY0NzA0MTQ5fV0sInNlc3Npb25faWQiOiIxZGI0MWNjZS0yMWYwLTQ4OGMtYjU2MC0zY2NlMzAxZTg1NzkiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.Ks8K26s342fZDtfLTbJgKEmtXvjF42kMzHToTGkFupA\",\"token_type\":\"bearer\",\"expires_in\":3600,\"expires_at\":1764707749,\"refresh_token\":\"w3qijfff3qzv\",\"user\":{\"id\":\"cc2b69a5-7563-4770-830b-d4ce5aec0d84\",\"aud\":\"authenticated\",\"role\":\"authenticated\",\"email\":\"testuser-a@test.com\",\"email_confirmed_at\":\"2025-11-30T23:07:37.10619Z\",\"phone\":\"\",\"confirmed_at\":\"2025-11-30T23:07:37.10619Z\",\"last_sign_in_at\":\"2025-12-02T19:35:49.357315354Z\",\"app_metadata\":{},\"user_metadata\":{\"full_name\":\"Test User A\"},\"identities\":[],\"created_at\":\"2025-11-30T23:07:37.10619Z\",\"updated_at\":\"2025-12-02T19:35:49.363652Z\",\"is_anonymous\":false},\"weak_password\":null}"
         },
         {
           "name": "awesome-video-user-profile",
-          "value": "{\"userId\":\"user_1764687755591_2zmhlo2hv\",\"preferredCategories\":[],\"skillLevel\":\"beginner\",\"learningGoals\":[],\"preferredResourceTypes\":[],\"timeCommitment\":\"flexible\",\"viewHistory\":[],\"bookmarks\":[],\"completedResources\":[],\"ratings\":{}}"
+          "value": "{\"userId\":\"user_1764704149090_f7k9fbobk\",\"preferredCategories\":[],\"skillLevel\":\"beginner\",\"learningGoals\":[],\"preferredResourceTypes\":[],\"timeCommitment\":\"flexible\",\"viewHistory\":[],\"bookmarks\":[],\"completedResources\":[],\"ratings\":{}}"
         },
         {
           "name": "awesome-video-user-id",
-          "value": "user_1764687755591_2zmhlo2hv"
+          "value": "user_1764704149090_f7k9fbobk"
         }
       ]
     }

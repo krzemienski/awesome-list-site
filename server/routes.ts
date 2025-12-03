@@ -696,6 +696,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // GET /api/user/preferences - Get user preferences
+  app.get('/api/user/preferences', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const preferences = await storage.getUserPreferences(userId);
+      
+      if (!preferences) {
+        return res.status(404).json({ message: 'No preferences found' });
+      }
+      
+      res.json(preferences);
+    } catch (error) {
+      console.error('Error fetching user preferences:', error);
+      res.status(500).json({ message: 'Failed to fetch preferences' });
+    }
+  });
+
   // POST /api/user/preferences - Save user preferences
   app.post('/api/user/preferences', isAuthenticated, async (req: Request, res: Response) => {
     try {

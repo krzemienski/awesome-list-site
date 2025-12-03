@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,6 +37,7 @@ import FavoriteButton from "@/components/resource/FavoriteButton";
 import BookmarkButton from "@/components/resource/BookmarkButton";
 import { useAuth } from "@/hooks/useAuth";
 import { formatDistanceToNow } from "date-fns";
+import { apiRequest } from "@/lib/queryClient";
 
 interface ProfileProps {
   user?: any;
@@ -560,7 +561,7 @@ export default function Profile({ user }: ProfileProps) {
                         <Skeleton key={i} className="h-24 w-full" />
                       ))}
                     </div>
-                  ) : submissions && submissions.count > 0 ? (
+                  ) : submissions && submissions.resources.length > 0 ? (
                     <div className="space-y-3">
                       {submissions.resources.map((resource) => (
                         <div
@@ -743,14 +744,15 @@ function PreferencesSettings({ user }: { user: any }) {
   const { data: currentPreferences, isLoading: preferencesLoading } = useQuery({
     queryKey: ["/api/user/preferences"],
     queryFn: async () => {
-      const res = await fetch("/api/user/preferences", {
-        credentials: "include",
-      });
-      if (!res.ok) {
-        if (res.status === 404) return null; // No preferences yet
-        throw new Error("Failed to fetch preferences");
+      try {
+        return await apiRequest("/api/user/preferences");
+      } catch (error) {
+        // Handle 404 gracefully (no preferences yet)
+        if (error instanceof Error && error.message.includes("404")) {
+          return null;
+        }
+        throw error;
       }
-      return res.json();
     },
   });
 
@@ -762,7 +764,7 @@ function PreferencesSettings({ user }: { user: any }) {
   const [timeCommitment, setTimeCommitment] = useState<string>("flexible");
 
   // Initialize form when preferences load
-  useState(() => {
+  useEffect(() => {
     if (currentPreferences) {
       if (currentPreferences.preferredCategories) {
         setPreferredCategories(currentPreferences.preferredCategories.join(", "));
@@ -771,7 +773,7 @@ function PreferencesSettings({ user }: { user: any }) {
         setSkillLevel(currentPreferences.skillLevel);
       }
       if (currentPreferences.learningGoals) {
-        setLearningGoals(currentPreferences.learningGoals.join("\n"));
+        setLearningGoals(currentPreferences.learningGoals.join("\\n"));
       }
       if (currentPreferences.preferredResourceTypes) {
         setPreferredResourceTypes(currentPreferences.preferredResourceTypes.join(", "));
@@ -780,7 +782,7 @@ function PreferencesSettings({ user }: { user: any }) {
         setTimeCommitment(currentPreferences.timeCommitment);
       }
     }
-  });
+  }, [currentPreferences]);
 
   // Save mutation
   const savePreferences = useMutation({
