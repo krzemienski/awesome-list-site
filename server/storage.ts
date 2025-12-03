@@ -456,7 +456,22 @@ export class DatabaseStorage implements IStorage {
   }
   
   async deleteResource(id: number): Promise<void> {
+    // Get resource before deletion for audit log
+    const resource = await this.getResource(id);
+    if (!resource) {
+      throw new Error('Resource not found');
+    }
+    
     await db.delete(resources).where(eq(resources.id, id));
+    
+    // Log the deletion
+    await this.logResourceAudit(
+      id,
+      'deleted',
+      undefined,
+      { resource: { title: resource.title, url: resource.url, category: resource.category } },
+      `Deleted resource: ${resource.title}`
+    );
   }
   
   // Category management
@@ -470,6 +485,16 @@ export class DatabaseStorage implements IStorage {
   }
   
   async createCategory(category: InsertCategory): Promise<Category> {
+    // Check for slug uniqueness
+    const [existing] = await db
+      .select()
+      .from(categories)
+      .where(eq(categories.slug, category.slug));
+    
+    if (existing) {
+      throw new Error(`Category with slug "${category.slug}" already exists`);
+    }
+    
     const [newCategory] = await db.insert(categories).values(category).returning();
     return newCategory;
   }
@@ -484,6 +509,23 @@ export class DatabaseStorage implements IStorage {
   }
   
   async deleteCategory(id: number): Promise<void> {
+    // Check if category has any resources
+    const category = await this.getCategory(id);
+    if (!category) {
+      throw new Error('Category not found');
+    }
+    
+    const resourceCount = await this.getCategoryResourceCount(category.name);
+    if (resourceCount > 0) {
+      throw new Error(`Cannot delete category "${category.name}" because it has ${resourceCount} resources`);
+    }
+    
+    // Check if category has any subcategories
+    const subcategories = await this.listSubcategories(id);
+    if (subcategories.length > 0) {
+      throw new Error(`Cannot delete category "${category.name}" because it has ${subcategories.length} subcategories`);
+    }
+    
     await db.delete(categories).where(eq(categories.id, id));
   }
   
@@ -512,6 +554,23 @@ export class DatabaseStorage implements IStorage {
   }
   
   async createSubcategory(subcategory: InsertSubcategory): Promise<Subcategory> {
+    // Check for slug uniqueness within the same category
+    if (subcategory.categoryId) {
+      const [existing] = await db
+        .select()
+        .from(subcategories)
+        .where(
+          and(
+            eq(subcategories.slug, subcategory.slug),
+            eq(subcategories.categoryId, subcategory.categoryId)
+          )
+        );
+      
+      if (existing) {
+        throw new Error(`Subcategory with slug "${subcategory.slug}" already exists in this category`);
+      }
+    }
+    
     const [newSubcategory] = await db.insert(subcategories).values(subcategory).returning();
     return newSubcategory;
   }
@@ -526,6 +585,23 @@ export class DatabaseStorage implements IStorage {
   }
   
   async deleteSubcategory(id: number): Promise<void> {
+    // Check if subcategory has any resources
+    const subcategory = await this.getSubcategory(id);
+    if (!subcategory) {
+      throw new Error('Subcategory not found');
+    }
+    
+    const resourceCount = await this.getSubcategoryResourceCount(subcategory.name);
+    if (resourceCount > 0) {
+      throw new Error(`Cannot delete subcategory "${subcategory.name}" because it has ${resourceCount} resources`);
+    }
+    
+    // Check if subcategory has any sub-subcategories
+    const subSubcategories = await this.listSubSubcategories(id);
+    if (subSubcategories.length > 0) {
+      throw new Error(`Cannot delete subcategory "${subcategory.name}" because it has ${subSubcategories.length} sub-subcategories`);
+    }
+    
     await db.delete(subcategories).where(eq(subcategories.id, id));
   }
   
@@ -554,6 +630,23 @@ export class DatabaseStorage implements IStorage {
   }
   
   async createSubSubcategory(subSubcategory: InsertSubSubcategory): Promise<SubSubcategory> {
+    // Check for slug uniqueness within the same subcategory
+    if (subSubcategory.subcategoryId) {
+      const [existing] = await db
+        .select()
+        .from(subSubcategories)
+        .where(
+          and(
+            eq(subSubcategories.slug, subSubcategory.slug),
+            eq(subSubcategories.subcategoryId, subSubcategory.subcategoryId)
+          )
+        );
+      
+      if (existing) {
+        throw new Error(`Sub-subcategory with slug "${subSubcategory.slug}" already exists in this subcategory`);
+      }
+    }
+    
     const [newSubSubcategory] = await db.insert(subSubcategories).values(subSubcategory).returning();
     return newSubSubcategory;
   }
@@ -568,6 +661,17 @@ export class DatabaseStorage implements IStorage {
   }
   
   async deleteSubSubcategory(id: number): Promise<void> {
+    // Check if sub-subcategory has any resources
+    const subSubcategory = await this.getSubSubcategory(id);
+    if (!subSubcategory) {
+      throw new Error('Sub-subcategory not found');
+    }
+    
+    const resourceCount = await this.getSubSubcategoryResourceCount(subSubcategory.name);
+    if (resourceCount > 0) {
+      throw new Error(`Cannot delete sub-subcategory "${subSubcategory.name}" because it has ${resourceCount} resources`);
+    }
+    
     await db.delete(subSubcategories).where(eq(subSubcategories.id, id));
   }
   
