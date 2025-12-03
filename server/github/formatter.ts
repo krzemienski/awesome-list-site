@@ -269,6 +269,9 @@ export class AwesomeListFormatter {
       description = description.replace(titleSuffixPattern, '');
       description = description.trim();
 
+      // Collapse multiple consecutive spaces (improves readability)
+      description = description.replace(/\s{2,}/g, ' ');
+
       // Replace remaining brackets in description with parentheses
       description = description.replace(/\[/g, '(').replace(/\]/g, ')');
 
