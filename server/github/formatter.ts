@@ -83,7 +83,6 @@ export class AwesomeListFormatter {
     lines.push(`# ${title}`);
     
     // Awesome badge must be on the line directly after the title with no blank line
-    lines.push('');
     lines.push('[![Awesome](https://awesome.re/badge.svg)](https://awesome.re)');
     
     // Add additional badges on same line to avoid double blank lines
@@ -258,9 +257,13 @@ export class AwesomeListFormatter {
       // Replace remaining brackets in description with parentheses
       description = description.replace(/\[/g, '(').replace(/\]/g, ')');
 
-      // Replace smart quotes with straight quotes (match-punctuation fix)
-      description = description.replace(/[\u2018\u2019]/g, "'"); // Replace curly single quotes
-      description = description.replace(/[\u201C\u201D]/g, '"'); // Replace curly double quotes
+      // Replace ALL quote variants with straight quotes (match-punctuation fix)
+      // Curly single quotes: ' ' 
+      description = description.replace(/[\u2018\u2019'']/g, "'");
+      // Curly double quotes: " "
+      description = description.replace(/[\u201C\u201D""]/g, '"');
+      // Prime and double-prime (sometimes used)
+      description = description.replace(/[′″]/g, "'");
 
       // Ensure description starts with capital letter (skip emojis/symbols)
       // Find first letter character and capitalize it
