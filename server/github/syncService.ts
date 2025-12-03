@@ -4,6 +4,7 @@ import { AwesomeListFormatter, generateContributingMd } from "./formatter";
 import { storage } from "../storage";
 import { Resource, InsertResource, GithubSyncQueue } from "@shared/schema";
 import { getGitHubClient } from "./replitConnection";
+import { validateAwesomeList } from "../validation/awesomeLint";
 
 /**
  * Service for synchronizing awesome lists with GitHub
@@ -234,6 +235,22 @@ export class GitHubSyncService {
 
       const readmeContent = formatter.generate();
       const contributingContent = generateContributingMd(this.websiteUrl, repoUrl);
+
+      // Validate with awesome-lint BEFORE pushing to GitHub
+      console.log('Validating generated markdown with awesome-lint...');
+      const validationResult = validateAwesomeList(readmeContent);
+      
+      if (!validationResult.valid) {
+        const errorMessages = validationResult.errors.map(e => 
+          `Line ${e.line}: ${e.rule} - ${e.message}`
+        ).join('\n');
+        
+        throw new Error(
+          `GitHub export blocked: awesome-lint validation failed with ${validationResult.errors.length} error(s):\n${errorMessages}`
+        );
+      }
+      
+      console.log(`✓ awesome-lint validation passed (${validationResult.warnings.length} warnings)`);
 
       if (options.dryRun) {
         console.log('Dry run - would update:');
