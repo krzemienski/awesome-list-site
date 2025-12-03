@@ -210,9 +210,12 @@ export class AwesomeListFormatter {
    * Format: - [Name](url) - Description.
    */
   private formatResource(resource: Resource): string {
+    // Trim title to remove leading/trailing whitespace (fixes no-inline-padding)
+    let title = resource.title.trim();
+
     // Replace brackets in title with parentheses to avoid breaking markdown link syntax
     // Titles with brackets break the [title](url) pattern in awesome-lint validator
-    let title = resource.title.replace(/\[/g, '(').replace(/\]/g, ')');
+    title = title.replace(/\[/g, '(').replace(/\]/g, ')');
 
     // Ensure proper capitalization in title
     title = this.ensureProperCapitalization(title);
