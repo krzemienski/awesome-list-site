@@ -213,6 +213,12 @@ export class AwesomeListFormatter {
     // Trim title to remove leading/trailing whitespace (fixes no-inline-padding)
     let title = resource.title.trim();
 
+    // Normalize quotes and punctuation in title (match-punctuation fix)
+    title = title.replace(/\u2026/g, '...'); // Horizontal ellipsis
+    title = title.replace(/[\u2018\u2019'']/g, "'"); // Curly single quotes
+    title = title.replace(/[\u201C\u201D""]/g, '"'); // Curly double quotes
+    title = title.replace(/[\u2013\u2014]/g, '-'); // Em/en dashes
+
     // Replace brackets in title with parentheses to avoid breaking markdown link syntax
     // Titles with brackets break the [title](url) pattern in awesome-lint validator
     title = title.replace(/\[/g, '(').replace(/\]/g, ')');
@@ -260,13 +266,17 @@ export class AwesomeListFormatter {
       // Replace remaining brackets in description with parentheses
       description = description.replace(/\[/g, '(').replace(/\]/g, ')');
 
-      // Replace ALL quote variants with straight quotes (match-punctuation fix)
+      // Replace ALL quote and punctuation variants (match-punctuation fix)
+      // Horizontal ellipsis → three periods
+      description = description.replace(/\u2026/g, '...');
       // Curly single quotes: ' ' 
       description = description.replace(/[\u2018\u2019'']/g, "'");
       // Curly double quotes: " "
       description = description.replace(/[\u201C\u201D""]/g, '"');
       // Prime and double-prime (sometimes used)
       description = description.replace(/[′″]/g, "'");
+      // Em dash and en dash → regular hyphen
+      description = description.replace(/[\u2013\u2014]/g, '-');
 
       // Ensure description starts with capital letter (skip emojis/symbols)
       // Find first letter character and capitalize it
