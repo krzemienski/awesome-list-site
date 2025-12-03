@@ -263,6 +263,12 @@ export class AwesomeListFormatter {
       description = description.replace(/\[\/vc_[^\]]+\]/g, '');
       description = description.trim();
 
+      // Remove title duplication from end of description (e.g., "... - krad/morsel")
+      const escapedTitle = title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const titleSuffixPattern = new RegExp(`\\s*-\\s*${escapedTitle}\\s*\\.?$`, 'i');
+      description = description.replace(titleSuffixPattern, '');
+      description = description.trim();
+
       // Replace remaining brackets in description with parentheses
       description = description.replace(/\[/g, '(').replace(/\]/g, ')');
 
