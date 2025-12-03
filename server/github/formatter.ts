@@ -472,9 +472,11 @@ export class AwesomeListFormatter {
   private toAnchor(text: string): string {
     return text
       .toLowerCase()
+      .replace(/&/g, '') // Remove ampersands explicitly (GitHub style)
       .replace(/[^\w\s-]/g, '') // Remove special characters
       .replace(/\s+/g, '-')      // Replace spaces with hyphens
       .replace(/-+/g, '-')       // Remove duplicate hyphens
+      .replace(/^-+|-+$/g, '')   // Remove leading/trailing hyphens
       .trim();
   }
 
