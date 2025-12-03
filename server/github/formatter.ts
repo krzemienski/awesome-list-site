@@ -214,7 +214,7 @@ export class AwesomeListFormatter {
     let title = resource.title.trim();
 
     // Normalize quotes and punctuation in title (match-punctuation fix)
-    title = title.replace(/\u2026/g, '...'); // Horizontal ellipsis
+    title = title.replace(/\.\.\./g, '\u2026'); // Convert ... to horizontal ellipsis (avoids no-repeat-punctuation)
     title = title.replace(/[\u2018\u2019'']/g, "'"); // Curly single quotes
     title = title.replace(/[\u201C\u201D""]/g, '"'); // Curly double quotes
     title = title.replace(/[\u2013\u2014]/g, '-'); // Em/en dashes
@@ -276,8 +276,8 @@ export class AwesomeListFormatter {
       description = description.replace(/\[/g, '(').replace(/\]/g, ')');
 
       // Replace ALL quote and punctuation variants (match-punctuation fix)
-      // Horizontal ellipsis → three periods
-      description = description.replace(/\u2026/g, '...');
+      // Convert three-period ellipsis to Unicode horizontal ellipsis (avoids no-repeat-punctuation)
+      description = description.replace(/\.\.\./g, '\u2026');
       // Curly single quotes: ' ' 
       description = description.replace(/[\u2018\u2019'']/g, "'");
       // Curly double quotes: " "
