@@ -352,6 +352,7 @@ export type UserJourneyProgress = typeof userJourneyProgress.$inferSelect;
 export const resourceAuditLog = pgTable("resource_audit_log", {
   id: serial("id").primaryKey(),
   resourceId: integer("resource_id").references(() => resources.id, { onDelete: "set null" }),
+  originalResourceId: integer("original_resource_id"), // Never SET NULL - preserves history after deletion
   action: text("action").notNull(), // created, updated, approved, rejected, synced, deleted
   performedBy: varchar("performed_by").references(() => users.id, { onDelete: "set null" }),
   changes: jsonb("changes").$type<Record<string, any>>(),

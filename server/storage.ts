@@ -144,7 +144,7 @@ export interface IStorage {
   
   // Resource Audit Log
   logResourceAudit(resourceId: number | null, action: string, performedBy?: string, changes?: any, notes?: string): Promise<void>;
-  getResourceAuditLog(resourceId: number, limit?: number): Promise<any[]>;
+  getResourceAuditLog(resourceId: number | null, limit?: number): Promise<any[]>;
   
   // Resource Edits
   createResourceEdit(data: InsertResourceEdit): Promise<ResourceEdit>;
@@ -997,6 +997,7 @@ export class DatabaseStorage implements IStorage {
   ): Promise<void> {
     await db.insert(resourceAuditLog).values({
       resourceId,
+      originalResourceId: resourceId, // Preserve original ID even if resource is deleted later
       action,
       performedBy,
       changes,
@@ -1004,11 +1005,30 @@ export class DatabaseStorage implements IStorage {
     });
   }
   
-  async getResourceAuditLog(resourceId: number, limit = 50): Promise<any[]> {
+  async getResourceAuditLog(resourceId: number | null, limit = 50): Promise<any[]> {
+    // If resourceId is null, return all audit logs
+    if (resourceId === null) {
+      return await db
+        .select()
+        .from(resourceAuditLog)
+        .orderBy(desc(resourceAuditLog.createdAt))
+        .limit(limit);
+    }
+    
+    // Return logs for this resource using both originalResourceId and resourceId
+    // This handles both:
+    // - New logs (have originalResourceId set)
+    // - Old logs from before migration (only have resourceId set)
+    // Note: Logs for deleted resources created before migration are lost (both fields NULL)
     return await db
       .select()
       .from(resourceAuditLog)
-      .where(eq(resourceAuditLog.resourceId, resourceId))
+      .where(
+        or(
+          eq(resourceAuditLog.originalResourceId, resourceId),
+          eq(resourceAuditLog.resourceId, resourceId)
+        )
+      )
       .orderBy(desc(resourceAuditLog.createdAt))
       .limit(limit);
   }
@@ -1746,7 +1766,7 @@ export class MemStorage implements IStorage {
   async listUserJourneyProgress(userId: string): Promise<UserJourneyProgress[]> { return []; }
   
   async logResourceAudit(resourceId: number | null, action: string, performedBy?: string, changes?: any, notes?: string): Promise<void> {}
-  async getResourceAuditLog(resourceId: number, limit?: number): Promise<any[]> { return []; }
+  async getResourceAuditLog(resourceId: number | null, limit?: number): Promise<any[]> { return []; }
   
   async createResourceEdit(data: InsertResourceEdit): Promise<ResourceEdit> {
     throw new Error("Not implemented in memory storage");

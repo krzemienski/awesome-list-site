@@ -204,34 +204,79 @@ async function testAuditLogging() {
       throw error;
     }
     
-    console.log(`  Checking deletion audit log...`);
+    console.log(`  Checking deletion audit log via storage layer...`);
     
-    // After deletion, resourceId becomes NULL due to SET NULL constraint
-    // So we need to query ALL audit logs and find the one for this resource
-    const allAuditLogs = await db.execute(sql`
-      SELECT * FROM resource_audit_log
-      WHERE (resource_id = ${testResource.id} OR resource_id IS NULL)
-        AND action = 'deleted'
-        AND notes LIKE '%Test Resource for Deletion%'
-      ORDER BY created_at DESC
-      LIMIT 1
-    `);
+    // Now we can use the storage layer method which uses originalResourceId
+    const auditLogs = await storage.getResourceAuditLog(testResource.id, 10);
     
-    console.log(`  Found ${allAuditLogs.rows.length} deletion audit log entries`);
+    console.log(`  Found ${auditLogs.length} audit log entries`);
     
-    if (allAuditLogs.rows.length > 0) {
-      const deleteLog = allAuditLogs.rows[0] as any;
+    // Find the deletion log
+    const deleteLog = auditLogs.find((log: any) => log.action === 'deleted');
+    
+    if (deleteLog) {
       logTest(
         'Create audit log on resource deletion',
         true,
-        `Found audit log with action='${deleteLog.action}', resourceId=${deleteLog.resource_id}, notes='${deleteLog.notes}'`
+        `Found audit log with action='${deleteLog.action}', resourceId=${deleteLog.resourceId}, originalResourceId=${deleteLog.originalResourceId}, notes='${deleteLog.notes}'`
       );
     } else {
+      console.log(`  All logs:`, auditLogs.map((l: any) => `${l.action} (resourceId=${l.resourceId}, originalResourceId=${l.originalResourceId})`).join(', '));
       logTest('Create audit log on resource deletion', false, 'No deletion audit log found');
     }
     
   } catch (error: any) {
     logTest('Audit logging test', false, undefined, error.message);
+  }
+  
+  // Test 9: Regression test - verify old logs without originalResourceId are still retrievable
+  try {
+    console.log('\n=== Testing Backward Compatibility (Old Audit Logs) ===');
+    
+    // Create a test resource
+    const oldStyleResource = await storage.createResource({
+      title: 'Old Style Audit Test',
+      url: `https://example.com/old-audit-${Date.now()}`,
+      description: 'Testing backward compatibility',
+      category: 'Intro & Learning',
+      status: 'approved',
+      tags: []
+    });
+    
+    console.log(`  Created test resource ID: ${oldStyleResource.id}`);
+    
+    // Manually insert an old-style audit log (without originalResourceId)
+    await db.execute(sql`
+      INSERT INTO resource_audit_log (resource_id, action, notes)
+      VALUES (${oldStyleResource.id}, 'old_style_update', 'This is an old audit log without originalResourceId')
+    `);
+    
+    console.log(`  Inserted old-style audit log (no originalResourceId)`);
+    
+    // Retrieve audit logs via storage API
+    const logs = await storage.getResourceAuditLog(oldStyleResource.id, 10);
+    
+    console.log(`  Retrieved ${logs.length} audit logs via storage API`);
+    
+    // Find the old-style log
+    const oldStyleLog = logs.find((l: any) => l.action === 'old_style_update');
+    
+    if (oldStyleLog) {
+      logTest(
+        'Retrieve old audit logs without originalResourceId',
+        true,
+        `Successfully retrieved old-style log with resourceId=${oldStyleLog.resourceId}, originalResourceId=${oldStyleLog.originalResourceId}`
+      );
+    } else {
+      console.log(`  All retrieved logs:`, logs.map((l: any) => `${l.action} (resId=${l.resourceId}, origId=${l.originalResourceId})`).join(', '));
+      logTest('Retrieve old audit logs without originalResourceId', false, 'Old-style audit log not found via storage API');
+    }
+    
+    // Clean up
+    await storage.deleteResource(oldStyleResource.id, 'admin');
+    
+  } catch (error: any) {
+    logTest('Backward compatibility test', false, undefined, error.message);
   }
 }
 
