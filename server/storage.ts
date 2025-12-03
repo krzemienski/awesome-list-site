@@ -72,6 +72,11 @@ export interface IStorage {
   updateResourceStatus(id: number, status: string, approvedBy?: string): Promise<Resource>;
   deleteResource(id: number): Promise<void>;
   
+  // Pending resource approval
+  getPendingResources(): Promise<{ resources: Resource[]; total: number }>;
+  approveResource(id: number, approvedBy: string): Promise<Resource>;
+  rejectResource(id: number, adminId: string, reason: string): Promise<void>;
+  
   // Category management
   listCategories(): Promise<Category[]>;
   getCategory(id: number): Promise<Category | undefined>;
@@ -1028,6 +1033,84 @@ export class DatabaseStorage implements IStorage {
     );
   }
 
+  async getPendingResources(): Promise<{ resources: Resource[]; total: number }> {
+    const pendingResources = await db
+      .select()
+      .from(resources)
+      .where(eq(resources.status, 'pending'))
+      .orderBy(desc(resources.createdAt));
+    
+    return {
+      resources: pendingResources,
+      total: pendingResources.length
+    };
+  }
+  
+  async approveResource(id: number, approvedBy: string): Promise<Resource> {
+    const resource = await this.getResource(id);
+    if (!resource) {
+      throw new Error('Resource not found');
+    }
+    
+    if (resource.status !== 'pending') {
+      throw new Error('Resource is not pending approval');
+    }
+    
+    const [updated] = await db
+      .update(resources)
+      .set({
+        status: 'approved',
+        approvedBy: approvedBy,
+        approvedAt: new Date(),
+        updatedAt: new Date()
+      })
+      .where(eq(resources.id, id))
+      .returning();
+    
+    // Log the approval action
+    await this.logResourceAudit(
+      id,
+      'approved',
+      approvedBy,
+      { previousStatus: resource.status, newStatus: 'approved' },
+      'Resource approved by admin'
+    );
+    
+    return updated;
+  }
+  
+  async rejectResource(id: number, adminId: string, reason: string): Promise<void> {
+    const resource = await this.getResource(id);
+    if (!resource) {
+      throw new Error('Resource not found');
+    }
+    
+    if (resource.status !== 'pending') {
+      throw new Error('Resource is not pending approval');
+    }
+    
+    if (!reason || reason.trim().length < 10) {
+      throw new Error('Rejection reason must be at least 10 characters');
+    }
+    
+    await db
+      .update(resources)
+      .set({
+        status: 'rejected',
+        updatedAt: new Date()
+      })
+      .where(eq(resources.id, id));
+    
+    // Log the rejection action
+    await this.logResourceAudit(
+      id,
+      'rejected',
+      adminId,
+      { previousStatus: resource.status, newStatus: 'rejected', reason },
+      `Resource rejected: ${reason}`
+    );
+  }
+
   async getResourceEditsByUser(userId: string): Promise<ResourceEdit[]> {
     return await db
       .select()
@@ -1572,6 +1655,18 @@ export class MemStorage implements IStorage {
     throw new Error("Not implemented in memory storage");
   }
   async rejectResourceEdit(editId: number, adminId: string, reason: string): Promise<void> {
+    throw new Error("Not implemented in memory storage");
+  }
+  
+  async getPendingResources(): Promise<{ resources: Resource[]; total: number }> {
+    return { resources: [], total: 0 };
+  }
+  
+  async approveResource(id: number, approvedBy: string): Promise<Resource> {
+    throw new Error("Not implemented in memory storage");
+  }
+  
+  async rejectResource(id: number, adminId: string, reason: string): Promise<void> {
     throw new Error("Not implemented in memory storage");
   }
   
