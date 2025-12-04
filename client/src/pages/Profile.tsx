@@ -419,19 +419,19 @@ export default function Profile({ user }: ProfileProps) {
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1 min-w-0">
-                            <h4 className="font-medium truncate">{favorite.resourceName}</h4>
+                            <h4 className="font-medium truncate">{favorite.title}</h4>
                             <div className="flex items-center gap-2 mt-1">
                               <Badge variant="secondary" className="text-xs">
                                 {favorite.category}
                               </Badge>
                               <span className="text-xs text-muted-foreground">
-                                Added {favorite.addedAt ? formatDistanceToNow(new Date(favorite.addedAt), { addSuffix: true }) : 'recently'}
+                                Added {favorite.favoritedAt ? formatDistanceToNow(new Date(favorite.favoritedAt), { addSuffix: true }) : 'recently'}
                               </span>
                             </div>
                           </div>
                           <div className="flex items-center gap-1">
                             <FavoriteButton
-                              resourceId={favorite.resourceId}
+                              resourceId={favorite.id}
                               isFavorited={true}
                               size="sm"
                               showCount={false}
@@ -441,7 +441,7 @@ export default function Profile({ user }: ProfileProps) {
                               size="sm"
                               asChild
                             >
-                              <a href={favorite.resourceUrl} target="_blank" rel="noopener noreferrer">
+                              <a href={favorite.url} target="_blank" rel="noopener noreferrer">
                                 <ExternalLink className="h-4 w-4" />
                               </a>
                             </Button>
@@ -491,7 +491,7 @@ export default function Profile({ user }: ProfileProps) {
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1 min-w-0">
-                            <h4 className="font-medium truncate">{bookmark.resourceName}</h4>
+                            <h4 className="font-medium truncate">{bookmark.title}</h4>
                             {bookmark.notes && (
                               <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
                                 {bookmark.notes}
@@ -502,13 +502,13 @@ export default function Profile({ user }: ProfileProps) {
                                 {bookmark.category}
                               </Badge>
                               <span className="text-xs text-muted-foreground">
-                                Added {bookmark.addedAt ? formatDistanceToNow(new Date(bookmark.addedAt), { addSuffix: true }) : 'recently'}
+                                Added {bookmark.bookmarkedAt ? formatDistanceToNow(new Date(bookmark.bookmarkedAt), { addSuffix: true }) : 'recently'}
                               </span>
                             </div>
                           </div>
                           <div className="flex items-center gap-1">
                             <BookmarkButton
-                              resourceId={bookmark.resourceId}
+                              resourceId={bookmark.id}
                               isBookmarked={true}
                               notes={bookmark.notes}
                               size="sm"
@@ -518,7 +518,7 @@ export default function Profile({ user }: ProfileProps) {
                               size="sm"
                               asChild
                             >
-                              <a href={bookmark.resourceUrl} target="_blank" rel="noopener noreferrer">
+                              <a href={bookmark.url} target="_blank" rel="noopener noreferrer">
                                 <ExternalLink className="h-4 w-4" />
                               </a>
                             </Button>
