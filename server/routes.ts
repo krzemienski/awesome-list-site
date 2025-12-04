@@ -1481,6 +1481,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(newCategory);
     } catch (error) {
       console.error('Error creating category:', error);
+      
+      if (error instanceof Error && error.message.includes('already exists')) {
+        return res.status(409).json({ message: error.message });
+      }
+      
       res.status(500).json({ message: 'Failed to create category' });
     }
   });
@@ -1625,6 +1630,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(newSubcategory);
     } catch (error) {
       console.error('Error creating subcategory:', error);
+      
+      if (error instanceof Error && error.message.includes('already exists')) {
+        return res.status(409).json({ message: error.message });
+      }
+      
       res.status(500).json({ message: 'Failed to create subcategory' });
     }
   });
@@ -1776,6 +1786,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(newSubSubcategory);
     } catch (error) {
       console.error('Error creating sub-subcategory:', error);
+      
+      if (error instanceof Error && error.message.includes('already exists')) {
+        return res.status(409).json({ message: error.message });
+      }
+      
       res.status(500).json({ message: 'Failed to create sub-subcategory' });
     }
   });
