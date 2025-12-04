@@ -1,5 +1,6 @@
 import { Resource } from "@shared/schema";
 import yaml from "js-yaml";
+import { mapCategoryName } from "@shared/categoryMapping";
 
 /**
  * Parser for awesome list README files
@@ -275,22 +276,33 @@ export async function parseAwesomeList(content: string): Promise<ParsedAwesomeLi
 
 /**
  * Convert parsed resources to database format
+ * BUG FIX: Now uses mapCategoryName to map variants to canonical categories
  */
 export function convertToDbResources(parsed: ParsedAwesomeList): Partial<Resource>[] {
-  return parsed.resources.map(resource => ({
-    title: resource.title,
-    url: resource.url,
-    description: resource.description || '',
-    category: normalizeCategory(resource.category),
-    subcategory: resource.subcategory ? normalizeCategory(resource.subcategory) : undefined,
-    subSubcategory: resource.subSubcategory ? normalizeCategory(resource.subSubcategory) : undefined,
-    status: 'approved',
-    githubSynced: true,
-    metadata: {
-      sourceList: parsed.title,
-      importedAt: new Date().toISOString()
-    }
-  }));
+  return parsed.resources.map(resource => {
+    // Normalize first to clean special characters
+    const normalizedCategory = normalizeCategory(resource.category);
+    const normalizedSubcategory = resource.subcategory ? normalizeCategory(resource.subcategory) : undefined;
+    const normalizedSubSubcategory = resource.subSubcategory ? normalizeCategory(resource.subSubcategory) : undefined;
+    
+    // Then map to canonical category names
+    const canonicalCategory = mapCategoryName(normalizedCategory) || normalizedCategory;
+    
+    return {
+      title: resource.title,
+      url: resource.url,
+      description: resource.description || '',
+      category: canonicalCategory,
+      subcategory: normalizedSubcategory,
+      subSubcategory: normalizedSubSubcategory,
+      status: 'approved',
+      githubSynced: true,
+      metadata: {
+        sourceList: parsed.title,
+        importedAt: new Date().toISOString()
+      }
+    };
+  });
 }
 
 /**

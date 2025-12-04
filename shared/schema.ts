@@ -36,7 +36,7 @@ export const resources = pgTable(
   {
     id: serial("id").primaryKey(),
     title: text("title").notNull(),
-    url: text("url").notNull(),
+    url: text("url").notNull().unique(), // BUG #4 FIX: Prevent duplicate URLs
     description: text("description").notNull().default(""),
     category: text("category").notNull(),
     subcategory: text("subcategory"),
@@ -150,7 +150,10 @@ export const subcategories = pgTable("subcategories", {
   name: text("name").notNull(),
   slug: text("slug").notNull(),
   categoryId: integer("category_id").references(() => categories.id, { onDelete: "cascade" }),
-});
+}, (table) => [
+  // BUG #3 FIX: Prevent duplicate subcategories within same category
+  unique("subcategories_slug_category_unique").on(table.slug, table.categoryId),
+]);
 
 export const insertSubcategorySchema = createInsertSchema(subcategories).pick({
   name: true,
@@ -170,7 +173,10 @@ export const subSubcategories = pgTable("sub_subcategories", {
   name: text("name").notNull(),
   slug: text("slug").notNull(),
   subcategoryId: integer("subcategory_id").references(() => subcategories.id, { onDelete: "cascade" }),
-});
+}, (table) => [
+  // Prevent duplicate sub-subcategories within same subcategory
+  unique("sub_subcategories_slug_subcategory_unique").on(table.slug, table.subcategoryId),
+]);
 
 export const insertSubSubcategorySchema = createInsertSchema(subSubcategories).pick({
   name: true,
