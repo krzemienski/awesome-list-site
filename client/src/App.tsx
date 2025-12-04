@@ -70,7 +70,8 @@ function Router() {
       if (!response.ok) throw new Error('Failed to fetch categories');
       return response.json();
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 2, // 2 minutes (reduced for testing, was 5 minutes causing stale Rust categories)
+    refetchOnMount: 'always', // Always refetch to get latest categories after imports
   });
 
   // Fetch all resources for search (flattened array)
