@@ -338,6 +338,75 @@ export class AwesomeListParser {
   }
 
   /**
+   * Detect format deviations from standard awesome list specification
+   * Returns warnings and suggestions for user review
+   */
+  detectFormatDeviations(): {
+    deviations: string[];
+    warnings: string[];
+    canProceed: boolean;
+  } {
+    const deviations: string[] = [];
+    const warnings: string[] = [];
+
+    // Check: Standard awesome badge
+    const hasBadge = this.content.includes('[![Awesome](https://awesome.re/badge') ||
+                     this.content.includes('[![Awesome](https://cdn.rawgit.com/sindresorhus/awesome');
+    if (!hasBadge) {
+      warnings.push('Missing standard awesome badge (non-critical)');
+    }
+
+    // Check: Resource list marker consistency
+    const dashResources = (this.content.match(/^- \[/gm) || []).length;
+    const asteriskResources = (this.content.match(/^\* \[/gm) || []).length;
+    const totalResources = dashResources + asteriskResources;
+
+    if (asteriskResources > dashResources && dashResources > 0) {
+      deviations.push(`Mixed list markers: ${asteriskResources} asterisk (*) vs ${dashResources} dash (-) resources`);
+    } else if (dashResources > asteriskResources * 2) {
+      warnings.push(`Using dashes (-) for list items (common variation from standard asterisk format)`);
+    }
+
+    // Check: Description presence
+    const resourcesWithDesc = (this.content.match(/^\* \[[^\]]+\]\([^)]+\)\s*[-–:]\s*.+$/gm) || []).length +
+                               (this.content.match(/^- \[[^\]]+\]\([^)]+\)\s*[-–:]\s*.+$/gm) || []).length;
+    const resourcesWithoutDesc = totalResources - resourcesWithDesc;
+
+    if (resourcesWithoutDesc > totalResources * 0.2) {
+      warnings.push(`${resourcesWithoutDesc} resources (${Math.round(resourcesWithoutDesc/totalResources*100)}%) lack descriptions`);
+    }
+
+    // Check: Heading depth (2-level vs 3-level hierarchy)
+    const level2Headers = (this.content.match(/^## /gm) || []).length;
+    const level3Headers = (this.content.match(/^### /gm) || []).length;
+    const level4Headers = (this.content.match(/^#### /gm) || []).length;
+
+    if (level4Headers === 0 && level3Headers > 0 && level2Headers > 0) {
+      warnings.push('Uses 2-level hierarchy (## → ###) instead of 3-level (## → ### → ####)');
+    } else if (level4Headers > 0) {
+      warnings.push(`Contains ${level4Headers} sub-subcategories (####) - 3-level hierarchy detected`);
+    }
+
+    // Check: Metadata sections as categories (known issue)
+    const hasRegistries = this.content.includes('## Registries');
+    const hasResources = this.content.includes('## Resources');
+    if (hasRegistries || hasResources) {
+      deviations.push('Contains metadata sections as category headers (Registries, Resources) - will be filtered');
+    }
+
+    // Check: Badges in content
+    const badgeCount = (this.content.match(/\[!\[[^\]]+\]\([^)]+\)\]\([^)]+\)/g) || []).length;
+    if (badgeCount > totalResources * 0.5) {
+      warnings.push(`${badgeCount} badges detected in content (will be preserved in descriptions)`);
+    }
+
+    // Determine if import can proceed safely
+    const canProceed = deviations.length <= 3; // Too many deviations = manual review
+
+    return { deviations, warnings, canProceed };
+  }
+
+  /**
    * Extract hierarchy structure from markdown headers
    * Returns categories, subcategories with parent mapping, and sub-subcategories with parent mapping
    */
