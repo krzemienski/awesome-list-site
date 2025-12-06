@@ -212,8 +212,11 @@ export class AwesomeListParser {
    * Check if a line is part of metadata sections
    */
   private isMetadataSection(line: string): boolean {
-    const metadataSections = ['License', 'Contributing', 'Contributors', 'Code of Conduct'];
-    return metadataSections.some(section => 
+    const metadataSections = [
+      'License', 'Contributing', 'Contributors', 'Code of Conduct',
+      'Registries', 'Resources', 'Table of Contents', 'Contents'
+    ];
+    return metadataSections.some(section =>
       line.toLowerCase().includes(section.toLowerCase())
     );
   }
