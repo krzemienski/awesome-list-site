@@ -110,21 +110,24 @@ export class AwesomeListParser {
 
   /**
    * Extract resources with their category hierarchy
+   * Note: AI-assisted parsing is available but not enabled by default
+   * Set enableAI=true in parse() to use Claude for edge cases
    */
-  private extractResources(): ParsedResource[] {
+  private async extractResourcesWithAI(enableAI: boolean = false): Promise<ParsedResource[]> {
     const resources: ParsedResource[] = [];
     let currentCategory = '';
     let currentSubcategory = '';
     let currentSubSubcategory = '';
-    
+    const failedLines: Array<{ line: string; lineNumber: number }> = [];
+
     for (let i = 0; i < this.lines.length; i++) {
       const line = this.lines[i];
-      
+
       // Skip table of contents and metadata sections
       if (this.isTableOfContents(line) || this.isMetadataSection(line)) {
         continue;
       }
-      
+
       // Handle category headers
       if (line.startsWith('## ')) {
         currentCategory = line.replace(/^## /, '').trim();
@@ -132,18 +135,107 @@ export class AwesomeListParser {
         currentSubSubcategory = '';
         continue;
       }
-      
+
       if (line.startsWith('### ')) {
         currentSubcategory = line.replace(/^### /, '').trim();
         currentSubSubcategory = '';
         continue;
       }
-      
+
       if (line.startsWith('#### ')) {
         currentSubSubcategory = line.replace(/^#### /, '').trim();
         continue;
       }
-      
+
+      // Parse resource lines with standard regex
+      const resource = this.parseResourceLine(line);
+      if (resource && currentCategory) {
+        resources.push({
+          ...resource,
+          category: currentCategory,
+          subcategory: currentSubcategory || undefined,
+          subSubcategory: currentSubSubcategory || undefined
+        });
+      } else if (line.trim().startsWith('-') || line.trim().startsWith('*')) {
+        // Line looks like a resource but failed parsing
+        // Save for potential AI processing
+        if (enableAI) {
+          failedLines.push({ line, lineNumber: i + 1 });
+        }
+      }
+    }
+
+    // If AI parsing is enabled and there are failed lines, try AI
+    if (enableAI && failedLines.length > 0) {
+      console.log(`🤖 AI parsing ${failedLines.length} ambiguous lines...`);
+
+      // Dynamically import AI assistant (only if needed)
+      const { parseAmbiguousResource } = await import('../ai/parsingAssistant');
+
+      for (const { line, lineNumber } of failedLines) {
+        try {
+          const aiResult = await parseAmbiguousResource(line, {
+            previousCategory: currentCategory,
+            previousSubcategory: currentSubcategory,
+            lineNumber
+          });
+
+          if (aiResult && !aiResult.skip) {
+            resources.push({
+              title: aiResult.title,
+              url: aiResult.url,
+              description: aiResult.description || '',
+              category: aiResult.category || currentCategory,
+              subcategory: aiResult.subcategory || currentSubcategory,
+              subSubcategory: currentSubSubcategory || undefined
+            });
+            console.log(`  ✅ AI recovered: "${aiResult.title}"`);
+          }
+        } catch (error) {
+          console.error(`  ❌ AI failed for line ${lineNumber}`);
+        }
+      }
+    }
+
+    return resources;
+  }
+
+  /**
+   * Extract resources with their category hierarchy (synchronous version)
+   */
+  private extractResources(): ParsedResource[] {
+    const resources: ParsedResource[] = [];
+    let currentCategory = '';
+    let currentSubcategory = '';
+    let currentSubSubcategory = '';
+
+    for (let i = 0; i < this.lines.length; i++) {
+      const line = this.lines[i];
+
+      // Skip table of contents and metadata sections
+      if (this.isTableOfContents(line) || this.isMetadataSection(line)) {
+        continue;
+      }
+
+      // Handle category headers
+      if (line.startsWith('## ')) {
+        currentCategory = line.replace(/^## /, '').trim();
+        currentSubcategory = '';
+        currentSubSubcategory = '';
+        continue;
+      }
+
+      if (line.startsWith('### ')) {
+        currentSubcategory = line.replace(/^### /, '').trim();
+        currentSubSubcategory = '';
+        continue;
+      }
+
+      if (line.startsWith('#### ')) {
+        currentSubSubcategory = line.replace(/^#### /, '').trim();
+        continue;
+      }
+
       // Parse resource lines
       const resource = this.parseResourceLine(line);
       if (resource && currentCategory) {
@@ -155,7 +247,7 @@ export class AwesomeListParser {
         });
       }
     }
-    
+
     return resources;
   }
 
