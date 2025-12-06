@@ -1459,7 +1459,158 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: 'Failed to start GitHub import' });
     }
   });
-  
+
+  // POST /api/github/import-stream - Import with real-time progress updates via SSE
+  app.post('/api/github/import-stream', isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    const sendProgress = (data: any) => {
+      res.write(`data: ${JSON.stringify(data)}\n\n`);
+    };
+
+    try {
+      const { repositoryUrl, options } = githubSyncSchema.parse(req.body);
+
+      // Fetch markdown (10% progress)
+      sendProgress({ status: 'fetching', progress: 10, message: 'Fetching README from GitHub...' });
+      const readmeContent = await (await import('./github/client')).GitHubClient.prototype.fetchFile.call(
+        new (await import('./github/client')).GitHubClient(),
+        repositoryUrl,
+        'README.md'
+      );
+
+      // Parse (30% progress)
+      sendProgress({ status: 'parsing', progress: 30, message: 'Parsing awesome list structure...' });
+      const { AwesomeListParser } = await import('./github/parser');
+      const parser = new AwesomeListParser(readmeContent);
+
+      // Detect deviations
+      const deviations = parser.detectFormatDeviations();
+      sendProgress({
+        status: 'analyzing',
+        progress: 40,
+        message: 'Analyzing format deviations...',
+        deviations: deviations.deviations,
+        warnings: deviations.warnings
+      });
+
+      if (!deviations.canProceed) {
+        sendProgress({
+          status: 'error',
+          progress: 40,
+          message: `Too many deviations (${deviations.deviations.length}). Manual review required.`
+        });
+        return res.end();
+      }
+
+      const parsedList = parser.parse();
+      const hierarchy = parser.extractHierarchy();
+
+      // Create hierarchy (50% progress)
+      sendProgress({ status: 'creating_hierarchy', progress: 50, message: 'Creating category hierarchy...' });
+
+      // Create categories
+      for (const categoryName of Array.from(hierarchy.categories)) {
+        const slug = categoryName.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-');
+        const existing = await storage.listCategories();
+        if (!existing.find(c => c.name === categoryName)) {
+          await storage.createCategory({ name: categoryName, slug });
+        }
+      }
+
+      // Create subcategories
+      for (const [subcategoryName, parentCategoryName] of Array.from(hierarchy.subcategories)) {
+        const parentCategory = (await storage.listCategories()).find(c => c.name === parentCategoryName);
+        if (parentCategory) {
+          const slug = subcategoryName.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-');
+          const existing = await storage.listSubcategories(parentCategory.id);
+          if (!existing.find(s => s.name === subcategoryName)) {
+            await storage.createSubcategory({ name: subcategoryName, slug, categoryId: parentCategory.id });
+          }
+        }
+      }
+
+      // Create sub-subcategories
+      for (const [subSubName, { parent, category }] of Array.from(hierarchy.subSubcategories)) {
+        const grandparent = (await storage.listCategories()).find(c => c.name === category);
+        if (grandparent) {
+          const parentSub = (await storage.listSubcategories(grandparent.id)).find(s => s.name === parent);
+          if (parentSub) {
+            const slug = subSubName.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-');
+            const existing = await storage.listSubSubcategories(parentSub.id);
+            if (!existing.find(ss => ss.name === subSubName)) {
+              await storage.createSubSubcategory({ name: subSubName, slug, subcategoryId: parentSub.id });
+            }
+          }
+        }
+      }
+
+      // Import resources (50-100% progress)
+      const dbResources = (await import('./github/parser')).convertToDbResources(parsedList);
+      const total = dbResources.length;
+      let imported = 0;
+      let updated = 0;
+      let skipped = 0;
+
+      for (let i = 0; i < total; i++) {
+        const resource = dbResources[i];
+
+        // Check for conflicts
+        const existingResources = await storage.listResources({ limit: 10000, status: 'approved' });
+        const existing = existingResources.resources.find(r => r.url === resource.url);
+
+        if (!existing) {
+          await storage.createResource({ ...resource, status: 'approved', githubSynced: true } as any);
+          imported++;
+        } else {
+          const hasChanges = existing.title !== resource.title || existing.description !== resource.description;
+          if (hasChanges) {
+            await storage.updateResource(existing.id, resource as any);
+            updated++;
+          } else {
+            skipped++;
+          }
+        }
+
+        // Send progress every 10 resources
+        if (i % 10 === 0) {
+          const progress = 50 + Math.floor((i / total) * 50);
+          sendProgress({
+            status: 'importing_resources',
+            progress,
+            current: i,
+            total,
+            imported,
+            updated,
+            skipped,
+            message: `Importing resources: ${i}/${total}...`
+          });
+        }
+      }
+
+      // Complete (100% progress)
+      sendProgress({
+        status: 'complete',
+        progress: 100,
+        message: 'Import complete!',
+        imported,
+        updated,
+        skipped,
+        total
+      });
+      res.end();
+    } catch (error: any) {
+      sendProgress({
+        status: 'error',
+        progress: 0,
+        message: error.message || 'Import failed'
+      });
+      res.end();
+    }
+  });
+
   // POST /api/github/export - Export approved resources to GitHub
   app.post('/api/github/export', isAuthenticated, isAdmin, async (req: Request, res: Response) => {
     try {

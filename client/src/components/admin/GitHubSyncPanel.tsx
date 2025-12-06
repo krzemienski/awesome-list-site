@@ -44,7 +44,13 @@ export default function GitHubSyncPanel() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [repoUrl, setRepoUrl] = useState("krzemienski/awesome-video");
-  
+  const [importProgress, setImportProgress] = useState(0);
+  const [importStatus, setImportStatus] = useState<string>('');
+  const [importMessage, setImportMessage] = useState<string>('');
+  const [deviations, setDeviations] = useState<string[]>([]);
+  const [warnings, setWarnings] = useState<string[]>([]);
+  const [isStreaming, setIsStreaming] = useState(false);
+
   // Fetch sync history
   const { data: syncHistory } = useQuery<SyncHistory[]>({
     queryKey: ['/api/github/sync-history'],
@@ -58,7 +64,80 @@ export default function GitHubSyncPanel() {
   });
   const syncQueue = syncQueueResponse?.items;
 
-  // Import mutation
+  // SSE Import with progress
+  const startStreamingImport = async () => {
+    setIsStreaming(true);
+    setImportProgress(0);
+    setImportStatus('fetching');
+    setDeviations([]);
+    setWarnings([]);
+
+    try {
+      const response = await fetch('/api/github/import-stream', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          repositoryUrl: repoUrl.startsWith('http') ? repoUrl : `https://github.com/${repoUrl}`,
+          options: { forceOverwrite: false }
+        }),
+      });
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+
+      if (!reader) {
+        throw new Error('No response body');
+      }
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n');
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = JSON.parse(line.slice(6));
+            setImportProgress(data.progress || 0);
+            setImportStatus(data.status || '');
+            setImportMessage(data.message || '');
+
+            if (data.deviations) setDeviations(data.deviations);
+            if (data.warnings) setWarnings(data.warnings);
+
+            if (data.status === 'complete') {
+              queryClient.invalidateQueries({ queryKey: ['/api/github/sync-history'] });
+              queryClient.invalidateQueries({ queryKey: ['/api/github/sync-status'] });
+              toast({
+                title: 'Import Complete!',
+                description: `Imported: ${data.imported}, Updated: ${data.updated}, Skipped: ${data.skipped}`,
+              });
+              setIsStreaming(false);
+            } else if (data.status === 'error') {
+              toast({
+                title: 'Import Failed',
+                description: data.message,
+                variant: 'destructive',
+              });
+              setIsStreaming(false);
+            }
+          }
+        }
+      }
+    } catch (error: any) {
+      toast({
+        title: 'Import Failed',
+        description: error.message || 'Failed to start import',
+        variant: 'destructive',
+      });
+      setIsStreaming(false);
+    }
+  };
+
+  // Import mutation (legacy, keep for backward compatibility)
   const importMutation = useMutation({
     mutationFn: async () => {
       return await apiRequest('/api/github/import', {
@@ -77,7 +156,7 @@ export default function GitHubSyncPanel() {
         description: `Importing resources from ${repoUrl}`,
       });
     },
-    onError: (error: any) => {
+    onError: (error: any) {
       toast({
         title: "Import Failed",
         description: error.message || "Failed to start import",
@@ -170,15 +249,15 @@ export default function GitHubSyncPanel() {
                 Pull resources from the GitHub repository and update the database
               </p>
               <Button
-                onClick={() => importMutation.mutate()}
-                disabled={importMutation.isPending || !repoUrl}
+                onClick={() => startStreamingImport()}
+                disabled={isStreaming || !repoUrl}
                 className="w-full"
                 data-testid="button-import-github"
               >
-                {importMutation.isPending ? (
+                {isStreaming ? (
                   <>
                     <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                    Importing...
+                    Importing... {importProgress}%
                   </>
                 ) : (
                   <>
@@ -187,6 +266,63 @@ export default function GitHubSyncPanel() {
                   </>
                 )}
               </Button>
+
+              {/* Progress Bar */}
+              {isStreaming && (
+                <div className="mt-4 space-y-2">
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>{importMessage}</span>
+                    <span>{importProgress}%</span>
+                  </div>
+                  <div className="w-full h-2 bg-secondary rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-primary transition-all duration-300"
+                      style={{ width: `${importProgress}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground">Status: {importStatus}</p>
+                </div>
+              )}
+
+              {/* Deviation Warnings */}
+              {(deviations.length > 0 || warnings.length > 0) && (
+                <Card className="mt-4 border-yellow-500 bg-yellow-500/10">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-sm">
+                      <AlertCircle className="h-4 w-4 text-yellow-500" />
+                      Format Analysis
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {deviations.length > 0 && (
+                      <div>
+                        <p className="text-xs font-semibold mb-1">Deviations:</p>
+                        <ul className="text-xs space-y-1">
+                          {deviations.map((dev, idx) => (
+                            <li key={idx} className="flex items-start gap-1">
+                              <span className="text-yellow-500">⚠️</span>
+                              <span>{dev}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {warnings.length > 0 && (
+                      <div>
+                        <p className="text-xs font-semibold mb-1">Warnings:</p>
+                        <ul className="text-xs space-y-1">
+                          {warnings.map((warn, idx) => (
+                            <li key={idx} className="flex items-start gap-1">
+                              <span className="text-blue-500">ℹ️</span>
+                              <span>{warn}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
             </div>
 
             <div className="space-y-2">
