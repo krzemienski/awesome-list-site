@@ -388,9 +388,10 @@ export function buildResourcesKey(options: {
   status?: string;
   category?: string;
   subcategory?: string;
+  subSubcategory?: string;
   search?: string;
 }): string {
-  const { page = 1, limit = 20, status, category, subcategory, search } = options;
+  const { page = 1, limit = 20, status, category, subcategory, subSubcategory, search } = options;
   return redisCache.buildKey(
     CACHE_KEYS.RESOURCES,
     `p${page}`,
@@ -398,6 +399,7 @@ export function buildResourcesKey(options: {
     status ? `s-${status}` : undefined,
     category ? `c-${category.substring(0, 20)}` : undefined,
     subcategory ? `sc-${subcategory.substring(0, 20)}` : undefined,
+    subSubcategory ? `ssc-${subSubcategory.substring(0, 20)}` : undefined,
     search ? `q-${search.substring(0, 30)}` : undefined
   );
 }

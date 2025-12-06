@@ -220,6 +220,7 @@ interface ListResourceOptions {
   status?: string;
   category?: string;
   subcategory?: string;
+  subSubcategory?: string;
   userId?: string;
   search?: string;
 }
@@ -321,30 +322,34 @@ export class DatabaseStorage implements IStorage {
   
   // Resource CRUD operations
   async listResources(options: ListResourceOptions): Promise<{ resources: Resource[]; total: number }> {
-    const { page = 1, limit = 20, status, category, subcategory, userId, search } = options;
+    const { page = 1, limit = 20, status, category, subcategory, subSubcategory, userId, search } = options;
     const offset = (page - 1) * limit;
-    
+
     let query = db.select().from(resources);
     let countQuery = db.select({ count: sql<number>`count(*)::int` }).from(resources);
-    
+
     const conditions = [];
-    
+
     if (status) {
       conditions.push(eq(resources.status, status));
     }
-    
+
     if (category) {
       conditions.push(eq(resources.category, category));
     }
-    
+
     if (subcategory) {
       conditions.push(eq(resources.subcategory, subcategory));
     }
-    
+
+    if (subSubcategory) {
+      conditions.push(eq(resources.subSubcategory, subSubcategory));
+    }
+
     if (userId) {
       conditions.push(eq(resources.submittedBy, userId));
     }
-    
+
     if (search) {
       conditions.push(
         or(

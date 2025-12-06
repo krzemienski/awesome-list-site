@@ -251,10 +251,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const limit = parseInt(req.query.limit as string) || 20;
       const category = req.query.category as string;
       const subcategory = req.query.subcategory as string;
+      const subSubcategory = req.query.subSubcategory as string;
       const search = req.query.search as string;
 
       // Build cache key from query parameters
-      const cacheKey = buildResourcesKey({ page, limit, status: 'approved', category, subcategory, search });
+      const cacheKey = buildResourcesKey({ page, limit, status: 'approved', category, subcategory, subSubcategory, search });
 
       const result = await redisCache.getOrSet(
         cacheKey,
@@ -264,6 +265,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           status: 'approved',
           category,
           subcategory,
+          subSubcategory,
           search
         }),
         CACHE_TTL.RESOURCES_LIST
