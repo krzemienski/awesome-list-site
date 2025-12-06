@@ -156,7 +156,7 @@ export default function GitHubSyncPanel() {
         description: `Importing resources from ${repoUrl}`,
       });
     },
-    onError: (error: any) {
+    onError: (error) => {
       toast({
         title: "Import Failed",
         description: error.message || "Failed to start import",
