@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 import { storage } from "./storage";
 import { db } from "./db";
-import { categories, subcategories, subSubcategories, resources, users } from "@shared/schema";
+import { categories, subcategories, subSubcategories, resources, users, resourceEdits } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import { hashPassword } from "./passwordUtils";
 import { mapCategoryName } from "@shared/categoryMapping";
@@ -193,6 +193,8 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
     // Optional: Clear existing data
     if (options.clearExisting) {
       console.log("🗑️  Clearing existing data...");
+      // Clear tables in correct order respecting foreign key constraints
+      await db.delete(resourceEdits); // Must delete before resources (FK constraint)
       await db.delete(resources);
       await db.delete(subSubcategories);
       await db.delete(subcategories);
