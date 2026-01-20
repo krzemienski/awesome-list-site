@@ -8,6 +8,15 @@ A production-ready React application for browsing and discovering over 2,600 cur
 
 ## Recent Changes
 
+### Feature Updates (January 20, 2026)
+- **View Mode Toggle**: Added three content card view modes (grid, list, compact) using ShadCN ToggleGroup component in the Category page
+- **JSON Export Endpoint**: Added `GET /api/admin/export-json` for full database backup including all resources (all statuses), users, category hierarchies, tags, learning journeys, and sync queue with schema documentation
+- **Tag Filtering Fix**: Fixed tag filtering by transforming resources to include `tags` at root level (extracted from `metadata.tags`) for frontend compatibility
+- **GitHub Import Improvements**: 
+  - Added category hierarchy database integration with `ensureCategoryHierarchy()` function
+  - Resources now store hierarchy IDs (categoryId, subcategoryId, subSubcategoryId) in metadata
+  - Update path also populates hierarchy IDs for consistency
+
 ### Bug Fixes (December 4, 2025)
 - **Bug #8 - Duplicate Slug Validation**: Fixed duplicate slug error handling to return proper 409 Conflict status code instead of 500 Internal Server Error. Applied to categories, subcategories, and sub-subcategories. Users now see clear error messages: "Category with slug 'X' already exists".
 
