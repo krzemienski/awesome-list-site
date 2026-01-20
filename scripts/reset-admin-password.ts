@@ -23,7 +23,6 @@ async function resetAdminPassword() {
       console.log(`✅ ADMIN PASSWORD RESET SUCCESSFUL`);
       console.log(`${'='.repeat(60)}`);
       console.log(`Email:    ${adminEmail}`);
-      console.log(`Password: ${newPassword}`);
       console.log(`User ID:  ${updated.id}`);
       console.log(`Role:     ${updated.role}`);
       console.log(`${'='.repeat(60)}\n`);
