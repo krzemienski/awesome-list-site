@@ -26,7 +26,24 @@ export default function Category() {
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>("all");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("category");
-  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  
+  // View mode with localStorage persistence
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('awesome-list-view-mode');
+      if (saved === 'grid' || saved === 'list' || saved === 'compact') {
+        return saved;
+      }
+    }
+    return 'grid';
+  });
+  
+  // Persist view mode to localStorage
+  const handleViewModeChange = (mode: ViewMode) => {
+    setViewMode(mode);
+    localStorage.setItem('awesome-list-view-mode', mode);
+  };
+  
   const { toast } = useToast();
   
   // Fetch awesome list data - use same query as homepage
@@ -264,7 +281,7 @@ export default function Category() {
           Showing {filteredResources.length} of {allResources.length} resources
           {selectedTags.length > 0 && ` (filtered by ${selectedTags.length} tag${selectedTags.length > 1 ? 's' : ''})`}
         </p>
-        <ViewModeToggle value={viewMode} onChange={setViewMode} />
+        <ViewModeToggle value={viewMode} onChange={handleViewModeChange} />
       </div>
       
       {/* Resources Display */}

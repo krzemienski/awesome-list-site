@@ -200,23 +200,60 @@ export class AwesomeListParser {
   }
 
   /**
-   * Check if a line is part of table of contents
+   * Check if we're currently in the table of contents section
+   * TOC is typically between "## Contents" header and the next section
    */
+  private inTableOfContents = false;
+  private tocEndLine = -1;
+  
   private isTableOfContents(line: string): boolean {
-    const tocIndicators = ['Table of Contents', 'Contents', '- ['];
-    return tocIndicators.some(indicator => 
-      line.toLowerCase().includes(indicator.toLowerCase())
-    );
+    // Check for TOC header
+    if (line.startsWith('## Contents') || line.startsWith('## Table of Contents')) {
+      this.inTableOfContents = true;
+      return true;
+    }
+    
+    // If we're in TOC and hit a new section header, exit TOC
+    if (this.inTableOfContents && line.startsWith('## ') && 
+        !line.includes('Contents') && !line.includes('Table of Contents')) {
+      this.inTableOfContents = false;
+      return false;
+    }
+    
+    // Skip TOC link lines (they link to section anchors, not external URLs)
+    if (this.inTableOfContents && line.trim().startsWith('- [') && line.includes('](#')) {
+      return true;
+    }
+    
+    return false;
   }
 
   /**
-   * Check if a line is part of metadata sections
+   * Track if we're in a metadata section (License, Contributing, etc.)
    */
+  private inMetadataSection = false;
+  
   private isMetadataSection(line: string): boolean {
-    const metadataSections = ['License', 'Contributing', 'Contributors', 'Code of Conduct'];
-    return metadataSections.some(section => 
-      line.toLowerCase().includes(section.toLowerCase())
-    );
+    // Check for metadata section headers
+    const metadataHeaders = ['## License', '## Contributing', '## Contributors', '## Code of Conduct'];
+    
+    if (metadataHeaders.some(header => line.startsWith(header))) {
+      this.inMetadataSection = true;
+      return true;
+    }
+    
+    // If in metadata section and hit a new content section, exit metadata
+    if (this.inMetadataSection && line.startsWith('## ')) {
+      const headerText = line.toLowerCase();
+      const isContentSection = !['license', 'contributing', 'contributors', 'code of conduct']
+        .some(meta => headerText.includes(meta));
+      if (isContentSection) {
+        this.inMetadataSection = false;
+        return false;
+      }
+    }
+    
+    return this.inMetadataSection;
   }
 
   /**

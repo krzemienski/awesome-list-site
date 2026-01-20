@@ -2114,31 +2114,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
         storage.listSubSubcategories(),
         storage.listTags(),
         storage.listLearningJourneys(),
-        storage.listGithubSyncQueue(),
-        storage.listUsers()
+        storage.getGithubSyncQueue(),
+        storage.listUsers(1, 10000)
       ]);
       
       const resources = allResources.resources;
+      const usersList = users.users;
 
       // Get journey steps for each journey
-      const journeyIds = learningJourneys.map(j => j.id);
+      const journeyIds = learningJourneys.map((j: any) => j.id);
       const stepsMap = await storage.listJourneyStepsBatch(journeyIds);
       
       // Attach steps to journeys
-      const journeysWithSteps = learningJourneys.map(journey => ({
+      const journeysWithSteps = learningJourneys.map((journey: any) => ({
         ...journey,
         steps: stepsMap.get(journey.id) || []
       }));
 
       // Build hierarchy structure
-      const categoryHierarchy = categories.map(cat => ({
+      const categoryHierarchy = categories.map((cat: any) => ({
         ...cat,
         subcategories: subcategories
-          .filter(sub => sub.categoryId === cat.id)
-          .map(sub => ({
+          .filter((sub: any) => sub.categoryId === cat.id)
+          .map((sub: any) => ({
             ...sub,
             subSubcategories: subSubcategories.filter(
-              ssub => ssub.subcategoryId === sub.id
+              (ssub: any) => ssub.subcategoryId === sub.id
             )
           }))
       }));
@@ -2150,7 +2151,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }, {});
       
       // Sanitize users for export (remove sensitive data)
-      const sanitizedUsers = users.map((u: any) => ({
+      const sanitizedUsers = usersList.map((u: any) => ({
         id: u.id,
         username: u.username,
         role: u.role,
@@ -2177,7 +2178,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           subSubcategories: subSubcategories.length,
           tags: tags.length,
           learningJourneys: learningJourneys.length,
-          users: users.length,
+          users: usersList.length,
           syncQueueItems: syncQueue.length
         },
         data: {
