@@ -80,6 +80,8 @@ export interface IStorage {
   // Category management
   listCategories(): Promise<Category[]>;
   getCategory(id: number): Promise<Category | undefined>;
+  getCategoryByName(name: string): Promise<Category | undefined>;
+  getCategoryBySlug(slug: string): Promise<Category | undefined>;
   createCategory(category: InsertCategory): Promise<Category>;
   updateCategory(id: number, category: Partial<InsertCategory>): Promise<Category>;
   deleteCategory(id: number): Promise<void>;
@@ -88,6 +90,7 @@ export interface IStorage {
   // Subcategory management
   listSubcategories(categoryId?: number): Promise<Subcategory[]>;
   getSubcategory(id: number): Promise<Subcategory | undefined>;
+  getSubcategoryByName(name: string, categoryId: number): Promise<Subcategory | undefined>;
   createSubcategory(subcategory: InsertSubcategory): Promise<Subcategory>;
   updateSubcategory(id: number, subcategory: Partial<InsertSubcategory>): Promise<Subcategory>;
   deleteSubcategory(id: number): Promise<void>;
@@ -96,6 +99,7 @@ export interface IStorage {
   // Sub-subcategory management
   listSubSubcategories(subcategoryId?: number): Promise<SubSubcategory[]>;
   getSubSubcategory(id: number): Promise<SubSubcategory | undefined>;
+  getSubSubcategoryByName(name: string, subcategoryId: number): Promise<SubSubcategory | undefined>;
   createSubSubcategory(subSubcategory: InsertSubSubcategory): Promise<SubSubcategory>;
   updateSubSubcategory(id: number, subSubcategory: Partial<InsertSubSubcategory>): Promise<SubSubcategory>;
   deleteSubSubcategory(id: number): Promise<void>;
@@ -484,6 +488,16 @@ export class DatabaseStorage implements IStorage {
     return category;
   }
   
+  async getCategoryByName(name: string): Promise<Category | undefined> {
+    const [category] = await db.select().from(categories).where(eq(categories.name, name));
+    return category;
+  }
+  
+  async getCategoryBySlug(slug: string): Promise<Category | undefined> {
+    const [category] = await db.select().from(categories).where(eq(categories.slug, slug));
+    return category;
+  }
+  
   async createCategory(category: InsertCategory): Promise<Category> {
     // Check for slug uniqueness
     const [existing] = await db
@@ -550,6 +564,14 @@ export class DatabaseStorage implements IStorage {
   
   async getSubcategory(id: number): Promise<Subcategory | undefined> {
     const [subcategory] = await db.select().from(subcategories).where(eq(subcategories.id, id));
+    return subcategory;
+  }
+  
+  async getSubcategoryByName(name: string, categoryId: number): Promise<Subcategory | undefined> {
+    const [subcategory] = await db
+      .select()
+      .from(subcategories)
+      .where(and(eq(subcategories.name, name), eq(subcategories.categoryId, categoryId)));
     return subcategory;
   }
   
@@ -626,6 +648,14 @@ export class DatabaseStorage implements IStorage {
   
   async getSubSubcategory(id: number): Promise<SubSubcategory | undefined> {
     const [subSubcategory] = await db.select().from(subSubcategories).where(eq(subSubcategories.id, id));
+    return subSubcategory;
+  }
+  
+  async getSubSubcategoryByName(name: string, subcategoryId: number): Promise<SubSubcategory | undefined> {
+    const [subSubcategory] = await db
+      .select()
+      .from(subSubcategories)
+      .where(and(eq(subSubcategories.name, name), eq(subSubcategories.subcategoryId, subcategoryId)));
     return subSubcategory;
   }
   
@@ -1386,12 +1416,37 @@ export class DatabaseStorage implements IStorage {
       });
     }
     
+    // Transform resources to include tags at root level for frontend compatibility
+    const transformedResources = allResources.map(r => ({
+      ...r,
+      tags: (r.metadata as any)?.tags || []
+    }));
+    
+    // Also transform resources in category hierarchies
+    const transformResource = (r: Resource) => ({
+      ...r,
+      tags: (r.metadata as any)?.tags || []
+    });
+    
+    const transformedCategories = hierarchicalCategories.map(cat => ({
+      ...cat,
+      resources: cat.resources.map(transformResource),
+      subcategories: cat.subcategories.map(sub => ({
+        ...sub,
+        resources: sub.resources.map(transformResource),
+        subSubcategories: sub.subSubcategories.map(subSub => ({
+          ...subSub,
+          resources: subSub.resources.map(transformResource)
+        }))
+      }))
+    }));
+    
     return {
       title: "Awesome Video",
       description: "A curated list of awesome video frameworks, libraries, and software for video processing, streaming, and manipulation",
       repoUrl: "https://github.com/krzemienski/awesome-video",
-      resources: allResources,
-      categories: hierarchicalCategories
+      resources: transformedResources,
+      categories: transformedCategories
     };
   }
   
@@ -1682,6 +1737,8 @@ export class MemStorage implements IStorage {
   
   async listCategories(): Promise<Category[]> { return []; }
   async getCategory(id: number): Promise<Category | undefined> { return undefined; }
+  async getCategoryByName(name: string): Promise<Category | undefined> { return undefined; }
+  async getCategoryBySlug(slug: string): Promise<Category | undefined> { return undefined; }
   async createCategory(category: InsertCategory): Promise<Category> {
     throw new Error("Not implemented in memory storage");
   }
@@ -1693,6 +1750,7 @@ export class MemStorage implements IStorage {
   
   async listSubcategories(categoryId?: number): Promise<Subcategory[]> { return []; }
   async getSubcategory(id: number): Promise<Subcategory | undefined> { return undefined; }
+  async getSubcategoryByName(name: string, categoryId: number): Promise<Subcategory | undefined> { return undefined; }
   async createSubcategory(subcategory: InsertSubcategory): Promise<Subcategory> {
     throw new Error("Not implemented in memory storage");
   }
@@ -1704,6 +1762,7 @@ export class MemStorage implements IStorage {
   
   async listSubSubcategories(subcategoryId?: number): Promise<SubSubcategory[]> { return []; }
   async getSubSubcategory(id: number): Promise<SubSubcategory | undefined> { return undefined; }
+  async getSubSubcategoryByName(name: string, subcategoryId: number): Promise<SubSubcategory | undefined> { return undefined; }
   async createSubSubcategory(subSubcategory: InsertSubSubcategory): Promise<SubSubcategory> {
     throw new Error("Not implemented in memory storage");
   }

@@ -23,6 +23,19 @@ interface ImportResult {
   updated: number;
   skipped: number;
   errors: string[];
+  warnings: string[];
+  validationPassed: boolean;
+  validationErrors: Array<{
+    line: number;
+    rule: string;
+    message: string;
+    severity: 'error' | 'warning';
+  }>;
+  validationStats: {
+    totalLines: number;
+    totalResources: number;
+    totalCategories: number;
+  };
   resources: Resource[];
 }
 
@@ -40,6 +53,98 @@ interface ConflictResolution {
   reason: string;
 }
 
+/**
+ * Helper function to generate URL-safe slugs from names
+ */
+function generateSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+/**
+ * Ensure category hierarchy exists in database, creating entries as needed
+ * Returns the IDs for the category, subcategory, and sub-subcategory
+ */
+async function ensureCategoryHierarchy(
+  categoryName: string,
+  subcategoryName?: string,
+  subSubcategoryName?: string
+): Promise<{
+  categoryId: number;
+  subcategoryId?: number;
+  subSubcategoryId?: number;
+}> {
+  // 1. Ensure category exists
+  let category = await storage.getCategoryByName(categoryName);
+  if (!category) {
+    try {
+      category = await storage.createCategory({
+        name: categoryName,
+        slug: generateSlug(categoryName),
+      });
+      console.log(`  Created category: ${categoryName}`);
+    } catch (e: any) {
+      // May already exist due to race condition, try to fetch again
+      category = await storage.getCategoryByName(categoryName);
+      if (!category) {
+        throw new Error(`Failed to create or find category: ${categoryName} - ${e.message}`);
+      }
+    }
+  }
+
+  // 2. Ensure subcategory exists (if provided)
+  let subcategory;
+  if (subcategoryName) {
+    subcategory = await storage.getSubcategoryByName(subcategoryName, category.id);
+    if (!subcategory) {
+      try {
+        subcategory = await storage.createSubcategory({
+          name: subcategoryName,
+          slug: generateSlug(subcategoryName),
+          categoryId: category.id,
+        });
+        console.log(`  Created subcategory: ${subcategoryName} under ${categoryName}`);
+      } catch (e: any) {
+        // May already exist due to race condition
+        subcategory = await storage.getSubcategoryByName(subcategoryName, category.id);
+        if (!subcategory) {
+          throw new Error(`Failed to create or find subcategory: ${subcategoryName} - ${e.message}`);
+        }
+      }
+    }
+  }
+
+  // 3. Ensure sub-subcategory exists (if provided)
+  let subSubcategory;
+  if (subSubcategoryName && subcategory) {
+    subSubcategory = await storage.getSubSubcategoryByName(subSubcategoryName, subcategory.id);
+    if (!subSubcategory) {
+      try {
+        subSubcategory = await storage.createSubSubcategory({
+          name: subSubcategoryName,
+          slug: generateSlug(subSubcategoryName),
+          subcategoryId: subcategory.id,
+        });
+        console.log(`  Created sub-subcategory: ${subSubcategoryName} under ${subcategoryName}`);
+      } catch (e: any) {
+        // May already exist due to race condition
+        subSubcategory = await storage.getSubSubcategoryByName(subSubcategoryName, subcategory.id);
+        if (!subSubcategory) {
+          throw new Error(`Failed to create or find sub-subcategory: ${subSubcategoryName} - ${e.message}`);
+        }
+      }
+    }
+  }
+
+  return {
+    categoryId: category.id,
+    subcategoryId: subcategory?.id,
+    subSubcategoryId: subSubcategory?.id,
+  };
+}
+
 export class GitHubSyncService {
   private client: GitHubClient;
   private websiteUrl: string;
@@ -54,13 +159,21 @@ export class GitHubSyncService {
    */
   async importFromGitHub(
     repoUrl: string, 
-    options: SyncOptions = {}
+    options: SyncOptions & { strictMode?: boolean } = {}
   ): Promise<ImportResult> {
     const result: ImportResult = {
       imported: 0,
       updated: 0,
       skipped: 0,
       errors: [],
+      warnings: [],
+      validationPassed: false,
+      validationErrors: [],
+      validationStats: {
+        totalLines: 0,
+        totalResources: 0,
+        totalCategories: 0
+      },
       resources: []
     };
 
@@ -69,23 +182,149 @@ export class GitHubSyncService {
       console.log(`Fetching README from ${repoUrl}...`);
       const readmeContent = await this.client.fetchFile(repoUrl, 'README.md');
       
-      // Parse the awesome list
+      // STEP 1: Validate with awesome-lint BEFORE importing
+      console.log('Validating awesome list with awesome-lint...');
+      const validationResult = validateAwesomeList(readmeContent);
+      
+      // Store validation results
+      result.validationPassed = validationResult.valid;
+      result.validationStats = validationResult.stats;
+      result.validationErrors = [
+        ...validationResult.errors.map(e => ({
+          line: e.line,
+          rule: e.rule,
+          message: e.message,
+          severity: 'error' as const
+        })),
+        ...validationResult.warnings.map(w => ({
+          line: w.line,
+          rule: w.rule,
+          message: w.message,
+          severity: 'warning' as const
+        }))
+      ];
+      
+      // Add warnings to result
+      result.warnings = validationResult.warnings.map(w => 
+        `Line ${w.line}: [${w.rule}] ${w.message}`
+      );
+      
+      // Log validation results
+      console.log(`Validation: ${validationResult.valid ? '✓ PASSED' : '✗ FAILED'}`);
+      console.log(`  - Lines: ${validationResult.stats.totalLines}`);
+      console.log(`  - Resources detected: ${validationResult.stats.totalResources}`);
+      console.log(`  - Categories detected: ${validationResult.stats.totalCategories}`);
+      console.log(`  - Errors: ${validationResult.errors.length}`);
+      console.log(`  - Warnings: ${validationResult.warnings.length}`);
+      
+      // REJECT if validation failed (has errors)
+      if (!validationResult.valid) {
+        const errorSummary = validationResult.errors.slice(0, 5).map(e => 
+          `Line ${e.line}: [${e.rule}] ${e.message}`
+        ).join('\n');
+        
+        const errorMessage = `Import rejected: awesome-lint validation failed with ${validationResult.errors.length} error(s).\n\nFirst ${Math.min(5, validationResult.errors.length)} errors:\n${errorSummary}`;
+        
+        result.errors.push(errorMessage);
+        console.error('Import rejected due to validation errors');
+        
+        // Log failed import attempt
+        if (!options.dryRun) {
+          await storage.addToGithubSyncQueue({
+            repositoryUrl: repoUrl,
+            action: 'import',
+            status: 'failed',
+            resourceIds: [],
+            metadata: { 
+              error: 'Validation failed',
+              validationErrors: validationResult.errors.length,
+              validationWarnings: validationResult.warnings.length
+            } as any
+          });
+        }
+        
+        return result;
+      }
+      
+      // In strict mode, also reject if there are warnings
+      if (options.strictMode && validationResult.warnings.length > 0) {
+        const warningMessage = `Import rejected (strict mode): ${validationResult.warnings.length} warning(s) found. Disable strict mode to import with warnings.`;
+        result.errors.push(warningMessage);
+        console.error('Import rejected due to warnings in strict mode');
+        return result;
+      }
+      
+      if (validationResult.warnings.length > 0) {
+        console.log(`⚠ Proceeding with ${validationResult.warnings.length} warnings`);
+      }
+      
+      // STEP 2: Parse the awesome list
       console.log('Parsing awesome list content...');
       const parsedList = await parseAwesomeList(readmeContent);
       const dbResources = convertToDbResources(parsedList);
       
       console.log(`Found ${dbResources.length} resources in the awesome list`);
       
-      // Process each resource
+      // STEP 3: Build and ensure category hierarchy exists in database
+      console.log('Ensuring category hierarchy exists in database...');
+      const uniqueHierarchies = new Map<string, { category: string; subcategory?: string; subSubcategory?: string }>();
+      
+      for (const resource of dbResources) {
+        const key = `${resource.category}|${resource.subcategory || ''}|${resource.subSubcategory || ''}`;
+        if (!uniqueHierarchies.has(key)) {
+          uniqueHierarchies.set(key, {
+            category: resource.category as string,
+            subcategory: resource.subcategory as string | undefined,
+            subSubcategory: resource.subSubcategory as string | undefined,
+          });
+        }
+      }
+      
+      console.log(`Found ${uniqueHierarchies.size} unique category hierarchies`);
+      
+      // Create all category hierarchies
+      const hierarchyIds = new Map<string, { categoryId: number; subcategoryId?: number; subSubcategoryId?: number }>();
+      for (const [key, hierarchy] of uniqueHierarchies) {
+        try {
+          const ids = await ensureCategoryHierarchy(
+            hierarchy.category,
+            hierarchy.subcategory,
+            hierarchy.subSubcategory
+          );
+          hierarchyIds.set(key, ids);
+        } catch (error: any) {
+          console.error(`Error creating hierarchy for ${key}: ${error.message}`);
+          result.errors.push(`Category hierarchy error: ${error.message}`);
+        }
+      }
+      
+      console.log('Category hierarchy setup complete');
+      
+      // STEP 4: Process each resource
       for (const resource of dbResources) {
         try {
+          // Get hierarchy IDs for this resource
+          const hierarchyKey = `${resource.category}|${resource.subcategory || ''}|${resource.subSubcategory || ''}`;
+          const hierarchyId = hierarchyIds.get(hierarchyKey);
+          
           const conflict = await this.checkConflict(resource);
           
           switch (conflict.action) {
             case 'create':
               if (!options.dryRun) {
+                // Add hierarchy IDs to metadata for fast lookups
+                const metadata = {
+                  ...(conflict.resource.metadata as Record<string, any> || {}),
+                  categoryId: hierarchyId?.categoryId,
+                  subcategoryId: hierarchyId?.subcategoryId,
+                  subSubcategoryId: hierarchyId?.subSubcategoryId,
+                  importedFrom: repoUrl,
+                  importedAt: new Date().toISOString(),
+                };
+                
                 const created = await storage.createResource({
                   ...conflict.resource,
+                  metadata,
                   status: 'approved',
                   githubSynced: true
                 } as InsertResource);
@@ -106,9 +345,23 @@ export class GitHubSyncService {
               
             case 'update':
               if (!options.dryRun && conflict.resource.id) {
+                // Update hierarchy IDs in metadata for consistency
+                const existingMetadata = (conflict.resource.metadata as Record<string, any>) || {};
+                const updatedMetadata = {
+                  ...existingMetadata,
+                  categoryId: hierarchyId?.categoryId,
+                  subcategoryId: hierarchyId?.subcategoryId,
+                  subSubcategoryId: hierarchyId?.subSubcategoryId,
+                  lastUpdatedFrom: repoUrl,
+                  lastUpdatedAt: new Date().toISOString(),
+                };
+                
                 const updated = await storage.updateResource(
                   conflict.resource.id,
-                  conflict.resource as Partial<InsertResource>
+                  {
+                    ...conflict.resource,
+                    metadata: updatedMetadata
+                  } as Partial<InsertResource>
                 );
                 result.resources.push(updated);
                 

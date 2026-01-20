@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import SEOHead from "@/components/layout/SEOHead";
 import TagFilter from "@/components/ui/tag-filter";
+import { ViewModeToggle, ViewMode } from "@/components/ui/view-mode-toggle";
 import { ArrowLeft, Search, ExternalLink } from "lucide-react";
 import { deslugify, slugify } from "@/lib/utils";
 import { Resource } from "@/types/awesome-list";
@@ -25,6 +26,7 @@ export default function Category() {
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>("all");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("category");
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const { toast } = useToast();
   
   // Fetch awesome list data - use same query as homepage
@@ -256,15 +258,16 @@ export default function Category() {
         />
       </div>
       
-      {/* Results Count */}
+      {/* Results Count and View Mode */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground" data-testid="text-results-count">
           Showing {filteredResources.length} of {allResources.length} resources
           {selectedTags.length > 0 && ` (filtered by ${selectedTags.length} tag${selectedTags.length > 1 ? 's' : ''})`}
         </p>
+        <ViewModeToggle value={viewMode} onChange={setViewMode} />
       </div>
       
-      {/* Resources Grid */}
+      {/* Resources Display */}
       {filteredResources.length === 0 ? (
         <div className="text-center py-12">
           <h3 className="text-lg font-semibold mb-2">No resources found</h3>
@@ -275,14 +278,19 @@ export default function Category() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className={
+          viewMode === "grid" 
+            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" 
+            : viewMode === "list"
+            ? "flex flex-col gap-2"
+            : "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3"
+        }>
           {filteredResources.map((resource, index) => {
             const resourceId = `${slugify(resource.title)}-${index}`;
             
             const handleResourceClick = () => {
               window.open(resource.url, '_blank', 'noopener,noreferrer');
               
-              // Build detailed toast message
               let description = resource.description || '';
               if (!description && resource.tags && resource.tags.length > 0) {
                 description = `Tags: ${resource.tags.slice(0, 3).join(', ')}${resource.tags.length > 3 ? ', ...' : ''}`;
@@ -293,6 +301,58 @@ export default function Category() {
                 description: description || 'Opening resource in new tab',
               });
             };
+            
+            if (viewMode === "list") {
+              return (
+                <div 
+                  key={`${resource.url}-${index}`}
+                  className="flex items-center gap-4 p-3 rounded-lg border border-border bg-card hover:bg-accent cursor-pointer transition-colors"
+                  onClick={handleResourceClick}
+                  data-testid={`card-resource-${resourceId}`}
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium truncate">{resource.title}</span>
+                      <ExternalLink className="h-3 w-3 flex-shrink-0 text-muted-foreground" />
+                    </div>
+                    {resource.description && (
+                      <p className="text-sm text-muted-foreground truncate mt-0.5">
+                        {resource.description}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex gap-1.5 flex-shrink-0">
+                    {resource.subcategory && (
+                      <Badge variant="outline" className="text-xs">{resource.subcategory}</Badge>
+                    )}
+                    {resource.tags && resource.tags.slice(0, 2).map((tag, tagIndex) => (
+                      <Badge key={tagIndex} variant="secondary" className="text-xs hidden md:inline-flex">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              );
+            }
+            
+            if (viewMode === "compact") {
+              return (
+                <Card 
+                  key={`${resource.url}-${index}`}
+                  className="cursor-pointer hover:bg-accent transition-colors border border-border bg-card p-3"
+                  onClick={handleResourceClick}
+                  data-testid={`card-resource-${resourceId}`}
+                >
+                  <div className="flex items-start gap-2">
+                    <span className="font-medium text-sm line-clamp-2 flex-1">{resource.title}</span>
+                    <ExternalLink className="h-3 w-3 flex-shrink-0 text-muted-foreground mt-0.5" />
+                  </div>
+                  {resource.subcategory && (
+                    <Badge variant="outline" className="text-xs mt-2">{resource.subcategory}</Badge>
+                  )}
+                </Card>
+              );
+            }
             
             return (
               <Card 

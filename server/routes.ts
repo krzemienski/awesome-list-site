@@ -2094,6 +2094,113 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // GET /api/admin/export-json - Export full database as JSON for backup
+  app.get('/api/admin/export-json', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      // Get ALL data from database (not just approved resources)
+      const [
+        allResources,
+        categories,
+        subcategories,
+        subSubcategories,
+        tags,
+        learningJourneys,
+        syncQueue,
+        users
+      ] = await Promise.all([
+        storage.listResources({ limit: 100000 }), // Get all resources regardless of status
+        storage.listCategories(),
+        storage.listSubcategories(),
+        storage.listSubSubcategories(),
+        storage.listTags(),
+        storage.listLearningJourneys(),
+        storage.listGithubSyncQueue(),
+        storage.listUsers()
+      ]);
+      
+      const resources = allResources.resources;
+
+      // Get journey steps for each journey
+      const journeyIds = learningJourneys.map(j => j.id);
+      const stepsMap = await storage.listJourneyStepsBatch(journeyIds);
+      
+      // Attach steps to journeys
+      const journeysWithSteps = learningJourneys.map(journey => ({
+        ...journey,
+        steps: stepsMap.get(journey.id) || []
+      }));
+
+      // Build hierarchy structure
+      const categoryHierarchy = categories.map(cat => ({
+        ...cat,
+        subcategories: subcategories
+          .filter(sub => sub.categoryId === cat.id)
+          .map(sub => ({
+            ...sub,
+            subSubcategories: subSubcategories.filter(
+              ssub => ssub.subcategoryId === sub.id
+            )
+          }))
+      }));
+
+      // Count resources by status
+      const resourcesByStatus = resources.reduce((acc: Record<string, number>, r: any) => {
+        acc[r.status || 'unknown'] = (acc[r.status || 'unknown'] || 0) + 1;
+        return acc;
+      }, {});
+      
+      // Sanitize users for export (remove sensitive data)
+      const sanitizedUsers = users.map((u: any) => ({
+        id: u.id,
+        username: u.username,
+        role: u.role,
+        createdAt: u.createdAt,
+        updatedAt: u.updatedAt
+      }));
+
+      const exportData = {
+        exportedAt: new Date().toISOString(),
+        version: '1.0.0',
+        schema: {
+          resources: "id, title, url, description, category, subcategory, subSubcategory, status, submittedBy, approvedBy, approvedAt, githubSynced, lastSyncedAt, metadata, createdAt, updatedAt",
+          categories: "id, name, slug",
+          subcategories: "id, name, slug, categoryId",
+          subSubcategories: "id, name, slug, subcategoryId",
+          tags: "id, name, slug",
+          learningJourneys: "id, title, description, category, difficulty, estimatedHours, createdBy, createdAt, updatedAt"
+        },
+        stats: {
+          resources: resources.length,
+          resourcesByStatus,
+          categories: categories.length,
+          subcategories: subcategories.length,
+          subSubcategories: subSubcategories.length,
+          tags: tags.length,
+          learningJourneys: learningJourneys.length,
+          users: users.length,
+          syncQueueItems: syncQueue.length
+        },
+        data: {
+          resources,
+          categoryHierarchy,
+          tags,
+          learningJourneys: journeysWithSteps,
+          syncQueue,
+          users: sanitizedUsers
+        }
+      };
+
+      // Set headers for JSON download
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Content-Disposition', `attachment; filename="awesome-list-backup-${new Date().toISOString().split('T')[0]}.json"`);
+      
+      res.json(exportData);
+    } catch (error) {
+      console.error('Error generating JSON export:', error);
+      res.status(500).json({ message: 'Failed to generate JSON export' });
+    }
+  });
+
   // POST /api/admin/validate - Run awesome-lint validation on current data
   app.post('/api/admin/validate', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
@@ -2255,7 +2362,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/admin/import-github - Import awesome list from GitHub URL
   app.post('/api/admin/import-github', isAuthenticated, isAdmin, async (req, res) => {
     try {
-      const { repoUrl, dryRun = false } = req.body;
+      const { repoUrl, dryRun = false, strictMode = false } = req.body;
       
       if (!repoUrl) {
         return res.status(400).json({ message: 'Repository URL is required' });
@@ -2264,9 +2371,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`Starting GitHub import from: ${repoUrl}`);
       
       // Use the sync service to import
-      const result = await syncService.importFromGitHub(repoUrl, { dryRun });
+      const result = await syncService.importFromGitHub(repoUrl, { dryRun, strictMode });
       
       console.log(`GitHub import completed: ${result.imported} imported, ${result.updated} updated, ${result.skipped} skipped`);
+      
+      // If validation failed, return 400 with validation details
+      if (!result.validationPassed && result.errors.length > 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'Import rejected: awesome-lint validation failed',
+          validationPassed: result.validationPassed,
+          validationStats: result.validationStats,
+          validationErrors: result.validationErrors.filter(e => e.severity === 'error'),
+          validationWarnings: result.validationErrors.filter(e => e.severity === 'warning'),
+          errors: result.errors
+        });
+      }
       
       res.json({
         success: true,
@@ -2274,6 +2394,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         updated: result.updated,
         skipped: result.skipped,
         errors: result.errors,
+        warnings: result.warnings,
+        validationPassed: result.validationPassed,
+        validationStats: result.validationStats,
+        validationErrors: result.validationErrors.filter(e => e.severity === 'error'),
+        validationWarnings: result.validationErrors.filter(e => e.severity === 'warning'),
         message: `Successfully imported ${result.imported} resources from ${repoUrl}`
       });
     } catch (error: any) {
