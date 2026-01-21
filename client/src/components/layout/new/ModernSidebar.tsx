@@ -215,9 +215,10 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
   };
 
   // Navigation helper to close sidebar after clicking (works on all screen sizes now)
+  // Close sidebar first, then navigate - ensures sidebar closes even when clicking current route
   const navigate = (path: string) => {
-    setLocation(path);
     setIsOpen(false);
+    setLocation(path);
   };
 
   // Sidebar content to reuse in both mobile and desktop views
