@@ -61,7 +61,7 @@ const SidebarProvider = React.forwardRef<
 >(
   (
     {
-      defaultOpen = true,
+      defaultOpen = false,
       open: openProp,
       onOpenChange: setOpenProp,
       className,
@@ -74,61 +74,30 @@ const SidebarProvider = React.forwardRef<
     const isMobile = useIsMobile()
     const [openMobile, setOpenMobile] = React.useState(false)
 
-    // On mobile, restore cookie persistence for openMobile state
-    React.useEffect(() => {
-      if (isMobile) {
-        // Read cookie on mount
-        const value = document.cookie.match('(^|;)\\s*sidebar:state\\s*=\\s*([^;]+)')?.pop()
-        if (value === 'true') setOpenMobile(true)
-        else if (value === 'false') setOpenMobile(false)
-      }
-    }, [isMobile])
+    // Sidebar is ALWAYS hidden by default (overlay mode on all screen sizes)
+    const open = openMobile
 
-    // DESKTOP: Always expanded (true), MOBILE: Use state
-    // On desktop, we completely ignore cookies and state mutations
-    const open = isMobile ? openMobile : true
-
-    // setOpen: Only works on mobile, no-op on desktop
+    // setOpen: Works on all screen sizes now
     const setOpen = React.useCallback(
       (value: boolean | ((value: boolean) => boolean)) => {
-        // Desktop: completely ignore all attempts to change state
-        if (!isMobile) {
-          return
-        }
-        
-        // Mobile: normal state management with cookies
         const openState = typeof value === "function" ? value(openMobile) : value
         setOpenMobile(openState)
-
-        // Only set cookie on mobile
-        document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
       },
-      [isMobile, openMobile]
+      [openMobile]
     )
 
-    // Helper to toggle the sidebar - only works on mobile
+    // Helper to toggle the sidebar - works on all screen sizes
     const toggleSidebar = React.useCallback(() => {
-      // Desktop: do nothing
-      if (!isMobile) {
-        return
-      }
-      // Mobile: toggle the mobile sidebar
       setOpenMobile((open) => !open)
-    }, [isMobile])
+    }, [])
 
-    // Adds a keyboard shortcut to toggle the sidebar - MOBILE ONLY
+    // Adds a keyboard shortcut to toggle the sidebar on all screen sizes
     React.useEffect(() => {
       const handleKeyDown = (event: KeyboardEvent) => {
         if (
           event.key === SIDEBAR_KEYBOARD_SHORTCUT &&
           (event.metaKey || event.ctrlKey)
         ) {
-          // Desktop: completely ignore the shortcut
-          if (!isMobile) {
-            return
-          }
-          
-          // Mobile: prevent default and toggle
           event.preventDefault()
           toggleSidebar()
         }
@@ -136,15 +105,15 @@ const SidebarProvider = React.forwardRef<
 
       window.addEventListener("keydown", handleKeyDown)
       return () => window.removeEventListener("keydown", handleKeyDown)
-    }, [toggleSidebar, isMobile])
+    }, [toggleSidebar])
 
     // We add a state so that we can do data-state="expanded" or "collapsed".
     // This makes it easier to style the sidebar with Tailwind classes.
     const state = open ? "expanded" : "collapsed"
 
-    // Enhanced scroll lock when mobile sidebar is open
+    // Enhanced scroll lock when sidebar is open (works on all screen sizes now)
     React.useEffect(() => {
-      if (isMobile && openMobile) {
+      if (openMobile) {
         // Store current scroll position
         const scrollY = window.scrollY;
         document.documentElement.style.setProperty('--scroll-top', `-${scrollY}px`);
@@ -177,9 +146,9 @@ const SidebarProvider = React.forwardRef<
         document.body.classList.remove('scroll-lock');
         document.documentElement.classList.remove('scroll-lock');
       }
-    }, [isMobile, openMobile]);
+    }, [openMobile]);
 
-    // Add auto-close on scroll/swipe gestures
+    // Add auto-close on scroll/swipe gestures (mobile only)
     React.useEffect(() => {
       if (!isMobile || !openMobile) return;
       
@@ -232,7 +201,6 @@ const SidebarProvider = React.forwardRef<
             }
             className={cn(
               "group/sidebar-wrapper flex min-h-svh w-full has-[[data-variant=inset]]:bg-sidebar",
-              "lg:grid lg:grid-cols-[var(--sidebar-width)_1fr]",
               className
             )}
             ref={ref}
@@ -266,7 +234,7 @@ const Sidebar = React.forwardRef<
     },
     ref
   ) => {
-    const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+    const { openMobile, setOpenMobile } = useSidebar()
 
     if (collapsible === "none") {
       return (
@@ -283,56 +251,32 @@ const Sidebar = React.forwardRef<
       )
     }
 
-    if (isMobile) {
-      return (
-        <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
-          <SheetContent
-            data-sidebar="sidebar"
-            data-mobile="true"
-            className={cn(
-              "z-[80] w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden",
-              !openMobile && "hidden"
-            )}
-            style={
-              {
-                "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
-                display: openMobile ? undefined : "none",
-                visibility: openMobile ? "visible" : "hidden",
-              } as React.CSSProperties
-            }
-            side={side}
-          >
-            <SheetHeader className="sr-only">
-              <SheetTitle>Sidebar</SheetTitle>
-              <SheetDescription>Displays the mobile sidebar.</SheetDescription>
-            </SheetHeader>
-            <div className="flex h-full w-full flex-col">{children}</div>
-          </SheetContent>
-        </Sheet>
-      )
-    }
-
+    // Always use Sheet/overlay behavior on all screen sizes
     return (
-      <div
-        ref={ref}
-        className="group peer hidden lg:block text-sidebar-foreground lg:sticky lg:top-0"
-        data-state="expanded"
-        data-variant={variant}
-        data-side={side}
-      >
-        <div
-          className={cn(
-            "flex h-svh w-[16rem] flex-col bg-sidebar",
-            "group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow",
-            "group-data-[side=left]:border-r group-data-[side=right]:border-l",
-            className
-          )}
+      <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
+        <SheetContent
           data-sidebar="sidebar"
-          {...props}
+          data-mobile="true"
+          className={cn(
+            "z-[80] w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden",
+            !openMobile && "hidden"
+          )}
+          style={
+            {
+              "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
+              display: openMobile ? undefined : "none",
+              visibility: openMobile ? "visible" : "hidden",
+            } as React.CSSProperties
+          }
+          side={side}
         >
-          {children}
-        </div>
-      </div>
+          <SheetHeader className="sr-only">
+            <SheetTitle>Sidebar</SheetTitle>
+            <SheetDescription>Displays the sidebar navigation.</SheetDescription>
+          </SheetHeader>
+          <div className="flex h-full w-full flex-col">{children}</div>
+        </SheetContent>
+      </Sheet>
     )
   }
 )

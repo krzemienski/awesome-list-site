@@ -312,6 +312,19 @@ export function AppSidebar({ categories, isLoading }: AppSidebarProps) {
                     <TooltipContent side="right">AI-Powered Recommendations</TooltipContent>
                   </Tooltip>
                 </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <SidebarMenuButton asChild isActive={isActiveRoute("/admin")}>
+                        <Link href="/admin" onClick={handleMobileNavigation}>
+                          <Shield className="h-4 w-4" />
+                          <span>Admin</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">Admin Dashboard</TooltipContent>
+                  </Tooltip>
+                </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>

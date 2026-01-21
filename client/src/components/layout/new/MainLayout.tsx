@@ -23,24 +23,6 @@ export default function MainLayout({ awesomeList, isLoading, children, user, onL
   
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  useEffect(() => {
-    const handleResize = () => {
-      const width = window.innerWidth;
-      if (width >= 1024) {
-        setIsSidebarOpen(true);
-      } else if (width >= 768) {
-        setIsSidebarOpen(true);
-      } else {
-        setIsSidebarOpen(false);
-      }
-    };
-    
-    handleResize();
-    
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
   return (
     <div className="flex h-screen flex-col">
       <TopBar 

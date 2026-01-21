@@ -214,12 +214,10 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
     }
   };
 
-  // Navigation helper to close mobile sidebar after clicking
+  // Navigation helper to close sidebar after clicking (works on all screen sizes now)
   const navigate = (path: string) => {
     setLocation(path);
-    if (isMobile) {
-      setIsOpen(false);
-    }
+    setIsOpen(false);
   };
 
   // Sidebar content to reuse in both mobile and desktop views
@@ -467,169 +465,16 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
     </>
   );
 
-  // Mobile sidebar with sheet component (< 768px)
-  if (isMobile) {
-    return (
-      <>
-        <Sheet open={isOpen} onOpenChange={setIsOpen}>
-          <SheetContent side="left" className="p-0 w-[85vw] max-w-[380px]">
-            <div className="flex flex-col h-full">
-              {sidebarContent}
-            </div>
-          </SheetContent>
-        </Sheet>
-        
-        <Dialog open={recommendationsOpen} onOpenChange={setRecommendationsOpen}>
-          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5" />
-                AI-Powered Recommendations
-              </DialogTitle>
-            </DialogHeader>
-            {userProfile ? (
-              <RecommendationPanel 
-                userProfile={userProfile}
-                resources={resources}
-                onResourceClick={(resourceId) => {
-                  setRecommendationsOpen(false);
-                  window.open(resourceId, '_blank');
-                }}
-              />
-            ) : (
-              <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-                <div className="rounded-full bg-muted p-4 mb-4">
-                  <Sparkles className="h-8 w-8 text-muted-foreground" />
-                </div>
-                <h3 className="text-lg font-semibold mb-2">Set Up Your Profile</h3>
-                <p className="text-sm text-muted-foreground mb-6 max-w-md">
-                  Create your personalized profile to get AI-powered recommendations tailored to your learning goals and interests.
-                </p>
-                <Button 
-                  onClick={() => {
-                    setRecommendationsOpen(false);
-                    navigate('/advanced');
-                  }}
-                  className="flex items-center gap-2"
-                >
-                  <Zap className="h-4 w-4" />
-                  Go to Preferences
-                </Button>
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
-      </>
-    );
-  }
-
-  // Tablet sidebar with collapsible sidebar (768px - 1023px)
-  if (isTablet) {
-    return (
-      <>
-        <Sidebar 
-          variant="sidebar" 
-          collapsible="offcanvas"
-          style={{ "--sidebar-width": "14rem" } as React.CSSProperties}
-          className={cn(
-            "transition-all duration-300 ease-in-out",
-            isOpen ? "translate-x-0" : "-translate-x-full"
-          )}
-        >
-          <SidebarContent>
-            {sidebarContent}
-          </SidebarContent>
-          <SidebarFooter>
-            <div className="border-t border-border p-3 flex items-center justify-between">
-              <Button variant="ghost" size="sm" asChild>
-                <a href={title.includes("Selfhosted") 
-                    ? "https://github.com/awesome-selfhosted/awesome-selfhosted" 
-                    : "https://github.com/krzemienski/awesome-video"} 
-                   target="_blank" 
-                   rel="noopener noreferrer">
-                  <ExternalLink className="mr-2 h-4 w-4" />
-                  GitHub
-                </a>
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={() => setIsOpen(false)}
-                className="h-11 w-11"
-                data-testid="button-collapse-sidebar"
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </Button>
-            </div>
-          </SidebarFooter>
-        </Sidebar>
-        
-        <Dialog open={recommendationsOpen} onOpenChange={setRecommendationsOpen}>
-          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5" />
-                AI-Powered Recommendations
-              </DialogTitle>
-            </DialogHeader>
-            {userProfile ? (
-              <RecommendationPanel 
-                userProfile={userProfile}
-                resources={resources}
-                onResourceClick={(resourceId) => {
-                  setRecommendationsOpen(false);
-                  window.open(resourceId, '_blank');
-                }}
-              />
-            ) : (
-              <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-                <div className="rounded-full bg-muted p-4 mb-4">
-                  <Sparkles className="h-8 w-8 text-muted-foreground" />
-                </div>
-                <h3 className="text-lg font-semibold mb-2">Set Up Your Profile</h3>
-                <p className="text-sm text-muted-foreground mb-6 max-w-md">
-                  Create your personalized profile to get AI-powered recommendations tailored to your learning goals and interests.
-                </p>
-                <Button 
-                  onClick={() => {
-                    setRecommendationsOpen(false);
-                    navigate('/advanced');
-                  }}
-                  className="flex items-center gap-2"
-                >
-                  <Zap className="h-4 w-4" />
-                  Go to Preferences
-                </Button>
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
-      </>
-    );
-  }
-
-  // Desktop sidebar using shadcn Sidebar component (in-flow, not fixed) (>= 1024px)
+  // Always use Sheet overlay sidebar on all screen sizes
   return (
     <>
-      <Sidebar variant="sidebar" collapsible="none" style={{ "--sidebar-width": "16rem" } as React.CSSProperties}>
-        <SidebarContent>
-          {sidebarContent}
-        </SidebarContent>
-        <SidebarFooter>
-          <div className="border-t border-border p-3">
-            <Button variant="ghost" className="w-full justify-start" asChild>
-              <a href={title.includes("Selfhosted") 
-                  ? "https://github.com/awesome-selfhosted/awesome-selfhosted" 
-                  : "https://github.com/krzemienski/awesome-video"} 
-                 target="_blank" 
-                 rel="noopener noreferrer">
-                <ExternalLink className="mr-2 h-4 w-4" />
-                GitHub Repository
-              </a>
-            </Button>
+      <Sheet open={isOpen} onOpenChange={setIsOpen}>
+        <SheetContent side="left" className="p-0 w-[85vw] max-w-[380px]">
+          <div className="flex flex-col h-full">
+            {sidebarContent}
           </div>
-        </SidebarFooter>
-      </Sidebar>
+        </SheetContent>
+      </Sheet>
       
       <Dialog open={recommendationsOpen} onOpenChange={setRecommendationsOpen}>
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
