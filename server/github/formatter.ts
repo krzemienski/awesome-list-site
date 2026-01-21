@@ -287,6 +287,16 @@ export class AwesomeListFormatter {
   private sanitizePunctuation(text: string): string {
     let result = text;
     
+    // Convert HTML entities to their characters first
+    result = result.replace(/&#39;/g, "'");  // HTML entity for single quote
+    result = result.replace(/&#x27;/g, "'"); // Hex HTML entity for single quote
+    result = result.replace(/&apos;/g, "'"); // Named HTML entity for apostrophe
+    result = result.replace(/&#34;/g, '"');  // HTML entity for double quote
+    result = result.replace(/&quot;/g, '"'); // Named HTML entity for double quote
+    result = result.replace(/&amp;/g, '&');  // HTML entity for ampersand
+    result = result.replace(/&lt;/g, '<');   // HTML entity for less-than
+    result = result.replace(/&gt;/g, '>');   // HTML entity for greater-than
+    
     // Convert curly/smart quotes to straight quotes (using Unicode escape sequences for reliability)
     // Single quotes: ' ' ‹ › ‚ (U+2018, U+2019, U+2039, U+203A, U+201A)
     result = result.replace(/[\u2018\u2019\u2039\u203A\u201A]/g, "'");
@@ -298,7 +308,8 @@ export class AwesomeListFormatter {
     result = result.replace(/[\u2013\u2014]/g, '-');  // En-dash, em-dash (U+2013, U+2014)
     
     // Remove repeated periods (awesome-lint: no-repeat-punctuation)
-    result = result.replace(/\.{2,}/g, '.');
+    // Must catch both consecutive periods and periods with spaces
+    result = result.replace(/\.(\s*\.)+/g, '.');
     
     // Remove repeated commas
     result = result.replace(/,{2,}/g, ',');
@@ -332,48 +343,66 @@ export class AwesomeListFormatter {
   private removeItemNameFromStart(description: string, title: string): string {
     if (!description || !title) return description;
     
-    // Normalize both for comparison
-    const descLower = description.toLowerCase();
-    const titleLower = title.toLowerCase();
+    // Normalize both for comparison - strip trailing punctuation/ellipsis/whitespace
+    const normalizeForCompare = (s: string) => s.toLowerCase().trim().replace(/[.!?\s…]+$/g, '').replace(/\.{2,}$/g, '');
+    const descNorm = normalizeForCompare(description);
+    const titleNorm = normalizeForCompare(title);
+    
+    // If description equals title (or is very similar after normalization), return empty to skip description
+    if (descNorm === titleNorm) {
+      return ''; // Will be skipped by the empty check
+    }
     
     // Check if description starts with the title (case-insensitive)
+    const descLower = description.toLowerCase().trim();
+    const titleLower = title.toLowerCase().trim();
     if (descLower.startsWith(titleLower)) {
       let rest = description.slice(title.length).trimStart();
-      // Remove common connecting words
-      const connectors = ['is', 'are', 'was', 'were', 'provides', 'offers', "'s", "'s"];
-      for (const connector of connectors) {
-        if (rest.toLowerCase().startsWith(connector + ' ')) {
-          rest = rest.slice(connector.length).trimStart();
-          break;
-        } else if (rest.toLowerCase().startsWith(connector + '.')) {
-          rest = rest.slice(connector.length).trimStart();
-          break;
-        }
-      }
-      // Capitalize first letter of remaining description
-      if (rest.length > 0) {
-        rest = rest[0].toUpperCase() + rest.slice(1);
-      }
+      rest = this.cleanDescriptionStart(rest);
       return rest || description;
     }
     
     // Also check for "The [title]" pattern
     if (descLower.startsWith('the ' + titleLower)) {
       let rest = description.slice(4 + title.length).trimStart();
-      const connectors = ['is', 'are', 'was', 'were', 'provides', 'offers'];
-      for (const connector of connectors) {
-        if (rest.toLowerCase().startsWith(connector + ' ')) {
-          rest = rest.slice(connector.length).trimStart();
-          break;
-        }
-      }
-      if (rest.length > 0) {
-        rest = rest[0].toUpperCase() + rest.slice(1);
-      }
+      rest = this.cleanDescriptionStart(rest);
       return rest || description;
     }
     
     return description;
+  }
+  
+  /**
+   * Clean the start of a description after removing item name
+   * Removes leading punctuation, connectors, and ensures proper capitalization
+   */
+  private cleanDescriptionStart(text: string): string {
+    let rest = text;
+    
+    // Remove leading punctuation (comma, period, colon, semicolon, dash, etc.)
+    rest = rest.replace(/^[,.:;!?\-–—\s]+/, '').trimStart();
+    
+    // Remove common connecting words
+    const connectors = ['is', 'are', 'was', 'were', 'provides', 'offers', "'s", "'s", 'a', 'an', 'the'];
+    for (const connector of connectors) {
+      if (rest.toLowerCase().startsWith(connector + ' ')) {
+        rest = rest.slice(connector.length).trimStart();
+        break;
+      } else if (rest.toLowerCase().startsWith(connector + '.')) {
+        rest = rest.slice(connector.length).trimStart();
+        break;
+      }
+    }
+    
+    // Remove any remaining leading punctuation after connector removal
+    rest = rest.replace(/^[,.:;!?\-–—\s]+/, '').trimStart();
+    
+    // Capitalize first letter of remaining description
+    if (rest.length > 0 && rest[0] !== rest[0].toUpperCase()) {
+      rest = rest[0].toUpperCase() + rest.slice(1);
+    }
+    
+    return rest;
   }
   
   /**
@@ -426,7 +455,6 @@ export class AwesomeListFormatter {
       'Tensorflow': 'TensorFlow',
       'centos': 'CentOS',
       'Centos': 'CentOS',
-      'macos': 'macOS',
       'MacOS': 'macOS',
       'Macos': 'macOS',
       'OS X': 'macOS',
@@ -440,7 +468,6 @@ export class AwesomeListFormatter {
       'openai': 'OpenAI',
       'Openai': 'OpenAI',
       'python': 'Python',
-      'Python': 'Python',
       'jasmine': 'Jasmine',
       'Gimp': 'GIMP',
       'gimp': 'GIMP'
@@ -459,7 +486,7 @@ export class AwesomeListFormatter {
 
   /**
    * Normalize URL for deduplication
-   * Handles: http/https, www/non-www, trailing slashes
+   * Handles: http/https, www/non-www, trailing slashes, fragments
    */
   private normalizeUrlForDedup(url: string): string {
     let normalized = url.toLowerCase();
@@ -467,6 +494,8 @@ export class AwesomeListFormatter {
     normalized = normalized.replace(/^https?:\/\//, '');
     // Remove www prefix
     normalized = normalized.replace(/^www\./, '');
+    // Remove fragment (everything after #)
+    normalized = normalized.replace(/#.*$/, '');
     // Remove trailing slash
     normalized = normalized.replace(/\/$/, '');
     return normalized;
