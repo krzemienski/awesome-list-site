@@ -330,50 +330,50 @@ export default function AdminDashboard() {
 
       {/* Admin Tabs */}
       <Tabs defaultValue="approvals" className="space-y-4">
-        <ScrollArea className="w-full">
-          <TabsList className="inline-flex w-auto min-w-full lg:grid lg:grid-cols-13 lg:w-full bg-black border border-pink-500/20">
-            <TabsTrigger value="approvals" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap" data-testid="tab-approvals">
+        <div className="w-full overflow-x-auto pb-2">
+          <TabsList className="inline-flex h-10 items-center gap-1 bg-black border border-pink-500/20 p-1">
+            <TabsTrigger value="approvals" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap" data-testid="tab-approvals">
               Approvals {stats?.pendingApprovals ? <Badge variant="destructive" className="ml-2">{stats.pendingApprovals}</Badge> : null}
             </TabsTrigger>
-            <TabsTrigger value="edits" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap" data-testid="tab-edits">
+            <TabsTrigger value="edits" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap" data-testid="tab-edits">
               Edits
             </TabsTrigger>
-            <TabsTrigger value="enrichment" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap" data-testid="tab-enrichment">
-              <Sparkles className="h-4 w-4 mr-2" />
-              Batch Enrichment
+            <TabsTrigger value="enrichment" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap" data-testid="tab-enrichment">
+              <Sparkles className="h-4 w-4 mr-1" />
+              Enrichment
             </TabsTrigger>
-            <TabsTrigger value="export" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap">
+            <TabsTrigger value="export" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap">
               Export
             </TabsTrigger>
-            <TabsTrigger value="database" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap">
+            <TabsTrigger value="database" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap">
               Database
             </TabsTrigger>
-            <TabsTrigger value="validation" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap">
+            <TabsTrigger value="validation" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap">
               Validation
             </TabsTrigger>
-            <TabsTrigger value="resources" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap">
+            <TabsTrigger value="resources" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap">
               Resources
             </TabsTrigger>
-            <TabsTrigger value="categories" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap" data-testid="tab-categories">
+            <TabsTrigger value="categories" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap" data-testid="tab-categories">
               Categories
             </TabsTrigger>
-            <TabsTrigger value="subcategories" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap" data-testid="tab-subcategories">
+            <TabsTrigger value="subcategories" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap" data-testid="tab-subcategories">
               Subcategories
             </TabsTrigger>
-            <TabsTrigger value="subsubcategories" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap" data-testid="tab-subsubcategories">
-              Sub-Subcategories
+            <TabsTrigger value="subsubcategories" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap" data-testid="tab-subsubcategories">
+              Sub-Subcats
             </TabsTrigger>
-            <TabsTrigger value="users" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap">
+            <TabsTrigger value="users" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap">
               Users
             </TabsTrigger>
-            <TabsTrigger value="github" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap">
+            <TabsTrigger value="github" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap">
               GitHub
             </TabsTrigger>
-            <TabsTrigger value="audit" className="data-[state=active]:bg-pink-500/20 whitespace-nowrap">
+            <TabsTrigger value="audit" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap">
               Audit
             </TabsTrigger>
           </TabsList>
-        </ScrollArea>
+        </div>
 
         {/* Approvals Tab */}
         <TabsContent value="approvals" data-testid="content-approvals">
