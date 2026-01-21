@@ -225,7 +225,15 @@ export class AwesomeListFormatter {
       // These break markdown parsing and are not useful in README
       description = description.replace(/\[vc_[^\]]+\]/g, '');
       description = description.replace(/\[\/vc_[^\]]+\]/g, '');
-      description = description.trim();
+      
+      // Remove GitHub emoji shortcodes from start (e.g., :chocolate_bar:, :clapper:)
+      description = description.replace(/^(:[a-z_]+:\s*)+/gi, '');
+      
+      // Remove Unicode emojis from start of description (awesome-lint: valid casing)
+      // Use a function to strip leading emoji characters
+      description = this.stripLeadingEmojis(description);
+      
+      description = description.trim()
       
       // Apply proper capitalizations FIRST so title and description have same transformations
       // This ensures "Wasm" → "WebAssembly" in both title and description before comparison
@@ -279,6 +287,49 @@ export class AwesomeListFormatter {
   }
   
   /**
+   * Strip leading emoji characters from text
+   * Emojis at start of description cause "valid casing" errors
+   */
+  private stripLeadingEmojis(text: string): string {
+    if (!text) return text;
+    
+    // Match and remove leading emojis and spaces
+    // This handles most common emoji ranges
+    let i = 0;
+    const chars = Array.from(text); // Array.from handles multi-byte characters properly
+    
+    while (i < chars.length) {
+      const char = chars[i];
+      const codePoint = char.codePointAt(0) || 0;
+      
+      // Skip whitespace
+      if (char === ' ' || char === '\t') {
+        i++;
+        continue;
+      }
+      
+      // Check if it's an emoji (common ranges)
+      const isEmoji = (
+        (codePoint >= 0x1F300 && codePoint <= 0x1F9FF) || // Misc symbols, emoticons
+        (codePoint >= 0x2600 && codePoint <= 0x26FF) ||   // Misc symbols
+        (codePoint >= 0x2700 && codePoint <= 0x27BF) ||   // Dingbats
+        (codePoint >= 0x1F600 && codePoint <= 0x1F64F) || // Emoticons
+        (codePoint >= 0x1F680 && codePoint <= 0x1F6FF) || // Transport
+        (codePoint >= 0xFE00 && codePoint <= 0xFE0F) ||   // Variation selectors
+        (codePoint >= 0x1F1E0 && codePoint <= 0x1F1FF)    // Flags
+      );
+      
+      if (isEmoji) {
+        i++;
+      } else {
+        break; // Found non-emoji, non-space character
+      }
+    }
+    
+    return chars.slice(i).join('').trim();
+  }
+  
+  /**
    * Sanitize punctuation to comply with awesome-lint
    * - Fix unmatched quotes (convert curly quotes to straight, remove unmatched)
    * - Remove repeated periods
@@ -304,22 +355,34 @@ export class AwesomeListFormatter {
     result = result.replace(/[\u201C\u201D\u00AB\u00BB\u201E]/g, '"');
     
     // Remove other problematic Unicode characters
-    result = result.replace(/\u2026/g, '...');  // Ellipsis (U+2026)
+    result = result.replace(/\u2026/g, '...');  // Ellipsis (U+2026) - keep as ... (valid)
     result = result.replace(/[\u2013\u2014]/g, '-');  // En-dash, em-dash (U+2013, U+2014)
     
-    // Remove repeated periods (awesome-lint: no-repeat-punctuation)
-    // Must catch both consecutive periods and periods with spaces
-    result = result.replace(/\.(\s*\.)+/g, '.');
+    // Remove repeated periods BUT preserve intentional ellipsis (...)
+    // awesome-lint: no-repeat-punctuation - only targets unintentional repetition
+    // First, temporarily replace valid ellipsis patterns
+    result = result.replace(/\.\.\./g, '\u2026');  // Protect ellipsis
+    result = result.replace(/\.(\s*\.)+/g, '.');   // Remove actual repeated periods
+    result = result.replace(/\u2026/g, '...');     // Restore ellipsis
     
     // Remove repeated commas
     result = result.replace(/,{2,}/g, ',');
     
-    // Fix unmatched single quotes - count and balance
-    const singleQuoteCount = (result.match(/'/g) || []).length;
-    if (singleQuoteCount % 2 !== 0) {
-      // Unmatched quote - try to remove the odd one out
-      // Strategy: just remove all single quotes if unbalanced (safer approach)
-      result = result.replace(/'/g, '');
+    // Handle single quotes: distinguish apostrophes from actual quotes
+    // Apostrophes (contractions/possessives) should NOT be counted as quotes
+    // Pattern: letter + ' + letter = apostrophe (don't, it's, program's)
+    const apostrophePattern = /\w'\w/g;
+    const apostrophes = result.match(apostrophePattern) || [];
+    
+    // Count only non-apostrophe single quotes
+    const allSingleQuotes = (result.match(/'/g) || []).length;
+    const apostropheCount = apostrophes.length;
+    const actualQuoteCount = allSingleQuotes - apostropheCount;
+    
+    if (actualQuoteCount % 2 !== 0 && actualQuoteCount > 0) {
+      // Only remove actual quote marks, not apostrophes in words
+      // Remove quotes that are NOT between word characters
+      result = result.replace(/(?<!\w)'(?!\w)/g, '');
     }
     
     // Fix unmatched double quotes
