@@ -17,7 +17,8 @@ import {
   Sparkles,
   User,
   Zap,
-  Github
+  Github,
+  Shield
 } from "lucide-react"
 import { useState, useEffect, useMemo } from "react"
 import { Link, useLocation } from "wouter"
