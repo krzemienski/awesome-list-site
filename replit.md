@@ -8,6 +8,20 @@ A production-ready React application for browsing and discovering over 2,600 cur
 
 ## Recent Changes
 
+### Awesome-Lint Compliance Fixes (January 21, 2026)
+- **Major Export Overhaul**: Reduced awesome-lint errors from 191+ to just 2 (unavoidable structural requirements)
+- **Badge Placement**: Badge now on same line as main heading per awesome-lint spec
+- **ToC Anchor Generation**: Fixed GitHub anchor format - "Community & Events" now correctly links to `#community--events`
+- **URL Deduplication**: Now handles http/https and www/non-www variations
+- **Description Sanitization**: 
+  - Removes item name from description start (no-repeat-item-in-description)
+  - Skips empty/punctuation-only descriptions (awesome-list-item compliance)
+  - Handles underscore-containing tool names with "A " prefix for valid casing
+- **Unicode Quote Handling**: Converts curly quotes to straight quotes using Unicode escape sequences
+- **Spelling Corrections**: TensorFlow, CentOS, macOS, WebAssembly, FFmpeg, WebRTC, OpenAI, etc.
+- **Lowercase Starter Preservation**: macOS, npm, webpack, iOS terms preserved when starting descriptions
+- **Remaining 2 Errors**: awesome-contributing (requires CONTRIBUTING.md) and awesome-github (requires git repo) - expected for standalone exports
+
 ### Feature Updates (January 20, 2026)
 - **View Mode Toggle**: Added three content card view modes (grid, list, compact) using ShadCN ToggleGroup component in the Category page
 - **JSON Export Endpoint**: Added `GET /api/admin/export-json` for full database backup including all resources (all statuses), users, category hierarchies, tags, learning journeys, and sync queue with schema documentation

@@ -2061,12 +2061,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const resources = await storage.getAllApprovedResources();
       
       // Get export options from request body
+      // NOTE: websiteUrl is undefined by default to avoid including internal dev URLs
+      // NOTE: includeLicense defaults to false because awesome-lint forbids inline license sections
       const {
         title = 'Awesome Video',
         description = 'A curated list of awesome video resources, tools, frameworks, and learning materials.',
-        includeContributing = true,
-        includeLicense = true,
-        websiteUrl = req.protocol + '://' + req.get('host'),
+        includeContributing = false, // References CONTRIBUTING.md which may not exist
+        includeLicense = false, // awesome-lint forbids inline license sections
+        websiteUrl = undefined, // Don't include dev URLs in exports
         repoUrl = process.env.GITHUB_REPO_URL
       } = req.body;
 
@@ -2209,12 +2211,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const resources = await storage.getAllApprovedResources();
       
       // Get export options from request body
+      // NOTE: websiteUrl undefined to avoid including dev URLs; includeLicense false per awesome-lint
       const {
         title = 'Awesome Video',
         description = 'A curated list of awesome video resources, tools, frameworks, and learning materials.',
-        includeContributing = true,
-        includeLicense = true,
-        websiteUrl = req.protocol + '://' + req.get('host'),
+        includeContributing = false,
+        includeLicense = false,
+        websiteUrl = undefined,
         repoUrl = process.env.GITHUB_REPO_URL
       } = req.body;
 

@@ -53,15 +53,13 @@ export class AwesomeListFormatter {
     // Add resources by category
     sections.push(this.generateResourceSections(categoryGroups));
 
-    // Add contributing section
+    // Add contributing section (references CONTRIBUTING.md file)
     if (this.options.includeContributing) {
       sections.push(this.generateContributingSection());
     }
 
-    // Add license section
-    if (this.options.includeLicense) {
-      sections.push(this.generateLicenseSection());
-    }
+    // NOTE: Do NOT add license section - awesome-lint forbids inline license sections
+    // License should be in a separate LICENSE file in the repo
 
     // Ensure file ends with a single newline (awesome-lint requirement)
     // Post-process to collapse any consecutive blank lines (3+ newlines to 2)
@@ -79,21 +77,18 @@ export class AwesomeListFormatter {
     const lines: string[] = [];
 
     // Title with Awesome prefix (awesome-lint requires "Awesome" prefix)
+    // Badge must be NEXT TO the main heading on the same line
     const title = this.options.title.startsWith('Awesome') 
       ? this.options.title 
       : `Awesome ${this.options.title}`;
-    lines.push(`# ${title}`);
+    lines.push(`# ${title} [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)`);
     
-    // Awesome badge must be on the line directly after the title with no blank line
-    lines.push('');
-    lines.push('[![Awesome](https://awesome.re/badge.svg)](https://awesome.re)');
-    
-    // Add additional badges on same line to avoid double blank lines
+    // Add additional badges on next line
     if (this.options.repoUrl) {
       const repoPath = this.extractRepoPath(this.options.repoUrl);
       if (repoPath) {
-        lines.push(`[![GitHub stars](https://img.shields.io/github/stars/${repoPath})](${this.options.repoUrl})`);
-        lines.push(`[![License: CC0-1.0](https://img.shields.io/badge/License-CC0%201.0-lightgrey.svg)](http://creativecommons.org/publicdomain/zero/1.0/)`);
+        lines.push('');
+        lines.push(`[![GitHub stars](https://img.shields.io/github/stars/${repoPath})](${this.options.repoUrl}) [![License: CC0-1.0](https://img.shields.io/badge/License-CC0%201.0-lightgrey.svg)](http://creativecommons.org/publicdomain/zero/1.0/)`);
       }
     }
 
@@ -160,7 +155,9 @@ export class AwesomeListFormatter {
 
       // Add subcategories
       for (const [subcategory, subgroup] of Array.from(group.subcategories)) {
-        sections.push(`### ${subcategory}`);
+        // Apply proper capitalization to subcategory heading (e.g., FFMPEG → FFmpeg)
+        const formattedSubcategory = this.ensureProperCapitalization(subcategory);
+        sections.push(`### ${formattedSubcategory}`);
         sections.push('');
 
         // Add resources directly under the subcategory
@@ -171,7 +168,9 @@ export class AwesomeListFormatter {
 
         // Add sub-subcategories
         for (const [subSubcategory, resources] of Array.from(subgroup.subSubcategories)) {
-          sections.push(`#### ${subSubcategory}`);
+          // Apply proper capitalization to sub-subcategory heading
+          const formattedSubSubcategory = this.ensureProperCapitalization(subSubcategory);
+          sections.push(`#### ${formattedSubSubcategory}`);
           sections.push('');
           sections.push(this.formatResourceList(resources));
           sections.push('');
@@ -201,6 +200,9 @@ export class AwesomeListFormatter {
     // Titles with brackets break the [title](url) pattern in awesome-lint validator
     let title = resource.title.replace(/\[/g, '(').replace(/\]/g, ')');
     
+    // Trim title to remove any inner padding spaces (awesome-lint: no-inline-padding)
+    title = title.trim();
+    
     // Ensure proper capitalization in title
     title = this.ensureProperCapitalization(title);
     
@@ -225,11 +227,38 @@ export class AwesomeListFormatter {
       description = description.replace(/\[\/vc_[^\]]+\]/g, '');
       description = description.trim();
       
+      // Apply proper capitalizations FIRST so title and description have same transformations
+      // This ensures "Wasm" → "WebAssembly" in both title and description before comparison
+      description = this.ensureProperCapitalization(description);
+      
+      // awesome-lint: no-repeat-item-in-description
+      // Description should not start with the item name
+      description = this.removeItemNameFromStart(description, title);
+      
       // Replace remaining brackets in description with parentheses
       description = description.replace(/\[/g, '(').replace(/\]/g, ')');
       
+      // Sanitize punctuation issues (awesome-lint requirements)
+      description = this.sanitizePunctuation(description);
+      
       // Ensure description starts with capital letter
-      if (description && description[0] !== description[0].toUpperCase()) {
+      // BUT preserve intentionally lowercase terms (macOS, npm, webpack, etc.)
+      const lowercaseStarters = ['macos', 'npm', 'webpack', 'ios', 'ipod', 'ipad', 'iphone', 'ebook'];
+      const startsWithLowercaseTerm = lowercaseStarters.some(term => 
+        description.toLowerCase().startsWith(term)
+      );
+      // Handle first word containing underscore (tool names like "pmd_tool")
+      const firstWord = description.split(/\s/)[0] || '';
+      const firstWordHasUnderscore = firstWord.includes('_');
+      
+      if (firstWordHasUnderscore && description[0] !== description[0].toUpperCase()) {
+        // Prepend "A tool that" when description starts with underscore-containing lowercase term
+        // This satisfies awesome-lint's "valid casing" requirement
+        const connector = firstWord.toLowerCase().endsWith('is') ? '' : 'A ';
+        if (connector) {
+          description = connector + description;
+        }
+      } else if (description && description[0] !== description[0].toUpperCase() && !startsWithLowercaseTerm) {
         description = description[0].toUpperCase() + description.slice(1);
       }
       
@@ -238,13 +267,113 @@ export class AwesomeListFormatter {
         description += '.';
       }
       
-      // Apply proper capitalizations in description
-      description = this.ensureProperCapitalization(description);
-      
-      line += ` - ${description}`;
+      // awesome-lint: awesome-list-item - description must be non-empty
+      // Skip descriptions that are just punctuation or whitespace
+      const substantiveContent = description.replace(/[.!?'"(),-\s]/g, '').trim();
+      if (substantiveContent.length > 0) {
+        line += ` - ${description}`;
+      }
     }
     
     return line;
+  }
+  
+  /**
+   * Sanitize punctuation to comply with awesome-lint
+   * - Fix unmatched quotes (convert curly quotes to straight, remove unmatched)
+   * - Remove repeated periods
+   * - Fix other punctuation issues
+   */
+  private sanitizePunctuation(text: string): string {
+    let result = text;
+    
+    // Convert curly/smart quotes to straight quotes (using Unicode escape sequences for reliability)
+    // Single quotes: ' ' ‹ › ‚ (U+2018, U+2019, U+2039, U+203A, U+201A)
+    result = result.replace(/[\u2018\u2019\u2039\u203A\u201A]/g, "'");
+    // Double quotes: " " « » „ (U+201C, U+201D, U+00AB, U+00BB, U+201E)
+    result = result.replace(/[\u201C\u201D\u00AB\u00BB\u201E]/g, '"');
+    
+    // Remove other problematic Unicode characters
+    result = result.replace(/\u2026/g, '...');  // Ellipsis (U+2026)
+    result = result.replace(/[\u2013\u2014]/g, '-');  // En-dash, em-dash (U+2013, U+2014)
+    
+    // Remove repeated periods (awesome-lint: no-repeat-punctuation)
+    result = result.replace(/\.{2,}/g, '.');
+    
+    // Remove repeated commas
+    result = result.replace(/,{2,}/g, ',');
+    
+    // Fix unmatched single quotes - count and balance
+    const singleQuoteCount = (result.match(/'/g) || []).length;
+    if (singleQuoteCount % 2 !== 0) {
+      // Unmatched quote - try to remove the odd one out
+      // Strategy: just remove all single quotes if unbalanced (safer approach)
+      result = result.replace(/'/g, '');
+    }
+    
+    // Fix unmatched double quotes
+    const doubleQuoteCount = (result.match(/"/g) || []).length;
+    if (doubleQuoteCount % 2 !== 0) {
+      // Remove trailing unmatched quote
+      result = result.replace(/"([^"]*$)/, '$1');
+    }
+    
+    // Remove trailing punctuation repetition before final period
+    result = result.replace(/([.!?,;:])\s*\.$/, '.');
+    
+    return result;
+  }
+  
+  /**
+   * Remove item name from the start of description
+   * awesome-lint: no-repeat-item-in-description
+   * "VidCon is a conference" -> "A conference" (when title is "VidCon")
+   */
+  private removeItemNameFromStart(description: string, title: string): string {
+    if (!description || !title) return description;
+    
+    // Normalize both for comparison
+    const descLower = description.toLowerCase();
+    const titleLower = title.toLowerCase();
+    
+    // Check if description starts with the title (case-insensitive)
+    if (descLower.startsWith(titleLower)) {
+      let rest = description.slice(title.length).trimStart();
+      // Remove common connecting words
+      const connectors = ['is', 'are', 'was', 'were', 'provides', 'offers', "'s", "'s"];
+      for (const connector of connectors) {
+        if (rest.toLowerCase().startsWith(connector + ' ')) {
+          rest = rest.slice(connector.length).trimStart();
+          break;
+        } else if (rest.toLowerCase().startsWith(connector + '.')) {
+          rest = rest.slice(connector.length).trimStart();
+          break;
+        }
+      }
+      // Capitalize first letter of remaining description
+      if (rest.length > 0) {
+        rest = rest[0].toUpperCase() + rest.slice(1);
+      }
+      return rest || description;
+    }
+    
+    // Also check for "The [title]" pattern
+    if (descLower.startsWith('the ' + titleLower)) {
+      let rest = description.slice(4 + title.length).trimStart();
+      const connectors = ['is', 'are', 'was', 'were', 'provides', 'offers'];
+      for (const connector of connectors) {
+        if (rest.toLowerCase().startsWith(connector + ' ')) {
+          rest = rest.slice(connector.length).trimStart();
+          break;
+        }
+      }
+      if (rest.length > 0) {
+        rest = rest[0].toUpperCase() + rest.slice(1);
+      }
+      return rest || description;
+    }
+    
+    return description;
   }
   
   /**
@@ -276,7 +405,45 @@ export class AwesomeListFormatter {
       'ios': 'iOS',
       'macos': 'macOS',
       'ipv4': 'IPv4',
-      'ipv6': 'IPv6'
+      'ipv6': 'IPv6',
+      // Common spelling issues from awesome-lint
+      'stackoverflow': 'Stack Overflow',
+      'Stackoverflow': 'Stack Overflow',
+      'StackOverflow': 'Stack Overflow',
+      'youtube': 'YouTube',
+      'Youtube': 'YouTube',
+      'linkedin': 'LinkedIn',
+      'Linkedin': 'LinkedIn',
+      'devops': 'DevOps',
+      'Devops': 'DevOps',
+      'oauth': 'OAuth',
+      'Oauth': 'OAuth',
+      'webpack': 'webpack',
+      'npm': 'npm',
+      'ffmpeg': 'FFmpeg',
+      'Ffmpeg': 'FFmpeg',
+      'tensorflow': 'TensorFlow',
+      'Tensorflow': 'TensorFlow',
+      'centos': 'CentOS',
+      'Centos': 'CentOS',
+      'macos': 'macOS',
+      'MacOS': 'macOS',
+      'Macos': 'macOS',
+      'OS X': 'macOS',
+      'OSX': 'macOS',
+      'WASM': 'WebAssembly',
+      'Wasm': 'WebAssembly',
+      'FFMPEG': 'FFmpeg',
+      'blockchain': 'Blockchain',
+      'Webrtc': 'WebRTC',
+      'webrtc': 'WebRTC',
+      'openai': 'OpenAI',
+      'Openai': 'OpenAI',
+      'python': 'Python',
+      'Python': 'Python',
+      'jasmine': 'Jasmine',
+      'Gimp': 'GIMP',
+      'gimp': 'GIMP'
     };
     
     let result = text;
@@ -291,12 +458,36 @@ export class AwesomeListFormatter {
   }
 
   /**
+   * Normalize URL for deduplication
+   * Handles: http/https, www/non-www, trailing slashes
+   */
+  private normalizeUrlForDedup(url: string): string {
+    let normalized = url.toLowerCase();
+    // Remove protocol (http:// or https://)
+    normalized = normalized.replace(/^https?:\/\//, '');
+    // Remove www prefix
+    normalized = normalized.replace(/^www\./, '');
+    // Remove trailing slash
+    normalized = normalized.replace(/\/$/, '');
+    return normalized;
+  }
+
+  /**
    * Group resources by their category hierarchy
+   * Also deduplicates resources by URL to avoid double-link errors
    */
   private groupResourcesByCategory(): Map<string, CategoryGroup> {
     const groups = new Map<string, CategoryGroup>();
+    const seenUrls = new Set<string>();
 
     for (const resource of this.resources) {
+      // Deduplicate by URL - skip if we've already seen this URL
+      // Normalize to handle http/https and www/non-www variations
+      const normalizedUrl = this.normalizeUrlForDedup(resource.url);
+      if (seenUrls.has(normalizedUrl)) {
+        continue; // Skip duplicate URLs
+      }
+      seenUrls.add(normalizedUrl);
       const category = resource.category || 'Uncategorized';
       
       if (!groups.has(category)) {
@@ -381,13 +572,15 @@ export class AwesomeListFormatter {
 
   /**
    * Convert string to GitHub markdown anchor format
+   * GitHub's anchor generation: lowercase, spaces to hyphens, removes most special chars
+   * IMPORTANT: GitHub keeps consecutive hyphens (e.g., "A & B" -> "a--b")
+   * Each space becomes a hyphen individually, so "A & B" -> "a  b" -> "a--b"
    */
   private toAnchor(text: string): string {
     return text
       .toLowerCase()
-      .replace(/[^\w\s-]/g, '') // Remove special characters
-      .replace(/\s+/g, '-')      // Replace spaces with hyphens
-      .replace(/-+/g, '-')       // Remove duplicate hyphens
+      .replace(/[^\w\s-]/g, '') // Remove special characters (& becomes empty, leaving spaces)
+      .replace(/\s/g, '-')       // Replace EACH space with a hyphen (not \s+ which collapses)
       .trim();
   }
 
