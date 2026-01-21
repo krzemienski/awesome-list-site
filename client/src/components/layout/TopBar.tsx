@@ -5,7 +5,6 @@ import { Menu, Search, Github, Sun, Moon, Palette, List, BarChart3, User, LogIn,
 import { useTheme } from "@/hooks/use-theme";
 import { useIsMobile } from "@/hooks/use-mobile";
 import CustomThemeManager, { CustomTheme } from "@/components/ui/custom-theme-manager";
-import AwesomeListExplorer from "@/components/ui/awesome-list-explorer";
 import AnalyticsDashboard from "@/components/ui/analytics-dashboard";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -122,8 +121,6 @@ export default function TopBar({
               </a>
             </Button>
           )}
-          
-          <AwesomeListExplorer />
           
           <Button
             variant="ghost"
