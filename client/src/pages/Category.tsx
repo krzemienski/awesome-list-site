@@ -10,22 +10,28 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import SEOHead from "@/components/layout/SEOHead";
 import TagFilter from "@/components/ui/tag-filter";
 import { ViewModeToggle, ViewMode } from "@/components/ui/view-mode-toggle";
-import { ArrowLeft, Search, ExternalLink } from "lucide-react";
+import { SuggestEditDialog } from "@/components/ui/suggest-edit-dialog";
+import { ArrowLeft, Search, ExternalLink, Edit } from "lucide-react";
 import { deslugify, slugify } from "@/lib/utils";
 import { Resource } from "@/types/awesome-list";
+import type { Resource as DbResource } from "@shared/schema";
 import NotFound from "@/pages/not-found";
 import { processAwesomeListData } from "@/lib/parser";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
 import { trackCategoryView } from "@/lib/analytics";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Category() {
   const { slug } = useParams<{ slug: string }>();
+  const { isAuthenticated } = useAuth();
   
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>("all");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("category");
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [resourceToEdit, setResourceToEdit] = useState<DbResource | null>(null);
   
   // View mode with localStorage persistence
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
@@ -152,6 +158,43 @@ export default function Category() {
       trackCategoryView(categoryName);
     }
   }, [categoryName, isLoading]);
+  
+  // Helper to check if resource is from database (editable)
+  const isDbResource = (resource: Resource) => resource.id.startsWith('db-');
+  
+  // Helper to get database ID from resource
+  const getDbId = (resource: Resource) => parseInt(resource.id.replace('db-', ''));
+  
+  // Helper to convert category resource to DbResource for edit dialog
+  const toDbResource = (resource: Resource, dbResource: any): DbResource => ({
+    id: getDbId(resource),
+    title: resource.title,
+    url: resource.url,
+    description: resource.description || "",
+    category: resource.category || categoryName,
+    subcategory: resource.subcategory || null,
+    subSubcategory: resource.subSubcategory || null,
+    status: "approved",
+    submittedBy: dbResource?.submittedBy || null,
+    approvedBy: dbResource?.approvedBy || null,
+    approvedAt: dbResource?.approvedAt || null,
+    githubSynced: dbResource?.githubSynced || false,
+    lastSyncedAt: dbResource?.lastSyncedAt || null,
+    metadata: dbResource?.metadata || {},
+    createdAt: dbResource?.createdAt || new Date(),
+    updatedAt: dbResource?.updatedAt || new Date(),
+  });
+  
+  // Handle suggest edit button click
+  const handleSuggestEdit = (e: React.MouseEvent, resource: Resource) => {
+    e.stopPropagation();
+    if (!isDbResource(resource)) return;
+    
+    const dbId = getDbId(resource);
+    const dbResource = dbResources.find(r => r.id === dbId);
+    setResourceToEdit(toDbResource(resource, dbResource));
+    setEditDialogOpen(true);
+  };
   
   if (isLoading) {
     return (
@@ -338,7 +381,7 @@ export default function Category() {
                       </p>
                     )}
                   </div>
-                  <div className="flex gap-1.5 flex-shrink-0">
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
                     {resource.subcategory && (
                       <Badge variant="outline" className="text-xs">{resource.subcategory}</Badge>
                     )}
@@ -347,6 +390,18 @@ export default function Category() {
                         {tag}
                       </Badge>
                     ))}
+                    {isAuthenticated && isDbResource(resource) && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 p-0 ml-2"
+                        onClick={(e) => handleSuggestEdit(e, resource)}
+                        data-testid={`button-suggest-edit-${resourceId}`}
+                        title="Suggest an edit"
+                      >
+                        <Edit className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
                   </div>
                 </div>
               );
@@ -362,7 +417,21 @@ export default function Category() {
                 >
                   <div className="flex items-start gap-2">
                     <span className="font-medium text-sm line-clamp-2 flex-1">{resource.title}</span>
-                    <ExternalLink className="h-3 w-3 flex-shrink-0 text-muted-foreground mt-0.5" />
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      <ExternalLink className="h-3 w-3 text-muted-foreground mt-0.5" />
+                      {isAuthenticated && isDbResource(resource) && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 p-0"
+                          onClick={(e) => handleSuggestEdit(e, resource)}
+                          data-testid={`button-suggest-edit-${resourceId}`}
+                          title="Suggest an edit"
+                        >
+                          <Edit className="h-3 w-3" />
+                        </Button>
+                      )}
+                    </div>
                   </div>
                   {resource.subcategory && (
                     <Badge variant="outline" className="text-xs mt-2">{resource.subcategory}</Badge>
@@ -381,7 +450,21 @@ export default function Category() {
                 <CardHeader>
                   <CardTitle className="text-lg flex items-start gap-2">
                     <span className="flex-1">{resource.title}</span>
-                    <ExternalLink className="h-4 w-4 flex-shrink-0 mt-1" />
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      <ExternalLink className="h-4 w-4 mt-1" />
+                      {isAuthenticated && isDbResource(resource) && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 w-7 p-0"
+                          onClick={(e) => handleSuggestEdit(e, resource)}
+                          data-testid={`button-suggest-edit-${resourceId}`}
+                          title="Suggest an edit"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
                   </CardTitle>
                   {resource.description && (
                     <CardDescription className="line-clamp-2">
@@ -415,6 +498,17 @@ export default function Category() {
             );
           })}
         </div>
+      )}
+      
+      {resourceToEdit && (
+        <SuggestEditDialog
+          resource={resourceToEdit}
+          open={editDialogOpen}
+          onOpenChange={(open) => {
+            setEditDialogOpen(open);
+            if (!open) setResourceToEdit(null);
+          }}
+        />
       )}
     </div>
   );

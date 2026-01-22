@@ -22,6 +22,9 @@ A production-ready React application for browsing and discovering over 2,600 cur
 - **Lowercase Starter Preservation**: macOS, npm, webpack, iOS terms preserved when starting descriptions
 - **Remaining 2 Errors**: awesome-contributing (requires CONTRIBUTING.md) and awesome-github (requires git repo) - expected for standalone exports
 
+### Feature Updates (January 22, 2026)
+- **Suggest Edit on Category Page**: Added suggest edit buttons to all three view modes (grid, list, compact) on the Category page. Edit buttons only appear for authenticated users and database-backed resources (id starts with "db-"). Clicking the edit button opens the SuggestEditDialog modal without triggering resource link navigation.
+
 ### Feature Updates (January 20, 2026)
 - **View Mode Toggle**: Added three content card view modes (grid, list, compact) using ShadCN ToggleGroup component in the Category page
 - **JSON Export Endpoint**: Added `GET /api/admin/export-json` for full database backup including all resources (all statuses), users, category hierarchies, tags, learning journeys, and sync queue with schema documentation
