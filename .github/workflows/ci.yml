@@ -7,9 +7,15 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+# Cancel in-progress runs on new pushes to same branch to save CI time
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lint:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     steps:
     - name: Checkout
@@ -22,14 +28,15 @@ jobs:
         cache: 'npm'
 
     - name: Install dependencies
-      run: npm ci
+      run: npm ci --prefer-offline
 
     - name: Run ESLint
-      timeout-minutes: 5
+      timeout-minutes: 3
       run: npm run lint
 
   type-check:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     steps:
     - name: Checkout
@@ -42,14 +49,15 @@ jobs:
         cache: 'npm'
 
     - name: Install dependencies
-      run: npm ci
+      run: npm ci --prefer-offline
 
     - name: Run TypeScript type check
-      timeout-minutes: 5
+      timeout-minutes: 3
       run: npm run check
 
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     steps:
     - name: Checkout
@@ -62,7 +70,7 @@ jobs:
         cache: 'npm'
 
     - name: Install dependencies
-      run: npm ci
+      run: npm ci --prefer-offline
 
     - name: Generate static data
       run: npx tsx scripts/build-static.ts
@@ -70,7 +78,7 @@ jobs:
         VITE_STATIC_BUILD: 'true'
 
     - name: Run tests with coverage
-      timeout-minutes: 10
+      timeout-minutes: 3
       run: npm run test:run -- --coverage
       env:
         NODE_ENV: 'test'
@@ -93,7 +101,7 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    needs: [lint, type-check, test]
+    timeout-minutes: 5
 
     steps:
     - name: Checkout
@@ -106,7 +114,7 @@ jobs:
         cache: 'npm'
 
     - name: Install dependencies
-      run: npm ci
+      run: npm ci --prefer-offline
 
     - name: Generate static data
       run: npx tsx scripts/build-static.ts
@@ -114,7 +122,7 @@ jobs:
         VITE_STATIC_BUILD: 'true'
 
     - name: Build application
-      timeout-minutes: 20
+      timeout-minutes: 4
       run: |
         # Optimize build environment for large React app
         export NODE_OPTIONS="--max-old-space-size=8192 --max-semi-space-size=2048"
