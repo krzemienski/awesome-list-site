@@ -41,12 +41,16 @@ vi.mock('@/components/ui/badge', () => ({
   ),
 }));
 
-// Mock wouter Link
-vi.mock('wouter', () => ({
-  Link: ({ children, href, 'data-testid': testId }: any) => (
-    <a href={href} data-testid={testId}>{children}</a>
-  ),
-}));
+// Mock wouter Link and Router
+vi.mock('wouter', async () => {
+  const actual = await vi.importActual('wouter');
+  return {
+    ...actual,
+    Link: ({ children, href, 'data-testid': testId }: any) => (
+      <a href={href} data-testid={testId}>{children}</a>
+    ),
+  };
+});
 
 import { useQuery } from '@tanstack/react-query';
 
