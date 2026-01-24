@@ -1,0 +1,12 @@
+node_modules
+dist
+build
+*.config.js
+*.config.ts
+coverage
+.replit
+.auto-claude
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
