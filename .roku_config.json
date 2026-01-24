@@ -1,0 +1,29 @@
+{
+  "projects": {
+    "sample": {
+      "app_name": "--version",
+      "stage_method": "script",
+      "source_files": [
+        "assets",
+        "components",
+        "source",
+        "manifest"
+      ],
+      "stages": {
+        "main": {
+          "key": "main",
+          "script": {
+            "stage": "cp -r ./src/* .",
+            "unstage": "rm -rf manifest source components assets"
+          }
+        }
+      }
+    }
+  },
+  "keys": {
+    "main": {
+      "keyed_pkg": "./keys/key_8537270f33ab76b0e4ce3312f786abe18e9db1f4.pkg",
+      "password": "tO73Km+HNdZCVTD7qJ/1Mg=="
+    }
+  }
+}

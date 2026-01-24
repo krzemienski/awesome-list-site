@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="Main" extends="Scene">
+  <script type="text/brightscript" uri="Main.brs" />
+  <interface>
+  </interface>
+  <children>
+      <Label id="helloWorld" translation="[200,200]" text="Hello, World!" />
+  </children>
+</component>
