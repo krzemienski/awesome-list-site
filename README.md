@@ -1,5 +1,7 @@
 # Awesome Video Resource Viewer
 
+[![CI](https://github.com/krzemienski/awesome-list-site/actions/workflows/ci.yml/badge.svg)](https://github.com/krzemienski/awesome-list-site/actions/workflows/ci.yml)
+
 A modern React application for browsing and discovering video development resources from the [krzemienski/awesome-video](https://github.com/krzemienski/awesome-video) repository.
 
 ## Features
