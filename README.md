@@ -56,6 +56,37 @@ A modern React application for browsing and discovering video development resour
    npm start
    ```
 
+## Testing
+
+### Run Tests
+
+**Watch mode** (recommended for development):
+```bash
+npm test
+```
+
+**Single run** (for CI/CD):
+```bash
+npm run test:run
+```
+
+### Code Quality
+
+**Type checking**:
+```bash
+npm run check
+```
+
+**Linting**:
+```bash
+npm run lint
+```
+
+**Run all checks** (type check + lint + tests):
+```bash
+npm run check && npm run lint && npm run test:run
+```
+
 ## Project Structure
 
 ```
