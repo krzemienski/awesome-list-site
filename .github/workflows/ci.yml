@@ -140,4 +140,20 @@ jobs:
           echo "Error: dist/index.js not found"
           exit 1
         fi
+
+        # Display build output structure
         echo "Build artifacts verified successfully"
+        echo "Build output structure:"
+        ls -lh dist/
+        if [ -d "dist/public" ]; then
+          echo "Public assets:"
+          ls -lh dist/public/ | head -20
+        fi
+
+    - name: Upload build artifacts
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifacts
+        path: dist/
+        retention-days: 30
