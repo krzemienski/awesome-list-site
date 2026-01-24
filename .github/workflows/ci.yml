@@ -69,11 +69,27 @@ jobs:
       env:
         VITE_STATIC_BUILD: 'true'
 
-    - name: Run tests
+    - name: Run tests with coverage
       timeout-minutes: 10
-      run: npm run test:run
+      run: npm run test:run -- --coverage
       env:
         NODE_ENV: 'test'
+
+    - name: Display coverage summary
+      if: always()
+      run: |
+        if [ -f "coverage/coverage-summary.json" ]; then
+          echo "Coverage Summary:"
+          cat coverage/coverage-summary.json
+        fi
+
+    - name: Upload coverage reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-reports
+        path: coverage/
+        retention-days: 30
 
   build:
     runs-on: ubuntu-latest

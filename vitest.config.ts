@@ -20,5 +20,20 @@ export default defineConfig({
       "**/*.{test,spec}.{ts,tsx}",
     ],
     exclude: ["node_modules", "dist", "build", ".auto-claude"],
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "json", "html", "lcov"],
+      reportsDirectory: "./coverage",
+      exclude: [
+        "node_modules",
+        "dist",
+        "build",
+        ".auto-claude",
+        "**/__tests__/**",
+        "**/*.{test,spec}.{ts,tsx}",
+        "**/*.config.{ts,js}",
+        "**/vite-env.d.ts",
+      ],
+    },
   },
 });
