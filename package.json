@@ -137,14 +137,3 @@
     "bufferutil": "^4.0.8"
   }
 }
-{
-  "name": "--version",
-  "version": "1.0.0",
-  "description": "",
-  "scripts": {
-    "build": "bsc",
-    "package": "roku --package --stage main -O out -V"
-  },
-  "author": "",
-  "license": "ISC"
-}
