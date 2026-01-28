@@ -32,8 +32,10 @@ A production-ready React application for browsing and discovering over 2,600 cur
   - CODE-MAP.md - Codebase navigation guide
   - CONTRIBUTING.md - Contribution guidelines
 - **README Overhaul**: Updated with accurate feature list, documentation links, and quick start
-- **Essential Scripts Retained**: build-static.ts, reset-admin-password.ts, test-awesome-lint.ts, migration scripts
-- **File Count**: Reduced from 2,517 to ~1,100 files (excluding node_modules, .git)
+- **Essential Scripts Retained**: build-static.ts, reset-admin-password.ts, test-awesome-lint.ts, migrate-audit-log-original-resource-id.ts
+- **File Count**: Reduced from 2,517 to 216 essential project files (excluding node_modules, .git, .cache, .config)
+- **Size Reduction**: From 619MB to 2.7MB of project code (excluding dependencies)
+- **Removed**: 740 test screenshots, 142 attached_assets, obsolete test reports, unused parsers, stale build artifacts
 
 ### Resource Details Page Implementation (January 28, 2026)
 - **Comprehensive Resource Details Page**: New `/resource/:id` route displays full resource information including OG images, favicon, tags, scraped metadata, related resources, and share functionality
