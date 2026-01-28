@@ -22,6 +22,13 @@ A production-ready React application for browsing and discovering over 2,600 cur
 - **Lowercase Starter Preservation**: macOS, npm, webpack, iOS terms preserved when starting descriptions
 - **Remaining 2 Errors**: awesome-contributing (requires CONTRIBUTING.md) and awesome-github (requires git repo) - expected for standalone exports
 
+### Resource Details Page Implementation (January 28, 2026)
+- **Comprehensive Resource Details Page**: New `/resource/:id` route displays full resource information including OG images, favicon, tags, scraped metadata, related resources, and share functionality
+- **Dual Navigation System**: Database resources (numeric IDs) navigate to details page; static resources open external links in new tab
+- **Universal Suggest Edit**: SuggestEditDialog now works for all users - authenticated users see edit form, unauthenticated users see login prompt with redirect
+- **Share Functionality**: Web Share API with clipboard fallback and error handling
+- **Responsive Design**: Tested across desktop (1280x720), tablet (768x1024), and mobile (400x720) with WCAG AAA touch targets
+
 ### Feature Updates (January 22, 2026)
 - **Suggest Edit on Category Page**: Added suggest edit buttons to all three view modes (grid, list, compact) on the Category page. Edit buttons only appear for authenticated users and database-backed resources (id starts with "db-"). Clicking the edit button opens the SuggestEditDialog modal without triggering resource link navigation.
 
