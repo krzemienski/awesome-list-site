@@ -22,6 +22,19 @@ A production-ready React application for browsing and discovering over 2,600 cur
 - **Lowercase Starter Preservation**: macOS, npm, webpack, iOS terms preserved when starting descriptions
 - **Remaining 2 Errors**: awesome-contributing (requires CONTRIBUTING.md) and awesome-github (requires git repo) - expected for standalone exports
 
+### Production Readiness Audit (January 28, 2026)
+- **Repository Cleanup**: Removed 263MB+ of dead weight (client/my-app/, test screenshots, 90+ obsolete test scripts)
+- **Documentation Suite**: Created comprehensive documentation in /docs:
+  - ARCHITECTURE.md - System design and data flows
+  - API.md - Complete API reference (75+ endpoints)
+  - SETUP.md - Development environment guide
+  - ADMIN-GUIDE.md - Administrator documentation
+  - CODE-MAP.md - Codebase navigation guide
+  - CONTRIBUTING.md - Contribution guidelines
+- **README Overhaul**: Updated with accurate feature list, documentation links, and quick start
+- **Essential Scripts Retained**: build-static.ts, reset-admin-password.ts, test-awesome-lint.ts, migration scripts
+- **File Count**: Reduced from 2,517 to ~1,100 files (excluding node_modules, .git)
+
 ### Resource Details Page Implementation (January 28, 2026)
 - **Comprehensive Resource Details Page**: New `/resource/:id` route displays full resource information including OG images, favicon, tags, scraped metadata, related resources, and share functionality
 - **Dual Navigation System**: Database resources (numeric IDs) navigate to details page; static resources open external links in new tab

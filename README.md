@@ -1,113 +1,172 @@
 # Awesome Video Resource Viewer
 
-A modern React application for browsing and discovering video development resources from the [krzemienski/awesome-video](https://github.com/krzemienski/awesome-video) repository.
+A production-ready React application for browsing and discovering 2,600+ curated video development resources. Features AI-powered recommendations, admin curation tools, GitHub synchronization, and awesome-lint compliant exports.
+
+[![awesome-lint](https://img.shields.io/badge/awesome--lint-compliant-brightgreen)](https://github.com/sindresorhus/awesome-lint)
 
 ## Features
 
-- 🎥 Browse 2,000+ curated video development resources
-- 🔍 Advanced search and filtering capabilities
-- 📱 Mobile-optimized responsive design
-- 🌙 Dark/light theme support
-- 📊 Analytics dashboard with resource insights
-- 🏷️ Organized by 55+ categories including:
-  - Adaptive Streaming
-  - FFmpeg Tools
-  - Encoding & Codecs
-  - Infrastructure & Delivery
-  - Learning Resources
-  - And many more...
+### For Users
+- **Resource Discovery**: Browse 2,600+ curated video development resources
+- **Advanced Search**: Fuzzy search with keyboard shortcut (⌘K)
+- **3-Level Navigation**: Categories → Subcategories → Sub-subcategories
+- **Learning Journeys**: Guided learning paths for skill development
+- **Bookmarks & Favorites**: Save resources for later
+- **Mobile-Optimized**: Responsive design with WCAG AAA touch targets
+- **Dark Theme**: Pure black cyberpunk aesthetic
+
+### For Administrators
+- **Resource Curation**: Approve/reject submissions, edit resources
+- **Edit Suggestion Queue**: Review and merge community contributions
+- **GitHub Sync**: Import from and export to awesome-list repositories
+- **AI Enrichment**: Batch metadata extraction using Claude AI
+- **Validation**: awesome-lint compliance checking and link verification
+- **Audit Trail**: Complete history of all changes
 
 ## Technology Stack
 
-- **Frontend**: React 18 + TypeScript + Vite
-- **UI Components**: shadcn/ui + Tailwind CSS
-- **Icons**: Lucide React
-- **Backend**: Node.js + Express
-- **Data Source**: GitHub API (krzemienski/awesome-video)
-- **Analytics**: Google Analytics 4
+| Layer | Technologies |
+|-------|--------------|
+| **Frontend** | React 18, TypeScript, Vite, TanStack Query, Wouter |
+| **UI** | Tailwind CSS, shadcn/ui, Lucide icons |
+| **Backend** | Express.js, TypeScript, Drizzle ORM |
+| **Database** | PostgreSQL (Neon-backed) |
+| **AI** | Anthropic Claude API |
+| **Auth** | Replit OAuth, local email/password |
 
 ## Quick Start
 
 ### Development
 
-1. **Install dependencies**:
-   ```bash
-   npm install
-   ```
+```bash
+# Install dependencies
+npm install
 
-2. **Start development server**:
-   ```bash
-   npm run dev
-   ```
+# Start development server
+npm run dev
 
-3. **Open in browser**: http://localhost:5000
+# Open in browser
+# http://localhost:5000
+```
 
-### Production Build
+### Production
 
-1. **Build the application**:
-   ```bash
-   npm run build
-   ```
+```bash
+# Build for production
+npm run build
 
-2. **Start production server**:
-   ```bash
-   npm start
-   ```
+# Start production server
+npm run start
+```
+
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [SETUP.md](docs/SETUP.md) | Development environment setup |
+| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | System architecture and design |
+| [API.md](docs/API.md) | Complete API reference |
+| [ADMIN-GUIDE.md](docs/ADMIN-GUIDE.md) | Administrator documentation |
+| [CODE-MAP.md](docs/CODE-MAP.md) | Codebase navigation guide |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines |
 
 ## Project Structure
 
 ```
-├── client/                 # React frontend
-│   ├── src/
-│   │   ├── components/     # UI components
-│   │   ├── pages/         # Application pages
-│   │   ├── hooks/         # Custom React hooks
-│   │   └── lib/           # Utilities and configuration
-├── server/                # Express backend
-│   ├── routes.ts          # API endpoints
-│   └── awesome-video-parser.ts  # Data parser
-├── shared/                # Shared types and schemas
-└── scripts/               # Build and deployment scripts
+├── client/src/           # React frontend
+│   ├── components/       # Reusable UI components
+│   ├── pages/            # Route pages (17 pages)
+│   ├── hooks/            # Custom React hooks
+│   └── lib/              # Utilities
+├── server/               # Express backend
+│   ├── ai/               # AI services (Claude, enrichment)
+│   ├── github/           # GitHub sync integration
+│   ├── validation/       # awesome-lint, link checking
+│   ├── routes.ts         # API endpoints (75+ routes)
+│   └── storage.ts        # Database layer
+├── shared/               # Shared types and schemas
+│   └── schema.ts         # Drizzle schema, Zod validation
+├── scripts/              # Utility scripts
+└── docs/                 # Documentation
 ```
 
-## Configuration
+## Key Features
 
-### Environment Variables
+### GitHub Sync
+Import resources from any awesome-list repository:
+```bash
+POST /api/admin/import-github
+{ "repoUrl": "https://raw.githubusercontent.com/user/repo/main/README.md" }
+```
 
-- `VITE_GA_MEASUREMENT_ID`: Google Analytics measurement ID (optional)
-- `DATABASE_URL`: PostgreSQL connection string (if using database)
+Export to awesome-lint compliant markdown:
+```bash
+POST /api/admin/export
+```
 
-### Data Source
+### AI Enrichment
+Automatically enhance resources with:
+- Page metadata (title, description, OG images)
+- AI-generated tags and categorization
+- Favicon extraction
 
-The application fetches data from the `krzemienski/awesome-video` repository, which contains a curated list of video development tools, libraries, and resources organized by category.
+### awesome-lint Compliance
+Exports pass all awesome-lint rules except:
+- `awesome-contributing`: Requires CONTRIBUTING.md in repo
+- `awesome-github`: Requires git repository
 
-## Features in Detail
+## Environment Variables
 
-### Resource Discovery
-- Browse resources by category (Adaptive Streaming, FFmpeg, Encoding, etc.)
-- Search across titles, descriptions, and tags
-- Filter by resource type and popularity
+```bash
+# Required
+DATABASE_URL=postgresql://...
+SESSION_SECRET=<random-string>
 
-### Analytics Dashboard
-- View resource distribution by category
-- Track popular resources and trends
-- Monitor search patterns and user engagement
+# Replit Auth
+REPLIT_DOMAINS=...
 
-### Mobile Experience
-- Responsive design optimized for all screen sizes
-- Touch-friendly navigation and interactions
-- Fast loading with optimized resource delivery
+# Optional - AI Features
+AI_INTEGRATIONS_ANTHROPIC_API_KEY=...
+
+# Optional - GitHub Sync
+GITHUB_TOKEN=...
+GITHUB_REPO_URL=...
+```
+
+## Admin Access
+
+Create an admin user:
+```bash
+npx tsx scripts/reset-admin-password.ts
+```
+
+Access admin panel at `/admin` after login.
+
+## API Overview
+
+| Category | Endpoints |
+|----------|-----------|
+| Resources | CRUD, search, filtering |
+| Categories | 3-level hierarchy management |
+| Auth | OAuth, local, session management |
+| Admin | User management, curation, audit |
+| GitHub | Import, export, sync queue |
+| AI | Claude analysis, batch enrichment |
+| Validation | awesome-lint, link checking |
+
+See [API.md](docs/API.md) for complete reference.
 
 ## Contributing
 
-This project displays resources from the [awesome-video](https://github.com/krzemienski/awesome-video) repository. To contribute new resources or suggest improvements, please submit them to the original repository.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## License
 
-MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License
 
 ## Acknowledgments
 
 - Data sourced from [krzemienski/awesome-video](https://github.com/krzemienski/awesome-video)
-- Built with modern web technologies and best practices
-- Designed for the video development community
+- Built with [shadcn/ui](https://ui.shadcn.com/) components
+- AI powered by [Anthropic Claude](https://anthropic.com/)
+- Deployed on [Replit](https://replit.com/)
