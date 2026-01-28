@@ -1,8 +1,9 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Edit } from "lucide-react";
+import { ExternalLink, Edit, ChevronRight } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import FavoriteButton from "./FavoriteButton";
 import BookmarkButton from "./BookmarkButton";
@@ -35,15 +36,23 @@ export default function ResourceCard({
   onClick 
 }: ResourceCardProps) {
   const { isAuthenticated } = useAuth();
+  const [, setLocation] = useLocation();
   const [suggestEditOpen, setSuggestEditOpen] = useState(false);
+
+  const numericId = parseInt(resource.id);
+  const isValidDbResource = !isNaN(numericId) && numericId > 0;
 
   const handleCardClick = () => {
     if (onClick) {
       onClick();
+    } else if (isValidDbResource) {
+      setLocation(`/resource/${resource.id}`);
+    } else {
+      window.open(resource.url, '_blank', 'noopener,noreferrer');
     }
   };
 
-  const handleResourceClick = (e: React.MouseEvent) => {
+  const handleExternalLink = (e: React.MouseEvent) => {
     e.stopPropagation();
     window.open(resource.url, '_blank', 'noopener,noreferrer');
   };
@@ -54,7 +63,7 @@ export default function ResourceCard({
   };
 
   const resourceForDialog: Resource = fullResource || {
-    id: parseInt(resource.id),
+    id: numericId,
     title: resource.name,
     url: resource.url,
     description: resource.description || "",
@@ -138,6 +147,12 @@ export default function ResourceCard({
         )}
         
         <div className="flex flex-wrap items-center gap-2 mb-3">
+          {isValidDbResource && (
+            <Badge variant="outline" className="text-xs border-pink-500/30 text-pink-400">
+              <ChevronRight className="h-3 w-3 mr-0.5" />
+              View Details
+            </Badge>
+          )}
           {resource.category && (
             <Badge variant="secondary" className="text-xs">
               {resource.category}
@@ -163,19 +178,21 @@ export default function ResourceCard({
           <Button 
             variant="outline" 
             size="sm" 
-            className="flex-1 border-cyan-500/50 hover:bg-cyan-500/10 hover:border-cyan-500"
-            onClick={handleResourceClick}
+            className="flex-1 border-cyan-500/50 hover:bg-cyan-500/10 hover:border-cyan-500 min-h-[44px]"
+            onClick={handleExternalLink}
             data-testid={`button-visit-${resource.id}`}
           >
             <ExternalLink className="h-4 w-4 mr-2" />
-            Visit Resource
+            Open Link
           </Button>
-          {isAuthenticated && (
+          {isValidDbResource && (
             <Button 
               variant="ghost" 
               size="sm"
+              className="min-h-[44px] min-w-[44px]"
               onClick={handleSuggestEdit}
               data-testid={`button-suggest-edit-${resource.id}`}
+              title="Suggest an edit"
             >
               <Edit className="h-4 w-4" />
             </Button>
@@ -183,7 +200,7 @@ export default function ResourceCard({
         </div>
       </CardContent>
 
-      {isAuthenticated && (
+      {suggestEditOpen && (
         <SuggestEditDialog 
           resource={resourceForDialog}
           open={suggestEditOpen}

@@ -34,6 +34,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Resource } from "@shared/schema";
 
@@ -121,6 +122,7 @@ function calculateDiff(original: Resource, updated: SuggestEditFormData): Record
 
 export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditDialogProps) {
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
   const [claudeSuggestions, setClaudeSuggestions] = useState<ClaudeSuggestions | null>(null);
   const [analyzingWithAI, setAnalyzingWithAI] = useState(false);
 
@@ -313,6 +315,40 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
   const onSubmit = (data: SuggestEditFormData) => {
     submitMutation.mutate(data);
   };
+
+  if (!isAuthenticated) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Login Required</DialogTitle>
+            <DialogDescription>
+              Please log in to suggest edits for this resource. This helps us maintain the quality of our curated list and track contributions.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-4 py-4">
+            <div className="bg-muted p-4 border border-border">
+              <p className="text-sm text-muted-foreground mb-4">
+                We value your input! Once logged in, you can propose updates to titles, descriptions, categories, and more.
+              </p>
+              <Button 
+                className="w-full" 
+                onClick={() => window.location.href = "/auth"}
+                data-testid="button-login-redirect"
+              >
+                Go to Login
+              </Button>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { useParams, Link } from "wouter";
+import { useParams, Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -25,6 +25,7 @@ import { useAuth } from "@/hooks/useAuth";
 export default function Category() {
   const { slug } = useParams<{ slug: string }>();
   const { isAuthenticated } = useAuth();
+  const [, setLocation] = useLocation();
   
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>("all");
@@ -160,10 +161,10 @@ export default function Category() {
   }, [categoryName, isLoading]);
   
   // Helper to check if resource is from database (editable)
-  const isDbResource = (resource: Resource) => resource.id.startsWith('db-');
+  const isDbResource = (resource: Resource) => String(resource.id).startsWith('db-');
   
   // Helper to get database ID from resource
-  const getDbId = (resource: Resource) => parseInt(resource.id.replace('db-', ''));
+  const getDbId = (resource: Resource) => parseInt(String(resource.id).replace('db-', ''));
   
   // Helper to convert category resource to DbResource for edit dialog
   const toDbResource = (resource: Resource, dbResource: any): DbResource => ({
@@ -349,16 +350,24 @@ export default function Category() {
             const resourceId = `${slugify(resource.title)}-${index}`;
             
             const handleResourceClick = () => {
-              window.open(resource.url, '_blank', 'noopener,noreferrer');
-              
-              let description = resource.description || '';
-              if (!description && resource.tags && resource.tags.length > 0) {
-                description = `Tags: ${resource.tags.slice(0, 3).join(', ')}${resource.tags.length > 3 ? ', ...' : ''}`;
+              if (isDbResource(resource)) {
+                const dbId = getDbId(resource);
+                setLocation(`/resource/${dbId}`);
+              } else {
+                window.open(resource.url, '_blank', 'noopener,noreferrer');
+                toast({
+                  title: resource.title,
+                  description: 'Opening resource in new tab',
+                });
               }
-              
+            };
+            
+            const handleExternalLink = (e: React.MouseEvent) => {
+              e.stopPropagation();
+              window.open(resource.url, '_blank', 'noopener,noreferrer');
               toast({
                 title: resource.title,
-                description: description || 'Opening resource in new tab',
+                description: 'Opening resource in new tab',
               });
             };
             
@@ -373,7 +382,11 @@ export default function Category() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="font-medium truncate">{resource.title}</span>
-                      <ExternalLink className="h-3 w-3 flex-shrink-0 text-muted-foreground" />
+                      {isDbResource(resource) && (
+                        <Badge variant="outline" className="text-xs border-pink-500/30 text-pink-400">
+                          Details
+                        </Badge>
+                      )}
                     </div>
                     {resource.description && (
                       <p className="text-sm text-muted-foreground truncate mt-0.5">
@@ -383,18 +396,28 @@ export default function Category() {
                   </div>
                   <div className="flex items-center gap-1.5 flex-shrink-0">
                     {resource.subcategory && (
-                      <Badge variant="outline" className="text-xs">{resource.subcategory}</Badge>
+                      <Badge variant="outline" className="text-xs hidden md:inline-flex">{resource.subcategory}</Badge>
                     )}
                     {resource.tags && resource.tags.slice(0, 2).map((tag, tagIndex) => (
-                      <Badge key={tagIndex} variant="secondary" className="text-xs hidden md:inline-flex">
+                      <Badge key={tagIndex} variant="secondary" className="text-xs hidden lg:inline-flex">
                         {tag}
                       </Badge>
                     ))}
-                    {isAuthenticated && isDbResource(resource) && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0 min-w-[32px] touch-manipulation"
+                      onClick={handleExternalLink}
+                      data-testid={`button-external-${resourceId}`}
+                      title="Open in new tab"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                    {isDbResource(resource) && (
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-8 w-8 p-0 ml-2 min-w-[32px] touch-manipulation"
+                        className="h-8 w-8 p-0 min-w-[32px] touch-manipulation"
                         onClick={(e) => handleSuggestEdit(e, resource)}
                         data-testid={`button-suggest-edit-${resourceId}`}
                         title="Suggest an edit"
@@ -418,8 +441,17 @@ export default function Category() {
                   <div className="flex items-start gap-2">
                     <span className="font-medium text-sm line-clamp-2 flex-1">{resource.title}</span>
                     <div className="flex items-center gap-1 flex-shrink-0">
-                      <ExternalLink className="h-3 w-3 text-muted-foreground mt-0.5" />
-                      {isAuthenticated && isDbResource(resource) && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 p-0 min-w-[28px] touch-manipulation"
+                        onClick={handleExternalLink}
+                        data-testid={`button-external-${resourceId}`}
+                        title="Open in new tab"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      </Button>
+                      {isDbResource(resource) && (
                         <Button
                           variant="ghost"
                           size="sm"
@@ -451,12 +483,21 @@ export default function Category() {
                   <CardTitle className="text-lg flex items-start gap-2">
                     <span className="flex-1">{resource.title}</span>
                     <div className="flex items-center gap-1 flex-shrink-0">
-                      <ExternalLink className="h-4 w-4 mt-1" />
-                      {isAuthenticated && isDbResource(resource) && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 min-h-[44px] min-w-[44px]"
+                        onClick={handleExternalLink}
+                        data-testid={`button-external-${resourceId}`}
+                        title="Open in new tab"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </Button>
+                      {isDbResource(resource) && (
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-7 w-7 p-0"
+                          className="h-8 w-8 p-0 min-h-[44px] min-w-[44px]"
                           onClick={(e) => handleSuggestEdit(e, resource)}
                           data-testid={`button-suggest-edit-${resourceId}`}
                           title="Suggest an edit"
@@ -472,28 +513,31 @@ export default function Category() {
                     </CardDescription>
                   )}
                 </CardHeader>
-                {(resource.subcategory || resource.subSubcategory || (resource.tags && resource.tags.length > 0)) && (
-                  <CardContent>
-                    <div className="flex gap-2 flex-wrap">
-                      {resource.subcategory && (
-                        <Badge variant="outline">{resource.subcategory}</Badge>
-                      )}
-                      {resource.subSubcategory && (
-                        <Badge variant="outline">{resource.subSubcategory}</Badge>
-                      )}
-                      {resource.tags && resource.tags.slice(0, 3).map((tag, tagIndex) => (
-                        <Badge key={tagIndex} variant="secondary" className="text-xs">
-                          {tag}
-                        </Badge>
-                      ))}
-                      {resource.tags && resource.tags.length > 3 && (
-                        <Badge variant="secondary" className="text-xs">
-                          +{resource.tags.length - 3}
-                        </Badge>
-                      )}
-                    </div>
-                  </CardContent>
-                )}
+                <CardContent>
+                  <div className="flex gap-2 flex-wrap">
+                    {isDbResource(resource) && (
+                      <Badge variant="outline" className="text-xs border-pink-500/30 text-pink-400">
+                        View Details
+                      </Badge>
+                    )}
+                    {resource.subcategory && (
+                      <Badge variant="outline">{resource.subcategory}</Badge>
+                    )}
+                    {resource.subSubcategory && (
+                      <Badge variant="outline">{resource.subSubcategory}</Badge>
+                    )}
+                    {resource.tags && resource.tags.slice(0, 3).map((tag, tagIndex) => (
+                      <Badge key={tagIndex} variant="secondary" className="text-xs">
+                        {tag}
+                      </Badge>
+                    ))}
+                    {resource.tags && resource.tags.length > 3 && (
+                      <Badge variant="secondary" className="text-xs">
+                        +{resource.tags.length - 3}
+                      </Badge>
+                    )}
+                  </div>
+                </CardContent>
               </Card>
             );
           })}
