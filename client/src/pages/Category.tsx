@@ -160,11 +160,11 @@ export default function Category() {
     }
   }, [categoryName, isLoading]);
   
-  // Helper to check if resource is from database (editable)
-  const isDbResource = (resource: Resource) => String(resource.id).startsWith('db-');
+  // Helper to check if resource is from database (has numeric ID)
+  const isDbResource = (resource: Resource) => typeof resource.id === 'number' || /^\d+$/.test(String(resource.id));
   
   // Helper to get database ID from resource
-  const getDbId = (resource: Resource) => parseInt(String(resource.id).replace('db-', ''));
+  const getDbId = (resource: Resource) => typeof resource.id === 'number' ? resource.id : parseInt(String(resource.id));
   
   // Helper to convert category resource to DbResource for edit dialog
   const toDbResource = (resource: Resource, dbResource: any): DbResource => ({
