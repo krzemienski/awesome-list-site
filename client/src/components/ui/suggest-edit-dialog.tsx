@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -145,11 +145,51 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
       title: resource.title || "",
       url: resource.url || "",
       description: resource.description || "",
-      category: resource.category || "",
-      subcategory: resource.subcategory || "",
-      subSubcategory: resource.subSubcategory || "",
+      category: "",
+      subcategory: "",
+      subSubcategory: "",
     },
   });
+
+  useEffect(() => {
+    if (open && categories.length > 0) {
+      const matchedCategory = categories.find(
+        c => c.name.toLowerCase() === resource.category?.toLowerCase() ||
+             c.slug === resource.category?.toLowerCase().replace(/\s+/g, '-')
+      );
+      if (matchedCategory) {
+        form.setValue('category', matchedCategory.id.toString());
+      }
+    }
+  }, [open, categories, resource.category, form]);
+
+  useEffect(() => {
+    const selectedCategoryId = form.watch('category');
+    if (open && subcategories.length > 0 && selectedCategoryId && resource.subcategory) {
+      const matchedSubcategory = subcategories.find(
+        s => s.categoryId === parseInt(selectedCategoryId) &&
+             (s.name.toLowerCase() === resource.subcategory?.toLowerCase() ||
+              s.slug === resource.subcategory?.toLowerCase().replace(/\s+/g, '-'))
+      );
+      if (matchedSubcategory) {
+        form.setValue('subcategory', matchedSubcategory.id.toString());
+      }
+    }
+  }, [open, subcategories, resource.subcategory, form.watch('category'), form]);
+
+  useEffect(() => {
+    const selectedSubcategoryId = form.watch('subcategory');
+    if (open && subSubcategories.length > 0 && selectedSubcategoryId && resource.subSubcategory) {
+      const matchedSubSubcategory = subSubcategories.find(
+        s => s.subcategoryId === parseInt(selectedSubcategoryId) &&
+             (s.name.toLowerCase() === resource.subSubcategory?.toLowerCase() ||
+              s.slug === resource.subSubcategory?.toLowerCase().replace(/\s+/g, '-'))
+      );
+      if (matchedSubSubcategory) {
+        form.setValue('subSubcategory', matchedSubSubcategory.id.toString());
+      }
+    }
+  }, [open, subSubcategories, resource.subSubcategory, form.watch('subcategory'), form]);
 
   const selectedCategory = form.watch("category");
   const selectedSubcategory = form.watch("subcategory");

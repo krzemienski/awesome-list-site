@@ -394,12 +394,12 @@ export default function Category() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-7 w-7 p-0 ml-2"
+                        className="h-8 w-8 p-0 ml-2 min-w-[32px] touch-manipulation"
                         onClick={(e) => handleSuggestEdit(e, resource)}
                         data-testid={`button-suggest-edit-${resourceId}`}
                         title="Suggest an edit"
                       >
-                        <Edit className="h-3.5 w-3.5" />
+                        <Edit className="h-4 w-4" />
                       </Button>
                     )}
                   </div>
@@ -423,12 +423,12 @@ export default function Category() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-6 w-6 p-0"
+                          className="h-7 w-7 p-0 min-w-[28px] touch-manipulation"
                           onClick={(e) => handleSuggestEdit(e, resource)}
                           data-testid={`button-suggest-edit-${resourceId}`}
                           title="Suggest an edit"
                         >
-                          <Edit className="h-3 w-3" />
+                          <Edit className="h-3.5 w-3.5" />
                         </Button>
                       )}
                     </div>
