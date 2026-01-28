@@ -1,3 +1,34 @@
+/**
+ * ============================================================================
+ * STORAGE.TS - Database Access Layer (DAL)
+ * ============================================================================
+ * 
+ * This module provides the data access layer for all database operations.
+ * It implements the IStorage interface with Drizzle ORM and PostgreSQL.
+ * 
+ * DESIGN PATTERN:
+ * - Singleton pattern: Single storage instance exported for app-wide use
+ * - Interface-based: IStorage defines all operations for testability
+ * - Transaction-safe: Uses Drizzle's transaction support for multi-table ops
+ * 
+ * KEY OPERATIONS:
+ * - Users: getUser, upsertUser, getAllUsers, updateUserRole
+ * - Resources: CRUD + status management (pending/approved/rejected)
+ * - Categories: 3-level hierarchy (category → subcategory → sub-subcategory)
+ * - Audit Log: Complete change tracking for all resource modifications
+ * - GitHub Sync: Queue and history for import/export operations
+ * - Enrichment: Job and queue management for AI-powered metadata extraction
+ * - Learning: Journeys, steps, and user progress tracking
+ * 
+ * HIERARCHICAL DATA:
+ * - getAwesomeListFromDatabase(): Builds complete category tree with resources
+ * - Uses LEFT JOINs for efficient single-query hierarchy loading
+ * - Supports accurate resource counts at each hierarchy level
+ * 
+ * See /docs/ARCHITECTURE.md for data flow diagrams.
+ * ============================================================================
+ */
+
 import {
   users,
   resources,

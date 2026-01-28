@@ -241,6 +241,9 @@ POST /api/github/process-queue          # Trigger queue processing
 ```
 
 ### Import/Export
+
+**Note**: All admin export endpoints require authentication and admin role. Unauthenticated requests return `{"message":"Unauthorized"}`. GET requests to POST-only endpoints return HTML (SPA fallback).
+
 ```
 POST /api/admin/export                  # Export markdown (awesome-list format)
 GET /api/admin/export-json              # Export full database backup (JSON)

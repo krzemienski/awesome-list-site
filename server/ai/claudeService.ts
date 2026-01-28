@@ -1,3 +1,42 @@
+/**
+ * ============================================================================
+ * CLAUDE SERVICE - AI-Powered Resource Analysis
+ * ============================================================================
+ * 
+ * This service provides Claude AI integration for automated resource analysis
+ * and metadata extraction. It uses the Anthropic API with intelligent caching
+ * and rate limiting for cost-effective operation.
+ * 
+ * CAPABILITIES:
+ * - URL Content Analysis: Extracts title, description, tags from web pages
+ * - Category Suggestion: Recommends appropriate categories based on content
+ * - Quality Scoring: Evaluates resource relevance and quality (1-10 scale)
+ * - Batch Processing: Sequential processing with configurable batch sizes
+ * 
+ * SECURITY:
+ * - ALLOWED_DOMAINS whitelist prevents SSRF attacks
+ * - Only known video/dev resource domains can be analyzed
+ * - API key managed through Replit secrets
+ * 
+ * CACHING:
+ * - Response cache (1 hour TTL): Deduplicates identical requests
+ * - Analysis cache (24 hour TTL): Stores URL analysis results
+ * - LRU eviction when cache exceeds MAX_CACHE_SIZE
+ * 
+ * RATE LIMITING:
+ * - Request counting for usage monitoring
+ * - Configurable delays between batch requests
+ * - Graceful handling of API rate limit errors
+ * 
+ * COST OPTIMIZATION:
+ * - Uses Claude Haiku 4.5 (fastest, cheapest model)
+ * - Caching reduces redundant API calls
+ * - Batch mode processes resources efficiently
+ * 
+ * See /docs/ADMIN-GUIDE.md for enrichment workflow documentation.
+ * ============================================================================
+ */
+
 import Anthropic from '@anthropic-ai/sdk';
 
 // <important_do_not_delete>

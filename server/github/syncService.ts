@@ -1,3 +1,41 @@
+/**
+ * ============================================================================
+ * SYNC SERVICE - GitHub Bidirectional Synchronization
+ * ============================================================================
+ * 
+ * This service handles bidirectional synchronization between the database
+ * and GitHub awesome-list repositories. It supports importing resources from
+ * existing awesome lists and exporting curated resources back to GitHub.
+ * 
+ * IMPORT FLOW:
+ * 1. Fetch raw markdown from GitHub (README.md or specified file)
+ * 2. Parse markdown into structured resources using parser.ts
+ * 3. Validate against awesome-lint rules
+ * 4. Resolve conflicts with existing database entries
+ * 5. Insert/update resources with proper category hierarchy
+ * 6. Record operation in sync history for audit trail
+ * 
+ * EXPORT FLOW:
+ * 1. Fetch all approved resources from database
+ * 2. Format as awesome-lint compliant markdown using formatter.ts
+ * 3. Validate output against awesome-lint before commit
+ * 4. Create GitHub commit or pull request via Replit OAuth
+ * 5. Update sync status on exported resources
+ * 
+ * CONFLICT RESOLUTION:
+ * - URL-based matching for duplicate detection
+ * - Configurable skip/update/create actions per conflict
+ * - Preserves local edits when importing updates
+ * 
+ * QUEUE PROCESSING:
+ * - Async queue for long-running sync operations
+ * - Status tracking: pending → processing → completed/failed
+ * - Automatic retry with exponential backoff
+ * 
+ * See /docs/ADMIN-GUIDE.md for import/export workflow documentation.
+ * ============================================================================
+ */
+
 import { GitHubClient } from "./client";
 import { parseAwesomeList, convertToDbResources } from "./parser";
 import { AwesomeListFormatter, generateContributingMd } from "./formatter";
@@ -5,11 +43,6 @@ import { storage } from "../storage";
 import { Resource, InsertResource, GithubSyncQueue } from "@shared/schema";
 import { getGitHubClient } from "./replitConnection";
 import { validateAwesomeList } from "../validation/awesomeLint";
-
-/**
- * Service for synchronizing awesome lists with GitHub
- * Handles import, export, conflict resolution, and queue processing
- */
 
 interface SyncOptions {
   dryRun?: boolean;

@@ -1,3 +1,34 @@
+/**
+ * ============================================================================
+ * ROUTES.TS - Express API Route Definitions
+ * ============================================================================
+ * 
+ * This is the main routing module for the Awesome Video Resource Viewer API.
+ * It defines 75+ REST endpoints organized into logical sections:
+ * 
+ * SECTIONS:
+ * - Authentication: Replit OAuth + local admin login (/api/auth/*)
+ * - Resources: CRUD operations for video resources (/api/resources/*)
+ * - Categories: Hierarchical category management (/api/categories/*)
+ * - Admin: Dashboard, user management, auditing (/api/admin/*)
+ * - GitHub Sync: Import/export with awesome lists (/api/github/*)
+ * - AI Services: Claude-powered enrichment (/api/admin/enrichment/*)
+ * - Learning: Personalized journeys (/api/journeys/*)
+ * - SEO: Sitemap, RSS feed, schema.org (/sitemap.xml, /feed.xml)
+ * 
+ * AUTHENTICATION:
+ * - Public routes: resource browsing, awesome-list, search
+ * - Auth required: bookmarks, favorites, profile, suggestions
+ * - Admin required: all /api/admin/* routes, GitHub sync, enrichment
+ * 
+ * KEY FUNCTIONS:
+ * - registerRoutes(): Main function that sets up all Express routes
+ * - runBackgroundInitialization(): Seeds database if empty on startup
+ * 
+ * See /docs/API.md for complete endpoint documentation.
+ * ============================================================================
+ */
+
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
