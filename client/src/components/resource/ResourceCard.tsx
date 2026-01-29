@@ -186,13 +186,14 @@ export default function ResourceCard({
             Open Link
           </Button>
           {isValidDbResource && (
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="sm"
               className="min-h-[44px] min-w-[44px]"
               onClick={handleSuggestEdit}
               data-testid={`button-suggest-edit-${resource.id}`}
               title="Suggest an edit"
+              aria-label="Suggest an edit"
             >
               <Edit className="h-4 w-4" />
             </Button>
