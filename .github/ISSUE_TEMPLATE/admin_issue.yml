@@ -1,0 +1,133 @@
+name: Admin Tool Issue
+description: Report issues with admin panel, GitHub sync, or curation tools
+title: "[Admin]: "
+labels: ["admin", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Report issues with the Admin Panel, GitHub Sync, AI enrichment, or resource curation tools.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Admin Feature Area
+      description: Which admin feature does this relate to?
+      options:
+        - Admin Panel (UI/UX)
+        - Resource Curation (approve/reject/edit)
+        - GitHub Import/Export
+        - AI Enrichment
+        - awesome-lint Validation
+        - Link Verification
+        - User Management
+        - Audit Trail
+        - Other
+      default: 0
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Issue Description
+      description: What's the problem?
+      placeholder: |
+        When attempting to import resources from a GitHub repository,
+        the import hangs for 5+ minutes and then fails silently.
+      validations:
+        required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this?
+      placeholder: |
+        1. Navigate to Admin Panel → GitHub Sync
+        2. Paste repository URL: https://github.com/user/awesome-repo
+        3. Click "Import Resources"
+        4. Wait 5 minutes - no progress or error message
+      value: |
+        1.
+        2.
+        3.
+      validations:
+        required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What should happen?
+      placeholder: "Resources should import within 30 seconds with a success message and progress indicator."
+    validations:
+      required: true
+
+  - type: input
+    id: resource-count
+    attributes:
+      label: Number of Resources Affected
+      description: How many resources are impacted by this issue?
+      placeholder: "e.g., 5 resources, all resources in TypeScript category, etc."
+
+  - type: textarea
+    id: data-sample
+    attributes:
+      label: Sample Data (if applicable)
+      description: Paste a sample of the problematic data (sanitized)
+      placeholder: |
+        GitHub URL that fails:
+        https://raw.githubusercontent.com/example/awesome-list/main/README.md
+
+        Sample resource with issue:
+        [Resource Title](https://example.com) - Description text
+      render: text
+
+  - type: textarea
+    id: server-logs
+    attributes:
+      label: Server Logs
+      description: Any error messages from server logs? (Check NODE_ENV=production logs)
+      placeholder: "Error: ECONNREFUSED 127.0.0.1:5432"
+      render: text
+
+  - type: textarea
+    id: database-info
+    attributes:
+      label: Database Impact
+      description: Does this affect database state? How?
+      placeholder: |
+        - Duplicate resources created but not merged
+        - Resource metadata partially updated
+        - No database changes, UI only issue
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: How severe is this issue?
+      options:
+        - Low (cosmetic, convenience)
+        - Medium (feature doesn't work as expected)
+        - High (data loss or major feature broken)
+        - Critical (security issue or data corruption)
+      default: 1
+
+  - type: checkboxes
+    id: testing
+    attributes:
+      label: Testing Performed
+      options:
+        - label: Tested in development environment
+        - label: Tested in production environment
+        - label: Confirmed issue reproduces consistently
+        - label: Tested with different user accounts/permissions
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Anything else that might help?
+      placeholder: |
+        - This started after the update on 2024-01-15
+        - Only happens with repositories containing 500+ resources
+        - Related to issue #123

@@ -1,0 +1,14 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Documentation
+    url: https://github.com/krzemienski/awesome-list-site/blob/main/docs/ARCHITECTURE.md
+    about: Read the architecture and design documentation
+  - name: Contributing Guide
+    url: https://github.com/krzemienski/awesome-list-site/blob/main/CONTRIBUTING.md
+    about: Learn how to contribute to this project
+  - name: Discussions
+    url: https://github.com/krzemienski/awesome-list-site/discussions
+    about: Ask questions and discuss features in our GitHub Discussions
+  - name: API Documentation
+    url: https://github.com/krzemienski/awesome-list-site/blob/main/docs/API.md
+    about: Reference for all API endpoints
