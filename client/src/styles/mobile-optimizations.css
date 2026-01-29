@@ -1,5 +1,19 @@
 /* Mobile Touch Optimizations */
 
+/* Safe area handling for notched devices */
+header, .header, [data-topbar] {
+  padding-top: env(safe-area-inset-top);
+}
+
+.bottom-sheet, [data-bottom-sheet] {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Right edge for landscape */
+main, .main-content {
+  padding-right: env(safe-area-inset-right);
+}
+
 /* Prevent touch callouts and text selection on interactive elements */
 .touch-optimized {
   -webkit-touch-callout: none;
@@ -12,7 +26,7 @@
 }
 
 /* Improve touch targets for mobile */
-@media (max-width: 768px) {
+@media (max-width: 1023px) {
   /* Larger touch targets for buttons */
   button:not(.btn-compact) {
     min-height: 44px !important;
@@ -175,7 +189,7 @@ button,
 }
 
 /* Better focus states for mobile */
-@media (max-width: 768px) {
+@media (max-width: 1023px) {
   *:focus-visible {
     outline: 2px solid hsl(var(--ring));
     outline-offset: 2px;
@@ -218,7 +232,7 @@ body.scroll-lock {
 }
 
 /* Mobile-specific popover improvements */
-@media (max-width: 768px) {
+@media (max-width: 1023px) {
   /* Make popovers full-width on very small screens */
   @media (max-width: 480px) {
     [data-radix-popover-content] {
