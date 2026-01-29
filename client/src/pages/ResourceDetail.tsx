@@ -173,7 +173,7 @@ export default function ResourceDetail() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6 max-w-5xl mx-auto px-4">
+      <div className="space-y-6 max-w-5xl mx-auto px-4" aria-busy={true} aria-live="polite">
         <Skeleton className="h-10 w-32" />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-4">
@@ -305,9 +305,9 @@ export default function ResourceDetail() {
                           }}
                         />
                       )}
-                      <CardTitle className="text-2xl md:text-3xl" data-testid="text-resource-title">
+                      <h1 className="text-2xl md:text-3xl font-semibold leading-none tracking-tight" data-testid="text-resource-title">
                         {resource.title}
-                      </CardTitle>
+                      </h1>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {resource.category && (
@@ -358,10 +358,10 @@ export default function ResourceDetail() {
             
             <CardContent className="pt-6 space-y-6">
               <div>
-                <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+                <h2 className="text-lg font-semibold mb-2 flex items-center gap-2">
                   <Globe className="h-4 w-4 text-pink-500" />
                   Description
-                </h3>
+                </h2>
                 <CardDescription className="text-base leading-relaxed" data-testid="text-description">
                   {resource.description || 'No description available for this resource.'}
                 </CardDescription>
@@ -371,10 +371,10 @@ export default function ResourceDetail() {
                 <>
                   <Separator />
                   <div>
-                    <h3 className="text-sm font-semibold mb-2 text-muted-foreground flex items-center gap-2">
+                    <h2 className="text-sm font-semibold mb-2 text-muted-foreground flex items-center gap-2">
                       <ImageIcon className="h-4 w-4" />
                       Page Description
-                    </h3>
+                    </h2>
                     <p className="text-sm text-muted-foreground leading-relaxed">
                       {scrapedDescription}
                     </p>
@@ -385,10 +385,10 @@ export default function ResourceDetail() {
               <Separator />
 
               <div>
-                <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+                <h2 className="text-lg font-semibold mb-2 flex items-center gap-2">
                   <Link2 className="h-4 w-4 text-cyan-500" />
                   URL
-                </h3>
+                </h2>
                 <a 
                   href={resource.url}
                   target="_blank"
@@ -405,10 +405,10 @@ export default function ResourceDetail() {
                 <>
                   <Separator />
                   <div>
-                    <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                    <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
                       <Tag className="h-4 w-4 text-pink-500" />
                       Tags
-                    </h3>
+                    </h2>
                     <div className="flex flex-wrap gap-2">
                       {tags.map((tag, index) => (
                         <Badge 

@@ -69,7 +69,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6" aria-busy={true} aria-live="polite">
         <SEOHead title="Loading - Awesome Video Resources" />
         <div className="space-y-4">
           <Skeleton className="h-10 w-80" />

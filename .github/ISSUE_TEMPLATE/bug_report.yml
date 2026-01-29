@@ -1,0 +1,128 @@
+name: Bug Report
+description: Report a bug or unexpected behavior
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a bug! Please provide as much detail as possible to help us fix it quickly.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: Clear and concise description of what the bug is
+      placeholder: |
+        When I click X, the page shows Y instead of Z.
+        The resource card displays broken image thumbnails.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Detailed steps to reproduce the bug
+      placeholder: |
+        1. Go to the Resources page
+        2. Search for "React"
+        3. Click on the first resource
+        4. The page crashes or shows an error
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What should happen instead?
+      placeholder: The resource page should load without errors and display the full description.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What currently happens?
+      placeholder: The page shows a blank white screen with no error message.
+
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      description: Which browser are you using?
+      options:
+        - Chrome
+        - Firefox
+        - Safari
+        - Edge
+        - Opera
+        - Other (please specify)
+      default: 0
+
+  - type: input
+    id: browser-version
+    attributes:
+      label: Browser Version
+      description: What version of the browser?
+      placeholder: "e.g., 120.0.6099.129"
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating System
+      description: What OS and version?
+      placeholder: "e.g., Windows 11, macOS 14.2, Ubuntu 22.04"
+
+  - type: input
+    id: device
+    attributes:
+      label: Device Type
+      description: "If applicable: Desktop, Laptop, Tablet, Mobile"
+      placeholder: "e.g., iPhone 15, Samsung Galaxy S24"
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots or Video
+      description: Add screenshots or screen recording if applicable (helps us understand the issue quickly)
+      placeholder: "You can paste images by dragging them here"
+
+  - type: textarea
+    id: console-errors
+    attributes:
+      label: Console Errors
+      description: Any JavaScript errors in the browser console? (F12 → Console tab)
+      placeholder: |
+        TypeError: Cannot read property 'title' of undefined
+        at ResourceCard.tsx:42
+      render: text
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Any other context that might help us reproduce and fix the bug
+      placeholder: |
+        - Does it happen in incognito mode?
+        - Does it work on mobile but not desktop?
+        - When did this start happening?
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      description: Please confirm before submitting
+      options:
+        - label: I have searched existing issues and this is not a duplicate
+          required: true
+        - label: I have provided clear steps to reproduce the bug
+          required: true
+        - label: I am using the latest version of the application
+          required: false

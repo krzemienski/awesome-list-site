@@ -1,19 +1,26 @@
 import { motion } from "framer-motion"
 import { ReactNode } from "react"
+import { useReducedMotion } from "@/hooks/use-reduced-motion"
 
 // Sidebar item morphing animation
-export function SidebarItemMorph({ children, isActive, isExpanded }: { 
+export function SidebarItemMorph({ children, isActive, isExpanded }: {
   children: ReactNode
   isActive?: boolean
-  isExpanded?: boolean 
+  isExpanded?: boolean
 }) {
+  const prefersReducedMotion = useReducedMotion()
+
   return (
     <motion.div
-      animate={{
+      animate={prefersReducedMotion ? {
+        borderRadius: isActive ? "0.375rem" : "0rem"
+      } : {
         scale: isActive ? 1.02 : 1,
         borderRadius: isActive ? "0.375rem" : "0rem"
       }}
-      whileHover={{
+      whileHover={prefersReducedMotion ? {
+        borderRadius: "0.375rem"
+      } : {
         scale: 1.01,
         borderRadius: "0.375rem"
       }}
@@ -30,15 +37,17 @@ export function SidebarItemMorph({ children, isActive, isExpanded }: {
 }
 
 // Expandable sidebar section with morphing
-export function SidebarExpandableMorph({ 
-  children, 
+export function SidebarExpandableMorph({
+  children,
   isExpanded,
   className = ""
-}: { 
+}: {
   children: ReactNode
   isExpanded: boolean
   className?: string
 }) {
+  const prefersReducedMotion = useReducedMotion()
+
   return (
     <motion.div
       initial={false}
@@ -46,7 +55,10 @@ export function SidebarExpandableMorph({
         height: isExpanded ? "auto" : 0,
         opacity: isExpanded ? 1 : 0
       }}
-      transition={{
+      transition={prefersReducedMotion ? {
+        height: { duration: 0 },
+        opacity: { duration: 0 }
+      } : {
         height: {
           type: "spring",
           stiffness: 300,
@@ -60,7 +72,7 @@ export function SidebarExpandableMorph({
       className={`overflow-hidden ${className}`}
     >
       <motion.div
-        animate={{
+        animate={prefersReducedMotion ? {} : {
           y: isExpanded ? 0 : -10
         }}
         transition={{
@@ -77,9 +89,11 @@ export function SidebarExpandableMorph({
 
 // Sidebar toggle morphing animation
 export function SidebarToggleMorph({ isOpen }: { isOpen: boolean }) {
+  const prefersReducedMotion = useReducedMotion()
+
   return (
     <motion.div
-      animate={{
+      animate={prefersReducedMotion ? {} : {
         rotate: isOpen ? 90 : 0
       }}
       transition={{

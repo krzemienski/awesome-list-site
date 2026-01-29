@@ -24,43 +24,50 @@ export default function MainLayout({ awesomeList, isLoading, children, user, onL
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen flex-col">
-      <TopBar 
-        isSidebarOpen={isSidebarOpen}
-        setIsSidebarOpen={setIsSidebarOpen}
-        onSearchOpen={() => setSearchOpen(true)}
-        title={awesomeList?.title || "Awesome Selfhosted"}
-        repoUrl={awesomeList?.repoUrl}
-        resources={awesomeList?.resources || []}
-        user={user}
-        onLogout={onLogout}
-      />
-      
-      <SidebarProvider className="flex-1 overflow-hidden" open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
-        <ModernSidebar 
-          isOpen={isSidebarOpen}
-          setIsOpen={setIsSidebarOpen}
+    <>
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-background focus:text-foreground focus:border focus:border-primary focus:rounded-none"
+      >
+        Skip to main content
+      </a>
+      <div className="flex h-screen flex-col">
+        <TopBar
+          isSidebarOpen={isSidebarOpen}
+          setIsSidebarOpen={setIsSidebarOpen}
+          onSearchOpen={() => setSearchOpen(true)}
           title={awesomeList?.title || "Awesome Selfhosted"}
-          categories={awesomeList?.categories || []}
+          repoUrl={awesomeList?.repoUrl}
           resources={awesomeList?.resources || []}
-          isLoading={isLoading}
           user={user}
+          onLogout={onLogout}
         />
-        
-        <SidebarInset className="overflow-auto">
-          <div className="flex-1 py-6 px-4 md:px-6">
-            {children}
-          </div>
-          <Footer />
-        </SidebarInset>
-      </SidebarProvider>
+
+        <SidebarProvider className="flex-1 overflow-hidden" open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
+          <ModernSidebar
+            isOpen={isSidebarOpen}
+            setIsOpen={setIsSidebarOpen}
+            title={awesomeList?.title || "Awesome Selfhosted"}
+            categories={awesomeList?.categories || []}
+            resources={awesomeList?.resources || []}
+            isLoading={isLoading}
+            user={user}
+          />
+
+          <SidebarInset className="overflow-auto">
+            <main id="main-content" className="flex-1 py-6 px-4 md:px-6">
+              {children}
+            </main>
+            <Footer />
+          </SidebarInset>
+        </SidebarProvider>
       
-      <SearchDialog 
-        isOpen={searchOpen} 
-        setIsOpen={setSearchOpen}
-        resources={awesomeList?.resources || []}
-      />
-      
-    </div>
+        <SearchDialog
+          isOpen={searchOpen}
+          setIsOpen={setSearchOpen}
+          resources={awesomeList?.resources || []}
+        />
+      </div>
+    </>
   );
 }

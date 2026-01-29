@@ -72,8 +72,8 @@ export default function Journeys() {
 
   if (journeysLoading) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        <SEOHead 
+      <div className="container mx-auto px-4 py-8 max-w-7xl" aria-busy={true} aria-live="polite">
+        <SEOHead
           title="Learning Journeys"
           description="Explore structured learning paths to master new skills"
         />
