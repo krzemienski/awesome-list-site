@@ -108,7 +108,7 @@ export default function Subcategory() {
   
   if (isLoading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6" aria-busy={true} aria-live="polite">
         <SEOHead title="Loading..." />
         <div className="space-y-4">
           <Skeleton className="h-10 w-64" />

@@ -267,7 +267,7 @@ export default function Profile({ user }: ProfileProps) {
             </CardHeader>
             <CardContent>
               {progressLoading ? (
-                <div className="space-y-3">
+                <div className="space-y-3" aria-busy={true} aria-live="polite">
                   <Skeleton className="h-4 w-full" />
                   <Skeleton className="h-4 w-3/4" />
                   <Skeleton className="h-4 w-1/2" />
@@ -325,7 +325,7 @@ export default function Profile({ user }: ProfileProps) {
             </CardHeader>
             <CardContent>
               {journeysLoading ? (
-                <div className="space-y-3">
+                <div className="space-y-3" aria-busy={true} aria-live="polite">
                   <Skeleton className="h-20 w-full" />
                   <Skeleton className="h-20 w-full" />
                 </div>
@@ -396,7 +396,7 @@ export default function Profile({ user }: ProfileProps) {
             <CardContent>
               <ScrollArea className="h-[400px] pr-4">
                 {favoritesLoading ? (
-                  <div className="space-y-3">
+                  <div className="space-y-3" aria-busy={true} aria-live="polite">
                     {Array(3).fill(0).map((_, i) => (
                       <Skeleton key={i} className="h-20 w-full" />
                     ))}
@@ -468,7 +468,7 @@ export default function Profile({ user }: ProfileProps) {
             <CardContent>
               <ScrollArea className="h-[400px] pr-4">
                 {bookmarksLoading ? (
-                  <div className="space-y-3">
+                  <div className="space-y-3" aria-busy={true} aria-live="polite">
                     {Array(3).fill(0).map((_, i) => (
                       <Skeleton key={i} className="h-20 w-full" />
                     ))}
@@ -547,7 +547,7 @@ export default function Profile({ user }: ProfileProps) {
               <CardContent>
                 <ScrollArea className="h-[300px] pr-4">
                   {submissionsLoading ? (
-                    <div className="space-y-3">
+                    <div className="space-y-3" aria-busy={true} aria-live="polite">
                       {Array(2).fill(0).map((_, i) => (
                         <Skeleton key={i} className="h-24 w-full" />
                       ))}
@@ -634,7 +634,7 @@ export default function Profile({ user }: ProfileProps) {
               <CardContent>
                 <ScrollArea className="h-[300px] pr-4">
                   {submissionsLoading ? (
-                    <div className="space-y-3">
+                    <div className="space-y-3" aria-busy={true} aria-live="polite">
                       {Array(2).fill(0).map((_, i) => (
                         <Skeleton key={i} className="h-24 w-full" />
                       ))}

@@ -23,8 +23,8 @@ export default function Bookmarks() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <SEOHead 
+      <div className="space-y-6" aria-busy={true} aria-live="polite">
+        <SEOHead
           title="My Bookmarks - Loading"
           description="View your saved bookmarks"
         />
