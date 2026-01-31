@@ -560,10 +560,13 @@ export class DatabaseStorage implements IStorage {
   
   async createResource(resource: InsertResource): Promise<Resource> {
     const [newResource] = await db.insert(resources).values(resource).returning();
-    
+
     // Log the creation
     await this.logResourceAudit(newResource.id, 'created', resource.submittedBy ?? undefined);
-    
+
+    // Invalidate cache
+    getAwesomeListFromDatabaseMemoized.clear();
+
     return newResource;
   }
   
@@ -573,30 +576,36 @@ export class DatabaseStorage implements IStorage {
       .set({ ...resource, updatedAt: new Date() })
       .where(eq(resources.id, id))
       .returning();
-    
+
     // Log the update
     await this.logResourceAudit(id, 'updated', resource.submittedBy ?? undefined, resource);
-    
+
+    // Invalidate cache
+    getAwesomeListFromDatabaseMemoized.clear();
+
     return updatedResource;
   }
   
   async updateResourceStatus(id: number, status: string, approvedBy?: string): Promise<Resource> {
     const updateData: any = { status, updatedAt: new Date() };
-    
+
     if (status === 'approved' && approvedBy) {
       updateData.approvedBy = approvedBy;
       updateData.approvedAt = new Date();
     }
-    
+
     const [updatedResource] = await db
       .update(resources)
       .set(updateData)
       .where(eq(resources.id, id))
       .returning();
-    
+
     // Log the status change
     await this.logResourceAudit(id, status, approvedBy, { status });
-    
+
+    // Invalidate cache
+    getAwesomeListFromDatabaseMemoized.clear();
+
     return updatedResource;
   }
   
@@ -606,7 +615,7 @@ export class DatabaseStorage implements IStorage {
     if (!resource) {
       throw new Error('Resource not found');
     }
-    
+
     // Log the deletion BEFORE deleting (foreign key constraint)
     await this.logResourceAudit(
       id,
@@ -615,8 +624,11 @@ export class DatabaseStorage implements IStorage {
       { resource: { title: resource.title, url: resource.url, category: resource.category } },
       `Deleted resource: ${resource.title}`
     );
-    
+
     await db.delete(resources).where(eq(resources.id, id));
+
+    // Invalidate cache
+    getAwesomeListFromDatabaseMemoized.clear();
   }
   
   // Category management
@@ -645,12 +657,16 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(categories)
       .where(eq(categories.slug, category.slug));
-    
+
     if (existing) {
       throw new Error(`Category with slug "${category.slug}" already exists`);
     }
-    
+
     const [newCategory] = await db.insert(categories).values(category).returning();
+
+    // Invalidate cache
+    getAwesomeListFromDatabaseMemoized.clear();
+
     return newCategory;
   }
   
@@ -660,6 +676,10 @@ export class DatabaseStorage implements IStorage {
       .set(category)
       .where(eq(categories.id, id))
       .returning();
+
+    // Invalidate cache
+    getAwesomeListFromDatabaseMemoized.clear();
+
     return updatedCategory;
   }
   
@@ -669,19 +689,22 @@ export class DatabaseStorage implements IStorage {
     if (!category) {
       throw new Error('Category not found');
     }
-    
+
     const resourceCount = await this.getCategoryResourceCount(category.name);
     if (resourceCount > 0) {
       throw new Error(`Cannot delete category "${category.name}" because it has ${resourceCount} resources`);
     }
-    
+
     // Check if category has any subcategories
     const subcategories = await this.listSubcategories(id);
     if (subcategories.length > 0) {
       throw new Error(`Cannot delete category "${category.name}" because it has ${subcategories.length} subcategories`);
     }
-    
+
     await db.delete(categories).where(eq(categories.id, id));
+
+    // Invalidate cache
+    getAwesomeListFromDatabaseMemoized.clear();
   }
   
   async getCategoryResourceCount(categoryName: string): Promise<number> {
@@ -728,13 +751,17 @@ export class DatabaseStorage implements IStorage {
             eq(subcategories.categoryId, subcategory.categoryId)
           )
         );
-      
+
       if (existing) {
         throw new Error(`Subcategory with slug "${subcategory.slug}" already exists in this category`);
       }
     }
-    
+
     const [newSubcategory] = await db.insert(subcategories).values(subcategory).returning();
+
+    // Invalidate cache
+    getAwesomeListFromDatabaseMemoized.clear();
+
     return newSubcategory;
   }
   
@@ -744,6 +771,10 @@ export class DatabaseStorage implements IStorage {
       .set(subcategory)
       .where(eq(subcategories.id, id))
       .returning();
+
+    // Invalidate cache
+    getAwesomeListFromDatabaseMemoized.clear();
+
     return updatedSubcategory;
   }
   
@@ -753,19 +784,22 @@ export class DatabaseStorage implements IStorage {
     if (!subcategory) {
       throw new Error('Subcategory not found');
     }
-    
+
     const resourceCount = await this.getSubcategoryResourceCount(subcategory.name);
     if (resourceCount > 0) {
       throw new Error(`Cannot delete subcategory "${subcategory.name}" because it has ${resourceCount} resources`);
     }
-    
+
     // Check if subcategory has any sub-subcategories
     const subSubcategories = await this.listSubSubcategories(id);
     if (subSubcategories.length > 0) {
       throw new Error(`Cannot delete subcategory "${subcategory.name}" because it has ${subSubcategories.length} sub-subcategories`);
     }
-    
+
     await db.delete(subcategories).where(eq(subcategories.id, id));
+
+    // Invalidate cache
+    getAwesomeListFromDatabaseMemoized.clear();
   }
   
   async getSubcategoryResourceCount(subcategoryName: string): Promise<number> {
@@ -812,13 +846,17 @@ export class DatabaseStorage implements IStorage {
             eq(subSubcategories.subcategoryId, subSubcategory.subcategoryId)
           )
         );
-      
+
       if (existing) {
         throw new Error(`Sub-subcategory with slug "${subSubcategory.slug}" already exists in this subcategory`);
       }
     }
-    
+
     const [newSubSubcategory] = await db.insert(subSubcategories).values(subSubcategory).returning();
+
+    // Invalidate cache
+    getAwesomeListFromDatabaseMemoized.clear();
+
     return newSubSubcategory;
   }
   
@@ -828,6 +866,10 @@ export class DatabaseStorage implements IStorage {
       .set(subSubcategory)
       .where(eq(subSubcategories.id, id))
       .returning();
+
+    // Invalidate cache
+    getAwesomeListFromDatabaseMemoized.clear();
+
     return updatedSubSubcategory;
   }
   
@@ -837,13 +879,16 @@ export class DatabaseStorage implements IStorage {
     if (!subSubcategory) {
       throw new Error('Sub-subcategory not found');
     }
-    
+
     const resourceCount = await this.getSubSubcategoryResourceCount(subSubcategory.name);
     if (resourceCount > 0) {
       throw new Error(`Cannot delete sub-subcategory "${subSubcategory.name}" because it has ${resourceCount} resources`);
     }
-    
+
     await db.delete(subSubcategories).where(eq(subSubcategories.id, id));
+
+    // Invalidate cache
+    getAwesomeListFromDatabaseMemoized.clear();
   }
   
   async getSubSubcategoryResourceCount(subSubcategoryName: string): Promise<number> {
@@ -1346,11 +1391,11 @@ export class DatabaseStorage implements IStorage {
     if (!resource) {
       throw new Error('Resource not found');
     }
-    
+
     if (resource.status !== 'pending') {
       throw new Error('Resource is not pending approval');
     }
-    
+
     const [updated] = await db
       .update(resources)
       .set({
@@ -1361,7 +1406,7 @@ export class DatabaseStorage implements IStorage {
       })
       .where(eq(resources.id, id))
       .returning();
-    
+
     // Log the approval action
     await this.logResourceAudit(
       id,
@@ -1370,7 +1415,10 @@ export class DatabaseStorage implements IStorage {
       { previousStatus: resource.status, newStatus: 'approved' },
       'Resource approved by admin'
     );
-    
+
+    // Invalidate cache
+    getAwesomeListFromDatabaseMemoized.clear();
+
     return updated;
   }
   
@@ -1379,15 +1427,15 @@ export class DatabaseStorage implements IStorage {
     if (!resource) {
       throw new Error('Resource not found');
     }
-    
+
     if (resource.status !== 'pending') {
       throw new Error('Resource is not pending approval');
     }
-    
+
     if (!reason || reason.trim().length < 10) {
       throw new Error('Rejection reason must be at least 10 characters');
     }
-    
+
     await db
       .update(resources)
       .set({
@@ -1395,7 +1443,7 @@ export class DatabaseStorage implements IStorage {
         updatedAt: new Date()
       })
       .where(eq(resources.id, id));
-    
+
     // Log the rejection action
     await this.logResourceAudit(
       id,
@@ -1404,6 +1452,9 @@ export class DatabaseStorage implements IStorage {
       { previousStatus: resource.status, newStatus: 'rejected', reason },
       `Resource rejected: ${reason}`
     );
+
+    // Invalidate cache (rejected resources don't appear in list, but this keeps consistency)
+    getAwesomeListFromDatabaseMemoized.clear();
   }
 
   async getResourceEditsByUser(userId: string): Promise<ResourceEdit[]> {
