@@ -466,17 +466,27 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
     </>
   );
 
-  // Always use Sheet overlay sidebar on all screen sizes
+  // Use Sheet overlay only on mobile (< 768px), persistent sidebar on tablet/desktop
+  const shouldUseSheet = isMobile && !isTablet;
+
   return (
     <>
-      <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetContent side="left" className="p-0 w-[85vw] max-w-[380px]">
+      {shouldUseSheet ? (
+        <Sheet open={isOpen} onOpenChange={setIsOpen}>
+          <SheetContent side="left" className="p-0 w-[85vw] max-w-[380px]">
+            <div className="flex flex-col h-full">
+              {sidebarContent}
+            </div>
+          </SheetContent>
+        </Sheet>
+      ) : (
+        <Sidebar variant="inset" className="border-r">
           <div className="flex flex-col h-full">
             {sidebarContent}
           </div>
-        </SheetContent>
-      </Sheet>
-      
+        </Sidebar>
+      )}
+
       <Dialog open={recommendationsOpen} onOpenChange={setRecommendationsOpen}>
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>

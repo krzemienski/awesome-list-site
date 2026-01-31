@@ -21,12 +21,13 @@ export default function MobileBottomSheet({
 }: MobileBottomSheetProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent 
-        side="bottom" 
+      <SheetContent
+        side="bottom"
         className={cn(
           "h-[90vh] flex flex-col",
           "rounded-t-2xl border-t border-pink-500/30",
           "bg-gradient-to-b from-background to-background/95",
+          "pb-[max(1rem,env(safe-area-inset-bottom))]",
           className
         )}
       >

@@ -326,6 +326,7 @@ export default function SubmitResource() {
                         <Input
                           placeholder="https://example.com/resource"
                           type="url"
+                          autoComplete="url"
                           {...field}
                           data-testid="input-url"
                         />

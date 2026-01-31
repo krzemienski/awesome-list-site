@@ -275,7 +275,28 @@ function getSubSubcategoryTitleFromSlug(slug: string): string {
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication (OAuth and local)
-  await setupAuth(app);
+  // Only setup Replit OAuth if REPL_ID is available (running on Replit)
+  if (process.env.REPL_ID) {
+    await setupAuth(app);
+  } else {
+    // For local development, just setup session without Replit OAuth
+    const { getSession } = await import("./replitAuth");
+    app.set("trust proxy", 1);
+    app.use(getSession());
+    app.use(passport.initialize());
+    app.use(passport.session());
+
+    // Configure passport serialization for local auth
+    passport.serializeUser((user: any, done) => {
+      done(null, user);
+    });
+
+    passport.deserializeUser((user: any, done) => {
+      done(null, user);
+    });
+
+    console.log("Running in local mode - Replit OAuth disabled, use local auth at /api/auth/local/login");
+  }
   setupLocalAuth();
 
   // Local authentication routes
@@ -2860,9 +2881,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
  * NOTE: /api/awesome-list now serves data from the PostgreSQL database
  * directly via storage.getAwesomeListFromDatabase(). No static JSON loading required.
  */
+// Helper to retry database operations with exponential backoff (for Neon cold starts)
+async function withRetry<T>(
+  operation: () => Promise<T>,
+  maxRetries: number = 3,
+  delayMs: number = 2000
+): Promise<T> {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await operation();
+    } catch (error: any) {
+      const isRetryable = error.message?.includes('too many clients') ||
+                          error.message?.includes('connection') ||
+                          error.message?.includes('ECONNREFUSED');
+      if (attempt === maxRetries || !isRetryable) {
+        throw error;
+      }
+      console.log(`⏳ Database operation failed (attempt ${attempt}/${maxRetries}), retrying in ${delayMs}ms...`);
+      await new Promise(resolve => setTimeout(resolve, delayMs));
+      delayMs *= 2; // Exponential backoff
+    }
+  }
+  throw new Error('Retry logic failed unexpectedly');
+}
+
 export async function runBackgroundInitialization(): Promise<void> {
   const isProduction = process.env.NODE_ENV === 'production';
-  
+
   console.log(`🔄 Running background initialization (${isProduction ? 'production' : 'development'} mode)...`);
   console.log('📊 Note: /api/awesome-list now serves from PostgreSQL database');
 
@@ -2870,27 +2915,26 @@ export async function runBackgroundInitialization(): Promise<void> {
   // This ensures data consistency across environments
   try {
     console.log('Checking if database needs seeding...');
-    const categories = await storage.listCategories();
-    
-    // Query database DIRECTLY for actual resource count (not via API that depends on mapCategoryName)
-    // This prevents false-positive reseeding when category mapping isn't working yet
-    const actualResourceCount = await storage.getResourceCount();
-    
+
+    // Use retry logic for initial database check (handles Neon cold starts)
+    const categories = await withRetry(() => storage.listCategories());
+    const actualResourceCount = await withRetry(() => storage.getResourceCount());
+
     // Only reseed if database is truly empty (both categories AND resources missing)
     // Don't reseed just because user added/removed items - preserve user changes
     const needsReseeding = (categories.length === 0 && actualResourceCount === 0);
-    
+
     if (needsReseeding) {
       console.log(`📦 Database needs seeding (categories: ${categories.length}, resources: ${actualResourceCount})...`);
       console.log(`⚙️  Running database seeding in ${isProduction ? 'production' : 'development'} mode...`);
       const seedResult = await seedDatabase({ clearExisting: actualResourceCount > 0 ? true : false });
-      
+
       console.log('✅ Auto-seeding completed successfully:');
       console.log(`   - Categories: ${seedResult.categoriesInserted}`);
       console.log(`   - Subcategories: ${seedResult.subcategoriesInserted}`);
       console.log(`   - Sub-subcategories: ${seedResult.subSubcategoriesInserted}`);
       console.log(`   - Resources: ${seedResult.resourcesInserted}`);
-      
+
       if (seedResult.errors.length > 0) {
         console.warn(`⚠️  Seeding completed with ${seedResult.errors.length} errors`);
       }
@@ -2901,6 +2945,6 @@ export async function runBackgroundInitialization(): Promise<void> {
     console.error('❌ Error during auto-seeding (non-fatal):', error);
     console.log('Server will continue without seeding. You can manually seed via /api/admin/seed-database');
   }
-  
+
   console.log('✅ Background initialization complete');
 }

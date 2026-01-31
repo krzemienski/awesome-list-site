@@ -199,7 +199,7 @@ export default function Category() {
   
   if (isLoading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6" aria-busy={true} aria-live="polite">
         <SEOHead title="Loading..." />
         <div className="space-y-4">
           <Skeleton className="h-10 w-64" />
@@ -237,7 +237,7 @@ export default function Category() {
   }
   
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 overflow-x-hidden max-w-full">
       {/* SEO Head */}
       <SEOHead 
         title={`${categoryName} Resources - Awesome Video`}
@@ -269,10 +269,10 @@ export default function Category() {
       </div>
       
       {/* Filters Bar */}
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col md:flex-row gap-4">
+      <div className="flex flex-col gap-4 min-w-0">
+        <div className="flex flex-col md:flex-row gap-4 min-w-0">
           {/* Search */}
-          <div className="relative flex-1">
+          <div className="relative flex-1 min-w-0">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search resources..."
@@ -340,11 +340,11 @@ export default function Category() {
         </div>
       ) : (
         <div className={
-          viewMode === "grid" 
-            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" 
+          viewMode === "grid"
+            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 min-w-0"
             : viewMode === "list"
-            ? "flex flex-col gap-2"
-            : "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3"
+            ? "flex flex-col gap-2 min-w-0"
+            : "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-3 min-w-0"
         }>
           {filteredResources.map((resource, index) => {
             const resourceId = `${slugify(resource.title)}-${index}`;
@@ -373,9 +373,9 @@ export default function Category() {
             
             if (viewMode === "list") {
               return (
-                <div 
+                <div
                   key={`${resource.url}-${index}`}
-                  className="flex items-center gap-4 p-3 rounded-lg border border-border bg-card hover:bg-accent cursor-pointer transition-colors"
+                  className="flex items-center gap-4 p-3 rounded-lg border border-border bg-card hover:bg-accent cursor-pointer transition-colors min-w-0"
                   onClick={handleResourceClick}
                   data-testid={`card-resource-${resourceId}`}
                 >
@@ -406,10 +406,11 @@ export default function Category() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 w-8 p-0 min-w-[32px] touch-manipulation"
+                      className="h-8 w-8 p-0 min-h-[44px] min-w-[44px] touch-manipulation"
                       onClick={handleExternalLink}
                       data-testid={`button-external-${resourceId}`}
                       title="Open in new tab"
+                      aria-label="Open in new tab"
                     >
                       <ExternalLink className="h-4 w-4" />
                     </Button>
@@ -417,10 +418,11 @@ export default function Category() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-8 w-8 p-0 min-w-[32px] touch-manipulation"
+                        className="h-8 w-8 p-0 min-h-[44px] min-w-[44px] touch-manipulation"
                         onClick={(e) => handleSuggestEdit(e, resource)}
                         data-testid={`button-suggest-edit-${resourceId}`}
                         title="Suggest an edit"
+                        aria-label="Suggest an edit"
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
@@ -429,25 +431,26 @@ export default function Category() {
                 </div>
               );
             }
-            
+
             if (viewMode === "compact") {
               return (
-                <Card 
+                <Card
                   key={`${resource.url}-${index}`}
-                  className="cursor-pointer hover:bg-accent transition-colors border border-border bg-card p-3"
+                  className="cursor-pointer hover:bg-accent transition-colors border border-border bg-card p-3 min-w-0"
                   onClick={handleResourceClick}
                   data-testid={`card-resource-${resourceId}`}
                 >
-                  <div className="flex items-start gap-2">
-                    <span className="font-medium text-sm line-clamp-2 flex-1">{resource.title}</span>
+                  <div className="flex items-start gap-2 min-w-0">
+                    <span className="font-medium text-sm line-clamp-2 flex-1 min-w-0">{resource.title}</span>
                     <div className="flex items-center gap-1 flex-shrink-0">
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-7 w-7 p-0 min-w-[28px] touch-manipulation"
+                        className="h-7 w-7 p-0 min-h-[44px] min-w-[44px] touch-manipulation"
                         onClick={handleExternalLink}
                         data-testid={`button-external-${resourceId}`}
                         title="Open in new tab"
+                        aria-label="Open in new tab"
                       >
                         <ExternalLink className="h-3.5 w-3.5" />
                       </Button>
@@ -455,10 +458,11 @@ export default function Category() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-7 w-7 p-0 min-w-[28px] touch-manipulation"
+                          className="h-7 w-7 p-0 min-h-[44px] min-w-[44px] touch-manipulation"
                           onClick={(e) => handleSuggestEdit(e, resource)}
                           data-testid={`button-suggest-edit-${resourceId}`}
                           title="Suggest an edit"
+                          aria-label="Suggest an edit"
                         >
                           <Edit className="h-3.5 w-3.5" />
                         </Button>
@@ -473,15 +477,15 @@ export default function Category() {
             }
             
             return (
-              <Card 
+              <Card
                 key={`${resource.url}-${index}`}
-                className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors border border-border bg-card text-card-foreground"
+                className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors border border-border bg-card text-card-foreground min-w-0"
                 onClick={handleResourceClick}
                 data-testid={`card-resource-${resourceId}`}
               >
                 <CardHeader>
                   <CardTitle className="text-lg flex items-start gap-2">
-                    <span className="flex-1">{resource.title}</span>
+                    <span className="flex-1 min-w-0">{resource.title}</span>
                     <div className="flex items-center gap-1 flex-shrink-0">
                       <Button
                         variant="ghost"
@@ -490,6 +494,7 @@ export default function Category() {
                         onClick={handleExternalLink}
                         data-testid={`button-external-${resourceId}`}
                         title="Open in new tab"
+                        aria-label="Open in new tab"
                       >
                         <ExternalLink className="h-4 w-4" />
                       </Button>
@@ -501,6 +506,7 @@ export default function Category() {
                           onClick={(e) => handleSuggestEdit(e, resource)}
                           data-testid={`button-suggest-edit-${resourceId}`}
                           title="Suggest an edit"
+                          aria-label="Suggest an edit"
                         >
                           <Edit className="h-4 w-4" />
                         </Button>

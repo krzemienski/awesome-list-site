@@ -1,0 +1,116 @@
+name: Feature Request
+description: Suggest a new feature or enhancement
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting a feature! Help us understand your idea by describing the problem it solves and how you'd like it to work.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: Describe the problem or limitation you're experiencing
+      placeholder: |
+        As a user browsing the resource library, I can't easily see which resources I've already watched or learned from.
+        This makes it hard to track my learning progress.
+      validations:
+        required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: How would you like to solve this problem?
+      placeholder: |
+        Add a "Watched" badge or status indicator on resource cards.
+        Allow users to mark resources as "Completed" from the detail page.
+        Show a summary of watched resources in the user profile.
+      validations:
+        required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternative Approaches
+      description: Have you considered other ways to solve this?
+      placeholder: |
+        - Store completion status in localStorage
+        - Add a completion percentage tracker
+        - Create a "Learning Progress" page
+
+  - type: textarea
+    id: benefits
+    attributes:
+      label: Benefits
+      description: What benefits would this feature bring?
+      placeholder: |
+        - Improves user engagement
+        - Helps users track their learning journey
+        - Enables personalized recommendations
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Potential Impact
+      description: |
+        How complex would this be? What parts of the system would it affect?
+        (Frontend, Backend, Database, Admin tools, etc.)
+      placeholder: |
+        Frontend: Add UI component for completion status
+        Backend: Add watched_at timestamp to resources
+        Database: Migrate user_resources table
+        Admin: No changes needed
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Feature Category
+      description: What area does this relate to?
+      options:
+        - User Experience
+        - Resource Discovery
+        - Admin Tools
+        - API/Backend
+        - Performance
+        - Accessibility
+        - Documentation
+        - Other
+      default: 0
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature to you?
+      options:
+        - Low (nice to have)
+        - Medium (useful)
+        - High (important)
+        - Critical (blocks workflow)
+      default: 1
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      description: Please confirm before submitting
+      options:
+        - label: I have searched existing issues and this is not a duplicate
+          required: true
+        - label: I have provided clear problem statement and proposed solution
+          required: true
+        - label: This aligns with the project's goals and scope
+          required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Information
+      description: Any mockups, links, or other context?
+      placeholder: |
+        Similar features in other apps:
+        - [App Name]: https://example.com
+        - Figma mockup: https://figma.com/...

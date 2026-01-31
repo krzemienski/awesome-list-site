@@ -9,7 +9,6 @@ import { useAuth } from "./hooks/useAuth";
 
 import MainLayout from "@/components/layout/new/MainLayout";
 import ErrorPage from "@/pages/ErrorPage";
-import Landing from "@/pages/Landing";
 import Login from "@/pages/Login";
 import Home from "@/pages/Home";
 import Category from "@/pages/Category";

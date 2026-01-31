@@ -116,13 +116,15 @@ export default function Login() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel htmlFor="email">Email</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                         <Input
                           {...field}
+                          id="email"
                           type="email"
+                          autoComplete="email"
                           placeholder="admin@example.com"
                           className="pl-10"
                           data-testid="input-email"
@@ -139,13 +141,15 @@ export default function Login() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel htmlFor="password">Password</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                         <Input
                           {...field}
+                          id="password"
                           type="password"
+                          autoComplete="current-password"
                           placeholder="Enter your password"
                           className="pl-10"
                           data-testid="input-password"

@@ -6,37 +6,41 @@ Technical architecture documentation for the Awesome Video Resource Viewer appli
 
 The Awesome Video Resource Viewer is a full-stack application built with modern web technologies. It serves as a curated platform for discovering video development resources, featuring AI-powered recommendations, GitHub integration, and admin curation tools.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        Client (Browser)                         │
-│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐               │
-│  │   React     │ │  TanStack   │ │   Wouter    │               │
-│  │ Components  │ │   Query     │ │  (Router)   │               │
-│  └─────────────┘ └─────────────┘ └─────────────┘               │
-│  ┌─────────────────────────────────────────────┐               │
-│  │          Tailwind CSS + shadcn/ui           │               │
-│  └─────────────────────────────────────────────┘               │
-└─────────────────────────────────────────────────────────────────┘
-                              │ HTTP
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                      Express.js Server                          │
-│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐               │
-│  │   Routes    │ │    Auth     │ │  Middleware │               │
-│  │  (API)      │ │ (Passport)  │ │  (Admin)    │               │
-│  └─────────────┘ └─────────────┘ └─────────────┘               │
-│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐               │
-│  │   Storage   │ │   GitHub    │ │     AI      │               │
-│  │  (Drizzle)  │ │   Sync      │ │  Services   │               │
-│  └─────────────┘ └─────────────┘ └─────────────┘               │
-└─────────────────────────────────────────────────────────────────┘
-                              │
-          ┌───────────────────┼───────────────────┐
-          ▼                   ▼                   ▼
-┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
-│   PostgreSQL    │ │     GitHub      │ │    Anthropic    │
-│   (Database)    │ │      API        │ │   Claude API    │
-└─────────────────┘ └─────────────────┘ └─────────────────┘
+### System Architecture Diagram
+
+```mermaid
+graph TB
+    subgraph Client["Client (Browser)"]
+        React["React 18<br/>(Components)"]
+        TQ["TanStack Query<br/>(State Management)"]
+        Router["Wouter Router<br/>(Client Routing)"]
+        UI["Tailwind CSS<br/>+ shadcn/ui"]
+    end
+
+    subgraph Server["Express.js Server"]
+        Routes["API Routes<br/>(RESTful)"]
+        Auth["Passport.js<br/>(Authentication)"]
+        Middleware["Middleware<br/>(Validation, Auth)"]
+        Storage["Drizzle ORM<br/>(Storage Layer)"]
+        GitHub["GitHub Sync<br/>(Import/Export)"]
+        AI["AI Services<br/>(Claude Integration)"]
+    end
+
+    subgraph External["External Services"]
+        DB["PostgreSQL<br/>(Database)"]
+        GH["GitHub API<br/>(Sync)"]
+        Claude["Claude API<br/>(Anthropic)"]
+    end
+
+    Client -->|HTTP| Routes
+    Client -->|HTTP| Auth
+    Routes -->|Query| Storage
+    Auth -->|Query| Storage
+    Storage -->|SQL| DB
+    GitHub -->|Query| Storage
+    AI -->|Query| Storage
+    Routes -->|REST| GH
+    Routes -->|REST| Claude
 ```
 
 ## Technology Stack
@@ -116,43 +120,146 @@ The Awesome Video Resource Viewer is a full-stack application built with modern 
 └── docs/                   # Documentation
 ```
 
+## Component Hierarchy
+
+```mermaid
+graph TD
+    App["App<br/>(Root)"]
+    MainLayout["MainLayout"]
+    ModernSidebar["ModernSidebar<br/>(Navigation)"]
+    TopBar["TopBar<br/>(Header)"]
+    Content["Content<br/>(Router Outlet)"]
+    Pages["Pages"]
+
+    Home["Home Page<br/>(Browse Resources)"]
+    Category["Category Page<br/>(Category View)"]
+    ResourceDetail["ResourceDetail<br/>(Single Resource)"]
+    AdminDash["AdminDashboard<br/>(Admin Panel)"]
+
+    App --> MainLayout
+    MainLayout --> ModernSidebar
+    MainLayout --> TopBar
+    MainLayout --> Content
+    Content --> Pages
+    Pages --> Home
+    Pages --> Category
+    Pages --> ResourceDetail
+    Pages --> AdminDash
+
+    style App fill:#e1f5ff
+    style MainLayout fill:#f3e5f5
+    style Pages fill:#fce4ec
+    style AdminDash fill:#ffebee
+```
+
 ## Data Flow
 
-### Resource Discovery Flow
-```
-User Request → React Query → API Endpoint → Storage Layer → PostgreSQL
-     ↑                                                          │
-     └──────────────────── Response ────────────────────────────┘
+### Request/Response Cycle Sequence Diagram
+
+```mermaid
+sequenceDiagram
+    participant U as User/Browser
+    participant R as React + Query
+    participant E as Express.js
+    participant D as Drizzle ORM
+    participant DB as PostgreSQL
+
+    U->>R: Navigate/User Action
+    R->>E: HTTP Request (GET/POST/PUT/DELETE)
+    E->>E: Route & Middleware Processing
+    E->>D: Build & Execute Query
+    D->>DB: SQL Query
+    DB-->>D: Result Set
+    D-->>E: Typed Data
+    E-->>R: JSON Response
+    R->>R: Cache & Update State
+    R-->>U: Re-render UI
 ```
 
-### Authentication Flow
-```
-1. User clicks "Login"
-2. Redirect to Replit OAuth (or local login form)
-3. OAuth callback creates/updates user in database
-4. Session established with Passport.js
-5. Session stored in PostgreSQL (connect-pg-simple)
-6. Subsequent requests include session cookie
-7. isAuthenticated middleware validates session
+### Authentication Flow (Detailed)
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant C as Client
+    participant E as Express
+    participant P as Passport.js
+    participant S as Session Store
+    participant DB as Database
+
+    U->>C: Click Login
+    C->>E: POST /api/auth/local/login
+    E->>P: authenticate('local')
+    P->>DB: Verify credentials
+    DB-->>P: User record
+    P->>S: Create session
+    S-->>P: Session ID
+    P-->>E: Set connect.sid cookie
+    E-->>C: 200 OK + Set-Cookie
+    C->>C: Store auth state
+
+    Note over C,E: Subsequent Requests (Protected)
+    C->>E: GET /api/admin/* (with cookie)
+    E->>S: Validate session
+    S-->>E: Session valid
+    E->>E: Check req.isAuthenticated()
+    E-->>C: Protected data
 ```
 
-### GitHub Sync Flow
-```
-1. Admin configures GitHub repository
-2. Import: Parse README.md → Validate → Insert resources
-3. Export: Query resources → Format markdown → Create PR/commit
-4. Queue: Background processing with status tracking
+### GitHub Sync Flow (Import & Export)
+
+```mermaid
+flowchart TD
+    subgraph Import["Import Flow"]
+        I1["POST /api/admin/import-github"]
+        I2["Fetch README.md from GitHub"]
+        I3["AwesomeListParser.parse"]
+        I4["Validate categories & resources"]
+        I5["Drizzle: Upsert to database"]
+        I6["Return import summary"]
+
+        I1 --> I2 --> I3 --> I4 --> I5 --> I6
+    end
+
+    subgraph Export["Export Flow"]
+        E1["POST /api/admin/export"]
+        E2["Query all categories & resources"]
+        E3["AwesomeListFormatter.format"]
+        E4["Generate awesome-lint compliant markdown"]
+        E5["Return markdown string"]
+
+        E1 --> E2 --> E3 --> E4 --> E5
+    end
+
+    subgraph Validation["Validation Layer"]
+        V1{{"Valid awesome-list<br/>format?"}}
+        V2["Category hierarchy<br/>check"]
+        V3["Resource URL<br/>validation"]
+        V4["Duplicate<br/>detection"]
+    end
+
+    I3 --> V1
+    V1 -->|Yes| V2
+    V2 --> V3
+    V3 --> V4
+    V4 --> I4
 ```
 
 ### AI Enrichment Flow
-```
-1. Admin starts enrichment job
-2. Service queries unenriched resources
-3. For each resource:
-   a. Scrape URL metadata (title, description, OG tags)
-   b. Send to Claude for analysis
-   c. Store enriched metadata
-4. Progress tracked via enrichment_jobs table
+
+```mermaid
+flowchart TD
+    A1["Admin starts<br/>enrichment job"]
+    A2["Query unenriched<br/>resources"]
+    A3["Create enrichment_job<br/>record"]
+    A4["For each resource"]
+    A5["Scrape URL metadata<br/>title, description, OG tags"]
+    A6["Send to Claude API<br/>for analysis"]
+    A7["Store enriched metadata<br/>JSONB"]
+    A8["Update enrichment_job<br/>progress"]
+    A9["Mark job complete"]
+
+    A1 --> A2 --> A3 --> A4 --> A5 --> A6 --> A7 --> A8 --> A9
 ```
 
 ## Database Schema

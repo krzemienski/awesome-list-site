@@ -3,17 +3,18 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  ChevronRight, 
-  ChevronDown, 
-  Star, 
-  Eye, 
+import {
+  ChevronRight,
+  ChevronDown,
+  Star,
+  Eye,
   ExternalLink,
   Heart,
   Bookmark,
   TrendingUp,
   Zap
 } from "lucide-react";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 // Animated Button with ripple effect
 interface AnimatedButtonProps {
@@ -25,42 +26,43 @@ interface AnimatedButtonProps {
   disabled?: boolean;
 }
 
-export function AnimatedButton({ 
-  children, 
-  onClick, 
-  variant = "default", 
+export function AnimatedButton({
+  children,
+  onClick,
+  variant = "default",
   size = "md",
   className = "",
   disabled = false
 }: AnimatedButtonProps) {
   const [ripples, setRipples] = useState<Array<{ x: number; y: number; id: number }>>([]);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (disabled) return;
-    
+
     const button = buttonRef.current;
-    if (button) {
+    if (button && !prefersReducedMotion) {
       const rect = button.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      
+
       const newRipple = { x, y, id: Date.now() };
       setRipples(prev => [...prev, newRipple]);
-      
+
       // Remove ripple after animation
       setTimeout(() => {
         setRipples(prev => prev.filter(ripple => ripple.id !== newRipple.id));
       }, 600);
     }
-    
+
     onClick?.();
   };
 
   return (
     <motion.div
-      whileHover={{ scale: disabled ? 1 : 1.02 }}
-      whileTap={{ scale: disabled ? 1 : 0.98 }}
+      whileHover={prefersReducedMotion ? {} : { scale: disabled ? 1 : 1.02 }}
+      whileTap={prefersReducedMotion ? {} : { scale: disabled ? 1 : 0.98 }}
       transition={{ type: "spring", stiffness: 400, damping: 17 }}
     >
       <Button
@@ -112,6 +114,8 @@ export function AnimatedCategoryItem({
   children,
   isActive = false
 }: AnimatedCategoryItemProps) {
+  const prefersReducedMotion = useReducedMotion();
+
   return (
     <div
       className="w-full"
@@ -119,16 +123,16 @@ export function AnimatedCategoryItem({
       <motion.button
         onClick={onToggle}
         className={`w-full flex items-center justify-between p-3 text-left transition-colors ${
-          isActive 
-            ? 'bg-primary/10 text-primary' 
+          isActive
+            ? 'bg-primary/10 text-primary'
             : 'hover:bg-accent hover:text-accent-foreground'
         }`}
-        whileHover={{ scale: 1.01 }}
-        whileTap={{ scale: 0.99 }}
+        whileHover={prefersReducedMotion ? {} : { scale: 1.01 }}
+        whileTap={prefersReducedMotion ? {} : { scale: 0.99 }}
       >
         <div className="flex items-center gap-3">
           <motion.div
-            animate={{ rotate: isOpen ? 90 : 0 }}
+            animate={prefersReducedMotion ? {} : { rotate: isOpen ? 90 : 0 }}
             transition={{ duration: 0.2 }}
           >
             <ChevronRight className="h-4 w-4" />
@@ -184,10 +188,11 @@ export function AnimatedResourceCard({
 }: AnimatedResourceCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const prefersReducedMotion = useReducedMotion();
 
   return (
     <motion.div
-      whileHover={{ y: -2 }}
+      whileHover={prefersReducedMotion ? {} : { y: -2 }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
     >
@@ -204,9 +209,9 @@ export function AnimatedResourceCard({
                 </Badge>
                 {metrics?.trending && (
                   <motion.div
-                    initial={{ scale: 0 }}
+                    initial={prefersReducedMotion ? { scale: 1 } : { scale: 0 }}
                     animate={{ scale: 1 }}
-                    transition={{ delay: 0.2 }}
+                    transition={{ delay: prefersReducedMotion ? 0 : 0.2 }}
                   >
                     <Badge variant="default" className="text-xs bg-orange-500">
                       <TrendingUp className="h-3 w-3 mr-1" />
@@ -220,11 +225,11 @@ export function AnimatedResourceCard({
             <motion.button
               onClick={() => setIsBookmarked(!isBookmarked)}
               className="p-2 hover:bg-accent transition-colors"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
+              whileHover={prefersReducedMotion ? {} : { scale: 1.1 }}
+              whileTap={prefersReducedMotion ? {} : { scale: 0.9 }}
             >
               <motion.div
-                animate={{ 
+                animate={prefersReducedMotion ? { color: isBookmarked ? "#fbbf24" : "currentColor" } : {
                   scale: isBookmarked ? 1.2 : 1,
                   color: isBookmarked ? "#fbbf24" : "currentColor"
                 }}
@@ -247,9 +252,9 @@ export function AnimatedResourceCard({
               {tags.slice(0, 3).map((tag, tagIndex) => (
                 <motion.div
                   key={tag}
-                  initial={{ opacity: 0, scale: 0.8 }}
+                  initial={prefersReducedMotion ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.1 + tagIndex * 0.05 }}
+                  transition={{ delay: prefersReducedMotion ? 0 : 0.1 + tagIndex * 0.05 }}
                 >
                   <Badge variant="outline" className="text-xs">
                     {tag}
@@ -269,18 +274,18 @@ export function AnimatedResourceCard({
             <div className="flex items-center justify-between pt-2 border-t">
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 {metrics.stars && (
-                  <motion.div 
+                  <motion.div
                     className="flex items-center gap-1"
-                    whileHover={{ scale: 1.05 }}
+                    whileHover={prefersReducedMotion ? {} : { scale: 1.05 }}
                   >
                     <Star className="h-3 w-3" />
                     <span>{metrics.stars}</span>
                   </motion.div>
                 )}
                 {metrics.views && (
-                  <motion.div 
+                  <motion.div
                     className="flex items-center gap-1"
-                    whileHover={{ scale: 1.05 }}
+                    whileHover={prefersReducedMotion ? {} : { scale: 1.05 }}
                   >
                     <Eye className="h-3 w-3" />
                     <span>{metrics.views}</span>
@@ -291,10 +296,10 @@ export function AnimatedResourceCard({
               <AnimatePresence>
                 {isHovered && (
                   <motion.div
-                    initial={{ opacity: 0, x: 10 }}
+                    initial={prefersReducedMotion ? { opacity: 1, x: 0 } : { opacity: 0, x: 10 }}
                     animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 10 }}
-                    transition={{ duration: 0.2 }}
+                    exit={prefersReducedMotion ? { opacity: 1, x: 0 } : { opacity: 0, x: 10 }}
+                    transition={{ duration: prefersReducedMotion ? 0 : 0.2 }}
                   >
                     <AnimatedButton
                       size="sm"
@@ -335,10 +340,12 @@ export function AnimatedListItem({
   onClick,
   index
 }: AnimatedListItemProps) {
+  const prefersReducedMotion = useReducedMotion();
+
   return (
     <motion.div
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
+      whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
+      whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
     >
       <Card 
         className={`cursor-pointer transition-all ${
@@ -355,9 +362,9 @@ export function AnimatedListItem({
                 <h4 className="font-semibold text-base truncate">{name}</h4>
                 {isActive && (
                   <motion.div
-                    initial={{ scale: 0 }}
+                    initial={prefersReducedMotion ? { scale: 1 } : { scale: 0 }}
                     animate={{ scale: 1 }}
-                    transition={{ delay: 0.1 }}
+                    transition={{ delay: prefersReducedMotion ? 0 : 0.1 }}
                   >
                     <Badge variant="default" className="text-xs">
                       Active
@@ -385,7 +392,7 @@ export function AnimatedListItem({
             
             <motion.div
               className="flex items-center justify-center w-8 h-8 bg-primary/10"
-              whileHover={{ rotate: 90 }}
+              whileHover={prefersReducedMotion ? {} : { rotate: 90 }}
               transition={{ duration: 0.2 }}
             >
               <ChevronRight className="h-4 w-4 text-primary" />
@@ -411,6 +418,7 @@ export function FloatingActionButton({
   label,
   position = "bottom-right"
 }: FloatingActionButtonProps) {
+  const prefersReducedMotion = useReducedMotion();
   const positionClasses = {
     "bottom-right": "bottom-6 right-6",
     "bottom-left": "bottom-6 left-6"
@@ -419,28 +427,28 @@ export function FloatingActionButton({
   return (
     <motion.div
       className={`fixed ${positionClasses[position]} z-50`}
-      initial={{ scale: 0 }}
+      initial={prefersReducedMotion ? { scale: 1 } : { scale: 0 }}
       animate={{ scale: 1 }}
-      transition={{ 
+      transition={prefersReducedMotion ? {} : {
         type: "spring",
         stiffness: 260,
         damping: 20,
         delay: 0.5
       }}
-      whileHover={{ scale: 1.1 }}
-      whileTap={{ scale: 0.9 }}
+      whileHover={prefersReducedMotion ? {} : { scale: 1.1 }}
+      whileTap={prefersReducedMotion ? {} : { scale: 0.9 }}
     >
       <motion.button
         onClick={onClick}
         className="bg-primary text-primary-foreground p-4 shadow-lg hover:shadow-xl transition-shadow"
-        animate={{ 
+        animate={prefersReducedMotion ? {} : {
           boxShadow: [
             "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
             "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
             "0 4px 6px -1px rgba(0, 0, 0, 0.1)"
           ]
         }}
-        transition={{ 
+        transition={prefersReducedMotion ? {} : {
           duration: 2,
           repeat: Infinity,
           ease: "easeInOut"

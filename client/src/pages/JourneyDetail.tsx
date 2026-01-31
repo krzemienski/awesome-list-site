@@ -149,7 +149,7 @@ export default function JourneyDetail() {
 
   if (journeyLoading) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="container mx-auto px-4 py-8 max-w-4xl" aria-busy={true} aria-live="polite">
         <Skeleton className="h-8 w-32 mb-6" />
         <Skeleton className="h-12 w-96 mb-4" />
         <Skeleton className="h-24 w-full mb-8" />
