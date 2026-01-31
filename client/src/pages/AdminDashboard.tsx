@@ -36,6 +36,7 @@ import ResourceManager from "@/components/admin/ResourceManager";
 import CategoryManager from "@/components/admin/CategoryManager";
 import SubcategoryManager from "@/components/admin/SubcategoryManager";
 import SubSubcategoryManager from "@/components/admin/SubSubcategoryManager";
+import BrokenLinkReports from "@/pages/admin/BrokenLinkReports";
 
 interface ValidationResult {
   valid: boolean;
@@ -338,6 +339,10 @@ export default function AdminDashboard() {
             <TabsTrigger value="edits" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap" data-testid="tab-edits">
               Edits
             </TabsTrigger>
+            <TabsTrigger value="broken-links" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap" data-testid="tab-broken-links">
+              <AlertTriangle className="h-4 w-4 mr-1" />
+              Broken Links
+            </TabsTrigger>
             <TabsTrigger value="enrichment" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap" data-testid="tab-enrichment">
               <Sparkles className="h-4 w-4 mr-1" />
               Enrichment
@@ -383,6 +388,11 @@ export default function AdminDashboard() {
         {/* Edits Tab */}
         <TabsContent value="edits" data-testid="content-edits">
           <PendingEdits />
+        </TabsContent>
+
+        {/* Broken Links Tab */}
+        <TabsContent value="broken-links" data-testid="content-broken-links">
+          <BrokenLinkReports />
         </TabsContent>
 
         {/* Enrichment Tab */}

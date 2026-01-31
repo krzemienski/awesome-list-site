@@ -1250,6 +1250,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ============= Broken Link Reports Routes =============
+
+  // GET /api/admin/broken-link-reports - Get all broken link reports (admin only)
+  app.get('/api/admin/broken-link-reports', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const status = req.query.status as "pending" | "reviewed" | undefined;
+      const reports = await storage.getBrokenLinkReports(status);
+
+      res.json({ reports, total: reports.length });
+    } catch (error) {
+      console.error('Error fetching broken link reports:', error);
+      res.status(500).json({ message: 'Failed to fetch broken link reports' });
+    }
+  });
+
+  // POST /api/admin/broken-link-reports/:id/review - Mark a broken link report as reviewed (admin only)
+  app.post('/api/admin/broken-link-reports/:id/review', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const reportId = parseInt(req.params.id);
+      const userId = req.user.claims.sub;
+
+      if (isNaN(reportId)) {
+        return res.status(400).json({ message: 'Invalid report ID' });
+      }
+
+      await storage.updateBrokenLinkReportStatus(reportId, userId);
+
+      res.json({ success: true, message: 'Report marked as reviewed' });
+    } catch (error) {
+      console.error('Error reviewing broken link report:', error);
+      res.status(500).json({ message: 'Failed to review broken link report' });
+    }
+  });
+
   // PUT /api/admin/resources/:id - Update a resource (admin only)
   app.put('/api/admin/resources/:id', isAuthenticated, isAdmin, async (req: any, res) => {
     try {

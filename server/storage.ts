@@ -230,7 +230,7 @@ export interface IStorage {
   // Link Health & Broken Link Reports
   updateResourceLinkHealth(resourceId: number, status: string, responseTime: number | null): Promise<void>;
   createBrokenLinkReport(data: InsertBrokenLinkReport): Promise<BrokenLinkReport>;
-  getBrokenLinkReports(status?: "pending" | "reviewed"): Promise<BrokenLinkReport[]>;
+  getBrokenLinkReports(status?: "pending" | "reviewed"): Promise<Array<BrokenLinkReport & { resource: Resource }>>;
   updateBrokenLinkReportStatus(reportId: number, reviewedBy: string): Promise<void>;
 
   // Database-driven awesome list hierarchy
@@ -1720,14 +1720,25 @@ export class DatabaseStorage implements IStorage {
     return report;
   }
 
-  async getBrokenLinkReports(status?: "pending" | "reviewed"): Promise<BrokenLinkReport[]> {
-    let query = db.select().from(brokenLinkReports);
+  async getBrokenLinkReports(status?: "pending" | "reviewed"): Promise<Array<BrokenLinkReport & { resource: Resource }>> {
+    let query = db
+      .select({
+        report: brokenLinkReports,
+        resource: resources
+      })
+      .from(brokenLinkReports)
+      .innerJoin(resources, eq(brokenLinkReports.resourceId, resources.id));
 
     if (status) {
       query = query.where(eq(brokenLinkReports.status, status)) as any;
     }
 
-    return await query.orderBy(desc(brokenLinkReports.reportedAt));
+    const result = await query.orderBy(desc(brokenLinkReports.reportedAt));
+
+    return result.map(r => ({
+      ...r.report,
+      resource: r.resource
+    }));
   }
 
   async updateBrokenLinkReportStatus(reportId: number, reviewedBy: string): Promise<void> {
@@ -2087,7 +2098,7 @@ export class MemStorage implements IStorage {
   async createBrokenLinkReport(data: InsertBrokenLinkReport): Promise<BrokenLinkReport> {
     throw new Error("Broken link reports not implemented in memory storage");
   }
-  async getBrokenLinkReports(status?: "pending" | "reviewed"): Promise<BrokenLinkReport[]> {
+  async getBrokenLinkReports(status?: "pending" | "reviewed"): Promise<Array<BrokenLinkReport & { resource: Resource }>> {
     return [];
   }
   async updateBrokenLinkReportStatus(reportId: number, reviewedBy: string): Promise<void> {}
