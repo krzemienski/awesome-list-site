@@ -476,7 +476,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const relatedResources = await storage.getRelatedResources(id, userId, limit);
 
-      res.json(relatedResources);
+      res.json({ resources: relatedResources });
     } catch (error) {
       console.error('Error fetching related resources:', error);
       res.status(500).json({ message: 'Failed to fetch related resources' });
