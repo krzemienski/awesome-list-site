@@ -130,9 +130,9 @@ export class RecommendationEngine {
         const awesomeListData = storage.getAwesomeListData();
         if (awesomeListData && awesomeListData.resources) {
           // Convert awesome list resources to database Resource format
-          resources = awesomeListData.resources.map((r: any, index: number) => ({
+          resources = awesomeListData.resources.map((r: Resource, index: number) => ({
             id: index + 1,
-            title: r.title || r.name || 'Untitled',
+            title: r.title || 'Untitled',
             url: r.url,
             description: r.description || '',
             category: r.category,
