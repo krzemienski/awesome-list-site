@@ -49,6 +49,7 @@ import {
   resourceEdits,
   enrichmentJobs,
   enrichmentQueue,
+  brokenLinkReports,
   type User,
   type UpsertUser,
   type Resource,
@@ -78,6 +79,8 @@ import {
   type InsertEnrichmentJob,
   type EnrichmentQueueItem,
   type InsertEnrichmentQueue,
+  type BrokenLinkReport,
+  type InsertBrokenLinkReport,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql, desc, asc, inArray, like, or, isNull, isNotNull } from "drizzle-orm";
@@ -223,7 +226,13 @@ export interface IStorage {
   getEnrichmentQueueItemsByJob(jobId: number): Promise<EnrichmentQueueItem[]>;
   getPendingEnrichmentQueueItems(jobId: number, limit?: number): Promise<EnrichmentQueueItem[]>;
   updateEnrichmentQueueItem(id: number, data: Partial<EnrichmentQueueItem>): Promise<EnrichmentQueueItem>;
-  
+
+  // Link Health & Broken Link Reports
+  updateResourceLinkHealth(resourceId: number, status: string, responseTime: number | null): Promise<void>;
+  createBrokenLinkReport(data: InsertBrokenLinkReport): Promise<BrokenLinkReport>;
+  getBrokenLinkReports(status?: "pending" | "reviewed"): Promise<BrokenLinkReport[]>;
+  updateBrokenLinkReportStatus(reportId: number, reviewedBy: string): Promise<void>;
+
   // Database-driven awesome list hierarchy
   getAwesomeListFromDatabase(): Promise<AwesomeListData>;
   
@@ -1686,6 +1695,52 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return item;
   }
+
+  // Link Health & Broken Link Reports
+  async updateResourceLinkHealth(resourceId: number, status: string, responseTime: number | null): Promise<void> {
+    await db
+      .update(resources)
+      .set({
+        linkHealthStatus: status,
+        lastLinkCheck: new Date(),
+        linkCheckResponseTime: responseTime,
+      })
+      .where(eq(resources.id, resourceId));
+  }
+
+  async createBrokenLinkReport(data: InsertBrokenLinkReport): Promise<BrokenLinkReport> {
+    const [report] = await db
+      .insert(brokenLinkReports)
+      .values({
+        resourceId: data.resourceId,
+        reportedBy: data.reportedBy,
+        status: (data.status as "pending" | "reviewed") || "pending",
+      })
+      .returning();
+    return report;
+  }
+
+  async getBrokenLinkReports(status?: "pending" | "reviewed"): Promise<BrokenLinkReport[]> {
+    let query = db.select().from(brokenLinkReports);
+
+    if (status) {
+      query = query.where(eq(brokenLinkReports.status, status)) as any;
+    }
+
+    return await query.orderBy(desc(brokenLinkReports.reportedAt));
+  }
+
+  async updateBrokenLinkReportStatus(reportId: number, reviewedBy: string): Promise<void> {
+    await db
+      .update(brokenLinkReports)
+      .set({
+        status: "reviewed",
+        reviewedBy,
+        reviewedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(brokenLinkReports.id, reportId));
+  }
 }
 
 // For backward compatibility, export both MemStorage and DatabaseStorage
@@ -2026,6 +2081,16 @@ export class MemStorage implements IStorage {
   async updateEnrichmentQueueItem(id: number, data: Partial<EnrichmentQueueItem>): Promise<EnrichmentQueueItem> {
     throw new Error("Enrichment not implemented in memory storage");
   }
+
+  // Link Health & Broken Link Reports - Not implemented for MemStorage
+  async updateResourceLinkHealth(resourceId: number, status: string, responseTime: number | null): Promise<void> {}
+  async createBrokenLinkReport(data: InsertBrokenLinkReport): Promise<BrokenLinkReport> {
+    throw new Error("Broken link reports not implemented in memory storage");
+  }
+  async getBrokenLinkReports(status?: "pending" | "reviewed"): Promise<BrokenLinkReport[]> {
+    return [];
+  }
+  async updateBrokenLinkReportStatus(reportId: number, reviewedBy: string): Promise<void> {}
 }
 
 // Use DatabaseStorage if DATABASE_URL exists, otherwise use MemStorage
