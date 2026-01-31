@@ -19,6 +19,7 @@ import Advanced from "@/pages/Advanced";
 import Profile from "@/pages/Profile";
 import Bookmarks from "@/pages/Bookmarks";
 import AdminDashboard from "@/pages/AdminDashboard";
+import BrokenLinkReports from "@/pages/admin/BrokenLinkReports";
 import AdminGuard from "@/components/auth/AdminGuard";
 import AuthGuard from "@/components/auth/AuthGuard";
 import NotFound from "@/pages/not-found";
@@ -136,6 +137,11 @@ function Router() {
           <AuthGuard>
             <Bookmarks />
           </AuthGuard>
+        )} />
+        <Route path="/admin/broken-links" component={() => (
+          <AdminGuard>
+            <BrokenLinkReports />
+          </AdminGuard>
         )} />
         <Route path="/admin" component={() => (
           <AdminGuard>
