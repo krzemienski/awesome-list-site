@@ -326,7 +326,7 @@ export default function ColorPaletteGenerator({ isOpen, onClose, onPaletteGenera
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <Label>Mood</Label>
-                    <Select value={options.mood} onValueChange={(value: any) => setOptions(prev => ({ ...prev, mood: value }))}>
+                    <Select value={options.mood} onValueChange={(value: PaletteGenerationOptions['mood']) => setOptions(prev => ({ ...prev, mood: value }))}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -344,7 +344,7 @@ export default function ColorPaletteGenerator({ isOpen, onClose, onPaletteGenera
 
                   <div className="space-y-2">
                     <Label>Style</Label>
-                    <Select value={options.style} onValueChange={(value: any) => setOptions(prev => ({ ...prev, style: value }))}>
+                    <Select value={options.style} onValueChange={(value: PaletteGenerationOptions['style']) => setOptions(prev => ({ ...prev, style: value }))}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -362,7 +362,7 @@ export default function ColorPaletteGenerator({ isOpen, onClose, onPaletteGenera
 
                   <div className="space-y-2">
                     <Label>Color Harmony</Label>
-                    <Select value={options.harmony} onValueChange={(value: any) => setOptions(prev => ({ ...prev, harmony: value }))}>
+                    <Select value={options.harmony} onValueChange={(value: PaletteGenerationOptions['harmony']) => setOptions(prev => ({ ...prev, harmony: value }))}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
