@@ -189,12 +189,854 @@ curl http://localhost:5000/api/awesome-list
 ## Troubleshooting
 
 ### Database Connection Issues
+
+#### DATABASE_URL Configuration
+
+The database connection is controlled by the `DATABASE_URL` environment variable:
+
 ```bash
-# Check DATABASE_URL is set
+# Check if DATABASE_URL is set
 echo $DATABASE_URL
 
-# Test connection
+# Expected format:
+# postgresql://username:password@host:port/database
+# Example:
+# postgresql://postgres:password@localhost:5432/awesome_videos
+```
+
+**Common DATABASE_URL problems:**
+
+**1. Missing or empty DATABASE_URL:**
+```bash
+# Symptom: Server crashes on startup with connection error
+# Error: "Error: no database URL provided"
+
+# Check if set:
+echo $DATABASE_URL
+
+# Fix: Add to environment
+# For Replit: Already auto-configured via PostgreSQL add-on
+# For local: Add to .env file
+DATABASE_URL=postgresql://postgres:password@localhost:5432/awesome_videos
+```
+
+**2. Invalid connection string format:**
+```bash
+# Wrong format examples:
+# postgres://... (should be postgresql://)
+# postgresql://localhost/database (missing port)
+# postgresql://host:5432 (missing database name)
+
+# Correct format:
+DATABASE_URL=postgresql://user:password@host:5432/dbname
+
+# Validate format:
+node -e "console.log(new URL(process.env.DATABASE_URL))"
+```
+
+**3. Connection refused (database not running):**
+```bash
+# Symptom: Error: connect ECONNREFUSED 127.0.0.1:5432
+
+# Check if PostgreSQL is running:
+# On Replit: Automatically managed, check PostgreSQL addon status
+# On local:
+lsof -i :5432  # Check if port 5432 is in use
+
+# Start PostgreSQL locally:
+# macOS: brew services start postgresql
+# Linux: sudo systemctl start postgresql
+# Windows: net start postgresql-x64-14
+```
+
+**4. Authentication failures:**
+```bash
+# Symptom: Error: password authentication failed for user "postgres"
+
+# Causes:
+# - Wrong username/password in DATABASE_URL
+# - User doesn't exist in PostgreSQL
+# - pg_hba.conf doesn't allow connection
+
+# Fix username/password:
+# Update DATABASE_URL with correct credentials
+# Check PostgreSQL user exists:
+psql -U postgres -l
+
+# For Replit: Check PostgreSQL addon connection details
+```
+
+**5. Database doesn't exist:**
+```bash
+# Symptom: Error: database "dbname" does not exist
+
+# Create the database:
+# Via psql:
+createdb awesome_videos
+
+# Or via SQL:
+psql -U postgres
+CREATE DATABASE awesome_videos;
+
+# Replit: Database created automatically by addon
+```
+
+**6. SSL/TLS connection issues (Neon, Supabase, etc.):**
+```bash
+# Symptom: Error: no pg_hba.conf entry for host
+# Symptom: Error: self signed certificate
+
+# Fix: Add SSL parameters to DATABASE_URL
+# For Neon (serverless Postgres):
+DATABASE_URL=postgresql://user:pass@host/db?sslmode=require
+
+# For development with self-signed certs:
+DATABASE_URL=postgresql://user:pass@host/db?sslmode=no-verify
+
+# Production: Always use sslmode=require
+```
+
+#### Testing Database Connection
+
+**Quick connection test:**
+```bash
+# Test connection via Drizzle Studio
 npm run db:studio
+
+# If successful: Opens https://local.drizzle.studio
+# If fails: Shows connection error
+
+# Test via psql (if installed):
+psql $DATABASE_URL -c "SELECT version();"
+
+# Should output PostgreSQL version if connected
+```
+
+**Detailed connection diagnostics:**
+```bash
+# Test with Node.js script:
+node -e "
+const pg = require('pg');
+const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+pool.query('SELECT NOW()', (err, res) => {
+  if (err) {
+    console.error('Connection failed:', err.message);
+  } else {
+    console.log('Connected successfully. Server time:', res.rows[0].now);
+  }
+  pool.end();
+});
+"
+
+# Output shows:
+# - Success: "Connected successfully. Server time: 2024-01-15..."
+# - Failure: Connection error details
+```
+
+#### Connection Pool Exhaustion
+
+The application uses connection pooling (max 3 connections for Neon free tier):
+
+**Symptoms of pool exhaustion:**
+```bash
+# Server logs show:
+# "Error: Connection pool timeout"
+# "Error: Timed out while waiting for connection from pool"
+# "Error: remaining connection slots are reserved"
+
+# Symptoms:
+# - API requests hang/timeout
+# - Database operations slow down dramatically
+# - New requests fail with timeout errors
+```
+
+**Check connection pool status:**
+```bash
+# View current connections via database:
+npm run db:studio
+
+# Run SQL query:
+SELECT count(*) as active_connections,
+       max_connections
+FROM pg_stat_activity,
+     (SELECT setting::int as max_connections FROM pg_settings WHERE name = 'max_connections') mc
+WHERE state = 'active';
+
+# Shows:
+# active_connections | max_connections
+# 3                  | 5
+
+# If active_connections approaches max, pool is exhausted
+```
+
+**Common causes:**
+
+**1. Long-running queries:**
+```bash
+# Symptom: Connections held open during slow queries
+
+# Identify long-running queries:
+npm run db:studio
+# Run SQL:
+SELECT pid, now() - query_start AS duration, state, query
+FROM pg_stat_activity
+WHERE state != 'idle'
+  AND query NOT ILIKE '%pg_stat_activity%'
+ORDER BY duration DESC;
+
+# Shows queries running longer than expected
+# Duration > 30 seconds is concerning
+
+# Kill stuck query:
+SELECT pg_terminate_backend(pid);
+# Replace pid with the process ID from above query
+```
+
+**2. Connection leaks (not releasing connections):**
+```bash
+# Symptom: Connections never returned to pool
+
+# Check pool configuration in server/db/index.ts:
+# max: 3                          # Max connections
+# idleTimeoutMillis: 30000        # Close idle connections after 30s
+# connectionTimeoutMillis: 15000  # Wait max 15s for connection
+
+# Restart server to reset pool:
+pkill -f "tsx server"
+npm run dev
+```
+
+**3. Concurrent operations exceeding pool size:**
+```bash
+# Symptom: Enrichment jobs or bulk imports cause pool exhaustion
+
+# Solutions:
+# 1. Reduce batch sizes:
+#    Admin → Enrichment → Set batch size to 5 (from default 10)
+
+# 2. Increase connection pool (if not on free tier):
+#    Edit server/db/index.ts:
+#    max: 10  # Increase from 3
+
+# 3. Add connection retry logic (already implemented)
+
+# 4. Sequential processing for bulk operations
+#    Use smaller concurrent batches
+```
+
+**Fix pool exhaustion:**
+```bash
+# Immediate fix - restart server:
+pkill -f "tsx server"
+npm run dev
+
+# Long-term fixes:
+# 1. Optimize slow queries (see Query Debugging section)
+# 2. Reduce concurrent operations
+# 3. Upgrade database tier for more connections
+# 4. Implement connection pooling best practices:
+#    - Always close connections in try-finally blocks
+#    - Use transactions for multi-step operations
+#    - Set reasonable timeouts
+```
+
+#### Schema Push Failures (Migration Issues)
+
+When pushing schema changes with `npm run db:push`, you may encounter conflicts:
+
+**Common schema push errors:**
+
+**1. Column type conflicts:**
+```bash
+# Error: "Column type mismatch: expected text, found varchar"
+
+# Cause: Changing column type incompatibly
+# Example: Changing text to integer
+
+# Fix options:
+
+# Option 1: Force push (data loss possible):
+npm run db:push --force
+# WARNING: Drops columns and recreates them, losing data!
+
+# Option 2: Manual migration:
+npm run db:studio
+# Run SQL to convert data:
+ALTER TABLE resources
+  ALTER COLUMN metadata TYPE jsonb
+  USING metadata::jsonb;
+
+# Then run:
+npm run db:push
+```
+
+**2. Non-nullable column addition:**
+```bash
+# Error: "Cannot add NOT NULL column without default value to non-empty table"
+
+# Cause: Adding required column to table with existing rows
+
+# Fix: Add default value in schema.ts:
+# Before:
+export const resources = pgTable("resources", {
+  newField: text("new_field").notNull(),
+});
+
+# After:
+export const resources = pgTable("resources", {
+  newField: text("new_field").notNull().default(""),
+});
+
+# Then push:
+npm run db:push
+```
+
+**3. Foreign key constraint violations:**
+```bash
+# Error: "Foreign key constraint would fail"
+
+# Cause: Referenced table doesn't exist yet, or has conflicting data
+
+# Fix: Push in correct order:
+# 1. Create referenced tables first
+# 2. Then create tables with foreign keys
+
+# Or use force push to recreate:
+npm run db:push --force
+
+# Or temporarily remove foreign key, push, then add back
+```
+
+**4. Unique constraint violations:**
+```bash
+# Error: "Unique constraint violation: duplicate key value"
+
+# Cause: Adding unique constraint to column with duplicates
+
+# Fix: Clean data first via Drizzle Studio:
+npm run db:studio
+
+# Find duplicates:
+SELECT url, COUNT(*)
+FROM resources
+GROUP BY url
+HAVING COUNT(*) > 1;
+
+# Remove duplicates (keep first occurrence):
+DELETE FROM resources
+WHERE id NOT IN (
+  SELECT MIN(id)
+  FROM resources
+  GROUP BY url
+);
+
+# Then push schema:
+npm run db:push
+```
+
+**5. Index name conflicts:**
+```bash
+# Error: "Index already exists"
+
+# Cause: Renaming table/column but index name unchanged
+
+# Fix via SQL:
+npm run db:studio
+# Drop old index:
+DROP INDEX idx_old_name;
+
+# Then push:
+npm run db:push
+```
+
+**Safe schema push workflow:**
+
+```bash
+# 1. Backup database first (production):
+pg_dump $DATABASE_URL > backup.sql
+
+# 2. Test locally before production:
+# Edit shared/schema.ts with changes
+
+# 3. Dry-run preview (shows SQL to be executed):
+npx drizzle-kit push:pg --driver=pg
+# Review the SQL statements carefully
+
+# 4. Push to development database:
+npm run db:push
+
+# 5. Verify changes:
+npm run db:studio
+# Check table structure matches expectations
+
+# 6. Test application:
+npm run dev
+# Verify all features work with new schema
+
+# 7. If issues, rollback:
+psql $DATABASE_URL < backup.sql
+
+# 8. If successful, push to production
+```
+
+**Force push (use with extreme caution):**
+```bash
+# WARNING: Force push can cause DATA LOSS
+# Only use when:
+# - Development database (no important data)
+# - You have a backup
+# - Schema conflicts are severe
+
+npm run db:push --force
+
+# This will:
+# - Drop conflicting columns/tables
+# - Recreate from scratch
+# - Lose data in affected columns
+
+# Always backup first:
+pg_dump $DATABASE_URL > backup_before_force.sql
+```
+
+#### Query Debugging with Drizzle Studio
+
+Drizzle Studio provides a GUI for database inspection and debugging:
+
+**Launch Drizzle Studio:**
+```bash
+npm run db:studio
+
+# Opens: https://local.drizzle.studio
+# Auto-connects using DATABASE_URL
+
+# Features:
+# - Browse all tables
+# - View/edit data
+# - Run custom SQL queries
+# - Inspect schema structure
+# - View indexes and constraints
+```
+
+**Debugging JSONB metadata fields:**
+
+The `resources` table has a `metadata` JSONB column for flexible data:
+
+```bash
+# View all resources with metadata:
+npm run db:studio
+# Navigate to resources table
+# Click on metadata column to see JSON structure
+
+# Common metadata fields:
+{
+  "manuallyEnriched": true,
+  "skipLinkCheck": true,
+  "aiTags": ["react", "javascript", "tutorial"],
+  "claudeMetadata": {
+    "suggestedTitle": "...",
+    "suggestedDescription": "...",
+    "confidence": 0.95
+  }
+}
+```
+
+**Query JSONB metadata via SQL:**
+
+```bash
+# Find resources with specific metadata flag:
+SELECT id, title, url, metadata
+FROM resources
+WHERE metadata->>'manuallyEnriched' = 'true';
+
+# Find resources with AI tags:
+SELECT id, title, metadata->'aiTags' as tags
+FROM resources
+WHERE metadata ? 'aiTags';
+
+# Find resources enriched by Claude:
+SELECT id, title,
+       metadata->'claudeMetadata'->>'confidence' as confidence
+FROM resources
+WHERE metadata @> '{"claudeMetadata": {}}';
+
+# Find resources without metadata:
+SELECT id, title, url
+FROM resources
+WHERE metadata = '{}' OR metadata IS NULL;
+
+# Update metadata for specific resource:
+UPDATE resources
+SET metadata = metadata || '{"manuallyEnriched": true}'::jsonb
+WHERE id = 123;
+
+# Remove metadata field:
+UPDATE resources
+SET metadata = metadata - 'skipLinkCheck'
+WHERE id = 123;
+
+# Count resources by metadata presence:
+SELECT
+  COUNT(*) FILTER (WHERE metadata ? 'aiTags') as with_ai_tags,
+  COUNT(*) FILTER (WHERE metadata ? 'claudeMetadata') as with_claude,
+  COUNT(*) FILTER (WHERE metadata->>'manuallyEnriched' = 'true') as manually_enriched,
+  COUNT(*) as total
+FROM resources;
+```
+
+**Debug enrichment metadata:**
+```bash
+# View Claude analysis metadata:
+SELECT
+  id,
+  title,
+  metadata->'claudeMetadata'->>'suggestedTitle' as suggested_title,
+  metadata->'claudeMetadata'->>'confidence' as confidence,
+  metadata->'claudeMetadata'->'keyTopics' as topics
+FROM resources
+WHERE metadata ? 'claudeMetadata'
+ORDER BY (metadata->'claudeMetadata'->>'confidence')::float DESC
+LIMIT 10;
+
+# Find low-confidence enrichments:
+SELECT id, title, metadata->'claudeMetadata'->>'confidence' as confidence
+FROM resources
+WHERE (metadata->'claudeMetadata'->>'confidence')::float < 0.5;
+```
+
+#### Checking Enrichment Jobs and Sync Queue
+
+**Inspect enrichment_jobs table:**
+
+```bash
+npm run db:studio
+# Navigate to enrichment_jobs table
+
+# View all jobs:
+SELECT
+  id,
+  status,
+  filter,
+  batch_size,
+  total_resources,
+  processed_resources,
+  successful_resources,
+  failed_resources,
+  created_at,
+  completed_at
+FROM enrichment_jobs
+ORDER BY created_at DESC;
+```
+
+**Query enrichment job status:**
+```bash
+# Get active/recent jobs:
+SELECT
+  id,
+  status,
+  ROUND(100.0 * processed_resources / total_resources, 2) as progress_pct,
+  successful_resources,
+  failed_resources,
+  skipped_resources,
+  created_at
+FROM enrichment_jobs
+WHERE status IN ('pending', 'processing')
+   OR created_at > NOW() - INTERVAL '24 hours'
+ORDER BY created_at DESC;
+
+# Find failed jobs:
+SELECT id, status, error_message, created_at
+FROM enrichment_jobs
+WHERE status = 'failed'
+ORDER BY created_at DESC;
+
+# Get job statistics:
+SELECT
+  status,
+  COUNT(*) as job_count,
+  SUM(total_resources) as total_resources_processed,
+  SUM(successful_resources) as total_successes,
+  SUM(failed_resources) as total_failures
+FROM enrichment_jobs
+GROUP BY status;
+```
+
+**Inspect enrichment_queue (individual resource status):**
+```bash
+# View queued items:
+SELECT
+  eq.id,
+  eq.resource_id,
+  r.title,
+  r.url,
+  eq.status,
+  eq.attempts,
+  eq.error_message,
+  eq.created_at
+FROM enrichment_queue eq
+JOIN resources r ON r.id = eq.resource_id
+WHERE eq.job_id = 123  -- Replace with your job ID
+ORDER BY eq.created_at DESC;
+
+# Find failed enrichments:
+SELECT
+  eq.resource_id,
+  r.title,
+  r.url,
+  eq.error_message,
+  eq.attempts
+FROM enrichment_queue eq
+JOIN resources r ON r.id = eq.resource_id
+WHERE eq.status = 'failed'
+  AND eq.job_id = 123
+ORDER BY eq.attempts DESC;
+
+# Get queue status summary:
+SELECT
+  status,
+  COUNT(*) as count
+FROM enrichment_queue
+WHERE job_id = 123
+GROUP BY status;
+```
+
+**Check github_sync_queue table:**
+```bash
+npm run db:studio
+# Navigate to github_sync_queue table
+
+# View sync history:
+SELECT
+  id,
+  operation,
+  status,
+  repository_url,
+  resources_imported,
+  resources_updated,
+  resources_skipped,
+  validation_passed,
+  created_at,
+  completed_at
+FROM github_sync_queue
+ORDER BY created_at DESC;
+
+# Find failed syncs:
+SELECT
+  id,
+  operation,
+  repository_url,
+  error_message,
+  created_at
+FROM github_sync_queue
+WHERE status = 'failed'
+ORDER BY created_at DESC;
+
+# Get sync statistics:
+SELECT
+  operation,
+  status,
+  COUNT(*) as sync_count,
+  SUM(resources_imported) as total_imported,
+  SUM(resources_updated) as total_updated,
+  SUM(resources_skipped) as total_skipped
+FROM github_sync_queue
+GROUP BY operation, status
+ORDER BY operation, status;
+
+# Find syncs with validation errors:
+SELECT
+  id,
+  repository_url,
+  validation_passed,
+  validation_errors,
+  created_at
+FROM github_sync_queue
+WHERE validation_passed = false
+ORDER BY created_at DESC;
+```
+
+**Debug active sync operations:**
+```bash
+# Check for in-progress syncs:
+SELECT
+  id,
+  operation,
+  status,
+  repository_url,
+  dry_run,
+  strict_mode,
+  created_at,
+  NOW() - created_at as duration
+FROM github_sync_queue
+WHERE status IN ('pending', 'processing')
+ORDER BY created_at DESC;
+
+# If sync is stuck (running > 5 minutes):
+# Cancel via database:
+UPDATE github_sync_queue
+SET status = 'cancelled'
+WHERE id = 123;  -- Replace with stuck job ID
+```
+
+**Query sync operation details:**
+```bash
+# View import details:
+SELECT
+  id,
+  repository_url,
+  resources_imported,
+  resources_updated,
+  resources_skipped,
+  validation_passed,
+  (completed_at - created_at) as duration,
+  metadata
+FROM github_sync_queue
+WHERE operation = 'import'
+  AND status = 'completed'
+ORDER BY created_at DESC
+LIMIT 10;
+
+# Check metadata for detailed sync info:
+SELECT
+  id,
+  metadata->'conflicts' as conflicts,
+  metadata->'categories_created' as new_categories,
+  metadata->'validation_warnings' as warnings
+FROM github_sync_queue
+WHERE id = 123;
+```
+
+#### Database Performance Debugging
+
+**Check table sizes:**
+```bash
+npm run db:studio
+# Run SQL:
+
+SELECT
+  schemaname,
+  tablename,
+  pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename)) AS size,
+  pg_total_relation_size(schemaname||'.'||tablename) AS size_bytes
+FROM pg_tables
+WHERE schemaname = 'public'
+ORDER BY size_bytes DESC;
+
+# Shows:
+# tablename           | size
+# resources           | 512 KB
+# enrichment_queue    | 256 KB
+# sessions            | 128 KB
+```
+
+**Identify slow queries:**
+```bash
+# Enable query logging (requires superuser):
+ALTER DATABASE awesome_videos SET log_min_duration_statement = 1000;
+# Logs queries taking longer than 1000ms (1 second)
+
+# View query performance:
+SELECT
+  queryid,
+  query,
+  calls,
+  total_exec_time,
+  mean_exec_time,
+  max_exec_time
+FROM pg_stat_statements
+ORDER BY mean_exec_time DESC
+LIMIT 10;
+
+# Note: pg_stat_statements extension must be enabled
+# For Replit/Neon: Usually pre-enabled
+```
+
+**Vacuum and analyze:**
+```bash
+# Clean up dead rows and update statistics:
+npm run db:studio
+# Run SQL:
+
+VACUUM ANALYZE resources;
+VACUUM ANALYZE enrichment_jobs;
+VACUUM ANALYZE github_sync_queue;
+
+# Or vacuum entire database:
+VACUUM ANALYZE;
+
+# When to vacuum:
+# - After bulk deletes
+# - After large imports
+# - If queries are slow
+# - Weekly maintenance
+```
+
+**Check index usage:**
+```bash
+# View index statistics:
+SELECT
+  schemaname,
+  tablename,
+  indexname,
+  idx_scan as index_scans,
+  idx_tup_read as tuples_read,
+  idx_tup_fetch as tuples_fetched
+FROM pg_stat_user_indexes
+ORDER BY idx_scan DESC;
+
+# Unused indexes (candidates for removal):
+SELECT
+  schemaname,
+  tablename,
+  indexname
+FROM pg_stat_user_indexes
+WHERE idx_scan = 0
+  AND indexname NOT LIKE '%pkey%';  -- Don't drop primary keys!
+```
+
+#### Common Database Error Messages
+
+**Error reference guide:**
+
+```bash
+# "connection refused" (ECONNREFUSED)
+# → PostgreSQL not running or wrong host/port
+# Fix: Check DATABASE_URL, start PostgreSQL
+
+# "password authentication failed"
+# → Wrong credentials in DATABASE_URL
+# Fix: Update username/password
+
+# "database does not exist"
+# → Database not created
+# Fix: createdb awesome_videos
+
+# "SSL connection required"
+# → Database requires SSL (Neon, Supabase)
+# Fix: Add ?sslmode=require to DATABASE_URL
+
+# "Connection pool timeout"
+# → Pool exhausted, no connections available
+# Fix: Restart server, reduce concurrent operations
+
+# "Query timeout"
+# → Query taking too long
+# Fix: Optimize query, add indexes, increase timeout
+
+# "foreign key violation"
+# → Referenced record doesn't exist
+# Fix: Check foreign key relationships
+
+# "unique constraint violation"
+# → Duplicate value in unique column
+# Fix: Check for duplicates before insert
+
+# "column does not exist"
+# → Schema mismatch between code and database
+# Fix: Run npm run db:push
+
+# "permission denied"
+# → Database user lacks permissions
+# Fix: Grant permissions or use superuser
 ```
 
 ### Port Already in Use
