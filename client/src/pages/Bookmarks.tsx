@@ -4,6 +4,7 @@ import ResourceCard from "@/components/resource/ResourceCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import SEOHead from "@/components/layout/SEOHead";
 import { Card, CardContent } from "@/components/ui/card";
+import BookmarkExportTools from "@/components/ui/bookmark-export-tools";
 
 interface BookmarkedResource {
   id: string;
@@ -76,12 +77,16 @@ export default function Bookmarks() {
           </h1>
         </div>
         <p className="text-muted-foreground">
-          {hasBookmarks 
+          {hasBookmarks
             ? `You have ${bookmarks.length} saved ${bookmarks.length === 1 ? 'resource' : 'resources'}`
             : 'Start bookmarking resources to build your personal collection'
           }
         </p>
       </div>
+
+      {hasBookmarks && (
+        <BookmarkExportTools bookmarks={bookmarks} />
+      )}
 
       {hasBookmarks ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
