@@ -110,6 +110,25 @@ export default function ResourceDetail() {
     }
   });
 
+  const trackInteraction = useMutation({
+    mutationFn: async (interaction: {
+      resourceId: string;
+      interactionType: string;
+      interactionValue?: number;
+      metadata?: any;
+    }) => {
+      const response = await fetch("/api/interactions", {
+        method: "POST",
+        body: JSON.stringify({
+          userId: user?.id,
+          ...interaction
+        }),
+        headers: { "Content-Type": "application/json" }
+      });
+      return response.json();
+    },
+  });
+
   const handleShare = async () => {
     const url = window.location.href;
     if (navigator.share) {
@@ -161,6 +180,11 @@ export default function ResourceDetail() {
   };
 
   const handleRelatedResourceClick = (relatedResource: Resource) => {
+    trackInteraction.mutate({
+      resourceId: relatedResource.id.toString(),
+      interactionType: "click",
+      metadata: { source: "related-resources", fromResourceId: id }
+    });
     setLocation(`/resource/${relatedResource.id}`);
   };
 
