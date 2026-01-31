@@ -3483,3 +3483,330 @@ The application automatically:
 - Serves static files from Express
 - Seeds database if empty
 - Validates awesome-list on export
+
+### Production Troubleshooting
+
+#### NODE_ENV Configuration
+
+**Problem:** Application behaves differently in production vs development
+
+**Solution:**
+```bash
+# Verify NODE_ENV is set correctly
+echo $NODE_ENV
+# Should output: production
+
+# Set for current session
+export NODE_ENV=production
+
+# Replit: Set in Secrets tab
+# Key: NODE_ENV
+# Value: production
+```
+
+**Important:**
+- `NODE_ENV=production` enables build optimizations
+- Disables verbose error messages for security
+- Changes routing behavior (serves static files)
+- Affects session cookie settings
+
+#### Missing Environment Variables
+
+**Problem:** Application starts but features don't work
+
+**Symptoms:**
+- Auth fails: Missing `SESSION_SECRET`
+- Database errors: Missing `DATABASE_URL`
+- AI features unavailable: Missing `AI_INTEGRATIONS_ANTHROPIC_API_KEY`
+- GitHub sync fails: Missing `GITHUB_TOKEN`
+
+**Solution:**
+```bash
+# Check all environment variables
+env | grep -E "(DATABASE_URL|SESSION_SECRET|GITHUB_TOKEN|AI_INTEGRATIONS)"
+
+# Required for production:
+DATABASE_URL=postgresql://...           # Database connection
+SESSION_SECRET=<min-32-char-random>     # Session encryption
+
+# Optional but recommended:
+AI_INTEGRATIONS_ANTHROPIC_API_KEY=sk-ant-...  # AI features
+GITHUB_TOKEN=ghp_...                    # GitHub sync
+```
+
+**Debugging:**
+1. Check server logs for "Missing required environment variable" errors
+2. Verify Replit Secrets are properly set
+3. Ensure `.env` file is not in `.gitignore` for local dev (but never commit secrets!)
+4. Use `/api/health` endpoint to check configuration status
+
+#### Build Failures
+
+**Problem:** `npm run build` fails with Vite/esbuild errors
+
+**Common Errors:**
+
+**1. TypeScript Errors**
+```bash
+# Error: TS2304: Cannot find name 'X'
+# Solution: Fix TypeScript errors before building
+npx tsc --noEmit
+# Fix all reported errors, then retry build
+```
+
+**2. Module Resolution Errors**
+```bash
+# Error: Could not resolve './path/to/module'
+# Solution: Check import paths and file extensions
+# - Use .tsx/.ts extensions for TypeScript files
+# - Verify file paths are correct
+# - Check for circular dependencies
+```
+
+**3. Memory Errors (esbuild)**
+```bash
+# Error: FATAL ERROR: Reached heap limit Allocation failed
+# Solution: Increase Node memory limit
+NODE_OPTIONS="--max-old-space-size=4096" npm run build
+```
+
+**4. Missing Dependencies**
+```bash
+# Error: Cannot find module 'X'
+# Solution: Install dependencies
+npm install
+# If issue persists, clear cache and reinstall
+rm -rf node_modules package-lock.json
+npm install
+```
+
+**5. Vite Build Optimization Errors**
+```bash
+# Error: (plugin:vite:esbuild) Transform failed
+# Solution: Check for:
+# - Invalid JSX syntax
+# - Unsupported JavaScript features
+# - Missing React imports (should auto-inject with JSX transform)
+```
+
+#### Replit Deployment Checklist
+
+**Pre-Deployment:**
+- [ ] All tests passing locally (`npm run dev` works)
+- [ ] Build succeeds locally (`npm run build` completes)
+- [ ] Environment variables set in Replit Secrets:
+  - [ ] `DATABASE_URL` (auto-set by Replit PostgreSQL)
+  - [ ] `SESSION_SECRET` (generate with `openssl rand -base64 32`)
+  - [ ] `NODE_ENV=production`
+  - [ ] `AI_INTEGRATIONS_ANTHROPIC_API_KEY` (if using AI)
+  - [ ] `GITHUB_TOKEN` (if using GitHub sync)
+- [ ] Database schema pushed (`npm run db:push`)
+- [ ] Admin user created (via script or first login)
+
+**Replit Configuration:**
+```toml
+# .replit file should have:
+run = "npm run start"
+entrypoint = "server/index.ts"
+
+[deployment]
+build = ["npm", "run", "build"]
+run = ["npm", "run", "start"]
+```
+
+**Post-Deployment:**
+- [ ] Visit deployed URL and verify homepage loads
+- [ ] Check `/api/health` endpoint returns 200 OK
+- [ ] Test login/authentication
+- [ ] Verify database connection (check resources display)
+- [ ] Monitor Replit logs for errors
+
+**Common Replit Issues:**
+
+1. **Port Issues**
+   - Replit requires listening on `0.0.0.0` not `localhost`
+   - Port should be from `process.env.PORT` or default 5000
+
+2. **File Permissions**
+   - Ensure uploaded files have correct permissions
+   - Check `.replit` file is properly configured
+
+3. **Persistent Storage**
+   - Database data persists via Replit PostgreSQL
+   - Uploaded files may be lost on restart (use database storage)
+
+#### Memory and Resource Limits
+
+**Problem:** Application crashes or becomes unresponsive
+
+**Symptoms:**
+- Server crashes with "JavaScript heap out of memory"
+- Slow response times
+- Build process killed mid-execution
+- Database connection pool exhausted
+
+**Solutions:**
+
+**1. Monitor Resource Usage**
+```bash
+# Check memory usage
+free -m
+# Check process memory
+ps aux | grep node
+
+# Replit: View resource usage in console
+# Look for memory warnings
+```
+
+**2. Optimize Build Process**
+```bash
+# Increase Node memory for builds
+NODE_OPTIONS="--max-old-space-size=4096" npm run build
+
+# Clear build cache if needed
+rm -rf dist node_modules/.vite
+npm run build
+```
+
+**3. Database Connection Pool**
+```typescript
+// Ensure connection pooling is configured
+// Check server/index.ts for pool settings
+// Default: { min: 2, max: 10 }
+// Reduce if hitting connection limits
+```
+
+**4. Reduce Concurrent Operations**
+```bash
+# For enrichment jobs, use smaller batch sizes
+# Navigate to Admin → Enrichment
+# Set batch size: 5-10 instead of 50+
+```
+
+**5. Replit Resource Limits**
+- Free tier: 0.5 vCPU, 512 MB RAM
+- Hacker tier: 1 vCPU, 2 GB RAM
+- Pro tier: 2 vCPU, 4 GB RAM
+- Consider upgrading if frequently hitting limits
+
+#### Health Check Monitoring
+
+**Endpoint:** `/api/health`
+
+**Purpose:**
+- Verify server is running
+- Check database connectivity
+- Monitor application status
+- Useful for uptime monitoring services
+
+**Usage:**
+```bash
+# Basic health check
+curl https://your-app.repl.co/api/health
+
+# Expected response (200 OK):
+{
+  "status": "healthy",
+  "timestamp": "2024-01-15T10:30:00.000Z",
+  "database": "connected",
+  "uptime": 3600,
+  "nodeVersion": "v18.17.0",
+  "environment": "production"
+}
+
+# If database is down (503 Service Unavailable):
+{
+  "status": "unhealthy",
+  "timestamp": "2024-01-15T10:30:00.000Z",
+  "database": "disconnected",
+  "error": "Connection refused"
+}
+```
+
+**Integration with Uptime Monitors:**
+```bash
+# UptimeRobot
+# Add HTTP(S) monitor with URL: https://your-app.repl.co/api/health
+# Interval: 5 minutes
+# Expected status code: 200
+
+# Pingdom, StatusCake, etc.
+# Configure to check /api/health endpoint
+# Alert on non-200 status codes
+```
+
+**Debugging with Health Check:**
+```bash
+# Check if server is running
+curl -I https://your-app.repl.co/api/health
+
+# View detailed response
+curl -v https://your-app.repl.co/api/health
+
+# Monitor continuously (every 10 seconds)
+watch -n 10 curl -s https://your-app.repl.co/api/health
+
+# From application code (for admin dashboard)
+fetch('/api/health')
+  .then(r => r.json())
+  .then(data => console.log('Health:', data))
+```
+
+**What to Monitor:**
+- Response time (should be < 1 second)
+- Database connectivity status
+- Uptime (tracks server restarts)
+- Environment configuration
+
+#### Production Debugging Checklist
+
+When issues occur in production:
+
+1. **Check Health Endpoint**
+   ```bash
+   curl https://your-app.repl.co/api/health
+   ```
+
+2. **Review Server Logs**
+   - Check Replit console for errors
+   - Look for uncaught exceptions
+   - Check for database connection errors
+
+3. **Verify Environment Variables**
+   ```bash
+   # In Replit shell:
+   env | grep -E "(NODE_ENV|DATABASE_URL|SESSION_SECRET)"
+   ```
+
+4. **Test Database Connection**
+   ```bash
+   # Use Drizzle Studio or direct query
+   npm run db:studio
+   # Or check via API:
+   curl https://your-app.repl.co/api/resources
+   ```
+
+5. **Check Build Artifacts**
+   ```bash
+   # Verify dist folder exists and has content
+   ls -la dist/
+   # Check bundle size
+   du -sh dist/
+   ```
+
+6. **Monitor Performance**
+   - Check response times via browser DevTools
+   - Review database query performance
+   - Monitor memory usage in Replit console
+
+7. **Test Critical Paths**
+   - Homepage loads
+   - Login/authentication works
+   - Resources display correctly
+   - Admin features accessible
+
+**Getting Help:**
+- Include health check output
+- Provide relevant server logs
+- Share environment configuration (without secrets!)
+- Describe steps to reproduce issue
