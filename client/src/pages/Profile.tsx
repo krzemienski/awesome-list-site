@@ -7,15 +7,16 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { 
-  User, 
-  Heart, 
-  Bookmark, 
-  Trophy, 
-  Target, 
-  Clock, 
-  TrendingUp, 
-  Settings, 
+import type { User } from "@shared/schema";
+import {
+  User as UserIcon,
+  Heart,
+  Bookmark,
+  Trophy,
+  Target,
+  Clock,
+  TrendingUp,
+  Settings,
   LogOut,
   Mail,
   Calendar,
@@ -34,7 +35,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { formatDistanceToNow } from "date-fns";
 
 interface ProfileProps {
-  user?: any;
+  user?: User;
 }
 
 interface Favorite {

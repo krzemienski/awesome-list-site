@@ -5,7 +5,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AwesomeList, Category } from "@/types/awesome-list";
+import type { Resource as DbResource } from "@shared/schema";
 import SEOHead from "@/components/layout/SEOHead";
+import type { LucideIcon } from "lucide-react";
 import {
   FileText,
   Video,
@@ -23,7 +25,7 @@ interface HomeProps {
   isLoading: boolean;
 }
 
-const categoryIcons: { [key: string]: any } = {
+const categoryIcons: Record<string, LucideIcon> = {
   "Intro & Learning": FileText,
   "Protocols & Transport": Server,
   "Encoding & Codecs": Code,
@@ -37,7 +39,7 @@ const categoryIcons: { [key: string]: any } = {
 
 export default function Home({ awesomeList, isLoading }: HomeProps) {
   // Fetch approved database resources (always fetch, React Query handles caching)
-  const { data: dbData } = useQuery<{resources: any[], total: number}>({
+  const { data: dbData } = useQuery<{resources: DbResource[], total: number}>({
     queryKey: ['/api/resources', { status: 'approved' }],
   });
   

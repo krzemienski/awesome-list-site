@@ -10,6 +10,7 @@ import TagFilter from "@/components/ui/tag-filter";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { deslugify } from "@/lib/utils";
 import { Resource } from "@/types/awesome-list";
+import type { Resource as DbResource } from "@shared/schema";
 import NotFound from "@/pages/not-found";
 import { processAwesomeListData } from "@/lib/parser";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
@@ -31,7 +32,7 @@ export default function SubSubcategory() {
   const awesomeList = rawData ? processAwesomeListData(rawData) : undefined;
   
   // Fetch approved database resources
-  const { data: dbData } = useQuery<{resources: any[], total: number}>({
+  const { data: dbData } = useQuery<{resources: DbResource[], total: number}>({
     queryKey: ['/api/resources', { status: 'approved' }],
     enabled: !!awesomeList,
   });
