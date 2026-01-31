@@ -8,10 +8,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import SEOHead from "@/components/layout/SEOHead";
 import { SuggestEditDialog } from "@/components/ui/suggest-edit-dialog";
-import { 
-  ArrowLeft, 
-  ExternalLink, 
-  Calendar, 
+import { LinkHealthBadge } from "@/components/ui/link-health-badge";
+import { ReportBrokenLinkDialog } from "@/components/resource/ReportBrokenLinkDialog";
+import {
+  ArrowLeft,
+  ExternalLink,
+  Calendar,
   FolderTree,
   Bookmark,
   Heart,
@@ -22,7 +24,8 @@ import {
   Image as ImageIcon,
   Link2,
   Clock,
-  ChevronRight
+  ChevronRight,
+  AlertTriangle
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -38,6 +41,7 @@ export default function ResourceDetail() {
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
   const [suggestEditOpen, setSuggestEditOpen] = useState(false);
+  const [reportBrokenLinkOpen, setReportBrokenLinkOpen] = useState(false);
 
   const { data: resource, isLoading, error } = useQuery<Resource>({
     queryKey: ['/api/resources', id],
@@ -332,12 +336,18 @@ export default function ResourceDetail() {
                           {resource.subSubcategory}
                         </Badge>
                       )}
-                      <Badge 
+                      <Badge
                         variant={resource.status === 'approved' ? 'default' : 'secondary'}
                         className={resource.status === 'approved' ? 'bg-green-500/20 text-green-400 border-green-500/30' : ''}
                       >
                         {resource.status}
                       </Badge>
+                      {resource.linkHealthStatus && (
+                        <LinkHealthBadge
+                          status={resource.linkHealthStatus as "verified" | "warning" | "broken" | "unknown"}
+                          lastChecked={resource.lastLinkCheck}
+                        />
+                      )}
                     </div>
                   </div>
                   
@@ -433,6 +443,24 @@ export default function ResourceDetail() {
                     <span>Added on {new Date(resource.createdAt).toLocaleDateString()}</span>
                   </div>
                 )}
+                {resource.lastLinkCheck && (
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4" />
+                    <span>
+                      Link checked {(() => {
+                        const date = new Date(resource.lastLinkCheck);
+                        const now = new Date();
+                        const diffMs = now.getTime() - date.getTime();
+                        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+                        if (diffDays === 0) return "today";
+                        if (diffDays === 1) return "yesterday";
+                        if (diffDays < 30) return `${diffDays} days ago`;
+                        return `on ${date.toLocaleDateString()}`;
+                      })()}
+                    </span>
+                  </div>
+                )}
                 {urlScraped && (
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4" />
@@ -477,13 +505,21 @@ export default function ResourceDetail() {
                 <ExternalLink className="h-4 w-4 mr-2" />
                 Open Resource
               </Button>
-              <Button 
-                variant="outline" 
-                className="w-full min-h-[44px]" 
+              <Button
+                variant="outline"
+                className="w-full min-h-[44px]"
                 onClick={handleShare}
               >
                 <Share2 className="h-4 w-4 mr-2" />
                 Share This Page
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full min-h-[44px] border-amber-500/30 text-amber-500 hover:bg-amber-500/10"
+                onClick={() => setReportBrokenLinkOpen(true)}
+              >
+                <AlertTriangle className="h-4 w-4 mr-2" />
+                Report Broken Link
               </Button>
               {isAuthenticated && (
                 <>
@@ -585,6 +621,12 @@ export default function ResourceDetail() {
         resource={resource}
         open={suggestEditOpen}
         onOpenChange={setSuggestEditOpen}
+      />
+
+      <ReportBrokenLinkDialog
+        resource={resource}
+        open={reportBrokenLinkOpen}
+        onOpenChange={setReportBrokenLinkOpen}
       />
     </div>
   );
