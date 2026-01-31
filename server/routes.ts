@@ -542,23 +542,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
       const resourceId = parseInt(req.params.id);
       const { proposedChanges, proposedData, claudeMetadata, triggerClaudeAnalysis } = req.body;
-      
+
       if (isNaN(resourceId)) {
         return res.status(400).json({ message: 'Invalid resource ID' });
       }
-      
+
       const resource = await storage.getResource(resourceId);
       if (!resource) {
         return res.status(404).json({ message: 'Resource not found' });
       }
-      
+
       if (!proposedChanges || !proposedData) {
         return res.status(400).json({ message: 'proposedChanges and proposedData are required' });
       }
-      
+
       // SECURITY FIX: Whitelist of editable fields only (ISSUE 1)
       const EDITABLE_FIELDS = ['title', 'description', 'url', 'tags', 'category', 'subcategory', 'subSubcategory'];
-      
+
       // Sanitize proposedData - only allow whitelisted fields
       const sanitizedProposedData: Record<string, any> = {};
       for (const field of EDITABLE_FIELDS) {
@@ -566,7 +566,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           sanitizedProposedData[field] = proposedData[field];
         }
       }
-      
+
       // Sanitize proposedChanges
       const sanitizedChanges: Record<string, any> = {};
       for (const field of EDITABLE_FIELDS) {
@@ -574,20 +574,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
           sanitizedChanges[field] = proposedChanges[field];
         }
       }
-      
+
       // SECURITY FIX: Validate field sizes (ISSUE 5)
       if (sanitizedProposedData.title && sanitizedProposedData.title.length > 200) {
         return res.status(400).json({ message: 'Title too long (max 200 characters)' });
       }
-      
+
       if (sanitizedProposedData.description && sanitizedProposedData.description.length > 2000) {
         return res.status(400).json({ message: 'Description too long (max 2000 characters)' });
       }
-      
+
       if (sanitizedProposedData.tags && Array.isArray(sanitizedProposedData.tags) && sanitizedProposedData.tags.length > 20) {
         return res.status(400).json({ message: 'Too many tags (max 20)' });
       }
-      
+
       let aiMetadata = claudeMetadata;
       if (triggerClaudeAnalysis && resource.url) {
         try {
@@ -596,7 +596,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.error('Error analyzing URL with Claude:', error);
         }
       }
-      
+
       // Use sanitized versions in createResourceEdit call
       const edit = await storage.createResourceEdit({
         resourceId,
@@ -608,7 +608,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         claudeMetadata: aiMetadata,
         claudeAnalyzedAt: aiMetadata ? new Date() : undefined,
       });
-      
+
       res.status(201).json(edit);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -616,6 +616,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       console.error('Error creating edit suggestion:', error);
       res.status(500).json({ message: 'Failed to create edit suggestion' });
+    }
+  });
+
+  // POST /api/resources/:id/report-broken - Report a broken link
+  app.post('/api/resources/:id/report-broken', async (req: any, res) => {
+    try {
+      const resourceId = parseInt(req.params.id);
+
+      if (isNaN(resourceId)) {
+        return res.status(400).json({ message: 'Invalid resource ID' });
+      }
+
+      const resource = await storage.getResource(resourceId);
+      if (!resource) {
+        return res.status(404).json({ message: 'Resource not found' });
+      }
+
+      // Use authenticated user ID if available, otherwise use 'anonymous'
+      const reportedBy = req.user?.claims?.sub || 'anonymous';
+
+      const report = await storage.createBrokenLinkReport({
+        resourceId,
+        reportedBy,
+        status: 'pending',
+      });
+
+      res.status(201).json(report);
+    } catch (error) {
+      console.error('Error reporting broken link:', error);
+      res.status(500).json({ message: 'Failed to report broken link' });
     }
   });
 
