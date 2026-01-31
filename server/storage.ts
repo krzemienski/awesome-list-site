@@ -84,6 +84,9 @@ import { eq, and, sql, desc, asc, inArray, like, or, isNull, isNotNull } from "d
 import { mapCategoryName } from "@shared/categoryMapping";
 import memoize from "memoizee";
 
+// Cache TTL configuration (in seconds)
+const AWESOME_LIST_CACHE_TTL = parseInt(process.env.AWESOME_LIST_CACHE_TTL || '3600', 10);
+
 // Interface for storage operations
 export interface IStorage {
   // User operations (MANDATORY for Replit Auth)
@@ -407,7 +410,7 @@ const getAwesomeListFromDatabaseMemoized = memoize(
       categories: transformedCategories
     };
   },
-  { maxAge: 3600 * 1000 }
+  { maxAge: AWESOME_LIST_CACHE_TTL * 1000 }
 );
 
 export class DatabaseStorage implements IStorage {
