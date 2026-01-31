@@ -550,6 +550,766 @@ public async batchProcess(
 
 **Note**: Actual time depends on cache hit rate. With high cache hits, batch processing is significantly faster.
 
+## EnrichmentService - Queue Processing & Batch Enrichment
+
+The `EnrichmentService` class (`server/ai/enrichmentService.ts`) orchestrates large-scale resource enrichment through an asynchronous queue-based architecture with retry logic, progress tracking, and cancellation support.
+
+### Architecture Pattern
+
+**Design**: Singleton pattern with concurrent job management
+- Single instance manages multiple enrichment jobs simultaneously
+- In-memory job tracking prevents duplicate processing
+- Asynchronous processing with graceful error handling
+
+```typescript
+// Usage throughout the application
+import { enrichmentService } from './server/ai/enrichmentService';
+
+// Queue batch enrichment
+const jobId = await enrichmentService.queueBatchEnrichment({
+  filter: 'unenriched',
+  batchSize: 10,
+  startedBy: 'admin@example.com'
+});
+
+// Monitor progress
+const status = await enrichmentService.getJobStatus(jobId);
+console.log(`Progress: ${status.progress}%`);
+
+// Cancel if needed
+await enrichmentService.cancelJob(jobId);
+```
+
+### Job Lifecycle Management
+
+The enrichment system uses a comprehensive state machine to track job execution from creation through completion or failure.
+
+#### Job States
+
+```mermaid
+stateDiagram-v2
+    [*] --> pending: Job Created
+    pending --> processing: Start Processing
+    processing --> completed: All Items Processed
+    processing --> failed: Unrecoverable Error
+    processing --> cancelled: User Cancellation
+    cancelled --> [*]
+    completed --> [*]
+    failed --> [*]
+
+    note right of processing
+        Checks cancellation
+        before each batch
+    end note
+```
+
+| State | Description | Next States |
+|-------|-------------|-------------|
+| `pending` | Job created, queue items added, waiting to start | `processing` |
+| `processing` | Actively processing resources in batches | `completed`, `failed`, `cancelled` |
+| `completed` | All resources processed successfully | Terminal state |
+| `failed` | Unrecoverable error occurred during processing | Terminal state |
+| `cancelled` | User requested cancellation | Terminal state |
+
+#### Job Creation Flow
+
+```typescript
+async queueBatchEnrichment(options: QueueBatchEnrichmentOptions): Promise<number> {
+  // 1. Load approved resources (max 10,000)
+  const { resources } = await storage.listResources({
+    status: 'approved',
+    limit: 10000
+  });
+
+  // 2. Filter resources based on criteria
+  let resourcesToEnrich = resources;
+  if (filter === 'unenriched') {
+    resourcesToEnrich = resources.filter(resource => {
+      const metadata = resource.metadata || {};
+      return !metadata.aiEnriched &&
+             (!resource.description || resource.description.trim() === '');
+    });
+  }
+
+  // 3. Create job record
+  const job = await storage.createEnrichmentJob({
+    filter,
+    batchSize,
+    startedBy
+  });
+
+  // 4. Create queue items for each resource
+  for (const resource of resourcesToEnrich) {
+    await storage.createEnrichmentQueueItem({
+      jobId: job.id,
+      resourceId: resource.id,
+      status: 'pending'
+    });
+  }
+
+  // 5. Start asynchronous processing (non-blocking)
+  this.startProcessing(job.id).catch(error => {
+    console.error(`Error processing enrichment job ${job.id}:`, error);
+    storage.updateEnrichmentJob(job.id, {
+      status: 'failed',
+      errorMessage: error.message,
+      completedAt: new Date()
+    });
+  });
+
+  return job.id;
+}
+```
+
+**Key Design Decisions**:
+- **Non-Blocking**: `startProcessing()` runs asynchronously, immediately returning the job ID
+- **Resource Filtering**: Support for "all" or "unenriched" resources
+- **Queue Item Creation**: Each resource gets a dedicated queue item for fine-grained tracking
+- **Error Recovery**: Top-level error handler marks job as failed if startup fails
+
+### Batch Processing Architecture
+
+The service processes resources in configurable batches with inter-batch delays to prevent API rate limiting and allow for graceful cancellation.
+
+#### Batch Processing Flow
+
+```mermaid
+sequenceDiagram
+    participant API as Admin API
+    participant ES as EnrichmentService
+    participant DB as Storage
+    participant Claude as ClaudeService
+    participant Web as URLScraper
+
+    API->>ES: queueBatchEnrichment(options)
+    ES->>DB: createEnrichmentJob()
+    DB-->>ES: job.id
+
+    ES->>DB: createEnrichmentQueueItems()
+    ES->>ES: startProcessing(jobId) [async]
+    ES-->>API: Return job.id immediately
+
+    loop For each batch
+        ES->>DB: getPendingEnrichmentQueueItems(batchSize)
+        DB-->>ES: batch items
+
+        loop For each item in batch
+            ES->>DB: Check job.status (cancellation check)
+
+            alt Job cancelled
+                ES->>ES: Break processing
+            else Job active
+                ES->>ES: enrichResource(resourceId)
+                ES->>Web: fetchUrlMetadata(url)
+                Web-->>ES: urlMetadata
+                ES->>Claude: generateResourceTags()
+                Claude-->>ES: aiResult
+                ES->>DB: updateResource(metadata merge)
+                ES->>DB: updateEnrichmentQueueItem(completed)
+                ES->>DB: updateEnrichmentJob(counters)
+            end
+        end
+
+        ES->>ES: delay(2000ms)
+    end
+
+    ES->>DB: updateEnrichmentJob(completed)
+```
+
+#### Batch Configuration
+
+```typescript
+interface QueueBatchEnrichmentOptions {
+  filter?: 'all' | 'unenriched';  // Resource selection criteria
+  batchSize?: number;              // Items per batch (default: 10)
+  startedBy?: string;              // User email for audit trail
+}
+```
+
+**Default Batch Size**: 10 resources per batch
+
+**Inter-Batch Delay**: 2000ms (2 seconds)
+
+#### Processing Loop
+
+```typescript
+private async processJobBatches(jobId: number, batchSize: number): Promise<void> {
+  while (true) {
+    // Check for cancellation before each batch
+    const job = await storage.getEnrichmentJob(jobId);
+    if (!job || job.status === 'cancelled') {
+      console.log(`Job ${jobId} was cancelled or not found`);
+      break;
+    }
+
+    // Fetch next batch of pending items
+    const pendingItems = await storage.getPendingEnrichmentQueueItems(jobId, batchSize);
+
+    // Exit when no more items to process
+    if (pendingItems.length === 0) {
+      break;
+    }
+
+    // Process batch sequentially
+    await this.processBatch(jobId, pendingItems);
+
+    // Wait before next batch (rate limiting + cancellation opportunity)
+    await this.delay(2000);
+  }
+}
+```
+
+**Why Batching?**
+- **Rate Limiting**: Prevents overwhelming external APIs (Claude, URL scrapers)
+- **Cancellation Windows**: 2-second delays provide frequent cancellation check points
+- **Progress Visibility**: Admin can see incremental progress updates
+- **Resource Management**: Limits concurrent database connections and memory usage
+
+### Retry Logic with Exponential Backoff
+
+Each resource enrichment attempt implements retry logic to handle transient failures from network issues, API rate limits, or temporary service unavailability.
+
+#### Retry Configuration
+
+```typescript
+async enrichResource(resourceId: number, jobId?: number): Promise<EnrichmentOutcome> {
+  let retryCount = 0;
+  const maxRetries = 3;
+  let lastError: Error | null = null;
+
+  while (retryCount < maxRetries) {
+    try {
+      // Attempt enrichment...
+      return 'success';
+    } catch (error: any) {
+      lastError = error;
+      retryCount++;
+
+      if (retryCount < maxRetries) {
+        console.log(`Retry ${retryCount}/${maxRetries} for resource ${resourceId}`);
+        await this.delay(1000 * retryCount); // Exponential backoff
+      } else {
+        // Log final failure
+        await storage.logResourceAudit(
+          resourceId,
+          'ai_enrichment_failed',
+          undefined,
+          { error: error.message },
+          `AI enrichment failed after ${maxRetries} retries`
+        );
+        return 'failed';
+      }
+    }
+  }
+
+  return 'failed';
+}
+```
+
+#### Retry Schedule
+
+| Attempt | Delay Before Retry | Cumulative Time |
+|---------|-------------------|-----------------|
+| 1st attempt | 0ms (immediate) | 0ms |
+| 2nd attempt | 1000ms (1s) | 1s |
+| 3rd attempt | 2000ms (2s) | 3s |
+| Final failure | - | 3s total |
+
+**Exponential Backoff Formula**: `delay = 1000ms * retryCount`
+
+**Why This Approach?**
+- **Transient Failures**: Network hiccups, temporary API unavailability
+- **Rate Limit Recovery**: Gives rate-limited APIs time to reset
+- **Gradual Backoff**: Increases delay with each retry to avoid hammering failing services
+- **Audit Trail**: Logs final failure with retry count for debugging
+
+#### Enrichment Outcomes
+
+Each resource enrichment returns one of three outcomes:
+
+```typescript
+type EnrichmentOutcome = 'success' | 'skipped' | 'failed';
+```
+
+| Outcome | Condition | Queue Item Status | Job Counter |
+|---------|-----------|-------------------|-------------|
+| `success` | AI analysis completed, metadata updated | `completed` | `successfulResources++` |
+| `skipped` | Invalid URL or manually curated | `skipped` | `skippedResources++` |
+| `failed` | Exceeded max retries or unrecoverable error | `failed` | `failedResources++` |
+
+All outcomes increment `processedResources` counter.
+
+### URL Validation
+
+Before attempting enrichment, the service validates URLs to skip non-HTTP resources and malformed links.
+
+#### Validation Logic
+
+```typescript
+private isValidUrl(url: string): boolean {
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// Usage in enrichResource
+if (!this.isValidUrl(resource.url)) {
+  console.log(`Skipping resource ${resourceId} - invalid URL: ${resource.url}`);
+  return 'skipped';
+}
+```
+
+**Invalid URL Examples**:
+- `#readme` (hash fragment only)
+- `mailto:support@example.com` (non-HTTP protocol)
+- `javascript:void(0)` (JavaScript pseudo-protocol)
+- `ftp://files.example.com` (unsupported protocol)
+- Malformed URLs without proper scheme
+
+**Valid URL Examples**:
+- `https://github.com/user/repo`
+- `http://example.com/resource`
+- `https://docs.example.com/guide`
+
+### Metadata Merging Strategy
+
+The enrichment process combines data from multiple sources into a unified metadata object, preserving existing manual curation and avoiding overwrites.
+
+#### Metadata Sources
+
+```mermaid
+graph LR
+    subgraph "Data Sources"
+        Existing["Existing Metadata<br/>(Manual Curation)"]
+        AI["AI Analysis<br/>(Claude)"]
+        Scraper["URL Scraper<br/>(Web Metadata)"]
+    end
+
+    subgraph "Merge Strategy"
+        Merge["Merge Operation"]
+    end
+
+    subgraph "Final Metadata"
+        Result["Enhanced Metadata Object"]
+    end
+
+    Existing --> Merge
+    AI --> Merge
+    Scraper --> Merge
+    Merge --> Result
+
+    style Existing fill:#fff3cd
+    style AI fill:#e1f5ff
+    style Scraper fill:#d4edda
+    style Result fill:#f8d7da
+```
+
+#### Merge Implementation
+
+```typescript
+// Fetch URL metadata first
+let urlMetadata: UrlMetadata | null = null;
+try {
+  urlMetadata = await fetchUrlMetadata(resource.url);
+} catch (error) {
+  console.error(`Error fetching URL metadata:`, error);
+}
+
+// Then call Claude AI
+const aiResult = await generateResourceTags(
+  resource.title,
+  resource.description,
+  resource.url
+);
+
+// Merge all sources (spread operator preserves existing metadata)
+const enhancedMetadata = {
+  ...metadata,                    // Preserve existing fields
+  aiEnriched: true,
+  aiEnrichedAt: new Date().toISOString(),
+  suggestedTags: aiResult.tags,
+  suggestedCategory: aiResult.category,
+  suggestedSubcategory: aiResult.subcategory,
+  confidence: aiResult.confidence,
+  aiModel: 'claude-haiku-4-5',
+
+  // Conditionally add URL metadata if scraping succeeded
+  ...(urlMetadata && !urlMetadata.error && {
+    urlScraped: true,
+    urlScrapedAt: new Date().toISOString(),
+    scrapedTitle: urlMetadata.title,
+    scrapedDescription: urlMetadata.description,
+    ogImage: urlMetadata.ogImage,
+    ogTitle: urlMetadata.ogTitle,
+    ogDescription: urlMetadata.ogDescription,
+    twitterCard: urlMetadata.twitterCard,
+    twitterImage: urlMetadata.twitterImage,
+    favicon: urlMetadata.favicon,
+    author: urlMetadata.author,
+    keywords: urlMetadata.keywords,
+  }),
+};
+```
+
+#### Metadata Fields
+
+| Field | Source | Type | Description |
+|-------|--------|------|-------------|
+| `aiEnriched` | System | boolean | Marks resource as AI-processed |
+| `aiEnrichedAt` | System | ISO timestamp | When AI enrichment occurred |
+| `suggestedTags` | Claude AI | string[] | AI-generated tags |
+| `suggestedCategory` | Claude AI | string | Primary category suggestion |
+| `suggestedSubcategory` | Claude AI | string | Subcategory suggestion |
+| `confidence` | Claude AI | string | AI confidence level |
+| `aiModel` | System | string | Model version used |
+| `urlScraped` | System | boolean | Indicates successful URL scraping |
+| `urlScrapedAt` | System | ISO timestamp | When URL was scraped |
+| `scrapedTitle` | URL Scraper | string | Page title from HTML |
+| `scrapedDescription` | URL Scraper | string | Meta description |
+| `ogImage` | URL Scraper | string | Open Graph image URL |
+| `ogTitle` | URL Scraper | string | Open Graph title |
+| `ogDescription` | URL Scraper | string | Open Graph description |
+| `twitterCard` | URL Scraper | string | Twitter card type |
+| `twitterImage` | URL Scraper | string | Twitter image URL |
+| `favicon` | URL Scraper | string | Site favicon URL |
+| `author` | URL Scraper | string | Page author metadata |
+| `keywords` | URL Scraper | string[] | Meta keywords |
+| `manuallyEnriched` | Manual | boolean | Preserves manual curation |
+
+**Critical: Manual Curation Protection**
+
+```typescript
+const metadata = resource.metadata || {};
+if (metadata.manuallyEnriched) {
+  console.log(`Skipping resource ${resourceId} - manually curated`);
+  return 'skipped';
+}
+```
+
+Resources marked with `manuallyEnriched: true` are automatically skipped to prevent AI from overwriting human curation.
+
+### Progress Tracking
+
+The service provides real-time progress tracking through counters and calculated metrics updated after each resource is processed.
+
+#### Progress Metrics
+
+```typescript
+interface JobStatus {
+  id: number;
+  status: string;                    // Job state
+  totalResources: number;            // Total items to process
+  processedResources: number;        // Items completed (success + failed + skipped)
+  successfulResources: number;       // Successfully enriched
+  failedResources: number;           // Failed after retries
+  skippedResources: number;          // Invalid URLs or manually curated
+  progress: number;                  // Percentage (0-100)
+  errorMessage?: string;             // Error details if failed
+  startedAt?: Date;                  // Processing start time
+  completedAt?: Date;                // Processing end time
+  estimatedTimeRemaining?: string;   // Calculated ETA
+}
+```
+
+#### Progress Calculation
+
+```typescript
+async getJobStatus(jobId: number): Promise<JobStatus> {
+  const job = await storage.getEnrichmentJob(jobId);
+
+  const totalResources = job.totalResources || 0;
+  const processedResources = job.processedResources || 0;
+
+  // Calculate percentage complete
+  const progress = totalResources > 0
+    ? Math.round((processedResources / totalResources) * 100)
+    : 0;
+
+  // Calculate estimated time remaining (ETA)
+  let estimatedTimeRemaining: string | undefined;
+  if (job.status === 'processing' && job.startedAt && processedResources > 0) {
+    const elapsedMs = Date.now() - new Date(job.startedAt).getTime();
+    const avgTimePerResource = elapsedMs / processedResources;
+    const remainingResources = totalResources - processedResources;
+    const estimatedRemainingMs = avgTimePerResource * remainingResources;
+
+    const minutes = Math.floor(estimatedRemainingMs / 60000);
+    const seconds = Math.floor((estimatedRemainingMs % 60000) / 1000);
+    estimatedTimeRemaining = `${minutes}m ${seconds}s`;
+  }
+
+  return { id, status, totalResources, processedResources, ... };
+}
+```
+
+**ETA Calculation Logic**:
+1. Measure elapsed time since job start
+2. Calculate average time per processed resource
+3. Multiply by remaining resources
+4. Format as human-readable time (e.g., "5m 30s")
+
+#### Counter Updates
+
+Counters are updated immediately after each resource is processed based on the outcome:
+
+```typescript
+// Success outcome
+await storage.updateEnrichmentJob(jobId, {
+  processedResources: (currentJob.processedResources || 0) + 1,
+  successfulResources: (currentJob.successfulResources || 0) + 1,
+  processedResourceIds: [...(currentJob.processedResourceIds || []), resourceId]
+});
+
+// Skipped outcome
+await storage.updateEnrichmentJob(jobId, {
+  processedResources: (currentJob.processedResources || 0) + 1,
+  skippedResources: (currentJob.skippedResources || 0) + 1
+});
+
+// Failed outcome
+await storage.updateEnrichmentJob(jobId, {
+  processedResources: (currentJob.processedResources || 0) + 1,
+  failedResources: (currentJob.failedResources || 0) + 1,
+  failedResourceIds: [...(currentJob.failedResourceIds || []), resourceId]
+});
+```
+
+**Invariant**: `processedResources = successfulResources + failedResources + skippedResources`
+
+### Cancellation Handling
+
+The service supports graceful job cancellation with multiple check points throughout the processing pipeline to ensure quick response to cancellation requests.
+
+#### Cancellation Flow
+
+```mermaid
+sequenceDiagram
+    participant Admin as Admin UI
+    participant API as API Endpoint
+    participant ES as EnrichmentService
+    participant DB as Storage
+
+    Admin->>API: POST /cancel-job
+    API->>ES: cancelJob(jobId)
+    ES->>DB: updateEnrichmentJob(status: 'cancelled')
+    DB-->>ES: Updated
+    ES-->>API: Cancellation requested
+    API-->>Admin: Job cancellation initiated
+
+    Note over ES: Processing loop continues...
+
+    loop Batch Processing
+        ES->>DB: getEnrichmentJob(jobId)
+        DB-->>ES: job (status: 'cancelled')
+        ES->>ES: Check job.status === 'cancelled'
+        ES->>ES: Break processing loop
+    end
+
+    ES->>ES: Clean up processingJobs Set
+    Note over ES: Job stopped gracefully
+```
+
+#### Cancellation Check Points
+
+The service checks for cancellation at multiple points to ensure responsive termination:
+
+**1. Before Each Batch** (Most Frequent)
+```typescript
+private async processJobBatches(jobId: number, batchSize: number): Promise<void> {
+  while (true) {
+    const job = await storage.getEnrichmentJob(jobId);
+    if (!job || job.status === 'cancelled') {
+      console.log(`Job ${jobId} was cancelled or not found`);
+      break; // Exit immediately
+    }
+    // ... process batch
+  }
+}
+```
+
+**2. Before Each Resource in Batch**
+```typescript
+async processBatch(jobId: number, batch: any[]): Promise<void> {
+  for (const queueItem of batch) {
+    if (job.status === 'cancelled') {
+      console.log(`Job ${jobId} was cancelled, stopping batch processing`);
+      break; // Stop processing current batch
+    }
+    // ... process resource
+  }
+}
+```
+
+**3. During Job Startup**
+```typescript
+private async startProcessing(jobId: number): Promise<void> {
+  const job = await storage.getEnrichmentJob(jobId);
+  if (job.status === 'cancelled') {
+    console.log(`Job ${jobId} was cancelled`);
+    return; // Don't start processing
+  }
+  // ... continue processing
+}
+```
+
+**4. Before Final Completion**
+```typescript
+const updatedJob = await storage.getEnrichmentJob(jobId);
+if (updatedJob && updatedJob.status !== 'cancelled') {
+  await storage.updateEnrichmentJob(jobId, {
+    status: 'completed',
+    completedAt: new Date()
+  });
+}
+```
+
+#### Cancellation API
+
+```typescript
+async cancelJob(jobId: number): Promise<void> {
+  await storage.cancelEnrichmentJob(jobId);
+}
+```
+
+**Storage Implementation**:
+```typescript
+async cancelEnrichmentJob(jobId: number): Promise<void> {
+  await this.db.updateTable('enrichment_jobs')
+    .set({ status: 'cancelled' })
+    .where('id', '=', jobId)
+    .execute();
+}
+```
+
+**Key Design Decisions**:
+- **Database-Driven**: Cancellation state stored in database (persistent, survives restarts)
+- **Polling-Based**: Processing loop checks database status (no complex event system needed)
+- **Graceful Degradation**: Completes current resource before stopping
+- **No Rollback**: Already-processed resources remain enriched (cancellation doesn't undo work)
+
+#### Cancellation Timing
+
+| Scenario | Response Time | In-Flight Work |
+|----------|---------------|----------------|
+| Before batch starts | Immediate (< 100ms) | None |
+| During batch (between resources) | < 5 seconds | Current resource completes |
+| During resource enrichment | Up to 30 seconds | Current AI call completes |
+| During inter-batch delay | ~2 seconds | None |
+
+**Worst-Case Latency**: Single resource enrichment time (typically < 30 seconds with retries)
+
+### Queue Item State Tracking
+
+Each resource in an enrichment job has a corresponding queue item that tracks its individual processing state independently from the job-level status.
+
+#### Queue Item States
+
+```typescript
+interface EnrichmentQueueItem {
+  id: number;
+  jobId: number;
+  resourceId: number;
+  status: 'pending' | 'completed' | 'failed' | 'skipped';
+  errorMessage?: string;
+  processedAt?: Date;
+}
+```
+
+| State | Description | Final State |
+|-------|-------------|-------------|
+| `pending` | Waiting to be processed | No |
+| `completed` | Successfully enriched | Yes |
+| `failed` | Failed after retries | Yes |
+| `skipped` | Invalid URL or manually curated | Yes |
+
+#### State Transitions
+
+```typescript
+// Success path
+await storage.updateEnrichmentQueueItem(queueItem.id, {
+  status: 'completed',
+  processedAt: new Date()
+});
+
+// Skipped path
+await storage.updateEnrichmentQueueItem(queueItem.id, {
+  status: 'skipped',
+  errorMessage: 'Invalid URL or manually curated',
+  processedAt: new Date()
+});
+
+// Failed path
+await storage.updateEnrichmentQueueItem(queueItem.id, {
+  status: 'failed',
+  errorMessage: 'Failed after retries',
+  processedAt: new Date()
+});
+```
+
+**Audit Value**: Queue item history provides detailed forensics for debugging failed enrichments.
+
+### Error Handling Strategy
+
+The enrichment service implements multi-layered error handling to ensure robustness and provide detailed failure diagnostics.
+
+#### Error Handling Layers
+
+**Layer 1: Resource-Level Errors** (Retry Logic)
+```typescript
+try {
+  const outcome = await this.enrichResource(queueItem.resourceId, jobId);
+  // Update counters based on outcome...
+} catch (error: any) {
+  // Unexpected errors (resource not found, database issues, etc.)
+  console.error(`Error processing resource ${queueItem.resourceId}:`, error);
+
+  await storage.updateEnrichmentQueueItem(queueItem.id, {
+    status: 'failed',
+    errorMessage: error instanceof Error ? error.message : 'Unknown error',
+    processedAt: new Date()
+  });
+}
+```
+
+**Layer 2: Job-Level Errors** (Top-Level Handler)
+```typescript
+this.startProcessing(job.id).catch(error => {
+  console.error(`Error processing enrichment job ${job.id}:`, error);
+  storage.updateEnrichmentJob(job.id, {
+    status: 'failed',
+    errorMessage: error.message,
+    completedAt: new Date()
+  });
+});
+```
+
+**Layer 3: Audit Trail** (Resource Audit Logs)
+```typescript
+await storage.logResourceAudit(
+  resourceId,
+  'ai_enrichment_failed',
+  undefined,
+  { error: error.message },
+  `AI enrichment failed after ${maxRetries} retries`
+);
+```
+
+#### Error Types
+
+| Error Type | Handling | Impact |
+|------------|----------|--------|
+| Network timeout | Retry with exponential backoff | Individual resource fails after 3 attempts |
+| API rate limit | Retry with exponential backoff | Automatic recovery on retry |
+| Invalid URL | Skip immediately | Resource marked as skipped |
+| Resource not found | Fail immediately | Queue item marked failed |
+| Database error | Fail job | Job marked failed, stop processing |
+| Unexpected exception | Fail job | Job marked failed, logged for debugging |
+
+**Philosophy**: Fail gracefully at the lowest possible level, preserve as much work as possible.
+
 ## Cost Optimization
 
 The AI Services layer is designed for **cost-effective operation** while maintaining high-quality analysis.
