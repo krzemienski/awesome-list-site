@@ -2606,6 +2606,789 @@ async function updateUserPreferences(userId: string, newPreferences: any) {
 
 ---
 
+## Learning Path Generator - Structured Learning Journeys
+
+The `LearningPathGenerator` class (`server/ai/learningPathGenerator.ts`) creates personalized learning paths that guide users through curated sequences of resources based on their skill level, goals, and preferences.
+
+### Architecture Pattern
+
+**Design**: Singleton pattern with template-based and AI-powered generation
+- Single instance manages predefined templates and path generation
+- `getInstance()` provides global access point
+- Hybrid approach: AI generation with template-based fallback
+
+```typescript
+// Usage in recommendation engine and API endpoints
+import { learningPathGenerator } from './server/ai/learningPathGenerator';
+
+const path = await learningPathGenerator.generateLearningPath(
+  userProfile,
+  'Encoding & Codecs',
+  ['Master video compression']
+);
+```
+
+### Data Models
+
+#### LearningPathTemplate
+
+Predefined template structure for common learning journeys:
+
+```typescript
+interface LearningPathTemplate {
+  title: string;                           // Display name
+  description: string;                     // What the path covers
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  estimatedDuration: string;               // e.g., "15h", "30h"
+  category: string;                        // Video technology category
+  milestones: string[];                    // Learning checkpoints
+  prerequisites: string[];                 // Required knowledge
+  learningObjectives: string[];            // Expected outcomes
+}
+```
+
+#### GeneratedLearningPath
+
+Output format for generated learning paths:
+
+```typescript
+interface GeneratedLearningPath {
+  id: string;                              // Unique identifier
+  title: string;                           // Path title
+  description: string;                     // Path overview
+  difficulty: string;                      // Skill level
+  estimatedDuration: string;               // Total time estimate
+  category: string;                        // Video category
+  resources: Resource[];                   // Selected resources
+  milestones: PathMilestone[];             // Learning checkpoints
+  prerequisites: string[];                 // Required knowledge
+  learningObjectives: string[];            // Learning goals
+  generationType: 'ai' | 'rule-based' | 'template';  // Generation method
+  matchScore?: number;                     // Quality score (75-90)
+}
+```
+
+#### PathMilestone
+
+Structured learning checkpoint with resources:
+
+```typescript
+interface PathMilestone {
+  id: string;                              // e.g., "milestone_1"
+  title: string;                           // Milestone name
+  description: string;                     // What to learn
+  resourceIds: string[];                   // Associated resource URLs
+  estimatedHours: number;                  // Time to complete
+  order: number;                           // Sequence position
+}
+```
+
+### Predefined Templates by Category
+
+The generator initializes with curated templates for common video technology domains.
+
+#### Template Categories
+
+**1. Encoding & Codecs**
+
+```typescript
+// Beginner Template
+{
+  title: 'Video Encoding Fundamentals',
+  difficulty: 'beginner',
+  estimatedDuration: '15h',
+  milestones: [
+    'Understanding video basics and terminology',
+    'Learning about common codecs (H.264, H.265, AV1)',
+    'Hands-on encoding with FFmpeg',
+    'Optimizing quality vs file size'
+  ],
+  prerequisites: ['Basic computer skills', 'Interest in video technology'],
+  learningObjectives: [
+    'Understand how video compression works',
+    'Choose the right codec for your needs',
+    'Use FFmpeg for basic encoding tasks',
+    'Optimize video quality and file size'
+  ]
+}
+
+// Advanced Template
+{
+  title: 'Advanced Video Encoding',
+  difficulty: 'advanced',
+  estimatedDuration: '30h',
+  milestones: [
+    'Advanced codec parameters and tuning',
+    'HDR and color space management',
+    'Hardware acceleration and performance',
+    'Production-ready encoding pipelines'
+  ],
+  prerequisites: [
+    'Video encoding basics',
+    'FFmpeg experience',
+    'Understanding of bitrate and quality'
+  ]
+}
+```
+
+**2. Protocols & Transport**
+
+```typescript
+{
+  title: 'Live Streaming Basics',
+  difficulty: 'beginner',
+  estimatedDuration: '20h',
+  milestones: [
+    'Understanding streaming protocols (HLS, DASH)',
+    'Setting up a basic streaming server',
+    'Implementing adaptive bitrate streaming',
+    'Testing and monitoring streams'
+  ],
+  prerequisites: ['Basic networking knowledge', 'Web development basics']
+}
+```
+
+**3. Players & Clients**
+
+```typescript
+{
+  title: 'Web Video Player Development',
+  difficulty: 'intermediate',
+  estimatedDuration: '25h',
+  milestones: [
+    'HTML5 video fundamentals',
+    'Building custom player controls',
+    'Implementing advanced features',
+    'Cross-browser compatibility'
+  ],
+  prerequisites: ['HTML/CSS/JavaScript', 'Basic web development']
+}
+```
+
+#### Generic Template Fallback
+
+When no category-specific template exists, the generator creates a generic template:
+
+```typescript
+{
+  title: `${category} ${skillLevel} Path`,
+  description: `A comprehensive learning journey for ${category}`,
+  estimatedDuration: {
+    beginner: '15h',
+    intermediate: '20h',
+    advanced: '30h'
+  },
+  milestones: [
+    'Foundation and core concepts',
+    'Practical implementation',
+    'Advanced techniques',
+    'Real-world projects'
+  ]
+}
+```
+
+### AI-Powered Path Generation
+
+The generator leverages Claude AI to create personalized paths when available (requires `claudeService.isAvailable()` and minimum 5 resources).
+
+#### Generation Flow
+
+```mermaid
+sequenceDiagram
+    participant API as API/Recommendation
+    participant LPG as LearningPathGenerator
+    participant Storage as Storage Layer
+    participant Claude as ClaudeService
+    participant Cache as AI Cache
+
+    API->>LPG: generateLearningPath(userProfile, category)
+    LPG->>Storage: listResources(category)
+    Storage-->>LPG: resources[]
+
+    alt AI Available & Resources > 5
+        LPG->>Claude: generateAIPath(profile, resources)
+        Claude->>Cache: Check cache
+
+        alt Cache Hit
+            Cache-->>Claude: Cached path
+        else Cache Miss
+            Claude->>Claude: Build prompt
+            Claude->>Claude: Call Anthropic API
+            Claude->>Cache: Store result
+        end
+
+        Claude-->>LPG: Generated path data
+        LPG->>LPG: Parse & structure
+        LPG-->>API: GeneratedLearningPath (AI, score=90)
+    else AI Unavailable or Few Resources
+        LPG->>LPG: generateTemplateBasedPath()
+        LPG->>LPG: Match template by category/difficulty
+        LPG->>LPG: Select resources
+        LPG-->>API: GeneratedLearningPath (template, score=75)
+    end
+```
+
+#### AI Prompt Structure
+
+The AI generation uses a structured prompt with user context and resource information:
+
+```typescript
+const prompt = `Create a personalized learning path for video development.
+
+User Profile:
+- Skill Level: ${userProfile.skillLevel}
+- Category: ${category}
+- Goals: ${goals.join(', ')}
+- Time Commitment: ${userProfile.timeCommitment}
+
+Available Resources (${resources.length} total):
+${resources.slice(0, 30).map(r =>
+  `- ${r.title}: ${r.description?.slice(0, 100)}`
+).join('\n')}
+
+Create a structured learning path with:
+1. 3-5 milestones with clear progression
+2. Select 4-8 resources that build on each other
+3. Realistic time estimates
+4. Clear prerequisites and objectives
+
+Response format (JSON):
+{
+  "title": "Path title",
+  "description": "What this path covers",
+  "difficulty": "${userProfile.skillLevel}",
+  "estimatedDuration": "20h",
+  "milestones": [
+    {
+      "title": "Milestone 1",
+      "description": "What you'll learn",
+      "estimatedHours": 5,
+      "resourceCount": 2
+    }
+  ],
+  "prerequisites": ["Required knowledge"],
+  "learningObjectives": ["What you'll achieve"],
+  "selectedResourceIndices": [0, 2, 5, 8]
+}`;
+```
+
+**Prompt Components**:
+1. **User Context**: Skill level, category, learning goals, time commitment
+2. **Resource Library**: First 30 resources with title and description preview
+3. **Requirements**: Specific constraints (3-5 milestones, 4-8 resources)
+4. **Format Specification**: Structured JSON response schema
+
+**Response Processing**:
+- Parse JSON response from Claude
+- Map `selectedResourceIndices` to actual Resource objects
+- Create PathMilestone objects from milestone data
+- Distribute resources across milestones (2 resources per milestone)
+- Set `generationType: 'ai'` and `matchScore: 90`
+
+### Template-Based Fallback
+
+When AI generation is unavailable or fails, the system falls back to template-based generation.
+
+#### Template Matching Logic
+
+```mermaid
+graph TD
+    Start[Template-Based Generation] --> GetTemplates[Get templates for category]
+    GetTemplates --> MatchDifficulty{Match by difficulty?}
+
+    MatchDifficulty -->|Found| UseTemplate[Use matched template]
+    MatchDifficulty -->|Not found| CheckFirst{First template exists?}
+
+    CheckFirst -->|Yes| UseFirst[Use first template]
+    CheckFirst -->|No| CreateGeneric[Create generic template]
+
+    UseTemplate --> SelectResources[Select resources by algorithm]
+    UseFirst --> SelectResources
+    CreateGeneric --> SelectResources
+
+    SelectResources --> CreateMilestones[Create milestone objects]
+    CreateMilestones --> Return[Return GeneratedLearningPath]
+```
+
+**Matching Rules**:
+1. **Primary Match**: Template with matching category AND difficulty
+2. **Fallback Match**: First template in category (any difficulty)
+3. **Generic Creation**: Dynamic template if no category templates exist
+
+**Template-Based Path Construction**:
+
+```typescript
+// 1. Find matching template
+const template = templates.find(t => t.difficulty === userProfile.skillLevel)
+  || templates[0]
+  || createGenericTemplate(category, skillLevel);
+
+// 2. Select resources
+const selectedResources = selectResourcesForPath(
+  resources,
+  skillLevel,
+  template.milestones.length * 2  // 2 resources per milestone
+);
+
+// 3. Create milestones
+const milestones = template.milestones.map((milestone, index) => ({
+  id: `milestone_${index + 1}`,
+  title: milestone,
+  description: `Complete this milestone to progress in your ${category} journey`,
+  resourceIds: selectedResources
+    .slice(index * 2, (index + 1) * 2)  // 2 resources per milestone
+    .map(r => r.url),
+  estimatedHours: parseInt(template.estimatedDuration) / template.milestones.length,
+  order: index + 1
+}));
+
+// 4. Return path with matchScore: 75
+```
+
+### Resource Selection Algorithm
+
+The generator uses a sophisticated scoring algorithm to select appropriate resources based on skill level and content diversity.
+
+#### Selection Flow
+
+```mermaid
+graph TD
+    Start[Resource Selection] --> Score[Score each resource]
+    Score --> SkillScore[Apply skill level scoring]
+    Score --> DiversityScore[Apply diversity scoring]
+
+    SkillScore --> Sort[Sort by total score]
+    DiversityScore --> Sort
+
+    Sort --> SelectDiverse[Select with subcategory diversity]
+    SelectDiverse --> CheckCount{Enough resources?}
+
+    CheckCount -->|Yes| Return[Return selected resources]
+    CheckCount -->|No| FillRemaining[Fill from remaining scored resources]
+    FillRemaining --> Return
+```
+
+#### Skill Level Scoring
+
+Resources are scored based on how well their content matches the user's skill level:
+
+```typescript
+const scoredResources = resources.map(resource => {
+  const text = `${resource.title} ${resource.description}`.toLowerCase();
+  let score = 0;
+
+  // Beginner scoring
+  if (skillLevel === 'beginner') {
+    if (text.includes('intro') ||
+        text.includes('basic') ||
+        text.includes('getting started')) {
+      score += 3;  // Strong match
+    }
+    if (text.includes('advanced') || text.includes('expert')) {
+      score -= 2;  // Penalize advanced content
+    }
+  }
+
+  // Intermediate scoring
+  if (skillLevel === 'intermediate') {
+    if (text.includes('guide') ||
+        text.includes('practical') ||
+        text.includes('hands-on')) {
+      score += 2;  // Practical content
+    }
+  }
+
+  // Advanced scoring
+  if (skillLevel === 'advanced') {
+    if (text.includes('advanced') ||
+        text.includes('optimization') ||
+        text.includes('architecture')) {
+      score += 3;  // Deep technical content
+    }
+    if (text.includes('beginner') || text.includes('intro')) {
+      score -= 2;  // Penalize beginner content
+    }
+  }
+
+  return { resource, score };
+});
+```
+
+**Scoring Weights**:
+- **Beginner**: +3 (intro/basic/getting started), -2 (advanced/expert)
+- **Intermediate**: +2 (guide/practical/hands-on)
+- **Advanced**: +3 (advanced/optimization/architecture), -2 (beginner/intro)
+
+#### Diversity Scoring
+
+Additional points promote variety in resource types:
+
+```typescript
+// Content type diversity
+if (text.includes('tutorial')) score += 1;      // Hands-on learning
+if (text.includes('documentation')) score += 1; // Reference material
+if (text.includes('example') || text.includes('demo')) score += 1; // Practical examples
+```
+
+#### Subcategory Diversity Selection
+
+After scoring, the algorithm prioritizes diverse subcategories:
+
+```typescript
+const selected: Resource[] = [];
+const usedSubcategories = new Set<string>();
+
+for (const { resource } of scoredResources) {
+  // Skip if subcategory already used (diversity)
+  if (resource.subcategory && usedSubcategories.has(resource.subcategory)) {
+    continue;
+  }
+
+  selected.push(resource);
+  if (resource.subcategory) {
+    usedSubcategories.add(resource.subcategory);
+  }
+
+  if (selected.length >= targetCount) break;
+}
+
+// Fill remaining slots with highest-scored resources
+if (selected.length < targetCount) {
+  for (const { resource } of scoredResources) {
+    if (!selected.includes(resource)) {
+      selected.push(resource);
+      if (selected.length >= targetCount) break;
+    }
+  }
+}
+```
+
+**Selection Strategy**:
+1. Sort all resources by total score (descending)
+2. Iterate through sorted list
+3. Skip resources from already-used subcategories
+4. Add resource and mark subcategory as used
+5. Continue until target count reached
+6. Fill any remaining slots with highest-scored resources (ignore diversity)
+
+### Milestone Creation Logic
+
+Milestones structure the learning path into manageable phases with associated resources.
+
+#### AI-Generated Milestones
+
+Created from Claude's structured response:
+
+```typescript
+const milestones: PathMilestone[] = pathData.milestones?.map((m: any, index: number) => ({
+  id: `milestone_${index + 1}`,
+  title: m.title,                        // From Claude response
+  description: m.description,            // From Claude response
+  resourceIds: selectedResources
+    .slice(index * 2, (index + 1) * 2)  // 2 resources per milestone
+    .map(r => r.url),
+  estimatedHours: m.estimatedHours || 5, // From Claude or default
+  order: index + 1
+})) || [];
+```
+
+**AI Milestone Features**:
+- Title and description from Claude's analysis
+- Estimated hours based on AI assessment
+- Resource distribution: 2 resources per milestone (evenly sliced)
+- Sequential ordering
+
+#### Template-Based Milestones
+
+Created from template milestone strings:
+
+```typescript
+const milestones: PathMilestone[] = template.milestones.map((milestone, index) => ({
+  id: `milestone_${index + 1}`,
+  title: milestone,                      // Template string
+  description: `Complete this milestone to progress in your ${category} journey`,
+  resourceIds: selectedResources
+    .slice(index * 2, (index + 1) * 2)  // 2 resources per milestone
+    .map(r => r.url),
+  estimatedHours: parseInt(template.estimatedDuration) / template.milestones.length,
+  order: index + 1
+}));
+```
+
+**Template Milestone Features**:
+- Title from predefined template
+- Generic description with category context
+- Even time distribution: total duration / number of milestones
+- Resource distribution: 2 resources per milestone
+
+**Resource Distribution Example**:
+```
+Selected Resources: [R1, R2, R3, R4, R5, R6, R7, R8]
+Milestones: 4
+
+Milestone 1: [R1, R2] (slice 0*2 to 1*2)
+Milestone 2: [R3, R4] (slice 1*2 to 2*2)
+Milestone 3: [R5, R6] (slice 2*2 to 3*2)
+Milestone 4: [R7, R8] (slice 3*2 to 4*2)
+```
+
+### Path Matching and Scoring
+
+Generated paths include a `matchScore` indicating quality and personalization level.
+
+#### Scoring System
+
+| Generation Type | Match Score | Rationale |
+|----------------|-------------|-----------|
+| `ai` | 90 | Highly personalized, considers user profile and goals |
+| `template` | 75 | Curated but generic, matches skill level |
+| `rule-based` | 60-85 | Algorithm-based, varies by match quality |
+
+**AI Path Score (90)**:
+- Personalized to user goals and skill level
+- Resource selection optimized by Claude
+- Custom milestone structure
+- Highest confidence in relevance
+
+**Template Path Score (75)**:
+- Predefined structure proven effective
+- Matches skill level
+- Generic content not tailored to specific goals
+- Reliable but less personalized
+
+#### Match Quality Factors
+
+The score reflects multiple quality dimensions:
+
+```typescript
+// AI generation quality
+{
+  generationType: 'ai',
+  matchScore: 90,  // Factors:
+  // - User profile alignment: 20 points
+  // - Goal relevance: 25 points
+  // - Resource quality: 25 points
+  // - Milestone structure: 20 points
+}
+
+// Template generation quality
+{
+  generationType: 'template',
+  matchScore: 75,  // Factors:
+  // - Skill level match: 30 points
+  // - Category relevance: 25 points
+  // - Template quality: 20 points
+}
+```
+
+### Persistence and Retrieval
+
+Learning paths can be saved to the database for tracking and progress monitoring.
+
+#### Saving Paths
+
+```typescript
+// Convert GeneratedLearningPath to database LearningJourney
+const journey = await learningPathGenerator.saveLearningPath(path, userId);
+
+// Creates:
+// 1. LearningJourney record (title, description, difficulty, duration)
+// 2. JourneyStep records (one per resource in each milestone)
+```
+
+**Database Schema Mapping**:
+
+```typescript
+// LearningJourney (main record)
+{
+  title: path.title,
+  description: path.description,
+  difficulty: path.difficulty,
+  estimatedDuration: path.estimatedDuration,
+  category: path.category,
+  status: 'published'
+}
+
+// JourneyStep (one per resource)
+{
+  journeyId: journey.id,
+  resourceId: resource.id,
+  stepNumber: sequentialNumber,
+  title: milestone.title,
+  description: milestone.description,
+  isOptional: false
+}
+```
+
+#### Suggested Paths
+
+Generate multiple paths for user discovery:
+
+```typescript
+const suggestions = await learningPathGenerator.getSuggestedPaths(userProfile, 5);
+
+// Returns:
+// - Paths for user's preferred categories (up to limit)
+// - Popular categories if needed to reach limit
+// - Each path generated with user's skill level
+```
+
+**Suggestion Strategy**:
+1. Generate paths for user's `preferredCategories`
+2. Fill remaining slots with popular categories:
+   - 'Encoding & Codecs'
+   - 'Protocols & Transport'
+   - 'Players & Clients'
+3. Respect `limit` parameter (default: 5)
+4. Skip generation on error, continue with remaining categories
+
+### Usage Examples
+
+#### Generate Personalized Path
+
+```typescript
+import { learningPathGenerator } from './server/ai/learningPathGenerator';
+
+const userProfile = {
+  skillLevel: 'intermediate',
+  preferredCategories: ['Encoding & Codecs'],
+  learningGoals: ['Master FFmpeg', 'Optimize video quality'],
+  timeCommitment: '10h/week'
+};
+
+const path = await learningPathGenerator.generateLearningPath(
+  userProfile,
+  'Encoding & Codecs',
+  ['Learn advanced encoding techniques']
+);
+
+console.log(path.title);              // "Advanced Video Encoding"
+console.log(path.generationType);     // "ai" or "template"
+console.log(path.matchScore);         // 90 or 75
+console.log(path.milestones.length);  // 3-5 milestones
+console.log(path.resources.length);   // 4-8 resources
+```
+
+#### Save Path to Database
+
+```typescript
+// Generate and save in one flow
+const path = await learningPathGenerator.generateLearningPath(userProfile);
+const journey = await learningPathGenerator.saveLearningPath(path, userId);
+
+// Access saved journey
+console.log(journey.id);              // Database ID
+console.log(journey.status);          // "published"
+
+// Journey steps created automatically
+const steps = await storage.getJourneySteps(journey.id);
+console.log(steps.length);            // Number of resources across all milestones
+```
+
+#### Get Multiple Suggestions
+
+```typescript
+// Get 5 suggested paths for user
+const paths = await learningPathGenerator.getSuggestedPaths(userProfile, 5);
+
+paths.forEach(path => {
+  console.log(`${path.title} (${path.difficulty})`);
+  console.log(`  Category: ${path.category}`);
+  console.log(`  Duration: ${path.estimatedDuration}`);
+  console.log(`  Match: ${path.matchScore}%`);
+  console.log(`  Type: ${path.generationType}`);
+});
+```
+
+### Performance Considerations
+
+**Template Initialization**: Templates are loaded once during singleton initialization (low overhead).
+
+**AI Generation Caching**: Claude responses are cached by `claudeService` for 24 hours (analysis cache).
+
+**Resource Limits**:
+- Maximum 100 resources fetched per category
+- First 30 resources included in AI prompt (token limit)
+- Template-based generation works with any resource count
+
+**Fallback Latency**:
+```
+AI Generation:     2-5 seconds (Claude API call)
+Template-Based:    <100ms (in-memory processing)
+Cache Hit (AI):    <50ms (cache lookup)
+```
+
+**Optimization Tips**:
+1. Pre-generate paths for popular categories
+2. Cache generated paths by user profile hash
+3. Use template-based generation for time-sensitive requests
+4. Batch multiple path generations in parallel
+
+### Troubleshooting
+
+**Issue**: Path has no resources
+
+**Symptoms**: Empty `resources` array or `milestones` without `resourceIds`
+
+**Causes**:
+1. No approved resources in category
+2. Database not populated
+3. Awesome list data not loaded
+
+**Solutions**:
+1. Verify resources exist: `storage.listResources({ category })`
+2. Check awesome list data: `storage.getAwesomeListData()`
+3. Use different category with known resources
+
+---
+
+**Issue**: AI generation always fails
+
+**Symptoms**: All paths have `generationType: 'template'`
+
+**Causes**:
+1. Claude API unavailable
+2. Insufficient resources (< 5)
+3. Invalid user profile
+
+**Solutions**:
+1. Check `claudeService.isAvailable()`
+2. Verify resource count: `resources.length >= 5`
+3. Ensure user profile has `skillLevel` and `preferredCategories`
+
+---
+
+**Issue**: Template mismatch for skill level
+
+**Symptoms**: Beginner user gets advanced template
+
+**Causes**:
+1. No template for user's difficulty level
+2. Template matching logic falls back to first available
+
+**Solutions**:
+1. Add templates for all difficulty levels per category
+2. Verify template difficulty matches user skill level
+3. Use generic template creation for missing cases
+
+---
+
+**Issue**: Resources not relevant to milestones
+
+**Symptoms**: Generic resources don't match milestone topics
+
+**Causes**:
+1. Limited resource pool in category
+2. Resource selection algorithm needs tuning
+3. Template milestones don't match available resources
+
+**Solutions**:
+1. Increase resource count in category
+2. Adjust skill level scoring weights
+3. Use AI generation for better resource matching
+
+---
+
 ## Related Documentation
 
 - [ADMIN-GUIDE.md](./ADMIN-GUIDE.md) - Admin enrichment workflow
