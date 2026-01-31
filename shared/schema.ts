@@ -135,7 +135,7 @@ export const brokenLinkReports = pgTable(
   {
     id: serial("id").primaryKey(),
     resourceId: integer("resource_id").references(() => resources.id, { onDelete: "cascade" }).notNull(),
-    reportedBy: varchar("reported_by").references(() => users.id, { onDelete: "cascade" }).notNull(),
+    reportedBy: varchar("reported_by").references(() => users.id, { onDelete: "cascade" }),
     reportedAt: timestamp("reported_at").defaultNow().notNull(),
     status: text("status").$type<"pending" | "reviewed">().default("pending").notNull(),
     reviewedBy: varchar("reviewed_by").references(() => users.id),
@@ -154,6 +154,8 @@ export const insertBrokenLinkReportSchema = createInsertSchema(brokenLinkReports
   resourceId: true,
   reportedBy: true,
   status: true,
+}).extend({
+  reportedBy: z.string().nullable().optional(),
 });
 
 export type InsertBrokenLinkReport = z.infer<typeof insertBrokenLinkReportSchema>;

@@ -636,8 +636,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'Resource not found' });
       }
 
-      // Use authenticated user ID if available, otherwise use 'anonymous'
-      const reportedBy = req.user?.claims?.sub || 'anonymous';
+      // Use authenticated user ID if available, otherwise null for anonymous reports
+      const reportedBy = req.user?.claims?.sub || null;
 
       const report = await storage.createBrokenLinkReport({
         resourceId,
