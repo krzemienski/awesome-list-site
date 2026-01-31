@@ -129,6 +129,36 @@ export const insertResourceEditSchema = createInsertSchema(resourceEdits).pick({
 export type InsertResourceEdit = z.infer<typeof insertResourceEditSchema>;
 export type ResourceEdit = typeof resourceEdits.$inferSelect;
 
+// Broken Link Reports - User-submitted reports of broken links
+export const brokenLinkReports = pgTable(
+  "broken_link_reports",
+  {
+    id: serial("id").primaryKey(),
+    resourceId: integer("resource_id").references(() => resources.id, { onDelete: "cascade" }).notNull(),
+    reportedBy: varchar("reported_by").references(() => users.id, { onDelete: "cascade" }).notNull(),
+    reportedAt: timestamp("reported_at").defaultNow().notNull(),
+    status: text("status").$type<"pending" | "reviewed">().default("pending").notNull(),
+    reviewedBy: varchar("reviewed_by").references(() => users.id),
+    reviewedAt: timestamp("reviewed_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_broken_link_reports_resource_id").on(table.resourceId),
+    index("idx_broken_link_reports_status").on(table.status),
+    index("idx_broken_link_reports_reported_by").on(table.reportedBy),
+  ]
+);
+
+export const insertBrokenLinkReportSchema = createInsertSchema(brokenLinkReports).pick({
+  resourceId: true,
+  reportedBy: true,
+  status: true,
+});
+
+export type InsertBrokenLinkReport = z.infer<typeof insertBrokenLinkReportSchema>;
+export type BrokenLinkReport = typeof brokenLinkReports.$inferSelect;
+
 // Category schema
 export const categories = pgTable("categories", {
   id: serial("id").primaryKey(),
