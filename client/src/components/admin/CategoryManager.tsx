@@ -64,7 +64,7 @@ export default function CategoryManager() {
       setCreateDialogOpen(false);
       setFormData({ name: "", slug: "" });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "Error",
         description: error.message || "Failed to create category",
@@ -92,7 +92,7 @@ export default function CategoryManager() {
       setSelectedCategory(null);
       setFormData({ name: "", slug: "" });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "Error",
         description: error.message || "Failed to update category",
@@ -118,7 +118,7 @@ export default function CategoryManager() {
       setDeleteDialogOpen(false);
       setSelectedCategory(null);
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "Error",
         description: error.message || "Failed to delete category",

@@ -86,7 +86,7 @@ export default function SubcategoryManager() {
       setCreateDialogOpen(false);
       setFormData({ name: "", slug: "", categoryId: "" });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "Error",
         description: error.message || "Failed to create subcategory",
@@ -114,7 +114,7 @@ export default function SubcategoryManager() {
       setSelectedSubcategory(null);
       setFormData({ name: "", slug: "", categoryId: "" });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "Error",
         description: error.message || "Failed to update subcategory",
@@ -140,7 +140,7 @@ export default function SubcategoryManager() {
       setDeleteDialogOpen(false);
       setSelectedSubcategory(null);
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "Error",
         description: error.message || "Failed to delete subcategory",
