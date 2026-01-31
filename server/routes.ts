@@ -29,7 +29,7 @@
  * ============================================================================
  */
 
-import type { Express, Request, Response } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
@@ -54,7 +54,7 @@ import { enrichmentService } from "./ai/enrichmentService";
 const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md";
 
 // Middleware to check if user is admin
-const isAdmin = async (req: any, res: Response, next: any) => {
+const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = req.user?.claims?.sub;
     if (!userId) {
@@ -73,7 +73,7 @@ const isAdmin = async (req: any, res: Response, next: any) => {
 };
 
 // SEO route handlers - now uses database-driven data
-async function generateSitemap(req: any, res: any) {
+async function generateSitemap(req: Request, res: Response) {
   try {
     const awesomeListData = await storage.getAwesomeListFromDatabase();
     
@@ -143,7 +143,7 @@ async function generateSitemap(req: any, res: any) {
   }
 }
 
-async function generateOpenGraphImage(req: any, res: any) {
+async function generateOpenGraphImage(req: Request, res: Response) {
   try {
     const { title, category, resourceCount } = req.query;
     
@@ -357,7 +357,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= Auth Routes (from Replit Auth blueprint) =============
   
   // GET /api/auth/user - Get current user (public endpoint)
-  app.get('/api/auth/user', async (req: any, res) => {
+  app.get('/api/auth/user', async (req: Request, res) => {
     try {
       console.log('[/api/auth/user] Request received');
       console.log('[/api/auth/user] isAuthenticated:', req.isAuthenticated?.());
@@ -410,7 +410,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/auth/logout - Logout user
-  app.post('/api/auth/logout', async (req: any, res) => {
+  app.post('/api/auth/logout', async (req: Request, res) => {
     try {
       req.logout(() => {
         res.json({ success: true });
@@ -468,7 +468,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/resources - Submit new resource (authenticated)
-  app.post('/api/resources', isAuthenticated, async (req: any, res) => {
+  app.post('/api/resources', isAuthenticated, async (req: Request, res) => {
     try {
       const userId = req.user.claims.sub;
       const resourceData = insertResourceSchema.parse(req.body);
@@ -509,7 +509,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // PUT /api/resources/:id/approve - Approve resource (admin)
-  app.put('/api/resources/:id/approve', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.put('/api/resources/:id/approve', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const id = parseInt(req.params.id);
       const userId = req.user.claims.sub;
@@ -523,7 +523,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // PUT /api/resources/:id/reject - Reject resource (admin)
-  app.put('/api/resources/:id/reject', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.put('/api/resources/:id/reject', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const id = parseInt(req.params.id);
       const userId = req.user.claims.sub;
@@ -537,7 +537,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/resources/:id/edits - Submit edit suggestion for a resource (authenticated)
-  app.post('/api/resources/:id/edits', isAuthenticated, async (req: any, res) => {
+  app.post('/api/resources/:id/edits', isAuthenticated, async (req: Request, res) => {
     try {
       const userId = req.user.claims.sub;
       const resourceId = parseInt(req.params.id);
@@ -703,7 +703,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= User Interaction Routes =============
   
   // POST /api/favorites/:resourceId - Add favorite
-  app.post('/api/favorites/:resourceId', isAuthenticated, async (req: any, res) => {
+  app.post('/api/favorites/:resourceId', isAuthenticated, async (req: Request, res) => {
     try {
       const userId = req.user.claims.sub;
       const resourceId = parseInt(req.params.resourceId);
@@ -717,7 +717,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // DELETE /api/favorites/:resourceId - Remove favorite
-  app.delete('/api/favorites/:resourceId', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/favorites/:resourceId', isAuthenticated, async (req: Request, res) => {
     try {
       const userId = req.user.claims.sub;
       const resourceId = parseInt(req.params.resourceId);
@@ -731,7 +731,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // GET /api/favorites - Get user's favorites
-  app.get('/api/favorites', isAuthenticated, async (req: any, res) => {
+  app.get('/api/favorites', isAuthenticated, async (req: Request, res) => {
     try {
       const userId = req.user.claims.sub;
       const favorites = await storage.getUserFavorites(userId);
@@ -743,7 +743,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/bookmarks/:resourceId - Add bookmark
-  app.post('/api/bookmarks/:resourceId', isAuthenticated, async (req: any, res) => {
+  app.post('/api/bookmarks/:resourceId', isAuthenticated, async (req: Request, res) => {
     try {
       const userId = req.user.claims.sub;
       const resourceId = parseInt(req.params.resourceId);
@@ -758,7 +758,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // DELETE /api/bookmarks/:resourceId - Remove bookmark
-  app.delete('/api/bookmarks/:resourceId', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/bookmarks/:resourceId', isAuthenticated, async (req: Request, res) => {
     try {
       const userId = req.user.claims.sub;
       const resourceId = parseInt(req.params.resourceId);
@@ -772,7 +772,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // GET /api/bookmarks - Get user's bookmarks
-  app.get('/api/bookmarks', isAuthenticated, async (req: any, res) => {
+  app.get('/api/bookmarks', isAuthenticated, async (req: Request, res) => {
     try {
       const userId = req.user.claims.sub;
       const bookmarks = await storage.getUserBookmarks(userId);
@@ -786,7 +786,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= User Profile & Progress Routes =============
 
   // GET /api/user/progress - Get user's learning progress
-  app.get('/api/user/progress', isAuthenticated, async (req: any, res) => {
+  app.get('/api/user/progress', isAuthenticated, async (req: Request, res) => {
     try {
       const userId = req.user.claims.sub;
 
@@ -885,7 +885,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // GET /api/user/submissions - Get user's submitted resources and edits
-  app.get('/api/user/submissions', isAuthenticated, async (req: any, res) => {
+  app.get('/api/user/submissions', isAuthenticated, async (req: Request, res) => {
     try {
       const userId = req.user.claims.sub;
 
@@ -912,7 +912,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // GET /api/user/journeys - Get user's learning journeys with details
-  app.get('/api/user/journeys', isAuthenticated, async (req: any, res) => {
+  app.get('/api/user/journeys', isAuthenticated, async (req: Request, res) => {
     try {
       const userId = req.user.claims.sub;
 
@@ -940,7 +940,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= Learning Journey Routes =============
   
   // GET /api/journeys - List all journeys
-  app.get('/api/journeys', async (req: any, res) => {
+  app.get('/api/journeys', async (req: Request, res) => {
     try {
       const category = req.query.category as string;
       const journeys = await storage.listLearningJourneys(category);
@@ -1015,7 +1015,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // GET /api/journeys/:id - Get journey details
-  app.get('/api/journeys/:id', async (req: any, res) => {
+  app.get('/api/journeys/:id', async (req: Request, res) => {
     try {
       const id = parseInt(req.params.id);
       const journey = await storage.getLearningJourney(id);
@@ -1057,7 +1057,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/journeys/:id/start - Start journey
-  app.post('/api/journeys/:id/start', isAuthenticated, async (req: any, res) => {
+  app.post('/api/journeys/:id/start', isAuthenticated, async (req: Request, res) => {
     try {
       const userId = req.user.claims.sub;
       const journeyId = parseInt(req.params.id);
@@ -1071,7 +1071,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // PUT /api/journeys/:id/progress - Update progress
-  app.put('/api/journeys/:id/progress', isAuthenticated, async (req: any, res) => {
+  app.put('/api/journeys/:id/progress', isAuthenticated, async (req: Request, res) => {
     try {
       const userId = req.user.claims.sub;
       const journeyId = parseInt(req.params.id);
@@ -1090,7 +1090,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // GET /api/journeys/:id/progress - Get user's progress
-  app.get('/api/journeys/:id/progress', isAuthenticated, async (req: any, res) => {
+  app.get('/api/journeys/:id/progress', isAuthenticated, async (req: Request, res) => {
     try {
       const userId = req.user.claims.sub;
       const journeyId = parseInt(req.params.id);
@@ -1142,7 +1142,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // PUT /api/admin/users/:id/role - Change user role
-  app.put('/api/admin/users/:id/role', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.put('/api/admin/users/:id/role', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const userId = req.params.id;
       const { role } = req.body;
@@ -1174,7 +1174,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/admin/resources/:id/approve - Approve a pending resource
-  app.post('/api/admin/resources/:id/approve', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/resources/:id/approve', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const resourceId = parseInt(req.params.id);
       const userId = req.user.claims.sub;
@@ -1193,7 +1193,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/admin/resources/:id/reject - Reject a pending resource
-  app.post('/api/admin/resources/:id/reject', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/resources/:id/reject', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const resourceId = parseInt(req.params.id);
       const userId = req.user.claims.sub;
@@ -1218,7 +1218,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // PUT /api/admin/resources/:id - Update a resource (admin only)
-  app.put('/api/admin/resources/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.put('/api/admin/resources/:id', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const resourceId = parseInt(req.params.id);
       const userId = req.user.claims.sub;
@@ -1271,7 +1271,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // DELETE /api/admin/resources/:id - Delete a resource (admin only)
-  app.delete('/api/admin/resources/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.delete('/api/admin/resources/:id', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const resourceId = parseInt(req.params.id);
       const userId = req.user.claims.sub;
@@ -1335,7 +1335,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // POST /api/admin/resources - Create a new resource (admin only)
-  app.post('/api/admin/resources', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/resources', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const userId = req.user.claims.sub;
       
@@ -1406,7 +1406,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/admin/resource-edits/:id/approve - Approve an edit (admin only)
-  app.post('/api/admin/resource-edits/:id/approve', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/resource-edits/:id/approve', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const editId = parseInt(req.params.id);
       const userId = req.user.claims.sub;
@@ -1433,7 +1433,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/admin/resource-edits/:id/reject - Reject an edit (admin only)
-  app.post('/api/admin/resource-edits/:id/reject', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/resource-edits/:id/reject', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const editId = parseInt(req.params.id);
       const userId = req.user.claims.sub;
@@ -1507,7 +1507,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/admin/categories - Create a new category
-  app.post('/api/admin/categories', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/categories', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const { insertCategorySchema } = await import('@shared/schema');
       
@@ -1543,7 +1543,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // PATCH /api/admin/categories/:id - Update a category
-  app.patch('/api/admin/categories/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.patch('/api/admin/categories/:id', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const categoryId = parseInt(req.params.id);
       
@@ -1585,7 +1585,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // DELETE /api/admin/categories/:id - Delete a category
-  app.delete('/api/admin/categories/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.delete('/api/admin/categories/:id', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const categoryId = parseInt(req.params.id);
       
@@ -1646,7 +1646,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/admin/subcategories - Create a new subcategory
-  app.post('/api/admin/subcategories', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/subcategories', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const { insertSubcategorySchema } = await import('@shared/schema');
       
@@ -1692,7 +1692,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // PATCH /api/admin/subcategories/:id - Update a subcategory
-  app.patch('/api/admin/subcategories/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.patch('/api/admin/subcategories/:id', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const subcategoryId = parseInt(req.params.id);
       
@@ -1741,7 +1741,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // DELETE /api/admin/subcategories/:id - Delete a subcategory
-  app.delete('/api/admin/subcategories/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.delete('/api/admin/subcategories/:id', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const subcategoryId = parseInt(req.params.id);
       
@@ -1802,7 +1802,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/admin/sub-subcategories - Create a new sub-subcategory
-  app.post('/api/admin/sub-subcategories', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/sub-subcategories', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const { insertSubSubcategorySchema } = await import('@shared/schema');
       
@@ -1848,7 +1848,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // PATCH /api/admin/sub-subcategories/:id - Update a sub-subcategory
-  app.patch('/api/admin/sub-subcategories/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.patch('/api/admin/sub-subcategories/:id', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const subSubcategoryId = parseInt(req.params.id);
       
@@ -1897,7 +1897,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // DELETE /api/admin/sub-subcategories/:id - Delete a sub-subcategory
-  app.delete('/api/admin/sub-subcategories/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.delete('/api/admin/sub-subcategories/:id', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const subSubcategoryId = parseInt(req.params.id);
       
@@ -1937,7 +1937,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= GitHub Sync Routes =============
   
   // POST /api/github/configure - Configure GitHub repository
-  app.post('/api/github/configure', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/github/configure', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const { repositoryUrl, token } = req.body;
       
@@ -1959,7 +1959,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/github/import - Import resources from GitHub awesome list
-  app.post('/api/github/import', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/github/import', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const { repositoryUrl, options = {} } = req.body;
       
@@ -1997,7 +1997,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/github/export - Export approved resources to GitHub
-  app.post('/api/github/export', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/github/export', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const { repositoryUrl, options = {} } = req.body;
       
@@ -2107,7 +2107,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= Awesome List Export & Validation Routes =============
 
   // POST /api/admin/export - Generate and download awesome list markdown
-  app.post('/api/admin/export', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/export', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       // Get all approved resources
       const resources = await storage.getAllApprovedResources();
@@ -2257,7 +2257,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // POST /api/admin/validate - Run awesome-lint validation on current data
-  app.post('/api/admin/validate', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/validate', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       // Get all approved resources
       const resources = await storage.getAllApprovedResources();
@@ -2311,7 +2311,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // POST /api/admin/check-links - Run link checker on all resources
-  app.post('/api/admin/check-links', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/check-links', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       // Get all approved resources
       const resources = await storage.getAllApprovedResources();
@@ -2470,7 +2470,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= Enrichment API Routes =============
   
   // POST /api/enrichment/start - Start batch enrichment job
-  app.post('/api/enrichment/start', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/enrichment/start', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const { filter = 'unenriched', batchSize = 10 } = req.body;
       const userId = req.user?.claims?.sub;
