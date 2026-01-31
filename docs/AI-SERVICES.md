@@ -1205,6 +1205,59 @@ async cancelEnrichmentJob(jobId: number): Promise<void> {
 
 Each resource in an enrichment job has a corresponding queue item that tracks its individual processing state independently from the job-level status.
 
+#### Enrichment Queue Architecture
+
+```mermaid
+graph TB
+    subgraph Job["Enrichment Job"]
+        JobRecord["Job Record<br/>id, status, filter, batchSize"]
+        JobMetrics["Progress Metrics<br/>total, processed, successful, failed"]
+    end
+
+    subgraph Queue["Queue Items"]
+        QI1["Queue Item 1<br/>resourceId: 101<br/>status: completed"]
+        QI2["Queue Item 2<br/>resourceId: 102<br/>status: pending"]
+        QI3["Queue Item 3<br/>resourceId: 103<br/>status: failed"]
+        QI4["Queue Item N<br/>resourceId: N<br/>status: pending"]
+    end
+
+    subgraph Processing["Processing Flow"]
+        Fetch["Fetch Pending Items<br/>(batch size)"]
+        Enrich["Enrich Each Resource<br/>(AI + Scraper)"]
+        Update["Update Queue Item<br/>(status, result)"]
+    end
+
+    subgraph States["Queue Item States"]
+        Pending["pending<br/>(Waiting)"]
+        Completed["completed<br/>(Success)"]
+        Failed["failed<br/>(Error after retries)"]
+        Skipped["skipped<br/>(Invalid/Manual)"]
+    end
+
+    JobRecord --> QI1
+    JobRecord --> QI2
+    JobRecord --> QI3
+    JobRecord --> QI4
+
+    Fetch --> QI2
+    Fetch --> QI4
+    QI2 --> Enrich
+    QI4 --> Enrich
+    Enrich --> Update
+    Update --> JobMetrics
+
+    Pending -->|Success| Completed
+    Pending -->|Error| Failed
+    Pending -->|Skip| Skipped
+
+    style JobRecord fill:#e1f5ff
+    style Queue fill:#fff3cd
+    style Processing fill:#d4edda
+    style Completed fill:#d4edda
+    style Failed fill:#f8d7da
+    style Skipped fill:#ffeaa7
+```
+
 #### Queue Item States
 
 ```typescript
@@ -3286,6 +3339,75 @@ When no category-specific template exists, the generator creates a generic templ
   ]
 }
 ```
+
+### Path Generation Strategy
+
+The learning path generator uses a hybrid approach that prioritizes AI-powered generation when available, with robust fallback to template-based paths.
+
+#### Learning Path Generation Decision Tree
+
+```mermaid
+flowchart TD
+    Start[generateLearningPath<br/>userProfile, category] --> LoadResources[Load Resources<br/>from Storage]
+    LoadResources --> CheckResources{Resources<br/>Available?}
+
+    CheckResources -->|No resources| ReturnEmpty[Return Empty Path<br/>score: 0]
+    CheckResources -->|Yes| CheckCount{Resource<br/>Count ≥ 5?}
+
+    CheckCount -->|No <5 resources| TemplateOnly[Template-Based Only<br/>Insufficient data for AI]
+    CheckCount -->|Yes ≥5 resources| CheckAI{AI Service<br/>Available?}
+
+    CheckAI -->|No| TemplateFallback[Template-Based Fallback<br/>AI unavailable]
+    CheckAI -->|Yes| TryAI[Attempt AI Generation<br/>Call Claude API]
+
+    TryAI --> AISuccess{AI Call<br/>Successful?}
+
+    AISuccess -->|Yes| ParseAI[Parse AI Response<br/>Extract milestones & resources]
+    AISuccess -->|No| TemplateFallback
+
+    ParseAI --> ValidateAI{Response<br/>Valid JSON?}
+    ValidateAI -->|Yes| ReturnAI[Return AI Path<br/>generationType: 'ai'<br/>matchScore: 90]
+    ValidateAI -->|No| TemplateFallback
+
+    TemplateOnly --> GetTemplates[Get Category Templates]
+    TemplateFallback --> GetTemplates
+
+    GetTemplates --> MatchTemplate{Template<br/>Matches<br/>Difficulty?}
+
+    MatchTemplate -->|Yes| UseMatched[Use Matched Template]
+    MatchTemplate -->|No| CheckFirst{First<br/>Template<br/>Exists?}
+
+    CheckFirst -->|Yes| UseFirst[Use First Template]
+    CheckFirst -->|No| CreateGeneric[Create Generic Template]
+
+    UseMatched --> SelectResources[Select Resources<br/>By skill level]
+    UseFirst --> SelectResources
+    CreateGeneric --> SelectResources
+
+    SelectResources --> BuildMilestones[Build Milestone Objects<br/>2 resources per milestone]
+    BuildMilestones --> ReturnTemplate[Return Template Path<br/>generationType: 'template'<br/>matchScore: 75]
+
+    style Start fill:#e1f5ff
+    style CheckAI fill:#fff3cd
+    style TryAI fill:#d4edda
+    style ReturnAI fill:#d4edda
+    style ReturnTemplate fill:#ffeaa7
+    style TemplateFallback fill:#f8d7da
+```
+
+**Decision Points**:
+1. **Resource Availability**: Check if category has any resources
+2. **Minimum Resource Count**: AI generation requires ≥5 resources for meaningful paths
+3. **AI Service Availability**: Check if Claude API is initialized and accessible
+4. **AI Generation Success**: Attempt AI generation with error handling
+5. **Response Validation**: Verify AI response is valid JSON with required fields
+6. **Template Matching**: Find template matching user's skill level
+7. **Fallback Strategy**: Use first template or create generic if no match
+
+**Generation Types & Match Scores**:
+- **AI-Generated**: `matchScore: 90` - Highest quality, personalized to user profile
+- **Template-Based**: `matchScore: 75` - Good quality, follows proven patterns
+- **Empty Path**: `matchScore: 0` - No resources available for category
 
 ### AI-Powered Path Generation
 
