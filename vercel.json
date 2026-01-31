@@ -11,7 +11,7 @@
       "destination": "/api/[...path]"
     },
     {
-      "source": "/((?!api|assets).*)",
+      "source": "/((?!api|assets|.*\\.ico|.*\\.png|.*\\.svg|.*\\.webmanifest|.*\\.txt|.*\\.xml|.*\\.json).*)",
       "destination": "/index.html"
     }
   ]
