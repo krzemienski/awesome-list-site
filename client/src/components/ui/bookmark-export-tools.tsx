@@ -175,6 +175,17 @@ export default function BookmarkExportTools({ bookmarks, className }: BookmarkEx
     return content;
   };
 
+  // Helper function to escape HTML entities to prevent XSS
+  const escapeHtml = (text: string): string => {
+    if (!text) return '';
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  };
+
   const generateHTML = (bookmarks: BookmarkedResource[]): string => {
     let content = `<!DOCTYPE html>
 <html lang="en">
@@ -211,18 +222,18 @@ export default function BookmarkExportTools({ bookmarks, className }: BookmarkEx
       }, {} as Record<string, BookmarkedResource[]>);
 
       Object.entries(categorizedBookmarks).forEach(([category, categoryBookmarks]) => {
-        content += `<h2>${category}</h2>`;
+        content += `<h2>${escapeHtml(category)}</h2>`;
         categoryBookmarks.forEach(bookmark => {
           content += `<div class="bookmark">
-            <div class="bookmark-title"><a href="${bookmark.url}" target="_blank">${bookmark.name}</a></div>`;
+            <div class="bookmark-title"><a href="${escapeHtml(bookmark.url)}" target="_blank">${escapeHtml(bookmark.name)}</a></div>`;
           if (exportOptions.includeDescriptions && bookmark.description) {
-            content += `<div class="bookmark-description">${bookmark.description}</div>`;
+            content += `<div class="bookmark-description">${escapeHtml(bookmark.description)}</div>`;
           }
           if (exportOptions.includeTags && bookmark.tags?.length) {
-            content += `<div class="tags">${bookmark.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>`;
+            content += `<div class="tags">${bookmark.tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('')}</div>`;
           }
           if (exportOptions.includeNotes && bookmark.notes) {
-            content += `<div class="bookmark-notes"><strong>Notes:</strong> ${bookmark.notes}</div>`;
+            content += `<div class="bookmark-notes"><strong>Notes:</strong> ${escapeHtml(bookmark.notes)}</div>`;
           }
           content += `</div>`;
         });
@@ -230,18 +241,18 @@ export default function BookmarkExportTools({ bookmarks, className }: BookmarkEx
     } else {
       bookmarks.forEach(bookmark => {
         content += `<div class="bookmark">
-          <div class="bookmark-title"><a href="${bookmark.url}" target="_blank">${bookmark.name}</a></div>`;
+          <div class="bookmark-title"><a href="${escapeHtml(bookmark.url)}" target="_blank">${escapeHtml(bookmark.name)}</a></div>`;
         if (exportOptions.includeCategories && bookmark.category) {
-          content += `<div class="category">Category: ${bookmark.category}</div>`;
+          content += `<div class="category">Category: ${escapeHtml(bookmark.category)}</div>`;
         }
         if (exportOptions.includeDescriptions && bookmark.description) {
-          content += `<div class="bookmark-description">${bookmark.description}</div>`;
+          content += `<div class="bookmark-description">${escapeHtml(bookmark.description)}</div>`;
         }
         if (exportOptions.includeTags && bookmark.tags?.length) {
-          content += `<div class="tags">${bookmark.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>`;
+          content += `<div class="tags">${bookmark.tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('')}</div>`;
         }
         if (exportOptions.includeNotes && bookmark.notes) {
-          content += `<div class="bookmark-notes"><strong>Notes:</strong> ${bookmark.notes}</div>`;
+          content += `<div class="bookmark-notes"><strong>Notes:</strong> ${escapeHtml(bookmark.notes)}</div>`;
         }
         content += `</div>`;
       });
