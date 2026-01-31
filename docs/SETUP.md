@@ -597,6 +597,401 @@ npm run db:studio
 # View github_sync_queue table for operation history
 ```
 
+### AI Enrichment Issues
+
+#### Checking Job Status
+Monitor enrichment job progress via the Admin UI or API:
+
+**Via Admin UI:**
+1. Navigate to Admin → Enrichment
+2. View active jobs in the job list
+3. Check progress bar and statistics
+4. Click job ID for detailed status
+
+**Via API:**
+```bash
+# Get job status
+curl http://localhost:5000/api/admin/enrichment/jobs/:jobId/status
+
+# Response includes:
+# - status: pending, processing, completed, failed, cancelled
+# - totalResources: total number of resources to process
+# - processedResources: number processed so far
+# - successfulResources: successfully enriched count
+# - failedResources: failed enrichment count
+# - skippedResources: skipped (invalid URLs or manually curated)
+# - progress: percentage complete (0-100)
+# - estimatedTimeRemaining: "5m 30s" format
+# - errorMessage: error details if failed
+```
+
+**Via Database:**
+```bash
+npm run db:studio
+# View enrichment_jobs table for all jobs
+# View enrichment_queue table for individual resource status
+```
+
+**Interpreting job status:**
+- `pending` - Job queued but not started
+- `processing` - Actively enriching resources
+- `completed` - All resources processed
+- `failed` - Job encountered fatal error
+- `cancelled` - Manually stopped by user
+
+#### Canceling Stuck Jobs
+If an enrichment job hangs or needs to be stopped:
+
+**Via Admin UI:**
+1. Navigate to Admin → Enrichment
+2. Find the running job
+3. Click "Cancel Job" button
+4. Job status changes to "cancelled"
+5. In-progress batch completes, remaining items skipped
+
+**Via API:**
+```bash
+# Cancel a job
+curl -X POST http://localhost:5000/api/admin/enrichment/jobs/:jobId/cancel
+```
+
+**Via Database (emergency):**
+```bash
+npm run db:studio
+# In enrichment_jobs table, set status = 'cancelled' for stuck job
+```
+
+**Common causes of stuck jobs:**
+1. **API rate limits** - Claude API throttling requests
+   - Wait 60 seconds and job should resume
+   - Check API key quota at console.anthropic.com
+
+2. **Network timeouts** - URL scraping taking too long
+   - Individual resources timeout after 30 seconds
+   - Job continues with next resource
+   - Check failed resources in job details
+
+3. **Server restart** - Process interrupted
+   - Jobs resume automatically on next startup if status is 'processing'
+   - Or manually restart job after server is back
+
+**Force restart a job:**
+```bash
+# 1. Cancel the stuck job
+curl -X POST http://localhost:5000/api/admin/enrichment/jobs/:jobId/cancel
+
+# 2. Start a new job with same parameters
+# Via Admin UI: Admin → Enrichment → Start Enrichment
+```
+
+#### Claude API Key Validation
+Ensure your Anthropic API key is properly configured:
+
+**Check if API key is set:**
+```bash
+# Verify environment variable
+echo $AI_INTEGRATIONS_ANTHROPIC_API_KEY
+
+# Should output: sk-ant-api03-...
+# If empty, key is not configured
+```
+
+**Set API key:**
+```bash
+# Option 1: Add to .env file (local development)
+echo "AI_INTEGRATIONS_ANTHROPIC_API_KEY=sk-ant-api03-your-key-here" >> .env
+
+# Option 2: Set in Replit Secrets (Replit deployment)
+# Go to Tools → Secrets → Add new secret
+# Key: AI_INTEGRATIONS_ANTHROPIC_API_KEY
+# Value: sk-ant-api03-your-key-here
+
+# Option 3: Export in shell (temporary)
+export AI_INTEGRATIONS_ANTHROPIC_API_KEY=sk-ant-api03-your-key-here
+```
+
+**Obtain an API key:**
+1. Visit https://console.anthropic.com/
+2. Sign up or log in
+3. Navigate to API Keys section
+4. Click "Create Key"
+5. Copy key (starts with `sk-ant-api03-`)
+6. Set in environment as shown above
+
+**Test API key validity:**
+```bash
+# Make a test request to Claude API
+curl https://api.anthropic.com/v1/messages \
+  -H "x-api-key: $AI_INTEGRATIONS_ANTHROPIC_API_KEY" \
+  -H "anthropic-version: 2023-06-01" \
+  -H "content-type: application/json" \
+  -d '{
+    "model": "claude-haiku-4-5",
+    "max_tokens": 10,
+    "messages": [{"role": "user", "content": "test"}]
+  }'
+
+# Success: Returns JSON with message content
+# Failure responses:
+# - 401 Unauthorized: Invalid API key
+# - 403 Forbidden: Key lacks permissions
+# - 429 Rate Limited: Too many requests or quota exceeded
+```
+
+**Common API key errors:**
+
+**Error: "API key not configured"**
+```bash
+# Symptom: Enrichment fails immediately with configuration error
+# Solution: Set AI_INTEGRATIONS_ANTHROPIC_API_KEY environment variable
+# Restart server after setting: npm run dev
+```
+
+**Error: "401 Unauthorized"**
+```bash
+# Symptom: API requests fail with authentication error
+# Causes:
+# 1. Invalid or expired API key
+# 2. Key format incorrect (must start with sk-ant-api03-)
+# 3. Key from wrong account or deleted
+
+# Solution:
+# 1. Verify key format: echo $AI_INTEGRATIONS_ANTHROPIC_API_KEY
+# 2. Generate new key at console.anthropic.com
+# 3. Update environment variable
+# 4. Restart server
+```
+
+**Error: "429 Rate Limited"**
+```bash
+# Symptom: Enrichment jobs fail with rate limit errors
+# Causes:
+# 1. Exceeded API rate limits (default: 60 requests/minute)
+# 2. Quota exhausted (check billing at console.anthropic.com)
+# 3. Too many concurrent jobs
+
+# Solutions:
+# 1. Reduce batch size to slow down requests
+# 2. Add credits to your Anthropic account
+# 3. Wait for rate limit reset (typically 60 seconds)
+# 4. Cancel other running jobs
+```
+
+**Check API usage and quota:**
+1. Visit https://console.anthropic.com/
+2. View Usage section for request counts
+3. Check Billing for remaining credits
+4. Monitor rate limit headers in API responses
+
+#### URL Scraping Timeout Solutions
+When enrichment jobs fail due to slow or unresponsive URLs:
+
+**Understanding URL scraping:**
+- Each resource URL is fetched to extract metadata (title, description, Open Graph data)
+- Timeout: 30 seconds per URL
+- Retries: 3 attempts with exponential backoff
+- Failures are logged but don't stop the job
+
+**Common timeout scenarios:**
+
+**1. Slow-loading websites:**
+```bash
+# Symptoms:
+# - Resources marked as 'failed' after 30 seconds
+# - Error: "URL fetch timeout"
+# - Job continues but without scraped metadata
+
+# Solutions:
+# - Accept the failure - resource still gets AI tags from title/URL
+# - Manually enrich resource later via Admin UI
+# - Update resource with manual description
+```
+
+**2. Blocked requests (anti-bot protection):**
+```bash
+# Symptoms:
+# - Consistent failures for certain domains
+# - Error: "403 Forbidden" or "Request blocked"
+# - Cloudflare or bot detection triggers
+
+# Solutions:
+# - These resources get marked as 'skipped'
+# - AI enrichment still generates tags from URL/title
+# - Manually add descriptions in Admin UI
+# - Consider marking as 'manuallyEnriched' to skip future attempts
+```
+
+**3. Invalid or dead links:**
+```bash
+# Symptoms:
+# - Error: "404 Not Found" or "DNS resolution failed"
+# - URL no longer accessible
+
+# Solutions:
+# - Review and update URL in resource editor
+# - Delete resource if permanently dead
+# - Check for redirects and update to final URL
+```
+
+**Optimize scraping performance:**
+
+**Increase success rate:**
+```bash
+# Resources with these URLs are automatically skipped:
+# - Invalid URLs: #readme, mailto:, javascript:
+# - Local anchors: #section-name
+# - These are marked 'skipped' not 'failed'
+
+# To manually mark resources to skip URL scraping:
+# Via database:
+npm run db:studio
+# Update resource metadata:
+# metadata: { manuallyEnriched: true }
+# This prevents future scraping attempts
+```
+
+**Handle batch failures:**
+```bash
+# If entire batch fails due to network issues:
+# 1. Check internet connection
+# 2. Test URL access manually:
+curl -I https://example.com
+
+# 3. Restart enrichment job
+# 4. Failed resources are automatically retried
+```
+
+**Monitor failed URLs:**
+```bash
+# View failed resources in database
+npm run db:studio
+# Query enrichment_queue table:
+# SELECT * FROM enrichment_queue WHERE status = 'failed'
+
+# Export failed URLs for manual review:
+# Via Admin UI: Check job details for failed resource list
+```
+
+#### Batch Size Optimization Tips
+Optimize enrichment performance by adjusting batch size:
+
+**Default batch size:** 10 resources processed concurrently
+
+**Recommended batch sizes by scenario:**
+
+**Small batch (1-5 resources):**
+```bash
+# Use when:
+# - Testing enrichment on new resource types
+# - Limited API quota (watching usage closely)
+# - High failure rates (want to minimize wasted requests)
+# - Slow network or server resources
+
+# Pros: Lower API usage, easier debugging, less memory
+# Cons: Slower overall completion time
+```
+
+**Medium batch (10-20 resources):**
+```bash
+# Use when:
+# - Standard production enrichment (default)
+# - Balanced speed and reliability
+# - Moderate API quota available
+# - Most common use case
+
+# Pros: Good balance of speed and control
+# Cons: May hit rate limits with very large jobs
+```
+
+**Large batch (25-50 resources):**
+```bash
+# Use when:
+# - Bulk enrichment of hundreds/thousands of resources
+# - Generous API quota
+# - Stable network and reliable URLs
+# - Maximum speed needed
+
+# Pros: Fastest completion time
+# Cons: Higher memory usage, harder to debug failures, rate limit risk
+```
+
+**Set batch size:**
+
+**Via Admin UI:**
+1. Navigate to Admin → Enrichment
+2. Enter batch size in "Batch Size" field
+3. Click "Start Enrichment"
+
+**Via API:**
+```bash
+curl -X POST http://localhost:5000/api/admin/enrichment/start \
+  -H "Content-Type: application/json" \
+  -d '{
+    "filter": "unenriched",
+    "batchSize": 15
+  }'
+```
+
+**Monitor batch performance:**
+```bash
+# Watch job progress to optimize batch size
+# Check in Admin UI:
+# - Successful rate: aim for >90%
+# - Processing speed: resources per minute
+# - Failure rate: if >10%, reduce batch size
+
+# Via API:
+curl http://localhost:5000/api/admin/enrichment/jobs/:jobId/status
+
+# Adjust based on:
+# - If many failures: reduce batch size
+# - If very slow: increase batch size (if failures are low)
+# - If rate limited: reduce batch size significantly
+```
+
+**Rate limit calculations:**
+```bash
+# Claude API limits (typical):
+# - Requests per minute: 60
+# - Tokens per minute: varies by plan
+
+# Safe batch sizes:
+# - Batch size 10 with 2s delay = ~20 resources/min = well under limit
+# - Batch size 50 with 2s delay = ~100 resources/min = may hit limits
+# - Batch size 1 with no delay = ~30 resources/min = safe
+
+# The system automatically adds 2-second delays between batches
+# to avoid overwhelming the API
+```
+
+**Best practices:**
+1. **Start small** - Use batch size 5-10 for first run
+2. **Monitor results** - Check success/failure ratio
+3. **Adjust up** - Increase if <5% failure rate
+4. **Adjust down** - Decrease if >10% failure rate or rate limited
+5. **Consider time** - Larger batches finish faster but risk rate limits
+6. **Check quota** - Monitor API usage at console.anthropic.com
+
+**Example optimization workflow:**
+```bash
+# 1. Initial test run
+# Batch size: 5, Filter: unenriched
+# Monitor: success rate, any errors
+
+# 2. If >95% success rate
+# Increase to batch size 15
+
+# 3. If failures occur
+# Check error types:
+# - Timeouts: reduce batch size
+# - Rate limits: reduce batch size significantly (try 3-5)
+# - API errors: check API key and quota
+
+# 4. Production runs
+# Use proven batch size from testing
+# Monitor first few batches, adjust if needed
+```
+
 ## Code Style
 
 - TypeScript throughout
