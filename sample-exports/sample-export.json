@@ -1,0 +1,54 @@
+{
+  "title": "My Bookmarks",
+  "exportDate": "2026-01-31T19:45:00.000Z",
+  "totalBookmarks": 4,
+  "bookmarks": [
+    {
+      "id": "1",
+      "name": "React Documentation",
+      "url": "https://react.dev",
+      "description": "Official React documentation and guides",
+      "category": "Frontend",
+      "tags": [
+        "react",
+        "javascript",
+        "frontend"
+      ],
+      "notes": "Great resource for learning React hooks and best practices"
+    },
+    {
+      "id": "2",
+      "name": "Node.js Guide",
+      "url": "https://nodejs.org",
+      "description": "Node.js official website with \"quotes\" and special chars: <>&",
+      "category": "Backend",
+      "tags": [
+        "nodejs",
+        "backend",
+        "javascript"
+      ],
+      "notes": "Essential reading for backend development. Contains commas, \"quotes\", and\nnewlines."
+    },
+    {
+      "id": "3",
+      "name": "TypeScript Handbook",
+      "url": "https://www.typescriptlang.org/docs/handbook/",
+      "description": "Comprehensive TypeScript guide",
+      "category": "Frontend",
+      "tags": [
+        "typescript",
+        "javascript"
+      ],
+      "notes": null
+    },
+    {
+      "id": "4",
+      "name": "Uncategorized Resource",
+      "url": "https://example.com",
+      "description": null,
+      "category": null,
+      "tags": [],
+      "notes": null
+    }
+  ]
+}
