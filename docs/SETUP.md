@@ -1442,7 +1442,7 @@ Monitor enrichment job progress via the Admin UI or API:
 **Via API:**
 ```bash
 # Get job status
-curl http://localhost:5000/api/admin/enrichment/jobs/:jobId/status
+curl http://localhost:5000/api/enrichment/jobs/:jobId/status
 
 # Response includes:
 # - status: pending, processing, completed, failed, cancelled
@@ -1483,7 +1483,7 @@ If an enrichment job hangs or needs to be stopped:
 **Via API:**
 ```bash
 # Cancel a job
-curl -X POST http://localhost:5000/api/admin/enrichment/jobs/:jobId/cancel
+curl -X POST http://localhost:5000/api/enrichment/jobs/:jobId/cancel
 ```
 
 **Via Database (emergency):**
@@ -1509,7 +1509,7 @@ npm run db:studio
 **Force restart a job:**
 ```bash
 # 1. Cancel the stuck job
-curl -X POST http://localhost:5000/api/admin/enrichment/jobs/:jobId/cancel
+curl -X POST http://localhost:5000/api/enrichment/jobs/:jobId/cancel
 
 # 2. Start a new job with same parameters
 # Via Admin UI: Admin → Enrichment → Start Enrichment
@@ -1755,7 +1755,7 @@ Optimize enrichment performance by adjusting batch size:
 
 **Via API:**
 ```bash
-curl -X POST http://localhost:5000/api/admin/enrichment/start \
+curl -X POST http://localhost:5000/api/enrichment/start \
   -H "Content-Type: application/json" \
   -d '{
     "filter": "unenriched",
@@ -1772,7 +1772,7 @@ curl -X POST http://localhost:5000/api/admin/enrichment/start \
 # - Failure rate: if >10%, reduce batch size
 
 # Via API:
-curl http://localhost:5000/api/admin/enrichment/jobs/:jobId/status
+curl http://localhost:5000/api/enrichment/jobs/:jobId/status
 
 # Adjust based on:
 # - If many failures: reduce batch size
@@ -2231,7 +2231,7 @@ The link checker validates all URLs in your awesome list to ensure they're acces
 **Via API:**
 ```bash
 # Check all resource links
-curl -X POST http://localhost:5000/api/admin/validate-links \
+curl -X POST http://localhost:5000/api/admin/check-links \
   -b admin-cookies.txt \
   -H "Content-Type: application/json" \
   -d '{
@@ -2412,7 +2412,7 @@ npm run db:studio
 # Set followRedirects: false to see intermediate URLs
 
 # Check without following redirects:
-curl -X POST http://localhost:5000/api/admin/validate-links \
+curl -X POST http://localhost:5000/api/admin/check-links \
   -b admin-cookies.txt \
   -H "Content-Type: application/json" \
   -d '{
@@ -2448,7 +2448,7 @@ curl -X POST http://localhost:5000/api/admin/validate-links \
 # - Want quick feedback
 # - Willing to accept false negatives
 
-curl -X POST http://localhost:5000/api/admin/validate-links \
+curl -X POST http://localhost:5000/api/admin/check-links \
   -b admin-cookies.txt \
   -H "Content-Type: application/json" \
   -d '{
@@ -2464,7 +2464,7 @@ curl -X POST http://localhost:5000/api/admin/validate-links \
 # - Balanced speed and accuracy
 # - Most common use case
 
-curl -X POST http://localhost:5000/api/admin/validate-links \
+curl -X POST http://localhost:5000/api/admin/check-links \
   -b admin-cookies.txt \
   -H "Content-Type: application/json" \
   -d '{
@@ -2480,7 +2480,7 @@ curl -X POST http://localhost:5000/api/admin/validate-links \
 # - Want minimal false negatives
 # - Not time-sensitive
 
-curl -X POST http://localhost:5000/api/admin/validate-links \
+curl -X POST http://localhost:5000/api/admin/check-links \
   -b admin-cookies.txt \
   -H "Content-Type: application/json" \
   -d '{
@@ -2596,7 +2596,7 @@ LINK_CHECK_SKIP_DOMAINS=example.com,slow-site.org
 # - Network instability
 # - Want to minimize false negatives
 
-curl -X POST http://localhost:5000/api/admin/validate-links \
+curl -X POST http://localhost:5000/api/admin/check-links \
   -b admin-cookies.txt \
   -H "Content-Type: application/json" \
   -d '{
@@ -2612,7 +2612,7 @@ curl -X POST http://localhost:5000/api/admin/validate-links \
 # - Checking known-reliable sites
 # - Want to see intermittent failures
 
-curl -X POST http://localhost:5000/api/admin/validate-links \
+curl -X POST http://localhost:5000/api/admin/check-links \
   -b admin-cookies.txt \
   -H "Content-Type: application/json" \
   -d '{
@@ -3251,7 +3251,7 @@ echo $AI_INTEGRATIONS_ANTHROPIC_API_KEY
 **4. GitHub API failures:**
 ```bash
 # Import with invalid token:
-curl -X POST http://localhost:5000/api/admin/github/import \
+curl -X POST http://localhost:5000/api/github/import \
   -b admin-cookies.txt \
   -H "Content-Type: application/json" \
   -d '{
