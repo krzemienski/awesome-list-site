@@ -195,10 +195,30 @@ async function handleGetAwesomeList(req: VercelRequest, res: VercelResponse) {
   const categories = await sql`SELECT * FROM categories ORDER BY name`;
   const subcategories = await sql`SELECT * FROM subcategories ORDER BY name`;
   const subSubcategories = await sql`SELECT * FROM sub_subcategories ORDER BY name`;
-  const resources = await sql`SELECT * FROM resources ORDER BY name`;
+  const dbResources = await sql`SELECT * FROM resources ORDER BY name`;
   
-  // Build nested structure
-  const result = categories.map((cat: any) => ({
+  // Map resources to expected format
+  const mapResource = (r: any) => ({
+    id: r.id,
+    name: r.name,
+    url: r.url,
+    description: r.description,
+    categoryId: r.category_id,
+    subcategoryId: r.subcategory_id,
+    subSubcategoryId: r.sub_subcategory_id,
+    githubStars: r.github_stars,
+    lastCommit: r.last_commit,
+    language: r.language,
+    license: r.license,
+    isAwesomeList: r.is_awesome_list,
+    awesomeListCount: r.awesome_list_count,
+  });
+  
+  // Build flat resources array (required by parser)
+  const resources = dbResources.map(mapResource);
+  
+  // Build nested category structure
+  const categoriesNested = categories.map((cat: any) => ({
     id: cat.id,
     name: cat.name,
     slug: cat.slug,
@@ -216,54 +236,26 @@ async function handleGetAwesomeList(req: VercelRequest, res: VercelResponse) {
             name: subsub.name,
             slug: subsub.slug,
             subcategoryId: subsub.subcategory_id,
-            resources: resources
+            resources: dbResources
               .filter((r: any) => r.sub_subcategory_id === subsub.id)
-              .map((r: any) => ({
-                id: r.id,
-                name: r.name,
-                url: r.url,
-                description: r.description,
-                githubStars: r.github_stars,
-                lastCommit: r.last_commit,
-                language: r.language,
-                license: r.license,
-                isAwesomeList: r.is_awesome_list,
-                awesomeListCount: r.awesome_list_count,
-              })),
+              .map(mapResource),
           })),
-        resources: resources
+        resources: dbResources
           .filter((r: any) => r.subcategory_id === sub.id && !r.sub_subcategory_id)
-          .map((r: any) => ({
-            id: r.id,
-            name: r.name,
-            url: r.url,
-            description: r.description,
-            githubStars: r.github_stars,
-            lastCommit: r.last_commit,
-            language: r.language,
-            license: r.license,
-            isAwesomeList: r.is_awesome_list,
-            awesomeListCount: r.awesome_list_count,
-          })),
+          .map(mapResource),
       })),
-    resources: resources
+    resources: dbResources
       .filter((r: any) => r.category_id === cat.id && !r.subcategory_id)
-      .map((r: any) => ({
-        id: r.id,
-        name: r.name,
-        url: r.url,
-        description: r.description,
-        githubStars: r.github_stars,
-        lastCommit: r.last_commit,
-        language: r.language,
-        license: r.license,
-        isAwesomeList: r.is_awesome_list,
-        awesomeListCount: r.awesome_list_count,
-      })),
+      .map(mapResource),
   }));
   
+  // Return format expected by parser (requires resources array at top level)
   return res.json({
-    categories: result,
+    title: "Awesome Video",
+    description: "A curated list of awesome video resources",
+    repoUrl: "https://github.com/krzemienski/awesome-video",
+    resources: resources,
+    categories: categoriesNested,
     totalResources: resources.length,
     lastUpdated: new Date().toISOString(),
   });
@@ -315,6 +307,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Auth routes
     if (path === '/api/auth/status' && req.method === 'GET') {
       return handleAuthStatus(req, res);
+    }
+    if (path === '/api/auth/user' && req.method === 'GET') {
+      return handleAuthStatus(req, res); // Same as status
     }
     if (path === '/api/auth/admin-status' && req.method === 'GET') {
       return handleAdminStatus(req, res);
