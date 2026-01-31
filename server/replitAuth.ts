@@ -7,6 +7,27 @@ import type { Express, RequestHandler } from "express";
 import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
+import type { User } from "@shared/schema";
+
+// OIDC Claims from Replit
+interface OIDCClaims {
+  sub: string;
+  email?: string;
+  first_name?: string;
+  last_name?: string;
+  profile_image_url?: string;
+  exp?: number;
+  [key: string]: unknown;
+}
+
+// Session user with OIDC tokens and claims
+interface SessionUser {
+  claims?: OIDCClaims;
+  access_token?: string;
+  refresh_token?: string;
+  expires_at?: number;
+  dbUser?: User;
+}
 
 const getOidcConfig = memoize(
   async () => {
@@ -42,24 +63,24 @@ export function getSession() {
 }
 
 function updateUserSession(
-  user: any,
+  user: SessionUser,
   tokens: client.TokenEndpointResponse & client.TokenEndpointResponseHelpers
 ) {
-  user.claims = tokens.claims();
+  user.claims = tokens.claims() as OIDCClaims;
   user.access_token = tokens.access_token;
   user.refresh_token = tokens.refresh_token;
   user.expires_at = user.claims?.exp;
 }
 
 async function upsertUser(
-  claims: any,
+  claims: OIDCClaims,
 ) {
   await storage.upsertUser({
-    id: claims["sub"],
-    email: claims["email"],
-    firstName: claims["first_name"],
-    lastName: claims["last_name"],
-    profileImageUrl: claims["profile_image_url"],
+    id: claims.sub,
+    email: claims.email,
+    firstName: claims.first_name,
+    lastName: claims.last_name,
+    profileImageUrl: claims.profile_image_url,
   });
 }
 
@@ -75,9 +96,9 @@ export async function setupAuth(app: Express) {
     tokens: client.TokenEndpointResponse & client.TokenEndpointResponseHelpers,
     verified: passport.AuthenticateCallback
   ) => {
-    const user = {};
+    const user: SessionUser = {};
     updateUserSession(user, tokens);
-    await upsertUser(tokens.claims());
+    await upsertUser(tokens.claims() as OIDCClaims);
     verified(null, user);
   };
 
@@ -107,12 +128,13 @@ export async function setupAuth(app: Express) {
     try {
       // Fetch fresh user data from DB to ensure we have the latest role
       const { storage } = await import('./storage.js');
-      const userId = (user as any).claims?.sub;
+      const sessionUser = user as SessionUser;
+      const userId = sessionUser.claims?.sub;
       if (userId) {
         const dbUser = await storage.getUser(userId);
         if (dbUser) {
           // Attach DB user data to session user object
-          (user as any).dbUser = dbUser;
+          sessionUser.dbUser = dbUser;
         }
       }
       cb(null, user);
@@ -150,7 +172,7 @@ export async function setupAuth(app: Express) {
 }
 
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
-  const user = req.user as any;
+  const user = req.user as SessionUser;
 
   if (!req.isAuthenticated() || !user.expires_at) {
     return res.status(401).json({ message: "Unauthorized" });
