@@ -582,3 +582,29 @@ export const insertEnrichmentQueueSchema = createInsertSchema(enrichmentQueue).p
 
 export type InsertEnrichmentQueue = z.infer<typeof insertEnrichmentQueueSchema>;
 export type EnrichmentQueueItem = typeof enrichmentQueue.$inferSelect;
+
+// Password Reset Tokens - For password recovery flow
+export const passwordResetTokens = pgTable(
+  "password_reset_tokens",
+  {
+    id: serial("id").primaryKey(),
+    userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+    token: varchar("token", { length: 255 }).notNull().unique(),
+    expiresAt: timestamp("expires_at").notNull(),
+    usedAt: timestamp("used_at"),
+    createdAt: timestamp("created_at").defaultNow(),
+  },
+  (table) => [
+    index("idx_password_reset_tokens_token").on(table.token),
+    index("idx_password_reset_tokens_user_id").on(table.userId),
+  ]
+);
+
+export const insertPasswordResetTokenSchema = createInsertSchema(passwordResetTokens).pick({
+  userId: true,
+  token: true,
+  expiresAt: true,
+});
+
+export type InsertPasswordResetToken = z.infer<typeof insertPasswordResetTokenSchema>;
+export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;

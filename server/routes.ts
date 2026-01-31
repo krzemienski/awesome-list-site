@@ -354,6 +354,221 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Note: Database seeding and data initialization moved to runBackgroundInitialization()
   // This ensures the server starts quickly for production deployments
 
+  // ============= User Registration =============
+  
+  // POST /api/auth/register - Register a new user
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const { email, password, firstName, lastName } = req.body;
+      
+      // Validate email
+      const { validateEmail, validatePassword, hashPassword } = await import("./passwordUtils");
+      
+      if (!email || !validateEmail(email)) {
+        return res.status(400).json({ message: "Please provide a valid email address" });
+      }
+      
+      // Validate password
+      const passwordValidation = validatePassword(password);
+      if (!passwordValidation.valid) {
+        return res.status(400).json({ message: passwordValidation.error || "Password must be at least 8 characters" });
+      }
+      
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(409).json({ message: "An account with this email already exists" });
+      }
+      
+      // Hash password and create user
+      const hashedPassword = await hashPassword(password);
+      
+      const newUser = await storage.upsertUser({
+        email,
+        password: hashedPassword,
+        firstName: firstName || null,
+        lastName: lastName || null,
+        role: 'user',
+      });
+      
+      // Create session for the new user (auto-login)
+      const userSession = {
+        claims: {
+          sub: newUser.id,
+          email: newUser.email,
+          first_name: newUser.firstName,
+          last_name: newUser.lastName,
+          profile_image_url: newUser.profileImageUrl,
+        },
+        expires_at: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60),
+      };
+      
+      req.logIn(userSession, (err) => {
+        if (err) {
+          console.log('[register] Login after registration failed:', err);
+          // Still return success - user was created, just auto-login failed
+          return res.status(201).json({
+            message: "Registration successful. Please log in.",
+            user: {
+              id: newUser.id,
+              email: newUser.email,
+              firstName: newUser.firstName,
+              lastName: newUser.lastName,
+              role: newUser.role,
+            }
+          });
+        }
+        
+        req.session.save((saveErr) => {
+          if (saveErr) {
+            console.log('[register] Session save failed:', saveErr);
+          }
+          
+          return res.status(201).json({
+            message: "Registration successful",
+            user: {
+              id: newUser.id,
+              email: newUser.email,
+              firstName: newUser.firstName,
+              lastName: newUser.lastName,
+              role: newUser.role,
+            }
+          });
+        });
+      });
+    } catch (error) {
+      console.error("Registration error:", error);
+      return res.status(500).json({ message: "Registration failed. Please try again." });
+    }
+  });
+
+  // ============= Password Reset =============
+  
+  // POST /api/auth/forgot-password - Request password reset
+  app.post("/api/auth/forgot-password", async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      const { validateEmail } = await import("./passwordUtils");
+      
+      if (!email || !validateEmail(email)) {
+        return res.status(400).json({ message: "Please provide a valid email address" });
+      }
+      
+      // Find user by email
+      const user = await storage.getUserByEmail(email);
+      
+      // Always return success to prevent email enumeration attacks
+      if (!user) {
+        console.log('[forgot-password] User not found for email:', email);
+        return res.json({ message: "If an account exists with that email, a password reset link has been sent." });
+      }
+      
+      // Generate reset token (cryptographically secure)
+      const crypto = await import("crypto");
+      const resetToken = crypto.randomBytes(32).toString("hex");
+      
+      // Set expiration to 1 hour from now
+      const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+      
+      // Clean up expired tokens
+      await storage.deleteExpiredPasswordResetTokens();
+      
+      // Store the token
+      await storage.createPasswordResetToken(user.id, resetToken, expiresAt);
+      
+      // In production, you would send an email here
+      // For now, we'll log the reset link (in development mode only)
+      const resetLink = `/reset-password?token=${resetToken}`;
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('[forgot-password] Reset link for', email, ':', resetLink);
+      }
+      
+      // TODO: Send email with reset link
+      // await sendPasswordResetEmail(user.email, resetToken);
+      
+      return res.json({ 
+        message: "If an account exists with that email, a password reset link has been sent.",
+        // Only include token in development for testing
+        ...(process.env.NODE_ENV !== 'production' && { _devToken: resetToken })
+      });
+    } catch (error) {
+      console.error("Forgot password error:", error);
+      return res.status(500).json({ message: "An error occurred. Please try again." });
+    }
+  });
+  
+  // POST /api/auth/reset-password - Reset password with token
+  app.post("/api/auth/reset-password", async (req, res) => {
+    try {
+      const { token, password } = req.body;
+      
+      if (!token) {
+        return res.status(400).json({ message: "Reset token is required" });
+      }
+      
+      const { validatePassword, hashPassword } = await import("./passwordUtils");
+      
+      // Validate password
+      const passwordValidation = validatePassword(password);
+      if (!passwordValidation.valid) {
+        return res.status(400).json({ message: passwordValidation.error || "Password must be at least 8 characters" });
+      }
+      
+      // Find the reset token
+      const resetToken = await storage.getPasswordResetToken(token);
+      
+      if (!resetToken) {
+        return res.status(400).json({ message: "Invalid or expired reset token" });
+      }
+      
+      // Check if token is expired
+      if (new Date() > resetToken.expiresAt) {
+        return res.status(400).json({ message: "Reset token has expired. Please request a new one." });
+      }
+      
+      // Hash the new password
+      const hashedPassword = await hashPassword(password);
+      
+      // Update user's password
+      await storage.updateUserPassword(resetToken.userId, hashedPassword);
+      
+      // Mark token as used
+      await storage.markPasswordResetTokenUsed(token);
+      
+      return res.json({ message: "Password has been reset successfully. You can now log in with your new password." });
+    } catch (error) {
+      console.error("Reset password error:", error);
+      return res.status(500).json({ message: "An error occurred. Please try again." });
+    }
+  });
+  
+  // GET /api/auth/verify-reset-token - Verify if a reset token is valid
+  app.get("/api/auth/verify-reset-token", async (req, res) => {
+    try {
+      const { token } = req.query;
+      
+      if (!token || typeof token !== 'string') {
+        return res.status(400).json({ valid: false, message: "Token is required" });
+      }
+      
+      const resetToken = await storage.getPasswordResetToken(token);
+      
+      if (!resetToken) {
+        return res.json({ valid: false, message: "Invalid or expired reset token" });
+      }
+      
+      if (new Date() > resetToken.expiresAt) {
+        return res.json({ valid: false, message: "Reset token has expired" });
+      }
+      
+      return res.json({ valid: true });
+    } catch (error) {
+      console.error("Verify reset token error:", error);
+      return res.status(500).json({ valid: false, message: "An error occurred" });
+    }
+  });
+
   // ============= Auth Routes (from Replit Auth blueprint) =============
   
   // GET /api/auth/user - Get current user (public endpoint)

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -141,7 +141,12 @@ export default function Login() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel htmlFor="password">Password</FormLabel>
+                    <div className="flex items-center justify-between">
+                      <FormLabel htmlFor="password">Password</FormLabel>
+                      <Link href="/forgot-password" className="text-xs text-muted-foreground hover:text-primary">
+                        Forgot password?
+                      </Link>
+                    </div>
                     <FormControl>
                       <div className="relative">
                         <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -203,11 +208,10 @@ export default function Login() {
           </div>
 
           <div className="text-center text-sm text-muted-foreground">
-            <p>Default admin credentials:</p>
-            <p className="font-mono text-xs mt-1">admin@example.com / admin123</p>
-            <p className="text-xs mt-1 text-yellow-600 dark:text-yellow-500">
-              ⚠️ Change password after first login
-            </p>
+            Don't have an account?{" "}
+            <Link href="/register" className="text-primary hover:underline">
+              Create one
+            </Link>
           </div>
         </CardContent>
       </Card>

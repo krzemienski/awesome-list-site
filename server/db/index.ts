@@ -3,12 +3,19 @@ import pkg from 'pg';
 const { Pool } = pkg;
 import * as schema from '../../shared/schema';
 
+// Validate DATABASE_URL is set
+if (!process.env.DATABASE_URL) {
+  console.error('DATABASE_URL environment variable is not set');
+  throw new Error('DATABASE_URL environment variable is required');
+}
+
 // Create PostgreSQL connection with limited pool for Neon serverless
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  max: 3, // Conservative limit for Neon free tier
+  max: 5, // Increased for better concurrency with Neon
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 15000, // Longer timeout for Neon cold starts
+  connectionTimeoutMillis: 20000, // Extended timeout for Neon cold starts
+  ssl: process.env.DATABASE_URL.includes('neon.tech') ? { rejectUnauthorized: false } : undefined,
 });
 
 // Add error handler for connection issues

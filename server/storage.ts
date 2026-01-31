@@ -78,6 +78,9 @@ import {
   type InsertEnrichmentJob,
   type EnrichmentQueueItem,
   type InsertEnrichmentQueue,
+  passwordResetTokens,
+  type PasswordResetToken,
+  type InsertPasswordResetToken,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql, desc, asc, inArray, like, or, isNull, isNotNull } from "drizzle-orm";
@@ -232,6 +235,15 @@ export interface IStorage {
   getAwesomeListData(): any | null;
   getCategories(): any[];
   getResources(): any[];
+  
+  // Password Reset Tokens
+  createPasswordResetToken(userId: string, token: string, expiresAt: Date): Promise<PasswordResetToken>;
+  getPasswordResetToken(token: string): Promise<PasswordResetToken | undefined>;
+  markPasswordResetTokenUsed(token: string): Promise<void>;
+  deleteExpiredPasswordResetTokens(): Promise<void>;
+  
+  // User password update
+  updateUserPassword(userId: string, hashedPassword: string): Promise<User>;
   
   // Legacy methods - kept for backward compatibility
   getUserByUsername(username: string): Promise<User | undefined>;
@@ -1686,6 +1698,50 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return item;
   }
+  
+  // Password Reset Token operations
+  async createPasswordResetToken(userId: string, token: string, expiresAt: Date): Promise<PasswordResetToken> {
+    const [resetToken] = await db
+      .insert(passwordResetTokens)
+      .values({ userId, token, expiresAt })
+      .returning();
+    return resetToken;
+  }
+  
+  async getPasswordResetToken(token: string): Promise<PasswordResetToken | undefined> {
+    const [resetToken] = await db
+      .select()
+      .from(passwordResetTokens)
+      .where(
+        and(
+          eq(passwordResetTokens.token, token),
+          isNull(passwordResetTokens.usedAt)
+        )
+      );
+    return resetToken;
+  }
+  
+  async markPasswordResetTokenUsed(token: string): Promise<void> {
+    await db
+      .update(passwordResetTokens)
+      .set({ usedAt: new Date() })
+      .where(eq(passwordResetTokens.token, token));
+  }
+  
+  async deleteExpiredPasswordResetTokens(): Promise<void> {
+    await db
+      .delete(passwordResetTokens)
+      .where(sql`${passwordResetTokens.expiresAt} < NOW()`);
+  }
+  
+  async updateUserPassword(userId: string, hashedPassword: string): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ password: hashedPassword, updatedAt: new Date() })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
 }
 
 // For backward compatibility, export both MemStorage and DatabaseStorage
@@ -2024,11 +2080,28 @@ export class MemStorage implements IStorage {
     return []; 
   }
   async updateEnrichmentQueueItem(id: number, data: Partial<EnrichmentQueueItem>): Promise<EnrichmentQueueItem> {
-    throw new Error("Enrichment not implemented in memory storage");
+  throw new Error("Enrichment not implemented in memory storage");
   }
-}
-
-// Use DatabaseStorage if DATABASE_URL exists, otherwise use MemStorage
+  
+  // Password Reset Token operations (stub implementations for MemStorage)
+  async createPasswordResetToken(userId: string, token: string, expiresAt: Date): Promise<PasswordResetToken> {
+    throw new Error("Password reset not implemented in memory storage");
+  }
+  async getPasswordResetToken(token: string): Promise<PasswordResetToken | undefined> {
+    return undefined;
+  }
+  async markPasswordResetTokenUsed(token: string): Promise<void> {
+    throw new Error("Password reset not implemented in memory storage");
+  }
+  async deleteExpiredPasswordResetTokens(): Promise<void> {
+    // No-op for memory storage
+  }
+  async updateUserPassword(userId: string, hashedPassword: string): Promise<User> {
+    throw new Error("Password update not implemented in memory storage");
+  }
+  }
+  
+  // Use DatabaseStorage if DATABASE_URL exists, otherwise use MemStorage
 export const storage: IStorage = process.env.DATABASE_URL 
   ? new DatabaseStorage() 
   : new MemStorage();
