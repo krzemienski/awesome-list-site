@@ -426,6 +426,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= Resource Routes =============
   
   // GET /api/resources - List approved resources (public)
+  // Returns: { resources: Resource[], total: number }
+  // Each Resource includes link health data: linkHealthStatus, lastLinkCheck, linkCheckResponseTime
   app.get('/api/resources', async (req, res) => {
     try {
       const page = parseInt(req.query.page as string) || 1;
@@ -433,7 +435,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const category = req.query.category as string;
       const subcategory = req.query.subcategory as string;
       const search = req.query.search as string;
-      
+
       const result = await storage.listResources({
         page,
         limit,
@@ -442,7 +444,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         subcategory,
         search
       });
-      
+
       res.json(result);
     } catch (error) {
       console.error('Error fetching resources:', error);
@@ -450,16 +452,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // GET /api/resources/:id - Get single resource
+  // GET /api/resources/:id - Get single resource (public)
+  // Returns: Resource object including link health data: linkHealthStatus, lastLinkCheck, linkCheckResponseTime
   app.get('/api/resources/:id', async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const resource = await storage.getResource(id);
-      
+
       if (!resource) {
         return res.status(404).json({ message: 'Resource not found' });
       }
-      
+
       res.json(resource);
     } catch (error) {
       console.error('Error fetching resource:', error);
