@@ -128,7 +128,7 @@ export default function ResourceManager() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number, data: any }) => {
+    mutationFn: async ({ id, data }: { id: number, data: Partial<Resource> }) => {
       return await apiRequest(`/api/admin/resources/${id}`, {
         method: 'PUT',
         body: JSON.stringify(data)
@@ -145,7 +145,7 @@ export default function ResourceManager() {
         description: "The resource has been successfully updated.",
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "Update Failed",
         description: error.message || "Failed to update resource",
@@ -155,7 +155,7 @@ export default function ResourceManager() {
   });
 
   const createMutation = useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: Partial<Resource>) => {
       return await apiRequest('/api/admin/resources', {
         method: 'POST',
         body: JSON.stringify(data)
@@ -173,7 +173,7 @@ export default function ResourceManager() {
         description: "The new resource has been added successfully.",
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "Creation Failed",
         description: error.message || "Failed to create resource",
@@ -200,7 +200,7 @@ export default function ResourceManager() {
         description: "The resource has been permanently deleted.",
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "Deletion Failed",
         description: error.message || "Failed to delete resource",
