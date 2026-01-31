@@ -769,7 +769,7 @@ SELECT
   r.title,
   r.url,
   eq.status,
-  eq.attempts,
+  eq.retry_count,
   eq.error_message,
   eq.created_at
 FROM enrichment_queue eq
@@ -783,12 +783,12 @@ SELECT
   r.title,
   r.url,
   eq.error_message,
-  eq.attempts
+  eq.retry_count
 FROM enrichment_queue eq
 JOIN resources r ON r.id = eq.resource_id
 WHERE eq.status = 'failed'
   AND eq.job_id = 123
-ORDER BY eq.attempts DESC;
+ORDER BY eq.retry_count DESC;
 
 # Get queue status summary:
 SELECT
@@ -807,22 +807,18 @@ npm run db:studio
 # View sync history:
 SELECT
   id,
-  operation,
+  action,
   status,
   repository_url,
-  resources_imported,
-  resources_updated,
-  resources_skipped,
-  validation_passed,
   created_at,
-  completed_at
+  processed_at
 FROM github_sync_queue
 ORDER BY created_at DESC;
 
 # Find failed syncs:
 SELECT
   id,
-  operation,
+  action,
   repository_url,
   error_message,
   created_at
@@ -832,25 +828,22 @@ ORDER BY created_at DESC;
 
 # Get sync statistics:
 SELECT
-  operation,
+  action,
   status,
-  COUNT(*) as sync_count,
-  SUM(resources_imported) as total_imported,
-  SUM(resources_updated) as total_updated,
-  SUM(resources_skipped) as total_skipped
+  COUNT(*) as sync_count
 FROM github_sync_queue
-GROUP BY operation, status
-ORDER BY operation, status;
+GROUP BY action, status
+ORDER BY action, status;
 
-# Find syncs with validation errors:
+# Find syncs with errors:
 SELECT
   id,
   repository_url,
-  validation_passed,
-  validation_errors,
+  status,
+  error_message,
   created_at
 FROM github_sync_queue
-WHERE validation_passed = false
+WHERE error_message IS NOT NULL
 ORDER BY created_at DESC;
 ```
 
@@ -859,11 +852,9 @@ ORDER BY created_at DESC;
 # Check for in-progress syncs:
 SELECT
   id,
-  operation,
+  action,
   status,
   repository_url,
-  dry_run,
-  strict_mode,
   created_at,
   NOW() - created_at as duration
 FROM github_sync_queue
@@ -883,14 +874,12 @@ WHERE id = 123;  -- Replace with stuck job ID
 SELECT
   id,
   repository_url,
-  resources_imported,
-  resources_updated,
-  resources_skipped,
-  validation_passed,
-  (completed_at - created_at) as duration,
+  action,
+  status,
+  (processed_at - created_at) as duration,
   metadata
 FROM github_sync_queue
-WHERE operation = 'import'
+WHERE action = 'import'
   AND status = 'completed'
 ORDER BY created_at DESC
 LIMIT 10;
