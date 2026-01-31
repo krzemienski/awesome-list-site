@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import FavoriteButton from "./FavoriteButton";
 import BookmarkButton from "./BookmarkButton";
 import { SuggestEditDialog } from "@/components/ui/suggest-edit-dialog";
+import { LinkHealthBadge } from "@/components/ui/link-health-badge";
 import { cn } from "@/lib/utils";
 import type { Resource } from "@shared/schema";
 
@@ -155,6 +156,12 @@ export default function ResourceCard({
               <ChevronRight className="h-3 w-3 mr-0.5" />
               View Details
             </Badge>
+          )}
+          {fullResource?.linkHealthStatus && (
+            <LinkHealthBadge
+              status={fullResource.linkHealthStatus as "verified" | "warning" | "broken" | "unknown"}
+              lastChecked={fullResource.lastLinkCheck}
+            />
           )}
           {resource.category && (
             <Badge variant="secondary" className="text-xs">
