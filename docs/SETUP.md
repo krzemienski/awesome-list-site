@@ -1379,6 +1379,659 @@ npx tsx scripts/test-awesome-lint.ts
 # Allows export with warnings
 ```
 
+### API Error Troubleshooting
+
+When working with the API, you may encounter various HTTP error codes. This section helps you debug and resolve common API errors.
+
+#### Debugging Tools Overview
+
+**Using curl for API debugging:**
+```bash
+# Basic curl request with verbose output
+curl -v http://localhost:5000/api/resources
+
+# Include cookies from browser for authenticated requests
+# 1. Export cookies from browser (use extension like "Cookie-Editor")
+# 2. Save to cookies.txt
+# 3. Use in curl:
+curl -v -b cookies.txt http://localhost:5000/api/admin/stats
+
+# Send POST request with JSON body
+curl -X POST http://localhost:5000/api/resources \
+  -H "Content-Type: application/json" \
+  -b cookies.txt \
+  -d '{
+    "title": "Test Resource",
+    "url": "https://example.com",
+    "description": "Test description",
+    "category": "General Tools"
+  }'
+
+# View response headers
+curl -i http://localhost:5000/api/health
+```
+
+**Using browser DevTools:**
+```bash
+# 1. Open browser DevTools (F12)
+# 2. Go to Network tab
+# 3. Trigger the API request via UI
+# 4. Click on the request in the Network tab
+# 5. View:
+#    - Request Headers (check cookies, content-type)
+#    - Request Payload (check sent data)
+#    - Response (check error message)
+#    - Response Headers (check status code)
+```
+
+**Quick debugging checklist:**
+```bash
+# For any API error:
+# 1. Check status code (400, 401, 403, 404, 500)
+# 2. Read error message in response body
+# 3. Verify request format matches API docs
+# 4. Check authentication state
+# 5. Review server logs in console
+```
+
+#### 400 Bad Request Errors
+
+400 errors indicate invalid request data, often from validation failures.
+
+**Common causes:**
+
+**1. Zod validation failures:**
+```bash
+# Request:
+curl -X POST http://localhost:5000/api/resources \
+  -H "Content-Type: application/json" \
+  -b cookies.txt \
+  -d '{
+    "title": "",
+    "url": "not-a-valid-url",
+    "category": "Invalid Category"
+  }'
+
+# Response (400):
+{
+  "message": "Invalid resource data",
+  "errors": [
+    {
+      "code": "too_small",
+      "minimum": 1,
+      "path": ["title"],
+      "message": "String must contain at least 1 character(s)"
+    },
+    {
+      "code": "invalid_string",
+      "path": ["url"],
+      "validation": "url",
+      "message": "Invalid url"
+    }
+  ]
+}
+
+# Fix: Provide valid data matching schema requirements
+curl -X POST http://localhost:5000/api/resources \
+  -H "Content-Type: application/json" \
+  -b cookies.txt \
+  -d '{
+    "title": "Valid Resource Title",
+    "url": "https://example.com/resource",
+    "description": "A proper description",
+    "category": "General Tools",
+    "subcategory": "DRM"
+  }'
+```
+
+**2. Missing required fields:**
+```bash
+# Request:
+curl -X POST http://localhost:5000/api/resources/:id/edits \
+  -H "Content-Type: application/json" \
+  -b cookies.txt \
+  -d '{
+    "title": "New Title"
+  }'
+
+# Response (400):
+{
+  "message": "proposedChanges and proposedData are required"
+}
+
+# Fix: Include all required fields
+curl -X POST http://localhost:5000/api/resources/:id/edits \
+  -H "Content-Type: application/json" \
+  -b cookies.txt \
+  -d '{
+    "proposedChanges": { "title": { "from": "Old Title", "to": "New Title" } },
+    "proposedData": { "title": "New Title" }
+  }'
+```
+
+**3. Data too long:**
+```bash
+# Request with title exceeding 200 characters:
+curl -X POST http://localhost:5000/api/resources/:id/edits \
+  -H "Content-Type: application/json" \
+  -b cookies.txt \
+  -d '{
+    "proposedData": { "title": "Very long title that exceeds the maximum allowed length..." }
+  }'
+
+# Response (400):
+{
+  "message": "Title too long (max 200 characters)"
+}
+
+# Other length validation errors:
+# "Description too long (max 2000 characters)"
+# "Too many tags (max 20)"
+```
+
+**4. Invalid IDs or parameters:**
+```bash
+# Request with invalid category ID:
+curl http://localhost:5000/api/subcategories?categoryId=not-a-number
+
+# Response (400):
+{
+  "message": "Invalid categoryId: must be a positive integer"
+}
+
+# Request with invalid resource ID in edit suggestion:
+curl -X POST http://localhost:5000/api/resources/invalid-id/edits \
+  -H "Content-Type: application/json" \
+  -b cookies.txt \
+  -d '{...}'
+
+# Response (400):
+{
+  "message": "Invalid resource ID"
+}
+```
+
+**Debugging 400 errors:**
+```bash
+# 1. Check the error.errors array for Zod validation details
+# 2. Each error shows:
+#    - code: Type of validation failure
+#    - path: Which field failed
+#    - message: Human-readable description
+# 3. Refer to API.md for field requirements
+# 4. Test with minimal valid data first
+# 5. Add optional fields incrementally
+```
+
+#### 401/403 Authentication/Authorization Errors
+
+**401 Unauthorized** - Not logged in or invalid session
+**403 Forbidden** - Logged in but insufficient permissions
+
+**401 Unauthorized errors:**
+
+```bash
+# Accessing authenticated endpoint without login:
+curl http://localhost:5000/api/favorites
+
+# Response (401):
+{
+  "message": "Unauthorized"
+}
+
+# Fix: Login first and include session cookie
+# Option 1: Via browser (automatic cookie handling)
+# Option 2: Via curl with cookies
+curl -X POST http://localhost:5000/api/auth/local/login \
+  -H "Content-Type: application/json" \
+  -c cookies.txt \
+  -d '{
+    "email": "admin@example.com",
+    "password": "admin123"
+  }'
+
+# Then use the cookie in subsequent requests:
+curl http://localhost:5000/api/favorites -b cookies.txt
+```
+
+**Session expired:**
+```bash
+# Request after session expiration:
+curl http://localhost:5000/api/user/progress -b old-cookies.txt
+
+# Response (401):
+{
+  "message": "Unauthorized"
+}
+
+# Fix: Re-authenticate to get fresh session
+# Check current auth status:
+curl http://localhost:5000/api/auth/user -b cookies.txt
+
+# Response shows auth state:
+{
+  "user": null,
+  "isAuthenticated": false
+}
+
+# Login again:
+curl -X POST http://localhost:5000/api/auth/local/login \
+  -H "Content-Type: application/json" \
+  -c fresh-cookies.txt \
+  -d '{ "email": "user@example.com", "password": "password" }'
+```
+
+**403 Forbidden errors (insufficient permissions):**
+
+```bash
+# Accessing admin endpoint as regular user:
+curl http://localhost:5000/api/admin/stats -b user-cookies.txt
+
+# Response (403):
+{
+  "message": "Forbidden: Admin access required"
+}
+
+# Debug: Check your user role
+curl http://localhost:5000/api/auth/user -b user-cookies.txt
+
+# Response:
+{
+  "user": {
+    "id": "123",
+    "email": "user@example.com",
+    "role": "user"  # Not "admin"
+  },
+  "isAuthenticated": true
+}
+
+# Fix: Promote user to admin via database
+npm run db:studio
+# Then run SQL:
+# UPDATE users SET role = 'admin' WHERE email = 'user@example.com';
+
+# Or use reset admin script:
+npx tsx scripts/reset-admin-password.ts
+```
+
+**Debugging auth errors:**
+```bash
+# 1. Check if you're logged in:
+curl http://localhost:5000/api/auth/user -b cookies.txt
+
+# 2. Verify cookie is being sent:
+curl -v http://localhost:5000/api/favorites -b cookies.txt
+# Look for "Cookie:" header in verbose output
+
+# 3. Check session secret is set:
+echo $SESSION_SECRET
+
+# 4. Clear cookies and re-login:
+rm cookies.txt
+curl -X POST http://localhost:5000/api/auth/local/login \
+  -c cookies.txt \
+  -H "Content-Type: application/json" \
+  -d '{ "email": "admin@example.com", "password": "admin123" }'
+
+# 5. For 403 errors, verify role in database:
+npm run db:studio
+# Check users table → role column
+```
+
+#### 404 Resource Not Found Errors
+
+404 errors occur when requesting non-existent resources or invalid URLs.
+
+**Common scenarios:**
+
+**1. Non-existent resource ID:**
+```bash
+# Request:
+curl http://localhost:5000/api/resources/99999
+
+# Response (404):
+{
+  "message": "Resource not found"
+}
+
+# Debug:
+# - Verify resource ID exists in database
+# - Check if resource was deleted
+# - Use list endpoint to find valid IDs:
+curl http://localhost:5000/api/resources?limit=5
+```
+
+**2. Wrong URL path:**
+```bash
+# Typo in endpoint:
+curl http://localhost:5000/api/resource  # Missing 's'
+
+# Response (404):
+# HTML error page or "Cannot GET /api/resource"
+
+# Fix: Use correct endpoint path
+curl http://localhost:5000/api/resources
+
+# Reference API.md for correct paths
+```
+
+**3. Non-existent journey:**
+```bash
+# Request:
+curl http://localhost:5000/api/journeys/invalid-id -b cookies.txt
+
+# Response (404):
+{
+  "message": "Journey not found"
+}
+
+# Fix: Get list of valid journey IDs:
+curl http://localhost:5000/api/journeys -b cookies.txt
+```
+
+**4. Empty database (sitemap example):**
+```bash
+# Request sitemap with empty database:
+curl http://localhost:5000/sitemap.xml
+
+# Response (404):
+Sitemap not available - database empty
+
+# Fix: Seed database
+curl -X POST http://localhost:5000/api/admin/seed-database -b admin-cookies.txt
+```
+
+**Debugging 404 errors:**
+```bash
+# 1. Verify the endpoint exists in API.md
+# 2. Check URL spelling and ID format
+# 3. List available resources:
+curl http://localhost:5000/api/resources
+curl http://localhost:5000/api/categories
+curl http://localhost:5000/api/journeys -b cookies.txt
+
+# 4. Check database for resource existence:
+npm run db:studio
+# Search in resources table for the ID
+
+# 5. Review server logs for routing issues
+# Look for "GET /api/..." in console output
+```
+
+#### 500 Internal Server Error
+
+500 errors indicate server-side problems, not client request issues.
+
+**Common causes:**
+
+**1. Database connection failures:**
+```bash
+# Request when database is unreachable:
+curl http://localhost:5000/api/resources
+
+# Response (500):
+{
+  "message": "Failed to fetch resources"
+}
+
+# Server logs show:
+# Error: connect ECONNREFUSED
+# Error: no pg_hba.conf entry for host
+
+# Debug:
+# Check DATABASE_URL is set
+echo $DATABASE_URL
+
+# Test database connection
+npm run db:studio
+
+# Restart PostgreSQL (Replit auto-manages this)
+# Or restart the dev server:
+pkill -f "tsx server"
+npm run dev
+```
+
+**2. Uncaught exceptions in route handlers:**
+```bash
+# Request that triggers server error:
+curl -X POST http://localhost:5000/api/admin/resources \
+  -b admin-cookies.txt \
+  -H "Content-Type: application/json" \
+  -d '{ invalid json }'
+
+# Response (500):
+{
+  "message": "Failed to create resource"
+}
+
+# Server logs show:
+# SyntaxError: Unexpected token i in JSON at position 2
+# at JSON.parse
+
+# Debug:
+# 1. Check server console for error stack trace
+# 2. Look for specific error message
+# 3. Fix malformed request data
+```
+
+**3. AI service failures:**
+```bash
+# Request Claude analysis without API key:
+curl -X POST http://localhost:5000/api/claude/analyze \
+  -b cookies.txt \
+  -H "Content-Type: application/json" \
+  -d '{ "url": "https://example.com" }'
+
+# Response (500):
+{
+  "message": "Failed to analyze URL"
+}
+
+# Server logs show:
+# Error: AI_INTEGRATIONS_ANTHROPIC_API_KEY not configured
+
+# Debug:
+echo $AI_INTEGRATIONS_ANTHROPIC_API_KEY
+# If empty, set the API key:
+# AI_INTEGRATIONS_ANTHROPIC_API_KEY=sk-ant-api03-...
+# Restart server
+```
+
+**4. GitHub API failures:**
+```bash
+# Import with invalid token:
+curl -X POST http://localhost:5000/api/admin/github/import \
+  -b admin-cookies.txt \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://github.com/user/repo/README.md"
+  }'
+
+# Response (500):
+{
+  "message": "Failed to import from GitHub"
+}
+
+# Server logs show:
+# Error: Bad credentials (GitHub API)
+
+# Debug:
+echo $GITHUB_TOKEN
+# Verify token validity:
+curl -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/user
+```
+
+**Debugging 500 errors:**
+```bash
+# 1. Check server console output
+# Look for error stack traces immediately after the request
+
+# 2. Common error patterns in logs:
+# "Error: connect ECONNREFUSED" → Database connection issue
+# "ZodError" → Validation error (should be 400, not 500)
+# "Error: API key not configured" → Missing environment variable
+# "Error: ENOENT" → File not found
+# "TypeError: Cannot read property" → Null/undefined bug in code
+
+# 3. Test dependencies:
+# Database:
+npm run db:studio
+
+# Environment variables:
+echo $DATABASE_URL
+echo $SESSION_SECRET
+echo $AI_INTEGRATIONS_ANTHROPIC_API_KEY
+echo $GITHUB_TOKEN
+
+# 4. Restart server to clear any cached errors:
+pkill -f "tsx server"
+npm run dev
+
+# 5. Check for recent code changes:
+git log -1
+git status
+
+# 6. Review the specific route in server/routes.ts
+# Search for the endpoint and check try-catch blocks
+```
+
+#### Complete Error Response Examples
+
+**Successful request:**
+```bash
+curl http://localhost:5000/api/resources/1
+
+# Response (200):
+{
+  "id": 1,
+  "title": "Awesome Video Resource",
+  "url": "https://example.com",
+  "description": "A great resource",
+  "category": "General Tools",
+  "subcategory": "DRM",
+  "status": "approved",
+  "createdAt": "2024-01-15T10:30:00Z",
+  "updatedAt": "2024-01-15T10:30:00Z"
+}
+```
+
+**400 Validation Error:**
+```bash
+curl -X POST http://localhost:5000/api/resources \
+  -b cookies.txt \
+  -H "Content-Type: application/json" \
+  -d '{ "title": "x", "url": "invalid" }'
+
+# Response (400):
+{
+  "message": "Invalid resource data",
+  "errors": [
+    {
+      "code": "invalid_string",
+      "path": ["url"],
+      "validation": "url",
+      "message": "Invalid url"
+    }
+  ]
+}
+```
+
+**401 Unauthorized:**
+```bash
+curl http://localhost:5000/api/admin/stats
+
+# Response (401):
+{
+  "message": "Unauthorized"
+}
+```
+
+**403 Forbidden:**
+```bash
+curl http://localhost:5000/api/admin/users -b user-cookies.txt
+
+# Response (403):
+{
+  "message": "Forbidden: Admin access required"
+}
+```
+
+**404 Not Found:**
+```bash
+curl http://localhost:5000/api/resources/99999
+
+# Response (404):
+{
+  "message": "Resource not found"
+}
+```
+
+**500 Internal Server Error:**
+```bash
+curl http://localhost:5000/api/resources
+# (when database is down)
+
+# Response (500):
+{
+  "message": "Failed to fetch resources"
+}
+
+# Server console shows:
+# Error: connect ECONNREFUSED 127.0.0.1:5432
+#     at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1144:16)
+```
+
+#### Testing API Error Scenarios
+
+**Comprehensive testing workflow:**
+
+```bash
+# 1. Test health check (should always work):
+curl http://localhost:5000/api/health
+# Expected: { "status": "ok" }
+
+# 2. Test public endpoint (no auth needed):
+curl http://localhost:5000/api/resources?limit=1
+# Expected: 200 with resources array
+
+# 3. Test auth required endpoint without login:
+curl http://localhost:5000/api/favorites
+# Expected: 401 Unauthorized
+
+# 4. Test login:
+curl -X POST http://localhost:5000/api/auth/local/login \
+  -c cookies.txt \
+  -H "Content-Type: application/json" \
+  -d '{ "email": "admin@example.com", "password": "admin123" }'
+# Expected: 200 with user object
+
+# 5. Test auth required endpoint with login:
+curl http://localhost:5000/api/favorites -b cookies.txt
+# Expected: 200 with favorites array
+
+# 6. Test admin endpoint as regular user:
+curl http://localhost:5000/api/admin/stats -b user-cookies.txt
+# Expected: 403 Forbidden
+
+# 7. Test admin endpoint as admin:
+curl http://localhost:5000/api/admin/stats -b admin-cookies.txt
+# Expected: 200 with stats object
+
+# 8. Test validation error:
+curl -X POST http://localhost:5000/api/resources \
+  -b cookies.txt \
+  -H "Content-Type: application/json" \
+  -d '{ "title": "", "url": "bad-url" }'
+# Expected: 400 with validation errors
+
+# 9. Test 404:
+curl http://localhost:5000/api/resources/99999
+# Expected: 404 Resource not found
+
+# 10. Monitor server logs during tests
+# Watch console for error messages and stack traces
+```
+
 ## Code Style
 
 - TypeScript throughout
