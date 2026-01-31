@@ -79,6 +79,9 @@ import {
   type EnrichmentQueueItem,
   type InsertEnrichmentQueue,
 } from "@shared/schema";
+
+// Infer ResourceAuditLog type from schema table
+export type ResourceAuditLog = typeof resourceAuditLog.$inferSelect;
 import { db } from "./db";
 import { eq, and, sql, desc, asc, inArray, like, or, isNull, isNotNull } from "drizzle-orm";
 import { mapCategoryName } from "@shared/categoryMapping";
@@ -178,8 +181,8 @@ export interface IStorage {
   listUserJourneyProgress(userId: string): Promise<UserJourneyProgress[]>;
   
   // Resource Audit Log
-  logResourceAudit(resourceId: number | null, action: string, performedBy?: string, changes?: any, notes?: string): Promise<void>;
-  getResourceAuditLog(resourceId: number | null, limit?: number): Promise<any[]>;
+  logResourceAudit(resourceId: number | null, action: string, performedBy?: string, changes?: Record<string, any>, notes?: string): Promise<void>;
+  getResourceAuditLog(resourceId: number | null, limit?: number): Promise<ResourceAuditLog[]>;
   
   // Resource Edits
   createResourceEdit(data: InsertResourceEdit): Promise<ResourceEdit>;
@@ -191,7 +194,7 @@ export interface IStorage {
   rejectResourceEdit(editId: number, adminId: string, reason: string): Promise<void>;
   
   // User Preferences
-  getUserPreferences(userId: string): Promise<any | undefined>;
+  getUserPreferences(userId: string): Promise<UserPreferences | undefined>;
   
   // GitHub Sync Queue
   addToGithubSyncQueue(item: InsertGithubSyncQueue): Promise<GithubSyncQueue>;
@@ -228,10 +231,10 @@ export interface IStorage {
   getAwesomeListFromDatabase(): Promise<AwesomeListData>;
   
   // Legacy methods for awesome list (in-memory) - TO BE REMOVED
-  setAwesomeListData(data: any): void;
-  getAwesomeListData(): any | null;
-  getCategories(): any[];
-  getResources(): any[];
+  setAwesomeListData(data: AwesomeListData | null): void;
+  getAwesomeListData(): AwesomeListData | null;
+  getCategories(): HierarchicalCategory[];
+  getResources(): Resource[];
   
   // Legacy methods - kept for backward compatibility
   getUserByUsername(username: string): Promise<User | undefined>;
@@ -260,14 +263,14 @@ interface AdminStats {
 
 interface ValidationStorageItem {
   type: 'awesome-lint' | 'link-check';
-  result: any;
+  result: unknown;
   markdown?: string;
   timestamp: string;
 }
 
 interface ValidationResults {
-  awesomeLint?: any;
-  linkCheck?: any;
+  awesomeLint?: unknown;
+  linkCheck?: unknown;
   lastUpdated?: string;
 }
 
@@ -302,7 +305,7 @@ export interface AwesomeListData {
 
 export class DatabaseStorage implements IStorage {
   // In-memory storage for awesome list compatibility
-  private awesomeListData: any = null;
+  private awesomeListData: AwesomeListData | null = null;
 
   // User operations (MANDATORY for Replit Auth)
   async getUser(id: string): Promise<User | undefined> {
@@ -1053,7 +1056,7 @@ export class DatabaseStorage implements IStorage {
     resourceId: number | null,
     action: string,
     performedBy?: string,
-    changes?: any,
+    changes?: Record<string, any>,
     notes?: string
   ): Promise<void> {
     await db.insert(resourceAuditLog).values({
@@ -1066,7 +1069,7 @@ export class DatabaseStorage implements IStorage {
     });
   }
   
-  async getResourceAuditLog(resourceId: number | null, limit = 50): Promise<any[]> {
+  async getResourceAuditLog(resourceId: number | null, limit = 50): Promise<ResourceAuditLog[]> {
     // If resourceId is null, return all audit logs
     if (resourceId === null) {
       return await db
@@ -1550,15 +1553,15 @@ export class DatabaseStorage implements IStorage {
   }
   
   // Legacy methods for awesome list (in-memory)
-  setAwesomeListData(data: any): void {
+  setAwesomeListData(data: AwesomeListData | null): void {
     this.awesomeListData = data;
   }
 
-  getAwesomeListData(): any | null {
+  getAwesomeListData(): AwesomeListData | null {
     return this.awesomeListData;
   }
 
-  getCategories(): any[] {
+  getCategories(): HierarchicalCategory[] {
     if (!this.awesomeListData) return [];
     
     const categories = new Map();
@@ -1595,7 +1598,7 @@ export class DatabaseStorage implements IStorage {
     }));
   }
 
-  getResources(): any[] {
+  getResources(): Resource[] {
     return this.awesomeListData?.resources || [];
   }
   
@@ -1691,7 +1694,7 @@ export class DatabaseStorage implements IStorage {
 // For backward compatibility, export both MemStorage and DatabaseStorage
 export class MemStorage implements IStorage {
   private users: Map<string, User>;
-  private awesomeListData: any = null;
+  private awesomeListData: AwesomeListData | null = null;
   currentId: number;
 
   constructor() {
@@ -1855,8 +1858,8 @@ export class MemStorage implements IStorage {
   }
   async listUserJourneyProgress(userId: string): Promise<UserJourneyProgress[]> { return []; }
   
-  async logResourceAudit(resourceId: number | null, action: string, performedBy?: string, changes?: any, notes?: string): Promise<void> {}
-  async getResourceAuditLog(resourceId: number | null, limit?: number): Promise<any[]> { return []; }
+  async logResourceAudit(resourceId: number | null, action: string, performedBy?: string, changes?: Record<string, any>, notes?: string): Promise<void> {}
+  async getResourceAuditLog(resourceId: number | null, limit?: number): Promise<ResourceAuditLog[]> { return []; }
   
   async createResourceEdit(data: InsertResourceEdit): Promise<ResourceEdit> {
     throw new Error("Not implemented in memory storage");
@@ -1884,7 +1887,7 @@ export class MemStorage implements IStorage {
     throw new Error("Not implemented in memory storage");
   }
   
-  async getUserPreferences(userId: string): Promise<any | undefined> { return undefined; }
+  async getUserPreferences(userId: string): Promise<UserPreferences | undefined> { return undefined; }
   
   async addToGithubSyncQueue(item: InsertGithubSyncQueue): Promise<GithubSyncQueue> {
     throw new Error("Not implemented in memory storage");
@@ -1949,15 +1952,15 @@ export class MemStorage implements IStorage {
   }
   
   // Legacy methods for awesome list (in-memory) - TO BE REMOVED
-  setAwesomeListData(data: any): void {
+  setAwesomeListData(data: AwesomeListData | null): void {
     this.awesomeListData = data;
   }
 
-  getAwesomeListData(): any | null {
+  getAwesomeListData(): AwesomeListData | null {
     return this.awesomeListData;
   }
 
-  getCategories(): any[] {
+  getCategories(): HierarchicalCategory[] {
     if (!this.awesomeListData) return [];
     
     const categoriesMap = new Map();
@@ -1994,7 +1997,7 @@ export class MemStorage implements IStorage {
     }));
   }
 
-  getResources(): any[] {
+  getResources(): Resource[] {
     return this.awesomeListData?.resources || [];
   }
   
