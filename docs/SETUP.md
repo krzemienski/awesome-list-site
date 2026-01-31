@@ -328,6 +328,275 @@ SESSION_SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString
 npm run dev
 ```
 
+### GitHub Sync Issues
+
+#### GitHub Token Configuration and Permissions
+If GitHub import/export fails with authentication errors:
+
+**Verify token is configured:**
+```bash
+# Check if GITHUB_TOKEN is set
+echo $GITHUB_TOKEN
+
+# Should output your Personal Access Token (PAT)
+# If empty, add to .env or Replit Secrets
+```
+
+**Required token permissions:**
+For successful GitHub sync, your PAT needs:
+- `repo` - Full repository access (for private repos)
+- `public_repo` - Public repository access (for public repos only)
+- `read:org` - Read organization data (if syncing org repos)
+- `workflow` - Update GitHub Actions workflows (if using CI/CD)
+
+**Create a new token:**
+1. Go to GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)
+2. Click "Generate new token (classic)"
+3. Select required scopes listed above
+4. Copy token and add to environment:
+   ```bash
+   GITHUB_TOKEN=ghp_your_token_here
+   ```
+5. Restart the server
+
+**Test token validity:**
+```bash
+# Via curl
+curl -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/user
+
+# Should return your GitHub user info
+# If 401 Unauthorized, token is invalid
+# If 403 Forbidden, token lacks permissions
+```
+
+#### Rate Limiting Solutions
+GitHub API has rate limits (5,000 requests/hour for authenticated users):
+
+**Check current rate limit:**
+```bash
+curl -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/rate_limit
+```
+
+**If you hit rate limits:**
+1. **Wait for reset** - Check `X-RateLimit-Reset` header
+   ```bash
+   # Rate limit resets at Unix timestamp shown
+   date -r $(curl -sI -H "Authorization: token $GITHUB_TOKEN" \
+     https://api.github.com/rate_limit | \
+     grep -i x-ratelimit-reset | awk '{print $2}')
+   ```
+
+2. **Use dry-run mode** - Test imports without consuming API calls:
+   ```bash
+   # In Admin UI, enable "Dry Run Mode" before import
+   # This parses locally without making GitHub API calls
+   ```
+
+3. **Batch operations** - Instead of multiple small imports:
+   - Import entire repositories at once
+   - Use scheduled imports during off-peak hours
+   - Cache results locally when testing
+
+4. **Upgrade limits** - Consider GitHub Enterprise or Apps for higher limits
+
+**Rate limit error messages:**
+- `API rate limit exceeded` - Wait for reset or use caching
+- `Secondary rate limit` - Too many requests too quickly, slow down
+
+#### Import Validation Error Debugging
+If import fails with validation errors:
+
+**Common validation failures:**
+
+**1. awesome-lint rule violations:**
+```bash
+# View detailed validation errors in import result
+# Errors show: line number, rule name, and message
+
+# Example error:
+# Line 45: remark-lint:awesome-list-item
+# Message: "Item must start with '- [Name](url) - Description'"
+```
+
+**Fix approaches:**
+- **Non-strict mode** - Allows warnings, only fails on errors
+  ```bash
+  # In Admin UI, disable "Strict Mode" checkbox
+  # This imports resources despite warnings
+  ```
+
+- **Manual corrections** - Edit source markdown to fix violations:
+  ```bash
+  # Common fixes:
+  # - Add descriptions after links: - [Name](url) - Description here
+  # - Fix broken URLs: ensure https:// prefix
+  # - Remove duplicate entries
+  # - Ensure proper list formatting with - prefix
+  ```
+
+**2. Malformed markdown:**
+```bash
+# Symptoms:
+# - "Failed to parse markdown" error
+# - Missing categories or resources
+# - Incorrect nesting
+
+# Debug steps:
+1. Test markdown locally:
+   npx tsx scripts/test-awesome-lint.ts
+
+2. Check for:
+   - Unclosed brackets/parentheses in links
+   - Invalid heading levels (must be ## or ###)
+   - Mixed list markers (-, *, +)
+
+3. Use dry-run mode to see parsing results
+```
+
+**3. URL validation errors:**
+```bash
+# Error: "Invalid URL format"
+# Ensure all URLs:
+# - Start with https:// (not http://)
+# - Have valid domain names
+# - Don't contain spaces (use %20 encoding)
+
+# Error: "Duplicate URL found"
+# The system detects conflicts - see Conflict Resolution below
+```
+
+#### Dry-Run Mode Usage
+Use dry-run mode to preview imports without database changes:
+
+**Enable dry-run:**
+1. Navigate to Admin → GitHub Sync
+2. Check "Dry Run Mode" checkbox
+3. Enter repository URL
+4. Click Import
+
+**What dry-run does:**
+- ✅ Fetches markdown from GitHub
+- ✅ Parses resources and categories
+- ✅ Validates against awesome-lint
+- ✅ Detects conflicts with existing data
+- ❌ Does NOT modify database
+- ❌ Does NOT create/update resources
+
+**Interpreting dry-run results:**
+```javascript
+{
+  "imported": 0,        // Always 0 in dry-run
+  "updated": 0,         // Always 0 in dry-run
+  "skipped": 42,        // Would be skipped (already exist)
+  "validationPassed": true,
+  "validationErrors": [],
+  "resources": [...]    // Preview of what would be imported
+}
+```
+
+**When to use dry-run:**
+- Testing new repository sources
+- Debugging validation errors
+- Previewing changes before applying
+- Checking for conflicts
+- Verifying markdown parsing
+
+**Switch to real import:**
+1. Review dry-run results
+2. Fix any validation errors in source
+3. Uncheck "Dry Run Mode"
+4. Re-run import to apply changes
+
+#### Conflict Resolution Strategies
+When importing resources that already exist (matched by URL):
+
+**Conflict detection:**
+The system identifies conflicts using:
+- **Primary match:** Exact URL match
+- **Fuzzy match:** Similar titles or descriptions
+- **Category conflicts:** Same resource in different categories
+
+**Resolution modes:**
+
+**1. Skip existing (default):**
+```bash
+# In Admin UI: Default behavior
+# - Leaves existing resources unchanged
+# - Only imports truly new resources
+# - Safe for incremental updates
+# Result: "skipped": N in import result
+```
+
+**2. Update existing:**
+```bash
+# In Admin UI: Check "Force Overwrite" (use with caution)
+# - Updates existing resources with new data
+# - Overwrites title, description, category
+# - Preserves local enrichments (AI data, tags)
+# Result: "updated": N in import result
+```
+
+**3. Manual resolution:**
+```bash
+# For complex conflicts:
+1. Run dry-run mode to preview conflicts
+2. Review existing resources in database:
+   npm run db:studio
+   # Check resources table for conflicting URLs
+
+3. Decide per resource:
+   - Delete local version if GitHub is source of truth
+   - Keep local version if manually curated
+   - Merge manually via Admin UI edit
+
+4. Re-run import after cleanup
+```
+
+**Common conflict scenarios:**
+
+**Scenario 1: Same URL, different metadata**
+```bash
+# Database: "React Docs - Official React documentation"
+# GitHub:   "React Documentation - Learn React"
+
+# Resolution:
+# - Skip: Keeps "Official React documentation"
+# - Update: Changes to "Learn React"
+# - Manual: Edit in Admin UI to preferred version
+```
+
+**Scenario 2: Duplicate URLs in import**
+```bash
+# GitHub markdown has same URL listed twice
+# System automatically deduplicates during parsing
+# Only first occurrence is imported
+```
+
+**Scenario 3: Different categories**
+```bash
+# Database: URL in "Frameworks → React"
+# GitHub:   Same URL in "Libraries → UI"
+
+# Resolution:
+# - Skip: Stays in "Frameworks → React"
+# - Update: Moves to "Libraries → UI"
+# - Manual: Consider if resource belongs in both categories
+```
+
+**Best practices:**
+1. **First import:** Use default skip mode to avoid duplicates
+2. **Updates:** Use dry-run first, then force overwrite if needed
+3. **Conflicts:** Review in database before deciding
+4. **Audit trail:** Check sync history in database for past imports
+5. **Backup:** Export current list before major imports
+
+**Check sync history:**
+```bash
+# Via database
+npm run db:studio
+# View github_sync_queue table for operation history
+```
+
 ## Code Style
 
 - TypeScript throughout
