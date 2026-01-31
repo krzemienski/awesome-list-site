@@ -301,6 +301,115 @@ export interface AwesomeListData {
   categories: HierarchicalCategory[];
 }
 
+// Memoized helper function for getAwesomeListFromDatabase
+const getAwesomeListFromDatabaseMemoized = memoize(
+  async () => {
+    // 1. Get all approved resources
+    const allResources = await db
+      .select()
+      .from(resources)
+      .where(eq(resources.status, 'approved'))
+      .orderBy(resources.category, resources.subcategory, resources.subSubcategory, resources.title);
+
+
+    // 2. Get all categories, subcategories, and sub-subcategories from database
+    const dbCategories = await db.select().from(categories).orderBy(asc(categories.name));
+    const dbSubcategories = await db.select().from(subcategories).orderBy(asc(subcategories.name));
+    const dbSubSubcategories = await db.select().from(subSubcategories).orderBy(asc(subSubcategories.name));
+
+    // 3. Helper function to filter resources by hierarchy level
+    // We use filter-based aggregation instead of Maps to avoid losing resources during normalization
+    const getResourcesForCategory = (categoryName: string): Resource[] => {
+      return allResources.filter(r => mapCategoryName(r.category) === categoryName);
+    };
+
+    const getResourcesForSubcategory = (subcategoryName: string): Resource[] => {
+      return allResources.filter(r => r.subcategory === subcategoryName);
+    };
+
+    const getResourcesForSubSubcategory = (subSubcategoryName: string): Resource[] => {
+      return allResources.filter(r => r.subSubcategory === subSubcategoryName);
+    };
+
+    // 4. Build hierarchical structure using filter-based aggregation
+    const hierarchicalCategories: HierarchicalCategory[] = [];
+
+    for (const dbCategory of dbCategories) {
+      // Get ALL resources for this category (filter from allResources)
+      const categoryResources = getResourcesForCategory(dbCategory.name);
+
+      // Get subcategories for this category
+      const catSubcategories = dbSubcategories.filter(sub => sub.categoryId === dbCategory.id);
+
+      const hierarchicalSubcategories: HierarchicalSubcategory[] = [];
+
+      for (const dbSubcat of catSubcategories) {
+        // Get ALL resources for this subcategory (filter from allResources)
+        const subcategoryResources = getResourcesForSubcategory(dbSubcat.name);
+
+        // Get sub-subcategories for this subcategory
+        const subcatSubSubcategories = dbSubSubcategories.filter(
+          subSub => subSub.subcategoryId === dbSubcat.id
+        );
+
+        const hierarchicalSubSubcategories: HierarchicalSubSubcategory[] = subcatSubSubcategories.map(subSub => ({
+          name: subSub.name,
+          slug: subSub.slug,
+          resources: getResourcesForSubSubcategory(subSub.name)
+        }));
+
+        hierarchicalSubcategories.push({
+          name: dbSubcat.name,
+          slug: dbSubcat.slug,
+          resources: subcategoryResources,
+          subSubcategories: hierarchicalSubSubcategories
+        });
+      }
+
+      hierarchicalCategories.push({
+        name: dbCategory.name,
+        slug: dbCategory.slug,
+        resources: categoryResources,
+        subcategories: hierarchicalSubcategories
+      });
+    }
+
+    // Transform resources to include tags at root level for frontend compatibility
+    const transformedResources = allResources.map(r => ({
+      ...r,
+      tags: (r.metadata as any)?.tags || []
+    }));
+
+    // Also transform resources in category hierarchies
+    const transformResource = (r: Resource) => ({
+      ...r,
+      tags: (r.metadata as any)?.tags || []
+    });
+
+    const transformedCategories = hierarchicalCategories.map(cat => ({
+      ...cat,
+      resources: cat.resources.map(transformResource),
+      subcategories: cat.subcategories.map(sub => ({
+        ...sub,
+        resources: sub.resources.map(transformResource),
+        subSubcategories: sub.subSubcategories.map(subSub => ({
+          ...subSub,
+          resources: subSub.resources.map(transformResource)
+        }))
+      }))
+    }));
+
+    return {
+      title: "Awesome Video",
+      description: "A curated list of awesome video frameworks, libraries, and software for video processing, streaming, and manipulation",
+      repoUrl: "https://github.com/krzemienski/awesome-video",
+      resources: transformedResources,
+      categories: transformedCategories
+    };
+  },
+  { maxAge: 3600 * 1000 }
+);
+
 export class DatabaseStorage implements IStorage {
   // In-memory storage for awesome list compatibility
   private awesomeListData: any = null;
@@ -1378,108 +1487,7 @@ export class DatabaseStorage implements IStorage {
 
   // Database-driven awesome list hierarchy - builds complete category tree from database
   async getAwesomeListFromDatabase(): Promise<AwesomeListData> {
-    // 1. Get all approved resources
-    const allResources = await db
-      .select()
-      .from(resources)
-      .where(eq(resources.status, 'approved'))
-      .orderBy(resources.category, resources.subcategory, resources.subSubcategory, resources.title);
-    
-    
-    // 2. Get all categories, subcategories, and sub-subcategories from database
-    const dbCategories = await db.select().from(categories).orderBy(asc(categories.name));
-    const dbSubcategories = await db.select().from(subcategories).orderBy(asc(subcategories.name));
-    const dbSubSubcategories = await db.select().from(subSubcategories).orderBy(asc(subSubcategories.name));
-    
-    // 3. Helper function to filter resources by hierarchy level
-    // We use filter-based aggregation instead of Maps to avoid losing resources during normalization
-    const getResourcesForCategory = (categoryName: string): Resource[] => {
-      return allResources.filter(r => mapCategoryName(r.category) === categoryName);
-    };
-    
-    const getResourcesForSubcategory = (subcategoryName: string): Resource[] => {
-      return allResources.filter(r => r.subcategory === subcategoryName);
-    };
-    
-    const getResourcesForSubSubcategory = (subSubcategoryName: string): Resource[] => {
-      return allResources.filter(r => r.subSubcategory === subSubcategoryName);
-    };
-    
-    // 4. Build hierarchical structure using filter-based aggregation
-    const hierarchicalCategories: HierarchicalCategory[] = [];
-    
-    for (const dbCategory of dbCategories) {
-      // Get ALL resources for this category (filter from allResources)
-      const categoryResources = getResourcesForCategory(dbCategory.name);
-      
-      // Get subcategories for this category
-      const catSubcategories = dbSubcategories.filter(sub => sub.categoryId === dbCategory.id);
-      
-      const hierarchicalSubcategories: HierarchicalSubcategory[] = [];
-      
-      for (const dbSubcat of catSubcategories) {
-        // Get ALL resources for this subcategory (filter from allResources)
-        const subcategoryResources = getResourcesForSubcategory(dbSubcat.name);
-        
-        // Get sub-subcategories for this subcategory
-        const subcatSubSubcategories = dbSubSubcategories.filter(
-          subSub => subSub.subcategoryId === dbSubcat.id
-        );
-        
-        const hierarchicalSubSubcategories: HierarchicalSubSubcategory[] = subcatSubSubcategories.map(subSub => ({
-          name: subSub.name,
-          slug: subSub.slug,
-          resources: getResourcesForSubSubcategory(subSub.name)
-        }));
-        
-        hierarchicalSubcategories.push({
-          name: dbSubcat.name,
-          slug: dbSubcat.slug,
-          resources: subcategoryResources,
-          subSubcategories: hierarchicalSubSubcategories
-        });
-      }
-      
-      hierarchicalCategories.push({
-        name: dbCategory.name,
-        slug: dbCategory.slug,
-        resources: categoryResources,
-        subcategories: hierarchicalSubcategories
-      });
-    }
-    
-    // Transform resources to include tags at root level for frontend compatibility
-    const transformedResources = allResources.map(r => ({
-      ...r,
-      tags: (r.metadata as any)?.tags || []
-    }));
-    
-    // Also transform resources in category hierarchies
-    const transformResource = (r: Resource) => ({
-      ...r,
-      tags: (r.metadata as any)?.tags || []
-    });
-    
-    const transformedCategories = hierarchicalCategories.map(cat => ({
-      ...cat,
-      resources: cat.resources.map(transformResource),
-      subcategories: cat.subcategories.map(sub => ({
-        ...sub,
-        resources: sub.resources.map(transformResource),
-        subSubcategories: sub.subSubcategories.map(subSub => ({
-          ...subSub,
-          resources: subSub.resources.map(transformResource)
-        }))
-      }))
-    }));
-    
-    return {
-      title: "Awesome Video",
-      description: "A curated list of awesome video frameworks, libraries, and software for video processing, streaming, and manipulation",
-      repoUrl: "https://github.com/krzemienski/awesome-video",
-      resources: transformedResources,
-      categories: transformedCategories
-    };
+    return getAwesomeListFromDatabaseMemoized();
   }
   
   // Admin Statistics
