@@ -146,7 +146,10 @@ export interface IStorage {
   addTagToResource(resourceId: number, tagId: number): Promise<void>;
   removeTagFromResource(resourceId: number, tagId: number): Promise<void>;
   getResourceTags(resourceId: number): Promise<Tag[]>;
-  
+
+  // Related Resources
+  getRelatedResources(resourceId: number, userId?: string, limit?: number): Promise<RelatedResource[]>;
+
   // Learning Journeys
   listLearningJourneys(category?: string): Promise<LearningJourney[]>;
   getLearningJourney(id: number): Promise<LearningJourney | undefined>;
@@ -269,6 +272,11 @@ interface ValidationResults {
   awesomeLint?: any;
   linkCheck?: any;
   lastUpdated?: string;
+}
+
+export interface RelatedResource extends Resource {
+  score: number;
+  reasons: string[];
 }
 
 // Hierarchical category structure for frontend
@@ -788,10 +796,106 @@ export class DatabaseStorage implements IStorage {
       .from(resourceTags)
       .innerJoin(tags, eq(resourceTags.tagId, tags.id))
       .where(eq(resourceTags.resourceId, resourceId));
-    
+
     return result.map(r => r.tag);
   }
-  
+
+  // Related Resources
+  async getRelatedResources(resourceId: number, userId?: string, limit: number = 6): Promise<RelatedResource[]> {
+    // Get the source resource
+    const sourceResource = await this.getResource(resourceId);
+    if (!sourceResource) {
+      return [];
+    }
+
+    // Get tags for the source resource
+    const sourceTags = await this.getResourceTags(resourceId);
+    const sourceTagIds = sourceTags.map(t => t.id);
+
+    // Build query to find related resources
+    // We'll use a subquery to count tag overlaps
+    const relatedResourcesQuery = db
+      .select({
+        resource: resources,
+        tagCount: sql<number>`COUNT(DISTINCT ${resourceTags.tagId})::int`
+      })
+      .from(resources)
+      .leftJoin(resourceTags, eq(resources.id, resourceTags.resourceId))
+      .where(
+        and(
+          eq(resources.status, 'approved'),
+          sql`${resources.id} != ${resourceId}`, // Exclude source resource
+          or(
+            // Same subcategory
+            sourceResource.subcategory
+              ? eq(resources.subcategory, sourceResource.subcategory)
+              : undefined,
+            // Or has overlapping tags
+            sourceTagIds.length > 0
+              ? inArray(resourceTags.tagId, sourceTagIds)
+              : undefined
+          )
+        )
+      )
+      .groupBy(resources.id)
+      .$dynamic();
+
+    // Exclude bookmarks if userId provided
+    let bookmarkedIds: number[] = [];
+    if (userId) {
+      const bookmarks = await db
+        .select({ resourceId: userBookmarks.resourceId })
+        .from(userBookmarks)
+        .where(eq(userBookmarks.userId, userId));
+      bookmarkedIds = bookmarks.map(b => b.resourceId);
+    }
+
+    // Execute the query
+    let results = await relatedResourcesQuery;
+
+    // Filter out bookmarked resources
+    if (bookmarkedIds.length > 0) {
+      results = results.filter(r => !bookmarkedIds.includes(r.resource.id));
+    }
+
+    // Calculate scores and reasons for each result
+    const scoredResults: RelatedResource[] = results.map(({ resource, tagCount }) => {
+      let score = 0;
+      const reasons: string[] = [];
+
+      // Same subcategory gets high score
+      if (sourceResource.subcategory && resource.subcategory === sourceResource.subcategory) {
+        score += 10;
+        reasons.push(`Same subcategory: ${resource.subcategory}`);
+      }
+
+      // Tag overlap contributes to score
+      if (tagCount > 0) {
+        score += tagCount * 2;
+        reasons.push(`${tagCount} shared tag${tagCount > 1 ? 's' : ''}`);
+      }
+
+      // Same category (but different subcategory) gets lower score
+      if (resource.category === sourceResource.category && resource.subcategory !== sourceResource.subcategory) {
+        score += 1;
+        if (!reasons.some(r => r.includes('subcategory'))) {
+          reasons.push(`Same category: ${resource.category}`);
+        }
+      }
+
+      return {
+        ...resource,
+        score,
+        reasons
+      };
+    });
+
+    // Sort by score (descending) and limit results
+    return scoredResults
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit);
+  }
+
   // Learning Journeys
   async listLearningJourneys(category?: string): Promise<LearningJourney[]> {
     let query = db.select().from(learningJourneys);
@@ -1813,7 +1917,9 @@ export class MemStorage implements IStorage {
   async addTagToResource(resourceId: number, tagId: number): Promise<void> {}
   async removeTagFromResource(resourceId: number, tagId: number): Promise<void> {}
   async getResourceTags(resourceId: number): Promise<Tag[]> { return []; }
-  
+
+  async getRelatedResources(resourceId: number, userId?: string, limit?: number): Promise<RelatedResource[]> { return []; }
+
   async listLearningJourneys(category?: string): Promise<LearningJourney[]> { return []; }
   async getLearningJourney(id: number): Promise<LearningJourney | undefined> { return undefined; }
   async createLearningJourney(journey: InsertLearningJourney): Promise<LearningJourney> {
