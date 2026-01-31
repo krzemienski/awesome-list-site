@@ -60,10 +60,10 @@ interface AwesomeListConfig {
   theme: ThemeConfig;
   analytics: AnalyticsConfig;
   features: FeaturesConfig;
-  build: any;
-  deploy: any;
-  seo: any;
-  performance: any;
+  build: Record<string, unknown>;
+  deploy: Record<string, unknown>;
+  seo: Record<string, unknown>;
+  performance: Record<string, unknown>;
 }
 
 // Default configuration
