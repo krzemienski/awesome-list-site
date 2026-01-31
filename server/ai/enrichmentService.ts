@@ -1,7 +1,7 @@
 import { storage } from '../storage';
 import { generateResourceTags } from './tagging';
 import { fetchUrlMetadata, type UrlMetadata } from './urlScraper';
-import type { EnrichmentJob } from '@shared/schema';
+import type { EnrichmentJob, EnrichmentQueueItem, Resource } from '@shared/schema';
 
 type EnrichmentOutcome = 'success' | 'skipped' | 'failed';
 
@@ -125,11 +125,11 @@ export class EnrichmentService {
           completedAt: new Date()
         });
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error(`Error processing job ${jobId}:`, error);
       await storage.updateEnrichmentJob(jobId, {
         status: 'failed',
-        errorMessage: error.message,
+        errorMessage: error instanceof Error ? error.message : 'Unknown error',
         completedAt: new Date()
       });
     } finally {
@@ -157,7 +157,7 @@ export class EnrichmentService {
     }
   }
 
-  async processBatch(jobId: number, batch: any[]): Promise<void> {
+  async processBatch(jobId: number, batch: EnrichmentQueueItem[]): Promise<void> {
     const job = await storage.getEnrichmentJob(jobId);
     if (!job) {
       throw new Error(`Job ${jobId} not found`);
@@ -218,8 +218,8 @@ export class EnrichmentService {
             processedAt: new Date()
           });
         }
-        
-      } catch (error: any) {
+
+      } catch (error) {
         // Unexpected errors (like resource not found)
         console.error(`Error processing resource ${queueItem.resourceId}:`, error);
         
@@ -315,7 +315,7 @@ export class EnrichmentService {
           }),
         };
 
-        const updates: any = {
+        const updates: Partial<Resource> = {
           metadata: enhancedMetadata
         };
 
@@ -345,10 +345,10 @@ export class EnrichmentService {
         );
 
         return 'success';
-      } catch (error: any) {
-        lastError = error;
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error('Unknown error');
         retryCount++;
-        
+
         if (retryCount < maxRetries) {
           console.log(`Retry ${retryCount}/${maxRetries} for resource ${resourceId}`);
           await this.delay(1000 * retryCount);
@@ -357,10 +357,10 @@ export class EnrichmentService {
             resourceId,
             'ai_enrichment_failed',
             undefined,
-            { error: error.message },
+            { error: error instanceof Error ? error.message : 'Unknown error' },
             `AI enrichment failed after ${maxRetries} retries`
           );
-          
+
           return 'failed';
         }
       }
