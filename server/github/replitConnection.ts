@@ -5,7 +5,29 @@ import { Octokit } from '@octokit/rest';
  * Manages OAuth token retrieval from Replit's connection service
  */
 
-let connectionSettings: any;
+// Octokit throttle options type
+interface ThrottleOptions {
+  method: string;
+  url: string;
+  request: {
+    retryCount: number;
+  };
+}
+
+// Replit connection settings types
+interface ReplitConnectionSettings {
+  settings: {
+    expires_at?: string;
+    access_token?: string;
+    oauth?: {
+      credentials?: {
+        access_token?: string;
+      };
+    };
+  };
+}
+
+let connectionSettings: ReplitConnectionSettings | undefined;
 
 async function getAccessToken(): Promise<string> {
   // Return cached token if still valid
@@ -35,7 +57,7 @@ async function getAccessToken(): Promise<string> {
     }
   ).then(res => res.json()).then(data => data.items?.[0]);
 
-  const accessToken = connectionSettings?.settings?.access_token || connectionSettings.settings?.oauth?.credentials?.access_token;
+  const accessToken = connectionSettings?.settings?.access_token || connectionSettings?.settings?.oauth?.credentials?.access_token;
 
   if (!connectionSettings || !accessToken) {
     throw new Error('GitHub not connected via Replit. Please set up the GitHub connection.');
@@ -55,14 +77,14 @@ export async function getGitHubClient(): Promise<Octokit> {
     auth: accessToken,
     userAgent: 'awesome-list-sync v1.0.0',
     throttle: {
-      onRateLimit: (retryAfter: number, options: any) => {
+      onRateLimit: (retryAfter: number, options: ThrottleOptions) => {
         console.warn(`GitHub rate limit reached for ${options.method} ${options.url}`);
         if (options.request.retryCount === 0) {
           console.log(`Retrying after ${retryAfter} seconds`);
           return true;
         }
       },
-      onSecondaryRateLimit: (retryAfter: number, options: any) => {
+      onSecondaryRateLimit: (retryAfter: number, options: ThrottleOptions) => {
         console.warn(`GitHub secondary rate limit for ${options.method} ${options.url}`);
       },
     },
