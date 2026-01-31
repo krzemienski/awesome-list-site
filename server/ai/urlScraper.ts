@@ -52,11 +52,11 @@ export async function fetchUrlMetadata(url: string, timeout: number = 10000): Pr
     const html = await response.text();
     return parseHtmlMetadata(html, url);
 
-  } catch (error: any) {
-    if (error.name === 'AbortError') {
+  } catch (error: unknown) {
+    if (error instanceof Error && error.name === 'AbortError') {
       return { error: 'Request timeout' };
     }
-    return { error: error.message || 'Unknown error' };
+    return { error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
 
