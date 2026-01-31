@@ -100,7 +100,6 @@
     "zod-validation-error": "^3.4.0"
   },
   "devDependencies": {
-    "@vercel/node": "^3.0.0",
     "@replit/vite-plugin-cartographer": "^0.4.3",
     "@replit/vite-plugin-runtime-error-modal": "^0.0.3",
     "@tailwindcss/vite": "^4.0.0",

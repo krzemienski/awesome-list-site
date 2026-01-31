@@ -1,6 +1,19 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { neon } from '@neondatabase/serverless';
 import bcrypt from 'bcryptjs';
+import type { IncomingMessage, ServerResponse } from 'http';
+
+// Vercel request/response types
+interface VercelRequest extends IncomingMessage {
+  query: Record<string, string | string[]>;
+  cookies: Record<string, string>;
+  body: any;
+}
+
+interface VercelResponse extends ServerResponse {
+  status: (code: number) => VercelResponse;
+  json: (data: any) => void;
+  send: (data: any) => void;
+}
 
 // Initialize Neon client
 const sql = neon(process.env.DATABASE_URL!);
