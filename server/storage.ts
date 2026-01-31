@@ -82,6 +82,7 @@ import {
 import { db } from "./db";
 import { eq, and, sql, desc, asc, inArray, like, or, isNull, isNotNull } from "drizzle-orm";
 import { mapCategoryName } from "@shared/categoryMapping";
+import memoize from "memoizee";
 
 // Interface for storage operations
 export interface IStorage {
