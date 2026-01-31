@@ -2407,6 +2407,1251 @@ const analysis = await claudeService.generateResponse(prompt, 2000);
 
 ---
 
+## Configuration Guide
+
+Complete reference for configuring and deploying AI services in your environment.
+
+### Environment Variables
+
+#### Required Configuration
+
+All AI services require at least one API key to function. Set either of these variables:
+
+```bash
+# Primary API key (recommended)
+AI_INTEGRATIONS_ANTHROPIC_API_KEY=sk-ant-api03-...
+
+# Fallback API key (checked if primary is not set)
+ANTHROPIC_API_KEY=sk-ant-api03-...
+```
+
+**Important**: Services will operate in **fallback mode** if no API key is provided. Check availability before making AI calls.
+
+#### Optional Configuration
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `AI_INTEGRATIONS_ANTHROPIC_BASE_URL` | `https://api.anthropic.com` | Custom API endpoint (for proxies/testing) |
+| `NODE_ENV` | `development` | Environment mode (affects logging verbosity) |
+
+#### Rate Limiting Configuration
+
+These constants are defined in code but can be adjusted based on your Anthropic tier:
+
+```typescript
+// server/ai/claudeService.ts
+private readonly RATE_LIMIT_DELAY = 1000; // 1 second between requests
+private readonly MAX_RETRIES = 3;          // Retry attempts on failure
+```
+
+**Anthropic Rate Limits by Tier**:
+| Tier | Requests/minute | Tokens/minute |
+|------|----------------|---------------|
+| Free | 5 | 25,000 |
+| Build Tier 1 | 50 | 50,000 |
+| Build Tier 2 | 1,000 | 100,000 |
+| Build Tier 3 | 2,000 | 200,000 |
+
+Adjust `RATE_LIMIT_DELAY` based on your tier to maximize throughput without hitting limits.
+
+### Initial Setup
+
+#### 1. Obtain Anthropic API Key
+
+1. Sign up at [console.anthropic.com](https://console.anthropic.com)
+2. Navigate to API Keys section
+3. Create new API key
+4. Copy the key (starts with `sk-ant-api03-`)
+
+#### 2. Configure Environment
+
+**Development (.env file)**:
+```bash
+# .env
+AI_INTEGRATIONS_ANTHROPIC_API_KEY=sk-ant-api03-your-key-here
+NODE_ENV=development
+```
+
+**Production (Replit)**:
+1. Open Secrets panel (lock icon in sidebar)
+2. Add secret: `AI_INTEGRATIONS_ANTHROPIC_API_KEY`
+3. Paste your API key as the value
+4. Restart your Repl
+
+**Production (Docker/Other)**:
+```bash
+# docker-compose.yml
+environment:
+  - AI_INTEGRATIONS_ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+
+# Or docker run
+docker run -e AI_INTEGRATIONS_ANTHROPIC_API_KEY=sk-ant-api03-... your-image
+```
+
+#### 3. Verify Configuration
+
+Test your configuration with the health check endpoint:
+
+```bash
+# Test AI service availability
+curl http://localhost:5000/api/health/ai
+
+# Expected response
+{
+  "status": "healthy",
+  "cacheSize": 0,
+  "responseCacheSize": 0,
+  "analysisCacheSize": 0
+}
+```
+
+Or programmatically:
+
+```typescript
+import { claudeService } from './server/ai/claudeService';
+
+// Check if service is configured
+if (claudeService.isAvailable()) {
+  console.log('✅ AI services ready');
+
+  // Test connection
+  const connected = await claudeService.testConnection();
+  console.log('✅ API connection:', connected ? 'SUCCESS' : 'FAILED');
+} else {
+  console.log('❌ AI services unavailable - check API key configuration');
+}
+```
+
+### Cache Configuration
+
+#### Cache TTL (Time-To-Live)
+
+Default cache durations optimized for cost and freshness:
+
+```typescript
+// server/ai/claudeService.ts
+private readonly CACHE_TTL = 60 * 60 * 1000;          // 1 hour (general responses)
+private readonly ANALYSIS_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours (URL analysis)
+```
+
+**When to adjust TTL**:
+- **Increase** for stable content (documentation, established projects)
+- **Decrease** for rapidly changing content (news, trending repos)
+- **Clear cache** during development/testing: `claudeService.clearCache()`
+
+#### Cache Sizing
+
+```typescript
+private readonly MAX_CACHE_SIZE = 100;  // Maximum entries per cache
+```
+
+**Memory estimation**:
+- Response cache: ~100-200 KB (100 entries × 1-2 KB each)
+- Analysis cache: ~50 KB (100 entries × 500 bytes each)
+- **Total**: ~250 KB maximum memory footprint
+
+**LRU Eviction**: Oldest entries are automatically removed when cache is full.
+
+### Security Configuration
+
+#### Domain Allowlist
+
+URL analysis is restricted to approved domains to prevent abuse:
+
+```typescript
+// server/ai/claudeService.ts
+private readonly ALLOWED_DOMAINS = [
+  'github.com',
+  'gitlab.com',
+  'bitbucket.org',
+  'youtube.com',
+  'vimeo.com',
+  'npmjs.com',
+  // ... video streaming related domains
+];
+```
+
+**To add domains**:
+1. Edit `server/ai/claudeService.ts`
+2. Add domain to `ALLOWED_DOMAINS` array
+3. Restart server
+4. Verify with `analyzeURL()` call
+
+#### Admin-Only Endpoints
+
+Batch enrichment and sensitive AI operations require admin role:
+
+```typescript
+// server/routes/admin.ts
+router.post('/resources/enrich', requireAdmin, async (req, res) => {
+  // Only admins can trigger batch enrichment
+});
+```
+
+See [ADMIN-GUIDE.md](./ADMIN-GUIDE.md) for admin setup.
+
+---
+
+## Common Integration Patterns
+
+Practical examples for integrating AI services into your application workflow.
+
+### Pattern 1: Resource Submission with Auto-Enrichment
+
+Automatically enrich user-submitted resources with AI metadata:
+
+```typescript
+// server/routes/resources.ts
+import { claudeService } from '../ai/claudeService';
+
+router.post('/api/resources', requireAuth, async (req, res) => {
+  const { url, title, description } = req.body;
+
+  // Create initial resource
+  const resource = await storage.createResource({
+    url,
+    title,
+    description,
+    userId: req.user.id,
+    status: 'pending'
+  });
+
+  // Enrich in background (don't block response)
+  if (claudeService.isAvailable()) {
+    claudeService.analyzeURL(url)
+      .then(analysis => {
+        if (analysis) {
+          // Update with AI suggestions
+          storage.updateResource(resource.id, {
+            aiSuggestedTitle: analysis.suggestedTitle,
+            aiSuggestedDescription: analysis.suggestedDescription,
+            aiSuggestedTags: analysis.suggestedTags,
+            aiSuggestedCategory: analysis.suggestedCategory,
+            aiConfidence: analysis.confidence
+          });
+        }
+      })
+      .catch(err => console.error('Background enrichment failed:', err));
+  }
+
+  // Return immediately to user
+  res.status(201).json(resource);
+});
+```
+
+**Benefits**:
+- Fast user experience (no waiting for AI)
+- Automatic metadata suggestions for admin review
+- Graceful degradation if AI unavailable
+
+### Pattern 2: Smart Edit Suggestion Review
+
+Use AI to validate and enhance user edit suggestions:
+
+```typescript
+// server/routes/resources.ts
+router.post('/api/resources/:id/edits', requireAuth, async (req, res) => {
+  const { proposedChanges, triggerClaudeAnalysis } = req.body;
+  const resource = await storage.getResourceById(req.params.id);
+
+  let aiAnalysis = null;
+
+  // Optional AI validation of proposed changes
+  if (triggerClaudeAnalysis && claudeService.isAvailable()) {
+    const prompt = `
+      Original: ${JSON.stringify(resource)}
+      Proposed Changes: ${JSON.stringify(proposedChanges)}
+
+      Evaluate if proposed changes improve accuracy and clarity.
+      Return JSON: { "approved": boolean, "reasoning": string, "suggestions": string[] }
+    `;
+
+    const response = await claudeService.generateResponse(prompt, 500);
+    if (response) {
+      try {
+        aiAnalysis = JSON.parse(response);
+      } catch (e) {
+        console.error('Failed to parse AI analysis:', e);
+      }
+    }
+  }
+
+  // Create edit suggestion with AI analysis
+  const suggestion = await storage.createEditSuggestion({
+    resourceId: resource.id,
+    userId: req.user.id,
+    proposedChanges,
+    aiAnalysis,
+    status: 'pending'
+  });
+
+  res.status(201).json(suggestion);
+});
+```
+
+**Benefits**:
+- AI assists admin review process
+- Identifies potential improvements
+- Reduces admin workload on obvious improvements
+
+### Pattern 3: Intelligent Search Enhancement
+
+Enhance search with AI-powered query understanding:
+
+```typescript
+// server/routes/search.ts
+import { claudeService } from '../ai/claudeService';
+
+router.get('/api/search', async (req, res) => {
+  const { q } = req.query;
+
+  // Standard keyword search
+  let results = await storage.searchResources(q);
+
+  // If few results, use AI to understand intent
+  if (results.length < 5 && claudeService.isAvailable()) {
+    const prompt = `
+      User searched for: "${q}"
+
+      Generate 5 related search terms for video streaming resources.
+      Return JSON array: ["term1", "term2", ...]
+    `;
+
+    const response = await claudeService.generateResponse(prompt, 200);
+    if (response) {
+      try {
+        const relatedTerms = JSON.parse(response);
+
+        // Expand search with related terms
+        for (const term of relatedTerms) {
+          const moreResults = await storage.searchResources(term);
+          results = [...results, ...moreResults];
+        }
+
+        // Deduplicate and limit
+        results = Array.from(new Set(results.map(r => r.id)))
+          .map(id => results.find(r => r.id === id))
+          .slice(0, 20);
+      } catch (e) {
+        console.error('AI search expansion failed:', e);
+      }
+    }
+  }
+
+  res.json({ results, query: q });
+});
+```
+
+**Benefits**:
+- Better search results for ambiguous queries
+- Discovers semantically related resources
+- Improves user discovery experience
+
+### Pattern 4: Batch Processing with Progress Tracking
+
+Process large datasets with real-time progress updates:
+
+```typescript
+// server/routes/admin.ts
+import { enrichmentService } from '../ai/enrichmentService';
+
+router.post('/api/admin/resources/enrich', requireAdmin, async (req, res) => {
+  const { filters, options } = req.body;
+
+  // Get resources to enrich
+  const resources = await storage.listResources(filters);
+
+  // Create enrichment job
+  const job = await enrichmentService.createJob({
+    resourceIds: resources.map(r => r.id),
+    adminId: req.user.id,
+    options
+  });
+
+  // Return job ID immediately
+  res.status(202).json({
+    jobId: job.id,
+    totalResources: resources.length,
+    statusUrl: `/api/admin/enrichment-jobs/${job.id}`
+  });
+
+  // Process in background
+  enrichmentService.processJob(job.id)
+    .then(() => console.log(`Job ${job.id} completed`))
+    .catch(err => console.error(`Job ${job.id} failed:`, err));
+});
+
+// Check job status
+router.get('/api/admin/enrichment-jobs/:id', requireAdmin, async (req, res) => {
+  const job = await enrichmentService.getJob(req.params.id);
+
+  res.json({
+    id: job.id,
+    status: job.status,
+    progress: {
+      processed: job.processedCount,
+      total: job.totalCount,
+      percentage: Math.round((job.processedCount / job.totalCount) * 100)
+    },
+    results: {
+      succeeded: job.succeededCount,
+      failed: job.failedCount,
+      skipped: job.skippedCount
+    },
+    errors: job.errors
+  });
+});
+```
+
+**Benefits**:
+- Non-blocking batch operations
+- Real-time progress monitoring
+- Error tracking and recovery
+
+### Pattern 5: Personalized Recommendations
+
+Generate AI-powered recommendations based on user behavior:
+
+```typescript
+// server/routes/recommendations.ts
+import { recommendationEngine } from '../ai/recommendationEngine';
+
+router.get('/api/recommendations', requireAuth, async (req, res) => {
+  const user = req.user;
+
+  // Build user profile from activity
+  const favorites = await storage.getUserFavorites(user.id);
+  const bookmarks = await storage.getUserBookmarks(user.id);
+  const completedJourneys = await storage.getUserJourneys(user.id, 'completed');
+
+  const userProfile = {
+    userId: user.id,
+    skillLevel: user.skillLevel || 'intermediate',
+    preferredCategories: [...new Set([
+      ...favorites.map(r => r.category),
+      ...bookmarks.map(r => r.category)
+    ])],
+    completedTopics: completedJourneys.map(j => j.category),
+    interactionHistory: {
+      favoriteCount: favorites.length,
+      bookmarkCount: bookmarks.length,
+      journeyCount: completedJourneys.length
+    }
+  };
+
+  // Get personalized recommendations
+  const recommendations = await recommendationEngine.getRecommendations(
+    userProfile,
+    { count: 10, includeScores: true }
+  );
+
+  res.json({
+    recommendations,
+    profile: {
+      skillLevel: userProfile.skillLevel,
+      interests: userProfile.preferredCategories
+    }
+  });
+});
+```
+
+**Benefits**:
+- Personalized user experience
+- Increased engagement with relevant content
+- AI learns from user interactions
+
+---
+
+## Debugging and Monitoring
+
+Tools and techniques for troubleshooting AI service issues in production and development.
+
+### Logging and Diagnostics
+
+#### Enable Debug Logging
+
+Set `NODE_ENV=development` for verbose logging:
+
+```bash
+# .env
+NODE_ENV=development
+```
+
+**Log output includes**:
+- API request/response details
+- Cache hit/miss events
+- Rate limiting delays
+- Error stack traces
+- Performance timings
+
+#### Service Statistics
+
+Get real-time service metrics:
+
+```typescript
+import { claudeService } from './server/ai/claudeService';
+
+// Get current stats
+const stats = claudeService.getStats();
+console.log(stats);
+```
+
+**Output**:
+```json
+{
+  "cacheSize": 156,           // Total cached entries
+  "responseCacheSize": 89,    // General response cache
+  "analysisCacheSize": 67     // URL analysis cache
+}
+```
+
+**Interpreting stats**:
+- **High cache sizes (>80)**: Cache is well-utilized, good performance
+- **Low cache sizes (<20)**: Either low traffic or frequent cache clears
+- **Cache at max (100)**: Consider increasing `MAX_CACHE_SIZE` if hit rate is high
+
+#### Health Check Endpoint
+
+Monitor service health programmatically:
+
+```bash
+# Check AI service health
+curl http://localhost:5000/api/health/ai
+
+# Response examples
+# ✅ Healthy
+{
+  "status": "healthy",
+  "cacheSize": 67,
+  "responseCacheSize": 42,
+  "analysisCacheSize": 25
+}
+
+# ❌ Unhealthy
+{
+  "status": "unavailable",
+  "cacheSize": 0,
+  "responseCacheSize": 0,
+  "analysisCacheSize": 0
+}
+```
+
+**Integration with monitoring tools**:
+```bash
+# Prometheus (example)
+- job_name: 'ai-service'
+  metrics_path: '/api/health/ai'
+  static_configs:
+    - targets: ['localhost:5000']
+```
+
+### Testing AI Services
+
+#### Unit Testing with Mocks
+
+Mock AI responses for predictable tests:
+
+```typescript
+// tests/ai/claudeService.test.ts
+import { claudeService } from '../../server/ai/claudeService';
+
+describe('ClaudeService', () => {
+  beforeEach(() => {
+    // Clear cache before each test
+    claudeService.clearCache();
+  });
+
+  test('analyzeURL returns null when service unavailable', async () => {
+    // Mock unavailable service
+    jest.spyOn(claudeService, 'isAvailable').mockReturnValue(false);
+
+    const result = await claudeService.analyzeURL('https://github.com/test/repo');
+    expect(result).toBeNull();
+  });
+
+  test('analyzeURL uses cache on repeated calls', async () => {
+    jest.spyOn(claudeService, 'isAvailable').mockReturnValue(true);
+
+    // Mock AI response
+    const mockAnalysis = {
+      suggestedTitle: 'Test Repo',
+      suggestedDescription: 'A test repository',
+      suggestedTags: ['test', 'demo'],
+      suggestedCategory: 'Tools',
+      confidence: 0.95
+    };
+
+    jest.spyOn(claudeService, 'analyzeURL').mockResolvedValue(mockAnalysis);
+
+    // First call
+    const result1 = await claudeService.analyzeURL('https://github.com/test/repo');
+
+    // Second call should hit cache
+    const result2 = await claudeService.analyzeURL('https://github.com/test/repo');
+
+    expect(result1).toEqual(mockAnalysis);
+    expect(result2).toEqual(mockAnalysis);
+  });
+});
+```
+
+#### Integration Testing
+
+Test actual API calls in development:
+
+```typescript
+// tests/integration/ai.test.ts
+import { claudeService } from '../../server/ai/claudeService';
+
+describe('AI Integration Tests', () => {
+  // Skip if no API key configured
+  const skipIfNoKey = !claudeService.isAvailable() ? test.skip : test;
+
+  skipIfNoKey('can analyze a real GitHub URL', async () => {
+    const result = await claudeService.analyzeURL(
+      'https://github.com/video-dev/hls.js'
+    );
+
+    expect(result).not.toBeNull();
+    expect(result.suggestedTitle).toBeTruthy();
+    expect(result.confidence).toBeGreaterThan(0);
+  }, 10000); // 10 second timeout for API call
+
+  skipIfNoKey('respects rate limiting', async () => {
+    const urls = [
+      'https://github.com/videojs/video.js',
+      'https://github.com/google/shaka-player',
+      'https://github.com/sampotts/plyr'
+    ];
+
+    const startTime = Date.now();
+
+    // Process sequentially (should take ~3 seconds with 1s delay)
+    for (const url of urls) {
+      await claudeService.analyzeURL(url);
+    }
+
+    const duration = Date.now() - startTime;
+    expect(duration).toBeGreaterThan(2000); // At least 2 seconds
+  }, 15000);
+});
+```
+
+### Performance Monitoring
+
+#### Response Time Tracking
+
+Measure AI service performance:
+
+```typescript
+// server/middleware/metrics.ts
+import { claudeService } from '../ai/claudeService';
+
+export async function trackAIPerformance(operation: string, fn: () => Promise<any>) {
+  const startTime = Date.now();
+  const startStats = claudeService.getStats();
+
+  try {
+    const result = await fn();
+    const duration = Date.now() - startTime;
+    const endStats = claudeService.getStats();
+
+    // Log performance metrics
+    console.log({
+      operation,
+      duration,
+      cacheHit: endStats.cacheSize > startStats.cacheSize,
+      success: true
+    });
+
+    return result;
+  } catch (error) {
+    const duration = Date.now() - startTime;
+
+    console.error({
+      operation,
+      duration,
+      success: false,
+      error: error.message
+    });
+
+    throw error;
+  }
+}
+
+// Usage
+const analysis = await trackAIPerformance('analyzeURL', () =>
+  claudeService.analyzeURL(url)
+);
+```
+
+#### Cache Hit Rate Monitoring
+
+Track cache effectiveness:
+
+```typescript
+// server/ai/cacheMonitor.ts
+class CacheMonitor {
+  private hits = 0;
+  private misses = 0;
+
+  recordHit() {
+    this.hits++;
+  }
+
+  recordMiss() {
+    this.misses++;
+  }
+
+  getHitRate() {
+    const total = this.hits + this.misses;
+    if (total === 0) return 0;
+    return (this.hits / total) * 100;
+  }
+
+  reset() {
+    this.hits = 0;
+    this.misses = 0;
+  }
+
+  report() {
+    return {
+      hits: this.hits,
+      misses: this.misses,
+      total: this.hits + this.misses,
+      hitRate: this.getHitRate().toFixed(2) + '%'
+    };
+  }
+}
+
+export const cacheMonitor = new CacheMonitor();
+
+// In claudeService.ts, track cache usage
+private getCachedResponse(key: string): string | null {
+  const cached = this.responseCache.get(key);
+
+  if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
+    cacheMonitor.recordHit();
+    return cached.response;
+  }
+
+  cacheMonitor.recordMiss();
+  return null;
+}
+```
+
+### Error Tracking
+
+#### Structured Error Logging
+
+Capture detailed error information:
+
+```typescript
+// server/utils/errorLogger.ts
+interface AIError {
+  operation: string;
+  url?: string;
+  error: string;
+  stack?: string;
+  timestamp: Date;
+  context?: any;
+}
+
+class AIErrorLogger {
+  private errors: AIError[] = [];
+  private readonly MAX_ERRORS = 100;
+
+  log(error: AIError) {
+    this.errors.unshift(error);
+
+    // Keep only recent errors
+    if (this.errors.length > this.MAX_ERRORS) {
+      this.errors = this.errors.slice(0, this.MAX_ERRORS);
+    }
+
+    // Log to console in development
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[AI Error]', error);
+    }
+  }
+
+  getRecent(count = 10): AIError[] {
+    return this.errors.slice(0, count);
+  }
+
+  getByOperation(operation: string): AIError[] {
+    return this.errors.filter(e => e.operation === operation);
+  }
+
+  clear() {
+    this.errors = [];
+  }
+}
+
+export const aiErrorLogger = new AIErrorLogger();
+
+// Usage in claudeService
+try {
+  const analysis = await this.analyzeURL(url);
+} catch (error) {
+  aiErrorLogger.log({
+    operation: 'analyzeURL',
+    url,
+    error: error.message,
+    stack: error.stack,
+    timestamp: new Date(),
+    context: { userId, resourceId }
+  });
+  throw error;
+}
+```
+
+#### Error Dashboard
+
+Expose errors to admins:
+
+```typescript
+// server/routes/admin.ts
+router.get('/api/admin/ai-errors', requireAdmin, (req, res) => {
+  const recent = aiErrorLogger.getRecent(50);
+
+  res.json({
+    errors: recent,
+    summary: {
+      total: recent.length,
+      byOperation: recent.reduce((acc, err) => {
+        acc[err.operation] = (acc[err.operation] || 0) + 1;
+        return acc;
+      }, {})
+    }
+  });
+});
+```
+
+### Troubleshooting Checklist
+
+Use this checklist when AI services malfunction:
+
+- [ ] **API Key**: Verify environment variable is set correctly
+  ```bash
+  echo $AI_INTEGRATIONS_ANTHROPIC_API_KEY
+  ```
+
+- [ ] **Connectivity**: Test API connection
+  ```typescript
+  const connected = await claudeService.testConnection();
+  console.log('Connected:', connected);
+  ```
+
+- [ ] **Rate Limits**: Check if hitting Anthropic rate limits
+  - Review error logs for 429 status codes
+  - Check Anthropic console for usage stats
+  - Reduce concurrent requests
+
+- [ ] **Cache State**: Verify cache is functioning
+  ```typescript
+  const stats = claudeService.getStats();
+  console.log('Cache size:', stats.cacheSize);
+  ```
+
+- [ ] **Domain Allowlist**: Ensure URL domain is allowed
+  ```typescript
+  // Check ALLOWED_DOMAINS in claudeService.ts
+  ```
+
+- [ ] **Error Logs**: Review recent errors
+  ```typescript
+  const errors = aiErrorLogger.getRecent(10);
+  console.log('Recent errors:', errors);
+  ```
+
+- [ ] **Service Availability**: Check initialization
+  ```typescript
+  console.log('Available:', claudeService.isAvailable());
+  ```
+
+---
+
+## Performance Tuning Guidelines
+
+Optimize AI service performance and reduce costs in production environments.
+
+### Cost Optimization Strategies
+
+#### 1. Maximize Cache Utilization
+
+**Strategy**: Increase cache TTL for stable content
+
+```typescript
+// For documentation sites or established projects
+private readonly ANALYSIS_CACHE_TTL = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+// For news or rapidly changing content
+private readonly ANALYSIS_CACHE_TTL = 1 * 60 * 60 * 1000; // 1 hour
+```
+
+**Impact**: 95%+ cache hit rate can reduce API costs by 95%
+
+#### 2. Use Haiku Model for Simple Tasks
+
+Already implemented - the system uses `claude-haiku-4-5` which is:
+- **20x cheaper** than Claude Opus
+- **3x faster** response times
+- Sufficient for metadata extraction and categorization
+
+**Cost comparison** (per 1M tokens):
+| Model | Input | Output |
+|-------|-------|--------|
+| Claude Haiku 4.5 | $0.80 | $4.00 |
+| Claude Sonnet 4 | $3.00 | $15.00 |
+| Claude Opus 4 | $15.00 | $75.00 |
+
+#### 3. Optimize Token Usage
+
+**Current optimization**:
+```typescript
+// URL scraper limits content to first 2000 characters
+const limitedContent = content.substring(0, 2000);
+```
+
+**Further optimizations**:
+```typescript
+// server/ai/urlScraper.ts
+export class URLScraper {
+  // Reduce content limit for simple metadata extraction
+  private readonly CONTENT_LIMIT = 1000; // Was 2000
+
+  // Only include essential metadata
+  private extractEssentialMetadata(html: string) {
+    return {
+      title: extractTitle(html),
+      description: extractDescription(html),
+      // Skip less critical fields to reduce token count
+    };
+  }
+}
+```
+
+**Token savings**: 50% reduction in input tokens per request
+
+#### 4. Batch Similar Requests
+
+Group similar URLs to leverage prompt caching:
+
+```typescript
+// Process URLs by domain to maximize cache hits
+const urlsByDomain = groupBy(urls, url => new URL(url).hostname);
+
+for (const [domain, domainUrls] of Object.entries(urlsByDomain)) {
+  // Process same-domain URLs sequentially (higher cache hit rate)
+  for (const url of domainUrls) {
+    await claudeService.analyzeURL(url);
+  }
+}
+```
+
+#### 5. Implement Request Deduplication
+
+Prevent duplicate simultaneous requests:
+
+```typescript
+// server/ai/claudeService.ts
+private pendingRequests: Map<string, Promise<any>> = new Map();
+
+async analyzeURL(url: string) {
+  const cacheKey = url.toLowerCase();
+
+  // Return existing promise if request is in flight
+  if (this.pendingRequests.has(cacheKey)) {
+    return this.pendingRequests.get(cacheKey);
+  }
+
+  const promise = this._analyzeURL(url);
+  this.pendingRequests.set(cacheKey, promise);
+
+  try {
+    const result = await promise;
+    return result;
+  } finally {
+    this.pendingRequests.delete(cacheKey);
+  }
+}
+```
+
+**Impact**: Eliminates redundant API calls during batch operations
+
+### Throughput Optimization
+
+#### 1. Parallel Processing with Rate Limiting
+
+Current implementation processes sequentially. Improve with controlled parallelism:
+
+```typescript
+// server/ai/enrichmentService.ts
+async processBatch(urls: string[], concurrency = 5) {
+  const results = [];
+
+  for (let i = 0; i < urls.length; i += concurrency) {
+    const batch = urls.slice(i, i + concurrency);
+
+    // Process concurrency URLs in parallel
+    const batchResults = await Promise.all(
+      batch.map(url => claudeService.analyzeURL(url))
+    );
+
+    results.push(...batchResults);
+
+    // Respect rate limits between batches
+    if (i + concurrency < urls.length) {
+      await new Promise(resolve => setTimeout(resolve, this.RATE_LIMIT_DELAY));
+    }
+  }
+
+  return results;
+}
+```
+
+**Throughput improvement**:
+- Sequential: 60 URLs/minute (1s delay)
+- 5x parallel: 300 URLs/minute (5 concurrent × 60 seconds)
+
+#### 2. Smart Cache Warming
+
+Pre-populate cache during low-traffic periods:
+
+```typescript
+// server/jobs/cacheWarmer.ts
+export class CacheWarmer {
+  async warmPopularResources() {
+    // Get most viewed resources without AI analysis
+    const popular = await storage.listResources({
+      sortBy: 'views',
+      limit: 100,
+      filter: { hasAIAnalysis: false }
+    });
+
+    console.log(`Warming cache for ${popular.length} resources...`);
+
+    // Analyze during off-peak hours
+    for (const resource of popular) {
+      await claudeService.analyzeURL(resource.url);
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Slow rate
+    }
+
+    console.log('Cache warming complete');
+  }
+}
+
+// Schedule with cron
+// crontab: 0 3 * * * # Run at 3 AM daily
+```
+
+#### 3. Optimize Database Queries
+
+Reduce database round-trips in enrichment workflow:
+
+```typescript
+// server/ai/enrichmentService.ts
+async enrichResources(resourceIds: number[]) {
+  // ❌ Inefficient: N+1 queries
+  for (const id of resourceIds) {
+    const resource = await storage.getResource(id);
+    const analysis = await claudeService.analyzeURL(resource.url);
+    await storage.updateResource(id, analysis);
+  }
+
+  // ✅ Efficient: Batch database operations
+  const resources = await storage.getResources(resourceIds); // 1 query
+  const analyses = await Promise.all(
+    resources.map(r => claudeService.analyzeURL(r.url))
+  );
+
+  await storage.updateResourcesBatch(
+    resources.map((r, i) => ({ id: r.id, ...analyses[i] }))
+  ); // 1 query
+}
+```
+
+### Memory Optimization
+
+#### 1. Cache Size Management
+
+Monitor memory usage and adjust limits:
+
+```typescript
+// server/ai/claudeService.ts
+private readonly MAX_CACHE_SIZE = 100; // Adjust based on available RAM
+
+// Add memory monitoring
+getMemoryUsage() {
+  const responseCacheSize = Array.from(this.responseCache.values())
+    .reduce((sum, entry) => sum + entry.response.length, 0);
+
+  const analysisCacheSize = Array.from(this.analysisCache.values())
+    .reduce((sum, entry) => sum + JSON.stringify(entry).length, 0);
+
+  return {
+    responseCacheBytes: responseCacheSize,
+    analysisCacheBytes: analysisCacheSize,
+    totalBytes: responseCacheSize + analysisCacheSize,
+    totalMB: ((responseCacheSize + analysisCacheSize) / 1024 / 1024).toFixed(2)
+  };
+}
+```
+
+#### 2. Implement Cache Compression
+
+Reduce memory footprint with compression:
+
+```typescript
+import { gzip, gunzip } from 'zlib';
+import { promisify } from 'util';
+
+const gzipAsync = promisify(gzip);
+const gunzipAsync = promisify(gunzip);
+
+interface CompressedCacheEntry {
+  response: Buffer; // Compressed data
+  timestamp: number;
+}
+
+private async setCacheEntry(key: string, value: string) {
+  const compressed = await gzipAsync(value);
+
+  this.responseCache.set(key, {
+    response: compressed,
+    timestamp: Date.now()
+  });
+}
+
+private async getCacheEntry(key: string): Promise<string | null> {
+  const entry = this.responseCache.get(key);
+  if (!entry) return null;
+
+  const decompressed = await gunzipAsync(entry.response);
+  return decompressed.toString();
+}
+```
+
+**Memory savings**: 60-80% reduction in cache memory usage
+
+### Latency Optimization
+
+#### 1. Implement Response Streaming
+
+For long responses, stream results to client:
+
+```typescript
+// server/routes/ai.ts
+router.post('/api/ai/analyze-stream', requireAuth, async (req, res) => {
+  const { url } = req.body;
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+
+  // Stream progress updates
+  res.write(`data: ${JSON.stringify({ status: 'fetching' })}\n\n`);
+
+  const content = await urlScraper.scrape(url);
+  res.write(`data: ${JSON.stringify({ status: 'analyzing' })}\n\n`);
+
+  const analysis = await claudeService.analyzeURL(url);
+  res.write(`data: ${JSON.stringify({ status: 'complete', analysis })}\n\n`);
+
+  res.end();
+});
+```
+
+#### 2. Prefetch on User Intent
+
+Anticipate user needs and prefetch:
+
+```typescript
+// client/components/ResourceCard.tsx
+function ResourceCard({ resource }) {
+  const handleMouseEnter = () => {
+    // Prefetch analysis on hover
+    if (!resource.aiAnalysis) {
+      fetch(`/api/resources/${resource.id}/prefetch-analysis`, {
+        method: 'POST'
+      });
+    }
+  };
+
+  return (
+    <div onMouseEnter={handleMouseEnter}>
+      {/* Resource content */}
+    </div>
+  );
+}
+```
+
+### Monitoring Production Performance
+
+#### Key Metrics to Track
+
+```typescript
+// server/metrics/aiMetrics.ts
+export interface AIMetrics {
+  // Performance
+  avgResponseTime: number;      // Milliseconds
+  p95ResponseTime: number;       // 95th percentile
+  p99ResponseTime: number;       // 99th percentile
+
+  // Throughput
+  requestsPerMinute: number;
+  successRate: number;           // Percentage
+
+  // Cache
+  cacheHitRate: number;          // Percentage
+  cacheSize: number;             // Entries
+
+  // Costs (estimated)
+  totalTokensUsed: number;
+  estimatedCostUSD: number;
+
+  // Errors
+  errorRate: number;             // Percentage
+  rateLimitHits: number;         // Count of 429 errors
+}
+```
+
+#### Set Performance Targets
+
+| Metric | Target | Alert Threshold |
+|--------|--------|-----------------|
+| P95 Response Time | <3s | >5s |
+| Cache Hit Rate | >80% | <60% |
+| Success Rate | >95% | <90% |
+| Error Rate | <5% | >10% |
+| Rate Limit Hits | 0 | >5/hour |
+
+#### Dashboard Integration
+
+```typescript
+// server/routes/admin.ts
+router.get('/api/admin/metrics/ai', requireAdmin, async (req, res) => {
+  const metrics = await aiMetricsCollector.getMetrics();
+
+  res.json({
+    current: metrics,
+    alerts: [
+      metrics.cacheHitRate < 60 && {
+        severity: 'warning',
+        message: 'Cache hit rate below 60%'
+      },
+      metrics.errorRate > 10 && {
+        severity: 'error',
+        message: 'Error rate above 10%'
+      }
+    ].filter(Boolean)
+  });
+});
+```
+
+---
+
 ## Recommendation Engine - Personalized Resource Discovery
 
 The `RecommendationEngine` class (`server/ai/recommendationEngine.ts`) provides intelligent, personalized resource recommendations using a hybrid AI+rule-based approach with sophisticated scoring algorithms.
@@ -4021,5 +5266,6 @@ Cache Hit (AI):    <50ms (cache lookup)
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.2 | 2025-01-31 | Added comprehensive Configuration Guide, Common Integration Patterns, Debugging/Monitoring, and Performance Tuning sections |
 | 1.1 | 2025-01-31 | Added Recommendation Engine documentation with 5-factor scoring algorithm |
 | 1.0 | 2025-01-31 | Initial AI Services documentation |
