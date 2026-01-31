@@ -5,12 +5,6 @@
   "buildCommand": "vite build",
   "outputDirectory": "dist/public",
   "installCommand": "pnpm install",
-  "functions": {
-    "api/[...path].ts": {
-      "runtime": "@vercel/node@3",
-      "maxDuration": 30
-    }
-  },
   "rewrites": [
     {
       "source": "/api/(.*)",
