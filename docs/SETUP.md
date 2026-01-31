@@ -1379,6 +1379,586 @@ npx tsx scripts/test-awesome-lint.ts
 # Allows export with warnings
 ```
 
+### Link Checking and Validation
+
+The link checker validates all URLs in your awesome list to ensure they're accessible and functioning correctly. This section covers running link validation, handling problematic URLs, and interpreting results.
+
+#### Running Link Validation
+
+**Via Admin UI:**
+```bash
+# 1. Navigate to Admin → Link Validation
+# 2. Configure check options:
+#    - Timeout (default: 10 seconds)
+#    - Follow redirects (default: enabled)
+#    - Concurrent checks (default: 5)
+#    - Retry count (default: 1)
+# 3. Click "Check All Links"
+# 4. View results in report format
+```
+
+**Via API:**
+```bash
+# Check all resource links
+curl -X POST http://localhost:5000/api/admin/validate-links \
+  -b admin-cookies.txt \
+  -H "Content-Type: application/json" \
+  -d '{
+    "timeout": 10000,
+    "followRedirects": true,
+    "concurrent": 5,
+    "retryCount": 1
+  }'
+
+# Response includes:
+# - totalLinks: number of links checked
+# - validLinks: number of accessible links
+# - brokenLinks: number of 4xx/5xx errors
+# - redirects: number of 3xx redirects
+# - errors: connection/timeout errors
+# - results: detailed per-link results
+```
+
+**Via test script:**
+```bash
+# If available, run link check script
+npx tsx scripts/check-links.ts
+
+# Output shows:
+# - Summary statistics
+# - List of broken links
+# - Redirect chains
+# - Slow-loading URLs
+```
+
+#### Interpreting Link Check Reports
+
+**Report format:**
+```bash
+# Summary shows:
+# - Total Links: 150
+# - ✅ Valid Links: 142 (94.7%)
+# - ❌ Broken Links: 5 (3.3%)
+# - 🔀 Redirects: 8
+# - ⚠️ Errors: 3
+# - Average Response Time: 1250ms
+
+# Status distribution:
+# - 2xx: 142 links (successful)
+# - 3xx: 8 links (redirects)
+# - 4xx: 3 links (client errors - broken)
+# - 5xx: 2 links (server errors - broken)
+# - error: 3 links (connection failed)
+```
+
+**Understanding status codes:**
+
+**2xx - Successful:**
+```bash
+# 200 OK: Link is valid and accessible
+# 204 No Content: Valid but returns no content (some APIs)
+
+# Action: No action needed
+```
+
+**3xx - Redirects:**
+```bash
+# 301 Moved Permanently: URL permanently moved to new location
+# 302 Found: Temporary redirect
+# 307/308: Temporary/permanent redirects preserving method
+
+# Example result:
+# Original URL: https://example.com/old-page
+# Redirects to: https://example.com/new-page
+# Status: 301 Moved Permanently
+
+# Action: Update resource URL to final destination
+# Benefits:
+# - Faster load times (no redirect hop)
+# - Prevents broken links if redirect is removed
+# - Better SEO and awesome-lint compliance
+```
+
+**4xx - Client Errors (Broken Links):**
+```bash
+# 404 Not Found: Page doesn't exist
+# 403 Forbidden: Access denied (may be anti-bot protection)
+# 410 Gone: Permanently removed
+
+# Action:
+# - 404: Remove resource or find replacement URL
+# - 403: May work in browser; consider keeping with note
+# - 410: Remove resource (permanently deleted)
+```
+
+**5xx - Server Errors:**
+```bash
+# 500 Internal Server Error: Server issue (may be temporary)
+# 503 Service Unavailable: Temporarily down
+# 504 Gateway Timeout: Server took too long to respond
+
+# Action:
+# - Re-check after 24 hours (may be temporary)
+# - If persistent for >1 week, consider removing
+# - Note in resource description if frequently down
+```
+
+**Connection Errors:**
+```bash
+# Timeout: Request exceeded timeout limit
+# DNS Not Found: Domain doesn't exist
+# Connection Refused: Server not accepting connections
+# SSL Certificate Expired: HTTPS certificate invalid
+
+# Action:
+# - Timeout: Increase timeout or mark as slow
+# - DNS Not Found: Domain expired/deleted, remove resource
+# - Connection Refused: Service shut down, remove resource
+# - SSL Expired: Contact site owner or remove if not fixed
+```
+
+#### Handling Redirect Chains
+
+**Identifying redirects:**
+```bash
+# Link check report shows redirected URLs:
+# | Resource | Original URL | Redirect To |
+# | React Docs | http://react.dev | https://react.dev |
+# | Vue Guide | https://vuejs.org/guide | https://vuejs.org/guide/introduction |
+
+# Multiple hops:
+# https://example.com/docs
+#   → https://www.example.com/docs (301)
+#   → https://docs.example.com (301)
+#   → https://docs.example.com/latest (302)
+```
+
+**Updating redirected URLs:**
+```bash
+# 1. Review redirect list in link check report
+# 2. For each redirect:
+#    a. Verify final URL is correct destination
+#    b. Update resource URL in database
+#    c. Re-run link check to confirm
+
+# Via Admin UI:
+# - Navigate to Resources → Search for resource
+# - Click Edit
+# - Update URL field to final destination
+# - Save changes
+
+# Via database:
+npm run db:studio
+# Update resources table:
+# Find resource by original URL
+# Set url field to redirect destination
+```
+
+**When to update redirects:**
+```bash
+# ✅ Always update:
+# - HTTP → HTTPS redirects (security upgrade)
+# - Permanent redirects (301, 308)
+# - Redirect chains (multiple hops)
+
+# ⚠️ Consider carefully:
+# - Temporary redirects (302, 307)
+#   May revert; wait to see if permanent
+# - Regional redirects (different by location)
+#   Keep original if it auto-redirects appropriately
+# - Version redirects (e.g., /v1 → /v2)
+#   Verify new version is appropriate
+
+# ❌ Don't update:
+# - Redirects to login pages (resource requires auth)
+# - Redirects to error pages (indicates broken link)
+# - Suspicious redirects (possible hijacking)
+```
+
+**Automatic redirect handling:**
+```bash
+# The link checker automatically follows redirects by default
+# Set followRedirects: false to see intermediate URLs
+
+# Check without following redirects:
+curl -X POST http://localhost:5000/api/admin/validate-links \
+  -b admin-cookies.txt \
+  -H "Content-Type: application/json" \
+  -d '{
+    "followRedirects": false
+  }'
+
+# Response shows redirect target in redirectUrl field
+# without actually following the redirect chain
+```
+
+#### Timeout Configuration
+
+**Default timeout settings:**
+```bash
+# Default: 10 seconds (10000ms)
+# Recommended range: 5-30 seconds
+
+# Too short (<5s):
+# - Many false positives (slow but valid sites)
+# - Useful for quick checks of fast sites only
+
+# Too long (>30s):
+# - Very slow validation for large link lists
+# - May indicate site is too slow for users anyway
+```
+
+**Adjusting timeout for different scenarios:**
+
+**Quick validation (5 seconds):**
+```bash
+# Use when:
+# - Checking only fast, reliable sites
+# - Want quick feedback
+# - Willing to accept false negatives
+
+curl -X POST http://localhost:5000/api/admin/validate-links \
+  -b admin-cookies.txt \
+  -H "Content-Type: application/json" \
+  -d '{
+    "timeout": 5000,
+    "concurrent": 10
+  }'
+```
+
+**Standard validation (10 seconds - default):**
+```bash
+# Use when:
+# - Mixed site performance
+# - Balanced speed and accuracy
+# - Most common use case
+
+curl -X POST http://localhost:5000/api/admin/validate-links \
+  -b admin-cookies.txt \
+  -H "Content-Type: application/json" \
+  -d '{
+    "timeout": 10000
+  }'
+```
+
+**Thorough validation (20-30 seconds):**
+```bash
+# Use when:
+# - Checking international sites (may be slow)
+# - Including CDN-heavy resources
+# - Want minimal false negatives
+# - Not time-sensitive
+
+curl -X POST http://localhost:5000/api/admin/validate-links \
+  -b admin-cookies.txt \
+  -H "Content-Type: application/json" \
+  -d '{
+    "timeout": 30000,
+    "concurrent": 3,
+    "retryCount": 2
+  }'
+```
+
+**Per-resource timeout handling:**
+```bash
+# Link checker automatically:
+# 1. Attempts request with configured timeout
+# 2. If timeout occurs, retries with exponential backoff
+# 3. After retryCount attempts, marks as "Timeout" error
+
+# Timeout errors in report:
+# | Resource | URL | Status | Error |
+# | Slow Site | https://example.com | 0 Timeout | AbortError |
+
+# Action for timeout errors:
+# - Verify URL works in browser
+# - If loads (but slowly): keep resource, note slow loading
+# - If doesn't load: broken, remove resource
+# - Consider marking in metadata: { slow: true }
+```
+
+#### Skipping Problematic Domains
+
+**Identifying domains to skip:**
+```bash
+# Common reasons to skip:
+# 1. Anti-bot protection (Cloudflare, etc.)
+# 2. Login/auth required (returns 403 but works in browser)
+# 3. Region-locked content (403/451 from certain locations)
+# 4. Rate-limited APIs (429 errors during bulk checks)
+# 5. Known slow but reliable sites
+```
+
+**Marking resources to skip validation:**
+```bash
+# Via database metadata:
+npm run db:studio
+
+# Update resource metadata field:
+{
+  "skipLinkCheck": true,
+  "reason": "Cloudflare anti-bot protection"
+}
+
+# Or mark as manually verified:
+{
+  "manuallyVerified": true,
+  "lastVerified": "2024-01-15",
+  "verifiedBy": "admin"
+}
+```
+
+**Domain-level skip patterns:**
+```bash
+# If many resources from same domain fail validation
+# but are known to work:
+
+# Create a skip list (if implemented):
+# In link checker config or environment:
+LINK_CHECK_SKIP_DOMAINS=example.com,slow-site.org
+
+# Or handle in validation results:
+# Filter out known problematic domains from report
+# Focus on actionable broken links
+```
+
+**Best practices for skip lists:**
+```bash
+# ✅ Good reasons to skip:
+# - Legitimate sites with aggressive bot protection
+# - Resources verified manually but fail automated checks
+# - Internal/auth-required resources for specialized audiences
+# - Sites with regional restrictions (document this)
+
+# ❌ Bad reasons to skip:
+# - "Too lazy to fix" - indicates link may be broken
+# - Skipping everything with errors - defeats purpose
+# - Sites that are actually broken - remove instead
+
+# Documentation:
+# Always document why a resource is skipped:
+# - Add note to resource description
+# - Update metadata with reason and date
+# - Review skipped resources periodically (quarterly)
+```
+
+#### Handling Retry Logic
+
+**Retry configuration:**
+```bash
+# Default: 1 retry (attempts request twice total)
+# Recommended range: 0-3 retries
+
+# Retry behavior:
+# 1. Initial request fails (5xx error or timeout)
+# 2. Wait with exponential backoff
+#    - First retry: 2 seconds
+#    - Second retry: 4 seconds
+#    - Third retry: 8 seconds
+# 3. Only retries server errors (5xx), not client errors (4xx)
+```
+
+**When to increase retries:**
+```bash
+# More retries (2-3):
+# - Checking unreliable/flaky services
+# - Network instability
+# - Want to minimize false negatives
+
+curl -X POST http://localhost:5000/api/admin/validate-links \
+  -b admin-cookies.txt \
+  -H "Content-Type: application/json" \
+  -d '{
+    "retryCount": 3,
+    "timeout": 15000
+  }'
+```
+
+**When to decrease retries:**
+```bash
+# No retries (0):
+# - Fast validation needed
+# - Checking known-reliable sites
+# - Want to see intermittent failures
+
+curl -X POST http://localhost:5000/api/admin/validate-links \
+  -b admin-cookies.txt \
+  -H "Content-Type: application/json" \
+  -d '{
+    "retryCount": 0,
+    "concurrent": 20
+  }'
+```
+
+#### Concurrent Check Optimization
+
+**Balancing speed and reliability:**
+```bash
+# Default: 5 concurrent checks
+# Recommended range: 1-20
+
+# Low concurrency (1-3):
+# - Checking rate-limited APIs
+# - Slow network/server
+# - Maximum reliability
+# Pros: Fewer failures, easier debugging
+# Cons: Very slow for large lists
+
+# Medium concurrency (5-10 - default):
+# - Standard validation
+# - Balanced performance
+# - Most use cases
+# Pros: Good balance of speed and reliability
+# Cons: None for typical usage
+
+# High concurrency (15-20):
+# - Fast, reliable network
+# - Checking stable sites
+# - Time-critical validation
+# Pros: Fastest completion
+# Cons: May trigger rate limits, harder to debug failures
+```
+
+**Optimal settings by list size:**
+```bash
+# Small list (<50 links):
+concurrent: 10, timeout: 10000, retryCount: 1
+# Completes in: ~30 seconds
+
+# Medium list (50-200 links):
+concurrent: 5, timeout: 10000, retryCount: 1
+# Completes in: 2-5 minutes
+
+# Large list (200-1000 links):
+concurrent: 5, timeout: 10000, retryCount: 1
+# Completes in: 10-30 minutes
+
+# Very large list (1000+ links):
+concurrent: 10, timeout: 5000, retryCount: 0
+# Consider splitting into batches
+# Or run during off-hours
+```
+
+#### Troubleshooting Common Link Check Issues
+
+**Issue: Many false positives (working links marked broken)**
+```bash
+# Symptoms:
+# - Links work in browser but fail validation
+# - Many 403 Forbidden errors
+# - Timeout errors on sites that load fine
+
+# Solutions:
+# 1. Increase timeout:
+#    timeout: 20000 (from default 10000)
+# 2. Check if User-Agent is blocked:
+#    Link checker uses: "Mozilla/5.0 (compatible; AwesomeListBot/1.0)"
+#    Some sites block non-browser agents
+# 3. Reduce concurrent checks:
+#    concurrent: 3 (from default 5)
+#    Prevents overwhelming servers
+# 4. Add retry logic:
+#    retryCount: 2 (from default 1)
+```
+
+**Issue: Validation takes too long**
+```bash
+# Symptoms:
+# - Check runs for >1 hour on medium list
+# - Many timeout errors
+# - Server becomes unresponsive
+
+# Solutions:
+# 1. Decrease timeout:
+#    timeout: 5000 (from default 10000)
+# 2. Increase concurrency:
+#    concurrent: 15 (from default 5)
+# 3. Remove retry logic:
+#    retryCount: 0 (from default 1)
+# 4. Run in batches:
+#    Validate 100 resources at a time
+```
+
+**Issue: Inconsistent results between runs**
+```bash
+# Symptoms:
+# - Same URL passes one run, fails another
+# - Flaky 5xx errors
+# - Intermittent timeouts
+
+# Causes:
+# - Site is genuinely unreliable
+# - Network instability
+# - Rate limiting kicking in
+# - Load balancer routing to different servers
+
+# Solutions:
+# 1. Run validation multiple times:
+#    Take average of 3 runs
+# 2. Increase retries:
+#    retryCount: 3
+#    Helps identify consistently flaky sites
+# 3. Document flaky sites:
+#    Add metadata: { flaky: true }
+#    Note in description: "Occasionally slow"
+# 4. Check site status pages:
+#    Verify if site has known uptime issues
+```
+
+**Issue: Cannot validate login-required resources**
+```bash
+# Symptoms:
+# - 401/403 errors on resources that require authentication
+# - Paywall content
+# - Member-only resources
+
+# Solutions:
+# Link checker cannot authenticate to sites
+# These resources need special handling:
+
+# 1. Mark as manually verified:
+npm run db:studio
+# Update metadata:
+{
+  "skipLinkCheck": true,
+  "requiresAuth": true,
+  "manuallyVerified": true,
+  "lastVerified": "2024-01-15"
+}
+
+# 2. Document auth requirement:
+# Add to resource description:
+# "Free account required to access"
+# "Premium subscription required"
+
+# 3. Periodic manual checks:
+# Quarterly: verify these resources still exist
+# Update metadata.lastVerified date
+```
+
+**Issue: Too many redirects detected**
+```bash
+# Symptoms:
+# - Large number of 3xx redirect results
+# - Redirect chains (multiple hops)
+
+# This is normal! Many sites redirect:
+# - HTTP → HTTPS (security upgrade)
+# - www → non-www (or vice versa)
+# - Old paths → new paths (site restructure)
+
+# Action:
+# 1. Review redirect report section
+# 2. Update URLs to final destination
+# 3. Re-run validation to confirm
+# 4. Note: fewer redirects = faster page loads
+
+# Batch update redirects:
+# 1. Export redirect list from report
+# 2. Update resources via Admin UI or API
+# 3. Verify awesome-lint compliance after updates
+```
+
 ### API Error Troubleshooting
 
 When working with the API, you may encounter various HTTP error codes. This section helps you debug and resolve common API errors.
