@@ -992,6 +992,393 @@ curl http://localhost:5000/api/admin/enrichment/jobs/:jobId/status
 # Monitor first few batches, adjust if needed
 ```
 
+### awesome-lint Validation Issues
+
+The awesome-lint validator ensures exported markdown follows awesome-list standards. Understanding validation rules helps fix errors quickly.
+
+#### Running Validation Locally
+
+Test markdown against awesome-lint rules before exporting:
+
+**Via test script:**
+```bash
+# Validate current awesome list
+npx tsx scripts/test-awesome-lint.ts
+
+# Output shows:
+# - Total errors and warnings
+# - Line-by-line validation results
+# - Specific rule violations
+# - Pass/fail status
+```
+
+**Via export dry-run:**
+```bash
+# Export to see validation without creating PR
+# In Admin UI: Admin → Export → Enable "Dry Run"
+# Shows validation results without GitHub push
+```
+
+**Via API:**
+```bash
+# Get awesome-list markdown with validation
+curl http://localhost:5000/api/awesome-list
+
+# Validation runs automatically on export
+# Check response for errors array
+```
+
+#### Interpreting Validation Errors
+
+Validation errors include line number, rule name, and fix instructions:
+
+**Error format:**
+```bash
+Line 12: title
+Message: Title must start with "Awesome"
+
+Line 45: list-format
+Message: Invalid list item format. Use: - [Name](url) - Description.
+
+Line 67: description-capital
+Message: Description must start with a capital letter
+```
+
+**Error severity levels:**
+- `error` - Must fix before passing validation (blocks export)
+- `warning` - Should fix but won't block export (unless strict mode)
+
+**Common patterns:**
+```bash
+# Multiple errors on same line
+# Usually indicates malformed markdown
+# Fix formatting first, then re-validate
+
+# Cascading errors
+# One error (missing heading) can cause multiple downstream errors
+# Fix from top to bottom
+
+# No errors shown but validation fails
+# Check for hidden characters, encoding issues, or empty sections
+```
+
+#### Common Rule Violations
+
+**1. Title format (`title` rule):**
+```bash
+# ❌ Wrong:
+# My Video List
+# Video Resources
+# Best Videos Ever
+
+# ✅ Correct:
+# Awesome Video Resources
+# Awesome Educational Videos
+# Awesome Tech Talks
+
+# Fix: Title must start with "Awesome" and use # heading
+```
+
+**2. Missing awesome badge (`badge` rule):**
+```bash
+# ❌ Wrong:
+# Awesome Videos
+#
+# A curated list...
+
+# ✅ Correct:
+# Awesome Videos
+#
+# [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
+#
+# A curated list...
+
+# Fix: Add badge after title and blank line
+# Exact format required: [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
+```
+
+**3. Table of contents issues (`toc` rule):**
+```bash
+# ❌ Wrong:
+## Contents
+- Videos
+- Tutorials
+
+# ✅ Correct:
+## Contents
+- [Videos](#videos)
+- [Tutorials](#tutorials)
+
+# Fix: TOC items must be links to section anchors
+# Anchor format: lowercase, spaces become hyphens
+# Example: "## React Resources" → "#react-resources"
+```
+
+**4. Capitalization errors (`description-capital` rule):**
+```bash
+# ❌ Wrong:
+- [React Docs](https://react.dev) - official React documentation.
+
+# ✅ Correct:
+- [React Docs](https://react.dev) - Official React documentation.
+
+# Fix: Description must start with capital letter after " - "
+```
+
+**5. Missing periods (`description-period` rule):**
+```bash
+# ❌ Wrong:
+- [Vue.js](https://vuejs.org) - Progressive JavaScript framework
+
+# ✅ Correct:
+- [Vue.js](https://vuejs.org) - Progressive JavaScript framework.
+
+# Fix: Description must end with period, exclamation, or question mark
+```
+
+**6. Category nesting problems (`category-nesting` rule):**
+```bash
+# ❌ Wrong:
+# Awesome Videos
+## Frameworks
+#### React Components  # Skipped ### level
+
+# ✅ Correct:
+# Awesome Videos
+## Frameworks
+### React
+#### Components
+
+# Fix: Don't skip heading levels
+# Progression must be # → ## → ### → ####
+```
+
+#### Link Format Requirements
+
+**URL formatting rules:**
+
+**1. No trailing slashes:**
+```bash
+# ❌ Wrong:
+- [React](https://react.dev/) - JavaScript library.
+
+# ✅ Correct:
+- [React](https://react.dev) - JavaScript library.
+
+# Exception: Root domain "/" is allowed
+# Fix: Remove trailing / from all URLs except root
+```
+
+**2. HTTPS required:**
+```bash
+# ❌ Wrong:
+- [Example](http://example.com) - Description.
+
+# ✅ Correct:
+- [Example](https://example.com) - Description.
+
+# Fix: Use https:// not http://
+# Some non-HTTPS sites may trigger warnings
+```
+
+**3. Valid URL format:**
+```bash
+# ❌ Wrong:
+- [Local Link](#readme) - Anchor link.
+- [Email](mailto:user@example.com) - Email link.
+- [Broken](example.com) - Missing protocol.
+
+# ✅ Correct:
+- [External Resource](https://example.com/resource) - Description.
+
+# Fix: Only external https:// URLs allowed in resource lists
+# Anchors and special protocols fail validation
+```
+
+**4. No duplicate URLs:**
+```bash
+# ❌ Wrong:
+- [React Docs](https://react.dev) - Official documentation.
+- [React](https://react.dev) - JavaScript library.
+
+# ✅ Correct:
+# Choose one entry per URL
+- [React](https://react.dev) - Official React documentation for JavaScript library.
+
+# Fix: Combine duplicate URLs or remove less descriptive entry
+# System detects exact URL matches
+```
+
+#### Description Format Rules
+
+**Length requirements:**
+```bash
+# Minimum: At least a few words
+# Maximum: Keep concise (under 100 characters recommended)
+
+# ❌ Too short:
+- [React](https://react.dev) - Library.
+
+# ✅ Good length:
+- [React](https://react.dev) - JavaScript library for building user interfaces.
+
+# ❌ Too long:
+- [React](https://react.dev) - React is a free and open-source front-end JavaScript library for building user interfaces based on components. It is maintained by Meta and a community of individual developers and companies and can be used to develop single-page, mobile, or server-rendered applications.
+
+# ✅ Correct:
+- [React](https://react.dev) - JavaScript library for building component-based user interfaces.
+```
+
+**Format requirements:**
+```bash
+# Complete pattern:
+- [Name](url) - Description.
+  ^     ^       ^           ^
+  |     |       |           |
+  |     |       |           Required period
+  |     |       Space-dash-space separator
+  |     HTTPS URL, no trailing slash
+  Link text
+
+# Common mistakes:
+- [Name](url)- Missing space before dash
+- [Name](url) -Missing space after dash
+- [Name](url) - description  # Lowercase start
+- [Name](url) - Description  # Missing period
+
+# Correct:
+- [Name](url) - Description text here.
+```
+
+**Content guidelines:**
+```bash
+# ✅ Good descriptions:
+# - Concise and informative
+# - Starts with capital letter
+# - Ends with period
+# - Explains what the resource is/does
+# - Avoids marketing language ("best", "amazing", "must-have")
+
+# ❌ Bad descriptions:
+# - Too vague: "Useful tool."
+# - Too promotional: "The best framework ever created!"
+# - Redundant: "React - React library for React development."
+# - Opinion-heavy: "My favorite way to build apps."
+
+# ✅ Examples:
+- [Vue.js](https://vuejs.org) - Progressive JavaScript framework for building UIs.
+- [Svelte](https://svelte.dev) - Component framework that compiles to vanilla JavaScript.
+- [Angular](https://angular.io) - Platform for building web applications with TypeScript.
+```
+
+#### Fixing Validation Errors Workflow
+
+**Step-by-step error resolution:**
+
+```bash
+# 1. Run validation
+npx tsx scripts/test-awesome-lint.ts
+
+# 2. Review errors from top to bottom
+# Output shows line numbers and specific issues
+
+# 3. Fix structural errors first
+# - Title format
+# - Badge presence
+# - Heading levels
+# These often cause cascading errors
+
+# 4. Fix format errors
+# - List item syntax
+# - URL formatting
+# - Description capitalization and periods
+
+# 5. Re-run validation
+npx tsx scripts/test-awesome-lint.ts
+
+# 6. Repeat until validation passes
+# Valid: true, Errors: 0
+
+# 7. Export to GitHub
+# Validation runs automatically
+# PR created only if validation passes
+```
+
+**Quick fixes for common errors:**
+
+```bash
+# Fix missing badge:
+# Add after title line:
+[![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
+
+# Fix list format:
+# Before: * [Name](url)
+# After:  - [Name](url) - Description.
+
+# Fix capitalization:
+# Before: - [Name](url) - description here.
+# After:  - [Name](url) - Description here.
+
+# Fix trailing slash:
+# Before: https://example.com/
+# After:  https://example.com
+
+# Fix TOC links:
+# Before: - Videos
+# After:  - [Videos](#videos)
+```
+
+#### Validation in Export Workflow
+
+**Automatic validation on export:**
+```bash
+# When exporting to GitHub:
+# 1. Generate markdown from database
+# 2. Run awesome-lint validation
+# 3. If errors: show errors, don't create PR
+# 4. If warnings only: create PR with warning note
+# 5. If pass: create PR
+
+# Check validation before export:
+# Admin UI → Export → "Validate Before Export" checkbox
+# Shows validation results before GitHub push
+```
+
+**Handling validation failures:**
+```bash
+# Export fails with validation errors:
+# 1. Review error list in UI
+# 2. Fix data in database via Admin UI:
+#    - Edit resource titles
+#    - Fix descriptions
+#    - Update URLs
+#    - Adjust categories
+# 3. Re-run validation test
+# 4. Retry export when validation passes
+
+# Note: Validation checks generated markdown
+# Not the database directly
+# Fix data, then re-generate to test
+```
+
+**Strict mode vs. warnings:**
+```bash
+# Strict mode (default):
+# - Fails on any error or warning
+# - Ensures 100% compliance
+# - Recommended for awesome-list submission
+
+# Warning-allowed mode:
+# - Fails only on errors
+# - Allows warnings to pass
+# - Useful for internal lists
+# - Enable in export settings
+
+# In Admin UI:
+# Export → Uncheck "Strict Mode"
+# Allows export with warnings
+```
+
 ## Code Style
 
 - TypeScript throughout
