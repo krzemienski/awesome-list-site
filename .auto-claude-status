@@ -1,0 +1,25 @@
+{
+  "active": true,
+  "spec": "027-user-facing-link-health-indicators",
+  "state": "planning",
+  "subtasks": {
+    "completed": 0,
+    "total": 0,
+    "in_progress": 1,
+    "failed": 0
+  },
+  "phase": {
+    "current": "Database Schema",
+    "id": null,
+    "total": 3
+  },
+  "workers": {
+    "active": 0,
+    "max": 1
+  },
+  "session": {
+    "number": 2,
+    "started_at": "2026-01-31T14:30:51.880692"
+  },
+  "last_update": "2026-01-31T14:34:52.776376"
+}

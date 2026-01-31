@@ -1,0 +1,39 @@
+{
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true
+  },
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Read(./**)",
+      "Write(./**)",
+      "Edit(./**)",
+      "Glob(./**)",
+      "Grep(./**)",
+      "Read(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/027-user-facing-link-health-indicators/**)",
+      "Write(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/027-user-facing-link-health-indicators/**)",
+      "Edit(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/027-user-facing-link-health-indicators/**)",
+      "Glob(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/027-user-facing-link-health-indicators/**)",
+      "Grep(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/027-user-facing-link-health-indicators/**)",
+      "Read(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/027-user-facing-link-health-indicators/.auto-claude/specs/027-user-facing-link-health-indicators/**)",
+      "Write(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/027-user-facing-link-health-indicators/.auto-claude/specs/027-user-facing-link-health-indicators/**)",
+      "Edit(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/027-user-facing-link-health-indicators/.auto-claude/specs/027-user-facing-link-health-indicators/**)",
+      "Read(/Users/nick/Desktop/awesome-list-site/.auto-claude/**)",
+      "Write(/Users/nick/Desktop/awesome-list-site/.auto-claude/**)",
+      "Edit(/Users/nick/Desktop/awesome-list-site/.auto-claude/**)",
+      "Glob(/Users/nick/Desktop/awesome-list-site/.auto-claude/**)",
+      "Grep(/Users/nick/Desktop/awesome-list-site/.auto-claude/**)",
+      "Bash(*)",
+      "WebFetch(*)",
+      "WebSearch(*)",
+      "mcp__context7__resolve-library-id(*)",
+      "mcp__context7__get-library-docs(*)",
+      "mcp__graphiti-memory__search_nodes(*)",
+      "mcp__graphiti-memory__search_facts(*)",
+      "mcp__graphiti-memory__add_episode(*)",
+      "mcp__graphiti-memory__get_episodes(*)",
+      "mcp__graphiti-memory__get_entity_edge(*)"
+    ]
+  }
+}

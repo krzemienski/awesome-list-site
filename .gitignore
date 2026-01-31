@@ -81,3 +81,6 @@ vite.config.ts.*
 # Deployment artifacts
 logs/
 attached_assets/
+
+# Auto Claude data directory
+.auto-claude/

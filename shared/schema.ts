@@ -47,6 +47,9 @@ export const resources = pgTable(
     approvedAt: timestamp("approved_at"),
     githubSynced: boolean("github_synced").default(false),
     lastSyncedAt: timestamp("last_synced_at"),
+    linkHealthStatus: text("link_health_status"), // verified, warning, broken, unknown
+    lastLinkCheck: timestamp("last_link_check"),
+    linkCheckResponseTime: integer("link_check_response_time"), // milliseconds
     metadata: jsonb("metadata").$type<Record<string, any>>().default({}),
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow(),
