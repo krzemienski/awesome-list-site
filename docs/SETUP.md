@@ -210,10 +210,123 @@ rm -rf node_modules
 npm install
 ```
 
-### Session Issues
-- Clear browser cookies
-- Restart dev server
-- Check SESSION_SECRET is set
+### Authentication Issues
+
+#### OAuth Redirect Loops
+If you're stuck in a redirect loop:
+```bash
+# 1. Clear browser cookies for the domain
+# 2. Check REPLIT_DOMAINS matches your domain exactly
+echo $REPLIT_DOMAINS
+
+# 3. Verify callback URL is registered
+# For Replit: https://your-app.repl.co
+
+# 4. Restart the server to refresh OAuth config
+pkill -f "tsx server"
+npm run dev
+```
+
+#### Session Persistence Issues
+If sessions aren't persisting across requests:
+```bash
+# 1. Verify SESSION_SECRET is set and non-empty
+echo $SESSION_SECRET
+
+# 2. If empty, generate a new secret
+# Add to .env or Replit Secrets
+SESSION_SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
+
+# 3. Restart the server
+npm run dev
+```
+
+**Additional checks:**
+- Clear browser cookies and cache
+- Ensure you're not in incognito/private mode
+- Check that cookies are enabled in browser
+- Verify the domain in cookie settings matches your app domain
+
+#### 401/403 Unauthorized Errors
+If you're getting unauthorized errors:
+
+**Check if you're logged in:**
+```bash
+# Via browser console
+fetch('/api/user').then(r => r.json()).then(console.log)
+```
+
+**Check your user role:**
+```bash
+# Via database
+npm run db:studio
+# Then view the users table to see your role
+```
+
+**Verify user role via SQL:**
+```sql
+SELECT id, username, email, role FROM users WHERE email = 'your@email.com';
+```
+
+#### Admin Access Issues
+If you can't access admin features:
+
+**Verify admin role:**
+```bash
+# Check current role via database
+npm run db:studio
+# Look for your user and confirm role = 'admin'
+```
+
+**Promote user to admin:**
+```sql
+-- Via Drizzle Studio SQL console
+UPDATE users SET role = 'admin' WHERE email = 'your@email.com';
+```
+
+**Or use the reset admin script:**
+```bash
+npx tsx scripts/reset-admin-password.ts
+# This creates/resets admin user with displayed credentials
+```
+
+**Then:**
+1. Log out completely
+2. Clear browser cookies
+3. Log back in
+4. Admin menu should now appear
+
+#### Cookie/Session Clearing Steps
+If experiencing persistent auth issues:
+
+**Browser-based clearing:**
+1. Open browser DevTools (F12)
+2. Go to Application/Storage tab
+3. Expand Cookies
+4. Delete all cookies for your domain
+5. Go to Local Storage and Session Storage
+6. Clear all entries
+7. Hard refresh (Ctrl+Shift+R or Cmd+Shift+R)
+
+**Server-side session reset:**
+```bash
+# Restart server to clear in-memory sessions
+pkill -f "tsx server"
+npm run dev
+```
+
+**Complete reset:**
+```bash
+# 1. Clear browser data (cookies, cache, storage)
+# 2. Restart server
+pkill -f "tsx server"
+
+# 3. Regenerate session secret
+SESSION_SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
+
+# 4. Start fresh
+npm run dev
+```
 
 ## Code Style
 
