@@ -78,13 +78,26 @@ const ALLOWED_DOMAINS = [
   'whatwg.org'
 ];
 
+/**
+ * Result structure for URL analysis
+ */
+interface URLAnalysisResult {
+  suggestedTitle: string;
+  suggestedDescription: string;
+  suggestedTags: string[];
+  suggestedCategory: string;
+  suggestedSubcategory?: string;
+  confidence: number;
+  keyTopics: string[];
+}
+
 interface CacheEntry {
   response: string;
   timestamp: number;
 }
 
 interface AnalysisCache {
-  result: any;
+  result: URLAnalysisResult;
   timestamp: number;
 }
 
@@ -183,8 +196,10 @@ export class ClaudeService {
         max_tokens: maxTokens
       });
 
-      const responseText = (response.content[0] as any).text || '';
-      
+      // Extract text from response with proper type checking
+      const firstContent = response.content[0];
+      const responseText = (firstContent && 'text' in firstContent) ? firstContent.text : '';
+
       // Cache the response
       this.addToCache(cacheKey, responseText);
       
@@ -194,16 +209,20 @@ export class ClaudeService {
 
       return responseText;
 
-    } catch (error: any) {
-      console.error('Claude API error:', error.message || error);
-      
-      // Handle specific error types
-      if (error.status === 429) {
-        console.log('Rate limited by Claude API, backing off...');
-        // Exponential backoff could be implemented here
-      } else if (error.status === 401) {
-        console.error('Invalid API key - disabling Claude service');
-        this.anthropic = null;
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('Claude API error:', errorMessage);
+
+      // Handle specific error types with type guard
+      if (error && typeof error === 'object' && 'status' in error) {
+        const statusError = error as { status: number };
+        if (statusError.status === 429) {
+          console.log('Rate limited by Claude API, backing off...');
+          // Exponential backoff could be implemented here
+        } else if (statusError.status === 401) {
+          console.error('Invalid API key - disabling Claude service');
+          this.anthropic = null;
+        }
       }
 
       return null;
@@ -350,7 +369,7 @@ export class ClaudeService {
   /**
    * Get cached analysis result
    */
-  private getCachedAnalysis(url: string): any | null {
+  private getCachedAnalysis(url: string): URLAnalysisResult | null {
     const entry = this.analysisCache.get(url);
     if (!entry) return null;
 
@@ -366,7 +385,7 @@ export class ClaudeService {
   /**
    * Cache analysis result
    */
-  private cacheAnalysis(url: string, result: any): void {
+  private cacheAnalysis(url: string, result: URLAnalysisResult): void {
     if (this.analysisCache.size >= this.MAX_CACHE_SIZE) {
       const oldestKey = this.analysisCache.keys().next().value;
       if (oldestKey) {
@@ -384,15 +403,7 @@ export class ClaudeService {
    * Analyze a URL and extract metadata for video streaming resources
    * Uses domain allowlist for SSRF protection
    */
-  public async analyzeURL(url: string): Promise<{
-    suggestedTitle: string;
-    suggestedDescription: string;
-    suggestedTags: string[];
-    suggestedCategory: string;
-    suggestedSubcategory?: string;
-    confidence: number;
-    keyTopics: string[];
-  } | null> {
+  public async analyzeURL(url: string): Promise<URLAnalysisResult | null> {
     if (!this.isAvailable()) {
       console.log('Claude service not available for URL analysis');
       return null;
@@ -480,11 +491,12 @@ export class ClaudeService {
           .replace(/\s+/g, ' ')
           .trim()
           .substring(0, 5000);
-      } catch (fetchError: any) {
-        if (fetchError.name === 'AbortError') {
+      } catch (fetchError: unknown) {
+        if (fetchError && typeof fetchError === 'object' && 'name' in fetchError && fetchError.name === 'AbortError') {
           throw new Error('Request timeout');
         }
-        console.error('Error fetching URL:', fetchError);
+        const errorMessage = fetchError instanceof Error ? fetchError.message : String(fetchError);
+        console.error('Error fetching URL:', errorMessage);
         pageContent = `URL: ${url}`;
       }
 
@@ -546,17 +558,17 @@ Return ONLY valid JSON with this structure:
       const parsed = JSON.parse(jsonMatch[0]);
 
       // SANITIZE Claude response before caching/returning
-      const sanitizedResult = {
+      const sanitizedResult: URLAnalysisResult = {
         suggestedTitle: (parsed.suggestedTitle || '').substring(0, 200),
         suggestedDescription: (parsed.suggestedDescription || '').substring(0, 2000),
-        suggestedTags: Array.isArray(parsed.suggestedTags) 
-          ? parsed.suggestedTags.slice(0, 20).map((tag: any) => String(tag).substring(0, 50))
+        suggestedTags: Array.isArray(parsed.suggestedTags)
+          ? parsed.suggestedTags.slice(0, 20).map((tag: unknown) => String(tag).substring(0, 50))
           : [],
         suggestedCategory: parsed.suggestedCategory || '',
         suggestedSubcategory: parsed.suggestedSubcategory,
         confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.5,
         keyTopics: Array.isArray(parsed.keyTopics)
-          ? parsed.keyTopics.slice(0, 10).map((topic: any) => String(topic).substring(0, 100))
+          ? parsed.keyTopics.slice(0, 10).map((topic: unknown) => String(topic).substring(0, 100))
           : []
       };
 
