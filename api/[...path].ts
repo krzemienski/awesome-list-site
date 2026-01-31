@@ -189,6 +189,114 @@ async function handleRegister(req: VercelRequest, res: VercelResponse) {
   });
 }
 
+// Awesome List data handlers
+async function handleGetAwesomeList(req: VercelRequest, res: VercelResponse) {
+  // Fetch all categories with their subcategories, sub-subcategories, and resources
+  const categories = await sql`SELECT * FROM categories ORDER BY name`;
+  const subcategories = await sql`SELECT * FROM subcategories ORDER BY name`;
+  const subSubcategories = await sql`SELECT * FROM sub_subcategories ORDER BY name`;
+  const resources = await sql`SELECT * FROM resources ORDER BY name`;
+  
+  // Build nested structure
+  const result = categories.map((cat: any) => ({
+    id: cat.id,
+    name: cat.name,
+    slug: cat.slug,
+    subcategories: subcategories
+      .filter((sub: any) => sub.category_id === cat.id)
+      .map((sub: any) => ({
+        id: sub.id,
+        name: sub.name,
+        slug: sub.slug,
+        categoryId: sub.category_id,
+        subSubcategories: subSubcategories
+          .filter((subsub: any) => subsub.subcategory_id === sub.id)
+          .map((subsub: any) => ({
+            id: subsub.id,
+            name: subsub.name,
+            slug: subsub.slug,
+            subcategoryId: subsub.subcategory_id,
+            resources: resources
+              .filter((r: any) => r.sub_subcategory_id === subsub.id)
+              .map((r: any) => ({
+                id: r.id,
+                name: r.name,
+                url: r.url,
+                description: r.description,
+                githubStars: r.github_stars,
+                lastCommit: r.last_commit,
+                language: r.language,
+                license: r.license,
+                isAwesomeList: r.is_awesome_list,
+                awesomeListCount: r.awesome_list_count,
+              })),
+          })),
+        resources: resources
+          .filter((r: any) => r.subcategory_id === sub.id && !r.sub_subcategory_id)
+          .map((r: any) => ({
+            id: r.id,
+            name: r.name,
+            url: r.url,
+            description: r.description,
+            githubStars: r.github_stars,
+            lastCommit: r.last_commit,
+            language: r.language,
+            license: r.license,
+            isAwesomeList: r.is_awesome_list,
+            awesomeListCount: r.awesome_list_count,
+          })),
+      })),
+    resources: resources
+      .filter((r: any) => r.category_id === cat.id && !r.subcategory_id)
+      .map((r: any) => ({
+        id: r.id,
+        name: r.name,
+        url: r.url,
+        description: r.description,
+        githubStars: r.github_stars,
+        lastCommit: r.last_commit,
+        language: r.language,
+        license: r.license,
+        isAwesomeList: r.is_awesome_list,
+        awesomeListCount: r.awesome_list_count,
+      })),
+  }));
+  
+  return res.json({
+    categories: result,
+    totalResources: resources.length,
+    lastUpdated: new Date().toISOString(),
+  });
+}
+
+async function handleGetCategories(req: VercelRequest, res: VercelResponse) {
+  const categories = await sql`SELECT * FROM categories ORDER BY name`;
+  return res.json(categories.map((c: any) => ({
+    id: c.id,
+    name: c.name,
+    slug: c.slug,
+  })));
+}
+
+async function handleGetResources(req: VercelRequest, res: VercelResponse) {
+  const resources = await sql`SELECT * FROM resources ORDER BY name LIMIT 100`;
+  return res.json(resources.map((r: any) => ({
+    id: r.id,
+    name: r.name,
+    url: r.url,
+    description: r.description,
+    categoryId: r.category_id,
+    subcategoryId: r.subcategory_id,
+    subSubcategoryId: r.sub_subcategory_id,
+    githubStars: r.github_stars,
+    lastCommit: r.last_commit,
+    language: r.language,
+    license: r.license,
+    isAwesomeList: r.is_awesome_list,
+    awesomeListCount: r.awesome_list_count,
+  })));
+}
+
 // Main handler
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Enable CORS
@@ -219,6 +327,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
     if (path === '/api/auth/register' && req.method === 'POST') {
       return handleRegister(req, res);
+    }
+    
+    // Data routes
+    if (path === '/api/awesome-list' && req.method === 'GET') {
+      return handleGetAwesomeList(req, res);
+    }
+    if (path === '/api/categories' && req.method === 'GET') {
+      return handleGetCategories(req, res);
+    }
+    if (path === '/api/resources' && req.method === 'GET') {
+      return handleGetResources(req, res);
     }
     
     // Default: return 404 for unhandled API routes
