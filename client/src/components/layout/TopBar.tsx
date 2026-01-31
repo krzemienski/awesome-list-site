@@ -16,6 +16,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useLocation } from "wouter";
+import { Resource } from "@/types/awesome-list";
+
+interface User {
+  id: string;
+  email?: string;
+  name?: string;
+  avatar?: string;
+  provider?: string;
+  role?: string;
+  createdAt?: string;
+}
 
 interface TopBarProps {
   isSidebarOpen: boolean;
@@ -23,8 +34,8 @@ interface TopBarProps {
   onSearchOpen: () => void;
   title: string;
   repoUrl?: string;
-  resources?: any[];
-  user?: any;
+  resources?: Resource[];
+  user?: User;
   onLogout?: () => void;
 }
 
