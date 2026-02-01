@@ -3,6 +3,10 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes, runBackgroundInitialization } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { handleSSR } from "./ssr";
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { migrate } from 'drizzle-orm/node-postgres/migrator';
+import pkg from 'pg';
+const { Pool } = pkg;
 
 const app = express();
 app.use(express.json());
@@ -38,7 +42,48 @@ app.use((req, res, next) => {
   next();
 });
 
+async function runMigrations() {
+  if (!process.env.DATABASE_URL) {
+    console.error('Error: DATABASE_URL environment variable is not set');
+    throw new Error('DATABASE_URL is required');
+  }
+
+  const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    max: 1, // Single connection for migration
+    connectionTimeoutMillis: 15000, // Longer timeout for Neon cold starts
+  });
+
+  pool.on('error', (err) => {
+    console.error('Database pool error during migration:', err.message);
+  });
+
+  try {
+    const db = drizzle(pool);
+    console.log('Running database migrations...');
+    await migrate(db, { migrationsFolder: './migrations' });
+    console.log('✓ Migrations completed successfully');
+    await pool.end();
+  } catch (error) {
+    await pool.end();
+    console.error('Migration failed:', error);
+    throw error;
+  }
+}
+
 (async () => {
+  const isProduction = process.env.NODE_ENV === 'production';
+
+  // Run migrations before starting server in production
+  if (isProduction) {
+    try {
+      await runMigrations();
+    } catch (error) {
+      console.error('❌ Failed to run migrations, cannot start server');
+      process.exit(1);
+    }
+  }
+
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -63,8 +108,7 @@ app.use((req, res, next) => {
   // Use PORT environment variable in production (Replit autoscale), fallback to 5000 in development
   // Production deployments set PORT automatically for health checks
   const port = process.env.PORT ? parseInt(process.env.PORT) : 5000;
-  const isProduction = process.env.NODE_ENV === 'production';
-  
+
   const platform = process.platform;
   const listenOptions: any = {
     port,
@@ -78,7 +122,7 @@ app.use((req, res, next) => {
 
   server.listen(listenOptions, () => {
     log(`serving on port ${port} (${isProduction ? 'production' : 'development'} mode)`);
-    
+
     // Run background initialization AFTER server is listening
     // This ensures fast startup for production deployments
     runBackgroundInitialization().catch((error) => {
