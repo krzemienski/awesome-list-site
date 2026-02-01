@@ -67,7 +67,7 @@ export function processAwesomeListData(data: unknown): AwesomeList {
       title: rawData.title ?? "Awesome List",
       description: rawData.description ?? "",
       repoUrl: rawData.repoUrl ?? "",
-      resources: rawData.resources,
+      resources: rawData.resources.map(r => ({ ...r, description: r.description || '' })),
       categories: rawData.categories.map((cat) => ({
         name: cat.name,
         slug: cat.slug,

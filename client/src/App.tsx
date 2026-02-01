@@ -105,9 +105,9 @@ function Router() {
   // Guest users can browse all resources, authenticated users get additional features
   return (
     <MainLayout 
-      awesomeList={awesomeList} 
+      awesomeList={awesomeList}
       isLoading={isLoading}
-      user={user}
+      user={user ?? undefined}
       onLogout={logout}
     >
       <Switch>
@@ -129,7 +129,7 @@ function Router() {
         <Route path="/journey/:id" component={JourneyDetail} />
         <Route path="/profile" component={() => (
           <AuthGuard>
-            <Profile user={user} />
+            <Profile user={user ?? undefined} />
           </AuthGuard>
         )} />
         <Route path="/bookmarks" component={() => (

@@ -32,7 +32,7 @@ let connectionSettings: ReplitConnectionSettings | undefined;
 async function getAccessToken(): Promise<string> {
   // Return cached token if still valid
   if (connectionSettings && connectionSettings.settings.expires_at && new Date(connectionSettings.settings.expires_at).getTime() > Date.now()) {
-    return connectionSettings.settings.access_token;
+    return connectionSettings.settings.access_token || '';
   }
   
   const hostname = process.env.REPLIT_CONNECTORS_HOSTNAME;
