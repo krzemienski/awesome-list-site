@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import SEOHead from "@/components/layout/SEOHead";
 import TagFilter from "@/components/ui/tag-filter";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { ArrowLeft, ExternalLink, FilterX } from "lucide-react";
 import { deslugify, getCategorySlug } from "@/lib/utils";
 import { Resource } from "@/types/awesome-list";
@@ -156,11 +157,24 @@ export default function Subcategory() {
   return (
     <div className="space-y-6">
       {/* SEO Head */}
-      <SEOHead 
+      <SEOHead
         title={`${subcategoryName} Resources - ${categoryName} - Awesome Video`}
         description={`Browse ${allResources.length} ${subcategoryName} resources in the ${categoryName} category.`}
       />
-      
+
+      {/* Breadcrumbs */}
+      <Breadcrumbs
+        items={[
+          {
+            label: categoryName,
+            href: `/category/${getCategorySlug(categoryName)}`,
+          },
+          {
+            label: subcategoryName,
+          },
+        ]}
+      />
+
       {/* Header */}
       <div className="space-y-4">
         <Link href={`/category/${getCategorySlug(categoryName)}`}>
