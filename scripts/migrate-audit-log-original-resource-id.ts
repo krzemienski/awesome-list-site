@@ -16,6 +16,14 @@
 import { db } from '../server/db';
 import { sql } from 'drizzle-orm';
 
+interface AuditLogStats {
+  total_logs: string;
+  logs_with_original_id: string;
+  logs_with_resource_id: string;
+  needs_backfill?: string;
+  still_needs_backfill?: string;
+}
+
 async function migrate() {
   console.log('╔════════════════════════════════════════════════════════╗');
   console.log('║  Audit Log Migration: Backfill originalResourceId     ║');
@@ -33,7 +41,7 @@ async function migrate() {
       FROM resource_audit_log
     `);
     
-    const before = beforeStats.rows[0] as any;
+    const before = beforeStats.rows[0] as AuditLogStats;
     console.log(`  Total audit logs: ${before.total_logs}`);
     console.log(`  Logs with originalResourceId: ${before.logs_with_original_id}`);
     console.log(`  Logs with resourceId: ${before.logs_with_resource_id}`);
@@ -66,7 +74,7 @@ async function migrate() {
       FROM resource_audit_log
     `);
     
-    const after = afterStats.rows[0] as any;
+    const after = afterStats.rows[0] as AuditLogStats;
     console.log(`  Total audit logs: ${after.total_logs}`);
     console.log(`  Logs with originalResourceId: ${after.logs_with_original_id}`);
     console.log(`  Logs with resourceId: ${after.logs_with_resource_id}`);
@@ -82,9 +90,13 @@ async function migrate() {
       process.exit(1);
     }
 
-  } catch (error: any) {
-    console.error('\n✗ Migration failed:', error.message);
-    console.error('   Stack trace:', error.stack);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    console.error('\n✗ Migration failed:', errorMessage);
+    if (errorStack) {
+      console.error('   Stack trace:', errorStack);
+    }
     process.exit(1);
   }
 }
