@@ -1,31 +1,82 @@
 import { Resource, Category, Subcategory, AwesomeList } from "@/types/awesome-list";
 import { slugify } from "@/lib/utils";
 
+// Types for raw API data (before processing)
+interface RawResource {
+  id: string;
+  title: string;
+  url: string;
+  description?: string;
+  category: string;
+  subcategory?: string;
+  tags?: string[];
+  [key: string]: unknown;
+}
+
+interface RawSubSubcategory {
+  name: string;
+  slug: string;
+  resources?: Resource[];
+  [key: string]: unknown;
+}
+
+interface RawSubcategory {
+  name: string;
+  slug: string;
+  resources?: Resource[];
+  subSubcategories?: RawSubSubcategory[];
+  [key: string]: unknown;
+}
+
+interface RawCategory {
+  name: string;
+  slug: string;
+  resources?: Resource[];
+  subcategories?: RawSubcategory[];
+  [key: string]: unknown;
+}
+
+interface RawAwesomeListData {
+  title?: string;
+  description?: string;
+  repoUrl?: string;
+  resources: RawResource[];
+  categories?: RawCategory[];
+  [key: string]: unknown;
+}
+
 /**
  * Process the raw JSON data from the API into a structured AwesomeList
  * If the server already provides categories, use those instead of recalculating
  */
-export function processAwesomeListData(data: any): AwesomeList {
-  if (!data || !data.resources || !Array.isArray(data.resources)) {
+export function processAwesomeListData(data: unknown): AwesomeList {
+  // Type guard to validate data structure
+  if (!data || typeof data !== 'object') {
     throw new Error("Invalid awesome list data format");
   }
-  
+
+  const rawData = data as RawAwesomeListData;
+
+  if (!rawData.resources || !Array.isArray(rawData.resources)) {
+    throw new Error("Invalid awesome list data format");
+  }
+
   // If the server already provides a properly structured categories array, use it
-  if (data.categories && Array.isArray(data.categories)) {
+  if (rawData.categories && Array.isArray(rawData.categories)) {
     return {
-      title: data.title,
-      description: data.description,
-      repoUrl: data.repoUrl,
-      resources: data.resources,
-      categories: data.categories.map((cat: any) => ({
+      title: rawData.title ?? "Awesome List",
+      description: rawData.description ?? "",
+      repoUrl: rawData.repoUrl ?? "",
+      resources: rawData.resources,
+      categories: rawData.categories.map((cat) => ({
         name: cat.name,
         slug: cat.slug,
         resources: cat.resources || [],
-        subcategories: (cat.subcategories || []).map((sub: any) => ({
+        subcategories: (cat.subcategories || []).map((sub) => ({
           name: sub.name,
           slug: sub.slug,
           resources: sub.resources || [],
-          subSubcategories: (sub.subSubcategories || []).map((subSub: any) => ({
+          subSubcategories: (sub.subSubcategories || []).map((subSub) => ({
             name: subSub.name,
             slug: subSub.slug,
             resources: subSub.resources || []
@@ -34,8 +85,8 @@ export function processAwesomeListData(data: any): AwesomeList {
       }))
     };
   }
-  
-  const resources: Resource[] = data.resources.map((resource: any) => ({
+
+  const resources: Resource[] = rawData.resources.map((resource) => ({
     id: resource.id,
     title: resource.title,
     url: resource.url,
@@ -122,9 +173,9 @@ export function processAwesomeListData(data: any): AwesomeList {
   });
   
   return {
-    title: data.title || "Awesome List",
-    description: data.description || "",
-    repoUrl: data.repoUrl || "",
+    title: rawData.title || "Awesome List",
+    description: rawData.description || "",
+    repoUrl: rawData.repoUrl || "",
     resources,
     categories
   };
