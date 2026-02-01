@@ -50,6 +50,8 @@ import { validateAwesomeList, formatValidationReport } from "./validation/awesom
 import { checkResourceLinks, formatLinkCheckReport } from "./validation/linkChecker";
 import { seedDatabase } from "./seed";
 import { enrichmentService } from "./ai/enrichmentService";
+import { asyncHandler } from "./middleware/asyncHandler";
+import { InternalServerError } from "./middleware/errors";
 
 const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md";
 
@@ -422,6 +424,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Note: /api/login, /api/callback are set up in setupAuth()
+
+  // ============= Test Routes =============
+
+  // GET /api/test-endpoint-with-error - Test centralized error handling
+  app.get('/api/test-endpoint-with-error', asyncHandler(async (req, res) => {
+    throw new InternalServerError('Test error for centralized error handling');
+  }));
 
   // ============= Resource Routes =============
   
