@@ -108,7 +108,7 @@ async function generateSitemap(req: any, res: any) {
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>`;
-      
+
       // Add subcategory URLs
       category.subcategories?.forEach(subcategory => {
         sitemap += `
@@ -118,7 +118,7 @@ async function generateSitemap(req: any, res: any) {
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>`;
-        
+
         // Add sub-subcategory URLs
         subcategory.subSubcategories?.forEach(subSubcategory => {
           sitemap += `
@@ -131,6 +131,21 @@ async function generateSitemap(req: any, res: any) {
         });
       });
     });
+
+    // Add resource URLs from database
+    if (awesomeListData.resources && awesomeListData.resources.length > 0) {
+      awesomeListData.resources.forEach(resource => {
+        if (resource.id) {
+          sitemap += `
+  <url>
+    <loc>${baseUrl}/resource/${resource.id}</loc>
+    <lastmod>${currentDate}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>`;
+        }
+      });
+    }
 
     sitemap += `
 </urlset>`;
