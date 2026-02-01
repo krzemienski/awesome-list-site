@@ -51,28 +51,24 @@ import { checkResourceLinks, formatLinkCheckReport } from "./validation/linkChec
 import { seedDatabase } from "./seed";
 import { enrichmentService } from "./ai/enrichmentService";
 import { asyncHandler } from "./middleware/asyncHandler";
-import { InternalServerError, UnauthorizedError, NotFoundError, ValidationError, BadRequestError, ConflictError } from "./middleware/errors";
+import { InternalServerError, UnauthorizedError, NotFoundError, ValidationError, BadRequestError, ConflictError, ForbiddenError } from "./middleware/errors";
 
 const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md";
 
 // Middleware to check if user is admin
-const isAdmin = async (req: any, res: Response, next: any) => {
-  try {
-    const userId = req.user?.claims?.sub;
-    if (!userId) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-    
-    const user = await storage.getUser(userId);
-    if (!user || user.role !== 'admin') {
-      return res.status(403).json({ message: "Forbidden: Admin access required" });
-    }
-    
-    next();
-  } catch (error) {
-    res.status(500).json({ message: "Error checking admin status" });
+const isAdmin = asyncHandler(async (req: any, res: Response, next: any) => {
+  const userId = req.user?.claims?.sub;
+  if (!userId) {
+    throw new UnauthorizedError();
   }
-};
+
+  const user = await storage.getUser(userId);
+  if (!user || user.role !== 'admin') {
+    throw new ForbiddenError("Admin access required");
+  }
+
+  next();
+});
 
 // SEO route handlers - now uses database-driven data
 async function generateSitemap(req: any, res: any) {
@@ -590,187 +586,131 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= Category Routes =============
   
   // GET /api/categories - List all categories (public)
-  app.get('/api/categories', async (req, res) => {
-    try {
-      const categories = await storage.listCategories();
-      res.json(categories);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-      res.status(500).json({ message: 'Failed to fetch categories' });
-    }
-  });
+  app.get('/api/categories', asyncHandler(async (req, res) => {
+    const categories = await storage.listCategories();
+    res.json(categories);
+  }));
 
   // GET /api/subcategories - List all subcategories (public)
-  app.get('/api/subcategories', async (req, res) => {
-    try {
-      let categoryId: number | undefined = undefined;
-      
-      // Validate categoryId query parameter if provided
-      if (req.query.categoryId) {
-        const categoryIdSchema = z.string().regex(/^\d+$/, "categoryId must be a valid number");
-        const validation = categoryIdSchema.safeParse(req.query.categoryId);
-        
-        if (!validation.success) {
-          return res.status(400).json({ 
-            message: 'Invalid categoryId parameter', 
-            errors: validation.error.errors 
-          });
-        }
-        
-        categoryId = parseInt(validation.data);
-        
-        if (isNaN(categoryId) || categoryId < 1) {
-          return res.status(400).json({ 
-            message: 'categoryId must be a positive number' 
-          });
-        }
+  app.get('/api/subcategories', asyncHandler(async (req, res) => {
+    let categoryId: number | undefined = undefined;
+
+    // Validate categoryId query parameter if provided
+    if (req.query.categoryId) {
+      const categoryIdSchema = z.string().regex(/^\d+$/, "categoryId must be a valid number");
+      const validation = categoryIdSchema.safeParse(req.query.categoryId);
+
+      if (!validation.success) {
+        throw new ValidationError('Invalid categoryId parameter', validation.error.errors);
       }
-      
-      const subcategories = await storage.listSubcategories(categoryId);
-      res.json(subcategories);
-    } catch (error) {
-      console.error('Error fetching subcategories:', error);
-      res.status(500).json({ message: 'Failed to fetch subcategories' });
+
+      categoryId = parseInt(validation.data);
+
+      if (isNaN(categoryId) || categoryId < 1) {
+        throw new BadRequestError('categoryId must be a positive number');
+      }
     }
-  });
+
+    const subcategories = await storage.listSubcategories(categoryId);
+    res.json(subcategories);
+  }));
 
   // GET /api/sub-subcategories - List all sub-subcategories (public)
-  app.get('/api/sub-subcategories', async (req, res) => {
-    try {
-      let subcategoryId: number | undefined = undefined;
-      
-      // Validate subcategoryId query parameter if provided
-      if (req.query.subcategoryId) {
-        const subcategoryIdSchema = z.string().regex(/^\d+$/, "subcategoryId must be a valid number");
-        const validation = subcategoryIdSchema.safeParse(req.query.subcategoryId);
-        
-        if (!validation.success) {
-          return res.status(400).json({ 
-            message: 'Invalid subcategoryId parameter', 
-            errors: validation.error.errors 
-          });
-        }
-        
-        subcategoryId = parseInt(validation.data);
-        
-        if (isNaN(subcategoryId) || subcategoryId < 1) {
-          return res.status(400).json({ 
-            message: 'subcategoryId must be a positive number' 
-          });
-        }
+  app.get('/api/sub-subcategories', asyncHandler(async (req, res) => {
+    let subcategoryId: number | undefined = undefined;
+
+    // Validate subcategoryId query parameter if provided
+    if (req.query.subcategoryId) {
+      const subcategoryIdSchema = z.string().regex(/^\d+$/, "subcategoryId must be a valid number");
+      const validation = subcategoryIdSchema.safeParse(req.query.subcategoryId);
+
+      if (!validation.success) {
+        throw new ValidationError('Invalid subcategoryId parameter', validation.error.errors);
       }
-      
-      const subSubcategories = await storage.listSubSubcategories(subcategoryId);
-      res.json(subSubcategories);
-    } catch (error) {
-      console.error('Error fetching sub-subcategories:', error);
-      res.status(500).json({ message: 'Failed to fetch sub-subcategories' });
+
+      subcategoryId = parseInt(validation.data);
+
+      if (isNaN(subcategoryId) || subcategoryId < 1) {
+        throw new BadRequestError('subcategoryId must be a positive number');
+      }
     }
-  });
+
+    const subSubcategories = await storage.listSubSubcategories(subcategoryId);
+    res.json(subSubcategories);
+  }));
 
   // ============= User Interaction Routes =============
   
   // POST /api/favorites/:resourceId - Add favorite
-  app.post('/api/favorites/:resourceId', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const resourceId = parseInt(req.params.resourceId);
-      
-      await storage.addFavorite(userId, resourceId);
-      res.json({ message: 'Favorite added successfully' });
-    } catch (error) {
-      console.error('Error adding favorite:', error);
-      res.status(500).json({ message: 'Failed to add favorite' });
-    }
-  });
-  
+  app.post('/api/favorites/:resourceId', isAuthenticated, asyncHandler(async (req: any, res) => {
+    const userId = req.user.claims.sub;
+    const resourceId = parseInt(req.params.resourceId);
+
+    await storage.addFavorite(userId, resourceId);
+    res.json({ message: 'Favorite added successfully' });
+  }));
+
   // DELETE /api/favorites/:resourceId - Remove favorite
-  app.delete('/api/favorites/:resourceId', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const resourceId = parseInt(req.params.resourceId);
-      
-      await storage.removeFavorite(userId, resourceId);
-      res.json({ message: 'Favorite removed successfully' });
-    } catch (error) {
-      console.error('Error removing favorite:', error);
-      res.status(500).json({ message: 'Failed to remove favorite' });
-    }
-  });
-  
+  app.delete('/api/favorites/:resourceId', isAuthenticated, asyncHandler(async (req: any, res) => {
+    const userId = req.user.claims.sub;
+    const resourceId = parseInt(req.params.resourceId);
+
+    await storage.removeFavorite(userId, resourceId);
+    res.json({ message: 'Favorite removed successfully' });
+  }));
+
   // GET /api/favorites - Get user's favorites
-  app.get('/api/favorites', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const favorites = await storage.getUserFavorites(userId);
-      res.json(favorites);
-    } catch (error) {
-      console.error('Error fetching favorites:', error);
-      res.status(500).json({ message: 'Failed to fetch favorites' });
-    }
-  });
+  app.get('/api/favorites', isAuthenticated, asyncHandler(async (req: any, res) => {
+    const userId = req.user.claims.sub;
+    const favorites = await storage.getUserFavorites(userId);
+    res.json(favorites);
+  }));
   
   // POST /api/bookmarks/:resourceId - Add bookmark
-  app.post('/api/bookmarks/:resourceId', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const resourceId = parseInt(req.params.resourceId);
-      const { notes } = req.body;
-      
-      await storage.addBookmark(userId, resourceId, notes);
-      res.json({ message: 'Bookmark added successfully' });
-    } catch (error) {
-      console.error('Error adding bookmark:', error);
-      res.status(500).json({ message: 'Failed to add bookmark' });
-    }
-  });
-  
+  app.post('/api/bookmarks/:resourceId', isAuthenticated, asyncHandler(async (req: any, res) => {
+    const userId = req.user.claims.sub;
+    const resourceId = parseInt(req.params.resourceId);
+    const { notes } = req.body;
+
+    await storage.addBookmark(userId, resourceId, notes);
+    res.json({ message: 'Bookmark added successfully' });
+  }));
+
   // DELETE /api/bookmarks/:resourceId - Remove bookmark
-  app.delete('/api/bookmarks/:resourceId', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const resourceId = parseInt(req.params.resourceId);
-      
-      await storage.removeBookmark(userId, resourceId);
-      res.json({ message: 'Bookmark removed successfully' });
-    } catch (error) {
-      console.error('Error removing bookmark:', error);
-      res.status(500).json({ message: 'Failed to remove bookmark' });
-    }
-  });
-  
+  app.delete('/api/bookmarks/:resourceId', isAuthenticated, asyncHandler(async (req: any, res) => {
+    const userId = req.user.claims.sub;
+    const resourceId = parseInt(req.params.resourceId);
+
+    await storage.removeBookmark(userId, resourceId);
+    res.json({ message: 'Bookmark removed successfully' });
+  }));
+
   // GET /api/bookmarks - Get user's bookmarks
-  app.get('/api/bookmarks', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const bookmarks = await storage.getUserBookmarks(userId);
-      res.json(bookmarks);
-    } catch (error) {
-      console.error('Error fetching bookmarks:', error);
-      res.status(500).json({ message: 'Failed to fetch bookmarks' });
-    }
-  });
+  app.get('/api/bookmarks', isAuthenticated, asyncHandler(async (req: any, res) => {
+    const userId = req.user.claims.sub;
+    const bookmarks = await storage.getUserBookmarks(userId);
+    res.json(bookmarks);
+  }));
 
   // ============= User Profile & Progress Routes =============
 
   // GET /api/user/progress - Get user's learning progress
-  app.get('/api/user/progress', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
+  app.get('/api/user/progress', isAuthenticated, asyncHandler(async (req: any, res) => {
+    const userId = req.user.claims.sub;
 
-      // Get total resources in catalog
-      const totalResourcesResult = await storage.listResources({ status: 'approved', limit: 1 });
-      const totalResources = totalResourcesResult.total;
+    // Get total resources in catalog
+    const totalResourcesResult = await storage.listResources({ status: 'approved', limit: 1 });
+    const totalResources = totalResourcesResult.total;
 
-      // Get user's journey progress to count completed resources
-      const journeyProgress = await storage.listUserJourneyProgress(userId);
-      const completedResources = journeyProgress.filter(p => p.completedAt !== null).length;
+    // Get user's journey progress to count completed resources
+    const journeyProgress = await storage.listUserJourneyProgress(userId);
+    const completedResources = journeyProgress.filter(p => p.completedAt !== null).length;
 
-      // Get current learning path (most recently accessed journey)
-      let currentPath: string | undefined;
-      if (journeyProgress.length > 0) {
-        const latestJourney = journeyProgress[0];
-        const journey = await storage.getLearningJourney(latestJourney.journeyId);
+    // Get current learning path (most recently accessed journey)
+    let currentPath: string | undefined;
+    if (journeyProgress.length > 0) {
+      const latestJourney = journeyProgress[0];
+      const journey = await storage.getLearningJourney(latestJourney.journeyId);
         currentPath = journey?.title;
       }
 
@@ -846,72 +786,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
 
       res.json(progressData);
-    } catch (error) {
-      console.error('Error fetching user progress:', error);
-      res.status(500).json({ message: 'Failed to fetch user progress' });
-    }
-  });
+  }));
 
   // GET /api/user/submissions - Get user's submitted resources and edits
-  app.get('/api/user/submissions', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
+  app.get('/api/user/submissions', isAuthenticated, asyncHandler(async (req: any, res) => {
+    const userId = req.user.claims.sub;
 
-      // Get user's submitted resources
-      const submittedResources = await storage.listResources({
-        userId,
-        page: 1,
-        limit: 100
-      });
+    // Get user's submitted resources
+    const submittedResources = await storage.listResources({
+      userId,
+      page: 1,
+      limit: 100
+    });
 
-      // Get user's suggested edits
-      const resourceEdits = await storage.getResourceEditsByUser(userId);
+    // Get user's suggested edits
+    const resourceEdits = await storage.getResourceEditsByUser(userId);
 
-      res.json({
-        resources: submittedResources.resources,
-        edits: resourceEdits,
-        totalResources: submittedResources.total,
-        totalEdits: resourceEdits.length
-      });
-    } catch (error) {
-      console.error('Error fetching user submissions:', error);
-      res.status(500).json({ message: 'Failed to fetch user submissions' });
-    }
-  });
+    res.json({
+      resources: submittedResources.resources,
+      edits: resourceEdits,
+      totalResources: submittedResources.total,
+      totalEdits: resourceEdits.length
+    });
+  }));
 
   // GET /api/user/journeys - Get user's learning journeys with details
-  app.get('/api/user/journeys', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
+  app.get('/api/user/journeys', isAuthenticated, asyncHandler(async (req: any, res) => {
+    const userId = req.user.claims.sub;
 
-      // Get user's journey progress
-      const journeyProgress = await storage.listUserJourneyProgress(userId);
+    // Get user's journey progress
+    const journeyProgress = await storage.listUserJourneyProgress(userId);
 
-      // Fetch journey details for each progress entry
-      const journeysWithDetails = await Promise.all(
-        journeyProgress.map(async (progress) => {
-          const journey = await storage.getLearningJourney(progress.journeyId);
-          return {
-            ...progress,
-            journey
-          };
-        })
-      );
+    // Fetch journey details for each progress entry
+    const journeysWithDetails = await Promise.all(
+      journeyProgress.map(async (progress) => {
+        const journey = await storage.getLearningJourney(progress.journeyId);
+        return {
+          ...progress,
+          journey
+        };
+      })
+    );
 
-      res.json(journeysWithDetails);
-    } catch (error) {
-      console.error('Error fetching user journeys:', error);
-      res.status(500).json({ message: 'Failed to fetch user journeys' });
-    }
-  });
+    res.json(journeysWithDetails);
+  }));
 
   // ============= Learning Journey Routes =============
   
   // GET /api/journeys - List all journeys
-  app.get('/api/journeys', async (req: any, res) => {
-    try {
-      const category = req.query.category as string;
-      const journeys = await storage.listLearningJourneys(category);
+  app.get('/api/journeys', asyncHandler(async (req: any, res) => {
+    const category = req.query.category as string;
+    const journeys = await storage.listLearningJourneys(category);
       
       // Early return if no journeys
       if (journeys.length === 0) {
@@ -976,105 +901,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         res.json(enrichedJourneys);
       }
-    } catch (error) {
-      console.error('Error fetching journeys:', error);
-      res.status(500).json({ message: 'Failed to fetch journeys' });
-    }
-  });
+  }));
   
   // GET /api/journeys/:id - Get journey details
-  app.get('/api/journeys/:id', async (req: any, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const journey = await storage.getLearningJourney(id);
-      
-      if (!journey) {
-        return res.status(404).json({ message: 'Journey not found' });
-      }
-      
-      const steps = await storage.listJourneySteps(id);
-      
-      // Count distinct stepNumbers for accurate step count (defensive: handle both strings and numbers)
-      const uniqueStepNumbers = new Set(
-        steps
-          .map(s => typeof s.stepNumber === 'number' ? s.stepNumber : parseInt(s.stepNumber, 10))
-          .filter(n => !isNaN(n))
-      );
-      const stepCount = uniqueStepNumbers.size;
-      
-      // If user is authenticated, get their progress
-      let progress = null;
-      if (req.user?.claims?.sub) {
-        progress = await storage.getUserJourneyProgress(req.user.claims.sub, id);
-      }
-      
-      res.json({
-        ...journey,
-        stepCount,
-        steps,
-        progress: progress ? {
-          completedSteps: progress.completedSteps || [],
-          currentStepId: progress.currentStepId,
-          completedAt: progress.completedAt
-        } : null
-      });
-    } catch (error) {
-      console.error('Error fetching journey:', error);
-      res.status(500).json({ message: 'Failed to fetch journey' });
+  app.get('/api/journeys/:id', asyncHandler(async (req: any, res) => {
+    const id = parseInt(req.params.id);
+    const journey = await storage.getLearningJourney(id);
+
+    if (!journey) {
+      throw new NotFoundError('Journey not found');
     }
-  });
+
+    const steps = await storage.listJourneySteps(id);
+
+    // Count distinct stepNumbers for accurate step count (defensive: handle both strings and numbers)
+    const uniqueStepNumbers = new Set(
+      steps
+        .map(s => typeof s.stepNumber === 'number' ? s.stepNumber : parseInt(s.stepNumber, 10))
+        .filter(n => !isNaN(n))
+    );
+    const stepCount = uniqueStepNumbers.size;
+
+    // If user is authenticated, get their progress
+    let progress = null;
+    if (req.user?.claims?.sub) {
+      progress = await storage.getUserJourneyProgress(req.user.claims.sub, id);
+    }
+
+    res.json({
+      ...journey,
+      stepCount,
+      steps,
+      progress: progress ? {
+        completedSteps: progress.completedSteps || [],
+        currentStepId: progress.currentStepId,
+        completedAt: progress.completedAt
+      } : null
+    });
+  }));
   
   // POST /api/journeys/:id/start - Start journey
-  app.post('/api/journeys/:id/start', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const journeyId = parseInt(req.params.id);
-      
-      const progress = await storage.startUserJourney(userId, journeyId);
-      res.json(progress);
-    } catch (error) {
-      console.error('Error starting journey:', error);
-      res.status(500).json({ message: 'Failed to start journey' });
-    }
-  });
+  app.post('/api/journeys/:id/start', isAuthenticated, asyncHandler(async (req: any, res) => {
+    const userId = req.user.claims.sub;
+    const journeyId = parseInt(req.params.id);
+
+    const progress = await storage.startUserJourney(userId, journeyId);
+    res.json(progress);
+  }));
   
   // PUT /api/journeys/:id/progress - Update progress
-  app.put('/api/journeys/:id/progress', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const journeyId = parseInt(req.params.id);
-      const { stepId } = req.body;
-      
-      if (!stepId) {
-        return res.status(400).json({ message: 'Step ID is required' });
-      }
-      
-      const progress = await storage.updateUserJourneyProgress(userId, journeyId, stepId);
-      res.json(progress);
-    } catch (error) {
-      console.error('Error updating journey progress:', error);
-      res.status(500).json({ message: 'Failed to update journey progress' });
+  app.put('/api/journeys/:id/progress', isAuthenticated, asyncHandler(async (req: any, res) => {
+    const userId = req.user.claims.sub;
+    const journeyId = parseInt(req.params.id);
+    const { stepId } = req.body;
+
+    if (!stepId) {
+      throw new BadRequestError('Step ID is required');
     }
-  });
+
+    const progress = await storage.updateUserJourneyProgress(userId, journeyId, stepId);
+    res.json(progress);
+  }));
   
   // GET /api/journeys/:id/progress - Get user's progress
-  app.get('/api/journeys/:id/progress', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const journeyId = parseInt(req.params.id);
-      
-      const progress = await storage.getUserJourneyProgress(userId, journeyId);
-      
-      if (!progress) {
-        return res.status(404).json({ message: 'Progress not found' });
-      }
-      
-      res.json(progress);
-    } catch (error) {
-      console.error('Error fetching journey progress:', error);
-      res.status(500).json({ message: 'Failed to fetch journey progress' });
+  app.get('/api/journeys/:id/progress', isAuthenticated, asyncHandler(async (req: any, res) => {
+    const userId = req.user.claims.sub;
+    const journeyId = parseInt(req.params.id);
+
+    const progress = await storage.getUserJourneyProgress(userId, journeyId);
+
+    if (!progress) {
+      throw new NotFoundError('Progress not found');
     }
-  });
+
+    res.json(progress);
+  }));
 
   // ============= Admin Routes =============
   
