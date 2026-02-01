@@ -75,6 +75,7 @@ npm run start
 | Document | Description |
 |----------|-------------|
 | [SETUP.md](docs/SETUP.md) | Development environment setup |
+| [ENVIRONMENT_VARIABLES.md](docs/ENVIRONMENT_VARIABLES.md) | Environment variables reference |
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md) | System architecture and design |
 | [API.md](docs/API.md) | Complete API reference |
 | [ADMIN-GUIDE.md](docs/ADMIN-GUIDE.md) | Administrator documentation |
@@ -128,21 +129,11 @@ Exports pass all awesome-lint rules except:
 
 ## Environment Variables
 
-```bash
-# Required
-DATABASE_URL=postgresql://...
-SESSION_SECRET=<random-string>
-
-# Replit Auth
-REPLIT_DOMAINS=...
-
-# Optional - AI Features
-AI_INTEGRATIONS_ANTHROPIC_API_KEY=...
-
-# Optional - GitHub Sync
-GITHUB_TOKEN=...
-GITHUB_REPO_URL=...
-```
+This project requires several environment variables to run. See [ENVIRONMENT_VARIABLES.md](docs/ENVIRONMENT_VARIABLES.md) for:
+- Complete list of required and optional variables
+- Detailed descriptions and configuration examples
+- Platform-specific setup instructions
+- Security best practices
 
 ## Admin Access
 
