@@ -51,7 +51,7 @@ import { checkResourceLinks, formatLinkCheckReport } from "./validation/linkChec
 import { seedDatabase } from "./seed";
 import { enrichmentService } from "./ai/enrichmentService";
 import { asyncHandler } from "./middleware/asyncHandler";
-import { InternalServerError, UnauthorizedError, NotFoundError, ValidationError, BadRequestError } from "./middleware/errors";
+import { InternalServerError, UnauthorizedError, NotFoundError, ValidationError, BadRequestError, ConflictError } from "./middleware/errors";
 
 const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md";
 
@@ -1088,350 +1088,277 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= Admin Routes =============
   
   // GET /api/admin/stats - Dashboard statistics
-  app.get('/api/admin/stats', isAuthenticated, isAdmin, async (req, res) => {
-    try {
-      const stats = await storage.getAdminStats();
-      // Map backend property names to frontend expectations
-      res.json({
-        users: stats.totalUsers,
-        resources: stats.totalResources,
-        journeys: stats.totalJourneys,
-        pendingApprovals: stats.pendingResources,
-      });
-    } catch (error) {
-      console.error('Error fetching admin stats:', error);
-      res.status(500).json({ message: 'Failed to fetch admin statistics' });
-    }
-  });
+  app.get('/api/admin/stats', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
+    const stats = await storage.getAdminStats();
+    // Map backend property names to frontend expectations
+    res.json({
+      users: stats.totalUsers,
+      resources: stats.totalResources,
+      journeys: stats.totalJourneys,
+      pendingApprovals: stats.pendingResources,
+    });
+  }));
   
   // GET /api/admin/users - List users
-  app.get('/api/admin/users', isAuthenticated, isAdmin, async (req, res) => {
-    try {
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 20;
-      
-      const result = await storage.listUsers(page, limit);
-      res.json(result);
-    } catch (error) {
-      console.error('Error fetching users:', error);
-      res.status(500).json({ message: 'Failed to fetch users' });
-    }
-  });
+  app.get('/api/admin/users', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 20;
+
+    const result = await storage.listUsers(page, limit);
+    res.json(result);
+  }));
   
   // PUT /api/admin/users/:id/role - Change user role
-  app.put('/api/admin/users/:id/role', isAuthenticated, isAdmin, async (req: any, res) => {
-    try {
-      const userId = req.params.id;
-      const { role } = req.body;
-      
-      if (!role || !['user', 'admin', 'moderator'].includes(role)) {
-        return res.status(400).json({ message: 'Invalid role' });
-      }
-      
-      const user = await storage.updateUserRole(userId, role);
-      res.json(user);
-    } catch (error) {
-      console.error('Error updating user role:', error);
-      res.status(500).json({ message: 'Failed to update user role' });
+  app.put('/api/admin/users/:id/role', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
+    const userId = req.params.id;
+    const { role } = req.body;
+
+    if (!role || !['user', 'admin', 'moderator'].includes(role)) {
+      throw new BadRequestError('Invalid role');
     }
-  });
+
+    const user = await storage.updateUserRole(userId, role);
+    res.json(user);
+  }));
   
   // ============= Resource Approval Routes =============
   
   // GET /api/admin/pending-resources - Get all pending resources for approval
-  app.get('/api/admin/pending-resources', isAuthenticated, isAdmin, async (req, res) => {
-    try {
-      const result = await storage.getPendingResources();
-      
-      res.json(result);
-    } catch (error) {
-      console.error('Error fetching pending resources:', error);
-      res.status(500).json({ message: 'Failed to fetch pending resources' });
-    }
-  });
+  app.get('/api/admin/pending-resources', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
+    const result = await storage.getPendingResources();
+
+    res.json(result);
+  }));
   
   // POST /api/admin/resources/:id/approve - Approve a pending resource
-  app.post('/api/admin/resources/:id/approve', isAuthenticated, isAdmin, async (req: any, res) => {
-    try {
-      const resourceId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
-      
-      if (isNaN(resourceId)) {
-        return res.status(400).json({ message: 'Invalid resource ID' });
-      }
-      
-      const updatedResource = await storage.approveResource(resourceId, userId);
-      
-      res.json(updatedResource);
-    } catch (error) {
-      console.error('Error approving resource:', error);
-      res.status(500).json({ message: 'Failed to approve resource' });
+  app.post('/api/admin/resources/:id/approve', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
+    const resourceId = parseInt(req.params.id);
+    const userId = req.user.claims.sub;
+
+    if (isNaN(resourceId)) {
+      throw new BadRequestError('Invalid resource ID');
     }
-  });
+
+    const updatedResource = await storage.approveResource(resourceId, userId);
+
+    res.json(updatedResource);
+  }));
   
   // POST /api/admin/resources/:id/reject - Reject a pending resource
-  app.post('/api/admin/resources/:id/reject', isAuthenticated, isAdmin, async (req: any, res) => {
-    try {
-      const resourceId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
-      const { reason } = req.body;
-      
-      if (isNaN(resourceId)) {
-        return res.status(400).json({ message: 'Invalid resource ID' });
-      }
-      
-      if (!reason || reason.trim().length < 10) {
-        return res.status(400).json({ message: 'Rejection reason is required (minimum 10 characters)' });
-      }
-      
-      await storage.rejectResource(resourceId, userId, reason);
-      const updatedResource = await storage.getResource(resourceId);
-      
-      res.json(updatedResource);
-    } catch (error) {
-      console.error('Error rejecting resource:', error);
-      res.status(500).json({ message: 'Failed to reject resource' });
+  app.post('/api/admin/resources/:id/reject', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
+    const resourceId = parseInt(req.params.id);
+    const userId = req.user.claims.sub;
+    const { reason } = req.body;
+
+    if (isNaN(resourceId)) {
+      throw new BadRequestError('Invalid resource ID');
     }
-  });
+
+    if (!reason || reason.trim().length < 10) {
+      throw new BadRequestError('Rejection reason is required (minimum 10 characters)');
+    }
+
+    await storage.rejectResource(resourceId, userId, reason);
+    const updatedResource = await storage.getResource(resourceId);
+
+    res.json(updatedResource);
+  }));
 
   // PUT /api/admin/resources/:id - Update a resource (admin only)
-  app.put('/api/admin/resources/:id', isAuthenticated, isAdmin, async (req: any, res) => {
-    try {
-      const resourceId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
-      
-      if (isNaN(resourceId)) {
-        return res.status(400).json({ message: 'Invalid resource ID' });
-      }
-      
-      const resource = await storage.getResource(resourceId);
-      if (!resource) {
-        return res.status(404).json({ message: 'Resource not found' });
-      }
-      
-      const updateSchema = insertResourceSchema.partial();
-      const validationResult = updateSchema.safeParse(req.body);
-      
-      if (!validationResult.success) {
-        return res.status(400).json({ 
-          message: 'Validation failed', 
-          errors: validationResult.error.errors 
-        });
-      }
-      
-      const validatedData = validationResult.data;
-      const updateData: Record<string, any> = {};
-      
-      if (validatedData.title !== undefined) updateData.title = validatedData.title;
-      if (validatedData.url !== undefined) updateData.url = validatedData.url;
-      if (validatedData.description !== undefined) updateData.description = validatedData.description;
-      if (validatedData.category !== undefined) updateData.category = validatedData.category;
-      if (validatedData.subcategory !== undefined) updateData.subcategory = validatedData.subcategory;
-      if (validatedData.subSubcategory !== undefined) updateData.subSubcategory = validatedData.subSubcategory;
-      if (validatedData.status !== undefined) updateData.status = validatedData.status;
-      
-      const updatedResource = await storage.updateResource(resourceId, updateData);
-      
-      await storage.logResourceAudit(
-        resourceId,
-        'updated',
-        userId,
-        updateData,
-        'Resource updated by admin'
-      );
-      
-      res.json(updatedResource);
-    } catch (error) {
-      console.error('Error updating resource:', error);
-      res.status(500).json({ message: 'Failed to update resource' });
+  app.put('/api/admin/resources/:id', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
+    const resourceId = parseInt(req.params.id);
+    const userId = req.user.claims.sub;
+
+    if (isNaN(resourceId)) {
+      throw new BadRequestError('Invalid resource ID');
     }
-  });
+
+    const resource = await storage.getResource(resourceId);
+    if (!resource) {
+      throw new NotFoundError('Resource not found');
+    }
+
+    const updateSchema = insertResourceSchema.partial();
+    const validationResult = updateSchema.safeParse(req.body);
+
+    if (!validationResult.success) {
+      throw new ValidationError('Validation failed', validationResult.error.errors);
+    }
+
+    const validatedData = validationResult.data;
+    const updateData: Record<string, any> = {};
+
+    if (validatedData.title !== undefined) updateData.title = validatedData.title;
+    if (validatedData.url !== undefined) updateData.url = validatedData.url;
+    if (validatedData.description !== undefined) updateData.description = validatedData.description;
+    if (validatedData.category !== undefined) updateData.category = validatedData.category;
+    if (validatedData.subcategory !== undefined) updateData.subcategory = validatedData.subcategory;
+    if (validatedData.subSubcategory !== undefined) updateData.subSubcategory = validatedData.subSubcategory;
+    if (validatedData.status !== undefined) updateData.status = validatedData.status;
+
+    const updatedResource = await storage.updateResource(resourceId, updateData);
+
+    await storage.logResourceAudit(
+      resourceId,
+      'updated',
+      userId,
+      updateData,
+      'Resource updated by admin'
+    );
+
+    res.json(updatedResource);
+  }));
 
   // DELETE /api/admin/resources/:id - Delete a resource (admin only)
-  app.delete('/api/admin/resources/:id', isAuthenticated, isAdmin, async (req: any, res) => {
-    try {
-      const resourceId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
-      
-      if (isNaN(resourceId)) {
-        return res.status(400).json({ message: 'Invalid resource ID' });
-      }
-      
-      const resource = await storage.getResource(resourceId);
-      if (!resource) {
-        return res.status(404).json({ message: 'Resource not found' });
-      }
-      
-      const resourceSnapshot = { title: resource.title, url: resource.url, category: resource.category };
-      
-      await storage.deleteResource(resourceId);
-      
-      await storage.logResourceAudit(
-        resourceId,
-        'deleted',
-        userId,
-        resourceSnapshot,
-        'Resource deleted by admin'
-      );
-      
-      res.json({ message: 'Resource deleted successfully' });
-    } catch (error) {
-      console.error('Error deleting resource:', error);
-      res.status(500).json({ message: 'Failed to delete resource' });
+  app.delete('/api/admin/resources/:id', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
+    const resourceId = parseInt(req.params.id);
+    const userId = req.user.claims.sub;
+
+    if (isNaN(resourceId)) {
+      throw new BadRequestError('Invalid resource ID');
     }
-  });
+
+    const resource = await storage.getResource(resourceId);
+    if (!resource) {
+      throw new NotFoundError('Resource not found');
+    }
+
+    const resourceSnapshot = { title: resource.title, url: resource.url, category: resource.category };
+
+    await storage.deleteResource(resourceId);
+
+    await storage.logResourceAudit(
+      resourceId,
+      'deleted',
+      userId,
+      resourceSnapshot,
+      'Resource deleted by admin'
+    );
+
+    res.json({ message: 'Resource deleted successfully' });
+  }));
 
   // GET /api/admin/resources - Get all resources for admin (with pagination and filters)
-  app.get('/api/admin/resources', isAuthenticated, isAdmin, async (req, res) => {
-    try {
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 50;
-      const search = req.query.search as string;
-      const category = req.query.category as string;
-      const status = req.query.status as string;
-      
-      const result = await storage.listResources({
-        page,
-        limit,
-        search,
-        category,
-        status: status || undefined
-      });
-      
-      res.json({
-        resources: result.resources,
-        total: result.total,
-        page,
-        limit,
-        totalPages: Math.ceil(result.total / limit)
-      });
-    } catch (error) {
-      console.error('Error fetching admin resources:', error);
-      res.status(500).json({ message: 'Failed to fetch resources' });
-    }
-  });
+  app.get('/api/admin/resources', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 50;
+    const search = req.query.search as string;
+    const category = req.query.category as string;
+    const status = req.query.status as string;
+
+    const result = await storage.listResources({
+      page,
+      limit,
+      search,
+      category,
+      status: status || undefined
+    });
+
+    res.json({
+      resources: result.resources,
+      total: result.total,
+      page,
+      limit,
+      totalPages: Math.ceil(result.total / limit)
+    });
+  }));
 
   // POST /api/admin/resources - Create a new resource (admin only)
-  app.post('/api/admin/resources', isAuthenticated, isAdmin, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      
-      const createSchema = insertResourceSchema.extend({
-        title: insertResourceSchema.shape.title.min(1, 'Title is required'),
-        url: insertResourceSchema.shape.url.min(1, 'URL is required'),
-      });
-      
-      const validationResult = createSchema.safeParse(req.body);
-      
-      if (!validationResult.success) {
-        return res.status(400).json({ 
-          message: 'Validation failed', 
-          errors: validationResult.error.errors 
-        });
-      }
-      
-      const validatedData = validationResult.data;
-      
-      const newResource = await storage.createResource({
-        title: validatedData.title,
-        url: validatedData.url,
-        description: validatedData.description || '',
-        category: validatedData.category || 'General Tools',
-        subcategory: validatedData.subcategory || null,
-        subSubcategory: validatedData.subSubcategory || null,
-        status: validatedData.status || 'approved',
-        submittedBy: userId
-      });
-      
-      await storage.logResourceAudit(
-        newResource.id,
-        'created',
-        userId,
-        { title: validatedData.title, url: validatedData.url },
-        'Resource created by admin'
-      );
-      
-      res.status(201).json(newResource);
-    } catch (error) {
-      console.error('Error creating resource:', error);
-      res.status(500).json({ message: 'Failed to create resource' });
+  app.post('/api/admin/resources', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
+    const userId = req.user.claims.sub;
+
+    const createSchema = insertResourceSchema.extend({
+      title: insertResourceSchema.shape.title.min(1, 'Title is required'),
+      url: insertResourceSchema.shape.url.min(1, 'URL is required'),
+    });
+
+    const validationResult = createSchema.safeParse(req.body);
+
+    if (!validationResult.success) {
+      throw new ValidationError('Validation failed', validationResult.error.errors);
     }
-  });
+
+    const validatedData = validationResult.data;
+
+    const newResource = await storage.createResource({
+      title: validatedData.title,
+      url: validatedData.url,
+      description: validatedData.description || '',
+      category: validatedData.category || 'General Tools',
+      subcategory: validatedData.subcategory || null,
+      subSubcategory: validatedData.subSubcategory || null,
+      status: validatedData.status || 'approved',
+      submittedBy: userId
+    });
+
+    await storage.logResourceAudit(
+      newResource.id,
+      'created',
+      userId,
+      { title: validatedData.title, url: validatedData.url },
+      'Resource created by admin'
+    );
+
+    res.status(201).json(newResource);
+  }));
   
   // ============= Resource Edit Management Routes =============
   
   // GET /api/admin/resource-edits - Get all pending resource edits (admin only)
-  app.get('/api/admin/resource-edits', isAuthenticated, isAdmin, async (req, res) => {
-    try {
-      const edits = await storage.getPendingResourceEdits();
-      
-      const editsWithResources = await Promise.all(
-        edits.map(async (edit) => {
-          const resource = await storage.getResource(edit.resourceId);
-          return {
-            ...edit,
-            resource
-          };
-        })
-      );
-      
-      res.json(editsWithResources);
-    } catch (error) {
-      console.error('Error fetching pending edits:', error);
-      res.status(500).json({ message: 'Failed to fetch pending edits' });
-    }
-  });
+  app.get('/api/admin/resource-edits', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
+    const edits = await storage.getPendingResourceEdits();
+
+    const editsWithResources = await Promise.all(
+      edits.map(async (edit) => {
+        const resource = await storage.getResource(edit.resourceId);
+        return {
+          ...edit,
+          resource
+        };
+      })
+    );
+
+    res.json(editsWithResources);
+  }));
   
   // POST /api/admin/resource-edits/:id/approve - Approve an edit (admin only)
-  app.post('/api/admin/resource-edits/:id/approve', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/resource-edits/:id/approve', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
+    const editId = parseInt(req.params.id);
+    const userId = req.user.claims.sub;
+
+    if (isNaN(editId)) {
+      throw new BadRequestError('Invalid edit ID');
+    }
+
     try {
-      const editId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
-      
-      if (isNaN(editId)) {
-        return res.status(400).json({ message: 'Invalid edit ID' });
-      }
-      
       await storage.approveResourceEdit(editId, userId);
-      
       res.json({ message: 'Edit approved and merged successfully' });
     } catch (error: any) {
-      console.error('Error approving edit:', error);
-      
       if (error.message && error.message.includes('Conflict detected')) {
-        return res.status(409).json({ 
-          message: error.message,
-          conflict: true
-        });
+        throw new ConflictError(error.message);
       }
-      
-      res.status(500).json({ message: error.message || 'Failed to approve edit' });
+      throw error;
     }
-  });
+  }));
   
   // POST /api/admin/resource-edits/:id/reject - Reject an edit (admin only)
-  app.post('/api/admin/resource-edits/:id/reject', isAuthenticated, isAdmin, async (req: any, res) => {
-    try {
-      const editId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
-      const { reason } = req.body;
-      
-      if (isNaN(editId)) {
-        return res.status(400).json({ message: 'Invalid edit ID' });
-      }
-      
-      if (!reason || reason.trim().length < 10) {
-        return res.status(400).json({ message: 'Rejection reason is required (minimum 10 characters)' });
-      }
-      
-      await storage.rejectResourceEdit(editId, userId, reason);
-      
-      res.json({ message: 'Edit rejected successfully' });
-    } catch (error: any) {
-      console.error('Error rejecting edit:', error);
-      res.status(500).json({ message: error.message || 'Failed to reject edit' });
+  app.post('/api/admin/resource-edits/:id/reject', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
+    const editId = parseInt(req.params.id);
+    const userId = req.user.claims.sub;
+    const { reason } = req.body;
+
+    if (isNaN(editId)) {
+      throw new BadRequestError('Invalid edit ID');
     }
-  });
+
+    if (!reason || reason.trim().length < 10) {
+      throw new BadRequestError('Rejection reason is required (minimum 10 characters)');
+    }
+
+    await storage.rejectResourceEdit(editId, userId, reason);
+
+    res.json({ message: 'Edit rejected successfully' });
+  }));
   
   // POST /api/claude/analyze - Analyze URL with Claude AI (authenticated)
   app.post('/api/claude/analyze', isAuthenticated, async (req, res) => {
@@ -1465,40 +1392,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= Category Management Routes =============
   
   // GET /api/admin/categories - List all categories
-  app.get('/api/admin/categories', isAuthenticated, isAdmin, async (req, res) => {
-    try {
-      const categories = await storage.listCategories();
-      
-      const categoriesWithCounts = await Promise.all(
-        categories.map(async (cat) => {
-          const count = await storage.getCategoryResourceCount(cat.name);
-          return { ...cat, resourceCount: count };
-        })
-      );
-      
-      res.json(categoriesWithCounts);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-      res.status(500).json({ message: 'Failed to fetch categories' });
-    }
-  });
+  app.get('/api/admin/categories', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
+    const categories = await storage.listCategories();
+
+    const categoriesWithCounts = await Promise.all(
+      categories.map(async (cat) => {
+        const count = await storage.getCategoryResourceCount(cat.name);
+        return { ...cat, resourceCount: count };
+      })
+    );
+
+    res.json(categoriesWithCounts);
+  }));
   
   // POST /api/admin/categories - Create a new category
-  app.post('/api/admin/categories', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/categories', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
+    const { insertCategorySchema } = await import('@shared/schema');
+
+    const validationResult = insertCategorySchema.safeParse(req.body);
+
+    if (!validationResult.success) {
+      throw new ValidationError('Validation failed', validationResult.error.errors);
+    }
+
     try {
-      const { insertCategorySchema } = await import('@shared/schema');
-      
-      const validationResult = insertCategorySchema.safeParse(req.body);
-      
-      if (!validationResult.success) {
-        return res.status(400).json({ 
-          message: 'Validation failed', 
-          errors: validationResult.error.errors 
-        });
-      }
-      
       const newCategory = await storage.createCategory(validationResult.data);
-      
+
       await storage.logResourceAudit(
         null,
         'category_created',
@@ -1506,148 +1425,122 @@ export async function registerRoutes(app: Express): Promise<Server> {
         { category: newCategory },
         `Created category: ${newCategory.name}`
       );
-      
+
       res.status(201).json(newCategory);
     } catch (error) {
-      console.error('Error creating category:', error);
-      
       if (error instanceof Error && error.message.includes('already exists')) {
-        return res.status(409).json({ message: error.message });
+        throw new ConflictError(error.message);
       }
-      
-      res.status(500).json({ message: 'Failed to create category' });
+      throw error;
     }
-  });
+  }));
   
   // PATCH /api/admin/categories/:id - Update a category
-  app.patch('/api/admin/categories/:id', isAuthenticated, isAdmin, async (req: any, res) => {
-    try {
-      const categoryId = parseInt(req.params.id);
-      
-      if (isNaN(categoryId)) {
-        return res.status(400).json({ message: 'Invalid category ID' });
-      }
-      
-      const { updateCategorySchema } = await import('@shared/schema');
-      
-      const validationResult = updateCategorySchema.safeParse(req.body);
-      
-      if (!validationResult.success) {
-        return res.status(400).json({ 
-          message: 'Validation failed', 
-          errors: validationResult.error.errors 
-        });
-      }
-      
-      const existingCategory = await storage.getCategory(categoryId);
-      if (!existingCategory) {
-        return res.status(404).json({ message: 'Category not found' });
-      }
-      
-      const updatedCategory = await storage.updateCategory(categoryId, validationResult.data);
-      
-      await storage.logResourceAudit(
-        null,
-        'category_updated',
-        req.user.claims.sub,
-        { before: existingCategory, after: updatedCategory },
-        `Updated category: ${existingCategory.name}`
-      );
-      
-      res.json(updatedCategory);
-    } catch (error) {
-      console.error('Error updating category:', error);
-      res.status(500).json({ message: 'Failed to update category' });
+  app.patch('/api/admin/categories/:id', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
+    const categoryId = parseInt(req.params.id);
+
+    if (isNaN(categoryId)) {
+      throw new BadRequestError('Invalid category ID');
     }
-  });
+
+    const { updateCategorySchema } = await import('@shared/schema');
+
+    const validationResult = updateCategorySchema.safeParse(req.body);
+
+    if (!validationResult.success) {
+      throw new ValidationError('Validation failed', validationResult.error.errors);
+    }
+
+    const existingCategory = await storage.getCategory(categoryId);
+    if (!existingCategory) {
+      throw new NotFoundError('Category not found');
+    }
+
+    const updatedCategory = await storage.updateCategory(categoryId, validationResult.data);
+
+    await storage.logResourceAudit(
+      null,
+      'category_updated',
+      req.user.claims.sub,
+      { before: existingCategory, after: updatedCategory },
+      `Updated category: ${existingCategory.name}`
+    );
+
+    res.json(updatedCategory);
+  }));
   
   // DELETE /api/admin/categories/:id - Delete a category
-  app.delete('/api/admin/categories/:id', isAuthenticated, isAdmin, async (req: any, res) => {
-    try {
-      const categoryId = parseInt(req.params.id);
-      
-      if (isNaN(categoryId)) {
-        return res.status(400).json({ message: 'Invalid category ID' });
-      }
-      
-      const category = await storage.getCategory(categoryId);
-      if (!category) {
-        return res.status(404).json({ message: 'Category not found' });
-      }
-      
-      const resourceCount = await storage.getCategoryResourceCount(category.name);
-      if (resourceCount > 0) {
-        return res.status(400).json({ 
-          message: `Cannot delete category with ${resourceCount} resources. Please reassign or delete resources first.` 
-        });
-      }
-      
-      await storage.deleteCategory(categoryId);
-      
-      await storage.logResourceAudit(
-        null,
-        'category_deleted',
-        req.user.claims.sub,
-        { category },
-        `Deleted category: ${category.name}`
-      );
-      
-      res.json({ message: 'Category deleted successfully' });
-    } catch (error) {
-      console.error('Error deleting category:', error);
-      res.status(500).json({ message: 'Failed to delete category' });
+  app.delete('/api/admin/categories/:id', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
+    const categoryId = parseInt(req.params.id);
+
+    if (isNaN(categoryId)) {
+      throw new BadRequestError('Invalid category ID');
     }
-  });
+
+    const category = await storage.getCategory(categoryId);
+    if (!category) {
+      throw new NotFoundError('Category not found');
+    }
+
+    const resourceCount = await storage.getCategoryResourceCount(category.name);
+    if (resourceCount > 0) {
+      throw new BadRequestError(`Cannot delete category with ${resourceCount} resources. Please reassign or delete resources first.`);
+    }
+
+    await storage.deleteCategory(categoryId);
+
+    await storage.logResourceAudit(
+      null,
+      'category_deleted',
+      req.user.claims.sub,
+      { category },
+      `Deleted category: ${category.name}`
+    );
+
+    res.json({ message: 'Category deleted successfully' });
+  }));
   
   // ============= Subcategory Management Routes =============
   
   // GET /api/admin/subcategories - List all subcategories (optionally filtered by category)
-  app.get('/api/admin/subcategories', isAuthenticated, isAdmin, async (req, res) => {
-    try {
-      const categoryId = req.query.categoryId ? parseInt(req.query.categoryId as string) : undefined;
-      
-      const subcategories = await storage.listSubcategories(categoryId);
-      
-      const subcategoriesWithCounts = await Promise.all(
-        subcategories.map(async (sub) => {
-          const count = await storage.getSubcategoryResourceCount(sub.name);
-          return { ...sub, resourceCount: count };
-        })
-      );
-      
-      res.json(subcategoriesWithCounts);
-    } catch (error) {
-      console.error('Error fetching subcategories:', error);
-      res.status(500).json({ message: 'Failed to fetch subcategories' });
-    }
-  });
+  app.get('/api/admin/subcategories', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
+    const categoryId = req.query.categoryId ? parseInt(req.query.categoryId as string) : undefined;
+
+    const subcategories = await storage.listSubcategories(categoryId);
+
+    const subcategoriesWithCounts = await Promise.all(
+      subcategories.map(async (sub) => {
+        const count = await storage.getSubcategoryResourceCount(sub.name);
+        return { ...sub, resourceCount: count };
+      })
+    );
+
+    res.json(subcategoriesWithCounts);
+  }));
   
   // POST /api/admin/subcategories - Create a new subcategory
-  app.post('/api/admin/subcategories', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/subcategories', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
+    const { insertSubcategorySchema } = await import('@shared/schema');
+
+    const validationResult = insertSubcategorySchema.safeParse(req.body);
+
+    if (!validationResult.success) {
+      throw new ValidationError('Validation failed', validationResult.error.errors);
+    }
+
+    const categoryId = validationResult.data.categoryId;
+    if (!categoryId) {
+      throw new BadRequestError('Category ID is required');
+    }
+
+    const category = await storage.getCategory(categoryId);
+    if (!category) {
+      throw new NotFoundError('Parent category not found');
+    }
+
     try {
-      const { insertSubcategorySchema } = await import('@shared/schema');
-      
-      const validationResult = insertSubcategorySchema.safeParse(req.body);
-      
-      if (!validationResult.success) {
-        return res.status(400).json({ 
-          message: 'Validation failed', 
-          errors: validationResult.error.errors 
-        });
-      }
-      
-      const categoryId = validationResult.data.categoryId;
-      if (!categoryId) {
-        return res.status(400).json({ message: 'Category ID is required' });
-      }
-      
-      const category = await storage.getCategory(categoryId);
-      if (!category) {
-        return res.status(404).json({ message: 'Parent category not found' });
-      }
-      
       const newSubcategory = await storage.createSubcategory(validationResult.data);
-      
+
       await storage.logResourceAudit(
         null,
         'subcategory_created',
@@ -1655,155 +1548,129 @@ export async function registerRoutes(app: Express): Promise<Server> {
         { subcategory: newSubcategory },
         `Created subcategory: ${newSubcategory.name} under ${category.name}`
       );
-      
+
       res.status(201).json(newSubcategory);
     } catch (error) {
-      console.error('Error creating subcategory:', error);
-      
       if (error instanceof Error && error.message.includes('already exists')) {
-        return res.status(409).json({ message: error.message });
+        throw new ConflictError(error.message);
       }
-      
-      res.status(500).json({ message: 'Failed to create subcategory' });
+      throw error;
     }
-  });
+  }));
   
   // PATCH /api/admin/subcategories/:id - Update a subcategory
-  app.patch('/api/admin/subcategories/:id', isAuthenticated, isAdmin, async (req: any, res) => {
-    try {
-      const subcategoryId = parseInt(req.params.id);
-      
-      if (isNaN(subcategoryId)) {
-        return res.status(400).json({ message: 'Invalid subcategory ID' });
-      }
-      
-      const { updateSubcategorySchema } = await import('@shared/schema');
-      
-      const validationResult = updateSubcategorySchema.safeParse(req.body);
-      
-      if (!validationResult.success) {
-        return res.status(400).json({ 
-          message: 'Validation failed', 
-          errors: validationResult.error.errors 
-        });
-      }
-      
-      const existingSubcategory = await storage.getSubcategory(subcategoryId);
-      if (!existingSubcategory) {
-        return res.status(404).json({ message: 'Subcategory not found' });
-      }
-      
-      if (validationResult.data.categoryId !== undefined && validationResult.data.categoryId !== null) {
-        const category = await storage.getCategory(validationResult.data.categoryId);
-        if (!category) {
-          return res.status(404).json({ message: 'Parent category not found' });
-        }
-      }
-      
-      const updatedSubcategory = await storage.updateSubcategory(subcategoryId, validationResult.data);
-      
-      await storage.logResourceAudit(
-        null,
-        'subcategory_updated',
-        req.user.claims.sub,
-        { before: existingSubcategory, after: updatedSubcategory },
-        `Updated subcategory: ${existingSubcategory.name}`
-      );
-      
-      res.json(updatedSubcategory);
-    } catch (error) {
-      console.error('Error updating subcategory:', error);
-      res.status(500).json({ message: 'Failed to update subcategory' });
+  app.patch('/api/admin/subcategories/:id', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
+    const subcategoryId = parseInt(req.params.id);
+
+    if (isNaN(subcategoryId)) {
+      throw new BadRequestError('Invalid subcategory ID');
     }
-  });
+
+    const { updateSubcategorySchema } = await import('@shared/schema');
+
+    const validationResult = updateSubcategorySchema.safeParse(req.body);
+
+    if (!validationResult.success) {
+      throw new ValidationError('Validation failed', validationResult.error.errors);
+    }
+
+    const existingSubcategory = await storage.getSubcategory(subcategoryId);
+    if (!existingSubcategory) {
+      throw new NotFoundError('Subcategory not found');
+    }
+
+    if (validationResult.data.categoryId !== undefined && validationResult.data.categoryId !== null) {
+      const category = await storage.getCategory(validationResult.data.categoryId);
+      if (!category) {
+        throw new NotFoundError('Parent category not found');
+      }
+    }
+
+    const updatedSubcategory = await storage.updateSubcategory(subcategoryId, validationResult.data);
+
+    await storage.logResourceAudit(
+      null,
+      'subcategory_updated',
+      req.user.claims.sub,
+      { before: existingSubcategory, after: updatedSubcategory },
+      `Updated subcategory: ${existingSubcategory.name}`
+    );
+
+    res.json(updatedSubcategory);
+  }));
   
   // DELETE /api/admin/subcategories/:id - Delete a subcategory
-  app.delete('/api/admin/subcategories/:id', isAuthenticated, isAdmin, async (req: any, res) => {
-    try {
-      const subcategoryId = parseInt(req.params.id);
-      
-      if (isNaN(subcategoryId)) {
-        return res.status(400).json({ message: 'Invalid subcategory ID' });
-      }
-      
-      const subcategory = await storage.getSubcategory(subcategoryId);
-      if (!subcategory) {
-        return res.status(404).json({ message: 'Subcategory not found' });
-      }
-      
-      const resourceCount = await storage.getSubcategoryResourceCount(subcategory.name);
-      if (resourceCount > 0) {
-        return res.status(400).json({ 
-          message: `Cannot delete subcategory with ${resourceCount} resources. Please reassign or delete resources first.` 
-        });
-      }
-      
-      await storage.deleteSubcategory(subcategoryId);
-      
-      await storage.logResourceAudit(
-        null,
-        'subcategory_deleted',
-        req.user.claims.sub,
-        { subcategory },
-        `Deleted subcategory: ${subcategory.name}`
-      );
-      
-      res.json({ message: 'Subcategory deleted successfully' });
-    } catch (error) {
-      console.error('Error deleting subcategory:', error);
-      res.status(500).json({ message: 'Failed to delete subcategory' });
+  app.delete('/api/admin/subcategories/:id', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
+    const subcategoryId = parseInt(req.params.id);
+
+    if (isNaN(subcategoryId)) {
+      throw new BadRequestError('Invalid subcategory ID');
     }
-  });
+
+    const subcategory = await storage.getSubcategory(subcategoryId);
+    if (!subcategory) {
+      throw new NotFoundError('Subcategory not found');
+    }
+
+    const resourceCount = await storage.getSubcategoryResourceCount(subcategory.name);
+    if (resourceCount > 0) {
+      throw new BadRequestError(`Cannot delete subcategory with ${resourceCount} resources. Please reassign or delete resources first.`);
+    }
+
+    await storage.deleteSubcategory(subcategoryId);
+
+    await storage.logResourceAudit(
+      null,
+      'subcategory_deleted',
+      req.user.claims.sub,
+      { subcategory },
+      `Deleted subcategory: ${subcategory.name}`
+    );
+
+    res.json({ message: 'Subcategory deleted successfully' });
+  }));
   
   // ============= Sub-subcategory Management Routes =============
   
   // GET /api/admin/sub-subcategories - List all sub-subcategories (optionally filtered by subcategory)
-  app.get('/api/admin/sub-subcategories', isAuthenticated, isAdmin, async (req, res) => {
-    try {
-      const subcategoryId = req.query.subcategoryId ? parseInt(req.query.subcategoryId as string) : undefined;
-      
-      const subSubcategories = await storage.listSubSubcategories(subcategoryId);
-      
-      const subSubcategoriesWithCounts = await Promise.all(
-        subSubcategories.map(async (subSub) => {
-          const count = await storage.getSubSubcategoryResourceCount(subSub.name);
-          return { ...subSub, resourceCount: count };
-        })
-      );
-      
-      res.json(subSubcategoriesWithCounts);
-    } catch (error) {
-      console.error('Error fetching sub-subcategories:', error);
-      res.status(500).json({ message: 'Failed to fetch sub-subcategories' });
-    }
-  });
+  app.get('/api/admin/sub-subcategories', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
+    const subcategoryId = req.query.subcategoryId ? parseInt(req.query.subcategoryId as string) : undefined;
+
+    const subSubcategories = await storage.listSubSubcategories(subcategoryId);
+
+    const subSubcategoriesWithCounts = await Promise.all(
+      subSubcategories.map(async (subSub) => {
+        const count = await storage.getSubSubcategoryResourceCount(subSub.name);
+        return { ...subSub, resourceCount: count };
+      })
+    );
+
+    res.json(subSubcategoriesWithCounts);
+  }));
   
   // POST /api/admin/sub-subcategories - Create a new sub-subcategory
-  app.post('/api/admin/sub-subcategories', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/sub-subcategories', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
+    const { insertSubSubcategorySchema } = await import('@shared/schema');
+
+    const validationResult = insertSubSubcategorySchema.safeParse(req.body);
+
+    if (!validationResult.success) {
+      throw new ValidationError('Validation failed', validationResult.error.errors);
+    }
+
+    const subcategoryId = validationResult.data.subcategoryId;
+    if (!subcategoryId) {
+      throw new BadRequestError('Subcategory ID is required');
+    }
+
+    const subcategory = await storage.getSubcategory(subcategoryId);
+    if (!subcategory) {
+      throw new NotFoundError('Parent subcategory not found');
+    }
+
     try {
-      const { insertSubSubcategorySchema } = await import('@shared/schema');
-      
-      const validationResult = insertSubSubcategorySchema.safeParse(req.body);
-      
-      if (!validationResult.success) {
-        return res.status(400).json({ 
-          message: 'Validation failed', 
-          errors: validationResult.error.errors 
-        });
-      }
-      
-      const subcategoryId = validationResult.data.subcategoryId;
-      if (!subcategoryId) {
-        return res.status(400).json({ message: 'Subcategory ID is required' });
-      }
-      
-      const subcategory = await storage.getSubcategory(subcategoryId);
-      if (!subcategory) {
-        return res.status(404).json({ message: 'Parent subcategory not found' });
-      }
-      
       const newSubSubcategory = await storage.createSubSubcategory(validationResult.data);
-      
+
       await storage.logResourceAudit(
         null,
         'sub_subcategory_created',
@@ -1811,105 +1678,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
         { subSubcategory: newSubSubcategory },
         `Created sub-subcategory: ${newSubSubcategory.name} under ${subcategory.name}`
       );
-      
+
       res.status(201).json(newSubSubcategory);
     } catch (error) {
-      console.error('Error creating sub-subcategory:', error);
-      
       if (error instanceof Error && error.message.includes('already exists')) {
-        return res.status(409).json({ message: error.message });
+        throw new ConflictError(error.message);
       }
-      
-      res.status(500).json({ message: 'Failed to create sub-subcategory' });
+      throw error;
     }
-  });
+  }));
   
   // PATCH /api/admin/sub-subcategories/:id - Update a sub-subcategory
-  app.patch('/api/admin/sub-subcategories/:id', isAuthenticated, isAdmin, async (req: any, res) => {
-    try {
-      const subSubcategoryId = parseInt(req.params.id);
-      
-      if (isNaN(subSubcategoryId)) {
-        return res.status(400).json({ message: 'Invalid sub-subcategory ID' });
-      }
-      
-      const { updateSubSubcategorySchema } = await import('@shared/schema');
-      
-      const validationResult = updateSubSubcategorySchema.safeParse(req.body);
-      
-      if (!validationResult.success) {
-        return res.status(400).json({ 
-          message: 'Validation failed', 
-          errors: validationResult.error.errors 
-        });
-      }
-      
-      const existingSubSubcategory = await storage.getSubSubcategory(subSubcategoryId);
-      if (!existingSubSubcategory) {
-        return res.status(404).json({ message: 'Sub-subcategory not found' });
-      }
-      
-      if (validationResult.data.subcategoryId !== undefined && validationResult.data.subcategoryId !== null) {
-        const subcategory = await storage.getSubcategory(validationResult.data.subcategoryId);
-        if (!subcategory) {
-          return res.status(404).json({ message: 'Parent subcategory not found' });
-        }
-      }
-      
-      const updatedSubSubcategory = await storage.updateSubSubcategory(subSubcategoryId, validationResult.data);
-      
-      await storage.logResourceAudit(
-        null,
-        'sub_subcategory_updated',
-        req.user.claims.sub,
-        { before: existingSubSubcategory, after: updatedSubSubcategory },
-        `Updated sub-subcategory: ${existingSubSubcategory.name}`
-      );
-      
-      res.json(updatedSubSubcategory);
-    } catch (error) {
-      console.error('Error updating sub-subcategory:', error);
-      res.status(500).json({ message: 'Failed to update sub-subcategory' });
+  app.patch('/api/admin/sub-subcategories/:id', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
+    const subSubcategoryId = parseInt(req.params.id);
+
+    if (isNaN(subSubcategoryId)) {
+      throw new BadRequestError('Invalid sub-subcategory ID');
     }
-  });
+
+    const { updateSubSubcategorySchema } = await import('@shared/schema');
+
+    const validationResult = updateSubSubcategorySchema.safeParse(req.body);
+
+    if (!validationResult.success) {
+      throw new ValidationError('Validation failed', validationResult.error.errors);
+    }
+
+    const existingSubSubcategory = await storage.getSubSubcategory(subSubcategoryId);
+    if (!existingSubSubcategory) {
+      throw new NotFoundError('Sub-subcategory not found');
+    }
+
+    if (validationResult.data.subcategoryId !== undefined && validationResult.data.subcategoryId !== null) {
+      const subcategory = await storage.getSubcategory(validationResult.data.subcategoryId);
+      if (!subcategory) {
+        throw new NotFoundError('Parent subcategory not found');
+      }
+    }
+
+    const updatedSubSubcategory = await storage.updateSubSubcategory(subSubcategoryId, validationResult.data);
+
+    await storage.logResourceAudit(
+      null,
+      'sub_subcategory_updated',
+      req.user.claims.sub,
+      { before: existingSubSubcategory, after: updatedSubSubcategory },
+      `Updated sub-subcategory: ${existingSubSubcategory.name}`
+    );
+
+    res.json(updatedSubSubcategory);
+  }));
   
   // DELETE /api/admin/sub-subcategories/:id - Delete a sub-subcategory
-  app.delete('/api/admin/sub-subcategories/:id', isAuthenticated, isAdmin, async (req: any, res) => {
-    try {
-      const subSubcategoryId = parseInt(req.params.id);
-      
-      if (isNaN(subSubcategoryId)) {
-        return res.status(400).json({ message: 'Invalid sub-subcategory ID' });
-      }
-      
-      const subSubcategory = await storage.getSubSubcategory(subSubcategoryId);
-      if (!subSubcategory) {
-        return res.status(404).json({ message: 'Sub-subcategory not found' });
-      }
-      
-      const resourceCount = await storage.getSubSubcategoryResourceCount(subSubcategory.name);
-      if (resourceCount > 0) {
-        return res.status(400).json({ 
-          message: `Cannot delete sub-subcategory with ${resourceCount} resources. Please reassign or delete resources first.` 
-        });
-      }
-      
-      await storage.deleteSubSubcategory(subSubcategoryId);
-      
-      await storage.logResourceAudit(
-        null,
-        'sub_subcategory_deleted',
-        req.user.claims.sub,
-        { subSubcategory },
-        `Deleted sub-subcategory: ${subSubcategory.name}`
-      );
-      
-      res.json({ message: 'Sub-subcategory deleted successfully' });
-    } catch (error) {
-      console.error('Error deleting sub-subcategory:', error);
-      res.status(500).json({ message: 'Failed to delete sub-subcategory' });
+  app.delete('/api/admin/sub-subcategories/:id', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
+    const subSubcategoryId = parseInt(req.params.id);
+
+    if (isNaN(subSubcategoryId)) {
+      throw new BadRequestError('Invalid sub-subcategory ID');
     }
-  });
+
+    const subSubcategory = await storage.getSubSubcategory(subSubcategoryId);
+    if (!subSubcategory) {
+      throw new NotFoundError('Sub-subcategory not found');
+    }
+
+    const resourceCount = await storage.getSubSubcategoryResourceCount(subSubcategory.name);
+    if (resourceCount > 0) {
+      throw new BadRequestError(`Cannot delete sub-subcategory with ${resourceCount} resources. Please reassign or delete resources first.`);
+    }
+
+    await storage.deleteSubSubcategory(subSubcategoryId);
+
+    await storage.logResourceAudit(
+      null,
+      'sub_subcategory_deleted',
+      req.user.claims.sub,
+      { subSubcategory },
+      `Deleted sub-subcategory: ${subSubcategory.name}`
+    );
+
+    res.json({ message: 'Sub-subcategory deleted successfully' });
+  }));
   
   // ============= GitHub Sync Routes =============
   
@@ -2084,365 +1933,322 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= Awesome List Export & Validation Routes =============
 
   // POST /api/admin/export - Generate and download awesome list markdown
-  app.post('/api/admin/export', isAuthenticated, isAdmin, async (req: any, res) => {
-    try {
-      // Get all approved resources
-      const resources = await storage.getAllApprovedResources();
-      
-      // Get export options from request body
-      // NOTE: websiteUrl is undefined by default to avoid including internal dev URLs
-      // NOTE: includeLicense defaults to false because awesome-lint forbids inline license sections
-      const {
-        title = 'Awesome Video',
-        description = 'A curated list of awesome video resources, tools, frameworks, and learning materials.',
-        includeContributing = false, // References CONTRIBUTING.md which may not exist
-        includeLicense = false, // awesome-lint forbids inline license sections
-        websiteUrl = undefined, // Don't include dev URLs in exports
-        repoUrl = process.env.GITHUB_REPO_URL
-      } = req.body;
+  app.post('/api/admin/export', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
+    // Get all approved resources
+    const resources = await storage.getAllApprovedResources();
 
-      // Create formatter with options
-      const formatter = new AwesomeListFormatter(resources, {
-        title,
-        description,
-        includeContributing,
-        includeLicense,
-        websiteUrl,
-        repoUrl
-      });
+    // Get export options from request body
+    // NOTE: websiteUrl is undefined by default to avoid including internal dev URLs
+    // NOTE: includeLicense defaults to false because awesome-lint forbids inline license sections
+    const {
+      title = 'Awesome Video',
+      description = 'A curated list of awesome video resources, tools, frameworks, and learning materials.',
+      includeContributing = false, // References CONTRIBUTING.md which may not exist
+      includeLicense = false, // awesome-lint forbids inline license sections
+      websiteUrl = undefined, // Don't include dev URLs in exports
+      repoUrl = process.env.GITHUB_REPO_URL
+    } = req.body;
 
-      // Generate the markdown
-      const markdown = formatter.generate();
-      
-      // Set headers for file download
-      res.setHeader('Content-Type', 'text/markdown');
-      res.setHeader('Content-Disposition', 'attachment; filename="awesome-list.md"');
-      
-      res.send(markdown);
-    } catch (error) {
-      console.error('Error generating awesome list export:', error);
-      res.status(500).json({ message: 'Failed to generate awesome list export' });
-    }
-  });
+    // Create formatter with options
+    const formatter = new AwesomeListFormatter(resources, {
+      title,
+      description,
+      includeContributing,
+      includeLicense,
+      websiteUrl,
+      repoUrl
+    });
+
+    // Generate the markdown
+    const markdown = formatter.generate();
+
+    // Set headers for file download
+    res.setHeader('Content-Type', 'text/markdown');
+    res.setHeader('Content-Disposition', 'attachment; filename="awesome-list.md"');
+
+    res.send(markdown);
+  }));
 
   // GET /api/admin/export-json - Export full database as JSON for backup
-  app.get('/api/admin/export-json', isAuthenticated, isAdmin, async (req, res) => {
-    try {
-      // Get ALL data from database (not just approved resources)
-      const [
-        allResources,
-        categories,
-        subcategories,
-        subSubcategories,
+  app.get('/api/admin/export-json', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
+    // Get ALL data from database (not just approved resources)
+    const [
+      allResources,
+      categories,
+      subcategories,
+      subSubcategories,
+      tags,
+      learningJourneys,
+      syncQueue,
+      users
+    ] = await Promise.all([
+      storage.listResources({ limit: 100000 }), // Get all resources regardless of status
+      storage.listCategories(),
+      storage.listSubcategories(),
+      storage.listSubSubcategories(),
+      storage.listTags(),
+      storage.listLearningJourneys(),
+      storage.getGithubSyncQueue(),
+      storage.listUsers(1, 10000)
+    ]);
+
+    const resources = allResources.resources;
+    const usersList = users.users;
+
+    // Get journey steps for each journey
+    const journeyIds = learningJourneys.map((j: any) => j.id);
+    const stepsMap = await storage.listJourneyStepsBatch(journeyIds);
+
+    // Attach steps to journeys
+    const journeysWithSteps = learningJourneys.map((journey: any) => ({
+      ...journey,
+      steps: stepsMap.get(journey.id) || []
+    }));
+
+    // Build hierarchy structure
+    const categoryHierarchy = categories.map((cat: any) => ({
+      ...cat,
+      subcategories: subcategories
+        .filter((sub: any) => sub.categoryId === cat.id)
+        .map((sub: any) => ({
+          ...sub,
+          subSubcategories: subSubcategories.filter(
+            (ssub: any) => ssub.subcategoryId === sub.id
+          )
+        }))
+    }));
+
+    // Count resources by status
+    const resourcesByStatus = resources.reduce((acc: Record<string, number>, r: any) => {
+      acc[r.status || 'unknown'] = (acc[r.status || 'unknown'] || 0) + 1;
+      return acc;
+    }, {});
+
+    // Sanitize users for export (remove sensitive data)
+    const sanitizedUsers = usersList.map((u: any) => ({
+      id: u.id,
+      username: u.username,
+      role: u.role,
+      createdAt: u.createdAt,
+      updatedAt: u.updatedAt
+    }));
+
+    const exportData = {
+      exportedAt: new Date().toISOString(),
+      version: '1.0.0',
+      schema: {
+        resources: "id, title, url, description, category, subcategory, subSubcategory, status, submittedBy, approvedBy, approvedAt, githubSynced, lastSyncedAt, metadata, createdAt, updatedAt",
+        categories: "id, name, slug",
+        subcategories: "id, name, slug, categoryId",
+        subSubcategories: "id, name, slug, subcategoryId",
+        tags: "id, name, slug",
+        learningJourneys: "id, title, description, category, difficulty, estimatedHours, createdBy, createdAt, updatedAt"
+      },
+      stats: {
+        resources: resources.length,
+        resourcesByStatus,
+        categories: categories.length,
+        subcategories: subcategories.length,
+        subSubcategories: subSubcategories.length,
+        tags: tags.length,
+        learningJourneys: learningJourneys.length,
+        users: usersList.length,
+        syncQueueItems: syncQueue.length
+      },
+      data: {
+        resources,
+        categoryHierarchy,
         tags,
-        learningJourneys,
+        learningJourneys: journeysWithSteps,
         syncQueue,
-        users
-      ] = await Promise.all([
-        storage.listResources({ limit: 100000 }), // Get all resources regardless of status
-        storage.listCategories(),
-        storage.listSubcategories(),
-        storage.listSubSubcategories(),
-        storage.listTags(),
-        storage.listLearningJourneys(),
-        storage.getGithubSyncQueue(),
-        storage.listUsers(1, 10000)
-      ]);
-      
-      const resources = allResources.resources;
-      const usersList = users.users;
+        users: sanitizedUsers
+      }
+    };
 
-      // Get journey steps for each journey
-      const journeyIds = learningJourneys.map((j: any) => j.id);
-      const stepsMap = await storage.listJourneyStepsBatch(journeyIds);
-      
-      // Attach steps to journeys
-      const journeysWithSteps = learningJourneys.map((journey: any) => ({
-        ...journey,
-        steps: stepsMap.get(journey.id) || []
-      }));
+    // Set headers for JSON download
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Disposition', `attachment; filename="awesome-list-backup-${new Date().toISOString().split('T')[0]}.json"`);
 
-      // Build hierarchy structure
-      const categoryHierarchy = categories.map((cat: any) => ({
-        ...cat,
-        subcategories: subcategories
-          .filter((sub: any) => sub.categoryId === cat.id)
-          .map((sub: any) => ({
-            ...sub,
-            subSubcategories: subSubcategories.filter(
-              (ssub: any) => ssub.subcategoryId === sub.id
-            )
-          }))
-      }));
-
-      // Count resources by status
-      const resourcesByStatus = resources.reduce((acc: Record<string, number>, r: any) => {
-        acc[r.status || 'unknown'] = (acc[r.status || 'unknown'] || 0) + 1;
-        return acc;
-      }, {});
-      
-      // Sanitize users for export (remove sensitive data)
-      const sanitizedUsers = usersList.map((u: any) => ({
-        id: u.id,
-        username: u.username,
-        role: u.role,
-        createdAt: u.createdAt,
-        updatedAt: u.updatedAt
-      }));
-
-      const exportData = {
-        exportedAt: new Date().toISOString(),
-        version: '1.0.0',
-        schema: {
-          resources: "id, title, url, description, category, subcategory, subSubcategory, status, submittedBy, approvedBy, approvedAt, githubSynced, lastSyncedAt, metadata, createdAt, updatedAt",
-          categories: "id, name, slug",
-          subcategories: "id, name, slug, categoryId",
-          subSubcategories: "id, name, slug, subcategoryId",
-          tags: "id, name, slug",
-          learningJourneys: "id, title, description, category, difficulty, estimatedHours, createdBy, createdAt, updatedAt"
-        },
-        stats: {
-          resources: resources.length,
-          resourcesByStatus,
-          categories: categories.length,
-          subcategories: subcategories.length,
-          subSubcategories: subSubcategories.length,
-          tags: tags.length,
-          learningJourneys: learningJourneys.length,
-          users: usersList.length,
-          syncQueueItems: syncQueue.length
-        },
-        data: {
-          resources,
-          categoryHierarchy,
-          tags,
-          learningJourneys: journeysWithSteps,
-          syncQueue,
-          users: sanitizedUsers
-        }
-      };
-
-      // Set headers for JSON download
-      res.setHeader('Content-Type', 'application/json');
-      res.setHeader('Content-Disposition', `attachment; filename="awesome-list-backup-${new Date().toISOString().split('T')[0]}.json"`);
-      
-      res.json(exportData);
-    } catch (error) {
-      console.error('Error generating JSON export:', error);
-      res.status(500).json({ message: 'Failed to generate JSON export' });
-    }
-  });
+    res.json(exportData);
+  }));
 
   // POST /api/admin/validate - Run awesome-lint validation on current data
-  app.post('/api/admin/validate', isAuthenticated, isAdmin, async (req: any, res) => {
-    try {
-      // Get all approved resources
-      const resources = await storage.getAllApprovedResources();
-      
-      // Get export options from request body
-      // NOTE: websiteUrl undefined to avoid including dev URLs; includeLicense false per awesome-lint
-      const {
-        title = 'Awesome Video',
-        description = 'A curated list of awesome video resources, tools, frameworks, and learning materials.',
-        includeContributing = false,
-        includeLicense = false,
-        websiteUrl = undefined,
-        repoUrl = process.env.GITHUB_REPO_URL
-      } = req.body;
+  app.post('/api/admin/validate', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
+    // Get all approved resources
+    const resources = await storage.getAllApprovedResources();
 
-      // Create formatter and generate markdown
-      const formatter = new AwesomeListFormatter(resources, {
-        title,
-        description,
-        includeContributing,
-        includeLicense,
-        websiteUrl,
-        repoUrl
-      });
+    // Get export options from request body
+    // NOTE: websiteUrl undefined to avoid including dev URLs; includeLicense false per awesome-lint
+    const {
+      title = 'Awesome Video',
+      description = 'A curated list of awesome video resources, tools, frameworks, and learning materials.',
+      includeContributing = false,
+      includeLicense = false,
+      websiteUrl = undefined,
+      repoUrl = process.env.GITHUB_REPO_URL
+    } = req.body;
 
-      const markdown = formatter.generate();
-      
-      // Validate the generated markdown
-      const validationResult = validateAwesomeList(markdown);
-      
-      // Store validation result for later retrieval
-      await storage.storeValidationResult({
-        type: 'awesome-lint',
-        result: validationResult,
-        markdown,
-        timestamp: new Date().toISOString()
-      });
-      
-      // Return validation results
-      res.json({
-        valid: validationResult.valid,
-        errors: validationResult.errors,
-        warnings: validationResult.warnings,
-        stats: validationResult.stats,
-        report: formatValidationReport(validationResult)
-      });
-    } catch (error) {
-      console.error('Error validating awesome list:', error);
-      res.status(500).json({ message: 'Failed to validate awesome list' });
-    }
-  });
+    // Create formatter and generate markdown
+    const formatter = new AwesomeListFormatter(resources, {
+      title,
+      description,
+      includeContributing,
+      includeLicense,
+      websiteUrl,
+      repoUrl
+    });
+
+    const markdown = formatter.generate();
+
+    // Validate the generated markdown
+    const validationResult = validateAwesomeList(markdown);
+
+    // Store validation result for later retrieval
+    await storage.storeValidationResult({
+      type: 'awesome-lint',
+      result: validationResult,
+      markdown,
+      timestamp: new Date().toISOString()
+    });
+
+    // Return validation results
+    res.json({
+      valid: validationResult.valid,
+      errors: validationResult.errors,
+      warnings: validationResult.warnings,
+      stats: validationResult.stats,
+      report: formatValidationReport(validationResult)
+    });
+  }));
 
   // POST /api/admin/check-links - Run link checker on all resources
-  app.post('/api/admin/check-links', isAuthenticated, isAdmin, async (req: any, res) => {
-    try {
-      // Get all approved resources
-      const resources = await storage.getAllApprovedResources();
-      
-      // Get check options from request body
-      const {
-        timeout = 10000,
-        concurrent = 5,
-        retryCount = 1
-      } = req.body;
+  app.post('/api/admin/check-links', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
+    // Get all approved resources
+    const resources = await storage.getAllApprovedResources();
 
-      // Prepare resources for link checking
-      const resourcesToCheck = resources.map(r => ({
-        id: r.id,
-        title: r.title,
-        url: r.url
-      }));
+    // Get check options from request body
+    const {
+      timeout = 10000,
+      concurrent = 5,
+      retryCount = 1
+    } = req.body;
 
-      // Check links
-      const linkCheckReport = await checkResourceLinks(resourcesToCheck, {
-        timeout,
-        concurrent,
-        retryCount
-      });
-      
-      // Store link check result for later retrieval
-      await storage.storeValidationResult({
-        type: 'link-check',
-        result: linkCheckReport,
-        timestamp: linkCheckReport.timestamp
-      });
-      
-      // Return link check results
-      res.json({
-        totalLinks: linkCheckReport.totalLinks,
-        validLinks: linkCheckReport.validLinks,
-        brokenLinks: linkCheckReport.brokenLinks,
-        redirects: linkCheckReport.redirects,
-        errors: linkCheckReport.errors,
-        summary: linkCheckReport.summary,
-        report: formatLinkCheckReport(linkCheckReport),
-        brokenResources: linkCheckReport.results.filter(r => !r.valid && r.status >= 400)
-      });
-    } catch (error) {
-      console.error('Error checking links:', error);
-      res.status(500).json({ message: 'Failed to check links' });
-    }
-  });
+    // Prepare resources for link checking
+    const resourcesToCheck = resources.map(r => ({
+      id: r.id,
+      title: r.title,
+      url: r.url
+    }));
+
+    // Check links
+    const linkCheckReport = await checkResourceLinks(resourcesToCheck, {
+      timeout,
+      concurrent,
+      retryCount
+    });
+
+    // Store link check result for later retrieval
+    await storage.storeValidationResult({
+      type: 'link-check',
+      result: linkCheckReport,
+      timestamp: linkCheckReport.timestamp
+    });
+
+    // Return link check results
+    res.json({
+      totalLinks: linkCheckReport.totalLinks,
+      validLinks: linkCheckReport.validLinks,
+      brokenLinks: linkCheckReport.brokenLinks,
+      redirects: linkCheckReport.redirects,
+      errors: linkCheckReport.errors,
+      summary: linkCheckReport.summary,
+      report: formatLinkCheckReport(linkCheckReport),
+      brokenResources: linkCheckReport.results.filter(r => !r.valid && r.status >= 400)
+    });
+  }));
 
   // GET /api/admin/validation-status - Get last validation results
-  app.get('/api/admin/validation-status', isAuthenticated, isAdmin, async (req, res) => {
-    try {
-      const validationResults = await storage.getLatestValidationResults();
-      
-      res.json({
-        awesomeLint: validationResults.awesomeLint || null,
-        linkCheck: validationResults.linkCheck || null,
-        lastUpdated: validationResults.lastUpdated || null
-      });
-    } catch (error) {
-      console.error('Error fetching validation status:', error);
-      res.status(500).json({ message: 'Failed to fetch validation status' });
-    }
-  });
+  app.get('/api/admin/validation-status', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
+    const validationResults = await storage.getLatestValidationResults();
+
+    res.json({
+      awesomeLint: validationResults.awesomeLint || null,
+      linkCheck: validationResults.linkCheck || null,
+      lastUpdated: validationResults.lastUpdated || null
+    });
+  }));
 
   // POST /api/admin/seed-database - Manual database seeding (optional)
   // Note: Database is automatically seeded on first startup. This endpoint is for:
   // - Re-seeding after data changes
   // - Clearing and rebuilding the database
   // - Manual admin intervention when needed
-  app.post('/api/admin/seed-database', isAuthenticated, isAdmin, async (req, res) => {
-    try {
-      console.log('Starting manual database seeding...');
-      
-      // Get options from request body
-      const { clearExisting = false } = req.body;
-      
-      // Run seeding
-      const result = await seedDatabase({ clearExisting });
-      
-      // Return results
-      res.json({
-        success: true,
-        message: 'Database seeding completed successfully',
-        counts: {
-          categoriesInserted: result.categoriesInserted,
-          subcategoriesInserted: result.subcategoriesInserted,
-          subSubcategoriesInserted: result.subSubcategoriesInserted,
-          resourcesInserted: result.resourcesInserted,
-        },
-        errors: result.errors,
-        totalErrors: result.errors.length
-      });
-    } catch (error: any) {
-      console.error('Error seeding database:', error);
-      res.status(500).json({ 
-        success: false,
-        message: 'Failed to seed database',
-        error: error.message 
-      });
-    }
-  });
+  app.post('/api/admin/seed-database', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
+    console.log('Starting manual database seeding...');
+
+    // Get options from request body
+    const { clearExisting = false } = req.body;
+
+    // Run seeding
+    const result = await seedDatabase({ clearExisting });
+
+    // Return results
+    res.json({
+      success: true,
+      message: 'Database seeding completed successfully',
+      counts: {
+        categoriesInserted: result.categoriesInserted,
+        subcategoriesInserted: result.subcategoriesInserted,
+        subSubcategoriesInserted: result.subSubcategoriesInserted,
+        resourcesInserted: result.resourcesInserted,
+      },
+      errors: result.errors,
+      totalErrors: result.errors.length
+    });
+  }));
 
   // POST /api/admin/import-github - Import awesome list from GitHub URL
-  app.post('/api/admin/import-github', isAuthenticated, isAdmin, async (req, res) => {
-    try {
-      const { repoUrl, dryRun = false, strictMode = false } = req.body;
-      
-      if (!repoUrl) {
-        return res.status(400).json({ message: 'Repository URL is required' });
-      }
+  app.post('/api/admin/import-github', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
+    const { repoUrl, dryRun = false, strictMode = false } = req.body;
 
-      console.log(`Starting GitHub import from: ${repoUrl}`);
-      
-      // Use the sync service to import
-      const result = await syncService.importFromGitHub(repoUrl, { dryRun, strictMode });
-      
-      console.log(`GitHub import completed: ${result.imported} imported, ${result.updated} updated, ${result.skipped} skipped`);
-      
-      // If validation failed, return 400 with validation details
-      if (!result.validationPassed && result.errors.length > 0) {
-        return res.status(400).json({
-          success: false,
-          message: 'Import rejected: awesome-lint validation failed',
-          validationPassed: result.validationPassed,
-          validationStats: result.validationStats,
-          validationErrors: result.validationErrors.filter(e => e.severity === 'error'),
-          validationWarnings: result.validationErrors.filter(e => e.severity === 'warning'),
-          errors: result.errors
-        });
-      }
-      
-      res.json({
-        success: true,
-        imported: result.imported,
-        updated: result.updated,
-        skipped: result.skipped,
-        errors: result.errors,
-        warnings: result.warnings,
+    if (!repoUrl) {
+      throw new BadRequestError('Repository URL is required');
+    }
+
+    console.log(`Starting GitHub import from: ${repoUrl}`);
+
+    // Use the sync service to import
+    const result = await syncService.importFromGitHub(repoUrl, { dryRun, strictMode });
+
+    console.log(`GitHub import completed: ${result.imported} imported, ${result.updated} updated, ${result.skipped} skipped`);
+
+    // If validation failed, return 400 with validation details
+    if (!result.validationPassed && result.errors.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Import rejected: awesome-lint validation failed',
         validationPassed: result.validationPassed,
         validationStats: result.validationStats,
         validationErrors: result.validationErrors.filter(e => e.severity === 'error'),
         validationWarnings: result.validationErrors.filter(e => e.severity === 'warning'),
-        message: `Successfully imported ${result.imported} resources from ${repoUrl}`
-      });
-    } catch (error: any) {
-      console.error('Error importing from GitHub:', error);
-      res.status(500).json({ 
-        success: false,
-        message: 'Failed to import from GitHub',
-        error: error.message 
+        errors: result.errors
       });
     }
-  });
+
+    res.json({
+      success: true,
+      imported: result.imported,
+      updated: result.updated,
+      skipped: result.skipped,
+      errors: result.errors,
+      warnings: result.warnings,
+      validationPassed: result.validationPassed,
+      validationStats: result.validationStats,
+      validationErrors: result.validationErrors.filter(e => e.severity === 'error'),
+      validationWarnings: result.validationErrors.filter(e => e.severity === 'warning'),
+      message: `Successfully imported ${result.imported} resources from ${repoUrl}`
+    });
+  }));
 
   // ============= Enrichment API Routes =============
   
