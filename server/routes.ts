@@ -383,9 +383,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Use DB user from session (populated by deserializeUser) or fetch if not available
-      let dbUser = req.user.dbUser;
+      let dbUser = req.user!.dbUser;
       if (!dbUser) {
-        const userId = req.user.claims.sub;
+        const userId = req.user!.claims!.sub;
         console.log('[/api/auth/user] dbUser not in session, fetching from DB, userId:', userId);
         dbUser = await storage.getUser(userId);
       }
@@ -482,7 +482,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/resources - Submit new resource (authenticated)
   app.post('/api/resources', isAuthenticated, async (req: Request, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       const resourceData = insertResourceSchema.parse(req.body);
       
       const resource = await storage.createResource({
@@ -524,7 +524,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put('/api/resources/:id/approve', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const id = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       
       const resource = await storage.updateResourceStatus(id, 'approved', userId);
       res.json(resource);
@@ -538,7 +538,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put('/api/resources/:id/reject', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const id = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       
       const resource = await storage.updateResourceStatus(id, 'rejected', userId);
       res.json(resource);
@@ -551,7 +551,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/resources/:id/edits - Submit edit suggestion for a resource (authenticated)
   app.post('/api/resources/:id/edits', isAuthenticated, async (req: Request, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       const resourceId = parseInt(req.params.id);
       const { proposedChanges, proposedData, claudeMetadata, triggerClaudeAnalysis } = req.body;
       
@@ -717,7 +717,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/favorites/:resourceId - Add favorite
   app.post('/api/favorites/:resourceId', isAuthenticated, async (req: Request, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       const resourceId = parseInt(req.params.resourceId);
       
       await storage.addFavorite(userId, resourceId);
@@ -731,7 +731,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // DELETE /api/favorites/:resourceId - Remove favorite
   app.delete('/api/favorites/:resourceId', isAuthenticated, async (req: Request, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       const resourceId = parseInt(req.params.resourceId);
       
       await storage.removeFavorite(userId, resourceId);
@@ -745,7 +745,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/favorites - Get user's favorites
   app.get('/api/favorites', isAuthenticated, async (req: Request, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       const favorites = await storage.getUserFavorites(userId);
       res.json(favorites);
     } catch (error) {
@@ -757,7 +757,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/bookmarks/:resourceId - Add bookmark
   app.post('/api/bookmarks/:resourceId', isAuthenticated, async (req: Request, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       const resourceId = parseInt(req.params.resourceId);
       const { notes } = req.body;
       
@@ -772,7 +772,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // DELETE /api/bookmarks/:resourceId - Remove bookmark
   app.delete('/api/bookmarks/:resourceId', isAuthenticated, async (req: Request, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       const resourceId = parseInt(req.params.resourceId);
       
       await storage.removeBookmark(userId, resourceId);
@@ -786,7 +786,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/bookmarks - Get user's bookmarks
   app.get('/api/bookmarks', isAuthenticated, async (req: Request, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       const bookmarks = await storage.getUserBookmarks(userId);
       res.json(bookmarks);
     } catch (error) {
@@ -800,7 +800,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/user/progress - Get user's learning progress
   app.get('/api/user/progress', isAuthenticated, async (req: Request, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
 
       // Get total resources in catalog
       const totalResourcesResult = await storage.listResources({ status: 'approved', limit: 1 });
@@ -899,7 +899,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/user/submissions - Get user's submitted resources and edits
   app.get('/api/user/submissions', isAuthenticated, async (req: Request, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
 
       // Get user's submitted resources
       const submittedResources = await storage.listResources({
@@ -926,7 +926,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/user/journeys - Get user's learning journeys with details
   app.get('/api/user/journeys', isAuthenticated, async (req: Request, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
 
       // Get user's journey progress
       const journeyProgress = await storage.listUserJourneyProgress(userId);
@@ -968,7 +968,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // If user is authenticated, batch fetch all progress
       if (req.user?.claims?.sub) {
-        const userId = req.user.claims.sub;
+        const userId = req.user!.claims!.sub;
         const allProgress = await storage.listUserJourneyProgress(userId);
         
         // Create progress map for O(1) lookup
@@ -1049,7 +1049,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // If user is authenticated, get their progress
       let progress = null;
       if (req.user?.claims?.sub) {
-        progress = await storage.getUserJourneyProgress(req.user.claims.sub, id);
+        progress = await storage.getUserJourneyProgress(req.user!.claims!.sub, id);
       }
       
       res.json({
@@ -1071,7 +1071,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/journeys/:id/start - Start journey
   app.post('/api/journeys/:id/start', isAuthenticated, async (req: Request, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       const journeyId = parseInt(req.params.id);
       
       const progress = await storage.startUserJourney(userId, journeyId);
@@ -1085,7 +1085,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // PUT /api/journeys/:id/progress - Update progress
   app.put('/api/journeys/:id/progress', isAuthenticated, async (req: Request, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       const journeyId = parseInt(req.params.id);
       const { stepId } = req.body;
       
@@ -1104,7 +1104,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/journeys/:id/progress - Get user's progress
   app.get('/api/journeys/:id/progress', isAuthenticated, async (req: Request, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       const journeyId = parseInt(req.params.id);
       
       const progress = await storage.getUserJourneyProgress(userId, journeyId);
@@ -1189,7 +1189,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/admin/resources/:id/approve', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const resourceId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       
       if (isNaN(resourceId)) {
         return res.status(400).json({ message: 'Invalid resource ID' });
@@ -1208,7 +1208,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/admin/resources/:id/reject', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const resourceId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       const { reason } = req.body;
       
       if (isNaN(resourceId)) {
@@ -1233,7 +1233,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put('/api/admin/resources/:id', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const resourceId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       
       if (isNaN(resourceId)) {
         return res.status(400).json({ message: 'Invalid resource ID' });
@@ -1286,7 +1286,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete('/api/admin/resources/:id', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const resourceId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       
       if (isNaN(resourceId)) {
         return res.status(400).json({ message: 'Invalid resource ID' });
@@ -1349,7 +1349,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/admin/resources - Create a new resource (admin only)
   app.post('/api/admin/resources', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       
       const createSchema = insertResourceSchema.extend({
         title: insertResourceSchema.shape.title.min(1, 'Title is required'),
@@ -1421,7 +1421,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/admin/resource-edits/:id/approve', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const editId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       
       if (isNaN(editId)) {
         return res.status(400).json({ message: 'Invalid edit ID' });
@@ -1449,7 +1449,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/admin/resource-edits/:id/reject', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const editId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       const { reason } = req.body;
       
       if (isNaN(editId)) {
@@ -1539,7 +1539,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.logResourceAudit(
         null,
         'category_created',
-        req.user.claims.sub,
+        req.user!.claims!.sub,
         { category: newCategory },
         `Created category: ${newCategory.name}`
       );
@@ -1586,7 +1586,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.logResourceAudit(
         null,
         'category_updated',
-        req.user.claims.sub,
+        req.user!.claims!.sub,
         { before: existingCategory, after: updatedCategory },
         `Updated category: ${existingCategory.name}`
       );
@@ -1624,7 +1624,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.logResourceAudit(
         null,
         'category_deleted',
-        req.user.claims.sub,
+        req.user!.claims!.sub,
         { category },
         `Deleted category: ${category.name}`
       );
@@ -1688,7 +1688,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.logResourceAudit(
         null,
         'subcategory_created',
-        req.user.claims.sub,
+        req.user!.claims!.sub,
         { subcategory: newSubcategory },
         `Created subcategory: ${newSubcategory.name} under ${category.name}`
       );
@@ -1742,7 +1742,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.logResourceAudit(
         null,
         'subcategory_updated',
-        req.user.claims.sub,
+        req.user!.claims!.sub,
         { before: existingSubcategory, after: updatedSubcategory },
         `Updated subcategory: ${existingSubcategory.name}`
       );
@@ -1780,7 +1780,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.logResourceAudit(
         null,
         'subcategory_deleted',
-        req.user.claims.sub,
+        req.user!.claims!.sub,
         { subcategory },
         `Deleted subcategory: ${subcategory.name}`
       );
@@ -1844,7 +1844,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.logResourceAudit(
         null,
         'sub_subcategory_created',
-        req.user.claims.sub,
+        req.user!.claims!.sub,
         { subSubcategory: newSubSubcategory },
         `Created sub-subcategory: ${newSubSubcategory.name} under ${subcategory.name}`
       );
@@ -1898,7 +1898,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.logResourceAudit(
         null,
         'sub_subcategory_updated',
-        req.user.claims.sub,
+        req.user!.claims!.sub,
         { before: existingSubSubcategory, after: updatedSubSubcategory },
         `Updated sub-subcategory: ${existingSubSubcategory.name}`
       );
@@ -1936,7 +1936,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.logResourceAudit(
         null,
         'sub_subcategory_deleted',
-        req.user.claims.sub,
+        req.user!.claims!.sub,
         { subSubcategory },
         `Deleted sub-subcategory: ${subSubcategory.name}`
       );
