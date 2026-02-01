@@ -11,7 +11,7 @@ import SEOHead from "@/components/layout/SEOHead";
 import TagFilter from "@/components/ui/tag-filter";
 import { ViewModeToggle, ViewMode } from "@/components/ui/view-mode-toggle";
 import { SuggestEditDialog } from "@/components/ui/suggest-edit-dialog";
-import { ArrowLeft, Search, ExternalLink, Edit } from "lucide-react";
+import { ArrowLeft, Search, ExternalLink, Edit, FilterX } from "lucide-react";
 import { deslugify, slugify } from "@/lib/utils";
 import { Resource } from "@/types/awesome-list";
 import type { Resource as DbResource } from "@shared/schema";
@@ -190,13 +190,24 @@ export default function Category() {
   const handleSuggestEdit = (e: React.MouseEvent, resource: Resource) => {
     e.stopPropagation();
     if (!isDbResource(resource)) return;
-    
+
     const dbId = getDbId(resource);
     const dbResource = dbResources.find(r => r.id === dbId);
     setResourceToEdit(toDbResource(resource, dbResource));
     setEditDialogOpen(true);
   };
-  
+
+  // Check if any filters are active
+  const hasActiveFilters = searchTerm !== "" || selectedSubcategory !== "all" || selectedTags.length > 0 || sortBy !== "category";
+
+  // Clear all filters function
+  const clearAllFilters = () => {
+    setSearchTerm("");
+    setSelectedSubcategory("all");
+    setSelectedTags([]);
+    setSortBy("category");
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-6" aria-busy={true} aria-live="polite">
@@ -312,11 +323,25 @@ export default function Category() {
         </div>
         
         {/* Tag Filter */}
-        <TagFilter 
+        <TagFilter
           resources={allResources}
           selectedTags={selectedTags}
           onTagsChange={setSelectedTags}
         />
+
+        {/* Clear Filters Button */}
+        {hasActiveFilters && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={clearAllFilters}
+            className="gap-2"
+            data-testid="button-clear-filters"
+          >
+            <FilterX className="h-4 w-4" />
+            Clear Filters
+          </Button>
+        )}
       </div>
       
       {/* Results Count and View Mode */}
