@@ -3,7 +3,7 @@
   "spec": "073-split-storage-ts-into-domain-based-repository-modu",
   "state": "building",
   "subtasks": {
-    "completed": 11,
+    "completed": 13,
     "total": 20,
     "in_progress": 1,
     "failed": 0
@@ -18,8 +18,8 @@
     "max": 1
   },
   "session": {
-    "number": 13,
-    "started_at": "2026-02-01T00:21:30.512330"
+    "number": 1,
+    "started_at": "2026-02-01T01:29:16.408643"
   },
-  "last_update": "2026-02-01T00:52:37.655710"
+  "last_update": "2026-02-01T01:29:16.469468"
 }
