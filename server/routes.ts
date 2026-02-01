@@ -73,17 +73,173 @@ const isAdmin = async (req: any, res: Response, next: any) => {
 };
 
 // SEO route handlers - now uses database-driven data
-async function generateSitemap(req: any, res: any) {
+// Helper function to count total URLs in sitemap
+function countTotalUrls(awesomeListData: any): number {
+  let count = 2; // Homepage and /advanced
+
+  awesomeListData.categories.forEach((category: any) => {
+    count++; // Category URL
+
+    category.subcategories?.forEach((subcategory: any) => {
+      count++; // Subcategory URL
+
+      subcategory.subSubcategories?.forEach(() => {
+        count++; // Sub-subcategory URL
+      });
+    });
+  });
+
+  // Add resource URLs
+  if (awesomeListData.resources && awesomeListData.resources.length > 0) {
+    count += awesomeListData.resources.filter((r: any) => r.id).length;
+  }
+
+  return count;
+}
+
+// Helper function to generate individual sitemap
+async function generateIndividualSitemap(req: any, res: any) {
   try {
+    const page = parseInt(req.params.page) || 1;
     const awesomeListData = await storage.getAwesomeListFromDatabase();
-    
+
     if (!awesomeListData || !awesomeListData.categories.length) {
       return res.status(404).send('Sitemap not available - database empty');
     }
 
     const baseUrl = `${req.protocol}://${req.get('host')}`;
     const currentDate = new Date().toISOString().split('T')[0];
+    const maxUrlsPerSitemap = 50000;
 
+    // Collect all URLs
+    const urls: Array<{ loc: string; lastmod: string; changefreq: string; priority: string }> = [];
+
+    // Static pages
+    urls.push({
+      loc: `${baseUrl}/`,
+      lastmod: currentDate,
+      changefreq: 'daily',
+      priority: '1.0'
+    });
+    urls.push({
+      loc: `${baseUrl}/advanced`,
+      lastmod: currentDate,
+      changefreq: 'weekly',
+      priority: '0.8'
+    });
+
+    // Category URLs
+    awesomeListData.categories.forEach((category: any) => {
+      urls.push({
+        loc: `${baseUrl}/category/${category.slug}`,
+        lastmod: currentDate,
+        changefreq: 'weekly',
+        priority: '0.7'
+      });
+
+      category.subcategories?.forEach((subcategory: any) => {
+        urls.push({
+          loc: `${baseUrl}/subcategory/${subcategory.slug}`,
+          lastmod: currentDate,
+          changefreq: 'weekly',
+          priority: '0.6'
+        });
+
+        subcategory.subSubcategories?.forEach((subSubcategory: any) => {
+          urls.push({
+            loc: `${baseUrl}/sub-subcategory/${subSubcategory.slug}`,
+            lastmod: currentDate,
+            changefreq: 'weekly',
+            priority: '0.5'
+          });
+        });
+      });
+    });
+
+    // Resource URLs
+    if (awesomeListData.resources && awesomeListData.resources.length > 0) {
+      awesomeListData.resources.forEach((resource: any) => {
+        if (resource.id) {
+          urls.push({
+            loc: `${baseUrl}/resource/${resource.id}`,
+            lastmod: currentDate,
+            changefreq: 'monthly',
+            priority: '0.4'
+          });
+        }
+      });
+    }
+
+    // Paginate URLs
+    const startIndex = (page - 1) * maxUrlsPerSitemap;
+    const endIndex = Math.min(startIndex + maxUrlsPerSitemap, urls.length);
+    const pageUrls = urls.slice(startIndex, endIndex);
+
+    if (pageUrls.length === 0) {
+      return res.status(404).send('Sitemap page not found');
+    }
+
+    // Generate sitemap XML
+    let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
+
+    pageUrls.forEach(url => {
+      sitemap += `
+  <url>
+    <loc>${url.loc}</loc>
+    <lastmod>${url.lastmod}</lastmod>
+    <changefreq>${url.changefreq}</changefreq>
+    <priority>${url.priority}</priority>
+  </url>`;
+    });
+
+    sitemap += `
+</urlset>`;
+
+    res.set('Content-Type', 'application/xml');
+    res.send(sitemap);
+  } catch (error) {
+    res.status(500).send('Error generating sitemap');
+  }
+}
+
+// Main sitemap handler - generates index if > 50k URLs, otherwise single sitemap
+async function generateSitemap(req: any, res: any) {
+  try {
+    const awesomeListData = await storage.getAwesomeListFromDatabase();
+
+    if (!awesomeListData || !awesomeListData.categories.length) {
+      return res.status(404).send('Sitemap not available - database empty');
+    }
+
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const currentDate = new Date().toISOString().split('T')[0];
+    const totalUrls = countTotalUrls(awesomeListData);
+    const maxUrlsPerSitemap = 50000;
+
+    // If total URLs exceed 50k, generate sitemap index
+    if (totalUrls > maxUrlsPerSitemap) {
+      const numSitemaps = Math.ceil(totalUrls / maxUrlsPerSitemap);
+
+      let sitemapIndex = `<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
+
+      for (let i = 1; i <= numSitemaps; i++) {
+        sitemapIndex += `
+  <sitemap>
+    <loc>${baseUrl}/sitemap-${i}.xml</loc>
+    <lastmod>${currentDate}</lastmod>
+  </sitemap>`;
+      }
+
+      sitemapIndex += `
+</sitemapindex>`;
+
+      res.set('Content-Type', 'application/xml');
+      return res.send(sitemapIndex);
+    }
+
+    // Otherwise, generate single sitemap (existing logic)
     let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
@@ -100,7 +256,7 @@ async function generateSitemap(req: any, res: any) {
   </url>`;
 
     // Add category URLs from database
-    awesomeListData.categories.forEach(category => {
+    awesomeListData.categories.forEach((category: any) => {
       sitemap += `
   <url>
     <loc>${baseUrl}/category/${category.slug}</loc>
@@ -110,7 +266,7 @@ async function generateSitemap(req: any, res: any) {
   </url>`;
 
       // Add subcategory URLs
-      category.subcategories?.forEach(subcategory => {
+      category.subcategories?.forEach((subcategory: any) => {
         sitemap += `
   <url>
     <loc>${baseUrl}/subcategory/${subcategory.slug}</loc>
@@ -120,7 +276,7 @@ async function generateSitemap(req: any, res: any) {
   </url>`;
 
         // Add sub-subcategory URLs
-        subcategory.subSubcategories?.forEach(subSubcategory => {
+        subcategory.subSubcategories?.forEach((subSubcategory: any) => {
           sitemap += `
   <url>
     <loc>${baseUrl}/sub-subcategory/${subSubcategory.slug}</loc>
@@ -134,7 +290,7 @@ async function generateSitemap(req: any, res: any) {
 
     // Add resource URLs from database
     if (awesomeListData.resources && awesomeListData.resources.length > 0) {
-      awesomeListData.resources.forEach(resource => {
+      awesomeListData.resources.forEach((resource: any) => {
         if (resource.id) {
           sitemap += `
   <url>
@@ -153,7 +309,6 @@ async function generateSitemap(req: any, res: any) {
     res.set('Content-Type', 'application/xml');
     res.send(sitemap);
   } catch (error) {
-    console.error('Error generating sitemap:', error);
     res.status(500).send('Error generating sitemap');
   }
 }
@@ -2739,6 +2894,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // SEO routes
   app.get("/sitemap.xml", generateSitemap);
+  app.get("/sitemap-:page.xml", generateIndividualSitemap);
   app.get("/og-image.svg", generateOpenGraphImage);
 
   // ============= AI Recommendation Routes =============
