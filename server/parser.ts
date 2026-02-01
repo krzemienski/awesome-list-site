@@ -1,6 +1,6 @@
 import { remark } from 'remark';
 import { visit } from 'unist-util-visit';
-import fetch from 'node-fetch';
+import fetch, { Response } from 'node-fetch';
 
 interface Resource {
   id: string;

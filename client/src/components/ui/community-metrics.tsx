@@ -82,37 +82,37 @@ export default function CommunityMetrics({ resources, categories, className }: C
     );
     
     // Group categories by actual resource distribution
-    const githubCategories = [...new Set(githubSyncedResources.map(r => r.category))];
-    const aiEnrichedCategories = [...new Set(aiEnrichedResources.map(r => r.category))];
-    const approvedCategories = [...new Set(approvedOnlyResources.map(r => r.category))];
-    const pendingCategories = [...new Set(pendingResources.map(r => r.category))];
+    const githubCategories = Array.from(new Set(githubSyncedResources.map(r => r.category)));
+    const aiEnrichedCategories = Array.from(new Set(aiEnrichedResources.map(r => r.category)));
+    const approvedCategories = Array.from(new Set(approvedOnlyResources.map(r => r.category)));
+    const pendingCategories = Array.from(new Set(pendingResources.map(r => r.category)));
 
     const contributors: ContributorMetric[] = [
       {
         name: "GitHub Synced Resources",
         contributions: githubSyncedResources.length,
-        categories: githubCategories.length > 0 ? githubCategories : [],
+        categories: githubCategories.length > 0 ? githubCategories : [] as string[],
         badge: "Primary Source",
         level: "platinum" as const
       },
       {
         name: "Approved Resources",
         contributions: approvedOnlyResources.length,
-        categories: approvedCategories.length > 0 ? approvedCategories : [],
+        categories: approvedCategories.length > 0 ? approvedCategories : [] as string[],
         badge: "Verified",
         level: "gold" as const
       },
       {
         name: "AI Enriched",
         contributions: aiEnrichedResources.length,
-        categories: aiEnrichedCategories.length > 0 ? aiEnrichedCategories : [],
+        categories: aiEnrichedCategories.length > 0 ? aiEnrichedCategories : [] as string[],
         badge: "AI Enhanced",
         level: "silver" as const
       },
       {
         name: "Pending Review",
         contributions: pendingResources.length,
-        categories: pendingCategories.length > 0 ? pendingCategories : [],
+        categories: pendingCategories.length > 0 ? pendingCategories : [] as string[],
         badge: "In Review",
         level: "bronze" as const
       }

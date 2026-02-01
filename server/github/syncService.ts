@@ -321,7 +321,7 @@ export class GitHubSyncService {
       
       // Create all category hierarchies
       const hierarchyIds = new Map<string, { categoryId: number; subcategoryId?: number; subSubcategoryId?: number }>();
-      for (const [key, hierarchy] of uniqueHierarchies) {
+      for (const [key, hierarchy] of Array.from(uniqueHierarchies.entries())) {
         try {
           const ids = await ensureCategoryHierarchy(
             hierarchy.category,
@@ -359,8 +359,8 @@ export class GitHubSyncService {
                   subSubcategoryId: hierarchyId?.subSubcategoryId,
                   importedFrom: repoUrl,
                   importedAt: new Date().toISOString(),
-                };
-                
+                } as Record<string, unknown>;
+
                 const created = await storage.createResource({
                   ...conflict.resource,
                   metadata,
@@ -393,8 +393,8 @@ export class GitHubSyncService {
                   subSubcategoryId: hierarchyId?.subSubcategoryId,
                   lastUpdatedFrom: repoUrl,
                   lastUpdatedAt: new Date().toISOString(),
-                };
-                
+                } as Record<string, unknown>;
+
                 const updated = await storage.updateResource(
                   conflict.resource.id,
                   {
