@@ -142,7 +142,10 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                       <Icon className="h-6 w-6" />
                       <CardTitle className="text-lg">{category.name}</CardTitle>
                     </div>
-                    <Badge variant="secondary" data-testid={`badge-count-${category.slug}`}>{totalCount}</Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary" data-testid={`badge-count-${category.slug}`}>{totalCount}</Badge>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                    </div>
                   </div>
                   {description && (
                     <CardDescription className="text-sm">
