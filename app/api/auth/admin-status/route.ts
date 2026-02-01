@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { getSession } from '../../../../lib/session-store';
+import { getSession } from '@/lib/session-store';
 
 export async function GET() {
   const cookieStore = await cookies();
