@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import SEOHead from "@/components/layout/SEOHead";
 import TagFilter from "@/components/ui/tag-filter";
 import { ArrowLeft, ExternalLink, FilterX } from "lucide-react";
@@ -175,14 +176,27 @@ export default function SubSubcategory() {
           </Button>
         </Link>
         
+        <Breadcrumbs
+          items={[
+            {
+              label: categoryName,
+              href: parentCategory?.slug ? `/category/${parentCategory.slug}` : undefined,
+            },
+            {
+              label: subcategoryName,
+              href: parentSubcategory?.slug ? `/subcategory/${parentSubcategory.slug}` : undefined,
+            },
+            {
+              label: subSubcategoryName,
+            },
+          ]}
+        />
+
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight" data-testid="heading-subsubcategory">
               {subSubcategoryName}
             </h1>
-            <p className="text-sm text-muted-foreground mt-1" data-testid="text-breadcrumb">
-              {categoryName} → {subcategoryName}
-            </p>
           </div>
           <Badge variant="secondary" className="text-lg px-4 py-2" data-testid="badge-count">
             {allResources.length}
