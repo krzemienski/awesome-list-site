@@ -470,9 +470,598 @@ All color tokens are defined in:
 
 ---
 
+## Typography System
+
+### Overview
+
+The typography system uses **JetBrains Mono**, a modern monospace typeface designed for developers, across the entire interface. This creates a consistent, terminal-inspired aesthetic that aligns with the cyberpunk theme.
+
+**Key Features:**
+- **Single Font Family** - JetBrains Mono for all text (sans, mono, and body)
+- **Monospace Everywhere** - Even UI text uses monospace for consistency
+- **Ligature Support** - Contextual alternates and ligatures enabled
+- **Terminal Aesthetic** - Code-first design language
+
+---
+
+### Font Families
+
+#### CSS Variables
+
+| Variable | Value | Description | Usage |
+|----------|-------|-------------|-------|
+| `--font-sans` | `'JetBrains Mono', monospace` | Primary UI font | Body text, headings, buttons |
+| `--font-mono` | `'JetBrains Mono', monospace` | Code/monospace | Code blocks, pre-formatted text |
+| `--font-serif` | `ui-serif, Georgia, serif` | Serif fallback | Not used in theme |
+
+**Note:** Both `--font-sans` and `--font-mono` use the same font (JetBrains Mono) to maintain visual consistency.
+
+---
+
+### Font Configuration
+
+#### JetBrains Mono
+
+**Source:** [Google Fonts](https://fonts.google.com/specimen/JetBrains+Mono) or [Official Site](https://www.jetbrains.com/lp/mono/)
+
+**Characteristics:**
+- **Type:** Monospace
+- **Designer:** Philipp Nurullin, Konstantin Bulenkov (JetBrains)
+- **Optimized for:** Code readability, long-form reading
+- **Supports:** 145+ languages, extensive Unicode coverage
+
+**Why JetBrains Mono?**
+- Clear distinction between similar characters (`0O`, `1lI`, `g9q`)
+- Increased x-height for better readability at small sizes
+- Balanced character width for comfortable reading
+- Modern aesthetic that fits cyberpunk theme
+
+---
+
+### Font Features
+
+Font feature settings are applied globally to enable advanced typography:
+
+```css
+font-feature-settings: "rlig" 1, "calt" 1;
+```
+
+| Feature | Code | Description | Example |
+|---------|------|-------------|---------|
+| **Contextual Ligatures** | `calt` | Replaces character sequences with combined glyphs | `=>` → `⇒`, `!=` → `≠` |
+| **Required Ligatures** | `rlig` | Essential ligatures for proper text rendering | Language-specific combinations |
+
+**Ligature Examples in JetBrains Mono:**
+- Arrow operators: `->` `=>` `<-` `<=` `>=`
+- Comparison: `==` `!=` `===` `!==`
+- Logic: `&&` `||`
+- Other: `..` `...` `::` `//` `/* */`
+
+**Note:** Ligatures enhance code readability but can be disabled per-element if needed:
+```css
+.no-ligatures {
+  font-feature-settings: "calt" 0, "rlig" 0;
+}
+```
+
+---
+
+### Typography Scale
+
+#### Tailwind Text Sizes
+
+The theme inherits Tailwind's default typography scale:
+
+| Class | Font Size | Line Height | Usage |
+|-------|-----------|-------------|-------|
+| `text-xs` | 0.75rem (12px) | 1rem (16px) | Captions, fine print, labels |
+| `text-sm` | 0.875rem (14px) | 1.25rem (20px) | Secondary text, helpers, metadata |
+| `text-base` | 1rem (16px) | 1.5rem (24px) | Body text, default paragraphs |
+| `text-lg` | 1.125rem (18px) | 1.75rem (28px) | Subheadings, emphasized text |
+| `text-xl` | 1.25rem (20px) | 1.75rem (28px) | Section headings |
+| `text-2xl` | 1.5rem (24px) | 2rem (32px) | Page titles, major headings |
+| `text-3xl` | 1.875rem (30px) | 2.25rem (36px) | Hero text, prominent headings |
+| `text-4xl` | 2.25rem (36px) | 2.5rem (40px) | Display text, landing page |
+| `text-5xl` | 3rem (48px) | 1 | Large display text |
+| `text-6xl` | 3.75rem (60px) | 1 | Extra large display |
+
+**Usage Example:**
+```tsx
+<h1 className="text-4xl font-bold">Large Heading</h1>
+<h2 className="text-2xl font-semibold">Section Title</h2>
+<p className="text-base">Body text content</p>
+<span className="text-sm text-muted-foreground">Helper text</span>
+```
+
+---
+
+### Font Weights
+
+JetBrains Mono supports multiple weights. Use Tailwind classes:
+
+| Class | Weight | Value | Usage |
+|-------|--------|-------|-------|
+| `font-thin` | Thin | 100 | Rarely used |
+| `font-extralight` | Extra Light | 200 | Subtle emphasis |
+| `font-light` | Light | 300 | De-emphasized text |
+| `font-normal` | Normal | 400 | Default body text |
+| `font-medium` | Medium | 500 | Slight emphasis |
+| `font-semibold` | Semibold | 600 | Subheadings, labels |
+| `font-bold` | Bold | 700 | Headings, strong emphasis |
+| `font-extrabold` | Extra Bold | 800 | Major headings |
+| `font-black` | Black | 900 | Display text, hero |
+
+**Recommended Weights:**
+- **Headings:** `font-bold` (700) or `font-extrabold` (800)
+- **Body:** `font-normal` (400)
+- **Emphasis:** `font-medium` (500) or `font-semibold` (600)
+- **De-emphasis:** `font-light` (300)
+
+**Example:**
+```tsx
+<h1 className="text-3xl font-bold">Bold Heading</h1>
+<p className="text-base font-normal">Regular paragraph text</p>
+<strong className="font-semibold">Emphasized text</strong>
+```
+
+---
+
+### Text Styles
+
+#### Headings
+
+```tsx
+// H1 - Page Title
+<h1 className="text-4xl font-bold text-foreground mb-6">
+  Page Title
+</h1>
+
+// H2 - Section Heading
+<h2 className="text-2xl font-semibold text-foreground mb-4">
+  Section Title
+</h2>
+
+// H3 - Subsection
+<h3 className="text-xl font-semibold text-foreground mb-3">
+  Subsection
+</h3>
+
+// H4 - Minor Heading
+<h4 className="text-lg font-medium text-foreground mb-2">
+  Minor Heading
+</h4>
+```
+
+---
+
+#### Body Text
+
+```tsx
+// Default paragraph
+<p className="text-base text-foreground leading-relaxed">
+  Standard body text with comfortable line height.
+</p>
+
+// Large body text
+<p className="text-lg text-foreground leading-relaxed">
+  Larger text for emphasis or readability.
+</p>
+
+// Small text
+<p className="text-sm text-muted-foreground">
+  Secondary information or metadata.
+</p>
+
+// Extra small (captions)
+<span className="text-xs text-muted-foreground">
+  Fine print or labels
+</span>
+```
+
+---
+
+#### Code & Preformatted
+
+Code elements automatically inherit `font-family: var(--font-mono)`:
+
+```tsx
+// Inline code
+<code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+  const variable = "value";
+</code>
+
+// Code block
+<pre className="bg-card p-4 rounded-lg overflow-x-auto">
+  <code className="text-sm">
+    function example() {'{'}
+      return "formatted code";
+    {'}'}
+  </code>
+</pre>
+
+// Keyboard shortcuts
+<kbd className="bg-muted px-2 py-1 rounded text-xs border border-border">
+  Ctrl+K
+</kbd>
+```
+
+---
+
+#### Links
+
+```tsx
+// Primary link
+<a className="text-primary hover:underline font-medium">
+  Primary Link
+</a>
+
+// Subtle link
+<a className="text-foreground hover:text-primary transition-colors">
+  Hover to highlight
+</a>
+
+// External link with icon
+<a className="text-primary hover:underline inline-flex items-center gap-1">
+  Visit Site <ExternalLink className="w-4 h-4" />
+</a>
+```
+
+---
+
+#### Text Colors
+
+Use semantic color tokens for text:
+
+```tsx
+// Primary text (default)
+<p className="text-foreground">Standard text</p>
+
+// Muted/secondary text
+<p className="text-muted-foreground">Less important text</p>
+
+// Brand color text
+<span className="text-primary">Highlighted text</span>
+
+// Accent text
+<span className="text-accent">Info or help text</span>
+
+// Error text
+<span className="text-destructive">Error message</span>
+
+// Success text (using chart-2)
+<span className="text-chart-2">Success message</span>
+```
+
+---
+
+### Text Utilities
+
+#### Line Height
+
+| Class | Value | Usage |
+|-------|-------|-------|
+| `leading-none` | 1 | Tight headings |
+| `leading-tight` | 1.25 | Compact text |
+| `leading-snug` | 1.375 | Slightly loose |
+| `leading-normal` | 1.5 | Default |
+| `leading-relaxed` | 1.625 | Comfortable reading |
+| `leading-loose` | 2 | Spacious text |
+
+**Example:**
+```tsx
+<h1 className="leading-tight">Tight Heading</h1>
+<p className="leading-relaxed">Comfortable paragraph text</p>
+```
+
+---
+
+#### Letter Spacing
+
+| Class | Value | Usage |
+|-------|-------|-------|
+| `tracking-tighter` | -0.05em | Very compact |
+| `tracking-tight` | -0.025em | Tight spacing |
+| `tracking-normal` | 0 | Default monospace |
+| `tracking-wide` | 0.025em | Slightly spaced |
+| `tracking-wider` | 0.05em | More spaced |
+| `tracking-widest` | 0.1em | Maximum spacing |
+
+**Example:**
+```tsx
+<h1 className="tracking-tight">Compact Heading</h1>
+<code className="tracking-normal">monospace_code</code>
+```
+
+---
+
+#### Text Alignment
+
+```tsx
+<p className="text-left">Left aligned</p>
+<p className="text-center">Center aligned</p>
+<p className="text-right">Right aligned</p>
+<p className="text-justify">Justified text</p>
+```
+
+---
+
+#### Text Decoration
+
+```tsx
+// Underline
+<a className="underline">Underlined link</a>
+<a className="hover:underline">Underline on hover</a>
+
+// No underline
+<a className="no-underline">Clean link</a>
+
+// Line through
+<del className="line-through">Deleted text</del>
+```
+
+---
+
+#### Text Transform
+
+```tsx
+<p className="uppercase">UPPERCASE TEXT</p>
+<p className="lowercase">lowercase text</p>
+<p className="capitalize">Capitalize Each Word</p>
+<p className="normal-case">Normal case</p>
+```
+
+---
+
+### Usage Patterns
+
+#### Card Title & Description
+
+```tsx
+<Card>
+  <CardHeader>
+    <CardTitle className="text-2xl font-bold">
+      Card Title
+    </CardTitle>
+    <CardDescription className="text-muted-foreground">
+      Supporting description text
+    </CardDescription>
+  </CardHeader>
+</Card>
+```
+
+---
+
+#### Form Labels & Helpers
+
+```tsx
+<div className="space-y-2">
+  <Label className="text-sm font-medium text-foreground">
+    Email Address
+  </Label>
+  <Input type="email" />
+  <p className="text-xs text-muted-foreground">
+    We'll never share your email
+  </p>
+</div>
+```
+
+---
+
+#### Alert Messages
+
+```tsx
+// Error
+<Alert variant="destructive">
+  <AlertTitle className="text-sm font-semibold">Error</AlertTitle>
+  <AlertDescription className="text-sm">
+    Something went wrong
+  </AlertDescription>
+</Alert>
+
+// Success
+<Alert className="border-chart-2">
+  <AlertTitle className="text-sm font-semibold text-chart-2">
+    Success
+  </AlertTitle>
+  <AlertDescription className="text-sm">
+    Operation completed
+  </AlertDescription>
+</Alert>
+```
+
+---
+
+#### Button Text
+
+```tsx
+// Primary button
+<Button className="font-medium">
+  Submit Form
+</Button>
+
+// Secondary button
+<Button variant="secondary" className="font-normal">
+  Cancel
+</Button>
+
+// Link button
+<Button variant="link" className="font-medium underline">
+  Learn More
+</Button>
+```
+
+---
+
+### Loading & Installation
+
+#### CDN (Google Fonts)
+
+```html
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+```
+
+#### NPM Package
+
+```bash
+npm install @fontsource/jetbrains-mono
+```
+
+```tsx
+// In your main entry file (e.g., main.tsx or _app.tsx)
+import '@fontsource/jetbrains-mono/400.css'; // Normal
+import '@fontsource/jetbrains-mono/500.css'; // Medium
+import '@fontsource/jetbrains-mono/700.css'; // Bold
+```
+
+---
+
+### Accessibility
+
+#### Font Size Considerations
+
+- **Minimum:** Never go below `text-xs` (12px) for body text
+- **Default:** Use `text-base` (16px) for main content
+- **Readability:** Pair appropriate font size with `leading-relaxed`
+- **Zoom:** Ensure text scales properly when users zoom (use `rem` units)
+
+#### Color Contrast
+
+Always pair text colors with appropriate backgrounds:
+
+| Text Color | Background | Contrast | WCAG |
+|------------|------------|----------|------|
+| `foreground` | `background` | 21:1 | AAA ✓ |
+| `card-foreground` | `card` | 19.8:1 | AAA ✓ |
+| `muted-foreground` | `background` | 7.4:1 | AAA ✓ |
+| `primary-foreground` | `primary` | 7.2:1 | AAA ✓ |
+
+#### Screen Reader Support
+
+```tsx
+// Use semantic HTML
+<h1>Page Title</h1>          // Not: <div className="text-4xl">
+<p>Paragraph</p>              // Not: <div className="text-base">
+<strong>Important</strong>    // Not: <span className="font-bold">
+<em>Emphasized</em>           // Not: <span className="italic">
+```
+
+---
+
+### Best Practices
+
+#### Do's ✓
+
+- **Use semantic HTML** - `<h1>` for headings, `<p>` for paragraphs
+- **Maintain hierarchy** - Clear size/weight progression for headings
+- **Comfortable line height** - Use `leading-relaxed` for body text
+- **Consistent spacing** - Use margin/padding utilities for rhythm
+- **Accessible colors** - Pair `text-*` classes with appropriate backgrounds
+
+**Example:**
+```tsx
+<article className="space-y-4">
+  <h1 className="text-3xl font-bold leading-tight">
+    Article Title
+  </h1>
+  <p className="text-base leading-relaxed text-foreground">
+    Body paragraph with comfortable line height.
+  </p>
+  <p className="text-sm text-muted-foreground">
+    Secondary information in muted color.
+  </p>
+</article>
+```
+
+---
+
+#### Don'ts ✗
+
+- **Don't mix fonts** - Stick to JetBrains Mono for consistency
+- **Don't skip heading levels** - H1 → H2 → H3 (not H1 → H3)
+- **Don't use tiny text** - Avoid going below `text-xs` (12px)
+- **Don't disable ligatures globally** - They improve code readability
+- **Don't use low contrast** - Always test text/background combinations
+
+**Bad Example:**
+```tsx
+// ✗ Skips H2, uses tiny text, poor contrast
+<h1>Title</h1>
+<h3 className="text-[10px] text-gray-500">Subtitle</h3>
+```
+
+**Good Example:**
+```tsx
+// ✓ Proper hierarchy, readable size, good contrast
+<h1 className="text-3xl font-bold">Title</h1>
+<h2 className="text-xl font-semibold text-muted-foreground">
+  Subtitle
+</h2>
+```
+
+---
+
+### Customization
+
+#### Changing Font Family
+
+To use a different font, update `client/src/index.css`:
+
+```css
+:root {
+  /* Replace JetBrains Mono with your font */
+  --font-sans: 'Inter', sans-serif;
+  --font-mono: 'Fira Code', monospace;
+}
+```
+
+Then load your font via CDN or package manager.
+
+---
+
+#### Adjusting Font Features
+
+Disable ligatures if needed:
+
+```css
+@layer base {
+  html, body {
+    /* Disable ligatures */
+    font-feature-settings: "calt" 0, "rlig" 0;
+  }
+}
+```
+
+Or enable additional features:
+
+```css
+font-feature-settings:
+  "rlig" 1,  /* Required ligatures */
+  "calt" 1,  /* Contextual alternates */
+  "ss01" 1,  /* Stylistic set 1 */
+  "zero" 1;  /* Slashed zero */
+```
+
+---
+
+### Typography Checklist
+
+Before shipping, verify:
+
+- [ ] Font loaded correctly (check Network tab)
+- [ ] Ligatures display properly in code blocks
+- [ ] Text scales appropriately at different viewport sizes
+- [ ] All text/background combinations meet WCAG AAA (21:1 for body, 7:1 for large)
+- [ ] Heading hierarchy is semantic (H1 → H2 → H3)
+- [ ] Line heights provide comfortable reading experience
+- [ ] Font weights create clear visual hierarchy
+- [ ] Text remains readable when zoomed to 200%
+
+---
+
 ## Next Steps
 
-- **Typography System:** See typography section (to be added)
 - **Spacing & Shadows:** See spacing section (to be added)
 - **Component Library:** [COMPONENT-LIBRARY.md](./COMPONENT-LIBRARY.md) (to be added)
 - **Theme Architecture:** See theme architecture section (to be added)
