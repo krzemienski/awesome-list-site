@@ -96,6 +96,8 @@ npm run start
 | [SETUP.md](docs/SETUP.md) | Development environment setup |
 | [ENVIRONMENT_VARIABLES.md](docs/ENVIRONMENT_VARIABLES.md) | Environment variables reference |
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md) | System architecture and design |
+| [DESIGN-SYSTEM.md](docs/DESIGN-SYSTEM.md) | Design system and theming guide |
+| [COMPONENT-LIBRARY.md](docs/COMPONENT-LIBRARY.md) | UI component library reference |
 | [API.md](docs/API.md) | Complete API reference |
 | [ADMIN-GUIDE.md](docs/ADMIN-GUIDE.md) | Administrator documentation |
 | [CODE-MAP.md](docs/CODE-MAP.md) | Codebase navigation guide |
