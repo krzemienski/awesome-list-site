@@ -236,9 +236,10 @@ export default function ResourceDetail() {
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto px-4">
-      <SEOHead 
+      <SEOHead
         title={`${resource.title} - Awesome Video`}
         description={resource.description || scrapedDescription || `View details for ${resource.title}`}
+        resource={resource}
       />
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
