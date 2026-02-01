@@ -2,7 +2,6 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { renderToString } from "react-dom/server";
 import fs from "fs";
 import path from "path";
-import { storage } from "./storage";
 
 export async function handleSSR(req: Request, res: Response, next: NextFunction) {
   // CRITICAL FIX: Disable SSR in production until we have proper server bundle

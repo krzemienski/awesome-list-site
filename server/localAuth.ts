@@ -1,9 +1,11 @@
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
-import { storage } from "./storage";
+import { UserRepository } from "./repositories";
 import { comparePassword, validateEmail, validatePassword } from "./passwordUtils";
 
 export function setupLocalAuth() {
+  const userRepo = new UserRepository();
+
   passport.use('local', new LocalStrategy(
     {
       usernameField: 'email',
@@ -20,7 +22,7 @@ export function setupLocalAuth() {
           return done(null, false, { message: passwordValidation.error || 'Invalid password' });
         }
 
-        const user = await storage.getUserByEmail(email);
+        const user = await userRepo.getUserByEmail(email);
         
         if (!user) {
           return done(null, false, { message: 'Invalid email or password' });

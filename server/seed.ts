@@ -1,5 +1,4 @@
 import fetch from 'node-fetch';
-import { storage } from "./storage";
 import { db } from "./db";
 import { categories, subcategories, subSubcategories, resources, users, resourceEdits } from "@shared/schema";
 import { eq } from "drizzle-orm";
