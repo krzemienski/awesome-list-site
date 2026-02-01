@@ -1546,36 +1546,27 @@ export class DatabaseStorage implements IStorage {
   
   // Admin Statistics
   async getAdminStats(): Promise<AdminStats> {
-    const [userCount] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(users);
-    
-    const [resourceCount] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(resources);
-    
-    const [pendingCount] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(resources)
-      .where(eq(resources.status, 'pending'));
-    
-    const [categoryCount] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(categories);
-    
-    const [journeyCount] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(learningJourneys);
-    
     // Active users (those who logged in within last 30 days)
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    
-    const [activeCount] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(users)
-      .where(sql`${users.updatedAt} > ${thirtyDaysAgo}`);
-    
+
+    // Execute all count queries in parallel for better performance
+    const [
+      [userCount],
+      [resourceCount],
+      [pendingCount],
+      [categoryCount],
+      [journeyCount],
+      [activeCount]
+    ] = await Promise.all([
+      db.select({ count: sql<number>`count(*)::int` }).from(users),
+      db.select({ count: sql<number>`count(*)::int` }).from(resources),
+      db.select({ count: sql<number>`count(*)::int` }).from(resources).where(eq(resources.status, 'pending')),
+      db.select({ count: sql<number>`count(*)::int` }).from(categories),
+      db.select({ count: sql<number>`count(*)::int` }).from(learningJourneys),
+      db.select({ count: sql<number>`count(*)::int` }).from(users).where(sql`${users.updatedAt} > ${thirtyDaysAgo}`)
+    ]);
+
     return {
       totalUsers: userCount.count,
       totalResources: resourceCount.count,
