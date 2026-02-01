@@ -1,0 +1,34 @@
+{
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true
+  },
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Read(./**)",
+      "Write(./**)",
+      "Edit(./**)",
+      "Glob(./**)",
+      "Grep(./**)",
+      "Read(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/020-extract-reusable-admin-crud-component-pattern-from/**)",
+      "Write(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/020-extract-reusable-admin-crud-component-pattern-from/**)",
+      "Edit(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/020-extract-reusable-admin-crud-component-pattern-from/**)",
+      "Glob(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/020-extract-reusable-admin-crud-component-pattern-from/**)",
+      "Grep(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/020-extract-reusable-admin-crud-component-pattern-from/**)",
+      "Read(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/020-extract-reusable-admin-crud-component-pattern-from/.auto-claude/specs/020-extract-reusable-admin-crud-component-pattern-from/**)",
+      "Write(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/020-extract-reusable-admin-crud-component-pattern-from/.auto-claude/specs/020-extract-reusable-admin-crud-component-pattern-from/**)",
+      "Edit(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/020-extract-reusable-admin-crud-component-pattern-from/.auto-claude/specs/020-extract-reusable-admin-crud-component-pattern-from/**)",
+      "Read(/Users/nick/Desktop/awesome-list-site/.auto-claude/**)",
+      "Write(/Users/nick/Desktop/awesome-list-site/.auto-claude/**)",
+      "Edit(/Users/nick/Desktop/awesome-list-site/.auto-claude/**)",
+      "Glob(/Users/nick/Desktop/awesome-list-site/.auto-claude/**)",
+      "Grep(/Users/nick/Desktop/awesome-list-site/.auto-claude/**)",
+      "Bash(*)",
+      "WebFetch(*)",
+      "WebSearch(*)",
+      "mcp__context7__resolve-library-id(*)",
+      "mcp__context7__get-library-docs(*)"
+    ]
+  }
+}

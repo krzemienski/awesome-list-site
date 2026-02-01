@@ -1,0 +1,182 @@
+import { LucideIcon } from "lucide-react";
+import { ReactNode } from "react";
+
+/**
+ * Defines the type of a form field in the CRUD manager
+ */
+export type FieldType = "text" | "select" | "number" | "textarea";
+
+/**
+ * Defines how a field should be validated
+ */
+export interface FieldValidation {
+  required?: boolean;
+  minLength?: number;
+  maxLength?: number;
+  pattern?: RegExp;
+  custom?: (value: any) => boolean | string;
+}
+
+/**
+ * Configuration for a single form field
+ */
+export interface FieldConfig {
+  /** Field name (used as form data key) */
+  name: string;
+  /** Display label for the field */
+  label: string;
+  /** Field type */
+  type: FieldType;
+  /** Placeholder text */
+  placeholder?: string;
+  /** Validation rules */
+  validation?: FieldValidation;
+  /** Whether this field auto-generates from another field (e.g., slug from name) */
+  autoGenerateFrom?: string;
+  /** Custom auto-generation function */
+  autoGenerateFn?: (sourceValue: string) => string;
+  /** Help text displayed below the field */
+  helpText?: string;
+  /** Whether the field is disabled by default */
+  disabled?: boolean;
+  /** For select fields: reference to parent entity type */
+  parentEntityType?: string;
+  /** For select fields: which field in parent to display */
+  parentDisplayField?: string;
+  /** For cascading selects: field name that this depends on */
+  dependsOn?: string;
+  /** For cascading selects: filter function based on dependent field */
+  filterFn?: (item: any, dependentValue: any) => boolean;
+}
+
+/**
+ * Configuration for a table column
+ */
+export interface ColumnConfig {
+  /** Column header text */
+  header: string;
+  /** Field name to display (supports dot notation for nested fields) */
+  field?: string;
+  /** Custom render function for the cell */
+  renderFn?: (item: any, allData?: any) => ReactNode | string;
+  /** CSS class for the column */
+  className?: string;
+  /** Alignment of column content */
+  align?: "left" | "center" | "right";
+  /** Width of the column */
+  width?: string;
+}
+
+/**
+ * Defines a parent relationship for an entity
+ */
+export interface ParentRelationship {
+  /** Name of the parent entity type (e.g., "category", "subcategory") */
+  entityType: string;
+  /** Field name that stores the parent ID */
+  fieldName: string;
+  /** Display name for the parent (e.g., "Parent Category") */
+  displayName: string;
+  /** API endpoint to fetch parent options */
+  endpoint: string;
+  /** Field in parent entity to display in select dropdown */
+  displayField: string;
+  /** For cascading parents: which parent this depends on */
+  dependsOn?: string;
+  /** For cascading parents: how to filter based on parent selection */
+  filterFn?: (item: any, parentValue: any) => boolean;
+}
+
+/**
+ * API endpoint configuration
+ */
+export interface ApiEndpoints {
+  /** Endpoint to list all entities (GET) */
+  list: string;
+  /** Endpoint to create entity (POST) */
+  create: string;
+  /** Endpoint to update entity (PATCH) - {id} will be replaced */
+  update: string;
+  /** Endpoint to delete entity (DELETE) - {id} will be replaced */
+  delete: string;
+  /** Additional query keys to invalidate on mutation */
+  invalidateKeys?: string[];
+}
+
+/**
+ * Display configuration for the CRUD manager
+ */
+export interface DisplayConfig {
+  /** Singular entity name (e.g., "Category") */
+  entityName: string;
+  /** Plural entity name (e.g., "Categories") */
+  entityNamePlural: string;
+  /** Icon component from lucide-react */
+  icon: LucideIcon;
+  /** Manager title (e.g., "Category Manager") */
+  title: string;
+  /** Description text shown in card header */
+  description: string;
+  /** Prefix for data-testid attributes (e.g., "category" -> "category-manager") */
+  testIdPrefix: string;
+}
+
+/**
+ * Configuration for delete behavior
+ */
+export interface DeleteConfig {
+  /** Field name that contains the count preventing deletion (e.g., "resourceCount") */
+  protectionField?: string;
+  /** Custom function to determine if delete should be disabled */
+  isDisabledFn?: (item: any) => boolean;
+  /** Warning message shown in delete dialog */
+  warningMessage?: (item: any) => string | null;
+  /** Confirmation message shown in delete dialog */
+  confirmationMessage?: (item: any) => string;
+}
+
+/**
+ * Main CRUD configuration interface
+ */
+export interface CrudConfig<TEntity = any, TFormData = any> {
+  /** Display configuration */
+  display: DisplayConfig;
+
+  /** API endpoints */
+  endpoints: ApiEndpoints;
+
+  /** Form field definitions */
+  fields: FieldConfig[];
+
+  /** Table column definitions */
+  columns: ColumnConfig[];
+
+  /** Parent relationships (empty array for top-level entities) */
+  parents: ParentRelationship[];
+
+  /** Delete behavior configuration */
+  deleteConfig?: DeleteConfig;
+
+  /** Default form data values */
+  defaultFormData: TFormData;
+
+  /** Transform entity data for editing (entity -> form data) */
+  entityToFormData?: (entity: TEntity, additionalData?: any) => TFormData;
+
+  /** Transform form data for API submission (form data -> API payload) */
+  formDataToPayload?: (formData: TFormData) => any;
+
+  /** Validate form data before submission */
+  validateFormData?: (formData: TFormData) => { valid: boolean; error?: string };
+}
+
+/**
+ * Type for entity data with resource count
+ */
+export interface EntityWithCount {
+  id: number;
+  name: string;
+  slug: string;
+  resourceCount: number;
+  [key: string]: any;
+}

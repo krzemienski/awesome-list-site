@@ -291,21 +291,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       done(null, user);
     });
 
-    passport.deserializeUser(async (user: any, done) => {
-      try {
-        // Fetch fresh user data from DB to ensure we have the latest role
-        const userId = (user as any).claims?.sub;
-        if (userId) {
-          const dbUser = await storage.getUser(userId);
-          if (dbUser) {
-            // Attach DB user data to session user object
-            (user as any).dbUser = dbUser;
-          }
-        }
-        done(null, user);
-      } catch (error) {
-        done(error);
-      }
+    passport.deserializeUser((user: any, done) => {
+      done(null, user);
     });
 
     console.log("Running in local mode - Replit OAuth disabled, use local auth at /api/auth/local/login");
@@ -446,7 +433,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const category = req.query.category as string;
       const subcategory = req.query.subcategory as string;
       const search = req.query.search as string;
-      
+
       const result = await storage.listResources({
         page,
         limit,
@@ -455,14 +442,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
         subcategory,
         search
       });
-      
+
       res.json(result);
     } catch (error) {
       console.error('Error fetching resources:', error);
       res.status(500).json({ message: 'Failed to fetch resources' });
     }
   });
-  
+
+  // GET /api/resources/check-url - Check if URL already exists (public)
+  app.get('/api/resources/check-url', async (req, res) => {
+    try {
+      const url = req.query.url as string;
+
+      if (!url) {
+        return res.status(400).json({ message: 'URL parameter is required' });
+      }
+
+      const existingResource = await storage.getResourceByUrl(url);
+
+      if (existingResource) {
+        return res.json({
+          exists: true,
+          resource: {
+            id: existingResource.id,
+            title: existingResource.title,
+            status: existingResource.status,
+            category: existingResource.category,
+            subcategory: existingResource.subcategory
+          }
+        });
+      }
+
+      res.json({ exists: false });
+    } catch (error) {
+      console.error('Error checking URL:', error);
+      res.status(500).json({ message: 'Failed to check URL' });
+    }
+  });
+
   // GET /api/resources/:id - Get single resource
   app.get('/api/resources/:id', async (req, res) => {
     try {
@@ -477,22 +495,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching resource:', error);
       res.status(500).json({ message: 'Failed to fetch resource' });
-    }
-  });
-
-  // GET /api/resources/:id/related - Get related resources
-  app.get('/api/resources/:id/related', async (req: any, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const limit = parseInt(req.query.limit as string) || 6;
-      const userId = req.user?.claims?.sub;
-
-      const relatedResources = await storage.getRelatedResources(id, userId, limit);
-
-      res.json({ resources: relatedResources });
-    } catch (error) {
-      console.error('Error fetching related resources:', error);
-      res.status(500).json({ message: 'Failed to fetch related resources' });
     }
   });
 

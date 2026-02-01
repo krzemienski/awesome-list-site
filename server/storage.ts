@@ -82,10 +82,6 @@ import {
 import { db } from "./db";
 import { eq, and, sql, desc, asc, inArray, like, or, isNull, isNotNull } from "drizzle-orm";
 import { mapCategoryName } from "@shared/categoryMapping";
-import memoize from "memoizee";
-
-// Cache TTL configuration (in seconds)
-const AWESOME_LIST_CACHE_TTL = parseInt(process.env.AWESOME_LIST_CACHE_TTL || '3600', 10);
 
 // Interface for storage operations
 export interface IStorage {
@@ -101,6 +97,7 @@ export interface IStorage {
   // Resource CRUD operations
   listResources(options: ListResourceOptions): Promise<{ resources: Resource[]; total: number }>;
   getResource(id: number): Promise<Resource | undefined>;
+  getResourceByUrl(url: string): Promise<Resource | undefined>;
   getResourceCount(): Promise<number>; // Get total count directly from database
   createResource(resource: InsertResource): Promise<Resource>;
   updateResource(id: number, resource: Partial<InsertResource>): Promise<Resource>;
@@ -150,10 +147,7 @@ export interface IStorage {
   addTagToResource(resourceId: number, tagId: number): Promise<void>;
   removeTagFromResource(resourceId: number, tagId: number): Promise<void>;
   getResourceTags(resourceId: number): Promise<Tag[]>;
-
-  // Related Resources
-  getRelatedResources(resourceId: number, userId?: string, limit?: number): Promise<RelatedResource[]>;
-
+  
   // Learning Journeys
   listLearningJourneys(category?: string): Promise<LearningJourney[]>;
   getLearningJourney(id: number): Promise<LearningJourney | undefined>;
@@ -278,11 +272,6 @@ interface ValidationResults {
   lastUpdated?: string;
 }
 
-export interface RelatedResource extends Resource {
-  score: number;
-  reasons: string[];
-}
-
 // Hierarchical category structure for frontend
 export interface HierarchicalSubSubcategory {
   name: string;
@@ -311,115 +300,6 @@ export interface AwesomeListData {
   resources: Resource[];
   categories: HierarchicalCategory[];
 }
-
-// Memoized helper function for getAwesomeListFromDatabase
-const getAwesomeListFromDatabaseMemoized = memoize(
-  async () => {
-    // 1. Get all approved resources
-    const allResources = await db
-      .select()
-      .from(resources)
-      .where(eq(resources.status, 'approved'))
-      .orderBy(resources.category, resources.subcategory, resources.subSubcategory, resources.title);
-
-
-    // 2. Get all categories, subcategories, and sub-subcategories from database
-    const dbCategories = await db.select().from(categories).orderBy(asc(categories.name));
-    const dbSubcategories = await db.select().from(subcategories).orderBy(asc(subcategories.name));
-    const dbSubSubcategories = await db.select().from(subSubcategories).orderBy(asc(subSubcategories.name));
-
-    // 3. Helper function to filter resources by hierarchy level
-    // We use filter-based aggregation instead of Maps to avoid losing resources during normalization
-    const getResourcesForCategory = (categoryName: string): Resource[] => {
-      return allResources.filter(r => mapCategoryName(r.category) === categoryName);
-    };
-
-    const getResourcesForSubcategory = (subcategoryName: string): Resource[] => {
-      return allResources.filter(r => r.subcategory === subcategoryName);
-    };
-
-    const getResourcesForSubSubcategory = (subSubcategoryName: string): Resource[] => {
-      return allResources.filter(r => r.subSubcategory === subSubcategoryName);
-    };
-
-    // 4. Build hierarchical structure using filter-based aggregation
-    const hierarchicalCategories: HierarchicalCategory[] = [];
-
-    for (const dbCategory of dbCategories) {
-      // Get ALL resources for this category (filter from allResources)
-      const categoryResources = getResourcesForCategory(dbCategory.name);
-
-      // Get subcategories for this category
-      const catSubcategories = dbSubcategories.filter(sub => sub.categoryId === dbCategory.id);
-
-      const hierarchicalSubcategories: HierarchicalSubcategory[] = [];
-
-      for (const dbSubcat of catSubcategories) {
-        // Get ALL resources for this subcategory (filter from allResources)
-        const subcategoryResources = getResourcesForSubcategory(dbSubcat.name);
-
-        // Get sub-subcategories for this subcategory
-        const subcatSubSubcategories = dbSubSubcategories.filter(
-          subSub => subSub.subcategoryId === dbSubcat.id
-        );
-
-        const hierarchicalSubSubcategories: HierarchicalSubSubcategory[] = subcatSubSubcategories.map(subSub => ({
-          name: subSub.name,
-          slug: subSub.slug,
-          resources: getResourcesForSubSubcategory(subSub.name)
-        }));
-
-        hierarchicalSubcategories.push({
-          name: dbSubcat.name,
-          slug: dbSubcat.slug,
-          resources: subcategoryResources,
-          subSubcategories: hierarchicalSubSubcategories
-        });
-      }
-
-      hierarchicalCategories.push({
-        name: dbCategory.name,
-        slug: dbCategory.slug,
-        resources: categoryResources,
-        subcategories: hierarchicalSubcategories
-      });
-    }
-
-    // Transform resources to include tags at root level for frontend compatibility
-    const transformedResources = allResources.map(r => ({
-      ...r,
-      tags: (r.metadata as any)?.tags || []
-    }));
-
-    // Also transform resources in category hierarchies
-    const transformResource = (r: Resource) => ({
-      ...r,
-      tags: (r.metadata as any)?.tags || []
-    });
-
-    const transformedCategories = hierarchicalCategories.map(cat => ({
-      ...cat,
-      resources: cat.resources.map(transformResource),
-      subcategories: cat.subcategories.map(sub => ({
-        ...sub,
-        resources: sub.resources.map(transformResource),
-        subSubcategories: sub.subSubcategories.map(subSub => ({
-          ...subSub,
-          resources: subSub.resources.map(transformResource)
-        }))
-      }))
-    }));
-
-    return {
-      title: "Awesome Video",
-      description: "A curated list of awesome video frameworks, libraries, and software for video processing, streaming, and manipulation",
-      repoUrl: "https://github.com/krzemienski/awesome-video",
-      resources: transformedResources,
-      categories: transformedCategories
-    };
-  },
-  { maxAge: AWESOME_LIST_CACHE_TTL * 1000 }
-);
 
 export class DatabaseStorage implements IStorage {
   // In-memory storage for awesome list compatibility
@@ -563,7 +443,12 @@ export class DatabaseStorage implements IStorage {
     const [resource] = await db.select().from(resources).where(eq(resources.id, id));
     return resource;
   }
-  
+
+  async getResourceByUrl(url: string): Promise<Resource | undefined> {
+    const [resource] = await db.select().from(resources).where(eq(resources.url, url));
+    return resource;
+  }
+
   async getResourceCount(): Promise<number> {
     const [result] = await db.select({ count: sql<number>`count(*)::int` }).from(resources);
     return result.count;
@@ -571,13 +456,10 @@ export class DatabaseStorage implements IStorage {
   
   async createResource(resource: InsertResource): Promise<Resource> {
     const [newResource] = await db.insert(resources).values(resource).returning();
-
+    
     // Log the creation
     await this.logResourceAudit(newResource.id, 'created', resource.submittedBy ?? undefined);
-
-    // Invalidate cache
-    getAwesomeListFromDatabaseMemoized.clear();
-
+    
     return newResource;
   }
   
@@ -587,36 +469,30 @@ export class DatabaseStorage implements IStorage {
       .set({ ...resource, updatedAt: new Date() })
       .where(eq(resources.id, id))
       .returning();
-
+    
     // Log the update
     await this.logResourceAudit(id, 'updated', resource.submittedBy ?? undefined, resource);
-
-    // Invalidate cache
-    getAwesomeListFromDatabaseMemoized.clear();
-
+    
     return updatedResource;
   }
   
   async updateResourceStatus(id: number, status: string, approvedBy?: string): Promise<Resource> {
     const updateData: any = { status, updatedAt: new Date() };
-
+    
     if (status === 'approved' && approvedBy) {
       updateData.approvedBy = approvedBy;
       updateData.approvedAt = new Date();
     }
-
+    
     const [updatedResource] = await db
       .update(resources)
       .set(updateData)
       .where(eq(resources.id, id))
       .returning();
-
+    
     // Log the status change
     await this.logResourceAudit(id, status, approvedBy, { status });
-
-    // Invalidate cache
-    getAwesomeListFromDatabaseMemoized.clear();
-
+    
     return updatedResource;
   }
   
@@ -626,7 +502,7 @@ export class DatabaseStorage implements IStorage {
     if (!resource) {
       throw new Error('Resource not found');
     }
-
+    
     // Log the deletion BEFORE deleting (foreign key constraint)
     await this.logResourceAudit(
       id,
@@ -635,11 +511,8 @@ export class DatabaseStorage implements IStorage {
       { resource: { title: resource.title, url: resource.url, category: resource.category } },
       `Deleted resource: ${resource.title}`
     );
-
+    
     await db.delete(resources).where(eq(resources.id, id));
-
-    // Invalidate cache
-    getAwesomeListFromDatabaseMemoized.clear();
   }
   
   // Category management
@@ -668,16 +541,12 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(categories)
       .where(eq(categories.slug, category.slug));
-
+    
     if (existing) {
       throw new Error(`Category with slug "${category.slug}" already exists`);
     }
-
+    
     const [newCategory] = await db.insert(categories).values(category).returning();
-
-    // Invalidate cache
-    getAwesomeListFromDatabaseMemoized.clear();
-
     return newCategory;
   }
   
@@ -687,10 +556,6 @@ export class DatabaseStorage implements IStorage {
       .set(category)
       .where(eq(categories.id, id))
       .returning();
-
-    // Invalidate cache
-    getAwesomeListFromDatabaseMemoized.clear();
-
     return updatedCategory;
   }
   
@@ -700,22 +565,19 @@ export class DatabaseStorage implements IStorage {
     if (!category) {
       throw new Error('Category not found');
     }
-
+    
     const resourceCount = await this.getCategoryResourceCount(category.name);
     if (resourceCount > 0) {
       throw new Error(`Cannot delete category "${category.name}" because it has ${resourceCount} resources`);
     }
-
+    
     // Check if category has any subcategories
     const subcategories = await this.listSubcategories(id);
     if (subcategories.length > 0) {
       throw new Error(`Cannot delete category "${category.name}" because it has ${subcategories.length} subcategories`);
     }
-
+    
     await db.delete(categories).where(eq(categories.id, id));
-
-    // Invalidate cache
-    getAwesomeListFromDatabaseMemoized.clear();
   }
   
   async getCategoryResourceCount(categoryName: string): Promise<number> {
@@ -762,17 +624,13 @@ export class DatabaseStorage implements IStorage {
             eq(subcategories.categoryId, subcategory.categoryId)
           )
         );
-
+      
       if (existing) {
         throw new Error(`Subcategory with slug "${subcategory.slug}" already exists in this category`);
       }
     }
-
+    
     const [newSubcategory] = await db.insert(subcategories).values(subcategory).returning();
-
-    // Invalidate cache
-    getAwesomeListFromDatabaseMemoized.clear();
-
     return newSubcategory;
   }
   
@@ -782,10 +640,6 @@ export class DatabaseStorage implements IStorage {
       .set(subcategory)
       .where(eq(subcategories.id, id))
       .returning();
-
-    // Invalidate cache
-    getAwesomeListFromDatabaseMemoized.clear();
-
     return updatedSubcategory;
   }
   
@@ -795,22 +649,19 @@ export class DatabaseStorage implements IStorage {
     if (!subcategory) {
       throw new Error('Subcategory not found');
     }
-
+    
     const resourceCount = await this.getSubcategoryResourceCount(subcategory.name);
     if (resourceCount > 0) {
       throw new Error(`Cannot delete subcategory "${subcategory.name}" because it has ${resourceCount} resources`);
     }
-
+    
     // Check if subcategory has any sub-subcategories
     const subSubcategories = await this.listSubSubcategories(id);
     if (subSubcategories.length > 0) {
       throw new Error(`Cannot delete subcategory "${subcategory.name}" because it has ${subSubcategories.length} sub-subcategories`);
     }
-
+    
     await db.delete(subcategories).where(eq(subcategories.id, id));
-
-    // Invalidate cache
-    getAwesomeListFromDatabaseMemoized.clear();
   }
   
   async getSubcategoryResourceCount(subcategoryName: string): Promise<number> {
@@ -857,17 +708,13 @@ export class DatabaseStorage implements IStorage {
             eq(subSubcategories.subcategoryId, subSubcategory.subcategoryId)
           )
         );
-
+      
       if (existing) {
         throw new Error(`Sub-subcategory with slug "${subSubcategory.slug}" already exists in this subcategory`);
       }
     }
-
+    
     const [newSubSubcategory] = await db.insert(subSubcategories).values(subSubcategory).returning();
-
-    // Invalidate cache
-    getAwesomeListFromDatabaseMemoized.clear();
-
     return newSubSubcategory;
   }
   
@@ -877,10 +724,6 @@ export class DatabaseStorage implements IStorage {
       .set(subSubcategory)
       .where(eq(subSubcategories.id, id))
       .returning();
-
-    // Invalidate cache
-    getAwesomeListFromDatabaseMemoized.clear();
-
     return updatedSubSubcategory;
   }
   
@@ -890,16 +733,13 @@ export class DatabaseStorage implements IStorage {
     if (!subSubcategory) {
       throw new Error('Sub-subcategory not found');
     }
-
+    
     const resourceCount = await this.getSubSubcategoryResourceCount(subSubcategory.name);
     if (resourceCount > 0) {
       throw new Error(`Cannot delete sub-subcategory "${subSubcategory.name}" because it has ${resourceCount} resources`);
     }
-
+    
     await db.delete(subSubcategories).where(eq(subSubcategories.id, id));
-
-    // Invalidate cache
-    getAwesomeListFromDatabaseMemoized.clear();
   }
   
   async getSubSubcategoryResourceCount(subSubcategoryName: string): Promise<number> {
@@ -954,106 +794,10 @@ export class DatabaseStorage implements IStorage {
       .from(resourceTags)
       .innerJoin(tags, eq(resourceTags.tagId, tags.id))
       .where(eq(resourceTags.resourceId, resourceId));
-
+    
     return result.map(r => r.tag);
   }
-
-  // Related Resources
-  async getRelatedResources(resourceId: number, userId?: string, limit: number = 6): Promise<RelatedResource[]> {
-    // Get the source resource
-    const sourceResource = await this.getResource(resourceId);
-    if (!sourceResource) {
-      return [];
-    }
-
-    // Get tags for the source resource
-    const sourceTags = await this.getResourceTags(resourceId);
-    const sourceTagIds = sourceTags.map(t => t.id);
-
-    // Build query to find related resources
-    // We'll use a subquery to count tag overlaps
-    const relatedResourcesQuery = db
-      .select({
-        resource: resources,
-        tagCount: sql<number>`COUNT(DISTINCT ${resourceTags.tagId})::int`
-      })
-      .from(resources)
-      .leftJoin(resourceTags, eq(resources.id, resourceTags.resourceId))
-      .where(
-        and(
-          eq(resources.status, 'approved'),
-          sql`${resources.id} != ${resourceId}`, // Exclude source resource
-          or(
-            // Same subcategory
-            sourceResource.subcategory
-              ? eq(resources.subcategory, sourceResource.subcategory)
-              : undefined,
-            // Or has overlapping tags
-            sourceTagIds.length > 0
-              ? inArray(resourceTags.tagId, sourceTagIds)
-              : undefined
-          )
-        )
-      )
-      .groupBy(resources.id)
-      .$dynamic();
-
-    // Exclude bookmarks if userId provided
-    let bookmarkedIds: number[] = [];
-    if (userId) {
-      const bookmarks = await db
-        .select({ resourceId: userBookmarks.resourceId })
-        .from(userBookmarks)
-        .where(eq(userBookmarks.userId, userId));
-      bookmarkedIds = bookmarks.map(b => b.resourceId);
-    }
-
-    // Execute the query
-    let results = await relatedResourcesQuery;
-
-    // Filter out bookmarked resources
-    if (bookmarkedIds.length > 0) {
-      results = results.filter(r => !bookmarkedIds.includes(r.resource.id));
-    }
-
-    // Calculate scores and reasons for each result
-    const scoredResults: RelatedResource[] = results.map(({ resource, tagCount }) => {
-      let score = 0;
-      const reasons: string[] = [];
-
-      // Same subcategory gets high score
-      if (sourceResource.subcategory && resource.subcategory === sourceResource.subcategory) {
-        score += 10;
-        reasons.push(`Same subcategory: ${resource.subcategory}`);
-      }
-
-      // Tag overlap contributes to score
-      if (tagCount > 0) {
-        score += tagCount * 2;
-        reasons.push(`${tagCount} shared tag${tagCount > 1 ? 's' : ''}`);
-      }
-
-      // Same category (but different subcategory) gets lower score
-      if (resource.category === sourceResource.category && resource.subcategory !== sourceResource.subcategory) {
-        score += 1;
-        if (!reasons.some(r => r.includes('subcategory'))) {
-          reasons.push(`Same category: ${resource.category}`);
-        }
-      }
-
-      return {
-        ...resource,
-        score,
-        reasons
-      };
-    });
-
-    // Sort by score (descending) and limit results
-    return scoredResults
-      .sort((a, b) => b.score - a.score)
-      .slice(0, limit);
-  }
-
+  
   // Learning Journeys
   async listLearningJourneys(category?: string): Promise<LearningJourney[]> {
     let query = db.select().from(learningJourneys);
@@ -1498,11 +1242,11 @@ export class DatabaseStorage implements IStorage {
     if (!resource) {
       throw new Error('Resource not found');
     }
-
+    
     if (resource.status !== 'pending') {
       throw new Error('Resource is not pending approval');
     }
-
+    
     const [updated] = await db
       .update(resources)
       .set({
@@ -1513,7 +1257,7 @@ export class DatabaseStorage implements IStorage {
       })
       .where(eq(resources.id, id))
       .returning();
-
+    
     // Log the approval action
     await this.logResourceAudit(
       id,
@@ -1522,10 +1266,7 @@ export class DatabaseStorage implements IStorage {
       { previousStatus: resource.status, newStatus: 'approved' },
       'Resource approved by admin'
     );
-
-    // Invalidate cache
-    getAwesomeListFromDatabaseMemoized.clear();
-
+    
     return updated;
   }
   
@@ -1534,15 +1275,15 @@ export class DatabaseStorage implements IStorage {
     if (!resource) {
       throw new Error('Resource not found');
     }
-
+    
     if (resource.status !== 'pending') {
       throw new Error('Resource is not pending approval');
     }
-
+    
     if (!reason || reason.trim().length < 10) {
       throw new Error('Rejection reason must be at least 10 characters');
     }
-
+    
     await db
       .update(resources)
       .set({
@@ -1550,7 +1291,7 @@ export class DatabaseStorage implements IStorage {
         updatedAt: new Date()
       })
       .where(eq(resources.id, id));
-
+    
     // Log the rejection action
     await this.logResourceAudit(
       id,
@@ -1559,9 +1300,6 @@ export class DatabaseStorage implements IStorage {
       { previousStatus: resource.status, newStatus: 'rejected', reason },
       `Resource rejected: ${reason}`
     );
-
-    // Invalidate cache (rejected resources don't appear in list, but this keeps consistency)
-    getAwesomeListFromDatabaseMemoized.clear();
   }
 
   async getResourceEditsByUser(userId: string): Promise<ResourceEdit[]> {
@@ -1645,32 +1383,142 @@ export class DatabaseStorage implements IStorage {
 
   // Database-driven awesome list hierarchy - builds complete category tree from database
   async getAwesomeListFromDatabase(): Promise<AwesomeListData> {
-    return getAwesomeListFromDatabaseMemoized();
+    // 1. Get all approved resources
+    const allResources = await db
+      .select()
+      .from(resources)
+      .where(eq(resources.status, 'approved'))
+      .orderBy(resources.category, resources.subcategory, resources.subSubcategory, resources.title);
+    
+    
+    // 2. Get all categories, subcategories, and sub-subcategories from database
+    const dbCategories = await db.select().from(categories).orderBy(asc(categories.name));
+    const dbSubcategories = await db.select().from(subcategories).orderBy(asc(subcategories.name));
+    const dbSubSubcategories = await db.select().from(subSubcategories).orderBy(asc(subSubcategories.name));
+    
+    // 3. Helper function to filter resources by hierarchy level
+    // We use filter-based aggregation instead of Maps to avoid losing resources during normalization
+    const getResourcesForCategory = (categoryName: string): Resource[] => {
+      return allResources.filter(r => mapCategoryName(r.category) === categoryName);
+    };
+    
+    const getResourcesForSubcategory = (subcategoryName: string): Resource[] => {
+      return allResources.filter(r => r.subcategory === subcategoryName);
+    };
+    
+    const getResourcesForSubSubcategory = (subSubcategoryName: string): Resource[] => {
+      return allResources.filter(r => r.subSubcategory === subSubcategoryName);
+    };
+    
+    // 4. Build hierarchical structure using filter-based aggregation
+    const hierarchicalCategories: HierarchicalCategory[] = [];
+    
+    for (const dbCategory of dbCategories) {
+      // Get ALL resources for this category (filter from allResources)
+      const categoryResources = getResourcesForCategory(dbCategory.name);
+      
+      // Get subcategories for this category
+      const catSubcategories = dbSubcategories.filter(sub => sub.categoryId === dbCategory.id);
+      
+      const hierarchicalSubcategories: HierarchicalSubcategory[] = [];
+      
+      for (const dbSubcat of catSubcategories) {
+        // Get ALL resources for this subcategory (filter from allResources)
+        const subcategoryResources = getResourcesForSubcategory(dbSubcat.name);
+        
+        // Get sub-subcategories for this subcategory
+        const subcatSubSubcategories = dbSubSubcategories.filter(
+          subSub => subSub.subcategoryId === dbSubcat.id
+        );
+        
+        const hierarchicalSubSubcategories: HierarchicalSubSubcategory[] = subcatSubSubcategories.map(subSub => ({
+          name: subSub.name,
+          slug: subSub.slug,
+          resources: getResourcesForSubSubcategory(subSub.name)
+        }));
+        
+        hierarchicalSubcategories.push({
+          name: dbSubcat.name,
+          slug: dbSubcat.slug,
+          resources: subcategoryResources,
+          subSubcategories: hierarchicalSubSubcategories
+        });
+      }
+      
+      hierarchicalCategories.push({
+        name: dbCategory.name,
+        slug: dbCategory.slug,
+        resources: categoryResources,
+        subcategories: hierarchicalSubcategories
+      });
+    }
+    
+    // Transform resources to include tags at root level for frontend compatibility
+    const transformedResources = allResources.map(r => ({
+      ...r,
+      tags: (r.metadata as any)?.tags || []
+    }));
+    
+    // Also transform resources in category hierarchies
+    const transformResource = (r: Resource) => ({
+      ...r,
+      tags: (r.metadata as any)?.tags || []
+    });
+    
+    const transformedCategories = hierarchicalCategories.map(cat => ({
+      ...cat,
+      resources: cat.resources.map(transformResource),
+      subcategories: cat.subcategories.map(sub => ({
+        ...sub,
+        resources: sub.resources.map(transformResource),
+        subSubcategories: sub.subSubcategories.map(subSub => ({
+          ...subSub,
+          resources: subSub.resources.map(transformResource)
+        }))
+      }))
+    }));
+    
+    return {
+      title: "Awesome Video",
+      description: "A curated list of awesome video frameworks, libraries, and software for video processing, streaming, and manipulation",
+      repoUrl: "https://github.com/krzemienski/awesome-video",
+      resources: transformedResources,
+      categories: transformedCategories
+    };
   }
   
   // Admin Statistics
   async getAdminStats(): Promise<AdminStats> {
+    const [userCount] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(users);
+    
+    const [resourceCount] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(resources);
+    
+    const [pendingCount] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(resources)
+      .where(eq(resources.status, 'pending'));
+    
+    const [categoryCount] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(categories);
+    
+    const [journeyCount] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(learningJourneys);
+    
     // Active users (those who logged in within last 30 days)
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-    // Execute all count queries in parallel for better performance
-    const [
-      [userCount],
-      [resourceCount],
-      [pendingCount],
-      [categoryCount],
-      [journeyCount],
-      [activeCount]
-    ] = await Promise.all([
-      db.select({ count: sql<number>`count(*)::int` }).from(users),
-      db.select({ count: sql<number>`count(*)::int` }).from(resources),
-      db.select({ count: sql<number>`count(*)::int` }).from(resources).where(eq(resources.status, 'pending')),
-      db.select({ count: sql<number>`count(*)::int` }).from(categories),
-      db.select({ count: sql<number>`count(*)::int` }).from(learningJourneys),
-      db.select({ count: sql<number>`count(*)::int` }).from(users).where(sql`${users.updatedAt} > ${thirtyDaysAgo}`)
-    ]);
-
+    
+    const [activeCount] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(users)
+      .where(sql`${users.updatedAt} > ${thirtyDaysAgo}`);
+    
     return {
       totalUsers: userCount.count,
       totalResources: resourceCount.count,
@@ -1912,6 +1760,7 @@ export class MemStorage implements IStorage {
     return { resources: [], total: 0 };
   }
   async getResource(id: number): Promise<Resource | undefined> { return undefined; }
+  async getResourceByUrl(url: string): Promise<Resource | undefined> { return undefined; }
   async getResourceCount(): Promise<number> { return 0; }
   async createResource(resource: InsertResource): Promise<Resource> {
     throw new Error("Not implemented in memory storage");
@@ -1971,9 +1820,7 @@ export class MemStorage implements IStorage {
   async addTagToResource(resourceId: number, tagId: number): Promise<void> {}
   async removeTagFromResource(resourceId: number, tagId: number): Promise<void> {}
   async getResourceTags(resourceId: number): Promise<Tag[]> { return []; }
-
-  async getRelatedResources(resourceId: number, userId?: string, limit?: number): Promise<RelatedResource[]> { return []; }
-
+  
   async listLearningJourneys(category?: string): Promise<LearningJourney[]> { return []; }
   async getLearningJourney(id: number): Promise<LearningJourney | undefined> { return undefined; }
   async createLearningJourney(journey: InsertLearningJourney): Promise<LearningJourney> {

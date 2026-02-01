@@ -82,8 +82,10 @@ vite.config.ts.*
 logs/
 attached_assets/
 
-# Auto Claude generated files
+# Auto Claude data directory
 .auto-claude/
+
+# Auto Claude generated files
 .auto-claude-security.json
 .auto-claude-status
 .claude_settings.json
