@@ -64,6 +64,8 @@ A production-ready React application for browsing and discovering 2,600+ curated
 
 ## Quick Start
 
+> **First time?** See [SETUP.md](docs/SETUP.md) for prerequisites (Node.js 18+, PostgreSQL) and environment setup (DATABASE_URL, SESSION_SECRET).
+
 ### Development
 
 ```bash
@@ -73,7 +75,7 @@ npm install
 # Start development server
 npm run dev
 
-# Open in browser
+# Open in browser (default port 5000, configurable via PORT env var)
 # http://localhost:5000
 ```
 

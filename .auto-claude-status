@@ -1,15 +1,15 @@
 {
   "active": true,
-  "spec": "078-add-aria-label-to-toast-close-button",
-  "state": "planning",
+  "spec": "079-enhance-404-not-found-page-with-navigation-options",
+  "state": "building",
   "subtasks": {
-    "completed": 0,
-    "total": 0,
+    "completed": 1,
+    "total": 2,
     "in_progress": 1,
     "failed": 0
   },
   "phase": {
-    "current": "Add aria-label Attribute",
+    "current": "Visual and Functional Verification",
     "id": null,
     "total": 1
   },
@@ -18,8 +18,8 @@
     "max": 1
   },
   "session": {
-    "number": 2,
-    "started_at": "2026-02-01T00:21:38.716643"
+    "number": 3,
+    "started_at": "2026-02-01T00:21:21.474037"
   },
-  "last_update": "2026-02-01T00:24:06.425723"
+  "last_update": "2026-02-01T00:26:10.634074"
 }
