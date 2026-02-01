@@ -485,6 +485,51 @@ export class RecommendationEngine {
       console.error('Error recording recommendation feedback:', error);
     }
   }
+
+  /**
+   * Record detailed feedback on a recommendation with analytics
+   */
+  public async recordDetailedFeedback(
+    userId: string,
+    resourceId: number,
+    feedback_type: 'helpful' | 'not_helpful' | 'irrelevant' | 'already_known',
+    context?: {
+      recommendationType?: 'ai_powered' | 'rule_based' | 'hybrid';
+      confidence?: number;
+      reason?: string;
+      position?: number;
+      sessionId?: string;
+    }
+  ): Promise<void> {
+    try {
+      // Log detailed feedback with analytics context
+      await storage.logResourceAudit(
+        resourceId,
+        `recommendation_feedback_${feedback_type}`,
+        userId,
+        {
+          feedback_type,
+          recommendation_type: context?.recommendationType,
+          confidence_score: context?.confidence,
+          recommendation_reason: context?.reason,
+          position_in_list: context?.position,
+          session_id: context?.sessionId,
+          timestamp: new Date().toISOString()
+        },
+        `User marked recommendation as ${feedback_type}`
+      );
+
+      // Clear cache to trigger fresh recommendations based on feedback
+      for (const [key] of Array.from(this.recommendationCache.entries())) {
+        if (key.startsWith(userId)) {
+          this.recommendationCache.delete(key);
+        }
+      }
+    } catch (error) {
+      console.error('Error recording detailed recommendation feedback:', error);
+      throw error;
+    }
+  }
 }
 
 // Export singleton instance

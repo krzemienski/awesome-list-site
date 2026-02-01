@@ -1,25 +1,25 @@
 {
   "active": true,
-  "spec": "079-enhance-404-not-found-page-with-navigation-options",
+  "spec": "058-ai-powered-smart-recommendations",
   "state": "building",
   "subtasks": {
-    "completed": 1,
-    "total": 2,
+    "completed": 6,
+    "total": 7,
     "in_progress": 1,
     "failed": 0
   },
   "phase": {
-    "current": "Visual and Functional Verification",
+    "current": "Integration and End-to-End Testing",
     "id": null,
-    "total": 1
+    "total": 2
   },
   "workers": {
     "active": 0,
     "max": 1
   },
   "session": {
-    "number": 3,
-    "started_at": "2026-02-01T00:21:21.474037"
+    "number": 1,
+    "started_at": "2026-02-01T01:29:14.877008"
   },
-  "last_update": "2026-02-01T00:26:10.634074"
+  "last_update": "2026-02-01T01:29:14.938231"
 }

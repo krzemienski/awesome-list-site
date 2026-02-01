@@ -8,10 +8,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import SEOHead from "@/components/layout/SEOHead";
 import { SuggestEditDialog } from "@/components/ui/suggest-edit-dialog";
-import { 
-  ArrowLeft, 
-  ExternalLink, 
-  Calendar, 
+import {
+  ArrowLeft,
+  ExternalLink,
+  Calendar,
   FolderTree,
   Bookmark,
   Heart,
@@ -22,7 +22,8 @@ import {
   Image as ImageIcon,
   Link2,
   Clock,
-  ChevronRight
+  ChevronRight,
+  TrendingUp
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -566,6 +567,17 @@ export default function ResourceDetail() {
                       <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
                         {related.description}
                       </p>
+                    )}
+                    {related.score !== undefined && (
+                      <div className="mt-2">
+                        <Badge
+                          variant="outline"
+                          className="text-xs bg-green-500/10 text-green-500"
+                        >
+                          <TrendingUp className="h-3 w-3 mr-1" />
+                          {related.score}% match
+                        </Badge>
+                      </div>
                     )}
                     {related.reasons && related.reasons.length > 0 && (
                       <div className="mt-2 space-y-1">

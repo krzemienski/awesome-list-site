@@ -32,6 +32,7 @@ import PendingResources from "@/components/admin/PendingResources";
 import PendingEdits from "@/components/admin/PendingEdits";
 import BatchEnrichmentPanel from "@/components/admin/BatchEnrichmentPanel";
 import GitHubSyncPanel from "@/components/admin/GitHubSyncPanel";
+import LinkHealthDashboard from "@/components/admin/LinkHealthDashboard";
 import ResourceManager from "@/components/admin/ResourceManager";
 import CategoryManager from "@/components/admin/CategoryManager";
 import SubcategoryManager from "@/components/admin/SubcategoryManager";
@@ -368,6 +369,10 @@ export default function AdminDashboard() {
             </TabsTrigger>
             <TabsTrigger value="github" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap">
               GitHub
+            </TabsTrigger>
+            <TabsTrigger value="linkhealth" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap">
+              <Link className="h-4 w-4 mr-1" />
+              Link Health
             </TabsTrigger>
             <TabsTrigger value="audit" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap">
               Audit
@@ -861,6 +866,10 @@ export default function AdminDashboard() {
 
         <TabsContent value="github">
           <GitHubSyncPanel />
+        </TabsContent>
+
+        <TabsContent value="linkhealth">
+          <LinkHealthDashboard />
         </TabsContent>
 
         <TabsContent value="audit">

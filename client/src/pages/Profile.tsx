@@ -7,15 +7,15 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { 
-  User, 
-  Heart, 
-  Bookmark, 
-  Trophy, 
-  Target, 
-  Clock, 
-  TrendingUp, 
-  Settings, 
+import {
+  User,
+  Heart,
+  Bookmark,
+  Trophy,
+  Target,
+  Clock,
+  TrendingUp,
+  Settings,
   LogOut,
   Mail,
   Calendar,
@@ -26,12 +26,15 @@ import {
   BookOpen,
   CheckCircle,
   XCircle,
-  AlertCircle
+  AlertCircle,
+  Sparkles
 } from "lucide-react";
 import FavoriteButton from "@/components/resource/FavoriteButton";
 import BookmarkButton from "@/components/resource/BookmarkButton";
+import RecommendationCard from "@/components/ai/RecommendationCard";
 import { useAuth } from "@/hooks/useAuth";
 import { formatDistanceToNow } from "date-fns";
+import { useLocation } from "wouter";
 
 interface ProfileProps {
   user?: any;
@@ -106,9 +109,22 @@ interface UserJourney {
   };
 }
 
+interface Recommendation {
+  id: string;
+  name: string;
+  url: string;
+  description?: string;
+  category: string;
+  tags?: string[];
+  confidence?: number;
+  matchReason?: string;
+  isAIBased?: boolean;
+}
+
 export default function Profile({ user }: ProfileProps) {
   const [activeTab, setActiveTab] = useState("overview");
   const { logout } = useAuth();
+  const [, setLocation] = useLocation();
 
   // Fetch favorites
   const { data: favorites, isLoading: favoritesLoading } = useQuery<Favorite[]>({
@@ -137,6 +153,17 @@ export default function Profile({ user }: ProfileProps) {
   // Fetch user's learning journeys
   const { data: userJourneys, isLoading: journeysLoading } = useQuery<UserJourney[]>({
     queryKey: ['/api/user/journeys'],
+    enabled: !!user
+  });
+
+  // Fetch personalized recommendations
+  const { data: recommendations, isLoading: recommendationsLoading } = useQuery<Recommendation[]>({
+    queryKey: ['/api/recommendations'],
+    queryFn: async () => {
+      const response = await fetch('/api/recommendations?limit=6', { credentials: 'include' });
+      if (!response.ok) throw new Error('Failed to fetch recommendations');
+      return response.json();
+    },
     enabled: !!user
   });
 
@@ -375,6 +402,48 @@ export default function Profile({ user }: ProfileProps) {
                   <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-50" />
                   <p>No learning journeys started yet</p>
                   <p className="text-sm mt-2">Start a learning path to track your progress!</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Personalized Recommendations */}
+          <Card data-testid="card-recommendations">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-pink-500" />
+                Recommended for You
+              </CardTitle>
+              <CardDescription>
+                AI-powered resource suggestions based on your interests and learning journey
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {recommendationsLoading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4" aria-busy={true} aria-live="polite">
+                  {Array(4).fill(0).map((_, i) => (
+                    <Skeleton key={i} className="h-48 w-full" />
+                  ))}
+                </div>
+              ) : recommendations && recommendations.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {recommendations.map((recommendation) => (
+                    <RecommendationCard
+                      key={recommendation.id}
+                      resource={recommendation}
+                      onClick={() => {
+                        setLocation(`/resource/${recommendation.id}`);
+                      }}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 text-muted-foreground">
+                  <Sparkles className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>No recommendations yet</p>
+                  <p className="text-sm mt-2">
+                    Start exploring resources to get personalized recommendations!
+                  </p>
                 </div>
               )}
             </CardContent>

@@ -498,6 +498,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // GET /api/resources/:id/related - Get AI-powered similar resources
+  app.get('/api/resources/:id/related', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const limit = parseInt(req.query.limit as string) || 5;
+
+      // Get the source resource
+      const resource = await storage.getResource(id);
+      if (!resource) {
+        return res.status(404).json({ message: 'Resource not found' });
+      }
+
+      // Create a synthetic user profile based on the resource's attributes
+      const userProfile: AIUserProfile = {
+        userId: 'anonymous',
+        preferredCategories: resource.category ? [resource.category] : [],
+        skillLevel: 'intermediate',
+        learningGoals: [],
+        preferredResourceTypes: [],
+        timeCommitment: 'flexible',
+        viewHistory: [resource.url], // Exclude this resource from results
+        bookmarks: [],
+        completedResources: [],
+        ratings: {}
+      };
+
+      // Generate recommendations
+      const result = await recommendationEngine.generateRecommendations(
+        userProfile,
+        limit + 1, // Request one more to account for filtering
+        false
+      );
+
+      // Filter out the source resource and limit results
+      const relatedResources = result.recommendations
+        .filter(rec => rec.resource.id !== id)
+        .slice(0, limit)
+        .map(rec => ({
+          ...rec.resource,
+          score: rec.confidence,
+          reasons: [rec.reason]
+        }));
+
+      res.json({ resources: relatedResources });
+    } catch (error) {
+      console.error('Error fetching related resources:', error);
+      res.status(500).json({ message: 'Failed to fetch related resources' });
+    }
+  });
+
   // POST /api/resources - Submit new resource (authenticated)
   app.post('/api/resources', isAuthenticated, async (req: any, res) => {
     try {

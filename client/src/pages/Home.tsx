@@ -2,10 +2,13 @@ import { useMemo } from "react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { AwesomeList, Category } from "@/types/awesome-list";
 import SEOHead from "@/components/layout/SEOHead";
+import AIRecommendationsPanel from "@/components/ui/ai-recommendations-panel";
+import { useAuth } from "@/hooks/useAuth";
 import {
   FileText,
   Video,
@@ -16,6 +19,8 @@ import {
   Server,
   Layers,
   Users,
+  Sparkles,
+  LogIn,
 } from "lucide-react";
 
 interface HomeProps {
@@ -36,11 +41,14 @@ const categoryIcons: { [key: string]: any } = {
 };
 
 export default function Home({ awesomeList, isLoading }: HomeProps) {
+  // Authentication hook
+  const { user, isAuthenticated } = useAuth();
+
   // Fetch approved database resources (always fetch, React Query handles caching)
   const { data: dbData } = useQuery<{resources: any[], total: number}>({
     queryKey: ['/api/resources', { status: 'approved' }],
   });
-  
+
   const dbResources = dbData?.resources || [];
   
   const filteredCategories = useMemo(() => {
@@ -116,22 +124,22 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
         {filteredCategories.map((category) => {
           const Icon = categoryIcons[category.name] || FileText;
           const totalCount = calculateTotalCount(category);
-          
+
           const firstResource = category.resources[0];
-          const description = firstResource?.description 
-            ? firstResource.description.length > 100 
-              ? `${firstResource.description.substring(0, 100)}...` 
+          const description = firstResource?.description
+            ? firstResource.description.length > 100
+              ? `${firstResource.description.substring(0, 100)}...`
               : firstResource.description
             : '';
-          
+
           return (
-            <Link 
-              key={category.slug} 
+            <Link
+              key={category.slug}
               href={`/category/${category.slug}`}
               aria-label={`View ${category.name} category with ${totalCount} resources`}
               data-testid={`link-category-${category.slug}`}
             >
-              <Card 
+              <Card
                 className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors border border-border bg-card text-card-foreground"
                 data-testid={`card-category-${category.slug}`}
               >
@@ -153,6 +161,43 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
             </Link>
           );
         })}
+      </div>
+
+      {/* AI Recommendations Section */}
+      <div className="mt-12">
+        <div className="mb-6">
+          <div className="flex items-center gap-3 mb-2">
+            <Sparkles className="h-6 w-6 text-primary" />
+            <h2 className="text-2xl font-bold">AI-Powered Recommendations</h2>
+          </div>
+          <p className="text-muted-foreground">
+            Get personalized resource recommendations based on your interests and learning goals
+          </p>
+        </div>
+
+        {isAuthenticated ? (
+          <AIRecommendationsPanel resources={awesomeList.resources} />
+        ) : (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <LogIn className="h-5 w-5" />
+                Login to See Personalized Recommendations
+              </CardTitle>
+              <CardDescription>
+                Sign in to unlock AI-powered recommendations tailored to your skill level and interests
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Link href="/login">
+                <Button className="w-full sm:w-auto">
+                  <LogIn className="mr-2 h-4 w-4" />
+                  Login to Get Started
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );

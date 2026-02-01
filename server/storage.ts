@@ -49,6 +49,8 @@ import {
   resourceEdits,
   enrichmentJobs,
   enrichmentQueue,
+  resourceEmbeddings,
+  relatedResourcesCache,
   type User,
   type UpsertUser,
   type Resource,
@@ -78,6 +80,10 @@ import {
   type InsertEnrichmentJob,
   type EnrichmentQueueItem,
   type InsertEnrichmentQueue,
+  type ResourceEmbedding,
+  type InsertResourceEmbedding,
+  type RelatedResourcesCache,
+  type InsertRelatedResourcesCache,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql, desc, asc, inArray, like, or, isNull, isNotNull } from "drizzle-orm";
@@ -97,7 +103,6 @@ export interface IStorage {
   // Resource CRUD operations
   listResources(options: ListResourceOptions): Promise<{ resources: Resource[]; total: number }>;
   getResource(id: number): Promise<Resource | undefined>;
-  getResourceByUrl(url: string): Promise<Resource | undefined>;
   getResourceCount(): Promise<number>; // Get total count directly from database
   createResource(resource: InsertResource): Promise<Resource>;
   updateResource(id: number, resource: Partial<InsertResource>): Promise<Resource>;
@@ -224,7 +229,21 @@ export interface IStorage {
   getEnrichmentQueueItemsByJob(jobId: number): Promise<EnrichmentQueueItem[]>;
   getPendingEnrichmentQueueItems(jobId: number, limit?: number): Promise<EnrichmentQueueItem[]>;
   updateEnrichmentQueueItem(id: number, data: Partial<EnrichmentQueueItem>): Promise<EnrichmentQueueItem>;
-  
+
+  // Resource Embeddings
+  storeResourceEmbedding(data: InsertResourceEmbedding): Promise<ResourceEmbedding>;
+  getResourceEmbedding(resourceId: number): Promise<ResourceEmbedding | undefined>;
+  deleteResourceEmbedding(resourceId: number): Promise<void>;
+  getResourcesWithoutEmbeddings(limit?: number): Promise<Resource[]>;
+
+  // Batch Embedding Generation
+  queueEmbeddingGeneration(options: { batchSize?: number; startedBy?: string }): Promise<number>;
+
+  // Related Resources Cache
+  storeRelatedResourcesCache(data: InsertRelatedResourcesCache): Promise<RelatedResourcesCache>;
+  getRelatedResourcesCache(resourceId: number): Promise<RelatedResourcesCache | undefined>;
+  deleteRelatedResourcesCache(resourceId: number): Promise<void>;
+
   // Database-driven awesome list hierarchy
   getAwesomeListFromDatabase(): Promise<AwesomeListData>;
   
@@ -443,12 +462,7 @@ export class DatabaseStorage implements IStorage {
     const [resource] = await db.select().from(resources).where(eq(resources.id, id));
     return resource;
   }
-
-  async getResourceByUrl(url: string): Promise<Resource | undefined> {
-    const [resource] = await db.select().from(resources).where(eq(resources.url, url));
-    return resource;
-  }
-
+  
   async getResourceCount(): Promise<number> {
     const [result] = await db.select({ count: sql<number>`count(*)::int` }).from(resources);
     return result.count;
@@ -1692,6 +1706,122 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return item;
   }
+
+  // Resource Embeddings
+  async storeResourceEmbedding(data: InsertResourceEmbedding): Promise<ResourceEmbedding> {
+    const [embedding] = await db
+      .insert(resourceEmbeddings)
+      .values(data)
+      .onConflictDoUpdate({
+        target: resourceEmbeddings.resourceId,
+        set: {
+          embedding: data.embedding,
+          model: data.model,
+          createdAt: new Date(),
+        },
+      })
+      .returning();
+    return embedding;
+  }
+
+  async getResourceEmbedding(resourceId: number): Promise<ResourceEmbedding | undefined> {
+    const [embedding] = await db
+      .select()
+      .from(resourceEmbeddings)
+      .where(eq(resourceEmbeddings.resourceId, resourceId));
+    return embedding;
+  }
+
+  async deleteResourceEmbedding(resourceId: number): Promise<void> {
+    await db
+      .delete(resourceEmbeddings)
+      .where(eq(resourceEmbeddings.resourceId, resourceId));
+  }
+
+  async getResourcesWithoutEmbeddings(limit?: number): Promise<Resource[]> {
+    const query = db
+      .select()
+      .from(resources)
+      .leftJoin(resourceEmbeddings, eq(resources.id, resourceEmbeddings.resourceId))
+      .where(
+        and(
+          eq(resources.status, 'approved'),
+          isNull(resourceEmbeddings.id)
+        )
+      )
+      .orderBy(asc(resources.id));
+
+    if (limit) {
+      const results = await query.limit(limit);
+      return results.map(r => r.resources);
+    }
+
+    const results = await query;
+    return results.map(r => r.resources);
+  }
+
+  async queueEmbeddingGeneration(options: { batchSize?: number; startedBy?: string }): Promise<number> {
+    const { batchSize = 10, startedBy } = options;
+
+    // Get all resources without embeddings
+    const resourcesToProcess = await this.getResourcesWithoutEmbeddings();
+
+    // Create a job for embedding generation using enrichment job infrastructure
+    const job = await this.createEnrichmentJob({
+      filter: 'embedding_generation',
+      batchSize,
+      startedBy: startedBy || undefined,
+    });
+
+    // Update job with total count
+    await this.updateEnrichmentJob(job.id, {
+      totalResources: resourcesToProcess.length,
+      status: 'pending',
+    });
+
+    // Queue each resource for processing
+    for (const resource of resourcesToProcess) {
+      await this.createEnrichmentQueueItem({
+        jobId: job.id,
+        resourceId: resource.id,
+        status: 'pending',
+      });
+    }
+
+    return job.id;
+  }
+
+  // Related Resources Cache
+  async storeRelatedResourcesCache(data: InsertRelatedResourcesCache): Promise<RelatedResourcesCache> {
+    const [cache] = await db
+      .insert(relatedResourcesCache)
+      .values(data)
+      .onConflictDoUpdate({
+        target: relatedResourcesCache.resourceId,
+        set: {
+          relatedResourceIds: data.relatedResourceIds,
+          scores: data.scores,
+          metadata: data.metadata,
+          lastUpdatedAt: new Date(),
+        },
+      })
+      .returning();
+    return cache;
+  }
+
+  async getRelatedResourcesCache(resourceId: number): Promise<RelatedResourcesCache | undefined> {
+    const [cache] = await db
+      .select()
+      .from(relatedResourcesCache)
+      .where(eq(relatedResourcesCache.resourceId, resourceId));
+    return cache;
+  }
+
+  async deleteRelatedResourcesCache(resourceId: number): Promise<void> {
+    await db
+      .delete(relatedResourcesCache)
+      .where(eq(relatedResourcesCache.resourceId, resourceId));
+  }
 }
 
 // For backward compatibility, export both MemStorage and DatabaseStorage
@@ -1760,7 +1890,6 @@ export class MemStorage implements IStorage {
     return { resources: [], total: 0 };
   }
   async getResource(id: number): Promise<Resource | undefined> { return undefined; }
-  async getResourceByUrl(url: string): Promise<Resource | undefined> { return undefined; }
   async getResourceCount(): Promise<number> { return 0; }
   async createResource(resource: InsertResource): Promise<Resource> {
     throw new Error("Not implemented in memory storage");
@@ -2033,6 +2162,30 @@ export class MemStorage implements IStorage {
   async updateEnrichmentQueueItem(id: number, data: Partial<EnrichmentQueueItem>): Promise<EnrichmentQueueItem> {
     throw new Error("Enrichment not implemented in memory storage");
   }
+
+  // Resource Embeddings - Not implemented for MemStorage
+  async storeResourceEmbedding(data: InsertResourceEmbedding): Promise<ResourceEmbedding> {
+    throw new Error("Embeddings not implemented in memory storage");
+  }
+  async getResourceEmbedding(resourceId: number): Promise<ResourceEmbedding | undefined> {
+    return undefined;
+  }
+  async deleteResourceEmbedding(resourceId: number): Promise<void> {}
+  async getResourcesWithoutEmbeddings(limit?: number): Promise<Resource[]> {
+    return [];
+  }
+  async queueEmbeddingGeneration(options: { batchSize?: number; startedBy?: string }): Promise<number> {
+    throw new Error("Embedding generation not implemented in memory storage");
+  }
+
+  // Related Resources Cache - Not implemented for MemStorage
+  async storeRelatedResourcesCache(data: InsertRelatedResourcesCache): Promise<RelatedResourcesCache> {
+    throw new Error("Related resources cache not implemented in memory storage");
+  }
+  async getRelatedResourcesCache(resourceId: number): Promise<RelatedResourcesCache | undefined> {
+    return undefined;
+  }
+  async deleteRelatedResourcesCache(resourceId: number): Promise<void> {}
 }
 
 // Use DatabaseStorage if DATABASE_URL exists, otherwise use MemStorage
