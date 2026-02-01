@@ -7,6 +7,7 @@ import { ExternalLink, Edit, ChevronRight } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import FavoriteButton from "./FavoriteButton";
 import BookmarkButton from "./BookmarkButton";
+import ShareButton from "./ShareButton";
 import { SuggestEditDialog } from "@/components/ui/suggest-edit-dialog";
 import { cn } from "@/lib/utils";
 import type { Resource } from "@shared/schema";
@@ -108,6 +109,13 @@ export default function ResourceCard({
                 resourceId={resource.id}
                 isBookmarked={resource.isBookmarked}
                 notes={resource.bookmarkNotes}
+                size="sm"
+              />
+              <ShareButton
+                resourceId={resource.id}
+                title={resource.name}
+                description={resource.description}
+                url={resource.url}
                 size="sm"
               />
             </div>
