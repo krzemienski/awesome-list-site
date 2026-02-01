@@ -219,14 +219,14 @@ export default function AdminDashboard() {
       });
       return response;
     },
-    onSuccess: (data: any) => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
       toast({
         title: "Database Seeded Successfully",
         description: `Added ${data.counts.resourcesInserted} resources, ${data.counts.categoriesInserted} categories, ${data.counts.subcategoriesInserted} subcategories, and ${data.counts.subSubcategoriesInserted} sub-subcategories.`,
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "Database Seeding Failed",
         description: error.message || "Failed to seed database. Please try again.",

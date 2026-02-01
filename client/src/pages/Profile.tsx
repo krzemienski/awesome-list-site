@@ -80,7 +80,7 @@ interface ResourceEdit {
   id: number;
   resourceId: number;
   status: string;
-  proposedChanges: Record<string, { old: any; new: any }>;
+  proposedChanges: Record<string, { old: unknown; new: unknown }>;
   createdAt: string;
 }
 
@@ -680,8 +680,8 @@ export default function Profile({ user }: ProfileProps) {
                                       const isObjectFormat = changeData && typeof changeData === 'object' && ('old' in changeData || 'new' in changeData);
                                       
                                       if (!isObjectFormat) return null;
-                                      
-                                      const change = changeData as { old?: any; new?: any };
+
+                                      const change = changeData as { old?: unknown; new?: unknown };
                                       const oldValue = Array.isArray(change.old) ? change.old.join(', ') : String(change.old ?? '');
                                       const newValue = Array.isArray(change.new) ? change.new.join(', ') : String(change.new ?? '');
                                       

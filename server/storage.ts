@@ -474,8 +474,8 @@ export class DatabaseStorage implements IStorage {
   }
   
   async updateResourceStatus(id: number, status: string, approvedBy?: string): Promise<Resource> {
-    const updateData: any = { status, updatedAt: new Date() };
-    
+    const updateData: Partial<Resource> = { status, updatedAt: new Date() };
+
     if (status === 'approved' && approvedBy) {
       updateData.approvedBy = approvedBy;
       updateData.approvedAt = new Date();
@@ -1565,7 +1565,7 @@ export class DatabaseStorage implements IStorage {
     if (!this.awesomeListData) return [];
     
     const categories = new Map();
-    this.awesomeListData.resources.forEach((resource: any) => {
+    this.awesomeListData.resources.forEach((resource: Resource) => {
       if (resource.category) {
         if (!categories.has(resource.category)) {
           categories.set(resource.category, {
@@ -1964,7 +1964,7 @@ export class MemStorage implements IStorage {
     if (!this.awesomeListData) return [];
     
     const categoriesMap = new Map();
-    this.awesomeListData.resources.forEach((resource: any) => {
+    this.awesomeListData.resources.forEach((resource: Resource) => {
       if (resource.category) {
         if (!categoriesMap.has(resource.category)) {
           categoriesMap.set(resource.category, {

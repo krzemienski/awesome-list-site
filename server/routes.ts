@@ -40,7 +40,15 @@ import { fetchAwesomeList } from "./parser";
 import { fetchAwesomeVideoData } from "./awesome-video-parser-clean";
 import { RecommendationEngine, UserProfile } from "./recommendation-engine";
 import { fetchAwesomeLists, searchAwesomeLists } from "./github-api";
-import { insertResourceSchema } from "@shared/schema";
+import {
+  insertResourceSchema,
+  type Resource,
+  type Category,
+  type Subcategory,
+  type SubSubcategory,
+  type LearningJourney,
+  type User
+} from "@shared/schema";
 import { z } from "zod";
 import { syncService } from "./github/syncService";
 import { recommendationEngine, UserProfile as AIUserProfile } from "./ai/recommendationEngine";
@@ -288,10 +296,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     app.use(passport.session());
 
     // Configure passport serialization for local auth
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Passport.js serializeUser callback requires any type
     passport.serializeUser((user: any, done) => {
       done(null, user);
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Passport.js deserializeUser callback requires any type
     passport.deserializeUser((user: any, done) => {
       done(null, user);
     });
@@ -302,6 +312,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Local authentication routes
   app.post("/api/auth/local/login", (req, res, next) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Passport.js authenticate callback requires any type
     passport.authenticate('local', (err: any, user: any, info: any) => {
       if (err) {
         console.log('[local/login] Authentication error:', err);
@@ -1419,17 +1430,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.approveResourceEdit(editId, userId);
       
       res.json({ message: 'Edit approved and merged successfully' });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error approving edit:', error);
-      
-      if (error.message && error.message.includes('Conflict detected')) {
-        return res.status(409).json({ 
-          message: error.message,
+
+      const errorMessage = error instanceof Error ? error.message : 'Failed to approve edit';
+      if (errorMessage.includes('Conflict detected')) {
+        return res.status(409).json({
+          message: errorMessage,
           conflict: true
         });
       }
-      
-      res.status(500).json({ message: error.message || 'Failed to approve edit' });
+
+      res.status(500).json({ message: errorMessage });
     }
   });
   
@@ -1451,9 +1463,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.rejectResourceEdit(editId, userId, reason);
       
       res.json({ message: 'Edit rejected successfully' });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error rejecting edit:', error);
-      res.status(500).json({ message: error.message || 'Failed to reject edit' });
+      const errorMessage = error instanceof Error ? error.message : 'Failed to reject edit';
+      res.status(500).json({ message: errorMessage });
     }
   });
   
@@ -2177,36 +2190,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const usersList = users.users;
 
       // Get journey steps for each journey
-      const journeyIds = learningJourneys.map((j: any) => j.id);
+      const journeyIds = learningJourneys.map((j: LearningJourney) => j.id);
       const stepsMap = await storage.listJourneyStepsBatch(journeyIds);
-      
+
       // Attach steps to journeys
-      const journeysWithSteps = learningJourneys.map((journey: any) => ({
+      const journeysWithSteps = learningJourneys.map((journey: LearningJourney) => ({
         ...journey,
         steps: stepsMap.get(journey.id) || []
       }));
 
       // Build hierarchy structure
-      const categoryHierarchy = categories.map((cat: any) => ({
+      const categoryHierarchy = categories.map((cat: Category) => ({
         ...cat,
         subcategories: subcategories
-          .filter((sub: any) => sub.categoryId === cat.id)
-          .map((sub: any) => ({
+          .filter((sub: Subcategory) => sub.categoryId === cat.id)
+          .map((sub: Subcategory) => ({
             ...sub,
             subSubcategories: subSubcategories.filter(
-              (ssub: any) => ssub.subcategoryId === sub.id
+              (ssub: SubSubcategory) => ssub.subcategoryId === sub.id
             )
           }))
       }));
 
       // Count resources by status
-      const resourcesByStatus = resources.reduce((acc: Record<string, number>, r: any) => {
+      const resourcesByStatus = resources.reduce((acc: Record<string, number>, r: Resource) => {
         acc[r.status || 'unknown'] = (acc[r.status || 'unknown'] || 0) + 1;
         return acc;
       }, {});
       
       // Sanitize users for export (remove sensitive data)
-      const sanitizedUsers = usersList.map((u: any) => ({
+      const sanitizedUsers = usersList.map((u: User) => ({
         id: u.id,
         username: u.username,
         role: u.role,
@@ -2406,12 +2419,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         errors: result.errors,
         totalErrors: result.errors.length
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error seeding database:', error);
-      res.status(500).json({ 
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      res.status(500).json({
         success: false,
         message: 'Failed to seed database',
-        error: error.message 
+        error: errorMessage
       });
     }
   });
@@ -2458,12 +2472,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         validationWarnings: result.validationErrors.filter(e => e.severity === 'warning'),
         message: `Successfully imported ${result.imported} resources from ${repoUrl}`
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error importing from GitHub:', error);
-      res.status(500).json({ 
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      res.status(500).json({
         success: false,
         message: 'Failed to import from GitHub',
-        error: error.message 
+        error: errorMessage
       });
     }
   });
@@ -2487,12 +2502,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         jobId,
         message: 'Batch enrichment job started successfully'
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error starting enrichment job:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       res.status(500).json({
         success: false,
         message: 'Failed to start enrichment job',
-        error: error.message
+        error: errorMessage
       });
     }
   });
@@ -2507,12 +2523,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: true,
         jobs
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error listing enrichment jobs:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       res.status(500).json({
         success: false,
         message: 'Failed to list enrichment jobs',
-        error: error.message
+        error: errorMessage
       });
     }
   });
@@ -2542,12 +2559,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: true,
         job
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error getting job status:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       res.status(500).json({
         success: false,
         message: 'Failed to get job status',
-        error: error.message
+        error: errorMessage
       });
     }
   });
@@ -2570,12 +2588,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: true,
         message: `Enrichment job ${jobId} cancelled successfully`
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error cancelling job:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       res.status(500).json({
         success: false,
         message: 'Failed to cancel job',
-        error: error.message
+        error: errorMessage
       });
     }
   });
@@ -2602,7 +2621,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (category) {
         // Convert category slug back to title for filtering
         const categoryTitle = getCategoryTitleFromSlug(category as string);
-        filteredResources = filteredResources.filter((resource: any) => 
+        filteredResources = filteredResources.filter((resource: Resource) => 
           resource.category === categoryTitle
         );
         console.log(`📁 Filtered by category "${categoryTitle}": ${filteredResources.length} resources`);
@@ -2611,7 +2630,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (subcategory) {
         // Convert subcategory slug back to title for filtering
         const subcategoryTitle = getSubcategoryTitleFromSlug(subcategory as string);
-        filteredResources = filteredResources.filter((resource: any) => 
+        filteredResources = filteredResources.filter((resource: Resource) => 
           resource.subcategory === subcategoryTitle
         );
         console.log(`📂 Filtered by subcategory "${subcategoryTitle}": ${filteredResources.length} resources`);
@@ -2620,7 +2639,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (subSubcategory) {
         // Convert sub-subcategory slug back to title for filtering
         const subSubcategoryTitle = getSubSubcategoryTitleFromSlug(subSubcategory as string);
-        filteredResources = filteredResources.filter((resource: any) => 
+        filteredResources = filteredResources.filter((resource: Resource) => 
           resource.subSubcategory === subSubcategoryTitle
         );
         console.log(`🎯 Filtered by sub-subcategory "${subSubcategoryTitle}": ${filteredResources.length} resources`);
@@ -2891,10 +2910,11 @@ async function withRetry<T>(
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       return await operation();
-    } catch (error: any) {
-      const isRetryable = error.message?.includes('too many clients') ||
-                          error.message?.includes('connection') ||
-                          error.message?.includes('ECONNREFUSED');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : '';
+      const isRetryable = errorMessage.includes('too many clients') ||
+                          errorMessage.includes('connection') ||
+                          errorMessage.includes('ECONNREFUSED');
       if (attempt === maxRetries || !isRetryable) {
         throw error;
       }

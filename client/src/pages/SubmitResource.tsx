@@ -187,7 +187,7 @@ export default function SubmitResource() {
       // Scroll to top
       window.scrollTo({ top: 0, behavior: 'smooth' });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "Submission Failed",
         description: error.message || "Failed to submit resource. Please try again.",
