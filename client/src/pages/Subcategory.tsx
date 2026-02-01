@@ -156,9 +156,9 @@ export default function Subcategory() {
   return (
     <div className="space-y-6">
       {/* SEO Head */}
-      <SEOHead 
+      <SEOHead
         title={`${subcategoryName} Resources - ${categoryName} - Awesome Video`}
-        description={`Browse ${allResources.length} ${subcategoryName} resources in the ${categoryName} category.`}
+        description={`Explore ${allResources.length} ${subcategoryName} resources in ${categoryName}. Curated tools, libraries, and guides for video development.`}
       />
       
       {/* Header */}
