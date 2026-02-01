@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import SEOHead from "@/components/layout/SEOHead";
 import TagFilter from "@/components/ui/tag-filter";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ArrowLeft, ExternalLink, FilterX } from "lucide-react";
 import { deslugify, getCategorySlug } from "@/lib/utils";
 import { Resource } from "@/types/awesome-list";
 import NotFound from "@/pages/not-found";
@@ -20,6 +20,14 @@ export default function Subcategory() {
   const { slug } = useParams<{ slug: string }>();
   const { toast } = useToast();
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+  // Clear all filters function
+  const clearAllFilters = () => {
+    setSelectedTags([]);
+  };
+
+  // Check if any filters are active
+  const hasActiveFilters = selectedTags.length > 0;
   
   // Fetch awesome list data - use same query as homepage
   const { data: rawData, isLoading, error } = useQuery({
@@ -191,6 +199,17 @@ export default function Subcategory() {
             Showing {filteredResources.length} of {allResources.length} resources
             {selectedTags.length > 0 && ` (filtered by ${selectedTags.length} tag${selectedTags.length > 1 ? 's' : ''})`}
           </p>
+          {hasActiveFilters && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={clearAllFilters}
+              className="gap-2"
+            >
+              <FilterX className="h-4 w-4" />
+              Clear Filters
+            </Button>
+          )}
         </div>
       )}
       
