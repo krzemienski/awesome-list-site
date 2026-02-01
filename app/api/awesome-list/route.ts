@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 const sql = neon(process.env.DATABASE_URL!);
 
 export async function GET() {
+  console.log("[v0] awesome-list API called");
   try {
     // Fetch all categories with their subcategories, sub-subcategories, and resources
     const categories = await sql`SELECT * FROM categories ORDER BY name`;
@@ -73,7 +74,10 @@ export async function GET() {
       lastUpdated: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Awesome list error:', error);
-    return NextResponse.json({ error: 'Failed to fetch awesome list' }, { status: 500 });
+    console.error('[v0] Awesome list error:', error);
+    return NextResponse.json({ 
+      error: 'Failed to fetch awesome list',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 });
   }
 }

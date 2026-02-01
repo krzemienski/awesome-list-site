@@ -1,15 +1,9 @@
 import { neon } from '@neondatabase/serverless';
 import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
+import { setSession, generateSessionId } from '@/lib/session-store';
 
 const sql = neon(process.env.DATABASE_URL!);
-
-// Shared session store
-const sessions = new Map<string, { userId: string; email: string; role: string; expires: number }>();
-
-function generateSessionId(): string {
-  return Math.random().toString(36).substring(2) + Date.now().toString(36);
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -42,7 +36,7 @@ export async function POST(request: NextRequest) {
     
     // Create session (auto-login)
     const sessionId = generateSessionId();
-    sessions.set(sessionId, {
+    setSession(sessionId, {
       userId: newUser.id,
       email: newUser.email,
       role: 'user',
@@ -73,5 +67,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: 'Registration failed' }, { status: 500 });
   }
 }
-
-export { sessions };
