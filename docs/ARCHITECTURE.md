@@ -264,6 +264,8 @@ flowchart TD
 
 ## Database Schema
 
+> **📖 For detailed database schema documentation, see [DATABASE.md](./DATABASE.md)**
+
 ### Core Tables
 
 **users**
