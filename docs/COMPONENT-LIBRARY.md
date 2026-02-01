@@ -742,6 +742,325 @@ import { cn } from "@/lib/utils"
 
 ---
 
+## Custom Feature Components
+
+These are application-specific components built using the core shadcn/ui components and tailored for the Awesome List site's functionality.
+
+### SearchDialog
+
+Global search dialog with fuzzy search powered by Fuse.js. Activated via Cmd+K / Ctrl+K keyboard shortcut.
+
+**Import:**
+```tsx
+import SearchDialog from "@/components/ui/search-dialog"
+```
+
+**Props:**
+```tsx
+interface SearchDialogProps {
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
+  resources: Resource[];
+}
+```
+
+**Features:**
+- Fuzzy search across resource titles, descriptions, categories, and subcategories
+- Keyboard shortcut support (Cmd+K / Ctrl+K)
+- Real-time search results with 2-character minimum
+- Analytics tracking for searches and clicks
+- Opens results in new tabs
+- Performance tracking for search operations
+
+**Example:**
+```tsx
+const [searchOpen, setSearchOpen] = useState(false);
+
+<SearchDialog
+  isOpen={searchOpen}
+  setIsOpen={setSearchOpen}
+  resources={allResources}
+/>
+```
+
+---
+
+### ViewModeToggle
+
+Toggle component for switching between grid, list, and compact view modes.
+
+**Import:**
+```tsx
+import { ViewModeToggle } from "@/components/ui/view-mode-toggle"
+```
+
+**Props:**
+```tsx
+interface ViewModeToggleProps {
+  value: ViewMode; // "grid" | "list" | "compact"
+  onChange: (value: ViewMode) => void;
+  className?: string;
+}
+```
+
+**Features:**
+- Three view mode options with corresponding icons
+- Accessible toggle buttons with ARIA labels
+- Test IDs for automated testing
+- Custom styling support
+
+**Example:**
+```tsx
+const [viewMode, setViewMode] = useState<ViewMode>("grid");
+
+<ViewModeToggle
+  value={viewMode}
+  onChange={setViewMode}
+  className="ml-auto"
+/>
+```
+
+---
+
+### AnalyticsDashboard
+
+Comprehensive analytics dashboard with charts and metrics powered by Recharts.
+
+**Import:**
+```tsx
+import AnalyticsDashboard from "@/components/ui/analytics-dashboard"
+```
+
+**Props:**
+```tsx
+interface AnalyticsDashboardProps {
+  resources: Resource[];
+  isOpen: boolean;
+  onClose: () => void;
+}
+```
+
+**Features:**
+- Multiple analytics tabs (Overview, Categories, Resources, Activity)
+- Interactive charts (bar, pie, line, area)
+- Real-time data from localStorage tracking
+- Popular resources and trending items
+- Category distribution visualization
+- Time-based usage patterns
+- Search term analytics
+- Export capabilities
+
+**Analytics Tracked:**
+- Total resources and categories
+- View counts and click tracking
+- Popular tags with percentages
+- Category distribution
+- Views and clicks trends
+- Time of day usage patterns
+- Search history and growth metrics
+
+**Example:**
+```tsx
+const [dashboardOpen, setDashboardOpen] = useState(false);
+
+<AnalyticsDashboard
+  resources={allResources}
+  isOpen={dashboardOpen}
+  onClose={() => setDashboardOpen(false)}
+/>
+```
+
+---
+
+### AIRecommendationsPanel
+
+AI-powered recommendation system using Claude API to suggest personalized resources.
+
+**Import:**
+```tsx
+import AIRecommendationsPanel from "@/components/ui/ai-recommendations-panel"
+```
+
+**Props:**
+```tsx
+interface AIRecommendationsPanelProps {
+  resources: Resource[];
+}
+```
+
+**Features:**
+- Personalized recommendations based on user profile
+- Skill level-based filtering (beginner, intermediate, advanced)
+- Category and tag preferences
+- Learning goals integration
+- Resource type preferences
+- Time commitment options
+- Confidence scoring for recommendations
+- Feedback collection system
+- Learning path suggestions
+
+**User Profile Options:**
+- **Skill Levels**: beginner, intermediate, advanced
+- **Preferred Categories**: Multiple selection from available categories
+- **Learning Goals**: Customizable learning objectives
+- **Resource Types**: Documentation, tutorials, tools, libraries, etc.
+- **Time Commitment**: daily, weekly, flexible
+
+**Example:**
+```tsx
+<AIRecommendationsPanel resources={allResources} />
+```
+
+**Recommendation Result Structure:**
+```tsx
+interface RecommendationResult {
+  resourceUrl: string;
+  confidence: number;
+  reasoning: string;
+  learningPath?: string[];
+  estimatedTime?: string;
+  prerequisites?: string[];
+  tags?: string[];
+}
+```
+
+---
+
+### CategoryExplorer
+
+Advanced category browsing and exploration interface with filtering and search.
+
+**Import:**
+```tsx
+import CategoryExplorer from "@/components/ui/category-explorer"
+```
+
+**Props:**
+```tsx
+interface CategoryExplorerProps {
+  categories: Category[];
+  resources: Resource[];
+  className?: string;
+}
+```
+
+**Features:**
+- Real-time search across categories and resources
+- Tag-based filtering with multi-select
+- Multiple sort options (name, resource count, activity)
+- Expandable/collapsible categories
+- Subcategory display toggle
+- Category statistics (resource count, subcategories, tags)
+- Visual hierarchy with badges and icons
+- External link support
+- Responsive layout
+
+**Sorting Options:**
+- **Name**: Alphabetical order
+- **Resource Count**: Number of resources per category
+- **Activity**: Based on resource popularity
+
+**Example:**
+```tsx
+<CategoryExplorer
+  categories={allCategories}
+  resources={allResources}
+  className="mt-6"
+/>
+```
+
+**Category Statistics Display:**
+Each category shows:
+- Total resource count
+- Number of subcategories
+- Unique tag count
+- Expandable resource lists
+- Quick links to resources
+
+---
+
+## Custom Component Patterns
+
+### Analytics Integration
+
+Custom components integrate with the analytics system for tracking user behavior:
+
+```tsx
+import { trackSearch, trackResourceClick, trackPerformance } from "@/lib/analytics"
+
+// Track search queries
+trackSearch(query, resultCount);
+
+// Track resource clicks
+trackResourceClick(resource.title, resource.url, resource.category);
+
+// Track performance metrics
+const startTime = performance.now();
+// ... operation ...
+trackPerformance('operation_name', performance.now() - startTime);
+```
+
+### User Profile Integration
+
+Components that use user preferences integrate with the user profile hook:
+
+```tsx
+import { useUserProfile } from "@/hooks/use-user-profile"
+
+const { userProfile } = useUserProfile();
+
+// Access profile data
+const skillLevel = userProfile.skillLevel;
+const preferences = userProfile.preferredCategories;
+const history = userProfile.viewHistory;
+```
+
+### AI Recommendations Hook
+
+The AI recommendations feature uses a custom hook:
+
+```tsx
+import { useAIRecommendations } from "@/hooks/useAIRecommendations"
+
+const {
+  generateRecommendations,
+  recommendations,
+  isLoading,
+  isError,
+  error,
+  isSuccess,
+} = useAIRecommendations(undefined, { limit: 10 });
+
+// Generate recommendations
+generateRecommendations({
+  userId: userProfile.userId,
+  skillLevel: 'intermediate',
+  preferredCategories: ['Encoding & Codecs'],
+  // ... other preferences
+});
+```
+
+### LocalStorage Persistence
+
+Custom components persist data to localStorage for analytics and preferences:
+
+```tsx
+// Store view data
+localStorage.setItem('resource-views', JSON.stringify(viewData));
+
+// Store click data
+localStorage.setItem('resource-clicks', JSON.stringify(clickData));
+
+// Store search history
+localStorage.setItem('search-history', JSON.stringify(searchHistory));
+
+// Retrieve data
+const views = localStorage.getItem('resource-views');
+if (views) setViewData(JSON.parse(views));
+```
+
+---
+
 ## Resources
 
 - [shadcn/ui Documentation](https://ui.shadcn.com/)
