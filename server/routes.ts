@@ -1361,33 +1361,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }));
   
   // POST /api/claude/analyze - Analyze URL with Claude AI (authenticated)
-  app.post('/api/claude/analyze', isAuthenticated, async (req, res) => {
-    try {
-      const { url } = req.body;
-      
-      if (!url) {
-        return res.status(400).json({ message: 'URL is required' });
-      }
-      
-      if (!claudeService.isAvailable()) {
-        return res.status(503).json({ 
-          message: 'Claude AI service is not available',
-          available: false
-        });
-      }
-      
-      const analysis = await claudeService.analyzeURL(url);
-      
-      if (!analysis) {
-        return res.status(500).json({ message: 'Failed to analyze URL' });
-      }
-      
-      res.json(analysis);
-    } catch (error) {
-      console.error('Error analyzing URL:', error);
-      res.status(500).json({ message: 'Failed to analyze URL' });
+  app.post('/api/claude/analyze', isAuthenticated, asyncHandler(async (req, res) => {
+    const { url } = req.body;
+
+    if (!url) {
+      throw new BadRequestError('URL is required');
     }
-  });
+
+    if (!claudeService.isAvailable()) {
+      return res.status(503).json({
+        message: 'Claude AI service is not available',
+        available: false
+      });
+    }
+
+    const analysis = await claudeService.analyzeURL(url);
+
+    if (!analysis) {
+      throw new InternalServerError('Failed to analyze URL');
+    }
+
+    res.json(analysis);
+  }));
 
   // ============= Category Management Routes =============
   
@@ -2209,114 +2204,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= Enrichment API Routes =============
   
   // POST /api/enrichment/start - Start batch enrichment job
-  app.post('/api/enrichment/start', isAuthenticated, isAdmin, async (req: any, res) => {
-    try {
-      const { filter = 'unenriched', batchSize = 10 } = req.body;
-      const userId = req.user?.claims?.sub;
-      
-      const jobId = await enrichmentService.queueBatchEnrichment({
-        filter,
-        batchSize,
-        startedBy: userId
-      });
-      
-      res.json({
-        success: true,
-        jobId,
-        message: 'Batch enrichment job started successfully'
-      });
-    } catch (error: any) {
-      console.error('Error starting enrichment job:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to start enrichment job',
-        error: error.message
-      });
-    }
-  });
+  app.post('/api/enrichment/start', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
+    const { filter = 'unenriched', batchSize = 10 } = req.body;
+    const userId = req.user?.claims?.sub;
+
+    const jobId = await enrichmentService.queueBatchEnrichment({
+      filter,
+      batchSize,
+      startedBy: userId
+    });
+
+    res.json({
+      success: true,
+      jobId,
+      message: 'Batch enrichment job started successfully'
+    });
+  }));
   
   // GET /api/enrichment/jobs - List all enrichment jobs
-  app.get('/api/enrichment/jobs', isAuthenticated, isAdmin, async (req, res) => {
-    try {
-      const limit = parseInt(req.query.limit as string) || 50;
-      const jobs = await storage.listEnrichmentJobs(limit);
-      
-      res.json({
-        success: true,
-        jobs
-      });
-    } catch (error: any) {
-      console.error('Error listing enrichment jobs:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to list enrichment jobs',
-        error: error.message
-      });
-    }
-  });
+  app.get('/api/enrichment/jobs', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
+    const limit = parseInt(req.query.limit as string) || 50;
+    const jobs = await storage.listEnrichmentJobs(limit);
+
+    res.json({
+      success: true,
+      jobs
+    });
+  }));
   
   // GET /api/enrichment/jobs/:id - Get job status with progress
-  app.get('/api/enrichment/jobs/:id', isAuthenticated, isAdmin, async (req, res) => {
-    try {
-      const jobId = parseInt(req.params.id);
-      
-      if (isNaN(jobId)) {
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid job ID'
-        });
-      }
-      
-      const job = await storage.getEnrichmentJob(jobId);
-      
-      if (!job) {
-        return res.json({
-          success: false,
-          message: 'Job not found'
-        });
-      }
-      
-      res.json({
-        success: true,
-        job
-      });
-    } catch (error: any) {
-      console.error('Error getting job status:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to get job status',
-        error: error.message
-      });
+  app.get('/api/enrichment/jobs/:id', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
+    const jobId = parseInt(req.params.id);
+
+    if (isNaN(jobId)) {
+      throw new BadRequestError('Invalid job ID');
     }
-  });
+
+    const job = await storage.getEnrichmentJob(jobId);
+
+    if (!job) {
+      throw new NotFoundError('Job not found');
+    }
+
+    res.json({
+      success: true,
+      job
+    });
+  }));
   
   // DELETE /api/enrichment/jobs/:id - Cancel a job
-  app.delete('/api/enrichment/jobs/:id', isAuthenticated, isAdmin, async (req, res) => {
-    try {
-      const jobId = parseInt(req.params.id);
-      
-      if (isNaN(jobId)) {
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid job ID'
-        });
-      }
-      
-      await enrichmentService.cancelJob(jobId);
-      
-      res.json({
-        success: true,
-        message: `Enrichment job ${jobId} cancelled successfully`
-      });
-    } catch (error: any) {
-      console.error('Error cancelling job:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to cancel job',
-        error: error.message
-      });
+  app.delete('/api/enrichment/jobs/:id', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
+    const jobId = parseInt(req.params.id);
+
+    if (isNaN(jobId)) {
+      throw new BadRequestError('Invalid job ID');
     }
-  });
+
+    await enrichmentService.cancelJob(jobId);
+
+    res.json({
+      success: true,
+      message: `Enrichment job ${jobId} cancelled successfully`
+    });
+  }));
 
   // ============= Database-Driven Routes =============
 
@@ -2427,171 +2377,131 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= AI Recommendation Routes =============
 
   // GET /api/recommendations/init - Initialize recommendation engine
-  app.get("/api/recommendations/init", async (req, res) => {
-    try {
-      res.json({ status: 'ready', message: 'Recommendation engine initialized' });
-    } catch (error) {
-      console.error('Error initializing recommendations:', error);
-      res.status(500).json({ error: 'Failed to initialize recommendations' });
-    }
-  });
+  app.get("/api/recommendations/init", asyncHandler(async (req, res) => {
+    res.json({ status: 'ready', message: 'Recommendation engine initialized' });
+  }));
 
   // GET /api/recommendations - Get personalized recommendations
-  app.get("/api/recommendations", async (req, res) => {
-    try {
-      const limit = parseInt(req.query.limit as string) || 10;
-      
-      // Create a user profile for anonymous users from query params
-      const userProfile: AIUserProfile = {
-        userId: 'anonymous',
-        preferredCategories: (req.query.categories as string)?.split(',').filter(Boolean) || [],
-        skillLevel: (req.query.skillLevel as string || 'intermediate') as 'beginner' | 'intermediate' | 'advanced',
-        learningGoals: (req.query.goals as string)?.split(',').filter(Boolean) || [],
-        preferredResourceTypes: (req.query.types as string)?.split(',').filter(Boolean) || [],
-        timeCommitment: (req.query.timeCommitment as string || 'flexible') as 'daily' | 'weekly' | 'flexible',
-        viewHistory: [],
-        bookmarks: [],
-        completedResources: [],
-        ratings: {}
-      };
+  app.get("/api/recommendations", asyncHandler(async (req, res) => {
+    const limit = parseInt(req.query.limit as string) || 10;
 
-      const result = await recommendationEngine.generateRecommendations(
-        userProfile,
-        limit,
-        false
-      );
+    // Create a user profile for anonymous users from query params
+    const userProfile: AIUserProfile = {
+      userId: 'anonymous',
+      preferredCategories: (req.query.categories as string)?.split(',').filter(Boolean) || [],
+      skillLevel: (req.query.skillLevel as string || 'intermediate') as 'beginner' | 'intermediate' | 'advanced',
+      learningGoals: (req.query.goals as string)?.split(',').filter(Boolean) || [],
+      preferredResourceTypes: (req.query.types as string)?.split(',').filter(Boolean) || [],
+      timeCommitment: (req.query.timeCommitment as string || 'flexible') as 'daily' | 'weekly' | 'flexible',
+      viewHistory: [],
+      bookmarks: [],
+      completedResources: [],
+      ratings: {}
+    };
 
-      res.json(result.recommendations || []);
-    } catch (error) {
-      console.error('Error generating recommendations:', error);
-      res.status(500).json({ error: 'Failed to generate recommendations' });
-    }
-  });
+    const result = await recommendationEngine.generateRecommendations(
+      userProfile,
+      limit,
+      false
+    );
+
+    res.json(result.recommendations || []);
+  }));
 
   // POST /api/recommendations - Get personalized recommendations for authenticated users
-  app.post("/api/recommendations", async (req, res) => {
-    try {
-      const userProfile: AIUserProfile = req.body;
-      const limit = parseInt(req.query.limit as string) || 10;
-      const forceRefresh = req.query.refresh === 'true';
+  app.post("/api/recommendations", asyncHandler(async (req, res) => {
+    const userProfile: AIUserProfile = req.body;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const forceRefresh = req.query.refresh === 'true';
 
-      const result = await recommendationEngine.generateRecommendations(
-        userProfile,
-        limit,
-        forceRefresh
-      );
+    const result = await recommendationEngine.generateRecommendations(
+      userProfile,
+      limit,
+      forceRefresh
+    );
 
-      res.json(result.recommendations || []);
-    } catch (error) {
-      console.error('Error generating AI recommendations:', error);
-      res.status(500).json({ error: 'Failed to generate recommendations' });
-    }
-  });
+    res.json(result.recommendations || []);
+  }));
 
   // POST /api/recommendations/feedback - Record user feedback on recommendations
-  app.post("/api/recommendations/feedback", async (req, res) => {
-    try {
-      const { userId, resourceId, feedback, rating } = req.body;
-      
-      if (!userId || !resourceId || !feedback) {
-        return res.status(400).json({ error: 'userId, resourceId, and feedback are required' });
-      }
+  app.post("/api/recommendations/feedback", asyncHandler(async (req, res) => {
+    const { userId, resourceId, feedback, rating } = req.body;
 
-      // Record the feedback
-      await recommendationEngine.recordFeedback(
-        userId,
-        resourceId,
-        feedback as 'clicked' | 'dismissed' | 'completed',
-        rating
-      );
-
-      res.json({ status: 'success', message: 'Feedback recorded' });
-    } catch (error) {
-      console.error('Error recording recommendation feedback:', error);
-      res.status(500).json({ error: 'Failed to record feedback' });
+    if (!userId || !resourceId || !feedback) {
+      throw new BadRequestError('userId, resourceId, and feedback are required');
     }
-  });
+
+    // Record the feedback
+    await recommendationEngine.recordFeedback(
+      userId,
+      resourceId,
+      feedback as 'clicked' | 'dismissed' | 'completed',
+      rating
+    );
+
+    res.json({ status: 'success', message: 'Feedback recorded' });
+  }));
 
   // GET /api/learning-paths/suggested - Get suggested learning paths
-  app.get("/api/learning-paths/suggested", async (req, res) => {
-    try {
-      const limit = parseInt(req.query.limit as string) || 5;
-      
-      // Create a basic user profile from query params
-      const userProfile: AIUserProfile = {
-        userId: req.query.userId as string || 'anonymous',
-        preferredCategories: (req.query.categories as string)?.split(',') || [],
-        skillLevel: (req.query.skillLevel as string || 'intermediate') as 'beginner' | 'intermediate' | 'advanced',
-        learningGoals: (req.query.goals as string)?.split(',') || [],
-        preferredResourceTypes: [],
-        timeCommitment: (req.query.timeCommitment as string || 'flexible') as 'daily' | 'weekly' | 'flexible',
-        viewHistory: [],
-        bookmarks: [],
-        completedResources: [],
-        ratings: {}
-      };
+  app.get("/api/learning-paths/suggested", asyncHandler(async (req, res) => {
+    const limit = parseInt(req.query.limit as string) || 5;
 
-      const paths = await learningPathGenerator.getSuggestedPaths(userProfile, limit);
-      
-      res.json(paths);
-    } catch (error) {
-      console.error('Error generating suggested learning paths:', error);
-      res.status(500).json({ error: 'Failed to generate suggested learning paths' });
-    }
-  });
+    // Create a basic user profile from query params
+    const userProfile: AIUserProfile = {
+      userId: req.query.userId as string || 'anonymous',
+      preferredCategories: (req.query.categories as string)?.split(',') || [],
+      skillLevel: (req.query.skillLevel as string || 'intermediate') as 'beginner' | 'intermediate' | 'advanced',
+      learningGoals: (req.query.goals as string)?.split(',') || [],
+      preferredResourceTypes: [],
+      timeCommitment: (req.query.timeCommitment as string || 'flexible') as 'daily' | 'weekly' | 'flexible',
+      viewHistory: [],
+      bookmarks: [],
+      completedResources: [],
+      ratings: {}
+    };
+
+    const paths = await learningPathGenerator.getSuggestedPaths(userProfile, limit);
+
+    res.json(paths);
+  }));
 
   // POST /api/learning-paths/generate - Generate custom learning path
-  app.post("/api/learning-paths/generate", async (req, res) => {
-    try {
-      const { userProfile, category, customGoals } = req.body;
-      
-      if (!userProfile) {
-        return res.status(400).json({ error: 'User profile is required' });
-      }
+  app.post("/api/learning-paths/generate", asyncHandler(async (req, res) => {
+    const { userProfile, category, customGoals } = req.body;
 
-      const path = await learningPathGenerator.generateLearningPath(
-        userProfile,
-        category,
-        customGoals
-      );
-
-      res.json(path);
-    } catch (error) {
-      console.error('Error generating custom learning path:', error);
-      res.status(500).json({ error: 'Failed to generate custom learning path' });
+    if (!userProfile) {
+      throw new BadRequestError('User profile is required');
     }
-  });
+
+    const path = await learningPathGenerator.generateLearningPath(
+      userProfile,
+      category,
+      customGoals
+    );
+
+    res.json(path);
+  }));
 
   // POST /api/learning-paths - Legacy route for compatibility
-  app.post("/api/learning-paths", async (req, res) => {
-    try {
-      const userProfile: AIUserProfile = req.body;
-      const limit = parseInt(req.query.limit as string) || 5;
+  app.post("/api/learning-paths", asyncHandler(async (req, res) => {
+    const userProfile: AIUserProfile = req.body;
+    const limit = parseInt(req.query.limit as string) || 5;
 
-      const paths = await learningPathGenerator.getSuggestedPaths(userProfile, limit);
-      
-      res.json(paths);
-    } catch (error) {
-      console.error('Error generating AI learning paths:', error);
-      res.status(500).json({ error: 'Failed to generate learning paths' });
-    }
-  });
+    const paths = await learningPathGenerator.getSuggestedPaths(userProfile, limit);
+
+    res.json(paths);
+  }));
 
   // Track user interaction for improving recommendations
-  app.post("/api/interactions", async (req, res) => {
-    try {
-      const { userId, resourceId, interactionType, interactionValue, metadata } = req.body;
-      
-      // Store interaction data (in a real app, this would go to database)
-      // For now, we'll just acknowledge the interaction
-      console.log(`User interaction: ${userId} ${interactionType} ${resourceId}`);
-      
-      res.json({ status: "recorded" });
-    } catch (error) {
-      console.error('Error recording interaction:', error);
-      res.status(500).json({ error: 'Failed to record interaction' });
-    }
-  });
+  app.post("/api/interactions", asyncHandler(async (req, res) => {
+    const { userId, resourceId, interactionType, interactionValue, metadata } = req.body;
+
+    // Store interaction data (in a real app, this would go to database)
+    // For now, we'll just acknowledge the interaction
+    console.log(`User interaction: ${userId} ${interactionType} ${resourceId}`);
+
+    res.json({ status: "recorded" });
+  }));
 
   // Health check
   app.get("/api/health", (req, res) => {
