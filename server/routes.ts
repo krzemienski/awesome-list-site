@@ -155,10 +155,10 @@ async function generateSitemap(req: Request, res: Response) {
 async function generateOpenGraphImage(req: Request, res: Response) {
   try {
     const { title, category, resourceCount } = req.query;
-    
+
     // Use database count if not provided in query
-    let count = resourceCount;
-    let pageTitle = title;
+    let count = typeof resourceCount === 'string' ? resourceCount : undefined;
+    let pageTitle = typeof title === 'string' ? title : undefined;
     
     if (!count || !pageTitle) {
       try {

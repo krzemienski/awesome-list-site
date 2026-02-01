@@ -158,7 +158,7 @@ function extractMetadata(text: string): ResourceMetadata {
 function parseListItems(tree: unknown, currentCategory: string, currentSubcategory?: string): Resource[] {
   const resources: Resource[] = [];
 
-  visit(tree, 'listItem', (node: unknown) => {
+  visit(tree as Node, 'listItem', (node: unknown) => {
     // Skip if this is a table of contents item (contains only links to headers)
     const text = extractTextFromNode(node);
     if (text.startsWith('#') || text.includes('back to top')) {
@@ -171,7 +171,7 @@ function parseListItems(tree: unknown, currentCategory: string, currentSubcatego
     let description = '';
     
     let linkCount = 0;
-    visit(node, 'link', (linkNode: unknown) => {
+    visit(node as Node, 'link', (linkNode: unknown) => {
       if (linkCount === 0) { // First link is the main resource
         title = extractTextFromNode(linkNode);
         url = (linkNode as { url: string }).url;
@@ -255,7 +255,7 @@ function getDefaultDescription(title: string): string {
 function extractTextFromNode(node: unknown): string {
   let text = '';
 
-  visit(node, (child: unknown) => {
+  visit(node as Node, (child: unknown) => {
     const childNode = child as { type?: string; value?: string };
     if (childNode.type === 'text') {
       text += childNode.value;

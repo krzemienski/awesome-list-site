@@ -273,7 +273,7 @@ export async function fetchAwesomeVideoData() {
         
         // Build sub-subcategories if they exist
         const subSubcategories = level2.level3 ? Object.keys(level2.level3).map(level3Id => {
-          const level3 = level2.level3[level3Id];
+          const level3 = level2.level3![level3Id];
           const level3Resources = categoryResources.filter(r => r.subSubcategory === level3.title);
           
           return {
@@ -378,14 +378,14 @@ function buildHierarchyFromJSON(categories: VideoCategory[], categoryMap: Map<st
       
       level3Categories.forEach(level3Cat => {
         const level3Slug = generateSlug(level3Cat.title);
-        hierarchy[slug].level2[level2Slug].level3[level3Slug] = {
+        hierarchy[slug].level2![level2Slug].level3![level3Slug] = {
           id: level3Cat.id,
           title: level3Cat.title
         };
       });
-      
+
       // If no level 3 categories, remove the empty level3 object
-      if (Object.keys(hierarchy[slug].level2[level2Slug].level3).length === 0) {
+      if (hierarchy[slug].level2![level2Slug].level3 && Object.keys(hierarchy[slug].level2![level2Slug].level3!).length === 0) {
         delete hierarchy[slug].level2[level2Slug].level3;
       }
     });

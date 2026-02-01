@@ -139,8 +139,15 @@ export class RecommendationEngine {
             subcategory: r.subcategory,
             subSubcategory: r.subSubcategory,
             status: 'approved',
-            createdAt: new Date()
-          }));
+            createdAt: new Date(),
+            metadata: null,
+            updatedAt: new Date(),
+            submittedBy: null,
+            approvedBy: null,
+            approvedAt: null,
+            githubSynced: false,
+            lastSyncedAt: null,
+          } as Resource));
         }
       }
 
