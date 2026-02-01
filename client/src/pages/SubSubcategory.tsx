@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import SEOHead from "@/components/layout/SEOHead";
 import TagFilter from "@/components/ui/tag-filter";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { ArrowLeft, ExternalLink, FilterX } from "lucide-react";
 import { deslugify } from "@/lib/utils";
 import { Resource } from "@/types/awesome-list";
@@ -166,28 +167,23 @@ export default function SubSubcategory() {
         description={`Browse ${allResources.length} ${subSubcategoryName} resources in the ${subcategoryName} category.`}
       />
       
+      {/* Breadcrumb Navigation */}
+      <Breadcrumbs
+        items={[
+          { label: categoryName, href: parentCategory?.slug ? `/category/${parentCategory.slug}` : undefined },
+          { label: subcategoryName, href: parentSubcategory?.slug ? `/subcategory/${parentSubcategory.slug}` : undefined },
+          { label: subSubcategoryName }
+        ]}
+      />
+
       {/* Header */}
-      <div className="space-y-4">
-        <Link href={parentSubcategory?.slug ? `/subcategory/${parentSubcategory.slug}` : "/"}>
-          <Button variant="ghost" size="sm" className="gap-2" data-testid="button-back-subcategory">
-            <ArrowLeft className="h-4 w-4" />
-            Back to {subcategoryName || "Home"}
-          </Button>
-        </Link>
-        
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight" data-testid="heading-subsubcategory">
-              {subSubcategoryName}
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1" data-testid="text-breadcrumb">
-              {categoryName} → {subcategoryName}
-            </p>
-          </div>
-          <Badge variant="secondary" className="text-lg px-4 py-2" data-testid="badge-count">
-            {allResources.length}
-          </Badge>
-        </div>
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold tracking-tight" data-testid="heading-subsubcategory">
+          {subSubcategoryName}
+        </h1>
+        <Badge variant="secondary" className="text-lg px-4 py-2" data-testid="badge-count">
+          {allResources.length}
+        </Badge>
       </div>
       
       {/* Tag Filter */}
