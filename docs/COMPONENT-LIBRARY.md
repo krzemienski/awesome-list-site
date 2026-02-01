@@ -742,6 +742,654 @@ import { cn } from "@/lib/utils"
 
 ---
 
+## Usage Patterns and Best Practices
+
+### Accessibility Guidelines
+
+#### Touch Target Sizes
+
+All interactive elements must meet minimum touch target sizes for mobile accessibility:
+
+```tsx
+// ✅ Good - Meets 44px minimum
+<Button size="default" className="min-h-[44px]">
+  Click Me
+</Button>
+
+// ✅ Good - Icon button with proper size
+<Button size="icon" className="min-h-[44px] min-w-[44px]">
+  <Icon className="h-4 w-4" />
+</Button>
+
+// ❌ Bad - Too small for touch
+<button className="h-6 w-6">X</button>
+```
+
+**Minimum sizes:**
+- Default buttons: `min-h-[44px]`
+- Icon buttons: `min-h-[44px] min-w-[44px]`
+- Small buttons: `min-h-[44px]` (adjust padding instead of height)
+
+#### ARIA Labels and Semantic HTML
+
+Always provide proper ARIA labels and use semantic HTML:
+
+```tsx
+// ✅ Good - Proper ARIA label for icon-only button
+<Button
+  variant="ghost"
+  size="icon"
+  aria-label="Close dialog"
+  title="Close dialog"
+>
+  <X className="h-4 w-4" />
+</Button>
+
+// ✅ Good - Semantic form structure
+<form>
+  <Label htmlFor="email">Email Address</Label>
+  <Input
+    id="email"
+    type="email"
+    aria-describedby="email-hint"
+    required
+  />
+  <p id="email-hint" className="text-sm text-muted-foreground">
+    We'll never share your email
+  </p>
+</form>
+
+// ✅ Good - Data test IDs for testing
+<Button
+  data-testid="submit-button"
+  aria-label="Submit form"
+>
+  Submit
+</Button>
+```
+
+#### Keyboard Navigation
+
+Ensure all interactive elements are keyboard accessible:
+
+```tsx
+// ✅ Good - Focus visible states
+<Button className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+  Accessible Button
+</Button>
+
+// ✅ Good - Custom element with keyboard support
+<div
+  role="button"
+  tabIndex={0}
+  onKeyDown={(e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleClick();
+    }
+  }}
+>
+  Custom Interactive Element
+</div>
+```
+
+#### Screen Reader Support
+
+Use descriptive text and hide decorative elements:
+
+```tsx
+// ✅ Good - Descriptive link text
+<Button asChild>
+  <a href="/resource/123">
+    View React Documentation Details
+  </a>
+</Button>
+
+// ✅ Good - Hidden decorative icon
+<div>
+  <ChevronRight className="h-4 w-4" aria-hidden="true" />
+  <span>Next Step</span>
+</div>
+
+// ❌ Bad - Non-descriptive link
+<a href="/resource/123">Click here</a>
+```
+
+### Event Handling Patterns
+
+#### Click Event Propagation
+
+Stop propagation when handling nested interactive elements:
+
+```tsx
+// ✅ Good - Prevents card click when clicking button
+<Card onClick={handleCardClick}>
+  <CardHeader>
+    <CardTitle>{resource.name}</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <Button
+      onClick={(e) => {
+        e.stopPropagation();
+        handleButtonClick();
+      }}
+    >
+      Action
+    </Button>
+  </CardContent>
+</Card>
+
+// ✅ Good - Multiple action buttons in a card
+<Card onClick={navigateToDetails}>
+  <CardHeader>
+    <div className="flex items-center gap-1">
+      <FavoriteButton
+        resourceId={id}
+        onClick={(e) => e.stopPropagation()}
+      />
+      <BookmarkButton
+        resourceId={id}
+        onClick={(e) => e.stopPropagation()}
+      />
+    </div>
+  </CardHeader>
+</Card>
+```
+
+#### External Link Handling
+
+Properly handle external links with security attributes:
+
+```tsx
+// ✅ Good - Secure external link
+<Button asChild>
+  <a
+    href={resource.url}
+    target="_blank"
+    rel="noopener,noreferrer"
+  >
+    <ExternalLink className="h-4 w-4 mr-2" />
+    Open Link
+  </a>
+</Button>
+
+// ✅ Good - Programmatic external link
+const handleExternalLink = (e: React.MouseEvent) => {
+  e.stopPropagation();
+  window.open(url, '_blank', 'noopener,noreferrer');
+};
+```
+
+### Component Composition Patterns
+
+#### Conditional Rendering with Authentication
+
+Show different UI based on authentication state:
+
+```tsx
+import { useAuth } from "@/hooks/useAuth";
+
+function ResourceActions({ resource }) {
+  const { isAuthenticated } = useAuth();
+
+  return (
+    <div className="flex gap-2">
+      {/* Always visible */}
+      <Button variant="outline" onClick={handleShare}>
+        <Share className="h-4 w-4 mr-2" />
+        Share
+      </Button>
+
+      {/* Authenticated users only */}
+      {isAuthenticated && (
+        <>
+          <FavoriteButton resourceId={resource.id} />
+          <BookmarkButton resourceId={resource.id} />
+        </>
+      )}
+
+      {/* Admin users only */}
+      {isAuthenticated && user?.role === 'admin' && (
+        <Button variant="destructive">Delete</Button>
+      )}
+    </div>
+  );
+}
+```
+
+#### Layout Composition
+
+Use flexible layouts with proper spacing:
+
+```tsx
+// ✅ Good - Responsive grid layout
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  {resources.map((resource) => (
+    <ResourceCard key={resource.id} resource={resource} />
+  ))}
+</div>
+
+// ✅ Good - Flex layout with spacing
+<div className="flex flex-wrap items-center gap-2">
+  {resource.tags?.slice(0, 3).map((tag) => (
+    <Badge key={tag} variant="outline">#{tag}</Badge>
+  ))}
+  {resource.tags.length > 3 && (
+    <span className="text-xs text-muted-foreground">
+      +{resource.tags.length - 3} more
+    </span>
+  )}
+</div>
+```
+
+#### Dynamic Class Composition
+
+Use `cn()` for conditional styling:
+
+```tsx
+import { cn } from "@/lib/utils";
+
+// ✅ Good - Conditional classes
+<Card
+  className={cn(
+    "group hover:border-pink-500/50 transition-all cursor-pointer",
+    isSelected && "border-pink-500 bg-pink-50",
+    isDisabled && "opacity-50 pointer-events-none",
+    className
+  )}
+>
+  {/* ... */}
+</Card>
+
+// ✅ Good - State-based styling
+<Button
+  className={cn(
+    "min-h-[44px]",
+    isFavorited ? "text-pink-500" : "text-muted-foreground",
+    isLoading && "animate-pulse"
+  )}
+>
+  {/* ... */}
+</Button>
+```
+
+### Performance Optimization
+
+#### Component Memoization
+
+Use React.memo for expensive components:
+
+```tsx
+import { memo } from "react";
+
+// ✅ Good - Memoized card component
+export const ResourceCard = memo(function ResourceCard({
+  resource,
+  onClick
+}: ResourceCardProps) {
+  // Component implementation
+}, (prevProps, nextProps) => {
+  // Custom comparison function
+  return prevProps.resource.id === nextProps.resource.id &&
+         prevProps.resource.isFavorited === nextProps.resource.isFavorited;
+});
+
+// ✅ Good - Memoized callback
+const handleClick = useCallback(() => {
+  setLocation(`/resource/${resource.id}`);
+}, [resource.id, setLocation]);
+```
+
+#### Lazy Loading Images
+
+Optimize image loading:
+
+```tsx
+// ✅ Good - Lazy loaded images
+{fullResource?.metadata?.ogImage && (
+  <div className="rounded-md overflow-hidden border">
+    <img
+      src={fullResource.metadata.ogImage}
+      alt={fullResource.metadata.ogTitle || resource.name}
+      className="w-full h-32 object-cover"
+      loading="lazy"
+    />
+  </div>
+)}
+```
+
+#### Text Clamping
+
+Prevent layout shifts with text clamping:
+
+```tsx
+// ✅ Good - Clamp long text
+<CardTitle className="text-lg line-clamp-1 flex-1 min-w-0">
+  {resource.name}
+</CardTitle>
+
+<p className="text-sm text-muted-foreground line-clamp-2">
+  {resource.description}
+</p>
+```
+
+### Error Handling and Validation
+
+#### Form Validation
+
+Implement proper form validation:
+
+```tsx
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+const formSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  name: z.string().min(2, "Name must be at least 2 characters"),
+});
+
+function MyForm() {
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: { email: "", name: "" },
+  });
+
+  return (
+    <form onSubmit={form.handleSubmit(onSubmit)}>
+      <div>
+        <Label htmlFor="email">Email</Label>
+        <Input
+          id="email"
+          {...form.register("email")}
+          aria-invalid={!!form.formState.errors.email}
+        />
+        {form.formState.errors.email && (
+          <p className="text-sm text-destructive mt-1">
+            {form.formState.errors.email.message}
+          </p>
+        )}
+      </div>
+    </form>
+  );
+}
+```
+
+#### Mutation Error Handling
+
+Handle API errors gracefully:
+
+```tsx
+import { useMutation } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
+
+function FavoriteButton({ resourceId }) {
+  const { toast } = useToast();
+
+  const mutation = useMutation({
+    mutationFn: () => fetch(`/api/favorites/${resourceId}`, {
+      method: 'POST'
+    }),
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Resource favorited!",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to favorite resource",
+        variant: "destructive",
+      });
+    },
+  });
+
+  return (
+    <Button
+      onClick={() => mutation.mutate()}
+      disabled={mutation.isPending}
+    >
+      {mutation.isPending ? "Loading..." : "Favorite"}
+    </Button>
+  );
+}
+```
+
+### Common Usage Scenarios
+
+#### Loading States
+
+Show appropriate loading UI:
+
+```tsx
+// ✅ Good - Loading skeleton
+{isLoading && (
+  <div className="space-y-2">
+    <Skeleton className="h-4 w-[250px]" />
+    <Skeleton className="h-4 w-[200px]" />
+  </div>
+)}
+
+// ✅ Good - Loading button
+<Button disabled={isPending}>
+  {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+  {isPending ? "Saving..." : "Save"}
+</Button>
+```
+
+#### Empty States
+
+Provide helpful empty state messages:
+
+```tsx
+// ✅ Good - Informative empty state
+{resources.length === 0 && (
+  <Card className="p-12 text-center">
+    <div className="mx-auto w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
+      <Search className="h-6 w-6 text-muted-foreground" />
+    </div>
+    <h3 className="text-lg font-semibold mb-2">No resources found</h3>
+    <p className="text-muted-foreground mb-4">
+      Try adjusting your search or filters
+    </p>
+    <Button onClick={clearFilters}>Clear Filters</Button>
+  </Card>
+)}
+```
+
+#### Error States
+
+Display user-friendly error messages:
+
+```tsx
+// ✅ Good - Error alert
+{isError && (
+  <Alert variant="destructive">
+    <AlertCircle className="h-4 w-4" />
+    <AlertTitle>Error</AlertTitle>
+    <AlertDescription>
+      {error?.message || "Something went wrong. Please try again."}
+    </AlertDescription>
+  </Alert>
+)}
+```
+
+#### Confirmation Dialogs
+
+Confirm destructive actions:
+
+```tsx
+// ✅ Good - Delete confirmation
+<Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>Are you sure?</DialogTitle>
+      <DialogDescription>
+        This action cannot be undone. This will permanently delete
+        your resource.
+      </DialogDescription>
+    </DialogHeader>
+    <DialogFooter>
+      <Button variant="outline" onClick={() => setConfirmOpen(false)}>
+        Cancel
+      </Button>
+      <Button
+        variant="destructive"
+        onClick={handleDelete}
+      >
+        Delete
+      </Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+```
+
+#### Search with Debouncing
+
+Optimize search performance:
+
+```tsx
+import { useState, useEffect } from "react";
+import { useDebouncedCallback } from "use-debounce";
+
+function SearchInput() {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState([]);
+
+  const debouncedSearch = useDebouncedCallback(
+    (searchQuery: string) => {
+      // Perform search
+      performSearch(searchQuery).then(setResults);
+    },
+    300
+  );
+
+  useEffect(() => {
+    if (query.length >= 2) {
+      debouncedSearch(query);
+    } else {
+      setResults([]);
+    }
+  }, [query, debouncedSearch]);
+
+  return (
+    <Input
+      type="search"
+      placeholder="Search resources..."
+      value={query}
+      onChange={(e) => setQuery(e.target.value)}
+    />
+  );
+}
+```
+
+### Responsive Design Patterns
+
+#### Mobile-First Approach
+
+Use Tailwind's responsive prefixes:
+
+```tsx
+// ✅ Good - Mobile-first responsive design
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+  {/* Cards stack on mobile, 2 cols on tablet, 3 on desktop, 4 on xl */}
+</div>
+
+// ✅ Good - Responsive spacing
+<Card className="p-4 md:p-6 lg:p-8">
+  {/* Smaller padding on mobile */}
+</Card>
+
+// ✅ Good - Hide on mobile
+<div className="hidden md:flex items-center gap-2">
+  {/* Only shown on tablet and up */}
+</div>
+```
+
+#### Touch-Friendly Interactions
+
+Optimize for touch devices:
+
+```tsx
+// ✅ Good - Larger touch targets on mobile
+<Button
+  size="default"
+  className="min-h-[44px] w-full sm:w-auto"
+>
+  Submit
+</Button>
+
+// ✅ Good - Simplified mobile layout
+<CardFooter className="flex-col gap-2 sm:flex-row sm:gap-4">
+  <Button className="w-full sm:w-auto">Primary</Button>
+  <Button variant="outline" className="w-full sm:w-auto">
+    Secondary
+  </Button>
+</CardFooter>
+```
+
+### Testing Best Practices
+
+#### Data Test IDs
+
+Add test IDs for reliable testing:
+
+```tsx
+// ✅ Good - Consistent test ID naming
+<Button
+  data-testid={`button-submit-${formId}`}
+  onClick={handleSubmit}
+>
+  Submit
+</Button>
+
+<Card data-testid={`card-resource-${resource.id}`}>
+  {/* ... */}
+</Card>
+
+// ✅ Good - Action-specific test IDs
+<Button
+  data-testid={`button-visit-${resource.id}`}
+  onClick={handleVisit}
+>
+  Visit
+</Button>
+
+<Button
+  data-testid={`button-suggest-edit-${resource.id}`}
+  onClick={handleEdit}
+>
+  Edit
+</Button>
+```
+
+#### Accessible Component Testing
+
+Ensure components are testable:
+
+```tsx
+// ✅ Good - Testable with accessible queries
+<form aria-label="Login form">
+  <Label htmlFor="username">Username</Label>
+  <Input
+    id="username"
+    name="username"
+    aria-label="Username"
+  />
+
+  <Button type="submit" aria-label="Log in">
+    Log In
+  </Button>
+</form>
+
+// Can be tested with:
+// screen.getByLabelText('Username')
+// screen.getByRole('button', { name: 'Log in' })
+```
+
+---
+
 ## Custom Feature Components
 
 These are application-specific components built using the core shadcn/ui components and tailored for the Awesome List site's functionality.
