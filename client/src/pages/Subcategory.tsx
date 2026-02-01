@@ -205,6 +205,7 @@ export default function Subcategory() {
               size="sm"
               onClick={clearAllFilters}
               className="gap-2"
+              data-testid="button-clear-filters"
             >
               <FilterX className="h-4 w-4" />
               Clear Filters
