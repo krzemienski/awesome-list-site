@@ -2519,6 +2519,1058 @@ return (
 
 ---
 
+## Common Patterns and Recipes
+
+This section documents real-world patterns used throughout the application, with complete working examples.
+
+### Search Dialog with Keyboard Shortcuts
+
+A complete search dialog with fuzzy search, keyboard shortcuts, and proper state management.
+
+**Features:**
+- Global keyboard shortcut (Cmd+K / Ctrl+K)
+- Fuzzy search with Fuse.js
+- Focus management on open
+- Prevents dialog close during link clicks
+- Analytics tracking
+
+**Implementation:**
+
+```tsx
+import { useState, useEffect, useMemo, useRef } from "react";
+import { Command, CommandInput, CommandList, CommandGroup, CommandItem } from "@/components/ui/command";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
+import Fuse from "fuse.js";
+import { trackSearch, trackResourceClick } from "@/lib/analytics";
+
+interface SearchDialogProps {
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
+  resources: Resource[];
+}
+
+export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDialogProps) {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<Resource[]>([]);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const linkClickingRef = useRef(false);
+
+  // Configure Fuse.js for fuzzy search
+  const fuse = useMemo(() => {
+    if (!resources || resources.length === 0) return null;
+    return new Fuse(resources, {
+      keys: ['title', 'description', 'category', 'subcategory'],
+      threshold: 0.4,
+      includeScore: true,
+      ignoreLocation: true,
+      minMatchCharLength: 2,
+    });
+  }, [resources]);
+
+  // Search when query changes
+  useEffect(() => {
+    if (!query || query.length < 2 || !fuse) {
+      setResults([]);
+      return;
+    }
+
+    const searchResults = fuse.search(query);
+    trackSearch(query, searchResults.length);
+    setResults(searchResults.slice(0, 15).map(result => result.item));
+  }, [query, fuse]);
+
+  // Global keyboard shortcut (Cmd+K / Ctrl+K)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsOpen(true);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [setIsOpen]);
+
+  // Focus input when dialog opens
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      setTimeout(() => inputRef.current?.focus(), 100);
+    }
+  }, [isOpen]);
+
+  // Clear search when dialog closes
+  useEffect(() => {
+    if (!isOpen) {
+      setQuery("");
+      setResults([]);
+    }
+  }, [isOpen]);
+
+  // Prevent dialog from closing when clicking search results
+  const handleOpenChange = (open: boolean) => {
+    if (!open && linkClickingRef.current) return;
+    setIsOpen(open);
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Search Resources</DialogTitle>
+          <DialogDescription>
+            Find packages, libraries, and tools in the awesome list.
+          </DialogDescription>
+        </DialogHeader>
+
+        <Command shouldFilter={false}>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none z-10" />
+            <CommandInput
+              ref={inputRef}
+              placeholder="Search packages, libraries, and tools..."
+              value={query}
+              onValueChange={setQuery}
+              className="w-full pl-10"
+            />
+          </div>
+
+          <CommandList className="max-h-[300px]">
+            {query.length >= 2 ? (
+              results.length > 0 ? (
+                <CommandGroup>
+                  {results.map((resource, index) => (
+                    <CommandItem
+                      key={`${resource.title}-${index}`}
+                      asChild
+                      onSelect={() => {
+                        linkClickingRef.current = true;
+                        trackResourceClick(resource.title, resource.url, resource.category);
+                        window.open(resource.url, '_blank', 'noopener,noreferrer');
+                        setTimeout(() => {
+                          linkClickingRef.current = false;
+                        }, 500);
+                      }}
+                    >
+                      <a href={resource.url} target="_blank" rel="noopener noreferrer">
+                        <div className="font-medium">{resource.title}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {resource.category}
+                        </div>
+                      </a>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              ) : (
+                <div className="text-center py-12">
+                  <Search className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                  <p className="text-sm">No results found</p>
+                </div>
+              )
+            ) : (
+              <div className="text-center py-12">
+                <Search className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                <p className="text-sm">Type at least 2 characters</p>
+              </div>
+            )}
+          </CommandList>
+        </Command>
+
+        <DialogFooter>
+          <Button variant="secondary" onClick={() => setIsOpen(false)}>
+            Cancel
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+```
+
+**Key Patterns:**
+- **Keyboard Shortcut**: Global event listener with cleanup
+- **Focus Management**: Auto-focus input with delay for animation
+- **State Cleanup**: Clear state when dialog closes
+- **Ref-Based Dialog Control**: Prevent premature close during interactions
+- **Debounced Search**: Memoized Fuse.js instance for performance
+- **Analytics Integration**: Track searches and clicks
+
+**Usage:**
+```tsx
+const [searchOpen, setSearchOpen] = useState(false);
+
+<SearchDialog
+  isOpen={searchOpen}
+  setIsOpen={setSearchOpen}
+  resources={allResources}
+/>
+```
+
+---
+
+### Cards with Action Buttons
+
+Interactive cards with multiple action buttons that prevent event propagation.
+
+**Features:**
+- Multiple action buttons (favorite, bookmark, share)
+- Event propagation control
+- Conditional rendering based on auth
+- External link handling
+- Metadata display (OG images)
+
+**Implementation:**
+
+```tsx
+import { useState, memo } from "react";
+import { useLocation } from "wouter";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ExternalLink, Edit } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import FavoriteButton from "./FavoriteButton";
+import BookmarkButton from "./BookmarkButton";
+import { SuggestEditDialog } from "@/components/ui/suggest-edit-dialog";
+import { cn } from "@/lib/utils";
+
+interface ResourceCardProps {
+  resource: {
+    id: string;
+    name: string;
+    url: string;
+    description?: string;
+    category?: string;
+    tags?: string[];
+    isFavorited?: boolean;
+    isBookmarked?: boolean;
+    favoriteCount?: number;
+    bookmarkNotes?: string;
+  };
+  className?: string;
+  onClick?: () => void;
+}
+
+const ResourceCard = memo(function ResourceCard({
+  resource,
+  className,
+  onClick
+}: ResourceCardProps) {
+  const { isAuthenticated } = useAuth();
+  const [, setLocation] = useLocation();
+  const [suggestEditOpen, setSuggestEditOpen] = useState(false);
+
+  const numericId = parseInt(resource.id);
+  const isValidDbResource = !isNaN(numericId) && numericId > 0;
+
+  // Main card click handler
+  const handleCardClick = () => {
+    if (onClick) {
+      onClick();
+    } else if (isValidDbResource) {
+      setLocation(`/resource/${resource.id}`);
+    } else {
+      window.open(resource.url, '_blank', 'noopener,noreferrer');
+    }
+  };
+
+  // External link handler - stops propagation
+  const handleExternalLink = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    window.open(resource.url, '_blank', 'noopener,noreferrer');
+  };
+
+  // Suggest edit handler - stops propagation
+  const handleSuggestEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSuggestEditOpen(true);
+  };
+
+  return (
+    <>
+      <Card
+        className={cn(
+          "group hover:border-pink-500/50 transition-all cursor-pointer",
+          className
+        )}
+        onClick={handleCardClick}
+        data-testid={`card-resource-${resource.id}`}
+      >
+        <CardHeader className="pb-3">
+          <div className="flex items-start justify-between">
+            <CardTitle className="text-lg line-clamp-1 flex-1 min-w-0">
+              {resource.name}
+            </CardTitle>
+            {/* Action buttons - only for authenticated users */}
+            {isAuthenticated && (
+              <div className="flex items-center gap-1 ml-2">
+                <FavoriteButton
+                  resourceId={resource.id}
+                  isFavorited={resource.isFavorited}
+                  favoriteCount={resource.favoriteCount}
+                  size="sm"
+                  showCount={false}
+                />
+                <BookmarkButton
+                  resourceId={resource.id}
+                  isBookmarked={resource.isBookmarked}
+                  notes={resource.bookmarkNotes}
+                  size="sm"
+                />
+              </div>
+            )}
+          </div>
+          {resource.description && (
+            <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+              {resource.description}
+            </p>
+          )}
+        </CardHeader>
+
+        <CardContent className="pt-0">
+          {/* Badges */}
+          <div className="flex flex-wrap items-center gap-2 mb-3">
+            {resource.category && (
+              <Badge variant="secondary">{resource.category}</Badge>
+            )}
+            {resource.tags?.slice(0, 3).map((tag) => (
+              <Badge key={tag} variant="outline">#{tag}</Badge>
+            ))}
+            {resource.tags && resource.tags.length > 3 && (
+              <span className="text-xs text-muted-foreground">
+                +{resource.tags.length - 3} more
+              </span>
+            )}
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1 min-h-[44px]"
+              onClick={handleExternalLink}
+              data-testid={`button-visit-${resource.id}`}
+            >
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Open Link
+            </Button>
+            {isValidDbResource && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="min-h-[44px] min-w-[44px]"
+                onClick={handleSuggestEdit}
+                data-testid={`button-suggest-edit-${resource.id}`}
+                title="Suggest an edit"
+                aria-label="Suggest an edit"
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Dialog outside card to prevent event issues */}
+      <SuggestEditDialog
+        resource={resource}
+        open={suggestEditOpen}
+        onOpenChange={setSuggestEditOpen}
+      />
+    </>
+  );
+});
+
+export default ResourceCard;
+```
+
+**Key Patterns:**
+- **Event Propagation**: `e.stopPropagation()` on nested buttons
+- **Conditional Auth UI**: Show/hide actions based on `isAuthenticated`
+- **Multiple Click Handlers**: Card vs button-specific handlers
+- **External Link Security**: `noopener,noreferrer` attributes
+- **Memoization**: `memo()` for performance with large lists
+- **Accessibility**: ARIA labels, proper touch targets (44px min)
+- **Dialog Placement**: Render dialog outside card to avoid event bubbling issues
+
+**Usage:**
+```tsx
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  {resources.map((resource) => (
+    <ResourceCard key={resource.id} resource={resource} />
+  ))}
+</div>
+```
+
+---
+
+### Keyboard Shortcuts Pattern
+
+Implementing global keyboard shortcuts with proper cleanup.
+
+**Pattern:**
+
+```tsx
+import { useEffect } from "react";
+
+function useKeyboardShortcut(
+  key: string,
+  callback: () => void,
+  modifiers: { ctrl?: boolean; meta?: boolean; shift?: boolean; alt?: boolean } = {}
+) {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check modifiers
+      const ctrlMatch = modifiers.ctrl === undefined || e.ctrlKey === modifiers.ctrl;
+      const metaMatch = modifiers.meta === undefined || e.metaKey === modifiers.meta;
+      const shiftMatch = modifiers.shift === undefined || e.shiftKey === modifiers.shift;
+      const altMatch = modifiers.alt === undefined || e.altKey === modifiers.alt;
+
+      // Check if key matches
+      const keyMatch = e.key.toLowerCase() === key.toLowerCase();
+
+      if (ctrlMatch && metaMatch && shiftMatch && altMatch && keyMatch) {
+        e.preventDefault();
+        callback();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [key, callback, modifiers]);
+}
+
+// Usage examples
+function MyComponent() {
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+
+  // Cmd+K or Ctrl+K for search
+  useKeyboardShortcut('k', () => setSearchOpen(true), {
+    ctrl: true,
+    meta: true // Either Ctrl OR Meta
+  });
+
+  // Cmd+, for settings (common macOS pattern)
+  useKeyboardShortcut(',', () => setSettingsOpen(true), { meta: true });
+
+  // Escape to close
+  useKeyboardShortcut('Escape', () => {
+    setSearchOpen(false);
+    setSettingsOpen(false);
+  });
+
+  return (
+    <>
+      <SearchDialog isOpen={searchOpen} setIsOpen={setSearchOpen} />
+      <SettingsDialog isOpen={settingsOpen} setIsOpen={setSettingsOpen} />
+    </>
+  );
+}
+```
+
+**Common Shortcuts:**
+- `Cmd+K` / `Ctrl+K`: Search/Command palette
+- `Cmd+,` / `Ctrl+,`: Settings
+- `Escape`: Close dialogs/modals
+- `Cmd+/` / `Ctrl+/`: Show keyboard shortcuts help
+- `Cmd+Shift+N`: New item
+
+**Best Practices:**
+- Always call `e.preventDefault()` to prevent browser defaults
+- Clean up event listeners in useEffect return
+- Support both Cmd (macOS) and Ctrl (Windows/Linux)
+- Document shortcuts in UI (tooltips, help dialog)
+- Don't override browser/system shortcuts
+
+---
+
+### Dialog State Management Pattern
+
+Prevent dialog from closing during specific interactions.
+
+**Problem:** When users click on links or buttons inside a dialog, the dialog may close unexpectedly.
+
+**Solution:** Use refs to track interaction state and control close behavior.
+
+```tsx
+import { useState, useRef } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+
+function InteractiveDialog({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (open: boolean) => void }) {
+  const interactionRef = useRef(false);
+
+  // Custom open change handler
+  const handleOpenChange = (open: boolean) => {
+    // If trying to close while interaction is happening, prevent it
+    if (!open && interactionRef.current) {
+      return;
+    }
+    setIsOpen(open);
+  };
+
+  // Handle link click
+  const handleLinkClick = (url: string) => {
+    // Set flag to prevent dialog close
+    interactionRef.current = true;
+
+    // Perform action (e.g., open external link)
+    window.open(url, '_blank', 'noopener,noreferrer');
+
+    // Reset flag after delay
+    setTimeout(() => {
+      interactionRef.current = false;
+    }, 500);
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Resources</DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-2">
+          {resources.map((resource) => (
+            <Button
+              key={resource.id}
+              variant="ghost"
+              className="w-full justify-start"
+              onClick={() => handleLinkClick(resource.url)}
+            >
+              {resource.name}
+            </Button>
+          ))}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+```
+
+**Key Points:**
+- Use `useRef` to track interaction state (doesn't trigger re-render)
+- Custom `onOpenChange` handler to intercept close attempts
+- Timeout to reset flag after interaction completes
+- Works for links, buttons, or any interactive elements
+
+**Alternative Pattern - Prevent Close During Async Operations:**
+
+```tsx
+const [isProcessing, setIsProcessing] = useState(false);
+
+const handleOpenChange = (open: boolean) => {
+  // Don't close if processing
+  if (!open && isProcessing) {
+    return;
+  }
+  setIsOpen(open);
+};
+
+const handleAsyncAction = async () => {
+  setIsProcessing(true);
+  try {
+    await performAction();
+  } finally {
+    setIsProcessing(false);
+  }
+};
+```
+
+---
+
+### Optimistic UI Updates Pattern
+
+Provide instant feedback while waiting for server confirmation.
+
+**Implementation:**
+
+```tsx
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Heart } from "lucide-react";
+import { useState } from "react";
+
+interface FavoriteButtonProps {
+  resourceId: string;
+  initialIsFavorited?: boolean;
+  initialFavoriteCount?: number;
+}
+
+function FavoriteButton({
+  resourceId,
+  initialIsFavorited = false,
+  initialFavoriteCount = 0
+}: FavoriteButtonProps) {
+  const [isFavorited, setIsFavorited] = useState(initialIsFavorited);
+  const [favoriteCount, setFavoriteCount] = useState(initialFavoriteCount);
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  const mutation = useMutation({
+    mutationFn: async () => {
+      const method = isFavorited ? 'DELETE' : 'POST';
+      const response = await fetch(`/api/favorites/${resourceId}`, { method });
+      if (!response.ok) throw new Error('Failed to update favorite');
+      return response.json();
+    },
+
+    // Optimistic update - runs immediately
+    onMutate: async () => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['/api/favorites'] });
+
+      // Snapshot previous value
+      const previousIsFavorited = isFavorited;
+      const previousCount = favoriteCount;
+
+      // Optimistically update UI
+      setIsFavorited(!isFavorited);
+      setFavoriteCount(prev => isFavorited ? prev - 1 : prev + 1);
+
+      // Return context with previous values
+      return { previousIsFavorited, previousCount };
+    },
+
+    // Rollback on error
+    onError: (error, variables, context) => {
+      // Restore previous values
+      if (context) {
+        setIsFavorited(context.previousIsFavorited);
+        setFavoriteCount(context.previousCount);
+      }
+
+      toast({
+        title: "Error",
+        description: "Failed to update favorite. Please try again.",
+        variant: "destructive",
+      });
+    },
+
+    // Update with server data on success
+    onSuccess: (data) => {
+      setIsFavorited(data.isFavorited);
+      setFavoriteCount(data.favoriteCount);
+
+      toast({
+        title: "Success",
+        description: isFavorited ? "Removed from favorites" : "Added to favorites",
+      });
+    },
+
+    // Always refetch after mutation
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/favorites'] });
+      queryClient.invalidateQueries({ queryKey: [`/api/resources/${resourceId}`] });
+    },
+  });
+
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={(e) => {
+        e.stopPropagation();
+        mutation.mutate();
+      }}
+      disabled={mutation.isPending}
+      className={cn(
+        "transition-all",
+        isFavorited && "text-pink-500"
+      )}
+    >
+      <Heart
+        className={cn(
+          "h-4 w-4 mr-1",
+          isFavorited && "fill-current"
+        )}
+      />
+      {favoriteCount > 0 && <span>{favoriteCount}</span>}
+
+      {/* Loading indicator */}
+      {mutation.isPending && (
+        <span className="absolute inset-0 bg-pink-500/20 animate-ping rounded-md" />
+      )}
+    </Button>
+  );
+}
+```
+
+**Key Concepts:**
+- **onMutate**: Runs before mutation, updates UI immediately
+- **Context**: Store previous state for rollback
+- **onError**: Restore previous state if mutation fails
+- **onSuccess**: Update with server response
+- **onSettled**: Invalidate queries to refetch fresh data
+- **Visual Feedback**: Show loading state with animation
+
+**Benefits:**
+- Instant user feedback
+- Feels faster and more responsive
+- Handles errors gracefully
+- Stays in sync with server
+
+---
+
+### Focus Management Pattern
+
+Automatically manage focus in modals and complex UI flows.
+
+**Auto-focus Input on Dialog Open:**
+
+```tsx
+import { useEffect, useRef } from "react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+
+function SearchDialog({ isOpen, setIsOpen }) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Focus input when dialog opens
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      // Delay to allow dialog animation to complete
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
+    }
+  }, [isOpen]);
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogContent>
+        <Input
+          ref={inputRef}
+          placeholder="Search..."
+          autoFocus // Also add this as fallback
+        />
+      </DialogContent>
+    </Dialog>
+  );
+}
+```
+
+**Focus Trap in Modal:**
+
+```tsx
+import { useEffect, useRef } from "react";
+
+function useFocusTrap(isActive: boolean) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isActive || !containerRef.current) return;
+
+    const container = containerRef.current;
+    const focusableElements = container.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    const handleTabKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+
+      if (e.shiftKey) {
+        // Shift + Tab
+        if (document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement.focus();
+        }
+      } else {
+        // Tab
+        if (document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement.focus();
+        }
+      }
+    };
+
+    container.addEventListener('keydown', handleTabKey);
+    firstElement?.focus();
+
+    return () => {
+      container.removeEventListener('keydown', handleTabKey);
+    };
+  }, [isActive]);
+
+  return containerRef;
+}
+
+// Usage
+function Modal({ isOpen }) {
+  const containerRef = useFocusTrap(isOpen);
+
+  return (
+    <div ref={containerRef}>
+      {/* Modal content */}
+    </div>
+  );
+}
+```
+
+**Restore Focus After Dialog Close:**
+
+```tsx
+function useRestoreFocus() {
+  const previousActiveElement = useRef<HTMLElement | null>(null);
+
+  const saveFocus = () => {
+    previousActiveElement.current = document.activeElement as HTMLElement;
+  };
+
+  const restoreFocus = () => {
+    previousActiveElement.current?.focus();
+  };
+
+  return { saveFocus, restoreFocus };
+}
+
+function MyDialog({ isOpen, setIsOpen }) {
+  const { saveFocus, restoreFocus } = useRestoreFocus();
+
+  useEffect(() => {
+    if (isOpen) {
+      saveFocus();
+    } else {
+      restoreFocus();
+    }
+  }, [isOpen]);
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      {/* Dialog content */}
+    </Dialog>
+  );
+}
+```
+
+---
+
+### External Link Security Pattern
+
+Safely handle external links with proper security attributes.
+
+**Basic Pattern:**
+
+```tsx
+// ✅ Good - Secure external link
+<a
+  href={resource.url}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="text-primary hover:underline"
+>
+  {resource.name}
+</a>
+```
+
+**With Button Component:**
+
+```tsx
+import { Button } from "@/components/ui/button";
+import { ExternalLink } from "lucide-react";
+
+// ✅ Good - Using asChild for polymorphism
+<Button asChild variant="outline">
+  <a
+    href={resource.url}
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <ExternalLink className="h-4 w-4 mr-2" />
+    Visit Site
+  </a>
+</Button>
+```
+
+**Programmatic Navigation:**
+
+```tsx
+const handleExternalLink = (e: React.MouseEvent) => {
+  e.stopPropagation(); // Prevent parent click handlers
+  window.open(url, '_blank', 'noopener,noreferrer');
+};
+
+<Button onClick={handleExternalLink}>
+  <ExternalLink className="h-4 w-4 mr-2" />
+  Open Link
+</Button>
+```
+
+**Why `noopener,noreferrer`?**
+- **noopener**: Prevents the new page from accessing `window.opener`
+- **noreferrer**: Prevents sending referrer information
+- Both protect against security vulnerabilities and privacy issues
+
+**Dynamic Link Validation:**
+
+```tsx
+function SafeExternalLink({ href, children, ...props }) {
+  const isExternal = href.startsWith('http://') || href.startsWith('https://');
+
+  if (!isExternal) {
+    return <a href={href} {...props}>{children}</a>;
+  }
+
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      {...props}
+    >
+      {children}
+      <ExternalLink className="inline h-3 w-3 ml-1" aria-hidden="true" />
+    </a>
+  );
+}
+```
+
+---
+
+### Analytics Integration Pattern
+
+Track user interactions for insights and improvements.
+
+**Setup Analytics Utility:**
+
+```tsx
+// lib/analytics.ts
+interface SearchEvent {
+  query: string;
+  resultCount: number;
+  timestamp: number;
+}
+
+interface ResourceClickEvent {
+  resourceTitle: string;
+  resourceUrl: string;
+  category: string;
+  timestamp: number;
+}
+
+export const trackSearch = (query: string, resultCount: number) => {
+  const searches = JSON.parse(localStorage.getItem('search-history') || '[]');
+  searches.push({
+    query,
+    resultCount,
+    timestamp: Date.now(),
+  });
+  localStorage.setItem('search-history', JSON.stringify(searches.slice(-100)));
+};
+
+export const trackResourceClick = (
+  resourceTitle: string,
+  resourceUrl: string,
+  category: string
+) => {
+  const clicks = JSON.parse(localStorage.getItem('resource-clicks') || '[]');
+  clicks.push({
+    resourceTitle,
+    resourceUrl,
+    category,
+    timestamp: Date.now(),
+  });
+  localStorage.setItem('resource-clicks', JSON.stringify(clicks.slice(-100)));
+};
+
+export const trackPerformance = (metricName: string, duration: number) => {
+  const metrics = JSON.parse(localStorage.getItem('performance-metrics') || '{}');
+  if (!metrics[metricName]) metrics[metricName] = [];
+  metrics[metricName].push({ duration, timestamp: Date.now() });
+  localStorage.setItem('performance-metrics', JSON.stringify(metrics));
+};
+```
+
+**Integration in Components:**
+
+```tsx
+import { trackSearch, trackResourceClick, trackPerformance } from "@/lib/analytics";
+
+function SearchComponent() {
+  const handleSearch = (query: string) => {
+    const startTime = performance.now();
+
+    const results = performSearch(query);
+
+    // Track search
+    trackSearch(query, results.length);
+
+    // Track performance
+    trackPerformance('search_time', performance.now() - startTime);
+
+    return results;
+  };
+
+  const handleResourceClick = (resource: Resource) => {
+    trackResourceClick(resource.title, resource.url, resource.category);
+    window.open(resource.url, '_blank', 'noopener,noreferrer');
+  };
+
+  return (
+    <div>
+      {/* Search UI */}
+    </div>
+  );
+}
+```
+
+**Retrieve Analytics Data:**
+
+```tsx
+function AnalyticsDashboard() {
+  const [searches, setSearches] = useState<SearchEvent[]>([]);
+  const [clicks, setClicks] = useState<ResourceClickEvent[]>([]);
+
+  useEffect(() => {
+    const searchData = localStorage.getItem('search-history');
+    const clickData = localStorage.getItem('resource-clicks');
+
+    if (searchData) setSearches(JSON.parse(searchData));
+    if (clickData) setClicks(JSON.parse(clickData));
+  }, []);
+
+  // Calculate popular searches
+  const popularSearches = useMemo(() => {
+    const searchCounts = searches.reduce((acc, search) => {
+      acc[search.query] = (acc[search.query] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    return Object.entries(searchCounts)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 10);
+  }, [searches]);
+
+  return (
+    <div>
+      <h2>Popular Searches</h2>
+      <ul>
+        {popularSearches.map(([query, count]) => (
+          <li key={query}>{query}: {count} searches</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+**Best Practices:**
+- Limit stored data (use `.slice(-100)` to keep last 100 entries)
+- Include timestamps for time-based analysis
+- Track performance metrics to identify bottlenecks
+- Respect user privacy - don't track sensitive data
+- Provide opt-out mechanism if needed
+
+---
+
 ## Resources
 
 - [shadcn/ui Documentation](https://ui.shadcn.com/)
