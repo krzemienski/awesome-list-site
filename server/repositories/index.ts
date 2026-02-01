@@ -50,16 +50,13 @@
 // Individual repositories will be exported here as they are created.
 // This file serves as a barrel export for all repository modules.
 
-// TODO: Export UserRepository once created (subtask-1-2)
-// TODO: Export ResourceRepository once created (subtask-1-3)
-// TODO: Export CategoryRepository once created (subtask-1-4)
-// TODO: Export TagRepository once created (subtask-1-5)
-// TODO: Export LearningJourneyRepository once created (subtask-1-5)
-// TODO: Export UserFeatureRepository once created (subtask-1-6)
-// TODO: Export AuditRepository once created (subtask-1-7)
-// TODO: Export GithubSyncRepository once created (subtask-1-8)
-// TODO: Export EnrichmentRepository once created (subtask-1-8)
-// TODO: Export AdminRepository once created (subtask-1-9)
-
-// Placeholder export to make this a valid module
-export {};
+export { UserRepository } from './UserRepository';
+export { ResourceRepository } from './ResourceRepository';
+export { CategoryRepository } from './CategoryRepository';
+export { TagRepository } from './TagRepository';
+export { LearningJourneyRepository } from './LearningJourneyRepository';
+export { UserFeatureRepository } from './UserFeatureRepository';
+export { AuditRepository } from './AuditRepository';
+export { GithubSyncRepository } from './GithubSyncRepository';
+export { EnrichmentRepository } from './EnrichmentRepository';
+export { AdminRepository, type AdminStats } from './AdminRepository';
