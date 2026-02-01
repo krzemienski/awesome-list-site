@@ -51,7 +51,7 @@ import { checkResourceLinks, formatLinkCheckReport } from "./validation/linkChec
 import { seedDatabase } from "./seed";
 import { enrichmentService } from "./ai/enrichmentService";
 import { asyncHandler } from "./middleware/asyncHandler";
-import { InternalServerError } from "./middleware/errors";
+import { InternalServerError, UnauthorizedError } from "./middleware/errors";
 
 const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md";
 
@@ -302,56 +302,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
   setupLocalAuth();
 
   // Local authentication routes
-  app.post("/api/auth/local/login", (req, res, next) => {
+  app.post("/api/auth/local/login", asyncHandler(async (req, res, next) => {
     passport.authenticate('local', (err: any, user: any, info: any) => {
       if (err) {
         console.log('[local/login] Authentication error:', err);
-        return res.status(500).json({ message: "Internal server error" });
+        return next(new InternalServerError("Internal server error"));
       }
-      
+
       if (!user) {
         console.log('[local/login] Authentication failed:', info?.message);
-        return res.status(401).json({ message: info?.message || "Invalid credentials" });
+        return next(new UnauthorizedError(info?.message || "Invalid credentials"));
       }
-      
+
       console.log('[local/login] User authenticated, establishing session for:', user.claims?.sub);
-      
+
       req.logIn(user, async (err) => {
         if (err) {
           console.log('[local/login] Login failed:', err);
-          return res.status(500).json({ message: "Login failed" });
+          return next(new InternalServerError("Login failed"));
         }
-        
+
         console.log('[local/login] Session established, saving to store...');
-        
+
         // Explicitly save the session to ensure it's persisted before sending response
         req.session.save(async (saveErr) => {
           if (saveErr) {
             console.log('[local/login] Session save failed:', saveErr);
-            return res.status(500).json({ message: "Failed to save session" });
+            return next(new InternalServerError("Failed to save session"));
           }
-          
+
           console.log('[local/login] Session saved successfully, session ID:', req.sessionID);
-          
-          // Fetch user from database to get the role
-          const dbUser = await storage.getUser(user.claims.sub);
-          
-          console.log('[local/login] Returning user response with role:', dbUser?.role);
-          
-          return res.json({
-            user: {
-              id: user.claims.sub,
-              email: user.claims.email,
-              firstName: user.claims.first_name,
-              lastName: user.claims.last_name,
-              profileImageUrl: user.claims.profile_image_url,
-              role: dbUser?.role || 'user',
-            }
-          });
+
+          try {
+            // Fetch user from database to get the role
+            const dbUser = await storage.getUser(user.claims.sub);
+
+            console.log('[local/login] Returning user response with role:', dbUser?.role);
+
+            return res.json({
+              user: {
+                id: user.claims.sub,
+                email: user.claims.email,
+                firstName: user.claims.first_name,
+                lastName: user.claims.last_name,
+                profileImageUrl: user.claims.profile_image_url,
+                role: dbUser?.role || 'user',
+              }
+            });
+          } catch (error) {
+            return next(new InternalServerError("Failed to fetch user data"));
+          }
         });
       });
     })(req, res, next);
-  });
+  }));
 
   // Note: Database seeding and data initialization moved to runBackgroundInitialization()
   // This ensures the server starts quickly for production deployments
@@ -359,69 +363,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= Auth Routes (from Replit Auth blueprint) =============
   
   // GET /api/auth/user - Get current user (public endpoint)
-  app.get('/api/auth/user', async (req: any, res) => {
-    try {
-      console.log('[/api/auth/user] Request received');
-      console.log('[/api/auth/user] isAuthenticated:', req.isAuthenticated?.());
-      console.log('[/api/auth/user] req.user?.dbUser:', req.user?.dbUser);
-      console.log('[/api/auth/user] req.user?.claims?.sub:', req.user?.claims?.sub);
-      
-      // Check if user is authenticated
-      if (!req.isAuthenticated() || !req.user?.claims?.sub) {
-        console.log('[/api/auth/user] User not authenticated, returning null');
-        return res.json({ user: null, isAuthenticated: false });
-      }
+  app.get('/api/auth/user', asyncHandler(async (req: any, res) => {
+    console.log('[/api/auth/user] Request received');
+    console.log('[/api/auth/user] isAuthenticated:', req.isAuthenticated?.());
+    console.log('[/api/auth/user] req.user?.dbUser:', req.user?.dbUser);
+    console.log('[/api/auth/user] req.user?.claims?.sub:', req.user?.claims?.sub);
 
-      // Use DB user from session (populated by deserializeUser) or fetch if not available
-      let dbUser = req.user.dbUser;
-      if (!dbUser) {
-        const userId = req.user.claims.sub;
-        console.log('[/api/auth/user] dbUser not in session, fetching from DB, userId:', userId);
-        dbUser = await storage.getUser(userId);
-      }
-      
-      if (!dbUser) {
-        console.log('[/api/auth/user] User not found in DB');
-        return res.json({ user: null, isAuthenticated: false });
-      }
-
-      console.log('[/api/auth/user] DB user found:', {
-        id: dbUser.id,
-        email: dbUser.email,
-        role: dbUser.role
-      });
-
-      // Map database fields to frontend-expected format
-      const user = {
-        id: dbUser.id,
-        email: dbUser.email,
-        name: dbUser.firstName && dbUser.lastName 
-          ? `${dbUser.firstName} ${dbUser.lastName}` 
-          : dbUser.firstName || dbUser.email?.split('@')[0] || 'User',
-        avatar: dbUser.profileImageUrl,
-        role: dbUser.role,
-        createdAt: dbUser.createdAt,
-      };
-
-      console.log('[/api/auth/user] Returning user:', user);
-      res.json({ user, isAuthenticated: true });
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
+    // Check if user is authenticated
+    if (!req.isAuthenticated() || !req.user?.claims?.sub) {
+      console.log('[/api/auth/user] User not authenticated, returning null');
+      return res.json({ user: null, isAuthenticated: false });
     }
-  });
+
+    // Use DB user from session (populated by deserializeUser) or fetch if not available
+    let dbUser = req.user.dbUser;
+    if (!dbUser) {
+      const userId = req.user.claims.sub;
+      console.log('[/api/auth/user] dbUser not in session, fetching from DB, userId:', userId);
+      dbUser = await storage.getUser(userId);
+    }
+
+    if (!dbUser) {
+      console.log('[/api/auth/user] User not found in DB');
+      return res.json({ user: null, isAuthenticated: false });
+    }
+
+    console.log('[/api/auth/user] DB user found:', {
+      id: dbUser.id,
+      email: dbUser.email,
+      role: dbUser.role
+    });
+
+    // Map database fields to frontend-expected format
+    const user = {
+      id: dbUser.id,
+      email: dbUser.email,
+      name: dbUser.firstName && dbUser.lastName
+        ? `${dbUser.firstName} ${dbUser.lastName}`
+        : dbUser.firstName || dbUser.email?.split('@')[0] || 'User',
+      avatar: dbUser.profileImageUrl,
+      role: dbUser.role,
+      createdAt: dbUser.createdAt,
+    };
+
+    console.log('[/api/auth/user] Returning user:', user);
+    res.json({ user, isAuthenticated: true });
+  }));
   
   // POST /api/auth/logout - Logout user
-  app.post('/api/auth/logout', async (req: any, res) => {
-    try {
-      req.logout(() => {
-        res.json({ success: true });
-      });
-    } catch (error) {
-      console.error("Error logging out:", error);
-      res.status(500).json({ message: "Failed to logout" });
-    }
-  });
+  app.post('/api/auth/logout', asyncHandler(async (req: any, res) => {
+    req.logout(() => {
+      res.json({ success: true });
+    });
+  }));
   
   // Note: /api/login, /api/callback are set up in setupAuth()
 
