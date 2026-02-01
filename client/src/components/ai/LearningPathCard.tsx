@@ -1,8 +1,24 @@
+import { memo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Clock, BookOpen, Target, ChevronRight, Award, BarChart } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+/**
+ * LearningPathCard - AI-based learning path recommendation display component
+ *
+ * IMPORTANT: This component is wrapped with React.memo using custom comparison.
+ * When using this component, avoid creating new object references for the
+ * `learningPath` prop on every render. Use useMemo or pass stable references.
+ *
+ * @example
+ * // ❌ BAD - Creates new object every render
+ * <LearningPathCard learningPath={{ ...data, extra: true }} />
+ *
+ * // ✅ GOOD - Stable reference from query/state
+ * <LearningPathCard learningPath={path} />
+ */
 
 interface LearningPath {
   id: string;
@@ -22,11 +38,11 @@ interface LearningPathCardProps {
   className?: string;
 }
 
-export default function LearningPathCard({ 
-  learningPath, 
+function LearningPathCard({
+  learningPath,
   onStart,
   onViewDetails,
-  className 
+  className
 }: LearningPathCardProps) {
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -146,3 +162,22 @@ export default function LearningPathCard({
     </Card>
   );
 }
+
+export default memo(LearningPathCard, (prevProps, nextProps) => {
+  const prevPath = prevProps.learningPath;
+  const nextPath = nextProps.learningPath;
+
+  return (
+    prevPath.id === nextPath.id &&
+    prevPath.title === nextPath.title &&
+    prevPath.description === nextPath.description &&
+    prevPath.difficulty === nextPath.difficulty &&
+    prevPath.duration === nextPath.duration &&
+    prevPath.resourceCount === nextPath.resourceCount &&
+    prevPath.matchPercentage === nextPath.matchPercentage &&
+    JSON.stringify(prevPath.objectives || []) === JSON.stringify(nextPath.objectives || []) &&
+    prevProps.onStart === nextProps.onStart &&
+    prevProps.onViewDetails === nextProps.onViewDetails &&
+    prevProps.className === nextProps.className
+  );
+});

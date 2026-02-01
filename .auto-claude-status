@@ -1,25 +1,25 @@
 {
   "active": true,
-  "spec": "020-extract-reusable-admin-crud-component-pattern-from",
-  "state": "complete",
+  "spec": "048-add-react-memo-to-resourcecard-and-other-frequentl",
+  "state": "building",
   "subtasks": {
-    "completed": 11,
-    "total": 11,
-    "in_progress": 0,
+    "completed": 6,
+    "total": 7,
+    "in_progress": 1,
     "failed": 0
   },
   "phase": {
-    "current": "Code Cleanup and Documentation",
+    "current": "Verification and Testing",
     "id": null,
-    "total": 3
+    "total": 2
   },
   "workers": {
     "active": 0,
     "max": 1
   },
   "session": {
-    "number": 4,
-    "started_at": "2026-01-31T22:53:48.117571"
+    "number": 8,
+    "started_at": "2026-01-31T23:33:25.666847"
   },
-  "last_update": "2026-01-31T23:07:04.170353"
+  "last_update": "2026-01-31T23:47:08.743775"
 }

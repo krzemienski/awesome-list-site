@@ -1,8 +1,24 @@
+import { memo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Brain, TrendingUp, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+/**
+ * RecommendationCard - AI-based resource recommendation display component
+ *
+ * IMPORTANT: This component is wrapped with React.memo using custom comparison.
+ * When using this component, avoid creating new object references for the
+ * `resource` prop on every render. Use useMemo or pass stable references.
+ *
+ * @example
+ * // ❌ BAD - Creates new object every render
+ * <RecommendationCard resource={{ ...data, extra: true }} />
+ *
+ * // ✅ GOOD - Stable reference from query/state
+ * <RecommendationCard resource={recommendation} />
+ */
 
 interface Resource {
   id: string;
@@ -22,7 +38,7 @@ interface RecommendationCardProps {
   className?: string;
 }
 
-export default function RecommendationCard({ 
+function RecommendationCard({ 
   resource, 
   onClick,
   className 
@@ -142,3 +158,22 @@ export default function RecommendationCard({
     </Card>
   );
 }
+
+export default memo(RecommendationCard, (prevProps, nextProps) => {
+  const prevRes = prevProps.resource;
+  const nextRes = nextProps.resource;
+
+  return (
+    prevRes.id === nextRes.id &&
+    prevRes.name === nextRes.name &&
+    prevRes.url === nextRes.url &&
+    prevRes.description === nextRes.description &&
+    prevRes.category === nextRes.category &&
+    prevRes.confidence === nextRes.confidence &&
+    prevRes.matchReason === nextRes.matchReason &&
+    prevRes.isAIBased === nextRes.isAIBased &&
+    JSON.stringify(prevRes.tags || []) === JSON.stringify(nextRes.tags || []) &&
+    prevProps.onClick === nextProps.onClick &&
+    prevProps.className === nextProps.className
+  );
+});

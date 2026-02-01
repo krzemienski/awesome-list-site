@@ -1,0 +1,32 @@
+{
+  "project_type": "monorepo",
+  "services": {
+    "frontend": {
+      "path": "./client",
+      "tech_stack": ["react", "typescript", "vite", "tanstack-query", "wouter", "tailwindcss"],
+      "port": 5000,
+      "dev_command": "npm run dev",
+      "test_command": null,
+      "build_command": "npm run build"
+    },
+    "backend": {
+      "path": "./server",
+      "tech_stack": ["node", "express", "typescript", "drizzle-orm", "postgresql"],
+      "port": 3000,
+      "dev_command": "npm run dev",
+      "test_command": null
+    }
+  },
+  "infrastructure": {
+    "docker": false,
+    "database": "postgresql",
+    "ci_cd": "github-actions"
+  },
+  "conventions": {
+    "linter": null,
+    "formatter": null,
+    "testing": "playwright",
+    "component_pattern": "shadcn-ui-radix",
+    "state_management": "tanstack-query-local-state"
+  }
+}

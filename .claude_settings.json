@@ -11,14 +11,14 @@
       "Edit(./**)",
       "Glob(./**)",
       "Grep(./**)",
-      "Read(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/020-extract-reusable-admin-crud-component-pattern-from/**)",
-      "Write(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/020-extract-reusable-admin-crud-component-pattern-from/**)",
-      "Edit(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/020-extract-reusable-admin-crud-component-pattern-from/**)",
-      "Glob(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/020-extract-reusable-admin-crud-component-pattern-from/**)",
-      "Grep(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/020-extract-reusable-admin-crud-component-pattern-from/**)",
-      "Read(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/020-extract-reusable-admin-crud-component-pattern-from/.auto-claude/specs/020-extract-reusable-admin-crud-component-pattern-from/**)",
-      "Write(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/020-extract-reusable-admin-crud-component-pattern-from/.auto-claude/specs/020-extract-reusable-admin-crud-component-pattern-from/**)",
-      "Edit(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/020-extract-reusable-admin-crud-component-pattern-from/.auto-claude/specs/020-extract-reusable-admin-crud-component-pattern-from/**)",
+      "Read(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/048-add-react-memo-to-resourcecard-and-other-frequentl/**)",
+      "Write(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/048-add-react-memo-to-resourcecard-and-other-frequentl/**)",
+      "Edit(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/048-add-react-memo-to-resourcecard-and-other-frequentl/**)",
+      "Glob(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/048-add-react-memo-to-resourcecard-and-other-frequentl/**)",
+      "Grep(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/048-add-react-memo-to-resourcecard-and-other-frequentl/**)",
+      "Read(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/048-add-react-memo-to-resourcecard-and-other-frequentl/.auto-claude/specs/048-add-react-memo-to-resourcecard-and-other-frequentl/**)",
+      "Write(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/048-add-react-memo-to-resourcecard-and-other-frequentl/.auto-claude/specs/048-add-react-memo-to-resourcecard-and-other-frequentl/**)",
+      "Edit(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/048-add-react-memo-to-resourcecard-and-other-frequentl/.auto-claude/specs/048-add-react-memo-to-resourcecard-and-other-frequentl/**)",
       "Read(/Users/nick/Desktop/awesome-list-site/.auto-claude/**)",
       "Write(/Users/nick/Desktop/awesome-list-site/.auto-claude/**)",
       "Edit(/Users/nick/Desktop/awesome-list-site/.auto-claude/**)",
@@ -28,7 +28,12 @@
       "WebFetch(*)",
       "WebSearch(*)",
       "mcp__context7__resolve-library-id(*)",
-      "mcp__context7__get-library-docs(*)"
+      "mcp__context7__get-library-docs(*)",
+      "mcp__graphiti-memory__search_nodes(*)",
+      "mcp__graphiti-memory__search_facts(*)",
+      "mcp__graphiti-memory__add_episode(*)",
+      "mcp__graphiti-memory__get_episodes(*)",
+      "mcp__graphiti-memory__get_entity_edge(*)"
     ]
   }
 }

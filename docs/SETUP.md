@@ -3462,16 +3462,37 @@ curl http://localhost:5000/api/resources/99999
 
 ## Production Deployment
 
+The application supports deployment on multiple platforms including Vercel, Railway, AWS, GCP, Azure, Docker, and Replit. Choose the deployment option that best fits your needs:
+
+### Deployment Options
+
+- **[DEPLOYMENT.md](./DEPLOYMENT.md)**: Comprehensive guide for deploying to cloud platforms (Vercel, Railway, AWS, GCP, Azure, Replit)
+- **[DOCKER.md](./DOCKER.md)**: Docker setup for local development and self-hosting
+- **[ENVIRONMENT.md](./ENVIRONMENT.md)**: Complete environment variable reference for all platforms
+
+### Quick Deployment (Replit)
+
+For Replit deployment (still fully supported):
+
 1. Set `NODE_ENV=production`
 2. Run `npm run build`
 3. Run `npm run start`
 4. Or use Replit's Deploy button
 
+### Multi-Platform Support
+
+The application is designed to work seamlessly across all deployment platforms:
+
+- **Replit**: Original platform, fully supported with Replit OAuth
+- **Cloud Platforms**: Deploy to Vercel, Railway, AWS, GCP, or Azure (see [DEPLOYMENT.md](./DEPLOYMENT.md))
+- **Self-Hosted**: Use Docker for complete control over your infrastructure (see [DOCKER.md](./DOCKER.md))
+
 The application automatically:
 - Builds optimized frontend bundle
 - Serves static files from Express
+- Runs database migrations on startup (production mode)
 - Seeds database if empty
-- Validates awesome-list on export
+- Detects platform and enables appropriate features (Replit OAuth when available, local auth otherwise)
 
 ### Production Troubleshooting
 
