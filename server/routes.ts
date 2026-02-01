@@ -433,6 +433,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const category = req.query.category as string;
       const subcategory = req.query.subcategory as string;
       const search = req.query.search as string;
+      const resourceType = req.query.resourceType as string;
+      const difficulty = req.query.difficulty as string;
+      const sortBy = req.query.sortBy as string;
 
       const result = await storage.listResources({
         page,
@@ -440,7 +443,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: 'approved',
         category,
         subcategory,
-        search
+        search,
+        resourceType,
+        difficulty,
+        sortBy
       });
 
       res.json(result);
@@ -449,55 +455,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: 'Failed to fetch resources' });
     }
   });
-
-  // GET /api/resources/check-url - Check if URL already exists (public)
-  app.get('/api/resources/check-url', async (req, res) => {
-    try {
-      const url = req.query.url as string;
-
-      if (!url) {
-        return res.status(400).json({ message: 'URL parameter is required' });
-      }
-
-      const existingResource = await storage.getResourceByUrl(url);
-
-      if (existingResource) {
-        return res.json({
-          exists: true,
-          resource: {
-            id: existingResource.id,
-            title: existingResource.title,
-            status: existingResource.status,
-            category: existingResource.category,
-            subcategory: existingResource.subcategory
-          }
-        });
-      }
-
-      res.json({ exists: false });
-    } catch (error) {
-      console.error('Error checking URL:', error);
-      res.status(500).json({ message: 'Failed to check URL' });
-    }
-  });
-
+  
   // GET /api/resources/:id - Get single resource
   app.get('/api/resources/:id', async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const resource = await storage.getResource(id);
-
+      
       if (!resource) {
         return res.status(404).json({ message: 'Resource not found' });
       }
-
+      
       res.json(resource);
     } catch (error) {
       console.error('Error fetching resource:', error);
       res.status(500).json({ message: 'Failed to fetch resource' });
     }
   });
-
+  
   // POST /api/resources - Submit new resource (authenticated)
   app.post('/api/resources', isAuthenticated, async (req: any, res) => {
     try {

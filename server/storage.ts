@@ -97,7 +97,6 @@ export interface IStorage {
   // Resource CRUD operations
   listResources(options: ListResourceOptions): Promise<{ resources: Resource[]; total: number }>;
   getResource(id: number): Promise<Resource | undefined>;
-  getResourceByUrl(url: string): Promise<Resource | undefined>;
   getResourceCount(): Promise<number>; // Get total count directly from database
   createResource(resource: InsertResource): Promise<Resource>;
   updateResource(id: number, resource: Partial<InsertResource>): Promise<Resource>;
@@ -248,6 +247,9 @@ interface ListResourceOptions {
   subcategory?: string;
   userId?: string;
   search?: string;
+  resourceType?: string;
+  difficulty?: string;
+  sortBy?: string;
 }
 
 interface AdminStats {
@@ -391,30 +393,30 @@ export class DatabaseStorage implements IStorage {
   
   // Resource CRUD operations
   async listResources(options: ListResourceOptions): Promise<{ resources: Resource[]; total: number }> {
-    const { page = 1, limit = 20, status, category, subcategory, userId, search } = options;
+    const { page = 1, limit = 20, status, category, subcategory, userId, search, resourceType, difficulty, sortBy } = options;
     const offset = (page - 1) * limit;
-    
+
     let query = db.select().from(resources);
     let countQuery = db.select({ count: sql<number>`count(*)::int` }).from(resources);
-    
+
     const conditions = [];
-    
+
     if (status) {
       conditions.push(eq(resources.status, status));
     }
-    
+
     if (category) {
       conditions.push(eq(resources.category, category));
     }
-    
+
     if (subcategory) {
       conditions.push(eq(resources.subcategory, subcategory));
     }
-    
+
     if (userId) {
       conditions.push(eq(resources.submittedBy, userId));
     }
-    
+
     if (search) {
       conditions.push(
         or(
@@ -423,19 +425,58 @@ export class DatabaseStorage implements IStorage {
         )
       );
     }
-    
+
+    if (resourceType) {
+      conditions.push(sql`${resources.metadata}->>'resourceType' = ${resourceType}`);
+    }
+
+    if (difficulty) {
+      conditions.push(sql`${resources.metadata}->>'difficulty' = ${difficulty}`);
+    }
+
     if (conditions.length > 0) {
       query = query.where(and(...conditions)) as any;
       countQuery = countQuery.where(and(...conditions)) as any;
     }
-    
+
     const [totalResult] = await countQuery;
-    
+
+    // Apply sorting based on sortBy parameter
+    // Supported formats: name-asc, name-desc, createdAt-asc, createdAt-desc, updatedAt-asc, updatedAt-desc
+    // Also support legacy formats: newest, oldest, recently-updated
+    let orderByClause;
+    switch (sortBy) {
+      case 'name-asc':
+        orderByClause = asc(resources.title);
+        break;
+      case 'name-desc':
+        orderByClause = desc(resources.title);
+        break;
+      case 'createdAt-asc':
+      case 'oldest':
+        orderByClause = asc(resources.createdAt);
+        break;
+      case 'createdAt-desc':
+      case 'newest':
+        orderByClause = desc(resources.createdAt);
+        break;
+      case 'updatedAt-asc':
+        orderByClause = asc(resources.updatedAt);
+        break;
+      case 'updatedAt-desc':
+      case 'recently-updated':
+        orderByClause = desc(resources.updatedAt);
+        break;
+      default:
+        // Default sort by newest first
+        orderByClause = desc(resources.createdAt);
+    }
+
     const resourceList = await query
-      .orderBy(desc(resources.createdAt))
+      .orderBy(orderByClause)
       .limit(limit)
       .offset(offset);
-    
+
     return { resources: resourceList, total: totalResult.count };
   }
   
@@ -443,12 +484,7 @@ export class DatabaseStorage implements IStorage {
     const [resource] = await db.select().from(resources).where(eq(resources.id, id));
     return resource;
   }
-
-  async getResourceByUrl(url: string): Promise<Resource | undefined> {
-    const [resource] = await db.select().from(resources).where(eq(resources.url, url));
-    return resource;
-  }
-
+  
   async getResourceCount(): Promise<number> {
     const [result] = await db.select({ count: sql<number>`count(*)::int` }).from(resources);
     return result.count;
@@ -1760,7 +1796,6 @@ export class MemStorage implements IStorage {
     return { resources: [], total: 0 };
   }
   async getResource(id: number): Promise<Resource | undefined> { return undefined; }
-  async getResourceByUrl(url: string): Promise<Resource | undefined> { return undefined; }
   async getResourceCount(): Promise<number> { return 0; }
   async createResource(resource: InsertResource): Promise<Resource> {
     throw new Error("Not implemented in memory storage");
