@@ -10,7 +10,7 @@ import { storage } from "./storage";
 import type { User } from "@shared/schema";
 
 // OIDC Claims from Replit
-interface OIDCClaims {
+export interface OIDCClaims {
   sub: string;
   email?: string;
   first_name?: string;
@@ -21,7 +21,7 @@ interface OIDCClaims {
 }
 
 // Session user with OIDC tokens and claims
-interface SessionUser {
+export interface SessionUser {
   claims?: OIDCClaims;
   access_token?: string;
   refresh_token?: string;

@@ -39,10 +39,10 @@ export function setupLocalAuth() {
         const userSession = {
           claims: {
             sub: user.id,
-            email: user.email,
-            first_name: user.firstName,
-            last_name: user.lastName,
-            profile_image_url: user.profileImageUrl,
+            email: user.email || undefined,
+            first_name: user.firstName || undefined,
+            last_name: user.lastName || undefined,
+            profile_image_url: user.profileImageUrl || undefined,
           },
           expires_at: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60),
         };
