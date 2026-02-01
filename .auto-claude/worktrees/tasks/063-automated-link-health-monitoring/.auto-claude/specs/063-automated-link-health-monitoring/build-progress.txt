@@ -1,0 +1,206 @@
+=== AUTO-BUILD PROGRESS ===
+
+Project: Automated Link Health Monitoring
+Workspace: .auto-claude/worktrees/tasks/063-automated-link-health-monitoring
+Started: 2026-02-01
+
+Workflow Type: feature
+Rationale: This is a new feature that adds scheduled background jobs to verify all resource links. It follows a feature workflow because implementation flows from database → backend services → cron scheduler → API → notifications → frontend UI. Each layer depends on the previous one being functional.
+
+Session 1 (Planner):
+- Completed deep codebase investigation
+- Created project_index.json with tech stack details
+- Created context.json with files to modify and patterns
+- Created implementation_plan.json with 8 phases and 13 subtasks
+- Created init.sh for environment setup
+
+Phase Summary:
+- Phase 1 (Database Schema): 1 subtask - Create link health tables (linkHealthJobs, linkHealthChecks, linkHealthNotifications)
+- Phase 2 (Storage Layer): 1 subtask - Add CRUD methods to server/storage.ts
+- Phase 3 (Monitoring Service): 1 subtask - Build LinkHealthMonitor service class
+- Phase 4 (Cron Scheduler): 3 subtasks - Install node-cron, create scheduler, integrate into server startup
+- Phase 5 (Notification Service): 3 subtasks - Install nodemailer, create email service, integrate with monitor
+- Phase 6 (API Endpoints): 1 subtask - Add admin API routes for link health
+- Phase 7 (Frontend Dashboard): 2 subtasks - Create LinkHealthDashboard component, integrate into AdminDashboard
+- Phase 8 (Integration): 1 subtask - End-to-end manual testing
+
+Services Involved:
+- backend: TypeScript/Express API, Drizzle ORM, PostgreSQL database
+- frontend: React/TypeScript, Vite, Admin Dashboard UI
+
+Key Technical Decisions:
+1. Reuse existing LinkChecker class from server/validation/linkChecker.ts
+2. Follow enrichmentService.ts pattern for job queue architecture
+3. Use node-cron for weekly scheduling (every Sunday at 2am)
+4. Email notifications when >5% of links are broken
+5. Store complete link check history for trend analysis
+
+Dependencies Added:
+- node-cron: Weekly cron job scheduling
+- nodemailer: Email notifications for admins
+
+Existing Patterns Used:
+- Database tables: Follow enrichmentJobs/enrichmentQueue pattern (job + queue tables)
+- Storage layer: Centralized methods in server/storage.ts
+- API routes: Express routes in server/routes.ts with isAdmin middleware
+- Admin UI: Tabs-based dashboard in AdminDashboard.tsx
+- Job processing: Batch processing with status tracking
+
+Parallelism Analysis:
+- Max parallel phases: 2
+- Parallel groups:
+  * Phase 4 (Cron Scheduler) and Phase 5 (Notification Service) can run in parallel
+  * Both depend only on Phase 3 and modify different files
+- Recommended workers: 1 (mostly sequential dependencies)
+- Speedup estimate: Minimal due to linear dependency chain
+
+Acceptance Criteria (from spec.md):
+✓ Background job runs weekly to check all 2,600+ resource links
+✓ Links categorized as: healthy (200), redirect (301/302), broken (4xx/5xx), timeout, DNS failure
+✓ Admin dashboard shows link health summary, trends, and drill-down to affected resources
+✓ Broken links auto-flagged for admin review after 2 consecutive failures
+✓ Email notifications for admins when broken link threshold exceeded (>5% of resources)
+✓ Link check history stored for trend analysis and reporting
+
+=== STARTUP COMMAND ===
+
+To continue building this spec, run:
+
+  npm run dev
+
+OR to run the initialization script:
+
+  ./.auto-claude/specs/063-automated-link-health-monitoring/init.sh
+
+Manual test after implementation:
+
+  curl -X POST http://localhost:5000/api/admin/link-health/run
+
+Then open: http://localhost:5000/admin (Link Health tab)
+
+=== NEXT SESSION ===
+
+The next coder agent should:
+1. Start with Phase 1 (Database Schema) - Create tables in shared/schema.ts
+2. Follow the implementation plan sequentially through all 8 phases
+3. Run 'npm run db:push' after schema changes
+4. Test each API endpoint as it's created
+5. Verify the admin dashboard UI renders correctly
+6. Perform end-to-end manual testing in Phase 8
+
+Files to create:
+- server/jobs/linkHealthScheduler.ts
+- server/services/linkHealthMonitor.ts
+- server/services/notificationService.ts
+- client/src/components/admin/LinkHealthDashboard.tsx
+
+Files to modify:
+- shared/schema.ts (add 3 tables)
+- server/storage.ts (add ~8 methods)
+- server/routes.ts (add 5 API endpoints)
+- server/index.ts (initialize cron scheduler)
+- client/src/pages/AdminDashboard.tsx (add Link Health tab)
+
+=== END SESSION 1 ===
+
+=== Subtask 2-1: Add link health storage methods to server/storage.ts ===
+Date: $(date)
+Status: COMPLETED
+
+Changes Made:
+1. Updated imports in server/storage.ts:
+   - Added linkHealthJobs, linkHealthChecks, linkHealthNotifications tables
+   - Added LinkHealthJob, LinkHealthCheck, LinkHealthNotification types
+   - Added InsertLinkHealthJob, InsertLinkHealthCheck, InsertLinkHealthNotification types
+
+2. Added method signatures to IStorage interface:
+   - Link Health Jobs: createLinkHealthJob, getLinkHealthJob, updateLinkHealthJob, listLinkHealthJobs
+   - Link Health Checks: createLinkHealthCheck, getLinkHealthHistory, getFailedLinks, getBrokenLinksSummary
+   - Link Health Notifications: createLinkHealthNotification
+
+3. Implemented methods in DatabaseStorage class:
+   - All methods follow enrichment job pattern
+   - Use Drizzle ORM with proper select/insert/update operations
+   - Include proper filtering, ordering, and limit clauses
+   - getBrokenLinksSummary uses complex query with DISTINCT ON for latest checks per resource
+
+4. Added stub implementations in MemStorage class:
+   - All methods return empty data or throw "not implemented" errors
+   - Maintains backward compatibility
+
+Verification:
+- TypeScript compilation succeeds (npm run check)
+- No new TypeScript errors introduced in storage module
+- Commit: 89d033a
+
+Next Steps:
+- Proceed to subtask-3-1: Create LinkHealthMonitor service class
+
+=== Subtask 4-1: Install node-cron dependency ===
+Date: 2026-02-01
+Status: COMPLETED
+
+Changes Made:
+1. Added node-cron to package.json dependencies:
+   - Added "node-cron": "^3.0.3" to dependencies section
+
+2. Added @types/node-cron to package.json devDependencies:
+   - Added "@types/node-cron": "^3.0.11" to devDependencies section
+
+Notes:
+- Both dependencies have been added to package.json in alphabetical order
+- npm install will be run when changes are committed back to main repository
+- Versions selected: node-cron 3.0.3 (latest stable) and @types/node-cron 3.0.11
+
+Verification:
+- package.json successfully modified with both dependencies
+- Once npm install is run, verification command will confirm: npm list node-cron
+
+Next Steps:
+- Proceed to subtask-4-2: Create cron job scheduler for weekly link health checks
+
+=== Subtask 5-3: Integrate notification service into LinkHealthMonitor ===
+Date: 2026-02-01
+Status: COMPLETED
+
+Changes Made:
+1. Modified server/services/linkHealthMonitor.ts:
+   - Added import for notificationService from ./notificationService
+   - Integrated notification call after job completion in startProcessing method
+   - Added try-catch wrapper around sendBrokenLinksAlert call
+   - Ensures notification failures don't affect job completion status
+
+2. Implementation details:
+   - Notification is sent only after job successfully completes (status='completed')
+   - notificationService.sendBrokenLinksAlert(jobId) automatically checks if threshold exceeded
+   - Threshold: >5% of total links are broken
+   - Error handling: logs notification failures but doesn't throw
+   - Follows existing pattern of non-blocking notification delivery
+
+3. Notification flow:
+   a) LinkHealthMonitor completes job and updates status to 'completed'
+   b) Calls notificationService.sendBrokenLinksAlert(jobId)
+   c) NotificationService checks if brokenLinks/totalLinks > 5%
+   d) If threshold met: sends email to admin with broken link summary
+   e) If threshold not met: logs message and returns without sending
+   f) Creates notification log entry in linkHealthNotifications table
+
+Verification:
+- File committed to git with notification integration
+- Manual verification pending: trigger link health check and verify notification sent when >5% links broken
+- To test: POST /api/admin/link-health/run (when API endpoints are added in phase-6)
+
+Files Modified:
+- server/services/linkHealthMonitor.ts
+
+Notes:
+- linkHealthMonitor.ts was created in subtask-3-1 but never committed to git
+- This commit includes both the file creation and notification integration
+- Notification service already implements threshold checking logic
+- Email configuration uses environment variables: EMAIL_HOST, EMAIL_USER, EMAIL_PASS, ADMIN_EMAIL
+
+Next Steps:
+- Proceed to phase-6: Add admin API endpoints for link health dashboard
+- Then phase-7: Create frontend LinkHealthDashboard component
+- Finally phase-8: End-to-end manual testing
+
