@@ -979,25 +979,23 @@ Used for importing resources from community awesome lists.
 
 ## Database Migrations
 
-Migrations are managed using **Drizzle Kit**.
+Migrations are managed using **Drizzle Kit**. For detailed migration procedures, upgrade guides, and best practices, see [DATABASE_MIGRATIONS.md](./DATABASE_MIGRATIONS.md).
 
-### Generate Migration
+### Quick Reference
+
+**Push Schema Changes:**
 ```bash
-npm run db:generate
+npm run db:push
 ```
-Creates a migration file in `migrations/` based on schema changes.
+Pushes schema changes directly to the database (development/prototype mode).
 
-### Apply Migration
-```bash
-npm run db:migrate
-```
-Applies pending migrations to the database.
-
-### View Schema
+**View Schema:**
 ```bash
 npm run db:studio
 ```
 Opens Drizzle Studio for visual schema exploration.
+
+For production migrations, version upgrades, and troubleshooting, refer to the [Database Migrations Guide](./DATABASE_MIGRATIONS.md).
 
 ---
 
