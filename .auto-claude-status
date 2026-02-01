@@ -1,25 +1,25 @@
 {
   "active": true,
-  "spec": "079-enhance-404-not-found-page-with-navigation-options",
+  "spec": "074-add-blur-placeholder-images-for-og-previews-to-pre",
   "state": "building",
   "subtasks": {
-    "completed": 1,
-    "total": 2,
+    "completed": 8,
+    "total": 9,
     "in_progress": 1,
     "failed": 0
   },
   "phase": {
-    "current": "Visual and Functional Verification",
+    "current": "Integration & Testing",
     "id": null,
-    "total": 1
+    "total": 3
   },
   "workers": {
     "active": 0,
     "max": 1
   },
   "session": {
-    "number": 3,
-    "started_at": "2026-02-01T00:21:21.474037"
+    "number": 10,
+    "started_at": "2026-02-01T00:21:32.041017"
   },
-  "last_update": "2026-02-01T00:26:10.634074"
+  "last_update": "2026-02-01T00:41:57.811707"
 }
