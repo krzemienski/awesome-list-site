@@ -16,6 +16,7 @@ import {
   Server,
   Layers,
   Users,
+  ChevronRight,
 } from "lucide-react";
 
 interface HomeProps {
