@@ -9,9 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import SEOHead from "@/components/layout/SEOHead";
 import TagFilter from "@/components/ui/tag-filter";
+import AdvancedFilter from "@/components/ui/advanced-filter";
 import { ViewModeToggle, ViewMode } from "@/components/ui/view-mode-toggle";
 import { SuggestEditDialog } from "@/components/ui/suggest-edit-dialog";
-import { ArrowLeft, Search, ExternalLink, Edit, FilterX } from "lucide-react";
+import { ArrowLeft, Search, ExternalLink, Edit } from "lucide-react";
 import { deslugify, slugify } from "@/lib/utils";
 import { Resource } from "@/types/awesome-list";
 import type { Resource as DbResource } from "@shared/schema";
@@ -25,12 +26,27 @@ import { useAuth } from "@/hooks/useAuth";
 export default function Category() {
   const { slug } = useParams<{ slug: string }>();
   const { isAuthenticated } = useAuth();
-  const [, setLocation] = useLocation();
-  
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedSubcategory, setSelectedSubcategory] = useState<string>("all");
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState("category");
+  const [location, setLocation] = useLocation();
+
+  // Helper to get current URL search params
+  const getSearchParams = () => new URLSearchParams(window.location.search);
+
+  // Initialize state from URL params
+  const [searchTerm, setSearchTerm] = useState(() => getSearchParams().get("search") || "");
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string>(() => getSearchParams().get("subcategory") || "all");
+  const [selectedTags, setSelectedTags] = useState<string[]>(() => {
+    const tags = getSearchParams().get("tags");
+    return tags ? tags.split(",") : [];
+  });
+  const [selectedResourceTypes, setSelectedResourceTypes] = useState<string[]>(() => {
+    const types = getSearchParams().get("resourceType");
+    return types ? types.split(",") : [];
+  });
+  const [selectedDifficulties, setSelectedDifficulties] = useState<string[]>(() => {
+    const difficulties = getSearchParams().get("difficulty");
+    return difficulties ? difficulties.split(",") : [];
+  });
+  const [sortBy, setSortBy] = useState(() => getSearchParams().get("sortBy") || "category");
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [resourceToEdit, setResourceToEdit] = useState<DbResource | null>(null);
   
@@ -117,42 +133,129 @@ export default function Category() {
     });
     return Array.from(uniqueSubcategories).sort();
   }, [allResources]);
+
+  // Calculate resource type counts
+  const resourceTypeCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    allResources.forEach(resource => {
+      const dbId = typeof resource.id === 'string' && resource.id.startsWith('db-') ? parseInt(resource.id.replace('db-', '')) : resource.id;
+      const dbResource = dbResources.find(dr => dr.id === dbId);
+      const resourceType = dbResource?.metadata?.resourceType;
+      if (resourceType) {
+        counts[resourceType] = (counts[resourceType] || 0) + 1;
+      }
+    });
+    return counts;
+  }, [allResources, dbResources]);
+
+  // Calculate difficulty counts
+  const difficultyCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    allResources.forEach(resource => {
+      const dbId = typeof resource.id === 'string' && resource.id.startsWith('db-') ? parseInt(resource.id.replace('db-', '')) : resource.id;
+      const dbResource = dbResources.find(dr => dr.id === dbId);
+      const difficulty = dbResource?.metadata?.difficulty;
+      if (difficulty) {
+        counts[difficulty] = (counts[difficulty] || 0) + 1;
+      }
+    });
+    return counts;
+  }, [allResources, dbResources]);
   
   // Filter and sort resources
   const filteredResources = useMemo(() => {
     let results = [...allResources];
-    
+
     // Search filter
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
-      results = results.filter(r => 
+      results = results.filter(r =>
         r.title.toLowerCase().includes(searchLower) ||
         r.description?.toLowerCase().includes(searchLower)
       );
     }
-    
+
     // Subcategory filter
     if (selectedSubcategory !== "all") {
       results = results.filter(r => r.subcategory === selectedSubcategory);
     }
-    
+
     // Tag filter
     if (selectedTags.length > 0) {
-      results = results.filter(r => 
+      results = results.filter(r =>
         r.tags && r.tags.some(tag => selectedTags.includes(tag))
       );
     }
-    
+
+    // Resource type filter
+    if (selectedResourceTypes.length > 0) {
+      results = results.filter(r => {
+        const dbId = typeof r.id === 'string' && r.id.startsWith('db-') ? parseInt(r.id.replace('db-', '')) : r.id;
+        const dbResource = dbResources.find(dr => dr.id === dbId);
+        const resourceType = dbResource?.metadata?.resourceType;
+        return resourceType && selectedResourceTypes.includes(resourceType);
+      });
+    }
+
+    // Difficulty filter
+    if (selectedDifficulties.length > 0) {
+      results = results.filter(r => {
+        const dbId = typeof r.id === 'string' && r.id.startsWith('db-') ? parseInt(r.id.replace('db-', '')) : r.id;
+        const dbResource = dbResources.find(dr => dr.id === dbId);
+        const difficulty = dbResource?.metadata?.difficulty;
+        return difficulty && selectedDifficulties.includes(difficulty);
+      });
+    }
+
     // Sort
     if (sortBy === "name-asc") {
       results.sort((a, b) => a.title.localeCompare(b.title));
     } else if (sortBy === "name-desc") {
       results.sort((a, b) => b.title.localeCompare(a.title));
     }
-    
+
     return results;
-  }, [allResources, searchTerm, selectedSubcategory, selectedTags, sortBy]);
+  }, [allResources, searchTerm, selectedSubcategory, selectedTags, selectedResourceTypes, selectedDifficulties, sortBy, dbResources]);
   
+  // Update URL when filters change
+  useEffect(() => {
+    const params = new URLSearchParams();
+
+    if (searchTerm) params.set("search", searchTerm);
+    if (selectedSubcategory && selectedSubcategory !== "all") params.set("subcategory", selectedSubcategory);
+    if (selectedTags.length > 0) params.set("tags", selectedTags.join(","));
+    if (selectedResourceTypes.length > 0) params.set("resourceType", selectedResourceTypes.join(","));
+    if (selectedDifficulties.length > 0) params.set("difficulty", selectedDifficulties.join(","));
+    if (sortBy && sortBy !== "category") params.set("sortBy", sortBy);
+
+    const newSearch = params.toString();
+    const newPath = `/category/${slug}${newSearch ? `?${newSearch}` : ""}`;
+
+    // Only update if the path changed
+    if (location !== newPath) {
+      window.history.replaceState({}, "", newPath);
+    }
+  }, [searchTerm, selectedSubcategory, selectedTags, selectedResourceTypes, selectedDifficulties, sortBy, slug, location]);
+
+  // Sync state from URL on popstate (browser back/forward)
+  useEffect(() => {
+    const handlePopState = () => {
+      const params = getSearchParams();
+      setSearchTerm(params.get("search") || "");
+      setSelectedSubcategory(params.get("subcategory") || "all");
+      const tags = params.get("tags");
+      setSelectedTags(tags ? tags.split(",") : []);
+      const types = params.get("resourceType");
+      setSelectedResourceTypes(types ? types.split(",") : []);
+      const difficulties = params.get("difficulty");
+      setSelectedDifficulties(difficulties ? difficulties.split(",") : []);
+      setSortBy(params.get("sortBy") || "category");
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
   // Track category view
   useEffect(() => {
     if (categoryName && !isLoading) {
@@ -190,24 +293,13 @@ export default function Category() {
   const handleSuggestEdit = (e: React.MouseEvent, resource: Resource) => {
     e.stopPropagation();
     if (!isDbResource(resource)) return;
-
+    
     const dbId = getDbId(resource);
     const dbResource = dbResources.find(r => r.id === dbId);
     setResourceToEdit(toDbResource(resource, dbResource));
     setEditDialogOpen(true);
   };
-
-  // Check if any filters are active
-  const hasActiveFilters = searchTerm !== "" || selectedSubcategory !== "all" || selectedTags.length > 0 || sortBy !== "category";
-
-  // Clear all filters function
-  const clearAllFilters = () => {
-    setSearchTerm("");
-    setSelectedSubcategory("all");
-    setSelectedTags([]);
-    setSortBy("category");
-  };
-
+  
   if (isLoading) {
     return (
       <div className="space-y-6" aria-busy={true} aria-live="polite">
@@ -308,40 +400,26 @@ export default function Category() {
               </SelectContent>
             </Select>
           )}
-          
-          {/* Sort */}
-          <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-full md:w-[180px]" data-testid="select-sort">
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="category">By Category</SelectItem>
-              <SelectItem value="name-asc">Name A-Z</SelectItem>
-              <SelectItem value="name-desc">Name Z-A</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
-        
+
+        {/* Advanced Filter */}
+        <AdvancedFilter
+          selectedResourceTypes={selectedResourceTypes}
+          selectedDifficulties={selectedDifficulties}
+          sortBy={sortBy}
+          resourceTypeCounts={resourceTypeCounts}
+          difficultyCounts={difficultyCounts}
+          onResourceTypesChange={setSelectedResourceTypes}
+          onDifficultiesChange={setSelectedDifficulties}
+          onSortChange={setSortBy}
+        />
+
         {/* Tag Filter */}
         <TagFilter
           resources={allResources}
           selectedTags={selectedTags}
           onTagsChange={setSelectedTags}
         />
-
-        {/* Clear Filters Button */}
-        {hasActiveFilters && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={clearAllFilters}
-            className="gap-2"
-            data-testid="button-clear-filters"
-          >
-            <FilterX className="h-4 w-4" />
-            Clear Filters
-          </Button>
-        )}
       </div>
       
       {/* Results Count and View Mode */}
@@ -357,11 +435,25 @@ export default function Category() {
       {filteredResources.length === 0 ? (
         <div className="text-center py-12">
           <h3 className="text-lg font-semibold mb-2">No resources found</h3>
-          <p className="text-muted-foreground">
-            {searchTerm || selectedSubcategory !== "all" 
+          <p className="text-muted-foreground mb-4">
+            {searchTerm || selectedSubcategory !== "all" || selectedTags.length > 0 || selectedResourceTypes.length > 0 || selectedDifficulties.length > 0
               ? "Try adjusting your filters to see more results."
               : "There are no resources in this category yet."}
           </p>
+          {(searchTerm || selectedSubcategory !== "all" || selectedTags.length > 0 || selectedResourceTypes.length > 0 || selectedDifficulties.length > 0) && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                setSearchTerm("");
+                setSelectedSubcategory("all");
+                setSelectedTags([]);
+                setSelectedResourceTypes([]);
+                setSelectedDifficulties([]);
+              }}
+            >
+              Clear all filters
+            </Button>
+          )}
         </div>
       ) : (
         <div className={

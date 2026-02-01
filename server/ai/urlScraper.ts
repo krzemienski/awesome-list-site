@@ -1,10 +1,13 @@
 import fetch from 'node-fetch';
 import * as cheerio from 'cheerio';
+import { encode } from 'blurhash';
+import sharp from 'sharp';
 
 export interface UrlMetadata {
   title?: string;
   description?: string;
   ogImage?: string;
+  ogImageBlurhash?: string;
   ogTitle?: string;
   ogDescription?: string;
   twitterCard?: string;
@@ -50,7 +53,7 @@ export async function fetchUrlMetadata(url: string, timeout: number = 10000): Pr
     }
 
     const html = await response.text();
-    return parseHtmlMetadata(html, url);
+    return await parseHtmlMetadata(html, url);
 
   } catch (error: any) {
     if (error.name === 'AbortError') {
@@ -60,7 +63,46 @@ export async function fetchUrlMetadata(url: string, timeout: number = 10000): Pr
   }
 }
 
-function parseHtmlMetadata(html: string, baseUrl: string): UrlMetadata {
+async function generateBlurhash(imageUrl: string): Promise<string | undefined> {
+  try {
+    const response = await fetch(imageUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; AwesomeVideoBot/1.0; +https://awesome-video.repl.co)',
+      },
+      timeout: 5000,
+      size: 2 * 1024 * 1024 // 2MB max for images
+    });
+
+    if (!response.ok) {
+      return undefined;
+    }
+
+    const buffer = await response.buffer();
+
+    // Resize image to 32x32 for blurhash generation
+    const { data, info } = await sharp(buffer)
+      .resize(32, 32, { fit: 'cover' })
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+
+    // Generate blurhash (4x3 components for balance between quality and size)
+    const blurhash = encode(
+      new Uint8ClampedArray(data),
+      info.width,
+      info.height,
+      4,
+      3
+    );
+
+    return blurhash;
+  } catch (error) {
+    // Silently fail - blurhash is optional enhancement
+    return undefined;
+  }
+}
+
+async function parseHtmlMetadata(html: string, baseUrl: string): Promise<UrlMetadata> {
   const $ = cheerio.load(html);
   const metadata: UrlMetadata = {};
 
@@ -95,6 +137,12 @@ function parseHtmlMetadata(html: string, baseUrl: string): UrlMetadata {
   }
   if (metadata.twitterImage && !metadata.twitterImage.startsWith('http')) {
     metadata.twitterImage = new URL(metadata.twitterImage, baseUrl).href;
+  }
+
+  // Generate blurhash for OG image (prefer ogImage, fallback to twitterImage)
+  const imageUrl = metadata.ogImage || metadata.twitterImage;
+  if (imageUrl) {
+    metadata.ogImageBlurhash = await generateBlurhash(imageUrl);
   }
 
   return metadata;

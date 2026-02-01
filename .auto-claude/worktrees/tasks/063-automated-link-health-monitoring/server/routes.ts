@@ -13,6 +13,7 @@
  * - Admin: Dashboard, user management, auditing (/api/admin/*)
  * - GitHub Sync: Import/export with awesome lists (/api/github/*)
  * - AI Services: Claude-powered enrichment (/api/admin/enrichment/*)
+ * - Link Health: Automated link monitoring (/api/admin/link-health/*)
  * - Learning: Personalized journeys (/api/journeys/*)
  * - SEO: Sitemap, RSS feed, schema.org (/sitemap.xml, /feed.xml)
  * 
@@ -50,10 +51,8 @@ import { validateAwesomeList, formatValidationReport } from "./validation/awesom
 import { checkResourceLinks, formatLinkCheckReport } from "./validation/linkChecker";
 import { seedDatabase } from "./seed";
 import { enrichmentService } from "./ai/enrichmentService";
+import { linkHealthMonitor } from "./services/linkHealthMonitor";
 import { freeTierLimiter, dynamicRateLimiter } from "./middleware/rateLimit";
-import { registerPublicApiRoutes } from "./api/public";
-import { swaggerSpec } from "./openapi";
-import swaggerUi from "swagger-ui-express";
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
 
@@ -441,16 +440,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= Public API Routes =============
   // These routes are intended for external API access with rate limiting
   // Rate limiting is applied based on API key tier or IP address (free tier)
-  // Routes are defined in server/api/public.ts for better organization
 
-  // Serve Swagger UI documentation at /api/docs
-  app.use('/api/docs', swaggerUi.serve);
-  app.get('/api/docs', swaggerUi.setup(swaggerSpec, {
-    customCss: '.swagger-ui .topbar { display: none }',
-    customSiteTitle: 'Awesome List Site - API Documentation',
-  }));
+  // GET /api/public/resources - List approved resources (public API with rate limiting)
+  app.get('/api/public/resources', freeTierLimiter, async (req, res) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 20;
+      const category = req.query.category as string;
+      const subcategory = req.query.subcategory as string;
+      const search = req.query.search as string;
 
-  registerPublicApiRoutes(app);
+      const result = await storage.listResources({
+        page,
+        limit,
+        status: 'approved',
+        category,
+        subcategory,
+        search
+      });
+
+      res.json(result);
+    } catch (error) {
+      console.error('Error fetching public resources:', error);
+      res.status(500).json({ message: 'Failed to fetch resources' });
+    }
+  });
+
+  // GET /api/public/resources/:id - Get single resource (public API with rate limiting)
+  app.get('/api/public/resources/:id', freeTierLimiter, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const resource = await storage.getResource(id);
+
+      if (!resource) {
+        return res.status(404).json({ message: 'Resource not found' });
+      }
+
+      // Only return approved resources via public API
+      if (resource.status !== 'approved') {
+        return res.status(404).json({ message: 'Resource not found' });
+      }
+
+      res.json(resource);
+    } catch (error) {
+      console.error('Error fetching public resource:', error);
+      res.status(500).json({ message: 'Failed to fetch resource' });
+    }
+  });
+
+  // GET /api/public/categories - List all categories (public API with rate limiting)
+  app.get('/api/public/categories', freeTierLimiter, async (req, res) => {
+    try {
+      const categories = await storage.listCategories();
+      res.json({ categories });
+    } catch (error) {
+      console.error('Error fetching public categories:', error);
+      res.status(500).json({ message: 'Failed to fetch categories' });
+    }
+  });
+
+  // GET /api/public/tags - List all tags (public API with rate limiting)
+  app.get('/api/public/tags', freeTierLimiter, async (req, res) => {
+    try {
+      // For now, return empty array as tags functionality may not be fully implemented
+      // This can be expanded when tag support is added to the storage layer
+      res.json({ tags: [] });
+    } catch (error) {
+      console.error('Error fetching public tags:', error);
+      res.status(500).json({ message: 'Failed to fetch tags' });
+    }
+  });
 
   // ============= Resource Routes =============
 
@@ -462,9 +521,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const category = req.query.category as string;
       const subcategory = req.query.subcategory as string;
       const search = req.query.search as string;
-      const resourceType = req.query.resourceType as string;
-      const difficulty = req.query.difficulty as string;
-      const sortBy = req.query.sortBy as string;
 
       const result = await storage.listResources({
         page,
@@ -472,10 +528,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: 'approved',
         category,
         subcategory,
-        search,
-        resourceType,
-        difficulty,
-        sortBy
+        search
       });
 
       res.json(result);
@@ -484,24 +537,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: 'Failed to fetch resources' });
     }
   });
-  
+
+  // GET /api/resources/check-url - Check if URL already exists (public)
+  app.get('/api/resources/check-url', async (req, res) => {
+    try {
+      const url = req.query.url as string;
+
+      if (!url) {
+        return res.status(400).json({ message: 'URL parameter is required' });
+      }
+
+      const existingResource = await storage.getResourceByUrl(url);
+
+      if (existingResource) {
+        return res.json({
+          exists: true,
+          resource: {
+            id: existingResource.id,
+            title: existingResource.title,
+            status: existingResource.status,
+            category: existingResource.category,
+            subcategory: existingResource.subcategory
+          }
+        });
+      }
+
+      res.json({ exists: false });
+    } catch (error) {
+      console.error('Error checking URL:', error);
+      res.status(500).json({ message: 'Failed to check URL' });
+    }
+  });
+
   // GET /api/resources/:id - Get single resource
   app.get('/api/resources/:id', async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const resource = await storage.getResource(id);
-      
+
       if (!resource) {
         return res.status(404).json({ message: 'Resource not found' });
       }
-      
+
       res.json(resource);
     } catch (error) {
       console.error('Error fetching resource:', error);
       res.status(500).json({ message: 'Failed to fetch resource' });
     }
   });
-  
+
   // POST /api/resources - Submit new resource (authenticated)
   app.post('/api/resources', isAuthenticated, async (req: any, res) => {
     try {
@@ -2706,6 +2790,152 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({
         success: false,
         message: 'Failed to cancel job',
+        error: error.message
+      });
+    }
+  });
+
+  // ============= Link Health Monitoring API Routes =============
+
+  // GET /api/admin/link-health/status - Get latest link health check status
+  app.get('/api/admin/link-health/status', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      // Get the most recent job
+      const jobs = await storage.listLinkHealthJobs(1);
+
+      if (jobs.length === 0) {
+        return res.json({
+          success: true,
+          job: null,
+          message: 'No link health checks have been run yet'
+        });
+      }
+
+      const latestJob = jobs[0];
+
+      res.json({
+        success: true,
+        job: latestJob
+      });
+    } catch (error: any) {
+      console.error('Error getting link health status:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to get link health status',
+        error: error.message
+      });
+    }
+  });
+
+  // GET /api/admin/link-health/history - List all link health check jobs
+  app.get('/api/admin/link-health/history', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 50;
+      const jobs = await storage.listLinkHealthJobs(limit);
+
+      res.json({
+        success: true,
+        jobs
+      });
+    } catch (error: any) {
+      console.error('Error listing link health jobs:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to list link health jobs',
+        error: error.message
+      });
+    }
+  });
+
+  // POST /api/admin/link-health/run - Manually trigger a link health check
+  app.post('/api/admin/link-health/run', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || 'admin';
+
+      const jobId = await linkHealthMonitor.runHealthCheck(userId);
+
+      res.json({
+        success: true,
+        jobId,
+        message: 'Link health check started successfully'
+      });
+    } catch (error: any) {
+      console.error('Error starting link health check:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to start link health check',
+        error: error.message
+      });
+    }
+  });
+
+  // GET /api/admin/link-health/jobs/:id - Get specific job details
+  app.get('/api/admin/link-health/jobs/:id', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const jobId = parseInt(req.params.id);
+
+      if (isNaN(jobId)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid job ID'
+        });
+      }
+
+      const job = await storage.getLinkHealthJob(jobId);
+
+      if (!job) {
+        return res.status(404).json({
+          success: false,
+          message: 'Job not found'
+        });
+      }
+
+      res.json({
+        success: true,
+        job
+      });
+    } catch (error: any) {
+      console.error('Error getting job details:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to get job details',
+        error: error.message
+      });
+    }
+  });
+
+  // GET /api/admin/link-health/broken-links - Get list of broken links with filters
+  app.get('/api/admin/link-health/broken-links', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const jobId = req.query.jobId ? parseInt(req.query.jobId as string) : undefined;
+      const status = req.query.status as string | undefined;
+
+      // Get broken links summary which includes failed resources
+      const summary = await storage.getBrokenLinksSummary(jobId);
+
+      // Filter by status if provided
+      let brokenLinks = summary.failedResources;
+      if (status) {
+        brokenLinks = brokenLinks.filter((link: any) => link.status === status);
+      }
+
+      res.json({
+        success: true,
+        brokenLinks,
+        summary: {
+          totalChecked: summary.totalChecked,
+          healthyCount: summary.healthyCount,
+          brokenCount: summary.brokenCount,
+          redirectCount: summary.redirectCount,
+          timeoutCount: summary.timeoutCount,
+          dnsFailureCount: summary.dnsFailureCount
+        }
+      });
+    } catch (error: any) {
+      console.error('Error getting broken links:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to get broken links',
         error: error.message
       });
     }
