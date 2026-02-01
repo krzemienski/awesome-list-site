@@ -31,8 +31,25 @@ A production-ready React application for browsing and discovering 2,600+ curated
 
 ## Screenshots
 
-<!-- Screenshots coming soon -->
-_Screenshots will be added before v1.0 release_
+### Home Page & Search Interface
+![Home page with fuzzy search (⌘K) interface showing resource discovery](docs/screenshots/home-search.png)
+*Browse 2,600+ resources with advanced fuzzy search (⌘K keyboard shortcut)*
+
+### Category Navigation
+![3-level navigation hierarchy: Categories → Subcategories → Sub-subcategories](docs/screenshots/category-navigation.png)
+*Navigate through the complete 3-level category hierarchy*
+
+### Learning Journeys
+![Guided learning paths with progress tracking and skill development milestones](docs/screenshots/learning-journeys.png)
+*Follow curated learning paths with progress tracking*
+
+### Admin Dashboard
+![Admin resource curation interface with approval queue and moderation tools](docs/screenshots/admin-dashboard.png)
+*Manage resources, review submissions, and curate content*
+
+### Mobile View
+![Responsive mobile interface with WCAG AAA touch targets](docs/screenshots/mobile-view.png)
+*Fully responsive design optimized for mobile devices*
 
 ## Technology Stack
 
