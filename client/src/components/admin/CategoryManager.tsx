@@ -1,4 +1,4 @@
-import GenericCrudManager, { BaseEntityWithCount } from "./GenericCrudManager";
+import GenericCrudManager, { BaseEntityWithCount, GenericCrudManagerProps } from "./GenericCrudManager";
 import { categoryConfig } from "./configs/category-config";
 
 interface CategoryWithCount extends BaseEntityWithCount {
@@ -8,6 +8,8 @@ interface CategoryWithCount extends BaseEntityWithCount {
   resourceCount: number;
 }
 
+const TypedCrudManager = GenericCrudManager as React.ComponentType<GenericCrudManagerProps<CategoryWithCount>>;
+
 export default function CategoryManager() {
-  return <GenericCrudManager<CategoryWithCount> {...categoryConfig} />;
+  return <TypedCrudManager {...categoryConfig} />;
 }
