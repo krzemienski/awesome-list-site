@@ -1,0 +1,25 @@
+{
+  "active": true,
+  "spec": "054-create-centralized-api-error-handling-middleware",
+  "state": "planning",
+  "subtasks": {
+    "completed": 0,
+    "total": 0,
+    "in_progress": 1,
+    "failed": 0
+  },
+  "phase": {
+    "current": "Setup - Create Error Infrastructure",
+    "id": null,
+    "total": 3
+  },
+  "workers": {
+    "active": 0,
+    "max": 1
+  },
+  "session": {
+    "number": 2,
+    "started_at": "2026-01-31T23:13:08.920439"
+  },
+  "last_update": "2026-01-31T23:16:52.027747"
+}
