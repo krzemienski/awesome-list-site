@@ -50,6 +50,7 @@ import { validateAwesomeList, formatValidationReport } from "./validation/awesom
 import { checkResourceLinks, formatLinkCheckReport } from "./validation/linkChecker";
 import { seedDatabase } from "./seed";
 import { enrichmentService } from "./ai/enrichmentService";
+import { linkHealthMonitor } from "./services/linkHealthMonitor";
 
 const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md";
 
@@ -2655,6 +2656,144 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({
         success: false,
         message: 'Failed to cancel job',
+        error: error.message
+      });
+    }
+  });
+
+  // ============= Link Health Monitoring API Routes =============
+
+  // GET /api/admin/link-health/status - Get latest link health check status
+  app.get('/api/admin/link-health/status', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      // Get the most recent job
+      const jobs = await storage.listLinkHealthJobs(1);
+
+      if (jobs.length === 0) {
+        return res.json({
+          success: true,
+          status: 'no_jobs',
+          message: 'No link health checks have been run yet',
+          job: null
+        });
+      }
+
+      const latestJob = jobs[0];
+
+      res.json({
+        success: true,
+        status: latestJob.status,
+        job: latestJob
+      });
+    } catch (error: any) {
+      console.error('Error getting link health status:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to get link health status',
+        error: error.message
+      });
+    }
+  });
+
+  // GET /api/admin/link-health/history - List all link health check jobs
+  app.get('/api/admin/link-health/history', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 50;
+      const jobs = await storage.listLinkHealthJobs(limit);
+
+      res.json({
+        success: true,
+        jobs
+      });
+    } catch (error: any) {
+      console.error('Error listing link health jobs:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to list link health jobs',
+        error: error.message
+      });
+    }
+  });
+
+  // POST /api/admin/link-health/run - Manually trigger a link health check
+  app.post('/api/admin/link-health/run', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub || 'admin';
+
+      const jobId = await linkHealthMonitor.runHealthCheck(userId);
+
+      res.json({
+        success: true,
+        jobId,
+        message: 'Link health check started successfully'
+      });
+    } catch (error: any) {
+      console.error('Error starting link health check:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to start link health check',
+        error: error.message
+      });
+    }
+  });
+
+  // GET /api/admin/link-health/jobs/:id - Get specific job details
+  app.get('/api/admin/link-health/jobs/:id', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const jobId = parseInt(req.params.id);
+
+      if (isNaN(jobId)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid job ID'
+        });
+      }
+
+      const job = await storage.getLinkHealthJob(jobId);
+
+      if (!job) {
+        return res.status(404).json({
+          success: false,
+          message: 'Job not found'
+        });
+      }
+
+      // Get detailed check results for this job
+      const checks = await storage.getLinkHealthChecks(jobId);
+
+      res.json({
+        success: true,
+        job,
+        checks
+      });
+    } catch (error: any) {
+      console.error('Error getting job details:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to get job details',
+        error: error.message
+      });
+    }
+  });
+
+  // GET /api/admin/link-health/broken-links - Get list of broken links with filters
+  app.get('/api/admin/link-health/broken-links', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const jobId = req.query.jobId ? parseInt(req.query.jobId as string) : undefined;
+      const status = req.query.status as string | undefined;
+
+      // Get broken links summary which includes failed resources
+      const brokenLinks = await storage.getBrokenLinks({ jobId, status });
+
+      res.json({
+        success: true,
+        brokenLinks
+      });
+    } catch (error: any) {
+      console.error('Error getting broken links:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to get broken links',
         error: error.message
       });
     }
