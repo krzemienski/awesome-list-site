@@ -6,6 +6,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import SEOHead from "@/components/layout/SEOHead";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
 
 interface BookmarkedResource {
   id: string;
@@ -163,13 +165,15 @@ export default function Bookmarks() {
               Start exploring resources and bookmark the ones you want to save for later. 
               Click the bookmark icon on any resource card to add it to your collection.
             </p>
-            <a 
-              href="/"
-              className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-pink-500 text-white hover:bg-pink-600 h-10 px-6 py-2"
+            <Button
+              className="bg-pink-500 text-white hover:bg-pink-600"
               data-testid="link-explore-resources"
+              asChild
             >
-              Explore Resources
-            </a>
+              <Link href="/">
+                Explore Resources
+              </Link>
+            </Button>
           </CardContent>
         </Card>
       )}

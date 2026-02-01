@@ -50,7 +50,12 @@ import { validateAwesomeList, formatValidationReport } from "./validation/awesom
 import { checkResourceLinks, formatLinkCheckReport } from "./validation/linkChecker";
 import { seedDatabase } from "./seed";
 import { enrichmentService } from "./ai/enrichmentService";
-import { linkHealthMonitor } from "./services/linkHealthMonitor";
+import { freeTierLimiter, dynamicRateLimiter } from "./middleware/rateLimit";
+import { registerPublicApiRoutes } from "./api/public";
+import { swaggerSpec } from "./openapi";
+import swaggerUi from "swagger-ui-express";
+import crypto from "crypto";
+import bcrypt from "bcryptjs";
 
 const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md";
 
@@ -61,17 +66,26 @@ const isAdmin = async (req: any, res: Response, next: any) => {
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-    
+
     const user = await storage.getUser(userId);
     if (!user || user.role !== 'admin') {
       return res.status(403).json({ message: "Forbidden: Admin access required" });
     }
-    
+
     next();
   } catch (error) {
     res.status(500).json({ message: "Error checking admin status" });
   }
 };
+
+// Helper function to generate secure API keys
+function generateApiKey(): string {
+  // Generate a 32-byte random string and encode as base64url (URL-safe)
+  return crypto.randomBytes(32).toString('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=/g, '');
+}
 
 // SEO route handlers - now uses database-driven data
 async function generateSitemap(req: any, res: any) {
@@ -424,8 +438,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Note: /api/login, /api/callback are set up in setupAuth()
 
+  // ============= Public API Routes =============
+  // These routes are intended for external API access with rate limiting
+  // Rate limiting is applied based on API key tier or IP address (free tier)
+  // Routes are defined in server/api/public.ts for better organization
+
+  // Serve Swagger UI documentation at /api/docs
+  app.use('/api/docs', swaggerUi.serve);
+  app.get('/api/docs', swaggerUi.setup(swaggerSpec, {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'Awesome List Site - API Documentation',
+  }));
+
+  registerPublicApiRoutes(app);
+
   // ============= Resource Routes =============
-  
+
   // GET /api/resources - List approved resources (public)
   app.get('/api/resources', async (req, res) => {
     try {
@@ -496,56 +524,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching resource:', error);
       res.status(500).json({ message: 'Failed to fetch resource' });
-    }
-  });
-
-  // GET /api/resources/:id/related - Get AI-powered similar resources
-  app.get('/api/resources/:id/related', async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const limit = parseInt(req.query.limit as string) || 5;
-
-      // Get the source resource
-      const resource = await storage.getResource(id);
-      if (!resource) {
-        return res.status(404).json({ message: 'Resource not found' });
-      }
-
-      // Create a synthetic user profile based on the resource's attributes
-      const userProfile: AIUserProfile = {
-        userId: 'anonymous',
-        preferredCategories: resource.category ? [resource.category] : [],
-        skillLevel: 'intermediate',
-        learningGoals: [],
-        preferredResourceTypes: [],
-        timeCommitment: 'flexible',
-        viewHistory: [resource.url], // Exclude this resource from results
-        bookmarks: [],
-        completedResources: [],
-        ratings: {}
-      };
-
-      // Generate recommendations
-      const result = await recommendationEngine.generateRecommendations(
-        userProfile,
-        limit + 1, // Request one more to account for filtering
-        false
-      );
-
-      // Filter out the source resource and limit results
-      const relatedResources = result.recommendations
-        .filter(rec => rec.resource.id !== id)
-        .slice(0, limit)
-        .map(rec => ({
-          ...rec.resource,
-          score: rec.confidence,
-          reasons: [rec.reason]
-        }));
-
-      res.json({ resources: relatedResources });
-    } catch (error) {
-      console.error('Error fetching related resources:', error);
-      res.status(500).json({ message: 'Failed to fetch related resources' });
     }
   });
 
@@ -1228,11 +1206,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.params.id;
       const { role } = req.body;
-      
+
       if (!role || !['user', 'admin', 'moderator'].includes(role)) {
         return res.status(400).json({ message: 'Invalid role' });
       }
-      
+
       const user = await storage.updateUserRole(userId, role);
       res.json(user);
     } catch (error) {
@@ -1240,7 +1218,104 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: 'Failed to update user role' });
     }
   });
-  
+
+  // ============= API Key Management Routes =============
+
+  // POST /api/admin/api-keys - Create a new API key
+  app.post('/api/admin/api-keys', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { name, scopes, expiresAt } = req.body;
+
+      // Validate input
+      if (!name || name.trim().length === 0) {
+        return res.status(400).json({ message: 'API key name is required' });
+      }
+
+      // Generate a secure random API key
+      const plaintextKey = generateApiKey();
+
+      // Hash the key before storing
+      const hashedKey = await bcrypt.hash(plaintextKey, 10);
+
+      // Create API key in database
+      const apiKey = await storage.createApiKey({
+        userId,
+        key: hashedKey,
+        name: name.trim(),
+        scopes: scopes || ['read'],
+        expiresAt: expiresAt ? new Date(expiresAt) : undefined,
+      });
+
+      // Return the API key with plaintext key (only time it's shown)
+      res.json({
+        id: apiKey.id,
+        name: apiKey.name,
+        key: plaintextKey, // Only returned once during creation
+        scopes: apiKey.scopes,
+        createdAt: apiKey.createdAt,
+        expiresAt: apiKey.expiresAt,
+      });
+    } catch (error) {
+      console.error('Error creating API key:', error);
+      res.status(500).json({ message: 'Failed to create API key' });
+    }
+  });
+
+  // GET /api/admin/api-keys - List all API keys for current user
+  app.get('/api/admin/api-keys', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+
+      // Get all API keys for the user
+      const apiKeys = await storage.listApiKeys(userId);
+
+      // Return keys without the hashed key value (security)
+      const sanitizedKeys = apiKeys.map(key => ({
+        id: key.id,
+        name: key.name,
+        scopes: key.scopes,
+        createdAt: key.createdAt,
+        lastUsedAt: key.lastUsedAt,
+        expiresAt: key.expiresAt,
+        revokedAt: key.revokedAt,
+      }));
+
+      res.json({ apiKeys: sanitizedKeys });
+    } catch (error) {
+      console.error('Error listing API keys:', error);
+      res.status(500).json({ message: 'Failed to list API keys' });
+    }
+  });
+
+  // DELETE /api/admin/api-keys/:id - Revoke an API key
+  app.delete('/api/admin/api-keys/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const keyId = req.params.id;
+      const userId = req.user.claims.sub;
+
+      if (!keyId) {
+        return res.status(400).json({ message: 'API key ID is required' });
+      }
+
+      // Verify the key belongs to the user (for security)
+      const userKeys = await storage.listApiKeys(userId);
+      const keyExists = userKeys.some(key => key.id === keyId);
+
+      if (!keyExists) {
+        return res.status(404).json({ message: 'API key not found' });
+      }
+
+      // Revoke the key
+      await storage.revokeApiKey(keyId);
+
+      res.json({ message: 'API key revoked successfully' });
+    } catch (error) {
+      console.error('Error revoking API key:', error);
+      res.status(500).json({ message: 'Failed to revoke API key' });
+    }
+  });
+
   // ============= Resource Approval Routes =============
   
   // GET /api/admin/pending-resources - Get all pending resources for approval
@@ -2656,144 +2731,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({
         success: false,
         message: 'Failed to cancel job',
-        error: error.message
-      });
-    }
-  });
-
-  // ============= Link Health Monitoring API Routes =============
-
-  // GET /api/admin/link-health/status - Get latest link health check status
-  app.get('/api/admin/link-health/status', isAuthenticated, isAdmin, async (req, res) => {
-    try {
-      // Get the most recent job
-      const jobs = await storage.listLinkHealthJobs(1);
-
-      if (jobs.length === 0) {
-        return res.json({
-          success: true,
-          status: 'no_jobs',
-          message: 'No link health checks have been run yet',
-          job: null
-        });
-      }
-
-      const latestJob = jobs[0];
-
-      res.json({
-        success: true,
-        status: latestJob.status,
-        job: latestJob
-      });
-    } catch (error: any) {
-      console.error('Error getting link health status:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to get link health status',
-        error: error.message
-      });
-    }
-  });
-
-  // GET /api/admin/link-health/history - List all link health check jobs
-  app.get('/api/admin/link-health/history', isAuthenticated, isAdmin, async (req, res) => {
-    try {
-      const limit = parseInt(req.query.limit as string) || 50;
-      const jobs = await storage.listLinkHealthJobs(limit);
-
-      res.json({
-        success: true,
-        jobs
-      });
-    } catch (error: any) {
-      console.error('Error listing link health jobs:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to list link health jobs',
-        error: error.message
-      });
-    }
-  });
-
-  // POST /api/admin/link-health/run - Manually trigger a link health check
-  app.post('/api/admin/link-health/run', isAuthenticated, isAdmin, async (req: any, res) => {
-    try {
-      const userId = req.user?.claims?.sub || 'admin';
-
-      const jobId = await linkHealthMonitor.runHealthCheck(userId);
-
-      res.json({
-        success: true,
-        jobId,
-        message: 'Link health check started successfully'
-      });
-    } catch (error: any) {
-      console.error('Error starting link health check:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to start link health check',
-        error: error.message
-      });
-    }
-  });
-
-  // GET /api/admin/link-health/jobs/:id - Get specific job details
-  app.get('/api/admin/link-health/jobs/:id', isAuthenticated, isAdmin, async (req, res) => {
-    try {
-      const jobId = parseInt(req.params.id);
-
-      if (isNaN(jobId)) {
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid job ID'
-        });
-      }
-
-      const job = await storage.getLinkHealthJob(jobId);
-
-      if (!job) {
-        return res.status(404).json({
-          success: false,
-          message: 'Job not found'
-        });
-      }
-
-      // Get detailed check results for this job
-      const checks = await storage.getLinkHealthChecks(jobId);
-
-      res.json({
-        success: true,
-        job,
-        checks
-      });
-    } catch (error: any) {
-      console.error('Error getting job details:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to get job details',
-        error: error.message
-      });
-    }
-  });
-
-  // GET /api/admin/link-health/broken-links - Get list of broken links with filters
-  app.get('/api/admin/link-health/broken-links', isAuthenticated, isAdmin, async (req, res) => {
-    try {
-      const jobId = req.query.jobId ? parseInt(req.query.jobId as string) : undefined;
-      const status = req.query.status as string | undefined;
-
-      // Get broken links summary which includes failed resources
-      const brokenLinks = await storage.getBrokenLinks({ jobId, status });
-
-      res.json({
-        success: true,
-        brokenLinks
-      });
-    } catch (error: any) {
-      console.error('Error getting broken links:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to get broken links',
         error: error.message
       });
     }

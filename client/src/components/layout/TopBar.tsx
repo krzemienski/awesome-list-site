@@ -89,7 +89,7 @@ export default function TopBar({
         <div className="flex-1 mx-1 md:mx-4 min-w-0">
           <button
             onClick={onSearchOpen}
-            className="w-full flex items-center h-8 md:h-9 rounded-md border border-input px-2 md:px-3 py-1 md:py-2 text-sm bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="w-full flex items-center h-8 md:h-9 rounded-lg border border-input px-2 md:px-3 py-1 md:py-2 text-sm bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             <Search className="mr-1 md:mr-2 h-4 w-4 shrink-0 opacity-50" />
             <span className="text-muted-foreground truncate text-xs md:text-sm">

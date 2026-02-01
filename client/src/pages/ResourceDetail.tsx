@@ -1,6 +1,6 @@
 import { useParams, Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -129,6 +129,17 @@ export default function ResourceDetail() {
       return response.json();
     },
   });
+
+  // Track page view when resource loads
+  useEffect(() => {
+    if (resource && user?.id) {
+      trackInteraction.mutate({
+        resourceId: resource.id.toString(),
+        interactionType: "view",
+        metadata: { timestamp: new Date().toISOString() }
+      });
+    }
+  }, [resource?.id, user?.id]);
 
   const handleShare = async () => {
     const url = window.location.href;

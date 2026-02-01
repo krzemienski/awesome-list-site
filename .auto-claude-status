@@ -1,15 +1,15 @@
 {
   "active": true,
-  "spec": "116-document-ui-component-library-and-design-system",
+  "spec": "095-public-api-access",
   "state": "building",
   "subtasks": {
-    "completed": 9,
-    "total": 14,
+    "completed": 19,
+    "total": 20,
     "in_progress": 1,
     "failed": 0
   },
   "phase": {
-    "current": "Component Library Documentation",
+    "current": "SDK & Code Examples",
     "id": null,
     "total": 4
   },
@@ -18,8 +18,8 @@
     "max": 1
   },
   "session": {
-    "number": 11,
-    "started_at": "2026-02-01T02:03:44.116272"
+    "number": 14,
+    "started_at": "2026-02-01T01:28:12.762540"
   },
-  "last_update": "2026-02-01T02:38:16.267754"
+  "last_update": "2026-02-01T02:00:50.399254"
 }

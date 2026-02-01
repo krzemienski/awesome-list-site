@@ -28,6 +28,7 @@ import { useAIRecommendations, type RecommendationResult } from "@/hooks/useAIRe
 import { useUserProfile } from "@/hooks/use-user-profile";
 import { Resource } from "@/types/awesome-list";
 import RecommendationFeedback from "@/components/ui/recommendation-feedback";
+import { queryClient } from "@/lib/queryClient";
 import {
   Sparkles,
   ExternalLink,
@@ -158,6 +159,11 @@ export default function AIRecommendationsPanel({ resources }: AIRecommendationsP
     if (confidence >= 0.8) return "default";
     if (confidence >= 0.6) return "secondary";
     return "outline";
+  };
+
+  const handleFeedbackChange = (feedback: 'helpful' | 'not_helpful' | null) => {
+    // Invalidate recommendations cache to refresh with updated user preferences
+    queryClient.invalidateQueries({ queryKey: ['/api/recommendations'] });
   };
 
   return (
@@ -615,6 +621,7 @@ export default function AIRecommendationsPanel({ resources }: AIRecommendationsP
                           resourceId={parseInt(resource.id, 10)}
                           userId={userProfile.userId}
                           size="sm"
+                          onFeedbackChange={handleFeedbackChange}
                           data-testid={`feedback-${index}`}
                         />
                       </div>
