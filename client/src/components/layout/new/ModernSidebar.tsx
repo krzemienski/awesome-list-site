@@ -17,7 +17,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Skeleton } from "@/components/ui/skeleton";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Home, Folder, ExternalLink, Menu, Sparkles, Zap, Shield, Plus, BookOpen, ChevronLeft } from "lucide-react";
+import { Home, Folder, ExternalLink, Menu, Sparkles, Zap, Shield, Plus, BookOpen, ChevronLeft, ChevronRight } from "lucide-react";
 import { slugify, getCategorySlug } from "@/lib/utils";
 import { Category, Resource } from "@/types/awesome-list";
 import { cn } from "@/lib/utils";
@@ -328,12 +328,10 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
                     }}
                     aria-label={`${openCategories.includes(category.name) ? 'Collapse' : 'Expand'} ${category.name}`}
                   >
-                    <div className={cn(
-                      "transform transition-transform duration-200",
+                    <ChevronRight className={cn(
+                      "h-4 w-4 transform transition-transform duration-200",
                       openCategories.includes(category.name) ? "rotate-90" : ""
-                    )}>
-                      <span className="text-sm">▶</span>
-                    </div>
+                    )} />
                   </button>
                   <Button
                     variant="ghost"
@@ -376,12 +374,10 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
                               }}
                               aria-label={`${openCategories.includes(`${category.name}-${subcategory.name}`) ? 'Collapse' : 'Expand'} ${subcategory.name}`}
                             >
-                              <div className={cn(
-                                "transform transition-transform duration-200",
+                              <ChevronRight className={cn(
+                                "h-4 w-4 transform transition-transform duration-200",
                                 openCategories.includes(`${category.name}-${subcategory.name}`) ? "rotate-90" : ""
-                              )}>
-                                <span className="text-sm">▶</span>
-                              </div>
+                              )} />
                             </button>
                           ) : (
                             <div className="min-w-[44px] h-[44px] flex-shrink-0"></div>
