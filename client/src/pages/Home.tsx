@@ -5,9 +5,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { AwesomeList, Category } from "@/types/awesome-list";
+import { AwesomeList, Category, Resource } from "@/types/awesome-list";
 import SEOHead from "@/components/layout/SEOHead";
 import AIRecommendationsPanel from "@/components/ui/ai-recommendations-panel";
+import AdvancedFilter from "@/components/ui/advanced-filter";
 import { useAuth } from "@/hooks/useAuth";
 import {
   FileText,
