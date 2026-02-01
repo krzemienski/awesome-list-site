@@ -51,7 +51,7 @@ import { checkResourceLinks, formatLinkCheckReport } from "./validation/linkChec
 import { seedDatabase } from "./seed";
 import { enrichmentService } from "./ai/enrichmentService";
 import { asyncHandler } from "./middleware/asyncHandler";
-import { InternalServerError, UnauthorizedError } from "./middleware/errors";
+import { InternalServerError, UnauthorizedError, NotFoundError, ValidationError, BadRequestError } from "./middleware/errors";
 
 const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md";
 
@@ -429,177 +429,152 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= Resource Routes =============
   
   // GET /api/resources - List approved resources (public)
-  app.get('/api/resources', async (req, res) => {
-    try {
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 20;
-      const category = req.query.category as string;
-      const subcategory = req.query.subcategory as string;
-      const search = req.query.search as string;
-      
-      const result = await storage.listResources({
-        page,
-        limit,
-        status: 'approved',
-        category,
-        subcategory,
-        search
-      });
-      
-      res.json(result);
-    } catch (error) {
-      console.error('Error fetching resources:', error);
-      res.status(500).json({ message: 'Failed to fetch resources' });
-    }
-  });
+  app.get('/api/resources', asyncHandler(async (req, res) => {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 20;
+    const category = req.query.category as string;
+    const subcategory = req.query.subcategory as string;
+    const search = req.query.search as string;
+
+    const result = await storage.listResources({
+      page,
+      limit,
+      status: 'approved',
+      category,
+      subcategory,
+      search
+    });
+
+    res.json(result);
+  }));
   
   // GET /api/resources/:id - Get single resource
-  app.get('/api/resources/:id', async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const resource = await storage.getResource(id);
-      
-      if (!resource) {
-        return res.status(404).json({ message: 'Resource not found' });
-      }
-      
-      res.json(resource);
-    } catch (error) {
-      console.error('Error fetching resource:', error);
-      res.status(500).json({ message: 'Failed to fetch resource' });
+  app.get('/api/resources/:id', asyncHandler(async (req, res) => {
+    const id = parseInt(req.params.id);
+    const resource = await storage.getResource(id);
+
+    if (!resource) {
+      throw new NotFoundError('Resource not found');
     }
-  });
+
+    res.json(resource);
+  }));
   
   // POST /api/resources - Submit new resource (authenticated)
-  app.post('/api/resources', isAuthenticated, async (req: any, res) => {
+  app.post('/api/resources', isAuthenticated, asyncHandler(async (req: any, res) => {
+    const userId = req.user.claims.sub;
+
     try {
-      const userId = req.user.claims.sub;
       const resourceData = insertResourceSchema.parse(req.body);
-      
+
       const resource = await storage.createResource({
         ...resourceData,
         submittedBy: userId,
         status: 'pending'
       });
-      
+
       res.status(201).json(resource);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: 'Invalid resource data', errors: error.errors });
+        throw new ValidationError('Invalid resource data', error.errors);
       }
-      console.error('Error creating resource:', error);
-      res.status(500).json({ message: 'Failed to create resource' });
+      throw error;
     }
-  });
+  }));
   
   // GET /api/resources/pending - List pending resources (admin only)
-  app.get('/api/resources/pending', isAuthenticated, isAdmin, async (req, res) => {
-    try {
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 20;
-      
-      const result = await storage.listResources({
-        page,
-        limit,
-        status: 'pending'
-      });
-      
-      res.json(result);
-    } catch (error) {
-      console.error('Error fetching pending resources:', error);
-      res.status(500).json({ message: 'Failed to fetch pending resources' });
-    }
-  });
+  app.get('/api/resources/pending', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 20;
+
+    const result = await storage.listResources({
+      page,
+      limit,
+      status: 'pending'
+    });
+
+    res.json(result);
+  }));
   
   // PUT /api/resources/:id/approve - Approve resource (admin)
-  app.put('/api/resources/:id/approve', isAuthenticated, isAdmin, async (req: any, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
-      
-      const resource = await storage.updateResourceStatus(id, 'approved', userId);
-      res.json(resource);
-    } catch (error) {
-      console.error('Error approving resource:', error);
-      res.status(500).json({ message: 'Failed to approve resource' });
-    }
-  });
+  app.put('/api/resources/:id/approve', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
+    const id = parseInt(req.params.id);
+    const userId = req.user.claims.sub;
+
+    const resource = await storage.updateResourceStatus(id, 'approved', userId);
+    res.json(resource);
+  }));
   
   // PUT /api/resources/:id/reject - Reject resource (admin)
-  app.put('/api/resources/:id/reject', isAuthenticated, isAdmin, async (req: any, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
-      
-      const resource = await storage.updateResourceStatus(id, 'rejected', userId);
-      res.json(resource);
-    } catch (error) {
-      console.error('Error rejecting resource:', error);
-      res.status(500).json({ message: 'Failed to reject resource' });
-    }
-  });
+  app.put('/api/resources/:id/reject', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
+    const id = parseInt(req.params.id);
+    const userId = req.user.claims.sub;
+
+    const resource = await storage.updateResourceStatus(id, 'rejected', userId);
+    res.json(resource);
+  }));
   
   // POST /api/resources/:id/edits - Submit edit suggestion for a resource (authenticated)
-  app.post('/api/resources/:id/edits', isAuthenticated, async (req: any, res) => {
+  app.post('/api/resources/:id/edits', isAuthenticated, asyncHandler(async (req: any, res) => {
+    const userId = req.user.claims.sub;
+    const resourceId = parseInt(req.params.id);
+    const { proposedChanges, proposedData, claudeMetadata, triggerClaudeAnalysis } = req.body;
+
+    if (isNaN(resourceId)) {
+      throw new BadRequestError('Invalid resource ID');
+    }
+
+    const resource = await storage.getResource(resourceId);
+    if (!resource) {
+      throw new NotFoundError('Resource not found');
+    }
+
+    if (!proposedChanges || !proposedData) {
+      throw new BadRequestError('proposedChanges and proposedData are required');
+    }
+
+    // SECURITY FIX: Whitelist of editable fields only (ISSUE 1)
+    const EDITABLE_FIELDS = ['title', 'description', 'url', 'tags', 'category', 'subcategory', 'subSubcategory'];
+
+    // Sanitize proposedData - only allow whitelisted fields
+    const sanitizedProposedData: Record<string, any> = {};
+    for (const field of EDITABLE_FIELDS) {
+      if (proposedData && field in proposedData) {
+        sanitizedProposedData[field] = proposedData[field];
+      }
+    }
+
+    // Sanitize proposedChanges
+    const sanitizedChanges: Record<string, any> = {};
+    for (const field of EDITABLE_FIELDS) {
+      if (proposedChanges && field in proposedChanges) {
+        sanitizedChanges[field] = proposedChanges[field];
+      }
+    }
+
+    // SECURITY FIX: Validate field sizes (ISSUE 5)
+    if (sanitizedProposedData.title && sanitizedProposedData.title.length > 200) {
+      throw new BadRequestError('Title too long (max 200 characters)');
+    }
+
+    if (sanitizedProposedData.description && sanitizedProposedData.description.length > 2000) {
+      throw new BadRequestError('Description too long (max 2000 characters)');
+    }
+
+    if (sanitizedProposedData.tags && Array.isArray(sanitizedProposedData.tags) && sanitizedProposedData.tags.length > 20) {
+      throw new BadRequestError('Too many tags (max 20)');
+    }
+
+    let aiMetadata = claudeMetadata;
+    if (triggerClaudeAnalysis && resource.url) {
+      try {
+        aiMetadata = await claudeService.analyzeURL(resource.url);
+      } catch (error) {
+        // Log but don't fail the entire request if Claude analysis fails
+      }
+    }
+
     try {
-      const userId = req.user.claims.sub;
-      const resourceId = parseInt(req.params.id);
-      const { proposedChanges, proposedData, claudeMetadata, triggerClaudeAnalysis } = req.body;
-      
-      if (isNaN(resourceId)) {
-        return res.status(400).json({ message: 'Invalid resource ID' });
-      }
-      
-      const resource = await storage.getResource(resourceId);
-      if (!resource) {
-        return res.status(404).json({ message: 'Resource not found' });
-      }
-      
-      if (!proposedChanges || !proposedData) {
-        return res.status(400).json({ message: 'proposedChanges and proposedData are required' });
-      }
-      
-      // SECURITY FIX: Whitelist of editable fields only (ISSUE 1)
-      const EDITABLE_FIELDS = ['title', 'description', 'url', 'tags', 'category', 'subcategory', 'subSubcategory'];
-      
-      // Sanitize proposedData - only allow whitelisted fields
-      const sanitizedProposedData: Record<string, any> = {};
-      for (const field of EDITABLE_FIELDS) {
-        if (proposedData && field in proposedData) {
-          sanitizedProposedData[field] = proposedData[field];
-        }
-      }
-      
-      // Sanitize proposedChanges
-      const sanitizedChanges: Record<string, any> = {};
-      for (const field of EDITABLE_FIELDS) {
-        if (proposedChanges && field in proposedChanges) {
-          sanitizedChanges[field] = proposedChanges[field];
-        }
-      }
-      
-      // SECURITY FIX: Validate field sizes (ISSUE 5)
-      if (sanitizedProposedData.title && sanitizedProposedData.title.length > 200) {
-        return res.status(400).json({ message: 'Title too long (max 200 characters)' });
-      }
-      
-      if (sanitizedProposedData.description && sanitizedProposedData.description.length > 2000) {
-        return res.status(400).json({ message: 'Description too long (max 2000 characters)' });
-      }
-      
-      if (sanitizedProposedData.tags && Array.isArray(sanitizedProposedData.tags) && sanitizedProposedData.tags.length > 20) {
-        return res.status(400).json({ message: 'Too many tags (max 20)' });
-      }
-      
-      let aiMetadata = claudeMetadata;
-      if (triggerClaudeAnalysis && resource.url) {
-        try {
-          aiMetadata = await claudeService.analyzeURL(resource.url);
-        } catch (error) {
-          console.error('Error analyzing URL with Claude:', error);
-        }
-      }
-      
       // Use sanitized versions in createResourceEdit call
       const edit = await storage.createResourceEdit({
         resourceId,
@@ -611,16 +586,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         claudeMetadata: aiMetadata,
         claudeAnalyzedAt: aiMetadata ? new Date() : undefined,
       });
-      
+
       res.status(201).json(edit);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: 'Invalid edit data', errors: error.errors });
+        throw new ValidationError('Invalid edit data', error.errors);
       }
-      console.error('Error creating edit suggestion:', error);
-      res.status(500).json({ message: 'Failed to create edit suggestion' });
+      throw error;
     }
-  });
+  }));
 
   // ============= Category Routes =============
   
