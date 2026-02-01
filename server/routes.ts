@@ -31,7 +31,7 @@
 
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { storage, type AwesomeListData } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { setupLocalAuth } from "./localAuth";
 import "./types"; // Load Express type augmentations
@@ -2670,8 +2670,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`Switching to list: ${rawUrl}`);
       const data = await fetchAwesomeList(rawUrl);
-      storage.setAwesomeListData(data);
-      
+      storage.setAwesomeListData(data as unknown as AwesomeListData);
+
       console.log(`Successfully switched to list with ${data.resources.length} resources`);
       res.json(data);
     } catch (error) {
