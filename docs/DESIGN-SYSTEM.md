@@ -1787,7 +1787,887 @@ The only "shadow-like" effect in the theme is the **scrollbar**, which uses colo
 
 ---
 
+## Theme Architecture
+
+### Overview
+
+The theme system is built on **CSS custom properties (variables)** that integrate seamlessly with **Tailwind CSS** and **shadcn/ui**. This architecture enables consistent theming, runtime customization, and type-safe component development.
+
+**Key Components:**
+- **CSS Variables** - Define all design tokens in `:root`
+- **Tailwind Integration** - Map variables to Tailwind utilities
+- **shadcn/ui Config** - Configure component generation and styling
+- **Theme Provider** - React context for theme management (dark mode only)
+- **Custom Theme Manager** - UI for creating and managing custom themes
+
+---
+
+### CSS Variable System
+
+#### How It Works
+
+All design tokens are defined as CSS custom properties in `client/src/index.css`:
+
+```css
+:root {
+  /* Color tokens */
+  --background: oklch(0 0 0);
+  --foreground: oklch(1.0000 0 0);
+  --primary: oklch(0.75 0.3225 328.3634);
+
+  /* Typography tokens */
+  --font-sans: 'JetBrains Mono', monospace;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Spacing tokens */
+  --radius: 0rem;
+
+  /* Shadow tokens (disabled) */
+  --shadow: 0 0 0 0 hsl(0 0 0 / 0.00);
+}
+```
+
+**Benefits:**
+- **Runtime Customization** - Change colors without recompiling CSS
+- **JavaScript Access** - Read/write variables via `document.documentElement.style`
+- **Inheritance** - Variables cascade through DOM tree
+- **Browser Support** - Works in all modern browsers
+
+---
+
+#### Variable Naming Convention
+
+| Pattern | Example | Usage |
+|---------|---------|-------|
+| `--{token}` | `--primary` | Main color token |
+| `--{token}-foreground` | `--primary-foreground` | Text on colored background |
+| `--{category}-{token}` | `--sidebar-background` | Component-specific token |
+| `--{category}-{number}` | `--chart-1` | Numbered series (charts) |
+
+---
+
+#### Tailwind Integration
+
+CSS variables are mapped to Tailwind utilities via `@theme inline` in `index.css`:
+
+```css
+@theme inline {
+  /* Map CSS variables to Tailwind color utilities */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  /* ... more mappings ... */
+}
+```
+
+This enables usage like:
+```tsx
+<div className="bg-primary text-primary-foreground">
+  {/* Uses var(--primary) and var(--primary-foreground) */}
+</div>
+```
+
+---
+
+### shadcn/ui Configuration
+
+#### components.json
+
+The `components.json` file at the project root configures shadcn/ui component generation:
+
+```json
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "new-york",
+  "rsc": false,
+  "tsx": true,
+  "tailwind": {
+    "config": "tailwind.config.ts",
+    "css": "client/src/index.css",
+    "baseColor": "neutral",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "aliases": {
+    "components": "@/components",
+    "utils": "@/lib/utils",
+    "ui": "@/components/ui",
+    "lib": "@/lib",
+    "hooks": "@/hooks"
+  }
+}
+```
+
+**Key Settings:**
+
+| Setting | Value | Description |
+|---------|-------|-------------|
+| `style` | `"new-york"` | Component style variant (clean, minimal) |
+| `rsc` | `false` | Not using React Server Components |
+| `tsx` | `true` | Generate TypeScript files |
+| `cssVariables` | `true` | **Critical** - Enables CSS variable theming |
+| `baseColor` | `"neutral"` | Base color palette (grayscale foundation) |
+| `prefix` | `""` | No Tailwind class prefix |
+
+---
+
+#### Path Aliases
+
+The `aliases` object configures import paths:
+
+```tsx
+// Instead of relative imports:
+import { Button } from "../../../components/ui/button";
+
+// Use clean aliases:
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
+```
+
+**Configured in:**
+- `components.json` - Tells shadcn/ui where to generate files
+- `tsconfig.json` - TypeScript path resolution
+- `vite.config.ts` - Vite module resolution
+
+---
+
+### Theme Provider
+
+#### Implementation
+
+The theme provider (`client/src/components/ui/theme-provider.tsx`) manages theme state:
+
+```tsx
+import { createContext, useEffect, ReactNode } from "react";
+
+type Theme = "dark" | "light" | "system";
+
+export const ThemeProviderContext = createContext<{
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+}>({
+  theme: "dark",
+  setTheme: () => null,
+});
+
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  useEffect(() => {
+    const root = window.document.documentElement;
+
+    // Always force dark mode
+    root.classList.remove("light");
+    root.classList.add("dark");
+  }, []);
+
+  const value = {
+    theme: "dark" as Theme,
+    setTheme: () => {
+      // No-op - dark mode only
+    },
+  };
+
+  return (
+    <ThemeProviderContext.Provider value={value}>
+      {children}
+    </ThemeProviderContext.Provider>
+  );
+}
+```
+
+**Characteristics:**
+- **Dark Mode Only** - Theme is hardcoded to `"dark"`
+- **No Toggle** - `setTheme()` is a no-op
+- **DOM Class** - Adds `class="dark"` to `<html>` element
+- **Persistent** - Enforces dark mode on every render
+
+---
+
+#### Usage
+
+Wrap your app with the provider:
+
+```tsx
+// In main.tsx or App.tsx
+import { ThemeProvider } from "@/components/ui/theme-provider";
+
+function App() {
+  return (
+    <ThemeProvider>
+      <YourApp />
+    </ThemeProvider>
+  );
+}
+```
+
+**Note:** The provider is required for proper theme behavior, even though the theme is fixed.
+
+---
+
+### Custom Theme Manager
+
+#### Overview
+
+The Custom Theme Manager (`client/src/components/ui/custom-theme-manager.tsx`) provides a UI for creating, editing, and managing custom color themes:
+
+**Features:**
+- **Create Custom Themes** - Define colors, typography, spacing
+- **Import/Export** - Save themes as JSON files
+- **Live Preview** - See changes in real-time
+- **Default Themes** - Ocean Blue, Forest Green, Sunset Orange presets
+- **LocalStorage Persistence** - Themes saved to browser storage
+
+---
+
+#### Custom Theme Structure
+
+```tsx
+interface CustomTheme {
+  id: string;                // Unique identifier
+  name: string;              // Display name
+  description?: string;      // Optional description
+
+  colors: {
+    primary: string;         // OKLCH value (e.g., "210 100% 50%")
+    secondary: string;
+    background: string;
+    foreground: string;
+    accent: string;
+    muted: string;
+    border: string;
+    card: string;
+    destructive?: string;
+  };
+
+  typography?: {
+    fontFamily?: string;     // Font family name
+    fontSize?: string;       // Base font size
+  };
+
+  spacing?: {
+    radius?: string;         // Border radius value
+  };
+
+  createdAt: string;         // ISO timestamp
+}
+```
+
+---
+
+#### Default Theme Presets
+
+The Custom Theme Manager includes three built-in themes:
+
+**Ocean Blue:**
+```tsx
+{
+  id: "ocean-blue",
+  name: "Ocean Blue",
+  colors: {
+    primary: "210 100% 50%",      // Vibrant blue
+    secondary: "210 40% 90%",
+    background: "210 20% 98%",
+    foreground: "210 100% 15%",
+    // ...
+  }
+}
+```
+
+**Forest Green:**
+```tsx
+{
+  id: "forest-green",
+  name: "Forest Green",
+  colors: {
+    primary: "142 100% 35%",      // Natural green
+    secondary: "142 40% 90%",
+    // ...
+  }
+}
+```
+
+**Sunset Orange:**
+```tsx
+{
+  id: "sunset-orange",
+  name: "Sunset Orange",
+  colors: {
+    primary: "25 100% 55%",       // Warm orange
+    secondary: "25 40% 90%",
+    // ...
+  }
+}
+```
+
+---
+
+#### Using the Theme Manager
+
+```tsx
+import CustomThemeManager from "@/components/ui/custom-theme-manager";
+
+function Settings() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [currentTheme, setCurrentTheme] = useState<CustomTheme | null>(null);
+
+  const handleThemeApply = (theme: CustomTheme) => {
+    setCurrentTheme(theme);
+    // Theme is automatically applied to CSS variables
+  };
+
+  return (
+    <>
+      <Button onClick={() => setIsOpen(true)}>
+        Customize Theme
+      </Button>
+
+      <CustomThemeManager
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        onThemeApply={handleThemeApply}
+        currentTheme={currentTheme}
+      />
+    </>
+  );
+}
+```
+
+---
+
+#### Theme Application
+
+When a theme is applied, the manager updates CSS variables:
+
+```tsx
+const applyTheme = (theme: CustomTheme) => {
+  const root = document.documentElement;
+
+  // Apply color variables
+  Object.entries(theme.colors).forEach(([key, value]) => {
+    root.style.setProperty(`--${key}`, value);
+  });
+
+  // Apply typography
+  if (theme.typography?.fontFamily) {
+    root.style.setProperty('--font-family', theme.typography.fontFamily);
+  }
+
+  // Apply spacing
+  if (theme.spacing?.radius) {
+    root.style.setProperty('--radius', theme.spacing.radius);
+  }
+};
+```
+
+**Result:** All components using `bg-primary`, `text-foreground`, etc. automatically update.
+
+---
+
+### Theme Customization Guide
+
+#### Modifying Global Colors
+
+**Option 1: Edit CSS File**
+
+Directly modify `client/src/index.css`:
+
+```css
+:root {
+  /* Change primary from pink to purple */
+  --primary: oklch(0.75 0.25 290);
+
+  /* Make backgrounds slightly lighter */
+  --background: oklch(0.05 0 0);
+  --card: oklch(0.20 0 0);
+
+  /* Adjust accent to cyan */
+  --accent: oklch(0.70 0.18 200);
+}
+```
+
+**Pros:**
+- Permanent changes
+- Version controlled
+- Applies to all users
+
+**Cons:**
+- Requires rebuild
+- Can't be changed at runtime
+
+---
+
+**Option 2: Use Custom Theme Manager**
+
+Apply themes via the UI:
+
+```tsx
+const customTheme: CustomTheme = {
+  id: "my-theme",
+  name: "My Custom Theme",
+  colors: {
+    primary: "290 100% 60%",    // Purple
+    accent: "200 90% 65%",      // Cyan
+    background: "0 0 5%",       // Slightly lighter
+    // ... other colors
+  },
+  createdAt: new Date().toISOString()
+};
+
+// Apply via theme manager or directly:
+const root = document.documentElement;
+root.style.setProperty('--primary', customTheme.colors.primary);
+```
+
+**Pros:**
+- Runtime changes
+- User-customizable
+- No rebuild required
+
+**Cons:**
+- Not persistent across sessions (unless saved to localStorage)
+- Requires JavaScript
+
+---
+
+#### Creating a Custom Color Palette
+
+**Step 1: Define Your Colors in OKLCH**
+
+Use [oklch.com](https://oklch.com) to pick colors:
+
+```css
+:root {
+  /* Brand colors */
+  --brand-purple: oklch(0.70 0.25 290);
+  --brand-cyan: oklch(0.75 0.20 200);
+
+  /* Functional colors */
+  --success: oklch(0.85 0.20 145);
+  --warning: oklch(0.90 0.18 90);
+  --error: oklch(0.65 0.24 25);
+}
+```
+
+---
+
+**Step 2: Map to Theme Tokens**
+
+```css
+:root {
+  /* Map brand colors to theme tokens */
+  --primary: var(--brand-purple);
+  --accent: var(--brand-cyan);
+  --destructive: var(--error);
+
+  /* Ensure contrast */
+  --primary-foreground: oklch(1.0 0 0);  /* White */
+  --accent-foreground: oklch(1.0 0 0);   /* White */
+}
+```
+
+---
+
+**Step 3: Add to Tailwind**
+
+```css
+@theme inline {
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+}
+```
+
+Now use in components:
+```tsx
+<Badge className="bg-success">Success</Badge>
+<Alert className="bg-warning">Warning</Alert>
+```
+
+---
+
+#### Adjusting Typography
+
+**Change Font Family:**
+
+```css
+:root {
+  /* Replace JetBrains Mono */
+  --font-sans: 'Inter', sans-serif;
+  --font-mono: 'Fira Code', monospace;
+}
+```
+
+Then load the font:
+```html
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+```
+
+---
+
+**Adjust Font Sizes:**
+
+```css
+:root {
+  /* Increase base font size */
+  font-size: 18px;  /* Default is 16px */
+}
+
+/* Or target specific elements */
+body {
+  font-size: 1.125rem;  /* 18px if root is 16px */
+}
+```
+
+---
+
+#### Enabling Border Radius
+
+To add rounded corners:
+
+```css
+:root {
+  /* Change from sharp edges */
+  --radius: 0.5rem;  /* 8px */
+}
+```
+
+All `rounded-*` classes will now have rounded corners:
+- `rounded-sm` → 4px
+- `rounded-md` → 6px
+- `rounded-lg` → 8px
+- `rounded-xl` → 12px
+
+**Note:** This changes the cyberpunk aesthetic significantly.
+
+---
+
+#### Enabling Shadows
+
+To add depth with shadows (not recommended):
+
+```css
+:root {
+  /* Enable shadows */
+  --shadow-sm: 0 1px 2px 0 hsl(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 hsl(0 0 0 / 0.1), 0 1px 2px -1px hsl(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px hsl(0 0 0 / 0.1), 0 2px 4px -2px hsl(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px hsl(0 0 0 / 0.1), 0 4px 6px -4px hsl(0 0 0 / 0.1);
+}
+```
+
+Components with `shadow-*` classes will now show shadows.
+
+---
+
+### Theme Import/Export
+
+#### Exporting a Theme
+
+**Via Custom Theme Manager:**
+
+```tsx
+const exportTheme = (theme: CustomTheme) => {
+  const dataStr = JSON.stringify(theme, null, 2);
+  const dataBlob = new Blob([dataStr], { type: 'application/json' });
+  const url = URL.createObjectURL(dataBlob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `${theme.name.toLowerCase().replace(/\s+/g, '-')}-theme.json`;
+  link.click();
+  URL.revokeObjectURL(url);
+};
+```
+
+**Manually:**
+
+Copy the theme object to a JSON file:
+
+```json
+{
+  "id": "custom-theme",
+  "name": "My Custom Theme",
+  "description": "A personalized color scheme",
+  "colors": {
+    "primary": "290 100% 60%",
+    "secondary": "290 40% 90%",
+    "background": "0 0 5%",
+    "foreground": "100 0 100%",
+    "accent": "200 90% 65%",
+    "muted": "0 0 22%",
+    "border": "0 0 32%",
+    "card": "0 0 17%"
+  },
+  "createdAt": "2024-01-15T12:00:00.000Z"
+}
+```
+
+---
+
+#### Importing a Theme
+
+**Via Custom Theme Manager:**
+
+```tsx
+const handleImport = async (file: File) => {
+  const text = await file.text();
+  const importedTheme: CustomTheme = JSON.parse(text);
+
+  // Validate structure
+  if (!importedTheme.name || !importedTheme.colors) {
+    throw new Error('Invalid theme file');
+  }
+
+  // Generate new ID
+  const newTheme = {
+    ...importedTheme,
+    id: `custom-${Date.now()}`,
+    createdAt: new Date().toISOString()
+  };
+
+  // Save to localStorage
+  const themes = JSON.parse(localStorage.getItem('custom-themes') || '[]');
+  themes.push(newTheme);
+  localStorage.setItem('custom-themes', JSON.stringify(themes));
+};
+```
+
+**Manually:**
+
+Load theme JSON and apply:
+
+```tsx
+import myTheme from './my-theme.json';
+
+const root = document.documentElement;
+Object.entries(myTheme.colors).forEach(([key, value]) => {
+  root.style.setProperty(`--${key}`, value);
+});
+```
+
+---
+
+### Best Practices
+
+#### Do's ✓
+
+- **Use CSS Variables** - Define all design tokens as variables
+- **Follow OKLCH Format** - Maintain perceptual uniformity
+- **Test Contrast** - Ensure WCAG AAA compliance after changes
+- **Document Changes** - Comment custom modifications in CSS
+- **Export Themes** - Back up custom themes as JSON
+- **Version Control** - Commit `index.css` changes with descriptive messages
+
+**Example:**
+```css
+:root {
+  /* Custom brand color - replaces default pink */
+  /* Ensures 7:1 contrast ratio on black background */
+  --primary: oklch(0.78 0.28 310);  /* Purple primary */
+}
+```
+
+---
+
+#### Don'ts ✗
+
+- **Don't Use Arbitrary Values** - Stick to defined variables
+- **Don't Break Contrast** - Always test with [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/)
+- **Don't Mix Color Spaces** - Keep all colors in OKLCH
+- **Don't Hardcode Colors** - Use tokens, not `bg-[#ff00ff]`
+- **Don't Forget Foreground** - Every color needs a foreground pair
+
+**Bad Example:**
+```tsx
+// ✗ Hardcoded color, no variable
+<div className="bg-[#9333ea] text-white">
+  Custom purple
+</div>
+```
+
+**Good Example:**
+```tsx
+// ✓ Uses theme variable
+<div className="bg-primary text-primary-foreground">
+  Themed purple
+</div>
+```
+
+---
+
+### Troubleshooting
+
+#### Theme Not Applying
+
+**Issue:** CSS variable changes don't appear
+
+**Solutions:**
+1. Check browser DevTools → Elements → `<html>` → Computed styles
+2. Verify variable is defined in `:root` selector
+3. Ensure variable name matches Tailwind mapping in `@theme inline`
+4. Clear browser cache and rebuild
+
+```bash
+# Rebuild to apply CSS changes
+npm run build
+```
+
+---
+
+#### Color Contrast Issues
+
+**Issue:** Text is hard to read
+
+**Solutions:**
+1. Use [oklch.com](https://oklch.com) contrast checker
+2. Increase lightness difference between bg and text
+3. Ensure minimum 7:1 contrast for AAA compliance
+
+```css
+/* Bad - low contrast */
+--background: oklch(0.20 0 0);
+--foreground: oklch(0.30 0 0);  /* Only 1.5:1 contrast */
+
+/* Good - high contrast */
+--background: oklch(0 0 0);
+--foreground: oklch(1.0 0 0);   /* 21:1 contrast */
+```
+
+---
+
+#### Custom Theme Manager Not Saving
+
+**Issue:** Themes disappear after refresh
+
+**Solutions:**
+1. Check browser localStorage (DevTools → Application → Local Storage)
+2. Verify `localStorage.setItem('custom-themes', ...)` is called
+3. Ensure browser allows localStorage (not in incognito mode)
+
+```tsx
+// Debug localStorage
+console.log(localStorage.getItem('custom-themes'));
+
+// Manually save theme
+localStorage.setItem('custom-themes', JSON.stringify([myTheme]));
+```
+
+---
+
+#### Imported Theme Not Working
+
+**Issue:** Theme imports fail or look wrong
+
+**Solutions:**
+1. Validate JSON structure matches `CustomTheme` interface
+2. Ensure color values are in correct format (e.g., `"210 100% 50%"` not `oklch(...)`)
+3. Check for missing required fields (`id`, `name`, `colors`)
+
+```tsx
+// Validate theme before applying
+const isValidTheme = (theme: any): theme is CustomTheme => {
+  return (
+    typeof theme.id === 'string' &&
+    typeof theme.name === 'string' &&
+    theme.colors &&
+    typeof theme.colors.primary === 'string'
+  );
+};
+```
+
+---
+
+### Advanced Customization
+
+#### Dynamic Theme Switching
+
+For runtime theme changes (e.g., light/dark toggle):
+
+```tsx
+function ThemeToggle() {
+  const [isDark, setIsDark] = useState(true);
+
+  const toggleTheme = () => {
+    const root = document.documentElement;
+
+    if (isDark) {
+      // Light theme
+      root.style.setProperty('--background', 'oklch(1.0 0 0)');
+      root.style.setProperty('--foreground', 'oklch(0 0 0)');
+    } else {
+      // Dark theme
+      root.style.setProperty('--background', 'oklch(0 0 0)');
+      root.style.setProperty('--foreground', 'oklch(1.0 0 0)');
+    }
+
+    setIsDark(!isDark);
+  };
+
+  return <Button onClick={toggleTheme}>Toggle Theme</Button>;
+}
+```
+
+**Note:** Currently theme is locked to dark mode. This requires modifying `theme-provider.tsx`.
+
+---
+
+#### Per-Component Theming
+
+Override theme variables for specific components:
+
+```tsx
+<Card
+  style={{
+    '--primary': 'oklch(0.70 0.25 200)',  // Blue instead of pink
+    '--card': 'oklch(0.25 0 0)'           // Lighter background
+  } as React.CSSProperties}
+  className="bg-card border-2 border-primary"
+>
+  <CardContent>Custom themed card</CardContent>
+</Card>
+```
+
+---
+
+#### CSS Variable Animations
+
+Animate theme transitions:
+
+```css
+:root {
+  /* Smooth color transitions */
+  transition: background-color 0.3s ease,
+              color 0.3s ease;
+}
+
+* {
+  /* Apply transition to all colored elements */
+  transition: background-color 0.3s ease,
+              border-color 0.3s ease,
+              color 0.3s ease;
+}
+```
+
+---
+
+### Theme Architecture Checklist
+
+Before deploying theme changes, verify:
+
+- [ ] All CSS variables defined in `:root` (index.css)
+- [ ] Variables mapped to Tailwind in `@theme inline`
+- [ ] Color contrast meets WCAG AAA (21:1 for text, 7:1 for large)
+- [ ] Theme provider wraps app (`<ThemeProvider>`)
+- [ ] Path aliases configured in `components.json`, `tsconfig.json`, `vite.config.ts`
+- [ ] Custom themes tested via Theme Manager
+- [ ] Exported themes validate against `CustomTheme` interface
+- [ ] All components use semantic tokens (not hardcoded colors)
+- [ ] Typography scales properly at different viewport sizes
+- [ ] Border radius and shadows align with design philosophy
+
+---
+
 ## Next Steps
 
 - **Component Library:** [COMPONENT-LIBRARY.md](./COMPONENT-LIBRARY.md) (to be added)
-- **Theme Architecture:** See theme architecture section (to be added)
+- **Accessibility Guide:** See WCAG compliance section (to be added)
