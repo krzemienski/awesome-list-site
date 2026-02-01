@@ -126,6 +126,7 @@ export default function SEOHead({
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       <link rel="dns-prefetch" href="//github.com" />
       <link rel="dns-prefetch" href="//api.github.com" />
+      <link rel="dns-prefetch" href="//www.googletagmanager.com" />
     </Helmet>
   );
 }
