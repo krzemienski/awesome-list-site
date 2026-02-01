@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Awesome List - Home & Search Demo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    * {
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: hsl(222.2 84% 4.9%);
+      color: hsl(210 40% 98%);
+    }
+
+    .search-dialog {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: hsl(222.2 84% 8%);
+      border: 1px solid hsl(217.2 32.6% 17.5%);
+      border-radius: 0.5rem;
+      width: 90%;
+      max-width: 32rem;
+      padding: 1.5rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+      z-index: 50;
+    }
+
+    .backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 40;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="border-b" style="border-color: hsl(217.2 32.6% 17.5%);">
+    <div class="container mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <svg class="w-8 h-8 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+          </svg>
+          <h1 class="text-xl font-bold">Awesome List</h1>
+        </div>
+        <div class="flex items-center gap-4">
+          <button class="px-3 py-1.5 rounded text-sm flex items-center gap-2" style="background: hsl(217.2 32.6% 17.5%);">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            Search
+            <kbd class="ml-2 px-1.5 py-0.5 text-xs rounded" style="background: hsl(222.2 84% 4.9%); border: 1px solid hsl(217.2 32.6% 17.5%);">⌘K</kbd>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container mx-auto px-4 py-8">
+    <div class="mb-8">
+      <h2 class="text-3xl font-bold mb-2">Discover Awesome Resources</h2>
+      <p class="text-gray-400">Curated collection of the best libraries, tools, and resources</p>
+    </div>
+
+    <!-- Category Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="p-6 rounded-lg border" style="background: hsl(222.2 84% 8%); border-color: hsl(217.2 32.6% 17.5%);">
+        <h3 class="font-semibold text-lg mb-2">Frontend</h3>
+        <p class="text-sm text-gray-400 mb-4">UI frameworks and libraries</p>
+        <div class="text-sm text-pink-500">24 resources</div>
+      </div>
+
+      <div class="p-6 rounded-lg border" style="background: hsl(222.2 84% 8%); border-color: hsl(217.2 32.6% 17.5%);">
+        <h3 class="font-semibold text-lg mb-2">Backend</h3>
+        <p class="text-sm text-gray-400 mb-4">Server-side tools and frameworks</p>
+        <div class="text-sm text-pink-500">18 resources</div>
+      </div>
+
+      <div class="p-6 rounded-lg border" style="background: hsl(222.2 84% 8%); border-color: hsl(217.2 32.6% 17.5%);">
+        <h3 class="font-semibold text-lg mb-2">DevOps</h3>
+        <p class="text-sm text-gray-400 mb-4">Deployment and infrastructure</p>
+        <div class="text-sm text-pink-500">15 resources</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Search Dialog -->
+  <div class="backdrop"></div>
+  <div class="search-dialog" role="dialog">
+    <div class="mb-4">
+      <h2 class="text-lg font-semibold mb-1">Search Resources</h2>
+      <p class="text-sm text-gray-400">Find packages, libraries, and tools in the awesome list.</p>
+    </div>
+
+    <div class="mb-4">
+      <div class="relative">
+        <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input
+          type="text"
+          placeholder="Search packages, libraries, and tools..."
+          class="w-full pl-10 pr-4 py-2 rounded border"
+          style="background: hsl(222.2 84% 4.9%); border-color: hsl(217.2 32.6% 17.5%);"
+          autofocus
+        />
+      </div>
+    </div>
+
+    <div class="mb-4" style="max-height: 300px; overflow-y: auto;">
+      <div class="flex flex-col items-center justify-center py-12">
+        <div class="w-16 h-16 flex items-center justify-center rounded" style="background: hsl(217.2 32.6% 17.5%);">
+          <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </div>
+        <h3 class="mt-4 text-sm font-semibold">Start typing to search</h3>
+        <p class="mt-2 text-xs text-gray-400">Type at least 2 characters</p>
+      </div>
+    </div>
+
+    <div class="flex justify-end">
+      <button class="px-4 py-2 rounded text-sm" style="background: hsl(217.2 32.6% 17.5%);">
+        Cancel
+      </button>
+    </div>
+  </div>
+</body>
+</html>
