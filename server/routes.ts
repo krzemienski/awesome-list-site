@@ -291,8 +291,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       done(null, user);
     });
 
-    passport.deserializeUser((user: any, done) => {
-      done(null, user);
+    passport.deserializeUser(async (user: any, done) => {
+      try {
+        // Fetch fresh user data from DB to ensure we have the latest role
+        const userId = (user as any).claims?.sub;
+        if (userId) {
+          const dbUser = await storage.getUser(userId);
+          if (dbUser) {
+            // Attach DB user data to session user object
+            (user as any).dbUser = dbUser;
+          }
+        }
+        done(null, user);
+      } catch (error) {
+        done(error);
+      }
     });
 
     console.log("Running in local mode - Replit OAuth disabled, use local auth at /api/auth/local/login");
