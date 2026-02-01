@@ -34,17 +34,21 @@ export default function SEOHead({
   const siteDescription = awesomeList?.description || "A curated list of awesome resources";
   
   // Generate dynamic title based on page context
-  const pageTitle = title 
+  const pageTitle = title
     ? `${title} | ${siteTitle}`
-    : category 
+    : resource
+    ? `${resource.title} | ${siteTitle}`
+    : category
     ? `${category} Resources | ${siteTitle}`
     : siteTitle;
 
   // Generate dynamic description
   const pageDescription = description || (
-    category 
+    resource
+      ? generateResourceDescription(resource, siteTitle)
+      : category
       ? `Discover ${resourceCount || 'amazing'} ${category.toLowerCase()} resources in our curated ${siteTitle}. Find the best tools, libraries, and frameworks.`
-      : awesomeList 
+      : awesomeList
       ? `${siteDescription} Explore ${awesomeList.resources?.length || '2750+'} carefully curated resources across ${awesomeList.categories?.length || '80+'} categories.`
       : siteDescription
   );
@@ -163,6 +167,45 @@ function generateKeywords(awesomeList?: AwesomeList, category?: string): string 
   }
 
   return baseKeywords.join(", ");
+}
+
+function generateResourceDescription(resource: Resource, siteTitle: string): string {
+  // Create a unique, descriptive meta description for the resource (120-160 chars)
+  const resourceDesc = resource.description || `Explore ${resource.title}`;
+
+  // Build category context
+  const categoryPath = [
+    resource.category,
+    resource.subcategory,
+    resource.subSubcategory
+  ].filter(Boolean).join(' > ');
+
+  // Create base description from resource description
+  let description = resourceDesc;
+
+  // Add category context if there's room and it's not already mentioned
+  const categoryContext = categoryPath ? ` A ${resource.category.toLowerCase()} resource in ${siteTitle}.` : ` Featured in ${siteTitle}.`;
+
+  // Combine description with category context
+  const fullDescription = `${description}${categoryContext}`;
+
+  // Ensure the description is within 120-160 character range
+  if (fullDescription.length > 160) {
+    // Truncate resource description to fit within limit
+    const maxDescLength = 160 - categoryContext.length - 3; // 3 for "..."
+    description = resourceDesc.length > maxDescLength
+      ? `${resourceDesc.substring(0, maxDescLength).trim()}...`
+      : resourceDesc;
+    return `${description}${categoryContext}`;
+  } else if (fullDescription.length < 120 && resource.tags && resource.tags.length > 0) {
+    // Add tags if we have room
+    const tagsText = ` Tags: ${resource.tags.slice(0, 3).join(', ')}.`;
+    if ((fullDescription + tagsText).length <= 160) {
+      return fullDescription.replace(/\.$/, '') + tagsText;
+    }
+  }
+
+  return fullDescription;
 }
 
 function generateBreadcrumbList(
