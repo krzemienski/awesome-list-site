@@ -121,24 +121,24 @@ export default function ResourceCard({
       </CardHeader>
       
       <CardContent className="pt-0">
-        {fullResource?.metadata?.urlScraped && (
+        {fullResource?.metadata && typeof fullResource.metadata === 'object' && 'urlScraped' in fullResource.metadata && fullResource.metadata.urlScraped && (
           <div className="mb-3 space-y-2">
-            {fullResource.metadata.ogImage && (
+            {typeof fullResource.metadata.ogImage === 'string' && (
               <div className="rounded-md overflow-hidden border border-border">
-                <img 
-                  src={fullResource.metadata.ogImage} 
-                  alt={fullResource.metadata.ogTitle || resource.name}
+                <img
+                  src={fullResource.metadata.ogImage}
+                  alt={(typeof fullResource.metadata.ogTitle === 'string' ? fullResource.metadata.ogTitle : resource.name)}
                   className="w-full h-32 object-cover"
                   loading="lazy"
                 />
               </div>
             )}
-            {fullResource.metadata.scrapedTitle && fullResource.metadata.scrapedTitle !== resource.name && (
+            {typeof fullResource.metadata.scrapedTitle === 'string' && fullResource.metadata.scrapedTitle !== resource.name && (
               <div className="text-xs text-muted-foreground">
                 <span className="font-medium">Page Title:</span> {fullResource.metadata.scrapedTitle}
               </div>
             )}
-            {fullResource.metadata.scrapedDescription && fullResource.metadata.scrapedDescription !== resource.description && (
+            {typeof fullResource.metadata.scrapedDescription === 'string' && fullResource.metadata.scrapedDescription !== resource.description && (
               <div className="text-xs text-muted-foreground line-clamp-2">
                 <span className="font-medium">Page Description:</span> {fullResource.metadata.scrapedDescription}
               </div>
