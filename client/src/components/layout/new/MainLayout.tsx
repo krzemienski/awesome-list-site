@@ -36,6 +36,7 @@ export default function MainLayout({ awesomeList, isLoading, children, user, onL
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}
           onSearchOpen={() => setSearchOpen(true)}
+          searchOpen={searchOpen}
           title={awesomeList?.title || "Awesome Selfhosted"}
           repoUrl={awesomeList?.repoUrl}
           resources={awesomeList?.resources || []}
