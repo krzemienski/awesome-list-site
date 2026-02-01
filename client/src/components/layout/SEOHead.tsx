@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet";
-import { AwesomeList } from "@/types/awesome-list";
+import { AwesomeList, Resource } from "@/types/awesome-list";
 
 interface SEOHeadProps {
   title?: string;
@@ -10,6 +10,7 @@ interface SEOHeadProps {
   category?: string;
   resourceCount?: number;
   type?: "website" | "article";
+  resource?: Resource;
 }
 
 export default function SEOHead({
@@ -20,7 +21,8 @@ export default function SEOHead({
   awesomeList,
   category,
   resourceCount,
-  type = "website"
+  type = "website",
+  resource
 }: SEOHeadProps) {
   // Generate dynamic SEO data based on the awesome list
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
@@ -101,7 +103,7 @@ export default function SEOHead({
 
       {/* Structured Data for Rich Snippets */}
       <script type="application/ld+json">
-        {JSON.stringify(generateStructuredData(awesomeList, category, currentUrl, pageTitle, pageDescription))}
+        {JSON.stringify(generateStructuredData(awesomeList, category, currentUrl, pageTitle, pageDescription, resource))}
       </script>
 
       {/* Additional Meta for iMessage and Social Previews */}
@@ -162,11 +164,12 @@ function generateKeywords(awesomeList?: AwesomeList, category?: string): string 
 }
 
 function generateStructuredData(
-  awesomeList?: AwesomeList, 
-  category?: string, 
-  url?: string, 
-  title?: string, 
-  description?: string
+  awesomeList?: AwesomeList,
+  category?: string,
+  url?: string,
+  title?: string,
+  description?: string,
+  resource?: Resource
 ) {
   const baseData = {
     "@context": "https://schema.org",
@@ -178,6 +181,41 @@ function generateStructuredData(
     "isAccessibleForFree": true,
     "keywords": generateKeywords(awesomeList, category)
   };
+
+  // If viewing a specific resource, use SoftwareApplication schema
+  if (resource) {
+    return {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": resource.title,
+      "description": resource.description,
+      "url": resource.url,
+      "applicationCategory": resource.category,
+      "applicationSubCategory": resource.subcategory,
+      "keywords": [
+        ...(resource.tags || []),
+        resource.category,
+        ...(resource.subcategory ? [resource.subcategory] : []),
+        ...(resource.subSubcategory ? [resource.subSubcategory] : [])
+      ].join(", "),
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock"
+      },
+      "operatingSystem": "Cross-platform",
+      "isAccessibleForFree": true,
+      "inLanguage": "en-US",
+      "datePublished": resource.createdAt,
+      "dateModified": resource.updatedAt,
+      "provider": {
+        "@type": "Organization",
+        "name": "Awesome List Community",
+        "url": url?.split('/').slice(0, 3).join('/')
+      }
+    };
+  }
 
   if (awesomeList) {
     return {
