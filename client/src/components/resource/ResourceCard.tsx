@@ -125,11 +125,13 @@ function ResourceCard({
           <div className="mb-3 space-y-2">
             {fullResource.metadata.ogImage && (
               <div className="rounded-md overflow-hidden border border-border">
-                <img 
-                  src={fullResource.metadata.ogImage} 
+                <img
+                  src={fullResource.metadata.ogImage}
                   alt={fullResource.metadata.ogTitle || resource.name}
                   className="w-full h-32 object-cover"
                   loading="lazy"
+                  width="1200"
+                  height="630"
                 />
               </div>
             )}
