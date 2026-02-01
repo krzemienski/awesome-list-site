@@ -47,7 +47,7 @@ export const resources = pgTable(
     approvedAt: timestamp("approved_at"),
     githubSynced: boolean("github_synced").default(false),
     lastSyncedAt: timestamp("last_synced_at"),
-    metadata: jsonb("metadata").$type<Record<string, any>>().default({}),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>().default({}),
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow(),
   },
@@ -84,7 +84,7 @@ export const resourceEdits = pgTable(
     
     originalResourceUpdatedAt: timestamp("original_resource_updated_at").notNull(),
     
-    proposedChanges: jsonb("proposed_changes").$type<Record<string, { old: any; new: any }>>().notNull(),
+    proposedChanges: jsonb("proposed_changes").$type<Record<string, { old: unknown; new: unknown }>>().notNull(),
     proposedData: jsonb("proposed_data").$type<Partial<Resource>>().notNull(),
     
     claudeMetadata: jsonb("claude_metadata").$type<{
@@ -361,7 +361,7 @@ export const resourceAuditLog = pgTable("resource_audit_log", {
   originalResourceId: integer("original_resource_id"), // Never SET NULL - preserves history after deletion
   action: text("action").notNull(), // created, updated, approved, rejected, synced, deleted
   performedBy: varchar("performed_by").references(() => users.id, { onDelete: "set null" }),
-  changes: jsonb("changes").$type<Record<string, any>>(),
+  changes: jsonb("changes").$type<Record<string, unknown>>(),
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -377,7 +377,7 @@ export const githubSyncQueue = pgTable(
     action: text("action").notNull(), // import, export
     status: text("status").default("pending"), // pending, processing, completed, failed
     errorMessage: text("error_message"),
-    metadata: jsonb("metadata").$type<Record<string, any>>().default({}),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>().default({}),
     createdAt: timestamp("created_at").defaultNow(),
     processedAt: timestamp("processed_at"),
   },
@@ -439,7 +439,7 @@ export const userInteractions = pgTable(
     resourceId: integer("resource_id").references(() => resources.id, { onDelete: "cascade" }).notNull(),
     interactionType: text("interaction_type").notNull(), // view, click, bookmark, rate, complete
     interactionValue: integer("interaction_value"), // rating (1-5) or time spent
-    metadata: jsonb("metadata").$type<Record<string, any>>().default({}),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>().default({}),
     timestamp: timestamp("timestamp").defaultNow(),
   },
   (table) => [
@@ -475,8 +475,8 @@ export const githubSyncHistory = pgTable(
     resourcesRemoved: integer("resources_removed").default(0),
     totalResources: integer("total_resources").default(0),
     performedBy: varchar("performed_by").references(() => users.id),
-    snapshot: jsonb("snapshot").$type<Record<string, any>>().default({}), // Resource snapshot
-    metadata: jsonb("metadata").$type<Record<string, any>>().default({}),
+    snapshot: jsonb("snapshot").$type<Record<string, unknown>>().default({}), // Resource snapshot
+    metadata: jsonb("metadata").$type<Record<string, unknown>>().default({}),
     createdAt: timestamp("created_at").defaultNow(),
   },
   (table) => [
@@ -519,7 +519,7 @@ export const enrichmentJobs = pgTable(
     processedResourceIds: jsonb("processed_resource_ids").$type<number[]>().default([]),
     failedResourceIds: jsonb("failed_resource_ids").$type<number[]>().default([]),
     errorMessage: text("error_message"),
-    metadata: jsonb("metadata").$type<Record<string, any>>().default({}),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>().default({}),
     startedBy: varchar("started_by").references(() => users.id),
     startedAt: timestamp("started_at"),
     completedAt: timestamp("completed_at"),

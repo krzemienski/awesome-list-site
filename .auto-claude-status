@@ -3,23 +3,23 @@
   "spec": "021-reduce-excessive-any-type-usage-for-improved-type-",
   "state": "building",
   "subtasks": {
-    "completed": 11,
+    "completed": 20,
     "total": 26,
     "in_progress": 1,
     "failed": 0
   },
   "phase": {
-    "current": "Server Utilities Types",
+    "current": "Shared Types & Scripts",
     "id": null,
-    "total": 4
+    "total": 3
   },
   "workers": {
     "active": 0,
     "max": 1
   },
   "session": {
-    "number": 13,
-    "started_at": "2026-01-31T14:30:47.718522"
+    "number": 2,
+    "started_at": "2026-01-31T22:53:12.241671"
   },
-  "last_update": "2026-01-31T15:15:21.080657"
+  "last_update": "2026-01-31T22:56:36.934091"
 }
