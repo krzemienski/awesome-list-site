@@ -76,17 +76,16 @@ const isAdmin = async (req: any, res: Response, next: any) => {
 
 // SEO route handlers - now uses database-driven data
 async function generateSitemap(req: any, res: any) {
-  try {
-    const awesomeListData = await storage.getAwesomeListFromDatabase();
-    
-    if (!awesomeListData || !awesomeListData.categories.length) {
-      return res.status(404).send('Sitemap not available - database empty');
-    }
+  const awesomeListData = await storage.getAwesomeListFromDatabase();
 
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-    const currentDate = new Date().toISOString().split('T')[0];
+  if (!awesomeListData || !awesomeListData.categories.length) {
+    throw new NotFoundError('Sitemap not available - database empty');
+  }
 
-    let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+  const baseUrl = `${req.protocol}://${req.get('host')}`;
+  const currentDate = new Date().toISOString().split('T')[0];
+
+  let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>${baseUrl}/</loc>
@@ -101,70 +100,66 @@ async function generateSitemap(req: any, res: any) {
     <priority>0.8</priority>
   </url>`;
 
-    // Add category URLs from database
-    awesomeListData.categories.forEach(category => {
-      sitemap += `
+  // Add category URLs from database
+  awesomeListData.categories.forEach(category => {
+    sitemap += `
   <url>
     <loc>${baseUrl}/category/${category.slug}</loc>
     <lastmod>${currentDate}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>`;
-      
-      // Add subcategory URLs
-      category.subcategories?.forEach(subcategory => {
-        sitemap += `
+
+    // Add subcategory URLs
+    category.subcategories?.forEach(subcategory => {
+      sitemap += `
   <url>
     <loc>${baseUrl}/subcategory/${subcategory.slug}</loc>
     <lastmod>${currentDate}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>`;
-        
-        // Add sub-subcategory URLs
-        subcategory.subSubcategories?.forEach(subSubcategory => {
-          sitemap += `
+
+      // Add sub-subcategory URLs
+      subcategory.subSubcategories?.forEach(subSubcategory => {
+        sitemap += `
   <url>
     <loc>${baseUrl}/sub-subcategory/${subSubcategory.slug}</loc>
     <lastmod>${currentDate}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>`;
-        });
       });
     });
+  });
 
-    sitemap += `
+  sitemap += `
 </urlset>`;
 
-    res.set('Content-Type', 'application/xml');
-    res.send(sitemap);
-  } catch (error) {
-    console.error('Error generating sitemap:', error);
-    res.status(500).send('Error generating sitemap');
-  }
+  res.set('Content-Type', 'application/xml');
+  res.send(sitemap);
 }
 
 async function generateOpenGraphImage(req: any, res: any) {
-  try {
-    const { title, category, resourceCount } = req.query;
-    
-    // Use database count if not provided in query
-    let count = resourceCount;
-    let pageTitle = title;
-    
-    if (!count || !pageTitle) {
-      try {
-        const awesomeListData = await storage.getAwesomeListFromDatabase();
-        if (!pageTitle) pageTitle = awesomeListData?.title || 'Awesome Video';
-        if (!count) count = awesomeListData?.resources?.length?.toString() || '2600+';
-      } catch {
-        pageTitle = pageTitle || 'Awesome Video';
-        count = count || '2600+';
-      }
-    }
+  const { title, category, resourceCount } = req.query;
 
-    const svg = `<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  // Use database count if not provided in query
+  let count = resourceCount;
+  let pageTitle = title;
+
+  if (!count || !pageTitle) {
+    try {
+      const awesomeListData = await storage.getAwesomeListFromDatabase();
+      if (!pageTitle) pageTitle = awesomeListData?.title || 'Awesome Video';
+      if (!count) count = awesomeListData?.resources?.length?.toString() || '2600+';
+    } catch {
+      // Fallback to defaults if database is unavailable
+      pageTitle = pageTitle || 'Awesome Video';
+      count = count || '2600+';
+    }
+  }
+
+  const svg = `<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#dc2626;stop-opacity:1" />
@@ -187,13 +182,9 @@ async function generateOpenGraphImage(req: any, res: any) {
   </g>
 </svg>`;
 
-    res.set('Content-Type', 'image/svg+xml');
-    res.set('Cache-Control', 'public, max-age=86400');
-    res.send(svg);
-  } catch (error) {
-    console.error('Error generating OG image:', error);
-    res.status(500).send('Error generating image');
-  }
+  res.set('Content-Type', 'image/svg+xml');
+  res.set('Cache-Control', 'public, max-age=86400');
+  res.send(svg);
 }
 
 // Helper functions to convert slugs back to original titles
@@ -2371,8 +2362,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }));
 
   // SEO routes
-  app.get("/sitemap.xml", generateSitemap);
-  app.get("/og-image.svg", generateOpenGraphImage);
+  app.get("/sitemap.xml", asyncHandler(generateSitemap));
+  app.get("/og-image.svg", asyncHandler(generateOpenGraphImage));
 
   // ============= AI Recommendation Routes =============
 
