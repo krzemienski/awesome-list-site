@@ -65,11 +65,18 @@ app.use((req, res, next) => {
   const port = process.env.PORT ? parseInt(process.env.PORT) : 5000;
   const isProduction = process.env.NODE_ENV === 'production';
   
-  server.listen({
+  const platform = process.platform;
+  const listenOptions: any = {
     port,
     host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
+  };
+
+  // reusePort only supported on Linux
+  if (platform === 'linux') {
+    listenOptions.reusePort = true;
+  }
+
+  server.listen(listenOptions, () => {
     log(`serving on port ${port} (${isProduction ? 'production' : 'development'} mode)`);
     
     // Run background initialization AFTER server is listening

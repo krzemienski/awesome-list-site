@@ -455,18 +455,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const resource = await storage.getResource(id);
-      
+
       if (!resource) {
         return res.status(404).json({ message: 'Resource not found' });
       }
-      
+
       res.json(resource);
     } catch (error) {
       console.error('Error fetching resource:', error);
       res.status(500).json({ message: 'Failed to fetch resource' });
     }
   });
-  
+
+  // GET /api/resources/:id/related - Get related resources
+  app.get('/api/resources/:id/related', async (req: any, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const limit = parseInt(req.query.limit as string) || 6;
+      const userId = req.user?.claims?.sub;
+
+      const relatedResources = await storage.getRelatedResources(id, userId, limit);
+
+      res.json({ resources: relatedResources });
+    } catch (error) {
+      console.error('Error fetching related resources:', error);
+      res.status(500).json({ message: 'Failed to fetch related resources' });
+    }
+  });
+
   // POST /api/resources - Submit new resource (authenticated)
   app.post('/api/resources', isAuthenticated, async (req: any, res) => {
     try {

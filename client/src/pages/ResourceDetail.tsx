@@ -59,9 +59,14 @@ export default function ResourceDetail() {
     enabled: isAuthenticated
   });
 
-  const { data: relatedResources } = useQuery<{resources: Resource[]}>({
-    queryKey: ['/api/resources', { category: resource?.category, limit: 6 }],
-    enabled: !!resource?.category
+  const { data: relatedResources } = useQuery<{resources: (Resource & {score?: number, reasons?: string[]})[]}>({
+    queryKey: ['/api/resources', id, 'related'],
+    queryFn: async () => {
+      const response = await fetch(`/api/resources/${id}/related`, { credentials: 'include' });
+      if (!response.ok) throw new Error('Failed to fetch related resources');
+      return response.json();
+    },
+    enabled: !!id
   });
 
   const isFavorite = favorites?.resourceIds?.includes(parseInt(id || '0')) ?? false;
@@ -103,6 +108,25 @@ export default function ResourceDetail() {
         description: isBookmarked ? "Resource removed from your bookmarks" : "Resource saved to your bookmarks"
       });
     }
+  });
+
+  const trackInteraction = useMutation({
+    mutationFn: async (interaction: {
+      resourceId: string;
+      interactionType: string;
+      interactionValue?: number;
+      metadata?: any;
+    }) => {
+      const response = await fetch("/api/interactions", {
+        method: "POST",
+        body: JSON.stringify({
+          userId: user?.id,
+          ...interaction
+        }),
+        headers: { "Content-Type": "application/json" }
+      });
+      return response.json();
+    },
   });
 
   const handleShare = async () => {
@@ -156,6 +180,11 @@ export default function ResourceDetail() {
   };
 
   const handleRelatedResourceClick = (relatedResource: Resource) => {
+    trackInteraction.mutate({
+      resourceId: relatedResource.id.toString(),
+      interactionType: "click",
+      metadata: { source: "related-resources", fromResourceId: id }
+    });
     setLocation(`/resource/${relatedResource.id}`);
   };
 
@@ -167,9 +196,7 @@ export default function ResourceDetail() {
   const urlScraped = metadata?.urlScraped;
   const tags = metadata?.tags as string[] | undefined;
 
-  const filteredRelatedResources = relatedResources?.resources
-    ?.filter(r => r.id !== resource?.id && r.status === 'approved')
-    ?.slice(0, 5) || [];
+  const filteredRelatedResources = relatedResources?.resources?.slice(0, 6) || [];
 
   if (isLoading) {
     return (
@@ -518,7 +545,7 @@ export default function ResourceDetail() {
                   Related Resources
                 </CardTitle>
                 <CardDescription>
-                  More from {resource.category}
+                  Resources you might find interesting
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
@@ -539,6 +566,18 @@ export default function ResourceDetail() {
                       <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
                         {related.description}
                       </p>
+                    )}
+                    {related.reasons && related.reasons.length > 0 && (
+                      <div className="mt-2 space-y-1">
+                        <div className="text-xs text-muted-foreground">Why recommended:</div>
+                        <div className="flex flex-wrap gap-1">
+                          {related.reasons.slice(0, 2).map((reason, index) => (
+                            <span key={index} className="text-xs bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300 px-2 py-0.5 rounded">
+                              {reason}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
                     )}
                   </div>
                 ))}
