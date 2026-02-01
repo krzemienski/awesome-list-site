@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Edit, ChevronRight } from "lucide-react";
+import { ExternalLink, Edit, ChevronRight, Image as ImageIcon } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import FavoriteButton from "./FavoriteButton";
 import BookmarkButton from "./BookmarkButton";
@@ -38,6 +38,7 @@ export default function ResourceCard({
   const { isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
   const [suggestEditOpen, setSuggestEditOpen] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   const numericId = parseInt(resource.id);
   const isValidDbResource = !isNaN(numericId) && numericId > 0;
@@ -123,14 +124,21 @@ export default function ResourceCard({
       <CardContent className="pt-0">
         {fullResource?.metadata?.urlScraped && (
           <div className="mb-3 space-y-2">
-            {fullResource.metadata.ogImage && (
+            {fullResource.metadata.ogImage && !imageError && (
               <div className="rounded-md overflow-hidden border border-border">
-                <img 
-                  src={fullResource.metadata.ogImage} 
+                <img
+                  src={fullResource.metadata.ogImage}
                   alt={fullResource.metadata.ogTitle || resource.name}
                   className="w-full h-32 object-cover"
                   loading="lazy"
+                  onError={() => setImageError(true)}
                 />
+              </div>
+            )}
+            {fullResource.metadata.ogImage && imageError && (
+              <div className="rounded-md border border-border bg-muted p-8 flex flex-col items-center justify-center h-32">
+                <ImageIcon className="h-8 w-8 text-muted-foreground mb-2" />
+                <p className="text-xs text-muted-foreground">Image unavailable</p>
               </div>
             )}
             {fullResource.metadata.scrapedTitle && fullResource.metadata.scrapedTitle !== resource.name && (
