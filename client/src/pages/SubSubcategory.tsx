@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import SEOHead from "@/components/layout/SEOHead";
 import TagFilter from "@/components/ui/tag-filter";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ArrowLeft, ExternalLink, FilterX } from "lucide-react";
 import { deslugify } from "@/lib/utils";
 import { Resource } from "@/types/awesome-list";
 import NotFound from "@/pages/not-found";
@@ -99,10 +99,18 @@ export default function SubSubcategory() {
     if (selectedTags.length === 0) {
       return allResources;
     }
-    return allResources.filter(r => 
+    return allResources.filter(r =>
       r.tags && r.tags.some(tag => selectedTags.includes(tag))
     );
   }, [allResources, selectedTags]);
+
+  // Check if any filters are active
+  const hasActiveFilters = selectedTags.length > 0;
+
+  // Clear all filters
+  const clearAllFilters = () => {
+    setSelectedTags([]);
+  };
   
   // Track sub-subcategory view
   useEffect(() => {
@@ -196,6 +204,18 @@ export default function SubSubcategory() {
             Showing {filteredResources.length} of {allResources.length} resources
             {selectedTags.length > 0 && ` (filtered by ${selectedTags.length} tag${selectedTags.length > 1 ? 's' : ''})`}
           </p>
+          {hasActiveFilters && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={clearAllFilters}
+              className="gap-2"
+              data-testid="button-clear-filters"
+            >
+              <FilterX className="h-4 w-4" />
+              Clear Filters
+            </Button>
+          )}
         </div>
       )}
       
