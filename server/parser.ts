@@ -1,5 +1,6 @@
 import { remark } from 'remark';
 import { visit } from 'unist-util-visit';
+import type { Node } from 'unist';
 import fetch, { Response } from 'node-fetch';
 
 interface Resource {
@@ -21,6 +22,7 @@ interface AwesomeListData {
   description: string;
   repoUrl: string;
   resources: Resource[];
+  categories: never[]; // Empty array - categories are built from resources by storage layer
 }
 
 function log(message: string, level: 'info' | 'warn' | 'error' = 'info') {
@@ -371,7 +373,8 @@ async function parseMarkdown(content: string, repoUrl: string): Promise<AwesomeL
     title: cleanText(title),
     description: description || getDefaultDescription(title),
     repoUrl,
-    resources: resources.filter(r => r.title && r.url && !r.url.startsWith('#'))
+    resources: resources.filter(r => r.title && r.url && !r.url.startsWith('#')),
+    categories: [] // Categories are built from resources by the storage layer
   };
   
   log(`Parsed ${data.resources.length} resources from ${repoUrl}`);

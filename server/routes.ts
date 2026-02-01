@@ -2221,7 +2221,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Sanitize users for export (remove sensitive data)
       const sanitizedUsers = usersList.map((u: User) => ({
         id: u.id,
-        username: u.username,
+        email: u.email,
         role: u.role,
         createdAt: u.createdAt,
         updatedAt: u.updatedAt

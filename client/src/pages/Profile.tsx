@@ -142,6 +142,7 @@ export default function Profile({ user }: ProfileProps) {
   });
 
   const getDisplayName = () => {
+    if (!user) return "User";
     if (user.firstName && user.lastName) {
       return `${user.firstName} ${user.lastName}`;
     }

@@ -121,7 +121,7 @@ export default function ResourceCard({
       </CardHeader>
       
       <CardContent className="pt-0">
-        {fullResource?.metadata && typeof fullResource.metadata === 'object' && 'urlScraped' in fullResource.metadata && fullResource.metadata.urlScraped && (
+        {fullResource?.metadata && typeof fullResource.metadata === 'object' && 'urlScraped' in fullResource.metadata && Boolean(fullResource.metadata.urlScraped) && (
           <div className="mb-3 space-y-2">
             {typeof fullResource.metadata.ogImage === 'string' && (
               <div className="rounded-md overflow-hidden border border-border">
