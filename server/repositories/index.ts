@@ -60,3 +60,10 @@ export { AuditRepository } from './AuditRepository';
 export { GithubSyncRepository } from './GithubSyncRepository';
 export { EnrichmentRepository } from './EnrichmentRepository';
 export { AdminRepository, type AdminStats } from './AdminRepository';
+export {
+  LegacyRepository,
+  type AwesomeListData,
+  type HierarchicalCategory,
+  type HierarchicalSubcategory,
+  type HierarchicalSubSubcategory,
+} from './LegacyRepository';

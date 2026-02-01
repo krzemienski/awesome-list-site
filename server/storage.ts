@@ -87,6 +87,7 @@ import {
   GithubSyncRepository,
   EnrichmentRepository,
   AdminRepository,
+  LegacyRepository,
   type AdminStats,
 } from "./repositories";
 
@@ -328,6 +329,7 @@ export class DatabaseStorage implements IStorage {
   private githubSyncRepo: GithubSyncRepository;
   private enrichmentRepo: EnrichmentRepository;
   private adminRepo: AdminRepository;
+  private legacyRepo: LegacyRepository;
 
   // In-memory storage for awesome list compatibility (legacy)
   private awesomeListData: any = null;
@@ -344,6 +346,7 @@ export class DatabaseStorage implements IStorage {
     this.githubSyncRepo = new GithubSyncRepository();
     this.enrichmentRepo = new EnrichmentRepository();
     this.adminRepo = new AdminRepository();
+    this.legacyRepo = new LegacyRepository();
   }
 
   // ==========================================================================
@@ -523,7 +526,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAwesomeListFromDatabase(): Promise<AwesomeListData> {
-    return this.categoryRepo.getAwesomeListFromDatabase();
+    return this.legacyRepo.getAwesomeListFromDatabase();
   }
 
   // ==========================================================================
