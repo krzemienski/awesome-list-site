@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Category Navigation - Awesome List</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    * {
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: hsl(222.2 84% 4.9%);
+      color: hsl(210 40% 98%);
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="border-b" style="border-color: hsl(217.2 32.6% 17.5%);">
+    <div class="container mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <svg class="w-8 h-8 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+          </svg>
+          <h1 class="text-xl font-bold">Awesome List</h1>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container mx-auto px-4 py-8">
+    <!-- Breadcrumb Navigation (3-level hierarchy) -->
+    <nav class="mb-6 flex items-center gap-2 text-sm">
+      <a href="/" class="text-gray-400 hover:text-white transition-colors">Home</a>
+      <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+      <a href="/category/encoding-codecs" class="text-gray-400 hover:text-white transition-colors">Encoding & Codecs</a>
+      <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+      <a href="/subcategory/video-encoding-processing" class="text-gray-400 hover:text-white transition-colors">Video Encoding & Processing</a>
+      <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+      <span class="text-white font-medium">Codec Libraries</span>
+    </nav>
+
+    <!-- Back Button -->
+    <div class="mb-6">
+      <button class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        Back to Video Encoding & Processing
+      </button>
+    </div>
+
+    <!-- Page Header -->
+    <div class="mb-8">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="px-2 py-1 text-xs rounded-md" style="background: hsl(217.2 32.6% 17.5%); color: hsl(280 100% 70%);">
+          Sub-subcategory
+        </span>
+      </div>
+      <h1 class="text-4xl font-bold mb-3">Codec Libraries</h1>
+      <p class="text-lg text-gray-400">Core libraries for video encoding, decoding, and codec implementation</p>
+    </div>
+
+    <!-- Category Hierarchy Card -->
+    <div class="mb-8 p-6 rounded-lg border" style="background: hsl(222.2 84% 8%); border-color: hsl(217.2 32.6% 17.5%);">
+      <h2 class="text-sm font-semibold text-gray-400 mb-4">NAVIGATION HIERARCHY</h2>
+
+      <!-- Level 1: Category -->
+      <div class="mb-4">
+        <div class="flex items-center gap-2 mb-2">
+          <div class="w-8 h-8 rounded flex items-center justify-center text-pink-500 font-bold text-sm" style="background: hsl(217.2 32.6% 17.5%);">1</div>
+          <h3 class="font-semibold">Encoding & Codecs</h3>
+        </div>
+        <p class="text-sm text-gray-400 ml-10">Top-level category covering all encoding and codec technologies</p>
+      </div>
+
+      <!-- Arrow -->
+      <div class="ml-4 mb-4">
+        <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+        </svg>
+      </div>
+
+      <!-- Level 2: Subcategory -->
+      <div class="mb-4 ml-8">
+        <div class="flex items-center gap-2 mb-2">
+          <div class="w-8 h-8 rounded flex items-center justify-center text-blue-400 font-bold text-sm" style="background: hsl(217.2 32.6% 17.5%);">2</div>
+          <h3 class="font-semibold">Video Encoding & Processing</h3>
+        </div>
+        <p class="text-sm text-gray-400 ml-10">Subcategory focusing on video encoding workflows and tools</p>
+      </div>
+
+      <!-- Arrow -->
+      <div class="ml-12 mb-4">
+        <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+        </svg>
+      </div>
+
+      <!-- Level 3: Sub-subcategory -->
+      <div class="ml-16">
+        <div class="flex items-center gap-2 mb-2">
+          <div class="w-8 h-8 rounded flex items-center justify-center text-purple-400 font-bold text-sm" style="background: hsl(217.2 32.6% 17.5%);">3</div>
+          <h3 class="font-semibold">Codec Libraries</h3>
+        </div>
+        <p class="text-sm text-gray-400 ml-10">Current page - specific codec implementation libraries</p>
+      </div>
+    </div>
+
+    <!-- Resources List -->
+    <div class="mb-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-semibold">Resources</h2>
+        <span class="text-sm text-gray-400">8 resources</span>
+      </div>
+
+      <!-- Resource Cards -->
+      <div class="space-y-4">
+        <!-- Resource 1 -->
+        <div class="p-6 rounded-lg border transition-colors hover:border-pink-500/50" style="background: hsl(222.2 84% 8%); border-color: hsl(217.2 32.6% 17.5%);">
+          <div class="flex items-start justify-between mb-3">
+            <h3 class="text-lg font-semibold flex items-center gap-2">
+              FFmpeg
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+              </svg>
+            </h3>
+          </div>
+          <p class="text-sm text-gray-400 mb-3">Complete, cross-platform solution to record, convert and stream audio and video</p>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-2 py-1 text-xs rounded" style="background: hsl(217.2 32.6% 17.5%); color: hsl(280 100% 70%);">codec</span>
+            <span class="px-2 py-1 text-xs rounded" style="background: hsl(217.2 32.6% 17.5%); color: hsl(280 100% 70%);">encoding</span>
+            <span class="px-2 py-1 text-xs rounded" style="background: hsl(217.2 32.6% 17.5%); color: hsl(280 100% 70%);">open-source</span>
+          </div>
+        </div>
+
+        <!-- Resource 2 -->
+        <div class="p-6 rounded-lg border transition-colors hover:border-pink-500/50" style="background: hsl(222.2 84% 8%); border-color: hsl(217.2 32.6% 17.5%);">
+          <div class="flex items-start justify-between mb-3">
+            <h3 class="text-lg font-semibold flex items-center gap-2">
+              x264
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+              </svg>
+            </h3>
+          </div>
+          <p class="text-sm text-gray-400 mb-3">Free software library for encoding video streams into H.264/MPEG-4 AVC format</p>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-2 py-1 text-xs rounded" style="background: hsl(217.2 32.6% 17.5%); color: hsl(280 100% 70%);">h264</span>
+            <span class="px-2 py-1 text-xs rounded" style="background: hsl(217.2 32.6% 17.5%); color: hsl(280 100% 70%);">encoder</span>
+          </div>
+        </div>
+
+        <!-- Resource 3 -->
+        <div class="p-6 rounded-lg border transition-colors hover:border-pink-500/50" style="background: hsl(222.2 84% 8%); border-color: hsl(217.2 32.6% 17.5%);">
+          <div class="flex items-start justify-between mb-3">
+            <h3 class="text-lg font-semibold flex items-center gap-2">
+              x265
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+              </svg>
+            </h3>
+          </div>
+          <p class="text-sm text-gray-400 mb-3">Open source HEVC encoder library for creating H.265/HEVC video streams</p>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-2 py-1 text-xs rounded" style="background: hsl(217.2 32.6% 17.5%); color: hsl(280 100% 70%);">hevc</span>
+            <span class="px-2 py-1 text-xs rounded" style="background: hsl(217.2 32.6% 17.5%); color: hsl(280 100% 70%);">h265</span>
+            <span class="px-2 py-1 text-xs rounded" style="background: hsl(217.2 32.6% 17.5%); color: hsl(280 100% 70%);">encoder</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Related Sub-subcategories -->
+    <div class="mt-8">
+      <h2 class="text-xl font-semibold mb-4">Related in Video Encoding & Processing</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="p-4 rounded-lg border" style="background: hsl(222.2 84% 8%); border-color: hsl(217.2 32.6% 17.5%);">
+          <h3 class="font-semibold mb-1">Transcoding Tools</h3>
+          <p class="text-sm text-gray-400">5 resources</p>
+        </div>
+        <div class="p-4 rounded-lg border" style="background: hsl(222.2 84% 8%); border-color: hsl(217.2 32.6% 17.5%);">
+          <h3 class="font-semibold mb-1">Format Conversion</h3>
+          <p class="text-sm text-gray-400">7 resources</p>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
