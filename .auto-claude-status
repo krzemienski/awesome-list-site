@@ -1,25 +1,25 @@
 {
   "active": true,
-  "spec": "048-add-react-memo-to-resourcecard-and-other-frequentl",
-  "state": "building",
+  "spec": "073-split-storage-ts-into-domain-based-repository-modu",
+  "state": "planning",
   "subtasks": {
-    "completed": 6,
-    "total": 7,
+    "completed": 0,
+    "total": 0,
     "in_progress": 1,
     "failed": 0
   },
   "phase": {
-    "current": "Verification and Testing",
+    "current": "Create Repository Modules",
     "id": null,
-    "total": 2
+    "total": 9
   },
   "workers": {
     "active": 0,
     "max": 1
   },
   "session": {
-    "number": 8,
-    "started_at": "2026-01-31T23:33:25.666847"
+    "number": 2,
+    "started_at": "2026-02-01T00:21:30.512330"
   },
-  "last_update": "2026-01-31T23:47:08.743775"
+  "last_update": "2026-02-01T00:26:12.612445"
 }
