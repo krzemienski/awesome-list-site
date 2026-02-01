@@ -51,7 +51,7 @@ import { checkResourceLinks, formatLinkCheckReport } from "./validation/linkChec
 import { seedDatabase } from "./seed";
 import { enrichmentService } from "./ai/enrichmentService";
 import { asyncHandler } from "./middleware/asyncHandler";
-import { InternalServerError, UnauthorizedError, NotFoundError, ValidationError, BadRequestError, ConflictError, ForbiddenError } from "./middleware/errors";
+import { InternalServerError, UnauthorizedError, NotFoundError, ValidationError, BadRequestError, ConflictError, ForbiddenError, ServiceUnavailableError } from "./middleware/errors";
 
 const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md";
 
@@ -1261,10 +1261,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     if (!claudeService.isAvailable()) {
-      return res.status(503).json({
-        message: 'Claude AI service is not available',
-        available: false
-      });
+      throw new ServiceUnavailableError('Claude AI service is not available');
     }
 
     const analysis = await claudeService.analyzeURL(url);
@@ -2065,11 +2062,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     console.log(`GitHub import completed: ${result.imported} imported, ${result.updated} updated, ${result.skipped} skipped`);
 
-    // If validation failed, return 400 with validation details
+    // If validation failed, throw ValidationError with details
     if (!result.validationPassed && result.errors.length > 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'Import rejected: awesome-lint validation failed',
+      throw new ValidationError('Import rejected: awesome-lint validation failed', {
         validationPassed: result.validationPassed,
         validationStats: result.validationStats,
         validationErrors: result.validationErrors.filter(e => e.severity === 'error'),
