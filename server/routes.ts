@@ -50,6 +50,12 @@ import { validateAwesomeList, formatValidationReport } from "./validation/awesom
 import { checkResourceLinks, formatLinkCheckReport } from "./validation/linkChecker";
 import { seedDatabase } from "./seed";
 import { enrichmentService } from "./ai/enrichmentService";
+import { freeTierLimiter, dynamicRateLimiter } from "./middleware/rateLimit";
+import { registerPublicApiRoutes } from "./api/public";
+import { swaggerSpec } from "./openapi";
+import swaggerUi from "swagger-ui-express";
+import crypto from "crypto";
+import bcrypt from "bcryptjs";
 
 const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md";
 
@@ -60,17 +66,26 @@ const isAdmin = async (req: any, res: Response, next: any) => {
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-    
+
     const user = await storage.getUser(userId);
     if (!user || user.role !== 'admin') {
       return res.status(403).json({ message: "Forbidden: Admin access required" });
     }
-    
+
     next();
   } catch (error) {
     res.status(500).json({ message: "Error checking admin status" });
   }
 };
+
+// Helper function to generate secure API keys
+function generateApiKey(): string {
+  // Generate a 32-byte random string and encode as base64url (URL-safe)
+  return crypto.randomBytes(32).toString('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=/g, '');
+}
 
 // SEO route handlers - now uses database-driven data
 async function generateSitemap(req: any, res: any) {
@@ -423,8 +438,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Note: /api/login, /api/callback are set up in setupAuth()
 
+  // ============= Public API Routes =============
+  // These routes are intended for external API access with rate limiting
+  // Rate limiting is applied based on API key tier or IP address (free tier)
+  // Routes are defined in server/api/public.ts for better organization
+
+  // Serve Swagger UI documentation at /api/docs
+  app.use('/api/docs', swaggerUi.serve);
+  app.get('/api/docs', swaggerUi.setup(swaggerSpec, {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'Awesome List Site - API Documentation',
+  }));
+
+  registerPublicApiRoutes(app);
+
   // ============= Resource Routes =============
-  
+
   // GET /api/resources - List approved resources (public)
   app.get('/api/resources', async (req, res) => {
     try {
@@ -433,6 +462,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const category = req.query.category as string;
       const subcategory = req.query.subcategory as string;
       const search = req.query.search as string;
+      const resourceType = req.query.resourceType as string;
+      const difficulty = req.query.difficulty as string;
+      const sortBy = req.query.sortBy as string;
 
       const result = await storage.listResources({
         page,
@@ -440,7 +472,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: 'approved',
         category,
         subcategory,
-        search
+        search,
+        resourceType,
+        difficulty,
+        sortBy
       });
 
       res.json(result);
@@ -449,105 +484,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: 'Failed to fetch resources' });
     }
   });
-
-  // GET /api/resources/check-url - Check if URL already exists (public)
-  app.get('/api/resources/check-url', async (req, res) => {
-    try {
-      const url = req.query.url as string;
-
-      if (!url) {
-        return res.status(400).json({ message: 'URL parameter is required' });
-      }
-
-      const existingResource = await storage.getResourceByUrl(url);
-
-      if (existingResource) {
-        return res.json({
-          exists: true,
-          resource: {
-            id: existingResource.id,
-            title: existingResource.title,
-            status: existingResource.status,
-            category: existingResource.category,
-            subcategory: existingResource.subcategory
-          }
-        });
-      }
-
-      res.json({ exists: false });
-    } catch (error) {
-      console.error('Error checking URL:', error);
-      res.status(500).json({ message: 'Failed to check URL' });
-    }
-  });
-
+  
   // GET /api/resources/:id - Get single resource
   app.get('/api/resources/:id', async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const resource = await storage.getResource(id);
-
+      
       if (!resource) {
         return res.status(404).json({ message: 'Resource not found' });
       }
-
+      
       res.json(resource);
     } catch (error) {
       console.error('Error fetching resource:', error);
       res.status(500).json({ message: 'Failed to fetch resource' });
     }
   });
-
-  // GET /api/resources/:id/related - Get AI-powered similar resources
-  app.get('/api/resources/:id/related', async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const limit = parseInt(req.query.limit as string) || 5;
-
-      // Get the source resource
-      const resource = await storage.getResource(id);
-      if (!resource) {
-        return res.status(404).json({ message: 'Resource not found' });
-      }
-
-      // Create a synthetic user profile based on the resource's attributes
-      const userProfile: AIUserProfile = {
-        userId: 'anonymous',
-        preferredCategories: resource.category ? [resource.category] : [],
-        skillLevel: 'intermediate',
-        learningGoals: [],
-        preferredResourceTypes: [],
-        timeCommitment: 'flexible',
-        viewHistory: [resource.url], // Exclude this resource from results
-        bookmarks: [],
-        completedResources: [],
-        ratings: {}
-      };
-
-      // Generate recommendations
-      const result = await recommendationEngine.generateRecommendations(
-        userProfile,
-        limit + 1, // Request one more to account for filtering
-        false
-      );
-
-      // Filter out the source resource and limit results
-      const relatedResources = result.recommendations
-        .filter(rec => rec.resource.id !== id)
-        .slice(0, limit)
-        .map(rec => ({
-          ...rec.resource,
-          score: rec.confidence,
-          reasons: [rec.reason]
-        }));
-
-      res.json({ resources: relatedResources });
-    } catch (error) {
-      console.error('Error fetching related resources:', error);
-      res.status(500).json({ message: 'Failed to fetch related resources' });
-    }
-  });
-
+  
   // POST /api/resources - Submit new resource (authenticated)
   app.post('/api/resources', isAuthenticated, async (req: any, res) => {
     try {
@@ -1227,11 +1181,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.params.id;
       const { role } = req.body;
-      
+
       if (!role || !['user', 'admin', 'moderator'].includes(role)) {
         return res.status(400).json({ message: 'Invalid role' });
       }
-      
+
       const user = await storage.updateUserRole(userId, role);
       res.json(user);
     } catch (error) {
@@ -1239,7 +1193,104 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: 'Failed to update user role' });
     }
   });
-  
+
+  // ============= API Key Management Routes =============
+
+  // POST /api/admin/api-keys - Create a new API key
+  app.post('/api/admin/api-keys', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { name, scopes, expiresAt } = req.body;
+
+      // Validate input
+      if (!name || name.trim().length === 0) {
+        return res.status(400).json({ message: 'API key name is required' });
+      }
+
+      // Generate a secure random API key
+      const plaintextKey = generateApiKey();
+
+      // Hash the key before storing
+      const hashedKey = await bcrypt.hash(plaintextKey, 10);
+
+      // Create API key in database
+      const apiKey = await storage.createApiKey({
+        userId,
+        key: hashedKey,
+        name: name.trim(),
+        scopes: scopes || ['read'],
+        expiresAt: expiresAt ? new Date(expiresAt) : undefined,
+      });
+
+      // Return the API key with plaintext key (only time it's shown)
+      res.json({
+        id: apiKey.id,
+        name: apiKey.name,
+        key: plaintextKey, // Only returned once during creation
+        scopes: apiKey.scopes,
+        createdAt: apiKey.createdAt,
+        expiresAt: apiKey.expiresAt,
+      });
+    } catch (error) {
+      console.error('Error creating API key:', error);
+      res.status(500).json({ message: 'Failed to create API key' });
+    }
+  });
+
+  // GET /api/admin/api-keys - List all API keys for current user
+  app.get('/api/admin/api-keys', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+
+      // Get all API keys for the user
+      const apiKeys = await storage.listApiKeys(userId);
+
+      // Return keys without the hashed key value (security)
+      const sanitizedKeys = apiKeys.map(key => ({
+        id: key.id,
+        name: key.name,
+        scopes: key.scopes,
+        createdAt: key.createdAt,
+        lastUsedAt: key.lastUsedAt,
+        expiresAt: key.expiresAt,
+        revokedAt: key.revokedAt,
+      }));
+
+      res.json({ apiKeys: sanitizedKeys });
+    } catch (error) {
+      console.error('Error listing API keys:', error);
+      res.status(500).json({ message: 'Failed to list API keys' });
+    }
+  });
+
+  // DELETE /api/admin/api-keys/:id - Revoke an API key
+  app.delete('/api/admin/api-keys/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const keyId = req.params.id;
+      const userId = req.user.claims.sub;
+
+      if (!keyId) {
+        return res.status(400).json({ message: 'API key ID is required' });
+      }
+
+      // Verify the key belongs to the user (for security)
+      const userKeys = await storage.listApiKeys(userId);
+      const keyExists = userKeys.some(key => key.id === keyId);
+
+      if (!keyExists) {
+        return res.status(404).json({ message: 'API key not found' });
+      }
+
+      // Revoke the key
+      await storage.revokeApiKey(keyId);
+
+      res.json({ message: 'API key revoked successfully' });
+    } catch (error) {
+      console.error('Error revoking API key:', error);
+      res.status(500).json({ message: 'Failed to revoke API key' });
+    }
+  });
+
   // ============= Resource Approval Routes =============
   
   // GET /api/admin/pending-resources - Get all pending resources for approval

@@ -1,6 +1,6 @@
 import { useParams, Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -30,6 +30,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { slugify } from "@/lib/utils";
+import { Blurhash } from "react-blurhash";
 import type { Resource } from "@shared/schema";
 
 export default function ResourceDetail() {
@@ -39,6 +40,7 @@ export default function ResourceDetail() {
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
   const [suggestEditOpen, setSuggestEditOpen] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   const { data: resource, isLoading, error } = useQuery<Resource>({
     queryKey: ['/api/resources', id],
@@ -129,6 +131,17 @@ export default function ResourceDetail() {
       return response.json();
     },
   });
+
+  // Track page view when resource loads
+  useEffect(() => {
+    if (resource && user?.id) {
+      trackInteraction.mutate({
+        resourceId: resource.id.toString(),
+        interactionType: "view",
+        metadata: { timestamp: new Date().toISOString() }
+      });
+    }
+  }, [resource?.id, user?.id]);
 
   const handleShare = async () => {
     const url = window.location.href;
@@ -305,11 +318,24 @@ export default function ResourceDetail() {
           <Card className="border-pink-500/20 bg-black overflow-hidden">
             {hasOgImage && (
               <div className="relative w-full h-48 md:h-64 overflow-hidden bg-gradient-to-b from-pink-500/10 to-transparent">
-                <img 
-                  src={metadata.ogImage} 
+                {metadata.ogImageBlurhash && !imageLoaded && (
+                  <div className="absolute inset-0">
+                    <Blurhash
+                      hash={metadata.ogImageBlurhash}
+                      width="100%"
+                      height="100%"
+                      resolutionX={32}
+                      resolutionY={32}
+                      punch={1}
+                    />
+                  </div>
+                )}
+                <img
+                  src={metadata.ogImage}
                   alt={resource.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover relative z-10"
                   loading="lazy"
+                  onLoad={() => setImageLoaded(true)}
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.display = 'none';
                   }}

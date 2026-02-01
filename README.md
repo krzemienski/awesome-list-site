@@ -64,8 +64,6 @@ A production-ready React application for browsing and discovering 2,600+ curated
 
 ## Quick Start
 
-> **First time?** See [SETUP.md](docs/SETUP.md) for prerequisites (Node.js 18+, PostgreSQL) and environment setup (DATABASE_URL, SESSION_SECRET).
-
 ### Development
 
 ```bash
@@ -75,7 +73,7 @@ npm install
 # Start development server
 npm run dev
 
-# Open in browser (default port 5000, configurable via PORT env var)
+# Open in browser
 # http://localhost:5000
 ```
 
@@ -97,6 +95,7 @@ npm run start
 | [ENVIRONMENT_VARIABLES.md](docs/ENVIRONMENT_VARIABLES.md) | Environment variables reference |
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md) | System architecture and design |
 | [API.md](docs/API.md) | Complete API reference |
+| [API Documentation](/api/docs) | Interactive OpenAPI documentation |
 | [ADMIN-GUIDE.md](docs/ADMIN-GUIDE.md) | Administrator documentation |
 | [CODE-MAP.md](docs/CODE-MAP.md) | Codebase navigation guide |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines |

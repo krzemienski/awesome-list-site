@@ -3,9 +3,11 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes, runBackgroundInitialization } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { handleSSR } from "./ssr";
+import { errorHandler } from "./middleware/errorHandler";
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import pkg from 'pg';
+import { initializeLinkHealthScheduler } from "./jobs/linkHealthScheduler";
 const { Pool } = pkg;
 
 const app = express();
@@ -86,13 +88,8 @@ async function runMigrations() {
 
   const server = await registerRoutes(app);
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-
-    res.status(status).json({ message });
-    throw err;
-  });
+  // Centralized error handling middleware
+  app.use(errorHandler);
 
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
@@ -128,6 +125,9 @@ async function runMigrations() {
     runBackgroundInitialization().catch((error) => {
       console.error('❌ Background initialization error (non-fatal):', error);
     });
+
+    // Initialize link health monitoring cron job
+    initializeLinkHealthScheduler();
   }).on('error', (err) => {
     console.error(`❌ Server failed to start on port ${port}:`, err);
     process.exit(1);
