@@ -21,7 +21,8 @@ graph TB
         Routes["API Routes<br/>(RESTful)"]
         Auth["Passport.js<br/>(Authentication)"]
         Middleware["Middleware<br/>(Validation, Auth)"]
-        Storage["Drizzle ORM<br/>(Storage Layer)"]
+        Repos["Repositories<br/>(Repository Pattern)"]
+        ORM["Drizzle ORM<br/>(Type-safe SQL)"]
         GitHub["GitHub Sync<br/>(Import/Export)"]
         AI["AI Services<br/>(Claude Integration)"]
     end
@@ -34,11 +35,12 @@ graph TB
 
     Client -->|HTTP| Routes
     Client -->|HTTP| Auth
-    Routes -->|Query| Storage
-    Auth -->|Query| Storage
-    Storage -->|SQL| DB
-    GitHub -->|Query| Storage
-    AI -->|Query| Storage
+    Routes -->|Query| Repos
+    Auth -->|Query| Repos
+    Repos -->|Query| ORM
+    ORM -->|SQL| DB
+    GitHub -->|Query| Repos
+    AI -->|Query| Repos
     Routes -->|REST| GH
     Routes -->|REST| Claude
 ```
@@ -97,6 +99,12 @@ graph TB
 │   │   └── App.tsx         # Root component & routing
 │   └── index.html
 ├── server/                 # Backend application
+│   ├── repositories/       # Data access layer (Repository Pattern)
+│   │   ├── resourceRepository.ts
+│   │   ├── categoryRepository.ts
+│   │   ├── userRepository.ts
+│   │   ├── enrichmentRepository.ts
+│   │   └── index.ts
 │   ├── ai/                 # AI services
 │   │   ├── claudeService.ts
 │   │   ├── enrichmentService.ts
@@ -110,7 +118,6 @@ graph TB
 │   │   ├── awesomeLint.ts
 │   │   └── linkChecker.ts
 │   ├── routes.ts           # API route definitions
-│   ├── storage.ts          # Database access layer
 │   ├── replitAuth.ts       # OAuth configuration
 │   ├── localAuth.ts        # Local auth for dev
 │   └── index.ts            # Server entry point
@@ -119,6 +126,77 @@ graph TB
 ├── scripts/                # Utility scripts
 └── docs/                   # Documentation
 ```
+
+## Backend Architecture Patterns
+
+### Repository Pattern
+
+The backend implements the **Repository Pattern** to separate data access logic from business logic, providing a clean abstraction layer over database operations.
+
+#### Structure
+
+The repository layer is organized by domain:
+
+```
+server/
+├── repositories/
+│   ├── resourceRepository.ts    # Resource domain operations
+│   ├── categoryRepository.ts    # Category hierarchy operations
+│   ├── userRepository.ts        # User management operations
+│   ├── enrichmentRepository.ts  # AI enrichment operations
+│   └── index.ts                 # Centralized exports
+```
+
+#### Benefits
+
+1. **Separation of Concerns**: Database queries are isolated from business logic
+2. **Testability**: Repositories can be mocked for unit testing
+3. **Maintainability**: Centralized data access patterns
+4. **Type Safety**: Drizzle ORM provides full TypeScript type inference
+5. **Reusability**: Common queries are defined once and reused across services
+
+#### Usage Example
+
+```typescript
+// In routes or services
+import { resourceRepository } from './repositories';
+
+// Clean, domain-focused API
+const resources = await resourceRepository.findAll();
+const resource = await resourceRepository.findById(id);
+await resourceRepository.create(data);
+await resourceRepository.update(id, changes);
+await resourceRepository.delete(id);
+```
+
+#### Architecture Diagram
+
+```mermaid
+graph TD
+    Routes["API Routes"] --> Services["Business Services"]
+    Services --> Repos["Domain Repositories"]
+    Repos --> Drizzle["Drizzle ORM"]
+    Drizzle --> DB["PostgreSQL"]
+
+    style Routes fill:#e3f2fd
+    style Services fill:#f3e5f5
+    style Repos fill:#fff3e0
+    style Drizzle fill:#e8f5e9
+    style DB fill:#fce4ec
+```
+
+#### Migration from storage.ts
+
+The legacy `storage.ts` monolithic file has been refactored into domain-based repositories:
+
+| Old Pattern | New Pattern |
+|-------------|-------------|
+| `import * as storage from './storage'` | `import { resourceRepository } from './repositories'` |
+| `storage.getResourceById(id)` | `resourceRepository.findById(id)` |
+| 1200+ lines in single file | ~200-300 lines per domain repository |
+| Mixed concerns | Single responsibility per repository |
+
+This refactoring improves code organization, maintainability, and makes the codebase more scalable for future features.
 
 ## Component Hierarchy
 
@@ -161,16 +239,19 @@ sequenceDiagram
     participant U as User/Browser
     participant R as React + Query
     participant E as Express.js
+    participant Repo as Repository
     participant D as Drizzle ORM
     participant DB as PostgreSQL
 
     U->>R: Navigate/User Action
     R->>E: HTTP Request (GET/POST/PUT/DELETE)
     E->>E: Route & Middleware Processing
-    E->>D: Build & Execute Query
+    E->>Repo: Call Repository Method
+    Repo->>D: Build & Execute Query
     D->>DB: SQL Query
     DB-->>D: Result Set
-    D-->>E: Typed Data
+    D-->>Repo: Typed Data
+    Repo-->>E: Domain Objects
     E-->>R: JSON Response
     R->>R: Cache & Update State
     R-->>U: Re-render UI
