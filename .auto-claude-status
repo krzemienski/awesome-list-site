@@ -1,25 +1,25 @@
 {
   "active": true,
-  "spec": "048-add-react-memo-to-resourcecard-and-other-frequentl",
-  "state": "building",
+  "spec": "078-add-aria-label-to-toast-close-button",
+  "state": "planning",
   "subtasks": {
-    "completed": 6,
-    "total": 7,
+    "completed": 0,
+    "total": 0,
     "in_progress": 1,
     "failed": 0
   },
   "phase": {
-    "current": "Verification and Testing",
+    "current": "Add aria-label Attribute",
     "id": null,
-    "total": 2
+    "total": 1
   },
   "workers": {
     "active": 0,
     "max": 1
   },
   "session": {
-    "number": 8,
-    "started_at": "2026-01-31T23:33:25.666847"
+    "number": 2,
+    "started_at": "2026-02-01T00:21:38.716643"
   },
-  "last_update": "2026-01-31T23:47:08.743775"
+  "last_update": "2026-02-01T00:24:06.425723"
 }
