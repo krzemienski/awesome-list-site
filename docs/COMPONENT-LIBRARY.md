@@ -2110,6 +2110,415 @@ if (views) setViewData(JSON.parse(views));
 
 ---
 
+## Component Composition Examples
+
+Real-world patterns from the codebase showing how components work together to create complete UI features.
+
+### Empty State Pattern
+
+A complete empty state with icon, messaging, and call-to-action:
+
+```tsx
+import { Card, CardContent } from "@/components/ui/card";
+import { BookmarkX } from "lucide-react";
+
+<Card className="border-2 border-dashed border-pink-500/30 bg-pink-500/5">
+  <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+    <div className="rounded-full bg-pink-500/10 p-6 mb-6">
+      <BookmarkX className="h-12 w-12 text-pink-500" />
+    </div>
+    <h2 className="text-2xl font-bold mb-3 text-pink-500">No Bookmarks Yet</h2>
+    <p className="text-muted-foreground max-w-md mb-6">
+      Start exploring resources and bookmark the ones you want to save for later.
+      Click the bookmark icon on any resource card to add it to your collection.
+    </p>
+    <a
+      href="/"
+      className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-pink-500 text-white hover:bg-pink-600 h-10 px-6 py-2"
+    >
+      Explore Resources
+    </a>
+  </CardContent>
+</Card>
+```
+
+**Pattern Breakdown:**
+- **Card**: Container with dashed border and subtle pink tint
+- **Icon**: Centered in colored circle for visual emphasis
+- **Typography**: Heading + description hierarchy
+- **Button/Link**: Primary action with proper ARIA attributes
+
+**Use Cases:**
+- Empty bookmarks list
+- No search results
+- Missing data states
+- Onboarding prompts
+
+---
+
+### List with Controls Pattern
+
+Sortable, filterable list with header and grid layout:
+
+```tsx
+import { useState, useMemo } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Bookmark } from "lucide-react";
+import ResourceCard from "@/components/resource/ResourceCard";
+
+const [sortBy, setSortBy] = useState("date-desc");
+
+// Sort data
+const sortedItems = useMemo(() => {
+  if (!items) return [];
+  const results = [...items];
+
+  if (sortBy === "name-asc") {
+    results.sort((a, b) => a.name.localeCompare(b.name));
+  } else if (sortBy === "date-desc") {
+    results.sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateB - dateA;
+    });
+  }
+
+  return results;
+}, [items, sortBy]);
+
+return (
+  <div className="space-y-6">
+    {/* Header with Icon and Title */}
+    <div className="space-y-2">
+      <div className="flex items-center gap-3">
+        <Bookmark className="h-8 w-8 text-pink-500" />
+        <h1 className="text-3xl font-bold tracking-tight">
+          My Bookmarks
+        </h1>
+      </div>
+      <p className="text-muted-foreground">
+        You have {sortedItems.length} saved {sortedItems.length === 1 ? 'resource' : 'resources'}
+      </p>
+    </div>
+
+    {/* Controls */}
+    <div className="flex items-center gap-4">
+      <Select value={sortBy} onValueChange={setSortBy}>
+        <SelectTrigger className="w-[200px]">
+          <SelectValue placeholder="Sort by..." />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="date-desc">Date: Newest First</SelectItem>
+          <SelectItem value="date-asc">Date: Oldest First</SelectItem>
+          <SelectItem value="name-asc">Name: A-Z</SelectItem>
+          <SelectItem value="name-desc">Name: Z-A</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
+
+    {/* Grid */}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {sortedItems.map((item) => (
+        <ResourceCard
+          key={item.id}
+          resource={item}
+          data-testid={`bookmark-card-${item.id}`}
+        />
+      ))}
+    </div>
+  </div>
+);
+```
+
+**Pattern Breakdown:**
+- **Header Section**: Icon + Title + Description for context
+- **Controls Section**: Sorting dropdown with state management
+- **Grid Layout**: Responsive grid with gap spacing
+- **Dynamic Content**: Memoized sorting for performance
+
+**Use Cases:**
+- Resource listings
+- Bookmarks page
+- Search results
+- Filtered collections
+
+---
+
+### Loading State Pattern
+
+Skeleton screens that match content structure:
+
+```tsx
+import { Skeleton } from "@/components/ui/skeleton";
+
+<div className="space-y-6" aria-busy={true} aria-live="polite">
+  {/* Header skeletons */}
+  <div className="space-y-4">
+    <Skeleton className="h-10 w-64" />
+    <Skeleton className="h-6 w-96" />
+  </div>
+
+  {/* Grid skeletons */}
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    {Array.from({ length: 6 }).map((_, i) => (
+      <Skeleton key={i} className="h-48 w-full" />
+    ))}
+  </div>
+</div>
+```
+
+**Pattern Breakdown:**
+- **ARIA Attributes**: `aria-busy` and `aria-live` for accessibility
+- **Structure Match**: Skeletons mirror actual content layout
+- **Grid Consistency**: Same responsive grid as loaded state
+- **Array Generation**: Creates multiple skeleton items
+
+**Use Cases:**
+- Page initial load
+- Data fetching states
+- Infinite scroll placeholders
+- Optimistic UI updates
+
+---
+
+### Error State Pattern
+
+User-friendly error display with icon and messaging:
+
+```tsx
+import { BookmarkX } from "lucide-react";
+
+<div className="space-y-6">
+  <div className="text-center py-12">
+    <BookmarkX className="h-16 w-16 mx-auto text-destructive mb-4" />
+    <h2 className="text-2xl font-bold mb-2">Error Loading Bookmarks</h2>
+    <p className="text-muted-foreground">
+      There was an error loading your bookmarks. Please try again later.
+    </p>
+  </div>
+</div>
+```
+
+**Pattern Breakdown:**
+- **Centered Layout**: Center-aligned for error states
+- **Destructive Color**: Uses `text-destructive` for error icon
+- **Clear Messaging**: Bold heading + explanation text
+- **Spacing**: Generous padding and gaps for readability
+
+**Use Cases:**
+- API errors
+- Network failures
+- Permission errors
+- 404 states
+
+---
+
+### Form with Validation Pattern
+
+Complete form with labels, validation, and actions:
+
+```tsx
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+
+<Card>
+  <CardHeader>
+    <CardTitle>Submit Resource</CardTitle>
+  </CardHeader>
+  <CardContent className="space-y-4">
+    <div className="space-y-2">
+      <Label htmlFor="name">Resource Name</Label>
+      <Input
+        id="name"
+        placeholder="Enter resource name..."
+        required
+      />
+    </div>
+
+    <div className="space-y-2">
+      <Label htmlFor="url">URL</Label>
+      <Input
+        id="url"
+        type="url"
+        placeholder="https://..."
+        required
+      />
+    </div>
+
+    <div className="space-y-2">
+      <Label htmlFor="description">Description</Label>
+      <Textarea
+        id="description"
+        placeholder="Describe this resource..."
+        rows={4}
+      />
+    </div>
+  </CardContent>
+  <CardFooter className="flex gap-2">
+    <Button variant="outline">Cancel</Button>
+    <Button type="submit">Submit Resource</Button>
+  </CardFooter>
+</Card>
+```
+
+**Pattern Breakdown:**
+- **Card Container**: Provides visual grouping
+- **Semantic Sections**: Header, Content, Footer structure
+- **Label/Input Pairing**: Accessible form fields with proper IDs
+- **Spacing**: Consistent `space-y-*` for vertical rhythm
+- **Action Buttons**: Primary and secondary actions in footer
+
+**Use Cases:**
+- Resource submission forms
+- Profile editing
+- Settings panels
+- Contact forms
+
+---
+
+### Conditional Rendering Pattern
+
+Dynamic UI based on state with consistent structure:
+
+```tsx
+import { Card, CardContent } from "@/components/ui/card";
+import { BookmarkX } from "lucide-react";
+
+const hasItems = items && items.length > 0;
+
+return (
+  <div className="space-y-6">
+    <Header />
+
+    {hasItems ? (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {items.map((item) => (
+          <ResourceCard key={item.id} resource={item} />
+        ))}
+      </div>
+    ) : (
+      <Card className="border-2 border-dashed">
+        <CardContent className="text-center py-16">
+          <BookmarkX className="h-12 w-12 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold mb-2">No Items Found</h2>
+          <p className="text-muted-foreground">
+            Try adjusting your filters or search query
+          </p>
+        </CardContent>
+      </Card>
+    )}
+  </div>
+);
+```
+
+**Pattern Breakdown:**
+- **Boolean Check**: Clean conditional logic
+- **Consistent Wrapper**: Same outer structure for both states
+- **Empty State Fallback**: Informative placeholder
+- **Maintainable**: Easy to read and modify
+
+**Use Cases:**
+- Search results
+- Filtered lists
+- User collections
+- Dynamic content areas
+
+---
+
+### Multi-Component Dashboard Pattern
+
+Complex layout combining multiple component patterns:
+
+```tsx
+import { useQuery } from "@tanstack/react-query";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+
+const { data: stats, isLoading } = useQuery({
+  queryKey: ['/api/stats'],
+  staleTime: 30000,
+});
+
+if (isLoading) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {Array.from({ length: 3 }).map((_, i) => (
+        <Skeleton key={i} className="h-32" />
+      ))}
+    </div>
+  );
+}
+
+return (
+  <div className="space-y-6">
+    {/* Stats Grid */}
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm font-medium">
+            Total Resources
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-3xl font-bold">{stats?.totalResources}</div>
+          <Badge variant="secondary" className="mt-2">
+            +12 this week
+          </Badge>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm font-medium">
+            Bookmarks
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-3xl font-bold">{stats?.bookmarks}</div>
+          <p className="text-sm text-muted-foreground mt-2">
+            Saved items
+          </p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm font-medium">
+            Categories
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-3xl font-bold">{stats?.categories}</div>
+          <Button variant="link" className="p-0 h-auto mt-2">
+            View all →
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  </div>
+);
+```
+
+**Pattern Breakdown:**
+- **Data Fetching**: React Query for state management
+- **Loading States**: Skeleton grid matches content structure
+- **Stats Cards**: Consistent card layout with title, value, meta
+- **Responsive Grid**: 1 column mobile, 3 columns desktop
+- **Mixed Content**: Numbers, badges, links in single pattern
+
+**Use Cases:**
+- Analytics dashboards
+- User profiles
+- Admin panels
+- Overview pages
+
+---
+
 ## Resources
 
 - [shadcn/ui Documentation](https://ui.shadcn.com/)

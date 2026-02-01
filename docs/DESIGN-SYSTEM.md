@@ -2667,6 +2667,552 @@ Before deploying theme changes, verify:
 
 ---
 
+## Design System Composition Examples
+
+Real-world examples showing how to combine design tokens to create complete, cohesive UI patterns.
+
+### Interactive Card Pattern
+
+Combining background hierarchy, primary colors, and transitions:
+
+```tsx
+<div className="bg-card border border-border rounded-[--radius] p-6 transition-colors hover:border-primary cursor-pointer">
+  <div className="flex items-start gap-4">
+    {/* Icon with primary accent */}
+    <div className="rounded-full bg-primary/10 p-3">
+      <Icon className="h-6 w-6 text-primary" />
+    </div>
+
+    {/* Content with typography hierarchy */}
+    <div className="flex-1 space-y-2">
+      <h3 className="text-lg font-semibold text-foreground">
+        Card Title
+      </h3>
+      <p className="text-sm text-muted-foreground leading-relaxed">
+        Description text that provides additional context
+      </p>
+
+      {/* Metadata with muted colors */}
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <span>Updated 2h ago</span>
+        <span>•</span>
+        <span>5 items</span>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+**Token Usage:**
+- **Background Hierarchy**: `bg-card` (elevated surface) over `bg-background` (page)
+- **Border**: `border-border` (default) → `border-primary` (hover state)
+- **Text Hierarchy**: `text-foreground` (heading) → `text-muted-foreground` (body/meta)
+- **Color Accents**: `bg-primary/10` (subtle tint) + `text-primary` (icon)
+- **Border Radius**: `rounded-[--radius]` (respects design system: 0rem = sharp edges)
+- **Transitions**: `transition-colors` for smooth hover effect
+
+**Design Principles Applied:**
+- Cyberpunk aesthetic with sharp edges and primary accent
+- Clear visual hierarchy through color and typography
+- Subtle interactions that don't rely on shadows
+- Consistent spacing with gap utilities
+
+---
+
+### Status Badge System
+
+Using color tokens to communicate state:
+
+```tsx
+{/* Success State */}
+<span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-[--radius] bg-accent/10 text-accent text-xs font-mono">
+  <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+  Active
+</span>
+
+{/* Warning State */}
+<span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-[--radius] bg-destructive/10 text-destructive text-xs font-mono">
+  <span className="h-1.5 w-1.5 rounded-full bg-destructive" />
+  Alert
+</span>
+
+{/* Neutral State */}
+<span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-[--radius] bg-muted text-muted-foreground text-xs font-mono">
+  <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground" />
+  Inactive
+</span>
+
+{/* Primary State */}
+<span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-[--radius] bg-primary/10 text-primary text-xs font-mono">
+  <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+  Featured
+</span>
+```
+
+**Token Usage:**
+- **Accent** (`oklch(0.7072 0.1679 242.0420)`): Blue for success/active states
+- **Destructive** (`oklch(0.6489 0.2370 26.9728)`): Orange/red for warnings/errors
+- **Muted** (`oklch(0.2178 0 0)` + `oklch(0.6993 0 0)`): Neutral/inactive states
+- **Primary** (`oklch(0.75 0.3225 328.3634)`): Pink for featured/important items
+- **Typography**: `font-mono` (JetBrains Mono) for technical aesthetic
+- **Opacity**: `/10` modifier for subtle backgrounds
+
+**Color Psychology:**
+- Blue (accent) = Calm, trustworthy, active
+- Orange/Red (destructive) = Attention, caution, urgent
+- Gray (muted) = Neutral, disabled, secondary
+- Pink (primary) = Brand, featured, emphasis
+
+---
+
+### Form Field Composition
+
+Combining input states with consistent visual language:
+
+```tsx
+<div className="space-y-2">
+  {/* Label with foreground color */}
+  <label className="text-sm font-medium text-foreground">
+    Email Address
+  </label>
+
+  {/* Input with focus states */}
+  <input
+    type="email"
+    className="flex h-10 w-full rounded-[--radius] border border-input bg-background px-3 py-2 text-sm text-foreground ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 font-mono"
+    placeholder="you@example.com"
+  />
+
+  {/* Helper text with muted foreground */}
+  <p className="text-xs text-muted-foreground">
+    We'll never share your email with anyone else.
+  </p>
+</div>
+
+{/* Error State */}
+<div className="space-y-2">
+  <label className="text-sm font-medium text-foreground">
+    Password
+  </label>
+
+  <input
+    type="password"
+    className="flex h-10 w-full rounded-[--radius] border border-destructive bg-background px-3 py-2 text-sm text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive focus-visible:ring-offset-2 font-mono"
+    aria-invalid="true"
+  />
+
+  <p className="text-xs text-destructive flex items-center gap-1">
+    <AlertCircle className="h-3 w-3" />
+    Password must be at least 8 characters
+  </p>
+</div>
+```
+
+**Token Usage:**
+- **Default State**: `border-input` with neutral appearance
+- **Focus State**: `ring-primary` (pink focus ring) with `ring-offset-2`
+- **Error State**: `border-destructive` + `text-destructive` for validation
+- **Disabled State**: `opacity-50` with `cursor-not-allowed`
+- **Placeholder**: `placeholder:text-muted-foreground` for subtle hints
+- **Typography**: `font-mono` (JetBrains Mono) for all text
+- **Spacing**: `space-y-2` for consistent vertical rhythm
+
+**Accessibility Features:**
+- Label properly associated with input
+- `aria-invalid` for error states
+- High contrast between text and backgrounds
+- Focus ring visible and distinct (2px primary color)
+- Helper text provides context without relying on color alone
+
+---
+
+### Loading Skeleton Hierarchy
+
+Creating depth with background tokens:
+
+```tsx
+<div className="bg-card border border-border rounded-[--radius] p-6">
+  {/* Header skeleton */}
+  <div className="space-y-3">
+    <div className="h-4 bg-muted rounded-[--radius] w-24 animate-pulse" />
+    <div className="h-8 bg-muted rounded-[--radius] w-3/4 animate-pulse" />
+  </div>
+
+  {/* Content skeleton */}
+  <div className="mt-6 space-y-2">
+    <div className="h-3 bg-muted rounded-[--radius] w-full animate-pulse" />
+    <div className="h-3 bg-muted rounded-[--radius] w-5/6 animate-pulse" />
+    <div className="h-3 bg-muted rounded-[--radius] w-4/6 animate-pulse" />
+  </div>
+
+  {/* Action skeleton */}
+  <div className="mt-6 flex gap-2">
+    <div className="h-10 bg-primary/20 rounded-[--radius] w-24 animate-pulse" />
+    <div className="h-10 bg-muted rounded-[--radius] w-20 animate-pulse" />
+  </div>
+</div>
+```
+
+**Token Usage:**
+- **Card Container**: `bg-card` (`oklch(0.1684 0 0)`) - slightly elevated
+- **Page Background**: `bg-background` (`oklch(0 0 0)`) - pure black
+- **Skeleton Elements**: `bg-muted` (`oklch(0.2178 0 0)`) - visible against card
+- **Primary Skeleton**: `bg-primary/20` - hint at interactive element
+- **Animation**: `animate-pulse` (Tailwind utility) for loading effect
+- **Border**: `border-border` for subtle card definition
+
+**Visual Hierarchy:**
+```
+Background (darkest)
+  └─ Card (darker)
+      └─ Muted elements (lighter)
+          └─ Primary hints (brightest accent)
+```
+
+**Lightness Values (OKLCH L):**
+- Background: `0` (pure black)
+- Card: `0.1684` (very dark gray)
+- Muted: `0.2178` (dark gray - visible on card)
+- Primary skeleton: Primary color at 20% opacity
+
+---
+
+### Navigation with Active States
+
+Using primary color for current page indication:
+
+```tsx
+<nav className="bg-card border-b border-border">
+  <div className="flex items-center gap-1 p-2">
+    {/* Active link */}
+    <a
+      href="/bookmarks"
+      className="flex items-center gap-2 px-3 py-2 rounded-[--radius] bg-primary/10 text-primary font-mono text-sm font-medium transition-colors"
+    >
+      <Bookmark className="h-4 w-4" />
+      Bookmarks
+    </a>
+
+    {/* Inactive links with hover */}
+    <a
+      href="/explore"
+      className="flex items-center gap-2 px-3 py-2 rounded-[--radius] text-muted-foreground hover:text-foreground hover:bg-accent/10 font-mono text-sm font-medium transition-colors"
+    >
+      <Compass className="h-4 w-4" />
+      Explore
+    </a>
+
+    <a
+      href="/profile"
+      className="flex items-center gap-2 px-3 py-2 rounded-[--radius] text-muted-foreground hover:text-foreground hover:bg-accent/10 font-mono text-sm font-medium transition-colors"
+    >
+      <User className="h-4 w-4" />
+      Profile
+    </a>
+  </div>
+</nav>
+```
+
+**Token Usage:**
+- **Nav Container**: `bg-card` with `border-border` bottom border
+- **Active State**: `bg-primary/10` (pink tint) + `text-primary` (pink text)
+- **Inactive State**: `text-muted-foreground` (subtle gray)
+- **Hover State**: `hover:bg-accent/10` (blue tint) + `hover:text-foreground` (white)
+- **Typography**: `font-mono` + `font-medium` for technical aesthetic
+- **Transitions**: `transition-colors` for smooth state changes
+
+**Interaction States:**
+1. **Default/Inactive**: Gray text on transparent background
+2. **Hover**: White text on subtle blue background
+3. **Active/Current**: Pink text on subtle pink background
+
+**Color Meanings:**
+- **Primary (Pink)**: Current page/active state
+- **Accent (Blue)**: Hover state/interactivity
+- **Muted**: Inactive but available
+
+---
+
+### Empty State with Brand Colors
+
+Combining pink accents with card hierarchy:
+
+```tsx
+<div className="bg-card border-2 border-dashed border-primary/30 rounded-[--radius] p-12">
+  <div className="flex flex-col items-center text-center max-w-md mx-auto">
+    {/* Icon with primary brand color */}
+    <div className="rounded-full bg-primary/10 p-6 mb-6">
+      <Inbox className="h-12 w-12 text-primary" />
+    </div>
+
+    {/* Heading with primary color */}
+    <h2 className="text-2xl font-bold mb-3 text-primary font-mono">
+      No Messages Yet
+    </h2>
+
+    {/* Description with muted foreground */}
+    <p className="text-muted-foreground mb-6 font-mono leading-relaxed">
+      When you receive messages, they'll appear here. Start by connecting
+      with other users or sharing your profile.
+    </p>
+
+    {/* Primary action button */}
+    <button className="inline-flex items-center justify-center px-6 py-2 rounded-[--radius] bg-primary text-primary-foreground font-mono font-medium hover:bg-primary/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background">
+      Get Started
+    </button>
+  </div>
+</div>
+```
+
+**Token Usage:**
+- **Container**: `bg-card` with dashed `border-primary/30` (subtle pink)
+- **Icon Circle**: `bg-primary/10` (very subtle pink tint) + `text-primary` icon
+- **Heading**: `text-primary` (neon pink for emphasis)
+- **Body Text**: `text-muted-foreground` (readable gray)
+- **Button**: `bg-primary` + `text-primary-foreground` (white on pink)
+- **Hover**: `hover:bg-primary/90` (slightly darker pink)
+- **Focus Ring**: `ring-primary` with 2px offset
+
+**Design Strategy:**
+- Pink draws attention to empty state (not an error)
+- Dashed border implies "space to be filled"
+- Clear call-to-action in brand color
+- Generous spacing for approachability
+
+---
+
+### Data Visualization with Color Scale
+
+Using OKLCH for consistent color ramps:
+
+```tsx
+{/* Progress indicators with primary color scale */}
+<div className="space-y-4">
+  {/* High progress - full saturation */}
+  <div className="flex items-center gap-3">
+    <span className="text-sm text-foreground font-mono w-24">Completed</span>
+    <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+      <div
+        className="h-full bg-primary rounded-full"
+        style={{ width: '90%' }}
+      />
+    </div>
+    <span className="text-sm text-primary font-mono font-bold">90%</span>
+  </div>
+
+  {/* Medium progress - reduced saturation */}
+  <div className="flex items-center gap-3">
+    <span className="text-sm text-foreground font-mono w-24">In Progress</span>
+    <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+      <div
+        className="h-full bg-accent rounded-full"
+        style={{ width: '60%' }}
+      />
+    </div>
+    <span className="text-sm text-accent font-mono font-bold">60%</span>
+  </div>
+
+  {/* Low progress - muted color */}
+  <div className="flex items-center gap-3">
+    <span className="text-sm text-foreground font-mono w-24">Started</span>
+    <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+      <div
+        className="h-full bg-muted-foreground/50 rounded-full"
+        style={{ width: '25%' }}
+      />
+    </div>
+    <span className="text-sm text-muted-foreground font-mono">25%</span>
+  </div>
+</div>
+```
+
+**Token Usage:**
+- **Primary** (`oklch(0.75 0.3225 328.3634)`): High values (pink)
+- **Accent** (`oklch(0.7072 0.1679 242.0420)`): Medium values (blue)
+- **Muted Foreground** (`oklch(0.6993 0 0)`): Low values (gray)
+- **Background Track**: `bg-muted` for consistent baseline
+- **Typography**: `font-mono` throughout for technical feel
+
+**OKLCH Benefits:**
+- Perceptually uniform progression from gray → blue → pink
+- Consistent lightness for accessibility
+- Chroma (saturation) communicates importance
+- Easy to extend with custom OKLCH values
+
+---
+
+### Alert Pattern with Semantic Colors
+
+Using destructive and accent colors for different alert types:
+
+```tsx
+{/* Error Alert - Destructive */}
+<div className="flex gap-3 p-4 bg-destructive/10 border border-destructive/30 rounded-[--radius]">
+  <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+  <div className="flex-1">
+    <h4 className="font-mono font-medium text-destructive mb-1">
+      Upload Failed
+    </h4>
+    <p className="text-sm text-destructive/80 font-mono leading-relaxed">
+      The file size exceeds the 10MB limit. Please compress and try again.
+    </p>
+  </div>
+</div>
+
+{/* Success Alert - Accent */}
+<div className="flex gap-3 p-4 bg-accent/10 border border-accent/30 rounded-[--radius]">
+  <CheckCircle className="h-5 w-5 text-accent shrink-0 mt-0.5" />
+  <div className="flex-1">
+    <h4 className="font-mono font-medium text-accent mb-1">
+      Successfully Saved
+    </h4>
+    <p className="text-sm text-accent/80 font-mono leading-relaxed">
+      Your changes have been saved and will sync across devices.
+    </p>
+  </div>
+</div>
+
+{/* Info Alert - Primary */}
+<div className="flex gap-3 p-4 bg-primary/10 border border-primary/30 rounded-[--radius]">
+  <Info className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+  <div className="flex-1">
+    <h4 className="font-mono font-medium text-primary mb-1">
+      New Feature Available
+    </h4>
+    <p className="text-sm text-primary/80 font-mono leading-relaxed">
+      Dark mode customization is now available in your profile settings.
+    </p>
+  </div>
+</div>
+```
+
+**Token Usage:**
+- **Destructive** (`oklch(0.6489 0.2370 26.9728)`): Errors, warnings (orange/red)
+- **Accent** (`oklch(0.7072 0.1679 242.0420)`): Success, confirmation (blue)
+- **Primary** (`oklch(0.75 0.3225 328.3634)`): Info, announcements (pink)
+- **Opacity Pattern**: `/10` for background, `/30` for border, `/80` for body text
+- **Layout**: Flexbox with icon + content structure
+
+**Semantic Color System:**
+- Destructive = Problems, errors, destructive actions
+- Accent = Success, completion, positive feedback
+- Primary = Information, features, neutral announcements
+
+---
+
+### Complete Page Layout Pattern
+
+Combining all design tokens for a cohesive interface:
+
+```tsx
+<div className="min-h-screen bg-background">
+  {/* Navigation */}
+  <header className="sticky top-0 z-50 bg-card border-b border-border backdrop-blur">
+    <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+      <div className="flex items-center gap-6">
+        <h1 className="text-xl font-bold text-primary font-mono">
+          AppName
+        </h1>
+        <nav className="hidden md:flex gap-1">
+          <a className="px-3 py-2 text-sm font-mono text-muted-foreground hover:text-foreground hover:bg-accent/10 rounded-[--radius] transition-colors">
+            Features
+          </a>
+          <a className="px-3 py-2 text-sm font-mono text-muted-foreground hover:text-foreground hover:bg-accent/10 rounded-[--radius] transition-colors">
+            Pricing
+          </a>
+        </nav>
+      </div>
+      <button className="px-4 py-2 bg-primary text-primary-foreground font-mono text-sm font-medium rounded-[--radius] hover:bg-primary/90 transition-colors">
+        Sign In
+      </button>
+    </div>
+  </header>
+
+  {/* Main Content */}
+  <main className="container mx-auto px-4 py-12">
+    <div className="max-w-4xl mx-auto space-y-8">
+      {/* Hero Section */}
+      <div className="text-center space-y-4">
+        <h2 className="text-4xl font-bold text-foreground font-mono">
+          Build Something Amazing
+        </h2>
+        <p className="text-lg text-muted-foreground font-mono max-w-2xl mx-auto">
+          The cyberpunk design system for modern web applications
+        </p>
+      </div>
+
+      {/* Features Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-card border border-border rounded-[--radius] p-6 hover:border-primary transition-colors">
+          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+            <Zap className="h-5 w-5 text-primary" />
+          </div>
+          <h3 className="text-lg font-semibold text-foreground font-mono mb-2">
+            Fast
+          </h3>
+          <p className="text-sm text-muted-foreground font-mono">
+            Optimized for performance and speed
+          </p>
+        </div>
+
+        <div className="bg-card border border-border rounded-[--radius] p-6 hover:border-accent transition-colors">
+          <div className="h-10 w-10 rounded-full bg-accent/10 flex items-center justify-center mb-4">
+            <Shield className="h-5 w-5 text-accent" />
+          </div>
+          <h3 className="text-lg font-semibold text-foreground font-mono mb-2">
+            Secure
+          </h3>
+          <p className="text-sm text-muted-foreground font-mono">
+            Built with security best practices
+          </p>
+        </div>
+
+        <div className="bg-card border border-border rounded-[--radius] p-6 hover:border-primary transition-colors">
+          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+            <Sparkles className="h-5 w-5 text-primary" />
+          </div>
+          <h3 className="text-lg font-semibold text-foreground font-mono mb-2">
+            Beautiful
+          </h3>
+          <p className="text-sm text-muted-foreground font-mono">
+            Cyberpunk aesthetic that stands out
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  {/* Footer */}
+  <footer className="border-t border-border bg-card mt-24">
+    <div className="container mx-auto px-4 py-8">
+      <div className="text-center text-sm text-muted-foreground font-mono">
+        © 2024 AppName. All rights reserved.
+      </div>
+    </div>
+  </footer>
+</div>
+```
+
+**Complete Token Usage:**
+- **Structure**: `bg-background` (page) → `bg-card` (surfaces)
+- **Borders**: `border-border` (neutral) with hover states
+- **Text Hierarchy**: `text-foreground` → `text-muted-foreground`
+- **Accents**: `text-primary` (brand), icon backgrounds with `/10` opacity
+- **Interactive**: Hover states with `border-primary` or `border-accent`
+- **Typography**: `font-mono` (JetBrains Mono) throughout
+- **Spacing**: Consistent scale with gap and padding utilities
+- **Border Radius**: `rounded-[--radius]` (0rem = sharp edges)
+
+**Cyberpunk Design Principles:**
+- Pure black background (`oklch(0 0 0)`)
+- No shadows, flat design with borders
+- Neon pink and blue accents
+- Monospace typography everywhere
+- Sharp corners (zero border radius)
+- High contrast text for readability
+
+---
+
 ## Next Steps
 
 - **Component Library:** [COMPONENT-LIBRARY.md](./COMPONENT-LIBRARY.md) (to be added)
