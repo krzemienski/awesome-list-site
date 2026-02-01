@@ -8,6 +8,7 @@ interface SEOHeadProps {
   image?: string;
   awesomeList?: AwesomeList;
   category?: string;
+  subcategory?: string;
   resourceCount?: number;
   type?: "website" | "article";
   resource?: Resource;
@@ -20,6 +21,7 @@ export default function SEOHead({
   image,
   awesomeList,
   category,
+  subcategory,
   resourceCount,
   type = "website",
   resource
@@ -103,7 +105,7 @@ export default function SEOHead({
 
       {/* Structured Data for Rich Snippets */}
       <script type="application/ld+json">
-        {JSON.stringify(generateStructuredData(awesomeList, category, currentUrl, pageTitle, pageDescription, resource))}
+        {JSON.stringify(generateStructuredData(awesomeList, category, subcategory, currentUrl, pageTitle, pageDescription, resource))}
       </script>
 
       {/* Additional Meta for iMessage and Social Previews */}
@@ -163,9 +165,54 @@ function generateKeywords(awesomeList?: AwesomeList, category?: string): string 
   return baseKeywords.join(", ");
 }
 
+function generateBreadcrumbList(
+  category?: string,
+  subcategory?: string,
+  url?: string
+) {
+  if (!category) return null;
+
+  const baseUrl = url?.split('/').slice(0, 3).join('/') || '';
+  const items = [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": baseUrl
+    }
+  ];
+
+  // Add category breadcrumb
+  const categoryUrl = `${baseUrl}/category/${encodeURIComponent(category.toLowerCase().replace(/\s+/g, '-'))}`;
+  items.push({
+    "@type": "ListItem",
+    "position": 2,
+    "name": category,
+    "item": categoryUrl
+  });
+
+  // Add subcategory breadcrumb if present
+  if (subcategory) {
+    const subcategoryUrl = `${categoryUrl}/${encodeURIComponent(subcategory.toLowerCase().replace(/\s+/g, '-'))}`;
+    items.push({
+      "@type": "ListItem",
+      "position": 3,
+      "name": subcategory,
+      "item": subcategoryUrl
+    });
+  }
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": items
+  };
+}
+
 function generateStructuredData(
   awesomeList?: AwesomeList,
   category?: string,
+  subcategory?: string,
   url?: string,
   title?: string,
   description?: string,
@@ -182,9 +229,12 @@ function generateStructuredData(
     "keywords": generateKeywords(awesomeList, category)
   };
 
+  // Generate breadcrumb list for category/subcategory pages
+  const breadcrumbList = generateBreadcrumbList(category, subcategory, url);
+
   // If viewing a specific resource, use SoftwareApplication schema
   if (resource) {
-    return {
+    const resourceSchema = {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       "name": resource.title,
@@ -215,10 +265,12 @@ function generateStructuredData(
         "url": url?.split('/').slice(0, 3).join('/')
       }
     };
+
+    return breadcrumbList ? [resourceSchema, breadcrumbList] : resourceSchema;
   }
 
   if (awesomeList) {
-    return {
+    const collectionSchema = {
       ...baseData,
       "@type": "CollectionPage",
       "about": {
@@ -242,7 +294,9 @@ function generateStructuredData(
         "url": url
       }
     };
+
+    return breadcrumbList ? [collectionSchema, breadcrumbList] : collectionSchema;
   }
 
-  return baseData;
+  return breadcrumbList ? [baseData, breadcrumbList] : baseData;
 }
