@@ -93,28 +93,28 @@ export default function CommunityMetrics({ resources, categories, className }: C
         contributions: githubSyncedResources.length,
         categories: githubCategories.length > 0 ? githubCategories : [],
         badge: "Primary Source",
-        level: "platinum"
+        level: "platinum" as const
       },
       {
-        name: "Approved Resources", 
+        name: "Approved Resources",
         contributions: approvedOnlyResources.length,
         categories: approvedCategories.length > 0 ? approvedCategories : [],
         badge: "Verified",
-        level: "gold"
+        level: "gold" as const
       },
       {
         name: "AI Enriched",
         contributions: aiEnrichedResources.length,
         categories: aiEnrichedCategories.length > 0 ? aiEnrichedCategories : [],
         badge: "AI Enhanced",
-        level: "silver"
+        level: "silver" as const
       },
       {
         name: "Pending Review",
         contributions: pendingResources.length,
         categories: pendingCategories.length > 0 ? pendingCategories : [],
         badge: "In Review",
-        level: "bronze"
+        level: "bronze" as const
       }
     ].filter(c => c.contributions > 0);
 

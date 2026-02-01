@@ -141,6 +141,16 @@ export default function Profile({ user }: ProfileProps) {
     enabled: !!user
   });
 
+  const getDisplayName = () => {
+    if (user.firstName && user.lastName) {
+      return `${user.firstName} ${user.lastName}`;
+    }
+    if (user.firstName) {
+      return user.firstName;
+    }
+    return "User";
+  };
+
   const getInitials = (name?: string) => {
     if (!name) return "U";
     return name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
@@ -186,14 +196,14 @@ export default function Profile({ user }: ProfileProps) {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-center gap-6 mb-8">
         <Avatar className="h-24 w-24 border-2 border-pink-500">
-          <AvatarImage src={user.avatar} alt={user.name} />
+          <AvatarImage src={user.profileImageUrl || undefined} alt={getDisplayName()} />
           <AvatarFallback className="text-xl bg-gradient-to-br from-pink-500 to-cyan-500 text-white">
-            {getInitials(user.name)}
+            {getInitials(getDisplayName())}
           </AvatarFallback>
         </Avatar>
-        
+
         <div className="flex-1 text-center sm:text-left">
-          <h1 className="text-3xl font-bold mb-2">{user.name || "User"}</h1>
+          <h1 className="text-3xl font-bold mb-2">{getDisplayName()}</h1>
           <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground justify-center sm:justify-start">
             {user.email && (
               <span className="flex items-center gap-1">
