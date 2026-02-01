@@ -979,6 +979,407 @@ Each category shows:
 
 ---
 
+## Resource Components
+
+### ResourceCard
+
+A comprehensive card component for displaying individual resources with integrated favorite/bookmark functionality.
+
+**Import:**
+```tsx
+import ResourceCard from "@/components/resource/ResourceCard"
+```
+
+**Props:**
+```tsx
+interface ResourceCardProps {
+  resource: {
+    id: string;
+    name: string;
+    url: string;
+    description?: string;
+    category?: string;
+    tags?: string[];
+    isFavorited?: boolean;
+    isBookmarked?: boolean;
+    favoriteCount?: number;
+    bookmarkNotes?: string;
+  };
+  fullResource?: Resource;  // Optional full resource object with metadata
+  className?: string;
+  onClick?: () => void;     // Custom click handler
+}
+```
+
+**Features:**
+- Displays resource title, description, and URL
+- Shows category and tag badges
+- Integrates FavoriteButton and BookmarkButton (when user is authenticated)
+- Displays scraped metadata (og:image, title, description) when available
+- Responsive hover effects with pink border
+- Click to view details or external link
+- Suggest edit functionality for database resources
+- Optimized with memo for performance
+
+**Behavior:**
+- **Database Resources** (numeric ID > 0): Click navigates to resource detail page
+- **External Resources**: Click opens URL in new tab
+- **Metadata Display**: Shows Open Graph images and scraped content when available
+- **Authentication**: Action buttons only shown to authenticated users
+
+**Example:**
+```tsx
+// Basic usage
+<ResourceCard
+  resource={{
+    id: "123",
+    name: "React Documentation",
+    url: "https://react.dev",
+    description: "Official React documentation",
+    category: "Frontend",
+    tags: ["react", "javascript"],
+    isFavorited: true,
+    isBookmarked: false,
+    favoriteCount: 42
+  }}
+/>
+
+// With full resource metadata
+<ResourceCard
+  resource={resourceSummary}
+  fullResource={fullResourceData}
+  className="shadow-lg"
+/>
+
+// With custom click handler
+<ResourceCard
+  resource={resource}
+  onClick={() => handleCustomAction(resource.id)}
+/>
+```
+
+**Visual Elements:**
+- **Header**: Title with favorite/bookmark buttons
+- **Description**: Two-line clamped text
+- **Metadata Section**: OG image, scraped title/description (if available)
+- **Badges**: "View Details" indicator, category badge, up to 3 tag badges
+- **Actions**: "Open Link" button and suggest edit button
+
+**Accessibility:**
+- Semantic HTML with `<article>` element
+- Proper ARIA labels on interactive elements
+- Keyboard navigation support
+- Focus indicators on hover
+
+---
+
+### FavoriteButton
+
+Interactive button for favoriting/unfavoriting resources with optimistic updates and visual feedback.
+
+**Import:**
+```tsx
+import FavoriteButton from "@/components/resource/FavoriteButton"
+```
+
+**Props:**
+```tsx
+interface FavoriteButtonProps {
+  resourceId: string;
+  isFavorited?: boolean;    // Initial favorited state
+  favoriteCount?: number;   // Initial favorite count
+  className?: string;
+  size?: "sm" | "default" | "lg";
+  showCount?: boolean;      // Display favorite count
+}
+```
+
+**Features:**
+- Optimistic UI updates for instant feedback
+- Automatic query invalidation on success
+- Heart icon with fill animation
+- Favorite count display (optional)
+- Ripple effect during mutation
+- Toast notifications for success/error
+- Hover scale animation
+- Click event propagation stopping
+
+**Styling:**
+- **Unfavorited**: Ghost variant with default color
+- **Favorited**: Pink text (`text-pink-500`) with filled heart
+- **Hover**: Scale animation and pink hover color
+- **Loading**: Ping animation with pink ripple
+
+**Example:**
+```tsx
+// Default with count
+<FavoriteButton
+  resourceId="123"
+  isFavorited={false}
+  favoriteCount={42}
+/>
+
+// Small without count
+<FavoriteButton
+  resourceId="123"
+  isFavorited={true}
+  size="sm"
+  showCount={false}
+/>
+
+// Large with custom styling
+<FavoriteButton
+  resourceId="123"
+  favoriteCount={156}
+  size="lg"
+  className="hover:bg-pink-50"
+/>
+```
+
+**API Integration:**
+- `POST /api/favorites/:resourceId` - Add favorite
+- `DELETE /api/favorites/:resourceId` - Remove favorite
+- Invalidates queries: `/api/favorites`, `/api/resources/:id`
+
+**State Management:**
+- Uses TanStack Query mutations
+- Optimistic updates with rollback on error
+- Local state synced with server response
+- Memoized for performance optimization
+
+---
+
+### BookmarkButton
+
+Bookmark button with optional notes functionality and dialog interface.
+
+**Import:**
+```tsx
+import BookmarkButton from "@/components/resource/BookmarkButton"
+```
+
+**Props:**
+```tsx
+interface BookmarkButtonProps {
+  resourceId: string;
+  isBookmarked?: boolean;   // Initial bookmarked state
+  notes?: string;           // Existing bookmark notes
+  className?: string;
+  size?: "sm" | "default" | "lg";
+  showNotesDialog?: boolean; // Show notes dialog on bookmark
+}
+```
+
+**Features:**
+- Add/remove bookmarks with single click
+- Optional notes dialog for new bookmarks
+- Save with or without notes
+- Character limit (500) with counter
+- Visual indicator when notes exist
+- Optimistic UI updates
+- Ripple effect during mutation
+- Toast notifications
+- Icon switching (BookmarkPlus → Bookmark filled)
+
+**Notes Dialog:**
+- Appears when creating new bookmark (if `showNotesDialog={true}`)
+- Optional textarea for notes (max 500 characters)
+- Two save options: "Save without notes" or "Save with notes"
+- Character counter
+- Responsive layout
+
+**Styling:**
+- **Unbookmarked**: BookmarkPlus icon with ghost variant
+- **Bookmarked**: Filled Bookmark icon in cyan (`text-cyan-500`)
+- **Has Notes**: Small notebook icon indicator
+- **Loading**: Ping animation with cyan ripple
+
+**Example:**
+```tsx
+// Basic usage
+<BookmarkButton
+  resourceId="123"
+  isBookmarked={false}
+/>
+
+// With existing notes
+<BookmarkButton
+  resourceId="123"
+  isBookmarked={true}
+  notes="Great resource for learning React hooks"
+/>
+
+// Small without dialog
+<BookmarkButton
+  resourceId="123"
+  size="sm"
+  showNotesDialog={false}
+/>
+
+// Large with custom styling
+<BookmarkButton
+  resourceId="123"
+  size="lg"
+  className="hover:bg-cyan-50"
+/>
+```
+
+**API Integration:**
+- `POST /api/bookmarks/:resourceId` - Add bookmark (with optional notes)
+- `DELETE /api/bookmarks/:resourceId` - Remove bookmark
+- Invalidates queries: `/api/bookmarks`, `/api/resources/:id`
+
+**User Flow:**
+1. User clicks unbookmarked button
+2. Notes dialog appears (if enabled)
+3. User can add notes or skip
+4. Bookmark saved with confirmation toast
+5. Icon updates to filled state
+
+---
+
+### ShareButton
+
+Share button with Web Share API support and clipboard fallback.
+
+**Import:**
+```tsx
+import ShareButton from "@/components/resource/ShareButton"
+```
+
+**Props:**
+```tsx
+interface ShareButtonProps {
+  resourceId: string;
+  title?: string;           // Share title
+  description?: string;     // Share description
+  url?: string;             // URL to share (defaults to current page)
+  className?: string;
+  size?: "sm" | "default" | "lg";
+}
+```
+
+**Features:**
+- Native Web Share API when available
+- Clipboard fallback for unsupported browsers
+- Share URL, title, and description
+- Loading state during share operation
+- Toast notifications for success/error
+- Graceful error handling
+- Ripple effect during action
+- Event propagation prevention
+
+**Behavior:**
+1. **Web Share API Available**: Opens native share dialog
+2. **User Cancels Share**: Falls back to clipboard copy
+3. **No Web Share API**: Directly copies URL to clipboard
+4. **Copy Fails**: Shows error toast with manual copy instructions
+
+**Styling:**
+- Ghost variant button
+- Blue ripple effect during operation (`bg-blue-500`)
+- Hover scale animation
+- Disabled state while sharing
+
+**Example:**
+```tsx
+// Basic usage (shares current URL)
+<ShareButton resourceId="123" />
+
+// With custom share data
+<ShareButton
+  resourceId="123"
+  title="React Documentation"
+  description="Official React documentation and guides"
+  url="https://react.dev"
+/>
+
+// Small size
+<ShareButton
+  resourceId="123"
+  title="Awesome Resource"
+  size="sm"
+/>
+
+// Custom styling
+<ShareButton
+  resourceId="123"
+  className="hover:bg-blue-50"
+  size="lg"
+/>
+```
+
+**Share Data:**
+- **title**: Resource name or custom title
+- **text**: Description or default message
+- **url**: Resource URL or current page URL
+
+**Toast Messages:**
+- **Share Success**: Native dialog (no toast)
+- **Copy Success**: "Link copied - Resource link copied to clipboard"
+- **Copy Failed**: "Unable to copy - Please copy the URL manually from the address bar"
+
+---
+
+### Resource Components Integration
+
+These components work together seamlessly within ResourceCard:
+
+**Example Integration:**
+```tsx
+<Card>
+  <CardHeader>
+    <div className="flex items-start justify-between">
+      <CardTitle>{resource.name}</CardTitle>
+      {isAuthenticated && (
+        <div className="flex items-center gap-1">
+          <FavoriteButton
+            resourceId={resource.id}
+            isFavorited={resource.isFavorited}
+            favoriteCount={resource.favoriteCount}
+            size="sm"
+            showCount={false}
+          />
+          <BookmarkButton
+            resourceId={resource.id}
+            isBookmarked={resource.isBookmarked}
+            notes={resource.bookmarkNotes}
+            size="sm"
+          />
+        </div>
+      )}
+    </div>
+  </CardHeader>
+  <CardContent>
+    {/* Resource content */}
+  </CardContent>
+</Card>
+```
+
+**Query Invalidation:**
+All resource action buttons (favorite, bookmark) automatically invalidate related queries:
+- `/api/favorites` - User's favorites list
+- `/api/bookmarks` - User's bookmarks list
+- `/api/resources/:id` - Specific resource details
+
+**Authentication:**
+Action buttons should only be rendered for authenticated users:
+```tsx
+import { useAuth } from "@/hooks/useAuth";
+
+const { isAuthenticated } = useAuth();
+
+{isAuthenticated && (
+  <div className="flex gap-1">
+    <FavoriteButton {...props} />
+    <BookmarkButton {...props} />
+    <ShareButton {...props} />
+  </div>
+)}
+```
+
+---
+
 ## Custom Component Patterns
 
 ### Analytics Integration
