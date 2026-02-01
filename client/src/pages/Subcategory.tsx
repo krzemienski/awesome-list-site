@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import SEOHead from "@/components/layout/SEOHead";
 import TagFilter from "@/components/ui/tag-filter";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { ArrowLeft, ExternalLink, FilterX } from "lucide-react";
 import { deslugify, getCategorySlug } from "@/lib/utils";
 import { Resource } from "@/types/awesome-list";
@@ -161,28 +162,27 @@ export default function Subcategory() {
         description={`Browse ${allResources.length} ${subcategoryName} resources in the ${categoryName} category.`}
       />
       
+      {/* Breadcrumb Navigation */}
+      <Breadcrumbs
+        items={[
+          { label: categoryName, href: `/category/${getCategorySlug(categoryName)}` },
+          { label: subcategoryName }
+        ]}
+      />
+
       {/* Header */}
-      <div className="space-y-4">
-        <Link href={`/category/${getCategorySlug(categoryName)}`}>
-          <Button variant="ghost" size="sm" className="gap-2" data-testid="button-back-category">
-            <ArrowLeft className="h-4 w-4" />
-            Back to {categoryName}
-          </Button>
-        </Link>
-        
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">
-              {subcategoryName}
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Category: {categoryName}
-            </p>
-          </div>
-          <Badge variant="secondary" className="text-lg px-4 py-2" data-testid="badge-count">
-            {allResources.length}
-          </Badge>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {subcategoryName}
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Category: {categoryName}
+          </p>
         </div>
+        <Badge variant="secondary" className="text-lg px-4 py-2" data-testid="badge-count">
+          {allResources.length}
+        </Badge>
       </div>
       
       {/* Tag Filter */}
