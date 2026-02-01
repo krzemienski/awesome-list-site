@@ -1,7 +1,7 @@
 import { neon } from '@neondatabase/serverless';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { getSession, deleteSession } from '@/lib/session-store';
+import { getSession, deleteSession } from '../../../../lib/session-store';
 
 const sql = neon(process.env.DATABASE_URL!);
 

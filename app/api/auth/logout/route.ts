@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { deleteSession } from '@/lib/session-store';
+import { deleteSession } from '../../../../lib/session-store';
 
 export async function POST() {
   const cookieStore = await cookies();

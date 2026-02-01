@@ -5,6 +5,7 @@ const sql = neon(process.env.DATABASE_URL!);
 
 export async function GET() {
   console.log("[v0] awesome-list API called");
+  console.log("[v0] DATABASE_URL exists:", !!process.env.DATABASE_URL);
   try {
     // Fetch all categories with their subcategories, sub-subcategories, and resources
     const categories = await sql`SELECT * FROM categories ORDER BY name`;

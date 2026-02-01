@@ -1,7 +1,7 @@
 import { neon } from '@neondatabase/serverless';
 import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
-import { setSession, generateSessionId } from '@/lib/session-store';
+import { setSession, generateSessionId } from '../../../../../lib/session-store';
 
 const sql = neon(process.env.DATABASE_URL!);
 
