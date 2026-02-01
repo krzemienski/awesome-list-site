@@ -1,9 +1,43 @@
+/**
+ * ============================================================================
+ * ASYNCHANDLER.TS - Async Route Handler Wrapper Utility
+ * ============================================================================
+ *
+ * This module provides a utility wrapper for Express async route handlers
+ * that automatically catches errors and forwards them to the centralized
+ * error handling middleware.
+ *
+ * BENEFITS:
+ * - Eliminates try-catch boilerplate in every route handler
+ * - Ensures all async errors are properly caught and handled
+ * - Works seamlessly with custom error classes from errors.ts
+ * - Maintains clean, readable route handler code
+ *
+ * USAGE:
+ * ```typescript
+ * import { asyncHandler } from './middleware/asyncHandler';
+ * import { NotFoundError } from './middleware/errors';
+ *
+ * // Wrap async route handlers
+ * app.get('/api/resource/:id', asyncHandler(async (req, res) => {
+ *   const resource = await getResource(req.params.id);
+ *   if (!resource) {
+ *     throw new NotFoundError('Resource not found');
+ *   }
+ *   res.json(resource);
+ * }));
+ * ```
+ *
+ * See errorHandler.ts for error processing and errors.ts for available error classes.
+ * ============================================================================
+ */
+
 import type { Request, Response, NextFunction } from "express";
 
 /**
  * Async handler wrapper utility
  *
- * Wraps async Express route handlers to automatically catch errors and pass them
+ * @description Wraps async Express route handlers to automatically catch errors and pass them
  * to the centralized error handling middleware. This eliminates the need for
  * try-catch blocks in every route handler.
  *

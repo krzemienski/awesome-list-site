@@ -1,3 +1,33 @@
+/**
+ * ============================================================================
+ * ERRORHANDLER.TS - Centralized Express Error Handling Middleware
+ * ============================================================================
+ *
+ * This module provides centralized error handling for the Express application.
+ * It processes different error types and returns consistent JSON responses.
+ *
+ * ERROR HANDLING:
+ * - AppError instances: Returns statusCode and message from the error
+ * - ZodError instances: Converts to 422 validation error with field details
+ * - Unknown errors: Returns 500 Internal Server Error
+ *
+ * LOGGING:
+ * - Client errors (4xx): Logged as info with basic message
+ * - Server errors (5xx): Logged as errors with full stack trace
+ * - Validation errors: Logged with field-level details
+ *
+ * USAGE:
+ * ```typescript
+ * import { errorHandler } from './middleware/errorHandler';
+ *
+ * // Register as the last middleware in Express
+ * app.use(errorHandler);
+ * ```
+ *
+ * See errors.ts for available error classes and asyncHandler.ts for async route handling.
+ * ============================================================================
+ */
+
 import type { Request, Response, NextFunction } from "express";
 import { AppError, ValidationError } from "./errors";
 import { ZodError } from "zod";
@@ -5,10 +35,15 @@ import { ZodError } from "zod";
 /**
  * Centralized error handling middleware for Express
  *
- * Handles different error types and returns consistent JSON responses:
- * - AppError instances: Use statusCode and message from error
- * - ZodError instances: Convert to 422 validation error with field details
- * - Unknown errors: Return 500 Internal Server Error
+ * @description Processes all errors thrown in the application and returns
+ * consistent JSON responses. Handles AppError instances, ZodError validation
+ * errors, and unknown errors with appropriate status codes and logging.
+ *
+ * @param err - Error object to handle
+ * @param _req - Express request object (unused but required for error middleware signature)
+ * @param res - Express response object
+ * @param _next - Express next function (unused but required for error middleware signature)
+ * @returns void - Sends JSON response to client
  *
  * @example
  * ```typescript
