@@ -1060,8 +1060,734 @@ Before shipping, verify:
 
 ---
 
+## Spacing System
+
+### Overview
+
+The spacing system uses **Tailwind CSS's default spacing scale**, based on a **4px (0.25rem) base unit**. This creates consistent, predictable spacing throughout the interface.
+
+**Key Features:**
+- **4px Base Unit** - All spacing is a multiple of 4px
+- **Rem-based** - Scales with user font size preferences
+- **T-shirt Sizing** - Easy to remember scale (xs, sm, md, lg, xl, etc.)
+- **Responsive** - Works seamlessly with responsive modifiers
+
+---
+
+### Spacing Scale
+
+| Token | Value (rem) | Value (px) | Usage |
+|-------|-------------|------------|-------|
+| `0` | 0 | 0px | Remove spacing |
+| `px` | 1px | 1px | Hairline borders/spacing |
+| `0.5` | 0.125rem | 2px | Minimal spacing |
+| `1` | 0.25rem | 4px | Extra tight spacing |
+| `1.5` | 0.375rem | 6px | Very tight spacing |
+| `2` | 0.5rem | 8px | Tight spacing |
+| `2.5` | 0.625rem | 10px | Compact spacing |
+| `3` | 0.75rem | 12px | Small spacing |
+| `3.5` | 0.875rem | 14px | Small-medium spacing |
+| `4` | 1rem | 16px | **Default spacing** |
+| `5` | 1.25rem | 20px | Medium spacing |
+| `6` | 1.5rem | 24px | Medium-large spacing |
+| `7` | 1.75rem | 28px | Large spacing |
+| `8` | 2rem | 32px | Extra large spacing |
+| `9` | 2.25rem | 36px | Section spacing |
+| `10` | 2.5rem | 40px | Block spacing |
+| `11` | 2.75rem | 44px | Large block spacing |
+| `12` | 3rem | 48px | Major section spacing |
+| `14` | 3.5rem | 56px | Hero spacing |
+| `16` | 4rem | 64px | Extra large section |
+| `20` | 5rem | 80px | Page section spacing |
+| `24` | 6rem | 96px | Major page spacing |
+| `32` | 8rem | 128px | Layout spacing |
+| `40` | 10rem | 160px | Large layout spacing |
+| `48` | 12rem | 192px | Extra large layout |
+| `56` | 14rem | 224px | Maximum layout |
+| `64` | 16rem | 256px | Maximum spacing |
+
+---
+
+### Spacing Utilities
+
+#### Padding
+
+```tsx
+// All sides
+<div className="p-4">Padding 16px on all sides</div>
+
+// Horizontal (left + right)
+<div className="px-6">Padding 24px left and right</div>
+
+// Vertical (top + bottom)
+<div className="py-8">Padding 32px top and bottom</div>
+
+// Individual sides
+<div className="pt-2 pr-4 pb-6 pl-8">
+  Different padding on each side
+</div>
+```
+
+**Common Patterns:**
+```tsx
+// Card padding
+<Card className="p-6">
+  <CardContent>Content with 24px padding</CardContent>
+</Card>
+
+// Button padding
+<Button className="px-4 py-2">
+  Compact button
+</Button>
+
+// Form spacing
+<div className="space-y-4">
+  <Input />
+  <Input />
+  {/* 16px gap between inputs */}
+</div>
+```
+
+---
+
+#### Margin
+
+```tsx
+// All sides
+<div className="m-4">Margin 16px on all sides</div>
+
+// Horizontal (left + right)
+<div className="mx-auto">Center with auto margins</div>
+
+// Vertical (top + bottom)
+<div className="my-8">Margin 32px top and bottom</div>
+
+// Individual sides
+<div className="mt-2 mr-4 mb-6 ml-8">
+  Different margin on each side
+</div>
+
+// Negative margins
+<div className="-mt-4">Negative margin to pull up</div>
+```
+
+**Common Patterns:**
+```tsx
+// Section spacing
+<section className="mb-12">
+  Content with 48px bottom margin
+</section>
+
+// Card grid spacing
+<div className="grid grid-cols-3 gap-6">
+  <Card /> <Card /> <Card />
+  {/* 24px gap between cards */}
+</div>
+
+// Centered container
+<div className="mx-auto max-w-4xl px-4">
+  Centered content with side padding
+</div>
+```
+
+---
+
+#### Gap (Flexbox & Grid)
+
+```tsx
+// Flexbox gap
+<div className="flex gap-4">
+  <Button>One</Button>
+  <Button>Two</Button>
+  {/* 16px gap between buttons */}
+</div>
+
+// Grid gap
+<div className="grid grid-cols-2 gap-6">
+  <Card />
+  <Card />
+  {/* 24px gap between grid items */}
+</div>
+
+// Different horizontal/vertical gap
+<div className="grid grid-cols-3 gap-x-4 gap-y-8">
+  {/* 16px horizontal, 32px vertical */}
+</div>
+```
+
+---
+
+#### Space Between
+
+```tsx
+// Vertical spacing between children
+<div className="space-y-6">
+  <p>Paragraph 1</p>
+  <p>Paragraph 2</p>
+  <p>Paragraph 3</p>
+  {/* 24px between each paragraph */}
+</div>
+
+// Horizontal spacing between children
+<div className="flex space-x-4">
+  <Button>Button 1</Button>
+  <Button>Button 2</Button>
+  {/* 16px between buttons */}
+</div>
+```
+
+---
+
+### Spacing Guidelines
+
+#### Component Spacing
+
+| Component | Internal Padding | External Margin | Gap Between |
+|-----------|------------------|-----------------|-------------|
+| **Button** | `px-4 py-2` (16px/8px) | `mr-2` (8px) | `gap-2` (8px) |
+| **Card** | `p-6` (24px) | `mb-6` (24px) | `gap-6` (24px) |
+| **Input** | `px-3 py-2` (12px/8px) | `mb-4` (16px) | N/A |
+| **Section** | `py-12` (48px) | `mb-12` (48px) | `gap-8` (32px) |
+| **Container** | `px-4` (16px mobile) | `mx-auto` (center) | N/A |
+
+---
+
+#### Layout Spacing
+
+```tsx
+// Page container
+<div className="container mx-auto px-4 py-8">
+  {/* 16px side padding, 32px vertical padding */}
+</div>
+
+// Section spacing
+<section className="py-12 md:py-16">
+  {/* 48px mobile, 64px desktop */}
+</section>
+
+// Card grid
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  {/* 24px gap between cards */}
+</div>
+
+// Content spacing
+<article className="space-y-6">
+  <h1>Title</h1>
+  <p>Paragraph</p>
+  {/* 24px between elements */}
+</article>
+```
+
+---
+
+#### Responsive Spacing
+
+```tsx
+// Mobile-first responsive padding
+<div className="p-4 md:p-6 lg:p-8">
+  {/* 16px → 24px → 32px */}
+</div>
+
+// Responsive margins
+<div className="mb-6 md:mb-8 lg:mb-12">
+  {/* 24px → 32px → 48px */}
+</div>
+
+// Responsive gaps
+<div className="grid gap-4 md:gap-6 lg:gap-8">
+  {/* 16px → 24px → 32px */}
+</div>
+```
+
+---
+
+### Common Spacing Patterns
+
+#### Form Layouts
+
+```tsx
+<form className="space-y-6">
+  {/* 24px between form sections */}
+  <div className="space-y-2">
+    {/* 8px between label and input */}
+    <Label>Email</Label>
+    <Input type="email" />
+  </div>
+
+  <div className="space-y-2">
+    <Label>Password</Label>
+    <Input type="password" />
+    <p className="text-xs text-muted-foreground">
+      {/* Helper text close to input */}
+      At least 8 characters
+    </p>
+  </div>
+
+  <Button className="mt-4">
+    {/* Extra spacing before submit */}
+    Submit
+  </Button>
+</form>
+```
+
+---
+
+#### Card Layouts
+
+```tsx
+<Card className="p-6">
+  {/* 24px padding around content */}
+  <CardHeader className="mb-4">
+    {/* 16px below header */}
+    <CardTitle className="text-2xl mb-2">
+      {/* 8px below title */}
+      Card Title
+    </CardTitle>
+    <CardDescription>
+      Description text
+    </CardDescription>
+  </CardHeader>
+
+  <CardContent className="space-y-4">
+    {/* 16px between content blocks */}
+    <p>Content paragraph 1</p>
+    <p>Content paragraph 2</p>
+  </CardContent>
+
+  <CardFooter className="mt-6">
+    {/* 24px above footer */}
+    <Button>Action</Button>
+  </CardFooter>
+</Card>
+```
+
+---
+
+#### Navigation Spacing
+
+```tsx
+<nav className="flex items-center gap-6 px-4 py-3">
+  {/* 24px between nav items, 16px horizontal padding */}
+  <a className="hover:text-primary">Home</a>
+  <a className="hover:text-primary">About</a>
+  <a className="hover:text-primary">Contact</a>
+</nav>
+```
+
+---
+
+## Border Radius System
+
+### Overview
+
+The design system uses **zero border radius** (`--radius: 0rem`) for all components, creating sharp, angular edges that reinforce the cyberpunk aesthetic.
+
+**Philosophy:**
+- **Sharp Edges** - No rounded corners anywhere
+- **Geometric** - Clean, precise lines
+- **Terminal-Inspired** - Mimics terminal/console UI
+- **Consistent** - All components follow the same pattern
+
+---
+
+### Border Radius Tokens
+
+| Token | CSS Variable | Calculated Value | Usage |
+|-------|--------------|------------------|-------|
+| **Base** | `--radius` | `0rem` | Default radius |
+| **Small** | `--radius-sm` | `calc(var(--radius) - 4px)` = `0rem` | Small components |
+| **Medium** | `--radius-md` | `calc(var(--radius) - 2px)` = `0rem` | Medium components |
+| **Large** | `--radius-lg` | `var(--radius)` = `0rem` | Large components |
+| **Extra Large** | `--radius-xl` | `calc(var(--radius) + 4px)` = `0rem` | Extra large components |
+
+**Note:** All radius values resolve to `0rem` because the base `--radius` is `0rem`. The calculations are kept for compatibility with Tailwind's border radius system.
+
+---
+
+### Tailwind Border Radius Classes
+
+| Class | Value | Usage |
+|-------|-------|-------|
+| `rounded-none` | `0` | Explicitly no rounding (default) |
+| `rounded-sm` | `var(--radius-sm)` = `0rem` | Small components |
+| `rounded` | `var(--radius-md)` = `0rem` | Default components |
+| `rounded-md` | `var(--radius-md)` = `0rem` | Medium components |
+| `rounded-lg` | `var(--radius-lg)` = `0rem` | Large components |
+| `rounded-xl` | `var(--radius-xl)` = `0rem` | Extra large components |
+| `rounded-full` | `9999px` | Still available for circles (use sparingly) |
+
+**All component classes resolve to sharp edges (0rem).**
+
+---
+
+### Usage Examples
+
+#### Components with Sharp Edges
+
+```tsx
+// Button - sharp edges
+<Button className="rounded-lg">
+  {/* rounded-lg = 0rem, sharp edges */}
+  Click Me
+</Button>
+
+// Card - sharp corners
+<Card className="rounded-lg border border-border">
+  {/* Card with sharp, angular corners */}
+  <CardContent>Content</CardContent>
+</Card>
+
+// Input - no rounding
+<Input className="rounded-md" />
+{/* Input with sharp edges */}
+
+// Badge - sharp edges (not pills)
+<Badge className="rounded-sm">
+  {/* Badge with sharp corners */}
+  New
+</Badge>
+
+// Dialog - angular
+<Dialog>
+  <DialogContent className="rounded-lg">
+    {/* Dialog with sharp corners */}
+  </DialogContent>
+</Dialog>
+```
+
+---
+
+#### Customization (If Needed)
+
+To add border radius to the design system, edit `client/src/index.css`:
+
+```css
+:root {
+  /* Change from sharp edges to rounded */
+  --radius: 0.5rem; /* 8px rounding */
+}
+```
+
+This will update all components that use `rounded-*` classes:
+- `rounded-sm` → `4px` (8px - 4px)
+- `rounded-md` → `6px` (8px - 2px)
+- `rounded-lg` → `8px`
+- `rounded-xl` → `12px` (8px + 4px)
+
+**However, this is not recommended** as it breaks the cyberpunk sharp-edge aesthetic.
+
+---
+
+#### Exceptions (Rare Cases)
+
+If you need circular elements (avatars, icons), use `rounded-full`:
+
+```tsx
+// Avatar - circular
+<Avatar className="rounded-full w-10 h-10">
+  {/* Circle instead of square */}
+  <AvatarImage src="/avatar.jpg" />
+</Avatar>
+
+// Icon button - circular
+<Button
+  size="icon"
+  variant="ghost"
+  className="rounded-full"
+>
+  <Icon />
+</Button>
+```
+
+**Use sparingly** - most UI should maintain sharp edges.
+
+---
+
+### Visual Examples
+
+#### Sharp Edge Components
+
+```
+┌─────────────────────┐
+│                     │  ← Sharp corners (0rem)
+│   Button / Card     │
+│                     │
+└─────────────────────┘
+
+NOT:
+╭─────────────────────╮
+│   Rounded corners   │  ← Avoid rounded (unless --radius changed)
+╰─────────────────────╯
+```
+
+---
+
+## Shadow System
+
+### Overview
+
+The design system uses **zero shadows** for all components, creating a flat, layered aesthetic that relies on borders and color contrast for depth.
+
+**Philosophy:**
+- **Flat Design** - No depth simulation via shadows
+- **Border-Based Separation** - Use borders instead of shadows
+- **Color Contrast** - Rely on background color differences
+- **Performance** - Eliminates shadow rendering overhead
+
+---
+
+### Shadow Tokens
+
+All shadow variables are set to **zero opacity** (invisible):
+
+| Token | CSS Variable | Value | Usage |
+|-------|--------------|-------|-------|
+| **2XS** | `--shadow-2xs` | `0 0 0 0 hsl(0 0 0 / 0.00)` | Disabled |
+| **XS** | `--shadow-xs` | `0 0 0 0 hsl(0 0 0 / 0.00)` | Disabled |
+| **SM** | `--shadow-sm` | `0 0 0 0 hsl(0 0 0 / 0.00)` | Disabled |
+| **MD (default)** | `--shadow` | `0 0 0 0 hsl(0 0 0 / 0.00)` | Disabled |
+| **MD** | `--shadow-md` | `0 0 0 0 hsl(0 0 0 / 0.00)` | Disabled |
+| **LG** | `--shadow-lg` | `0 0 0 0 hsl(0 0 0 / 0.00)` | Disabled |
+| **XL** | `--shadow-xl` | `0 0 0 0 hsl(0 0 0 / 0.00)` | Disabled |
+| **2XL** | `--shadow-2xl` | `0 0 0 0 hsl(0 0 0 / 0.00)` | Disabled |
+
+**All shadows are invisible** - components using shadow classes will have no visual shadow.
+
+---
+
+### Shadow Variables (CSS)
+
+Defined in `client/src/index.css`:
+
+```css
+:root {
+  /* Shadow configuration - all disabled */
+  --shadow-x: 0;
+  --shadow-y: 0;
+  --shadow-blur: 0;
+  --shadow-spread: 0;
+  --shadow-opacity: 0;
+  --shadow-color: 0 0 0;
+
+  /* Shadow tokens - all invisible */
+  --shadow-2xs: 0 0 0 0 hsl(0 0 0 / 0.00);
+  --shadow-xs: 0 0 0 0 hsl(0 0 0 / 0.00);
+  --shadow-sm: 0 0 0 0 hsl(0 0 0 / 0.00);
+  --shadow: 0 0 0 0 hsl(0 0 0 / 0.00);
+  --shadow-md: 0 0 0 0 hsl(0 0 0 / 0.00);
+  --shadow-lg: 0 0 0 0 hsl(0 0 0 / 0.00);
+  --shadow-xl: 0 0 0 0 hsl(0 0 0 / 0.00);
+  --shadow-2xl: 0 0 0 0 hsl(0 0 0 / 0.00);
+}
+```
+
+---
+
+### Usage (No Visual Effect)
+
+These classes are **safe to use** but produce **no visible shadow**:
+
+```tsx
+// Shadow classes have no effect
+<Card className="shadow-lg">
+  {/* No shadow - same as no class */}
+</Card>
+
+<Button className="shadow-md hover:shadow-xl">
+  {/* No shadow on default or hover */}
+  Click Me
+</Button>
+
+<div className="shadow-2xl">
+  {/* Still no shadow */}
+</div>
+```
+
+---
+
+### Alternative: Border-Based Depth
+
+Instead of shadows, use **borders** and **background colors** to create visual separation:
+
+```tsx
+// Elevated card with border (instead of shadow)
+<Card className="border-2 border-primary">
+  {/* Neon border creates emphasis */}
+  <CardContent>Important content</CardContent>
+</Card>
+
+// Layered surfaces with color contrast
+<div className="bg-background">
+  <div className="bg-card p-6 border border-border">
+    {/* Card elevated via background color */}
+    <div className="bg-popover p-4 border border-border">
+      {/* Popover layered on top */}
+      Content
+    </div>
+  </div>
+</div>
+
+// Focus ring instead of shadow
+<Input className="focus:ring-2 focus:ring-primary" />
+{/* Neon ring on focus (not shadow) */}
+```
+
+---
+
+### Visual Hierarchy Without Shadows
+
+```tsx
+// Page structure using color and borders
+<div className="bg-background">
+  {/* Base layer: pure black */}
+
+  <Card className="bg-card border border-border">
+    {/* Elevated layer: slightly lighter background + border */}
+
+    <div className="bg-popover p-4 border-t border-border">
+      {/* Top layer: lighter background + top border */}
+      Floating content
+    </div>
+  </Card>
+</div>
+```
+
+**Visual Hierarchy:**
+1. **Background** (`oklch(0 0 0)`) - Darkest
+2. **Card** (`oklch(0.1684 0 0)`) + Border - Elevated
+3. **Popover** (`oklch(0.1448 0 0)`) + Border - Top layer
+
+---
+
+### Customization (If Needed)
+
+To enable shadows (not recommended), edit `client/src/index.css`:
+
+```css
+:root {
+  /* Enable subtle shadows */
+  --shadow-sm: 0 1px 2px 0 hsl(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 hsl(0 0 0 / 0.1), 0 1px 2px -1px hsl(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px hsl(0 0 0 / 0.1), 0 2px 4px -2px hsl(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px hsl(0 0 0 / 0.1), 0 4px 6px -4px hsl(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px hsl(0 0 0 / 0.1), 0 8px 10px -6px hsl(0 0 0 / 0.1);
+  --shadow-2xl: 0 25px 50px -12px hsl(0 0 0 / 0.25);
+}
+```
+
+**Warning:** This breaks the flat design aesthetic and is not recommended for this theme.
+
+---
+
+### Best Practices
+
+#### Do's ✓
+
+- **Use borders** for separation: `border border-border`
+- **Use color contrast** for depth: `bg-card` vs `bg-background`
+- **Use focus rings** for interactivity: `focus:ring-2 focus:ring-primary`
+- **Use neon accents** for emphasis: `border-2 border-primary`
+
+**Example:**
+```tsx
+<Card className="bg-card border border-border">
+  <div className="border-l-4 border-primary p-4">
+    {/* Left accent border for emphasis */}
+    Important message
+  </div>
+</Card>
+```
+
+---
+
+#### Don'ts ✗
+
+- **Don't rely on shadows** - they won't render
+- **Don't expect depth from shadow classes** - use borders instead
+- **Don't add custom shadows** - breaks theme consistency
+
+**Bad Example:**
+```tsx
+// ✗ Shadow class has no effect
+<Card className="shadow-lg">
+  Content
+</Card>
+```
+
+**Good Example:**
+```tsx
+// ✓ Border creates visual separation
+<Card className="border border-border">
+  Content
+</Card>
+```
+
+---
+
+### Scrollbar Styling (Exception)
+
+The only "shadow-like" effect in the theme is the **scrollbar**, which uses color instead of shadows:
+
+```css
+/* Custom scrollbar (from index.css) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--card);
+  border: 1px solid var(--border);
+  /* No shadow - uses border */
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: var(--radius-sm); /* 0rem - sharp */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+  /* Color change on hover, not shadow */
+}
+```
+
+---
+
+## Design System Summary
+
+### Core Principles
+
+| Aspect | Implementation | Philosophy |
+|--------|----------------|------------|
+| **Colors** | OKLCH color space, dark mode only | Perceptually uniform, accessible |
+| **Typography** | JetBrains Mono everywhere | Monospace, terminal-inspired |
+| **Spacing** | 4px base unit, Tailwind scale | Consistent, predictable |
+| **Border Radius** | 0rem (sharp edges) | Geometric, cyberpunk |
+| **Shadows** | Disabled (flat design) | Border-based depth |
+| **Theme** | Cyberpunk dark | Neon accents, pure black |
+
+---
+
+### Quick Reference
+
+**Spacing:**
+- Use `p-4` (16px), `p-6` (24px), `p-8` (32px) for padding
+- Use `space-y-4` (16px), `space-y-6` (24px) for vertical rhythm
+- Use `gap-4`, `gap-6` for flexbox/grid spacing
+
+**Border Radius:**
+- All components: `rounded-lg` = `0rem` (sharp)
+- Exception: `rounded-full` for circles (avatars, icons)
+
+**Shadows:**
+- Don't use shadow classes - they have no effect
+- Use `border border-border` for separation
+- Use color contrast (`bg-card` vs `bg-background`) for depth
+
+---
+
 ## Next Steps
 
-- **Spacing & Shadows:** See spacing section (to be added)
 - **Component Library:** [COMPONENT-LIBRARY.md](./COMPONENT-LIBRARY.md) (to be added)
 - **Theme Architecture:** See theme architecture section (to be added)
