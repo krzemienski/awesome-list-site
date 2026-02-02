@@ -20,6 +20,7 @@ import ResourceManager from "@/components/admin/ResourceManager";
 import CategoryManager from "@/components/admin/CategoryManager";
 import SubcategoryManager from "@/components/admin/SubcategoryManager";
 import SubSubcategoryManager from "@/components/admin/SubSubcategoryManager";
+import { ResearchPanel, CostDashboard } from '@/components/admin/research';
 import type { ValidationStatus } from "@/components/admin/types/validation";
 
 export default function AdminDashboard() {
@@ -177,6 +178,9 @@ export default function AdminDashboard() {
             <TabsTrigger value="audit" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap">
               Audit
             </TabsTrigger>
+            <TabsTrigger value="research" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap">
+              Research
+            </TabsTrigger>
           </TabsList>
         </div>
 
@@ -244,6 +248,13 @@ export default function AdminDashboard() {
 
         <TabsContent value="audit">
           <AuditTab />
+        </TabsContent>
+
+        <TabsContent value="research">
+          <div className="space-y-6">
+            <CostDashboard />
+            <ResearchPanel />
+          </div>
         </TabsContent>
       </Tabs>
     </div>
