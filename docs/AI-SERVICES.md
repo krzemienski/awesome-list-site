@@ -3275,11 +3275,19 @@ Use this checklist when AI services malfunction:
   - *Domain validation (`claudeService.ts:416-428`) checks exact match, www. prefix, and subdomains*
   - *SSRF protection: Only HTTPS URLs from allowlisted domains can be analyzed*
 
-- [ ] **Error Logs**: Review recent errors
+- [x] **Error Logs**: Review recent errors
   ```typescript
   const errors = aiErrorLogger.getRecent(10);
   console.log('Recent errors:', errors);
   ```
+  - *Verified 2026-02-02: Error logging uses console.error throughout claudeService.ts:*
+    - *Initialization errors (`claudeService.ts:131`): `console.error('Failed to initialize Claude service:', error)`*
+    - *API errors (`claudeService.ts:198`): `console.error('Claude API error:', error.message || error)`*
+    - *Connection test failures (`claudeService.ts:322`): `console.error('Claude connection test failed:', error)`*
+    - *URL analysis errors (`claudeService.ts:570`): `console.error('Error analyzing URL:', error)`*
+  - *Error codes handled: 429 (rate limit), 401 (invalid API key - disables service)*
+  - *Centralized error middleware (`errorHandler.ts:64-80`) logs all HTTP errors with severity-based detail levels*
+  - *Note: `aiErrorLogger.getRecent()` is a documentation example - actual implementation uses console.error with structured error messages*
 
 - [ ] **Service Availability**: Check initialization
   ```typescript
