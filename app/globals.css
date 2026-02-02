@@ -1,24 +1,26 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: oklch(0.12 0.02 280);
-  --color-foreground: oklch(0.95 0.01 280);
-  --color-card: oklch(0.15 0.02 280);
-  --color-card-foreground: oklch(0.95 0.01 280);
-  --color-primary: oklch(0.7 0.2 330);
-  --color-primary-foreground: oklch(0.98 0.01 280);
-  --color-secondary: oklch(0.2 0.02 280);
-  --color-secondary-foreground: oklch(0.95 0.01 280);
-  --color-muted: oklch(0.2 0.02 280);
-  --color-muted-foreground: oklch(0.65 0.02 280);
-  --color-accent: oklch(0.25 0.03 280);
-  --color-accent-foreground: oklch(0.95 0.01 280);
-  --color-destructive: oklch(0.55 0.2 25);
-  --color-border: oklch(0.25 0.02 280);
-  --color-input: oklch(0.2 0.02 280);
-  --color-ring: oklch(0.7 0.2 330);
+  /* Cyberpunk dark theme with magenta/pink accent */
+  --color-background: #0a0a0f;
+  --color-foreground: #e8e8f0;
+  --color-card: #12121a;
+  --color-card-foreground: #e8e8f0;
+  --color-primary: #ec4899;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #1a1a25;
+  --color-secondary-foreground: #e8e8f0;
+  --color-muted: #1a1a25;
+  --color-muted-foreground: #888899;
+  --color-accent: #22222f;
+  --color-accent-foreground: #e8e8f0;
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+  --color-border: #2a2a3a;
+  --color-input: #1a1a25;
+  --color-ring: #ec4899;
   --radius: 0.5rem;
-  --font-sans: system-ui, sans-serif;
+  --font-sans: system-ui, -apple-system, sans-serif;
 }
 
 * {
@@ -28,4 +30,24 @@
 body {
   background-color: var(--color-background);
   color: var(--color-foreground);
+  font-family: var(--font-sans);
+}
+
+/* Custom scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted-foreground);
 }

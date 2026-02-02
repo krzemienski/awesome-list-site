@@ -10,9 +10,13 @@ export async function GET() {
   try {
     // Fetch all categories with their subcategories, sub-subcategories, and resources
     const categories = await sql`SELECT * FROM categories ORDER BY name`;
+    console.log("[v0] Categories count:", categories.length, categories);
     const subcategories = await sql`SELECT * FROM subcategories ORDER BY name`;
+    console.log("[v0] Subcategories count:", subcategories.length);
     const subSubcategories = await sql`SELECT * FROM sub_subcategories ORDER BY name`;
+    console.log("[v0] SubSubcategories count:", subSubcategories.length);
     const dbResources = await sql`SELECT * FROM resources ORDER BY name`;
+    console.log("[v0] Resources count:", dbResources.length, dbResources);
     
     // Map resources to expected format
     const mapResource = (r: any) => ({
