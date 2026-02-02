@@ -3243,7 +3243,10 @@ Use this checklist when AI services malfunction:
   console.log('Connected:', connected);
   ```
 
-- [ ] **Rate Limits**: Check if hitting Anthropic rate limits
+- [x] **Rate Limits**: Check if hitting Anthropic rate limits ✓ *Verified: Comprehensive rate limiting implemented at multiple layers:*
+  - *Claude API layer (`claudeService.ts:101`): `RATE_LIMIT_DELAY = 1000ms` enforces 1-second minimum between requests via `applyRateLimit()` method*
+  - *429 error handling (`claudeService.ts:201-202`): Logs rate limit events with "Rate limited by Claude API, backing off..." message*
+  - *Server API layer (`middleware/rateLimit.ts`): Tiered limits (Free: 60/hr, Standard: 1000/hr, Premium: 10000/hr) with proper 429 responses and Retry-After headers*
   - Review error logs for 429 status codes
   - Check Anthropic console for usage stats
   - Reduce concurrent requests
