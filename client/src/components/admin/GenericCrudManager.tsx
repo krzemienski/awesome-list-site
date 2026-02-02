@@ -13,7 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Pencil, Trash2, Save, X, LucideIcon, Upload, FileIcon, XCircle, Bold, Italic, Underline, Strikethrough, Link, Heading, List, ListOrdered, Quote, Code } from "lucide-react";
+import { Plus, Pencil, Trash2, Save, X, LucideIcon, Upload, FileIcon, XCircle, Bold, Italic, Underline, Strikethrough, Link, Heading, List, ListOrdered, Quote, Code, Check, ChevronsUpDown, Search } from "lucide-react";
 
 /**
  * Base entity interface that all managed entities must extend.
@@ -134,6 +134,64 @@ export interface RichTextFieldConfig {
   toolbar?: Array<"bold" | "italic" | "underline" | "strikethrough" | "link" | "heading" | "list" | "orderedList" | "quote" | "code">;
   outputFormat?: "html" | "markdown";
   placeholder?: string;
+}
+
+/**
+ * Option for multi-select fields
+ */
+export interface MultiSelectOption {
+  value: string;
+  label: string;
+}
+
+/**
+ * Configuration for multi-select dropdown fields.
+ *
+ * @property {MultiSelectOption[]} [options] - Static options for the multi-select
+ * @property {string} [fetchUrl] - API endpoint to fetch options dynamically
+ * @property {string} [queryKey] - React Query key for caching fetched options
+ * @property {string} [valueField] - Field name for the option value (default: "id")
+ * @property {string} [labelField] - Field name for the option label (default: "name")
+ * @property {string} [placeholder] - Placeholder text when no items selected
+ * @property {number} [maxItems] - Maximum number of items that can be selected
+ * @property {number} [minItems] - Minimum number of items that must be selected
+ * @property {boolean} [searchable] - Whether to allow searching/filtering options
+ * @property {"array" | "csv"} [outputFormat] - Output format (default: "array")
+ *
+ * @example
+ * ```typescript
+ * // Static options
+ * const tagsConfig: MultiSelectFieldConfig = {
+ *   options: [
+ *     { value: "frontend", label: "Frontend" },
+ *     { value: "backend", label: "Backend" },
+ *     { value: "devops", label: "DevOps" }
+ *   ],
+ *   placeholder: "Select tags...",
+ *   maxItems: 5
+ * };
+ *
+ * // Dynamic options from API
+ * const categoriesConfig: MultiSelectFieldConfig = {
+ *   fetchUrl: "/api/tags",
+ *   queryKey: "tags",
+ *   valueField: "id",
+ *   labelField: "name",
+ *   searchable: true
+ * };
+ * ```
+ */
+export interface MultiSelectFieldConfig {
+  options?: MultiSelectOption[];
+  fetchUrl?: string;
+  queryKey?: string;
+  valueField?: string;
+  labelField?: string;
+  placeholder?: string;
+  maxItems?: number;
+  minItems?: number;
+  searchable?: boolean;
+  outputFormat?: "array" | "csv";
 }
 
 /**
@@ -272,6 +330,186 @@ function RichTextEditor({ value, onChange, config, id, "data-testid": testId }: 
 }
 
 /**
+ * Multi-Select Dropdown Component
+ *
+ * A combobox-style multi-select component with search support and badge display.
+ * Supports both static options and dynamic options from API.
+ */
+interface MultiSelectProps {
+  value: string[];
+  onChange: (value: string[]) => void;
+  config?: MultiSelectFieldConfig;
+  id?: string;
+  "data-testid"?: string;
+}
+
+function MultiSelect({ value, onChange, config, id, "data-testid": testId }: MultiSelectProps) {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
+  const placeholder = config?.placeholder || "Select items...";
+  const maxItems = config?.maxItems;
+  const searchable = config?.searchable ?? true;
+  const valueField = config?.valueField || "id";
+  const labelField = config?.labelField || "name";
+
+  // Fetch dynamic options if fetchUrl is provided
+  const { data: fetchedOptions } = useQuery<any[]>({
+    queryKey: [config?.queryKey || config?.fetchUrl],
+    queryFn: async () => {
+      if (!config?.fetchUrl) return [];
+      const response = await fetch(config.fetchUrl, { credentials: 'include' });
+      if (!response.ok) throw new Error('Failed to fetch options');
+      return response.json();
+    },
+    enabled: !!config?.fetchUrl
+  });
+
+  // Combine static and fetched options
+  const allOptions: MultiSelectOption[] = React.useMemo(() => {
+    if (config?.options) return config.options;
+    if (fetchedOptions) {
+      return fetchedOptions.map(item => ({
+        value: String(item[valueField]),
+        label: String(item[labelField])
+      }));
+    }
+    return [];
+  }, [config?.options, fetchedOptions, valueField, labelField]);
+
+  // Filter options based on search
+  const filteredOptions = React.useMemo(() => {
+    if (!searchQuery) return allOptions;
+    return allOptions.filter(opt =>
+      opt.label.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [allOptions, searchQuery]);
+
+  // Get labels for selected values
+  const selectedLabels = React.useMemo(() => {
+    return value.map(v => {
+      const opt = allOptions.find(o => o.value === v);
+      return opt?.label || v;
+    });
+  }, [value, allOptions]);
+
+  // Handle clicking outside to close dropdown
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const toggleOption = (optionValue: string) => {
+    if (value.includes(optionValue)) {
+      onChange(value.filter(v => v !== optionValue));
+    } else {
+      if (maxItems && value.length >= maxItems) return;
+      onChange([...value, optionValue]);
+    }
+  };
+
+  const removeOption = (optionValue: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    onChange(value.filter(v => v !== optionValue));
+  };
+
+  return (
+    <div ref={containerRef} className="relative" id={id} data-testid={testId}>
+      {/* Trigger button */}
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex min-h-[40px] w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+        data-testid={testId ? `${testId}-trigger` : undefined}
+      >
+        <div className="flex flex-wrap gap-1 flex-1">
+          {value.length === 0 ? (
+            <span className="text-muted-foreground">{placeholder}</span>
+          ) : (
+            selectedLabels.map((label, idx) => (
+              <span
+                key={value[idx]}
+                className="inline-flex items-center gap-1 bg-secondary text-secondary-foreground px-2 py-0.5 rounded-md text-xs"
+              >
+                {label}
+                <button
+                  type="button"
+                  onClick={(e) => removeOption(value[idx], e)}
+                  className="hover:bg-secondary-foreground/20 rounded-full p-0.5"
+                  data-testid={testId ? `${testId}-remove-${value[idx]}` : undefined}
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            ))
+          )}
+        </div>
+        <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50 ml-2" />
+      </button>
+
+      {/* Dropdown */}
+      {isOpen && (
+        <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-lg">
+          {searchable && (
+            <div className="p-2 border-b">
+              <Input
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-8"
+                data-testid={testId ? `${testId}-search` : undefined}
+              />
+            </div>
+          )}
+          <div className="max-h-60 overflow-y-auto p-1">
+            {filteredOptions.length === 0 ? (
+              <div className="py-6 text-center text-sm text-muted-foreground">
+                No options found.
+              </div>
+            ) : (
+              filteredOptions.map((option) => {
+                const isSelected = value.includes(option.value);
+                const isDisabled = !isSelected && maxItems && value.length >= maxItems;
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => !isDisabled && toggleOption(option.value)}
+                    disabled={isDisabled}
+                    className={`flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors ${
+                      isSelected ? 'bg-accent' : 'hover:bg-accent/50'
+                    } ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                    data-testid={testId ? `${testId}-option-${option.value}` : undefined}
+                  >
+                    <div className={`flex h-4 w-4 items-center justify-center rounded-sm border ${
+                      isSelected ? 'bg-primary border-primary text-primary-foreground' : 'border-input'
+                    }`}>
+                      {isSelected && <Check className="h-3 w-3" />}
+                    </div>
+                    <span>{option.label}</span>
+                  </button>
+                );
+              })
+            )}
+          </div>
+          {maxItems && (
+            <div className="px-2 py-1.5 text-xs text-muted-foreground border-t">
+              {value.length} / {maxItems} selected
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/**
  * Configuration for a custom form field in the CRUD manager.
  *
  * @property {string} name - Field name (used as form data key)
@@ -299,12 +537,13 @@ function RichTextEditor({ value, onChange, config, id, "data-testid": testId }: 
 export interface CustomFieldConfig {
   name: string;
   label: string;
-  type: "text" | "textarea" | "number" | "file" | "richtext";
+  type: "text" | "textarea" | "number" | "file" | "richtext" | "multiselect";
   placeholder?: string;
   helpText?: string;
   required?: boolean;
   fileConfig?: FileFieldConfig;
   richTextConfig?: RichTextFieldConfig;
+  multiSelectConfig?: MultiSelectFieldConfig;
 }
 
 /**
@@ -449,6 +688,12 @@ export interface GenericCrudManagerProps<T extends BaseEntityWithCount> {
   customFields?: CustomFieldConfig[];
   /** Whether to use FormData for submissions (required for file uploads) */
   useFormData?: boolean;
+  /** Enable search/filter functionality (default: true) */
+  searchEnabled?: boolean;
+  /** Fields to search across (default: ['name', 'slug']) */
+  searchableFields?: string[];
+  /** Custom search placeholder */
+  searchPlaceholder?: string;
 }
 
 /**
@@ -641,7 +886,10 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     }
   },
   customFields = [],
-  useFormData = false
+  useFormData = false,
+  searchEnabled = true,
+  searchableFields = ['name', 'slug'],
+  searchPlaceholder
 }: GenericCrudManagerProps<T>) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -652,13 +900,14 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   const [selectedItem, setSelectedItem] = useState<T | null>(null);
   const [fileData, setFileData] = useState<Record<string, File | null>>({});
   const [filePreviews, setFilePreviews] = useState<Record<string, string>>({});
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Check if we have file fields (auto-enable FormData if so)
   const hasFileFields = customFields.some(f => f.type === "file");
   const shouldUseFormData = useFormData || hasFileFields;
 
   const initialFormData = useMemo(() => {
-    const data: Record<string, string> = {
+    const data: Record<string, string | string[]> = {
       name: "",
       slug: ""
     };
@@ -667,14 +916,18 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     });
     // Initialize custom fields
     customFields.forEach(field => {
-      if (field.type !== "file") {
+      if (field.type === "file") {
+        // File fields handled separately
+      } else if (field.type === "multiselect") {
+        data[field.name] = [];
+      } else {
         data[field.name] = "";
       }
     });
     return data;
   }, [parents, customFields]);
 
-  const [formData, setFormData] = useState<Record<string, string>>(initialFormData);
+  const [formData, setFormData] = useState<Record<string, string | string[]>>(initialFormData);
 
   // Fetch parent data
   const parentQueries = parents.map(parent =>
@@ -706,6 +959,19 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       return response.json();
     }
   });
+
+  // Filter items based on search query
+  const filteredItems = useMemo(() => {
+    if (!items || !searchQuery.trim() || !searchEnabled) return items;
+    const query = searchQuery.toLowerCase();
+    const fieldsToSearch = searchableFields || ['name', 'slug'];
+    return items.filter(item =>
+      fieldsToSearch.some(field => {
+        const value = item[field];
+        return value && String(value).toLowerCase().includes(query);
+      })
+    );
+  }, [items, searchQuery, searchEnabled, searchableFields]);
 
   // Create mutation
   const createMutation = useMutation({
@@ -831,10 +1097,10 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     }
 
     const filterValue = formData[parent.filterBy];
-    if (!filterValue) return [];
+    if (!filterValue || Array.isArray(filterValue)) return [];
 
     return (parentData[parentFieldName] || []).filter(item =>
-      item[parent.filterBy!] === parseInt(filterValue)
+      item[parent.filterBy!] === parseInt(filterValue as string)
     );
   };
 
@@ -893,14 +1159,22 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
 
   const handleCreate = async () => {
     const requiredFields = ["name", "slug", ...parents.map(p => p.fieldName)];
-    const requiredCustomFields = customFields.filter(f => f.required && f.type !== "file").map(f => f.name);
+    const requiredCustomFields = customFields.filter(f => f.required && f.type !== "file" && f.type !== "multiselect").map(f => f.name);
     const requiredFileFields = customFields.filter(f => f.required && f.type === "file").map(f => f.name);
+    const requiredMultiSelectFields = customFields.filter(f => f.required && f.type === "multiselect").map(f => f.name);
 
-    const missingFields = [...requiredFields, ...requiredCustomFields].filter(field => !formData[field]?.trim());
+    const missingFields = [...requiredFields, ...requiredCustomFields].filter(field => {
+      const val = formData[field];
+      return typeof val === "string" ? !val.trim() : false;
+    });
     const missingFileFields = requiredFileFields.filter(field => !fileData[field]);
+    const missingMultiSelectFields = requiredMultiSelectFields.filter(field => {
+      const val = formData[field] as string[];
+      return !val || val.length === 0;
+    });
 
-    if (missingFields.length > 0 || missingFileFields.length > 0) {
-      const fieldLabels = [...missingFields, ...missingFileFields].map(field => {
+    if (missingFields.length > 0 || missingFileFields.length > 0 || missingMultiSelectFields.length > 0) {
+      const fieldLabels = [...missingFields, ...missingFileFields, ...missingMultiSelectFields].map(field => {
         if (field === "name") return "Name";
         if (field === "slug") return "Slug";
         const parent = parents.find(p => p.fieldName === field);
@@ -935,8 +1209,18 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
           if (file) {
             formDataPayload.append(field.name, file);
           }
+        } else if (field.type === "multiselect") {
+          const arr = formData[field.name] as string[];
+          if (arr && arr.length > 0) {
+            // For FormData, join as CSV or send as JSON array string
+            formDataPayload.append(field.name,
+              field.multiSelectConfig?.outputFormat === "csv"
+                ? arr.join(",")
+                : JSON.stringify(arr)
+            );
+          }
         } else if (formData[field.name]) {
-          formDataPayload.append(field.name, formData[field.name]);
+          formDataPayload.append(field.name, formData[field.name] as string);
         }
       });
 
@@ -953,10 +1237,20 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
 
       // Add custom fields (non-file)
       customFields.forEach(field => {
-        if (field.type !== "file" && formData[field.name]) {
+        if (field.type === "file") return;
+        const value = formData[field.name];
+        if (field.type === "multiselect") {
+          const arr = value as string[];
+          if (arr && arr.length > 0) {
+            // Convert to CSV if configured, otherwise keep as array
+            payload[field.name] = field.multiSelectConfig?.outputFormat === "csv"
+              ? arr.join(",")
+              : arr;
+          }
+        } else if (value) {
           payload[field.name] = field.type === "number"
-            ? parseFloat(formData[field.name])
-            : formData[field.name];
+            ? parseFloat(value as string)
+            : value;
         }
       });
 
@@ -1008,8 +1302,18 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
           if (file) {
             formDataPayload.append(field.name, file);
           }
+        } else if (field.type === "multiselect") {
+          const arr = formData[field.name] as string[];
+          if (arr && arr.length > 0) {
+            // For FormData, join as CSV or send as JSON array string
+            formDataPayload.append(field.name,
+              field.multiSelectConfig?.outputFormat === "csv"
+                ? arr.join(",")
+                : JSON.stringify(arr)
+            );
+          }
         } else if (formData[field.name]) {
-          formDataPayload.append(field.name, formData[field.name]);
+          formDataPayload.append(field.name, formData[field.name] as string);
         }
       });
 
@@ -1029,10 +1333,20 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
 
       // Add custom fields (non-file)
       customFields.forEach(field => {
-        if (field.type !== "file" && formData[field.name]) {
+        if (field.type === "file") return;
+        const value = formData[field.name];
+        if (field.type === "multiselect") {
+          const arr = value as string[];
+          if (arr && arr.length > 0) {
+            // Convert to CSV if configured, otherwise keep as array
+            payload[field.name] = field.multiSelectConfig?.outputFormat === "csv"
+              ? arr.join(",")
+              : arr;
+          }
+        } else if (value) {
           payload[field.name] = field.type === "number"
-            ? parseFloat(formData[field.name])
-            : formData[field.name];
+            ? parseFloat(value as string)
+            : value;
         }
       });
 
@@ -1077,7 +1391,20 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
 
     // Load custom field values
     customFields.forEach(field => {
-      if (field.type !== "file") {
+      if (field.type === "file") {
+        // File fields handled separately
+      } else if (field.type === "multiselect") {
+        // Handle multi-select: could be array or CSV string
+        const itemValue = item[field.name];
+        if (Array.isArray(itemValue)) {
+          newFormData[field.name] = itemValue.map(String);
+        } else if (typeof itemValue === "string" && itemValue) {
+          // Parse CSV string
+          newFormData[field.name] = itemValue.split(",").map(s => s.trim());
+        } else {
+          newFormData[field.name] = [];
+        }
+      } else {
         newFormData[field.name] = item[field.name]?.toString() || "";
       }
     });
@@ -1132,16 +1459,45 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               {description}
             </CardDescription>
           </div>
-          <Button
-            onClick={openCreateDialog}
-            data-testid={`button-create-${testIdEntity}`}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add {entityName}
-          </Button>
+          <div className="flex items-center gap-4">
+            {searchEnabled && (
+              <div className="relative w-64">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder={searchPlaceholder || `Search ${entityNamePlural.toLowerCase()}...`}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-8 pr-8"
+                  data-testid={`input-search-${testIdEntityPlural}`}
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground"
+                    data-testid="button-clear-search"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+            )}
+            <Button
+              onClick={openCreateDialog}
+              data-testid={`button-create-${testIdEntity}`}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add {entityName}
+            </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
+        {searchEnabled && searchQuery && filteredItems && (
+          <p className="text-sm text-muted-foreground mb-4" data-testid="text-search-results">
+            Showing {filteredItems.length} of {items?.length || 0} {entityNamePlural.toLowerCase()}
+          </p>
+        )}
         {isLoading ? (
           <div className="space-y-2">
             {[...Array(5)].map((_, i) => (
@@ -1163,7 +1519,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {items?.map((item) => (
+              {filteredItems?.map((item) => (
                 <TableRow key={item.id} data-testid={`row-${testIdEntity}-${item.id}`}>
                   {columns.map((col) => (
                     <TableCell
@@ -1354,16 +1710,24 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                 ) : field.type === "richtext" ? (
                   <RichTextEditor
                     id={`create-${field.name}`}
-                    value={formData[field.name] || ""}
+                    value={(formData[field.name] as string) || ""}
                     onChange={(value) => setFormData({ ...formData, [field.name]: value })}
                     config={field.richTextConfig}
+                    data-testid={`input-create-${field.name}`}
+                  />
+                ) : field.type === "multiselect" ? (
+                  <MultiSelect
+                    id={`create-${field.name}`}
+                    value={(formData[field.name] as string[]) || []}
+                    onChange={(value) => setFormData({ ...formData, [field.name]: value })}
+                    config={field.multiSelectConfig}
                     data-testid={`input-create-${field.name}`}
                   />
                 ) : field.type === "textarea" ? (
                   <textarea
                     id={`create-${field.name}`}
                     placeholder={field.placeholder}
-                    value={formData[field.name] || ""}
+                    value={(formData[field.name] as string) || ""}
                     onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
                     className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     data-testid={`input-create-${field.name}`}
@@ -1373,7 +1737,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                     id={`create-${field.name}`}
                     type={field.type === "number" ? "number" : "text"}
                     placeholder={field.placeholder}
-                    value={formData[field.name] || ""}
+                    value={(formData[field.name] as string) || ""}
                     onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
                     data-testid={`input-create-${field.name}`}
                   />
@@ -1554,16 +1918,24 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                 ) : field.type === "richtext" ? (
                   <RichTextEditor
                     id={`edit-${field.name}`}
-                    value={formData[field.name] || ""}
+                    value={(formData[field.name] as string) || ""}
                     onChange={(value) => setFormData({ ...formData, [field.name]: value })}
                     config={field.richTextConfig}
+                    data-testid={`input-edit-${field.name}`}
+                  />
+                ) : field.type === "multiselect" ? (
+                  <MultiSelect
+                    id={`edit-${field.name}`}
+                    value={(formData[field.name] as string[]) || []}
+                    onChange={(value) => setFormData({ ...formData, [field.name]: value })}
+                    config={field.multiSelectConfig}
                     data-testid={`input-edit-${field.name}`}
                   />
                 ) : field.type === "textarea" ? (
                   <textarea
                     id={`edit-${field.name}`}
                     placeholder={field.placeholder}
-                    value={formData[field.name] || ""}
+                    value={(formData[field.name] as string) || ""}
                     onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
                     className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     data-testid={`input-edit-${field.name}`}
@@ -1573,7 +1945,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                     id={`edit-${field.name}`}
                     type={field.type === "number" ? "number" : "text"}
                     placeholder={field.placeholder}
-                    value={formData[field.name] || ""}
+                    value={(formData[field.name] as string) || ""}
                     onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
                     data-testid={`input-edit-${field.name}`}
                   />

@@ -899,14 +899,232 @@ const articleConfig: GenericCrudManagerProps<ArticleWithCount> = {
 `input-edit-{fieldName}` // e.g., "input-edit-body"
 ```
 
+## Multi-Select Dropdown Fields
+
+The GenericCrudManager supports multi-select dropdown fields through the `customFields` prop with `type: "multiselect"`.
+
+### Basic Multi-Select Configuration
+
+```typescript
+import GenericCrudManager, { CustomFieldConfig } from "./GenericCrudManager";
+
+const customFields: CustomFieldConfig[] = [
+  {
+    name: "tags",
+    label: "Tags",
+    type: "multiselect",
+    multiSelectConfig: {
+      options: [
+        { value: "frontend", label: "Frontend" },
+        { value: "backend", label: "Backend" },
+        { value: "devops", label: "DevOps" },
+        { value: "mobile", label: "Mobile" }
+      ],
+      placeholder: "Select tags...",
+      maxItems: 5
+    }
+  }
+];
+
+<GenericCrudManager
+  {...otherProps}
+  customFields={customFields}
+/>
+```
+
+### Multi-Select Configuration Options
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `options` | `Array<{value, label}>` | `[]` | Static options for the dropdown |
+| `fetchUrl` | `string` | - | API endpoint to fetch options dynamically |
+| `queryKey` | `string` | - | React Query key for caching fetched options |
+| `valueField` | `string` | `"id"` | Field name for option value (when using fetchUrl) |
+| `labelField` | `string` | `"name"` | Field name for option label (when using fetchUrl) |
+| `placeholder` | `string` | `"Select items..."` | Placeholder text when empty |
+| `maxItems` | `number` | `undefined` | Maximum number of selections allowed |
+| `minItems` | `number` | `undefined` | Minimum number of selections required |
+| `searchable` | `boolean` | `true` | Enable search/filter functionality |
+| `outputFormat` | `"array" \| "csv"` | `"array"` | Output format for the selected values |
+
+### Dynamic Options from API
+
+```typescript
+const customFields: CustomFieldConfig[] = [
+  {
+    name: "categoryIds",
+    label: "Categories",
+    type: "multiselect",
+    required: true,
+    multiSelectConfig: {
+      fetchUrl: "/api/categories",
+      queryKey: "categories",
+      valueField: "id",
+      labelField: "name",
+      searchable: true,
+      maxItems: 3
+    }
+  }
+];
+```
+
+### Complete Example with Multi-Select
+
+```typescript
+const resourceConfig: GenericCrudManagerProps<ResourceWithCount> = {
+  entityName: "Resource",
+  entityNamePlural: "Resources",
+  // ... other config ...
+  customFields: [
+    {
+      name: "description",
+      label: "Description",
+      type: "textarea",
+      placeholder: "Enter resource description..."
+    },
+    {
+      name: "tags",
+      label: "Tags",
+      type: "multiselect",
+      required: false,
+      multiSelectConfig: {
+        options: [
+          { value: "beginner", label: "Beginner Friendly" },
+          { value: "advanced", label: "Advanced" },
+          { value: "tutorial", label: "Tutorial" },
+          { value: "reference", label: "Reference" },
+          { value: "tool", label: "Tool" }
+        ],
+        placeholder: "Select tags...",
+        maxItems: 5,
+        searchable: true
+      }
+    },
+    {
+      name: "relatedResources",
+      label: "Related Resources",
+      type: "multiselect",
+      multiSelectConfig: {
+        fetchUrl: "/api/resources",
+        queryKey: "resources",
+        valueField: "id",
+        labelField: "name",
+        placeholder: "Select related resources...",
+        maxItems: 10
+      }
+    }
+  ]
+};
+```
+
+### Multi-Select Behavior
+
+- **Badge Display**: Selected items appear as removable badges/chips in the trigger button
+- **Search**: Type to filter available options (enabled by default)
+- **Max Items**: When `maxItems` is reached, remaining options are disabled
+- **Keyboard Navigation**: Full keyboard support for accessibility
+- **Dynamic Loading**: Options can be fetched from an API endpoint
+- **Output Formats**: Values can be stored as array or comma-separated string
+
+### Test IDs for Multi-Select Fields
+
+```typescript
+// Multi-select container
+`input-create-{fieldName}` // e.g., "input-create-tags"
+`input-edit-{fieldName}` // e.g., "input-edit-tags"
+
+// Trigger button
+`input-create-{fieldName}-trigger`
+`input-edit-{fieldName}-trigger`
+
+// Search input
+`input-create-{fieldName}-search`
+`input-edit-{fieldName}-search`
+
+// Individual options
+`input-create-{fieldName}-option-{value}` // e.g., "input-create-tags-option-frontend"
+
+// Remove buttons on selected badges
+`input-create-{fieldName}-remove-{value}` // e.g., "input-create-tags-remove-frontend"
+```
+
+## Search/Filter for Large Tables
+
+The GenericCrudManager includes built-in search functionality for filtering table data.
+
+### Basic Usage
+
+Search is enabled by default and searches across `name` and `slug` fields:
+
+```typescript
+<GenericCrudManager
+  {...otherProps}
+  // Search is enabled by default
+/>
+```
+
+### Customizing Search
+
+```typescript
+<GenericCrudManager
+  {...otherProps}
+  searchEnabled={true}                    // Enable/disable search (default: true)
+  searchableFields={['name', 'slug', 'description']}  // Fields to search
+  searchPlaceholder="Find categories..."   // Custom placeholder text
+/>
+```
+
+### Search Configuration Options
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `searchEnabled` | `boolean` | `true` | Enable or disable the search feature |
+| `searchableFields` | `string[]` | `['name', 'slug']` | Array of field names to search across |
+| `searchPlaceholder` | `string` | `"Search {entities}..."` | Custom placeholder text |
+
+### Search Behavior
+
+- **Case-insensitive**: Searches are not case-sensitive
+- **Multi-field**: Searches across all specified fields simultaneously
+- **Client-side**: Filtering happens in the browser for fast results
+- **Result count**: Shows "Showing X of Y {entities}" when filtering
+
+### Test IDs for Search
+
+```typescript
+// Search input
+`input-search-{testIdEntityPlural}` // e.g., "input-search-categories"
+
+// Clear search button
+`button-clear-search`
+
+// Results count text
+`text-search-results`
+```
+
+### Example with Search
+
+```typescript
+const resourceConfig: GenericCrudManagerProps<ResourceWithCount> = {
+  entityName: "Resource",
+  entityNamePlural: "Resources",
+  // ... other config ...
+
+  // Search configuration
+  searchEnabled: true,
+  searchableFields: ['name', 'slug', 'description', 'url'],
+  searchPlaceholder: "Search resources by name, URL..."
+};
+```
+
 ## Future Enhancements
 
 Potential improvements to the pattern:
 
 - [x] File upload fields *(Completed: 2026-02-02)*
 - [x] Rich text editor fields *(Completed: 2026-02-02)*
-- [ ] Multi-select dropdowns
-- [ ] Search/filter for large tables
+- [x] Multi-select dropdowns *(Completed: 2026-02-02)*
+- [x] Search/filter for large tables *(Completed: 2026-02-02)*
 - [ ] Pagination support
 - [ ] Bulk operations (delete multiple, export)
 - [ ] Field-level permissions
