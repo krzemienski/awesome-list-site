@@ -13,7 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Pencil, Trash2, Save, X, LucideIcon, Upload, FileIcon, XCircle, Bold, Italic, Underline, Strikethrough, Link, Heading, List, ListOrdered, Quote, Code, Check, ChevronsUpDown, Search } from "lucide-react";
+import { Plus, Pencil, Trash2, Save, X, LucideIcon, Upload, FileIcon, XCircle, Bold, Italic, Underline, Strikethrough, Link, Heading, List, ListOrdered, Quote, Code, Check, ChevronsUpDown, Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 
 /**
  * Base entity interface that all managed entities must extend.
@@ -694,6 +694,12 @@ export interface GenericCrudManagerProps<T extends BaseEntityWithCount> {
   searchableFields?: string[];
   /** Custom search placeholder */
   searchPlaceholder?: string;
+  /** Enable pagination (default: true) */
+  paginationEnabled?: boolean;
+  /** Number of items per page (default: 10) */
+  itemsPerPage?: number;
+  /** Available page size options (default: [10, 25, 50, 100]) */
+  pageSizeOptions?: number[];
 }
 
 /**
@@ -889,7 +895,10 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   useFormData = false,
   searchEnabled = true,
   searchableFields = ['name', 'slug'],
-  searchPlaceholder
+  searchPlaceholder,
+  paginationEnabled = true,
+  itemsPerPage: defaultItemsPerPage = 10,
+  pageSizeOptions = [10, 25, 50, 100]
 }: GenericCrudManagerProps<T>) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -901,6 +910,8 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   const [fileData, setFileData] = useState<Record<string, File | null>>({});
   const [filePreviews, setFilePreviews] = useState<Record<string, string>>({});
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(defaultItemsPerPage);
 
   // Check if we have file fields (auto-enable FormData if so)
   const hasFileFields = customFields.some(f => f.type === "file");
@@ -972,6 +983,35 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       })
     );
   }, [items, searchQuery, searchEnabled, searchableFields]);
+
+  // Pagination calculations
+  const totalItems = filteredItems?.length || 0;
+  const totalPages = Math.ceil(totalItems / pageSize);
+
+  // Reset to page 1 when search query changes or when current page exceeds total pages
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(1);
+    }
+  }, [searchQuery, totalPages, currentPage]);
+
+  // Paginate the filtered items
+  const paginatedItems = useMemo(() => {
+    if (!filteredItems || !paginationEnabled) return filteredItems;
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    return filteredItems.slice(startIndex, endIndex);
+  }, [filteredItems, currentPage, pageSize, paginationEnabled]);
+
+  // Pagination handlers
+  const goToPage = (page: number) => {
+    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    setPageSize(newSize);
+    setCurrentPage(1); // Reset to first page when changing page size
+  };
 
   // Create mutation
   const createMutation = useMutation({
@@ -1493,11 +1533,15 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
         </div>
       </CardHeader>
       <CardContent>
-        {searchEnabled && searchQuery && filteredItems && (
+        {(searchEnabled && searchQuery && filteredItems) || (paginationEnabled && totalItems > 0) ? (
           <p className="text-sm text-muted-foreground mb-4" data-testid="text-search-results">
-            Showing {filteredItems.length} of {items?.length || 0} {entityNamePlural.toLowerCase()}
+            {searchQuery ? (
+              <>Showing {paginationEnabled ? `${Math.min((currentPage - 1) * pageSize + 1, totalItems)}-${Math.min(currentPage * pageSize, totalItems)} of ` : ''}{totalItems} result{totalItems !== 1 ? 's' : ''} (filtered from {items?.length || 0})</>
+            ) : paginationEnabled ? (
+              <>Showing {Math.min((currentPage - 1) * pageSize + 1, totalItems)}-{Math.min(currentPage * pageSize, totalItems)} of {totalItems} {entityNamePlural.toLowerCase()}</>
+            ) : null}
           </p>
-        )}
+        ) : null}
         {isLoading ? (
           <div className="space-y-2">
             {[...Array(5)].map((_, i) => (
@@ -1505,6 +1549,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
             ))}
           </div>
         ) : (
+          <>
           <Table data-testid={`table-${testIdEntityPlural}`}>
             <TableHeader>
               <TableRow>
@@ -1519,7 +1564,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredItems?.map((item) => (
+              {paginatedItems?.map((item) => (
                 <TableRow key={item.id} data-testid={`row-${testIdEntity}-${item.id}`}>
                   {columns.map((col) => (
                     <TableCell
@@ -1568,6 +1613,77 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               ))}
             </TableBody>
           </Table>
+
+          {/* Pagination Controls */}
+          {paginationEnabled && totalPages > 1 && (
+            <div className="flex items-center justify-between mt-4 pt-4 border-t" data-testid={`pagination-${testIdEntityPlural}`}>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Rows per page:</span>
+                <Select
+                  value={pageSize.toString()}
+                  onValueChange={(value) => handlePageSizeChange(Number(value))}
+                >
+                  <SelectTrigger className="w-[70px] h-8" data-testid="select-page-size">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {pageSizeOptions.map((size) => (
+                      <SelectItem key={size} value={size.toString()}>
+                        {size}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex items-center gap-1">
+                <span className="text-sm text-muted-foreground mr-2" data-testid="text-page-info">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => goToPage(1)}
+                  disabled={currentPage === 1}
+                  className="h-8 w-8 p-0"
+                  data-testid="button-first-page"
+                >
+                  <ChevronsLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => goToPage(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="h-8 w-8 p-0"
+                  data-testid="button-prev-page"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => goToPage(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="h-8 w-8 p-0"
+                  data-testid="button-next-page"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => goToPage(totalPages)}
+                  disabled={currentPage === totalPages}
+                  className="h-8 w-8 p-0"
+                  data-testid="button-last-page"
+                >
+                  <ChevronsRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+          </>
         )}
       </CardContent>
 

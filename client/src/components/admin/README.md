@@ -1117,6 +1117,93 @@ const resourceConfig: GenericCrudManagerProps<ResourceWithCount> = {
 };
 ```
 
+## Pagination
+
+The GenericCrudManager includes built-in pagination for handling large datasets efficiently.
+
+### Basic Usage
+
+Pagination is enabled by default with 10 items per page:
+
+```typescript
+<GenericCrudManager
+  {...otherProps}
+  // Pagination is enabled by default
+/>
+```
+
+### Customizing Pagination
+
+```typescript
+<GenericCrudManager
+  {...otherProps}
+  paginationEnabled={true}              // Enable/disable pagination (default: true)
+  itemsPerPage={25}                     // Initial items per page (default: 10)
+  pageSizeOptions={[10, 25, 50, 100]}   // Available page size options
+/>
+```
+
+### Pagination Configuration Options
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `paginationEnabled` | `boolean` | `true` | Enable or disable the pagination feature |
+| `itemsPerPage` | `number` | `10` | Initial number of items displayed per page |
+| `pageSizeOptions` | `number[]` | `[10, 25, 50, 100]` | Available options for items per page selector |
+
+### Pagination Behavior
+
+- **Client-side**: Pagination works on the client side for fast page navigation
+- **Search integration**: Pagination automatically resets to page 1 when search query changes
+- **Page size selector**: Users can change how many items are displayed per page
+- **Navigation controls**: First, previous, next, and last page buttons
+- **Auto-hide**: Pagination controls are hidden when there's only one page of results
+
+### Test IDs for Pagination
+
+```typescript
+// Pagination container
+`pagination-{testIdEntityPlural}` // e.g., "pagination-categories"
+
+// Page size selector
+`select-page-size`
+
+// Navigation buttons
+`button-first-page`
+`button-prev-page`
+`button-next-page`
+`button-last-page`
+
+// Page info text
+`text-page-info`
+```
+
+### Example with Custom Pagination
+
+```typescript
+const resourceConfig: GenericCrudManagerProps<ResourceWithCount> = {
+  entityName: "Resource",
+  entityNamePlural: "Resources",
+  // ... other config ...
+
+  // Pagination configuration
+  paginationEnabled: true,
+  itemsPerPage: 25,
+  pageSizeOptions: [25, 50, 100, 200]
+};
+```
+
+### Disabling Pagination
+
+For smaller datasets where pagination isn't needed:
+
+```typescript
+<GenericCrudManager
+  {...otherProps}
+  paginationEnabled={false}  // Show all items without pagination
+/>
+```
+
 ## Future Enhancements
 
 Potential improvements to the pattern:
@@ -1125,7 +1212,7 @@ Potential improvements to the pattern:
 - [x] Rich text editor fields *(Completed: 2026-02-02)*
 - [x] Multi-select dropdowns *(Completed: 2026-02-02)*
 - [x] Search/filter for large tables *(Completed: 2026-02-02)*
-- [ ] Pagination support
+- [x] Pagination support *(Completed: 2026-02-02)*
 - [ ] Bulk operations (delete multiple, export)
 - [ ] Field-level permissions
 - [ ] Custom validation rules per field
