@@ -3289,10 +3289,14 @@ Use this checklist when AI services malfunction:
   - *Centralized error middleware (`errorHandler.ts:64-80`) logs all HTTP errors with severity-based detail levels*
   - *Note: `aiErrorLogger.getRecent()` is a documentation example - actual implementation uses console.error with structured error messages*
 
-- [ ] **Service Availability**: Check initialization
+- [x] **Service Availability**: Check initialization
   ```typescript
   console.log('Available:', claudeService.isAvailable());
   ```
+  - *Verified 2026-02-02: `isAvailable()` method implemented at `claudeService.ts:142`*
+  - *Returns `this.anthropic !== null` - true if Anthropic client initialized successfully*
+  - *Used as guard before all API operations: `generateResponse()`, `testConnection()`, `analyzeUrl()`, and `getStats()`*
+  - *Service becomes unavailable if: API key missing/invalid, or initialization throws an error*
 
 ---
 
