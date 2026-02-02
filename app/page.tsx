@@ -38,22 +38,16 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    console.log("[v0] Fetching awesome-list...");
     fetch("/api/awesome-list")
       .then((res) => {
-        console.log("[v0] API response status:", res.status);
         if (!res.ok) throw new Error(`API error: ${res.status}`);
         return res.json();
       })
       .then((data) => {
-        console.log("[v0] Received data:", data);
-        console.log("[v0] Categories count:", data.categories?.length);
-        console.log("[v0] Resources count:", data.totalResources);
         setData(data);
         setLoading(false);
       })
       .catch((err) => {
-        console.error("[v0] Fetch error:", err);
         setError(err.message);
         setLoading(false);
       });
