@@ -1292,6 +1292,144 @@ const resourceConfig: GenericCrudManagerProps<ResourceWithCount> = {
 `button-confirm-bulk-delete`
 ```
 
+## Field-Level Permissions
+
+The GenericCrudManager supports field-level permissions to control visibility and editability of fields based on context.
+
+### Basic Usage
+
+Add a `permissions` property to any custom field or column configuration:
+
+```typescript
+const customFields: CustomFieldConfig[] = [
+  {
+    name: "internalNotes",
+    label: "Internal Notes",
+    type: "textarea",
+    permissions: {
+      visibleOnCreate: true,
+      visibleOnEdit: true,
+      visibleInTable: false,  // Hide from table view
+      editableOnCreate: true,
+      editableOnEdit: false   // Read-only after creation
+    }
+  }
+];
+```
+
+### Permission Configuration Options
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `visibleOnCreate` | `boolean` | `true` | Whether the field appears in the create form |
+| `visibleOnEdit` | `boolean` | `true` | Whether the field appears in the edit form |
+| `visibleInTable` | `boolean` | `true` | Whether the column appears in the table |
+| `editableOnCreate` | `boolean` | `true` | Whether the field can be edited during creation |
+| `editableOnEdit` | `boolean` | `true` | Whether the field can be edited during updates |
+| `checkPermission` | `function` | - | Dynamic permission check function |
+
+### Dynamic Permission Checks
+
+For complex permission logic, use the `checkPermission` function:
+
+```typescript
+const customFields: CustomFieldConfig[] = [
+  {
+    name: "adminNotes",
+    label: "Admin Notes",
+    type: "textarea",
+    permissions: {
+      checkPermission: (context) => {
+        // context contains: { mode: 'create' | 'edit' | 'view', entity?: any }
+        const isAdmin = getCurrentUser()?.role === 'admin';
+        return {
+          visible: isAdmin,
+          editable: isAdmin && context.mode !== 'view',
+          message: isAdmin ? undefined : "Admin access required"
+        };
+      }
+    }
+  }
+];
+```
+
+### Column Permissions
+
+Columns can also have permissions to control table visibility:
+
+```typescript
+const columns: ColumnConfig[] = [
+  { key: "id", label: "ID" },
+  { key: "name", label: "Name" },
+  {
+    key: "internalId",
+    label: "Internal ID",
+    permissions: {
+      visibleInTable: false  // Hidden from regular users
+    }
+  },
+  { key: "actions", label: "Actions", align: "right" }
+];
+```
+
+### Complete Example with Permissions
+
+```typescript
+const resourceConfig: GenericCrudManagerProps<ResourceWithCount> = {
+  entityName: "Resource",
+  entityNamePlural: "Resources",
+  // ... other config ...
+
+  columns: [
+    { key: "id", label: "ID" },
+    { key: "name", label: "Name" },
+    {
+      key: "cost",
+      label: "Cost",
+      permissions: { visibleInTable: isAdmin() }
+    },
+    { key: "actions", label: "Actions" }
+  ],
+
+  customFields: [
+    {
+      name: "description",
+      label: "Description",
+      type: "textarea"
+    },
+    {
+      name: "createdBy",
+      label: "Created By",
+      type: "text",
+      permissions: {
+        visibleOnCreate: false,      // Auto-set on server
+        visibleOnEdit: true,
+        editableOnEdit: false,       // Read-only
+        visibleInTable: true
+      }
+    },
+    {
+      name: "adminOverride",
+      label: "Admin Override",
+      type: "text",
+      permissions: {
+        checkPermission: ({ mode, entity }) => ({
+          visible: hasRole('admin'),
+          editable: hasRole('admin') && mode !== 'view'
+        })
+      }
+    }
+  ]
+};
+```
+
+### Permission Behavior
+
+- **Hidden fields**: Fields with `visible: false` are completely hidden from the UI
+- **Read-only fields**: Fields with `editable: false` are displayed but cannot be modified (shown with disabled styling)
+- **Dynamic permissions**: The `checkPermission` function is called each time the form/table renders, allowing real-time permission updates
+- **Default behavior**: Without a `permissions` property, all fields are visible and editable
+
 ## Future Enhancements
 
 Potential improvements to the pattern:
@@ -1302,7 +1440,7 @@ Potential improvements to the pattern:
 - [x] Search/filter for large tables *(Completed: 2026-02-02)*
 - [x] Pagination support *(Completed: 2026-02-02)*
 - [x] Bulk operations (delete multiple, export) *(Completed: 2026-02-02)*
-- [ ] Field-level permissions
+- [x] Field-level permissions *(Completed: 2026-02-02)*
 - [ ] Custom validation rules per field
 - [ ] Undo/redo functionality
 - [ ] Audit trail / change history

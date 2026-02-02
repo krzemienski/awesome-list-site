@@ -88,6 +88,49 @@ export interface FieldValidation {
 }
 
 /**
+ * Field-level permissions configuration
+ * Controls visibility and editability of fields based on context or user roles
+ */
+export interface FieldPermissions {
+  /** Whether the field is visible in create form (default: true) */
+  visibleOnCreate?: boolean;
+  /** Whether the field is visible in edit form (default: true) */
+  visibleOnEdit?: boolean;
+  /** Whether the field is visible in table columns (default: true) */
+  visibleInTable?: boolean;
+  /** Whether the field is editable on create (default: true) */
+  editableOnCreate?: boolean;
+  /** Whether the field is editable on edit - if false, shows as read-only (default: true) */
+  editableOnEdit?: boolean;
+  /** Dynamic permission check function - receives current user context */
+  checkPermission?: (context: FieldPermissionContext) => FieldPermissionResult;
+}
+
+/**
+ * Context provided to dynamic permission check functions
+ */
+export interface FieldPermissionContext {
+  /** Current operation mode */
+  mode: 'create' | 'edit' | 'view';
+  /** The entity being edited (only available in edit mode) */
+  entity?: any;
+  /** Additional context data passed from the component */
+  customContext?: Record<string, any>;
+}
+
+/**
+ * Result of a dynamic permission check
+ */
+export interface FieldPermissionResult {
+  /** Whether the field should be visible */
+  visible: boolean;
+  /** Whether the field should be editable (if visible) */
+  editable: boolean;
+  /** Optional message to show explaining why field is hidden/disabled */
+  message?: string;
+}
+
+/**
  * Configuration for a single form field
  */
 export interface FieldConfig {
@@ -123,6 +166,8 @@ export interface FieldConfig {
   richTextConfig?: RichTextFieldConfig;
   /** For multi-select fields: dropdown configuration */
   multiSelectConfig?: MultiSelectFieldConfig;
+  /** Field-level permissions configuration */
+  permissions?: FieldPermissions;
 }
 
 /**
@@ -141,6 +186,8 @@ export interface ColumnConfig {
   align?: "left" | "center" | "right";
   /** Width of the column */
   width?: string;
+  /** Field-level permissions - controls column visibility */
+  permissions?: FieldPermissions;
 }
 
 /**

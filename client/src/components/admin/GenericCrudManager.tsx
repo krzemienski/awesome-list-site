@@ -536,6 +536,49 @@ function MultiSelect({ value, onChange, config, id, "data-testid": testId }: Mul
  * };
  * ```
  */
+/**
+ * Field-level permissions configuration
+ * Controls visibility and editability of fields based on context
+ */
+export interface FieldPermissions {
+  /** Whether the field is visible in create form (default: true) */
+  visibleOnCreate?: boolean;
+  /** Whether the field is visible in edit form (default: true) */
+  visibleOnEdit?: boolean;
+  /** Whether the field is visible in table columns (default: true) */
+  visibleInTable?: boolean;
+  /** Whether the field is editable on create (default: true) */
+  editableOnCreate?: boolean;
+  /** Whether the field is editable on edit - if false, shows as read-only (default: true) */
+  editableOnEdit?: boolean;
+  /** Dynamic permission check function - receives current context */
+  checkPermission?: (context: FieldPermissionContext) => FieldPermissionResult;
+}
+
+/**
+ * Context provided to dynamic permission check functions
+ */
+export interface FieldPermissionContext {
+  /** Current operation mode */
+  mode: 'create' | 'edit' | 'view';
+  /** The entity being edited (only available in edit mode) */
+  entity?: any;
+  /** Additional context data passed from the component */
+  customContext?: Record<string, any>;
+}
+
+/**
+ * Result of a dynamic permission check
+ */
+export interface FieldPermissionResult {
+  /** Whether the field should be visible */
+  visible: boolean;
+  /** Whether the field should be editable (if visible) */
+  editable: boolean;
+  /** Optional message to show explaining why field is hidden/disabled */
+  message?: string;
+}
+
 export interface CustomFieldConfig {
   name: string;
   label: string;
@@ -546,6 +589,8 @@ export interface CustomFieldConfig {
   fileConfig?: FileFieldConfig;
   richTextConfig?: RichTextFieldConfig;
   multiSelectConfig?: MultiSelectFieldConfig;
+  /** Field-level permissions configuration */
+  permissions?: FieldPermissions;
 }
 
 /**
@@ -590,6 +635,8 @@ export interface ColumnConfig {
   align?: "left" | "center" | "right";
   className?: string;
   render?: (item: BaseEntityWithCount, parentData?: Record<string, BaseEntityWithCount[]>) => ReactNode;
+  /** Field-level permissions - controls column visibility */
+  permissions?: FieldPermissions;
 }
 
 /**
@@ -935,6 +982,72 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   // Check if we have file fields (auto-enable FormData if so)
   const hasFileFields = customFields.some(f => f.type === "file");
   const shouldUseFormData = useFormData || hasFileFields;
+
+  /**
+   * Helper to check field permissions based on mode and entity
+   * Returns { visible, editable, message } based on field's permission config
+   */
+  const checkFieldPermissions = (
+    permissions: FieldPermissions | undefined,
+    mode: 'create' | 'edit' | 'view',
+    entity?: T
+  ): { visible: boolean; editable: boolean; message?: string } => {
+    // Default: field is visible and editable
+    if (!permissions) {
+      return { visible: true, editable: true };
+    }
+
+    // Check dynamic permission function first (overrides static settings)
+    if (permissions.checkPermission) {
+      const context: FieldPermissionContext = { mode, entity };
+      return permissions.checkPermission(context);
+    }
+
+    // Apply static permission settings
+    let visible = true;
+    let editable = true;
+
+    if (mode === 'create') {
+      visible = permissions.visibleOnCreate !== false;
+      editable = permissions.editableOnCreate !== false;
+    } else if (mode === 'edit') {
+      visible = permissions.visibleOnEdit !== false;
+      editable = permissions.editableOnEdit !== false;
+    } else if (mode === 'view') {
+      visible = permissions.visibleInTable !== false;
+      editable = false; // Table view is never editable
+    }
+
+    return { visible, editable };
+  };
+
+  /**
+   * Filter columns based on permissions for table view
+   */
+  const getVisibleColumns = useMemo(() => {
+    return columns.filter(col => {
+      const { visible } = checkFieldPermissions(col.permissions, 'view');
+      return visible;
+    });
+  }, [columns]);
+
+  /**
+   * Filter custom fields based on permissions for a given mode
+   */
+  const getVisibleCustomFields = (mode: 'create' | 'edit', entity?: T) => {
+    return customFields.filter(field => {
+      const { visible } = checkFieldPermissions(field.permissions, mode, entity);
+      return visible;
+    });
+  };
+
+  /**
+   * Check if a custom field is editable for a given mode
+   */
+  const isFieldEditable = (field: CustomFieldConfig, mode: 'create' | 'edit', entity?: T): boolean => {
+    const { editable } = checkFieldPermissions(field.permissions, mode, entity);
+    return editable;
+  };
 
   const initialFormData = useMemo(() => {
     const data: Record<string, string | string[]> = {
@@ -1835,7 +1948,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                     />
                   </TableHead>
                 )}
-                {columns.map((col) => (
+                {getVisibleColumns.map((col) => (
                   <TableHead
                     key={col.key}
                     className={col.width ? col.width : col.align === "right" ? "text-right" : ""}
@@ -1860,7 +1973,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                       />
                     </TableCell>
                   )}
-                  {columns.map((col) => (
+                  {getVisibleColumns.map((col) => (
                     <TableCell
                       key={col.key}
                       className={`${col.className || ""} ${col.align === "right" ? "text-right" : ""}`}
@@ -2046,7 +2159,9 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               )}
             </div>
             {/* Custom Fields (including file uploads) */}
-            {customFields.map((field) => (
+            {getVisibleCustomFields('create').map((field) => {
+              const fieldEditable = isFieldEditable(field, 'create');
+              return (
               <div key={field.name} className="space-y-2">
                 <Label htmlFor={`create-${field.name}`}>
                   {field.label}{field.required ? " *" : ""}
@@ -2139,6 +2254,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                     placeholder={field.placeholder}
                     value={(formData[field.name] as string) || ""}
                     onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+                    disabled={!fieldEditable}
                     className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     data-testid={`input-create-${field.name}`}
                   />
@@ -2149,6 +2265,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                     placeholder={field.placeholder}
                     value={(formData[field.name] as string) || ""}
                     onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+                    disabled={!fieldEditable}
                     data-testid={`input-create-${field.name}`}
                   />
                 )}
@@ -2158,7 +2275,8 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                   </p>
                 )}
               </div>
-            ))}
+            );
+            })}
           </div>
           <DialogFooter>
             <Button
@@ -2241,7 +2359,9 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               />
             </div>
             {/* Custom Fields (including file uploads) */}
-            {customFields.map((field) => (
+            {getVisibleCustomFields('edit', selectedItem || undefined).map((field) => {
+              const fieldEditable = isFieldEditable(field, 'edit', selectedItem || undefined);
+              return (
               <div key={field.name} className="space-y-2">
                 <Label htmlFor={`edit-${field.name}`}>
                   {field.label}{field.required ? " *" : ""}
@@ -2347,6 +2467,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                     placeholder={field.placeholder}
                     value={(formData[field.name] as string) || ""}
                     onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+                    disabled={!fieldEditable}
                     className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     data-testid={`input-edit-${field.name}`}
                   />
@@ -2357,6 +2478,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                     placeholder={field.placeholder}
                     value={(formData[field.name] as string) || ""}
                     onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+                    disabled={!fieldEditable}
                     data-testid={`input-edit-${field.name}`}
                   />
                 )}
@@ -2366,7 +2488,8 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                   </p>
                 )}
               </div>
-            ))}
+            );
+            })}
           </div>
           <DialogFooter>
             <Button
