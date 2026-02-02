@@ -3262,10 +3262,18 @@ Use this checklist when AI services malfunction:
   console.log('Cache size:', stats.cacheSize);
   ```
 
-- [ ] **Domain Allowlist**: Ensure URL domain is allowed
+- [x] **Domain Allowlist**: Ensure URL domain is allowed
   ```typescript
   // Check ALLOWED_DOMAINS in claudeService.ts
   ```
+  - *Verified 2026-02-02: ALLOWED_DOMAINS (`claudeService.ts:51-79`) contains 27 trusted domains:*
+    - *Video platforms: youtube.com, youtu.be, vimeo.com, twitch.tv, dailymotion.com*
+    - *CDN providers: cloudflare.com, akamai.com, fastly.com, cdn.jsdelivr.net, unpkg.com*
+    - *Video tech: bitmovin.com, wowza.com, mux.com, jwplayer.com, videojs.com, encoding.com, zencoder.com*
+    - *Developer resources: github.com, npmjs.com, stackoverflow.com, medium.com, dev.to*
+    - *Documentation: developer.mozilla.org, docs.microsoft.com, w3.org, ietf.org, whatwg.org*
+  - *Domain validation (`claudeService.ts:416-428`) checks exact match, www. prefix, and subdomains*
+  - *SSRF protection: Only HTTPS URLs from allowlisted domains can be analyzed*
 
 - [ ] **Error Logs**: Review recent errors
   ```typescript
