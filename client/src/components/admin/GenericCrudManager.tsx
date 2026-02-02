@@ -13,7 +13,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Pencil, Trash2, Save, X, LucideIcon, Upload, FileIcon, XCircle, Bold, Italic, Underline, Strikethrough, Link, Heading, List, ListOrdered, Quote, Code, Check, ChevronsUpDown, Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { Plus, Pencil, Trash2, Save, X, LucideIcon, Upload, FileIcon, XCircle, Bold, Italic, Underline, Strikethrough, Link, Heading, List, ListOrdered, Quote, Code, Check, ChevronsUpDown, Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Download, Square, CheckSquare, Minus } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 /**
  * Base entity interface that all managed entities must extend.
@@ -700,6 +702,16 @@ export interface GenericCrudManagerProps<T extends BaseEntityWithCount> {
   itemsPerPage?: number;
   /** Available page size options (default: [10, 25, 50, 100]) */
   pageSizeOptions?: number[];
+  /** Enable bulk operations (select multiple, delete, export) (default: false) */
+  bulkOperationsEnabled?: boolean;
+  /** Bulk delete API endpoint - if not provided, individual delete endpoints are called */
+  bulkDeleteUrl?: string;
+  /** Export formats to enable (default: ['csv', 'json']) */
+  exportFormats?: Array<'csv' | 'json'>;
+  /** Custom export filename (without extension) */
+  exportFilename?: string;
+  /** Fields to include in export (default: all visible columns) */
+  exportFields?: string[];
 }
 
 /**
@@ -898,7 +910,12 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   searchPlaceholder,
   paginationEnabled = true,
   itemsPerPage: defaultItemsPerPage = 10,
-  pageSizeOptions = [10, 25, 50, 100]
+  pageSizeOptions = [10, 25, 50, 100],
+  bulkOperationsEnabled = false,
+  bulkDeleteUrl,
+  exportFormats = ['csv', 'json'],
+  exportFilename,
+  exportFields
 }: GenericCrudManagerProps<T>) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -912,6 +929,8 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(defaultItemsPerPage);
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
 
   // Check if we have file fields (auto-enable FormData if so)
   const hasFileFields = customFields.some(f => f.type === "file");
@@ -1012,6 +1031,63 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     setPageSize(newSize);
     setCurrentPage(1); // Reset to first page when changing page size
   };
+
+  // Bulk selection helpers
+  const selectableItems = useMemo(() => {
+    // Items that can be selected for bulk delete (resourceCount === 0)
+    return (paginatedItems || []).filter(item => item.resourceCount === 0);
+  }, [paginatedItems]);
+
+  const allSelectableOnPageSelected = useMemo(() => {
+    if (selectableItems.length === 0) return false;
+    return selectableItems.every(item => selectedIds.has(item.id));
+  }, [selectableItems, selectedIds]);
+
+  const someSelectedOnPage = useMemo(() => {
+    return (paginatedItems || []).some(item => selectedIds.has(item.id));
+  }, [paginatedItems, selectedIds]);
+
+  const handleSelectAll = () => {
+    if (allSelectableOnPageSelected) {
+      // Deselect all on current page
+      const newSelected = new Set(selectedIds);
+      (paginatedItems || []).forEach(item => newSelected.delete(item.id));
+      setSelectedIds(newSelected);
+    } else {
+      // Select all selectable items on current page
+      const newSelected = new Set(selectedIds);
+      selectableItems.forEach(item => newSelected.add(item.id));
+      setSelectedIds(newSelected);
+    }
+  };
+
+  const handleSelectItem = (id: number, checked: boolean) => {
+    const newSelected = new Set(selectedIds);
+    if (checked) {
+      newSelected.add(id);
+    } else {
+      newSelected.delete(id);
+    }
+    setSelectedIds(newSelected);
+  };
+
+  const clearSelection = () => {
+    setSelectedIds(new Set());
+  };
+
+  // Get selected items data for operations
+  const selectedItems = useMemo(() => {
+    return (items || []).filter(item => selectedIds.has(item.id));
+  }, [items, selectedIds]);
+
+  // Check if any selected items have resources (can't be deleted)
+  const selectedWithResources = useMemo(() => {
+    return selectedItems.filter(item => item.resourceCount > 0);
+  }, [selectedItems]);
+
+  const deletableSelectedItems = useMemo(() => {
+    return selectedItems.filter(item => item.resourceCount === 0);
+  }, [selectedItems]);
 
   // Create mutation
   const createMutation = useMutation({
@@ -1128,6 +1204,126 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       setDeleteDialogOpen(false);
     }
   });
+
+  // Bulk delete mutation
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (ids: number[]) => {
+      if (bulkDeleteUrl) {
+        // Use bulk endpoint if provided
+        return await apiRequest(bulkDeleteUrl, {
+          method: 'DELETE',
+          body: JSON.stringify({ ids })
+        });
+      } else {
+        // Fall back to individual deletes
+        const results = await Promise.allSettled(
+          ids.map(id => apiRequest(deleteUrl(id), { method: 'DELETE' }))
+        );
+        const failures = results.filter(r => r.status === 'rejected');
+        if (failures.length > 0) {
+          throw new Error(`Failed to delete ${failures.length} of ${ids.length} items`);
+        }
+        return { deleted: ids.length };
+      }
+    },
+    onSuccess: (_, deletedIds) => {
+      queryClient.invalidateQueries({ queryKey: [queryKey] });
+      if (publicQueryKey) {
+        queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
+      }
+      toast({
+        title: "Success",
+        description: `${deletedIds.length} ${deletedIds.length === 1 ? entityName.toLowerCase() : entityNamePlural.toLowerCase()} deleted successfully`
+      });
+      setBulkDeleteDialogOpen(false);
+      clearSelection();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || `Failed to delete ${entityNamePlural.toLowerCase()}`,
+        variant: "destructive"
+      });
+      setBulkDeleteDialogOpen(false);
+    }
+  });
+
+  // Export functionality
+  const handleExport = (format: 'csv' | 'json') => {
+    const dataToExport = selectedIds.size > 0 ? selectedItems : (filteredItems || []);
+
+    if (dataToExport.length === 0) {
+      toast({
+        title: "Nothing to export",
+        description: "No data available to export",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Determine which fields to export
+    const fieldsToExport = exportFields || columns
+      .filter(col => col.key !== 'actions')
+      .map(col => col.key);
+
+    const filename = exportFilename || `${entityNamePlural.toLowerCase()}-export-${new Date().toISOString().split('T')[0]}`;
+
+    if (format === 'json') {
+      // Export as JSON
+      const exportData = dataToExport.map(item => {
+        const row: Record<string, any> = {};
+        fieldsToExport.forEach(field => {
+          row[field] = item[field];
+        });
+        return row;
+      });
+
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${filename}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } else {
+      // Export as CSV
+      const headers = fieldsToExport.map(field => {
+        const col = columns.find(c => c.key === field);
+        return col?.label || field;
+      });
+
+      const rows = dataToExport.map(item =>
+        fieldsToExport.map(field => {
+          const value = item[field];
+          // Handle values that might contain commas or quotes
+          if (value === null || value === undefined) return '';
+          const stringValue = String(value);
+          if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+            return `"${stringValue.replace(/"/g, '""')}"`;
+          }
+          return stringValue;
+        })
+      );
+
+      const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${filename}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    toast({
+      title: "Export successful",
+      description: `Exported ${dataToExport.length} ${dataToExport.length === 1 ? entityName.toLowerCase() : entityNamePlural.toLowerCase()} as ${format.toUpperCase()}`
+    });
+  };
 
   // Filter parent options based on cascading dependencies
   const getFilteredParentOptions = (parentFieldName: string): BaseEntityWithCount[] => {
@@ -1500,6 +1696,80 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
             </CardDescription>
           </div>
           <div className="flex items-center gap-4">
+            {/* Bulk Actions Toolbar */}
+            {bulkOperationsEnabled && selectedIds.size > 0 && (
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-muted rounded-lg" data-testid="bulk-actions-toolbar">
+                <span className="text-sm font-medium" data-testid="text-selected-count">
+                  {selectedIds.size} selected
+                </span>
+                <div className="h-4 w-px bg-border" />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setBulkDeleteDialogOpen(true)}
+                  disabled={deletableSelectedItems.length === 0}
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                  data-testid="button-bulk-delete"
+                >
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  Delete{deletableSelectedItems.length > 0 && ` (${deletableSelectedItems.length})`}
+                </Button>
+                {exportFormats.length > 0 && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" data-testid="button-export-selected">
+                        <Download className="h-4 w-4 mr-1" />
+                        Export
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      {exportFormats.includes('csv') && (
+                        <DropdownMenuItem onClick={() => handleExport('csv')} data-testid="menu-export-csv">
+                          Export as CSV
+                        </DropdownMenuItem>
+                      )}
+                      {exportFormats.includes('json') && (
+                        <DropdownMenuItem onClick={() => handleExport('json')} data-testid="menu-export-json">
+                          Export as JSON
+                        </DropdownMenuItem>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearSelection}
+                  data-testid="button-clear-selection"
+                >
+                  <X className="h-4 w-4 mr-1" />
+                  Clear
+                </Button>
+              </div>
+            )}
+            {/* Export All (when nothing selected) */}
+            {bulkOperationsEnabled && selectedIds.size === 0 && exportFormats.length > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" data-testid="button-export-all">
+                    <Download className="h-4 w-4 mr-2" />
+                    Export
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  {exportFormats.includes('csv') && (
+                    <DropdownMenuItem onClick={() => handleExport('csv')} data-testid="menu-export-all-csv">
+                      Export all as CSV
+                    </DropdownMenuItem>
+                  )}
+                  {exportFormats.includes('json') && (
+                    <DropdownMenuItem onClick={() => handleExport('json')} data-testid="menu-export-all-json">
+                      Export all as JSON
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
             {searchEnabled && (
               <div className="relative w-64">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -1553,6 +1823,18 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
           <Table data-testid={`table-${testIdEntityPlural}`}>
             <TableHeader>
               <TableRow>
+                {bulkOperationsEnabled && (
+                  <TableHead className="w-[50px]">
+                    <Checkbox
+                      checked={allSelectableOnPageSelected && selectableItems.length > 0}
+                      onCheckedChange={handleSelectAll}
+                      aria-label="Select all"
+                      data-testid="checkbox-select-all"
+                      disabled={selectableItems.length === 0}
+                      className={someSelectedOnPage && !allSelectableOnPageSelected ? "data-[state=checked]:bg-primary/50" : ""}
+                    />
+                  </TableHead>
+                )}
                 {columns.map((col) => (
                   <TableHead
                     key={col.key}
@@ -1565,7 +1847,19 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
             </TableHeader>
             <TableBody>
               {paginatedItems?.map((item) => (
-                <TableRow key={item.id} data-testid={`row-${testIdEntity}-${item.id}`}>
+                <TableRow key={item.id} data-testid={`row-${testIdEntity}-${item.id}`} className={selectedIds.has(item.id) ? "bg-muted/50" : ""}>
+                  {bulkOperationsEnabled && (
+                    <TableCell className="w-[50px]">
+                      <Checkbox
+                        checked={selectedIds.has(item.id)}
+                        onCheckedChange={(checked) => handleSelectItem(item.id, checked as boolean)}
+                        aria-label={`Select ${item.name}`}
+                        data-testid={`checkbox-select-${item.id}`}
+                        disabled={item.resourceCount > 0}
+                        title={item.resourceCount > 0 ? `Cannot select: has ${item.resourceCount} resources` : undefined}
+                      />
+                    </TableCell>
+                  )}
                   {columns.map((col) => (
                     <TableCell
                       key={col.key}
@@ -2120,6 +2414,55 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               data-testid="button-confirm-delete"
             >
               {deleteMutation.isPending ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Bulk Delete Dialog */}
+      <AlertDialog open={bulkDeleteDialogOpen} onOpenChange={setBulkDeleteDialogOpen}>
+        <AlertDialogContent data-testid={`dialog-bulk-delete-${testIdEntity}`}>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Multiple {entityNamePlural}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deletableSelectedItems.length > 0 ? (
+                <>
+                  Are you sure you want to delete {deletableSelectedItems.length} {deletableSelectedItems.length === 1 ? entityName.toLowerCase() : entityNamePlural.toLowerCase()}?
+                  {selectedWithResources.length > 0 && (
+                    <span className="block mt-2 text-amber-600">
+                      Note: {selectedWithResources.length} selected {selectedWithResources.length === 1 ? 'item has' : 'items have'} resources and will be skipped.
+                    </span>
+                  )}
+                  <span className="block mt-2 font-medium">
+                    Items to delete:
+                  </span>
+                  <ul className="mt-1 max-h-32 overflow-y-auto text-sm">
+                    {deletableSelectedItems.slice(0, 10).map(item => (
+                      <li key={item.id} className="truncate">• {item.name}</li>
+                    ))}
+                    {deletableSelectedItems.length > 10 && (
+                      <li className="text-muted-foreground">...and {deletableSelectedItems.length - 10} more</li>
+                    )}
+                  </ul>
+                </>
+              ) : (
+                <span className="text-amber-600">
+                  None of the selected items can be deleted because they all have associated resources.
+                </span>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-bulk-delete">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => bulkDeleteMutation.mutate(deletableSelectedItems.map(item => item.id))}
+              disabled={bulkDeleteMutation.isPending || deletableSelectedItems.length === 0}
+              className="bg-destructive hover:bg-destructive/90"
+              data-testid="button-confirm-bulk-delete"
+            >
+              {bulkDeleteMutation.isPending ? "Deleting..." : `Delete ${deletableSelectedItems.length}`}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -1204,6 +1204,94 @@ For smaller datasets where pagination isn't needed:
 />
 ```
 
+## Bulk Operations
+
+The GenericCrudManager supports bulk operations including multi-select, bulk delete, and data export.
+
+### Enabling Bulk Operations
+
+```typescript
+<GenericCrudManager
+  {...otherProps}
+  bulkOperationsEnabled={true}
+/>
+```
+
+### Bulk Operations Configuration Options
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `bulkOperationsEnabled` | `boolean` | `false` | Enable bulk select, delete, and export features |
+| `bulkDeleteUrl` | `string` | - | API endpoint for bulk delete (POST with `{ids: number[]}`) |
+| `exportFormats` | `Array<'csv' \| 'json'>` | `['csv', 'json']` | Export formats to enable |
+| `exportFilename` | `string` | `{entities}-export-{date}` | Custom export filename (without extension) |
+| `exportFields` | `string[]` | All columns | Fields to include in export |
+
+### Bulk Delete Behavior
+
+- **Selection**: Checkbox column appears when `bulkOperationsEnabled` is true
+- **Protection**: Items with `resourceCount > 0` cannot be selected for deletion (checkboxes are disabled)
+- **Batch API**: If `bulkDeleteUrl` is provided, sends `{ ids: [1, 2, 3] }` to that endpoint
+- **Fallback**: Without `bulkDeleteUrl`, individual delete requests are made in parallel
+- **Partial success**: If some items have resources, only deletable items are processed
+
+### Export Functionality
+
+- **Export selected**: When items are selected, exports only selected items
+- **Export all**: When nothing selected, exports all items (respects search filter)
+- **CSV format**: Properly escapes commas, quotes, and newlines
+- **JSON format**: Pretty-printed JSON array of objects
+
+### Complete Example with Bulk Operations
+
+```typescript
+const resourceConfig: GenericCrudManagerProps<ResourceWithCount> = {
+  entityName: "Resource",
+  entityNamePlural: "Resources",
+  // ... other config ...
+
+  // Bulk operations configuration
+  bulkOperationsEnabled: true,
+  bulkDeleteUrl: "/api/admin/resources/bulk-delete",
+  exportFormats: ['csv', 'json'],
+  exportFilename: "resources-backup",
+  exportFields: ['id', 'name', 'slug', 'url', 'resourceCount']
+};
+```
+
+### Test IDs for Bulk Operations
+
+```typescript
+// Select all checkbox (header)
+`checkbox-select-all`
+
+// Individual row checkbox
+`checkbox-select-{id}` // e.g., "checkbox-select-123"
+
+// Bulk actions toolbar
+`bulk-actions-toolbar`
+
+// Selected count text
+`text-selected-count`
+
+// Bulk action buttons
+`button-bulk-delete`
+`button-export-selected`
+`button-clear-selection`
+`button-export-all`
+
+// Export menu items
+`menu-export-csv`
+`menu-export-json`
+`menu-export-all-csv`
+`menu-export-all-json`
+
+// Bulk delete dialog
+`dialog-bulk-delete-{testIdEntity}` // e.g., "dialog-bulk-delete-resource"
+`button-cancel-bulk-delete`
+`button-confirm-bulk-delete`
+```
+
 ## Future Enhancements
 
 Potential improvements to the pattern:
@@ -1213,7 +1301,7 @@ Potential improvements to the pattern:
 - [x] Multi-select dropdowns *(Completed: 2026-02-02)*
 - [x] Search/filter for large tables *(Completed: 2026-02-02)*
 - [x] Pagination support *(Completed: 2026-02-02)*
-- [ ] Bulk operations (delete multiple, export)
+- [x] Bulk operations (delete multiple, export) *(Completed: 2026-02-02)*
 - [ ] Field-level permissions
 - [ ] Custom validation rules per field
 - [ ] Undo/redo functionality

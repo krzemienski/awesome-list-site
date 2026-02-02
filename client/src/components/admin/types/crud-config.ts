@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 /**
  * Defines the type of a form field in the CRUD manager
  */
-export type FieldType = "text" | "select" | "number" | "textarea" | "file" | "richtext";
+export type FieldType = "text" | "select" | "number" | "textarea" | "file" | "richtext" | "multiselect";
 
 /**
  * Configuration for file upload fields
@@ -38,6 +38,42 @@ export interface RichTextFieldConfig {
   outputFormat?: "html" | "markdown";
   /** Placeholder text for the editor */
   placeholder?: string;
+}
+
+/**
+ * Option for multi-select fields
+ */
+export interface MultiSelectOption {
+  /** Unique value for the option */
+  value: string;
+  /** Display label for the option */
+  label: string;
+}
+
+/**
+ * Configuration for multi-select dropdown fields
+ */
+export interface MultiSelectFieldConfig {
+  /** Static options for the multi-select */
+  options?: MultiSelectOption[];
+  /** API endpoint to fetch options dynamically */
+  fetchUrl?: string;
+  /** React Query key for caching fetched options */
+  queryKey?: string;
+  /** Field name for the option value (default: "id") */
+  valueField?: string;
+  /** Field name for the option label (default: "name") */
+  labelField?: string;
+  /** Placeholder text when no items selected */
+  placeholder?: string;
+  /** Maximum number of items that can be selected */
+  maxItems?: number;
+  /** Minimum number of items that must be selected */
+  minItems?: number;
+  /** Whether to allow searching/filtering options */
+  searchable?: boolean;
+  /** Output format: "array" returns string[], "csv" returns comma-separated string */
+  outputFormat?: "array" | "csv";
 }
 
 /**
@@ -85,6 +121,8 @@ export interface FieldConfig {
   fileConfig?: FileFieldConfig;
   /** For rich text fields: editor configuration */
   richTextConfig?: RichTextFieldConfig;
+  /** For multi-select fields: dropdown configuration */
+  multiSelectConfig?: MultiSelectFieldConfig;
 }
 
 /**
@@ -218,3 +256,24 @@ export interface EntityWithCount {
   resourceCount: number;
   [key: string]: any;
 }
+
+/**
+ * Configuration for bulk operations (delete multiple, export)
+ */
+export interface BulkOperationsConfig {
+  /** Enable bulk operations (default: false) */
+  enabled?: boolean;
+  /** Bulk delete API endpoint - if not provided, individual delete endpoints are called */
+  bulkDeleteUrl?: string;
+  /** Export formats to enable (default: ['csv', 'json']) */
+  exportFormats?: Array<'csv' | 'json'>;
+  /** Custom export filename (without extension) */
+  exportFilename?: string;
+  /** Fields to include in export (default: all visible columns) */
+  exportFields?: string[];
+}
+
+/**
+ * Export format types
+ */
+export type ExportFormat = 'csv' | 'json';
