@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { pgTable, text, serial, varchar, timestamp, integer, boolean, jsonb, index, uuid, primaryKey, unique } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, varchar, timestamp, integer, boolean, jsonb, index, uuid, primaryKey, unique, real } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -1138,3 +1138,258 @@ export const insertEnrichmentQueueSchema = createInsertSchema(enrichmentQueue).p
 
 export type InsertEnrichmentQueue = z.infer<typeof insertEnrichmentQueueSchema>;
 export type EnrichmentQueueItem = typeof enrichmentQueue.$inferSelect;
+
+/**
+ * Research Jobs table - Multi-agent AI research operations
+ *
+ * Tracks AI research jobs that analyze awesome lists for validation, enrichment,
+ * discovery, and trend analysis. Supports configurable depth and focus areas.
+ *
+ * @property {string} id - UUID primary key, auto-generated
+ * @property {number} awesomeListId - Reference to the awesome list being researched (required, cascades on delete)
+ * @property {string} jobType - Type of research: 'validation', 'enrichment', 'discovery', 'category_analysis', 'trend', 'comprehensive' (required)
+ * @property {string} status - Job status: 'pending', 'processing', 'completed', 'failed', 'cancelled' (default: 'pending')
+ * @property {object} config - Research configuration: depth, focusAreas, maxAgents, timeout (default: empty object)
+ * @property {object} results - Research results: totalFindings, findingsByType, executionTime, agentsUsed
+ * @property {object[]} agentLogs - Array of agent execution logs (default: empty array)
+ * @property {number} totalFindings - Total findings discovered (default: 0)
+ * @property {number} appliedFindings - Findings that have been applied (default: 0)
+ * @property {string} startedBy - User who initiated the research (nullable, SET NULL on user delete)
+ * @property {timestamp} startedAt - When processing began
+ * @property {timestamp} completedAt - When job finished
+ * @property {string} errorMessage - Error details if job failed
+ * @property {timestamp} createdAt - Job creation timestamp
+ * @property {timestamp} updatedAt - Last status update timestamp
+ *
+ * Indexes:
+ * - idx_research_jobs_status: Fast filtering by job status
+ * - idx_research_jobs_awesome_list_id: Find jobs for a specific awesome list
+ * - idx_research_jobs_started_by: Track jobs by user
+ *
+ * Relationships:
+ * - References awesomeLists.id (many-to-one)
+ * - References users.id for startedBy (many-to-one, nullable)
+ *
+ * Referenced by:
+ * - researchFindings.jobId (one-to-many)
+ */
+export const researchJobs = pgTable(
+  "research_jobs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    awesomeListId: integer("awesome_list_id").references(() => awesomeLists.id, { onDelete: "cascade" }).notNull(),
+    jobType: text("job_type").notNull(), // 'validation', 'enrichment', 'discovery', 'category_analysis', 'trend', 'comprehensive'
+    status: text("status").default("pending").notNull(), // 'pending', 'processing', 'completed', 'failed', 'cancelled'
+    config: jsonb("config").$type<{
+      depth?: "shallow" | "medium" | "deep";
+      focusAreas?: string[];
+      maxAgents?: number;
+      timeout?: number;
+    }>().default({}).notNull(),
+    results: jsonb("results").$type<{
+      totalFindings?: number;
+      findingsByType?: Record<string, number>;
+      executionTime?: number;
+      agentsUsed?: number;
+    }>(),
+    agentLogs: jsonb("agent_logs").$type<Array<{
+      agentName: string;
+      status: string;
+      output: string;
+      timestamp: string;
+    }>>().default([]).notNull(),
+    totalFindings: integer("total_findings").default(0).notNull(),
+    appliedFindings: integer("applied_findings").default(0).notNull(),
+
+    // Cost tracking fields
+    modelUsed: varchar("model_used", { length: 50 }),
+    totalInputTokens: integer("total_input_tokens").default(0).notNull(),
+    totalOutputTokens: integer("total_output_tokens").default(0).notNull(),
+    totalCostUsd: real("total_cost_usd").default(0).notNull(),
+    webSourcesScraped: integer("web_sources_scraped").default(0).notNull(),
+
+    startedBy: varchar("started_by").references(() => users.id, { onDelete: "set null" }),
+    startedAt: timestamp("started_at"),
+    completedAt: timestamp("completed_at"),
+    errorMessage: text("error_message"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_research_jobs_status").on(table.status),
+    index("idx_research_jobs_awesome_list_id").on(table.awesomeListId),
+    index("idx_research_jobs_started_by").on(table.startedBy),
+  ]
+);
+
+export const insertResearchJobSchema = createInsertSchema(researchJobs).pick({
+  awesomeListId: true,
+  jobType: true,
+  status: true,
+  config: true,
+  startedBy: true,
+  modelUsed: true,
+  totalInputTokens: true,
+  totalOutputTokens: true,
+  totalCostUsd: true,
+  webSourcesScraped: true,
+});
+
+export type InsertResearchJob = z.infer<typeof insertResearchJobSchema>;
+export type ResearchJob = typeof researchJobs.$inferSelect;
+
+/**
+ * Research Findings table - Individual research results
+ *
+ * Stores individual findings from research jobs including dead links, enrichment
+ * suggestions, new resource discoveries, and category recommendations.
+ *
+ * @property {string} id - UUID primary key, auto-generated
+ * @property {string} jobId - Parent research job (required, cascades on delete)
+ * @property {string} findingType - Type: 'dead_link', 'redirect', 'missing_description', 'outdated', 'duplicate', 'miscategorized', 'new_resource', 'tag_suggestion', 'category_suggestion' (required)
+ * @property {number} targetResourceId - Resource this finding applies to (nullable, SET NULL on resource delete)
+ * @property {number} targetCategoryId - Category this finding applies to (nullable, SET NULL on category delete)
+ * @property {object} data - Type-specific finding data (required)
+ * @property {number} confidence - AI confidence score 0.0-1.0
+ * @property {string} severity - Finding severity: 'info', 'warning', 'critical' (default: 'info')
+ * @property {boolean} applied - Whether finding has been applied (default: false)
+ * @property {timestamp} appliedAt - When finding was applied
+ * @property {string} appliedBy - User who applied the finding (nullable, SET NULL on user delete)
+ * @property {boolean} dismissed - Whether finding was dismissed (default: false)
+ * @property {timestamp} dismissedAt - When finding was dismissed
+ * @property {string} dismissedBy - User who dismissed the finding (nullable, SET NULL on user delete)
+ * @property {timestamp} createdAt - Finding creation timestamp
+ *
+ * Indexes:
+ * - idx_research_findings_job_applied: Fast lookup of unapplied findings per job
+ * - idx_research_findings_type: Filter by finding type
+ * - idx_research_findings_severity: Filter by severity level
+ *
+ * Relationships:
+ * - References researchJobs.id (many-to-one)
+ * - References resources.id for targetResourceId (many-to-one, nullable)
+ * - References categories.id for targetCategoryId (many-to-one, nullable)
+ * - References users.id for appliedBy and dismissedBy (many-to-one, nullable)
+ */
+export const researchFindings = pgTable(
+  "research_findings",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    jobId: uuid("job_id").references(() => researchJobs.id, { onDelete: "cascade" }).notNull(),
+    findingType: text("finding_type").notNull(), // 'dead_link', 'redirect', 'missing_description', 'outdated', 'duplicate', 'miscategorized', 'new_resource', 'tag_suggestion', 'category_suggestion'
+    targetResourceId: integer("target_resource_id").references(() => resources.id, { onDelete: "set null" }),
+    targetCategoryId: integer("target_category_id").references(() => categories.id, { onDelete: "set null" }),
+    data: jsonb("data").$type<Record<string, any>>().notNull(),
+    confidence: real("confidence"), // 0.0 - 1.0
+    severity: text("severity").default("info").notNull(), // 'info', 'warning', 'critical'
+    applied: boolean("applied").default(false).notNull(),
+    appliedAt: timestamp("applied_at"),
+    appliedBy: varchar("applied_by").references(() => users.id, { onDelete: "set null" }),
+    dismissed: boolean("dismissed").default(false).notNull(),
+    dismissedAt: timestamp("dismissed_at"),
+    dismissedBy: varchar("dismissed_by").references(() => users.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_research_findings_job_applied").on(table.jobId, table.applied),
+    index("idx_research_findings_type").on(table.findingType),
+    index("idx_research_findings_severity").on(table.severity),
+  ]
+);
+
+export const insertResearchFindingSchema = createInsertSchema(researchFindings).pick({
+  jobId: true,
+  findingType: true,
+  targetResourceId: true,
+  targetCategoryId: true,
+  data: true,
+  confidence: true,
+  severity: true,
+});
+
+export type InsertResearchFinding = z.infer<typeof insertResearchFindingSchema>;
+export type ResearchFinding = typeof researchFindings.$inferSelect;
+
+// Research Job Config validation schema
+export const researchJobConfigSchema = z.object({
+  depth: z.enum(["shallow", "medium", "deep"]).default("medium"),
+  focusAreas: z.array(z.enum(["validation", "enrichment", "discovery", "category", "trends"])).default(["validation"]),
+  maxAgents: z.number().min(1).max(4).default(4),
+  timeout: z.number().min(60).max(3600).default(600),
+});
+export type ResearchJobConfig = z.infer<typeof researchJobConfigSchema>;
+
+// Finding data schemas by type
+export const deadLinkFindingDataSchema = z.object({
+  url: z.string().url(),
+  httpStatus: z.number(),
+  errorMessage: z.string().optional(),
+  lastChecked: z.string(),
+  suggestedAction: z.enum(["remove", "update", "archive"]),
+});
+export type DeadLinkFindingData = z.infer<typeof deadLinkFindingDataSchema>;
+
+export const enrichmentFindingDataSchema = z.object({
+  field: z.enum(["description", "tags", "metadata"]),
+  currentValue: z.string().optional(),
+  suggestedValue: z.string(),
+  reason: z.string(),
+});
+export type EnrichmentFindingData = z.infer<typeof enrichmentFindingDataSchema>;
+
+export const newResourceFindingDataSchema = z.object({
+  title: z.string(),
+  url: z.string().url(),
+  description: z.string(),
+  suggestedCategory: z.string(),
+  suggestedSubcategory: z.string().optional(),
+  source: z.string(), // Where the suggestion came from
+});
+export type NewResourceFindingData = z.infer<typeof newResourceFindingDataSchema>;
+
+export const categoryChangeFindingDataSchema = z.object({
+  currentCategory: z.string(),
+  currentSubcategory: z.string().optional(),
+  suggestedCategory: z.string(),
+  suggestedSubcategory: z.string().optional(),
+  reason: z.string(),
+});
+export type CategoryChangeFindingData = z.infer<typeof categoryChangeFindingDataSchema>;
+
+/**
+ * AI Usage Daily Aggregates table
+ *
+ * Tracks daily AI API usage for cost monitoring and budgeting.
+ * Aggregated by date and model for efficient querying.
+ */
+export const aiUsageDaily = pgTable(
+  "ai_usage_daily",
+  {
+    id: serial("id").primaryKey(),
+    date: varchar("date", { length: 10 }).notNull(), // YYYY-MM-DD format
+    model: varchar("model", { length: 50 }).notNull(),
+    totalInputTokens: integer("total_input_tokens").default(0).notNull(),
+    totalOutputTokens: integer("total_output_tokens").default(0).notNull(),
+    totalCostUsd: real("total_cost_usd").default(0).notNull(),
+    jobCount: integer("job_count").default(0).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_ai_usage_daily_date").on(table.date),
+    index("idx_ai_usage_daily_model").on(table.model),
+    unique("ai_usage_daily_date_model_unique").on(table.date, table.model),
+  ]
+);
+
+export const insertAiUsageDailySchema = createInsertSchema(aiUsageDaily).pick({
+  date: true,
+  model: true,
+  totalInputTokens: true,
+  totalOutputTokens: true,
+  totalCostUsd: true,
+  jobCount: true,
+});
+
+export type InsertAiUsageDaily = z.infer<typeof insertAiUsageDailySchema>;
+export type AiUsageDaily = typeof aiUsageDaily.$inferSelect;

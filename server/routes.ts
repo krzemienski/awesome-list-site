@@ -52,6 +52,7 @@ import { seedDatabase } from "./seed";
 import { enrichmentService } from "./ai/enrichmentService";
 import { freeTierLimiter, dynamicRateLimiter } from "./middleware/rateLimit";
 import { registerPublicApiRoutes } from "./api/public";
+import { researchModule } from "./modules/research";
 import { swaggerSpec } from "./openapi";
 import swaggerUi from "swagger-ui-express";
 import crypto from "crypto";
@@ -3000,6 +3001,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
   });
+
+  // Register research module routes
+  researchModule.registerRoutes(app);
 
   const httpServer = createServer(app);
   return httpServer;
