@@ -1430,6 +1430,225 @@ const resourceConfig: GenericCrudManagerProps<ResourceWithCount> = {
 - **Dynamic permissions**: The `checkPermission` function is called each time the form/table renders, allowing real-time permission updates
 - **Default behavior**: Without a `permissions` property, all fields are visible and editable
 
+## Custom Validation Rules
+
+The GenericCrudManager supports custom validation rules per field through the `validation` property on custom fields.
+
+### Basic Usage
+
+Add a `validation` property to any custom field configuration:
+
+```typescript
+const customFields: CustomFieldConfig[] = [
+  {
+    name: "username",
+    label: "Username",
+    type: "text",
+    required: true,
+    validation: {
+      minLength: 3,
+      maxLength: 20,
+      pattern: /^[a-z0-9_]+$/,
+      patternMessage: "Only lowercase letters, numbers, and underscores allowed"
+    }
+  }
+];
+```
+
+### Validation Configuration Options
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `minLength` | `number` | Minimum length for text/textarea fields |
+| `maxLength` | `number` | Maximum length for text/textarea fields |
+| `min` | `number` | Minimum value for number fields |
+| `max` | `number` | Maximum value for number fields |
+| `pattern` | `RegExp \| string` | Regex pattern to validate against |
+| `patternMessage` | `string` | Custom error message when pattern fails |
+| `custom` | `function` | Custom validation function (sync) |
+| `asyncCustom` | `function` | Async validation function (e.g., for uniqueness checks) |
+
+### Custom Validation Functions
+
+For complex validation logic, use the `custom` function:
+
+```typescript
+const customFields: CustomFieldConfig[] = [
+  {
+    name: "password",
+    label: "Password",
+    type: "text",
+    required: true,
+    validation: {
+      minLength: 8,
+      custom: (value, formData) => {
+        // Must contain at least one number
+        if (!/\d/.test(value)) {
+          return "Password must contain at least one number";
+        }
+        // Must contain at least one uppercase letter
+        if (!/[A-Z]/.test(value)) {
+          return "Password must contain at least one uppercase letter";
+        }
+        return true; // Validation passed
+      }
+    }
+  },
+  {
+    name: "confirmPassword",
+    label: "Confirm Password",
+    type: "text",
+    required: true,
+    validation: {
+      custom: (value, formData) => {
+        if (value !== formData.password) {
+          return "Passwords do not match";
+        }
+        return true;
+      }
+    }
+  }
+];
+```
+
+### Async Validation (e.g., Uniqueness Checks)
+
+For validation that requires server calls:
+
+```typescript
+const customFields: CustomFieldConfig[] = [
+  {
+    name: "email",
+    label: "Email Address",
+    type: "text",
+    required: true,
+    validation: {
+      pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+      patternMessage: "Please enter a valid email address",
+      asyncCustom: async (value, formData) => {
+        // Check if email is already in use
+        const response = await fetch(`/api/check-email?email=${encodeURIComponent(value)}`);
+        const { available } = await response.json();
+        if (!available) {
+          return "This email is already registered";
+        }
+        return true;
+      }
+    }
+  }
+];
+```
+
+### Number Field Validation
+
+```typescript
+const customFields: CustomFieldConfig[] = [
+  {
+    name: "age",
+    label: "Age",
+    type: "number",
+    validation: {
+      min: 18,
+      max: 120,
+      custom: (value) => {
+        if (!Number.isInteger(Number(value))) {
+          return "Age must be a whole number";
+        }
+        return true;
+      }
+    }
+  },
+  {
+    name: "price",
+    label: "Price",
+    type: "number",
+    validation: {
+      min: 0.01,
+      max: 99999.99,
+      custom: (value) => {
+        const num = Number(value);
+        if (Math.round(num * 100) / 100 !== num) {
+          return "Price can only have up to 2 decimal places";
+        }
+        return true;
+      }
+    }
+  }
+];
+```
+
+### Complete Example with Multiple Validations
+
+```typescript
+const resourceConfig: GenericCrudManagerProps<ResourceWithCount> = {
+  entityName: "Resource",
+  entityNamePlural: "Resources",
+  // ... other config ...
+
+  customFields: [
+    {
+      name: "title",
+      label: "Title",
+      type: "text",
+      required: true,
+      validation: {
+        minLength: 5,
+        maxLength: 200
+      }
+    },
+    {
+      name: "url",
+      label: "URL",
+      type: "text",
+      required: true,
+      validation: {
+        pattern: /^https?:\/\/.+/,
+        patternMessage: "URL must start with http:// or https://"
+      }
+    },
+    {
+      name: "description",
+      label: "Description",
+      type: "textarea",
+      validation: {
+        maxLength: 1000,
+        custom: (value) => {
+          if (value && value.includes('<script>')) {
+            return "HTML scripts are not allowed";
+          }
+          return true;
+        }
+      }
+    },
+    {
+      name: "priority",
+      label: "Priority (1-10)",
+      type: "number",
+      validation: {
+        min: 1,
+        max: 10
+      }
+    }
+  ]
+};
+```
+
+### Validation Behavior
+
+- **Real-time feedback**: Validation runs on field blur, showing errors immediately
+- **Clear on edit**: Errors clear when the user starts typing in the field
+- **Submit validation**: All fields are validated before form submission
+- **Error display**: Errors appear below the field with red text and red border
+- **Toast notification**: A summary toast appears when submission fails due to validation
+
+### Test IDs for Validation Errors
+
+```typescript
+// Error message elements
+`error-create-{fieldName}` // e.g., "error-create-username"
+`error-edit-{fieldName}` // e.g., "error-edit-username"
+```
+
 ## Future Enhancements
 
 Potential improvements to the pattern:
@@ -1441,7 +1660,7 @@ Potential improvements to the pattern:
 - [x] Pagination support *(Completed: 2026-02-02)*
 - [x] Bulk operations (delete multiple, export) *(Completed: 2026-02-02)*
 - [x] Field-level permissions *(Completed: 2026-02-02)*
-- [ ] Custom validation rules per field
+- [x] Custom validation rules per field *(Completed: 2026-02-02)*
 - [ ] Undo/redo functionality
 - [ ] Audit trail / change history
 

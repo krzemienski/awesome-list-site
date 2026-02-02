@@ -579,6 +579,58 @@ export interface FieldPermissionResult {
   message?: string;
 }
 
+/**
+ * Configuration for custom validation rules on form fields.
+ *
+ * @property {number} [minLength] - Minimum length for text/textarea fields
+ * @property {number} [maxLength] - Maximum length for text/textarea fields
+ * @property {number} [min] - Minimum value for number fields
+ * @property {number} [max] - Maximum value for number fields
+ * @property {RegExp | string} [pattern] - Regex pattern to validate against
+ * @property {string} [patternMessage] - Custom error message when pattern fails
+ * @property {Function} [custom] - Custom validation function returning true/error string
+ * @property {Function} [asyncCustom] - Async custom validation (e.g., for uniqueness checks)
+ *
+ * @example
+ * ```typescript
+ * const validation: ValidationConfig = {
+ *   minLength: 3,
+ *   maxLength: 100,
+ *   pattern: /^[a-z0-9-]+$/,
+ *   patternMessage: "Only lowercase letters, numbers, and hyphens allowed",
+ *   custom: (value) => {
+ *     if (value.includes('admin')) return "Cannot contain 'admin'";
+ *     return true;
+ *   }
+ * };
+ * ```
+ */
+export interface ValidationConfig {
+  /** Minimum length for text/textarea fields */
+  minLength?: number;
+  /** Maximum length for text/textarea fields */
+  maxLength?: number;
+  /** Minimum value for number fields */
+  min?: number;
+  /** Maximum value for number fields */
+  max?: number;
+  /** Regex pattern to validate against (can be RegExp or string) */
+  pattern?: RegExp | string;
+  /** Custom error message when pattern validation fails */
+  patternMessage?: string;
+  /** Custom validation function - return true if valid, or error message string */
+  custom?: (value: any, formData: Record<string, any>) => boolean | string;
+  /** Async custom validation function (e.g., for uniqueness checks) */
+  asyncCustom?: (value: any, formData: Record<string, any>) => Promise<boolean | string>;
+}
+
+/**
+ * Validation error state for form fields
+ */
+export interface FieldValidationErrors {
+  [fieldName: string]: string | undefined;
+}
+
 export interface CustomFieldConfig {
   name: string;
   label: string;
@@ -591,6 +643,8 @@ export interface CustomFieldConfig {
   multiSelectConfig?: MultiSelectFieldConfig;
   /** Field-level permissions configuration */
   permissions?: FieldPermissions;
+  /** Custom validation rules for this field */
+  validation?: ValidationConfig;
 }
 
 /**
@@ -1071,6 +1125,109 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   }, [parents, customFields]);
 
   const [formData, setFormData] = useState<Record<string, string | string[]>>(initialFormData);
+  const [validationErrors, setValidationErrors] = useState<FieldValidationErrors>({});
+
+  /**
+   * Validates a single field against its validation configuration
+   * @returns Error message or undefined if valid
+   */
+  const validateField = (
+    fieldName: string,
+    value: any,
+    validation: ValidationConfig | undefined,
+    allFormData: Record<string, any>
+  ): string | undefined => {
+    if (!validation) return undefined;
+
+    const stringValue = typeof value === "string" ? value : "";
+    const numberValue = typeof value === "number" ? value : parseFloat(stringValue);
+
+    // minLength validation
+    if (validation.minLength !== undefined && stringValue.length < validation.minLength) {
+      return `Must be at least ${validation.minLength} characters`;
+    }
+
+    // maxLength validation
+    if (validation.maxLength !== undefined && stringValue.length > validation.maxLength) {
+      return `Must be no more than ${validation.maxLength} characters`;
+    }
+
+    // min validation (for numbers)
+    if (validation.min !== undefined && !isNaN(numberValue) && numberValue < validation.min) {
+      return `Must be at least ${validation.min}`;
+    }
+
+    // max validation (for numbers)
+    if (validation.max !== undefined && !isNaN(numberValue) && numberValue > validation.max) {
+      return `Must be no more than ${validation.max}`;
+    }
+
+    // pattern validation
+    if (validation.pattern) {
+      const regex = typeof validation.pattern === "string"
+        ? new RegExp(validation.pattern)
+        : validation.pattern;
+      if (!regex.test(stringValue)) {
+        return validation.patternMessage || "Invalid format";
+      }
+    }
+
+    // custom validation
+    if (validation.custom) {
+      const result = validation.custom(value, allFormData);
+      if (result !== true) {
+        return typeof result === "string" ? result : "Invalid value";
+      }
+    }
+
+    return undefined;
+  };
+
+  /**
+   * Validates all fields and returns errors object
+   * @returns Object with field names as keys and error messages as values
+   */
+  const validateAllFields = async (): Promise<FieldValidationErrors> => {
+    const errors: FieldValidationErrors = {};
+
+    // Validate custom fields with validation rules
+    for (const field of customFields) {
+      if (field.validation) {
+        const value = formData[field.name];
+        const error = validateField(field.name, value, field.validation, formData);
+        if (error) {
+          errors[field.name] = error;
+        }
+
+        // Run async validation if present and no sync error
+        if (!error && field.validation.asyncCustom) {
+          try {
+            const asyncResult = await field.validation.asyncCustom(value, formData);
+            if (asyncResult !== true) {
+              errors[field.name] = typeof asyncResult === "string" ? asyncResult : "Invalid value";
+            }
+          } catch (e) {
+            errors[field.name] = "Validation failed";
+          }
+        }
+      }
+    }
+
+    return errors;
+  };
+
+  /**
+   * Clears validation error for a specific field
+   */
+  const clearFieldError = (fieldName: string) => {
+    if (validationErrors[fieldName]) {
+      setValidationErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[fieldName];
+        return newErrors;
+      });
+    }
+  };
 
   // Fetch parent data
   const parentQueries = parents.map(parent =>
@@ -1235,6 +1392,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       setFormData(initialFormData);
       setFileData({});
       setFilePreviews({});
+      setValidationErrors({});
     },
     onError: (error: any) => {
       toast({
@@ -1279,6 +1437,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       setFormData(initialFormData);
       setFileData({});
       setFilePreviews({});
+      setValidationErrors({});
     },
     onError: (error: any) => {
       toast({
@@ -1541,6 +1700,22 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       return;
     }
 
+    // Run custom validation rules
+    const fieldErrors = await validateAllFields();
+    if (Object.keys(fieldErrors).length > 0) {
+      setValidationErrors(fieldErrors);
+      const errorFields = Object.keys(fieldErrors).map(fieldName => {
+        const customField = customFields.find(f => f.name === fieldName);
+        return customField?.label.replace(" *", "") || fieldName;
+      });
+      toast({
+        title: "Validation Error",
+        description: `Please fix the following fields: ${errorFields.join(", ")}`,
+        variant: "destructive"
+      });
+      return;
+    }
+
     // Build payload (FormData if files present, otherwise JSON)
     if (shouldUseFormData && Object.values(fileData).some(f => f !== null)) {
       const formDataPayload = new FormData();
@@ -1629,6 +1804,22 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       toast({
         title: "Validation Error",
         description: `${fieldLabels.join(", ")} ${fieldLabels.length === 1 ? 'is' : 'are'} required`,
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Run custom validation rules
+    const fieldErrors = await validateAllFields();
+    if (Object.keys(fieldErrors).length > 0) {
+      setValidationErrors(fieldErrors);
+      const errorFields = Object.keys(fieldErrors).map(fieldName => {
+        const customField = customFields.find(f => f.name === fieldName);
+        return customField?.label.replace(" *", "") || fieldName;
+      });
+      toast({
+        title: "Validation Error",
+        description: `Please fix the following fields: ${errorFields.join(", ")}`,
         variant: "destructive"
       });
       return;
@@ -2253,9 +2444,20 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                     id={`create-${field.name}`}
                     placeholder={field.placeholder}
                     value={(formData[field.name] as string) || ""}
-                    onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+                    onChange={(e) => {
+                      setFormData({ ...formData, [field.name]: e.target.value });
+                      clearFieldError(field.name);
+                    }}
+                    onBlur={() => {
+                      if (field.validation) {
+                        const error = validateField(field.name, formData[field.name], field.validation, formData);
+                        if (error) {
+                          setValidationErrors(prev => ({ ...prev, [field.name]: error }));
+                        }
+                      }
+                    }}
                     disabled={!fieldEditable}
-                    className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    className={`flex min-h-[80px] w-full rounded-md border bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${validationErrors[field.name] ? "border-destructive" : "border-input"}`}
                     data-testid={`input-create-${field.name}`}
                   />
                 ) : (
@@ -2264,14 +2466,31 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                     type={field.type === "number" ? "number" : "text"}
                     placeholder={field.placeholder}
                     value={(formData[field.name] as string) || ""}
-                    onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+                    onChange={(e) => {
+                      setFormData({ ...formData, [field.name]: e.target.value });
+                      clearFieldError(field.name);
+                    }}
+                    onBlur={() => {
+                      if (field.validation) {
+                        const error = validateField(field.name, formData[field.name], field.validation, formData);
+                        if (error) {
+                          setValidationErrors(prev => ({ ...prev, [field.name]: error }));
+                        }
+                      }
+                    }}
                     disabled={!fieldEditable}
+                    className={validationErrors[field.name] ? "border-destructive" : ""}
                     data-testid={`input-create-${field.name}`}
                   />
                 )}
                 {field.helpText && (
                   <p className="text-xs text-muted-foreground">
                     {field.helpText}
+                  </p>
+                )}
+                {validationErrors[field.name] && (
+                  <p className="text-xs text-destructive" data-testid={`error-create-${field.name}`}>
+                    {validationErrors[field.name]}
                   </p>
                 )}
               </div>
@@ -2281,7 +2500,10 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setCreateDialogOpen(false)}
+              onClick={() => {
+                setCreateDialogOpen(false);
+                setValidationErrors({});
+              }}
               data-testid="button-cancel-create"
             >
               <X className="h-4 w-4 mr-2" />
@@ -2466,9 +2688,20 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                     id={`edit-${field.name}`}
                     placeholder={field.placeholder}
                     value={(formData[field.name] as string) || ""}
-                    onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+                    onChange={(e) => {
+                      setFormData({ ...formData, [field.name]: e.target.value });
+                      clearFieldError(field.name);
+                    }}
+                    onBlur={() => {
+                      if (field.validation) {
+                        const error = validateField(field.name, formData[field.name], field.validation, formData);
+                        if (error) {
+                          setValidationErrors(prev => ({ ...prev, [field.name]: error }));
+                        }
+                      }
+                    }}
                     disabled={!fieldEditable}
-                    className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    className={`flex min-h-[80px] w-full rounded-md border bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${validationErrors[field.name] ? "border-destructive" : "border-input"}`}
                     data-testid={`input-edit-${field.name}`}
                   />
                 ) : (
@@ -2477,14 +2710,31 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                     type={field.type === "number" ? "number" : "text"}
                     placeholder={field.placeholder}
                     value={(formData[field.name] as string) || ""}
-                    onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+                    onChange={(e) => {
+                      setFormData({ ...formData, [field.name]: e.target.value });
+                      clearFieldError(field.name);
+                    }}
+                    onBlur={() => {
+                      if (field.validation) {
+                        const error = validateField(field.name, formData[field.name], field.validation, formData);
+                        if (error) {
+                          setValidationErrors(prev => ({ ...prev, [field.name]: error }));
+                        }
+                      }
+                    }}
                     disabled={!fieldEditable}
+                    className={validationErrors[field.name] ? "border-destructive" : ""}
                     data-testid={`input-edit-${field.name}`}
                   />
                 )}
                 {field.helpText && (
                   <p className="text-xs text-muted-foreground">
                     {field.helpText}
+                  </p>
+                )}
+                {validationErrors[field.name] && (
+                  <p className="text-xs text-destructive" data-testid={`error-edit-${field.name}`}>
+                    {validationErrors[field.name]}
                   </p>
                 )}
               </div>
@@ -2494,7 +2744,10 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setEditDialogOpen(false)}
+              onClick={() => {
+                setEditDialogOpen(false);
+                setValidationErrors({});
+              }}
               data-testid="button-cancel-edit"
             >
               <X className="h-4 w-4 mr-2" />
