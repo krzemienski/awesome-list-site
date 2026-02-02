@@ -711,12 +711,200 @@ testIdEntity: "category"           // Singular, lowercase
 testIdEntityPlural: "categories"   // Plural, lowercase
 ```
 
+## File Upload Fields
+
+The GenericCrudManager supports file upload fields through the `customFields` prop.
+
+### Basic File Upload Configuration
+
+```typescript
+import GenericCrudManager, { CustomFieldConfig } from "./GenericCrudManager";
+
+const customFields: CustomFieldConfig[] = [
+  {
+    name: "avatar",
+    label: "Profile Image",
+    type: "file",
+    fileConfig: {
+      accept: "image/*",
+      maxSize: 5 * 1024 * 1024, // 5MB
+      previewType: "image",
+      fileHelpText: "PNG, JPG up to 5MB"
+    }
+  }
+];
+
+<GenericCrudManager
+  {...otherProps}
+  customFields={customFields}
+/>
+```
+
+### File Field Configuration Options
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `accept` | `string` | Accepted file types (e.g., `"image/*"`, `".pdf,.doc"`) |
+| `maxSize` | `number` | Maximum file size in bytes |
+| `multiple` | `boolean` | Whether multiple files can be uploaded (future) |
+| `previewType` | `"image" \| "icon" \| "none"` | How to preview uploaded files |
+| `fileHelpText` | `string` | Help text about allowed file types/sizes |
+
+### Complete Example with File Upload
+
+```typescript
+const categoryConfig: GenericCrudManagerProps<CategoryWithImage> = {
+  entityName: "Category",
+  entityNamePlural: "Categories",
+  // ... other config ...
+  customFields: [
+    {
+      name: "description",
+      label: "Description",
+      type: "textarea",
+      placeholder: "Enter category description...",
+      helpText: "Optional description for this category"
+    },
+    {
+      name: "icon",
+      label: "Category Icon",
+      type: "file",
+      required: false,
+      fileConfig: {
+        accept: "image/png,image/svg+xml",
+        maxSize: 1 * 1024 * 1024, // 1MB
+        previewType: "image",
+        fileHelpText: "PNG or SVG, max 1MB"
+      }
+    }
+  ]
+};
+```
+
+### File Upload Behavior
+
+- **Automatic FormData**: When file fields are present, the component automatically uses `FormData` for API submissions
+- **Image Preview**: Files with `previewType: "image"` show a thumbnail preview before upload
+- **Size Validation**: Files exceeding `maxSize` are rejected with an error toast
+- **Edit Mode**: In edit dialogs, existing files are shown and can be replaced
+
+### Test IDs for File Fields
+
+```typescript
+// File inputs
+`input-create-{fieldName}` // e.g., "input-create-avatar"
+`input-edit-{fieldName}` // e.g., "input-edit-avatar"
+
+// Clear file buttons
+`button-clear-file-create-{fieldName}`
+`button-clear-file-edit-{fieldName}`
+```
+
+## Rich Text Editor Fields
+
+The GenericCrudManager supports rich text editor fields through the `customFields` prop with `type: "richtext"`.
+
+### Basic Rich Text Configuration
+
+```typescript
+import GenericCrudManager, { CustomFieldConfig } from "./GenericCrudManager";
+
+const customFields: CustomFieldConfig[] = [
+  {
+    name: "content",
+    label: "Content",
+    type: "richtext",
+    richTextConfig: {
+      minHeight: 200,
+      placeholder: "Enter your content here..."
+    }
+  }
+];
+
+<GenericCrudManager
+  {...otherProps}
+  customFields={customFields}
+/>
+```
+
+### Rich Text Configuration Options
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `minHeight` | `number` | `150` | Minimum height of the editor in pixels |
+| `maxHeight` | `number` | `undefined` | Maximum height (enables scrolling when exceeded) |
+| `toolbar` | `Array` | All tools | Which toolbar buttons to show |
+| `outputFormat` | `"html" \| "markdown"` | `"html"` | Output format for the content |
+| `placeholder` | `string` | `"Enter content..."` | Placeholder text when empty |
+
+### Available Toolbar Options
+
+```typescript
+toolbar: [
+  "bold",           // Bold text
+  "italic",         // Italic text
+  "underline",      // Underlined text
+  "strikethrough",  // Strikethrough text
+  "link",           // Insert hyperlink
+  "heading",        // Heading (H3)
+  "list",           // Bullet list
+  "orderedList",    // Numbered list
+  "quote",          // Blockquote
+  "code"            // Code block
+]
+```
+
+### Complete Example with Rich Text
+
+```typescript
+const articleConfig: GenericCrudManagerProps<ArticleWithCount> = {
+  entityName: "Article",
+  entityNamePlural: "Articles",
+  // ... other config ...
+  customFields: [
+    {
+      name: "summary",
+      label: "Summary",
+      type: "textarea",
+      placeholder: "Brief summary of the article..."
+    },
+    {
+      name: "body",
+      label: "Article Body",
+      type: "richtext",
+      required: true,
+      richTextConfig: {
+        minHeight: 300,
+        maxHeight: 500,
+        toolbar: ["bold", "italic", "link", "heading", "list", "quote"],
+        placeholder: "Write your article content here..."
+      }
+    }
+  ]
+};
+```
+
+### Rich Text Editor Behavior
+
+- **Toolbar**: Formatting buttons appear above the editor area
+- **Paste Handling**: Pasted content is stripped to plain text to avoid formatting issues
+- **HTML Output**: Content is stored as HTML by default
+- **Placeholder**: Shows when the editor is empty and unfocused
+
+### Test IDs for Rich Text Fields
+
+```typescript
+// Rich text editor container
+`input-create-{fieldName}` // e.g., "input-create-body"
+`input-edit-{fieldName}` // e.g., "input-edit-body"
+```
+
 ## Future Enhancements
 
 Potential improvements to the pattern:
 
-- [ ] File upload fields
-- [ ] Rich text editor fields
+- [x] File upload fields *(Completed: 2026-02-02)*
+- [x] Rich text editor fields *(Completed: 2026-02-02)*
 - [ ] Multi-select dropdowns
 - [ ] Search/filter for large tables
 - [ ] Pagination support

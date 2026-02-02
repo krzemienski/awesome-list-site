@@ -1,4 +1,5 @@
-import { useState, useMemo, ReactNode } from "react";
+import * as React from "react";
+import { useState, useMemo, ReactNode, useRef, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -12,7 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Pencil, Trash2, Save, X, LucideIcon } from "lucide-react";
+import { Plus, Pencil, Trash2, Save, X, LucideIcon, Upload, FileIcon, XCircle, Bold, Italic, Underline, Strikethrough, Link, Heading, List, ListOrdered, Quote, Code } from "lucide-react";
 
 /**
  * Base entity interface that all managed entities must extend.
@@ -76,6 +77,234 @@ export interface ParentConfig {
   fetchUrl: string;
   filterBy?: string;
   getNameFn?: (id: number, parentData?: BaseEntityWithCount[]) => string;
+}
+
+/**
+ * Configuration for file upload fields.
+ *
+ * @property {string} [accept] - Accepted file types (e.g., "image/*", ".pdf,.doc")
+ * @property {number} [maxSize] - Maximum file size in bytes
+ * @property {boolean} [multiple] - Whether multiple files can be uploaded
+ * @property {Function} [uploadHandler] - Custom upload handler that returns a URL
+ * @property {"image" | "icon" | "none"} [previewType] - How to preview uploaded files
+ * @property {string} [fileHelpText] - Help text about allowed file types/sizes
+ *
+ * @example
+ * ```typescript
+ * const fileConfig: FileFieldConfig = {
+ *   accept: "image/*",
+ *   maxSize: 5 * 1024 * 1024, // 5MB
+ *   previewType: "image",
+ *   fileHelpText: "PNG, JPG up to 5MB"
+ * };
+ * ```
+ */
+export interface FileFieldConfig {
+  accept?: string;
+  maxSize?: number;
+  multiple?: boolean;
+  uploadHandler?: (file: File) => Promise<string>;
+  previewType?: "image" | "icon" | "none";
+  fileHelpText?: string;
+}
+
+/**
+ * Configuration for rich text editor fields.
+ *
+ * @property {number} [minHeight] - Minimum height of the editor in pixels (default: 150)
+ * @property {number} [maxHeight] - Maximum height of the editor in pixels (enables scrolling)
+ * @property {Array} [toolbar] - Toolbar features to enable (default: all)
+ * @property {"html" | "markdown"} [outputFormat] - Output format for the content (default: "html")
+ * @property {string} [placeholder] - Placeholder text for the editor
+ *
+ * @example
+ * ```typescript
+ * const richTextConfig: RichTextFieldConfig = {
+ *   minHeight: 200,
+ *   maxHeight: 400,
+ *   toolbar: ["bold", "italic", "link", "list"],
+ *   outputFormat: "html",
+ *   placeholder: "Enter rich text content..."
+ * };
+ * ```
+ */
+export interface RichTextFieldConfig {
+  minHeight?: number;
+  maxHeight?: number;
+  toolbar?: Array<"bold" | "italic" | "underline" | "strikethrough" | "link" | "heading" | "list" | "orderedList" | "quote" | "code">;
+  outputFormat?: "html" | "markdown";
+  placeholder?: string;
+}
+
+/**
+ * Default toolbar configuration for rich text editor
+ */
+const DEFAULT_TOOLBAR: RichTextFieldConfig["toolbar"] = [
+  "bold", "italic", "underline", "strikethrough", "link", "heading", "list", "orderedList", "quote", "code"
+];
+
+/**
+ * Toolbar button configuration mapping
+ */
+const TOOLBAR_BUTTONS: Record<string, { icon: React.ComponentType<{ className?: string }>; label: string; command: string; value?: string }> = {
+  bold: { icon: Bold, label: "Bold", command: "bold" },
+  italic: { icon: Italic, label: "Italic", command: "italic" },
+  underline: { icon: Underline, label: "Underline", command: "underline" },
+  strikethrough: { icon: Strikethrough, label: "Strikethrough", command: "strikeThrough" },
+  link: { icon: Link, label: "Link", command: "createLink" },
+  heading: { icon: Heading, label: "Heading", command: "formatBlock", value: "h3" },
+  list: { icon: List, label: "Bullet List", command: "insertUnorderedList" },
+  orderedList: { icon: ListOrdered, label: "Numbered List", command: "insertOrderedList" },
+  quote: { icon: Quote, label: "Quote", command: "formatBlock", value: "blockquote" },
+  code: { icon: Code, label: "Code", command: "formatBlock", value: "pre" },
+};
+
+/**
+ * Rich Text Editor Component
+ *
+ * A simple contentEditable-based rich text editor with toolbar support.
+ * Uses execCommand for formatting (works in all modern browsers).
+ */
+interface RichTextEditorProps {
+  value: string;
+  onChange: (value: string) => void;
+  config?: RichTextFieldConfig;
+  id?: string;
+  "data-testid"?: string;
+}
+
+function RichTextEditor({ value, onChange, config, id, "data-testid": testId }: RichTextEditorProps) {
+  const editorRef = React.useRef<HTMLDivElement>(null);
+  const [isFocused, setIsFocused] = React.useState(false);
+
+  const toolbar = config?.toolbar || DEFAULT_TOOLBAR;
+  const minHeight = config?.minHeight || 150;
+  const maxHeight = config?.maxHeight;
+  const placeholder = config?.placeholder || "Enter content...";
+
+  // Initialize editor content
+  React.useEffect(() => {
+    if (editorRef.current && value !== editorRef.current.innerHTML) {
+      editorRef.current.innerHTML = value;
+    }
+  }, [value]);
+
+  const handleCommand = (command: string, value?: string) => {
+    if (command === "createLink") {
+      const url = prompt("Enter URL:");
+      if (url) {
+        document.execCommand(command, false, url);
+      }
+    } else if (value) {
+      document.execCommand(command, false, value);
+    } else {
+      document.execCommand(command, false);
+    }
+    // Update the value after command execution
+    if (editorRef.current) {
+      onChange(editorRef.current.innerHTML);
+    }
+    editorRef.current?.focus();
+  };
+
+  const handleInput = () => {
+    if (editorRef.current) {
+      onChange(editorRef.current.innerHTML);
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const text = e.clipboardData.getData("text/plain");
+    document.execCommand("insertText", false, text);
+  };
+
+  return (
+    <div className="border rounded-md overflow-hidden">
+      {/* Toolbar */}
+      <div className="flex flex-wrap gap-1 p-2 bg-muted/50 border-b">
+        {toolbar.map((tool) => {
+          const buttonConfig = TOOLBAR_BUTTONS[tool];
+          if (!buttonConfig) return null;
+          const IconComponent = buttonConfig.icon;
+          return (
+            <button
+              key={tool}
+              type="button"
+              onClick={() => handleCommand(buttonConfig.command, buttonConfig.value)}
+              className="p-1.5 rounded hover:bg-muted transition-colors"
+              title={buttonConfig.label}
+              aria-label={buttonConfig.label}
+            >
+              <IconComponent className="h-4 w-4" />
+            </button>
+          );
+        })}
+      </div>
+      {/* Editor */}
+      <div
+        ref={editorRef}
+        id={id}
+        data-testid={testId}
+        contentEditable
+        className={`px-3 py-2 outline-none prose prose-sm max-w-none ${!value && !isFocused ? "text-muted-foreground" : ""}`}
+        style={{
+          minHeight: `${minHeight}px`,
+          maxHeight: maxHeight ? `${maxHeight}px` : undefined,
+          overflowY: maxHeight ? "auto" : undefined,
+        }}
+        onInput={handleInput}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        onPaste={handlePaste}
+        data-placeholder={placeholder}
+        suppressContentEditableWarning
+      />
+      <style>{`
+        [contenteditable]:empty:before {
+          content: attr(data-placeholder);
+          color: hsl(var(--muted-foreground));
+          pointer-events: none;
+        }
+      `}</style>
+    </div>
+  );
+}
+
+/**
+ * Configuration for a custom form field in the CRUD manager.
+ *
+ * @property {string} name - Field name (used as form data key)
+ * @property {string} label - Display label for the field
+ * @property {"text" | "textarea" | "number" | "file"} type - Field type
+ * @property {string} [placeholder] - Placeholder text
+ * @property {string} [helpText] - Help text displayed below the field
+ * @property {boolean} [required] - Whether the field is required
+ * @property {FileFieldConfig} [fileConfig] - Configuration for file fields
+ *
+ * @example
+ * ```typescript
+ * const avatarField: CustomFieldConfig = {
+ *   name: "avatar",
+ *   label: "Profile Image",
+ *   type: "file",
+ *   fileConfig: {
+ *     accept: "image/*",
+ *     maxSize: 2 * 1024 * 1024,
+ *     previewType: "image"
+ *   }
+ * };
+ * ```
+ */
+export interface CustomFieldConfig {
+  name: string;
+  label: string;
+  type: "text" | "textarea" | "number" | "file" | "richtext";
+  placeholder?: string;
+  helpText?: string;
+  required?: boolean;
+  fileConfig?: FileFieldConfig;
+  richTextConfig?: RichTextFieldConfig;
 }
 
 /**
@@ -216,6 +445,10 @@ export interface GenericCrudManagerProps<T extends BaseEntityWithCount> {
       helpText?: string;
     };
   };
+  /** Additional custom fields (including file upload fields) */
+  customFields?: CustomFieldConfig[];
+  /** Whether to use FormData for submissions (required for file uploads) */
+  useFormData?: boolean;
 }
 
 /**
@@ -406,7 +639,9 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       placeholder: "enter-slug",
       helpText: "Auto-generated from name. Edit if needed."
     }
-  }
+  },
+  customFields = [],
+  useFormData = false
 }: GenericCrudManagerProps<T>) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -415,6 +650,12 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<T | null>(null);
+  const [fileData, setFileData] = useState<Record<string, File | null>>({});
+  const [filePreviews, setFilePreviews] = useState<Record<string, string>>({});
+
+  // Check if we have file fields (auto-enable FormData if so)
+  const hasFileFields = customFields.some(f => f.type === "file");
+  const shouldUseFormData = useFormData || hasFileFields;
 
   const initialFormData = useMemo(() => {
     const data: Record<string, string> = {
@@ -424,8 +665,14 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     parents.forEach(parent => {
       data[parent.fieldName] = "";
     });
+    // Initialize custom fields
+    customFields.forEach(field => {
+      if (field.type !== "file") {
+        data[field.name] = "";
+      }
+    });
     return data;
-  }, [parents]);
+  }, [parents, customFields]);
 
   const [formData, setFormData] = useState<Record<string, string>>(initialFormData);
 
@@ -462,7 +709,19 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
 
   // Create mutation
   const createMutation = useMutation({
-    mutationFn: async (data: Record<string, any>) => {
+    mutationFn: async (data: Record<string, any> | FormData) => {
+      if (data instanceof FormData) {
+        const response = await fetch(createUrl, {
+          method: 'POST',
+          credentials: 'include',
+          body: data
+        });
+        if (!response.ok) {
+          const error = await response.json().catch(() => ({ message: 'Request failed' }));
+          throw new Error(error.message || 'Failed to create');
+        }
+        return response.json();
+      }
       return await apiRequest(createUrl, {
         method: 'POST',
         body: JSON.stringify(data)
@@ -479,6 +738,8 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       });
       setCreateDialogOpen(false);
       setFormData(initialFormData);
+      setFileData({});
+      setFilePreviews({});
     },
     onError: (error: any) => {
       toast({
@@ -491,7 +752,19 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
 
   // Update mutation
   const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: Record<string, any> }) => {
+    mutationFn: async ({ id, data }: { id: number; data: Record<string, any> | FormData }) => {
+      if (data instanceof FormData) {
+        const response = await fetch(updateUrl(id), {
+          method: 'PATCH',
+          credentials: 'include',
+          body: data
+        });
+        if (!response.ok) {
+          const error = await response.json().catch(() => ({ message: 'Request failed' }));
+          throw new Error(error.message || 'Failed to update');
+        }
+        return response.json();
+      }
       return await apiRequest(updateUrl(id), {
         method: 'PATCH',
         body: JSON.stringify(data)
@@ -509,6 +782,8 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       setEditDialogOpen(false);
       setSelectedItem(null);
       setFormData(initialFormData);
+      setFileData({});
+      setFilePreviews({});
     },
     onError: (error: any) => {
       toast({
@@ -563,16 +838,76 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     );
   };
 
-  const handleCreate = () => {
-    const requiredFields = ["name", "slug", ...parents.map(p => p.fieldName)];
-    const missingFields = requiredFields.filter(field => !formData[field]?.trim());
+  // Validate file size
+  const validateFile = (file: File, fieldConfig: CustomFieldConfig): string | null => {
+    const maxSize = fieldConfig.fileConfig?.maxSize;
+    if (maxSize && file.size > maxSize) {
+      const maxSizeMB = (maxSize / (1024 * 1024)).toFixed(1);
+      return `File size exceeds ${maxSizeMB}MB limit`;
+    }
+    return null;
+  };
 
-    if (missingFields.length > 0) {
-      const fieldLabels = missingFields.map(field => {
+  // Handle file selection
+  const handleFileChange = (fieldName: string, file: File | null, fieldConfig: CustomFieldConfig) => {
+    if (file) {
+      const error = validateFile(file, fieldConfig);
+      if (error) {
+        toast({
+          title: "File Error",
+          description: error,
+          variant: "destructive"
+        });
+        return;
+      }
+
+      setFileData(prev => ({ ...prev, [fieldName]: file }));
+
+      // Generate preview for images
+      if (fieldConfig.fileConfig?.previewType === "image" && file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setFilePreviews(prev => ({ ...prev, [fieldName]: reader.result as string }));
+        };
+        reader.readAsDataURL(file);
+      }
+    } else {
+      setFileData(prev => ({ ...prev, [fieldName]: null }));
+      setFilePreviews(prev => {
+        const newPreviews = { ...prev };
+        delete newPreviews[fieldName];
+        return newPreviews;
+      });
+    }
+  };
+
+  // Clear file selection
+  const clearFile = (fieldName: string) => {
+    setFileData(prev => ({ ...prev, [fieldName]: null }));
+    setFilePreviews(prev => {
+      const newPreviews = { ...prev };
+      delete newPreviews[fieldName];
+      return newPreviews;
+    });
+  };
+
+  const handleCreate = async () => {
+    const requiredFields = ["name", "slug", ...parents.map(p => p.fieldName)];
+    const requiredCustomFields = customFields.filter(f => f.required && f.type !== "file").map(f => f.name);
+    const requiredFileFields = customFields.filter(f => f.required && f.type === "file").map(f => f.name);
+
+    const missingFields = [...requiredFields, ...requiredCustomFields].filter(field => !formData[field]?.trim());
+    const missingFileFields = requiredFileFields.filter(field => !fileData[field]);
+
+    if (missingFields.length > 0 || missingFileFields.length > 0) {
+      const fieldLabels = [...missingFields, ...missingFileFields].map(field => {
         if (field === "name") return "Name";
         if (field === "slug") return "Slug";
         const parent = parents.find(p => p.fieldName === field);
-        return parent ? parent.label.replace(" *", "") : field;
+        if (parent) return parent.label.replace(" *", "");
+        const customField = customFields.find(f => f.name === field);
+        if (customField) return customField.label.replace(" *", "");
+        return field;
       });
 
       toast({
@@ -583,30 +918,69 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       return;
     }
 
-    const payload: Record<string, any> = {
-      name: formData.name,
-      slug: formData.slug
-    };
+    // Build payload (FormData if files present, otherwise JSON)
+    if (shouldUseFormData && Object.values(fileData).some(f => f !== null)) {
+      const formDataPayload = new FormData();
+      formDataPayload.append("name", formData.name);
+      formDataPayload.append("slug", formData.slug);
 
-    parents.forEach(parent => {
-      payload[parent.fieldName] = parseInt(formData[parent.fieldName]);
-    });
+      parents.forEach(parent => {
+        formDataPayload.append(parent.fieldName, formData[parent.fieldName]);
+      });
 
-    createMutation.mutate(payload);
+      // Add custom fields
+      customFields.forEach(field => {
+        if (field.type === "file") {
+          const file = fileData[field.name];
+          if (file) {
+            formDataPayload.append(field.name, file);
+          }
+        } else if (formData[field.name]) {
+          formDataPayload.append(field.name, formData[field.name]);
+        }
+      });
+
+      createMutation.mutate(formDataPayload);
+    } else {
+      const payload: Record<string, any> = {
+        name: formData.name,
+        slug: formData.slug
+      };
+
+      parents.forEach(parent => {
+        payload[parent.fieldName] = parseInt(formData[parent.fieldName]);
+      });
+
+      // Add custom fields (non-file)
+      customFields.forEach(field => {
+        if (field.type !== "file" && formData[field.name]) {
+          payload[field.name] = field.type === "number"
+            ? parseFloat(formData[field.name])
+            : formData[field.name];
+        }
+      });
+
+      createMutation.mutate(payload);
+    }
   };
 
-  const handleUpdate = () => {
+  const handleUpdate = async () => {
     if (!selectedItem) return;
 
     const requiredFields = ["name", "slug", ...parents.map(p => p.fieldName)];
-    const missingFields = requiredFields.filter(field => !formData[field]?.trim());
+    const requiredCustomFields = customFields.filter(f => f.required && f.type !== "file").map(f => f.name);
+
+    const missingFields = [...requiredFields, ...requiredCustomFields].filter(field => !formData[field]?.trim());
 
     if (missingFields.length > 0) {
       const fieldLabels = missingFields.map(field => {
         if (field === "name") return "Name";
         if (field === "slug") return "Slug";
         const parent = parents.find(p => p.fieldName === field);
-        return parent ? parent.label.replace(" *", "") : field;
+        if (parent) return parent.label.replace(" *", "");
+        const customField = customFields.find(f => f.name === field);
+        if (customField) return customField.label.replace(" *", "");
+        return field;
       });
 
       toast({
@@ -617,19 +991,56 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       return;
     }
 
-    const payload: Record<string, any> = {
-      name: formData.name,
-      slug: formData.slug
-    };
+    // Build payload (FormData if files present, otherwise JSON)
+    if (shouldUseFormData && Object.values(fileData).some(f => f !== null)) {
+      const formDataPayload = new FormData();
+      formDataPayload.append("name", formData.name);
+      formDataPayload.append("slug", formData.slug);
 
-    parents.forEach(parent => {
-      payload[parent.fieldName] = parseInt(formData[parent.fieldName]);
-    });
+      parents.forEach(parent => {
+        formDataPayload.append(parent.fieldName, formData[parent.fieldName]);
+      });
 
-    updateMutation.mutate({
-      id: selectedItem.id,
-      data: payload
-    });
+      // Add custom fields
+      customFields.forEach(field => {
+        if (field.type === "file") {
+          const file = fileData[field.name];
+          if (file) {
+            formDataPayload.append(field.name, file);
+          }
+        } else if (formData[field.name]) {
+          formDataPayload.append(field.name, formData[field.name]);
+        }
+      });
+
+      updateMutation.mutate({
+        id: selectedItem.id,
+        data: formDataPayload
+      });
+    } else {
+      const payload: Record<string, any> = {
+        name: formData.name,
+        slug: formData.slug
+      };
+
+      parents.forEach(parent => {
+        payload[parent.fieldName] = parseInt(formData[parent.fieldName]);
+      });
+
+      // Add custom fields (non-file)
+      customFields.forEach(field => {
+        if (field.type !== "file" && formData[field.name]) {
+          payload[field.name] = field.type === "number"
+            ? parseFloat(formData[field.name])
+            : formData[field.name];
+        }
+      });
+
+      updateMutation.mutate({
+        id: selectedItem.id,
+        data: payload
+      });
+    }
   };
 
   const handleDelete = () => {
@@ -639,6 +1050,8 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
 
   const openCreateDialog = () => {
     setFormData(initialFormData);
+    setFileData({});
+    setFilePreviews({});
     setCreateDialogOpen(true);
   };
 
@@ -662,7 +1075,16 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       }
     });
 
+    // Load custom field values
+    customFields.forEach(field => {
+      if (field.type !== "file") {
+        newFormData[field.name] = item[field.name]?.toString() || "";
+      }
+    });
+
     setFormData(newFormData);
+    setFileData({});
+    setFilePreviews({});
     setEditDialogOpen(true);
   };
 
@@ -857,6 +1279,112 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                 </p>
               )}
             </div>
+            {/* Custom Fields (including file uploads) */}
+            {customFields.map((field) => (
+              <div key={field.name} className="space-y-2">
+                <Label htmlFor={`create-${field.name}`}>
+                  {field.label}{field.required ? " *" : ""}
+                </Label>
+                {field.type === "file" ? (
+                  <div className="space-y-2">
+                    {/* File Preview */}
+                    {filePreviews[field.name] && field.fileConfig?.previewType === "image" && (
+                      <div className="relative w-32 h-32 rounded-lg overflow-hidden border">
+                        <img
+                          src={filePreviews[field.name]}
+                          alt="Preview"
+                          className="w-full h-full object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => clearFile(field.name)}
+                          className="absolute top-1 right-1 p-1 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90"
+                          data-testid={`button-clear-file-create-${field.name}`}
+                        >
+                          <XCircle className="h-4 w-4" />
+                        </button>
+                      </div>
+                    )}
+                    {fileData[field.name] && field.fileConfig?.previewType !== "image" && (
+                      <div className="flex items-center gap-2 p-2 bg-muted rounded-lg">
+                        <FileIcon className="h-5 w-5 text-muted-foreground" />
+                        <span className="text-sm truncate flex-1">{fileData[field.name]?.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => clearFile(field.name)}
+                          className="p-1 hover:bg-destructive/10 rounded"
+                          data-testid={`button-clear-file-create-${field.name}`}
+                        >
+                          <XCircle className="h-4 w-4 text-destructive" />
+                        </button>
+                      </div>
+                    )}
+                    {/* File Input */}
+                    {!fileData[field.name] && (
+                      <div className="flex items-center gap-2">
+                        <label
+                          htmlFor={`create-${field.name}`}
+                          className="flex items-center gap-2 px-4 py-2 border border-dashed rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
+                        >
+                          <Upload className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm text-muted-foreground">
+                            Choose file...
+                          </span>
+                        </label>
+                        <input
+                          id={`create-${field.name}`}
+                          type="file"
+                          accept={field.fileConfig?.accept}
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0] || null;
+                            handleFileChange(field.name, file, field);
+                            e.target.value = ""; // Reset input
+                          }}
+                          data-testid={`input-create-${field.name}`}
+                        />
+                      </div>
+                    )}
+                    {field.fileConfig?.fileHelpText && (
+                      <p className="text-xs text-muted-foreground">
+                        {field.fileConfig.fileHelpText}
+                      </p>
+                    )}
+                  </div>
+                ) : field.type === "richtext" ? (
+                  <RichTextEditor
+                    id={`create-${field.name}`}
+                    value={formData[field.name] || ""}
+                    onChange={(value) => setFormData({ ...formData, [field.name]: value })}
+                    config={field.richTextConfig}
+                    data-testid={`input-create-${field.name}`}
+                  />
+                ) : field.type === "textarea" ? (
+                  <textarea
+                    id={`create-${field.name}`}
+                    placeholder={field.placeholder}
+                    value={formData[field.name] || ""}
+                    onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+                    className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    data-testid={`input-create-${field.name}`}
+                  />
+                ) : (
+                  <Input
+                    id={`create-${field.name}`}
+                    type={field.type === "number" ? "number" : "text"}
+                    placeholder={field.placeholder}
+                    value={formData[field.name] || ""}
+                    onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+                    data-testid={`input-create-${field.name}`}
+                  />
+                )}
+                {field.helpText && (
+                  <p className="text-xs text-muted-foreground">
+                    {field.helpText}
+                  </p>
+                )}
+              </div>
+            ))}
           </div>
           <DialogFooter>
             <Button
@@ -938,6 +1466,125 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                 data-testid="input-edit-slug"
               />
             </div>
+            {/* Custom Fields (including file uploads) */}
+            {customFields.map((field) => (
+              <div key={field.name} className="space-y-2">
+                <Label htmlFor={`edit-${field.name}`}>
+                  {field.label}{field.required ? " *" : ""}
+                </Label>
+                {field.type === "file" ? (
+                  <div className="space-y-2">
+                    {/* Existing file preview (from entity data) */}
+                    {selectedItem?.[field.name] && !fileData[field.name] && !filePreviews[field.name] && (
+                      <div className="flex items-center gap-2 p-2 bg-muted rounded-lg">
+                        {field.fileConfig?.previewType === "image" ? (
+                          <img
+                            src={selectedItem[field.name]}
+                            alt="Current"
+                            className="w-16 h-16 object-cover rounded"
+                          />
+                        ) : (
+                          <FileIcon className="h-5 w-5 text-muted-foreground" />
+                        )}
+                        <span className="text-sm text-muted-foreground">Current file</span>
+                      </div>
+                    )}
+                    {/* New File Preview */}
+                    {filePreviews[field.name] && field.fileConfig?.previewType === "image" && (
+                      <div className="relative w-32 h-32 rounded-lg overflow-hidden border">
+                        <img
+                          src={filePreviews[field.name]}
+                          alt="Preview"
+                          className="w-full h-full object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => clearFile(field.name)}
+                          className="absolute top-1 right-1 p-1 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90"
+                          data-testid={`button-clear-file-edit-${field.name}`}
+                        >
+                          <XCircle className="h-4 w-4" />
+                        </button>
+                      </div>
+                    )}
+                    {fileData[field.name] && field.fileConfig?.previewType !== "image" && (
+                      <div className="flex items-center gap-2 p-2 bg-muted rounded-lg">
+                        <FileIcon className="h-5 w-5 text-muted-foreground" />
+                        <span className="text-sm truncate flex-1">{fileData[field.name]?.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => clearFile(field.name)}
+                          className="p-1 hover:bg-destructive/10 rounded"
+                          data-testid={`button-clear-file-edit-${field.name}`}
+                        >
+                          <XCircle className="h-4 w-4 text-destructive" />
+                        </button>
+                      </div>
+                    )}
+                    {/* File Input */}
+                    <div className="flex items-center gap-2">
+                      <label
+                        htmlFor={`edit-${field.name}`}
+                        className="flex items-center gap-2 px-4 py-2 border border-dashed rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
+                      >
+                        <Upload className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">
+                          {fileData[field.name] ? "Change file..." : selectedItem?.[field.name] ? "Replace file..." : "Choose file..."}
+                        </span>
+                      </label>
+                      <input
+                        id={`edit-${field.name}`}
+                        type="file"
+                        accept={field.fileConfig?.accept}
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0] || null;
+                          handleFileChange(field.name, file, field);
+                          e.target.value = ""; // Reset input
+                        }}
+                        data-testid={`input-edit-${field.name}`}
+                      />
+                    </div>
+                    {field.fileConfig?.fileHelpText && (
+                      <p className="text-xs text-muted-foreground">
+                        {field.fileConfig.fileHelpText}
+                      </p>
+                    )}
+                  </div>
+                ) : field.type === "richtext" ? (
+                  <RichTextEditor
+                    id={`edit-${field.name}`}
+                    value={formData[field.name] || ""}
+                    onChange={(value) => setFormData({ ...formData, [field.name]: value })}
+                    config={field.richTextConfig}
+                    data-testid={`input-edit-${field.name}`}
+                  />
+                ) : field.type === "textarea" ? (
+                  <textarea
+                    id={`edit-${field.name}`}
+                    placeholder={field.placeholder}
+                    value={formData[field.name] || ""}
+                    onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+                    className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    data-testid={`input-edit-${field.name}`}
+                  />
+                ) : (
+                  <Input
+                    id={`edit-${field.name}`}
+                    type={field.type === "number" ? "number" : "text"}
+                    placeholder={field.placeholder}
+                    value={formData[field.name] || ""}
+                    onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+                    data-testid={`input-edit-${field.name}`}
+                  />
+                )}
+                {field.helpText && (
+                  <p className="text-xs text-muted-foreground">
+                    {field.helpText}
+                  </p>
+                )}
+              </div>
+            ))}
           </div>
           <DialogFooter>
             <Button

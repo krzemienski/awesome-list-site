@@ -4,7 +4,41 @@ import { ReactNode } from "react";
 /**
  * Defines the type of a form field in the CRUD manager
  */
-export type FieldType = "text" | "select" | "number" | "textarea";
+export type FieldType = "text" | "select" | "number" | "textarea" | "file" | "richtext";
+
+/**
+ * Configuration for file upload fields
+ */
+export interface FileFieldConfig {
+  /** Accepted file types (e.g., "image/*", ".pdf,.doc") */
+  accept?: string;
+  /** Maximum file size in bytes */
+  maxSize?: number;
+  /** Whether multiple files can be uploaded */
+  multiple?: boolean;
+  /** Custom upload handler - if not provided, file is included in FormData */
+  uploadHandler?: (file: File) => Promise<string>;
+  /** Preview type for uploaded files */
+  previewType?: "image" | "icon" | "none";
+  /** Help text about allowed file types/sizes */
+  fileHelpText?: string;
+}
+
+/**
+ * Configuration for rich text editor fields
+ */
+export interface RichTextFieldConfig {
+  /** Minimum height of the editor in pixels */
+  minHeight?: number;
+  /** Maximum height of the editor in pixels (enables scrolling) */
+  maxHeight?: number;
+  /** Toolbar features to enable */
+  toolbar?: Array<"bold" | "italic" | "underline" | "strikethrough" | "link" | "heading" | "list" | "orderedList" | "quote" | "code">;
+  /** Output format for the content */
+  outputFormat?: "html" | "markdown";
+  /** Placeholder text for the editor */
+  placeholder?: string;
+}
 
 /**
  * Defines how a field should be validated
@@ -47,6 +81,10 @@ export interface FieldConfig {
   dependsOn?: string;
   /** For cascading selects: filter function based on dependent field */
   filterFn?: (item: any, dependentValue: any) => boolean;
+  /** For file fields: file upload configuration */
+  fileConfig?: FileFieldConfig;
+  /** For rich text fields: editor configuration */
+  richTextConfig?: RichTextFieldConfig;
 }
 
 /**
