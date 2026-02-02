@@ -1649,6 +1649,90 @@ const resourceConfig: GenericCrudManagerProps<ResourceWithCount> = {
 `error-edit-{fieldName}` // e.g., "error-edit-username"
 ```
 
+## Undo/Redo Functionality
+
+The GenericCrudManager supports undo/redo functionality to allow users to revert or replay CRUD operations.
+
+### Enabling Undo/Redo
+
+```typescript
+<GenericCrudManager
+  {...otherProps}
+  undoRedoEnabled={true}
+  undoRedoHistoryLimit={50}  // Optional, default: 50
+/>
+```
+
+### Undo/Redo Configuration Options
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `undoRedoEnabled` | `boolean` | `false` | Enable or disable undo/redo functionality |
+| `undoRedoHistoryLimit` | `number` | `50` | Maximum number of operations to keep in history |
+
+### Supported Operations
+
+The following operations can be undone and redone:
+
+| Operation | Undo Action | Redo Action |
+|-----------|-------------|-------------|
+| **Create** | Deletes the created entity | Re-creates the entity |
+| **Update** | Restores previous entity data | Re-applies the new data |
+| **Delete** | Re-creates the deleted entity | Deletes the entity again |
+
+### Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl+Z` (Windows/Linux) or `Cmd+Z` (Mac) | Undo last operation |
+| `Ctrl+Shift+Z` or `Ctrl+Y` (Windows/Linux) or `Cmd+Shift+Z` (Mac) | Redo last undone operation |
+
+### UI Controls
+
+When enabled, Undo and Redo buttons appear in the card header next to the Create button:
+- **Undo button**: Reverts the most recent operation (disabled when at beginning of history)
+- **Redo button**: Replays an undone operation (disabled when at end of history)
+
+### Toast Notifications
+
+Operations display informative toast messages:
+- "Undo: [Entity] creation reverted"
+- "Undo: [Entity] update reverted"
+- "Undo: [Entity] deletion reverted"
+- "Redo: [Entity] re-created"
+- "Redo: [Entity] update re-applied"
+- "Redo: [Entity] re-deleted"
+
+### Test IDs for Undo/Redo
+
+```typescript
+// Undo/Redo buttons
+`button-undo`
+`button-redo`
+```
+
+### Complete Example with Undo/Redo
+
+```typescript
+const resourceConfig: GenericCrudManagerProps<ResourceWithCount> = {
+  entityName: "Resource",
+  entityNamePlural: "Resources",
+  // ... other config ...
+
+  // Undo/Redo configuration
+  undoRedoEnabled: true,
+  undoRedoHistoryLimit: 100  // Keep last 100 operations
+};
+```
+
+### Undo/Redo Behavior
+
+- **History Limit**: When the history limit is reached, the oldest operations are removed
+- **Operation Tracking**: Each create, update, and delete operation is automatically recorded
+- **State Preservation**: For updates and deletes, the previous entity state is preserved for restoration
+- **Error Handling**: If an undo/redo operation fails, an error toast is displayed
+- **Query Invalidation**: After undo/redo, relevant queries are invalidated to refresh the UI
+
 ## Future Enhancements
 
 Potential improvements to the pattern:
@@ -1661,7 +1745,7 @@ Potential improvements to the pattern:
 - [x] Bulk operations (delete multiple, export) *(Completed: 2026-02-02)*
 - [x] Field-level permissions *(Completed: 2026-02-02)*
 - [x] Custom validation rules per field *(Completed: 2026-02-02)*
-- [ ] Undo/redo functionality
+- [x] Undo/redo functionality *(Completed: 2026-02-02)*
 - [ ] Audit trail / change history
 
 ## Summary

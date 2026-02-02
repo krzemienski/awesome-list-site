@@ -13,7 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Pencil, Trash2, Save, X, LucideIcon, Upload, FileIcon, XCircle, Bold, Italic, Underline, Strikethrough, Link, Heading, List, ListOrdered, Quote, Code, Check, ChevronsUpDown, Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Download, Square, CheckSquare, Minus } from "lucide-react";
+import { Plus, Pencil, Trash2, Save, X, LucideIcon, Upload, FileIcon, XCircle, Bold, Italic, Underline, Strikethrough, Link, Heading, List, ListOrdered, Quote, Code, Check, ChevronsUpDown, Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Download, Square, CheckSquare, Minus, Undo, Redo } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
@@ -813,6 +813,10 @@ export interface GenericCrudManagerProps<T extends BaseEntityWithCount> {
   exportFilename?: string;
   /** Fields to include in export (default: all visible columns) */
   exportFields?: string[];
+  /** Enable undo/redo functionality (default: false) */
+  undoRedoEnabled?: boolean;
+  /** Maximum number of operations to keep in history (default: 50) */
+  undoRedoHistoryLimit?: number;
 }
 
 /**
@@ -1016,7 +1020,9 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   bulkDeleteUrl,
   exportFormats = ['csv', 'json'],
   exportFilename,
-  exportFields
+  exportFields,
+  undoRedoEnabled = false,
+  undoRedoHistoryLimit = 50
 }: GenericCrudManagerProps<T>) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -1033,9 +1039,180 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
 
+  // Undo/redo state management
+  const [history, setHistory] = useState<Array<{
+    type: 'create' | 'update' | 'delete';
+    entityId: number;
+    previousData?: T;
+    newData?: T;
+    timestamp: number;
+  }>>([]);
+  const [historyPointer, setHistoryPointer] = useState(-1);
+
   // Check if we have file fields (auto-enable FormData if so)
   const hasFileFields = customFields.some(f => f.type === "file");
   const shouldUseFormData = useFormData || hasFileFields;
+
+  /**
+   * Helper to record an operation in the undo/redo history
+   */
+  const recordOperation = (
+    type: 'create' | 'update' | 'delete',
+    entityId: number,
+    previousData?: T,
+    newData?: T
+  ) => {
+    if (!undoRedoEnabled) return;
+
+    const operation = {
+      type,
+      entityId,
+      previousData,
+      newData,
+      timestamp: Date.now()
+    };
+
+    // When recording a new operation, truncate any future history
+    const newHistory = history.slice(0, historyPointer + 1);
+    newHistory.push(operation);
+
+    // Enforce history limit
+    const limitedHistory = newHistory.slice(-undoRedoHistoryLimit);
+
+    setHistory(limitedHistory);
+    setHistoryPointer(limitedHistory.length - 1);
+  };
+
+  /**
+   * Undo the last operation
+   */
+  const handleUndo = async () => {
+    if (!undoRedoEnabled || historyPointer < 0) return;
+
+    const operation = history[historyPointer];
+
+    try {
+      if (operation.type === 'create') {
+        // Undo create: delete the created entity
+        await apiRequest(deleteUrl(operation.entityId), { method: 'DELETE' });
+        queryClient.invalidateQueries({ queryKey: [queryKey] });
+        if (publicQueryKey) {
+          queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
+        }
+        toast({
+          title: "Undo",
+          description: `Undo: ${entityName} creation reverted`
+        });
+      } else if (operation.type === 'update') {
+        // Undo update: restore previous data
+        if (operation.previousData) {
+          await apiRequest(updateUrl(operation.entityId), {
+            method: 'PATCH',
+            body: JSON.stringify(operation.previousData)
+          });
+          queryClient.invalidateQueries({ queryKey: [queryKey] });
+          if (publicQueryKey) {
+            queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
+          }
+          toast({
+            title: "Undo",
+            description: `Undo: ${entityName} update reverted`
+          });
+        }
+      } else if (operation.type === 'delete') {
+        // Undo delete: re-create the entity
+        if (operation.previousData) {
+          await apiRequest(createUrl, {
+            method: 'POST',
+            body: JSON.stringify(operation.previousData)
+          });
+          queryClient.invalidateQueries({ queryKey: [queryKey] });
+          if (publicQueryKey) {
+            queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
+          }
+          toast({
+            title: "Undo",
+            description: `Undo: ${entityName} deletion reverted`
+          });
+        }
+      }
+
+      // Move pointer back
+      setHistoryPointer(historyPointer - 1);
+    } catch (error: any) {
+      toast({
+        title: "Undo Failed",
+        description: error.message || "Failed to undo operation",
+        variant: "destructive"
+      });
+    }
+  };
+
+  /**
+   * Redo the next operation
+   */
+  const handleRedo = async () => {
+    if (!undoRedoEnabled || historyPointer >= history.length - 1) return;
+
+    const nextPointer = historyPointer + 1;
+    const operation = history[nextPointer];
+
+    try {
+      if (operation.type === 'create') {
+        // Redo create: re-create the entity
+        if (operation.newData) {
+          await apiRequest(createUrl, {
+            method: 'POST',
+            body: JSON.stringify(operation.newData)
+          });
+          queryClient.invalidateQueries({ queryKey: [queryKey] });
+          if (publicQueryKey) {
+            queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
+          }
+          toast({
+            title: "Redo",
+            description: `Redo: ${entityName} re-created`
+          });
+        }
+      } else if (operation.type === 'update') {
+        // Redo update: apply the new data again
+        if (operation.newData) {
+          await apiRequest(updateUrl(operation.entityId), {
+            method: 'PATCH',
+            body: JSON.stringify(operation.newData)
+          });
+          queryClient.invalidateQueries({ queryKey: [queryKey] });
+          if (publicQueryKey) {
+            queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
+          }
+          toast({
+            title: "Redo",
+            description: `Redo: ${entityName} update re-applied`
+          });
+        }
+      } else if (operation.type === 'delete') {
+        // Redo delete: delete the entity again
+        await apiRequest(deleteUrl(operation.entityId), { method: 'DELETE' });
+        queryClient.invalidateQueries({ queryKey: [queryKey] });
+        if (publicQueryKey) {
+          queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
+        }
+        toast({
+          title: "Redo",
+          description: `Redo: ${entityName} re-deleted`
+        });
+      }
+
+      // Move pointer forward
+      setHistoryPointer(nextPointer);
+    } catch (error: any) {
+      toast({
+        title: "Redo Failed",
+        description: error.message || "Failed to redo operation",
+        variant: "destructive"
+      });
+    }
+  };
 
   /**
    * Helper to check field permissions based on mode and entity
@@ -1284,6 +1461,28 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     }
   }, [searchQuery, totalPages, currentPage]);
 
+  // Keyboard shortcuts for undo/redo
+  useEffect(() => {
+    if (!undoRedoEnabled) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl+Z or Cmd+Z for undo
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        handleUndo();
+      }
+      // Ctrl+Shift+Z or Cmd+Shift+Z or Ctrl+Y or Cmd+Y for redo
+      if (((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'z') ||
+          ((e.ctrlKey || e.metaKey) && e.key === 'y')) {
+        e.preventDefault();
+        handleRedo();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [undoRedoEnabled, historyPointer, history]);
+
   // Paginate the filtered items
   const paginatedItems = useMemo(() => {
     if (!filteredItems || !paginationEnabled) return filteredItems;
@@ -1379,11 +1578,17 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
         body: JSON.stringify(data)
       });
     },
-    onSuccess: () => {
+    onSuccess: (newEntity: T) => {
       queryClient.invalidateQueries({ queryKey: [queryKey] });
       if (publicQueryKey) {
         queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
       }
+
+      // Record the create operation for undo/redo
+      if (undoRedoEnabled && newEntity?.id) {
+        recordOperation('create', newEntity.id, undefined, newEntity);
+      }
+
       toast({
         title: "Success",
         description: `${entityName} created successfully`
@@ -1405,7 +1610,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
 
   // Update mutation
   const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: Record<string, any> | FormData }) => {
+    mutationFn: async ({ id, data, previousData }: { id: number; data: Record<string, any> | FormData; previousData?: T }) => {
       if (data instanceof FormData) {
         const response = await fetch(updateUrl(id), {
           method: 'PATCH',
@@ -1416,18 +1621,25 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
           const error = await response.json().catch(() => ({ message: 'Request failed' }));
           throw new Error(error.message || 'Failed to update');
         }
-        return response.json();
+        return { updatedEntity: await response.json(), previousData };
       }
-      return await apiRequest(updateUrl(id), {
+      const updatedEntity = await apiRequest(updateUrl(id), {
         method: 'PATCH',
         body: JSON.stringify(data)
       });
+      return { updatedEntity, previousData };
     },
-    onSuccess: () => {
+    onSuccess: ({ updatedEntity, previousData }) => {
       queryClient.invalidateQueries({ queryKey: [queryKey] });
       if (publicQueryKey) {
         queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
       }
+
+      // Record the update operation for undo/redo
+      if (undoRedoEnabled && previousData && updatedEntity?.id) {
+        recordOperation('update', updatedEntity.id, previousData, updatedEntity);
+      }
+
       toast({
         title: "Success",
         description: `${entityName} updated successfully`
@@ -1450,16 +1662,23 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
 
   // Delete mutation
   const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
-      return await apiRequest(deleteUrl(id), {
+    mutationFn: async ({ id, previousData }: { id: number; previousData?: T }) => {
+      await apiRequest(deleteUrl(id), {
         method: 'DELETE'
       });
+      return { id, previousData };
     },
-    onSuccess: () => {
+    onSuccess: ({ id, previousData }) => {
       queryClient.invalidateQueries({ queryKey: [queryKey] });
       if (publicQueryKey) {
         queryClient.invalidateQueries({ queryKey: [publicQueryKey] });
       }
+
+      // Record the delete operation for undo/redo
+      if (undoRedoEnabled && previousData) {
+        recordOperation('delete', id, previousData, undefined);
+      }
+
       toast({
         title: "Success",
         description: `${entityName} deleted successfully`
@@ -1859,7 +2078,8 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
 
       updateMutation.mutate({
         id: selectedItem.id,
-        data: formDataPayload
+        data: formDataPayload,
+        previousData: selectedItem
       });
     } else {
       const payload: Record<string, any> = {
@@ -1892,14 +2112,15 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
 
       updateMutation.mutate({
         id: selectedItem.id,
-        data: payload
+        data: payload,
+        previousData: selectedItem
       });
     }
   };
 
   const handleDelete = () => {
     if (!selectedItem) return;
-    deleteMutation.mutate(selectedItem.id);
+    deleteMutation.mutate({ id: selectedItem.id, previousData: selectedItem });
   };
 
   const openCreateDialog = () => {
@@ -2095,6 +2316,30 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                   </button>
                 )}
               </div>
+            )}
+            {undoRedoEnabled && (
+              <>
+                <Button
+                  onClick={handleUndo}
+                  disabled={historyPointer < 0}
+                  variant="outline"
+                  data-testid="button-undo"
+                  title="Undo (Ctrl+Z)"
+                >
+                  <Undo className="h-4 w-4 mr-2" />
+                  Undo
+                </Button>
+                <Button
+                  onClick={handleRedo}
+                  disabled={historyPointer >= history.length - 1}
+                  variant="outline"
+                  data-testid="button-redo"
+                  title="Redo (Ctrl+Shift+Z)"
+                >
+                  <Redo className="h-4 w-4 mr-2" />
+                  Redo
+                </Button>
+              </>
             )}
             <Button
               onClick={openCreateDialog}

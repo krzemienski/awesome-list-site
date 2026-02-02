@@ -324,3 +324,34 @@ export interface BulkOperationsConfig {
  * Export format types
  */
 export type ExportFormat = 'csv' | 'json';
+
+/**
+ * Types of operations that can be undone/redone
+ */
+export type UndoableOperationType = 'create' | 'update' | 'delete';
+
+/**
+ * Record of an undoable operation
+ */
+export interface UndoableOperation<T = any> {
+  /** Type of operation */
+  type: UndoableOperationType;
+  /** ID of the affected entity */
+  entityId: number;
+  /** Entity data before the operation (for update/delete) */
+  previousData?: T;
+  /** Entity data after the operation (for create/update) */
+  newData?: T;
+  /** Timestamp of the operation */
+  timestamp: number;
+}
+
+/**
+ * Configuration for undo/redo functionality
+ */
+export interface UndoRedoConfig {
+  /** Enable undo/redo (default: false) */
+  enabled?: boolean;
+  /** Maximum history size (default: 50) */
+  historyLimit?: number;
+}
