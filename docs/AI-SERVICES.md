@@ -3232,7 +3232,7 @@ router.get('/api/admin/ai-errors', requireAdmin, (req, res) => {
 
 Use this checklist when AI services malfunction:
 
-- [ ] **API Key**: Verify environment variable is set correctly
+- [x] **API Key**: Verify environment variable is set correctly ✓ *Verified: Command correctly checks the primary env var. Service also falls back to `ANTHROPIC_API_KEY` if primary is not set (see `claudeService.ts:120`).*
   ```bash
   echo $AI_INTEGRATIONS_ANTHROPIC_API_KEY
   ```
