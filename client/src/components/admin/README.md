@@ -1733,6 +1733,113 @@ const resourceConfig: GenericCrudManagerProps<ResourceWithCount> = {
 - **Error Handling**: If an undo/redo operation fails, an error toast is displayed
 - **Query Invalidation**: After undo/redo, relevant queries are invalidated to refresh the UI
 
+## Audit Trail / Change History
+
+The GenericCrudManager supports an audit trail feature to track and display all CRUD operations performed on entities.
+
+### Enabling Audit Trail
+
+```typescript
+<GenericCrudManager
+  {...otherProps}
+  auditTrailEnabled={true}
+  auditTrailMaxEntries={100}     // Optional, default: 100
+  auditTrailPersist={true}       // Optional, default: false
+  auditTrailExcludeFields={['password', 'token']}  // Optional
+/>
+```
+
+### Audit Trail Configuration Options
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `auditTrailEnabled` | `boolean` | `false` | Enable or disable audit trail functionality |
+| `auditTrailMaxEntries` | `number` | `100` | Maximum number of entries to keep in history |
+| `auditTrailPersist` | `boolean` | `false` | Whether to persist audit trail to localStorage |
+| `auditTrailExcludeFields` | `string[]` | `[]` | Fields to exclude from change tracking (e.g., sensitive data) |
+
+### Tracked Operations
+
+All CRUD operations are automatically recorded:
+
+| Operation | Recorded Data |
+|-----------|--------------|
+| **Create** | New entity data, timestamp, entity name |
+| **Update** | Previous data, new data, changed fields list, timestamp |
+| **Delete** | Deleted entity data, timestamp, entity name |
+
+### Audit Trail UI
+
+When enabled, a "History" button appears in the card header next to the Create button. Clicking it opens a dialog showing:
+
+- **Operation Type**: Color-coded badges (green for create, blue for update, red for delete)
+- **Entity Name**: The name of the affected entity
+- **Timestamp**: When the operation occurred
+- **Description**: Human-readable description of the change
+- **Changed Fields**: For updates, shows which fields were modified
+- **Data Diff**: Expandable sections showing before/after data for each operation
+
+### Local Storage Persistence
+
+When `auditTrailPersist` is enabled:
+- Audit trail is saved to localStorage using the key `audit-trail-{queryKey}`
+- History persists across browser sessions and page reloads
+- Each entity type maintains its own separate history
+- Clear history using the "Clear History" button in the dialog
+
+### Excluding Sensitive Fields
+
+Use `auditTrailExcludeFields` to prevent sensitive data from being recorded:
+
+```typescript
+<GenericCrudManager
+  {...otherProps}
+  auditTrailEnabled={true}
+  auditTrailExcludeFields={['password', 'apiKey', 'secretToken']}
+/>
+```
+
+### Test IDs for Audit Trail
+
+```typescript
+// History button
+`button-audit-trail`
+
+// Audit trail dialog
+`dialog-audit-trail`
+
+// Individual audit entries
+`audit-entry-{id}` // e.g., "audit-entry-1234567890-abc123def"
+
+// Action buttons
+`button-clear-audit-trail`
+`button-close-audit-trail`
+```
+
+### Complete Example with Audit Trail
+
+```typescript
+const resourceConfig: GenericCrudManagerProps<ResourceWithCount> = {
+  entityName: "Resource",
+  entityNamePlural: "Resources",
+  // ... other config ...
+
+  // Audit trail configuration
+  auditTrailEnabled: true,
+  auditTrailMaxEntries: 200,        // Keep last 200 operations
+  auditTrailPersist: true,          // Persist across sessions
+  auditTrailExcludeFields: ['internalNotes']  // Don't track this field
+};
+```
+
+### Audit Trail Behavior
+
+- **Automatic Recording**: All create, update, and delete operations are automatically tracked
+- **Changed Fields Detection**: For updates, automatically detects and lists which fields changed
+- **Memory Management**: When `maxEntries` is reached, oldest entries are removed
+- **Clear Functionality**: Users can clear all history via the dialog
+- **Expandable Details**: Each entry can be expanded to view full before/after data
+
 ## Future Enhancements
 
 Potential improvements to the pattern:
@@ -1746,7 +1853,7 @@ Potential improvements to the pattern:
 - [x] Field-level permissions *(Completed: 2026-02-02)*
 - [x] Custom validation rules per field *(Completed: 2026-02-02)*
 - [x] Undo/redo functionality *(Completed: 2026-02-02)*
-- [ ] Audit trail / change history
+- [x] Audit trail / change history *(Completed: 2026-02-02)*
 
 ## Summary
 

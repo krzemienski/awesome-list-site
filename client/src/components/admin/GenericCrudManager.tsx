@@ -13,7 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Pencil, Trash2, Save, X, LucideIcon, Upload, FileIcon, XCircle, Bold, Italic, Underline, Strikethrough, Link, Heading, List, ListOrdered, Quote, Code, Check, ChevronsUpDown, Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Download, Square, CheckSquare, Minus, Undo, Redo } from "lucide-react";
+import { Plus, Pencil, Trash2, Save, X, LucideIcon, Upload, FileIcon, XCircle, Bold, Italic, Underline, Strikethrough, Link, Heading, List, ListOrdered, Quote, Code, Check, ChevronsUpDown, Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Download, Square, CheckSquare, Minus, Undo, Redo, History, Clock } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
@@ -817,6 +817,14 @@ export interface GenericCrudManagerProps<T extends BaseEntityWithCount> {
   undoRedoEnabled?: boolean;
   /** Maximum number of operations to keep in history (default: 50) */
   undoRedoHistoryLimit?: number;
+  /** Enable audit trail / change history (default: false) */
+  auditTrailEnabled?: boolean;
+  /** Maximum number of audit entries to keep (default: 100) */
+  auditTrailMaxEntries?: number;
+  /** Whether to persist audit trail to localStorage (default: false) */
+  auditTrailPersist?: boolean;
+  /** Fields to exclude from audit trail tracking */
+  auditTrailExcludeFields?: string[];
 }
 
 /**
@@ -1022,7 +1030,11 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
   exportFilename,
   exportFields,
   undoRedoEnabled = false,
-  undoRedoHistoryLimit = 50
+  undoRedoHistoryLimit = 50,
+  auditTrailEnabled = false,
+  auditTrailMaxEntries = 100,
+  auditTrailPersist = false,
+  auditTrailExcludeFields = []
 }: GenericCrudManagerProps<T>) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -1048,6 +1060,32 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     timestamp: number;
   }>>([]);
   const [historyPointer, setHistoryPointer] = useState(-1);
+
+  // Audit trail state management
+  const auditStorageKey = `audit-trail-${queryKey}`;
+  const [auditTrail, setAuditTrail] = useState<Array<{
+    id: string;
+    operationType: 'create' | 'update' | 'delete';
+    entityId: number;
+    entityName: string;
+    previousData: T | null;
+    newData: T | null;
+    timestamp: string;
+    description: string;
+    changedFields?: string[];
+  }>>(() => {
+    // Load from localStorage if persistence is enabled
+    if (auditTrailEnabled && auditTrailPersist && typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem(auditStorageKey);
+        return stored ? JSON.parse(stored) : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  });
+  const [auditDialogOpen, setAuditDialogOpen] = useState(false);
 
   // Check if we have file fields (auto-enable FormData if so)
   const hasFileFields = customFields.some(f => f.type === "file");
@@ -1081,6 +1119,94 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
 
     setHistory(limitedHistory);
     setHistoryPointer(limitedHistory.length - 1);
+  };
+
+  /**
+   * Helper to record an operation in the audit trail
+   */
+  const recordAuditEntry = (
+    operationType: 'create' | 'update' | 'delete',
+    entityId: number,
+    entityNameValue: string,
+    previousData: T | null,
+    newData: T | null
+  ) => {
+    if (!auditTrailEnabled) return;
+
+    // Calculate changed fields for updates
+    let changedFields: string[] | undefined;
+    if (operationType === 'update' && previousData && newData) {
+      changedFields = Object.keys(newData).filter(key => {
+        if (auditTrailExcludeFields.includes(key)) return false;
+        return JSON.stringify(previousData[key]) !== JSON.stringify(newData[key]);
+      });
+    }
+
+    // Filter out excluded fields from data
+    const filterData = (data: T | null): T | null => {
+      if (!data || auditTrailExcludeFields.length === 0) return data;
+      const filtered = { ...data };
+      auditTrailExcludeFields.forEach(field => {
+        delete (filtered as any)[field];
+      });
+      return filtered;
+    };
+
+    // Generate description
+    let description: string;
+    if (operationType === 'create') {
+      description = `Created ${entityName} "${entityNameValue}"`;
+    } else if (operationType === 'update') {
+      const fieldCount = changedFields?.length || 0;
+      description = `Updated ${entityName} "${entityNameValue}" (${fieldCount} field${fieldCount !== 1 ? 's' : ''} changed)`;
+    } else {
+      description = `Deleted ${entityName} "${entityNameValue}"`;
+    }
+
+    const entry = {
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      operationType,
+      entityId,
+      entityName: entityNameValue,
+      previousData: filterData(previousData),
+      newData: filterData(newData),
+      timestamp: new Date().toISOString(),
+      description,
+      changedFields
+    };
+
+    setAuditTrail(prev => {
+      const newTrail = [entry, ...prev].slice(0, auditTrailMaxEntries);
+
+      // Persist to localStorage if enabled
+      if (auditTrailPersist && typeof window !== 'undefined') {
+        try {
+          localStorage.setItem(auditStorageKey, JSON.stringify(newTrail));
+        } catch (e) {
+          console.warn('Failed to persist audit trail to localStorage:', e);
+        }
+      }
+
+      return newTrail;
+    });
+  };
+
+  /**
+   * Clear all audit trail entries
+   */
+  const clearAuditTrail = () => {
+    setAuditTrail([]);
+    if (auditTrailPersist && typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem(auditStorageKey);
+      } catch (e) {
+        console.warn('Failed to clear audit trail from localStorage:', e);
+      }
+    }
+    toast({
+      title: "Audit Trail Cleared",
+      description: "All change history has been removed"
+    });
   };
 
   /**
@@ -1589,6 +1715,11 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
         recordOperation('create', newEntity.id, undefined, newEntity);
       }
 
+      // Record in audit trail
+      if (auditTrailEnabled && newEntity?.id) {
+        recordAuditEntry('create', newEntity.id, newEntity.name || 'Unknown', null, newEntity);
+      }
+
       toast({
         title: "Success",
         description: `${entityName} created successfully`
@@ -1640,6 +1771,11 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
         recordOperation('update', updatedEntity.id, previousData, updatedEntity);
       }
 
+      // Record in audit trail
+      if (auditTrailEnabled && updatedEntity?.id) {
+        recordAuditEntry('update', updatedEntity.id, updatedEntity.name || previousData?.name || 'Unknown', previousData || null, updatedEntity);
+      }
+
       toast({
         title: "Success",
         description: `${entityName} updated successfully`
@@ -1677,6 +1813,11 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       // Record the delete operation for undo/redo
       if (undoRedoEnabled && previousData) {
         recordOperation('delete', id, previousData, undefined);
+      }
+
+      // Record in audit trail
+      if (auditTrailEnabled && previousData) {
+        recordAuditEntry('delete', id, previousData.name || 'Unknown', previousData, null);
       }
 
       toast({
@@ -2340,6 +2481,22 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                   Redo
                 </Button>
               </>
+            )}
+            {auditTrailEnabled && (
+              <Button
+                onClick={() => setAuditDialogOpen(true)}
+                variant="outline"
+                data-testid="button-audit-trail"
+                title="View change history"
+              >
+                <History className="h-4 w-4 mr-2" />
+                History
+                {auditTrail.length > 0 && (
+                  <Badge variant="secondary" className="ml-2 h-5 px-1.5">
+                    {auditTrail.length}
+                  </Badge>
+                )}
+              </Button>
             )}
             <Button
               onClick={openCreateDialog}
@@ -3088,6 +3245,149 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Audit Trail Dialog */}
+      <Dialog open={auditDialogOpen} onOpenChange={setAuditDialogOpen}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden flex flex-col" data-testid="dialog-audit-trail">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <History className="h-5 w-5" />
+              Change History
+            </DialogTitle>
+            <DialogDescription>
+              View the audit trail of all changes made to {entityNamePlural.toLowerCase()}.
+              {auditTrailPersist && " History is persisted across sessions."}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto py-4">
+            {auditTrail.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <History className="h-12 w-12 mx-auto mb-4 opacity-20" />
+                <p>No changes recorded yet.</p>
+                <p className="text-sm mt-1">Changes will appear here as you create, update, or delete {entityNamePlural.toLowerCase()}.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {auditTrail.map((entry) => (
+                  <div
+                    key={entry.id}
+                    className={`border rounded-lg p-3 ${
+                      entry.operationType === 'create' ? 'border-l-4 border-l-green-500' :
+                      entry.operationType === 'update' ? 'border-l-4 border-l-blue-500' :
+                      'border-l-4 border-l-red-500'
+                    }`}
+                    data-testid={`audit-entry-${entry.id}`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            variant={
+                              entry.operationType === 'create' ? 'default' :
+                              entry.operationType === 'update' ? 'secondary' :
+                              'destructive'
+                            }
+                            className="text-xs"
+                          >
+                            {entry.operationType.toUpperCase()}
+                          </Badge>
+                          <span className="font-medium">{entry.entityName}</span>
+                          <span className="text-xs text-muted-foreground">ID: {entry.entityId}</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-1">{entry.description}</p>
+                        {entry.changedFields && entry.changedFields.length > 0 && (
+                          <div className="mt-2">
+                            <span className="text-xs text-muted-foreground">Changed fields: </span>
+                            <span className="text-xs font-mono">{entry.changedFields.join(', ')}</span>
+                          </div>
+                        )}
+                        {entry.operationType === 'update' && entry.previousData && entry.newData && (
+                          <details className="mt-2">
+                            <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">
+                              View changes
+                            </summary>
+                            <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
+                              <div className="bg-red-50 dark:bg-red-950/20 rounded p-2">
+                                <span className="font-medium text-red-700 dark:text-red-400">Before:</span>
+                                <pre className="mt-1 whitespace-pre-wrap break-all text-muted-foreground max-h-32 overflow-y-auto">
+                                  {JSON.stringify(entry.previousData, null, 2)}
+                                </pre>
+                              </div>
+                              <div className="bg-green-50 dark:bg-green-950/20 rounded p-2">
+                                <span className="font-medium text-green-700 dark:text-green-400">After:</span>
+                                <pre className="mt-1 whitespace-pre-wrap break-all text-muted-foreground max-h-32 overflow-y-auto">
+                                  {JSON.stringify(entry.newData, null, 2)}
+                                </pre>
+                              </div>
+                            </div>
+                          </details>
+                        )}
+                        {entry.operationType === 'create' && entry.newData && (
+                          <details className="mt-2">
+                            <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">
+                              View created data
+                            </summary>
+                            <div className="mt-2 bg-green-50 dark:bg-green-950/20 rounded p-2 text-xs">
+                              <pre className="whitespace-pre-wrap break-all text-muted-foreground max-h-32 overflow-y-auto">
+                                {JSON.stringify(entry.newData, null, 2)}
+                              </pre>
+                            </div>
+                          </details>
+                        )}
+                        {entry.operationType === 'delete' && entry.previousData && (
+                          <details className="mt-2">
+                            <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">
+                              View deleted data
+                            </summary>
+                            <div className="mt-2 bg-red-50 dark:bg-red-950/20 rounded p-2 text-xs">
+                              <pre className="whitespace-pre-wrap break-all text-muted-foreground max-h-32 overflow-y-auto">
+                                {JSON.stringify(entry.previousData, null, 2)}
+                              </pre>
+                            </div>
+                          </details>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
+                        <Clock className="h-3 w-3" />
+                        {new Date(entry.timestamp).toLocaleString()}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          <DialogFooter className="border-t pt-4">
+            <div className="flex items-center justify-between w-full">
+              <span className="text-sm text-muted-foreground">
+                {auditTrail.length} {auditTrail.length === 1 ? 'entry' : 'entries'}
+                {auditTrailMaxEntries && ` (max ${auditTrailMaxEntries})`}
+              </span>
+              <div className="flex gap-2">
+                {auditTrail.length > 0 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={clearAuditTrail}
+                    data-testid="button-clear-audit-trail"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Clear History
+                  </Button>
+                )}
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={() => setAuditDialogOpen(false)}
+                  data-testid="button-close-audit-trail"
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

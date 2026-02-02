@@ -355,3 +355,48 @@ export interface UndoRedoConfig {
   /** Maximum history size (default: 50) */
   historyLimit?: number;
 }
+
+/**
+ * Types of operations tracked in audit trail
+ */
+export type AuditOperationType = 'create' | 'update' | 'delete';
+
+/**
+ * A single entry in the audit trail / change history
+ */
+export interface AuditTrailEntry<T = any> {
+  /** Unique ID for this audit entry */
+  id: string;
+  /** Type of operation performed */
+  operationType: AuditOperationType;
+  /** ID of the affected entity */
+  entityId: number;
+  /** Name of the entity at the time of the operation */
+  entityName: string;
+  /** Entity data before the operation (null for create) */
+  previousData: T | null;
+  /** Entity data after the operation (null for delete) */
+  newData: T | null;
+  /** ISO timestamp when the operation occurred */
+  timestamp: string;
+  /** Human-readable description of the change */
+  description: string;
+  /** List of fields that were changed (for updates) */
+  changedFields?: string[];
+}
+
+/**
+ * Configuration for audit trail / change history functionality
+ */
+export interface AuditTrailConfig {
+  /** Enable audit trail (default: false) */
+  enabled?: boolean;
+  /** Maximum number of entries to keep in history (default: 100) */
+  maxEntries?: number;
+  /** Whether to persist audit trail to localStorage (default: false) */
+  persistToStorage?: boolean;
+  /** Storage key for localStorage persistence */
+  storageKey?: string;
+  /** Fields to exclude from change tracking (e.g., sensitive data) */
+  excludeFields?: string[];
+}
