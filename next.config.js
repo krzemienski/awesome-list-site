@@ -1,20 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Exclude the old client directory from compilation
-  webpack: (config) => {
-    config.watchOptions = {
-      ...config.watchOptions,
-      ignored: ['**/client/**', '**/server/**', '**/shared/**', '**/node_modules/**'],
-    };
-    return config;
-  },
+  // Use Turbopack (Next.js 16 default)
+  turbopack: {},
   // Allow TypeScript errors during migration
   typescript: {
     ignoreBuildErrors: true,
-  },
-  // Allow ESLint errors during migration
-  eslint: {
-    ignoreDuringBuilds: true,
   },
 };
 
