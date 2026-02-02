@@ -3237,7 +3237,7 @@ Use this checklist when AI services malfunction:
   echo $AI_INTEGRATIONS_ANTHROPIC_API_KEY
   ```
 
-- [ ] **Connectivity**: Test API connection
+- [x] **Connectivity**: Test API connection ✓ *Verified: `testConnection()` method exists at `claudeService.ts:311`. It validates API availability and sends a test prompt to confirm the connection works.*
   ```typescript
   const connected = await claudeService.testConnection();
   console.log('Connected:', connected);
