@@ -118,7 +118,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 max-w-full overflow-x-hidden">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-pink-500 font-mono flex items-center gap-2">
           <Shield className="h-8 w-8" />
@@ -132,8 +132,8 @@ export default function AdminDashboard() {
 
       {/* Admin Tabs */}
       <Tabs defaultValue="approvals" className="space-y-4">
-        <div className="w-full overflow-x-auto pb-2">
-          <TabsList className="inline-flex h-10 items-center gap-1 bg-black border border-pink-500/20 p-1">
+        <div className="w-full overflow-x-auto pb-2 max-w-full">
+          <TabsList className="inline-flex h-10 items-center gap-1 bg-black border border-pink-500/20 p-1 max-w-full">
             <TabsTrigger value="approvals" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap" data-testid="tab-approvals">
               Approvals {stats?.pendingApprovals ? <Badge variant="destructive" className="ml-2">{stats.pendingApprovals}</Badge> : null}
             </TabsTrigger>

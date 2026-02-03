@@ -133,7 +133,7 @@
   }
 }
 
-/* Custom scrollbar for dark theme */
+/* Custom scrollbar for dark theme - more subtle styling */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -145,12 +145,12 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--primary);
+  background: var(--muted);
   border-radius: var(--radius-sm);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--accent);
+  background: var(--muted-foreground);
 }
 
 /* Terminal-style text selection */
