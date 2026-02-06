@@ -7,25 +7,11 @@ node_modules/
 dist/
 build/
 
-# Environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
-
-# Coverage directory used by tools like istanbul
+# Coverage directory
 coverage/
 *.lcov
 
 # Dependency directories
-node_modules/
 jspm_packages/
 
 # TypeScript cache
@@ -39,11 +25,7 @@ jspm_packages/
 
 # IDE and editor files
 .vscode/
-!.vscode/settings.json
 .idea/
-*.swp
-*.swo
-*~
 
 # OS generated files
 .DS_Store
@@ -85,3 +67,8 @@ attached_assets/
 
 # Auto Claude data directory
 .auto-claude/
+
+# Package manager lock files (don't format these)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
