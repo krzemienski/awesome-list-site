@@ -1,7 +1,9 @@
-import { storage } from '../storage';
+import { EnrichmentRepository } from '../repositories/EnrichmentRepository';
+import { ResourceRepository } from '../repositories/ResourceRepository';
+import { AuditRepository } from '../repositories/AuditRepository';
 import { generateResourceTags } from './tagging';
 import { fetchUrlMetadata, type UrlMetadata } from './urlScraper';
-import type { EnrichmentJob, EnrichmentQueueItem, Resource } from '@shared/schema';
+import type { EnrichmentJob } from '@shared/schema';
 
 type EnrichmentOutcome = 'success' | 'skipped' | 'failed';
 
@@ -29,8 +31,15 @@ interface JobStatus {
 export class EnrichmentService {
   private static instance: EnrichmentService;
   private processingJobs: Set<number> = new Set();
+  private enrichmentRepo: EnrichmentRepository;
+  private resourceRepo: ResourceRepository;
+  private auditRepo: AuditRepository;
 
-  private constructor() {}
+  private constructor() {
+    this.enrichmentRepo = new EnrichmentRepository();
+    this.resourceRepo = new ResourceRepository();
+    this.auditRepo = new AuditRepository();
+  }
 
   public static getInstance(): EnrichmentService {
     if (!EnrichmentService.instance) {
@@ -46,7 +55,7 @@ export class EnrichmentService {
       startedBy
     } = options;
 
-    const { resources } = await storage.listResources({
+    const { resources } = await this.resourceRepo.listResources({
       status: 'approved',
       limit: 10000
     });
@@ -61,19 +70,19 @@ export class EnrichmentService {
       });
     }
 
-    const job = await storage.createEnrichmentJob({
+    const job = await this.enrichmentRepo.createEnrichmentJob({
       filter,
       batchSize,
       startedBy: startedBy || undefined
     });
 
-    await storage.updateEnrichmentJob(job.id, {
+    await this.enrichmentRepo.updateEnrichmentJob(job.id, {
       totalResources: resourcesToEnrich.length,
       status: 'pending'
     });
 
     for (const resource of resourcesToEnrich) {
-      await storage.createEnrichmentQueueItem({
+      await this.enrichmentRepo.createEnrichmentQueueItem({
         jobId: job.id,
         resourceId: resource.id,
         status: 'pending'
@@ -82,7 +91,7 @@ export class EnrichmentService {
 
     this.startProcessing(job.id).catch(error => {
       console.error(`Error processing enrichment job ${job.id}:`, error);
-      storage.updateEnrichmentJob(job.id, {
+      this.enrichmentRepo.updateEnrichmentJob(job.id, {
         status: 'failed',
         errorMessage: error.message,
         completedAt: new Date()
@@ -101,7 +110,7 @@ export class EnrichmentService {
     this.processingJobs.add(jobId);
 
     try {
-      const job = await storage.getEnrichmentJob(jobId);
+      const job = await this.enrichmentRepo.getEnrichmentJob(jobId);
       if (!job) {
         throw new Error(`Job ${jobId} not found`);
       }
@@ -111,25 +120,25 @@ export class EnrichmentService {
         return;
       }
 
-      await storage.updateEnrichmentJob(jobId, {
+      await this.enrichmentRepo.updateEnrichmentJob(jobId, {
         status: 'processing',
         startedAt: new Date()
       });
 
       await this.processJobBatches(jobId, job.batchSize || 10);
 
-      const updatedJob = await storage.getEnrichmentJob(jobId);
+      const updatedJob = await this.enrichmentRepo.getEnrichmentJob(jobId);
       if (updatedJob && updatedJob.status !== 'cancelled') {
-        await storage.updateEnrichmentJob(jobId, {
+        await this.enrichmentRepo.updateEnrichmentJob(jobId, {
           status: 'completed',
           completedAt: new Date()
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error processing job ${jobId}:`, error);
-      await storage.updateEnrichmentJob(jobId, {
+      await this.enrichmentRepo.updateEnrichmentJob(jobId, {
         status: 'failed',
-        errorMessage: error instanceof Error ? error.message : 'Unknown error',
+        errorMessage: error.message,
         completedAt: new Date()
       });
     } finally {
@@ -139,13 +148,13 @@ export class EnrichmentService {
 
   private async processJobBatches(jobId: number, batchSize: number): Promise<void> {
     while (true) {
-      const job = await storage.getEnrichmentJob(jobId);
+      const job = await this.enrichmentRepo.getEnrichmentJob(jobId);
       if (!job || job.status === 'cancelled') {
         console.log(`Job ${jobId} was cancelled or not found`);
         break;
       }
 
-      const pendingItems = await storage.getPendingEnrichmentQueueItems(jobId, batchSize);
+      const pendingItems = await this.enrichmentRepo.getPendingEnrichmentQueueItems(jobId, batchSize);
       
       if (pendingItems.length === 0) {
         break;
@@ -157,8 +166,8 @@ export class EnrichmentService {
     }
   }
 
-  async processBatch(jobId: number, batch: EnrichmentQueueItem[]): Promise<void> {
-    const job = await storage.getEnrichmentJob(jobId);
+  async processBatch(jobId: number, batch: any[]): Promise<void> {
+    const job = await this.enrichmentRepo.getEnrichmentJob(jobId);
     if (!job) {
       throw new Error(`Job ${jobId} not found`);
     }
@@ -173,32 +182,32 @@ export class EnrichmentService {
         const outcome = await this.enrichResource(queueItem.resourceId, jobId);
         
         // Get current job state ONCE
-        const currentJob = await storage.getEnrichmentJob(jobId);
+        const currentJob = await this.enrichmentRepo.getEnrichmentJob(jobId);
         if (!currentJob) continue;
         
         // Update counters and queue item based on outcome
         if (outcome === 'success') {
           // Success: Update processed, successful, and resource IDs
-          await storage.updateEnrichmentJob(jobId, {
+          await this.enrichmentRepo.updateEnrichmentJob(jobId, {
             processedResources: (currentJob.processedResources || 0) + 1,
             successfulResources: (currentJob.successfulResources || 0) + 1,
             processedResourceIds: [...(currentJob.processedResourceIds || []), queueItem.resourceId]
           });
           
-          await storage.updateEnrichmentQueueItem(queueItem.id, {
+          await this.enrichmentRepo.updateEnrichmentQueueItem(queueItem.id, {
             status: 'completed',
             processedAt: new Date()
           });
           
         } else if (outcome === 'skipped') {
           // Skipped: Update processed and skipped counters
-          await storage.updateEnrichmentJob(jobId, {
+          await this.enrichmentRepo.updateEnrichmentJob(jobId, {
             processedResources: (currentJob.processedResources || 0) + 1,
             skippedResources: (currentJob.skippedResources || 0) + 1
           });
           
           // CRITICAL: Update queue item status to 'skipped'
-          await storage.updateEnrichmentQueueItem(queueItem.id, {
+          await this.enrichmentRepo.updateEnrichmentQueueItem(queueItem.id, {
             status: 'skipped',
             errorMessage: 'Invalid URL or manually curated',
             processedAt: new Date()
@@ -206,33 +215,33 @@ export class EnrichmentService {
           
         } else if (outcome === 'failed') {
           // Failed: Update processed, failed, and failed IDs
-          await storage.updateEnrichmentJob(jobId, {
+          await this.enrichmentRepo.updateEnrichmentJob(jobId, {
             processedResources: (currentJob.processedResources || 0) + 1,
             failedResources: (currentJob.failedResources || 0) + 1,
             failedResourceIds: [...(currentJob.failedResourceIds || []), queueItem.resourceId]
           });
           
-          await storage.updateEnrichmentQueueItem(queueItem.id, {
+          await this.enrichmentRepo.updateEnrichmentQueueItem(queueItem.id, {
             status: 'failed',
             errorMessage: 'Failed after retries',
             processedAt: new Date()
           });
         }
-
-      } catch (error) {
+        
+      } catch (error: any) {
         // Unexpected errors (like resource not found)
         console.error(`Error processing resource ${queueItem.resourceId}:`, error);
         
-        const currentJob = await storage.getEnrichmentJob(jobId);
+        const currentJob = await this.enrichmentRepo.getEnrichmentJob(jobId);
         if (currentJob) {
-          await storage.updateEnrichmentJob(jobId, {
+          await this.enrichmentRepo.updateEnrichmentJob(jobId, {
             processedResources: (currentJob.processedResources || 0) + 1,
             failedResources: (currentJob.failedResources || 0) + 1,
             failedResourceIds: [...(currentJob.failedResourceIds || []), queueItem.resourceId]
           });
         }
         
-        await storage.updateEnrichmentQueueItem(queueItem.id, {
+        await this.enrichmentRepo.updateEnrichmentQueueItem(queueItem.id, {
           status: 'failed',
           errorMessage: error instanceof Error ? error.message : 'Unknown error',
           processedAt: new Date()
@@ -242,7 +251,7 @@ export class EnrichmentService {
   }
 
   async enrichResource(resourceId: number, jobId?: number): Promise<EnrichmentOutcome> {
-    const resource = await storage.getResource(resourceId);
+    const resource = await this.resourceRepo.getResource(resourceId);
     if (!resource) {
       throw new Error(`Resource ${resourceId} not found`);
     }
@@ -305,7 +314,6 @@ export class EnrichmentService {
             scrapedTitle: urlMetadata.title,
             scrapedDescription: urlMetadata.description,
             ogImage: urlMetadata.ogImage,
-            ogImageBlurhash: urlMetadata.ogImageBlurhash,
             ogTitle: urlMetadata.ogTitle,
             ogDescription: urlMetadata.ogDescription,
             twitterCard: urlMetadata.twitterCard,
@@ -316,7 +324,7 @@ export class EnrichmentService {
           }),
         };
 
-        const updates: Partial<Resource> = {
+        const updates: any = {
           metadata: enhancedMetadata
         };
 
@@ -335,9 +343,9 @@ export class EnrichmentService {
           }
         }
 
-        await storage.updateResource(resourceId, updates);
+        await this.resourceRepo.updateResource(resourceId, updates);
 
-        await storage.logResourceAudit(
+        await this.auditRepo.logResourceAudit(
           resourceId,
           'ai_enriched',
           undefined,
@@ -346,22 +354,22 @@ export class EnrichmentService {
         );
 
         return 'success';
-      } catch (error) {
-        lastError = error instanceof Error ? error : new Error('Unknown error');
+      } catch (error: any) {
+        lastError = error;
         retryCount++;
-
+        
         if (retryCount < maxRetries) {
           console.log(`Retry ${retryCount}/${maxRetries} for resource ${resourceId}`);
           await this.delay(1000 * retryCount);
         } else {
-          await storage.logResourceAudit(
+          await this.auditRepo.logResourceAudit(
             resourceId,
             'ai_enrichment_failed',
             undefined,
-            { error: error instanceof Error ? error.message : 'Unknown error' },
+            { error: error.message },
             `AI enrichment failed after ${maxRetries} retries`
           );
-
+          
           return 'failed';
         }
       }
@@ -371,7 +379,7 @@ export class EnrichmentService {
   }
 
   async getJobStatus(jobId: number): Promise<JobStatus> {
-    const job = await storage.getEnrichmentJob(jobId);
+    const job = await this.enrichmentRepo.getEnrichmentJob(jobId);
     if (!job) {
       throw new Error(`Job ${jobId} not found`);
     }
@@ -412,7 +420,7 @@ export class EnrichmentService {
   }
 
   async cancelJob(jobId: number): Promise<void> {
-    await storage.cancelEnrichmentJob(jobId);
+    await this.enrichmentRepo.cancelEnrichmentJob(jobId);
   }
 
   private isValidUrl(url: string): boolean {

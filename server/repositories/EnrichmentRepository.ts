@@ -1,55 +1,72 @@
 /**
- * ENRICHMENT REPOSITORY - AI-Powered Resource Metadata Enrichment
+ * ============================================================================
+ * ENRICHMENT REPOSITORY - Enrichment Data Access Layer
+ * ============================================================================
  *
- * Repository for managing enrichment jobs, queue items, embeddings, and related resources.
+ * This module provides the data access layer for enrichment operations.
+ * It encapsulates all database queries related to AI-powered resource enrichment.
+ *
+ * KEY OPERATIONS:
+ * - Job Management: Create, retrieve, update, and cancel enrichment jobs
+ * - Queue Management: Create and retrieve enrichment queue items
+ * - Status Tracking: Update job and queue item status (pending/processing/completed/failed)
+ *
+ * DESIGN NOTES:
+ * - Jobs represent bulk enrichment operations (e.g., "enrich all resources")
+ * - Queue items are individual resources within a job awaiting enrichment
+ * - Supports batch processing with configurable limits
+ * - Uses AI to extract metadata, tags, and improve descriptions
+ * ============================================================================
  */
 
-import { db as dbInstance } from "../db";
-import { eq, and, desc, asc, isNull } from "drizzle-orm";
 import {
   enrichmentJobs,
   enrichmentQueue,
-  resourceEmbeddings,
-  relatedResourcesCache,
-  resources,
   type EnrichmentJob,
   type InsertEnrichmentJob,
   type EnrichmentQueueItem,
   type InsertEnrichmentQueue,
-  type ResourceEmbedding,
-  type InsertResourceEmbedding,
-  type RelatedResourcesCache,
-  type InsertRelatedResourcesCache,
-  type Resource,
 } from "@shared/schema";
+import { db } from "../db";
+import { eq, and, desc, asc } from "drizzle-orm";
 
-/** Repository for AI enrichment operations */
+/**
+ * Repository class for enrichment-related database operations
+ */
 export class EnrichmentRepository {
-  constructor(private db: typeof dbInstance) {}
-
-  // JOB OPERATIONS
-
-  /** Create a new enrichment job */
-  async createJob(data: InsertEnrichmentJob): Promise<EnrichmentJob> {
-    const [job] = await this.db
+  /**
+   * Create a new enrichment job
+   * @param data - Job data (job type, configuration, filters)
+   * @returns The created job with ID
+   */
+  async createEnrichmentJob(data: InsertEnrichmentJob): Promise<EnrichmentJob> {
+    const [job] = await db
       .insert(enrichmentJobs)
       .values(data)
       .returning();
     return job;
   }
 
-  /** Get an enrichment job by ID */
-  async getJob(id: number): Promise<EnrichmentJob | undefined> {
-    const [job] = await this.db
+  /**
+   * Get an enrichment job by ID
+   * @param id - Job ID
+   * @returns Enrichment job or undefined if not found
+   */
+  async getEnrichmentJob(id: number): Promise<EnrichmentJob | undefined> {
+    const [job] = await db
       .select()
       .from(enrichmentJobs)
       .where(eq(enrichmentJobs.id, id));
     return job;
   }
 
-  /** List enrichment jobs ordered by creation time (newest first) */
-  async listJobs(limit: number = 50): Promise<EnrichmentJob[]> {
-    const jobs = await this.db
+  /**
+   * List enrichment jobs
+   * @param limit - Maximum number of jobs to return (default: 50)
+   * @returns Array of enrichment jobs ordered by creation time (newest first)
+   */
+  async listEnrichmentJobs(limit: number = 50): Promise<EnrichmentJob[]> {
+    const jobs = await db
       .select()
       .from(enrichmentJobs)
       .orderBy(desc(enrichmentJobs.createdAt))
@@ -57,9 +74,14 @@ export class EnrichmentRepository {
     return jobs;
   }
 
-  /** Update an enrichment job */
-  async updateJob(id: number, data: Partial<EnrichmentJob>): Promise<EnrichmentJob> {
-    const [job] = await this.db
+  /**
+   * Update an enrichment job
+   * @param id - Job ID
+   * @param data - Partial job data to update (status, progress, etc.)
+   * @returns Updated job object
+   */
+  async updateEnrichmentJob(id: number, data: Partial<EnrichmentJob>): Promise<EnrichmentJob> {
+    const [job] = await db
       .update(enrichmentJobs)
       .set({ ...data, updatedAt: new Date() })
       .where(eq(enrichmentJobs.id, id))
@@ -67,32 +89,41 @@ export class EnrichmentRepository {
     return job;
   }
 
-  /** Cancel an enrichment job */
-  async cancelJob(id: number): Promise<void> {
-    await this.db
+  /**
+   * Cancel an enrichment job
+   * @param id - Job ID to cancel
+   */
+  async cancelEnrichmentJob(id: number): Promise<void> {
+    await db
       .update(enrichmentJobs)
       .set({
-        status: "cancelled",
+        status: 'cancelled',
         completedAt: new Date(),
-        updatedAt: new Date(),
+        updatedAt: new Date()
       })
       .where(eq(enrichmentJobs.id, id));
   }
 
-  // QUEUE ITEM OPERATIONS
-
-  /** Create a queue item for a resource */
-  async createItem(data: InsertEnrichmentQueue): Promise<EnrichmentQueueItem> {
-    const [item] = await this.db
+  /**
+   * Create an enrichment queue item
+   * @param data - Queue item data (job ID, resource ID, status)
+   * @returns The created queue item with ID
+   */
+  async createEnrichmentQueueItem(data: InsertEnrichmentQueue): Promise<EnrichmentQueueItem> {
+    const [item] = await db
       .insert(enrichmentQueue)
       .values(data)
       .returning();
     return item;
   }
 
-  /** Get all queue items for a job */
-  async getItemsByJob(jobId: number): Promise<EnrichmentQueueItem[]> {
-    const items = await this.db
+  /**
+   * Get all enrichment queue items for a specific job
+   * @param jobId - Job ID
+   * @returns Array of queue items ordered by ID
+   */
+  async getEnrichmentQueueItemsByJob(jobId: number): Promise<EnrichmentQueueItem[]> {
+    const items = await db
       .select()
       .from(enrichmentQueue)
       .where(eq(enrichmentQueue.jobId, jobId))
@@ -100,15 +131,20 @@ export class EnrichmentRepository {
     return items;
   }
 
-  /** Get pending queue items for processing */
-  async getPendingItems(jobId: number, limit: number = 10): Promise<EnrichmentQueueItem[]> {
-    const items = await this.db
+  /**
+   * Get pending enrichment queue items for a job
+   * @param jobId - Job ID
+   * @param limit - Maximum number of items to return (default: 10)
+   * @returns Array of pending queue items ordered by ID
+   */
+  async getPendingEnrichmentQueueItems(jobId: number, limit: number = 10): Promise<EnrichmentQueueItem[]> {
+    const items = await db
       .select()
       .from(enrichmentQueue)
       .where(
         and(
           eq(enrichmentQueue.jobId, jobId),
-          eq(enrichmentQueue.status, "pending")
+          eq(enrichmentQueue.status, 'pending')
         )
       )
       .orderBy(asc(enrichmentQueue.id))
@@ -116,139 +152,18 @@ export class EnrichmentRepository {
     return items;
   }
 
-  /** Update a queue item */
-  async updateItem(id: number, data: Partial<EnrichmentQueueItem>): Promise<EnrichmentQueueItem> {
-    const [item] = await this.db
+  /**
+   * Update an enrichment queue item
+   * @param id - Queue item ID
+   * @param data - Partial queue item data to update (status, error, enriched data, etc.)
+   * @returns Updated queue item object
+   */
+  async updateEnrichmentQueueItem(id: number, data: Partial<EnrichmentQueueItem>): Promise<EnrichmentQueueItem> {
+    const [item] = await db
       .update(enrichmentQueue)
       .set({ ...data, updatedAt: new Date() })
       .where(eq(enrichmentQueue.id, id))
       .returning();
     return item;
-  }
-
-  // EMBEDDING OPERATIONS
-
-  /** Store or update a resource embedding */
-  async storeEmbedding(data: InsertResourceEmbedding): Promise<ResourceEmbedding> {
-    const [embedding] = await this.db
-      .insert(resourceEmbeddings)
-      .values(data)
-      .onConflictDoUpdate({
-        target: resourceEmbeddings.resourceId,
-        set: {
-          embedding: data.embedding,
-          model: data.model,
-          createdAt: new Date(),
-        },
-      })
-      .returning();
-    return embedding;
-  }
-
-  /** Get embedding for a resource */
-  async getEmbedding(resourceId: number): Promise<ResourceEmbedding | undefined> {
-    const [embedding] = await this.db
-      .select()
-      .from(resourceEmbeddings)
-      .where(eq(resourceEmbeddings.resourceId, resourceId));
-    return embedding;
-  }
-
-  /** Delete embedding for a resource */
-  async deleteEmbedding(resourceId: number): Promise<void> {
-    await this.db
-      .delete(resourceEmbeddings)
-      .where(eq(resourceEmbeddings.resourceId, resourceId));
-  }
-
-  /** Get resources without embeddings */
-  async getResourcesWithoutEmbeddings(limit?: number): Promise<Resource[]> {
-    const query = this.db
-      .select()
-      .from(resources)
-      .leftJoin(resourceEmbeddings, eq(resources.id, resourceEmbeddings.resourceId))
-      .where(
-        and(
-          eq(resources.status, "approved"),
-          isNull(resourceEmbeddings.id)
-        )
-      )
-      .orderBy(asc(resources.id));
-
-    if (limit) {
-      const results = await query.limit(limit);
-      return results.map((r) => r.resources);
-    }
-
-    const results = await query;
-    return results.map((r) => r.resources);
-  }
-
-  /** Queue resources for embedding generation */
-  async queueEmbeddingGeneration(options: { batchSize?: number; startedBy?: string }): Promise<number> {
-    const { batchSize = 10, startedBy } = options;
-
-    // Get all resources without embeddings
-    const resourcesToProcess = await this.getResourcesWithoutEmbeddings();
-
-    // Create a job for embedding generation
-    const job = await this.createJob({
-      filter: "embedding_generation",
-      batchSize,
-      startedBy: startedBy || undefined,
-    });
-
-    // Update job with total count
-    await this.updateJob(job.id, {
-      totalResources: resourcesToProcess.length,
-      status: "pending",
-    });
-
-    // Queue each resource for processing
-    for (const resource of resourcesToProcess) {
-      await this.createItem({
-        jobId: job.id,
-        resourceId: resource.id,
-        status: "pending",
-      });
-    }
-
-    return resourcesToProcess.length;
-  }
-
-  // RELATED RESOURCES CACHE OPERATIONS
-
-  /** Store or update related resources cache */
-  async storeRelatedCache(data: InsertRelatedResourcesCache): Promise<RelatedResourcesCache> {
-    const [cache] = await this.db
-      .insert(relatedResourcesCache)
-      .values(data)
-      .onConflictDoUpdate({
-        target: relatedResourcesCache.resourceId,
-        set: {
-          relatedResourceIds: data.relatedResourceIds,
-          scores: data.scores,
-          metadata: data.metadata,
-          lastUpdatedAt: new Date(),
-        },
-      })
-      .returning();
-    return cache;
-  }
-
-  /** Get related resources cache */
-  async getRelatedCache(resourceId: number): Promise<RelatedResourcesCache | undefined> {
-    const [cache] = await this.db
-      .select()
-      .from(relatedResourcesCache)
-      .where(eq(relatedResourcesCache.resourceId, resourceId));
-    return cache;
-  }
-
-  /** Delete related resources cache */
-  async deleteRelatedCache(resourceId: number): Promise<void> {
-    await this.db
-      .delete(relatedResourcesCache)
-      .where(eq(relatedResourcesCache.resourceId, resourceId));
   }
 }

@@ -1,72 +1,69 @@
 /**
  * ============================================================================
- * REPOSITORIES INDEX - Central export for all repository classes
+ * REPOSITORY MODULES - Domain-Based Data Access Layer
  * ============================================================================
  *
- * This module provides a single import point for all repository classes.
- * Repositories implement the repository pattern, providing a clean abstraction
- * over database operations with type safety and consistent error handling.
+ * This module provides domain-based repository classes that encapsulate
+ * database operations for specific business entities. This architecture
+ * replaces the monolithic storage.ts file with focused, single-responsibility
+ * modules that are easier to test, maintain, and reason about.
  *
- * DESIGN PATTERN:
- * - Repository Pattern: Each repository encapsulates data access for one entity
- * - Dependency Injection: Repositories accept db instance in constructor
- * - Type Safety: Full TypeScript support with proper typing
- * - Separation of Concerns: Business logic in services, data access in repos
+ * ARCHITECTURE:
+ * Each repository handles one domain:
+ * - UserRepository: User accounts, roles, authentication
+ * - ResourceRepository: Resource CRUD, approval workflow, status management
+ * - CategoryRepository: 3-level category hierarchy (categories, subcategories, sub-subcategories)
+ * - TagRepository: Tag management and resource tagging
+ * - LearningJourneyRepository: Learning journeys and progress tracking
+ * - UserFeatureRepository: User features (favorites, bookmarks, preferences)
+ * - AuditRepository: Audit logs and resource edit workflow
+ * - GithubSyncRepository: GitHub sync queue and history
+ * - EnrichmentRepository: AI enrichment jobs and queue
+ * - AdminRepository: Administrative statistics and operations
+ *
+ * BENEFITS:
+ * - Single Responsibility: Each repository handles one domain
+ * - Testability: Repositories can be tested and mocked independently
+ * - Maintainability: Smaller files are easier to navigate and modify
+ * - Parallel Development: Teams can work on different repositories simultaneously
+ * - Type Safety: Each repository exports its own types and interfaces
  *
  * USAGE:
- * ```typescript
- * import { UserRepository, ResourceRepository } from './repositories';
- * import { db } from './db';
+ * Import repositories individually for better tree-shaking and clarity:
  *
- * const userRepo = new UserRepository(db);
- * const resourceRepo = new ResourceRepository(db);
+ * import { UserRepository } from './repositories';
+ * const userRepo = new UserRepository();
+ * const user = await userRepo.getUser(userId);
  *
- * const user = await userRepo.getById('user-id');
- * const resource = await resourceRepo.getById(123);
- * ```
+ * Or use the unified storage facade for backward compatibility:
  *
- * REPOSITORY CATEGORIES:
- * - User Management: UserRepository
- * - Resources: ResourceRepository
- * - Hierarchical Data: CategoryRepository, SubcategoryRepository, SubSubcategoryRepository
- * - User Interactions: FavoriteRepository, BookmarkRepository
- * - Learning: JourneyRepository
- * - Metadata: TagRepository
- * - Integrations: GithubSyncRepository, EnrichmentRepository
- * - Audit & Compliance: AuditLogRepository
- * - Base Classes: HierarchyRepository (generic base for hierarchical entities)
+ * import { storage } from './storage';
+ * const user = await storage.getUser(userId);
+ *
+ * See /server/repositories/README.md for detailed documentation.
  * ============================================================================
  */
 
-// Base repository classes
-export { HierarchyRepository } from './HierarchyRepository';
-export type { HierarchyRepositoryConfig } from './HierarchyRepository';
+// ============================================================================
+// REPOSITORY EXPORTS
+// ============================================================================
+// Individual repositories will be exported here as they are created.
+// This file serves as a barrel export for all repository modules.
 
-// User management
 export { UserRepository } from './UserRepository';
-
-// Resource management
 export { ResourceRepository } from './ResourceRepository';
-
-// Category hierarchy
 export { CategoryRepository } from './CategoryRepository';
-export { SubcategoryRepository } from './SubcategoryRepository';
-export { SubSubcategoryRepository } from './SubSubcategoryRepository';
-
-// User interactions
-export { FavoriteRepository } from './FavoriteRepository';
-export { BookmarkRepository } from './BookmarkRepository';
-
-// Learning journeys
-export { JourneyRepository } from './JourneyRepository';
-
-// Tags and metadata
 export { TagRepository } from './TagRepository';
-
-// External integrations
+export { LearningJourneyRepository } from './LearningJourneyRepository';
+export { UserFeatureRepository } from './UserFeatureRepository';
+export { AuditRepository } from './AuditRepository';
 export { GithubSyncRepository } from './GithubSyncRepository';
 export { EnrichmentRepository } from './EnrichmentRepository';
-
-// Audit logging
-export { AuditLogRepository } from './AuditLogRepository';
-export type { AuditLogEntry, AuditLogRecord } from './AuditLogRepository';
+export { AdminRepository, type AdminStats } from './AdminRepository';
+export {
+  LegacyRepository,
+  type AwesomeListData,
+  type HierarchicalCategory,
+  type HierarchicalSubcategory,
+  type HierarchicalSubSubcategory,
+} from './LegacyRepository';

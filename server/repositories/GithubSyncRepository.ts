@@ -1,50 +1,23 @@
 /**
  * ============================================================================
- * GITHUB SYNC REPOSITORY - GitHub Sync Queue and History Management
+ * GITHUB SYNC REPOSITORY - GitHub Sync Data Access Layer
  * ============================================================================
  *
- * This repository provides database operations for GitHub synchronization,
- * managing both the sync queue (pending/processing jobs) and sync history
- * (completed sync records).
- *
- * DESIGN PATTERN:
- * - Repository pattern with focused responsibility
- * - Separates queue management from history tracking
- * - Provides type-safe database operations using Drizzle ORM
+ * This module provides the data access layer for GitHub sync operations.
+ * It encapsulates all database queries related to GitHub import/export sync.
  *
  * KEY OPERATIONS:
- * Queue Management:
- * - addToQueue: Create new sync jobs (import/export)
- * - getQueue: Retrieve queue items, optionally filtered by status
- * - updateStatus: Update job status and handle completion timestamps
+ * - Queue Management: Add, retrieve, and update sync queue items
+ * - History Tracking: Save and retrieve sync history records
+ * - Status Updates: Track sync operation status (pending/processing/completed/failed)
  *
- * History Tracking:
- * - getLastSync: Get most recent sync for a repository/direction
- * - saveHistory: Record completed sync operations with stats
- * - getHistory: Retrieve historical sync records
- *
- * USAGE:
- * ```typescript
- * const syncRepo = new GithubSyncRepository(db);
- *
- * // Add to queue
- * const job = await syncRepo.addToQueue({
- *   repositoryUrl: 'https://github.com/user/repo',
- *   action: 'export',
- *   branch: 'main'
- * });
- *
- * // Update status
- * await syncRepo.updateStatus(job.id, 'completed');
- *
- * // Get history
- * const history = await syncRepo.getHistory('https://github.com/user/repo');
- * ```
+ * DESIGN NOTES:
+ * - Queue items represent pending import/export operations
+ * - History items provide audit trail of completed syncs
+ * - Supports both import (GitHub → Database) and export (Database → GitHub)
  * ============================================================================
  */
 
-import { db as dbInstance } from "../db";
-import { eq, and, desc, asc } from "drizzle-orm";
 import {
   githubSyncQueue,
   githubSyncHistory,
@@ -53,68 +26,30 @@ import {
   type GithubSyncHistory,
   type InsertGithubSyncHistory,
 } from "@shared/schema";
+import { db } from "../db";
+import { eq, and, desc, asc } from "drizzle-orm";
 
 /**
- * Repository for GitHub synchronization operations
- *
- * Manages the queue of pending/processing sync jobs and maintains
- * a historical record of all completed synchronization operations.
+ * Repository class for GitHub sync-related database operations
  */
 export class GithubSyncRepository {
   /**
-   * Creates a new GithubSyncRepository instance
-   *
-   * @param db - Drizzle database instance
+   * Add an item to the GitHub sync queue
+   * @param item - Sync queue item data (repository URL, direction, metadata)
+   * @returns The created queue item with ID
    */
-  constructor(private db: typeof dbInstance) {}
-
-  // ============================================================================
-  // QUEUE OPERATIONS
-  // ============================================================================
-
-  /**
-   * Add a new sync job to the queue
-   *
-   * Creates a new sync job for either importing resources from GitHub
-   * or exporting resources to GitHub. Jobs start in 'pending' status.
-   *
-   * @param item - The sync queue item to create
-   * @returns The created queue item with ID and timestamps
-   *
-   * @example
-   * const job = await repo.addToQueue({
-   *   repositoryUrl: 'https://github.com/user/awesome-list',
-   *   action: 'export',
-   *   branch: 'main',
-   *   resourceIds: [1, 2, 3]
-   * });
-   */
-  async addToQueue(item: InsertGithubSyncQueue): Promise<GithubSyncQueue> {
-    const [queueItem] = await this.db
-      .insert(githubSyncQueue)
-      .values(item as any)
-      .returning();
+  async addToGithubSyncQueue(item: InsertGithubSyncQueue): Promise<GithubSyncQueue> {
+    const [queueItem] = await db.insert(githubSyncQueue).values(item as any).returning();
     return queueItem;
   }
 
   /**
    * Get sync queue items, optionally filtered by status
-   *
-   * Retrieves all queue items or filters by status (pending, processing,
-   * completed, failed). Results are ordered by creation time (oldest first).
-   *
-   * @param status - Optional status filter (pending, processing, completed, failed)
-   * @returns Array of sync queue items matching the filter
-   *
-   * @example
-   * // Get all pending jobs
-   * const pending = await repo.getQueue('pending');
-   *
-   * // Get all jobs regardless of status
-   * const all = await repo.getQueue();
+   * @param status - Optional status filter ('pending', 'processing', 'completed', 'failed')
+   * @returns Array of queue items ordered by creation time
    */
-  async getQueue(status?: string): Promise<GithubSyncQueue[]> {
-    let query = this.db.select().from(githubSyncQueue);
+  async getGithubSyncQueue(status?: string): Promise<GithubSyncQueue[]> {
+    let query = db.select().from(githubSyncQueue);
 
     if (status) {
       query = query.where(eq(githubSyncQueue.status, status)) as any;
@@ -124,63 +59,30 @@ export class GithubSyncRepository {
   }
 
   /**
-   * Update the status of a sync job
-   *
-   * Updates the job status and automatically sets the processedAt timestamp
-   * when the job reaches a terminal state (completed or failed).
-   *
-   * @param id - The ID of the sync job to update
-   * @param status - The new status (pending, processing, completed, failed)
-   * @param errorMessage - Optional error message for failed jobs
-   *
-   * @example
-   * // Mark job as completed
-   * await repo.updateStatus(jobId, 'completed');
-   *
-   * // Mark job as failed with error
-   * await repo.updateStatus(jobId, 'failed', 'Connection timeout');
+   * Update the status of a sync queue item
+   * @param id - Queue item ID
+   * @param status - New status ('pending', 'processing', 'completed', 'failed')
+   * @param errorMessage - Optional error message if status is 'failed'
    */
-  async updateStatus(
-    id: number,
-    status: string,
-    errorMessage?: string
-  ): Promise<void> {
-    await this.db
+  async updateGithubSyncStatus(id: number, status: string, errorMessage?: string): Promise<void> {
+    await db
       .update(githubSyncQueue)
       .set({
         status,
         errorMessage,
-        processedAt: status === "completed" || status === "failed" ? new Date() : null,
+        processedAt: status === 'completed' || status === 'failed' ? new Date() : null
       })
       .where(eq(githubSyncQueue.id, id));
   }
 
-  // ============================================================================
-  // HISTORY OPERATIONS
-  // ============================================================================
-
   /**
-   * Get the most recent sync history for a repository and direction
-   *
-   * Retrieves the last sync operation (import or export) performed on
-   * a specific repository. Useful for checking last sync time and stats.
-   *
-   * @param repositoryUrl - The GitHub repository URL
-   * @param direction - The sync direction ('export' or 'import')
-   * @returns The most recent sync history record, or undefined if none exists
-   *
-   * @example
-   * const lastExport = await repo.getLastSync(
-   *   'https://github.com/user/repo',
-   *   'export'
-   * );
-   * console.log(`Last export: ${lastExport?.createdAt}`);
+   * Get the last sync history record for a repository and direction
+   * @param repositoryUrl - GitHub repository URL
+   * @param direction - Sync direction ('import' or 'export')
+   * @returns Most recent sync history or undefined if none found
    */
-  async getLastSync(
-    repositoryUrl: string,
-    direction: "export" | "import"
-  ): Promise<GithubSyncHistory | undefined> {
-    const results = await this.db
+  async getLastSyncHistory(repositoryUrl: string, direction: 'export' | 'import'): Promise<GithubSyncHistory | undefined> {
+    const results = await db
       .select()
       .from(githubSyncHistory)
       .where(
@@ -197,59 +99,22 @@ export class GithubSyncRepository {
 
   /**
    * Save a sync history record
-   *
-   * Records a completed sync operation with statistics about resources
-   * added, updated, and removed. Creates a permanent historical record
-   * that can be used for auditing and troubleshooting.
-   *
-   * @param item - The history record to save
-   * @returns The saved history record with ID and timestamps
-   *
-   * @example
-   * const history = await repo.saveHistory({
-   *   repositoryUrl: 'https://github.com/user/repo',
-   *   direction: 'export',
-   *   commitSha: 'abc123',
-   *   resourcesAdded: 5,
-   *   resourcesUpdated: 3,
-   *   resourcesRemoved: 1,
-   *   totalResources: 100,
-   *   performedBy: userId
-   * });
+   * @param item - Sync history data (repository URL, direction, status, metadata)
+   * @returns The created history item with ID
    */
-  async saveHistory(item: InsertGithubSyncHistory): Promise<GithubSyncHistory> {
-    const [historyItem] = await this.db
-      .insert(githubSyncHistory)
-      .values(item)
-      .returning();
+  async saveSyncHistory(item: InsertGithubSyncHistory): Promise<GithubSyncHistory> {
+    const [historyItem] = await db.insert(githubSyncHistory).values(item).returning();
     return historyItem;
   }
 
   /**
-   * Get sync history, optionally filtered by repository
-   *
-   * Retrieves historical sync records, most recent first. Can be filtered
-   * to a specific repository or retrieve all sync history.
-   *
-   * @param repositoryUrl - Optional repository URL to filter by
+   * Get sync history, optionally filtered by repository URL
+   * @param repositoryUrl - Optional repository URL filter
    * @param limit - Maximum number of records to return (default: 20)
-   * @returns Array of sync history records
-   *
-   * @example
-   * // Get last 20 syncs for a specific repo
-   * const repoHistory = await repo.getHistory(
-   *   'https://github.com/user/repo',
-   *   20
-   * );
-   *
-   * // Get last 50 syncs across all repos
-   * const allHistory = await repo.getHistory(undefined, 50);
+   * @returns Array of sync history records ordered by creation time (newest first)
    */
-  async getHistory(
-    repositoryUrl?: string,
-    limit: number = 20
-  ): Promise<GithubSyncHistory[]> {
-    let query = this.db.select().from(githubSyncHistory);
+  async getSyncHistory(repositoryUrl?: string, limit: number = 20): Promise<GithubSyncHistory[]> {
+    let query = db.select().from(githubSyncHistory);
 
     if (repositoryUrl) {
       query = query.where(eq(githubSyncHistory.repositoryUrl, repositoryUrl)) as any;

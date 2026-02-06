@@ -1,128 +1,68 @@
 /**
  * ============================================================================
- * RESOURCE REPOSITORY - CRUD Operations for Resources
+ * RESOURCE REPOSITORY - Resource Data Access Layer
  * ============================================================================
  *
- * This repository provides type-safe CRUD operations for learning resources.
- * It handles resource lifecycle management including creation, updates, approval
- * workflow, and filtering.
+ * This module provides the data access layer for resource operations.
+ * It encapsulates all database queries related to resources including
+ * CRUD operations, status management, and approval workflows.
  *
- * DESIGN PATTERN:
- * - Repository pattern with TypeScript for type safety
- * - Supports filtering by status, category, search terms, and user
- * - Implements approval workflow (pending → approved/rejected)
- * - Enforces URL uniqueness to prevent duplicate resources
+ * KEY OPERATIONS:
+ * - listResources: Paginated resource listing with filtering
+ * - getResource: Retrieve resource by ID or URL
+ * - createResource: Create new resource with audit logging
+ * - updateResource: Update resource with audit logging
+ * - deleteResource: Delete resource with audit logging
+ * - getPendingResources: Get resources awaiting approval
+ * - approveResource: Approve pending resource
+ * - rejectResource: Reject pending resource with reason
  *
- * KEY FEATURES:
- * - Paginated listing with flexible filtering options
- * - Status management (pending, approved, rejected, archived)
- * - URL uniqueness validation
- * - Approval workflow with audit trail (approvedBy, approvedAt)
- * - Search functionality across title and description
- *
- * USAGE:
- * ```typescript
- * const resourceRepo = new ResourceRepository(db);
- *
- * // List resources with filtering
- * const { resources, total } = await resourceRepo.list({
- *   status: 'approved',
- *   category: 'JavaScript',
- *   page: 1,
- *   limit: 20
- * });
- *
- * // Approve a pending resource
- * const approved = await resourceRepo.updateStatus(
- *   resourceId,
- *   'approved',
- *   userId
- * );
- * ```
+ * DESIGN NOTES:
+ * - All modifications are logged to resource_audit_log table
+ * - Status transitions: pending → approved/rejected
+ * - Supports filtering by status, category, subcategory, user, and search
+ * - Uses Drizzle ORM for type-safe database operations
  * ============================================================================
  */
 
-import { db as dbInstance } from "../db";
-import { eq, and, sql, desc, like, or, inArray } from "drizzle-orm";
 import {
   resources,
+  resourceAuditLog,
   type Resource,
   type InsertResource,
 } from "@shared/schema";
+import { db } from "../db";
+import { eq, and, sql, desc, like, or } from "drizzle-orm";
 
 /**
- * Options for filtering resources in list queries
+ * Options for listing resources with filtering and pagination
  */
 export interface ListResourceOptions {
-  /** Page number for pagination (1-indexed) */
   page?: number;
-  /** Number of resources per page */
   limit?: number;
-  /** Filter by resource status (pending, approved, rejected, archived) */
   status?: string;
-  /** Filter by category name */
   category?: string;
-  /** Filter by subcategory name */
   subcategory?: string;
-  /** Filter by user ID who submitted the resource */
   userId?: string;
-  /** Search term to match against title and description */
   search?: string;
 }
 
 /**
- * Repository for resource CRUD operations
- *
- * Provides type-safe database operations for learning resources with
- * support for filtering, pagination, approval workflow, and validation.
+ * Repository class for resource-related database operations
  */
 export class ResourceRepository {
   /**
-   * Creates a new ResourceRepository instance
-   *
-   * @param db - Drizzle database instance
-   */
-  constructor(private db: typeof dbInstance) {}
-
-  /**
-   * List resources with optional filtering and pagination
-   *
-   * Returns a paginated list of resources matching the provided filter criteria.
-   * Results are ordered by creation date (newest first).
-   *
-   * @param options - Filtering and pagination options
+   * List resources with filtering and pagination
+   * @param options - Filter and pagination options
    * @returns Object containing resources array and total count
-   *
-   * @example
-   * // Get first page of approved JavaScript resources
-   * const result = await repo.list({
-   *   status: 'approved',
-   *   category: 'JavaScript',
-   *   page: 1,
-   *   limit: 20
-   * });
-   *
-   * // Search across all resources
-   * const searchResults = await repo.list({
-   *   search: 'react hooks',
-   *   page: 1,
-   *   limit: 10
-   * });
    */
-  async list(
-    options: ListResourceOptions = {}
-  ): Promise<{ resources: Resource[]; total: number }> {
-    const {
-      page = 1,
-      limit = 20,
-      status,
-      category,
-      subcategory,
-      userId,
-      search,
-    } = options;
+  async listResources(options: ListResourceOptions): Promise<{ resources: Resource[]; total: number }> {
+    const { page = 1, limit = 20, status, category, subcategory, userId, search } = options;
+    const offset = (page - 1) * limit;
 
-    // Build filter conditions
+    let query = db.select().from(resources);
+    let countQuery = db.select({ count: sql<number>`count(*)::int` }).from(resources);
+
     const conditions = [];
 
     if (status) {
@@ -146,321 +86,262 @@ export class ResourceRepository {
         or(
           like(resources.title, `%${search}%`),
           like(resources.description, `%${search}%`)
-        )!
+        )
       );
     }
 
-    // Build WHERE clause
-    const whereClause =
-      conditions.length > 0
-        ? conditions.length === 1
-          ? conditions[0]
-          : and(...conditions)
-        : undefined;
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
+      countQuery = countQuery.where(and(...conditions));
+    }
 
-    // Get total count
-    const [countResult] = await this.db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(resources)
-      .where(whereClause);
-
-    const total = countResult?.count ?? 0;
-
-    // Get paginated resources
-    const offset = (page - 1) * limit;
-    let query = this.db
-      .select()
-      .from(resources)
+    const [totalResult] = await countQuery;
+    const resourceList = await query
       .orderBy(desc(resources.createdAt))
       .limit(limit)
       .offset(offset);
 
-    if (whereClause) {
-      query = query.where(whereClause) as any;
-    }
-
-    const resourceList = await query;
-
-    return {
-      resources: resourceList,
-      total,
-    };
+    return { resources: resourceList, total: totalResult.count };
   }
 
   /**
-   * Get total count of resources
-   *
-   * Returns the total number of resources in the database, regardless of status.
-   *
-   * @returns Total number of resources
+   * Get a resource by its ID
+   * @param id - Resource ID
+   * @returns Resource object or undefined if not found
    */
-  async getCount(): Promise<number> {
-    const [result] = await this.db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(resources);
-
-    return result?.count ?? 0;
-  }
-
-  /**
-   * Get resource by ID
-   *
-   * Retrieves a single resource by its primary key.
-   *
-   * @param id - The primary key of the resource to retrieve
-   * @returns The resource if found, undefined otherwise
-   */
-  async getById(id: number): Promise<Resource | undefined> {
-    const [resource] = await this.db
-      .select()
-      .from(resources)
-      .where(eq(resources.id, id));
-
+  async getResource(id: number): Promise<Resource | undefined> {
+    const [resource] = await db.select().from(resources).where(eq(resources.id, id));
     return resource;
   }
 
   /**
-   * Get resource by URL
-   *
-   * Retrieves a resource by its URL. Useful for checking if a URL
-   * has already been submitted to prevent duplicates.
-   *
-   * @param url - The exact URL to search for
-   * @returns The resource if found, undefined otherwise
+   * Get a resource by its URL
+   * @param url - Resource URL
+   * @returns Resource object or undefined if not found
    */
-  async getByUrl(url: string): Promise<Resource | undefined> {
-    const [resource] = await this.db
-      .select()
-      .from(resources)
-      .where(eq(resources.url, url));
-
+  async getResourceByUrl(url: string): Promise<Resource | undefined> {
+    const [resource] = await db.select().from(resources).where(eq(resources.url, url));
     return resource;
+  }
+
+  /**
+   * Get total count of all resources
+   * @returns Total number of resources in database
+   */
+  async getResourceCount(): Promise<number> {
+    const [result] = await db.select({ count: sql<number>`count(*)::int` }).from(resources);
+    return result.count;
   }
 
   /**
    * Create a new resource
-   *
-   * Validates URL uniqueness before creating the resource.
-   * The URL must be unique across all resources.
-   *
-   * @param data - The resource data to insert (must include required fields)
-   * @returns The newly created resource with all columns populated
-   * @throws {Error} If a resource with the same URL already exists
-   *
-   * @example
-   * const newResource = await repo.create({
-   *   title: "React Documentation",
-   *   url: "https://react.dev",
-   *   description: "Official React documentation",
-   *   category: "JavaScript",
-   *   subcategory: "React",
-   *   status: "pending",
-   *   submittedBy: userId
-   * });
+   * Automatically logs the creation to audit log
+   * @param resource - Resource data to create
+   * @returns The created resource
    */
-  async create(data: InsertResource): Promise<Resource> {
-    // Check for URL uniqueness
-    const existing = await this.getByUrl(data.url);
-    if (existing) {
-      throw new Error(`Resource with URL "${data.url}" already exists`);
-    }
+  async createResource(resource: InsertResource): Promise<Resource> {
+    const [newResource] = await db.insert(resources).values(resource).returning();
 
-    const [newResource] = await this.db
-      .insert(resources)
-      .values(data)
-      .returning();
+    // Log the creation
+    await this.logResourceAudit(newResource.id, 'created', resource.submittedBy ?? undefined);
 
     return newResource;
   }
 
   /**
-   * Update a resource
-   *
-   * Updates one or more fields of an existing resource. Only the fields
-   * provided in the data object will be modified. The updatedAt timestamp
-   * is automatically updated.
-   *
-   * @param id - The primary key of the resource to update
-   * @param data - Partial resource data containing only the fields to update
-   * @returns The updated resource with all columns populated
-   * @throws {Error} If the resource with the given ID does not exist
-   *
-   * @example
-   * // Update just the description
-   * const updated = await repo.update(resourceId, {
-   *   description: "Updated description"
-   * });
+   * Update an existing resource
+   * Automatically logs the update to audit log
+   * @param id - Resource ID to update
+   * @param resource - Partial resource data to update
+   * @returns The updated resource
    */
-  async update(id: number, data: Partial<InsertResource>): Promise<Resource> {
-    const [updatedResource] = await this.db
+  async updateResource(id: number, resource: Partial<InsertResource>): Promise<Resource> {
+    const [updatedResource] = await db
       .update(resources)
-      .set({
-        ...data,
-        updatedAt: new Date(),
-      })
+      .set({ ...resource, updatedAt: new Date() })
       .where(eq(resources.id, id))
       .returning();
 
-    if (!updatedResource) {
-      throw new Error(`Resource with ID ${id} not found`);
-    }
+    // Log the update
+    await this.logResourceAudit(id, 'updated', resource.submittedBy ?? undefined, resource);
 
     return updatedResource;
   }
 
   /**
-   * Update resource status (for approval workflow)
-   *
-   * Changes the status of a resource and optionally records who approved it.
-   * This is the primary method for the approval workflow:
-   * - pending → approved (with approvedBy user ID)
-   * - pending → rejected
-   * - approved → archived
-   *
-   * When approving a resource (status = 'approved'), automatically sets
-   * approvedBy and approvedAt fields.
-   *
-   * @param id - The primary key of the resource to update
-   * @param status - The new status (approved, rejected, archived, etc.)
-   * @param approvedBy - Optional user ID who performed the status change
-   * @returns The updated resource with all columns populated
-   * @throws {Error} If the resource with the given ID does not exist
-   *
-   * @example
-   * // Approve a pending resource
-   * const approved = await repo.updateStatus(
-   *   resourceId,
-   *   'approved',
-   *   adminUserId
-   * );
-   *
-   * // Reject a pending resource
-   * const rejected = await repo.updateStatus(
-   *   resourceId,
-   *   'rejected',
-   *   adminUserId
-   * );
+   * Update resource status (pending/approved/rejected)
+   * When approving, sets approvedBy and approvedAt fields
+   * @param id - Resource ID to update
+   * @param status - New status value
+   * @param approvedBy - User ID who approved (optional)
+   * @returns The updated resource
    */
-  async updateStatus(
-    id: number,
-    status: string,
-    approvedBy?: string
-  ): Promise<Resource> {
-    const updateData: Partial<Resource> = {
-      status,
-      updatedAt: new Date(),
-    };
+  async updateResourceStatus(id: number, status: string, approvedBy?: string): Promise<Resource> {
+    const updateData: any = { status, updatedAt: new Date() };
 
-    // If approving, set approval metadata
-    if (status === "approved" && approvedBy) {
+    if (status === 'approved' && approvedBy) {
       updateData.approvedBy = approvedBy;
       updateData.approvedAt = new Date();
     }
 
-    const [updatedResource] = await this.db
+    const [updatedResource] = await db
       .update(resources)
       .set(updateData)
       .where(eq(resources.id, id))
       .returning();
 
-    if (!updatedResource) {
-      throw new Error(`Resource with ID ${id} not found`);
-    }
+    // Log the status change
+    await this.logResourceAudit(id, status, approvedBy, { status });
 
     return updatedResource;
   }
 
   /**
    * Delete a resource
-   *
-   * Permanently removes a resource from the database. This operation
-   * cannot be undone. Consider using status = 'archived' instead for
-   * soft deletion.
-   *
-   * @param id - The primary key of the resource to delete
-   * @throws {Error} If the resource with the given ID does not exist
-   *
-   * @example
-   * await repo.delete(resourceId);
+   * Logs deletion to audit log before removing the resource
+   * @param id - Resource ID to delete
+   * @throws Error if resource not found
    */
-  async delete(id: number): Promise<void> {
-    const result = await this.db
-      .delete(resources)
-      .where(eq(resources.id, id))
-      .returning();
-
-    if (result.length === 0) {
-      throw new Error(`Resource with ID ${id} not found`);
+  async deleteResource(id: number): Promise<void> {
+    // Get resource before deletion for audit log
+    const resource = await this.getResource(id);
+    if (!resource) {
+      throw new Error('Resource not found');
     }
+
+    // Log the deletion BEFORE deleting (foreign key constraint)
+    await this.logResourceAudit(
+      id,
+      'deleted',
+      undefined,
+      { resource: { title: resource.title, url: resource.url, category: resource.category } },
+      `Deleted resource: ${resource.title}`
+    );
+
+    await db.delete(resources).where(eq(resources.id, id));
   }
 
   /**
-   * Get pending resources for approval
-   *
-   * Returns all resources with status = 'pending', ordered by creation date
-   * (oldest first) so admins can review them in submission order.
-   *
+   * Get all resources with pending status
    * @returns Object containing pending resources array and total count
-   *
-   * @example
-   * const { resources: pending, total } = await repo.getPendingResources();
    */
-  async getPendingResources(): Promise<{
-    resources: Resource[];
-    total: number;
-  }> {
-    const [countResult] = await this.db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(resources)
-      .where(eq(resources.status, "pending"));
-
-    const total = countResult?.count ?? 0;
-
-    const resourceList = await this.db
+  async getPendingResources(): Promise<{ resources: Resource[]; total: number }> {
+    const pendingResources = await db
       .select()
       .from(resources)
-      .where(eq(resources.status, "pending"))
-      .orderBy(resources.createdAt); // Oldest first for review
+      .where(eq(resources.status, 'pending'))
+      .orderBy(desc(resources.createdAt));
 
     return {
-      resources: resourceList,
-      total,
+      resources: pendingResources,
+      total: pendingResources.length
     };
   }
 
   /**
-   * Approve a resource
-   *
-   * Convenience method for approving a pending resource. Updates status
-   * to 'approved' and records the approver and approval timestamp.
-   *
-   * @param id - The primary key of the resource to approve
-   * @param approvedBy - User ID of the person approving the resource
-   * @returns The approved resource with all columns populated
-   * @throws {Error} If the resource with the given ID does not exist
-   *
-   * @example
-   * const approved = await repo.approve(resourceId, adminUserId);
+   * Approve a pending resource
+   * Sets status to 'approved' and records approver and timestamp
+   * @param id - Resource ID to approve
+   * @param approvedBy - User ID who is approving
+   * @returns The approved resource
+   * @throws Error if resource not found or not pending
    */
-  async approve(id: number, approvedBy: string): Promise<Resource> {
-    return this.updateStatus(id, "approved", approvedBy);
+  async approveResource(id: number, approvedBy: string): Promise<Resource> {
+    const resource = await this.getResource(id);
+    if (!resource) {
+      throw new Error('Resource not found');
+    }
+
+    if (resource.status !== 'pending') {
+      throw new Error('Resource is not pending approval');
+    }
+
+    const [updated] = await db
+      .update(resources)
+      .set({
+        status: 'approved',
+        approvedBy: approvedBy,
+        approvedAt: new Date(),
+        updatedAt: new Date()
+      })
+      .where(eq(resources.id, id))
+      .returning();
+
+    // Log the approval action
+    await this.logResourceAudit(
+      id,
+      'approved',
+      approvedBy,
+      { previousStatus: resource.status, newStatus: 'approved' },
+      'Resource approved by admin'
+    );
+
+    return updated;
   }
 
   /**
-   * Reject a resource
-   *
-   * Convenience method for rejecting a pending resource. Updates status
-   * to 'rejected'. Note: This does not store a rejection reason - use
-   * the audit log for detailed rejection tracking.
-   *
-   * @param id - The primary key of the resource to reject
-   * @returns The rejected resource with all columns populated
-   * @throws {Error} If the resource with the given ID does not exist
-   *
-   * @example
-   * const rejected = await repo.reject(resourceId);
+   * Reject a pending resource
+   * Sets status to 'rejected' and logs the reason
+   * @param id - Resource ID to reject
+   * @param adminId - User ID who is rejecting
+   * @param reason - Rejection reason (minimum 10 characters)
+   * @throws Error if resource not found, not pending, or reason too short
    */
-  async reject(id: number): Promise<Resource> {
-    return this.updateStatus(id, "rejected");
+  async rejectResource(id: number, adminId: string, reason: string): Promise<void> {
+    const resource = await this.getResource(id);
+    if (!resource) {
+      throw new Error('Resource not found');
+    }
+
+    if (resource.status !== 'pending') {
+      throw new Error('Resource is not pending approval');
+    }
+
+    if (!reason || reason.trim().length < 10) {
+      throw new Error('Rejection reason must be at least 10 characters');
+    }
+
+    await db
+      .update(resources)
+      .set({
+        status: 'rejected',
+        updatedAt: new Date()
+      })
+      .where(eq(resources.id, id));
+
+    // Log the rejection action
+    await this.logResourceAudit(
+      id,
+      'rejected',
+      adminId,
+      { previousStatus: resource.status, newStatus: 'rejected', reason },
+      `Resource rejected: ${reason}`
+    );
+  }
+
+  /**
+   * Log a resource audit event
+   * Private helper method for tracking all resource changes
+   * @param resourceId - Resource ID (can be null for system-level events)
+   * @param action - Action performed (created/updated/deleted/approved/rejected)
+   * @param performedBy - User ID who performed the action
+   * @param changes - Object containing the changes made
+   * @param notes - Additional notes about the action
+   */
+  private async logResourceAudit(
+    resourceId: number | null,
+    action: string,
+    performedBy?: string,
+    changes?: any,
+    notes?: string
+  ): Promise<void> {
+    await db.insert(resourceAuditLog).values({
+      resourceId,
+      originalResourceId: resourceId, // Preserve original ID even if resource is deleted later
+      action,
+      performedBy,
+      changes,
+      notes
+    });
   }
 }
