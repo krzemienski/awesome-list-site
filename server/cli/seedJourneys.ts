@@ -1,4 +1,6 @@
-import { storage } from "../storage";
+import { LearningJourneyRepository, ResourceRepository } from "../repositories";
+const learningJourneyRepo = new LearningJourneyRepository();
+const resourceRepo = new ResourceRepository();
 import { claudeService } from "../ai/claudeService";
 
 interface JourneyTemplate {
@@ -63,7 +65,7 @@ const journeyTemplates: JourneyTemplate[] = [
 ];
 
 async function getRelevantResources(keywords: string[], category: string, limit: number = 30): Promise<any[]> {
-  const { resources } = await storage.listResources({
+  const { resources } = await resourceRepo.listResources({
     status: "approved",
     limit: limit * 3 // Get more to filter later
   });
@@ -355,7 +357,7 @@ async function createJourney(journeyData: GeneratedJourney, category: string) {
   console.log(`\n📚 Creating journey: ${journeyData.title}`);
   
   // Create the journey
-  const journey = await storage.createLearningJourney({
+  const journey = await learningJourneyRepo.createLearningJourney({
     title: journeyData.title,
     description: journeyData.description,
     difficulty: journeyData.difficulty,
@@ -374,7 +376,7 @@ async function createJourney(journeyData: GeneratedJourney, category: string) {
     // This allows multiple resources per logical step
     if (step.resourceIds && step.resourceIds.length > 0) {
       for (const resourceId of step.resourceIds) {
-        await storage.createJourneyStep({
+        await learningJourneyRepo.createJourneyStep({
           journeyId: journey.id,
           stepNumber: step.stepNumber,
           title: step.title,
@@ -392,7 +394,7 @@ async function createJourney(journeyData: GeneratedJourney, category: string) {
   }
 
   // CRITICAL VALIDATION: Check distinct stepNumbers (not total rows)
-  const createdSteps = await storage.listJourneySteps(journey.id);
+  const createdSteps = await learningJourneyRepo.listJourneySteps(journey.id);
   const uniqueStepNumbers = new Set(createdSteps.map(s => s.stepNumber));
 
   if (uniqueStepNumbers.size === 0) {
@@ -400,7 +402,7 @@ async function createJourney(journeyData: GeneratedJourney, category: string) {
     console.error(`   Deleting empty journey...`);
     
     // Delete the empty journey
-    await storage.deleteLearningJourney(journey.id);
+    await learningJourneyRepo.deleteLearningJourney(journey.id);
     
     console.error(`   ⚠️  Please review resource selection for this category`);
     throw new Error(`Journey "${journey.title}" has no valid steps and was deleted`);
@@ -411,7 +413,7 @@ async function createJourney(journeyData: GeneratedJourney, category: string) {
     console.error(`   Deleting invalid journey...`);
     
     // Delete the invalid journey
-    await storage.deleteLearningJourney(journey.id);
+    await learningJourneyRepo.deleteLearningJourney(journey.id);
     
     console.error(`   ⚠️  Please review resource selection for this category`);
     throw new Error(`Failed to create valid journey: ${journey.title}`);
@@ -441,7 +443,7 @@ async function seedJourneys() {
       console.log(`   Duration: ${template.estimatedDuration}`);
 
       // Check if journey already exists
-      const existingJourneys = await storage.listLearningJourneys(template.category);
+      const existingJourneys = await learningJourneyRepo.listLearningJourneys(template.category);
       const exists = existingJourneys.some(j => j.title === template.title);
 
       if (exists) {

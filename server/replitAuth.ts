@@ -6,7 +6,8 @@ import session from "express-session";
 import type { Express, RequestHandler } from "express";
 import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
-import { storage } from "./storage";
+import { UserRepository } from "./repositories";
+const userRepo = new UserRepository();
 
 const getOidcConfig = memoize(
   async () => {
@@ -54,7 +55,7 @@ function updateUserSession(
 async function upsertUser(
   claims: any,
 ) {
-  await storage.upsertUser({
+  await userRepo.upsertUser({
     id: claims["sub"],
     email: claims["email"],
     firstName: claims["first_name"],
@@ -109,7 +110,7 @@ export async function setupAuth(app: Express) {
       const { storage } = await import('./storage.js');
       const userId = (user as any).claims?.sub;
       if (userId) {
-        const dbUser = await storage.getUser(userId);
+        const dbUser = await userRepo.getUser(userId);
         if (dbUser) {
           // Attach DB user data to session user object
           (user as any).dbUser = dbUser;
