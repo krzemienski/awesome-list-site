@@ -127,6 +127,9 @@ If resource was modified after edit submission:
 
 ## GitHub Synchronization
 
+> **📘 Deep Dive Guide Available**
+> For comprehensive conceptual understanding, conflict resolution strategies, and detailed troubleshooting, see [GITHUB-SYNC-DEEP-DIVE.md](./GITHUB-SYNC-DEEP-DIVE.md).
+
 ### Import from GitHub
 
 Import resources from any awesome-list repository.

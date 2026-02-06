@@ -14,6 +14,15 @@ export interface UserProfile {
   bookmarks: string[];
   completedResources: string[];
   ratings: Record<string, number>;
+  completedJourneys: number[]; // Journey IDs that are completed
+  journeyProgress: Array<{
+    journeyId: number;
+    completedSteps: number[];
+    currentStepId: number | null;
+    startedAt: Date;
+    lastAccessedAt: Date;
+    completedAt: Date | null;
+  }>;
 }
 
 export interface RecommendationResult {
@@ -66,7 +75,7 @@ export class RecommendationEngine {
   }> {
     // FIXED: Clone profile before merging (done early so cache hit also uses enriched profile)
     // Ensure all required fields have default values
-    const enrichedProfile: UserProfile = { 
+    const enrichedProfile: UserProfile = {
       ...userProfile,
       viewHistory: userProfile.viewHistory || [],
       bookmarks: userProfile.bookmarks || [],
@@ -74,32 +83,87 @@ export class RecommendationEngine {
       preferredCategories: userProfile.preferredCategories || [],
       learningGoals: userProfile.learningGoals || [],
       preferredResourceTypes: userProfile.preferredResourceTypes || [],
-      ratings: userProfile.ratings || {}
+      ratings: userProfile.ratings || {},
+      completedJourneys: userProfile.completedJourneys || [],
+      journeyProgress: userProfile.journeyProgress || []
     };
 
-    // Get user preferences from database and enrich the profile
+    // Get user preferences and interactions from database and enrich the profile
     try {
-      const dbPreferences = await storage.getUserPreferences(userProfile.userId);
+      const [dbPreferences, viewHistory, interactions, journeyProgressList] = await Promise.all([
+        storage.getUserPreferences(userProfile.userId),
+        storage.getUserViewHistory(userProfile.userId),
+        storage.getUserInteractions(userProfile.userId),
+        storage.listUserJourneyProgress(userProfile.userId)
+      ]);
+
+      // Merge DB preferences with provided profile (provided profile takes precedence)
       if (dbPreferences) {
-        // Merge DB preferences with provided profile (provided profile takes precedence)
-        enrichedProfile.preferredCategories = userProfile.preferredCategories.length > 0 
-          ? userProfile.preferredCategories 
+        enrichedProfile.preferredCategories = userProfile.preferredCategories.length > 0
+          ? userProfile.preferredCategories
           : dbPreferences.preferredCategories || [];
-        
+
         enrichedProfile.skillLevel = userProfile.skillLevel || dbPreferences.skillLevel || 'beginner';
-        
+
         enrichedProfile.learningGoals = userProfile.learningGoals.length > 0
           ? userProfile.learningGoals
           : dbPreferences.learningGoals || [];
-        
+
         enrichedProfile.preferredResourceTypes = userProfile.preferredResourceTypes.length > 0
           ? userProfile.preferredResourceTypes
           : dbPreferences.preferredResourceTypes || [];
-        
+
         enrichedProfile.timeCommitment = userProfile.timeCommitment || dbPreferences.timeCommitment || 'flexible';
       }
+
+      // Enrich view history from userInteractions table
+      if (viewHistory && viewHistory.length > 0) {
+        enrichedProfile.viewHistory = viewHistory.map(r => r.url);
+      }
+
+      // Extract completed resources and ratings from interactions
+      const completedInteractions = interactions.filter(i => i.interactionType === 'complete');
+      if (completedInteractions.length > 0) {
+        const completedUrls = await Promise.all(
+          completedInteractions.map(async i => {
+            const resource = await storage.getResource(i.resourceId);
+            return resource?.url;
+          })
+        );
+        enrichedProfile.completedResources = completedUrls.filter(Boolean) as string[];
+      }
+
+      // Extract ratings from interactions
+      const ratingInteractions = interactions.filter(i => i.interactionType === 'rate' && i.interactionValue !== null);
+      if (ratingInteractions.length > 0) {
+        const ratings: Record<string, number> = {};
+        for (const interaction of ratingInteractions) {
+          const resource = await storage.getResource(interaction.resourceId);
+          if (resource && interaction.interactionValue !== null) {
+            ratings[resource.url] = interaction.interactionValue;
+          }
+        }
+        enrichedProfile.ratings = { ...enrichedProfile.ratings, ...ratings };
+      }
+
+      // Enrich journey progress from database
+      if (journeyProgressList && journeyProgressList.length > 0) {
+        enrichedProfile.journeyProgress = journeyProgressList.map(jp => ({
+          journeyId: jp.journeyId,
+          completedSteps: jp.completedSteps || [],
+          currentStepId: jp.currentStepId || null,
+          startedAt: jp.startedAt || new Date(),
+          lastAccessedAt: jp.lastAccessedAt || new Date(),
+          completedAt: jp.completedAt || null
+        }));
+
+        // Extract completed journeys (those with completedAt date)
+        enrichedProfile.completedJourneys = journeyProgressList
+          .filter(jp => jp.completedAt !== null)
+          .map(jp => jp.journeyId);
+      }
     } catch (error) {
-      console.error('Error fetching user preferences, using provided profile:', error);
+      console.error('Error fetching user preferences and interactions, using provided profile:', error);
       // enrichedProfile already has a copy of userProfile
     }
 
@@ -151,22 +215,117 @@ export class RecommendationEngine {
         }
       }
 
-      // Fetch user's favorites and bookmarks for better personalization
-      const [favorites, bookmarks] = await Promise.all([
+      // Fetch user's favorites, bookmarks, and completed journey resources for better personalization
+      const [favorites, bookmarks, completedJourneyResources] = await Promise.all([
         this.getUserFavorites(enrichedProfile.userId),
-        this.getUserBookmarks(enrichedProfile.userId)
+        this.getUserBookmarks(enrichedProfile.userId),
+        storage.getCompletedJourneyResources(enrichedProfile.userId)
       ]);
 
       // Update enriched profile with actual data
       enrichedProfile.bookmarks = bookmarks.map(r => r.url);
-      
-      // Filter out already viewed/completed resources
-      const eligibleResources = resources.filter(resource => 
+
+      // Add completed journey resources to completedResources list
+      const completedJourneyUrls = completedJourneyResources.map(r => r.url);
+      enrichedProfile.completedResources = [
+        ...enrichedProfile.completedResources,
+        ...completedJourneyUrls.filter(url => !enrichedProfile.completedResources.includes(url))
+      ];
+
+      // Filter out already viewed/completed resources (including journey resources)
+      const eligibleResources = resources.filter(resource =>
         !enrichedProfile.viewHistory.includes(resource.url) &&
         !enrichedProfile.completedResources.includes(resource.url)
       );
 
       let recommendations: RecommendationResult[] = [];
+
+      // Cold-start detection: Check if user has minimal interaction history
+      const isColdStart = enrichedProfile.viewHistory.length === 0 &&
+                          enrichedProfile.completedResources.length === 0 &&
+                          Object.keys(enrichedProfile.ratings).length === 0 &&
+                          bookmarks.length === 0;
+
+      // Debug: Log cold-start detection
+      console.log('[COLD-START DEBUG]', {
+        userId: enrichedProfile.userId,
+        viewHistoryLength: enrichedProfile.viewHistory.length,
+        completedResourcesLength: enrichedProfile.completedResources.length,
+        ratingsCount: Object.keys(enrichedProfile.ratings).length,
+        bookmarksLength: bookmarks.length,
+        isColdStart
+      });
+
+      // Debug: Log personalization data for non-cold-start users
+      if (!isColdStart) {
+        const viewedCategories = new Map<string, number>();
+        const bookmarkedCategories = new Map<string, number>();
+        const journeyCategories = new Map<string, number>();
+
+        // Extract categories from view history
+        for (const viewedUrl of enrichedProfile.viewHistory) {
+          const resource = resources.find(r => r.url === viewedUrl);
+          if (resource?.category) {
+            viewedCategories.set(resource.category, (viewedCategories.get(resource.category) || 0) + 1);
+          }
+        }
+
+        // Extract categories from bookmarks
+        for (const bookmark of bookmarks) {
+          if (bookmark.category) {
+            bookmarkedCategories.set(bookmark.category, (bookmarkedCategories.get(bookmark.category) || 0) + 1);
+          }
+        }
+
+        // Extract categories from active journey resources
+        for (const journeyResource of completedJourneyResources) {
+          if (journeyResource.category) {
+            journeyCategories.set(journeyResource.category, (journeyCategories.get(journeyResource.category) || 0) + 1);
+          }
+        }
+
+        console.log('[PERSONALIZATION DEBUG]', {
+          userId: enrichedProfile.userId,
+          totalResources: resources.length,
+          eligibleResources: eligibleResources.length,
+          excludedByViews: enrichedProfile.viewHistory.length,
+          excludedByCompleted: enrichedProfile.completedResources.length,
+          excludedByJourneys: completedJourneyUrls.length,
+          bookmarksCount: bookmarks.length,
+          viewedCategories: Object.fromEntries(viewedCategories),
+          bookmarkedCategories: Object.fromEntries(bookmarkedCategories),
+          journeyCategories: Object.fromEntries(journeyCategories),
+          preferredCategories: enrichedProfile.preferredCategories,
+          activeJourneys: enrichedProfile.journeyProgress.filter(jp => !jp.completedAt).length,
+          completedJourneys: enrichedProfile.completedJourneys.length
+        });
+      }
+
+      // For cold-start users, use popular resources as recommendations
+      if (isColdStart) {
+        console.log('[COLD-START] Generating popular resources for new user:', enrichedProfile.userId);
+        const popularResources = await this.getPopularResources(eligibleResources, limit);
+        recommendations = popularResources.map(resource => ({
+          resource,
+          confidence: 75, // Medium-high confidence for popular items
+          reason: 'Popular among users',
+          type: 'rule_based' as const,
+          score: 0.75
+        }));
+
+        // Cache and return early for cold-start users
+        this.recommendationCache.set(cacheKey, {
+          recommendations,
+          timestamp: Date.now()
+        });
+
+        const learningPaths = await this.generateLearningPathRecommendations(enrichedProfile);
+
+        return {
+          recommendations,
+          learningPaths
+        };
+      }
 
       // Try AI-powered recommendations first if API key is available
       if (claudeService.isAvailable()) {
@@ -203,6 +362,7 @@ export class RecommendationEngine {
           eligibleResources,
           favorites,
           bookmarks,
+          completedJourneyResources,
           remainingSlots
         );
 
@@ -218,6 +378,18 @@ export class RecommendationEngine {
       // Sort by confidence score
       recommendations.sort((a, b) => b.confidence - a.confidence);
       recommendations = recommendations.slice(0, limit);
+
+      // Debug: Log final recommendations with categories
+      console.log('[RECOMMENDATIONS DEBUG]', {
+        userId: enrichedProfile.userId,
+        totalRecommendations: recommendations.length,
+        recommendedCategories: recommendations.map(r => ({
+          category: r.resource.category,
+          confidence: r.confidence,
+          type: r.type,
+          reason: r.reason
+        }))
+      });
 
       // Cache the results
       this.recommendationCache.set(cacheKey, {
@@ -252,11 +424,12 @@ export class RecommendationEngine {
     resources: Resource[],
     favorites: Resource[],
     bookmarks: Resource[],
+    journeyResources: Resource[],
     limit: number
   ): RecommendationResult[] {
     const recommendations: RecommendationResult[] = [];
 
-    // Create category frequency map from favorites and bookmarks
+    // Create category frequency map from favorites, bookmarks, and journey resources
     const categoryFrequency = new Map<string, number>();
     [...favorites, ...bookmarks].forEach(resource => {
       const category = resource.category;
@@ -264,6 +437,43 @@ export class RecommendationEngine {
         categoryFrequency.set(category, (categoryFrequency.get(category) || 0) + 1);
       }
     });
+
+    // Create journey category frequency map (separate for higher weight)
+    const journeyCategoryFrequency = new Map<string, number>();
+    journeyResources.forEach(resource => {
+      const category = resource.category;
+      if (category) {
+        journeyCategoryFrequency.set(category, (journeyCategoryFrequency.get(category) || 0) + 1);
+      }
+    });
+
+    // Create category preference map from user ratings (feedback)
+    // High ratings (4-5) boost similar categories, low ratings (1-2) reduce them
+    const ratingCategoryPreference = new Map<string, { positive: number; negative: number }>();
+    for (const [url, rating] of Object.entries(userProfile.ratings)) {
+      // Find the resource to get its category
+      const ratedResource = [...favorites, ...bookmarks, ...resources].find(r => r.url === url);
+      if (ratedResource?.category) {
+        const pref = ratingCategoryPreference.get(ratedResource.category) || { positive: 0, negative: 0 };
+        if (rating >= 4) {
+          pref.positive += 1;
+        } else if (rating <= 2) {
+          pref.negative += 1;
+        }
+        ratingCategoryPreference.set(ratedResource.category, pref);
+      }
+    }
+
+    // Debug: Log category frequency for rule-based recommendations
+    console.log('[RULE-BASED DEBUG] Category frequency from bookmarks/favorites:',
+      Object.fromEntries(categoryFrequency)
+    );
+    console.log('[RULE-BASED DEBUG] Journey category frequency:',
+      Object.fromEntries(journeyCategoryFrequency)
+    );
+    console.log('[RULE-BASED DEBUG] Rating-based category preferences:',
+      Object.fromEntries(ratingCategoryPreference)
+    );
 
     resources.forEach(resource => {
       let score = 0;
@@ -281,6 +491,29 @@ export class RecommendationEngine {
         score += Math.min(20, frequency * 5);
         if (frequency > 2) {
           reasons.push(`similar to your bookmarked resources`);
+        }
+      }
+
+      // Learning journey category match (15% weight - strong signal of current learning focus)
+      if (resource.category && journeyCategoryFrequency.has(resource.category)) {
+        const frequency = journeyCategoryFrequency.get(resource.category) || 0;
+        score += Math.min(15, frequency * 5);
+        if (frequency > 0) {
+          reasons.push(`related to your active learning journey in ${resource.category}`);
+        }
+      }
+
+      // User feedback rating influence (10% weight - boost or reduce based on feedback)
+      if (resource.category && ratingCategoryPreference.has(resource.category)) {
+        const pref = ratingCategoryPreference.get(resource.category)!;
+        const netPreference = pref.positive - pref.negative;
+        const ratingScore = Math.max(-10, Math.min(10, netPreference * 3));
+        score += ratingScore;
+        if (netPreference > 0) {
+          reasons.push(`similar to resources you rated highly`);
+        } else if (netPreference < 0) {
+          // Negative feedback - reduce score but don't add to reason
+          score = Math.max(0, score); // Ensure score doesn't go negative
         }
       }
 
@@ -395,6 +628,52 @@ export class RecommendationEngine {
   }
 
   /**
+   * Get popular resources based on view counts and interactions
+   * Used for cold-start users with no personalization data
+   */
+  private async getPopularResources(resources: Resource[], limit: number): Promise<Resource[]> {
+    try {
+      // Get interaction counts for all resources
+      const resourcePopularity = await Promise.all(
+        resources.map(async (resource) => {
+          try {
+            const interactions = await storage.getResourceInteractions(resource.id);
+            const viewCount = interactions.filter(i => i.interactionType === 'view').length;
+            const bookmarkCount = interactions.filter(i => i.interactionType === 'bookmark').length;
+            const completeCount = interactions.filter(i => i.interactionType === 'complete').length;
+
+            // Calculate weighted popularity score
+            // Views: 1 point, Bookmarks: 3 points, Completions: 5 points
+            const popularityScore = viewCount + (bookmarkCount * 3) + (completeCount * 5);
+
+            return {
+              resource,
+              popularityScore
+            };
+          } catch (error) {
+            return {
+              resource,
+              popularityScore: 0
+            };
+          }
+        })
+      );
+
+      // Sort by popularity and return top resources
+      return resourcePopularity
+        .sort((a, b) => b.popularityScore - a.popularityScore)
+        .slice(0, limit)
+        .map(item => item.resource);
+
+    } catch (error) {
+      console.error('Error fetching popular resources:', error);
+      // Fallback: return random sample of resources
+      const shuffled = [...resources].sort(() => Math.random() - 0.5);
+      return shuffled.slice(0, limit);
+    }
+  }
+
+  /**
    * Generate learning path recommendations
    */
   private async generateLearningPathRecommendations(
@@ -482,14 +761,98 @@ export class RecommendationEngine {
         `User ${feedback} recommendation`
       );
 
+      // Store rating as user interaction so it influences future recommendations
+      if (rating !== undefined && rating !== null) {
+        await storage.trackUserInteraction(
+          userId,
+          resourceId,
+          'rate',
+          rating,
+          { source: 'recommendation_feedback', feedback }
+        );
+        console.log('[FEEDBACK DEBUG] Stored rating interaction:', {
+          userId,
+          resourceId,
+          feedback,
+          rating,
+          impact: rating >= 4 ? 'positive - will boost similar resources' : 'negative - will reduce similar resources'
+        });
+      }
+
+      // Also track clicked/dismissed interactions for better personalization
+      if (feedback === 'clicked') {
+        await storage.trackUserInteraction(
+          userId,
+          resourceId,
+          'click',
+          null,
+          { source: 'recommendation_feedback' }
+        );
+      } else if (feedback === 'dismissed') {
+        await storage.trackUserInteraction(
+          userId,
+          resourceId,
+          'dismiss',
+          null,
+          { source: 'recommendation_feedback' }
+        );
+      }
+
       // Clear cache to refresh recommendations
       for (const [key] of Array.from(this.recommendationCache.entries())) {
         if (key.startsWith(userId)) {
           this.recommendationCache.delete(key);
         }
       }
+
+      console.log('[FEEDBACK DEBUG] Cache invalidated for user:', userId);
     } catch (error) {
       console.error('Error recording recommendation feedback:', error);
+    }
+  }
+
+  /**
+   * Record detailed feedback on a recommendation with analytics
+   */
+  public async recordDetailedFeedback(
+    userId: string,
+    resourceId: number,
+    feedback_type: 'helpful' | 'not_helpful' | 'irrelevant' | 'already_known',
+    context?: {
+      recommendationType?: 'ai_powered' | 'rule_based' | 'hybrid';
+      confidence?: number;
+      reason?: string;
+      position?: number;
+      sessionId?: string;
+    }
+  ): Promise<void> {
+    try {
+      // Log detailed feedback with analytics context
+      await storage.logResourceAudit(
+        resourceId,
+        `recommendation_feedback_${feedback_type}`,
+        userId,
+        {
+          feedback_type,
+          recommendation_type: context?.recommendationType,
+          confidence_score: context?.confidence,
+          recommendation_reason: context?.reason,
+          position_in_list: context?.position,
+          session_id: context?.sessionId,
+          timestamp: new Date().toISOString()
+        },
+        `User marked recommendation as ${feedback_type}`
+      );
+
+      // Clear cache to trigger fresh recommendations based on feedback
+      for (const [key] of Array.from(this.recommendationCache.entries())) {
+        if (key.startsWith(userId)) {
+          this.recommendationCache.delete(key);
+        }
+      }
+    } catch (error) {
+      console.error('Error recording detailed recommendation feedback:', error);
+      throw error;
     }
   }
 }

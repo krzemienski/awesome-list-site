@@ -166,7 +166,7 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
                 </CommandGroup>
               ) : (
                 <div className="flex flex-col items-center justify-center h-[200px] text-center p-4">
-                  <div className="flex h-16 w-16 items-center justify-center bg-muted">
+                  <div className="flex h-16 w-16 items-center justify-center bg-muted rounded-lg">
                     <Search className="h-8 w-8 text-muted-foreground" />
                   </div>
                   <h3 className="mt-4 text-sm font-semibold">No results found</h3>
@@ -175,7 +175,7 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
               )
             ) : (
               <div className="flex flex-col items-center justify-center h-[200px] text-center p-4">
-                <div className="flex h-16 w-16 items-center justify-center bg-muted">
+                <div className="flex h-16 w-16 items-center justify-center bg-muted rounded-lg">
                   <Search className="h-8 w-8 text-muted-foreground" />
                 </div>
                 <h3 className="mt-4 text-sm font-semibold">Start typing to search</h3>

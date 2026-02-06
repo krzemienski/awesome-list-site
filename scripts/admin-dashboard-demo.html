@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Awesome List</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    * {
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: hsl(222.2 84% 4.9%);
+      color: hsl(210 40% 98%);
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, hsl(222.2 84% 8%) 0%, hsl(222.2 84% 6%) 100%);
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="border-b" style="border-color: hsl(217.2 32.6% 17.5%);">
+    <div class="container mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <svg class="w-8 h-8 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+          </svg>
+          <h1 class="text-xl font-bold">Awesome List</h1>
+          <span class="ml-2 px-2 py-1 text-xs rounded" style="background: hsl(280 100% 70%); color: hsl(222.2 84% 4.9%);">Admin</span>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, #ec4899, #a855f7);">
+              <span class="text-xs font-bold">AD</span>
+            </div>
+            <span class="text-sm">Admin User</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container mx-auto px-4 py-8">
+    <!-- Breadcrumb -->
+    <nav class="mb-6 flex items-center gap-2 text-sm">
+      <a href="/" class="text-gray-400 hover:text-white transition-colors">Home</a>
+      <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+      <span class="text-white font-medium">Admin Dashboard</span>
+    </nav>
+
+    <!-- Page Title -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold mb-2">Dashboard</h1>
+      <p class="text-gray-400">Manage resources, categories, and curate your awesome list</p>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <!-- Total Resources -->
+      <div class="stat-card p-6 rounded-lg border" style="border-color: hsl(217.2 32.6% 17.5%);">
+        <div class="flex items-start justify-between mb-3">
+          <div>
+            <p class="text-sm text-gray-400 mb-1">Total Resources</p>
+            <p class="text-3xl font-bold">1,247</p>
+          </div>
+          <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background: hsl(217.2 32.6% 17.5%);">
+            <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="flex items-center gap-1 text-xs">
+          <span class="text-green-400">+23</span>
+          <span class="text-gray-500">this week</span>
+        </div>
+      </div>
+
+      <!-- Pending Reviews -->
+      <div class="stat-card p-6 rounded-lg border" style="border-color: hsl(217.2 32.6% 17.5%);">
+        <div class="flex items-start justify-between mb-3">
+          <div>
+            <p class="text-sm text-gray-400 mb-1">Pending Reviews</p>
+            <p class="text-3xl font-bold">8</p>
+          </div>
+          <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background: hsl(217.2 32.6% 17.5%);">
+            <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="flex items-center gap-1 text-xs">
+          <span class="text-yellow-400">Action needed</span>
+        </div>
+      </div>
+
+      <!-- Categories -->
+      <div class="stat-card p-6 rounded-lg border" style="border-color: hsl(217.2 32.6% 17.5%);">
+        <div class="flex items-start justify-between mb-3">
+          <div>
+            <p class="text-sm text-gray-400 mb-1">Categories</p>
+            <p class="text-3xl font-bold">42</p>
+          </div>
+          <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background: hsl(217.2 32.6% 17.5%);">
+            <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="flex items-center gap-1 text-xs">
+          <span class="text-gray-500">158 subcategories</span>
+        </div>
+      </div>
+
+      <!-- Contributors -->
+      <div class="stat-card p-6 rounded-lg border" style="border-color: hsl(217.2 32.6% 17.5%);">
+        <div class="flex items-start justify-between mb-3">
+          <div>
+            <p class="text-sm text-gray-400 mb-1">Contributors</p>
+            <p class="text-3xl font-bold">89</p>
+          </div>
+          <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background: hsl(217.2 32.6% 17.5%);">
+            <svg class="w-6 h-6 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="flex items-center gap-1 text-xs">
+          <span class="text-green-400">+5</span>
+          <span class="text-gray-500">this month</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Main Content Area -->
+      <div class="lg:col-span-2 space-y-8">
+        <!-- Pending Submissions -->
+        <div class="rounded-lg border" style="background: hsl(222.2 84% 8%); border-color: hsl(217.2 32.6% 17.5%);">
+          <div class="p-6 border-b" style="border-color: hsl(217.2 32.6% 17.5%);">
+            <div class="flex items-center justify-between">
+              <h2 class="text-xl font-bold">Pending Submissions</h2>
+              <span class="px-3 py-1 text-xs rounded-full" style="background: hsl(217.2 32.6% 17.5%); color: hsl(280 100% 70%);">8 items</span>
+            </div>
+          </div>
+          <div class="divide-y" style="border-color: hsl(217.2 32.6% 17.5%);">
+            <!-- Submission Item 1 -->
+            <div class="p-6 hover:bg-opacity-50 transition-colors">
+              <div class="flex items-start gap-4">
+                <div class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center" style="background: linear-gradient(135deg, #ec4899, #a855f7);">
+                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                  </svg>
+                </div>
+                <div class="flex-grow">
+                  <div class="flex items-start justify-between mb-2">
+                    <div>
+                      <h3 class="font-semibold mb-1">Next.js 14 Performance Guide</h3>
+                      <p class="text-sm text-gray-400">Complete guide to optimizing Next.js applications for maximum performance</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-3 mb-3">
+                    <span class="px-2 py-1 text-xs rounded" style="background: hsl(217.2 32.6% 17.5%); color: hsl(280 100% 70%);">Web Development</span>
+                    <span class="text-xs text-gray-500">Submitted by @developer42</span>
+                    <span class="text-xs text-gray-500">2 hours ago</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <button class="px-3 py-1.5 text-xs rounded font-medium text-white" style="background: linear-gradient(135deg, #10b981, #059669);">
+                      Approve
+                    </button>
+                    <button class="px-3 py-1.5 text-xs rounded font-medium" style="background: hsl(217.2 32.6% 17.5%); color: hsl(210 40% 98%);">
+                      Edit
+                    </button>
+                    <button class="px-3 py-1.5 text-xs rounded font-medium text-red-400" style="background: hsl(217.2 32.6% 17.5%);">
+                      Reject
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Submission Item 2 -->
+            <div class="p-6 hover:bg-opacity-50 transition-colors">
+              <div class="flex items-start gap-4">
+                <div class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">
+                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                  </svg>
+                </div>
+                <div class="flex-grow">
+                  <div class="flex items-start justify-between mb-2">
+                    <div>
+                      <h3 class="font-semibold mb-1">TypeScript Design Patterns Collection</h3>
+                      <p class="text-sm text-gray-400">Modern design patterns implemented in TypeScript with real-world examples</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-3 mb-3">
+                    <span class="px-2 py-1 text-xs rounded" style="background: hsl(217.2 32.6% 17.5%); color: hsl(280 100% 70%);">Programming</span>
+                    <span class="text-xs text-gray-500">Submitted by @codemaster</span>
+                    <span class="text-xs text-gray-500">5 hours ago</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <button class="px-3 py-1.5 text-xs rounded font-medium text-white" style="background: linear-gradient(135deg, #10b981, #059669);">
+                      Approve
+                    </button>
+                    <button class="px-3 py-1.5 text-xs rounded font-medium" style="background: hsl(217.2 32.6% 17.5%); color: hsl(210 40% 98%);">
+                      Edit
+                    </button>
+                    <button class="px-3 py-1.5 text-xs rounded font-medium text-red-400" style="background: hsl(217.2 32.6% 17.5%);">
+                      Reject
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Submission Item 3 -->
+            <div class="p-6 hover:bg-opacity-50 transition-colors">
+              <div class="flex items-start gap-4">
+                <div class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                  </svg>
+                </div>
+                <div class="flex-grow">
+                  <div class="flex items-start justify-between mb-2">
+                    <div>
+                      <h3 class="font-semibold mb-1">Machine Learning Resources for Beginners</h3>
+                      <p class="text-sm text-gray-400">Curated list of ML tutorials, courses, and projects for getting started</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-3 mb-3">
+                    <span class="px-2 py-1 text-xs rounded" style="background: hsl(217.2 32.6% 17.5%); color: hsl(280 100% 70%);">Machine Learning</span>
+                    <span class="text-xs text-gray-500">Submitted by @aiexplorer</span>
+                    <span class="text-xs text-gray-500">1 day ago</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <button class="px-3 py-1.5 text-xs rounded font-medium text-white" style="background: linear-gradient(135deg, #10b981, #059669);">
+                      Approve
+                    </button>
+                    <button class="px-3 py-1.5 text-xs rounded font-medium" style="background: hsl(217.2 32.6% 17.5%); color: hsl(210 40% 98%);">
+                      Edit
+                    </button>
+                    <button class="px-3 py-1.5 text-xs rounded font-medium text-red-400" style="background: hsl(217.2 32.6% 17.5%);">
+                      Reject
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="rounded-lg border" style="background: hsl(222.2 84% 8%); border-color: hsl(217.2 32.6% 17.5%);">
+          <div class="p-6 border-b" style="border-color: hsl(217.2 32.6% 17.5%);">
+            <h2 class="text-xl font-bold">Recent Activity</h2>
+          </div>
+          <div class="p-6 space-y-4">
+            <div class="flex items-start gap-3">
+              <div class="w-2 h-2 rounded-full mt-2" style="background: hsl(142 76% 56%);"></div>
+              <div class="flex-grow">
+                <p class="text-sm"><span class="font-medium">Admin User</span> approved <span class="text-pink-400">React Performance Tips</span></p>
+                <p class="text-xs text-gray-500 mt-1">15 minutes ago</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <div class="w-2 h-2 rounded-full mt-2" style="background: hsl(280 100% 70%);"></div>
+              <div class="flex-grow">
+                <p class="text-sm"><span class="font-medium">@contributor23</span> submitted <span class="text-pink-400">Docker Best Practices</span></p>
+                <p class="text-xs text-gray-500 mt-1">1 hour ago</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <div class="w-2 h-2 rounded-full mt-2" style="background: hsl(142 76% 56%);"></div>
+              <div class="flex-grow">
+                <p class="text-sm"><span class="font-medium">Admin User</span> created new category <span class="text-pink-400">Cloud Native</span></p>
+                <p class="text-xs text-gray-500 mt-1">3 hours ago</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <div class="w-2 h-2 rounded-full mt-2" style="background: hsl(0 84% 60%);"></div>
+              <div class="flex-grow">
+                <p class="text-sm"><span class="font-medium">Admin User</span> rejected <span class="text-pink-400">Low Quality Tutorial</span></p>
+                <p class="text-xs text-gray-500 mt-1">5 hours ago</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="lg:col-span-1 space-y-6">
+        <!-- Quick Actions -->
+        <div class="rounded-lg border" style="background: hsl(222.2 84% 8%); border-color: hsl(217.2 32.6% 17.5%);">
+          <div class="p-6">
+            <h3 class="font-semibold mb-4">Quick Actions</h3>
+            <div class="space-y-2">
+              <button class="w-full px-4 py-2 rounded font-medium text-white flex items-center gap-2" style="background: linear-gradient(135deg, #ec4899, #a855f7);">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                </svg>
+                Add Resource
+              </button>
+              <button class="w-full px-4 py-2 rounded font-medium flex items-center gap-2" style="background: hsl(217.2 32.6% 17.5%); color: hsl(210 40% 98%);">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                </svg>
+                Add Category
+              </button>
+              <button class="w-full px-4 py-2 rounded font-medium flex items-center gap-2" style="background: hsl(217.2 32.6% 17.5%); color: hsl(210 40% 98%);">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+                Bulk Import
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top Categories -->
+        <div class="rounded-lg border" style="background: hsl(222.2 84% 8%); border-color: hsl(217.2 32.6% 17.5%);">
+          <div class="p-6">
+            <h3 class="font-semibold mb-4">Top Categories</h3>
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 rounded flex items-center justify-center" style="background: hsl(217.2 32.6% 17.5%);">
+                    <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                    </svg>
+                  </div>
+                  <span class="text-sm">Web Development</span>
+                </div>
+                <span class="text-xs text-gray-400">234</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 rounded flex items-center justify-center" style="background: hsl(217.2 32.6% 17.5%);">
+                    <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                    </svg>
+                  </div>
+                  <span class="text-sm">Machine Learning</span>
+                </div>
+                <span class="text-xs text-gray-400">187</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 rounded flex items-center justify-center" style="background: hsl(217.2 32.6% 17.5%);">
+                    <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                    </svg>
+                  </div>
+                  <span class="text-sm">Mobile Dev</span>
+                </div>
+                <span class="text-xs text-gray-400">156</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 rounded flex items-center justify-center" style="background: hsl(217.2 32.6% 17.5%);">
+                    <svg class="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/>
+                    </svg>
+                  </div>
+                  <span class="text-sm">DevOps</span>
+                </div>
+                <span class="text-xs text-gray-400">143</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- System Health -->
+        <div class="rounded-lg border" style="background: hsl(222.2 84% 8%); border-color: hsl(217.2 32.6% 17.5%);">
+          <div class="p-6">
+            <h3 class="font-semibold mb-4">System Health</h3>
+            <div class="space-y-3">
+              <div>
+                <div class="flex items-center justify-between text-xs mb-2">
+                  <span class="text-gray-400">Database</span>
+                  <span class="text-green-400">Healthy</span>
+                </div>
+                <div class="w-full h-1.5 rounded-full" style="background: hsl(217.2 32.6% 17.5%);">
+                  <div class="h-full rounded-full" style="width: 95%; background: linear-gradient(135deg, #10b981, #059669);"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex items-center justify-between text-xs mb-2">
+                  <span class="text-gray-400">API Response</span>
+                  <span class="text-green-400">Fast</span>
+                </div>
+                <div class="w-full h-1.5 rounded-full" style="background: hsl(217.2 32.6% 17.5%);">
+                  <div class="h-full rounded-full" style="width: 88%; background: linear-gradient(135deg, #10b981, #059669);"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex items-center justify-between text-xs mb-2">
+                  <span class="text-gray-400">Cache Hit Rate</span>
+                  <span class="text-green-400">92%</span>
+                </div>
+                <div class="w-full h-1.5 rounded-full" style="background: hsl(217.2 32.6% 17.5%);">
+                  <div class="h-full rounded-full" style="width: 92%; background: linear-gradient(135deg, #10b981, #059669);"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

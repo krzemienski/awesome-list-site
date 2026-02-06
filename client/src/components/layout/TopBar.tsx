@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { Menu, Search, Github, Sun, Moon, Palette, List, BarChart3, User, LogIn, LogOut, Bookmark, Shield } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
 import { useIsMobile } from "@/hooks/use-mobile";
 import CustomThemeManager, { CustomTheme } from "@/components/ui/custom-theme-manager";
-import AnalyticsDashboard from "@/components/ui/analytics-dashboard";
+const AnalyticsDashboard = lazy(() => import("@/components/ui/analytics-dashboard"));
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -100,7 +100,7 @@ export default function TopBar({
         <div className="flex-1 mx-1 md:mx-4 min-w-0">
           <button
             onClick={onSearchOpen}
-            className="w-full flex items-center h-8 md:h-9 rounded-md border border-input px-2 md:px-3 py-1 md:py-2 text-sm bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="w-full flex items-center h-8 md:h-9 rounded-lg border border-input px-2 md:px-3 py-1 md:py-2 text-sm bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             <Search className="mr-1 md:mr-2 h-4 w-4 shrink-0 opacity-50" />
             <span className="text-muted-foreground truncate text-xs md:text-sm">
@@ -206,12 +206,23 @@ export default function TopBar({
           )}
         </div>
       </div>
-      
-      <AnalyticsDashboard
-        resources={resources}
-        isOpen={isAnalyticsOpen}
-        onClose={() => setIsAnalyticsOpen(false)}
-      />
+
+      {isAnalyticsOpen && (
+        <Suspense fallback={
+          <div className="flex items-center justify-center p-8">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Loading analytics...</p>
+            </div>
+          </div>
+        }>
+          <AnalyticsDashboard
+            resources={resources}
+            isOpen={isAnalyticsOpen}
+            onClose={() => setIsAnalyticsOpen(false)}
+          />
+        </Suspense>
+      )}
       
       <CustomThemeManager
         isOpen={isThemeManagerOpen}

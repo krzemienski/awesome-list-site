@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Search, Filter, Tag, Folder, ExternalLink, Star } from "lucide-react";
+import { Search, Filter, Tag, Folder, ExternalLink, Star, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -257,12 +257,10 @@ export default function CategoryExplorer({ categories, resources, className }: C
                           onClick={() => toggleCategoryExpansion(category.name)}
                           className="h-8 w-8 p-0"
                         >
-                          <span className={cn(
-                            "transform transition-transform",
+                          <ChevronRight className={cn(
+                            "h-4 w-4 transform transition-transform",
                             isExpanded ? "rotate-90" : "rotate-0"
-                          )}>
-                            ▶
-                          </span>
+                          )} />
                         </Button>
                       </CollapsibleTrigger>
                     </Collapsible>

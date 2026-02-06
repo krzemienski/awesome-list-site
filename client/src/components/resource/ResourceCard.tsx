@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +9,7 @@ import FavoriteButton from "./FavoriteButton";
 import BookmarkButton from "./BookmarkButton";
 import { SuggestEditDialog } from "@/components/ui/suggest-edit-dialog";
 import { cn } from "@/lib/utils";
+import { Blurhash } from "react-blurhash";
 import type { Resource } from "@shared/schema";
 
 interface ResourceCardProps {
@@ -29,15 +30,16 @@ interface ResourceCardProps {
   onClick?: () => void;
 }
 
-export default function ResourceCard({ 
-  resource, 
+function ResourceCard({
+  resource,
   fullResource,
   className,
-  onClick 
+  onClick
 }: ResourceCardProps) {
   const { isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
   const [suggestEditOpen, setSuggestEditOpen] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   const numericId = parseInt(resource.id);
   const isValidDbResource = !isNaN(numericId) && numericId > 0;
@@ -121,24 +123,40 @@ export default function ResourceCard({
       </CardHeader>
       
       <CardContent className="pt-0">
-        {fullResource?.metadata && typeof fullResource.metadata === 'object' && 'urlScraped' in fullResource.metadata && Boolean(fullResource.metadata.urlScraped) && (
+        {fullResource?.metadata?.urlScraped && (
           <div className="mb-3 space-y-2">
-            {typeof fullResource.metadata.ogImage === 'string' && (
-              <div className="rounded-md overflow-hidden border border-border">
+            {fullResource.metadata.ogImage && (
+              <div className="rounded-md overflow-hidden border border-border relative h-32">
+                {fullResource.metadata.ogImageBlurhash && !imageLoaded && (
+                  <div className="absolute inset-0">
+                    <Blurhash
+                      hash={fullResource.metadata.ogImageBlurhash}
+                      width="100%"
+                      height="100%"
+                      resolutionX={32}
+                      resolutionY={32}
+                      punch={1}
+                    />
+                  </div>
+                )}
                 <img
                   src={fullResource.metadata.ogImage}
-                  alt={(typeof fullResource.metadata.ogTitle === 'string' ? fullResource.metadata.ogTitle : resource.name)}
-                  className="w-full h-32 object-cover"
+                  alt={fullResource.metadata.ogTitle || resource.name}
+                  className="w-full h-32 object-cover relative z-10"
                   loading="lazy"
+                  onLoad={() => setImageLoaded(true)}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
                 />
               </div>
             )}
-            {typeof fullResource.metadata.scrapedTitle === 'string' && fullResource.metadata.scrapedTitle !== resource.name && (
+            {fullResource.metadata.scrapedTitle && fullResource.metadata.scrapedTitle !== resource.name && (
               <div className="text-xs text-muted-foreground">
                 <span className="font-medium">Page Title:</span> {fullResource.metadata.scrapedTitle}
               </div>
             )}
-            {typeof fullResource.metadata.scrapedDescription === 'string' && fullResource.metadata.scrapedDescription !== resource.description && (
+            {fullResource.metadata.scrapedDescription && fullResource.metadata.scrapedDescription !== resource.description && (
               <div className="text-xs text-muted-foreground line-clamp-2">
                 <span className="font-medium">Page Description:</span> {fullResource.metadata.scrapedDescription}
               </div>
@@ -211,3 +229,27 @@ export default function ResourceCard({
     </Card>
   );
 }
+
+export default memo(ResourceCard, (prevProps, nextProps) => {
+  const prevRes = prevProps.resource;
+  const nextRes = nextProps.resource;
+
+  // Return true if props are equal (skip re-render), false if different (re-render)
+  return (
+    prevRes.id === nextRes.id &&
+    prevRes.name === nextRes.name &&
+    prevRes.url === nextRes.url &&
+    prevRes.description === nextRes.description &&
+    prevRes.isFavorited === nextRes.isFavorited &&
+    prevRes.isBookmarked === nextRes.isBookmarked &&
+    prevRes.favoriteCount === nextRes.favoriteCount &&
+    prevRes.bookmarkNotes === nextRes.bookmarkNotes &&
+    prevRes.category === nextRes.category &&
+    // Handle optional array comparison
+    JSON.stringify(prevRes.tags || []) === JSON.stringify(nextRes.tags || []) &&
+    // Compare other props
+    prevProps.className === nextProps.className &&
+    prevProps.onClick === nextProps.onClick &&
+    prevProps.fullResource === nextProps.fullResource
+  );
+});

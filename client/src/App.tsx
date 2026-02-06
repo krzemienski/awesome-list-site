@@ -143,7 +143,7 @@ function Router() {
             <AdminDashboard />
           </AdminGuard>
         )} />
-        <Route component={NotFound} />
+        <Route path="/:rest*" component={NotFound} />
       </Switch>
     </MainLayout>
   );

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 import { Button } from "@/components/ui/button";
 import { Bookmark, BookmarkPlus, NotebookPen } from "lucide-react";
 import {
@@ -25,7 +25,7 @@ interface BookmarkButtonProps {
   showNotesDialog?: boolean;
 }
 
-export default function BookmarkButton({
+function BookmarkButton({
   resourceId,
   isBookmarked: initialBookmarked = false,
   notes: initialNotes = "",
@@ -219,3 +219,5 @@ export default function BookmarkButton({
     </>
   );
 }
+
+export default memo(BookmarkButton);

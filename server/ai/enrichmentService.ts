@@ -305,6 +305,7 @@ export class EnrichmentService {
             scrapedTitle: urlMetadata.title,
             scrapedDescription: urlMetadata.description,
             ogImage: urlMetadata.ogImage,
+            ogImageBlurhash: urlMetadata.ogImageBlurhash,
             ogTitle: urlMetadata.ogTitle,
             ogDescription: urlMetadata.ogDescription,
             twitterCard: urlMetadata.twitterCard,

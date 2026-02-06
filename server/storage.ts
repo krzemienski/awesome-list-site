@@ -49,6 +49,7 @@ import {
   resourceEdits,
   enrichmentJobs,
   enrichmentQueue,
+  apiKeys,
   type User,
   type UpsertUser,
   type Resource,
@@ -78,6 +79,8 @@ import {
   type InsertEnrichmentJob,
   type EnrichmentQueueItem,
   type InsertEnrichmentQueue,
+  type ApiKey,
+  type InsertApiKey,
 } from "@shared/schema";
 
 // Infer ResourceAuditLog type from schema table
@@ -85,6 +88,7 @@ export type ResourceAuditLog = typeof resourceAuditLog.$inferSelect;
 import { db } from "./db";
 import { eq, and, sql, desc, asc, inArray, like, or, isNull, isNotNull } from "drizzle-orm";
 import { mapCategoryName } from "@shared/categoryMapping";
+import bcrypt from "bcryptjs";
 
 // Interface for storage operations
 export interface IStorage {
@@ -96,7 +100,14 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   listUsers(page: number, limit: number): Promise<{ users: User[]; total: number }>;
   updateUserRole(userId: string, role: string): Promise<User>;
-  
+
+  // API Key operations
+  createApiKey(apiKey: InsertApiKey): Promise<ApiKey>;
+  getApiKey(key: string): Promise<ApiKey | undefined>;
+  listApiKeys(userId: string): Promise<ApiKey[]>;
+  revokeApiKey(id: string): Promise<void>;
+  updateApiKeyLastUsed(id: string): Promise<void>;
+
   // Resource CRUD operations
   listResources(options: ListResourceOptions): Promise<{ resources: Resource[]; total: number }>;
   getResource(id: number): Promise<Resource | undefined>;
@@ -250,6 +261,9 @@ interface ListResourceOptions {
   subcategory?: string;
   userId?: string;
   search?: string;
+  resourceType?: string;
+  difficulty?: string;
+  sortBy?: string;
 }
 
 interface AdminStats {
@@ -390,33 +404,93 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return user;
   }
-  
+
+  // API Key operations
+  async createApiKey(apiKey: InsertApiKey): Promise<ApiKey> {
+    const [key] = await db
+      .insert(apiKeys)
+      .values(apiKey)
+      .returning();
+    return key;
+  }
+
+  async getApiKey(key: string): Promise<ApiKey | undefined> {
+    // Fetch all non-revoked, non-expired API keys
+    // We need to check against all of them since keys are hashed
+    const allKeys = await db
+      .select()
+      .from(apiKeys)
+      .where(isNull(apiKeys.revokedAt))
+      .limit(1000); // Reasonable limit to prevent DoS
+
+    // Check each key using bcrypt.compare
+    for (const apiKey of allKeys) {
+      const isMatch = await bcrypt.compare(key, apiKey.key);
+      if (isMatch) {
+        // Additional check: ensure not expired
+        if (apiKey.expiresAt) {
+          const now = new Date();
+          const expiresAt = new Date(apiKey.expiresAt);
+          if (now > expiresAt) {
+            continue; // Skip expired keys
+          }
+        }
+        return apiKey;
+      }
+    }
+
+    return undefined;
+  }
+
+  async listApiKeys(userId: string): Promise<ApiKey[]> {
+    const keys = await db
+      .select()
+      .from(apiKeys)
+      .where(eq(apiKeys.userId, userId))
+      .orderBy(desc(apiKeys.createdAt));
+    return keys;
+  }
+
+  async revokeApiKey(id: string): Promise<void> {
+    await db
+      .update(apiKeys)
+      .set({ revokedAt: new Date() })
+      .where(eq(apiKeys.id, id));
+  }
+
+  async updateApiKeyLastUsed(id: string): Promise<void> {
+    await db
+      .update(apiKeys)
+      .set({ lastUsedAt: new Date() })
+      .where(eq(apiKeys.id, id));
+  }
+
   // Resource CRUD operations
   async listResources(options: ListResourceOptions): Promise<{ resources: Resource[]; total: number }> {
-    const { page = 1, limit = 20, status, category, subcategory, userId, search } = options;
+    const { page = 1, limit = 20, status, category, subcategory, userId, search, resourceType, difficulty, sortBy } = options;
     const offset = (page - 1) * limit;
-    
+
     let query = db.select().from(resources);
     let countQuery = db.select({ count: sql<number>`count(*)::int` }).from(resources);
-    
+
     const conditions = [];
-    
+
     if (status) {
       conditions.push(eq(resources.status, status));
     }
-    
+
     if (category) {
       conditions.push(eq(resources.category, category));
     }
-    
+
     if (subcategory) {
       conditions.push(eq(resources.subcategory, subcategory));
     }
-    
+
     if (userId) {
       conditions.push(eq(resources.submittedBy, userId));
     }
-    
+
     if (search) {
       conditions.push(
         or(
@@ -425,19 +499,58 @@ export class DatabaseStorage implements IStorage {
         )
       );
     }
-    
+
+    if (resourceType) {
+      conditions.push(sql`${resources.metadata}->>'resourceType' = ${resourceType}`);
+    }
+
+    if (difficulty) {
+      conditions.push(sql`${resources.metadata}->>'difficulty' = ${difficulty}`);
+    }
+
     if (conditions.length > 0) {
       query = query.where(and(...conditions)) as any;
       countQuery = countQuery.where(and(...conditions)) as any;
     }
-    
+
     const [totalResult] = await countQuery;
-    
+
+    // Apply sorting based on sortBy parameter
+    // Supported formats: name-asc, name-desc, createdAt-asc, createdAt-desc, updatedAt-asc, updatedAt-desc
+    // Also support legacy formats: newest, oldest, recently-updated
+    let orderByClause;
+    switch (sortBy) {
+      case 'name-asc':
+        orderByClause = asc(resources.title);
+        break;
+      case 'name-desc':
+        orderByClause = desc(resources.title);
+        break;
+      case 'createdAt-asc':
+      case 'oldest':
+        orderByClause = asc(resources.createdAt);
+        break;
+      case 'createdAt-desc':
+      case 'newest':
+        orderByClause = desc(resources.createdAt);
+        break;
+      case 'updatedAt-asc':
+        orderByClause = asc(resources.updatedAt);
+        break;
+      case 'updatedAt-desc':
+      case 'recently-updated':
+        orderByClause = desc(resources.updatedAt);
+        break;
+      default:
+        // Default sort by newest first
+        orderByClause = desc(resources.createdAt);
+    }
+
     const resourceList = await query
-      .orderBy(desc(resources.createdAt))
+      .orderBy(orderByClause)
       .limit(limit)
       .offset(offset);
-    
+
     return { resources: resourceList, total: totalResult.count };
   }
   
@@ -1749,10 +1862,27 @@ export class MemStorage implements IStorage {
   async listUsers(page: number, limit: number): Promise<{ users: User[]; total: number }> { 
     return { users: [], total: 0 }; 
   }
-  async updateUserRole(userId: string, role: string): Promise<User> { 
-    throw new Error("Not implemented in memory storage"); 
+  async updateUserRole(userId: string, role: string): Promise<User> {
+    throw new Error("Not implemented in memory storage");
   }
-  
+
+  // API Key operations (not implemented in memory storage)
+  async createApiKey(apiKey: InsertApiKey): Promise<ApiKey> {
+    throw new Error("Not implemented in memory storage");
+  }
+  async getApiKey(key: string): Promise<ApiKey | undefined> {
+    return undefined;
+  }
+  async listApiKeys(userId: string): Promise<ApiKey[]> {
+    return [];
+  }
+  async revokeApiKey(id: string): Promise<void> {
+    // No-op in memory storage
+  }
+  async updateApiKeyLastUsed(id: string): Promise<void> {
+    // No-op in memory storage
+  }
+
   async listResources(options: ListResourceOptions): Promise<{ resources: Resource[]; total: number }> {
     return { resources: [], total: 0 };
   }

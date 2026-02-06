@@ -1,16 +1,35 @@
 /* Fix for content disappearing on scroll - optimized */
 html {
   scroll-behavior: smooth;
-  overflow-x: hidden;
+  overflow-x: hidden !important;
   /* Optimize scroll performance */
   scroll-padding-top: 80px;
+  /* Use 100% instead of 100vw to avoid scrollbar width issues */
+  max-width: 100%;
+  width: 100%;
 }
 
 body {
-  overflow-x: hidden;
+  overflow-x: hidden !important;
   min-height: 100vh;
   /* Prevent overscroll bounce */
   overscroll-behavior: none;
+  /* Use 100% instead of 100vw */
+  max-width: 100%;
+  width: 100%;
+  position: relative;
+}
+
+/* Prevent any element from causing horizontal overflow */
+#root {
+  overflow-x: hidden !important;
+  max-width: 100%;
+  width: 100%;
+}
+
+/* Global overflow prevention - clip any horizontal overflow */
+html, body, #root {
+  overflow-x: clip !important;
 }
 
 /* Prevent layout shifts during scroll */

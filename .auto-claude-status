@@ -1,25 +1,25 @@
 {
   "active": true,
-  "spec": "021-reduce-excessive-any-type-usage-for-improved-type-",
+  "spec": "023-add-eslint-and-prettier-configuration-for-consiste",
   "state": "complete",
   "subtasks": {
-    "completed": 26,
-    "total": 26,
+    "completed": 10,
+    "total": 10,
     "in_progress": 0,
     "failed": 0
   },
   "phase": {
-    "current": "",
-    "id": 0,
-    "total": 0
+    "current": "Verification and Initial Run",
+    "id": null,
+    "total": 3
   },
   "workers": {
     "active": 0,
     "max": 1
   },
   "session": {
-    "number": 0,
-    "started_at": "2026-02-01T00:50:49.002771"
+    "number": 11,
+    "started_at": "2026-01-31T23:33:33.283367"
   },
-  "last_update": "2026-02-01T00:50:49.067699"
+  "last_update": "2026-01-31T23:57:32.454789"
 }

@@ -128,6 +128,53 @@ npx tsx scripts/test-awesome-lint.ts
 4. Include screenshots for UI changes
 5. Keep PRs focused (one feature/fix per PR)
 
+### Including Screenshots in PRs
+
+For UI changes, include screenshots in your PR description to help reviewers understand the visual impact. Follow the format used in our [README.md](README.md#screenshots) and [docs/screenshots/](docs/screenshots/) directory.
+
+**Screenshot Format:**
+```markdown
+![Descriptive alt text explaining what the screenshot shows](path/to/screenshot.png)
+*Brief caption describing the key feature or change*
+```
+
+**Example - Feature Screenshot:**
+```markdown
+### Search Interface Updates
+![Home page with fuzzy search (⌘K) interface showing resource discovery](docs/screenshots/home-search.png)
+*Browse 2,600+ resources with advanced fuzzy search (⌘K keyboard shortcut)*
+```
+
+**Example - Before/After Comparison:**
+```markdown
+### Mobile Navigation Improvements
+
+**Before:**
+![Old mobile navigation with hamburger menu](docs/screenshots/mobile-before.png)
+*Previous mobile navigation required multiple taps*
+
+**After:**
+![New mobile navigation with bottom nav bar](docs/screenshots/mobile-after.png)
+*New bottom navigation bar provides one-tap access to key features*
+```
+
+**Screenshot Best Practices:**
+- Use descriptive alt text that explains what the screenshot shows
+- Add italic captions below images to highlight key features
+- Optimize images for GitHub (<1MB each, use PNG or JPG)
+- Show both desktop and mobile views for responsive changes
+- Include before/after comparisons for visual updates
+- Store screenshots in `docs/screenshots/` directory
+- Use kebab-case for filenames: `feature-name.png`
+
+**See Real Examples:**
+Check out these screenshots in our repository for reference:
+- [Home & Search Interface](docs/screenshots/home-search.png)
+- [Category Navigation](docs/screenshots/category-navigation.png)
+- [Learning Journeys](docs/screenshots/learning-journeys.png)
+- [Admin Dashboard](docs/screenshots/admin-dashboard.png)
+- [Mobile View](docs/screenshots/mobile-view.png)
+
 ### PR Title Format
 
 - `feat:` New feature

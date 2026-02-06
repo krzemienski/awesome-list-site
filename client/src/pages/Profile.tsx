@@ -7,9 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { User } from "@shared/schema";
 import {
-  User as UserIcon,
+  User,
   Heart,
   Bookmark,
   Trophy,
@@ -27,15 +26,18 @@ import {
   BookOpen,
   CheckCircle,
   XCircle,
-  AlertCircle
+  AlertCircle,
+  Sparkles
 } from "lucide-react";
 import FavoriteButton from "@/components/resource/FavoriteButton";
 import BookmarkButton from "@/components/resource/BookmarkButton";
+import RecommendationCard from "@/components/ai/RecommendationCard";
 import { useAuth } from "@/hooks/useAuth";
 import { formatDistanceToNow } from "date-fns";
+import { useLocation } from "wouter";
 
 interface ProfileProps {
-  user?: User;
+  user?: any;
 }
 
 interface Favorite {
@@ -80,7 +82,7 @@ interface ResourceEdit {
   id: number;
   resourceId: number;
   status: string;
-  proposedChanges: Record<string, { old: unknown; new: unknown }>;
+  proposedChanges: Record<string, { old: any; new: any }>;
   createdAt: string;
 }
 
@@ -107,9 +109,22 @@ interface UserJourney {
   };
 }
 
+interface Recommendation {
+  id: string;
+  name: string;
+  url: string;
+  description?: string;
+  category: string;
+  tags?: string[];
+  confidence?: number;
+  matchReason?: string;
+  isAIBased?: boolean;
+}
+
 export default function Profile({ user }: ProfileProps) {
   const [activeTab, setActiveTab] = useState("overview");
   const { logout } = useAuth();
+  const [, setLocation] = useLocation();
 
   // Fetch favorites
   const { data: favorites, isLoading: favoritesLoading } = useQuery<Favorite[]>({
@@ -141,16 +156,16 @@ export default function Profile({ user }: ProfileProps) {
     enabled: !!user
   });
 
-  const getDisplayName = () => {
-    if (!user) return "User";
-    if (user.firstName && user.lastName) {
-      return `${user.firstName} ${user.lastName}`;
-    }
-    if (user.firstName) {
-      return user.firstName;
-    }
-    return "User";
-  };
+  // Fetch personalized recommendations
+  const { data: recommendations, isLoading: recommendationsLoading } = useQuery<Recommendation[]>({
+    queryKey: ['/api/recommendations'],
+    queryFn: async () => {
+      const response = await fetch('/api/recommendations?limit=6', { credentials: 'include' });
+      if (!response.ok) throw new Error('Failed to fetch recommendations');
+      return response.json();
+    },
+    enabled: !!user
+  });
 
   const getInitials = (name?: string) => {
     if (!name) return "U";
@@ -197,14 +212,14 @@ export default function Profile({ user }: ProfileProps) {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-center gap-6 mb-8">
         <Avatar className="h-24 w-24 border-2 border-pink-500">
-          <AvatarImage src={user.profileImageUrl || undefined} alt={getDisplayName()} />
+          <AvatarImage src={user.avatar} alt={user.name} />
           <AvatarFallback className="text-xl bg-gradient-to-br from-pink-500 to-cyan-500 text-white">
-            {getInitials(getDisplayName())}
+            {getInitials(user.name)}
           </AvatarFallback>
         </Avatar>
-
+        
         <div className="flex-1 text-center sm:text-left">
-          <h1 className="text-3xl font-bold mb-2">{getDisplayName()}</h1>
+          <h1 className="text-3xl font-bold mb-2">{user.name || "User"}</h1>
           <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground justify-center sm:justify-start">
             {user.email && (
               <span className="flex items-center gap-1">
@@ -387,6 +402,48 @@ export default function Profile({ user }: ProfileProps) {
                   <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-50" />
                   <p>No learning journeys started yet</p>
                   <p className="text-sm mt-2">Start a learning path to track your progress!</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Personalized Recommendations */}
+          <Card data-testid="card-recommendations">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-pink-500" />
+                Recommended for You
+              </CardTitle>
+              <CardDescription>
+                AI-powered resource suggestions based on your interests and learning journey
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {recommendationsLoading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4" aria-busy={true} aria-live="polite">
+                  {Array(4).fill(0).map((_, i) => (
+                    <Skeleton key={i} className="h-48 w-full" />
+                  ))}
+                </div>
+              ) : recommendations && recommendations.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {recommendations.map((recommendation) => (
+                    <RecommendationCard
+                      key={recommendation.id}
+                      resource={recommendation}
+                      onClick={() => {
+                        setLocation(`/resource/${recommendation.id}`);
+                      }}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 text-muted-foreground">
+                  <Sparkles className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>No recommendations yet</p>
+                  <p className="text-sm mt-2">
+                    Start exploring resources to get personalized recommendations!
+                  </p>
                 </div>
               )}
             </CardContent>
@@ -691,8 +748,8 @@ export default function Profile({ user }: ProfileProps) {
                                       const isObjectFormat = changeData && typeof changeData === 'object' && ('old' in changeData || 'new' in changeData);
                                       
                                       if (!isObjectFormat) return null;
-
-                                      const change = changeData as { old?: unknown; new?: unknown };
+                                      
+                                      const change = changeData as { old?: any; new?: any };
                                       const oldValue = Array.isArray(change.old) ? change.old.join(', ') : String(change.old ?? '');
                                       const newValue = Array.isArray(change.new) ? change.new.join(', ') : String(change.new ?? '');
                                       
