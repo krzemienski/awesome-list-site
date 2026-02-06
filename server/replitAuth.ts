@@ -7,7 +7,6 @@ import type { Express, RequestHandler } from "express";
 import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import { UserRepository } from "./repositories";
-const userRepo = new UserRepository();
 
 const getOidcConfig = memoize(
   async () => {
@@ -55,6 +54,7 @@ function updateUserSession(
 async function upsertUser(
   claims: any,
 ) {
+  const userRepo = new UserRepository();
   await userRepo.upsertUser({
     id: claims["sub"],
     email: claims["email"],
@@ -107,7 +107,8 @@ export async function setupAuth(app: Express) {
   passport.deserializeUser(async (user: Express.User, cb) => {
     try {
       // Fetch fresh user data from DB to ensure we have the latest role
-      const { storage } = await import('./storage.js');
+      const { UserRepository } = await import('./repositories/index.js');
+      const userRepo = new UserRepository();
       const userId = (user as any).claims?.sub;
       if (userId) {
         const dbUser = await userRepo.getUser(userId);

@@ -25,8 +25,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { useDebounce } from "@/hooks/useDebounce";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Helmet } from "react-helmet";
 
@@ -76,6 +78,8 @@ export default function SubmitResource() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [showSuccess, setShowSuccess] = useState(false);
+  const [duplicateResource, setDuplicateResource] = useState<{ id: number; title: string; status: string } | null>(null);
+  const [isCheckingDuplicate, setIsCheckingDuplicate] = useState(false);
 
   // Fetch categories
   const { data: categories = [], isLoading: categoriesLoading } = useQuery<Category[]>({
@@ -110,6 +114,8 @@ export default function SubmitResource() {
 
   const selectedCategory = form.watch("category");
   const selectedSubcategory = form.watch("subcategory");
+  const urlValue = form.watch("url");
+  const debouncedUrl = useDebounce(urlValue, 500);
 
   // Filter subcategories based on selected category ID
   const filteredSubcategories = subcategories.filter(
@@ -137,6 +143,36 @@ export default function SubmitResource() {
   useEffect(() => {
     form.setValue("subSubcategory", "");
   }, [selectedSubcategory, form]);
+
+  // Check for duplicate URLs
+  useEffect(() => {
+    const checkDuplicateUrl = async () => {
+      // Only check if URL is valid and starts with https://
+      if (!debouncedUrl || !debouncedUrl.startsWith("https://")) {
+        setDuplicateResource(null);
+        return;
+      }
+
+      setIsCheckingDuplicate(true);
+      try {
+        const response = await fetch(`/api/resources/check-url?url=${encodeURIComponent(debouncedUrl)}`);
+        const data = await response.json();
+
+        if (data.exists && data.resource) {
+          setDuplicateResource(data.resource);
+        } else {
+          setDuplicateResource(null);
+        }
+      } catch (error) {
+        // Silently handle errors - don't block the user
+        setDuplicateResource(null);
+      } finally {
+        setIsCheckingDuplicate(false);
+      }
+    };
+
+    checkDuplicateUrl();
+  }, [debouncedUrl]);
 
   // Submit mutation
   const submitMutation = useMutation({
@@ -187,7 +223,7 @@ export default function SubmitResource() {
       // Scroll to top
       window.scrollTo({ top: 0, behavior: 'smooth' });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "Submission Failed",
         description: error.message || "Failed to submit resource. Please try again.",
@@ -335,6 +371,22 @@ export default function SubmitResource() {
                         Must be a valid HTTPS URL
                       </FormDescription>
                       <FormMessage />
+
+                      {/* Duplicate URL Warning */}
+                      {duplicateResource && (
+                        <Alert className="mt-2 border-yellow-500/50 bg-yellow-500/10">
+                          <AlertCircle className="h-4 w-4 text-yellow-500" />
+                          <AlertTitle className="text-yellow-500">Duplicate URL Detected</AlertTitle>
+                          <AlertDescription>
+                            This URL already exists: <strong>{duplicateResource.title}</strong>
+                            {' '}(Status: <span className="capitalize">{duplicateResource.status}</span>)
+                            <br />
+                            <span className="text-xs text-muted-foreground mt-1 block">
+                              You can still submit, but this may be rejected as a duplicate.
+                            </span>
+                          </AlertDescription>
+                        </Alert>
+                      )}
                     </FormItem>
                   )}
                 />
@@ -485,7 +537,7 @@ export default function SubmitResource() {
                   >
                     {submitMutation.isPending ? (
                       <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                         Submitting...
                       </>
                     ) : (

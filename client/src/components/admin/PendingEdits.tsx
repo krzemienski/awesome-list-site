@@ -53,7 +53,7 @@ export default function PendingEdits() {
       setApproveDialogOpen(false);
       setEditToApprove(null);
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       const isConflict = error.message?.includes('Conflict');
       toast({
         title: isConflict ? "Merge Conflict" : "Approval Failed",
@@ -81,7 +81,7 @@ export default function PendingEdits() {
       setEditToReject(null);
       setRejectionReason("");
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "Rejection Failed",
         description: error.message || "Failed to reject edit. Please try again.",
@@ -143,7 +143,7 @@ export default function PendingEdits() {
     });
   };
 
-  const renderDiff = (changes: Record<string, { old: any; new: any }>) => {
+  const renderDiff = (changes: Record<string, { old: string | number | null; new: string | number | null }>) => {
     return Object.entries(changes).map(([field, { old: oldValue, new: newValue }]) => (
       <div key={field} className="border-l-4 border-yellow-500 pl-3 py-2 mb-2">
         <p className="text-sm font-semibold capitalize">{field}</p>
@@ -263,7 +263,7 @@ export default function PendingEdits() {
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline">
-                        {Object.keys(edit.proposedChanges as any).length} field(s)
+                        {Object.keys(edit.proposedChanges).length} field(s)
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -271,7 +271,7 @@ export default function PendingEdits() {
                         <div className="flex items-center gap-1">
                           <Sparkles className="h-4 w-4 text-purple-500" />
                           <span className="text-xs">
-                            {Math.round(((edit.claudeMetadata as any)?.confidence || 0) * 100)}%
+                            {Math.round((edit.claudeMetadata.confidence || 0) * 100)}%
                           </span>
                         </div>
                       ) : (
@@ -361,7 +361,7 @@ export default function PendingEdits() {
               <div>
                 <h3 className="font-semibold mb-2">Proposed Changes</h3>
                 <div className="bg-muted/50 rounded-lg p-3">
-                  {renderDiff(selectedEdit.proposedChanges as any)}
+                  {renderDiff(selectedEdit.proposedChanges as Record<string, { old: string | number | null; new: string | number | null }>)}
                 </div>
               </div>
 
@@ -375,14 +375,14 @@ export default function PendingEdits() {
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">Confidence</span>
                       <Badge variant="secondary">
-                        {Math.round(((selectedEdit.claudeMetadata as any)?.confidence || 0) * 100)}%
+                        {Math.round((selectedEdit.claudeMetadata.confidence || 0) * 100)}%
                       </Badge>
                     </div>
-                    {(selectedEdit.claudeMetadata as any)?.keyTopics && (
+                    {selectedEdit.claudeMetadata.keyTopics && (
                       <div>
                         <span className="text-sm font-medium">Key Topics</span>
                         <div className="flex flex-wrap gap-1 mt-1">
-                          {((selectedEdit.claudeMetadata as any).keyTopics as string[]).map((topic: string, i: number) => (
+                          {selectedEdit.claudeMetadata.keyTopics.map((topic: string, i: number) => (
                             <Badge key={i} variant="outline" className="text-xs">
                               {topic}
                             </Badge>

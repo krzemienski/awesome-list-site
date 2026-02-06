@@ -6,6 +6,8 @@ function Skeleton({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
+      role="status"
+      aria-label="Loading..."
       className={cn("animate-pulse bg-muted", className)}
       {...props}
     />

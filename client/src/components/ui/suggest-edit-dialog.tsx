@@ -93,16 +93,16 @@ interface SuggestEditDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-function calculateDiff(original: Resource, updated: SuggestEditFormData): Record<string, { old: any; new: any }> {
-  const diff: Record<string, { old: any; new: any }> = {};
-  
+function calculateDiff(original: Resource, updated: SuggestEditFormData): Record<string, { old: unknown; new: unknown }> {
+  const diff: Record<string, { old: unknown; new: unknown }> = {};
+
   // SECURITY FIX: Improved diff calculation with array support (ISSUE 4)
-  const EDITABLE_FIELDS = ['title', 'description', 'url', 'tags', 'category', 'subcategory', 'subSubcategory'];
-  
+  const EDITABLE_FIELDS = ['title', 'description', 'url', 'tags', 'category', 'subcategory', 'subSubcategory'] as const;
+
   for (const field of EDITABLE_FIELDS) {
-    const oldValue = (original as any)[field];
-    const newValue = (updated as any)[field];
-    
+    const oldValue = original[field as keyof Resource];
+    const newValue = updated[field as keyof SuggestEditFormData];
+
     // Deep comparison for arrays (tags)
     if (Array.isArray(oldValue) && Array.isArray(newValue)) {
       const oldSorted = [...oldValue].sort().join(',');
@@ -116,7 +116,7 @@ function calculateDiff(original: Resource, updated: SuggestEditFormData): Record
       diff[field] = { old: oldValue, new: newValue };
     }
   }
-  
+
   return diff;
 }
 
@@ -303,7 +303,7 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
       setClaudeSuggestions(null);
       queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "Submission Failed",
         description: error.message || "Failed to submit edit suggestion",

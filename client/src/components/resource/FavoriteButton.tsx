@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 import { Button } from "@/components/ui/button";
 import { Heart } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
@@ -15,7 +15,7 @@ interface FavoriteButtonProps {
   showCount?: boolean;
 }
 
-export default function FavoriteButton({
+function FavoriteButton({
   resourceId,
   isFavorited: initialFavorited = false,
   favoriteCount: initialCount = 0,
@@ -118,3 +118,5 @@ export default function FavoriteButton({
     </Button>
   );
 }
+
+export default memo(FavoriteButton);

@@ -1,10 +1,11 @@
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import { UserRepository } from "./repositories";
-const userRepo = new UserRepository();
 import { comparePassword, validateEmail, validatePassword } from "./passwordUtils";
 
 export function setupLocalAuth() {
+  const userRepo = new UserRepository();
+
   passport.use('local', new LocalStrategy(
     {
       usernameField: 'email',
@@ -40,10 +41,10 @@ export function setupLocalAuth() {
         const userSession = {
           claims: {
             sub: user.id,
-            email: user.email,
-            first_name: user.firstName,
-            last_name: user.lastName,
-            profile_image_url: user.profileImageUrl,
+            email: user.email || undefined,
+            first_name: user.firstName || undefined,
+            last_name: user.lastName || undefined,
+            profile_image_url: user.profileImageUrl || undefined,
           },
           expires_at: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60),
         };

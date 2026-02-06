@@ -7,11 +7,21 @@ import SearchDialog from "@/components/ui/search-dialog";
 import { useIsMobile, useIsTablet, useIsDesktop } from "@/hooks/use-mobile";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 
+interface User {
+  id: string;
+  email?: string;
+  name?: string;
+  avatar?: string;
+  provider?: string;
+  role?: string;
+  createdAt?: string;
+}
+
 interface MainLayoutProps {
   awesomeList?: AwesomeList;
   isLoading: boolean;
   children: React.ReactNode;
-  user?: any;
+  user?: User;
   onLogout?: () => void;
 }
 
@@ -36,6 +46,7 @@ export default function MainLayout({ awesomeList, isLoading, children, user, onL
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}
           onSearchOpen={() => setSearchOpen(true)}
+          searchOpen={searchOpen}
           title={awesomeList?.title || "Awesome Selfhosted"}
           repoUrl={awesomeList?.repoUrl}
           resources={awesomeList?.resources || []}

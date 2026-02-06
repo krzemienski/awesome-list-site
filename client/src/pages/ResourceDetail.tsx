@@ -1,6 +1,6 @@
 import { useParams, Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,10 +8,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import SEOHead from "@/components/layout/SEOHead";
 import { SuggestEditDialog } from "@/components/ui/suggest-edit-dialog";
-import { 
-  ArrowLeft, 
-  ExternalLink, 
-  Calendar, 
+import {
+  ArrowLeft,
+  ExternalLink,
+  Calendar,
   FolderTree,
   Bookmark,
   Heart,
@@ -22,13 +22,15 @@ import {
   Image as ImageIcon,
   Link2,
   Clock,
-  ChevronRight
+  ChevronRight,
+  TrendingUp
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { slugify } from "@/lib/utils";
+import { Blurhash } from "react-blurhash";
 import type { Resource } from "@shared/schema";
 
 export default function ResourceDetail() {
@@ -38,6 +40,7 @@ export default function ResourceDetail() {
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
   const [suggestEditOpen, setSuggestEditOpen] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   const { data: resource, isLoading, error } = useQuery<Resource>({
     queryKey: ['/api/resources', id],
@@ -59,9 +62,14 @@ export default function ResourceDetail() {
     enabled: isAuthenticated
   });
 
-  const { data: relatedResources } = useQuery<{resources: Resource[]}>({
-    queryKey: ['/api/resources', { category: resource?.category, limit: 6 }],
-    enabled: !!resource?.category
+  const { data: relatedResources } = useQuery<{resources: (Resource & {score?: number, reasons?: string[]})[]}>({
+    queryKey: ['/api/resources', id, 'related'],
+    queryFn: async () => {
+      const response = await fetch(`/api/resources/${id}/related`, { credentials: 'include' });
+      if (!response.ok) throw new Error('Failed to fetch related resources');
+      return response.json();
+    },
+    enabled: !!id
   });
 
   const isFavorite = favorites?.resourceIds?.includes(parseInt(id || '0')) ?? false;
@@ -104,6 +112,36 @@ export default function ResourceDetail() {
       });
     }
   });
+
+  const trackInteraction = useMutation({
+    mutationFn: async (interaction: {
+      resourceId: string;
+      interactionType: string;
+      interactionValue?: number;
+      metadata?: any;
+    }) => {
+      const response = await fetch("/api/interactions", {
+        method: "POST",
+        body: JSON.stringify({
+          userId: user?.id,
+          ...interaction
+        }),
+        headers: { "Content-Type": "application/json" }
+      });
+      return response.json();
+    },
+  });
+
+  // Track page view when resource loads
+  useEffect(() => {
+    if (resource && user?.id) {
+      trackInteraction.mutate({
+        resourceId: resource.id.toString(),
+        interactionType: "view",
+        metadata: { timestamp: new Date().toISOString() }
+      });
+    }
+  }, [resource?.id, user?.id]);
 
   const handleShare = async () => {
     const url = window.location.href;
@@ -156,6 +194,11 @@ export default function ResourceDetail() {
   };
 
   const handleRelatedResourceClick = (relatedResource: Resource) => {
+    trackInteraction.mutate({
+      resourceId: relatedResource.id.toString(),
+      interactionType: "click",
+      metadata: { source: "related-resources", fromResourceId: id }
+    });
     setLocation(`/resource/${relatedResource.id}`);
   };
 
@@ -167,9 +210,7 @@ export default function ResourceDetail() {
   const urlScraped = metadata?.urlScraped;
   const tags = metadata?.tags as string[] | undefined;
 
-  const filteredRelatedResources = relatedResources?.resources
-    ?.filter(r => r.id !== resource?.id && r.status === 'approved')
-    ?.slice(0, 5) || [];
+  const filteredRelatedResources = relatedResources?.resources?.slice(0, 6) || [];
 
   if (isLoading) {
     return (
@@ -277,11 +318,24 @@ export default function ResourceDetail() {
           <Card className="border-pink-500/20 bg-black overflow-hidden">
             {hasOgImage && (
               <div className="relative w-full h-48 md:h-64 overflow-hidden bg-gradient-to-b from-pink-500/10 to-transparent">
-                <img 
-                  src={metadata.ogImage} 
+                {metadata.ogImageBlurhash && !imageLoaded && (
+                  <div className="absolute inset-0">
+                    <Blurhash
+                      hash={metadata.ogImageBlurhash}
+                      width="100%"
+                      height="100%"
+                      resolutionX={32}
+                      resolutionY={32}
+                      punch={1}
+                    />
+                  </div>
+                )}
+                <img
+                  src={metadata.ogImage}
                   alt={resource.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover relative z-10"
                   loading="lazy"
+                  onLoad={() => setImageLoaded(true)}
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.display = 'none';
                   }}
@@ -518,7 +572,7 @@ export default function ResourceDetail() {
                   Related Resources
                 </CardTitle>
                 <CardDescription>
-                  More from {resource.category}
+                  Resources you might find interesting
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
@@ -539,6 +593,29 @@ export default function ResourceDetail() {
                       <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
                         {related.description}
                       </p>
+                    )}
+                    {related.score !== undefined && (
+                      <div className="mt-2">
+                        <Badge
+                          variant="outline"
+                          className="text-xs bg-green-500/10 text-green-500"
+                        >
+                          <TrendingUp className="h-3 w-3 mr-1" />
+                          {related.score}% match
+                        </Badge>
+                      </div>
+                    )}
+                    {related.reasons && related.reasons.length > 0 && (
+                      <div className="mt-2 space-y-1">
+                        <div className="text-xs text-muted-foreground">Why recommended:</div>
+                        <div className="flex flex-wrap gap-1">
+                          {related.reasons.slice(0, 2).map((reason, index) => (
+                            <span key={index} className="text-xs bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300 px-2 py-0.5 rounded">
+                              {reason}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
                     )}
                   </div>
                 ))}

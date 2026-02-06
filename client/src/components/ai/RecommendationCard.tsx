@@ -1,8 +1,27 @@
+import { memo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Brain, TrendingUp, Sparkles } from "lucide-react";
+import { ExternalLink, Brain, TrendingUp, Sparkles, ThumbsUp, ThumbsDown } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import { queryClient, apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+
+/**
+ * RecommendationCard - AI-based resource recommendation display component
+ *
+ * IMPORTANT: This component is wrapped with React.memo using custom comparison.
+ * When using this component, avoid creating new object references for the
+ * `resource` prop on every render. Use useMemo or pass stable references.
+ *
+ * @example
+ * // ❌ BAD - Creates new object every render
+ * <RecommendationCard resource={{ ...data, extra: true }} />
+ *
+ * // ✅ GOOD - Stable reference from query/state
+ * <RecommendationCard resource={recommendation} />
+ */
 
 interface Resource {
   id: string;
@@ -14,6 +33,7 @@ interface Resource {
   confidence?: number;
   matchReason?: string;
   isAIBased?: boolean;
+  userFeedback?: 'helpful' | 'not_helpful' | null;
 }
 
 interface RecommendationCardProps {
@@ -22,13 +42,17 @@ interface RecommendationCardProps {
   className?: string;
 }
 
-export default function RecommendationCard({ 
-  resource, 
+function RecommendationCard({
+  resource,
   onClick,
-  className 
+  className
 }: RecommendationCardProps) {
+  const [feedback, setFeedback] = useState<'helpful' | 'not_helpful' | null>(
+    resource.userFeedback || null
+  );
+  const { toast } = useToast();
   const confidence = resource.confidence || 0;
-  
+
   // Determine confidence level
   const getConfidenceLevel = (conf: number) => {
     if (conf >= 80) return { label: "High", color: "text-green-500", bgColor: "bg-green-500/10" };
@@ -37,6 +61,44 @@ export default function RecommendationCard({
   };
 
   const confidenceLevel = getConfidenceLevel(confidence);
+
+  const feedbackMutation = useMutation({
+    mutationFn: async (feedbackType: 'helpful' | 'not_helpful') => {
+      return await apiRequest(`/api/recommendations/${resource.id}/feedback`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ feedback: feedbackType })
+      });
+    },
+    onMutate: async (feedbackType) => {
+      // Optimistic update
+      setFeedback(feedbackType);
+    },
+    onSuccess: (data, feedbackType) => {
+      // Invalidate recommendations queries
+      queryClient.invalidateQueries({ queryKey: ['/api/recommendations'] });
+
+      toast({
+        description: feedbackType === 'helpful'
+          ? "Thanks for your feedback! This helps improve recommendations."
+          : "Feedback recorded. We'll improve our recommendations.",
+        duration: 2000
+      });
+    },
+    onError: (error, feedbackType) => {
+      // Revert optimistic update
+      setFeedback(resource.userFeedback || null);
+
+      toast({
+        title: "Error",
+        description: "Failed to submit feedback. Please try again.",
+        variant: "destructive"
+      });
+    }
+  });
 
   return (
     <Card 
@@ -124,11 +186,62 @@ export default function RecommendationCard({
             </div>
           )}
 
+          {/* Feedback Buttons */}
+          <div className="flex items-center gap-2 pt-2 border-t border-border">
+            <span className="text-xs text-muted-foreground mr-1">Was this helpful?</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              className={cn(
+                "h-8 px-3",
+                feedback === 'helpful' && "text-green-500 hover:text-green-600 bg-green-500/10"
+              )}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                feedbackMutation.mutate('helpful');
+              }}
+              disabled={feedbackMutation.isPending}
+              aria-label="Mark as helpful"
+            >
+              <ThumbsUp
+                className={cn(
+                  "h-4 w-4 mr-1.5",
+                  feedback === 'helpful' && "fill-current"
+                )}
+              />
+              <span className="text-xs">Helpful</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className={cn(
+                "h-8 px-3",
+                feedback === 'not_helpful' && "text-red-500 hover:text-red-600 bg-red-500/10"
+              )}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                feedbackMutation.mutate('not_helpful');
+              }}
+              disabled={feedbackMutation.isPending}
+              aria-label="Mark as not helpful"
+            >
+              <ThumbsDown
+                className={cn(
+                  "h-4 w-4 mr-1.5",
+                  feedback === 'not_helpful' && "fill-current"
+                )}
+              />
+              <span className="text-xs">Not Helpful</span>
+            </Button>
+          </div>
+
           {/* Action Button */}
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="w-full mt-2 border-cyan-500/50 hover:bg-cyan-500/10 hover:border-cyan-500"
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full border-cyan-500/50 hover:bg-cyan-500/10 hover:border-cyan-500"
             onClick={(e) => {
               e.stopPropagation();
               onClick && onClick();
@@ -142,3 +255,23 @@ export default function RecommendationCard({
     </Card>
   );
 }
+
+export default memo(RecommendationCard, (prevProps, nextProps) => {
+  const prevRes = prevProps.resource;
+  const nextRes = nextProps.resource;
+
+  return (
+    prevRes.id === nextRes.id &&
+    prevRes.name === nextRes.name &&
+    prevRes.url === nextRes.url &&
+    prevRes.description === nextRes.description &&
+    prevRes.category === nextRes.category &&
+    prevRes.confidence === nextRes.confidence &&
+    prevRes.matchReason === nextRes.matchReason &&
+    prevRes.isAIBased === nextRes.isAIBased &&
+    prevRes.userFeedback === nextRes.userFeedback &&
+    JSON.stringify(prevRes.tags || []) === JSON.stringify(nextRes.tags || []) &&
+    prevProps.onClick === nextProps.onClick &&
+    prevProps.className === nextProps.className
+  );
+});

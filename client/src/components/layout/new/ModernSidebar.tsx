@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useLocation, useRoute, Link } from "wouter";
-import { 
-  Sidebar, 
-  SidebarProvider, 
-  SidebarHeader, 
+import {
+  Sidebar,
+  SidebarProvider,
+  SidebarHeader,
   SidebarContent,
   SidebarMenu,
   SidebarMenuItem,
@@ -17,14 +17,24 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Skeleton } from "@/components/ui/skeleton";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Home, Folder, ExternalLink, Menu, Sparkles, Zap, Shield, Plus, BookOpen, ChevronLeft } from "lucide-react";
+import { Home, Folder, ExternalLink, Menu, Sparkles, Zap, Shield, Plus, BookOpen, ChevronLeft, ChevronRight } from "lucide-react";
 import { slugify, getCategorySlug } from "@/lib/utils";
-import { Category, Resource } from "@/types/awesome-list";
+import { Category, Resource, Subcategory, SubSubcategory } from "@/types/awesome-list";
 import { cn } from "@/lib/utils";
 import { useIsMobile, useIsTablet } from "@/hooks/use-mobile";
 import { useUserProfile } from "@/hooks/use-user-profile";
 import RecommendationPanel from "@/components/ui/recommendation-panel";
 import { getCategoryIcon, getSubcategoryIcon, getSubSubcategoryIcon } from "@/config/navigation-icons";
+
+interface User {
+  id: string;
+  email?: string;
+  name?: string;
+  avatar?: string;
+  provider?: string;
+  role?: string;
+  createdAt?: string;
+}
 
 interface ModernSidebarProps {
   title: string;
@@ -33,7 +43,7 @@ interface ModernSidebarProps {
   isLoading: boolean;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  user?: any;
+  user?: User;
 }
 
 export default function ModernSidebar({ title, categories, resources, isLoading, isOpen, setIsOpen, user }: ModernSidebarProps) {
@@ -50,23 +60,23 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
   };
 
   // Helper to count total resources including descendants
-  const getTotalResourceCount = (item: any): number => {
+  const getTotalResourceCount = (item: Category | Subcategory | SubSubcategory): number => {
     let total = item.resources?.length || 0;
-    
+
     // Add resources from subcategories
-    if (item.subcategories) {
-      total += item.subcategories.reduce((sum: number, sub: any) => 
+    if ('subcategories' in item && item.subcategories) {
+      total += item.subcategories.reduce((sum: number, sub: Subcategory) =>
         sum + getTotalResourceCount(sub), 0
       );
     }
-    
+
     // Add resources from sub-subcategories
-    if (item.subSubcategories) {
-      total += item.subSubcategories.reduce((sum: number, subSub: any) => 
+    if ('subSubcategories' in item && item.subSubcategories) {
+      total += item.subSubcategories.reduce((sum: number, subSub: SubSubcategory) =>
         sum + getTotalResourceCount(subSub), 0
       );
     }
-    
+
     return total;
   };
 
@@ -328,12 +338,10 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
                     }}
                     aria-label={`${openCategories.includes(category.name) ? 'Collapse' : 'Expand'} ${category.name}`}
                   >
-                    <div className={cn(
-                      "transform transition-transform duration-200",
+                    <ChevronRight className={cn(
+                      "h-4 w-4 transform transition-transform duration-200",
                       openCategories.includes(category.name) ? "rotate-90" : ""
-                    )}>
-                      <span className="text-sm">▶</span>
-                    </div>
+                    )} />
                   </button>
                   <Button
                     variant="ghost"
@@ -361,7 +369,7 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
                 {/* Subcategories - Show when category is expanded */}
                 {category.subcategories && category.subcategories.length > 0 && openCategories.includes(category.name) && (
                   <div className="ml-6 mt-1 space-y-1 border-l border-muted pl-3">
-                    {category.subcategories.map((subcategory: any) => (
+                    {category.subcategories.map((subcategory: Subcategory) => (
                       <div key={subcategory.name}>
                         {/* Level 2: Subcategory */}
                         <div className="flex items-center w-full">
@@ -376,12 +384,10 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
                               }}
                               aria-label={`${openCategories.includes(`${category.name}-${subcategory.name}`) ? 'Collapse' : 'Expand'} ${subcategory.name}`}
                             >
-                              <div className={cn(
-                                "transform transition-transform duration-200",
+                              <ChevronRight className={cn(
+                                "h-4 w-4 transform transition-transform duration-200",
                                 openCategories.includes(`${category.name}-${subcategory.name}`) ? "rotate-90" : ""
-                              )}>
-                                <span className="text-sm">▶</span>
-                              </div>
+                              )} />
                             </button>
                           ) : (
                             <div className="min-w-[44px] h-[44px] flex-shrink-0"></div>
@@ -411,10 +417,10 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
                         </div>
                         
                         {/* Level 3: Sub-subcategories */}
-                        {subcategory.subSubcategories && subcategory.subSubcategories.length > 0 && 
+                        {subcategory.subSubcategories && subcategory.subSubcategories.length > 0 &&
                          openCategories.includes(`${category.name}-${subcategory.name}`) && (
                           <div className="ml-6 mt-1 space-y-1 border-l border-muted/50 pl-3">
-                            {subcategory.subSubcategories.map((subSubcategory: any) => (
+                            {subcategory.subSubcategories.map((subSubcategory: SubSubcategory) => (
                               <Button
                                 key={subSubcategory.name}
                                 variant="ghost"

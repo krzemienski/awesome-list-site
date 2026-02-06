@@ -9,18 +9,19 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { 
-  Plus, 
-  Pencil, 
-  Trash2, 
-  Search, 
-  ExternalLink, 
-  ChevronLeft, 
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  Search,
+  ExternalLink,
+  ChevronLeft,
   ChevronRight,
   Database,
   Filter,
@@ -58,7 +59,10 @@ export default function ResourceManager() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
-  
+  const [selectedResourceIds, setSelectedResourceIds] = useState<number[]>([]);
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
+
   const [editForm, setEditForm] = useState({
     title: "",
     url: "",
@@ -128,7 +132,7 @@ export default function ResourceManager() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number, data: any }) => {
+    mutationFn: async ({ id, data }: { id: number, data: Partial<Resource> }) => {
       return await apiRequest(`/api/admin/resources/${id}`, {
         method: 'PUT',
         body: JSON.stringify(data)
@@ -145,7 +149,7 @@ export default function ResourceManager() {
         description: "The resource has been successfully updated.",
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "Update Failed",
         description: error.message || "Failed to update resource",
@@ -155,7 +159,7 @@ export default function ResourceManager() {
   });
 
   const createMutation = useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: Partial<Resource>) => {
       return await apiRequest('/api/admin/resources', {
         method: 'POST',
         body: JSON.stringify(data)
@@ -173,7 +177,7 @@ export default function ResourceManager() {
         description: "The new resource has been added successfully.",
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "Creation Failed",
         description: error.message || "Failed to create resource",
@@ -200,10 +204,92 @@ export default function ResourceManager() {
         description: "The resource has been permanently deleted.",
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "Deletion Failed",
         description: error.message || "Failed to delete resource",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const bulkApproveMutation = useMutation({
+    mutationFn: async (ids: number[]) => {
+      return await apiRequest('/api/admin/resources/bulk/approve', {
+        method: 'POST',
+        body: JSON.stringify({ ids })
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/awesome-list'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
+      setSelectedResourceIds([]);
+      toast({
+        title: "Resources Approved",
+        description: `Successfully approved ${selectedResourceIds.length} resource(s).`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Bulk Approve Failed",
+        description: error.message || "Failed to approve resources",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const bulkRejectMutation = useMutation({
+    mutationFn: async ({ ids, reason }: { ids: number[], reason: string }) => {
+      return await apiRequest('/api/admin/resources/bulk/reject', {
+        method: 'POST',
+        body: JSON.stringify({ ids, reason })
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/awesome-list'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
+      setSelectedResourceIds([]);
+      setRejectDialogOpen(false);
+      toast({
+        title: "Resources Rejected",
+        description: `Successfully rejected ${selectedResourceIds.length} resource(s).`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Bulk Reject Failed",
+        description: error.message || "Failed to reject resources",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (ids: number[]) => {
+      return await apiRequest('/api/admin/resources/bulk/delete', {
+        method: 'POST',
+        body: JSON.stringify({ ids })
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/resources'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/awesome-list'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
+      setSelectedResourceIds([]);
+      toast({
+        title: "Resources Deleted",
+        description: `Successfully deleted ${selectedResourceIds.length} resource(s).`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Bulk Delete Failed",
+        description: error.message || "Failed to delete resources",
         variant: "destructive"
       });
     }
@@ -270,9 +356,38 @@ export default function ResourceManager() {
     deleteMutation.mutate(selectedResource.id);
   };
 
+  const handleBulkApprove = () => {
+    if (selectedResourceIds.length === 0) return;
+    bulkApproveMutation.mutate(selectedResourceIds);
+  };
+
+  const handleBulkReject = () => {
+    if (selectedResourceIds.length === 0) return;
+    setRejectReason("");
+    setRejectDialogOpen(true);
+  };
+
+  const confirmBulkReject = () => {
+    if (rejectReason.trim().length < 10) {
+      toast({
+        title: "Validation Error",
+        description: "Rejection reason must be at least 10 characters",
+        variant: "destructive"
+      });
+      return;
+    }
+    bulkRejectMutation.mutate({ ids: selectedResourceIds, reason: rejectReason });
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedResourceIds.length === 0) return;
+    bulkDeleteMutation.mutate(selectedResourceIds);
+  };
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setPage(1);
+    setSelectedResourceIds([]);
   };
 
   const clearFilters = () => {
@@ -280,6 +395,7 @@ export default function ResourceManager() {
     setCategoryFilter("");
     setStatusFilter("");
     setPage(1);
+    setSelectedResourceIds([]);
   };
 
   const getStatusBadge = (status: string) => {
@@ -290,6 +406,42 @@ export default function ResourceManager() {
       </Badge>
     );
   };
+
+  const toggleResourceSelection = (id: number) => {
+    if (selectedResourceIds.includes(id)) {
+      setSelectedResourceIds(selectedResourceIds.filter(resId => resId !== id));
+    } else {
+      setSelectedResourceIds([...selectedResourceIds, id]);
+    }
+  };
+
+  const toggleSelectAll = () => {
+    if (!data?.resources) return;
+    const currentPageIds = data.resources.map(r => r.id);
+    const allSelected = currentPageIds.every(id => selectedResourceIds.includes(id));
+
+    if (allSelected) {
+      setSelectedResourceIds(selectedResourceIds.filter(id => !currentPageIds.includes(id)));
+    } else {
+      const newIds = [...selectedResourceIds];
+      currentPageIds.forEach(id => {
+        if (!newIds.includes(id)) {
+          newIds.push(id);
+        }
+      });
+      setSelectedResourceIds(newIds);
+    }
+  };
+
+  const isAllSelected = useMemo(() => {
+    if (!data?.resources || data.resources.length === 0) return false;
+    return data.resources.every(r => selectedResourceIds.includes(r.id));
+  }, [data?.resources, selectedResourceIds]);
+
+  const isSomeSelected = useMemo(() => {
+    if (!data?.resources || data.resources.length === 0) return false;
+    return data.resources.some(r => selectedResourceIds.includes(r.id)) && !isAllSelected;
+  }, [data?.resources, selectedResourceIds, isAllSelected]);
 
   if (isLoading) {
     return (
@@ -377,10 +529,112 @@ export default function ResourceManager() {
             )}
           </form>
 
+          {selectedResourceIds.length > 0 && (
+            <div className="flex items-center justify-between p-3 bg-gray-800 border border-pink-500/30 rounded-lg">
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-medium text-gray-300">
+                  {selectedResourceIds.length} {selectedResourceIds.length === 1 ? 'item' : 'items'} selected
+                </span>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="bg-green-500/10 hover:bg-green-500/20 border-green-500/30 text-green-400"
+                    onClick={handleBulkApprove}
+                    disabled={bulkApproveMutation.isPending}
+                    data-testid="button-bulk-approve"
+                  >
+                    <CheckCircle2 className="h-4 w-4 mr-1" />
+                    {bulkApproveMutation.isPending ? "Approving..." : "Approve"}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="bg-yellow-500/10 hover:bg-yellow-500/20 border-yellow-500/30 text-yellow-400"
+                    onClick={handleBulkReject}
+                    disabled={bulkRejectMutation.isPending}
+                    data-testid="button-bulk-reject"
+                  >
+                    <X className="h-4 w-4 mr-1" />
+                    {bulkRejectMutation.isPending ? "Rejecting..." : "Reject"}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="bg-red-500/10 hover:bg-red-500/20 border-red-500/30 text-red-400"
+                    onClick={handleBulkDelete}
+                    disabled={bulkDeleteMutation.isPending}
+                    data-testid="button-bulk-delete"
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    {bulkDeleteMutation.isPending ? "Deleting..." : "Delete"}
+                  </Button>
+                </div>
+              </div>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setSelectedResourceIds([])}
+                className="text-gray-400 hover:text-white"
+                data-testid="button-clear-selection"
+              >
+                Clear Selection
+              </Button>
+            </div>
+          )}
+
+          {/* Bulk Reject Reason Dialog */}
+          <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Reject Selected Resources</DialogTitle>
+                <DialogDescription>
+                  You are about to reject {selectedResourceIds.length} resource(s).
+                  Please provide a reason (minimum 10 characters).
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="reject-reason">Rejection Reason</Label>
+                  <Textarea
+                    id="reject-reason"
+                    value={rejectReason}
+                    onChange={(e) => setRejectReason(e.target.value)}
+                    placeholder="Explain why these resources are being rejected..."
+                    rows={4}
+                  />
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {rejectReason.length}/10 characters minimum
+                  </p>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setRejectDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button
+                  onClick={confirmBulkReject}
+                  disabled={rejectReason.trim().length < 10}
+                  className="bg-yellow-600 hover:bg-yellow-700"
+                >
+                  Confirm Rejection
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
           <ScrollArea className="h-[600px]">
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-12">
+                    <Checkbox
+                      checked={isAllSelected}
+                      onCheckedChange={toggleSelectAll}
+                      aria-label="Select all resources on this page"
+                      className={isSomeSelected ? "data-[state=checked]:bg-primary/50" : ""}
+                    />
+                  </TableHead>
                   <TableHead className="w-12">ID</TableHead>
                   <TableHead>Title</TableHead>
                   <TableHead className="hidden md:table-cell">Category</TableHead>
@@ -390,7 +644,18 @@ export default function ResourceManager() {
               </TableHeader>
               <TableBody>
                 {data?.resources.map((resource) => (
-                  <TableRow key={resource.id} data-testid={`row-resource-${resource.id}`}>
+                  <TableRow
+                    key={resource.id}
+                    data-testid={`row-resource-${resource.id}`}
+                    data-state={selectedResourceIds.includes(resource.id) ? "selected" : undefined}
+                  >
+                    <TableCell>
+                      <Checkbox
+                        checked={selectedResourceIds.includes(resource.id)}
+                        onCheckedChange={() => toggleResourceSelection(resource.id)}
+                        aria-label={`Select resource ${resource.id}`}
+                      />
+                    </TableCell>
                     <TableCell className="font-mono text-xs text-gray-400">
                       {resource.id}
                     </TableCell>
@@ -399,7 +664,7 @@ export default function ResourceManager() {
                         <div className="font-medium truncate max-w-[300px]" title={resource.title || ''}>
                           {resource.title || 'Untitled'}
                         </div>
-                        <a 
+                        <a
                           href={resource.url}
                           target="_blank"
                           rel="noopener noreferrer"

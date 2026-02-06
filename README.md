@@ -31,8 +31,25 @@ A production-ready React application for browsing and discovering 2,600+ curated
 
 ## Screenshots
 
-<!-- Screenshots coming soon -->
-_Screenshots will be added before v1.0 release_
+### Home Page & Search Interface
+![Home page with fuzzy search (⌘K) interface showing resource discovery](docs/screenshots/home-search.png)
+*Browse 2,600+ resources with advanced fuzzy search (⌘K keyboard shortcut)*
+
+### Category Navigation
+![3-level navigation hierarchy: Categories → Subcategories → Sub-subcategories](docs/screenshots/category-navigation.png)
+*Navigate through the complete 3-level category hierarchy*
+
+### Learning Journeys
+![Guided learning paths with progress tracking and skill development milestones](docs/screenshots/learning-journeys.png)
+*Follow curated learning paths with progress tracking*
+
+### Admin Dashboard
+![Admin resource curation interface with approval queue and moderation tools](docs/screenshots/admin-dashboard.png)
+*Manage resources, review submissions, and curate content*
+
+### Mobile View
+![Responsive mobile interface with WCAG AAA touch targets](docs/screenshots/mobile-view.png)
+*Fully responsive design optimized for mobile devices*
 
 ## Technology Stack
 
@@ -75,8 +92,10 @@ npm run start
 | Document | Description |
 |----------|-------------|
 | [SETUP.md](docs/SETUP.md) | Development environment setup |
+| [ENVIRONMENT_VARIABLES.md](docs/ENVIRONMENT_VARIABLES.md) | Environment variables reference |
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md) | System architecture and design |
 | [API.md](docs/API.md) | Complete API reference |
+| [API Documentation](/api/docs) | Interactive OpenAPI documentation |
 | [ADMIN-GUIDE.md](docs/ADMIN-GUIDE.md) | Administrator documentation |
 | [CODE-MAP.md](docs/CODE-MAP.md) | Codebase navigation guide |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines |
@@ -128,21 +147,11 @@ Exports pass all awesome-lint rules except:
 
 ## Environment Variables
 
-```bash
-# Required
-DATABASE_URL=postgresql://...
-SESSION_SECRET=<random-string>
-
-# Replit Auth
-REPLIT_DOMAINS=...
-
-# Optional - AI Features
-AI_INTEGRATIONS_ANTHROPIC_API_KEY=...
-
-# Optional - GitHub Sync
-GITHUB_TOKEN=...
-GITHUB_REPO_URL=...
-```
+This project requires several environment variables to run. See [ENVIRONMENT_VARIABLES.md](docs/ENVIRONMENT_VARIABLES.md) for:
+- Complete list of required and optional variables
+- Detailed descriptions and configuration examples
+- Platform-specific setup instructions
+- Security best practices
 
 ## Admin Access
 

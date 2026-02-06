@@ -110,14 +110,15 @@ async function parseAwesomeList(url: string): Promise<ParseResult> {
       warnings: [] // Add any warnings here
     };
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     const parseTime = (Date.now() - startTime) / 1000;
-    
+    const errorMessage = error instanceof Error ? error.message : String(error);
+
     return {
       success: false,
       url,
       parseTime: Number(parseTime.toFixed(2)),
-      errors: [error.message]
+      errors: [errorMessage]
     };
   }
 }
@@ -153,9 +154,10 @@ async function main() {
       process.exit(1);
     }
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.log('\n💥 Unexpected error occurred:');
-    console.log(`   ${error.message}`);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.log(`   ${errorMessage}`);
     printTips();
     process.exit(1);
   }
@@ -168,7 +170,8 @@ process.on('SIGINT', () => {
 });
 
 // Run the CLI
-main().catch(error => {
-  console.error('\n💥 Fatal error:', error.message);
+main().catch((error: unknown) => {
+  const errorMessage = error instanceof Error ? error.message : String(error);
+  console.error('\n💥 Fatal error:', errorMessage);
   process.exit(1);
 });

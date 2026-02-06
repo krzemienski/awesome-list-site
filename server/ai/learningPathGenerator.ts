@@ -3,6 +3,43 @@ import { Resource, LearningJourney, InsertLearningJourney, InsertJourneyStep } f
 import { claudeService } from './claudeService';
 import { UserProfile } from './recommendationEngine';
 
+/**
+ * Awesome list resource structure (from parsed data)
+ */
+interface AwesomeListResource {
+  title?: string;
+  name?: string;
+  url: string;
+  description?: string;
+  category?: string;
+  subcategory?: string;
+  subSubcategory?: string;
+}
+
+/**
+ * AI-generated path milestone structure
+ */
+interface AIMilestoneResponse {
+  title: string;
+  description: string;
+  estimatedHours: number;
+  resourceCount?: number;
+}
+
+/**
+ * AI-generated path data structure
+ */
+interface AIPathData {
+  title: string;
+  description: string;
+  difficulty: string;
+  estimatedDuration: string;
+  milestones: AIMilestoneResponse[];
+  prerequisites: string[];
+  learningObjectives: string[];
+  selectedResourceIndices?: number[];
+}
+
 export interface LearningPathTemplate {
   title: string;
   description: string;
@@ -175,10 +212,10 @@ export class LearningPathGenerator {
         const awesomeListData = storage.getAwesomeListData();
         if (awesomeListData && awesomeListData.resources) {
           // Filter by category and convert to database Resource format
-          resources = awesomeListData.resources
-            .filter((r: any) => !targetCategory || r.category === targetCategory)
+          resources = (awesomeListData.resources as AwesomeListResource[])
+            .filter((r: AwesomeListResource) => !targetCategory || r.category === targetCategory)
             .slice(0, 100)
-            .map((r: any, index: number) => ({
+            .map((r: AwesomeListResource, index: number) => ({
               id: index + 1,
               title: r.title || r.name || 'Untitled',
               url: r.url,
@@ -187,8 +224,15 @@ export class LearningPathGenerator {
               subcategory: r.subcategory,
               subSubcategory: r.subSubcategory,
               status: 'approved',
-              createdAt: new Date()
-            }));
+              createdAt: new Date(),
+              metadata: null,
+              updatedAt: new Date(),
+              submittedBy: null,
+              approvedBy: null,
+              approvedAt: null,
+              githubSynced: false,
+              lastSyncedAt: null,
+            } as Resource));
         }
       }
 
@@ -237,7 +281,7 @@ User Profile:
 - Time Commitment: ${userProfile.timeCommitment}
 
 Available Resources (${resources.length} total):
-${resources.slice(0, 30).map(r => `- ${r.title}: ${r.description?.slice(0, 100)}`).join('\n')}
+${resources.slice(0, 30).map((r: Resource) => `- ${r.title}: ${r.description?.slice(0, 100)}`).join('\n')}
 
 Create a structured learning path with:
 1. 3-5 milestones with clear progression
@@ -265,15 +309,15 @@ Response format (JSON):
 }`;
 
       const response = await claudeService.generateResponse(prompt, 2000);
-      
+
       if (!response) return null;
 
-      const pathData = JSON.parse(response);
-      const selectedResources = pathData.selectedResourceIndices?.map((i: number) => resources[i]).filter(Boolean) 
+      const pathData = JSON.parse(response) as AIPathData;
+      const selectedResources = pathData.selectedResourceIndices?.map((i: number) => resources[i]).filter(Boolean)
         || resources.slice(0, 6);
 
       // Create milestones with resource distribution
-      const milestones: PathMilestone[] = pathData.milestones?.map((m: any, index: number) => ({
+      const milestones: PathMilestone[] = pathData.milestones?.map((m: AIMilestoneResponse, index: number) => ({
         id: `milestone_${index + 1}`,
         title: m.title,
         description: m.description,

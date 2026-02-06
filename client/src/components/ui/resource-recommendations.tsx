@@ -1,17 +1,21 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Lightbulb, 
-  TrendingUp, 
-  Tag, 
+import {
+  Lightbulb,
+  TrendingUp,
+  Tag,
   ExternalLink,
   Star,
   ArrowRight,
   Zap,
-  Target
+  Target,
+  Loader2,
+  AlertCircle
 } from "lucide-react";
 import { Resource } from "@/types/awesome-list";
 
@@ -25,190 +29,68 @@ interface ResourceRecommendationsProps {
 interface RecommendationScore {
   resource: Resource;
   score: number;
+  confidence: number;
   reasons: string[];
+  relationshipType?: 'similar' | 'prerequisite' | 'next-step';
 }
 
-export default function ResourceRecommendations({ 
-  currentResource, 
-  allResources, 
-  userTags = [], 
-  className 
+interface RelatedResourcesResponse {
+  similar: RecommendationScore[];
+  prerequisites: RecommendationScore[];
+  nextSteps: RecommendationScore[];
+  totalFound: number;
+}
+
+export default function ResourceRecommendations({
+  currentResource,
+  allResources,
+  userTags = [],
+  className
 }: ResourceRecommendationsProps) {
   const [activeTab, setActiveTab] = useState("similar");
 
-  // Calculate recommendations based on different algorithms
-  const recommendations = useMemo(() => {
-    if (!currentResource) {
-      return {
-        similar: [],
-        trending: [],
-        tagged: [],
-        complementary: []
-      };
-    }
+  // Fetch AI-powered related resources from API
+  const { data: relatedResourcesData, isLoading, isError, error } = useQuery<RelatedResourcesResponse>({
+    queryKey: ['/api/resources/related', currentResource?.id],
+    queryFn: async () => {
+      if (!currentResource?.id) {
+        throw new Error('No resource ID provided');
+      }
+      return await apiRequest(`/api/resources/${currentResource.id}/related?limit=5`, {
+        method: 'GET'
+      });
+    },
+    enabled: !!currentResource?.id,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 1
+  });
 
-    // Similar resources (same category, shared tags)
-    const similarResources = allResources
-      .filter(r => r.id !== currentResource.id)
-      .map(resource => {
-        let score = 0;
-        const reasons: string[] = [];
+  // Transform API response to match component structure
+  const recommendations = {
+    similar: relatedResourcesData?.similar?.map(item => ({
+      resource: item.resource,
+      score: item.score * 100, // Convert 0-1 to 0-100 for display
+      confidence: item.confidence,
+      reasons: [item.reason],
+      relationshipType: item.relationshipType
+    })) || [],
+    prerequisites: relatedResourcesData?.prerequisites?.map(item => ({
+      resource: item.resource,
+      score: item.score * 100,
+      confidence: item.confidence,
+      reasons: [item.reason],
+      relationshipType: item.relationshipType
+    })) || [],
+    nextSteps: relatedResourcesData?.nextSteps?.map(item => ({
+      resource: item.resource,
+      score: item.score * 100,
+      confidence: item.confidence,
+      reasons: [item.reason],
+      relationshipType: item.relationshipType
+    })) || []
+  };
 
-        // Same category bonus
-        if (resource.category === currentResource.category) {
-          score += 3;
-          reasons.push(`Same category: ${resource.category}`);
-        }
-
-        // Shared tags bonus
-        const sharedTags = resource.tags?.filter(tag => 
-          currentResource.tags?.includes(tag)
-        ) || [];
-        if (sharedTags.length > 0) {
-          score += sharedTags.length * 2;
-          reasons.push(`Shared tags: ${sharedTags.join(', ')}`);
-        }
-
-        // Similar title words
-        const currentWords = currentResource.title.toLowerCase().split(/\s+/);
-        const resourceWords = resource.title.toLowerCase().split(/\s+/);
-        const sharedWords = currentWords.filter(word => 
-          word.length > 3 && resourceWords.includes(word)
-        );
-        if (sharedWords.length > 0) {
-          score += sharedWords.length;
-          reasons.push(`Similar title words`);
-        }
-
-        // Description similarity (basic keyword matching)
-        if (currentResource.description && resource.description) {
-          const currentDesc = currentResource.description.toLowerCase();
-          const resourceDesc = resource.description.toLowerCase();
-          const keywordMatches = ['api', 'framework', 'library', 'tool', 'service', 'database']
-            .filter(keyword => currentDesc.includes(keyword) && resourceDesc.includes(keyword));
-          if (keywordMatches.length > 0) {
-            score += keywordMatches.length * 0.5;
-            reasons.push(`Similar functionality`);
-          }
-        }
-
-        return { resource, score, reasons };
-      })
-      .filter(item => item.score > 0)
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 5);
-
-    // Trending resources (simulate with highest tag count and category popularity)
-    const trendingResources = allResources
-      .filter(r => r.id !== currentResource.id)
-      .map(resource => {
-        let score = 0;
-        const reasons: string[] = [];
-
-        // Resources with many tags tend to be well-documented
-        const tagCount = resource.tags?.length || 0;
-        if (tagCount > 2) {
-          score += tagCount;
-          reasons.push(`Well-documented (${tagCount} tags)`);
-        }
-
-        // Resources in popular categories
-        const categorySize = allResources.filter(r => r.category === resource.category).length;
-        if (categorySize > 10) {
-          score += Math.log(categorySize);
-          reasons.push(`Popular category`);
-        }
-
-        // GitHub-based resources (more likely to be maintained)
-        if (resource.url.includes('github.com')) {
-          score += 2;
-          reasons.push(`Open source on GitHub`);
-        }
-
-        // Add some randomness to simulate trending
-        score += Math.random() * 2;
-
-        return { resource, score, reasons };
-      })
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 5);
-
-    // Tag-based recommendations (resources with user's preferred tags)
-    const taggedResources = userTags.length > 0 
-      ? allResources
-          .filter(r => r.id !== currentResource.id)
-          .map(resource => {
-            let score = 0;
-            const reasons: string[] = [];
-
-            const matchingTags = resource.tags?.filter(tag => 
-              userTags.includes(tag)
-            ) || [];
-
-            if (matchingTags.length > 0) {
-              score = matchingTags.length * 3;
-              reasons.push(`Matches your interests: ${matchingTags.join(', ')}`);
-            }
-
-            return { resource, score, reasons };
-          })
-          .filter(item => item.score > 0)
-          .sort((a, b) => b.score - a.score)
-          .slice(0, 5)
-      : [];
-
-    // Complementary resources (different category but related functionality)
-    const complementaryResources = allResources
-      .filter(r => r.id !== currentResource.id && r.category !== currentResource.category)
-      .map(resource => {
-        let score = 0;
-        const reasons: string[] = [];
-
-        // Look for complementary patterns
-        const complementaryPairs = [
-          { from: 'web', to: 'database', reason: 'Database for web applications' },
-          { from: 'api', to: 'testing', reason: 'Testing tools for APIs' },
-          { from: 'framework', to: 'monitoring', reason: 'Monitoring for frameworks' },
-          { from: 'authentication', to: 'security', reason: 'Security tools' },
-          { from: 'orm', to: 'migration', reason: 'Database migration tools' },
-          { from: 'cli', to: 'configuration', reason: 'Configuration management' }
-        ];
-
-        const currentCategory = currentResource.category.toLowerCase();
-        const resourceCategory = resource.category.toLowerCase();
-
-        complementaryPairs.forEach(pair => {
-          if ((currentCategory.includes(pair.from) && resourceCategory.includes(pair.to)) ||
-              (currentCategory.includes(pair.to) && resourceCategory.includes(pair.from))) {
-            score += 3;
-            reasons.push(pair.reason);
-          }
-        });
-
-        // Shared tags but different category
-        const sharedTags = resource.tags?.filter(tag => 
-          currentResource.tags?.includes(tag)
-        ) || [];
-        if (sharedTags.length > 0) {
-          score += sharedTags.length;
-          reasons.push(`Related tools: ${sharedTags.join(', ')}`);
-        }
-
-        return { resource, score, reasons };
-      })
-      .filter(item => item.score > 0)
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 5);
-
-    return {
-      similar: similarResources,
-      trending: trendingResources,
-      tagged: taggedResources,
-      complementary: complementaryResources
-    };
-  }, [currentResource, allResources, userTags]);
-
-  const renderRecommendationCard = (item: RecommendationScore, showScore: boolean = false) => (
+  const renderRecommendationCard = (item: RecommendationScore, showScore: boolean = true) => (
     <Card key={item.resource.id} className="hover:shadow-md transition-shadow">
       <CardContent className="p-4">
         <div className="flex items-start justify-between mb-2">
@@ -227,21 +109,25 @@ export default function ResourceRecommendations({
                 {item.resource.category}
               </Badge>
               {showScore && (
-                <Badge variant="secondary" className="text-xs">
-                  {Math.round(item.score * 10)/10} match
+                <Badge variant="secondary" className="text-xs flex items-center gap-1">
+                  <Zap className="h-3 w-3" />
+                  {Math.round(item.confidence)}% match
                 </Badge>
               )}
             </div>
           </div>
         </div>
-        
+
         <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
           {item.resource.description}
         </p>
-        
-        {item.reasons.length > 0 && (
+
+        {item.reasons && item.reasons.length > 0 && (
           <div className="space-y-1">
-            <div className="text-xs text-muted-foreground">Why recommended:</div>
+            <div className="text-xs text-muted-foreground flex items-center gap-1">
+              <Lightbulb className="h-3 w-3" />
+              AI Analysis:
+            </div>
             <div className="flex flex-wrap gap-1">
               {item.reasons.slice(0, 2).map((reason, index) => (
                 <span key={index} className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded">
@@ -275,47 +161,99 @@ export default function ResourceRecommendations({
       <Card className={className}>
         <CardContent className="py-12 text-center">
           <Lightbulb className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Resource Recommendations</h3>
+          <h3 className="text-lg font-semibold mb-2">AI-Powered Resource Recommendations</h3>
           <p className="text-muted-foreground">
-            Select a resource to see personalized recommendations
+            Select a resource to see AI-powered semantic recommendations
           </p>
         </CardContent>
       </Card>
     );
   }
 
-  const hasAnyRecommendations = Object.values(recommendations).some(recs => recs.length > 0);
+  // Loading state
+  if (isLoading) {
+    return (
+      <Card className={className}>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Lightbulb className="h-5 w-5" />
+            AI Recommendations for "{currentResource.title}"
+          </CardTitle>
+          <CardDescription>
+            Discovering semantically related resources using AI embeddings...
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+            <p className="text-sm text-muted-foreground">
+              Analyzing semantic relationships...
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Error state
+  if (isError) {
+    return (
+      <Card className={className}>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Lightbulb className="h-5 w-5" />
+            AI Recommendations for "{currentResource.title}"
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center py-12">
+            <AlertCircle className="h-8 w-8 text-destructive mb-4" />
+            <p className="text-sm text-muted-foreground mb-2">
+              Failed to load AI recommendations
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {error instanceof Error ? error.message : 'Unknown error'}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const totalRecommendations =
+    recommendations.similar.length +
+    recommendations.prerequisites.length +
+    recommendations.nextSteps.length;
+
+  const hasAnyRecommendations = totalRecommendations > 0;
 
   return (
     <Card className={className}>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Lightbulb className="h-5 w-5" />
-          Recommendations for "{currentResource.title}"
+          AI Recommendations for "{currentResource.title}"
         </CardTitle>
-        <CardDescription>
-          Discover related resources based on tags, categories, and usage patterns
+        <CardDescription className="flex items-center gap-1">
+          <Zap className="h-3 w-3" />
+          Powered by semantic similarity and AI embeddings
         </CardDescription>
       </CardHeader>
       <CardContent>
         {hasAnyRecommendations ? (
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid grid-cols-4 w-full">
+            <TabsList className="grid grid-cols-3 w-full">
               <TabsTrigger value="similar" className="text-xs">
                 <Target className="h-3 w-3 mr-1" />
                 Similar
               </TabsTrigger>
-              <TabsTrigger value="trending" className="text-xs">
-                <TrendingUp className="h-3 w-3 mr-1" />
-                Trending
+              <TabsTrigger value="prerequisites" className="text-xs">
+                <ArrowRight className="h-3 w-3 mr-1 rotate-180" />
+                Prerequisites
               </TabsTrigger>
-              <TabsTrigger value="tagged" className="text-xs" disabled={userTags.length === 0}>
-                <Tag className="h-3 w-3 mr-1" />
-                For You
-              </TabsTrigger>
-              <TabsTrigger value="complementary" className="text-xs">
-                <Zap className="h-3 w-3 mr-1" />
-                Related
+              <TabsTrigger value="nextSteps" className="text-xs">
+                <ArrowRight className="h-3 w-3 mr-1" />
+                Next Steps
               </TabsTrigger>
             </TabsList>
 
@@ -331,69 +269,72 @@ export default function ResourceRecommendations({
                 {recommendations.similar.length > 0 ? (
                   recommendations.similar.map(item => renderRecommendationCard(item, true))
                 ) : (
-                  <p className="text-sm text-muted-foreground text-center py-8">
-                    No similar resources found in the same category
-                  </p>
-                )}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="trending" className="mt-4">
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 mb-3">
-                  <TrendingUp className="h-4 w-4 text-green-600" />
-                  <span className="text-sm font-medium">Trending Resources</span>
-                  <Badge variant="outline" className="text-xs">
-                    {recommendations.trending.length} found
-                  </Badge>
-                </div>
-                {recommendations.trending.map(item => renderRecommendationCard(item))}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="tagged" className="mt-4">
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 mb-3">
-                  <Tag className="h-4 w-4 text-purple-600" />
-                  <span className="text-sm font-medium">Based on Your Interests</span>
-                  <Badge variant="outline" className="text-xs">
-                    {recommendations.tagged.length} found
-                  </Badge>
-                </div>
-                {userTags.length === 0 ? (
                   <div className="text-center py-8">
-                    <p className="text-sm text-muted-foreground mb-2">
-                      No user preferences set
+                    <p className="text-sm text-muted-foreground">
+                      No similar resources found
                     </p>
-                    <p className="text-xs text-muted-foreground">
-                      Interact with resources to build personalized recommendations
+                    <p className="text-xs text-muted-foreground mt-1">
+                      AI embeddings are still being generated
                     </p>
                   </div>
-                ) : recommendations.tagged.length > 0 ? (
-                  recommendations.tagged.map(item => renderRecommendationCard(item, true))
-                ) : (
-                  <p className="text-sm text-muted-foreground text-center py-8">
-                    No resources found matching your interests: {userTags.join(', ')}
-                  </p>
                 )}
               </div>
             </TabsContent>
 
-            <TabsContent value="complementary" className="mt-4">
+            <TabsContent value="prerequisites" className="mt-4">
               <div className="space-y-3">
                 <div className="flex items-center gap-2 mb-3">
-                  <Zap className="h-4 w-4 text-orange-600" />
-                  <span className="text-sm font-medium">Complementary Tools</span>
+                  <ArrowRight className="h-4 w-4 text-green-600 rotate-180" />
+                  <span className="text-sm font-medium">Prerequisites</span>
                   <Badge variant="outline" className="text-xs">
-                    {recommendations.complementary.length} found
+                    {recommendations.prerequisites.length} found
                   </Badge>
                 </div>
-                {recommendations.complementary.length > 0 ? (
-                  recommendations.complementary.map(item => renderRecommendationCard(item, true))
+                {recommendations.prerequisites.length > 0 ? (
+                  <>
+                    <p className="text-xs text-muted-foreground mb-2">
+                      Resources to learn before this one
+                    </p>
+                    {recommendations.prerequisites.map(item => renderRecommendationCard(item, true))}
+                  </>
                 ) : (
-                  <p className="text-sm text-muted-foreground text-center py-8">
-                    No complementary resources found
-                  </p>
+                  <div className="text-center py-8">
+                    <p className="text-sm text-muted-foreground">
+                      No prerequisites identified
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      This resource may be a good starting point
+                    </p>
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="nextSteps" className="mt-4">
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 mb-3">
+                  <ArrowRight className="h-4 w-4 text-purple-600" />
+                  <span className="text-sm font-medium">Next Steps</span>
+                  <Badge variant="outline" className="text-xs">
+                    {recommendations.nextSteps.length} found
+                  </Badge>
+                </div>
+                {recommendations.nextSteps.length > 0 ? (
+                  <>
+                    <p className="text-xs text-muted-foreground mb-2">
+                      Resources to learn after mastering this one
+                    </p>
+                    {recommendations.nextSteps.map(item => renderRecommendationCard(item, true))}
+                  </>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-sm text-muted-foreground">
+                      No next steps identified
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      This resource may be advanced or specialized
+                    </p>
+                  </div>
                 )}
               </div>
             </TabsContent>
@@ -401,8 +342,11 @@ export default function ResourceRecommendations({
         ) : (
           <div className="text-center py-8">
             <Lightbulb className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-            <p className="text-sm text-muted-foreground">
-              No recommendations available for this resource
+            <p className="text-sm text-muted-foreground mb-1">
+              No AI recommendations available yet
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Embeddings for this resource are still being generated
             </p>
           </div>
         )}

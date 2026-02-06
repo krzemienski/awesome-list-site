@@ -31,7 +31,19 @@
 
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import {
+  UserRepository,
+  ResourceRepository,
+  CategoryRepository,
+  TagRepository,
+  LearningJourneyRepository,
+  UserFeatureRepository,
+  AuditRepository,
+  GithubSyncRepository,
+  EnrichmentRepository,
+  AdminRepository,
+  LegacyRepository,
+} from "./repositories";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { setupLocalAuth } from "./localAuth";
 import passport from "passport";
@@ -50,38 +62,58 @@ import { validateAwesomeList, formatValidationReport } from "./validation/awesom
 import { checkResourceLinks, formatLinkCheckReport } from "./validation/linkChecker";
 import { seedDatabase } from "./seed";
 import { enrichmentService } from "./ai/enrichmentService";
-import { asyncHandler } from "./middleware/asyncHandler";
-import { InternalServerError, UnauthorizedError, NotFoundError, ValidationError, BadRequestError, ConflictError, ForbiddenError, ServiceUnavailableError } from "./middleware/errors";
 
 const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md";
 
+// ============================================================================
+// REPOSITORY INSTANCES - Direct Usage of Domain Repositories
+// ============================================================================
+// Instead of using the storage facade, we instantiate repositories directly
+// for better modularity and clearer dependencies.
+const userRepo = new UserRepository();
+const resourceRepo = new ResourceRepository();
+const categoryRepo = new CategoryRepository();
+const tagRepo = new TagRepository();
+const learningJourneyRepo = new LearningJourneyRepository();
+const userFeatureRepo = new UserFeatureRepository();
+const auditRepo = new AuditRepository();
+const githubSyncRepo = new GithubSyncRepository();
+const enrichmentRepo = new EnrichmentRepository();
+const adminRepo = new AdminRepository();
+const legacyRepo = new LegacyRepository();
+
 // Middleware to check if user is admin
-const isAdmin = asyncHandler(async (req: any, res: Response, next: any) => {
-  const userId = req.user?.claims?.sub;
-  if (!userId) {
-    throw new UnauthorizedError();
+const isAdmin = async (req: any, res: Response, next: any) => {
+  try {
+    const userId = req.user?.claims?.sub;
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    const user = await userRepo.getUser(userId);
+    if (!user || user.role !== 'admin') {
+      return res.status(403).json({ message: "Forbidden: Admin access required" });
+    }
+    
+    next();
+  } catch (error) {
+    res.status(500).json({ message: "Error checking admin status" });
   }
-
-  const user = await storage.getUser(userId);
-  if (!user || user.role !== 'admin') {
-    throw new ForbiddenError("Admin access required");
-  }
-
-  next();
-});
+};
 
 // SEO route handlers - now uses database-driven data
 async function generateSitemap(req: any, res: any) {
-  const awesomeListData = await storage.getAwesomeListFromDatabase();
+  try {
+    const awesomeListData = await legacyRepo.getAwesomeListFromDatabase();
+    
+    if (!awesomeListData || !awesomeListData.categories.length) {
+      return res.status(404).send('Sitemap not available - database empty');
+    }
 
-  if (!awesomeListData || !awesomeListData.categories.length) {
-    throw new NotFoundError('Sitemap not available - database empty');
-  }
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const currentDate = new Date().toISOString().split('T')[0];
 
-  const baseUrl = `${req.protocol}://${req.get('host')}`;
-  const currentDate = new Date().toISOString().split('T')[0];
-
-  let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+    let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>${baseUrl}/</loc>
@@ -96,66 +128,70 @@ async function generateSitemap(req: any, res: any) {
     <priority>0.8</priority>
   </url>`;
 
-  // Add category URLs from database
-  awesomeListData.categories.forEach(category => {
-    sitemap += `
+    // Add category URLs from database
+    awesomeListData.categories.forEach(category => {
+      sitemap += `
   <url>
     <loc>${baseUrl}/category/${category.slug}</loc>
     <lastmod>${currentDate}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>`;
-
-    // Add subcategory URLs
-    category.subcategories?.forEach(subcategory => {
-      sitemap += `
+      
+      // Add subcategory URLs
+      category.subcategories?.forEach(subcategory => {
+        sitemap += `
   <url>
     <loc>${baseUrl}/subcategory/${subcategory.slug}</loc>
     <lastmod>${currentDate}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>`;
-
-      // Add sub-subcategory URLs
-      subcategory.subSubcategories?.forEach(subSubcategory => {
-        sitemap += `
+        
+        // Add sub-subcategory URLs
+        subcategory.subSubcategories?.forEach(subSubcategory => {
+          sitemap += `
   <url>
     <loc>${baseUrl}/sub-subcategory/${subSubcategory.slug}</loc>
     <lastmod>${currentDate}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>`;
+        });
       });
     });
-  });
 
-  sitemap += `
+    sitemap += `
 </urlset>`;
 
-  res.set('Content-Type', 'application/xml');
-  res.send(sitemap);
+    res.set('Content-Type', 'application/xml');
+    res.send(sitemap);
+  } catch (error) {
+    console.error('Error generating sitemap:', error);
+    res.status(500).send('Error generating sitemap');
+  }
 }
 
 async function generateOpenGraphImage(req: any, res: any) {
-  const { title, category, resourceCount } = req.query;
-
-  // Use database count if not provided in query
-  let count = resourceCount;
-  let pageTitle = title;
-
-  if (!count || !pageTitle) {
-    try {
-      const awesomeListData = await storage.getAwesomeListFromDatabase();
-      if (!pageTitle) pageTitle = awesomeListData?.title || 'Awesome Video';
-      if (!count) count = awesomeListData?.resources?.length?.toString() || '2600+';
-    } catch {
-      // Fallback to defaults if database is unavailable
-      pageTitle = pageTitle || 'Awesome Video';
-      count = count || '2600+';
+  try {
+    const { title, category, resourceCount } = req.query;
+    
+    // Use database count if not provided in query
+    let count = resourceCount;
+    let pageTitle = title;
+    
+    if (!count || !pageTitle) {
+      try {
+        const awesomeListData = await legacyRepo.getAwesomeListFromDatabase();
+        if (!pageTitle) pageTitle = awesomeListData?.title || 'Awesome Video';
+        if (!count) count = awesomeListData?.resources?.length?.toString() || '2600+';
+      } catch {
+        pageTitle = pageTitle || 'Awesome Video';
+        count = count || '2600+';
+      }
     }
-  }
 
-  const svg = `<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+    const svg = `<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#dc2626;stop-opacity:1" />
@@ -178,9 +214,13 @@ async function generateOpenGraphImage(req: any, res: any) {
   </g>
 </svg>`;
 
-  res.set('Content-Type', 'image/svg+xml');
-  res.set('Cache-Control', 'public, max-age=86400');
-  res.send(svg);
+    res.set('Content-Type', 'image/svg+xml');
+    res.set('Cache-Control', 'public, max-age=86400');
+    res.send(svg);
+  } catch (error) {
+    console.error('Error generating OG image:', error);
+    res.status(500).send('Error generating image');
+  }
 }
 
 // Helper functions to convert slugs back to original titles
@@ -289,60 +329,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
   setupLocalAuth();
 
   // Local authentication routes
-  app.post("/api/auth/local/login", asyncHandler(async (req, res, next) => {
+  app.post("/api/auth/local/login", (req, res, next) => {
     passport.authenticate('local', (err: any, user: any, info: any) => {
       if (err) {
         console.log('[local/login] Authentication error:', err);
-        return next(new InternalServerError("Internal server error"));
+        return res.status(500).json({ message: "Internal server error" });
       }
-
+      
       if (!user) {
         console.log('[local/login] Authentication failed:', info?.message);
-        return next(new UnauthorizedError(info?.message || "Invalid credentials"));
+        return res.status(401).json({ message: info?.message || "Invalid credentials" });
       }
-
+      
       console.log('[local/login] User authenticated, establishing session for:', user.claims?.sub);
-
+      
       req.logIn(user, async (err) => {
         if (err) {
           console.log('[local/login] Login failed:', err);
-          return next(new InternalServerError("Login failed"));
+          return res.status(500).json({ message: "Login failed" });
         }
-
+        
         console.log('[local/login] Session established, saving to store...');
-
+        
         // Explicitly save the session to ensure it's persisted before sending response
         req.session.save(async (saveErr) => {
           if (saveErr) {
             console.log('[local/login] Session save failed:', saveErr);
-            return next(new InternalServerError("Failed to save session"));
+            return res.status(500).json({ message: "Failed to save session" });
           }
-
+          
           console.log('[local/login] Session saved successfully, session ID:', req.sessionID);
-
-          try {
-            // Fetch user from database to get the role
-            const dbUser = await storage.getUser(user.claims.sub);
-
-            console.log('[local/login] Returning user response with role:', dbUser?.role);
-
-            return res.json({
-              user: {
-                id: user.claims.sub,
-                email: user.claims.email,
-                firstName: user.claims.first_name,
-                lastName: user.claims.last_name,
-                profileImageUrl: user.claims.profile_image_url,
-                role: dbUser?.role || 'user',
-              }
-            });
-          } catch (error) {
-            return next(new InternalServerError("Failed to fetch user data"));
-          }
+          
+          // Fetch user from database to get the role
+          const dbUser = await userRepo.getUser(user.claims.sub);
+          
+          console.log('[local/login] Returning user response with role:', dbUser?.role);
+          
+          return res.json({
+            user: {
+              id: user.claims.sub,
+              email: user.claims.email,
+              firstName: user.claims.first_name,
+              lastName: user.claims.last_name,
+              profileImageUrl: user.claims.profile_image_url,
+              role: dbUser?.role || 'user',
+            }
+          });
         });
       });
     })(req, res, next);
-  }));
+  });
 
   // Note: Database seeding and data initialization moved to runBackgroundInitialization()
   // This ensures the server starts quickly for production deployments
@@ -350,220 +386,279 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= Auth Routes (from Replit Auth blueprint) =============
   
   // GET /api/auth/user - Get current user (public endpoint)
-  app.get('/api/auth/user', asyncHandler(async (req: any, res) => {
-    console.log('[/api/auth/user] Request received');
-    console.log('[/api/auth/user] isAuthenticated:', req.isAuthenticated?.());
-    console.log('[/api/auth/user] req.user?.dbUser:', req.user?.dbUser);
-    console.log('[/api/auth/user] req.user?.claims?.sub:', req.user?.claims?.sub);
+  app.get('/api/auth/user', async (req: any, res) => {
+    try {
+      console.log('[/api/auth/user] Request received');
+      console.log('[/api/auth/user] isAuthenticated:', req.isAuthenticated?.());
+      console.log('[/api/auth/user] req.user?.dbUser:', req.user?.dbUser);
+      console.log('[/api/auth/user] req.user?.claims?.sub:', req.user?.claims?.sub);
+      
+      // Check if user is authenticated
+      if (!req.isAuthenticated() || !req.user?.claims?.sub) {
+        console.log('[/api/auth/user] User not authenticated, returning null');
+        return res.json({ user: null, isAuthenticated: false });
+      }
 
-    // Check if user is authenticated
-    if (!req.isAuthenticated() || !req.user?.claims?.sub) {
-      console.log('[/api/auth/user] User not authenticated, returning null');
-      return res.json({ user: null, isAuthenticated: false });
+      // Use DB user from session (populated by deserializeUser) or fetch if not available
+      let dbUser = req.user.dbUser;
+      if (!dbUser) {
+        const userId = req.user.claims.sub;
+        console.log('[/api/auth/user] dbUser not in session, fetching from DB, userId:', userId);
+        dbUser = await userRepo.getUser(userId);
+      }
+      
+      if (!dbUser) {
+        console.log('[/api/auth/user] User not found in DB');
+        return res.json({ user: null, isAuthenticated: false });
+      }
+
+      console.log('[/api/auth/user] DB user found:', {
+        id: dbUser.id,
+        email: dbUser.email,
+        role: dbUser.role
+      });
+
+      // Map database fields to frontend-expected format
+      const user = {
+        id: dbUser.id,
+        email: dbUser.email,
+        name: dbUser.firstName && dbUser.lastName 
+          ? `${dbUser.firstName} ${dbUser.lastName}` 
+          : dbUser.firstName || dbUser.email?.split('@')[0] || 'User',
+        avatar: dbUser.profileImageUrl,
+        role: dbUser.role,
+        createdAt: dbUser.createdAt,
+      };
+
+      console.log('[/api/auth/user] Returning user:', user);
+      res.json({ user, isAuthenticated: true });
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
     }
-
-    // Use DB user from session (populated by deserializeUser) or fetch if not available
-    let dbUser = req.user.dbUser;
-    if (!dbUser) {
-      const userId = req.user.claims.sub;
-      console.log('[/api/auth/user] dbUser not in session, fetching from DB, userId:', userId);
-      dbUser = await storage.getUser(userId);
-    }
-
-    if (!dbUser) {
-      console.log('[/api/auth/user] User not found in DB');
-      return res.json({ user: null, isAuthenticated: false });
-    }
-
-    console.log('[/api/auth/user] DB user found:', {
-      id: dbUser.id,
-      email: dbUser.email,
-      role: dbUser.role
-    });
-
-    // Map database fields to frontend-expected format
-    const user = {
-      id: dbUser.id,
-      email: dbUser.email,
-      name: dbUser.firstName && dbUser.lastName
-        ? `${dbUser.firstName} ${dbUser.lastName}`
-        : dbUser.firstName || dbUser.email?.split('@')[0] || 'User',
-      avatar: dbUser.profileImageUrl,
-      role: dbUser.role,
-      createdAt: dbUser.createdAt,
-    };
-
-    console.log('[/api/auth/user] Returning user:', user);
-    res.json({ user, isAuthenticated: true });
-  }));
+  });
   
   // POST /api/auth/logout - Logout user
-  app.post('/api/auth/logout', asyncHandler(async (req: any, res) => {
-    req.logout(() => {
-      res.json({ success: true });
-    });
-  }));
+  app.post('/api/auth/logout', async (req: any, res) => {
+    try {
+      req.logout(() => {
+        res.json({ success: true });
+      });
+    } catch (error) {
+      console.error("Error logging out:", error);
+      res.status(500).json({ message: "Failed to logout" });
+    }
+  });
   
   // Note: /api/login, /api/callback are set up in setupAuth()
-
-  // ============= Test Routes =============
-
-  // GET /api/test-endpoint-with-error - Test centralized error handling
-  app.get('/api/test-endpoint-with-error', asyncHandler(async (req, res) => {
-    throw new InternalServerError('Test error for centralized error handling');
-  }));
 
   // ============= Resource Routes =============
   
   // GET /api/resources - List approved resources (public)
-  app.get('/api/resources', asyncHandler(async (req, res) => {
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 20;
-    const category = req.query.category as string;
-    const subcategory = req.query.subcategory as string;
-    const search = req.query.search as string;
-
-    const result = await storage.listResources({
-      page,
-      limit,
-      status: 'approved',
-      category,
-      subcategory,
-      search
-    });
-
-    res.json(result);
-  }));
-  
-  // GET /api/resources/:id - Get single resource
-  app.get('/api/resources/:id', asyncHandler(async (req, res) => {
-    const id = parseInt(req.params.id);
-    const resource = await storage.getResource(id);
-
-    if (!resource) {
-      throw new NotFoundError('Resource not found');
-    }
-
-    res.json(resource);
-  }));
-  
-  // POST /api/resources - Submit new resource (authenticated)
-  app.post('/api/resources', isAuthenticated, asyncHandler(async (req: any, res) => {
-    const userId = req.user.claims.sub;
-
+  app.get('/api/resources', async (req, res) => {
     try {
-      const resourceData = insertResourceSchema.parse(req.body);
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 20;
+      const category = req.query.category as string;
+      const subcategory = req.query.subcategory as string;
+      const search = req.query.search as string;
 
-      const resource = await storage.createResource({
+      const result = await resourceRepo.listResources({
+        page,
+        limit,
+        status: 'approved',
+        category,
+        subcategory,
+        search
+      });
+
+      res.json(result);
+    } catch (error) {
+      console.error('Error fetching resources:', error);
+      res.status(500).json({ message: 'Failed to fetch resources' });
+    }
+  });
+
+  // GET /api/resources/check-url - Check if URL already exists (public)
+  app.get('/api/resources/check-url', async (req, res) => {
+    try {
+      const url = req.query.url as string;
+
+      if (!url) {
+        return res.status(400).json({ message: 'URL parameter is required' });
+      }
+
+      const existingResource = await resourceRepo.getResourceByUrl(url);
+
+      if (existingResource) {
+        return res.json({
+          exists: true,
+          resource: {
+            id: existingResource.id,
+            title: existingResource.title,
+            status: existingResource.status,
+            category: existingResource.category,
+            subcategory: existingResource.subcategory
+          }
+        });
+      }
+
+      res.json({ exists: false });
+    } catch (error) {
+      console.error('Error checking URL:', error);
+      res.status(500).json({ message: 'Failed to check URL' });
+    }
+  });
+
+  // GET /api/resources/:id - Get single resource
+  app.get('/api/resources/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const resource = await resourceRepo.getResource(id);
+
+      if (!resource) {
+        return res.status(404).json({ message: 'Resource not found' });
+      }
+
+      res.json(resource);
+    } catch (error) {
+      console.error('Error fetching resource:', error);
+      res.status(500).json({ message: 'Failed to fetch resource' });
+    }
+  });
+
+  // POST /api/resources - Submit new resource (authenticated)
+  app.post('/api/resources', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const resourceData = insertResourceSchema.parse(req.body);
+      
+      const resource = await resourceRepo.createResource({
         ...resourceData,
         submittedBy: userId,
         status: 'pending'
       });
-
+      
       res.status(201).json(resource);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        throw new ValidationError('Invalid resource data', error.errors);
+        return res.status(400).json({ message: 'Invalid resource data', errors: error.errors });
       }
-      throw error;
+      console.error('Error creating resource:', error);
+      res.status(500).json({ message: 'Failed to create resource' });
     }
-  }));
+  });
   
   // GET /api/resources/pending - List pending resources (admin only)
-  app.get('/api/resources/pending', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 20;
-
-    const result = await storage.listResources({
-      page,
-      limit,
-      status: 'pending'
-    });
-
-    res.json(result);
-  }));
+  app.get('/api/resources/pending', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 20;
+      
+      const result = await resourceRepo.listResources({
+        page,
+        limit,
+        status: 'pending'
+      });
+      
+      res.json(result);
+    } catch (error) {
+      console.error('Error fetching pending resources:', error);
+      res.status(500).json({ message: 'Failed to fetch pending resources' });
+    }
+  });
   
   // PUT /api/resources/:id/approve - Approve resource (admin)
-  app.put('/api/resources/:id/approve', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
-    const id = parseInt(req.params.id);
-    const userId = req.user.claims.sub;
-
-    const resource = await storage.updateResourceStatus(id, 'approved', userId);
-    res.json(resource);
-  }));
+  app.put('/api/resources/:id/approve', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const userId = req.user.claims.sub;
+      
+      const resource = await resourceRepo.updateResourceStatus(id, 'approved', userId);
+      res.json(resource);
+    } catch (error) {
+      console.error('Error approving resource:', error);
+      res.status(500).json({ message: 'Failed to approve resource' });
+    }
+  });
   
   // PUT /api/resources/:id/reject - Reject resource (admin)
-  app.put('/api/resources/:id/reject', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
-    const id = parseInt(req.params.id);
-    const userId = req.user.claims.sub;
-
-    const resource = await storage.updateResourceStatus(id, 'rejected', userId);
-    res.json(resource);
-  }));
+  app.put('/api/resources/:id/reject', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const userId = req.user.claims.sub;
+      
+      const resource = await resourceRepo.updateResourceStatus(id, 'rejected', userId);
+      res.json(resource);
+    } catch (error) {
+      console.error('Error rejecting resource:', error);
+      res.status(500).json({ message: 'Failed to reject resource' });
+    }
+  });
   
   // POST /api/resources/:id/edits - Submit edit suggestion for a resource (authenticated)
-  app.post('/api/resources/:id/edits', isAuthenticated, asyncHandler(async (req: any, res) => {
-    const userId = req.user.claims.sub;
-    const resourceId = parseInt(req.params.id);
-    const { proposedChanges, proposedData, claudeMetadata, triggerClaudeAnalysis } = req.body;
-
-    if (isNaN(resourceId)) {
-      throw new BadRequestError('Invalid resource ID');
-    }
-
-    const resource = await storage.getResource(resourceId);
-    if (!resource) {
-      throw new NotFoundError('Resource not found');
-    }
-
-    if (!proposedChanges || !proposedData) {
-      throw new BadRequestError('proposedChanges and proposedData are required');
-    }
-
-    // SECURITY FIX: Whitelist of editable fields only (ISSUE 1)
-    const EDITABLE_FIELDS = ['title', 'description', 'url', 'tags', 'category', 'subcategory', 'subSubcategory'];
-
-    // Sanitize proposedData - only allow whitelisted fields
-    const sanitizedProposedData: Record<string, any> = {};
-    for (const field of EDITABLE_FIELDS) {
-      if (proposedData && field in proposedData) {
-        sanitizedProposedData[field] = proposedData[field];
-      }
-    }
-
-    // Sanitize proposedChanges
-    const sanitizedChanges: Record<string, any> = {};
-    for (const field of EDITABLE_FIELDS) {
-      if (proposedChanges && field in proposedChanges) {
-        sanitizedChanges[field] = proposedChanges[field];
-      }
-    }
-
-    // SECURITY FIX: Validate field sizes (ISSUE 5)
-    if (sanitizedProposedData.title && sanitizedProposedData.title.length > 200) {
-      throw new BadRequestError('Title too long (max 200 characters)');
-    }
-
-    if (sanitizedProposedData.description && sanitizedProposedData.description.length > 2000) {
-      throw new BadRequestError('Description too long (max 2000 characters)');
-    }
-
-    if (sanitizedProposedData.tags && Array.isArray(sanitizedProposedData.tags) && sanitizedProposedData.tags.length > 20) {
-      throw new BadRequestError('Too many tags (max 20)');
-    }
-
-    let aiMetadata = claudeMetadata;
-    if (triggerClaudeAnalysis && resource.url) {
-      try {
-        aiMetadata = await claudeService.analyzeURL(resource.url);
-      } catch (error) {
-        // Log but don't fail the entire request if Claude analysis fails
-      }
-    }
-
+  app.post('/api/resources/:id/edits', isAuthenticated, async (req: any, res) => {
     try {
+      const userId = req.user.claims.sub;
+      const resourceId = parseInt(req.params.id);
+      const { proposedChanges, proposedData, claudeMetadata, triggerClaudeAnalysis } = req.body;
+      
+      if (isNaN(resourceId)) {
+        return res.status(400).json({ message: 'Invalid resource ID' });
+      }
+      
+      const resource = await resourceRepo.getResource(resourceId);
+      if (!resource) {
+        return res.status(404).json({ message: 'Resource not found' });
+      }
+      
+      if (!proposedChanges || !proposedData) {
+        return res.status(400).json({ message: 'proposedChanges and proposedData are required' });
+      }
+      
+      // SECURITY FIX: Whitelist of editable fields only (ISSUE 1)
+      const EDITABLE_FIELDS = ['title', 'description', 'url', 'tags', 'category', 'subcategory', 'subSubcategory'];
+      
+      // Sanitize proposedData - only allow whitelisted fields
+      const sanitizedProposedData: Record<string, any> = {};
+      for (const field of EDITABLE_FIELDS) {
+        if (proposedData && field in proposedData) {
+          sanitizedProposedData[field] = proposedData[field];
+        }
+      }
+      
+      // Sanitize proposedChanges
+      const sanitizedChanges: Record<string, any> = {};
+      for (const field of EDITABLE_FIELDS) {
+        if (proposedChanges && field in proposedChanges) {
+          sanitizedChanges[field] = proposedChanges[field];
+        }
+      }
+      
+      // SECURITY FIX: Validate field sizes (ISSUE 5)
+      if (sanitizedProposedData.title && sanitizedProposedData.title.length > 200) {
+        return res.status(400).json({ message: 'Title too long (max 200 characters)' });
+      }
+      
+      if (sanitizedProposedData.description && sanitizedProposedData.description.length > 2000) {
+        return res.status(400).json({ message: 'Description too long (max 2000 characters)' });
+      }
+      
+      if (sanitizedProposedData.tags && Array.isArray(sanitizedProposedData.tags) && sanitizedProposedData.tags.length > 20) {
+        return res.status(400).json({ message: 'Too many tags (max 20)' });
+      }
+      
+      let aiMetadata = claudeMetadata;
+      if (triggerClaudeAnalysis && resource.url) {
+        try {
+          aiMetadata = await claudeService.analyzeURL(resource.url);
+        } catch (error) {
+          console.error('Error analyzing URL with Claude:', error);
+        }
+      }
+      
       // Use sanitized versions in createResourceEdit call
-      const edit = await storage.createResourceEdit({
+      const edit = await auditRepo.createResourceEdit({
         resourceId,
         submittedBy: userId,
         status: 'pending',
@@ -573,150 +668,207 @@ export async function registerRoutes(app: Express): Promise<Server> {
         claudeMetadata: aiMetadata,
         claudeAnalyzedAt: aiMetadata ? new Date() : undefined,
       });
-
+      
       res.status(201).json(edit);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        throw new ValidationError('Invalid edit data', error.errors);
+        return res.status(400).json({ message: 'Invalid edit data', errors: error.errors });
       }
-      throw error;
+      console.error('Error creating edit suggestion:', error);
+      res.status(500).json({ message: 'Failed to create edit suggestion' });
     }
-  }));
+  });
 
   // ============= Category Routes =============
   
   // GET /api/categories - List all categories (public)
-  app.get('/api/categories', asyncHandler(async (req, res) => {
-    const categories = await storage.listCategories();
-    res.json(categories);
-  }));
+  app.get('/api/categories', async (req, res) => {
+    try {
+      const categories = await categoryRepo.listCategories();
+      res.json(categories);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      res.status(500).json({ message: 'Failed to fetch categories' });
+    }
+  });
 
   // GET /api/subcategories - List all subcategories (public)
-  app.get('/api/subcategories', asyncHandler(async (req, res) => {
-    let categoryId: number | undefined = undefined;
-
-    // Validate categoryId query parameter if provided
-    if (req.query.categoryId) {
-      const categoryIdSchema = z.string().regex(/^\d+$/, "categoryId must be a valid number");
-      const validation = categoryIdSchema.safeParse(req.query.categoryId);
-
-      if (!validation.success) {
-        throw new ValidationError('Invalid categoryId parameter', validation.error.errors);
+  app.get('/api/subcategories', async (req, res) => {
+    try {
+      let categoryId: number | undefined = undefined;
+      
+      // Validate categoryId query parameter if provided
+      if (req.query.categoryId) {
+        const categoryIdSchema = z.string().regex(/^\d+$/, "categoryId must be a valid number");
+        const validation = categoryIdSchema.safeParse(req.query.categoryId);
+        
+        if (!validation.success) {
+          return res.status(400).json({ 
+            message: 'Invalid categoryId parameter', 
+            errors: validation.error.errors 
+          });
+        }
+        
+        categoryId = parseInt(validation.data);
+        
+        if (isNaN(categoryId) || categoryId < 1) {
+          return res.status(400).json({ 
+            message: 'categoryId must be a positive number' 
+          });
+        }
       }
-
-      categoryId = parseInt(validation.data);
-
-      if (isNaN(categoryId) || categoryId < 1) {
-        throw new BadRequestError('categoryId must be a positive number');
-      }
+      
+      const subcategories = await categoryRepo.listSubcategories(categoryId);
+      res.json(subcategories);
+    } catch (error) {
+      console.error('Error fetching subcategories:', error);
+      res.status(500).json({ message: 'Failed to fetch subcategories' });
     }
-
-    const subcategories = await storage.listSubcategories(categoryId);
-    res.json(subcategories);
-  }));
+  });
 
   // GET /api/sub-subcategories - List all sub-subcategories (public)
-  app.get('/api/sub-subcategories', asyncHandler(async (req, res) => {
-    let subcategoryId: number | undefined = undefined;
-
-    // Validate subcategoryId query parameter if provided
-    if (req.query.subcategoryId) {
-      const subcategoryIdSchema = z.string().regex(/^\d+$/, "subcategoryId must be a valid number");
-      const validation = subcategoryIdSchema.safeParse(req.query.subcategoryId);
-
-      if (!validation.success) {
-        throw new ValidationError('Invalid subcategoryId parameter', validation.error.errors);
+  app.get('/api/sub-subcategories', async (req, res) => {
+    try {
+      let subcategoryId: number | undefined = undefined;
+      
+      // Validate subcategoryId query parameter if provided
+      if (req.query.subcategoryId) {
+        const subcategoryIdSchema = z.string().regex(/^\d+$/, "subcategoryId must be a valid number");
+        const validation = subcategoryIdSchema.safeParse(req.query.subcategoryId);
+        
+        if (!validation.success) {
+          return res.status(400).json({ 
+            message: 'Invalid subcategoryId parameter', 
+            errors: validation.error.errors 
+          });
+        }
+        
+        subcategoryId = parseInt(validation.data);
+        
+        if (isNaN(subcategoryId) || subcategoryId < 1) {
+          return res.status(400).json({ 
+            message: 'subcategoryId must be a positive number' 
+          });
+        }
       }
-
-      subcategoryId = parseInt(validation.data);
-
-      if (isNaN(subcategoryId) || subcategoryId < 1) {
-        throw new BadRequestError('subcategoryId must be a positive number');
-      }
+      
+      const subSubcategories = await categoryRepo.listSubSubcategories(subcategoryId);
+      res.json(subSubcategories);
+    } catch (error) {
+      console.error('Error fetching sub-subcategories:', error);
+      res.status(500).json({ message: 'Failed to fetch sub-subcategories' });
     }
-
-    const subSubcategories = await storage.listSubSubcategories(subcategoryId);
-    res.json(subSubcategories);
-  }));
+  });
 
   // ============= User Interaction Routes =============
   
   // POST /api/favorites/:resourceId - Add favorite
-  app.post('/api/favorites/:resourceId', isAuthenticated, asyncHandler(async (req: any, res) => {
-    const userId = req.user.claims.sub;
-    const resourceId = parseInt(req.params.resourceId);
-
-    await storage.addFavorite(userId, resourceId);
-    res.json({ message: 'Favorite added successfully' });
-  }));
-
+  app.post('/api/favorites/:resourceId', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const resourceId = parseInt(req.params.resourceId);
+      
+      await userFeatureRepo.addFavorite(userId, resourceId);
+      res.json({ message: 'Favorite added successfully' });
+    } catch (error) {
+      console.error('Error adding favorite:', error);
+      res.status(500).json({ message: 'Failed to add favorite' });
+    }
+  });
+  
   // DELETE /api/favorites/:resourceId - Remove favorite
-  app.delete('/api/favorites/:resourceId', isAuthenticated, asyncHandler(async (req: any, res) => {
-    const userId = req.user.claims.sub;
-    const resourceId = parseInt(req.params.resourceId);
-
-    await storage.removeFavorite(userId, resourceId);
-    res.json({ message: 'Favorite removed successfully' });
-  }));
-
+  app.delete('/api/favorites/:resourceId', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const resourceId = parseInt(req.params.resourceId);
+      
+      await userFeatureRepo.removeFavorite(userId, resourceId);
+      res.json({ message: 'Favorite removed successfully' });
+    } catch (error) {
+      console.error('Error removing favorite:', error);
+      res.status(500).json({ message: 'Failed to remove favorite' });
+    }
+  });
+  
   // GET /api/favorites - Get user's favorites
-  app.get('/api/favorites', isAuthenticated, asyncHandler(async (req: any, res) => {
-    const userId = req.user.claims.sub;
-    const favorites = await storage.getUserFavorites(userId);
-    res.json(favorites);
-  }));
+  app.get('/api/favorites', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const favorites = await userFeatureRepo.getUserFavorites(userId);
+      res.json(favorites);
+    } catch (error) {
+      console.error('Error fetching favorites:', error);
+      res.status(500).json({ message: 'Failed to fetch favorites' });
+    }
+  });
   
   // POST /api/bookmarks/:resourceId - Add bookmark
-  app.post('/api/bookmarks/:resourceId', isAuthenticated, asyncHandler(async (req: any, res) => {
-    const userId = req.user.claims.sub;
-    const resourceId = parseInt(req.params.resourceId);
-    const { notes } = req.body;
-
-    await storage.addBookmark(userId, resourceId, notes);
-    res.json({ message: 'Bookmark added successfully' });
-  }));
-
+  app.post('/api/bookmarks/:resourceId', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const resourceId = parseInt(req.params.resourceId);
+      const { notes } = req.body;
+      
+      await userFeatureRepo.addBookmark(userId, resourceId, notes);
+      res.json({ message: 'Bookmark added successfully' });
+    } catch (error) {
+      console.error('Error adding bookmark:', error);
+      res.status(500).json({ message: 'Failed to add bookmark' });
+    }
+  });
+  
   // DELETE /api/bookmarks/:resourceId - Remove bookmark
-  app.delete('/api/bookmarks/:resourceId', isAuthenticated, asyncHandler(async (req: any, res) => {
-    const userId = req.user.claims.sub;
-    const resourceId = parseInt(req.params.resourceId);
-
-    await storage.removeBookmark(userId, resourceId);
-    res.json({ message: 'Bookmark removed successfully' });
-  }));
-
+  app.delete('/api/bookmarks/:resourceId', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const resourceId = parseInt(req.params.resourceId);
+      
+      await userFeatureRepo.removeBookmark(userId, resourceId);
+      res.json({ message: 'Bookmark removed successfully' });
+    } catch (error) {
+      console.error('Error removing bookmark:', error);
+      res.status(500).json({ message: 'Failed to remove bookmark' });
+    }
+  });
+  
   // GET /api/bookmarks - Get user's bookmarks
-  app.get('/api/bookmarks', isAuthenticated, asyncHandler(async (req: any, res) => {
-    const userId = req.user.claims.sub;
-    const bookmarks = await storage.getUserBookmarks(userId);
-    res.json(bookmarks);
-  }));
+  app.get('/api/bookmarks', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const bookmarks = await userFeatureRepo.getUserBookmarks(userId);
+      res.json(bookmarks);
+    } catch (error) {
+      console.error('Error fetching bookmarks:', error);
+      res.status(500).json({ message: 'Failed to fetch bookmarks' });
+    }
+  });
 
   // ============= User Profile & Progress Routes =============
 
   // GET /api/user/progress - Get user's learning progress
-  app.get('/api/user/progress', isAuthenticated, asyncHandler(async (req: any, res) => {
-    const userId = req.user.claims.sub;
+  app.get('/api/user/progress', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
 
-    // Get total resources in catalog
-    const totalResourcesResult = await storage.listResources({ status: 'approved', limit: 1 });
-    const totalResources = totalResourcesResult.total;
+      // Get total resources in catalog
+      const totalResourcesResult = await resourceRepo.listResources({ status: 'approved', limit: 1 });
+      const totalResources = totalResourcesResult.total;
 
-    // Get user's journey progress to count completed resources
-    const journeyProgress = await storage.listUserJourneyProgress(userId);
-    const completedResources = journeyProgress.filter(p => p.completedAt !== null).length;
+      // Get user's journey progress to count completed resources
+      const journeyProgress = await learningJourneyRepo.listUserJourneyProgress(userId);
+      const completedResources = journeyProgress.filter(p => p.completedAt !== null).length;
 
-    // Get current learning path (most recently accessed journey)
-    let currentPath: string | undefined;
-    if (journeyProgress.length > 0) {
-      const latestJourney = journeyProgress[0];
-      const journey = await storage.getLearningJourney(latestJourney.journeyId);
+      // Get current learning path (most recently accessed journey)
+      let currentPath: string | undefined;
+      if (journeyProgress.length > 0) {
+        const latestJourney = journeyProgress[0];
+        const journey = await learningJourneyRepo.getLearningJourney(latestJourney.journeyId);
         currentPath = journey?.title;
       }
 
       // Calculate streak days from favorites and bookmarks
-      const favorites = await storage.getUserFavorites(userId);
-      const bookmarks = await storage.getUserBookmarks(userId);
+      const favorites = await userFeatureRepo.getUserFavorites(userId);
+      const bookmarks = await userFeatureRepo.getUserBookmarks(userId);
       
       // Debug: Log sample data to verify timestamps are available
       if (favorites.length > 0) {
@@ -768,7 +920,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get skill level from user preferences
       let skillLevel = 'beginner';
       try {
-        const userPrefs = await storage.getUserPreferences(userId);
+        const userPrefs = await userFeatureRepo.getUserPreferences(userId);
         if (userPrefs?.skillLevel) {
           skillLevel = userPrefs.skillLevel;
         }
@@ -786,57 +938,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
 
       res.json(progressData);
-  }));
+    } catch (error) {
+      console.error('Error fetching user progress:', error);
+      res.status(500).json({ message: 'Failed to fetch user progress' });
+    }
+  });
 
   // GET /api/user/submissions - Get user's submitted resources and edits
-  app.get('/api/user/submissions', isAuthenticated, asyncHandler(async (req: any, res) => {
-    const userId = req.user.claims.sub;
+  app.get('/api/user/submissions', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
 
-    // Get user's submitted resources
-    const submittedResources = await storage.listResources({
-      userId,
-      page: 1,
-      limit: 100
-    });
+      // Get user's submitted resources
+      const submittedResources = await resourceRepo.listResources({
+        userId,
+        page: 1,
+        limit: 100
+      });
 
-    // Get user's suggested edits
-    const resourceEdits = await storage.getResourceEditsByUser(userId);
+      // Get user's suggested edits
+      const resourceEdits = await auditRepo.getResourceEditsByUser(userId);
 
-    res.json({
-      resources: submittedResources.resources,
-      edits: resourceEdits,
-      totalResources: submittedResources.total,
-      totalEdits: resourceEdits.length
-    });
-  }));
+      res.json({
+        resources: submittedResources.resources,
+        edits: resourceEdits,
+        totalResources: submittedResources.total,
+        totalEdits: resourceEdits.length
+      });
+    } catch (error) {
+      console.error('Error fetching user submissions:', error);
+      res.status(500).json({ message: 'Failed to fetch user submissions' });
+    }
+  });
 
   // GET /api/user/journeys - Get user's learning journeys with details
-  app.get('/api/user/journeys', isAuthenticated, asyncHandler(async (req: any, res) => {
-    const userId = req.user.claims.sub;
+  app.get('/api/user/journeys', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
 
-    // Get user's journey progress
-    const journeyProgress = await storage.listUserJourneyProgress(userId);
+      // Get user's journey progress
+      const journeyProgress = await learningJourneyRepo.listUserJourneyProgress(userId);
 
-    // Fetch journey details for each progress entry
-    const journeysWithDetails = await Promise.all(
-      journeyProgress.map(async (progress) => {
-        const journey = await storage.getLearningJourney(progress.journeyId);
-        return {
-          ...progress,
-          journey
-        };
-      })
-    );
+      // Fetch journey details for each progress entry
+      const journeysWithDetails = await Promise.all(
+        journeyProgress.map(async (progress) => {
+          const journey = await learningJourneyRepo.getLearningJourney(progress.journeyId);
+          return {
+            ...progress,
+            journey
+          };
+        })
+      );
 
-    res.json(journeysWithDetails);
-  }));
+      res.json(journeysWithDetails);
+    } catch (error) {
+      console.error('Error fetching user journeys:', error);
+      res.status(500).json({ message: 'Failed to fetch user journeys' });
+    }
+  });
 
   // ============= Learning Journey Routes =============
   
   // GET /api/journeys - List all journeys
-  app.get('/api/journeys', asyncHandler(async (req: any, res) => {
-    const category = req.query.category as string;
-    const journeys = await storage.listLearningJourneys(category);
+  app.get('/api/journeys', async (req: any, res) => {
+    try {
+      const category = req.query.category as string;
+      const journeys = await learningJourneyRepo.listLearningJourneys(category);
       
       // Early return if no journeys
       if (journeys.length === 0) {
@@ -845,12 +1012,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // BATCH FETCH: Single query for all steps
       const journeyIds = journeys.map(j => j.id);
-      const stepsMap = await storage.listJourneyStepsBatch(journeyIds);
+      const stepsMap = await learningJourneyRepo.listJourneyStepsBatch(journeyIds);
       
       // If user is authenticated, batch fetch all progress
       if (req.user?.claims?.sub) {
         const userId = req.user.claims.sub;
-        const allProgress = await storage.listUserJourneyProgress(userId);
+        const allProgress = await learningJourneyRepo.listUserJourneyProgress(userId);
         
         // Create progress map for O(1) lookup
         const progressMap = new Map();
@@ -901,1484 +1068,1861 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         res.json(enrichedJourneys);
       }
-  }));
+    } catch (error) {
+      console.error('Error fetching journeys:', error);
+      res.status(500).json({ message: 'Failed to fetch journeys' });
+    }
+  });
   
   // GET /api/journeys/:id - Get journey details
-  app.get('/api/journeys/:id', asyncHandler(async (req: any, res) => {
-    const id = parseInt(req.params.id);
-    const journey = await storage.getLearningJourney(id);
-
-    if (!journey) {
-      throw new NotFoundError('Journey not found');
+  app.get('/api/journeys/:id', async (req: any, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const journey = await learningJourneyRepo.getLearningJourney(id);
+      
+      if (!journey) {
+        return res.status(404).json({ message: 'Journey not found' });
+      }
+      
+      const steps = await learningJourneyRepo.listJourneySteps(id);
+      
+      // Count distinct stepNumbers for accurate step count (defensive: handle both strings and numbers)
+      const uniqueStepNumbers = new Set(
+        steps
+          .map(s => typeof s.stepNumber === 'number' ? s.stepNumber : parseInt(s.stepNumber, 10))
+          .filter(n => !isNaN(n))
+      );
+      const stepCount = uniqueStepNumbers.size;
+      
+      // If user is authenticated, get their progress
+      let progress = null;
+      if (req.user?.claims?.sub) {
+        progress = await learningJourneyRepo.getUserJourneyProgress(req.user.claims.sub, id);
+      }
+      
+      res.json({
+        ...journey,
+        stepCount,
+        steps,
+        progress: progress ? {
+          completedSteps: progress.completedSteps || [],
+          currentStepId: progress.currentStepId,
+          completedAt: progress.completedAt
+        } : null
+      });
+    } catch (error) {
+      console.error('Error fetching journey:', error);
+      res.status(500).json({ message: 'Failed to fetch journey' });
     }
-
-    const steps = await storage.listJourneySteps(id);
-
-    // Count distinct stepNumbers for accurate step count (defensive: handle both strings and numbers)
-    const uniqueStepNumbers = new Set(
-      steps
-        .map(s => typeof s.stepNumber === 'number' ? s.stepNumber : parseInt(s.stepNumber, 10))
-        .filter(n => !isNaN(n))
-    );
-    const stepCount = uniqueStepNumbers.size;
-
-    // If user is authenticated, get their progress
-    let progress = null;
-    if (req.user?.claims?.sub) {
-      progress = await storage.getUserJourneyProgress(req.user.claims.sub, id);
-    }
-
-    res.json({
-      ...journey,
-      stepCount,
-      steps,
-      progress: progress ? {
-        completedSteps: progress.completedSteps || [],
-        currentStepId: progress.currentStepId,
-        completedAt: progress.completedAt
-      } : null
-    });
-  }));
+  });
   
   // POST /api/journeys/:id/start - Start journey
-  app.post('/api/journeys/:id/start', isAuthenticated, asyncHandler(async (req: any, res) => {
-    const userId = req.user.claims.sub;
-    const journeyId = parseInt(req.params.id);
-
-    const progress = await storage.startUserJourney(userId, journeyId);
-    res.json(progress);
-  }));
+  app.post('/api/journeys/:id/start', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const journeyId = parseInt(req.params.id);
+      
+      const progress = await learningJourneyRepo.startUserJourney(userId, journeyId);
+      res.json(progress);
+    } catch (error) {
+      console.error('Error starting journey:', error);
+      res.status(500).json({ message: 'Failed to start journey' });
+    }
+  });
   
   // PUT /api/journeys/:id/progress - Update progress
-  app.put('/api/journeys/:id/progress', isAuthenticated, asyncHandler(async (req: any, res) => {
-    const userId = req.user.claims.sub;
-    const journeyId = parseInt(req.params.id);
-    const { stepId } = req.body;
-
-    if (!stepId) {
-      throw new BadRequestError('Step ID is required');
+  app.put('/api/journeys/:id/progress', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const journeyId = parseInt(req.params.id);
+      const { stepId } = req.body;
+      
+      if (!stepId) {
+        return res.status(400).json({ message: 'Step ID is required' });
+      }
+      
+      const progress = await learningJourneyRepo.updateUserJourneyProgress(userId, journeyId, stepId);
+      res.json(progress);
+    } catch (error) {
+      console.error('Error updating journey progress:', error);
+      res.status(500).json({ message: 'Failed to update journey progress' });
     }
-
-    const progress = await storage.updateUserJourneyProgress(userId, journeyId, stepId);
-    res.json(progress);
-  }));
+  });
   
   // GET /api/journeys/:id/progress - Get user's progress
-  app.get('/api/journeys/:id/progress', isAuthenticated, asyncHandler(async (req: any, res) => {
-    const userId = req.user.claims.sub;
-    const journeyId = parseInt(req.params.id);
-
-    const progress = await storage.getUserJourneyProgress(userId, journeyId);
-
-    if (!progress) {
-      throw new NotFoundError('Progress not found');
+  app.get('/api/journeys/:id/progress', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const journeyId = parseInt(req.params.id);
+      
+      const progress = await learningJourneyRepo.getUserJourneyProgress(userId, journeyId);
+      
+      if (!progress) {
+        return res.status(404).json({ message: 'Progress not found' });
+      }
+      
+      res.json(progress);
+    } catch (error) {
+      console.error('Error fetching journey progress:', error);
+      res.status(500).json({ message: 'Failed to fetch journey progress' });
     }
-
-    res.json(progress);
-  }));
+  });
 
   // ============= Admin Routes =============
   
   // GET /api/admin/stats - Dashboard statistics
-  app.get('/api/admin/stats', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
-    const stats = await storage.getAdminStats();
-    // Map backend property names to frontend expectations
-    res.json({
-      users: stats.totalUsers,
-      resources: stats.totalResources,
-      journeys: stats.totalJourneys,
-      pendingApprovals: stats.pendingResources,
-    });
-  }));
+  app.get('/api/admin/stats', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const stats = await adminRepo.getAdminStats();
+      // Map backend property names to frontend expectations
+      res.json({
+        users: stats.totalUsers,
+        resources: stats.totalResources,
+        journeys: stats.totalJourneys,
+        pendingApprovals: stats.pendingResources,
+      });
+    } catch (error) {
+      console.error('Error fetching admin stats:', error);
+      res.status(500).json({ message: 'Failed to fetch admin statistics' });
+    }
+  });
   
   // GET /api/admin/users - List users
-  app.get('/api/admin/users', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 20;
-
-    const result = await storage.listUsers(page, limit);
-    res.json(result);
-  }));
+  app.get('/api/admin/users', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 20;
+      
+      const result = await userRepo.listUsers(page, limit);
+      res.json(result);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      res.status(500).json({ message: 'Failed to fetch users' });
+    }
+  });
   
   // PUT /api/admin/users/:id/role - Change user role
-  app.put('/api/admin/users/:id/role', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
-    const userId = req.params.id;
-    const { role } = req.body;
-
-    if (!role || !['user', 'admin', 'moderator'].includes(role)) {
-      throw new BadRequestError('Invalid role');
+  app.put('/api/admin/users/:id/role', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const userId = req.params.id;
+      const { role } = req.body;
+      
+      if (!role || !['user', 'admin', 'moderator'].includes(role)) {
+        return res.status(400).json({ message: 'Invalid role' });
+      }
+      
+      const user = await userRepo.updateUserRole(userId, role);
+      res.json(user);
+    } catch (error) {
+      console.error('Error updating user role:', error);
+      res.status(500).json({ message: 'Failed to update user role' });
     }
-
-    const user = await storage.updateUserRole(userId, role);
-    res.json(user);
-  }));
+  });
   
   // ============= Resource Approval Routes =============
   
   // GET /api/admin/pending-resources - Get all pending resources for approval
-  app.get('/api/admin/pending-resources', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
-    const result = await storage.getPendingResources();
-
-    res.json(result);
-  }));
+  app.get('/api/admin/pending-resources', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const result = await resourceRepo.getPendingResources();
+      
+      res.json(result);
+    } catch (error) {
+      console.error('Error fetching pending resources:', error);
+      res.status(500).json({ message: 'Failed to fetch pending resources' });
+    }
+  });
   
   // POST /api/admin/resources/:id/approve - Approve a pending resource
-  app.post('/api/admin/resources/:id/approve', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
-    const resourceId = parseInt(req.params.id);
-    const userId = req.user.claims.sub;
-
-    if (isNaN(resourceId)) {
-      throw new BadRequestError('Invalid resource ID');
+  app.post('/api/admin/resources/:id/approve', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const resourceId = parseInt(req.params.id);
+      const userId = req.user.claims.sub;
+      
+      if (isNaN(resourceId)) {
+        return res.status(400).json({ message: 'Invalid resource ID' });
+      }
+      
+      const updatedResource = await resourceRepo.approveResource(resourceId, userId);
+      
+      res.json(updatedResource);
+    } catch (error) {
+      console.error('Error approving resource:', error);
+      res.status(500).json({ message: 'Failed to approve resource' });
     }
-
-    const updatedResource = await storage.approveResource(resourceId, userId);
-
-    res.json(updatedResource);
-  }));
+  });
   
   // POST /api/admin/resources/:id/reject - Reject a pending resource
-  app.post('/api/admin/resources/:id/reject', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
-    const resourceId = parseInt(req.params.id);
-    const userId = req.user.claims.sub;
-    const { reason } = req.body;
-
-    if (isNaN(resourceId)) {
-      throw new BadRequestError('Invalid resource ID');
+  app.post('/api/admin/resources/:id/reject', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const resourceId = parseInt(req.params.id);
+      const userId = req.user.claims.sub;
+      const { reason } = req.body;
+      
+      if (isNaN(resourceId)) {
+        return res.status(400).json({ message: 'Invalid resource ID' });
+      }
+      
+      if (!reason || reason.trim().length < 10) {
+        return res.status(400).json({ message: 'Rejection reason is required (minimum 10 characters)' });
+      }
+      
+      await resourceRepo.rejectResource(resourceId, userId, reason);
+      const updatedResource = await resourceRepo.getResource(resourceId);
+      
+      res.json(updatedResource);
+    } catch (error) {
+      console.error('Error rejecting resource:', error);
+      res.status(500).json({ message: 'Failed to reject resource' });
     }
-
-    if (!reason || reason.trim().length < 10) {
-      throw new BadRequestError('Rejection reason is required (minimum 10 characters)');
-    }
-
-    await storage.rejectResource(resourceId, userId, reason);
-    const updatedResource = await storage.getResource(resourceId);
-
-    res.json(updatedResource);
-  }));
+  });
 
   // PUT /api/admin/resources/:id - Update a resource (admin only)
-  app.put('/api/admin/resources/:id', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
-    const resourceId = parseInt(req.params.id);
-    const userId = req.user.claims.sub;
-
-    if (isNaN(resourceId)) {
-      throw new BadRequestError('Invalid resource ID');
+  app.put('/api/admin/resources/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const resourceId = parseInt(req.params.id);
+      const userId = req.user.claims.sub;
+      
+      if (isNaN(resourceId)) {
+        return res.status(400).json({ message: 'Invalid resource ID' });
+      }
+      
+      const resource = await resourceRepo.getResource(resourceId);
+      if (!resource) {
+        return res.status(404).json({ message: 'Resource not found' });
+      }
+      
+      const updateSchema = insertResourceSchema.partial();
+      const validationResult = updateSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: 'Validation failed', 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      const validatedData = validationResult.data;
+      const updateData: Record<string, any> = {};
+      
+      if (validatedData.title !== undefined) updateData.title = validatedData.title;
+      if (validatedData.url !== undefined) updateData.url = validatedData.url;
+      if (validatedData.description !== undefined) updateData.description = validatedData.description;
+      if (validatedData.category !== undefined) updateData.category = validatedData.category;
+      if (validatedData.subcategory !== undefined) updateData.subcategory = validatedData.subcategory;
+      if (validatedData.subSubcategory !== undefined) updateData.subSubcategory = validatedData.subSubcategory;
+      if (validatedData.status !== undefined) updateData.status = validatedData.status;
+      
+      const updatedResource = await resourceRepo.updateResource(resourceId, updateData);
+      
+      await auditRepo.logResourceAudit(
+        resourceId,
+        'updated',
+        userId,
+        updateData,
+        'Resource updated by admin'
+      );
+      
+      res.json(updatedResource);
+    } catch (error) {
+      console.error('Error updating resource:', error);
+      res.status(500).json({ message: 'Failed to update resource' });
     }
-
-    const resource = await storage.getResource(resourceId);
-    if (!resource) {
-      throw new NotFoundError('Resource not found');
-    }
-
-    const updateSchema = insertResourceSchema.partial();
-    const validationResult = updateSchema.safeParse(req.body);
-
-    if (!validationResult.success) {
-      throw new ValidationError('Validation failed', validationResult.error.errors);
-    }
-
-    const validatedData = validationResult.data;
-    const updateData: Record<string, any> = {};
-
-    if (validatedData.title !== undefined) updateData.title = validatedData.title;
-    if (validatedData.url !== undefined) updateData.url = validatedData.url;
-    if (validatedData.description !== undefined) updateData.description = validatedData.description;
-    if (validatedData.category !== undefined) updateData.category = validatedData.category;
-    if (validatedData.subcategory !== undefined) updateData.subcategory = validatedData.subcategory;
-    if (validatedData.subSubcategory !== undefined) updateData.subSubcategory = validatedData.subSubcategory;
-    if (validatedData.status !== undefined) updateData.status = validatedData.status;
-
-    const updatedResource = await storage.updateResource(resourceId, updateData);
-
-    await storage.logResourceAudit(
-      resourceId,
-      'updated',
-      userId,
-      updateData,
-      'Resource updated by admin'
-    );
-
-    res.json(updatedResource);
-  }));
+  });
 
   // DELETE /api/admin/resources/:id - Delete a resource (admin only)
-  app.delete('/api/admin/resources/:id', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
-    const resourceId = parseInt(req.params.id);
-    const userId = req.user.claims.sub;
-
-    if (isNaN(resourceId)) {
-      throw new BadRequestError('Invalid resource ID');
+  app.delete('/api/admin/resources/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const resourceId = parseInt(req.params.id);
+      const userId = req.user.claims.sub;
+      
+      if (isNaN(resourceId)) {
+        return res.status(400).json({ message: 'Invalid resource ID' });
+      }
+      
+      const resource = await resourceRepo.getResource(resourceId);
+      if (!resource) {
+        return res.status(404).json({ message: 'Resource not found' });
+      }
+      
+      const resourceSnapshot = { title: resource.title, url: resource.url, category: resource.category };
+      
+      await resourceRepo.deleteResource(resourceId);
+      
+      await auditRepo.logResourceAudit(
+        resourceId,
+        'deleted',
+        userId,
+        resourceSnapshot,
+        'Resource deleted by admin'
+      );
+      
+      res.json({ message: 'Resource deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting resource:', error);
+      res.status(500).json({ message: 'Failed to delete resource' });
     }
-
-    const resource = await storage.getResource(resourceId);
-    if (!resource) {
-      throw new NotFoundError('Resource not found');
-    }
-
-    const resourceSnapshot = { title: resource.title, url: resource.url, category: resource.category };
-
-    await storage.deleteResource(resourceId);
-
-    await storage.logResourceAudit(
-      resourceId,
-      'deleted',
-      userId,
-      resourceSnapshot,
-      'Resource deleted by admin'
-    );
-
-    res.json({ message: 'Resource deleted successfully' });
-  }));
+  });
 
   // GET /api/admin/resources - Get all resources for admin (with pagination and filters)
-  app.get('/api/admin/resources', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 50;
-    const search = req.query.search as string;
-    const category = req.query.category as string;
-    const status = req.query.status as string;
-
-    const result = await storage.listResources({
-      page,
-      limit,
-      search,
-      category,
-      status: status || undefined
-    });
-
-    res.json({
-      resources: result.resources,
-      total: result.total,
-      page,
-      limit,
-      totalPages: Math.ceil(result.total / limit)
-    });
-  }));
+  app.get('/api/admin/resources', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 50;
+      const search = req.query.search as string;
+      const category = req.query.category as string;
+      const status = req.query.status as string;
+      
+      const result = await resourceRepo.listResources({
+        page,
+        limit,
+        search,
+        category,
+        status: status || undefined
+      });
+      
+      res.json({
+        resources: result.resources,
+        total: result.total,
+        page,
+        limit,
+        totalPages: Math.ceil(result.total / limit)
+      });
+    } catch (error) {
+      console.error('Error fetching admin resources:', error);
+      res.status(500).json({ message: 'Failed to fetch resources' });
+    }
+  });
 
   // POST /api/admin/resources - Create a new resource (admin only)
-  app.post('/api/admin/resources', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
-    const userId = req.user.claims.sub;
-
-    const createSchema = insertResourceSchema.extend({
-      title: insertResourceSchema.shape.title.min(1, 'Title is required'),
-      url: insertResourceSchema.shape.url.min(1, 'URL is required'),
-    });
-
-    const validationResult = createSchema.safeParse(req.body);
-
-    if (!validationResult.success) {
-      throw new ValidationError('Validation failed', validationResult.error.errors);
+  app.post('/api/admin/resources', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      const createSchema = insertResourceSchema.extend({
+        title: insertResourceSchema.shape.title.min(1, 'Title is required'),
+        url: insertResourceSchema.shape.url.min(1, 'URL is required'),
+      });
+      
+      const validationResult = createSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: 'Validation failed', 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      const validatedData = validationResult.data;
+      
+      const newResource = await resourceRepo.createResource({
+        title: validatedData.title,
+        url: validatedData.url,
+        description: validatedData.description || '',
+        category: validatedData.category || 'General Tools',
+        subcategory: validatedData.subcategory || null,
+        subSubcategory: validatedData.subSubcategory || null,
+        status: validatedData.status || 'approved',
+        submittedBy: userId
+      });
+      
+      await auditRepo.logResourceAudit(
+        newResource.id,
+        'created',
+        userId,
+        { title: validatedData.title, url: validatedData.url },
+        'Resource created by admin'
+      );
+      
+      res.status(201).json(newResource);
+    } catch (error) {
+      console.error('Error creating resource:', error);
+      res.status(500).json({ message: 'Failed to create resource' });
     }
-
-    const validatedData = validationResult.data;
-
-    const newResource = await storage.createResource({
-      title: validatedData.title,
-      url: validatedData.url,
-      description: validatedData.description || '',
-      category: validatedData.category || 'General Tools',
-      subcategory: validatedData.subcategory || null,
-      subSubcategory: validatedData.subSubcategory || null,
-      status: validatedData.status || 'approved',
-      submittedBy: userId
-    });
-
-    await storage.logResourceAudit(
-      newResource.id,
-      'created',
-      userId,
-      { title: validatedData.title, url: validatedData.url },
-      'Resource created by admin'
-    );
-
-    res.status(201).json(newResource);
-  }));
+  });
   
   // ============= Resource Edit Management Routes =============
   
   // GET /api/admin/resource-edits - Get all pending resource edits (admin only)
-  app.get('/api/admin/resource-edits', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
-    const edits = await storage.getPendingResourceEdits();
-
-    const editsWithResources = await Promise.all(
-      edits.map(async (edit) => {
-        const resource = await storage.getResource(edit.resourceId);
-        return {
-          ...edit,
-          resource
-        };
-      })
-    );
-
-    res.json(editsWithResources);
-  }));
+  app.get('/api/admin/resource-edits', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const edits = await auditRepo.getPendingResourceEdits();
+      
+      const editsWithResources = await Promise.all(
+        edits.map(async (edit) => {
+          const resource = await resourceRepo.getResource(edit.resourceId);
+          return {
+            ...edit,
+            resource
+          };
+        })
+      );
+      
+      res.json(editsWithResources);
+    } catch (error) {
+      console.error('Error fetching pending edits:', error);
+      res.status(500).json({ message: 'Failed to fetch pending edits' });
+    }
+  });
   
   // POST /api/admin/resource-edits/:id/approve - Approve an edit (admin only)
-  app.post('/api/admin/resource-edits/:id/approve', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
-    const editId = parseInt(req.params.id);
-    const userId = req.user.claims.sub;
-
-    if (isNaN(editId)) {
-      throw new BadRequestError('Invalid edit ID');
-    }
-
+  app.post('/api/admin/resource-edits/:id/approve', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
-      await storage.approveResourceEdit(editId, userId);
+      const editId = parseInt(req.params.id);
+      const userId = req.user.claims.sub;
+      
+      if (isNaN(editId)) {
+        return res.status(400).json({ message: 'Invalid edit ID' });
+      }
+      
+      await auditRepo.approveResourceEdit(editId, userId);
+      
       res.json({ message: 'Edit approved and merged successfully' });
     } catch (error: any) {
+      console.error('Error approving edit:', error);
+      
       if (error.message && error.message.includes('Conflict detected')) {
-        throw new ConflictError(error.message);
+        return res.status(409).json({ 
+          message: error.message,
+          conflict: true
+        });
       }
-      throw error;
+      
+      res.status(500).json({ message: error.message || 'Failed to approve edit' });
     }
-  }));
+  });
   
   // POST /api/admin/resource-edits/:id/reject - Reject an edit (admin only)
-  app.post('/api/admin/resource-edits/:id/reject', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
-    const editId = parseInt(req.params.id);
-    const userId = req.user.claims.sub;
-    const { reason } = req.body;
-
-    if (isNaN(editId)) {
-      throw new BadRequestError('Invalid edit ID');
+  app.post('/api/admin/resource-edits/:id/reject', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const editId = parseInt(req.params.id);
+      const userId = req.user.claims.sub;
+      const { reason } = req.body;
+      
+      if (isNaN(editId)) {
+        return res.status(400).json({ message: 'Invalid edit ID' });
+      }
+      
+      if (!reason || reason.trim().length < 10) {
+        return res.status(400).json({ message: 'Rejection reason is required (minimum 10 characters)' });
+      }
+      
+      await auditRepo.rejectResourceEdit(editId, userId, reason);
+      
+      res.json({ message: 'Edit rejected successfully' });
+    } catch (error: any) {
+      console.error('Error rejecting edit:', error);
+      res.status(500).json({ message: error.message || 'Failed to reject edit' });
     }
-
-    if (!reason || reason.trim().length < 10) {
-      throw new BadRequestError('Rejection reason is required (minimum 10 characters)');
-    }
-
-    await storage.rejectResourceEdit(editId, userId, reason);
-
-    res.json({ message: 'Edit rejected successfully' });
-  }));
+  });
   
   // POST /api/claude/analyze - Analyze URL with Claude AI (authenticated)
-  app.post('/api/claude/analyze', isAuthenticated, asyncHandler(async (req, res) => {
-    const { url } = req.body;
-
-    if (!url) {
-      throw new BadRequestError('URL is required');
+  app.post('/api/claude/analyze', isAuthenticated, async (req, res) => {
+    try {
+      const { url } = req.body;
+      
+      if (!url) {
+        return res.status(400).json({ message: 'URL is required' });
+      }
+      
+      if (!claudeService.isAvailable()) {
+        return res.status(503).json({ 
+          message: 'Claude AI service is not available',
+          available: false
+        });
+      }
+      
+      const analysis = await claudeService.analyzeURL(url);
+      
+      if (!analysis) {
+        return res.status(500).json({ message: 'Failed to analyze URL' });
+      }
+      
+      res.json(analysis);
+    } catch (error) {
+      console.error('Error analyzing URL:', error);
+      res.status(500).json({ message: 'Failed to analyze URL' });
     }
-
-    if (!claudeService.isAvailable()) {
-      throw new ServiceUnavailableError('Claude AI service is not available');
-    }
-
-    const analysis = await claudeService.analyzeURL(url);
-
-    if (!analysis) {
-      throw new InternalServerError('Failed to analyze URL');
-    }
-
-    res.json(analysis);
-  }));
+  });
 
   // ============= Category Management Routes =============
   
   // GET /api/admin/categories - List all categories
-  app.get('/api/admin/categories', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
-    const categories = await storage.listCategories();
-
-    const categoriesWithCounts = await Promise.all(
-      categories.map(async (cat) => {
-        const count = await storage.getCategoryResourceCount(cat.name);
-        return { ...cat, resourceCount: count };
-      })
-    );
-
-    res.json(categoriesWithCounts);
-  }));
+  app.get('/api/admin/categories', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const categories = await categoryRepo.listCategories();
+      
+      const categoriesWithCounts = await Promise.all(
+        categories.map(async (cat) => {
+          const count = await categoryRepo.getCategoryResourceCount(cat.name);
+          return { ...cat, resourceCount: count };
+        })
+      );
+      
+      res.json(categoriesWithCounts);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      res.status(500).json({ message: 'Failed to fetch categories' });
+    }
+  });
   
   // POST /api/admin/categories - Create a new category
-  app.post('/api/admin/categories', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
-    const { insertCategorySchema } = await import('@shared/schema');
-
-    const validationResult = insertCategorySchema.safeParse(req.body);
-
-    if (!validationResult.success) {
-      throw new ValidationError('Validation failed', validationResult.error.errors);
-    }
-
+  app.post('/api/admin/categories', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
-      const newCategory = await storage.createCategory(validationResult.data);
-
-      await storage.logResourceAudit(
+      const { insertCategorySchema } = await import('@shared/schema');
+      
+      const validationResult = insertCategorySchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: 'Validation failed', 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      const newCategory = await categoryRepo.createCategory(validationResult.data);
+      
+      await auditRepo.logResourceAudit(
         null,
         'category_created',
         req.user.claims.sub,
         { category: newCategory },
         `Created category: ${newCategory.name}`
       );
-
+      
       res.status(201).json(newCategory);
     } catch (error) {
+      console.error('Error creating category:', error);
+      
       if (error instanceof Error && error.message.includes('already exists')) {
-        throw new ConflictError(error.message);
+        return res.status(409).json({ message: error.message });
       }
-      throw error;
+      
+      res.status(500).json({ message: 'Failed to create category' });
     }
-  }));
+  });
   
   // PATCH /api/admin/categories/:id - Update a category
-  app.patch('/api/admin/categories/:id', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
-    const categoryId = parseInt(req.params.id);
-
-    if (isNaN(categoryId)) {
-      throw new BadRequestError('Invalid category ID');
+  app.patch('/api/admin/categories/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const categoryId = parseInt(req.params.id);
+      
+      if (isNaN(categoryId)) {
+        return res.status(400).json({ message: 'Invalid category ID' });
+      }
+      
+      const { updateCategorySchema } = await import('@shared/schema');
+      
+      const validationResult = updateCategorySchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: 'Validation failed', 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      const existingCategory = await categoryRepo.getCategory(categoryId);
+      if (!existingCategory) {
+        return res.status(404).json({ message: 'Category not found' });
+      }
+      
+      const updatedCategory = await categoryRepo.updateCategory(categoryId, validationResult.data);
+      
+      await auditRepo.logResourceAudit(
+        null,
+        'category_updated',
+        req.user.claims.sub,
+        { before: existingCategory, after: updatedCategory },
+        `Updated category: ${existingCategory.name}`
+      );
+      
+      res.json(updatedCategory);
+    } catch (error) {
+      console.error('Error updating category:', error);
+      res.status(500).json({ message: 'Failed to update category' });
     }
-
-    const { updateCategorySchema } = await import('@shared/schema');
-
-    const validationResult = updateCategorySchema.safeParse(req.body);
-
-    if (!validationResult.success) {
-      throw new ValidationError('Validation failed', validationResult.error.errors);
-    }
-
-    const existingCategory = await storage.getCategory(categoryId);
-    if (!existingCategory) {
-      throw new NotFoundError('Category not found');
-    }
-
-    const updatedCategory = await storage.updateCategory(categoryId, validationResult.data);
-
-    await storage.logResourceAudit(
-      null,
-      'category_updated',
-      req.user.claims.sub,
-      { before: existingCategory, after: updatedCategory },
-      `Updated category: ${existingCategory.name}`
-    );
-
-    res.json(updatedCategory);
-  }));
+  });
   
   // DELETE /api/admin/categories/:id - Delete a category
-  app.delete('/api/admin/categories/:id', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
-    const categoryId = parseInt(req.params.id);
-
-    if (isNaN(categoryId)) {
-      throw new BadRequestError('Invalid category ID');
+  app.delete('/api/admin/categories/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const categoryId = parseInt(req.params.id);
+      
+      if (isNaN(categoryId)) {
+        return res.status(400).json({ message: 'Invalid category ID' });
+      }
+      
+      const category = await categoryRepo.getCategory(categoryId);
+      if (!category) {
+        return res.status(404).json({ message: 'Category not found' });
+      }
+      
+      const resourceCount = await categoryRepo.getCategoryResourceCount(category.name);
+      if (resourceCount > 0) {
+        return res.status(400).json({ 
+          message: `Cannot delete category with ${resourceCount} resources. Please reassign or delete resources first.` 
+        });
+      }
+      
+      await categoryRepo.deleteCategory(categoryId);
+      
+      await auditRepo.logResourceAudit(
+        null,
+        'category_deleted',
+        req.user.claims.sub,
+        { category },
+        `Deleted category: ${category.name}`
+      );
+      
+      res.json({ message: 'Category deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting category:', error);
+      res.status(500).json({ message: 'Failed to delete category' });
     }
-
-    const category = await storage.getCategory(categoryId);
-    if (!category) {
-      throw new NotFoundError('Category not found');
-    }
-
-    const resourceCount = await storage.getCategoryResourceCount(category.name);
-    if (resourceCount > 0) {
-      throw new BadRequestError(`Cannot delete category with ${resourceCount} resources. Please reassign or delete resources first.`);
-    }
-
-    await storage.deleteCategory(categoryId);
-
-    await storage.logResourceAudit(
-      null,
-      'category_deleted',
-      req.user.claims.sub,
-      { category },
-      `Deleted category: ${category.name}`
-    );
-
-    res.json({ message: 'Category deleted successfully' });
-  }));
+  });
   
   // ============= Subcategory Management Routes =============
   
   // GET /api/admin/subcategories - List all subcategories (optionally filtered by category)
-  app.get('/api/admin/subcategories', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
-    const categoryId = req.query.categoryId ? parseInt(req.query.categoryId as string) : undefined;
-
-    const subcategories = await storage.listSubcategories(categoryId);
-
-    const subcategoriesWithCounts = await Promise.all(
-      subcategories.map(async (sub) => {
-        const count = await storage.getSubcategoryResourceCount(sub.name);
-        return { ...sub, resourceCount: count };
-      })
-    );
-
-    res.json(subcategoriesWithCounts);
-  }));
+  app.get('/api/admin/subcategories', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const categoryId = req.query.categoryId ? parseInt(req.query.categoryId as string) : undefined;
+      
+      const subcategories = await categoryRepo.listSubcategories(categoryId);
+      
+      const subcategoriesWithCounts = await Promise.all(
+        subcategories.map(async (sub) => {
+          const count = await categoryRepo.getSubcategoryResourceCount(sub.name);
+          return { ...sub, resourceCount: count };
+        })
+      );
+      
+      res.json(subcategoriesWithCounts);
+    } catch (error) {
+      console.error('Error fetching subcategories:', error);
+      res.status(500).json({ message: 'Failed to fetch subcategories' });
+    }
+  });
   
   // POST /api/admin/subcategories - Create a new subcategory
-  app.post('/api/admin/subcategories', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
-    const { insertSubcategorySchema } = await import('@shared/schema');
-
-    const validationResult = insertSubcategorySchema.safeParse(req.body);
-
-    if (!validationResult.success) {
-      throw new ValidationError('Validation failed', validationResult.error.errors);
-    }
-
-    const categoryId = validationResult.data.categoryId;
-    if (!categoryId) {
-      throw new BadRequestError('Category ID is required');
-    }
-
-    const category = await storage.getCategory(categoryId);
-    if (!category) {
-      throw new NotFoundError('Parent category not found');
-    }
-
+  app.post('/api/admin/subcategories', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
-      const newSubcategory = await storage.createSubcategory(validationResult.data);
-
-      await storage.logResourceAudit(
+      const { insertSubcategorySchema } = await import('@shared/schema');
+      
+      const validationResult = insertSubcategorySchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: 'Validation failed', 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      const categoryId = validationResult.data.categoryId;
+      if (!categoryId) {
+        return res.status(400).json({ message: 'Category ID is required' });
+      }
+      
+      const category = await categoryRepo.getCategory(categoryId);
+      if (!category) {
+        return res.status(404).json({ message: 'Parent category not found' });
+      }
+      
+      const newSubcategory = await categoryRepo.createSubcategory(validationResult.data);
+      
+      await auditRepo.logResourceAudit(
         null,
         'subcategory_created',
         req.user.claims.sub,
         { subcategory: newSubcategory },
         `Created subcategory: ${newSubcategory.name} under ${category.name}`
       );
-
+      
       res.status(201).json(newSubcategory);
     } catch (error) {
+      console.error('Error creating subcategory:', error);
+      
       if (error instanceof Error && error.message.includes('already exists')) {
-        throw new ConflictError(error.message);
+        return res.status(409).json({ message: error.message });
       }
-      throw error;
+      
+      res.status(500).json({ message: 'Failed to create subcategory' });
     }
-  }));
+  });
   
   // PATCH /api/admin/subcategories/:id - Update a subcategory
-  app.patch('/api/admin/subcategories/:id', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
-    const subcategoryId = parseInt(req.params.id);
-
-    if (isNaN(subcategoryId)) {
-      throw new BadRequestError('Invalid subcategory ID');
-    }
-
-    const { updateSubcategorySchema } = await import('@shared/schema');
-
-    const validationResult = updateSubcategorySchema.safeParse(req.body);
-
-    if (!validationResult.success) {
-      throw new ValidationError('Validation failed', validationResult.error.errors);
-    }
-
-    const existingSubcategory = await storage.getSubcategory(subcategoryId);
-    if (!existingSubcategory) {
-      throw new NotFoundError('Subcategory not found');
-    }
-
-    if (validationResult.data.categoryId !== undefined && validationResult.data.categoryId !== null) {
-      const category = await storage.getCategory(validationResult.data.categoryId);
-      if (!category) {
-        throw new NotFoundError('Parent category not found');
+  app.patch('/api/admin/subcategories/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const subcategoryId = parseInt(req.params.id);
+      
+      if (isNaN(subcategoryId)) {
+        return res.status(400).json({ message: 'Invalid subcategory ID' });
       }
+      
+      const { updateSubcategorySchema } = await import('@shared/schema');
+      
+      const validationResult = updateSubcategorySchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: 'Validation failed', 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      const existingSubcategory = await categoryRepo.getSubcategory(subcategoryId);
+      if (!existingSubcategory) {
+        return res.status(404).json({ message: 'Subcategory not found' });
+      }
+      
+      if (validationResult.data.categoryId !== undefined && validationResult.data.categoryId !== null) {
+        const category = await categoryRepo.getCategory(validationResult.data.categoryId);
+        if (!category) {
+          return res.status(404).json({ message: 'Parent category not found' });
+        }
+      }
+      
+      const updatedSubcategory = await categoryRepo.updateSubcategory(subcategoryId, validationResult.data);
+      
+      await auditRepo.logResourceAudit(
+        null,
+        'subcategory_updated',
+        req.user.claims.sub,
+        { before: existingSubcategory, after: updatedSubcategory },
+        `Updated subcategory: ${existingSubcategory.name}`
+      );
+      
+      res.json(updatedSubcategory);
+    } catch (error) {
+      console.error('Error updating subcategory:', error);
+      res.status(500).json({ message: 'Failed to update subcategory' });
     }
-
-    const updatedSubcategory = await storage.updateSubcategory(subcategoryId, validationResult.data);
-
-    await storage.logResourceAudit(
-      null,
-      'subcategory_updated',
-      req.user.claims.sub,
-      { before: existingSubcategory, after: updatedSubcategory },
-      `Updated subcategory: ${existingSubcategory.name}`
-    );
-
-    res.json(updatedSubcategory);
-  }));
+  });
   
   // DELETE /api/admin/subcategories/:id - Delete a subcategory
-  app.delete('/api/admin/subcategories/:id', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
-    const subcategoryId = parseInt(req.params.id);
-
-    if (isNaN(subcategoryId)) {
-      throw new BadRequestError('Invalid subcategory ID');
+  app.delete('/api/admin/subcategories/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const subcategoryId = parseInt(req.params.id);
+      
+      if (isNaN(subcategoryId)) {
+        return res.status(400).json({ message: 'Invalid subcategory ID' });
+      }
+      
+      const subcategory = await categoryRepo.getSubcategory(subcategoryId);
+      if (!subcategory) {
+        return res.status(404).json({ message: 'Subcategory not found' });
+      }
+      
+      const resourceCount = await categoryRepo.getSubcategoryResourceCount(subcategory.name);
+      if (resourceCount > 0) {
+        return res.status(400).json({ 
+          message: `Cannot delete subcategory with ${resourceCount} resources. Please reassign or delete resources first.` 
+        });
+      }
+      
+      await categoryRepo.deleteSubcategory(subcategoryId);
+      
+      await auditRepo.logResourceAudit(
+        null,
+        'subcategory_deleted',
+        req.user.claims.sub,
+        { subcategory },
+        `Deleted subcategory: ${subcategory.name}`
+      );
+      
+      res.json({ message: 'Subcategory deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting subcategory:', error);
+      res.status(500).json({ message: 'Failed to delete subcategory' });
     }
-
-    const subcategory = await storage.getSubcategory(subcategoryId);
-    if (!subcategory) {
-      throw new NotFoundError('Subcategory not found');
-    }
-
-    const resourceCount = await storage.getSubcategoryResourceCount(subcategory.name);
-    if (resourceCount > 0) {
-      throw new BadRequestError(`Cannot delete subcategory with ${resourceCount} resources. Please reassign or delete resources first.`);
-    }
-
-    await storage.deleteSubcategory(subcategoryId);
-
-    await storage.logResourceAudit(
-      null,
-      'subcategory_deleted',
-      req.user.claims.sub,
-      { subcategory },
-      `Deleted subcategory: ${subcategory.name}`
-    );
-
-    res.json({ message: 'Subcategory deleted successfully' });
-  }));
+  });
   
   // ============= Sub-subcategory Management Routes =============
   
   // GET /api/admin/sub-subcategories - List all sub-subcategories (optionally filtered by subcategory)
-  app.get('/api/admin/sub-subcategories', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
-    const subcategoryId = req.query.subcategoryId ? parseInt(req.query.subcategoryId as string) : undefined;
-
-    const subSubcategories = await storage.listSubSubcategories(subcategoryId);
-
-    const subSubcategoriesWithCounts = await Promise.all(
-      subSubcategories.map(async (subSub) => {
-        const count = await storage.getSubSubcategoryResourceCount(subSub.name);
-        return { ...subSub, resourceCount: count };
-      })
-    );
-
-    res.json(subSubcategoriesWithCounts);
-  }));
+  app.get('/api/admin/sub-subcategories', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const subcategoryId = req.query.subcategoryId ? parseInt(req.query.subcategoryId as string) : undefined;
+      
+      const subSubcategories = await categoryRepo.listSubSubcategories(subcategoryId);
+      
+      const subSubcategoriesWithCounts = await Promise.all(
+        subSubcategories.map(async (subSub) => {
+          const count = await categoryRepo.getSubSubcategoryResourceCount(subSub.name);
+          return { ...subSub, resourceCount: count };
+        })
+      );
+      
+      res.json(subSubcategoriesWithCounts);
+    } catch (error) {
+      console.error('Error fetching sub-subcategories:', error);
+      res.status(500).json({ message: 'Failed to fetch sub-subcategories' });
+    }
+  });
   
   // POST /api/admin/sub-subcategories - Create a new sub-subcategory
-  app.post('/api/admin/sub-subcategories', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
-    const { insertSubSubcategorySchema } = await import('@shared/schema');
-
-    const validationResult = insertSubSubcategorySchema.safeParse(req.body);
-
-    if (!validationResult.success) {
-      throw new ValidationError('Validation failed', validationResult.error.errors);
-    }
-
-    const subcategoryId = validationResult.data.subcategoryId;
-    if (!subcategoryId) {
-      throw new BadRequestError('Subcategory ID is required');
-    }
-
-    const subcategory = await storage.getSubcategory(subcategoryId);
-    if (!subcategory) {
-      throw new NotFoundError('Parent subcategory not found');
-    }
-
+  app.post('/api/admin/sub-subcategories', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
-      const newSubSubcategory = await storage.createSubSubcategory(validationResult.data);
-
-      await storage.logResourceAudit(
+      const { insertSubSubcategorySchema } = await import('@shared/schema');
+      
+      const validationResult = insertSubSubcategorySchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: 'Validation failed', 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      const subcategoryId = validationResult.data.subcategoryId;
+      if (!subcategoryId) {
+        return res.status(400).json({ message: 'Subcategory ID is required' });
+      }
+      
+      const subcategory = await categoryRepo.getSubcategory(subcategoryId);
+      if (!subcategory) {
+        return res.status(404).json({ message: 'Parent subcategory not found' });
+      }
+      
+      const newSubSubcategory = await categoryRepo.createSubSubcategory(validationResult.data);
+      
+      await auditRepo.logResourceAudit(
         null,
         'sub_subcategory_created',
         req.user.claims.sub,
         { subSubcategory: newSubSubcategory },
         `Created sub-subcategory: ${newSubSubcategory.name} under ${subcategory.name}`
       );
-
+      
       res.status(201).json(newSubSubcategory);
     } catch (error) {
+      console.error('Error creating sub-subcategory:', error);
+      
       if (error instanceof Error && error.message.includes('already exists')) {
-        throw new ConflictError(error.message);
+        return res.status(409).json({ message: error.message });
       }
-      throw error;
+      
+      res.status(500).json({ message: 'Failed to create sub-subcategory' });
     }
-  }));
+  });
   
   // PATCH /api/admin/sub-subcategories/:id - Update a sub-subcategory
-  app.patch('/api/admin/sub-subcategories/:id', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
-    const subSubcategoryId = parseInt(req.params.id);
-
-    if (isNaN(subSubcategoryId)) {
-      throw new BadRequestError('Invalid sub-subcategory ID');
-    }
-
-    const { updateSubSubcategorySchema } = await import('@shared/schema');
-
-    const validationResult = updateSubSubcategorySchema.safeParse(req.body);
-
-    if (!validationResult.success) {
-      throw new ValidationError('Validation failed', validationResult.error.errors);
-    }
-
-    const existingSubSubcategory = await storage.getSubSubcategory(subSubcategoryId);
-    if (!existingSubSubcategory) {
-      throw new NotFoundError('Sub-subcategory not found');
-    }
-
-    if (validationResult.data.subcategoryId !== undefined && validationResult.data.subcategoryId !== null) {
-      const subcategory = await storage.getSubcategory(validationResult.data.subcategoryId);
-      if (!subcategory) {
-        throw new NotFoundError('Parent subcategory not found');
+  app.patch('/api/admin/sub-subcategories/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const subSubcategoryId = parseInt(req.params.id);
+      
+      if (isNaN(subSubcategoryId)) {
+        return res.status(400).json({ message: 'Invalid sub-subcategory ID' });
       }
+      
+      const { updateSubSubcategorySchema } = await import('@shared/schema');
+      
+      const validationResult = updateSubSubcategorySchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: 'Validation failed', 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      const existingSubSubcategory = await categoryRepo.getSubSubcategory(subSubcategoryId);
+      if (!existingSubSubcategory) {
+        return res.status(404).json({ message: 'Sub-subcategory not found' });
+      }
+      
+      if (validationResult.data.subcategoryId !== undefined && validationResult.data.subcategoryId !== null) {
+        const subcategory = await categoryRepo.getSubcategory(validationResult.data.subcategoryId);
+        if (!subcategory) {
+          return res.status(404).json({ message: 'Parent subcategory not found' });
+        }
+      }
+      
+      const updatedSubSubcategory = await categoryRepo.updateSubSubcategory(subSubcategoryId, validationResult.data);
+      
+      await auditRepo.logResourceAudit(
+        null,
+        'sub_subcategory_updated',
+        req.user.claims.sub,
+        { before: existingSubSubcategory, after: updatedSubSubcategory },
+        `Updated sub-subcategory: ${existingSubSubcategory.name}`
+      );
+      
+      res.json(updatedSubSubcategory);
+    } catch (error) {
+      console.error('Error updating sub-subcategory:', error);
+      res.status(500).json({ message: 'Failed to update sub-subcategory' });
     }
-
-    const updatedSubSubcategory = await storage.updateSubSubcategory(subSubcategoryId, validationResult.data);
-
-    await storage.logResourceAudit(
-      null,
-      'sub_subcategory_updated',
-      req.user.claims.sub,
-      { before: existingSubSubcategory, after: updatedSubSubcategory },
-      `Updated sub-subcategory: ${existingSubSubcategory.name}`
-    );
-
-    res.json(updatedSubSubcategory);
-  }));
+  });
   
   // DELETE /api/admin/sub-subcategories/:id - Delete a sub-subcategory
-  app.delete('/api/admin/sub-subcategories/:id', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
-    const subSubcategoryId = parseInt(req.params.id);
-
-    if (isNaN(subSubcategoryId)) {
-      throw new BadRequestError('Invalid sub-subcategory ID');
+  app.delete('/api/admin/sub-subcategories/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const subSubcategoryId = parseInt(req.params.id);
+      
+      if (isNaN(subSubcategoryId)) {
+        return res.status(400).json({ message: 'Invalid sub-subcategory ID' });
+      }
+      
+      const subSubcategory = await categoryRepo.getSubSubcategory(subSubcategoryId);
+      if (!subSubcategory) {
+        return res.status(404).json({ message: 'Sub-subcategory not found' });
+      }
+      
+      const resourceCount = await categoryRepo.getSubSubcategoryResourceCount(subSubcategory.name);
+      if (resourceCount > 0) {
+        return res.status(400).json({ 
+          message: `Cannot delete sub-subcategory with ${resourceCount} resources. Please reassign or delete resources first.` 
+        });
+      }
+      
+      await categoryRepo.deleteSubSubcategory(subSubcategoryId);
+      
+      await auditRepo.logResourceAudit(
+        null,
+        'sub_subcategory_deleted',
+        req.user.claims.sub,
+        { subSubcategory },
+        `Deleted sub-subcategory: ${subSubcategory.name}`
+      );
+      
+      res.json({ message: 'Sub-subcategory deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting sub-subcategory:', error);
+      res.status(500).json({ message: 'Failed to delete sub-subcategory' });
     }
-
-    const subSubcategory = await storage.getSubSubcategory(subSubcategoryId);
-    if (!subSubcategory) {
-      throw new NotFoundError('Sub-subcategory not found');
-    }
-
-    const resourceCount = await storage.getSubSubcategoryResourceCount(subSubcategory.name);
-    if (resourceCount > 0) {
-      throw new BadRequestError(`Cannot delete sub-subcategory with ${resourceCount} resources. Please reassign or delete resources first.`);
-    }
-
-    await storage.deleteSubSubcategory(subSubcategoryId);
-
-    await storage.logResourceAudit(
-      null,
-      'sub_subcategory_deleted',
-      req.user.claims.sub,
-      { subSubcategory },
-      `Deleted sub-subcategory: ${subSubcategory.name}`
-    );
-
-    res.json({ message: 'Sub-subcategory deleted successfully' });
-  }));
+  });
   
   // ============= GitHub Sync Routes =============
   
   // POST /api/github/configure - Configure GitHub repository
-  app.post('/api/github/configure', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
-    const { repositoryUrl, token } = req.body;
-
-    if (!repositoryUrl) {
-      throw new BadRequestError('Repository URL is required');
+  app.post('/api/github/configure', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const { repositoryUrl, token } = req.body;
+      
+      if (!repositoryUrl) {
+        return res.status(400).json({ message: 'Repository URL is required' });
+      }
+      
+      const result = await syncService.configureRepository(repositoryUrl, token);
+      
+      if (!result.success) {
+        return res.status(400).json(result);
+      }
+      
+      res.json(result);
+    } catch (error) {
+      console.error('Error configuring GitHub repository:', error);
+      res.status(500).json({ message: 'Failed to configure GitHub repository' });
     }
-
-    const result = await syncService.configureRepository(repositoryUrl, token);
-
-    if (!result.success) {
-      throw new BadRequestError(result.message || 'Failed to configure repository');
-    }
-
-    res.json(result);
-  }));
+  });
   
   // POST /api/github/import - Import resources from GitHub awesome list
-  app.post('/api/github/import', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
-    const { repositoryUrl, options = {} } = req.body;
-
-    if (!repositoryUrl) {
-      throw new BadRequestError('Repository URL is required');
-    }
-
-    // Add to queue for processing
-    const queueItem = await storage.addToGithubSyncQueue({
-      repositoryUrl,
-      action: 'import',
-      status: 'pending',
-      resourceIds: [],
-      metadata: options
-    });
-
-    // Process immediately in background
-    syncService.importFromGitHub(repositoryUrl, options)
-      .catch(() => {
-        // Errors are logged by syncService
+  app.post('/api/github/import', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const { repositoryUrl, options = {} } = req.body;
+      
+      if (!repositoryUrl) {
+        return res.status(400).json({ message: 'Repository URL is required' });
+      }
+      
+      // Add to queue for processing
+      const queueItem = await githubSyncRepo.addToGithubSyncQueue({
+        repositoryUrl,
+        action: 'import',
+        status: 'pending',
+        resourceIds: [],
+        metadata: options
       });
-
-    res.json({
-      message: 'Import started',
-      queueId: queueItem.id,
-      status: 'processing'
-    });
-  }));
+      
+      // Process immediately in background
+      syncService.importFromGitHub(repositoryUrl, options)
+        .then(result => {
+          console.log('GitHub import completed:', result);
+        })
+        .catch(error => {
+          console.error('GitHub import failed:', error);
+        });
+      
+      res.json({
+        message: 'Import started',
+        queueId: queueItem.id,
+        status: 'processing'
+      });
+    } catch (error) {
+      console.error('Error starting GitHub import:', error);
+      res.status(500).json({ message: 'Failed to start GitHub import' });
+    }
+  });
   
   // POST /api/github/export - Export approved resources to GitHub
-  app.post('/api/github/export', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
-    const { repositoryUrl, options = {} } = req.body;
-
-    if (!repositoryUrl) {
-      throw new BadRequestError('Repository URL is required');
-    }
-
-    // Add to queue for processing
-    const queueItem = await storage.addToGithubSyncQueue({
-      repositoryUrl,
-      action: 'export',
-      status: 'pending',
-      resourceIds: [],
-      metadata: options
-    });
-
-    // Process immediately in background
-    syncService.exportToGitHub(repositoryUrl, options)
-      .catch(() => {
-        // Errors are logged by syncService
+  app.post('/api/github/export', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const { repositoryUrl, options = {} } = req.body;
+      
+      if (!repositoryUrl) {
+        return res.status(400).json({ message: 'Repository URL is required' });
+      }
+      
+      // Add to queue for processing
+      const queueItem = await githubSyncRepo.addToGithubSyncQueue({
+        repositoryUrl,
+        action: 'export',
+        status: 'pending',
+        resourceIds: [],
+        metadata: options
       });
-
-    res.json({
-      message: 'Export started',
-      queueId: queueItem.id,
-      status: 'processing'
-    });
-  }));
+      
+      // Process immediately in background
+      syncService.exportToGitHub(repositoryUrl, options)
+        .then(result => {
+          console.log('GitHub export completed:', result);
+        })
+        .catch(error => {
+          console.error('GitHub export failed:', error);
+        });
+      
+      res.json({
+        message: 'Export started',
+        queueId: queueItem.id,
+        status: 'processing'
+      });
+    } catch (error) {
+      console.error('Error starting GitHub export:', error);
+      res.status(500).json({ message: 'Failed to start GitHub export' });
+    }
+  });
   
   // GET /api/github/sync-status - Check sync queue status
-  app.get('/api/github/sync-status', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
-    const status = req.query.status as string;
-    const queueItems = await storage.getGithubSyncQueue(status);
-
-    res.json({
-      total: queueItems.length,
-      items: queueItems
-    });
-  }));
+  app.get('/api/github/sync-status', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const status = req.query.status as string;
+      const queueItems = await githubSyncRepo.getGithubSyncQueue(status);
+      
+      res.json({
+        total: queueItems.length,
+        items: queueItems
+      });
+    } catch (error) {
+      console.error('Error fetching sync status:', error);
+      res.status(500).json({ message: 'Failed to fetch sync status' });
+    }
+  });
   
   // GET /api/github/sync-status/:id - Get specific sync item status
-  app.get('/api/github/sync-status/:id', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
-    const id = parseInt(req.params.id);
-    const queueItems = await storage.getGithubSyncQueue();
-    const item = queueItems.find(q => q.id === id);
-
-    if (!item) {
-      throw new NotFoundError('Sync item not found');
+  app.get('/api/github/sync-status/:id', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const queueItems = await githubSyncRepo.getGithubSyncQueue();
+      const item = queueItems.find(q => q.id === id);
+      
+      if (!item) {
+        return res.status(404).json({ message: 'Sync item not found' });
+      }
+      
+      res.json(item);
+    } catch (error) {
+      console.error('Error fetching sync item:', error);
+      res.status(500).json({ message: 'Failed to fetch sync item' });
     }
-
-    res.json(item);
-  }));
+  });
   
   // GET /api/github/sync-history - Get all sync history
-  app.get('/api/github/sync-history', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
-    const history = await storage.getSyncHistory();
-
-    res.json(history.sort((a, b) =>
-      new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
-    ));
-  }));
+  app.get('/api/github/sync-history', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const history = await githubSyncRepo.getSyncHistory();
+      
+      res.json(history.sort((a, b) => 
+        new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
+      ));
+    } catch (error) {
+      console.error('Error fetching sync history:', error);
+      res.status(500).json({ message: 'Failed to fetch sync history' });
+    }
+  });
   
   // POST /api/github/process-queue - Manually trigger queue processing
-  app.post('/api/github/process-queue', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
-    // Process queue in background
-    syncService.processQueue()
-      .catch(() => {
-        // Errors are logged by syncService
+  app.post('/api/github/process-queue', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      // Process queue in background
+      syncService.processQueue()
+        .then(() => {
+          console.log('GitHub sync queue processing completed');
+        })
+        .catch(error => {
+          console.error('GitHub sync queue processing failed:', error);
+        });
+      
+      res.json({
+        message: 'Queue processing started',
+        status: 'processing'
       });
-
-    res.json({
-      message: 'Queue processing started',
-      status: 'processing'
-    });
-  }));
+    } catch (error) {
+      console.error('Error starting queue processing:', error);
+      res.status(500).json({ message: 'Failed to start queue processing' });
+    }
+  });
 
   // ============= Awesome List Export & Validation Routes =============
 
   // POST /api/admin/export - Generate and download awesome list markdown
-  app.post('/api/admin/export', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
-    // Get all approved resources
-    const resources = await storage.getAllApprovedResources();
+  app.post('/api/admin/export', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      // Get all approved resources
+      const resources = await resourceRepo.getAllApprovedResources();
+      
+      // Get export options from request body
+      // NOTE: websiteUrl is undefined by default to avoid including internal dev URLs
+      // NOTE: includeLicense defaults to false because awesome-lint forbids inline license sections
+      const {
+        title = 'Awesome Video',
+        description = 'A curated list of awesome video resources, tools, frameworks, and learning materials.',
+        includeContributing = false, // References CONTRIBUTING.md which may not exist
+        includeLicense = false, // awesome-lint forbids inline license sections
+        websiteUrl = undefined, // Don't include dev URLs in exports
+        repoUrl = process.env.GITHUB_REPO_URL
+      } = req.body;
 
-    // Get export options from request body
-    // NOTE: websiteUrl is undefined by default to avoid including internal dev URLs
-    // NOTE: includeLicense defaults to false because awesome-lint forbids inline license sections
-    const {
-      title = 'Awesome Video',
-      description = 'A curated list of awesome video resources, tools, frameworks, and learning materials.',
-      includeContributing = false, // References CONTRIBUTING.md which may not exist
-      includeLicense = false, // awesome-lint forbids inline license sections
-      websiteUrl = undefined, // Don't include dev URLs in exports
-      repoUrl = process.env.GITHUB_REPO_URL
-    } = req.body;
+      // Create formatter with options
+      const formatter = new AwesomeListFormatter(resources, {
+        title,
+        description,
+        includeContributing,
+        includeLicense,
+        websiteUrl,
+        repoUrl
+      });
 
-    // Create formatter with options
-    const formatter = new AwesomeListFormatter(resources, {
-      title,
-      description,
-      includeContributing,
-      includeLicense,
-      websiteUrl,
-      repoUrl
-    });
-
-    // Generate the markdown
-    const markdown = formatter.generate();
-
-    // Set headers for file download
-    res.setHeader('Content-Type', 'text/markdown');
-    res.setHeader('Content-Disposition', 'attachment; filename="awesome-list.md"');
-
-    res.send(markdown);
-  }));
+      // Generate the markdown
+      const markdown = formatter.generate();
+      
+      // Set headers for file download
+      res.setHeader('Content-Type', 'text/markdown');
+      res.setHeader('Content-Disposition', 'attachment; filename="awesome-list.md"');
+      
+      res.send(markdown);
+    } catch (error) {
+      console.error('Error generating awesome list export:', error);
+      res.status(500).json({ message: 'Failed to generate awesome list export' });
+    }
+  });
 
   // GET /api/admin/export-json - Export full database as JSON for backup
-  app.get('/api/admin/export-json', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
-    // Get ALL data from database (not just approved resources)
-    const [
-      allResources,
-      categories,
-      subcategories,
-      subSubcategories,
-      tags,
-      learningJourneys,
-      syncQueue,
-      users
-    ] = await Promise.all([
-      storage.listResources({ limit: 100000 }), // Get all resources regardless of status
-      storage.listCategories(),
-      storage.listSubcategories(),
-      storage.listSubSubcategories(),
-      storage.listTags(),
-      storage.listLearningJourneys(),
-      storage.getGithubSyncQueue(),
-      storage.listUsers(1, 10000)
-    ]);
-
-    const resources = allResources.resources;
-    const usersList = users.users;
-
-    // Get journey steps for each journey
-    const journeyIds = learningJourneys.map((j: any) => j.id);
-    const stepsMap = await storage.listJourneyStepsBatch(journeyIds);
-
-    // Attach steps to journeys
-    const journeysWithSteps = learningJourneys.map((journey: any) => ({
-      ...journey,
-      steps: stepsMap.get(journey.id) || []
-    }));
-
-    // Build hierarchy structure
-    const categoryHierarchy = categories.map((cat: any) => ({
-      ...cat,
-      subcategories: subcategories
-        .filter((sub: any) => sub.categoryId === cat.id)
-        .map((sub: any) => ({
-          ...sub,
-          subSubcategories: subSubcategories.filter(
-            (ssub: any) => ssub.subcategoryId === sub.id
-          )
-        }))
-    }));
-
-    // Count resources by status
-    const resourcesByStatus = resources.reduce((acc: Record<string, number>, r: any) => {
-      acc[r.status || 'unknown'] = (acc[r.status || 'unknown'] || 0) + 1;
-      return acc;
-    }, {});
-
-    // Sanitize users for export (remove sensitive data)
-    const sanitizedUsers = usersList.map((u: any) => ({
-      id: u.id,
-      username: u.username,
-      role: u.role,
-      createdAt: u.createdAt,
-      updatedAt: u.updatedAt
-    }));
-
-    const exportData = {
-      exportedAt: new Date().toISOString(),
-      version: '1.0.0',
-      schema: {
-        resources: "id, title, url, description, category, subcategory, subSubcategory, status, submittedBy, approvedBy, approvedAt, githubSynced, lastSyncedAt, metadata, createdAt, updatedAt",
-        categories: "id, name, slug",
-        subcategories: "id, name, slug, categoryId",
-        subSubcategories: "id, name, slug, subcategoryId",
-        tags: "id, name, slug",
-        learningJourneys: "id, title, description, category, difficulty, estimatedHours, createdBy, createdAt, updatedAt"
-      },
-      stats: {
-        resources: resources.length,
-        resourcesByStatus,
-        categories: categories.length,
-        subcategories: subcategories.length,
-        subSubcategories: subSubcategories.length,
-        tags: tags.length,
-        learningJourneys: learningJourneys.length,
-        users: usersList.length,
-        syncQueueItems: syncQueue.length
-      },
-      data: {
-        resources,
-        categoryHierarchy,
+  app.get('/api/admin/export-json', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      // Get ALL data from database (not just approved resources)
+      const [
+        allResources,
+        categories,
+        subcategories,
+        subSubcategories,
         tags,
-        learningJourneys: journeysWithSteps,
+        learningJourneys,
         syncQueue,
-        users: sanitizedUsers
-      }
-    };
+        users
+      ] = await Promise.all([
+        resourceRepo.listResources({ limit: 100000 }), // Get all resources regardless of status
+        categoryRepo.listCategories(),
+        categoryRepo.listSubcategories(),
+        categoryRepo.listSubSubcategories(),
+        tagRepo.listTags(),
+        learningJourneyRepo.listLearningJourneys(),
+        githubSyncRepo.getGithubSyncQueue(),
+        userRepo.listUsers(1, 10000)
+      ]);
+      
+      const resources = allResources.resources;
+      const usersList = users.users;
 
-    // Set headers for JSON download
-    res.setHeader('Content-Type', 'application/json');
-    res.setHeader('Content-Disposition', `attachment; filename="awesome-list-backup-${new Date().toISOString().split('T')[0]}.json"`);
+      // Get journey steps for each journey
+      const journeyIds = learningJourneys.map((j: any) => j.id);
+      const stepsMap = await learningJourneyRepo.listJourneyStepsBatch(journeyIds);
+      
+      // Attach steps to journeys
+      const journeysWithSteps = learningJourneys.map((journey: any) => ({
+        ...journey,
+        steps: stepsMap.get(journey.id) || []
+      }));
 
-    res.json(exportData);
-  }));
+      // Build hierarchy structure
+      const categoryHierarchy = categories.map((cat: any) => ({
+        ...cat,
+        subcategories: subcategories
+          .filter((sub: any) => sub.categoryId === cat.id)
+          .map((sub: any) => ({
+            ...sub,
+            subSubcategories: subSubcategories.filter(
+              (ssub: any) => ssub.subcategoryId === sub.id
+            )
+          }))
+      }));
+
+      // Count resources by status
+      const resourcesByStatus = resources.reduce((acc: Record<string, number>, r: any) => {
+        acc[r.status || 'unknown'] = (acc[r.status || 'unknown'] || 0) + 1;
+        return acc;
+      }, {});
+      
+      // Sanitize users for export (remove sensitive data)
+      const sanitizedUsers = usersList.map((u: any) => ({
+        id: u.id,
+        username: u.username,
+        role: u.role,
+        createdAt: u.createdAt,
+        updatedAt: u.updatedAt
+      }));
+
+      const exportData = {
+        exportedAt: new Date().toISOString(),
+        version: '1.0.0',
+        schema: {
+          resources: "id, title, url, description, category, subcategory, subSubcategory, status, submittedBy, approvedBy, approvedAt, githubSynced, lastSyncedAt, metadata, createdAt, updatedAt",
+          categories: "id, name, slug",
+          subcategories: "id, name, slug, categoryId",
+          subSubcategories: "id, name, slug, subcategoryId",
+          tags: "id, name, slug",
+          learningJourneys: "id, title, description, category, difficulty, estimatedHours, createdBy, createdAt, updatedAt"
+        },
+        stats: {
+          resources: resources.length,
+          resourcesByStatus,
+          categories: categories.length,
+          subcategories: subcategories.length,
+          subSubcategories: subSubcategories.length,
+          tags: tags.length,
+          learningJourneys: learningJourneys.length,
+          users: usersList.length,
+          syncQueueItems: syncQueue.length
+        },
+        data: {
+          resources,
+          categoryHierarchy,
+          tags,
+          learningJourneys: journeysWithSteps,
+          syncQueue,
+          users: sanitizedUsers
+        }
+      };
+
+      // Set headers for JSON download
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Content-Disposition', `attachment; filename="awesome-list-backup-${new Date().toISOString().split('T')[0]}.json"`);
+      
+      res.json(exportData);
+    } catch (error) {
+      console.error('Error generating JSON export:', error);
+      res.status(500).json({ message: 'Failed to generate JSON export' });
+    }
+  });
 
   // POST /api/admin/validate - Run awesome-lint validation on current data
-  app.post('/api/admin/validate', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
-    // Get all approved resources
-    const resources = await storage.getAllApprovedResources();
+  app.post('/api/admin/validate', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      // Get all approved resources
+      const resources = await resourceRepo.getAllApprovedResources();
+      
+      // Get export options from request body
+      // NOTE: websiteUrl undefined to avoid including dev URLs; includeLicense false per awesome-lint
+      const {
+        title = 'Awesome Video',
+        description = 'A curated list of awesome video resources, tools, frameworks, and learning materials.',
+        includeContributing = false,
+        includeLicense = false,
+        websiteUrl = undefined,
+        repoUrl = process.env.GITHUB_REPO_URL
+      } = req.body;
 
-    // Get export options from request body
-    // NOTE: websiteUrl undefined to avoid including dev URLs; includeLicense false per awesome-lint
-    const {
-      title = 'Awesome Video',
-      description = 'A curated list of awesome video resources, tools, frameworks, and learning materials.',
-      includeContributing = false,
-      includeLicense = false,
-      websiteUrl = undefined,
-      repoUrl = process.env.GITHUB_REPO_URL
-    } = req.body;
+      // Create formatter and generate markdown
+      const formatter = new AwesomeListFormatter(resources, {
+        title,
+        description,
+        includeContributing,
+        includeLicense,
+        websiteUrl,
+        repoUrl
+      });
 
-    // Create formatter and generate markdown
-    const formatter = new AwesomeListFormatter(resources, {
-      title,
-      description,
-      includeContributing,
-      includeLicense,
-      websiteUrl,
-      repoUrl
-    });
-
-    const markdown = formatter.generate();
-
-    // Validate the generated markdown
-    const validationResult = validateAwesomeList(markdown);
-
-    // Store validation result for later retrieval
-    await storage.storeValidationResult({
-      type: 'awesome-lint',
-      result: validationResult,
-      markdown,
-      timestamp: new Date().toISOString()
-    });
-
-    // Return validation results
-    res.json({
-      valid: validationResult.valid,
-      errors: validationResult.errors,
-      warnings: validationResult.warnings,
-      stats: validationResult.stats,
-      report: formatValidationReport(validationResult)
-    });
-  }));
+      const markdown = formatter.generate();
+      
+      // Validate the generated markdown
+      const validationResult = validateAwesomeList(markdown);
+      
+      // Store validation result for later retrieval
+      await legacyRepo.storeValidationResult({
+        type: 'awesome-lint',
+        result: validationResult,
+        markdown,
+        timestamp: new Date().toISOString()
+      });
+      
+      // Return validation results
+      res.json({
+        valid: validationResult.valid,
+        errors: validationResult.errors,
+        warnings: validationResult.warnings,
+        stats: validationResult.stats,
+        report: formatValidationReport(validationResult)
+      });
+    } catch (error) {
+      console.error('Error validating awesome list:', error);
+      res.status(500).json({ message: 'Failed to validate awesome list' });
+    }
+  });
 
   // POST /api/admin/check-links - Run link checker on all resources
-  app.post('/api/admin/check-links', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
-    // Get all approved resources
-    const resources = await storage.getAllApprovedResources();
+  app.post('/api/admin/check-links', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      // Get all approved resources
+      const resources = await resourceRepo.getAllApprovedResources();
+      
+      // Get check options from request body
+      const {
+        timeout = 10000,
+        concurrent = 5,
+        retryCount = 1
+      } = req.body;
 
-    // Get check options from request body
-    const {
-      timeout = 10000,
-      concurrent = 5,
-      retryCount = 1
-    } = req.body;
+      // Prepare resources for link checking
+      const resourcesToCheck = resources.map(r => ({
+        id: r.id,
+        title: r.title,
+        url: r.url
+      }));
 
-    // Prepare resources for link checking
-    const resourcesToCheck = resources.map(r => ({
-      id: r.id,
-      title: r.title,
-      url: r.url
-    }));
-
-    // Check links
-    const linkCheckReport = await checkResourceLinks(resourcesToCheck, {
-      timeout,
-      concurrent,
-      retryCount
-    });
-
-    // Store link check result for later retrieval
-    await storage.storeValidationResult({
-      type: 'link-check',
-      result: linkCheckReport,
-      timestamp: linkCheckReport.timestamp
-    });
-
-    // Return link check results
-    res.json({
-      totalLinks: linkCheckReport.totalLinks,
-      validLinks: linkCheckReport.validLinks,
-      brokenLinks: linkCheckReport.brokenLinks,
-      redirects: linkCheckReport.redirects,
-      errors: linkCheckReport.errors,
-      summary: linkCheckReport.summary,
-      report: formatLinkCheckReport(linkCheckReport),
-      brokenResources: linkCheckReport.results.filter(r => !r.valid && r.status >= 400)
-    });
-  }));
+      // Check links
+      const linkCheckReport = await checkResourceLinks(resourcesToCheck, {
+        timeout,
+        concurrent,
+        retryCount
+      });
+      
+      // Store link check result for later retrieval
+      await legacyRepo.storeValidationResult({
+        type: 'link-check',
+        result: linkCheckReport,
+        timestamp: linkCheckReport.timestamp
+      });
+      
+      // Return link check results
+      res.json({
+        totalLinks: linkCheckReport.totalLinks,
+        validLinks: linkCheckReport.validLinks,
+        brokenLinks: linkCheckReport.brokenLinks,
+        redirects: linkCheckReport.redirects,
+        errors: linkCheckReport.errors,
+        summary: linkCheckReport.summary,
+        report: formatLinkCheckReport(linkCheckReport),
+        brokenResources: linkCheckReport.results.filter(r => !r.valid && r.status >= 400)
+      });
+    } catch (error) {
+      console.error('Error checking links:', error);
+      res.status(500).json({ message: 'Failed to check links' });
+    }
+  });
 
   // GET /api/admin/validation-status - Get last validation results
-  app.get('/api/admin/validation-status', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
-    const validationResults = await storage.getLatestValidationResults();
-
-    res.json({
-      awesomeLint: validationResults.awesomeLint || null,
-      linkCheck: validationResults.linkCheck || null,
-      lastUpdated: validationResults.lastUpdated || null
-    });
-  }));
+  app.get('/api/admin/validation-status', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const validationResults = await legacyRepo.getLatestValidationResults();
+      
+      res.json({
+        awesomeLint: validationResults.awesomeLint || null,
+        linkCheck: validationResults.linkCheck || null,
+        lastUpdated: validationResults.lastUpdated || null
+      });
+    } catch (error) {
+      console.error('Error fetching validation status:', error);
+      res.status(500).json({ message: 'Failed to fetch validation status' });
+    }
+  });
 
   // POST /api/admin/seed-database - Manual database seeding (optional)
   // Note: Database is automatically seeded on first startup. This endpoint is for:
   // - Re-seeding after data changes
   // - Clearing and rebuilding the database
   // - Manual admin intervention when needed
-  app.post('/api/admin/seed-database', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
-    console.log('Starting manual database seeding...');
-
-    // Get options from request body
-    const { clearExisting = false } = req.body;
-
-    // Run seeding
-    const result = await seedDatabase({ clearExisting });
-
-    // Return results
-    res.json({
-      success: true,
-      message: 'Database seeding completed successfully',
-      counts: {
-        categoriesInserted: result.categoriesInserted,
-        subcategoriesInserted: result.subcategoriesInserted,
-        subSubcategoriesInserted: result.subSubcategoriesInserted,
-        resourcesInserted: result.resourcesInserted,
-      },
-      errors: result.errors,
-      totalErrors: result.errors.length
-    });
-  }));
+  app.post('/api/admin/seed-database', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      console.log('Starting manual database seeding...');
+      
+      // Get options from request body
+      const { clearExisting = false } = req.body;
+      
+      // Run seeding
+      const result = await seedDatabase({ clearExisting });
+      
+      // Return results
+      res.json({
+        success: true,
+        message: 'Database seeding completed successfully',
+        counts: {
+          categoriesInserted: result.categoriesInserted,
+          subcategoriesInserted: result.subcategoriesInserted,
+          subSubcategoriesInserted: result.subSubcategoriesInserted,
+          resourcesInserted: result.resourcesInserted,
+        },
+        errors: result.errors,
+        totalErrors: result.errors.length
+      });
+    } catch (error: any) {
+      console.error('Error seeding database:', error);
+      res.status(500).json({ 
+        success: false,
+        message: 'Failed to seed database',
+        error: error.message 
+      });
+    }
+  });
 
   // POST /api/admin/import-github - Import awesome list from GitHub URL
-  app.post('/api/admin/import-github', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
-    const { repoUrl, dryRun = false, strictMode = false } = req.body;
+  app.post('/api/admin/import-github', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const { repoUrl, dryRun = false, strictMode = false } = req.body;
+      
+      if (!repoUrl) {
+        return res.status(400).json({ message: 'Repository URL is required' });
+      }
 
-    if (!repoUrl) {
-      throw new BadRequestError('Repository URL is required');
-    }
-
-    console.log(`Starting GitHub import from: ${repoUrl}`);
-
-    // Use the sync service to import
-    const result = await syncService.importFromGitHub(repoUrl, { dryRun, strictMode });
-
-    console.log(`GitHub import completed: ${result.imported} imported, ${result.updated} updated, ${result.skipped} skipped`);
-
-    // If validation failed, throw ValidationError with details
-    if (!result.validationPassed && result.errors.length > 0) {
-      throw new ValidationError('Import rejected: awesome-lint validation failed', {
+      console.log(`Starting GitHub import from: ${repoUrl}`);
+      
+      // Use the sync service to import
+      const result = await syncService.importFromGitHub(repoUrl, { dryRun, strictMode });
+      
+      console.log(`GitHub import completed: ${result.imported} imported, ${result.updated} updated, ${result.skipped} skipped`);
+      
+      // If validation failed, return 400 with validation details
+      if (!result.validationPassed && result.errors.length > 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'Import rejected: awesome-lint validation failed',
+          validationPassed: result.validationPassed,
+          validationStats: result.validationStats,
+          validationErrors: result.validationErrors.filter(e => e.severity === 'error'),
+          validationWarnings: result.validationErrors.filter(e => e.severity === 'warning'),
+          errors: result.errors
+        });
+      }
+      
+      res.json({
+        success: true,
+        imported: result.imported,
+        updated: result.updated,
+        skipped: result.skipped,
+        errors: result.errors,
+        warnings: result.warnings,
         validationPassed: result.validationPassed,
         validationStats: result.validationStats,
         validationErrors: result.validationErrors.filter(e => e.severity === 'error'),
         validationWarnings: result.validationErrors.filter(e => e.severity === 'warning'),
-        errors: result.errors
+        message: `Successfully imported ${result.imported} resources from ${repoUrl}`
+      });
+    } catch (error: any) {
+      console.error('Error importing from GitHub:', error);
+      res.status(500).json({ 
+        success: false,
+        message: 'Failed to import from GitHub',
+        error: error.message 
       });
     }
-
-    res.json({
-      success: true,
-      imported: result.imported,
-      updated: result.updated,
-      skipped: result.skipped,
-      errors: result.errors,
-      warnings: result.warnings,
-      validationPassed: result.validationPassed,
-      validationStats: result.validationStats,
-      validationErrors: result.validationErrors.filter(e => e.severity === 'error'),
-      validationWarnings: result.validationErrors.filter(e => e.severity === 'warning'),
-      message: `Successfully imported ${result.imported} resources from ${repoUrl}`
-    });
-  }));
+  });
 
   // ============= Enrichment API Routes =============
   
   // POST /api/enrichment/start - Start batch enrichment job
-  app.post('/api/enrichment/start', isAuthenticated, isAdmin, asyncHandler(async (req: any, res) => {
-    const { filter = 'unenriched', batchSize = 10 } = req.body;
-    const userId = req.user?.claims?.sub;
-
-    const jobId = await enrichmentService.queueBatchEnrichment({
-      filter,
-      batchSize,
-      startedBy: userId
-    });
-
-    res.json({
-      success: true,
-      jobId,
-      message: 'Batch enrichment job started successfully'
-    });
-  }));
+  app.post('/api/enrichment/start', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const { filter = 'unenriched', batchSize = 10 } = req.body;
+      const userId = req.user?.claims?.sub;
+      
+      const jobId = await enrichmentService.queueBatchEnrichment({
+        filter,
+        batchSize,
+        startedBy: userId
+      });
+      
+      res.json({
+        success: true,
+        jobId,
+        message: 'Batch enrichment job started successfully'
+      });
+    } catch (error: any) {
+      console.error('Error starting enrichment job:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to start enrichment job',
+        error: error.message
+      });
+    }
+  });
   
   // GET /api/enrichment/jobs - List all enrichment jobs
-  app.get('/api/enrichment/jobs', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
-    const limit = parseInt(req.query.limit as string) || 50;
-    const jobs = await storage.listEnrichmentJobs(limit);
-
-    res.json({
-      success: true,
-      jobs
-    });
-  }));
+  app.get('/api/enrichment/jobs', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 50;
+      const jobs = await enrichmentRepo.listEnrichmentJobs(limit);
+      
+      res.json({
+        success: true,
+        jobs
+      });
+    } catch (error: any) {
+      console.error('Error listing enrichment jobs:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to list enrichment jobs',
+        error: error.message
+      });
+    }
+  });
   
   // GET /api/enrichment/jobs/:id - Get job status with progress
-  app.get('/api/enrichment/jobs/:id', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
-    const jobId = parseInt(req.params.id);
-
-    if (isNaN(jobId)) {
-      throw new BadRequestError('Invalid job ID');
+  app.get('/api/enrichment/jobs/:id', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const jobId = parseInt(req.params.id);
+      
+      if (isNaN(jobId)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid job ID'
+        });
+      }
+      
+      const job = await enrichmentRepo.getEnrichmentJob(jobId);
+      
+      if (!job) {
+        return res.json({
+          success: false,
+          message: 'Job not found'
+        });
+      }
+      
+      res.json({
+        success: true,
+        job
+      });
+    } catch (error: any) {
+      console.error('Error getting job status:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to get job status',
+        error: error.message
+      });
     }
-
-    const job = await storage.getEnrichmentJob(jobId);
-
-    if (!job) {
-      throw new NotFoundError('Job not found');
-    }
-
-    res.json({
-      success: true,
-      job
-    });
-  }));
+  });
   
   // DELETE /api/enrichment/jobs/:id - Cancel a job
-  app.delete('/api/enrichment/jobs/:id', isAuthenticated, isAdmin, asyncHandler(async (req, res) => {
-    const jobId = parseInt(req.params.id);
-
-    if (isNaN(jobId)) {
-      throw new BadRequestError('Invalid job ID');
+  app.delete('/api/enrichment/jobs/:id', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const jobId = parseInt(req.params.id);
+      
+      if (isNaN(jobId)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid job ID'
+        });
+      }
+      
+      await enrichmentService.cancelJob(jobId);
+      
+      res.json({
+        success: true,
+        message: `Enrichment job ${jobId} cancelled successfully`
+      });
+    } catch (error: any) {
+      console.error('Error cancelling job:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to cancel job',
+        error: error.message
+      });
     }
-
-    await enrichmentService.cancelJob(jobId);
-
-    res.json({
-      success: true,
-      message: `Enrichment job ${jobId} cancelled successfully`
-    });
-  }));
+  });
 
   // ============= Database-Driven Routes =============
 
   // API routes for awesome list - NOW SERVED FROM DATABASE
-  app.get("/api/awesome-list", asyncHandler(async (req, res) => {
-    // Use database-driven hierarchy (replaces static JSON)
-    const data = await storage.getAwesomeListFromDatabase();
+  app.get("/api/awesome-list", async (req, res) => {
+    try {
+      // Use database-driven hierarchy (replaces static JSON)
+      const data = await legacyRepo.getAwesomeListFromDatabase();
+      
+      if (!data || !data.resources || data.resources.length === 0) {
+        console.warn('⚠️ No resources in database - database may need seeding');
+        return res.status(500).json({ error: 'No awesome list data available' });
+      }
 
-    if (!data || !data.resources || data.resources.length === 0) {
-      console.warn('⚠️ No resources in database - database may need seeding');
-      throw new InternalServerError('No awesome list data available');
+      // Extract query parameters for filtering
+      const { category, subcategory, subSubcategory } = req.query;
+      
+      let filteredResources = data.resources;
+
+      // Apply filtering based on query parameters
+      if (category) {
+        // Convert category slug back to title for filtering
+        const categoryTitle = getCategoryTitleFromSlug(category as string);
+        filteredResources = filteredResources.filter((resource: any) => 
+          resource.category === categoryTitle
+        );
+        console.log(`📁 Filtered by category "${categoryTitle}": ${filteredResources.length} resources`);
+      }
+
+      if (subcategory) {
+        // Convert subcategory slug back to title for filtering
+        const subcategoryTitle = getSubcategoryTitleFromSlug(subcategory as string);
+        filteredResources = filteredResources.filter((resource: any) => 
+          resource.subcategory === subcategoryTitle
+        );
+        console.log(`📂 Filtered by subcategory "${subcategoryTitle}": ${filteredResources.length} resources`);
+      }
+
+      if (subSubcategory) {
+        // Convert sub-subcategory slug back to title for filtering
+        const subSubcategoryTitle = getSubSubcategoryTitleFromSlug(subSubcategory as string);
+        filteredResources = filteredResources.filter((resource: any) => 
+          resource.subSubcategory === subSubcategoryTitle
+        );
+        console.log(`🎯 Filtered by sub-subcategory "${subSubcategoryTitle}": ${filteredResources.length} resources`);
+      }
+
+      // Return filtered data
+      const filteredData = {
+        ...data,
+        resources: filteredResources
+      };
+      
+      console.log(`📊 /api/awesome-list: ${filteredResources.length} resources, ${data.categories.length} categories`);
+      res.json(filteredData);
+    } catch (error) {
+      console.error('Error processing awesome list:', error);
+      res.status(500).json({ error: 'Failed to process awesome list' });
     }
-
-    // Extract query parameters for filtering
-    const { category, subcategory, subSubcategory } = req.query;
-
-    let filteredResources = data.resources;
-
-    // Apply filtering based on query parameters
-    if (category) {
-      // Convert category slug back to title for filtering
-      const categoryTitle = getCategoryTitleFromSlug(category as string);
-      filteredResources = filteredResources.filter((resource: any) =>
-        resource.category === categoryTitle
-      );
-      console.log(`📁 Filtered by category "${categoryTitle}": ${filteredResources.length} resources`);
-    }
-
-    if (subcategory) {
-      // Convert subcategory slug back to title for filtering
-      const subcategoryTitle = getSubcategoryTitleFromSlug(subcategory as string);
-      filteredResources = filteredResources.filter((resource: any) =>
-        resource.subcategory === subcategoryTitle
-      );
-      console.log(`📂 Filtered by subcategory "${subcategoryTitle}": ${filteredResources.length} resources`);
-    }
-
-    if (subSubcategory) {
-      // Convert sub-subcategory slug back to title for filtering
-      const subSubcategoryTitle = getSubSubcategoryTitleFromSlug(subSubcategory as string);
-      filteredResources = filteredResources.filter((resource: any) =>
-        resource.subSubcategory === subSubcategoryTitle
-      );
-      console.log(`🎯 Filtered by sub-subcategory "${subSubcategoryTitle}": ${filteredResources.length} resources`);
-    }
-
-    // Return filtered data
-    const filteredData = {
-      ...data,
-      resources: filteredResources
-    };
-
-    console.log(`📊 /api/awesome-list: ${filteredResources.length} resources, ${data.categories.length} categories`);
-    res.json(filteredData);
-  }));
+  });
 
   // New endpoint to switch lists
-  app.post("/api/switch-list", asyncHandler(async (req, res) => {
-    const { rawUrl } = req.body;
-
-    if (!rawUrl) {
-      throw new BadRequestError('Raw URL is required');
+  app.post("/api/switch-list", async (req, res) => {
+    try {
+      const { rawUrl } = req.body;
+      
+      if (!rawUrl) {
+        return res.status(400).json({ error: 'Raw URL is required' });
+      }
+      
+      console.log(`Switching to list: ${rawUrl}`);
+      const data = await fetchAwesomeList(rawUrl);
+      legacyRepo.setAwesomeListData(data);
+      
+      console.log(`Successfully switched to list with ${data.resources.length} resources`);
+      res.json(data);
+    } catch (error) {
+      console.error('Error switching list:', error);
+      res.status(500).json({ error: 'Failed to switch list' });
     }
-
-    console.log(`Switching to list: ${rawUrl}`);
-    const data = await fetchAwesomeList(rawUrl);
-    storage.setAwesomeListData(data);
-
-    console.log(`Successfully switched to list with ${data.resources.length} resources`);
-    res.json(data);
-  }));
+  });
 
   // GitHub awesome lists discovery routes
-  app.get("/api/github/awesome-lists", asyncHandler(async (req, res) => {
-    const page = parseInt(req.query.page as string) || 1;
-    const perPage = parseInt(req.query.per_page as string) || 30;
-
-    const result = await fetchAwesomeLists(page, perPage);
-    res.json(result);
-  }));
-
-  app.get("/api/github/search", asyncHandler(async (req, res) => {
-    const query = req.query.q as string;
-    const page = parseInt(req.query.page as string) || 1;
-
-    if (!query) {
-      throw new BadRequestError('Search query is required');
+  app.get("/api/github/awesome-lists", async (req, res) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const perPage = parseInt(req.query.per_page as string) || 30;
+      
+      const result = await fetchAwesomeLists(page, perPage);
+      res.json(result);
+    } catch (error) {
+      console.error('Error fetching awesome lists from GitHub:', error);
+      res.status(500).json({ error: 'Failed to fetch awesome lists' });
     }
+  });
 
-    const result = await searchAwesomeLists(query, page);
-    res.json(result);
-  }));
+  app.get("/api/github/search", async (req, res) => {
+    try {
+      const query = req.query.q as string;
+      const page = parseInt(req.query.page as string) || 1;
+      
+      if (!query) {
+        return res.status(400).json({ error: 'Search query is required' });
+      }
+      
+      const result = await searchAwesomeLists(query, page);
+      res.json(result);
+    } catch (error) {
+      console.error('Error searching awesome lists:', error);
+      res.status(500).json({ error: 'Failed to search awesome lists' });
+    }
+  });
 
   // SEO routes
-  app.get("/sitemap.xml", asyncHandler(generateSitemap));
-  app.get("/og-image.svg", asyncHandler(generateOpenGraphImage));
+  app.get("/sitemap.xml", generateSitemap);
+  app.get("/og-image.svg", generateOpenGraphImage);
 
   // ============= AI Recommendation Routes =============
 
   // GET /api/recommendations/init - Initialize recommendation engine
-  app.get("/api/recommendations/init", asyncHandler(async (req, res) => {
-    res.json({ status: 'ready', message: 'Recommendation engine initialized' });
-  }));
+  app.get("/api/recommendations/init", async (req, res) => {
+    try {
+      res.json({ status: 'ready', message: 'Recommendation engine initialized' });
+    } catch (error) {
+      console.error('Error initializing recommendations:', error);
+      res.status(500).json({ error: 'Failed to initialize recommendations' });
+    }
+  });
 
   // GET /api/recommendations - Get personalized recommendations
-  app.get("/api/recommendations", asyncHandler(async (req, res) => {
-    const limit = parseInt(req.query.limit as string) || 10;
+  app.get("/api/recommendations", async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 10;
+      
+      // Create a user profile for anonymous users from query params
+      const userProfile: AIUserProfile = {
+        userId: 'anonymous',
+        preferredCategories: (req.query.categories as string)?.split(',').filter(Boolean) || [],
+        skillLevel: (req.query.skillLevel as string || 'intermediate') as 'beginner' | 'intermediate' | 'advanced',
+        learningGoals: (req.query.goals as string)?.split(',').filter(Boolean) || [],
+        preferredResourceTypes: (req.query.types as string)?.split(',').filter(Boolean) || [],
+        timeCommitment: (req.query.timeCommitment as string || 'flexible') as 'daily' | 'weekly' | 'flexible',
+        viewHistory: [],
+        bookmarks: [],
+        completedResources: [],
+        ratings: {}
+      };
 
-    // Create a user profile for anonymous users from query params
-    const userProfile: AIUserProfile = {
-      userId: 'anonymous',
-      preferredCategories: (req.query.categories as string)?.split(',').filter(Boolean) || [],
-      skillLevel: (req.query.skillLevel as string || 'intermediate') as 'beginner' | 'intermediate' | 'advanced',
-      learningGoals: (req.query.goals as string)?.split(',').filter(Boolean) || [],
-      preferredResourceTypes: (req.query.types as string)?.split(',').filter(Boolean) || [],
-      timeCommitment: (req.query.timeCommitment as string || 'flexible') as 'daily' | 'weekly' | 'flexible',
-      viewHistory: [],
-      bookmarks: [],
-      completedResources: [],
-      ratings: {}
-    };
+      const result = await recommendationEngine.generateRecommendations(
+        userProfile,
+        limit,
+        false
+      );
 
-    const result = await recommendationEngine.generateRecommendations(
-      userProfile,
-      limit,
-      false
-    );
-
-    res.json(result.recommendations || []);
-  }));
+      res.json(result.recommendations || []);
+    } catch (error) {
+      console.error('Error generating recommendations:', error);
+      res.status(500).json({ error: 'Failed to generate recommendations' });
+    }
+  });
 
   // POST /api/recommendations - Get personalized recommendations for authenticated users
-  app.post("/api/recommendations", asyncHandler(async (req, res) => {
-    const userProfile: AIUserProfile = req.body;
-    const limit = parseInt(req.query.limit as string) || 10;
-    const forceRefresh = req.query.refresh === 'true';
+  app.post("/api/recommendations", async (req, res) => {
+    try {
+      const userProfile: AIUserProfile = req.body;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const forceRefresh = req.query.refresh === 'true';
 
-    const result = await recommendationEngine.generateRecommendations(
-      userProfile,
-      limit,
-      forceRefresh
-    );
+      const result = await recommendationEngine.generateRecommendations(
+        userProfile,
+        limit,
+        forceRefresh
+      );
 
-    res.json(result.recommendations || []);
-  }));
+      res.json(result.recommendations || []);
+    } catch (error) {
+      console.error('Error generating AI recommendations:', error);
+      res.status(500).json({ error: 'Failed to generate recommendations' });
+    }
+  });
 
   // POST /api/recommendations/feedback - Record user feedback on recommendations
-  app.post("/api/recommendations/feedback", asyncHandler(async (req, res) => {
-    const { userId, resourceId, feedback, rating } = req.body;
+  app.post("/api/recommendations/feedback", async (req, res) => {
+    try {
+      const { userId, resourceId, feedback, rating } = req.body;
+      
+      if (!userId || !resourceId || !feedback) {
+        return res.status(400).json({ error: 'userId, resourceId, and feedback are required' });
+      }
 
-    if (!userId || !resourceId || !feedback) {
-      throw new BadRequestError('userId, resourceId, and feedback are required');
+      // Record the feedback
+      await recommendationEngine.recordFeedback(
+        userId,
+        resourceId,
+        feedback as 'clicked' | 'dismissed' | 'completed',
+        rating
+      );
+
+      res.json({ status: 'success', message: 'Feedback recorded' });
+    } catch (error) {
+      console.error('Error recording recommendation feedback:', error);
+      res.status(500).json({ error: 'Failed to record feedback' });
     }
-
-    // Record the feedback
-    await recommendationEngine.recordFeedback(
-      userId,
-      resourceId,
-      feedback as 'clicked' | 'dismissed' | 'completed',
-      rating
-    );
-
-    res.json({ status: 'success', message: 'Feedback recorded' });
-  }));
+  });
 
   // GET /api/learning-paths/suggested - Get suggested learning paths
-  app.get("/api/learning-paths/suggested", asyncHandler(async (req, res) => {
-    const limit = parseInt(req.query.limit as string) || 5;
+  app.get("/api/learning-paths/suggested", async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 5;
+      
+      // Create a basic user profile from query params
+      const userProfile: AIUserProfile = {
+        userId: req.query.userId as string || 'anonymous',
+        preferredCategories: (req.query.categories as string)?.split(',') || [],
+        skillLevel: (req.query.skillLevel as string || 'intermediate') as 'beginner' | 'intermediate' | 'advanced',
+        learningGoals: (req.query.goals as string)?.split(',') || [],
+        preferredResourceTypes: [],
+        timeCommitment: (req.query.timeCommitment as string || 'flexible') as 'daily' | 'weekly' | 'flexible',
+        viewHistory: [],
+        bookmarks: [],
+        completedResources: [],
+        ratings: {}
+      };
 
-    // Create a basic user profile from query params
-    const userProfile: AIUserProfile = {
-      userId: req.query.userId as string || 'anonymous',
-      preferredCategories: (req.query.categories as string)?.split(',') || [],
-      skillLevel: (req.query.skillLevel as string || 'intermediate') as 'beginner' | 'intermediate' | 'advanced',
-      learningGoals: (req.query.goals as string)?.split(',') || [],
-      preferredResourceTypes: [],
-      timeCommitment: (req.query.timeCommitment as string || 'flexible') as 'daily' | 'weekly' | 'flexible',
-      viewHistory: [],
-      bookmarks: [],
-      completedResources: [],
-      ratings: {}
-    };
-
-    const paths = await learningPathGenerator.getSuggestedPaths(userProfile, limit);
-
-    res.json(paths);
-  }));
+      const paths = await learningPathGenerator.getSuggestedPaths(userProfile, limit);
+      
+      res.json(paths);
+    } catch (error) {
+      console.error('Error generating suggested learning paths:', error);
+      res.status(500).json({ error: 'Failed to generate suggested learning paths' });
+    }
+  });
 
   // POST /api/learning-paths/generate - Generate custom learning path
-  app.post("/api/learning-paths/generate", asyncHandler(async (req, res) => {
-    const { userProfile, category, customGoals } = req.body;
+  app.post("/api/learning-paths/generate", async (req, res) => {
+    try {
+      const { userProfile, category, customGoals } = req.body;
+      
+      if (!userProfile) {
+        return res.status(400).json({ error: 'User profile is required' });
+      }
 
-    if (!userProfile) {
-      throw new BadRequestError('User profile is required');
+      const path = await learningPathGenerator.generateLearningPath(
+        userProfile,
+        category,
+        customGoals
+      );
+
+      res.json(path);
+    } catch (error) {
+      console.error('Error generating custom learning path:', error);
+      res.status(500).json({ error: 'Failed to generate custom learning path' });
     }
-
-    const path = await learningPathGenerator.generateLearningPath(
-      userProfile,
-      category,
-      customGoals
-    );
-
-    res.json(path);
-  }));
+  });
 
   // POST /api/learning-paths - Legacy route for compatibility
-  app.post("/api/learning-paths", asyncHandler(async (req, res) => {
-    const userProfile: AIUserProfile = req.body;
-    const limit = parseInt(req.query.limit as string) || 5;
+  app.post("/api/learning-paths", async (req, res) => {
+    try {
+      const userProfile: AIUserProfile = req.body;
+      const limit = parseInt(req.query.limit as string) || 5;
 
-    const paths = await learningPathGenerator.getSuggestedPaths(userProfile, limit);
-
-    res.json(paths);
-  }));
+      const paths = await learningPathGenerator.getSuggestedPaths(userProfile, limit);
+      
+      res.json(paths);
+    } catch (error) {
+      console.error('Error generating AI learning paths:', error);
+      res.status(500).json({ error: 'Failed to generate learning paths' });
+    }
+  });
 
   // Track user interaction for improving recommendations
-  app.post("/api/interactions", asyncHandler(async (req, res) => {
-    const { userId, resourceId, interactionType, interactionValue, metadata } = req.body;
-
-    // Store interaction data (in a real app, this would go to database)
-    // For now, we'll just acknowledge the interaction
-    console.log(`User interaction: ${userId} ${interactionType} ${resourceId}`);
-
-    res.json({ status: "recorded" });
-  }));
+  app.post("/api/interactions", async (req, res) => {
+    try {
+      const { userId, resourceId, interactionType, interactionValue, metadata } = req.body;
+      
+      // Store interaction data (in a real app, this would go to database)
+      // For now, we'll just acknowledge the interaction
+      console.log(`User interaction: ${userId} ${interactionType} ${resourceId}`);
+      
+      res.json({ status: "recorded" });
+    } catch (error) {
+      console.error('Error recording interaction:', error);
+      res.status(500).json({ error: 'Failed to record interaction' });
+    }
+  });
 
   // Health check
   app.get("/api/health", (req, res) => {
@@ -2395,7 +2939,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
  * These tasks are non-blocking and run in the background.
  * 
  * NOTE: /api/awesome-list now serves data from the PostgreSQL database
- * directly via storage.getAwesomeListFromDatabase(). No static JSON loading required.
+ * directly via legacyRepo.getAwesomeListFromDatabase(). No static JSON loading required.
  */
 // Helper to retry database operations with exponential backoff (for Neon cold starts)
 async function withRetry<T>(
@@ -2433,8 +2977,8 @@ export async function runBackgroundInitialization(): Promise<void> {
     console.log('Checking if database needs seeding...');
 
     // Use retry logic for initial database check (handles Neon cold starts)
-    const categories = await withRetry(() => storage.listCategories());
-    const actualResourceCount = await withRetry(() => storage.getResourceCount());
+    const categories = await withRetry(() => categoryRepo.listCategories());
+    const actualResourceCount = await withRetry(() => resourceRepo.getResourceCount());
 
     // Only reseed if database is truly empty (both categories AND resources missing)
     // Don't reseed just because user added/removed items - preserve user changes

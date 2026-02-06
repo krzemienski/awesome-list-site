@@ -27,6 +27,8 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useAIRecommendations, type RecommendationResult } from "@/hooks/useAIRecommendations";
 import { useUserProfile } from "@/hooks/use-user-profile";
 import { Resource } from "@/types/awesome-list";
+import RecommendationFeedback from "@/components/ui/recommendation-feedback";
+import { queryClient } from "@/lib/queryClient";
 import {
   Sparkles,
   ExternalLink,
@@ -131,29 +133,19 @@ export default function AIRecommendationsPanel({ resources }: AIRecommendationsP
   };
 
   const getResourceDetails = (resourceUrl: string): Resource | undefined => {
-    // Debug logging to see what we're searching for
-    console.log('[AI Recommendations] Searching for resourceUrl:', resourceUrl);
-    console.log('[AI Recommendations] Sample resources URLs (first 3):', resources.slice(0, 3).map(r => ({
-      url: r.url,
-      title: r.title,
-      id: r.id
-    })));
-    
     // Try exact URL match first
     let resource = resources.find(r => r.url === resourceUrl);
-    
+
     // If not found, try matching by ID or title as fallback
     if (!resource) {
       resource = resources.find(r => r.id?.toString() === resourceUrl);
     }
-    
+
     // Additional fallback: try partial URL match
     if (!resource) {
       resource = resources.find(r => r.url?.includes(resourceUrl) || resourceUrl.includes(r.url || ''));
     }
-    
-    console.log('[AI Recommendations] Found resource:', resource ? 'Yes' : 'No', resource?.title);
-    
+
     return resource;
   };
 
@@ -167,6 +159,11 @@ export default function AIRecommendationsPanel({ resources }: AIRecommendationsP
     if (confidence >= 0.8) return "default";
     if (confidence >= 0.6) return "secondary";
     return "outline";
+  };
+
+  const handleFeedbackChange = (feedback: 'helpful' | 'not_helpful' | null) => {
+    // Invalidate recommendations cache to refresh with updated user preferences
+    queryClient.invalidateQueries({ queryKey: ['/api/recommendations'] });
   };
 
   return (
@@ -597,23 +594,39 @@ export default function AIRecommendationsPanel({ resources }: AIRecommendationsP
                     </p>
                   )}
 
-                  {/* Action Button */}
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    asChild
-                    data-testid={`button-view-${index}`}
-                  >
-                    <a
-                      href={rec.resource.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2"
+                  {/* Action Button and Feedback */}
+                  <div className="space-y-3">
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      asChild
+                      data-testid={`button-view-${index}`}
                     >
-                      <ExternalLink className="h-4 w-4" />
-                      View Resource
-                    </a>
-                  </Button>
+                      <a
+                        href={rec.resource.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-2"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                        View Resource
+                      </a>
+                    </Button>
+
+                    {/* Feedback Buttons */}
+                    {resource?.id && (
+                      <div className="flex items-center justify-center gap-2 pt-2 border-t">
+                        <span className="text-xs text-muted-foreground">Was this helpful?</span>
+                        <RecommendationFeedback
+                          resourceId={parseInt(resource.id, 10)}
+                          userId={userProfile.userId}
+                          size="sm"
+                          onFeedbackChange={handleFeedbackChange}
+                          data-testid={`feedback-${index}`}
+                        />
+                      </div>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             );

@@ -5,15 +5,15 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Moon, Sun, Wand2 } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
 import { trackThemeChange } from "@/lib/analytics";
-import ColorPaletteGenerator from "@/components/ui/color-palette-generator";
+import ColorPaletteGenerator, { ColorPalette } from "@/components/ui/color-palette-generator";
 
 export default function ThemeSelector() {
   const [open, setOpen] = useState(false);
   const [showPaletteGenerator, setShowPaletteGenerator] = useState(false);
   const { theme, setTheme } = useTheme();
-  
+
   // Handle color palette application
-  const handlePaletteGenerated = (palette: any) => {
+  const handlePaletteGenerated = (palette: ColorPalette) => {
     // For now, we'll just show a toast - can be expanded later
     console.log('Palette generated:', palette);
     setShowPaletteGenerator(false);

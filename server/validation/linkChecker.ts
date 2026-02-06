@@ -196,11 +196,11 @@ export class LinkChecker {
           resourceTitle: link.title,
           resourceId: link.id
         };
-      } catch (fetchError: any) {
+      } catch (fetchError: unknown) {
         clearTimeout(timeout);
-        
+
         // If HEAD fails, try GET (some servers don't support HEAD)
-        if (fetchError.name !== 'AbortError') {
+        if (fetchError instanceof Error && fetchError.name !== 'AbortError') {
           const getResponse = await this.tryGetRequest(link.url, controller.signal);
           if (getResponse) {
             const responseTime = Date.now() - startTime;
@@ -215,19 +215,30 @@ export class LinkChecker {
         
         throw fetchError;
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       const responseTime = Date.now() - startTime;
-      
+
       // Handle specific error types
       let statusText = 'Connection Error';
-      if (error.name === 'AbortError') {
-        statusText = 'Timeout';
-      } else if (error.code === 'ENOTFOUND') {
-        statusText = 'DNS Not Found';
-      } else if (error.code === 'ECONNREFUSED') {
-        statusText = 'Connection Refused';
-      } else if (error.code === 'CERT_HAS_EXPIRED') {
-        statusText = 'SSL Certificate Expired';
+      let errorMessage = 'Unknown error';
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+        if (error.name === 'AbortError') {
+          statusText = 'Timeout';
+        }
+      }
+
+      // Check for Node.js error codes
+      if (typeof error === 'object' && error !== null && 'code' in error) {
+        const code = (error as { code?: string }).code;
+        if (code === 'ENOTFOUND') {
+          statusText = 'DNS Not Found';
+        } else if (code === 'ECONNREFUSED') {
+          statusText = 'Connection Refused';
+        } else if (code === 'CERT_HAS_EXPIRED') {
+          statusText = 'SSL Certificate Expired';
+        }
       }
 
       return {
@@ -236,7 +247,7 @@ export class LinkChecker {
         statusText,
         valid: false,
         responseTime,
-        error: error.message,
+        error: errorMessage,
         resourceTitle: link.title,
         resourceId: link.id
       };

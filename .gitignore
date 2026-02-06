@@ -39,6 +39,7 @@ jspm_packages/
 
 # IDE and editor files
 .vscode/
+!.vscode/settings.json
 .idea/
 *.swp
 *.swo
