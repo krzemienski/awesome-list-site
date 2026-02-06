@@ -17,7 +17,7 @@ export interface Resource {
     tags?: string[];
     sourceCategories?: string[];
     aiEnriched?: boolean;
-    [key: string]: any;
+    [key: string]: unknown;
   };
   createdAt?: string;
   updatedAt?: string;

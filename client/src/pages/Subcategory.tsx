@@ -12,6 +12,7 @@ import { ArrowLeft, ExternalLink, FilterX } from "lucide-react";
 import AdvancedFilter from "@/components/ui/advanced-filter";
 import { deslugify, getCategorySlug } from "@/lib/utils";
 import { Resource } from "@/types/awesome-list";
+import type { Resource as DbResource } from "@shared/schema";
 import NotFound from "@/pages/not-found";
 import { processAwesomeListData } from "@/lib/parser";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
@@ -51,7 +52,7 @@ export default function Subcategory() {
   const awesomeList = rawData ? processAwesomeListData(rawData) : undefined;
   
   // Fetch approved database resources
-  const { data: dbData } = useQuery<{resources: any[], total: number}>({
+  const { data: dbData } = useQuery<{resources: DbResource[], total: number}>({
     queryKey: ['/api/resources', { status: 'approved' }],
     enabled: !!awesomeList,
   });
@@ -99,7 +100,7 @@ export default function Subcategory() {
         title: r.title,
         description: r.description || '',
         url: r.url,
-        tags: r.metadata?.tags || [],
+        tags: Array.isArray(r.metadata?.tags) ? r.metadata.tags as string[] : [],
         category: r.category,
         subcategory: r.subcategory || undefined,
         subSubcategory: r.subSubcategory || undefined,

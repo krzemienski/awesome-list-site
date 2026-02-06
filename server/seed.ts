@@ -163,10 +163,11 @@ async function seedAdminUser(): Promise<boolean> {
     console.log(`Password: ${adminPassword}`);
     console.log(`⚠️  IMPORTANT: Change this password after first login!`);
     console.log(`${'='.repeat(60)}\n`);
-    
+
     return true;
-  } catch (error: any) {
-    console.error(`❌ Failed to create admin user: ${error.message}`);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error(`❌ Failed to create admin user: ${errorMessage}`);
     return false;
   }
 }
@@ -259,10 +260,11 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
           result.categoriesInserted++;
           console.log(`  ✅ Inserted category: ${cat.title} (ID: ${dbId})`);
         }
-        
+
         categoryDbMap.set(jsonId, dbId);
-      } catch (error: any) {
-        const errorMsg = `Failed to insert category ${cat.title}: ${error.message}`;
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        const errorMsg = `Failed to insert category ${cat.title}: ${errorMessage}`;
         console.error(`  ❌ ${errorMsg}`);
         result.errors.push(errorMsg);
       }
@@ -298,10 +300,11 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
           result.subcategoriesInserted++;
           console.log(`  ✅ Inserted subcategory: ${cat.title} (ID: ${dbId})`);
         }
-        
+
         subcategoryDbMap.set(jsonId, dbId);
-      } catch (error: any) {
-        const errorMsg = `Failed to insert subcategory ${cat.title}: ${error.message}`;
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        const errorMsg = `Failed to insert subcategory ${cat.title}: ${errorMessage}`;
         console.error(`  ❌ ${errorMsg}`);
         result.errors.push(errorMsg);
       }
@@ -337,10 +340,11 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
           result.subSubcategoriesInserted++;
           console.log(`  ✅ Inserted sub-subcategory: ${cat.title} (ID: ${dbId})`);
         }
-        
+
         subSubcategoryDbMap.set(jsonId, dbId);
-      } catch (error: any) {
-        const errorMsg = `Failed to insert sub-subcategory ${cat.title}: ${error.message}`;
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        const errorMsg = `Failed to insert sub-subcategory ${cat.title}: ${errorMessage}`;
         console.error(`  ❌ ${errorMsg}`);
         result.errors.push(errorMsg);
       }
@@ -416,8 +420,9 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
         if (resourceCount % 100 === 0) {
           console.log(`  📊 Inserted ${resourceCount} resources...`);
         }
-      } catch (error: any) {
-        const errorMsg = `Failed to insert resource ${project.title}: ${error.message}`;
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        const errorMsg = `Failed to insert resource ${project.title}: ${errorMessage}`;
         console.error(`  ❌ ${errorMsg}`);
         result.errors.push(errorMsg);
       }
@@ -437,9 +442,10 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
     console.log(`  - Errors: ${result.errors.length}`);
 
     return result;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("❌ Database seeding failed:", error);
-    result.errors.push(`Fatal error: ${error.message}`);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    result.errors.push(`Fatal error: ${errorMessage}`);
     throw error;
   }
 }

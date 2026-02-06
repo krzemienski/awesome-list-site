@@ -29,17 +29,26 @@
  * ============================================================================
  */
 
-import type { Express, Request, Response } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { storage, type AwesomeListData } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { setupLocalAuth } from "./localAuth";
+import "./types"; // Load Express type augmentations
 import passport from "passport";
 import { fetchAwesomeList } from "./parser";
 import { fetchAwesomeVideoData } from "./awesome-video-parser-clean";
 import { RecommendationEngine, UserProfile } from "./recommendation-engine";
 import { fetchAwesomeLists, searchAwesomeLists } from "./github-api";
-import { insertResourceSchema } from "@shared/schema";
+import {
+  insertResourceSchema,
+  type Resource,
+  type Category,
+  type Subcategory,
+  type SubSubcategory,
+  type LearningJourney,
+  type User
+} from "@shared/schema";
 import { z } from "zod";
 import { syncService } from "./github/syncService";
 import { recommendationEngine, UserProfile as AIUserProfile } from "./ai/recommendationEngine";
@@ -61,7 +70,7 @@ import bcrypt from "bcryptjs";
 const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md";
 
 // Middleware to check if user is admin
-const isAdmin = async (req: any, res: Response, next: any) => {
+const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = req.user?.claims?.sub;
     if (!userId) {
@@ -89,7 +98,7 @@ function generateApiKey(): string {
 }
 
 // SEO route handlers - now uses database-driven data
-async function generateSitemap(req: any, res: any) {
+async function generateSitemap(req: Request, res: Response) {
   try {
     const awesomeListData = await storage.getAwesomeListFromDatabase();
     
@@ -159,13 +168,13 @@ async function generateSitemap(req: any, res: any) {
   }
 }
 
-async function generateOpenGraphImage(req: any, res: any) {
+async function generateOpenGraphImage(req: Request, res: Response) {
   try {
     const { title, category, resourceCount } = req.query;
-    
+
     // Use database count if not provided in query
-    let count = resourceCount;
-    let pageTitle = title;
+    let count = typeof resourceCount === 'string' ? resourceCount : undefined;
+    let pageTitle = typeof title === 'string' ? title : undefined;
     
     if (!count || !pageTitle) {
       try {
@@ -303,10 +312,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     app.use(passport.session());
 
     // Configure passport serialization for local auth
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Passport.js serializeUser callback requires any type
     passport.serializeUser((user: any, done) => {
       done(null, user);
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Passport.js deserializeUser callback requires any type
     passport.deserializeUser((user: any, done) => {
       done(null, user);
     });
@@ -317,6 +328,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Local authentication routes
   app.post("/api/auth/local/login", (req, res, next) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Passport.js authenticate callback requires any type
     passport.authenticate('local', (err: any, user: any, info: any) => {
       if (err) {
         console.log('[local/login] Authentication error:', err);
@@ -373,7 +385,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= Auth Routes (from Replit Auth blueprint) =============
   
   // GET /api/auth/user - Get current user (public endpoint)
-  app.get('/api/auth/user', async (req: any, res) => {
+  app.get('/api/auth/user', async (req: Request, res) => {
     try {
       console.log('[/api/auth/user] Request received');
       console.log('[/api/auth/user] isAuthenticated:', req.isAuthenticated?.());
@@ -387,9 +399,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Use DB user from session (populated by deserializeUser) or fetch if not available
-      let dbUser = req.user.dbUser;
+      let dbUser = req.user!.dbUser;
       if (!dbUser) {
-        const userId = req.user.claims.sub;
+        const userId = req.user!.claims!.sub;
         console.log('[/api/auth/user] dbUser not in session, fetching from DB, userId:', userId);
         dbUser = await storage.getUser(userId);
       }
@@ -426,7 +438,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/auth/logout - Logout user
-  app.post('/api/auth/logout', async (req: any, res) => {
+  app.post('/api/auth/logout', async (req: Request, res) => {
     try {
       req.logout(() => {
         res.json({ success: true });
@@ -504,9 +516,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/resources - Submit new resource (authenticated)
-  app.post('/api/resources', isAuthenticated, async (req: any, res) => {
+  app.post('/api/resources', isAuthenticated, async (req: Request, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       const resourceData = insertResourceSchema.parse(req.body);
       
       const resource = await storage.createResource({
@@ -545,10 +557,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // PUT /api/resources/:id/approve - Approve resource (admin)
-  app.put('/api/resources/:id/approve', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.put('/api/resources/:id/approve', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const id = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       
       const resource = await storage.updateResourceStatus(id, 'approved', userId);
       res.json(resource);
@@ -559,10 +571,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // PUT /api/resources/:id/reject - Reject resource (admin)
-  app.put('/api/resources/:id/reject', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.put('/api/resources/:id/reject', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const id = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       
       const resource = await storage.updateResourceStatus(id, 'rejected', userId);
       res.json(resource);
@@ -573,9 +585,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/resources/:id/edits - Submit edit suggestion for a resource (authenticated)
-  app.post('/api/resources/:id/edits', isAuthenticated, async (req: any, res) => {
+  app.post('/api/resources/:id/edits', isAuthenticated, async (req: Request, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       const resourceId = parseInt(req.params.id);
       const { proposedChanges, proposedData, claudeMetadata, triggerClaudeAnalysis } = req.body;
       
@@ -739,9 +751,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= User Interaction Routes =============
   
   // POST /api/favorites/:resourceId - Add favorite
-  app.post('/api/favorites/:resourceId', isAuthenticated, async (req: any, res) => {
+  app.post('/api/favorites/:resourceId', isAuthenticated, async (req: Request, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       const resourceId = parseInt(req.params.resourceId);
       
       await storage.addFavorite(userId, resourceId);
@@ -753,9 +765,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // DELETE /api/favorites/:resourceId - Remove favorite
-  app.delete('/api/favorites/:resourceId', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/favorites/:resourceId', isAuthenticated, async (req: Request, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       const resourceId = parseInt(req.params.resourceId);
       
       await storage.removeFavorite(userId, resourceId);
@@ -767,9 +779,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // GET /api/favorites - Get user's favorites
-  app.get('/api/favorites', isAuthenticated, async (req: any, res) => {
+  app.get('/api/favorites', isAuthenticated, async (req: Request, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       const favorites = await storage.getUserFavorites(userId);
       res.json(favorites);
     } catch (error) {
@@ -779,9 +791,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/bookmarks/:resourceId - Add bookmark
-  app.post('/api/bookmarks/:resourceId', isAuthenticated, async (req: any, res) => {
+  app.post('/api/bookmarks/:resourceId', isAuthenticated, async (req: Request, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       const resourceId = parseInt(req.params.resourceId);
       const { notes } = req.body;
       
@@ -794,9 +806,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // DELETE /api/bookmarks/:resourceId - Remove bookmark
-  app.delete('/api/bookmarks/:resourceId', isAuthenticated, async (req: any, res) => {
+  app.delete('/api/bookmarks/:resourceId', isAuthenticated, async (req: Request, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       const resourceId = parseInt(req.params.resourceId);
       
       await storage.removeBookmark(userId, resourceId);
@@ -808,9 +820,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // GET /api/bookmarks - Get user's bookmarks
-  app.get('/api/bookmarks', isAuthenticated, async (req: any, res) => {
+  app.get('/api/bookmarks', isAuthenticated, async (req: Request, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       const bookmarks = await storage.getUserBookmarks(userId);
       res.json(bookmarks);
     } catch (error) {
@@ -822,9 +834,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= User Profile & Progress Routes =============
 
   // GET /api/user/progress - Get user's learning progress
-  app.get('/api/user/progress', isAuthenticated, async (req: any, res) => {
+  app.get('/api/user/progress', isAuthenticated, async (req: Request, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
 
       // Get total resources in catalog
       const totalResourcesResult = await storage.listResources({ status: 'approved', limit: 1 });
@@ -921,9 +933,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // GET /api/user/submissions - Get user's submitted resources and edits
-  app.get('/api/user/submissions', isAuthenticated, async (req: any, res) => {
+  app.get('/api/user/submissions', isAuthenticated, async (req: Request, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
 
       // Get user's submitted resources
       const submittedResources = await storage.listResources({
@@ -948,9 +960,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // GET /api/user/journeys - Get user's learning journeys with details
-  app.get('/api/user/journeys', isAuthenticated, async (req: any, res) => {
+  app.get('/api/user/journeys', isAuthenticated, async (req: Request, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
 
       // Get user's journey progress
       const journeyProgress = await storage.listUserJourneyProgress(userId);
@@ -976,7 +988,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= Learning Journey Routes =============
   
   // GET /api/journeys - List all journeys
-  app.get('/api/journeys', async (req: any, res) => {
+  app.get('/api/journeys', async (req: Request, res) => {
     try {
       const category = req.query.category as string;
       const journeys = await storage.listLearningJourneys(category);
@@ -992,7 +1004,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // If user is authenticated, batch fetch all progress
       if (req.user?.claims?.sub) {
-        const userId = req.user.claims.sub;
+        const userId = req.user!.claims!.sub;
         const allProgress = await storage.listUserJourneyProgress(userId);
         
         // Create progress map for O(1) lookup
@@ -1051,7 +1063,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // GET /api/journeys/:id - Get journey details
-  app.get('/api/journeys/:id', async (req: any, res) => {
+  app.get('/api/journeys/:id', async (req: Request, res) => {
     try {
       const id = parseInt(req.params.id);
       const journey = await storage.getLearningJourney(id);
@@ -1073,7 +1085,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // If user is authenticated, get their progress
       let progress = null;
       if (req.user?.claims?.sub) {
-        progress = await storage.getUserJourneyProgress(req.user.claims.sub, id);
+        progress = await storage.getUserJourneyProgress(req.user!.claims!.sub, id);
       }
       
       res.json({
@@ -1093,9 +1105,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/journeys/:id/start - Start journey
-  app.post('/api/journeys/:id/start', isAuthenticated, async (req: any, res) => {
+  app.post('/api/journeys/:id/start', isAuthenticated, async (req: Request, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       const journeyId = parseInt(req.params.id);
       
       const progress = await storage.startUserJourney(userId, journeyId);
@@ -1107,9 +1119,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // PUT /api/journeys/:id/progress - Update progress
-  app.put('/api/journeys/:id/progress', isAuthenticated, async (req: any, res) => {
+  app.put('/api/journeys/:id/progress', isAuthenticated, async (req: Request, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       const journeyId = parseInt(req.params.id);
       const { stepId } = req.body;
       
@@ -1126,9 +1138,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // GET /api/journeys/:id/progress - Get user's progress
-  app.get('/api/journeys/:id/progress', isAuthenticated, async (req: any, res) => {
+  app.get('/api/journeys/:id/progress', isAuthenticated, async (req: Request, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       const journeyId = parseInt(req.params.id);
       
       const progress = await storage.getUserJourneyProgress(userId, journeyId);
@@ -1178,7 +1190,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // PUT /api/admin/users/:id/role - Change user role
-  app.put('/api/admin/users/:id/role', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.put('/api/admin/users/:id/role', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const userId = req.params.id;
       const { role } = req.body;
@@ -1307,10 +1319,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/admin/resources/:id/approve - Approve a pending resource
-  app.post('/api/admin/resources/:id/approve', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/resources/:id/approve', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const resourceId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       
       if (isNaN(resourceId)) {
         return res.status(400).json({ message: 'Invalid resource ID' });
@@ -1326,10 +1338,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/admin/resources/:id/reject - Reject a pending resource
-  app.post('/api/admin/resources/:id/reject', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/resources/:id/reject', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const resourceId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       const { reason } = req.body;
       
       if (isNaN(resourceId)) {
@@ -1351,10 +1363,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // PUT /api/admin/resources/:id - Update a resource (admin only)
-  app.put('/api/admin/resources/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.put('/api/admin/resources/:id', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const resourceId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       
       if (isNaN(resourceId)) {
         return res.status(400).json({ message: 'Invalid resource ID' });
@@ -1404,10 +1416,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // DELETE /api/admin/resources/:id - Delete a resource (admin only)
-  app.delete('/api/admin/resources/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.delete('/api/admin/resources/:id', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const resourceId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       
       if (isNaN(resourceId)) {
         return res.status(400).json({ message: 'Invalid resource ID' });
@@ -1468,9 +1480,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // POST /api/admin/resources - Create a new resource (admin only)
-  app.post('/api/admin/resources', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/resources', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       
       const createSchema = insertResourceSchema.extend({
         title: insertResourceSchema.shape.title.min(1, 'Title is required'),
@@ -1539,10 +1551,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/admin/resource-edits/:id/approve - Approve an edit (admin only)
-  app.post('/api/admin/resource-edits/:id/approve', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/resource-edits/:id/approve', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const editId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       
       if (isNaN(editId)) {
         return res.status(400).json({ message: 'Invalid edit ID' });
@@ -1551,25 +1563,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.approveResourceEdit(editId, userId);
       
       res.json({ message: 'Edit approved and merged successfully' });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error approving edit:', error);
-      
-      if (error.message && error.message.includes('Conflict detected')) {
-        return res.status(409).json({ 
-          message: error.message,
+
+      const errorMessage = error instanceof Error ? error.message : 'Failed to approve edit';
+      if (errorMessage.includes('Conflict detected')) {
+        return res.status(409).json({
+          message: errorMessage,
           conflict: true
         });
       }
-      
-      res.status(500).json({ message: error.message || 'Failed to approve edit' });
+
+      res.status(500).json({ message: errorMessage });
     }
   });
   
   // POST /api/admin/resource-edits/:id/reject - Reject an edit (admin only)
-  app.post('/api/admin/resource-edits/:id/reject', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/resource-edits/:id/reject', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const editId = parseInt(req.params.id);
-      const userId = req.user.claims.sub;
+      const userId = req.user!.claims!.sub;
       const { reason } = req.body;
       
       if (isNaN(editId)) {
@@ -1583,9 +1596,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.rejectResourceEdit(editId, userId, reason);
       
       res.json({ message: 'Edit rejected successfully' });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error rejecting edit:', error);
-      res.status(500).json({ message: error.message || 'Failed to reject edit' });
+      const errorMessage = error instanceof Error ? error.message : 'Failed to reject edit';
+      res.status(500).json({ message: errorMessage });
     }
   });
   
@@ -1640,7 +1654,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/admin/categories - Create a new category
-  app.post('/api/admin/categories', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/categories', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const { insertCategorySchema } = await import('@shared/schema');
       
@@ -1658,7 +1672,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.logResourceAudit(
         null,
         'category_created',
-        req.user.claims.sub,
+        req.user!.claims!.sub,
         { category: newCategory },
         `Created category: ${newCategory.name}`
       );
@@ -1676,7 +1690,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // PATCH /api/admin/categories/:id - Update a category
-  app.patch('/api/admin/categories/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.patch('/api/admin/categories/:id', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const categoryId = parseInt(req.params.id);
       
@@ -1705,7 +1719,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.logResourceAudit(
         null,
         'category_updated',
-        req.user.claims.sub,
+        req.user!.claims!.sub,
         { before: existingCategory, after: updatedCategory },
         `Updated category: ${existingCategory.name}`
       );
@@ -1718,7 +1732,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // DELETE /api/admin/categories/:id - Delete a category
-  app.delete('/api/admin/categories/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.delete('/api/admin/categories/:id', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const categoryId = parseInt(req.params.id);
       
@@ -1743,7 +1757,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.logResourceAudit(
         null,
         'category_deleted',
-        req.user.claims.sub,
+        req.user!.claims!.sub,
         { category },
         `Deleted category: ${category.name}`
       );
@@ -1779,7 +1793,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/admin/subcategories - Create a new subcategory
-  app.post('/api/admin/subcategories', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/subcategories', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const { insertSubcategorySchema } = await import('@shared/schema');
       
@@ -1807,7 +1821,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.logResourceAudit(
         null,
         'subcategory_created',
-        req.user.claims.sub,
+        req.user!.claims!.sub,
         { subcategory: newSubcategory },
         `Created subcategory: ${newSubcategory.name} under ${category.name}`
       );
@@ -1825,7 +1839,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // PATCH /api/admin/subcategories/:id - Update a subcategory
-  app.patch('/api/admin/subcategories/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.patch('/api/admin/subcategories/:id', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const subcategoryId = parseInt(req.params.id);
       
@@ -1861,7 +1875,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.logResourceAudit(
         null,
         'subcategory_updated',
-        req.user.claims.sub,
+        req.user!.claims!.sub,
         { before: existingSubcategory, after: updatedSubcategory },
         `Updated subcategory: ${existingSubcategory.name}`
       );
@@ -1874,7 +1888,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // DELETE /api/admin/subcategories/:id - Delete a subcategory
-  app.delete('/api/admin/subcategories/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.delete('/api/admin/subcategories/:id', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const subcategoryId = parseInt(req.params.id);
       
@@ -1899,7 +1913,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.logResourceAudit(
         null,
         'subcategory_deleted',
-        req.user.claims.sub,
+        req.user!.claims!.sub,
         { subcategory },
         `Deleted subcategory: ${subcategory.name}`
       );
@@ -1935,7 +1949,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/admin/sub-subcategories - Create a new sub-subcategory
-  app.post('/api/admin/sub-subcategories', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/sub-subcategories', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const { insertSubSubcategorySchema } = await import('@shared/schema');
       
@@ -1963,7 +1977,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.logResourceAudit(
         null,
         'sub_subcategory_created',
-        req.user.claims.sub,
+        req.user!.claims!.sub,
         { subSubcategory: newSubSubcategory },
         `Created sub-subcategory: ${newSubSubcategory.name} under ${subcategory.name}`
       );
@@ -1981,7 +1995,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // PATCH /api/admin/sub-subcategories/:id - Update a sub-subcategory
-  app.patch('/api/admin/sub-subcategories/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.patch('/api/admin/sub-subcategories/:id', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const subSubcategoryId = parseInt(req.params.id);
       
@@ -2017,7 +2031,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.logResourceAudit(
         null,
         'sub_subcategory_updated',
-        req.user.claims.sub,
+        req.user!.claims!.sub,
         { before: existingSubSubcategory, after: updatedSubSubcategory },
         `Updated sub-subcategory: ${existingSubSubcategory.name}`
       );
@@ -2030,7 +2044,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // DELETE /api/admin/sub-subcategories/:id - Delete a sub-subcategory
-  app.delete('/api/admin/sub-subcategories/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.delete('/api/admin/sub-subcategories/:id', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const subSubcategoryId = parseInt(req.params.id);
       
@@ -2055,7 +2069,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.logResourceAudit(
         null,
         'sub_subcategory_deleted',
-        req.user.claims.sub,
+        req.user!.claims!.sub,
         { subSubcategory },
         `Deleted sub-subcategory: ${subSubcategory.name}`
       );
@@ -2070,7 +2084,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= GitHub Sync Routes =============
   
   // POST /api/github/configure - Configure GitHub repository
-  app.post('/api/github/configure', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/github/configure', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const { repositoryUrl, token } = req.body;
       
@@ -2092,7 +2106,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/github/import - Import resources from GitHub awesome list
-  app.post('/api/github/import', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/github/import', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const { repositoryUrl, options = {} } = req.body;
       
@@ -2130,7 +2144,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/github/export - Export approved resources to GitHub
-  app.post('/api/github/export', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/github/export', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const { repositoryUrl, options = {} } = req.body;
       
@@ -2240,7 +2254,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= Awesome List Export & Validation Routes =============
 
   // POST /api/admin/export - Generate and download awesome list markdown
-  app.post('/api/admin/export', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/export', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       // Get all approved resources
       const resources = await storage.getAllApprovedResources();
@@ -2309,38 +2323,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const usersList = users.users;
 
       // Get journey steps for each journey
-      const journeyIds = learningJourneys.map((j: any) => j.id);
+      const journeyIds = learningJourneys.map((j: LearningJourney) => j.id);
       const stepsMap = await storage.listJourneyStepsBatch(journeyIds);
-      
+
       // Attach steps to journeys
-      const journeysWithSteps = learningJourneys.map((journey: any) => ({
+      const journeysWithSteps = learningJourneys.map((journey: LearningJourney) => ({
         ...journey,
         steps: stepsMap.get(journey.id) || []
       }));
 
       // Build hierarchy structure
-      const categoryHierarchy = categories.map((cat: any) => ({
+      const categoryHierarchy = categories.map((cat: Category) => ({
         ...cat,
         subcategories: subcategories
-          .filter((sub: any) => sub.categoryId === cat.id)
-          .map((sub: any) => ({
+          .filter((sub: Subcategory) => sub.categoryId === cat.id)
+          .map((sub: Subcategory) => ({
             ...sub,
             subSubcategories: subSubcategories.filter(
-              (ssub: any) => ssub.subcategoryId === sub.id
+              (ssub: SubSubcategory) => ssub.subcategoryId === sub.id
             )
           }))
       }));
 
       // Count resources by status
-      const resourcesByStatus = resources.reduce((acc: Record<string, number>, r: any) => {
+      const resourcesByStatus = resources.reduce((acc: Record<string, number>, r: Resource) => {
         acc[r.status || 'unknown'] = (acc[r.status || 'unknown'] || 0) + 1;
         return acc;
       }, {});
       
       // Sanitize users for export (remove sensitive data)
-      const sanitizedUsers = usersList.map((u: any) => ({
+      const sanitizedUsers = usersList.map((u: User) => ({
         id: u.id,
-        username: u.username,
+        email: u.email,
         role: u.role,
         createdAt: u.createdAt,
         updatedAt: u.updatedAt
@@ -2390,7 +2404,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // POST /api/admin/validate - Run awesome-lint validation on current data
-  app.post('/api/admin/validate', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/validate', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       // Get all approved resources
       const resources = await storage.getAllApprovedResources();
@@ -2444,7 +2458,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // POST /api/admin/check-links - Run link checker on all resources
-  app.post('/api/admin/check-links', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/admin/check-links', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       // Get all approved resources
       const resources = await storage.getAllApprovedResources();
@@ -2538,12 +2552,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         errors: result.errors,
         totalErrors: result.errors.length
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error seeding database:', error);
-      res.status(500).json({ 
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      res.status(500).json({
         success: false,
         message: 'Failed to seed database',
-        error: error.message 
+        error: errorMessage
       });
     }
   });
@@ -2590,12 +2605,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         validationWarnings: result.validationErrors.filter(e => e.severity === 'warning'),
         message: `Successfully imported ${result.imported} resources from ${repoUrl}`
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error importing from GitHub:', error);
-      res.status(500).json({ 
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      res.status(500).json({
         success: false,
         message: 'Failed to import from GitHub',
-        error: error.message 
+        error: errorMessage
       });
     }
   });
@@ -2603,7 +2619,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= Enrichment API Routes =============
   
   // POST /api/enrichment/start - Start batch enrichment job
-  app.post('/api/enrichment/start', isAuthenticated, isAdmin, async (req: any, res) => {
+  app.post('/api/enrichment/start', isAuthenticated, isAdmin, async (req: Request, res) => {
     try {
       const { filter = 'unenriched', batchSize = 10 } = req.body;
       const userId = req.user?.claims?.sub;
@@ -2619,12 +2635,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         jobId,
         message: 'Batch enrichment job started successfully'
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error starting enrichment job:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       res.status(500).json({
         success: false,
         message: 'Failed to start enrichment job',
-        error: error.message
+        error: errorMessage
       });
     }
   });
@@ -2639,12 +2656,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: true,
         jobs
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error listing enrichment jobs:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       res.status(500).json({
         success: false,
         message: 'Failed to list enrichment jobs',
-        error: error.message
+        error: errorMessage
       });
     }
   });
@@ -2674,12 +2692,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: true,
         job
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error getting job status:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       res.status(500).json({
         success: false,
         message: 'Failed to get job status',
-        error: error.message
+        error: errorMessage
       });
     }
   });
@@ -2702,12 +2721,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: true,
         message: `Enrichment job ${jobId} cancelled successfully`
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error cancelling job:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       res.status(500).json({
         success: false,
         message: 'Failed to cancel job',
-        error: error.message
+        error: errorMessage
       });
     }
   });
@@ -2734,7 +2754,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (category) {
         // Convert category slug back to title for filtering
         const categoryTitle = getCategoryTitleFromSlug(category as string);
-        filteredResources = filteredResources.filter((resource: any) => 
+        filteredResources = filteredResources.filter((resource: Resource) => 
           resource.category === categoryTitle
         );
         console.log(`📁 Filtered by category "${categoryTitle}": ${filteredResources.length} resources`);
@@ -2743,7 +2763,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (subcategory) {
         // Convert subcategory slug back to title for filtering
         const subcategoryTitle = getSubcategoryTitleFromSlug(subcategory as string);
-        filteredResources = filteredResources.filter((resource: any) => 
+        filteredResources = filteredResources.filter((resource: Resource) => 
           resource.subcategory === subcategoryTitle
         );
         console.log(`📂 Filtered by subcategory "${subcategoryTitle}": ${filteredResources.length} resources`);
@@ -2752,7 +2772,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (subSubcategory) {
         // Convert sub-subcategory slug back to title for filtering
         const subSubcategoryTitle = getSubSubcategoryTitleFromSlug(subSubcategory as string);
-        filteredResources = filteredResources.filter((resource: any) => 
+        filteredResources = filteredResources.filter((resource: Resource) => 
           resource.subSubcategory === subSubcategoryTitle
         );
         console.log(`🎯 Filtered by sub-subcategory "${subSubcategoryTitle}": ${filteredResources.length} resources`);
@@ -2783,8 +2803,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`Switching to list: ${rawUrl}`);
       const data = await fetchAwesomeList(rawUrl);
-      storage.setAwesomeListData(data);
-      
+      storage.setAwesomeListData(data as unknown as AwesomeListData);
+
       console.log(`Successfully switched to list with ${data.resources.length} resources`);
       res.json(data);
     } catch (error) {
@@ -3026,10 +3046,11 @@ async function withRetry<T>(
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       return await operation();
-    } catch (error: any) {
-      const isRetryable = error.message?.includes('too many clients') ||
-                          error.message?.includes('connection') ||
-                          error.message?.includes('ECONNREFUSED');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : '';
+      const isRetryable = errorMessage.includes('too many clients') ||
+                          errorMessage.includes('connection') ||
+                          errorMessage.includes('ECONNREFUSED');
       if (attempt === maxRetries || !isRetryable) {
         throw error;
       }

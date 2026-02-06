@@ -20,6 +20,36 @@ interface AwesomeVideoData {
   projects?: VideoResource[];
 }
 
+interface ProcessedVideoResource {
+  id: string;
+  title: string;
+  url: string;
+  description: string;
+  category: string;
+  subcategory: string | null;
+  subSubcategory: string | null;
+  tags: string[];
+}
+
+interface HierarchyLevel3 {
+  id: string;
+  title: string;
+}
+
+interface HierarchyLevel2 {
+  id: string;
+  title: string;
+  level3?: Record<string, HierarchyLevel3>;
+}
+
+interface HierarchyStructure {
+  [key: string]: {
+    id: string;
+    title: string;
+    level2: Record<string, HierarchyLevel2>;
+  };
+}
+
 /**
  * Fetches and parses the awesome-video data from JSON source
  * Uses only the natural JSON structure - no hardcoded CSV forcing
@@ -125,7 +155,7 @@ export async function fetchAwesomeVideoData() {
     };
     
     // Process resources and assign to natural hierarchy levels
-    const resources: any[] = [];
+    const resources: ProcessedVideoResource[] = [];
     
     // Track category depth distribution for validation
     const categoryDepthStats = new Map<string, { depth1: number, depth2: number, depth3: number, total: number }>();
@@ -243,7 +273,7 @@ export async function fetchAwesomeVideoData() {
         
         // Build sub-subcategories if they exist
         const subSubcategories = level2.level3 ? Object.keys(level2.level3).map(level3Id => {
-          const level3 = level2.level3[level3Id];
+          const level3 = level2.level3![level3Id];
           const level3Resources = categoryResources.filter(r => r.subSubcategory === level3.title);
           
           return {
@@ -307,9 +337,10 @@ export async function fetchAwesomeVideoData() {
       resources: resources,
       categories: categories
     };
-    
-  } catch (error: any) {
-    console.error(`❌ Error fetching awesome-video data: ${error.message}`);
+
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error(`❌ Error fetching awesome-video data: ${errorMessage}`);
     throw error;
   }
 }
@@ -317,8 +348,8 @@ export async function fetchAwesomeVideoData() {
 /**
  * Build hierarchy structure dynamically from JSON categories
  */
-function buildHierarchyFromJSON(categories: VideoCategory[], categoryMap: Map<string, VideoCategory>) {
-  const hierarchy: any = {};
+function buildHierarchyFromJSON(categories: VideoCategory[], categoryMap: Map<string, VideoCategory>): HierarchyStructure {
+  const hierarchy: HierarchyStructure = {};
   
   // Find all top-level categories (categories without parents)
   const topLevelCategories = categories.filter(cat => !cat.parent);
@@ -347,14 +378,14 @@ function buildHierarchyFromJSON(categories: VideoCategory[], categoryMap: Map<st
       
       level3Categories.forEach(level3Cat => {
         const level3Slug = generateSlug(level3Cat.title);
-        hierarchy[slug].level2[level2Slug].level3[level3Slug] = {
+        hierarchy[slug].level2![level2Slug].level3![level3Slug] = {
           id: level3Cat.id,
           title: level3Cat.title
         };
       });
-      
+
       // If no level 3 categories, remove the empty level3 object
-      if (Object.keys(hierarchy[slug].level2[level2Slug].level3).length === 0) {
+      if (hierarchy[slug].level2![level2Slug].level3 && Object.keys(hierarchy[slug].level2![level2Slug].level3!).length === 0) {
         delete hierarchy[slug].level2[level2Slug].level3;
       }
     });

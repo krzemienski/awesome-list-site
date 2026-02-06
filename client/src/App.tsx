@@ -28,6 +28,7 @@ import JourneyDetail from "@/pages/JourneyDetail";
 import ResourceDetail from "@/pages/ResourceDetail";
 
 import { AwesomeList } from "@/types/awesome-list";
+import type { User as DbUser } from "@shared/schema";
 import { processAwesomeListData } from "@/lib/parser";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
 
@@ -105,9 +106,9 @@ function Router() {
   // Guest users can browse all resources, authenticated users get additional features
   return (
     <MainLayout 
-      awesomeList={awesomeList} 
+      awesomeList={awesomeList}
       isLoading={isLoading}
-      user={user}
+      user={user ?? undefined}
       onLogout={logout}
     >
       <Switch>
@@ -129,7 +130,7 @@ function Router() {
         <Route path="/journey/:id" component={JourneyDetail} />
         <Route path="/profile" component={() => (
           <AuthGuard>
-            <Profile user={user} />
+            <Profile user={(user as DbUser | null) ?? undefined} />
           </AuthGuard>
         )} />
         <Route path="/bookmarks" component={() => (

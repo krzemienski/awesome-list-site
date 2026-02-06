@@ -11,9 +11,31 @@ const anthropic = new Anthropic({
 });
 
 /**
+ * AI response interfaces for type safety
+ */
+interface AIRecommendationResponse {
+  resourceId: string;
+  score: number;
+  reason: string;
+  confidenceLevel: number;
+}
+
+interface AILearningPathResponse {
+  title: string;
+  description: string;
+  category: string;
+  skillLevel: string;
+  estimatedHours: number;
+  prerequisites: string[];
+  learningObjectives: string[];
+  matchScore: number;
+  matchReasons: string[];
+}
+
+/**
  * Extract JSON from Claude's response, handling markdown code fences and extra text
  */
-function extractJSON(text: string): any {
+function extractJSON(text: string): unknown {
   try {
     text = text.trim();
     
@@ -160,10 +182,11 @@ Respond in JSON format:
     });
 
     // Extract JSON from response using robust extraction
-    const jsonText = (response.content[0] as any).text || '{}';
-    const result = extractJSON(jsonText);
-    
-    const recommendations: AIRecommendationResult[] = result.recommendations?.map((rec: any) => {
+    const firstContent = response.content[0];
+    const jsonText = firstContent && 'text' in firstContent ? firstContent.text : '{}';
+    const result = extractJSON(jsonText) as { recommendations?: AIRecommendationResponse[] };
+
+    const recommendations: AIRecommendationResult[] = result.recommendations?.map((rec: AIRecommendationResponse) => {
       const resource = availableResources.find(r => r.url === rec.resourceId);
       return {
         resourceId: rec.resourceId,
@@ -177,9 +200,9 @@ Respond in JSON format:
 
     return recommendations;
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('AI recommendation generation failed:', error);
-    if (error.response) {
+    if (error && typeof error === 'object' && 'response' in error) {
       console.error('Claude API error response:', JSON.stringify(error.response, null, 2));
     }
     return generateFallbackRecommendations(userProfile, availableResources, limit);
@@ -246,10 +269,11 @@ Respond in JSON format:
     });
 
     // Extract JSON from response using robust extraction
-    const jsonText = (response.content[0] as any).text || '{}';
-    const result = extractJSON(jsonText);
-    
-    const learningPaths: AILearningPath[] = result.learningPaths?.map((path: any, index: number) => {
+    const firstContent = response.content[0];
+    const jsonText = firstContent && 'text' in firstContent ? firstContent.text : '{}';
+    const result = extractJSON(jsonText) as { learningPaths?: AILearningPathResponse[] };
+
+    const learningPaths: AILearningPath[] = result.learningPaths?.map((path: AILearningPathResponse, index: number) => {
       // Find relevant resources for this path
       const pathResources = availableResources
         .filter(r => r.category === path.category || 
@@ -274,8 +298,8 @@ Respond in JSON format:
 
     return learningPaths;
 
-  } catch (error: any) {
-    console.warn('AI learning path generation failed:', error.message || error);
+  } catch (error: unknown) {
+    console.warn('AI learning path generation failed:', error instanceof Error ? error.message : 'Unknown error');
     const fallbackPaths = generateFallbackLearningPaths(userProfile, availableResources);
     console.log(`Generated ${fallbackPaths.length} fallback paths in AI system`);
     return fallbackPaths;

@@ -3,6 +3,8 @@ import { renderToString } from "react-dom/server";
 import fs from "fs";
 import path from "path";
 import { storage } from "./storage";
+import type { AwesomeListData, HierarchicalCategory, HierarchicalSubcategory } from "./storage";
+import type { Resource } from "@shared/schema";
 
 export async function handleSSR(req: Request, res: Response, next: NextFunction) {
   // CRITICAL FIX: Disable SSR in production until we have proper server bundle
@@ -12,7 +14,7 @@ export async function handleSSR(req: Request, res: Response, next: NextFunction)
   return next();
 }
 
-async function renderAppWithData(awesomeListData: any, url: string): Promise<string> {
+async function renderAppWithData(awesomeListData: AwesomeListData, url: string): Promise<string> {
   // Dynamic import to avoid issues in development
   try {
     // We'll render a basic HTML structure with the data
@@ -36,7 +38,7 @@ async function renderAppWithData(awesomeListData: any, url: string): Promise<str
 
     // Add categories to sidebar
     if (categories && categories.length > 0) {
-      categories.forEach((category: any) => {
+      categories.forEach((category: HierarchicalCategory) => {
         html += `
           <li>
             <a href="/category/${category.slug || category.name.toLowerCase().replace(/\s+/g, '-')}" 
@@ -49,7 +51,7 @@ async function renderAppWithData(awesomeListData: any, url: string): Promise<str
         // Add subcategories if present
         if (category.subcategories && category.subcategories.length > 0) {
           html += '<ul class="subcategories">';
-          category.subcategories.forEach((sub: any) => {
+          category.subcategories.forEach((sub: HierarchicalSubcategory) => {
             html += `
               <li>
                 <a href="/subcategory/${sub.slug}">
@@ -82,7 +84,7 @@ async function renderAppWithData(awesomeListData: any, url: string): Promise<str
     // Add some initial resources
     if (resources && resources.length > 0) {
       const initialResources = resources.slice(0, 24); // First 24 resources
-      initialResources.forEach((resource: any) => {
+      initialResources.forEach((resource: Resource) => {
         html += `
           <div class="resource-card" data-testid="resource-${resource.title?.toLowerCase().replace(/\s+/g, '-')}">
             <h3>${resource.title}</h3>

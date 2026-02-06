@@ -43,6 +43,7 @@ import { storage } from "../storage";
 import { Resource, InsertResource, GithubSyncQueue } from "@shared/schema";
 import { getGitHubClient } from "./replitConnection";
 import { validateAwesomeList } from "../validation/awesomeLint";
+import type { Octokit } from "@octokit/rest";
 
 interface SyncOptions {
   dryRun?: boolean;
@@ -118,11 +119,12 @@ async function ensureCategoryHierarchy(
         slug: generateSlug(categoryName),
       });
       console.log(`  Created category: ${categoryName}`);
-    } catch (e: any) {
+    } catch (e: unknown) {
       // May already exist due to race condition, try to fetch again
       category = await storage.getCategoryByName(categoryName);
       if (!category) {
-        throw new Error(`Failed to create or find category: ${categoryName} - ${e.message}`);
+        const errorMessage = e instanceof Error ? e.message : 'Unknown error';
+        throw new Error(`Failed to create or find category: ${categoryName} - ${errorMessage}`);
       }
     }
   }
@@ -139,11 +141,12 @@ async function ensureCategoryHierarchy(
           categoryId: category.id,
         });
         console.log(`  Created subcategory: ${subcategoryName} under ${categoryName}`);
-      } catch (e: any) {
+      } catch (e: unknown) {
         // May already exist due to race condition
         subcategory = await storage.getSubcategoryByName(subcategoryName, category.id);
         if (!subcategory) {
-          throw new Error(`Failed to create or find subcategory: ${subcategoryName} - ${e.message}`);
+          const errorMessage = e instanceof Error ? e.message : 'Unknown error';
+          throw new Error(`Failed to create or find subcategory: ${subcategoryName} - ${errorMessage}`);
         }
       }
     }
@@ -161,11 +164,12 @@ async function ensureCategoryHierarchy(
           subcategoryId: subcategory.id,
         });
         console.log(`  Created sub-subcategory: ${subSubcategoryName} under ${subcategoryName}`);
-      } catch (e: any) {
+      } catch (e: unknown) {
         // May already exist due to race condition
         subSubcategory = await storage.getSubSubcategoryByName(subSubcategoryName, subcategory.id);
         if (!subSubcategory) {
-          throw new Error(`Failed to create or find sub-subcategory: ${subSubcategoryName} - ${e.message}`);
+          const errorMessage = e instanceof Error ? e.message : 'Unknown error';
+          throw new Error(`Failed to create or find sub-subcategory: ${subSubcategoryName} - ${errorMessage}`);
         }
       }
     }
@@ -268,11 +272,11 @@ export class GitHubSyncService {
             action: 'import',
             status: 'failed',
             resourceIds: [],
-            metadata: { 
+            metadata: {
               error: 'Validation failed',
               validationErrors: validationResult.errors.length,
               validationWarnings: validationResult.warnings.length
-            } as any
+            }
           });
         }
         
@@ -317,7 +321,7 @@ export class GitHubSyncService {
       
       // Create all category hierarchies
       const hierarchyIds = new Map<string, { categoryId: number; subcategoryId?: number; subSubcategoryId?: number }>();
-      for (const [key, hierarchy] of uniqueHierarchies) {
+      for (const [key, hierarchy] of Array.from(uniqueHierarchies.entries())) {
         try {
           const ids = await ensureCategoryHierarchy(
             hierarchy.category,
@@ -325,9 +329,10 @@ export class GitHubSyncService {
             hierarchy.subSubcategory
           );
           hierarchyIds.set(key, ids);
-        } catch (error: any) {
-          console.error(`Error creating hierarchy for ${key}: ${error.message}`);
-          result.errors.push(`Category hierarchy error: ${error.message}`);
+        } catch (error: unknown) {
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+          console.error(`Error creating hierarchy for ${key}: ${errorMessage}`);
+          result.errors.push(`Category hierarchy error: ${errorMessage}`);
         }
       }
       
@@ -346,15 +351,16 @@ export class GitHubSyncService {
             case 'create':
               if (!options.dryRun) {
                 // Add hierarchy IDs to metadata for fast lookups
+                const existingMetadata = conflict.resource.metadata as Record<string, unknown> || {};
                 const metadata = {
-                  ...(conflict.resource.metadata as Record<string, any> || {}),
+                  ...existingMetadata,
                   categoryId: hierarchyId?.categoryId,
                   subcategoryId: hierarchyId?.subcategoryId,
                   subSubcategoryId: hierarchyId?.subSubcategoryId,
                   importedFrom: repoUrl,
                   importedAt: new Date().toISOString(),
-                };
-                
+                } as Record<string, unknown>;
+
                 const created = await storage.createResource({
                   ...conflict.resource,
                   metadata,
@@ -379,16 +385,16 @@ export class GitHubSyncService {
             case 'update':
               if (!options.dryRun && conflict.resource.id) {
                 // Update hierarchy IDs in metadata for consistency
-                const existingMetadata = (conflict.resource.metadata as Record<string, any>) || {};
+                const currentMetadata = (conflict.resource.metadata as Record<string, unknown>) || {};
                 const updatedMetadata = {
-                  ...existingMetadata,
+                  ...currentMetadata,
                   categoryId: hierarchyId?.categoryId,
                   subcategoryId: hierarchyId?.subcategoryId,
                   subSubcategoryId: hierarchyId?.subSubcategoryId,
                   lastUpdatedFrom: repoUrl,
                   lastUpdatedAt: new Date().toISOString(),
-                };
-                
+                } as Record<string, unknown>;
+
                 const updated = await storage.updateResource(
                   conflict.resource.id,
                   {
@@ -416,8 +422,9 @@ export class GitHubSyncService {
               console.log(`- Skipped: ${resource.title} - ${conflict.reason}`);
               break;
           }
-        } catch (error: any) {
-          const errorMsg = `Error processing ${resource.title}: ${error.message}`;
+        } catch (error: unknown) {
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+          const errorMsg = `Error processing ${resource.title}: ${errorMessage}`;
           result.errors.push(errorMsg);
           console.error(errorMsg);
         }
@@ -431,18 +438,19 @@ export class GitHubSyncService {
           status: 'completed',
           resourceIds: result.resources.map(r => r.id),
           metadata: {
-            imported: [result.imported] as [any, ...any[]],
-            updated: [result.updated] as [any, ...any[]],
-            skipped: [result.skipped] as [any, ...any[]]
+            imported: result.imported,
+            updated: result.updated,
+            skipped: result.skipped
           }
         });
       }
       
-    } catch (error: any) {
-      const errorMsg = `Import failed: ${error.message}`;
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMsg = `Import failed: ${errorMessage}`;
       result.errors.push(errorMsg);
       console.error(errorMsg);
-      
+
       // Log failed import
       if (!options.dryRun) {
         await storage.addToGithubSyncQueue({
@@ -450,7 +458,7 @@ export class GitHubSyncService {
           action: 'import',
           status: 'failed',
           resourceIds: [],
-          metadata: { error: error.message }
+          metadata: { error: errorMessage }
         });
       }
     }
@@ -463,20 +471,22 @@ export class GitHubSyncService {
    * Robustly tries repository's actual default branch with retry logic
    */
   private async detectDefaultBranch(
-    octokit: any,
+    octokit: Octokit,
     owner: string,
     repo: string
   ): Promise<string> {
     let defaultBranch: string | null = null;
-    let repoFetchError: any = null;
+    let repoFetchError: unknown = null;
 
     // Step 1: Get repository info to find the actual default branch
     try {
       const { data: repoInfo } = await octokit.repos.get({ owner, repo });
       defaultBranch = repoInfo.default_branch;
       console.log(`Repository default branch: ${defaultBranch}`);
-    } catch (error: any) {
-      console.warn(`Could not fetch repository info: ${error.message} (HTTP ${error.status || 'unknown'})`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const status = (error && typeof error === 'object' && 'status' in error) ? error.status : 'unknown';
+      console.warn(`Could not fetch repository info: ${errorMessage} (HTTP ${status})`);
       repoFetchError = error;
     }
 
@@ -500,7 +510,7 @@ export class GitHubSyncService {
     }
 
     // Step 3: Try each branch with retry logic for transient errors
-    const errors: { branch: string; error: any; attempt: number }[] = [];
+    const errors: { branch: string; error: unknown; attempt: number }[] = [];
     const MAX_RETRIES = 3;
     const RETRY_DELAY_MS = 500;
     
@@ -517,16 +527,17 @@ export class GitHubSyncService {
           });
           console.log(`✓ Using branch: ${branch}${attempt > 1 ? ` (attempt ${attempt})` : ''}`);
           return branch;
-        } catch (error: any) {
-          const status = error.status || 'unknown';
+        } catch (error: unknown) {
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+          const status = (error && typeof error === 'object' && 'status' in error) ? error.status : 'unknown';
           const isTransient = status === 503 || status === 500 || status === 'unknown';
           const shouldRetry = isDefaultBranch && attempt < maxAttempts && isTransient;
-          
+
           console.warn(
             `Branch '${branch}' not accessible (attempt ${attempt}/${maxAttempts}): ` +
-            `${error.message} (HTTP ${status})${shouldRetry ? ' - retrying...' : ''}`
+            `${errorMessage} (HTTP ${status})${shouldRetry ? ' - retrying...' : ''}`
           );
-          
+
           errors.push({ branch, error, attempt });
           
           if (shouldRetry) {
@@ -544,26 +555,32 @@ export class GitHubSyncService {
     // Step 4: All branches failed - provide detailed diagnostic error
     const triedBranches = Array.from(new Set(branchesToTry)).join(', '); // Remove duplicates for display
     const errorDetails = errors
-      .filter((e, i, arr) => 
+      .filter((e, i, arr) =>
         // Keep last attempt for each branch
         i === arr.findIndex(x => x.branch === e.branch && x.attempt >= e.attempt)
       )
-      .map(({ branch, error, attempt }) => 
-        `${branch}: ${error.message} (HTTP ${error.status || 'unknown'})${attempt > 1 ? ` after ${attempt} attempts` : ''}`
-      )
+      .map(({ branch, error, attempt }) => {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        const status = (error && typeof error === 'object' && 'status' in error) ? error.status : 'unknown';
+        return `${branch}: ${errorMessage} (HTTP ${status})${attempt > 1 ? ` after ${attempt} attempts` : ''}`;
+      })
       .join('; ');
-    
+
     // Build comprehensive error message
     let errorMsg = `Could not find an accessible branch in ${owner}/${repo}. ` +
       `Tried: ${triedBranches}. ` +
       `Errors: ${errorDetails}.`;
-    
+
     if (repoFetchError) {
-      const repoStatus = repoFetchError.status || 'unknown';
-      const repoDetails = repoFetchError.response?.headers 
-        ? ` (request-id: ${repoFetchError.response.headers['x-github-request-id'] || 'unavailable'})` 
+      const errorMessage = repoFetchError instanceof Error ? repoFetchError.message : 'Unknown error';
+      const repoStatus = (repoFetchError && typeof repoFetchError === 'object' && 'status' in repoFetchError) ? repoFetchError.status : 'unknown';
+      const repoDetails = (repoFetchError && typeof repoFetchError === 'object' && 'response' in repoFetchError &&
+                          repoFetchError.response && typeof repoFetchError.response === 'object' &&
+                          'headers' in repoFetchError.response && repoFetchError.response.headers &&
+                          typeof repoFetchError.response.headers === 'object' && 'x-github-request-id' in repoFetchError.response.headers)
+        ? ` (request-id: ${repoFetchError.response.headers['x-github-request-id'] || 'unavailable'})`
         : '';
-      errorMsg += ` Repository fetch error: ${repoFetchError.message} (HTTP ${repoStatus})${repoDetails}.`;
+      errorMsg += ` Repository fetch error: ${errorMessage} (HTTP ${repoStatus})${repoDetails}.`;
     }
     
     errorMsg += ` The repository may be empty, private, or you may not have the required permissions.`;
@@ -770,10 +787,10 @@ export class GitHubSyncService {
             subcategory: r.subcategory,
             subSubcategory: r.subSubcategory
           }))
-        } as any,
+        },
         metadata: {
           diff: { added, updated, removed }
-        } as any
+        }
       });
 
       // Log the export
@@ -797,32 +814,34 @@ export class GitHubSyncService {
         repositoryUrl: repoUrl,
         action: 'export',
         status: 'completed',
-        resourceIds: resourceIds as any,
+        resourceIds: resourceIds,
         metadata: {
           exported: result.exported,
           commitSha: result.commitSha,
           commitMessage,
           diff: { added, updated, removed }
-        } as any
+        }
       });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Provide user-friendly error messages for common GitHub issues
-      let errorMsg = error.message;
-      
-      if (error.status === 404) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const status = (error && typeof error === 'object' && 'status' in error) ? error.status : undefined;
+      let errorMsg = errorMessage;
+
+      if (status === 404) {
         errorMsg = `Repository not found or you don't have access. Please check the repository URL and your permissions.`;
-      } else if (error.status === 403) {
+      } else if (status === 403) {
         errorMsg = `Permission denied. You need write access to this repository. Check your GitHub authentication.`;
-      } else if (error.message.includes('branch')) {
-        errorMsg = `Branch error: ${error.message}. The repository may be empty or you may need to create an initial commit.`;
-      } else if (error.message.includes('awesome-lint')) {
+      } else if (errorMessage.includes('branch')) {
+        errorMsg = `Branch error: ${errorMessage}. The repository may be empty or you may need to create an initial commit.`;
+      } else if (errorMessage.includes('awesome-lint')) {
         // awesome-lint errors are already detailed, keep them as-is
-        errorMsg = error.message;
+        errorMsg = errorMessage;
       } else {
-        errorMsg = `Export failed: ${error.message}`;
+        errorMsg = `Export failed: ${errorMessage}`;
       }
-      
+
       result.errors.push(errorMsg);
       console.error('GitHub export error:', errorMsg);
 
@@ -832,10 +851,10 @@ export class GitHubSyncService {
         repositoryUrl: repoUrl,
         action: 'export',
         status: 'failed',
-        resourceIds: [] as any,
-        metadata: { 
+        resourceIds: [],
+        metadata: {
           error: errorMsg
-        } as any
+        }
       });
     }
 
@@ -937,12 +956,13 @@ export class GitHubSyncService {
             );
           }
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         console.error(`Error processing queue item ${item.id}:`, error);
         await storage.updateGithubSyncStatus(
           item.id,
           'failed',
-          error.message
+          errorMessage
         );
       }
     }
@@ -1045,10 +1065,11 @@ export class GitHubSyncService {
         message: 'Repository configured successfully',
         hasAccess: true
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       return {
         success: false,
-        message: `Configuration failed: ${error.message}`,
+        message: `Configuration failed: ${errorMessage}`,
         hasAccess: false
       };
     }

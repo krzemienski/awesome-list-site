@@ -79,7 +79,7 @@ export default function Category() {
   const awesomeList = rawData ? processAwesomeListData(rawData) : undefined;
   
   // Fetch approved database resources
-  const { data: dbData } = useQuery<{resources: any[], total: number}>({
+  const { data: dbData } = useQuery<{resources: DbResource[], total: number}>({
     queryKey: ['/api/resources', { status: 'approved' }],
     enabled: !!awesomeList,
   });
@@ -113,7 +113,7 @@ export default function Category() {
         title: r.title,
         description: r.description || '',
         url: r.url,
-        tags: r.metadata?.tags || [],
+        tags: Array.isArray(r.metadata?.tags) ? r.metadata.tags as string[] : [],
         category: r.category,
         subcategory: r.subcategory || undefined,
         subSubcategory: r.subSubcategory || undefined,
@@ -278,7 +278,7 @@ export default function Category() {
   };
   
   // Helper to convert category resource to DbResource for edit dialog
-  const toDbResource = (resource: Resource, dbResource: any): DbResource => ({
+  const toDbResource = (resource: Resource, dbResource: DbResource | undefined): DbResource => ({
     id: getDbId(resource),
     title: resource.title,
     url: resource.url,
