@@ -711,20 +711,1149 @@ testIdEntity: "category"           // Singular, lowercase
 testIdEntityPlural: "categories"   // Plural, lowercase
 ```
 
+## File Upload Fields
+
+The GenericCrudManager supports file upload fields through the `customFields` prop.
+
+### Basic File Upload Configuration
+
+```typescript
+import GenericCrudManager, { CustomFieldConfig } from "./GenericCrudManager";
+
+const customFields: CustomFieldConfig[] = [
+  {
+    name: "avatar",
+    label: "Profile Image",
+    type: "file",
+    fileConfig: {
+      accept: "image/*",
+      maxSize: 5 * 1024 * 1024, // 5MB
+      previewType: "image",
+      fileHelpText: "PNG, JPG up to 5MB"
+    }
+  }
+];
+
+<GenericCrudManager
+  {...otherProps}
+  customFields={customFields}
+/>
+```
+
+### File Field Configuration Options
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `accept` | `string` | Accepted file types (e.g., `"image/*"`, `".pdf,.doc"`) |
+| `maxSize` | `number` | Maximum file size in bytes |
+| `multiple` | `boolean` | Whether multiple files can be uploaded (future) |
+| `previewType` | `"image" \| "icon" \| "none"` | How to preview uploaded files |
+| `fileHelpText` | `string` | Help text about allowed file types/sizes |
+
+### Complete Example with File Upload
+
+```typescript
+const categoryConfig: GenericCrudManagerProps<CategoryWithImage> = {
+  entityName: "Category",
+  entityNamePlural: "Categories",
+  // ... other config ...
+  customFields: [
+    {
+      name: "description",
+      label: "Description",
+      type: "textarea",
+      placeholder: "Enter category description...",
+      helpText: "Optional description for this category"
+    },
+    {
+      name: "icon",
+      label: "Category Icon",
+      type: "file",
+      required: false,
+      fileConfig: {
+        accept: "image/png,image/svg+xml",
+        maxSize: 1 * 1024 * 1024, // 1MB
+        previewType: "image",
+        fileHelpText: "PNG or SVG, max 1MB"
+      }
+    }
+  ]
+};
+```
+
+### File Upload Behavior
+
+- **Automatic FormData**: When file fields are present, the component automatically uses `FormData` for API submissions
+- **Image Preview**: Files with `previewType: "image"` show a thumbnail preview before upload
+- **Size Validation**: Files exceeding `maxSize` are rejected with an error toast
+- **Edit Mode**: In edit dialogs, existing files are shown and can be replaced
+
+### Test IDs for File Fields
+
+```typescript
+// File inputs
+`input-create-{fieldName}` // e.g., "input-create-avatar"
+`input-edit-{fieldName}` // e.g., "input-edit-avatar"
+
+// Clear file buttons
+`button-clear-file-create-{fieldName}`
+`button-clear-file-edit-{fieldName}`
+```
+
+## Rich Text Editor Fields
+
+The GenericCrudManager supports rich text editor fields through the `customFields` prop with `type: "richtext"`.
+
+### Basic Rich Text Configuration
+
+```typescript
+import GenericCrudManager, { CustomFieldConfig } from "./GenericCrudManager";
+
+const customFields: CustomFieldConfig[] = [
+  {
+    name: "content",
+    label: "Content",
+    type: "richtext",
+    richTextConfig: {
+      minHeight: 200,
+      placeholder: "Enter your content here..."
+    }
+  }
+];
+
+<GenericCrudManager
+  {...otherProps}
+  customFields={customFields}
+/>
+```
+
+### Rich Text Configuration Options
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `minHeight` | `number` | `150` | Minimum height of the editor in pixels |
+| `maxHeight` | `number` | `undefined` | Maximum height (enables scrolling when exceeded) |
+| `toolbar` | `Array` | All tools | Which toolbar buttons to show |
+| `outputFormat` | `"html" \| "markdown"` | `"html"` | Output format for the content |
+| `placeholder` | `string` | `"Enter content..."` | Placeholder text when empty |
+
+### Available Toolbar Options
+
+```typescript
+toolbar: [
+  "bold",           // Bold text
+  "italic",         // Italic text
+  "underline",      // Underlined text
+  "strikethrough",  // Strikethrough text
+  "link",           // Insert hyperlink
+  "heading",        // Heading (H3)
+  "list",           // Bullet list
+  "orderedList",    // Numbered list
+  "quote",          // Blockquote
+  "code"            // Code block
+]
+```
+
+### Complete Example with Rich Text
+
+```typescript
+const articleConfig: GenericCrudManagerProps<ArticleWithCount> = {
+  entityName: "Article",
+  entityNamePlural: "Articles",
+  // ... other config ...
+  customFields: [
+    {
+      name: "summary",
+      label: "Summary",
+      type: "textarea",
+      placeholder: "Brief summary of the article..."
+    },
+    {
+      name: "body",
+      label: "Article Body",
+      type: "richtext",
+      required: true,
+      richTextConfig: {
+        minHeight: 300,
+        maxHeight: 500,
+        toolbar: ["bold", "italic", "link", "heading", "list", "quote"],
+        placeholder: "Write your article content here..."
+      }
+    }
+  ]
+};
+```
+
+### Rich Text Editor Behavior
+
+- **Toolbar**: Formatting buttons appear above the editor area
+- **Paste Handling**: Pasted content is stripped to plain text to avoid formatting issues
+- **HTML Output**: Content is stored as HTML by default
+- **Placeholder**: Shows when the editor is empty and unfocused
+
+### Test IDs for Rich Text Fields
+
+```typescript
+// Rich text editor container
+`input-create-{fieldName}` // e.g., "input-create-body"
+`input-edit-{fieldName}` // e.g., "input-edit-body"
+```
+
+## Multi-Select Dropdown Fields
+
+The GenericCrudManager supports multi-select dropdown fields through the `customFields` prop with `type: "multiselect"`.
+
+### Basic Multi-Select Configuration
+
+```typescript
+import GenericCrudManager, { CustomFieldConfig } from "./GenericCrudManager";
+
+const customFields: CustomFieldConfig[] = [
+  {
+    name: "tags",
+    label: "Tags",
+    type: "multiselect",
+    multiSelectConfig: {
+      options: [
+        { value: "frontend", label: "Frontend" },
+        { value: "backend", label: "Backend" },
+        { value: "devops", label: "DevOps" },
+        { value: "mobile", label: "Mobile" }
+      ],
+      placeholder: "Select tags...",
+      maxItems: 5
+    }
+  }
+];
+
+<GenericCrudManager
+  {...otherProps}
+  customFields={customFields}
+/>
+```
+
+### Multi-Select Configuration Options
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `options` | `Array<{value, label}>` | `[]` | Static options for the dropdown |
+| `fetchUrl` | `string` | - | API endpoint to fetch options dynamically |
+| `queryKey` | `string` | - | React Query key for caching fetched options |
+| `valueField` | `string` | `"id"` | Field name for option value (when using fetchUrl) |
+| `labelField` | `string` | `"name"` | Field name for option label (when using fetchUrl) |
+| `placeholder` | `string` | `"Select items..."` | Placeholder text when empty |
+| `maxItems` | `number` | `undefined` | Maximum number of selections allowed |
+| `minItems` | `number` | `undefined` | Minimum number of selections required |
+| `searchable` | `boolean` | `true` | Enable search/filter functionality |
+| `outputFormat` | `"array" \| "csv"` | `"array"` | Output format for the selected values |
+
+### Dynamic Options from API
+
+```typescript
+const customFields: CustomFieldConfig[] = [
+  {
+    name: "categoryIds",
+    label: "Categories",
+    type: "multiselect",
+    required: true,
+    multiSelectConfig: {
+      fetchUrl: "/api/categories",
+      queryKey: "categories",
+      valueField: "id",
+      labelField: "name",
+      searchable: true,
+      maxItems: 3
+    }
+  }
+];
+```
+
+### Complete Example with Multi-Select
+
+```typescript
+const resourceConfig: GenericCrudManagerProps<ResourceWithCount> = {
+  entityName: "Resource",
+  entityNamePlural: "Resources",
+  // ... other config ...
+  customFields: [
+    {
+      name: "description",
+      label: "Description",
+      type: "textarea",
+      placeholder: "Enter resource description..."
+    },
+    {
+      name: "tags",
+      label: "Tags",
+      type: "multiselect",
+      required: false,
+      multiSelectConfig: {
+        options: [
+          { value: "beginner", label: "Beginner Friendly" },
+          { value: "advanced", label: "Advanced" },
+          { value: "tutorial", label: "Tutorial" },
+          { value: "reference", label: "Reference" },
+          { value: "tool", label: "Tool" }
+        ],
+        placeholder: "Select tags...",
+        maxItems: 5,
+        searchable: true
+      }
+    },
+    {
+      name: "relatedResources",
+      label: "Related Resources",
+      type: "multiselect",
+      multiSelectConfig: {
+        fetchUrl: "/api/resources",
+        queryKey: "resources",
+        valueField: "id",
+        labelField: "name",
+        placeholder: "Select related resources...",
+        maxItems: 10
+      }
+    }
+  ]
+};
+```
+
+### Multi-Select Behavior
+
+- **Badge Display**: Selected items appear as removable badges/chips in the trigger button
+- **Search**: Type to filter available options (enabled by default)
+- **Max Items**: When `maxItems` is reached, remaining options are disabled
+- **Keyboard Navigation**: Full keyboard support for accessibility
+- **Dynamic Loading**: Options can be fetched from an API endpoint
+- **Output Formats**: Values can be stored as array or comma-separated string
+
+### Test IDs for Multi-Select Fields
+
+```typescript
+// Multi-select container
+`input-create-{fieldName}` // e.g., "input-create-tags"
+`input-edit-{fieldName}` // e.g., "input-edit-tags"
+
+// Trigger button
+`input-create-{fieldName}-trigger`
+`input-edit-{fieldName}-trigger`
+
+// Search input
+`input-create-{fieldName}-search`
+`input-edit-{fieldName}-search`
+
+// Individual options
+`input-create-{fieldName}-option-{value}` // e.g., "input-create-tags-option-frontend"
+
+// Remove buttons on selected badges
+`input-create-{fieldName}-remove-{value}` // e.g., "input-create-tags-remove-frontend"
+```
+
+## Search/Filter for Large Tables
+
+The GenericCrudManager includes built-in search functionality for filtering table data.
+
+### Basic Usage
+
+Search is enabled by default and searches across `name` and `slug` fields:
+
+```typescript
+<GenericCrudManager
+  {...otherProps}
+  // Search is enabled by default
+/>
+```
+
+### Customizing Search
+
+```typescript
+<GenericCrudManager
+  {...otherProps}
+  searchEnabled={true}                    // Enable/disable search (default: true)
+  searchableFields={['name', 'slug', 'description']}  // Fields to search
+  searchPlaceholder="Find categories..."   // Custom placeholder text
+/>
+```
+
+### Search Configuration Options
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `searchEnabled` | `boolean` | `true` | Enable or disable the search feature |
+| `searchableFields` | `string[]` | `['name', 'slug']` | Array of field names to search across |
+| `searchPlaceholder` | `string` | `"Search {entities}..."` | Custom placeholder text |
+
+### Search Behavior
+
+- **Case-insensitive**: Searches are not case-sensitive
+- **Multi-field**: Searches across all specified fields simultaneously
+- **Client-side**: Filtering happens in the browser for fast results
+- **Result count**: Shows "Showing X of Y {entities}" when filtering
+
+### Test IDs for Search
+
+```typescript
+// Search input
+`input-search-{testIdEntityPlural}` // e.g., "input-search-categories"
+
+// Clear search button
+`button-clear-search`
+
+// Results count text
+`text-search-results`
+```
+
+### Example with Search
+
+```typescript
+const resourceConfig: GenericCrudManagerProps<ResourceWithCount> = {
+  entityName: "Resource",
+  entityNamePlural: "Resources",
+  // ... other config ...
+
+  // Search configuration
+  searchEnabled: true,
+  searchableFields: ['name', 'slug', 'description', 'url'],
+  searchPlaceholder: "Search resources by name, URL..."
+};
+```
+
+## Pagination
+
+The GenericCrudManager includes built-in pagination for handling large datasets efficiently.
+
+### Basic Usage
+
+Pagination is enabled by default with 10 items per page:
+
+```typescript
+<GenericCrudManager
+  {...otherProps}
+  // Pagination is enabled by default
+/>
+```
+
+### Customizing Pagination
+
+```typescript
+<GenericCrudManager
+  {...otherProps}
+  paginationEnabled={true}              // Enable/disable pagination (default: true)
+  itemsPerPage={25}                     // Initial items per page (default: 10)
+  pageSizeOptions={[10, 25, 50, 100]}   // Available page size options
+/>
+```
+
+### Pagination Configuration Options
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `paginationEnabled` | `boolean` | `true` | Enable or disable the pagination feature |
+| `itemsPerPage` | `number` | `10` | Initial number of items displayed per page |
+| `pageSizeOptions` | `number[]` | `[10, 25, 50, 100]` | Available options for items per page selector |
+
+### Pagination Behavior
+
+- **Client-side**: Pagination works on the client side for fast page navigation
+- **Search integration**: Pagination automatically resets to page 1 when search query changes
+- **Page size selector**: Users can change how many items are displayed per page
+- **Navigation controls**: First, previous, next, and last page buttons
+- **Auto-hide**: Pagination controls are hidden when there's only one page of results
+
+### Test IDs for Pagination
+
+```typescript
+// Pagination container
+`pagination-{testIdEntityPlural}` // e.g., "pagination-categories"
+
+// Page size selector
+`select-page-size`
+
+// Navigation buttons
+`button-first-page`
+`button-prev-page`
+`button-next-page`
+`button-last-page`
+
+// Page info text
+`text-page-info`
+```
+
+### Example with Custom Pagination
+
+```typescript
+const resourceConfig: GenericCrudManagerProps<ResourceWithCount> = {
+  entityName: "Resource",
+  entityNamePlural: "Resources",
+  // ... other config ...
+
+  // Pagination configuration
+  paginationEnabled: true,
+  itemsPerPage: 25,
+  pageSizeOptions: [25, 50, 100, 200]
+};
+```
+
+### Disabling Pagination
+
+For smaller datasets where pagination isn't needed:
+
+```typescript
+<GenericCrudManager
+  {...otherProps}
+  paginationEnabled={false}  // Show all items without pagination
+/>
+```
+
+## Bulk Operations
+
+The GenericCrudManager supports bulk operations including multi-select, bulk delete, and data export.
+
+### Enabling Bulk Operations
+
+```typescript
+<GenericCrudManager
+  {...otherProps}
+  bulkOperationsEnabled={true}
+/>
+```
+
+### Bulk Operations Configuration Options
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `bulkOperationsEnabled` | `boolean` | `false` | Enable bulk select, delete, and export features |
+| `bulkDeleteUrl` | `string` | - | API endpoint for bulk delete (POST with `{ids: number[]}`) |
+| `exportFormats` | `Array<'csv' \| 'json'>` | `['csv', 'json']` | Export formats to enable |
+| `exportFilename` | `string` | `{entities}-export-{date}` | Custom export filename (without extension) |
+| `exportFields` | `string[]` | All columns | Fields to include in export |
+
+### Bulk Delete Behavior
+
+- **Selection**: Checkbox column appears when `bulkOperationsEnabled` is true
+- **Protection**: Items with `resourceCount > 0` cannot be selected for deletion (checkboxes are disabled)
+- **Batch API**: If `bulkDeleteUrl` is provided, sends `{ ids: [1, 2, 3] }` to that endpoint
+- **Fallback**: Without `bulkDeleteUrl`, individual delete requests are made in parallel
+- **Partial success**: If some items have resources, only deletable items are processed
+
+### Export Functionality
+
+- **Export selected**: When items are selected, exports only selected items
+- **Export all**: When nothing selected, exports all items (respects search filter)
+- **CSV format**: Properly escapes commas, quotes, and newlines
+- **JSON format**: Pretty-printed JSON array of objects
+
+### Complete Example with Bulk Operations
+
+```typescript
+const resourceConfig: GenericCrudManagerProps<ResourceWithCount> = {
+  entityName: "Resource",
+  entityNamePlural: "Resources",
+  // ... other config ...
+
+  // Bulk operations configuration
+  bulkOperationsEnabled: true,
+  bulkDeleteUrl: "/api/admin/resources/bulk-delete",
+  exportFormats: ['csv', 'json'],
+  exportFilename: "resources-backup",
+  exportFields: ['id', 'name', 'slug', 'url', 'resourceCount']
+};
+```
+
+### Test IDs for Bulk Operations
+
+```typescript
+// Select all checkbox (header)
+`checkbox-select-all`
+
+// Individual row checkbox
+`checkbox-select-{id}` // e.g., "checkbox-select-123"
+
+// Bulk actions toolbar
+`bulk-actions-toolbar`
+
+// Selected count text
+`text-selected-count`
+
+// Bulk action buttons
+`button-bulk-delete`
+`button-export-selected`
+`button-clear-selection`
+`button-export-all`
+
+// Export menu items
+`menu-export-csv`
+`menu-export-json`
+`menu-export-all-csv`
+`menu-export-all-json`
+
+// Bulk delete dialog
+`dialog-bulk-delete-{testIdEntity}` // e.g., "dialog-bulk-delete-resource"
+`button-cancel-bulk-delete`
+`button-confirm-bulk-delete`
+```
+
+## Field-Level Permissions
+
+The GenericCrudManager supports field-level permissions to control visibility and editability of fields based on context.
+
+### Basic Usage
+
+Add a `permissions` property to any custom field or column configuration:
+
+```typescript
+const customFields: CustomFieldConfig[] = [
+  {
+    name: "internalNotes",
+    label: "Internal Notes",
+    type: "textarea",
+    permissions: {
+      visibleOnCreate: true,
+      visibleOnEdit: true,
+      visibleInTable: false,  // Hide from table view
+      editableOnCreate: true,
+      editableOnEdit: false   // Read-only after creation
+    }
+  }
+];
+```
+
+### Permission Configuration Options
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `visibleOnCreate` | `boolean` | `true` | Whether the field appears in the create form |
+| `visibleOnEdit` | `boolean` | `true` | Whether the field appears in the edit form |
+| `visibleInTable` | `boolean` | `true` | Whether the column appears in the table |
+| `editableOnCreate` | `boolean` | `true` | Whether the field can be edited during creation |
+| `editableOnEdit` | `boolean` | `true` | Whether the field can be edited during updates |
+| `checkPermission` | `function` | - | Dynamic permission check function |
+
+### Dynamic Permission Checks
+
+For complex permission logic, use the `checkPermission` function:
+
+```typescript
+const customFields: CustomFieldConfig[] = [
+  {
+    name: "adminNotes",
+    label: "Admin Notes",
+    type: "textarea",
+    permissions: {
+      checkPermission: (context) => {
+        // context contains: { mode: 'create' | 'edit' | 'view', entity?: any }
+        const isAdmin = getCurrentUser()?.role === 'admin';
+        return {
+          visible: isAdmin,
+          editable: isAdmin && context.mode !== 'view',
+          message: isAdmin ? undefined : "Admin access required"
+        };
+      }
+    }
+  }
+];
+```
+
+### Column Permissions
+
+Columns can also have permissions to control table visibility:
+
+```typescript
+const columns: ColumnConfig[] = [
+  { key: "id", label: "ID" },
+  { key: "name", label: "Name" },
+  {
+    key: "internalId",
+    label: "Internal ID",
+    permissions: {
+      visibleInTable: false  // Hidden from regular users
+    }
+  },
+  { key: "actions", label: "Actions", align: "right" }
+];
+```
+
+### Complete Example with Permissions
+
+```typescript
+const resourceConfig: GenericCrudManagerProps<ResourceWithCount> = {
+  entityName: "Resource",
+  entityNamePlural: "Resources",
+  // ... other config ...
+
+  columns: [
+    { key: "id", label: "ID" },
+    { key: "name", label: "Name" },
+    {
+      key: "cost",
+      label: "Cost",
+      permissions: { visibleInTable: isAdmin() }
+    },
+    { key: "actions", label: "Actions" }
+  ],
+
+  customFields: [
+    {
+      name: "description",
+      label: "Description",
+      type: "textarea"
+    },
+    {
+      name: "createdBy",
+      label: "Created By",
+      type: "text",
+      permissions: {
+        visibleOnCreate: false,      // Auto-set on server
+        visibleOnEdit: true,
+        editableOnEdit: false,       // Read-only
+        visibleInTable: true
+      }
+    },
+    {
+      name: "adminOverride",
+      label: "Admin Override",
+      type: "text",
+      permissions: {
+        checkPermission: ({ mode, entity }) => ({
+          visible: hasRole('admin'),
+          editable: hasRole('admin') && mode !== 'view'
+        })
+      }
+    }
+  ]
+};
+```
+
+### Permission Behavior
+
+- **Hidden fields**: Fields with `visible: false` are completely hidden from the UI
+- **Read-only fields**: Fields with `editable: false` are displayed but cannot be modified (shown with disabled styling)
+- **Dynamic permissions**: The `checkPermission` function is called each time the form/table renders, allowing real-time permission updates
+- **Default behavior**: Without a `permissions` property, all fields are visible and editable
+
+## Custom Validation Rules
+
+The GenericCrudManager supports custom validation rules per field through the `validation` property on custom fields.
+
+### Basic Usage
+
+Add a `validation` property to any custom field configuration:
+
+```typescript
+const customFields: CustomFieldConfig[] = [
+  {
+    name: "username",
+    label: "Username",
+    type: "text",
+    required: true,
+    validation: {
+      minLength: 3,
+      maxLength: 20,
+      pattern: /^[a-z0-9_]+$/,
+      patternMessage: "Only lowercase letters, numbers, and underscores allowed"
+    }
+  }
+];
+```
+
+### Validation Configuration Options
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `minLength` | `number` | Minimum length for text/textarea fields |
+| `maxLength` | `number` | Maximum length for text/textarea fields |
+| `min` | `number` | Minimum value for number fields |
+| `max` | `number` | Maximum value for number fields |
+| `pattern` | `RegExp \| string` | Regex pattern to validate against |
+| `patternMessage` | `string` | Custom error message when pattern fails |
+| `custom` | `function` | Custom validation function (sync) |
+| `asyncCustom` | `function` | Async validation function (e.g., for uniqueness checks) |
+
+### Custom Validation Functions
+
+For complex validation logic, use the `custom` function:
+
+```typescript
+const customFields: CustomFieldConfig[] = [
+  {
+    name: "password",
+    label: "Password",
+    type: "text",
+    required: true,
+    validation: {
+      minLength: 8,
+      custom: (value, formData) => {
+        // Must contain at least one number
+        if (!/\d/.test(value)) {
+          return "Password must contain at least one number";
+        }
+        // Must contain at least one uppercase letter
+        if (!/[A-Z]/.test(value)) {
+          return "Password must contain at least one uppercase letter";
+        }
+        return true; // Validation passed
+      }
+    }
+  },
+  {
+    name: "confirmPassword",
+    label: "Confirm Password",
+    type: "text",
+    required: true,
+    validation: {
+      custom: (value, formData) => {
+        if (value !== formData.password) {
+          return "Passwords do not match";
+        }
+        return true;
+      }
+    }
+  }
+];
+```
+
+### Async Validation (e.g., Uniqueness Checks)
+
+For validation that requires server calls:
+
+```typescript
+const customFields: CustomFieldConfig[] = [
+  {
+    name: "email",
+    label: "Email Address",
+    type: "text",
+    required: true,
+    validation: {
+      pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+      patternMessage: "Please enter a valid email address",
+      asyncCustom: async (value, formData) => {
+        // Check if email is already in use
+        const response = await fetch(`/api/check-email?email=${encodeURIComponent(value)}`);
+        const { available } = await response.json();
+        if (!available) {
+          return "This email is already registered";
+        }
+        return true;
+      }
+    }
+  }
+];
+```
+
+### Number Field Validation
+
+```typescript
+const customFields: CustomFieldConfig[] = [
+  {
+    name: "age",
+    label: "Age",
+    type: "number",
+    validation: {
+      min: 18,
+      max: 120,
+      custom: (value) => {
+        if (!Number.isInteger(Number(value))) {
+          return "Age must be a whole number";
+        }
+        return true;
+      }
+    }
+  },
+  {
+    name: "price",
+    label: "Price",
+    type: "number",
+    validation: {
+      min: 0.01,
+      max: 99999.99,
+      custom: (value) => {
+        const num = Number(value);
+        if (Math.round(num * 100) / 100 !== num) {
+          return "Price can only have up to 2 decimal places";
+        }
+        return true;
+      }
+    }
+  }
+];
+```
+
+### Complete Example with Multiple Validations
+
+```typescript
+const resourceConfig: GenericCrudManagerProps<ResourceWithCount> = {
+  entityName: "Resource",
+  entityNamePlural: "Resources",
+  // ... other config ...
+
+  customFields: [
+    {
+      name: "title",
+      label: "Title",
+      type: "text",
+      required: true,
+      validation: {
+        minLength: 5,
+        maxLength: 200
+      }
+    },
+    {
+      name: "url",
+      label: "URL",
+      type: "text",
+      required: true,
+      validation: {
+        pattern: /^https?:\/\/.+/,
+        patternMessage: "URL must start with http:// or https://"
+      }
+    },
+    {
+      name: "description",
+      label: "Description",
+      type: "textarea",
+      validation: {
+        maxLength: 1000,
+        custom: (value) => {
+          if (value && value.includes('<script>')) {
+            return "HTML scripts are not allowed";
+          }
+          return true;
+        }
+      }
+    },
+    {
+      name: "priority",
+      label: "Priority (1-10)",
+      type: "number",
+      validation: {
+        min: 1,
+        max: 10
+      }
+    }
+  ]
+};
+```
+
+### Validation Behavior
+
+- **Real-time feedback**: Validation runs on field blur, showing errors immediately
+- **Clear on edit**: Errors clear when the user starts typing in the field
+- **Submit validation**: All fields are validated before form submission
+- **Error display**: Errors appear below the field with red text and red border
+- **Toast notification**: A summary toast appears when submission fails due to validation
+
+### Test IDs for Validation Errors
+
+```typescript
+// Error message elements
+`error-create-{fieldName}` // e.g., "error-create-username"
+`error-edit-{fieldName}` // e.g., "error-edit-username"
+```
+
+## Undo/Redo Functionality
+
+The GenericCrudManager supports undo/redo functionality to allow users to revert or replay CRUD operations.
+
+### Enabling Undo/Redo
+
+```typescript
+<GenericCrudManager
+  {...otherProps}
+  undoRedoEnabled={true}
+  undoRedoHistoryLimit={50}  // Optional, default: 50
+/>
+```
+
+### Undo/Redo Configuration Options
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `undoRedoEnabled` | `boolean` | `false` | Enable or disable undo/redo functionality |
+| `undoRedoHistoryLimit` | `number` | `50` | Maximum number of operations to keep in history |
+
+### Supported Operations
+
+The following operations can be undone and redone:
+
+| Operation | Undo Action | Redo Action |
+|-----------|-------------|-------------|
+| **Create** | Deletes the created entity | Re-creates the entity |
+| **Update** | Restores previous entity data | Re-applies the new data |
+| **Delete** | Re-creates the deleted entity | Deletes the entity again |
+
+### Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl+Z` (Windows/Linux) or `Cmd+Z` (Mac) | Undo last operation |
+| `Ctrl+Shift+Z` or `Ctrl+Y` (Windows/Linux) or `Cmd+Shift+Z` (Mac) | Redo last undone operation |
+
+### UI Controls
+
+When enabled, Undo and Redo buttons appear in the card header next to the Create button:
+- **Undo button**: Reverts the most recent operation (disabled when at beginning of history)
+- **Redo button**: Replays an undone operation (disabled when at end of history)
+
+### Toast Notifications
+
+Operations display informative toast messages:
+- "Undo: [Entity] creation reverted"
+- "Undo: [Entity] update reverted"
+- "Undo: [Entity] deletion reverted"
+- "Redo: [Entity] re-created"
+- "Redo: [Entity] update re-applied"
+- "Redo: [Entity] re-deleted"
+
+### Test IDs for Undo/Redo
+
+```typescript
+// Undo/Redo buttons
+`button-undo`
+`button-redo`
+```
+
+### Complete Example with Undo/Redo
+
+```typescript
+const resourceConfig: GenericCrudManagerProps<ResourceWithCount> = {
+  entityName: "Resource",
+  entityNamePlural: "Resources",
+  // ... other config ...
+
+  // Undo/Redo configuration
+  undoRedoEnabled: true,
+  undoRedoHistoryLimit: 100  // Keep last 100 operations
+};
+```
+
+### Undo/Redo Behavior
+
+- **History Limit**: When the history limit is reached, the oldest operations are removed
+- **Operation Tracking**: Each create, update, and delete operation is automatically recorded
+- **State Preservation**: For updates and deletes, the previous entity state is preserved for restoration
+- **Error Handling**: If an undo/redo operation fails, an error toast is displayed
+- **Query Invalidation**: After undo/redo, relevant queries are invalidated to refresh the UI
+
+## Audit Trail / Change History
+
+The GenericCrudManager supports an audit trail feature to track and display all CRUD operations performed on entities.
+
+### Enabling Audit Trail
+
+```typescript
+<GenericCrudManager
+  {...otherProps}
+  auditTrailEnabled={true}
+  auditTrailMaxEntries={100}     // Optional, default: 100
+  auditTrailPersist={true}       // Optional, default: false
+  auditTrailExcludeFields={['password', 'token']}  // Optional
+/>
+```
+
+### Audit Trail Configuration Options
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `auditTrailEnabled` | `boolean` | `false` | Enable or disable audit trail functionality |
+| `auditTrailMaxEntries` | `number` | `100` | Maximum number of entries to keep in history |
+| `auditTrailPersist` | `boolean` | `false` | Whether to persist audit trail to localStorage |
+| `auditTrailExcludeFields` | `string[]` | `[]` | Fields to exclude from change tracking (e.g., sensitive data) |
+
+### Tracked Operations
+
+All CRUD operations are automatically recorded:
+
+| Operation | Recorded Data |
+|-----------|--------------|
+| **Create** | New entity data, timestamp, entity name |
+| **Update** | Previous data, new data, changed fields list, timestamp |
+| **Delete** | Deleted entity data, timestamp, entity name |
+
+### Audit Trail UI
+
+When enabled, a "History" button appears in the card header next to the Create button. Clicking it opens a dialog showing:
+
+- **Operation Type**: Color-coded badges (green for create, blue for update, red for delete)
+- **Entity Name**: The name of the affected entity
+- **Timestamp**: When the operation occurred
+- **Description**: Human-readable description of the change
+- **Changed Fields**: For updates, shows which fields were modified
+- **Data Diff**: Expandable sections showing before/after data for each operation
+
+### Local Storage Persistence
+
+When `auditTrailPersist` is enabled:
+- Audit trail is saved to localStorage using the key `audit-trail-{queryKey}`
+- History persists across browser sessions and page reloads
+- Each entity type maintains its own separate history
+- Clear history using the "Clear History" button in the dialog
+
+### Excluding Sensitive Fields
+
+Use `auditTrailExcludeFields` to prevent sensitive data from being recorded:
+
+```typescript
+<GenericCrudManager
+  {...otherProps}
+  auditTrailEnabled={true}
+  auditTrailExcludeFields={['password', 'apiKey', 'secretToken']}
+/>
+```
+
+### Test IDs for Audit Trail
+
+```typescript
+// History button
+`button-audit-trail`
+
+// Audit trail dialog
+`dialog-audit-trail`
+
+// Individual audit entries
+`audit-entry-{id}` // e.g., "audit-entry-1234567890-abc123def"
+
+// Action buttons
+`button-clear-audit-trail`
+`button-close-audit-trail`
+```
+
+### Complete Example with Audit Trail
+
+```typescript
+const resourceConfig: GenericCrudManagerProps<ResourceWithCount> = {
+  entityName: "Resource",
+  entityNamePlural: "Resources",
+  // ... other config ...
+
+  // Audit trail configuration
+  auditTrailEnabled: true,
+  auditTrailMaxEntries: 200,        // Keep last 200 operations
+  auditTrailPersist: true,          // Persist across sessions
+  auditTrailExcludeFields: ['internalNotes']  // Don't track this field
+};
+```
+
+### Audit Trail Behavior
+
+- **Automatic Recording**: All create, update, and delete operations are automatically tracked
+- **Changed Fields Detection**: For updates, automatically detects and lists which fields changed
+- **Memory Management**: When `maxEntries` is reached, oldest entries are removed
+- **Clear Functionality**: Users can clear all history via the dialog
+- **Expandable Details**: Each entry can be expanded to view full before/after data
+
 ## Future Enhancements
 
 Potential improvements to the pattern:
 
-- [ ] File upload fields
-- [ ] Rich text editor fields
-- [ ] Multi-select dropdowns
-- [ ] Search/filter for large tables
-- [ ] Pagination support
-- [ ] Bulk operations (delete multiple, export)
-- [ ] Field-level permissions
-- [ ] Custom validation rules per field
-- [ ] Undo/redo functionality
-- [ ] Audit trail / change history
+- [x] File upload fields *(Completed: 2026-02-02)*
+- [x] Rich text editor fields *(Completed: 2026-02-02)*
+- [x] Multi-select dropdowns *(Completed: 2026-02-02)*
+- [x] Search/filter for large tables *(Completed: 2026-02-02)*
+- [x] Pagination support *(Completed: 2026-02-02)*
+- [x] Bulk operations (delete multiple, export) *(Completed: 2026-02-02)*
+- [x] Field-level permissions *(Completed: 2026-02-02)*
+- [x] Custom validation rules per field *(Completed: 2026-02-02)*
+- [x] Undo/redo functionality *(Completed: 2026-02-02)*
+- [x] Audit trail / change history *(Completed: 2026-02-02)*
 
 ## Summary
 

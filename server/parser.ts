@@ -1,6 +1,7 @@
 import { remark } from 'remark';
 import { visit } from 'unist-util-visit';
-import fetch from 'node-fetch';
+import type { Node } from 'unist';
+import fetch, { Response } from 'node-fetch';
 
 interface Resource {
   id: string;
@@ -21,6 +22,7 @@ interface AwesomeListData {
   description: string;
   repoUrl: string;
   resources: Resource[];
+  categories: never[]; // Empty array - categories are built from resources by storage layer
 }
 
 function log(message: string, level: 'info' | 'warn' | 'error' = 'info') {
@@ -111,8 +113,15 @@ function extractExistingTags(text: string): string[] {
 /**
  * Extract metadata from resource text (license, language, etc.)
  */
-function extractMetadata(text: string) {
-  const metadata: any = {};
+interface ResourceMetadata {
+  sourceCode?: string;
+  demo?: string;
+  license?: string;
+  language?: string;
+}
+
+function extractMetadata(text: string): ResourceMetadata {
+  const metadata: ResourceMetadata = {};
   
   // Extract source code link
   const sourceMatch = text.match(/\[Source Code\]\(([^)]+)\)/i);
@@ -148,10 +157,10 @@ function extractMetadata(text: string) {
 /**
  * Parse list items into resources
  */
-function parseListItems(tree: any, currentCategory: string, currentSubcategory?: string): Resource[] {
+function parseListItems(tree: unknown, currentCategory: string, currentSubcategory?: string): Resource[] {
   const resources: Resource[] = [];
-  
-  visit(tree, 'listItem', (node: any) => {
+
+  visit(tree as Node, 'listItem', (node: unknown) => {
     // Skip if this is a table of contents item (contains only links to headers)
     const text = extractTextFromNode(node);
     if (text.startsWith('#') || text.includes('back to top')) {
@@ -164,10 +173,10 @@ function parseListItems(tree: any, currentCategory: string, currentSubcategory?:
     let description = '';
     
     let linkCount = 0;
-    visit(node, 'link', (linkNode: any) => {
+    visit(node as Node, 'link', (linkNode: unknown) => {
       if (linkCount === 0) { // First link is the main resource
         title = extractTextFromNode(linkNode);
-        url = linkNode.url;
+        url = (linkNode as { url: string }).url;
       }
       linkCount++;
     });
@@ -245,14 +254,15 @@ function getDefaultDescription(title: string): string {
 /**
  * Extract plain text from markdown node
  */
-function extractTextFromNode(node: any): string {
+function extractTextFromNode(node: unknown): string {
   let text = '';
-  
-  visit(node, (child: any) => {
-    if (child.type === 'text') {
-      text += child.value;
-    } else if (child.type === 'inlineCode') {
-      text += '`' + child.value + '`';
+
+  visit(node as Node, (child: unknown) => {
+    const childNode = child as { type?: string; value?: string };
+    if (childNode.type === 'text') {
+      text += childNode.value;
+    } else if (childNode.type === 'inlineCode') {
+      text += '`' + childNode.value + '`';
     }
   });
   
@@ -275,8 +285,9 @@ async function parseMarkdown(content: string, repoUrl: string): Promise<AwesomeL
   
   // Find the first h1 heading that contains "Awesome"
   let titleFound = false;
-  visit(tree, 'heading', (node: any) => {
-    if (node.depth === 1 && !titleFound) {
+  visit(tree, 'heading', (node: unknown) => {
+    const headingNode = node as { depth?: number };
+    if (headingNode.depth === 1 && !titleFound) {
       const headingText = extractTextFromNode(node);
       if (headingText.toLowerCase().includes('awesome')) {
         title = headingText;
@@ -287,7 +298,7 @@ async function parseMarkdown(content: string, repoUrl: string): Promise<AwesomeL
   
   // Extract description from the first meaningful paragraph after title
   let foundDescription = false;
-  visit(tree, 'paragraph', (node: any) => {
+  visit(tree, 'paragraph', (node: unknown) => {
     if (!foundDescription && !description) {
       const text = extractTextFromNode(node);
       // Skip badges, build status, and other metadata
@@ -310,10 +321,11 @@ async function parseMarkdown(content: string, repoUrl: string): Promise<AwesomeL
   // Track if we're inside the main content area (after Contents)
   let insideMainContent = false;
   let skipContentsSection = true;
-  
+
   // Process each section
-  visit(tree, (node: any) => {
-    if (node.type === 'heading') {
+  visit(tree, (node: unknown) => {
+    const treeNode = node as { type?: string; depth?: number };
+    if (treeNode.type === 'heading') {
       const headingText = extractTextFromNode(node);
       
       // Skip certain sections entirely
@@ -341,16 +353,16 @@ async function parseMarkdown(content: string, repoUrl: string): Promise<AwesomeL
         return;
       }
       
-      if (node.depth === 2 && insideMainContent) {
+      if (treeNode.depth === 2 && insideMainContent) {
         // Main category (## Category) - these are the real categories
         currentCategory = headingText;
         currentSubcategory = '';
         skipContentsSection = false;
-      } else if (node.depth === 3 && currentCategory) {
+      } else if (treeNode.depth === 3 && currentCategory) {
         // Subcategory (### Subcategory)
         currentSubcategory = headingText;
       }
-    } else if (node.type === 'list' && currentCategory && !skipContentsSection) {
+    } else if (treeNode.type === 'list' && currentCategory && !skipContentsSection) {
       // Parse resources from this list
       const sectionResources = parseListItems(node, currentCategory, currentSubcategory);
       resources.push(...sectionResources);
@@ -361,7 +373,8 @@ async function parseMarkdown(content: string, repoUrl: string): Promise<AwesomeL
     title: cleanText(title),
     description: description || getDefaultDescription(title),
     repoUrl,
-    resources: resources.filter(r => r.title && r.url && !r.url.startsWith('#'))
+    resources: resources.filter(r => r.title && r.url && !r.url.startsWith('#')),
+    categories: [] // Categories are built from resources by the storage layer
   };
   
   log(`Parsed ${data.resources.length} resources from ${repoUrl}`);
@@ -450,7 +463,7 @@ export async function fetchAwesomeList(rawUrl: string): Promise<AwesomeListData>
     
     let response: Response;
     try {
-      response = await fetch(rawUrl, { 
+      response = await fetch(rawUrl, {
         signal: controller.signal,
         headers: {
           'User-Agent': 'Awesome-List-Generator/1.0',
@@ -458,13 +471,14 @@ export async function fetchAwesomeList(rawUrl: string): Promise<AwesomeListData>
         }
       });
       clearTimeout(timeoutId);
-    } catch (fetchError: any) {
+    } catch (fetchError: unknown) {
       clearTimeout(timeoutId);
-      if (fetchError.name === 'AbortError') {
+      if (fetchError instanceof Error && fetchError.name === 'AbortError') {
         log('Request timed out after 30 seconds', 'error');
         throw new Error('Request timeout: The awesome list URL took too long to respond');
       }
-      log(`Network error: ${fetchError.message}`, 'error');
+      const errorMessage = fetchError instanceof Error ? fetchError.message : 'Unknown error';
+      log(`Network error: ${errorMessage}`, 'error');
       throw new Error(`Network error: Unable to connect to ${rawUrl}. Please check the URL and try again.`);
     }
     
@@ -517,16 +531,17 @@ export async function fetchAwesomeList(rawUrl: string): Promise<AwesomeListData>
     
     const parseTime = (Date.now() - startTime) / 1000;
     logParsingStats(data, parseTime);
-    
+
     return data;
-    
-  } catch (error: any) {
+
+  } catch (error: unknown) {
     const parseTime = (Date.now() - startTime) / 1000;
-    log(`Parsing failed after ${parseTime.toFixed(2)}s: ${error.message}`, 'error');
-    
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    log(`Parsing failed after ${parseTime.toFixed(2)}s: ${errorMessage}`, 'error');
+
     log('Debugging information:', 'info');
     log(`  - URL: ${rawUrl}`, 'info');
-    log(`  - Error type: ${error.constructor.name}`, 'info');
+    log(`  - Error type: ${error instanceof Error ? error.constructor.name : typeof error}`, 'info');
     log(`  - Time elapsed: ${parseTime.toFixed(2)}s`, 'info');
     
     throw error;

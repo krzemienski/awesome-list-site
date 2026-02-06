@@ -1,4 +1,4 @@
-import GenericCrudManager, { BaseEntityWithCount } from "./GenericCrudManager";
+import GenericCrudManager, { BaseEntityWithCount, GenericCrudManagerProps } from "./GenericCrudManager";
 import { subSubcategoryConfig } from "./configs/subsubcategory-config";
 
 interface SubSubcategoryWithCount extends BaseEntityWithCount {
@@ -9,6 +9,8 @@ interface SubSubcategoryWithCount extends BaseEntityWithCount {
   resourceCount: number;
 }
 
+const TypedCrudManager = GenericCrudManager as React.ComponentType<GenericCrudManagerProps<SubSubcategoryWithCount>>;
+
 export default function SubSubcategoryManager() {
-  return <GenericCrudManager<SubSubcategoryWithCount> {...subSubcategoryConfig} />;
+  return <TypedCrudManager {...subSubcategoryConfig} />;
 }

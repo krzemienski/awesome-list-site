@@ -4,7 +4,77 @@ import { ReactNode } from "react";
 /**
  * Defines the type of a form field in the CRUD manager
  */
-export type FieldType = "text" | "select" | "number" | "textarea";
+export type FieldType = "text" | "select" | "number" | "textarea" | "file" | "richtext" | "multiselect";
+
+/**
+ * Configuration for file upload fields
+ */
+export interface FileFieldConfig {
+  /** Accepted file types (e.g., "image/*", ".pdf,.doc") */
+  accept?: string;
+  /** Maximum file size in bytes */
+  maxSize?: number;
+  /** Whether multiple files can be uploaded */
+  multiple?: boolean;
+  /** Custom upload handler - if not provided, file is included in FormData */
+  uploadHandler?: (file: File) => Promise<string>;
+  /** Preview type for uploaded files */
+  previewType?: "image" | "icon" | "none";
+  /** Help text about allowed file types/sizes */
+  fileHelpText?: string;
+}
+
+/**
+ * Configuration for rich text editor fields
+ */
+export interface RichTextFieldConfig {
+  /** Minimum height of the editor in pixels */
+  minHeight?: number;
+  /** Maximum height of the editor in pixels (enables scrolling) */
+  maxHeight?: number;
+  /** Toolbar features to enable */
+  toolbar?: Array<"bold" | "italic" | "underline" | "strikethrough" | "link" | "heading" | "list" | "orderedList" | "quote" | "code">;
+  /** Output format for the content */
+  outputFormat?: "html" | "markdown";
+  /** Placeholder text for the editor */
+  placeholder?: string;
+}
+
+/**
+ * Option for multi-select fields
+ */
+export interface MultiSelectOption {
+  /** Unique value for the option */
+  value: string;
+  /** Display label for the option */
+  label: string;
+}
+
+/**
+ * Configuration for multi-select dropdown fields
+ */
+export interface MultiSelectFieldConfig {
+  /** Static options for the multi-select */
+  options?: MultiSelectOption[];
+  /** API endpoint to fetch options dynamically */
+  fetchUrl?: string;
+  /** React Query key for caching fetched options */
+  queryKey?: string;
+  /** Field name for the option value (default: "id") */
+  valueField?: string;
+  /** Field name for the option label (default: "name") */
+  labelField?: string;
+  /** Placeholder text when no items selected */
+  placeholder?: string;
+  /** Maximum number of items that can be selected */
+  maxItems?: number;
+  /** Minimum number of items that must be selected */
+  minItems?: number;
+  /** Whether to allow searching/filtering options */
+  searchable?: boolean;
+  /** Output format: "array" returns string[], "csv" returns comma-separated string */
+  outputFormat?: "array" | "csv";
+}
 
 /**
  * Defines how a field should be validated
@@ -15,6 +85,49 @@ export interface FieldValidation {
   maxLength?: number;
   pattern?: RegExp;
   custom?: (value: any) => boolean | string;
+}
+
+/**
+ * Field-level permissions configuration
+ * Controls visibility and editability of fields based on context or user roles
+ */
+export interface FieldPermissions {
+  /** Whether the field is visible in create form (default: true) */
+  visibleOnCreate?: boolean;
+  /** Whether the field is visible in edit form (default: true) */
+  visibleOnEdit?: boolean;
+  /** Whether the field is visible in table columns (default: true) */
+  visibleInTable?: boolean;
+  /** Whether the field is editable on create (default: true) */
+  editableOnCreate?: boolean;
+  /** Whether the field is editable on edit - if false, shows as read-only (default: true) */
+  editableOnEdit?: boolean;
+  /** Dynamic permission check function - receives current user context */
+  checkPermission?: (context: FieldPermissionContext) => FieldPermissionResult;
+}
+
+/**
+ * Context provided to dynamic permission check functions
+ */
+export interface FieldPermissionContext {
+  /** Current operation mode */
+  mode: 'create' | 'edit' | 'view';
+  /** The entity being edited (only available in edit mode) */
+  entity?: any;
+  /** Additional context data passed from the component */
+  customContext?: Record<string, any>;
+}
+
+/**
+ * Result of a dynamic permission check
+ */
+export interface FieldPermissionResult {
+  /** Whether the field should be visible */
+  visible: boolean;
+  /** Whether the field should be editable (if visible) */
+  editable: boolean;
+  /** Optional message to show explaining why field is hidden/disabled */
+  message?: string;
 }
 
 /**
@@ -47,6 +160,14 @@ export interface FieldConfig {
   dependsOn?: string;
   /** For cascading selects: filter function based on dependent field */
   filterFn?: (item: any, dependentValue: any) => boolean;
+  /** For file fields: file upload configuration */
+  fileConfig?: FileFieldConfig;
+  /** For rich text fields: editor configuration */
+  richTextConfig?: RichTextFieldConfig;
+  /** For multi-select fields: dropdown configuration */
+  multiSelectConfig?: MultiSelectFieldConfig;
+  /** Field-level permissions configuration */
+  permissions?: FieldPermissions;
 }
 
 /**
@@ -65,6 +186,8 @@ export interface ColumnConfig {
   align?: "left" | "center" | "right";
   /** Width of the column */
   width?: string;
+  /** Field-level permissions - controls column visibility */
+  permissions?: FieldPermissions;
 }
 
 /**
@@ -179,4 +302,101 @@ export interface EntityWithCount {
   slug: string;
   resourceCount: number;
   [key: string]: any;
+}
+
+/**
+ * Configuration for bulk operations (delete multiple, export)
+ */
+export interface BulkOperationsConfig {
+  /** Enable bulk operations (default: false) */
+  enabled?: boolean;
+  /** Bulk delete API endpoint - if not provided, individual delete endpoints are called */
+  bulkDeleteUrl?: string;
+  /** Export formats to enable (default: ['csv', 'json']) */
+  exportFormats?: Array<'csv' | 'json'>;
+  /** Custom export filename (without extension) */
+  exportFilename?: string;
+  /** Fields to include in export (default: all visible columns) */
+  exportFields?: string[];
+}
+
+/**
+ * Export format types
+ */
+export type ExportFormat = 'csv' | 'json';
+
+/**
+ * Types of operations that can be undone/redone
+ */
+export type UndoableOperationType = 'create' | 'update' | 'delete';
+
+/**
+ * Record of an undoable operation
+ */
+export interface UndoableOperation<T = any> {
+  /** Type of operation */
+  type: UndoableOperationType;
+  /** ID of the affected entity */
+  entityId: number;
+  /** Entity data before the operation (for update/delete) */
+  previousData?: T;
+  /** Entity data after the operation (for create/update) */
+  newData?: T;
+  /** Timestamp of the operation */
+  timestamp: number;
+}
+
+/**
+ * Configuration for undo/redo functionality
+ */
+export interface UndoRedoConfig {
+  /** Enable undo/redo (default: false) */
+  enabled?: boolean;
+  /** Maximum history size (default: 50) */
+  historyLimit?: number;
+}
+
+/**
+ * Types of operations tracked in audit trail
+ */
+export type AuditOperationType = 'create' | 'update' | 'delete';
+
+/**
+ * A single entry in the audit trail / change history
+ */
+export interface AuditTrailEntry<T = any> {
+  /** Unique ID for this audit entry */
+  id: string;
+  /** Type of operation performed */
+  operationType: AuditOperationType;
+  /** ID of the affected entity */
+  entityId: number;
+  /** Name of the entity at the time of the operation */
+  entityName: string;
+  /** Entity data before the operation (null for create) */
+  previousData: T | null;
+  /** Entity data after the operation (null for delete) */
+  newData: T | null;
+  /** ISO timestamp when the operation occurred */
+  timestamp: string;
+  /** Human-readable description of the change */
+  description: string;
+  /** List of fields that were changed (for updates) */
+  changedFields?: string[];
+}
+
+/**
+ * Configuration for audit trail / change history functionality
+ */
+export interface AuditTrailConfig {
+  /** Enable audit trail (default: false) */
+  enabled?: boolean;
+  /** Maximum number of entries to keep in history (default: 100) */
+  maxEntries?: number;
+  /** Whether to persist audit trail to localStorage (default: false) */
+  persistToStorage?: boolean;
+  /** Storage key for localStorage persistence */
+  storageKey?: string;
+  /** Fields to exclude from change tracking (e.g., sensitive data) */
+  excludeFields?: string[];
 }

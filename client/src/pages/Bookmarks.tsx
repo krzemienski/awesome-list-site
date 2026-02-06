@@ -1,9 +1,13 @@
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Bookmark, BookmarkX } from "lucide-react";
 import ResourceCard from "@/components/resource/ResourceCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import SEOHead from "@/components/layout/SEOHead";
 import { Card, CardContent } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
 
 interface BookmarkedResource {
   id: string;
@@ -13,9 +17,12 @@ interface BookmarkedResource {
   category?: string;
   tags?: string[];
   notes?: string;
+  createdAt?: string;
 }
 
 export default function Bookmarks() {
+  const [sortBy, setSortBy] = useState("date-desc");
+
   const { data: bookmarks, isLoading, error } = useQuery<BookmarkedResource[]>({
     queryKey: ['/api/bookmarks'],
     staleTime: 30000,
@@ -44,7 +51,7 @@ export default function Bookmarks() {
   if (error) {
     return (
       <div className="space-y-6">
-        <SEOHead 
+        <SEOHead
           title="My Bookmarks - Error"
           description="View your saved bookmarks"
         />
@@ -59,7 +66,40 @@ export default function Bookmarks() {
     );
   }
 
-  const hasBookmarks = bookmarks && bookmarks.length > 0;
+  // Sort bookmarks
+  const sortedBookmarks = useMemo(() => {
+    if (!bookmarks) return [];
+
+    const results = [...bookmarks];
+
+    if (sortBy === "name-asc") {
+      results.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sortBy === "name-desc") {
+      results.sort((a, b) => b.name.localeCompare(a.name));
+    } else if (sortBy === "category") {
+      results.sort((a, b) => {
+        const catA = a.category || "";
+        const catB = b.category || "";
+        return catA.localeCompare(catB);
+      });
+    } else if (sortBy === "date-desc") {
+      results.sort((a, b) => {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return dateB - dateA; // Newest first
+      });
+    } else if (sortBy === "date-asc") {
+      results.sort((a, b) => {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return dateA - dateB; // Oldest first
+      });
+    }
+
+    return results;
+  }, [bookmarks, sortBy]);
+
+  const hasBookmarks = sortedBookmarks && sortedBookmarks.length > 0;
 
   return (
     <div className="space-y-6">
@@ -76,16 +116,33 @@ export default function Bookmarks() {
           </h1>
         </div>
         <p className="text-muted-foreground">
-          {hasBookmarks 
-            ? `You have ${bookmarks.length} saved ${bookmarks.length === 1 ? 'resource' : 'resources'}`
+          {hasBookmarks
+            ? `You have ${sortedBookmarks.length} saved ${sortedBookmarks.length === 1 ? 'resource' : 'resources'}`
             : 'Start bookmarking resources to build your personal collection'
           }
         </p>
       </div>
 
+      {hasBookmarks && (
+        <div className="flex items-center gap-4">
+          <Select value={sortBy} onValueChange={setSortBy}>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Sort by..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="date-desc">Date: Newest First</SelectItem>
+              <SelectItem value="date-asc">Date: Oldest First</SelectItem>
+              <SelectItem value="name-asc">Name: A-Z</SelectItem>
+              <SelectItem value="name-desc">Name: Z-A</SelectItem>
+              <SelectItem value="category">Category</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
       {hasBookmarks ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {bookmarks.map((resource) => (
+          {sortedBookmarks.map((resource) => (
             <ResourceCard
               key={resource.id}
               resource={{
@@ -108,13 +165,15 @@ export default function Bookmarks() {
               Start exploring resources and bookmark the ones you want to save for later. 
               Click the bookmark icon on any resource card to add it to your collection.
             </p>
-            <a 
-              href="/"
-              className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-pink-500 text-white hover:bg-pink-600 h-10 px-6 py-2"
+            <Button
+              className="bg-pink-500 text-white hover:bg-pink-600"
               data-testid="link-explore-resources"
+              asChild
             >
-              Explore Resources
-            </a>
+              <Link href="/">
+                Explore Resources
+              </Link>
+            </Button>
           </CardContent>
         </Card>
       )}

@@ -1,0 +1,330 @@
+#!/usr/bin/env node
+/**
+ * OpenAPI YAML Export Script
+ *
+ * This script exports the OpenAPI specification to a static YAML file
+ * for documentation purposes.
+ */
+
+import { writeFileSync, mkdirSync, existsSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+import { dump } from 'js-yaml';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const rootDir = join(__dirname, '..');
+
+// OpenAPI specification (imported from server/openapi.ts logic)
+const swaggerSpec = {
+  openapi: '3.0.0',
+  info: {
+    title: 'Awesome List Site - Public API',
+    version: '1.0.0',
+    description: `# Public API Documentation
+
+Programmatic access to curated video resources, categories, and tags.
+
+## Features
+- **RESTful API** with JSON responses
+- **API Key Authentication** for access control
+- **Rate Limiting** to prevent abuse (60 req/hour free tier)
+- **Pagination** for large datasets
+- **Search & Filtering** for precise queries
+
+## Getting Started
+
+1. **Get an API Key**: Log in and visit the admin panel to create an API key
+2. **Make Requests**: Include your API key in the \`Authorization: Bearer <key>\` header
+3. **Handle Rate Limits**: Respect rate limit headers and implement retry logic
+
+## Rate Limits
+
+| Tier | Requests/Hour | Scopes |
+|------|---------------|--------|
+| Free | 60 | Default for all API keys |
+| Standard | 1000 | Requires upgrade |
+| Premium | 10000 | Contact us |
+
+Rate limit information is included in response headers:
+- \`RateLimit-Limit\`: Maximum requests per window
+- \`RateLimit-Remaining\`: Remaining requests in current window
+- \`RateLimit-Reset\`: Time when the rate limit resets (Unix timestamp)
+
+## Examples
+
+### JavaScript (fetch)
+\`\`\`javascript
+const response = await fetch('https://api.example.com/api/public/resources', {
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY'
+  }
+});
+const data = await response.json();
+\`\`\`
+
+### Python (requests)
+\`\`\`python
+import requests
+
+headers = {'Authorization': 'Bearer YOUR_API_KEY'}
+response = requests.get('https://api.example.com/api/public/resources', headers=headers)
+data = response.json()
+\`\`\`
+
+### cURL
+\`\`\`bash
+curl -H "Authorization: Bearer YOUR_API_KEY" \\
+  https://api.example.com/api/public/resources
+\`\`\`
+    `,
+    contact: {
+      name: 'API Support',
+      email: 'api@example.com',
+    },
+    license: {
+      name: 'MIT',
+      url: 'https://opensource.org/licenses/MIT',
+    },
+  },
+  servers: [
+    {
+      url: 'http://localhost:5000',
+      description: 'Development server',
+    },
+    {
+      url: 'https://api.example.com',
+      description: 'Production server',
+    },
+  ],
+  components: {
+    securitySchemes: {
+      BearerAuth: {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'API Key',
+        description: 'API key authentication. Include your API key in the Authorization header as: `Bearer YOUR_API_KEY`',
+      },
+    },
+    schemas: {
+      Resource: {
+        type: 'object',
+        description: 'A curated video resource with metadata and categorization',
+        properties: {
+          id: { type: 'integer', description: 'Unique resource identifier', example: 42 },
+          title: { type: 'string', description: 'Resource title', example: 'Introduction to React Hooks' },
+          url: { type: 'string', format: 'uri', description: 'Resource URL (typically a video link)', example: 'https://www.youtube.com/watch?v=example' },
+          description: { type: 'string', description: 'Resource description or summary', example: 'A comprehensive guide to React Hooks covering useState, useEffect, and custom hooks.' },
+          category: { type: 'string', description: 'Top-level category', example: 'Frameworks' },
+          subcategory: { type: 'string', nullable: true, description: 'Second-level category', example: 'React' },
+          subSubcategory: { type: 'string', nullable: true, description: 'Third-level category', example: 'Hooks' },
+          status: { type: 'string', enum: ['pending', 'approved', 'rejected', 'archived'], description: 'Approval status (public API only returns approved resources)', example: 'approved' },
+          submittedBy: { type: 'string', nullable: true, description: 'User ID who submitted the resource', example: 'user-uuid-123' },
+          approvedBy: { type: 'string', nullable: true, description: 'User ID who approved the resource', example: 'admin-uuid-456' },
+          approvedAt: { type: 'string', format: 'date-time', nullable: true, description: 'Timestamp when resource was approved', example: '2024-01-15T10:30:00Z' },
+          githubSynced: { type: 'boolean', description: 'Whether resource has been synced to GitHub', example: true },
+          lastSyncedAt: { type: 'string', format: 'date-time', nullable: true, description: 'Last GitHub sync timestamp', example: '2024-01-15T12:00:00Z' },
+          metadata: { type: 'object', description: 'Flexible metadata (AI enrichment, tags, etc.)', additionalProperties: true, example: { tags: ['react', 'hooks', 'frontend'], difficulty: 'intermediate' } },
+          createdAt: { type: 'string', format: 'date-time', description: 'Resource creation timestamp', example: '2024-01-10T08:00:00Z' },
+          updatedAt: { type: 'string', format: 'date-time', description: 'Last modification timestamp', example: '2024-01-15T10:30:00Z' },
+        },
+        required: ['id', 'title', 'url', 'description', 'category', 'status'],
+      },
+      Category: {
+        type: 'object',
+        description: 'A top-level category for organizing resources',
+        properties: {
+          id: { type: 'integer', description: 'Unique category identifier', example: 1 },
+          name: { type: 'string', description: 'Category display name', example: 'Frameworks' },
+          slug: { type: 'string', description: 'URL-friendly identifier', example: 'frameworks' },
+        },
+        required: ['id', 'name', 'slug'],
+      },
+      Subcategory: {
+        type: 'object',
+        description: 'A second-level category within a parent category',
+        properties: {
+          id: { type: 'integer', description: 'Unique subcategory identifier', example: 10 },
+          name: { type: 'string', description: 'Subcategory display name', example: 'React' },
+          slug: { type: 'string', description: 'URL-friendly identifier', example: 'react' },
+          categoryId: { type: 'integer', nullable: true, description: 'Parent category ID', example: 1 },
+        },
+        required: ['id', 'name', 'slug'],
+      },
+      Tag: {
+        type: 'object',
+        description: 'A tag for categorizing and searching resources',
+        properties: {
+          id: { type: 'integer', description: 'Unique tag identifier', example: 5 },
+          name: { type: 'string', description: 'Tag display name', example: 'react' },
+          slug: { type: 'string', description: 'URL-friendly identifier', example: 'react' },
+          createdAt: { type: 'string', format: 'date-time', description: 'Tag creation timestamp', example: '2024-01-01T00:00:00Z' },
+        },
+        required: ['id', 'name', 'slug'],
+      },
+      ApiKey: {
+        type: 'object',
+        description: 'API key for authentication (admin only)',
+        properties: {
+          id: { type: 'string', format: 'uuid', description: 'Unique API key identifier', example: 'api-key-uuid-789' },
+          userId: { type: 'string', format: 'uuid', description: 'Owner user ID', example: 'user-uuid-123' },
+          name: { type: 'string', description: 'User-provided label for the key', example: 'My IDE Extension' },
+          scopes: { type: 'array', items: { type: 'string' }, description: 'Permission scopes', example: ['read:resources', 'read:tags'] },
+          createdAt: { type: 'string', format: 'date-time', description: 'Creation timestamp', example: '2024-01-10T08:00:00Z' },
+          lastUsedAt: { type: 'string', format: 'date-time', nullable: true, description: 'Last usage timestamp', example: '2024-01-15T10:30:00Z' },
+          expiresAt: { type: 'string', format: 'date-time', nullable: true, description: 'Expiration timestamp (null if non-expiring)', example: null },
+          revokedAt: { type: 'string', format: 'date-time', nullable: true, description: 'Revocation timestamp (null if active)', example: null },
+        },
+        required: ['id', 'userId', 'name', 'scopes', 'createdAt'],
+      },
+      PaginatedResourcesResponse: {
+        type: 'object',
+        description: 'Paginated list of resources',
+        properties: {
+          resources: { type: 'array', items: { $ref: '#/components/schemas/Resource' }, description: 'Array of resources for current page' },
+          total: { type: 'integer', description: 'Total number of matching resources', example: 150 },
+          page: { type: 'integer', description: 'Current page number', example: 1 },
+          limit: { type: 'integer', description: 'Items per page', example: 20 },
+          totalPages: { type: 'integer', description: 'Total number of pages', example: 8 },
+        },
+        required: ['resources', 'total', 'page', 'limit', 'totalPages'],
+      },
+      CategoriesResponse: {
+        type: 'object',
+        description: 'List of categories',
+        properties: {
+          categories: { type: 'array', items: { $ref: '#/components/schemas/Category' }, description: 'Array of all categories' },
+        },
+        required: ['categories'],
+      },
+      TagsResponse: {
+        type: 'object',
+        description: 'List of tags',
+        properties: {
+          tags: { type: 'array', items: { $ref: '#/components/schemas/Tag' }, description: 'Array of all tags' },
+        },
+        required: ['tags'],
+      },
+      Error: {
+        type: 'object',
+        description: 'Error response',
+        properties: {
+          message: { type: 'string', description: 'Error message', example: 'Resource not found' },
+        },
+        required: ['message'],
+      },
+    },
+  },
+  paths: {
+    '/api/public/resources': {
+      get: {
+        summary: 'List approved resources',
+        description: 'Retrieve a paginated list of approved resources with optional filtering and search',
+        tags: ['Resources'],
+        security: [{ BearerAuth: [] }, {}],
+        parameters: [
+          { name: 'page', in: 'query', description: 'Page number (starts at 1)', required: false, schema: { type: 'integer', minimum: 1, default: 1 }, example: 1 },
+          { name: 'limit', in: 'query', description: 'Items per page (max 100)', required: false, schema: { type: 'integer', minimum: 1, maximum: 100, default: 20 }, example: 20 },
+          { name: 'category', in: 'query', description: 'Filter by category name', required: false, schema: { type: 'string' }, example: 'Frameworks' },
+          { name: 'subcategory', in: 'query', description: 'Filter by subcategory name', required: false, schema: { type: 'string' }, example: 'React' },
+          { name: 'search', in: 'query', description: 'Search query for title/description', required: false, schema: { type: 'string' }, example: 'hooks' },
+        ],
+        responses: {
+          '200': {
+            description: 'Successful response',
+            headers: {
+              'RateLimit-Limit': { description: 'Maximum requests per hour', schema: { type: 'integer', example: 60 } },
+              'RateLimit-Remaining': { description: 'Remaining requests in current window', schema: { type: 'integer', example: 59 } },
+              'RateLimit-Reset': { description: 'Time when rate limit resets (Unix timestamp)', schema: { type: 'integer', example: 1705328400 } },
+            },
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/PaginatedResourcesResponse' } } },
+          },
+          '400': { description: 'Bad request (invalid parameters)', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+          '429': { description: 'Too many requests (rate limit exceeded)', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' }, example: { message: 'Too many requests, please try again later.' } } } },
+          '500': { description: 'Internal server error', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+    },
+    '/api/public/resources/{id}': {
+      get: {
+        summary: 'Get resource by ID',
+        description: 'Retrieve a single approved resource by its ID',
+        tags: ['Resources'],
+        security: [{ BearerAuth: [] }, {}],
+        parameters: [{ name: 'id', in: 'path', description: 'Resource ID', required: true, schema: { type: 'integer' }, example: 42 }],
+        responses: {
+          '200': { description: 'Successful response', content: { 'application/json': { schema: { $ref: '#/components/schemas/Resource' } } } },
+          '400': { description: 'Invalid resource ID', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' }, example: { message: 'Invalid resource ID' } } } },
+          '404': { description: 'Resource not found or not approved', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' }, example: { message: 'Resource not found' } } } },
+          '429': { description: 'Too many requests (rate limit exceeded)', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+          '500': { description: 'Internal server error', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+    },
+    '/api/public/categories': {
+      get: {
+        summary: 'List all categories',
+        description: 'Retrieve all categories with their hierarchy',
+        tags: ['Categories'],
+        security: [{ BearerAuth: [] }, {}],
+        responses: {
+          '200': { description: 'Successful response', content: { 'application/json': { schema: { $ref: '#/components/schemas/CategoriesResponse' } } } },
+          '429': { description: 'Too many requests (rate limit exceeded)', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+          '500': { description: 'Internal server error', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+    },
+    '/api/public/tags': {
+      get: {
+        summary: 'List all tags',
+        description: 'Retrieve all tags with usage counts',
+        tags: ['Tags'],
+        security: [{ BearerAuth: [] }, {}],
+        responses: {
+          '200': { description: 'Successful response', content: { 'application/json': { schema: { $ref: '#/components/schemas/TagsResponse' } } } },
+          '429': { description: 'Too many requests (rate limit exceeded)', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+          '500': { description: 'Internal server error', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+    },
+  },
+  tags: [
+    { name: 'Resources', description: 'Operations for accessing curated video resources' },
+    { name: 'Categories', description: 'Operations for accessing resource categories' },
+    { name: 'Tags', description: 'Operations for accessing resource tags' },
+  ],
+};
+
+async function exportOpenApiYaml() {
+  console.log('🚀 Starting OpenAPI YAML export...');
+
+  try {
+    // Create docs/api directory if it doesn't exist
+    const apiDocsDir = join(rootDir, 'docs', 'api');
+    if (!existsSync(apiDocsDir)) {
+      mkdirSync(apiDocsDir, { recursive: true });
+      console.log(`📁 Created directory: ${apiDocsDir}`);
+    }
+
+    // Convert OpenAPI spec to YAML
+    console.log('🔄 Converting OpenAPI spec to YAML...');
+    const yamlContent = dump(swaggerSpec, {
+      indent: 2,
+      lineWidth: 120,
+      noRefs: true,
+    });
+
+    // Write YAML file
+    const yamlPath = join(apiDocsDir, 'openapi.yaml');
+    writeFileSync(yamlPath, yamlContent, 'utf-8');
+    console.log(`📄 OpenAPI spec written to: ${yamlPath}`);
+
+    console.log('✨ OpenAPI YAML export completed successfully!');
+
+  } catch (error) {
+    console.error('❌ Error during OpenAPI YAML export:', error);
+    process.exit(1);
+  }
+}
+
+exportOpenApiYaml();

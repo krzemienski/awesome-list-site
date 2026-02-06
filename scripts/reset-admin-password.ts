@@ -32,8 +32,9 @@ async function resetAdminPassword() {
     }
     
     process.exit(0);
-  } catch (error: any) {
-    console.error(`❌ Failed to reset admin password: ${error.message}`);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error(`❌ Failed to reset admin password: ${errorMessage}`);
     process.exit(1);
   }
 }

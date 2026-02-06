@@ -11,14 +11,14 @@
       "Edit(./**)",
       "Glob(./**)",
       "Grep(./**)",
-      "Read(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/073-split-storage-ts-into-domain-based-repository-modu/**)",
-      "Write(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/073-split-storage-ts-into-domain-based-repository-modu/**)",
-      "Edit(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/073-split-storage-ts-into-domain-based-repository-modu/**)",
-      "Glob(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/073-split-storage-ts-into-domain-based-repository-modu/**)",
-      "Grep(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/073-split-storage-ts-into-domain-based-repository-modu/**)",
-      "Read(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/073-split-storage-ts-into-domain-based-repository-modu/.auto-claude/specs/073-split-storage-ts-into-domain-based-repository-modu/**)",
-      "Write(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/073-split-storage-ts-into-domain-based-repository-modu/.auto-claude/specs/073-split-storage-ts-into-domain-based-repository-modu/**)",
-      "Edit(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/073-split-storage-ts-into-domain-based-repository-modu/.auto-claude/specs/073-split-storage-ts-into-domain-based-repository-modu/**)",
+      "Read(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/023-add-eslint-and-prettier-configuration-for-consiste/**)",
+      "Write(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/023-add-eslint-and-prettier-configuration-for-consiste/**)",
+      "Edit(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/023-add-eslint-and-prettier-configuration-for-consiste/**)",
+      "Glob(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/023-add-eslint-and-prettier-configuration-for-consiste/**)",
+      "Grep(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/023-add-eslint-and-prettier-configuration-for-consiste/**)",
+      "Read(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/023-add-eslint-and-prettier-configuration-for-consiste/.auto-claude/specs/023-add-eslint-and-prettier-configuration-for-consiste/**)",
+      "Write(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/023-add-eslint-and-prettier-configuration-for-consiste/.auto-claude/specs/023-add-eslint-and-prettier-configuration-for-consiste/**)",
+      "Edit(/Users/nick/Desktop/awesome-list-site/.auto-claude/worktrees/tasks/023-add-eslint-and-prettier-configuration-for-consiste/.auto-claude/specs/023-add-eslint-and-prettier-configuration-for-consiste/**)",
       "Read(/Users/nick/Desktop/awesome-list-site/.auto-claude/**)",
       "Write(/Users/nick/Desktop/awesome-list-site/.auto-claude/**)",
       "Edit(/Users/nick/Desktop/awesome-list-site/.auto-claude/**)",
@@ -28,7 +28,12 @@
       "WebFetch(*)",
       "WebSearch(*)",
       "mcp__context7__resolve-library-id(*)",
-      "mcp__context7__get-library-docs(*)"
+      "mcp__context7__get-library-docs(*)",
+      "mcp__graphiti-memory__search_nodes(*)",
+      "mcp__graphiti-memory__search_facts(*)",
+      "mcp__graphiti-memory__add_episode(*)",
+      "mcp__graphiti-memory__get_episodes(*)",
+      "mcp__graphiti-memory__get_entity_edge(*)"
     ]
   }
 }

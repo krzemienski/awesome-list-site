@@ -95,6 +95,7 @@ npm run start
 | [ENVIRONMENT_VARIABLES.md](docs/ENVIRONMENT_VARIABLES.md) | Environment variables reference |
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md) | System architecture and design |
 | [API.md](docs/API.md) | Complete API reference |
+| [API Documentation](/api/docs) | Interactive OpenAPI documentation |
 | [ADMIN-GUIDE.md](docs/ADMIN-GUIDE.md) | Administrator documentation |
 | [CODE-MAP.md](docs/CODE-MAP.md) | Codebase navigation guide |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines |

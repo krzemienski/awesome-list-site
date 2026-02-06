@@ -3232,43 +3232,71 @@ router.get('/api/admin/ai-errors', requireAdmin, (req, res) => {
 
 Use this checklist when AI services malfunction:
 
-- [ ] **API Key**: Verify environment variable is set correctly
+- [x] **API Key**: Verify environment variable is set correctly ✓ *Verified: Command correctly checks the primary env var. Service also falls back to `ANTHROPIC_API_KEY` if primary is not set (see `claudeService.ts:120`).*
   ```bash
   echo $AI_INTEGRATIONS_ANTHROPIC_API_KEY
   ```
 
-- [ ] **Connectivity**: Test API connection
+- [x] **Connectivity**: Test API connection ✓ *Verified: `testConnection()` method exists at `claudeService.ts:311`. It validates API availability and sends a test prompt to confirm the connection works.*
   ```typescript
   const connected = await claudeService.testConnection();
   console.log('Connected:', connected);
   ```
 
-- [ ] **Rate Limits**: Check if hitting Anthropic rate limits
+- [x] **Rate Limits**: Check if hitting Anthropic rate limits ✓ *Verified: Comprehensive rate limiting implemented at multiple layers:*
+  - *Claude API layer (`claudeService.ts:101`): `RATE_LIMIT_DELAY = 1000ms` enforces 1-second minimum between requests via `applyRateLimit()` method*
+  - *429 error handling (`claudeService.ts:201-202`): Logs rate limit events with "Rate limited by Claude API, backing off..." message*
+  - *Server API layer (`middleware/rateLimit.ts`): Tiered limits (Free: 60/hr, Standard: 1000/hr, Premium: 10000/hr) with proper 429 responses and Retry-After headers*
   - Review error logs for 429 status codes
   - Check Anthropic console for usage stats
   - Reduce concurrent requests
 
-- [ ] **Cache State**: Verify cache is functioning
+- [x] **Cache State**: Verify cache is functioning ✓ *Verified: Multi-layer caching implemented:*
+  - *Response cache (`claudeService.ts:94`): `Map<string, CacheEntry>` with 1-hour TTL (`CACHE_TTL = 60 * 60 * 1000`)*
+  - *Analysis cache (`claudeService.ts:95`): `Map<string, AnalysisCache>` with 24-hour TTL for URL analysis results*
+  - *LRU eviction (`claudeService.ts:270-276`): Removes oldest entries when cache exceeds `MAX_CACHE_SIZE = 100`*
+  - *`getStats()` method (`claudeService.ts:294-306`): Returns `{ available, requestCount, cacheSize, cacheHitRate }`*
+  - *`clearCache()` method (`claudeService.ts:287-289`): Clears response cache on demand*
   ```typescript
   const stats = claudeService.getStats();
   console.log('Cache size:', stats.cacheSize);
   ```
 
-- [ ] **Domain Allowlist**: Ensure URL domain is allowed
+- [x] **Domain Allowlist**: Ensure URL domain is allowed
   ```typescript
   // Check ALLOWED_DOMAINS in claudeService.ts
   ```
+  - *Verified 2026-02-02: ALLOWED_DOMAINS (`claudeService.ts:51-79`) contains 27 trusted domains:*
+    - *Video platforms: youtube.com, youtu.be, vimeo.com, twitch.tv, dailymotion.com*
+    - *CDN providers: cloudflare.com, akamai.com, fastly.com, cdn.jsdelivr.net, unpkg.com*
+    - *Video tech: bitmovin.com, wowza.com, mux.com, jwplayer.com, videojs.com, encoding.com, zencoder.com*
+    - *Developer resources: github.com, npmjs.com, stackoverflow.com, medium.com, dev.to*
+    - *Documentation: developer.mozilla.org, docs.microsoft.com, w3.org, ietf.org, whatwg.org*
+  - *Domain validation (`claudeService.ts:416-428`) checks exact match, www. prefix, and subdomains*
+  - *SSRF protection: Only HTTPS URLs from allowlisted domains can be analyzed*
 
-- [ ] **Error Logs**: Review recent errors
+- [x] **Error Logs**: Review recent errors
   ```typescript
   const errors = aiErrorLogger.getRecent(10);
   console.log('Recent errors:', errors);
   ```
+  - *Verified 2026-02-02: Error logging uses console.error throughout claudeService.ts:*
+    - *Initialization errors (`claudeService.ts:131`): `console.error('Failed to initialize Claude service:', error)`*
+    - *API errors (`claudeService.ts:198`): `console.error('Claude API error:', error.message || error)`*
+    - *Connection test failures (`claudeService.ts:322`): `console.error('Claude connection test failed:', error)`*
+    - *URL analysis errors (`claudeService.ts:570`): `console.error('Error analyzing URL:', error)`*
+  - *Error codes handled: 429 (rate limit), 401 (invalid API key - disables service)*
+  - *Centralized error middleware (`errorHandler.ts:64-80`) logs all HTTP errors with severity-based detail levels*
+  - *Note: `aiErrorLogger.getRecent()` is a documentation example - actual implementation uses console.error with structured error messages*
 
-- [ ] **Service Availability**: Check initialization
+- [x] **Service Availability**: Check initialization
   ```typescript
   console.log('Available:', claudeService.isAvailable());
   ```
+  - *Verified 2026-02-02: `isAvailable()` method implemented at `claudeService.ts:142`*
+  - *Returns `this.anthropic !== null` - true if Anthropic client initialized successfully*
+  - *Used as guard before all API operations: `generateResponse()`, `testConnection()`, `analyzeUrl()`, and `getStats()`*
+  - *Service becomes unavailable if: API key missing/invalid, or initialization throws an error*
 
 ---
 

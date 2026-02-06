@@ -3,10 +3,18 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes, runBackgroundInitialization } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { handleSSR } from "./ssr";
+import { errorHandler } from "./middleware/errorHandler";
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import pkg from 'pg';
+import { initializeLinkHealthScheduler } from "./jobs/linkHealthScheduler";
+import * as fs from 'fs';
+import * as path from 'path';
+import { fileURLToPath } from 'url';
+
 const { Pool } = pkg;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(express.json());
@@ -48,24 +56,76 @@ async function runMigrations() {
     throw new Error('DATABASE_URL is required');
   }
 
+  // Check multiple possible migration folder locations
+  const possiblePaths = [
+    './migrations',
+    path.join(__dirname, 'migrations'),
+    path.join(__dirname, '..', 'migrations'),
+    path.join(process.cwd(), 'migrations'),
+  ];
+
+  let migrationsFolder: string | null = null;
+  for (const p of possiblePaths) {
+    const journalPath = path.join(p, 'meta', '_journal.json');
+    if (fs.existsSync(journalPath)) {
+      migrationsFolder = p;
+      console.log(`Found migrations at: ${p}`);
+      break;
+    }
+  }
+
   const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    max: 1, // Single connection for migration
-    connectionTimeoutMillis: 15000, // Longer timeout for Neon cold starts
+    max: 1,
+    connectionTimeoutMillis: 15000,
   });
 
   pool.on('error', (err) => {
     console.error('Database pool error during migration:', err.message);
   });
 
+  // If no migrations folder found, verify database is already set up
+  if (!migrationsFolder) {
+    console.log('⚠️ No migrations folder found, checking if database is already configured...');
+    try {
+      const client = await pool.connect();
+      const result = await client.query(`
+        SELECT EXISTS (
+          SELECT FROM information_schema.tables 
+          WHERE table_schema = 'public' 
+          AND table_name = 'resources'
+        ) as exists
+      `);
+      client.release();
+      await pool.end();
+      
+      if (result.rows[0]?.exists) {
+        console.log('✓ Database schema already exists (configured via db:push)');
+        return;
+      } else {
+        throw new Error('Migrations folder not found and database schema is missing. Please run db:push or ensure migrations are included in build.');
+      }
+    } catch (error: any) {
+      await pool.end();
+      throw error;
+    }
+  }
+
   try {
     const db = drizzle(pool);
     console.log('Running database migrations...');
-    await migrate(db, { migrationsFolder: './migrations' });
+    await migrate(db, { migrationsFolder });
     console.log('✓ Migrations completed successfully');
     await pool.end();
-  } catch (error) {
+  } catch (error: any) {
     await pool.end();
+    // Handle case where relation/table already exists (PostgreSQL error code 42P07)
+    const isAlreadyExistsError = error?.code === '42P07' || 
+      (error?.message?.includes('already exists') && error?.message?.includes('relation'));
+    if (isAlreadyExistsError) {
+      console.log('✓ Database schema already up to date');
+      return;
+    }
     console.error('Migration failed:', error);
     throw error;
   }
@@ -86,13 +146,8 @@ async function runMigrations() {
 
   const server = await registerRoutes(app);
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-
-    res.status(status).json({ message });
-    throw err;
-  });
+  // Centralized error handling middleware
+  app.use(errorHandler);
 
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
@@ -128,6 +183,9 @@ async function runMigrations() {
     runBackgroundInitialization().catch((error) => {
       console.error('❌ Background initialization error (non-fatal):', error);
     });
+
+    // Initialize link health monitoring cron job
+    initializeLinkHealthScheduler();
   }).on('error', (err) => {
     console.error(`❌ Server failed to start on port ${port}:`, err);
     process.exit(1);

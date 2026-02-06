@@ -1,9 +1,19 @@
 import { Octokit } from "@octokit/rest";
+import type { RequestError } from "@octokit/request-error";
 
 /**
  * GitHub client for interacting with repositories
  * Handles authentication, rate limiting, and common operations
  */
+
+// Octokit throttle options type
+interface ThrottleOptions {
+  method: string;
+  url: string;
+  request: {
+    retryCount: number;
+  };
+}
 
 interface RepoInfo {
   owner: string;
@@ -42,14 +52,14 @@ export class GitHubClient {
       auth: token,
       userAgent: 'awesome-list-sync v1.0.0',
       throttle: {
-        onRateLimit: (retryAfter: number, options: any) => {
+        onRateLimit: (retryAfter: number, options: ThrottleOptions) => {
           console.warn(`Request quota exhausted for request ${options.method} ${options.url}`);
           if (options.request.retryCount === 0) {
             console.log(`Retrying after ${retryAfter} seconds!`);
             return true;
           }
         },
-        onSecondaryRateLimit: (retryAfter: number, options: any) => {
+        onSecondaryRateLimit: (retryAfter: number, options: ThrottleOptions) => {
           console.warn(`Abuse detected for request ${options.method} ${options.url}`);
         },
       },
@@ -83,15 +93,15 @@ export class GitHubClient {
   /**
    * Get repository information
    */
-  async getRepository(repoUrl: string): Promise<any> {
+  async getRepository(repoUrl: string) {
     const { owner, repo } = this.parseRepoUrl(repoUrl);
-    
+
     try {
       const { data } = await this.octokit.repos.get({ owner, repo });
       await this.updateRateLimits();
       return data;
-    } catch (error: any) {
-      if (error.status === 404) {
+    } catch (error: unknown) {
+      if (error && typeof error === 'object' && 'status' in error && error.status === 404) {
         throw new Error(`Repository not found: ${repoUrl}`);
       }
       throw error;
@@ -127,7 +137,7 @@ export class GitHubClient {
         }
         
         throw new Error(`Failed to fetch file: ${response.status} ${response.statusText}`);
-      } catch (error: any) {
+      } catch (error: unknown) {
         if (branches.indexOf(branchName) === branches.length - 1) {
           // Last branch, throw error
           throw new Error(`File not found: ${path} in ${repoUrl} (tried branches: ${branches.join(', ')})`);
@@ -158,8 +168,8 @@ export class GitHubClient {
         return data.sha;
       }
       return null;
-    } catch (error: any) {
-      if (error.status === 404) {
+    } catch (error: unknown) {
+      if (error && typeof error === 'object' && 'status' in error && error.status === 404) {
         return null; // File doesn't exist
       }
       throw error;
@@ -200,8 +210,8 @@ export class GitHubClient {
         url: data.commit.html_url!,
         message: data.commit.message!
       };
-    } catch (error: any) {
-      if (error.status === 409) {
+    } catch (error: unknown) {
+      if (error && typeof error === 'object' && 'status' in error && error.status === 409) {
         throw new Error('Conflict: File has been modified. Please sync and try again.');
       }
       throw error;
@@ -290,7 +300,7 @@ export class GitHubClient {
         url: newCommit.html_url,
         message: commitMessage
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error committing files:', error);
       throw error;
     }
@@ -319,8 +329,8 @@ export class GitHubClient {
       });
 
       await this.updateRateLimits();
-    } catch (error: any) {
-      if (error.status === 422) {
+    } catch (error: unknown) {
+      if (error && typeof error === 'object' && 'status' in error && error.status === 422) {
         throw new Error(`Branch ${branchName} already exists`);
       }
       throw error;
@@ -355,8 +365,8 @@ export class GitHubClient {
         number: data.number,
         url: data.html_url
       };
-    } catch (error: any) {
-      if (error.status === 422) {
+    } catch (error: unknown) {
+      if (error && typeof error === 'object' && 'status' in error && error.status === 422) {
         throw new Error('Pull request already exists or invalid branches');
       }
       throw error;
@@ -379,8 +389,8 @@ export class GitHubClient {
 
       // Check if the authenticated user has push access
       return data.permissions?.push || false;
-    } catch (error: any) {
-      if (error.status === 404) {
+    } catch (error: unknown) {
+      if (error && typeof error === 'object' && 'status' in error && error.status === 404) {
         return false;
       }
       throw error;

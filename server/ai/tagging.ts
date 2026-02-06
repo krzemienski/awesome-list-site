@@ -55,7 +55,9 @@ Respond with JSON in this format:
       max_tokens: 300
     });
 
-    const result = JSON.parse((response.content[0] as any).text || '{}');
+    const firstContent = response.content[0];
+    const textContent = firstContent && 'text' in firstContent ? firstContent.text : '{}';
+    const result = JSON.parse(textContent);
     
     return {
       tags: result.tags || [],
@@ -64,9 +66,9 @@ Respond with JSON in this format:
       confidence: Math.max(0, Math.min(1, result.confidence || 0.5))
     };
 
-  } catch (error: any) {
-    console.warn('AI tagging failed:', error.message);
-    
+  } catch (error: unknown) {
+    console.warn('AI tagging failed:', error instanceof Error ? error.message : 'Unknown error');
+
     // Fallback to simple rule-based tagging
     return generateFallbackTags(title, description, url);
   }

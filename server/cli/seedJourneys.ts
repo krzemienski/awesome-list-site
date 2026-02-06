@@ -24,6 +24,14 @@ interface GeneratedJourney {
   steps: GeneratedStep[];
 }
 
+interface RelevantResource {
+  id: number;
+  title: string;
+  description: string;
+  category: string;
+  subcategory: string | null;
+}
+
 const journeyTemplates: JourneyTemplate[] = [
   {
     title: "Video Streaming Fundamentals",
@@ -62,7 +70,7 @@ const journeyTemplates: JourneyTemplate[] = [
   }
 ];
 
-async function getRelevantResources(keywords: string[], category: string, limit: number = 30): Promise<any[]> {
+async function getRelevantResources(keywords: string[], category: string, limit: number = 30): Promise<RelevantResource[]> {
   const { resources } = await storage.listResources({
     status: "approved",
     limit: limit * 3 // Get more to filter later
@@ -138,7 +146,7 @@ async function getRelevantResources(keywords: string[], category: string, limit:
 
 async function generateJourneyWithClaude(
   template: JourneyTemplate,
-  relevantResources: any[]
+  relevantResources: RelevantResource[]
 ): Promise<GeneratedJourney | null> {
   if (!claudeService.isAvailable()) {
     console.log("⚠️  Claude service not available, using fallback generation");
@@ -213,7 +221,7 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks):
 
     // Count total valid resource IDs across all steps
     const totalValidResourceIds = journeyData.steps.reduce(
-      (sum: number, step: any) => sum + (step.resourceIds?.length || 0),
+      (sum: number, step: GeneratedStep) => sum + (step.resourceIds?.length || 0),
       0
     );
 
@@ -235,7 +243,7 @@ Return ONLY valid JSON in this exact format (no markdown, no code blocks):
 
 function generateJourneyFallback(
   template: JourneyTemplate,
-  relevantResources: any[]
+  relevantResources: RelevantResource[]
 ): GeneratedJourney {
   console.log(`📝 Using fallback generation for: ${template.title}`);
   

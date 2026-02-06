@@ -9,6 +9,7 @@ import FavoriteButton from "./FavoriteButton";
 import BookmarkButton from "./BookmarkButton";
 import { SuggestEditDialog } from "@/components/ui/suggest-edit-dialog";
 import { cn } from "@/lib/utils";
+import { Blurhash } from "react-blurhash";
 import type { Resource } from "@shared/schema";
 
 interface ResourceCardProps {
@@ -38,6 +39,7 @@ function ResourceCard({
   const { isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
   const [suggestEditOpen, setSuggestEditOpen] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   const numericId = parseInt(resource.id);
   const isValidDbResource = !isNaN(numericId) && numericId > 0;
@@ -124,12 +126,28 @@ function ResourceCard({
         {fullResource?.metadata?.urlScraped && (
           <div className="mb-3 space-y-2">
             {fullResource.metadata.ogImage && (
-              <div className="rounded-md overflow-hidden border border-border">
-                <img 
-                  src={fullResource.metadata.ogImage} 
+              <div className="rounded-md overflow-hidden border border-border relative h-32">
+                {fullResource.metadata.ogImageBlurhash && !imageLoaded && (
+                  <div className="absolute inset-0">
+                    <Blurhash
+                      hash={fullResource.metadata.ogImageBlurhash}
+                      width="100%"
+                      height="100%"
+                      resolutionX={32}
+                      resolutionY={32}
+                      punch={1}
+                    />
+                  </div>
+                )}
+                <img
+                  src={fullResource.metadata.ogImage}
                   alt={fullResource.metadata.ogTitle || resource.name}
-                  className="w-full h-32 object-cover"
+                  className="w-full h-32 object-cover relative z-10"
                   loading="lazy"
+                  onLoad={() => setImageLoaded(true)}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
                 />
               </div>
             )}

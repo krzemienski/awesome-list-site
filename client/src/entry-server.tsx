@@ -8,7 +8,7 @@ import { processAwesomeListData } from "@/lib/parser";
 
 export interface SSRContext {
   url: string;
-  awesomeListData: any;
+  awesomeListData: unknown;
 }
 
 export function render(context: SSRContext) {

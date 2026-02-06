@@ -223,7 +223,7 @@ export default function SubmitResource() {
       // Scroll to top
       window.scrollTo({ top: 0, behavior: 'smooth' });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "Submission Failed",
         description: error.message || "Failed to submit resource. Please try again.",
@@ -537,7 +537,7 @@ export default function SubmitResource() {
                   >
                     {submitMutation.isPending ? (
                       <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                         Submitting...
                       </>
                     ) : (
