@@ -1,231 +1,33 @@
-/* Fix for content disappearing on scroll - optimized */
+/* Scroll behavior */
 html {
   scroll-behavior: smooth;
   overflow-x: hidden;
-  /* Optimize scroll performance */
-  scroll-padding-top: 80px;
 }
 
 body {
   overflow-x: hidden;
   min-height: 100vh;
-  /* Prevent overscroll bounce */
-  overscroll-behavior: none;
 }
 
-/* Prevent layout shifts during scroll */
 * {
   box-sizing: border-box;
 }
 
-/* Improve scroll performance with passive events */
-.scroll-container {
-  scroll-behavior: smooth;
-  /* Optimize for touch scrolling - iOS momentum scrolling */
-  -webkit-overflow-scrolling: touch;
-  /* Direct touch action for better performance */
-  touch-action: pan-y;
-  /* GPU acceleration - minimal usage */
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  /* Ensure scrollable */
-  overflow-y: auto;
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-/* Fix card content overflow and cutoff issues */
-.card-content-fix {
-  contain: layout style;
-  /* Minimal GPU usage - removed will-change */
-  transform: translateZ(0);
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-/* Ensure card layouts don't clip content */
-[data-radix-aspect-ratio-wrapper] {
-  contain: layout;
-  overflow: visible !important;
+::-webkit-scrollbar-thumb {
+  background: var(--muted-foreground);
+  border-radius: 3px;
 }
 
-/* Optimize card rendering performance */
-.card {
-  /* GPU acceleration */
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  /* Removed will-change for better performance */
-}
-
-/* Fix button and interactive element positioning */
-.flex-shrink-0 {
-  flex-shrink: 0 !important;
-}
-
-/* Prevent content cutoff in card grids */
-.grid {
-  overflow: visible;
-}
-
-.grid > * {
-  overflow: visible;
-}
-
-/* Remove problematic card overrides */
-
-/* Improve badge and content wrapping */
-.flex-wrap {
-  flex-wrap: wrap;
-  align-items: flex-start;
-}
-
-/* Ensure proper spacing in card layouts */
-.card-spacing-fix {
-  margin: 0.25rem;
-  padding: 0.25rem;
-}
-
-/* Intersection observer optimization for lazy loading */
-.lazy-load {
-  opacity: 0;
-  transition: opacity 0.3s ease-out;
-}
-
-.lazy-load-visible {
-  opacity: 1;
-}
-
-/* Ensure main content area is properly positioned */
-main {
-  position: relative;
-  z-index: 1;
-  background-color: inherit;
-  min-height: 100vh;
-}
-
-/* Fix for table visibility */
-table {
-  position: relative;
-  z-index: 1;
-  background-color: var(--card);
-}
-
-/* Ensure content containers are visible */
-.space-y-6,
-.space-y-4,
-.space-y-2 {
-  position: relative;
-  z-index: 1;
-}
-
-/* Fix sticky header positioning */
-header.sticky {
-  z-index: 50 !important;
-}
-
-/* Ensure sidebar doesn't overlap content */
-[data-sidebar] {
-  z-index: 40;
-}
-
-/* Content area should be above background */
-[data-sidebar-inset] {
-  position: relative;
-  z-index: 1;
-  background-color: var(--background);
-}
-
-/* Table rows and cells visibility */
-tr, td, th {
-  background-color: transparent;
-}
-
-tbody tr:hover {
-  background-color: var(--muted);
-}
-
-/* Remove overly broad color rule that breaks components */
-
-/* Fix for compact view items */
-.compact-item {
-  background-color: var(--card);
-  color: var(--card-foreground);
-}
-
-/* Content containment improvements */
-.contain-layout {
-  contain: layout;
-  /* Minimal hardware acceleration */
-  transform: translateZ(0);
-}
-
-/* Grid container improvements with GPU optimization */
-.grid {
-  contain: layout;
-  width: 100%;
-  /* Minimal GPU usage */
-  transform: translateZ(0);
-  backface-visibility: hidden;
-}
-
-/* Mobile-specific scroll optimizations */
-@media (max-width: 768px) {
-  /* Optimize mobile scrolling */
-  .scroll-container {
-    /* Enable momentum scrolling for scrollable containers */
-    -webkit-overflow-scrolling: touch;
-    /* Ensure proper touch handling */
-    touch-action: pan-y;
-  }
-  
-  .grid,
-  .card {
-    /* Remove will-change for better performance */
-    will-change: auto;
-  }
-  
-  /* Prevent scroll jank on mobile */
-  * {
-    -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
-  }
-  
-  /* Optimize touch scrolling */
-  .scroll-container {
-    touch-action: pan-y;
-  }
-}
-
-/* Ensure all cards maintain proper boundaries */
-.group {
-  contain: layout;
-}
-
-/* Text content overflow handling */
-.line-clamp-1 {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
-  word-break: break-word;
-}
-
-.line-clamp-2 {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  word-break: break-word;
-}
-
-.line-clamp-3 {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  word-break: break-word;
-}
-
-/* Badge text truncation */
-.badge-text {
-  max-width: 120px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
 }

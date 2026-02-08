@@ -87,7 +87,7 @@ function FavoriteButton({
       size={size}
       className={cn(
         "group relative",
-        isFavorited && "text-pink-500 hover:text-pink-600",
+        isFavorited && "text-primary hover:text-primary/90",
         className
       )}
       onClick={handleClick}
@@ -113,7 +113,7 @@ function FavoriteButton({
       
       {/* Ripple effect on click */}
       {favoriteMutation.isPending && (
-        <span className="absolute inset-0 animate-ping rounded-full bg-pink-500 opacity-20" />
+        <span className="absolute inset-0 animate-ping rounded-full bg-primary opacity-20" />
       )}
     </Button>
   );

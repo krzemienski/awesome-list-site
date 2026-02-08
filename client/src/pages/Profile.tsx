@@ -177,13 +177,13 @@ export default function Profile({ user }: ProfileProps) {
       label: "Favorites",
       value: favorites?.length || 0,
       icon: Heart,
-      color: "text-pink-500"
+      color: "text-primary"
     },
     {
       label: "Bookmarks",
       value: bookmarks?.length || 0,
       icon: Bookmark,
-      color: "text-cyan-500"
+      color: "text-primary"
     },
     {
       label: "Learning Streak",
@@ -211,9 +211,9 @@ export default function Profile({ user }: ProfileProps) {
     <div className="container mx-auto py-8 px-4 max-w-6xl">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-center gap-6 mb-8">
-        <Avatar className="h-24 w-24 border-2 border-pink-500">
+        <Avatar className="h-24 w-24 border-2 border-primary">
           <AvatarImage src={user.avatar} alt={user.name} />
-          <AvatarFallback className="text-xl bg-gradient-to-br from-pink-500 to-cyan-500 text-white">
+          <AvatarFallback className="text-xl bg-gradient-to-br from-primary to-primary/80 text-white">
             {getInitials(user.name)}
           </AvatarFallback>
         </Avatar>
@@ -311,7 +311,7 @@ export default function Profile({ user }: ProfileProps) {
                     </div>
                     <div className="h-2 bg-muted rounded-full overflow-hidden">
                       <div 
-                        className="h-full bg-gradient-to-r from-pink-500 to-cyan-500 transition-all"
+                        className="h-full bg-gradient-to-r from-primary to-primary/80 transition-all"
                         style={{
                           width: `${((progress?.completedResources || 0) / (progress?.totalResources || 1)) * 100}%`
                         }}
@@ -411,7 +411,7 @@ export default function Profile({ user }: ProfileProps) {
           <Card data-testid="card-recommendations">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-pink-500" />
+                <Sparkles className="h-5 w-5 text-primary" />
                 Recommended for You
               </CardTitle>
               <CardDescription>
@@ -455,7 +455,7 @@ export default function Profile({ user }: ProfileProps) {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Heart className="h-5 w-5 text-pink-500" />
+                <Heart className="h-5 w-5 text-primary" />
                 Your Favorites
               </CardTitle>
               <CardDescription>
@@ -527,7 +527,7 @@ export default function Profile({ user }: ProfileProps) {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Bookmark className="h-5 w-5 text-cyan-500" />
+                <Bookmark className="h-5 w-5 text-muted-foreground" />
                 Your Bookmarks
               </CardTitle>
               <CardDescription>
@@ -606,7 +606,7 @@ export default function Profile({ user }: ProfileProps) {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-pink-500" />
+                  <FileText className="h-5 w-5 text-primary" />
                   Submitted Resources
                 </CardTitle>
                 <CardDescription>
@@ -693,7 +693,7 @@ export default function Profile({ user }: ProfileProps) {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Edit className="h-5 w-5 text-cyan-500" />
+                  <Edit className="h-5 w-5 text-muted-foreground" />
                   Suggested Edits
                 </CardTitle>
                 <CardDescription>
@@ -755,10 +755,10 @@ export default function Profile({ user }: ProfileProps) {
                                       
                                       return (
                                         <div key={field} className="text-xs pl-2">
-                                          <span className="text-pink-500">{field}:</span>{' '}
+                                          <span className="text-primary">{field}:</span>{' '}
                                           <span className="line-through opacity-60">{oldValue}</span>
                                           {' → '}
-                                          <span className="text-cyan-500">{newValue}</span>
+                                          <span className="text-primary">{newValue}</span>
                                         </div>
                                       );
                                     }).filter(Boolean)}

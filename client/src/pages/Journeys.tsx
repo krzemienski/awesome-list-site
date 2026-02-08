@@ -100,7 +100,7 @@ export default function Journeys() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 flex items-center gap-3">
-          <BookOpen className="h-8 w-8 text-pink-500" />
+          <BookOpen className="h-8 w-8 text-primary" />
           Learning Journeys
         </h1>
         <p className="text-muted-foreground text-base md:text-lg">
@@ -167,8 +167,8 @@ export default function Journeys() {
               <Card 
                 key={journey.id}
                 className={cn(
-                  "overflow-hidden transition-all hover:border-pink-500/50 hover:shadow-lg hover:shadow-pink-500/10 flex flex-col",
-                  enrolled && "border-pink-500/30"
+                  "overflow-hidden transition-all hover:border-primary/50 hover:shadow-lg flex flex-col",
+                  enrolled && "border-primary/30"
                 )}
                 data-testid={`card-journey-${journey.id}`}
               >
@@ -215,13 +215,13 @@ export default function Journeys() {
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-muted-foreground">Progress</span>
-                          <span className="font-medium text-pink-500">
+                          <span className="font-medium text-primary">
                             {progressPercent}%
                           </span>
                         </div>
                         <div className="h-2 bg-muted rounded-full overflow-hidden">
                           <div 
-                            className="h-full bg-gradient-to-r from-pink-500 to-purple-500 transition-all duration-500"
+                            className="h-full bg-gradient-to-r from-primary to-primary/80 transition-all duration-500"
                             style={{ width: `${progressPercent}%` }}
                           />
                         </div>
@@ -237,7 +237,7 @@ export default function Journeys() {
                   <Button 
                     className={cn(
                       "w-full group",
-                      enrolled ? "bg-pink-500/20 hover:bg-pink-500/30 text-pink-500" : ""
+                      enrolled ? "bg-primary/20 hover:bg-primary/30 text-primary" : ""
                     )}
                     variant={enrolled ? "outline" : "default"}
                     onClick={() => setLocation(`/journey/${journey.id}`)}

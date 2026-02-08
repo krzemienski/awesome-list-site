@@ -248,7 +248,7 @@ export default function BatchEnrichmentPanel() {
             <Button
               onClick={handleStartEnrichment}
               disabled={hasActiveJob || startMutation.isPending}
-              className="bg-pink-500 hover:bg-pink-600"
+              className="bg-primary hover:bg-primary/90"
               data-testid="button-start-enrichment"
             >
               {startMutation.isPending ? (

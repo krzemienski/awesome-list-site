@@ -151,7 +151,7 @@ export default function AIRecommendationsPanel({ resources }: AIRecommendationsP
 
   const getConfidenceColor = (confidence: number) => {
     if (confidence >= 0.8) return "text-green-500";
-    if (confidence >= 0.6) return "text-cyan-500";
+    if (confidence >= 0.6) return "text-primary";
     return "text-primary";
   };
 

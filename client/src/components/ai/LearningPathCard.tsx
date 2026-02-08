@@ -66,7 +66,7 @@ function LearningPathCard({
   return (
     <Card 
       className={cn(
-        "overflow-hidden transition-all hover:border-cyan-500/50",
+        "overflow-hidden transition-all hover:border-primary/50",
         className
       )}
     >
@@ -109,7 +109,7 @@ function LearningPathCard({
             <Badge 
               variant="outline"
               className={cn(
-                "text-xs bg-gradient-to-r from-pink-500/10 to-cyan-500/10 border-pink-500/30",
+                "text-xs bg-gradient-to-r from-primary/10 to-primary/5 border-primary/30",
                 getMatchColor(learningPath.matchPercentage)
               )}
             >
@@ -127,7 +127,7 @@ function LearningPathCard({
               <ul className="space-y-1">
                 {learningPath.objectives.slice(0, 3).map((objective, index) => (
                   <li key={index} className="flex items-start gap-2 text-xs text-muted-foreground">
-                    <Target className="h-3 w-3 mt-0.5 flex-shrink-0 text-cyan-500" />
+                    <Target className="h-3 w-3 mt-0.5 flex-shrink-0 text-primary" />
                     <span className="line-clamp-1">{objective}</span>
                   </li>
                 ))}
@@ -140,7 +140,7 @@ function LearningPathCard({
             <Button 
               variant="default" 
               size="sm" 
-              className="flex-1 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white border-0"
+              className="flex-1 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 text-white border-0"
               onClick={onStart}
             >
               Start Learning
@@ -150,7 +150,7 @@ function LearningPathCard({
               <Button 
                 variant="outline" 
                 size="sm"
-                className="border-cyan-500/50 hover:bg-cyan-500/10 hover:border-cyan-500"
+                className="border-primary/50 hover:bg-primary/10 hover:border-primary"
                 onClick={onViewDetails}
               >
                 View Details

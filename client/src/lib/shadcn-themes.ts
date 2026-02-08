@@ -389,14 +389,38 @@ export const shadcnThemes: ShadcnTheme[] = [
   }
 ];
 
+function wrapHsl(value: string): string {
+  if (value.startsWith("hsl(") || value.startsWith("oklch(") || value.startsWith("rgb(")) {
+    return value;
+  }
+  return `hsl(${value})`;
+}
+
 export function applyTheme(theme: ShadcnTheme, mode: "light" | "dark") {
   const root = document.documentElement;
   const vars = theme.cssVars[mode];
-  
+
   Object.entries(vars).forEach(([key, value]) => {
-    root.style.setProperty(`--${key}`, value);
+    root.style.setProperty(`--${key}`, wrapHsl(value));
   });
-  
-  // Set data-theme attribute for compatibility
+
+  const bg = vars.background;
+  const fg = vars.foreground;
+  const primary = vars.primary;
+  const primaryFg = vars["primary-foreground"];
+  const accent = vars.accent;
+  const accentFg = vars["accent-foreground"];
+  const border = vars.border;
+
+  root.style.setProperty("--sidebar", wrapHsl(mode === "dark" ? bg : "0 0% 98%"));
+  root.style.setProperty("--sidebar-background", wrapHsl(mode === "dark" ? bg : "0 0% 98%"));
+  root.style.setProperty("--sidebar-foreground", wrapHsl(fg));
+  root.style.setProperty("--sidebar-primary", wrapHsl(primary));
+  root.style.setProperty("--sidebar-primary-foreground", wrapHsl(primaryFg));
+  root.style.setProperty("--sidebar-accent", wrapHsl(accent));
+  root.style.setProperty("--sidebar-accent-foreground", wrapHsl(accentFg));
+  root.style.setProperty("--sidebar-border", wrapHsl(border));
+  root.style.setProperty("--sidebar-ring", wrapHsl(primary));
+
   root.setAttribute("data-theme", theme.value);
 }

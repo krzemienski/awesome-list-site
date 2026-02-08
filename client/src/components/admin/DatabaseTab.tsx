@@ -78,7 +78,7 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
 
   return (
     <div className="space-y-4">
-      <Card className="border-cyan-500/20 bg-black">
+      <Card className="border-primary/20 bg-card">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Database className="h-5 w-5" />
@@ -89,7 +89,7 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Alert className="border-cyan-500/20 bg-cyan-500/5">
+          <Alert className="border-primary/20 bg-primary/5">
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Database Seeding</AlertTitle>
             <AlertDescription>
@@ -104,7 +104,7 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
               <Button
                 onClick={() => seedDatabaseMutation.mutate({ clearExisting: false })}
                 disabled={seedDatabaseMutation.isPending}
-                className="bg-cyan-500 hover:bg-cyan-600"
+                className="bg-primary hover:bg-primary/90"
                 data-testid="button-seed-database"
               >
                 {seedDatabaseMutation.isPending ? (
@@ -157,25 +157,25 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
                 <div className="mt-2 space-y-1 text-sm">
                   <div className="flex justify-between">
                     <span>Categories inserted:</span>
-                    <span className="font-mono font-semibold text-cyan-400">
+                    <span className="font-mono font-semibold text-primary">
                       {seedDatabaseMutation.data.counts.categoriesInserted}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span>Subcategories inserted:</span>
-                    <span className="font-mono font-semibold text-cyan-400">
+                    <span className="font-mono font-semibold text-primary">
                       {seedDatabaseMutation.data.counts.subcategoriesInserted}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span>Sub-subcategories inserted:</span>
-                    <span className="font-mono font-semibold text-cyan-400">
+                    <span className="font-mono font-semibold text-primary">
                       {seedDatabaseMutation.data.counts.subSubcategoriesInserted}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span>Resources inserted:</span>
-                    <span className="font-mono font-semibold text-pink-400">
+                    <span className="font-mono font-semibold text-primary">
                       {seedDatabaseMutation.data.counts.resourcesInserted}
                     </span>
                   </div>
@@ -197,19 +197,19 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               <div className="space-y-1">
                 <div className="text-xs text-gray-400">Resources</div>
-                <div className="text-xl font-mono font-bold text-pink-400">
+                <div className="text-xl font-mono font-bold text-primary">
                   {stats?.resources || 0}
                 </div>
               </div>
               <div className="space-y-1">
                 <div className="text-xs text-gray-400">Users</div>
-                <div className="text-xl font-mono font-bold text-pink-400">
+                <div className="text-xl font-mono font-bold text-primary">
                   {stats?.users || 0}
                 </div>
               </div>
               <div className="space-y-1">
                 <div className="text-xs text-gray-400">Journeys</div>
-                <div className="text-xl font-mono font-bold text-cyan-400">
+                <div className="text-xl font-mono font-bold text-primary">
                   {stats?.journeys || 0}
                 </div>
               </div>

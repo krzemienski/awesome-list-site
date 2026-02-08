@@ -110,7 +110,7 @@ export default function Bookmarks() {
       
       <div className="space-y-2">
         <div className="flex items-center gap-3">
-          <Bookmark className="h-8 w-8 text-pink-500" />
+          <Bookmark className="h-8 w-8 text-primary" />
           <h1 className="text-3xl font-bold tracking-tight">
             My Bookmarks
           </h1>
@@ -155,18 +155,18 @@ export default function Bookmarks() {
           ))}
         </div>
       ) : (
-        <Card className="border-2 border-dashed border-pink-500/30 bg-pink-500/5">
+        <Card className="border-2 border-dashed border-primary/30 bg-primary/5">
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="rounded-full bg-pink-500/10 p-6 mb-6">
-              <BookmarkX className="h-12 w-12 text-pink-500" />
+            <div className="rounded-full bg-primary/10 p-6 mb-6">
+              <BookmarkX className="h-12 w-12 text-primary" />
             </div>
-            <h2 className="text-2xl font-bold mb-3 text-pink-500">No Bookmarks Yet</h2>
+            <h2 className="text-2xl font-bold mb-3 text-primary">No Bookmarks Yet</h2>
             <p className="text-muted-foreground max-w-md mb-6">
               Start exploring resources and bookmark the ones you want to save for later. 
               Click the bookmark icon on any resource card to add it to your collection.
             </p>
             <Button
-              className="bg-pink-500 text-white hover:bg-pink-600"
+              className="bg-primary text-white hover:bg-primary/90"
               data-testid="link-explore-resources"
               asChild
             >

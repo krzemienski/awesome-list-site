@@ -259,7 +259,7 @@ export default function JourneyDetail() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <h3 className="text-sm font-semibold">Your Progress</h3>
-                  <span className="text-sm font-medium text-pink-500">
+                  <span className="text-sm font-medium text-primary">
                     {progressPercent}%
                   </span>
                 </div>
@@ -321,7 +321,7 @@ export default function JourneyDetail() {
                   className={cn(
                     "transition-all",
                     isStepCompleted && "border-green-500/30 bg-green-500/5",
-                    isCurrentStep && !isStepCompleted && "border-pink-500/50 shadow-lg shadow-pink-500/10"
+                    isCurrentStep && !isStepCompleted && "border-primary/50 shadow-lg"
                   )}
                   data-testid={`card-step-${step.id}`}
                 >
@@ -368,7 +368,7 @@ export default function JourneyDetail() {
                               href={step.resource.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex items-center gap-2 text-sm hover:text-pink-500 transition-colors min-h-[44px] py-2"
+                              className="flex items-center gap-2 text-sm hover:text-primary transition-colors min-h-[44px] py-2"
                               data-testid={`link-resource-${step.id}`}
                             >
                               <ExternalLink className="h-4 w-4 flex-shrink-0" />

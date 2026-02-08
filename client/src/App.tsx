@@ -6,6 +6,7 @@ import { useAnalytics } from "./hooks/use-analytics";
 import { useSessionAnalytics } from "./hooks/use-session-analytics";
 import { trackKeyboardShortcut } from "./lib/analytics";
 import { useAuth } from "./hooks/useAuth";
+import { ThemeProvider } from "@/components/ui/theme-provider";
 
 import MainLayout from "@/components/layout/new/MainLayout";
 import ErrorPage from "@/pages/ErrorPage";
@@ -27,52 +28,42 @@ import Journeys from "@/pages/Journeys";
 import JourneyDetail from "@/pages/JourneyDetail";
 import ResourceDetail from "@/pages/ResourceDetail";
 
-import { AwesomeList } from "@/types/awesome-list";
 import { processAwesomeListData } from "@/lib/parser";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
 
 function Router() {
-  // Track page views when routes change
   useAnalytics();
-  
-  // Track comprehensive session analytics
   const sessionAnalytics = useSessionAnalytics();
-  
-  // Authentication hook
   const { user, isAuthenticated, isLoading: authLoading, logout } = useAuth();
-  
+
   const [searchOpen, setSearchOpen] = useState(false);
   const [location] = useLocation();
 
-  // Fetch awesome list data - use static data in production builds
   const { data: rawData, isLoading, error } = useQuery({
     queryKey: ["awesome-list-data"],
     queryFn: fetchStaticAwesomeList,
-    staleTime: 1000 * 60 * 60, // 1 hour
+    staleTime: 1000 * 60 * 60,
   });
-  
-  // Process the raw data into a structured AwesomeList
+
   const awesomeList = rawData ? processAwesomeListData(rawData) : undefined;
 
-  // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // '/' key for search
-      if (e.key === "/" && !e.ctrlKey && !e.metaKey && 
-          !(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) {
+      if (
+        e.key === "/" &&
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)
+      ) {
         e.preventDefault();
         trackKeyboardShortcut("/", "open_search");
         sessionAnalytics.incrementSearchesPerformed();
         setSearchOpen(true);
       }
-      
-      // Escape key to close search
       if (e.key === "Escape" && searchOpen) {
         trackKeyboardShortcut("Escape", "close_search");
         setSearchOpen(false);
       }
-      
-      // Ctrl/Cmd+K for search
       if ((e.ctrlKey || e.metaKey) && e.key === "k") {
         e.preventDefault();
         trackKeyboardShortcut("Ctrl+K", "open_search");
@@ -80,7 +71,6 @@ function Router() {
         setSearchOpen(true);
       }
     };
-    
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [searchOpen]);
@@ -89,34 +79,21 @@ function Router() {
     return <ErrorPage error={error} />;
   }
 
-  // Show loading state while checking authentication
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-muted-foreground">Loading...</p>
         </div>
       </div>
     );
   }
 
-  // Show main app for all users (authenticated and guests)
-  // Guest users can browse all resources, authenticated users get additional features
   return (
-    <MainLayout 
-      awesomeList={awesomeList} 
-      isLoading={isLoading}
-      user={user}
-      onLogout={logout}
-    >
+    <MainLayout awesomeList={awesomeList} isLoading={isLoading} user={user} onLogout={logout}>
       <Switch>
-        <Route path="/" component={() => 
-          <Home 
-            awesomeList={awesomeList} 
-            isLoading={isLoading} 
-          />
-        } />
+        <Route path="/" component={() => <Home awesomeList={awesomeList} isLoading={isLoading} />} />
         <Route path="/login" component={Login} />
         <Route path="/category/:slug" component={Category} />
         <Route path="/subcategory/:slug" component={Subcategory} />
@@ -127,21 +104,9 @@ function Router() {
         <Route path="/submit" component={SubmitResource} />
         <Route path="/journeys" component={Journeys} />
         <Route path="/journey/:id" component={JourneyDetail} />
-        <Route path="/profile" component={() => (
-          <AuthGuard>
-            <Profile user={user} />
-          </AuthGuard>
-        )} />
-        <Route path="/bookmarks" component={() => (
-          <AuthGuard>
-            <Bookmarks />
-          </AuthGuard>
-        )} />
-        <Route path="/admin" component={() => (
-          <AdminGuard>
-            <AdminDashboard />
-          </AdminGuard>
-        )} />
+        <Route path="/profile" component={() => (<AuthGuard><Profile user={user} /></AuthGuard>)} />
+        <Route path="/bookmarks" component={() => (<AuthGuard><Bookmarks /></AuthGuard>)} />
+        <Route path="/admin" component={() => (<AdminGuard><AdminDashboard /></AdminGuard>)} />
         <Route component={NotFound} />
       </Switch>
     </MainLayout>
@@ -149,22 +114,19 @@ function Router() {
 }
 
 function App() {
-  // Force dark mode - apply dark class to document root
   useEffect(() => {
-    document.documentElement.classList.add('dark');
-  }, []);
-
-  // Initialize Google Analytics when app loads
-  useEffect(() => {
-    // Verify required environment variable is present
     if (!import.meta.env.VITE_GA_MEASUREMENT_ID) {
-      console.warn('Missing required Google Analytics key: VITE_GA_MEASUREMENT_ID');
+      console.warn("Missing required Google Analytics key: VITE_GA_MEASUREMENT_ID");
     } else {
       initGA();
     }
   }, []);
 
-  return <Router />;
+  return (
+    <ThemeProvider>
+      <Router />
+    </ThemeProvider>
+  );
 }
 
 export default App;

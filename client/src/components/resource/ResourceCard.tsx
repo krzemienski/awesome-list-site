@@ -86,7 +86,7 @@ function ResourceCard({
   return (
     <Card 
       className={cn(
-        "group hover:border-pink-500/50 transition-all cursor-pointer",
+        "group hover:border-primary/50 transition-all cursor-pointer",
         className
       )}
       onClick={handleCardClick}
@@ -166,7 +166,7 @@ function ResourceCard({
         
         <div className="flex flex-wrap items-center gap-2 mb-3">
           {isValidDbResource && (
-            <Badge variant="outline" className="text-xs border-pink-500/30 text-pink-400">
+            <Badge variant="outline" className="text-xs border-primary/30 text-primary">
               <ChevronRight className="h-3 w-3 mr-0.5" />
               View Details
             </Badge>
@@ -196,7 +196,7 @@ function ResourceCard({
           <Button 
             variant="outline" 
             size="sm" 
-            className="flex-1 border-cyan-500/50 hover:bg-cyan-500/10 hover:border-cyan-500 min-h-[44px]"
+            className="flex-1 border-primary/50 hover:bg-primary/10 hover:border-primary min-h-[44px]"
             onClick={handleExternalLink}
             data-testid={`button-visit-${resource.id}`}
           >

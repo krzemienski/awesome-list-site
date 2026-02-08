@@ -315,9 +315,9 @@ export default function ResourceDetail() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <Card className="border-pink-500/20 bg-black overflow-hidden">
+          <Card className="border-primary/20 bg-card overflow-hidden">
             {hasOgImage && (
-              <div className="relative w-full h-48 md:h-64 overflow-hidden bg-gradient-to-b from-pink-500/10 to-transparent">
+              <div className="relative w-full h-48 md:h-64 overflow-hidden bg-gradient-to-b from-primary/10 to-transparent">
                 {metadata.ogImageBlurhash && !imageLoaded && (
                   <div className="absolute inset-0">
                     <Blurhash
@@ -396,7 +396,7 @@ export default function ResourceDetail() {
                   </div>
                   
                   <Button
-                    className="bg-pink-500 hover:bg-pink-600 flex-shrink-0 min-h-[44px]"
+                    className="bg-primary hover:bg-primary/90 flex-shrink-0 min-h-[44px]"
                     onClick={handleVisitResource}
                     data-testid="button-visit"
                   >
@@ -413,7 +413,7 @@ export default function ResourceDetail() {
             <CardContent className="pt-6 space-y-6">
               <div>
                 <h2 className="text-lg font-semibold mb-2 flex items-center gap-2">
-                  <Globe className="h-4 w-4 text-pink-500" />
+                  <Globe className="h-4 w-4 text-primary" />
                   Description
                 </h2>
                 <CardDescription className="text-base leading-relaxed" data-testid="text-description">
@@ -440,14 +440,14 @@ export default function ResourceDetail() {
 
               <div>
                 <h2 className="text-lg font-semibold mb-2 flex items-center gap-2">
-                  <Link2 className="h-4 w-4 text-cyan-500" />
+                  <Link2 className="h-4 w-4 text-primary" />
                   URL
                 </h2>
                 <a 
                   href={resource.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-cyan-400 hover:underline break-all flex items-center gap-2 text-sm md:text-base"
+                  className="text-primary hover:underline break-all flex items-center gap-2 text-sm md:text-base"
                   data-testid="link-url"
                 >
                   {resource.url}
@@ -460,7 +460,7 @@ export default function ResourceDetail() {
                   <Separator />
                   <div>
                     <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                      <Tag className="h-4 w-4 text-pink-500" />
+                      <Tag className="h-4 w-4 text-primary" />
                       Tags
                     </h2>
                     <div className="flex flex-wrap gap-2">
@@ -468,7 +468,7 @@ export default function ResourceDetail() {
                         <Badge 
                           key={index} 
                           variant="outline" 
-                          className="text-xs border-pink-500/30 text-pink-400"
+                          className="text-xs border-primary/30 text-primary"
                         >
                           #{tag}
                         </Badge>
@@ -516,16 +516,16 @@ export default function ResourceDetail() {
         </div>
 
         <div className="space-y-6">
-          <Card className="border-cyan-500/20 bg-black">
+          <Card className="border-primary/20 bg-card">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <ExternalLink className="h-4 w-4 text-cyan-500" />
+                <ExternalLink className="h-4 w-4 text-primary" />
                 Quick Actions
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <Button 
-                className="w-full bg-pink-500 hover:bg-pink-600 min-h-[44px]" 
+                className="w-full bg-primary hover:bg-primary/90 min-h-[44px]" 
                 onClick={handleVisitResource}
               >
                 <ExternalLink className="h-4 w-4 mr-2" />
@@ -565,10 +565,10 @@ export default function ResourceDetail() {
           </Card>
 
           {filteredRelatedResources.length > 0 && (
-            <Card className="border-pink-500/20 bg-black">
+            <Card className="border-primary/20 bg-card">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <FolderTree className="h-4 w-4 text-pink-500" />
+                  <FolderTree className="h-4 w-4 text-primary" />
                   Related Resources
                 </CardTitle>
                 <CardDescription>
@@ -579,15 +579,15 @@ export default function ResourceDetail() {
                 {filteredRelatedResources.map((related) => (
                   <div
                     key={related.id}
-                    className="p-3 rounded border border-border hover:border-pink-500/50 hover:bg-pink-500/5 cursor-pointer transition-all group"
+                    className="p-3 rounded border border-border hover:border-primary/50 hover:bg-primary/5 cursor-pointer transition-all group"
                     onClick={() => handleRelatedResourceClick(related)}
                     data-testid={`related-resource-${related.id}`}
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-medium text-sm line-clamp-1 flex-1 group-hover:text-pink-400 transition-colors">
+                      <span className="font-medium text-sm line-clamp-1 flex-1 group-hover:text-primary transition-colors">
                         {related.title}
                       </span>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-pink-500 transition-colors flex-shrink-0" />
+                      <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
                     </div>
                     {related.description && (
                       <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
@@ -632,7 +632,7 @@ export default function ResourceDetail() {
           )}
 
           {scrapedTitle && (
-            <Card className="border-border bg-black/50">
+            <Card className="border-border bg-card/50">
               <CardHeader>
                 <CardTitle className="text-sm flex items-center gap-2 text-muted-foreground">
                   <ImageIcon className="h-4 w-4" />

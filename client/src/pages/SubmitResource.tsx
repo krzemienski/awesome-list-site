@@ -246,10 +246,10 @@ export default function SubmitResource() {
         </Helmet>
         
         <div className="container max-w-2xl mx-auto px-4 py-12">
-          <Card className="border-pink-500/20">
+          <Card className="border-primary/20">
             <CardHeader className="text-center">
-              <div className="mx-auto mb-4 rounded-full bg-pink-500/10 p-4 w-fit">
-                <LogIn className="h-12 w-12 text-pink-500" />
+              <div className="mx-auto mb-4 rounded-full bg-primary/10 p-4 w-fit">
+                <LogIn className="h-12 w-12 text-primary" />
               </div>
               <CardTitle className="text-2xl">Authentication Required</CardTitle>
               <CardDescription>
@@ -259,7 +259,7 @@ export default function SubmitResource() {
             <CardContent className="flex flex-col gap-4">
               <Button 
                 onClick={() => window.location.href = '/api/login'}
-                className="w-full bg-pink-500 hover:bg-pink-600"
+                className="w-full bg-primary hover:bg-primary/90"
                 data-testid="button-login"
               >
                 <LogIn className="mr-2 h-4 w-4" />
@@ -283,7 +283,7 @@ export default function SubmitResource() {
     return (
       <div className="container max-w-2xl mx-auto px-4 py-12">
         <div className="flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-pink-500" />
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
           <span className="ml-2">Loading...</span>
         </div>
       </div>
@@ -319,7 +319,7 @@ export default function SubmitResource() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-2xl">
-              <Plus className="h-6 w-6 text-pink-500" />
+              <Plus className="h-6 w-6 text-primary" />
               Submit a Resource
             </CardTitle>
             <CardDescription>
@@ -532,7 +532,7 @@ export default function SubmitResource() {
                   <Button
                     type="submit"
                     disabled={submitMutation.isPending}
-                    className="flex-1 bg-pink-500 hover:bg-pink-600"
+                    className="flex-1 bg-primary hover:bg-primary/90"
                     data-testid="button-submit"
                   >
                     {submitMutation.isPending ? (
@@ -573,23 +573,23 @@ export default function SubmitResource() {
           <CardContent>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li className="flex gap-2">
-                <span className="text-pink-500">•</span>
+                <span className="text-primary">•</span>
                 <span>Ensure the resource is relevant to video streaming, encoding, or related technologies</span>
               </li>
               <li className="flex gap-2">
-                <span className="text-pink-500">•</span>
+                <span className="text-primary">•</span>
                 <span>Provide a clear, concise description that helps others understand the resource</span>
               </li>
               <li className="flex gap-2">
-                <span className="text-pink-500">•</span>
+                <span className="text-primary">•</span>
                 <span>Only submit resources with valid HTTPS URLs that are publicly accessible</span>
               </li>
               <li className="flex gap-2">
-                <span className="text-pink-500">•</span>
+                <span className="text-primary">•</span>
                 <span>Your submission will be reviewed by admins before being published</span>
               </li>
               <li className="flex gap-2">
-                <span className="text-pink-500">•</span>
+                <span className="text-primary">•</span>
                 <span>Please check if the resource already exists before submitting</span>
               </li>
             </ul>

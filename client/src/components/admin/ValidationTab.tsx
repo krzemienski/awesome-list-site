@@ -35,7 +35,7 @@ export default function ValidationTab({
   return (
     <div className="space-y-4">
       {/* Awesome Lint Validation */}
-      <Card className="border-pink-500/20 bg-black">
+      <Card className="border-primary/20 bg-card">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileCheck className="h-5 w-5" />
@@ -130,7 +130,7 @@ export default function ValidationTab({
       </Card>
 
       {/* Link Checker Results */}
-      <Card className="border-cyan-500/20 bg-black">
+      <Card className="border-primary/20 bg-card">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Link className="h-5 w-5" />

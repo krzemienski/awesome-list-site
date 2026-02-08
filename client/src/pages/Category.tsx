@@ -508,7 +508,7 @@ export default function Category() {
                     <div className="flex items-center gap-2">
                       <span className="font-medium truncate">{resource.title}</span>
                       {isDbResource(resource) && (
-                        <Badge variant="outline" className="text-xs border-pink-500/30 text-pink-400">
+                        <Badge variant="outline" className="text-xs border-primary/30 text-primary">
                           Details
                         </Badge>
                       )}
@@ -647,7 +647,7 @@ export default function Category() {
                 <CardContent>
                   <div className="flex gap-2 flex-wrap">
                     {isDbResource(resource) && (
-                      <Badge variant="outline" className="text-xs border-pink-500/30 text-pink-400">
+                      <Badge variant="outline" className="text-xs border-primary/30 text-primary">
                         View Details
                       </Badge>
                     )}

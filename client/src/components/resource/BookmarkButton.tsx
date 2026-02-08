@@ -129,7 +129,7 @@ function BookmarkButton({
         size={size}
         className={cn(
           "group relative",
-          isBookmarked && "text-cyan-500 hover:text-cyan-600",
+          isBookmarked && "text-primary hover:text-primary/90",
           className
         )}
         onClick={handleClick}
@@ -162,7 +162,7 @@ function BookmarkButton({
         
         {/* Ripple effect on click */}
         {bookmarkMutation.isPending && (
-          <span className="absolute inset-0 animate-ping rounded-full bg-cyan-500 opacity-20" />
+          <span className="absolute inset-0 animate-ping rounded-full bg-primary opacity-20" />
         )}
       </Button>
 
@@ -171,7 +171,7 @@ function BookmarkButton({
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <BookmarkPlus className="h-5 w-5 text-cyan-500" />
+              <BookmarkPlus className="h-5 w-5 text-primary" />
               Add Bookmark
             </DialogTitle>
             <DialogDescription>
@@ -208,7 +208,7 @@ function BookmarkButton({
             <Button
               onClick={handleSaveWithNotes}
               disabled={bookmarkMutation.isPending}
-              className="flex-1 sm:flex-initial bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white border-0"
+              className="flex-1 sm:flex-initial bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 text-white border-0"
             >
               <NotebookPen className="h-4 w-4 mr-2" />
               Save with notes

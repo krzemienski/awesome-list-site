@@ -97,7 +97,7 @@ export default function AdminDashboard() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-muted-foreground">Loading admin dashboard...</p>
         </div>
       </div>
@@ -119,7 +119,7 @@ export default function AdminDashboard() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-pink-500 font-mono flex items-center gap-2">
+        <h1 className="text-3xl font-bold text-primary font-mono flex items-center gap-2">
           <Shield className="h-8 w-8" />
           Admin Dashboard
         </h1>
@@ -132,49 +132,49 @@ export default function AdminDashboard() {
       {/* Admin Tabs */}
       <Tabs defaultValue="approvals" className="space-y-4">
         <div className="w-full overflow-x-auto pb-2">
-          <TabsList className="inline-flex h-10 items-center gap-1 bg-black border border-pink-500/20 p-1">
-            <TabsTrigger value="approvals" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap" data-testid="tab-approvals">
+          <TabsList className="inline-flex h-10 items-center gap-1 bg-card border border-primary/20 p-1">
+            <TabsTrigger value="approvals" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap" data-testid="tab-approvals">
               Approvals {stats?.pendingApprovals ? <Badge variant="destructive" className="ml-2">{stats.pendingApprovals}</Badge> : null}
             </TabsTrigger>
-            <TabsTrigger value="edits" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap" data-testid="tab-edits">
+            <TabsTrigger value="edits" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap" data-testid="tab-edits">
               Edits
             </TabsTrigger>
-            <TabsTrigger value="enrichment" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap" data-testid="tab-enrichment">
+            <TabsTrigger value="enrichment" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap" data-testid="tab-enrichment">
               <Sparkles className="h-4 w-4 mr-1" />
               Enrichment
             </TabsTrigger>
-            <TabsTrigger value="export" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap">
+            <TabsTrigger value="export" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap">
               Export
             </TabsTrigger>
-            <TabsTrigger value="database" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap">
+            <TabsTrigger value="database" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap">
               Database
             </TabsTrigger>
-            <TabsTrigger value="validation" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap">
+            <TabsTrigger value="validation" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap">
               Validation
             </TabsTrigger>
-            <TabsTrigger value="resources" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap">
+            <TabsTrigger value="resources" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap">
               Resources
             </TabsTrigger>
-            <TabsTrigger value="categories" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap" data-testid="tab-categories">
+            <TabsTrigger value="categories" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap" data-testid="tab-categories">
               Categories
             </TabsTrigger>
-            <TabsTrigger value="subcategories" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap" data-testid="tab-subcategories">
+            <TabsTrigger value="subcategories" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap" data-testid="tab-subcategories">
               Subcategories
             </TabsTrigger>
-            <TabsTrigger value="subsubcategories" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap" data-testid="tab-subsubcategories">
+            <TabsTrigger value="subsubcategories" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap" data-testid="tab-subsubcategories">
               Sub-Subcats
             </TabsTrigger>
-            <TabsTrigger value="users" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap">
+            <TabsTrigger value="users" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap">
               Users
             </TabsTrigger>
-            <TabsTrigger value="github" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap">
+            <TabsTrigger value="github" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap">
               GitHub
             </TabsTrigger>
-            <TabsTrigger value="linkhealth" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap">
+            <TabsTrigger value="linkhealth" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap">
               <Link className="h-4 w-4 mr-1" />
               Link Health
             </TabsTrigger>
-            <TabsTrigger value="audit" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap">
+            <TabsTrigger value="audit" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap">
               Audit
             </TabsTrigger>
           </TabsList>

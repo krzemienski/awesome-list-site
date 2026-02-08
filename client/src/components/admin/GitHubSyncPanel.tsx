@@ -273,7 +273,7 @@ export default function GitHubSyncPanel() {
                       <div className="text-xs text-muted-foreground">Removed</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-cyan-500 font-semibold">{lastSync.totalResources}</div>
+                      <div className="text-primary font-semibold">{lastSync.totalResources}</div>
                       <div className="text-xs text-muted-foreground">Total</div>
                     </div>
                   </div>
@@ -352,9 +352,9 @@ export default function GitHubSyncPanel() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         {sync.direction === 'export' ? (
-                          <Upload className="h-4 w-4 text-cyan-500" />
+                          <Upload className="h-4 w-4 text-primary" />
                         ) : (
-                          <Download className="h-4 w-4 text-pink-500" />
+                          <Download className="h-4 w-4 text-primary" />
                         )}
                         <span className="font-semibold capitalize">{sync.direction}</span>
                       </div>

@@ -130,7 +130,7 @@ export default function ExportTab({ validationStatus }: ExportTabProps) {
 
   return (
     <div className="space-y-4">
-      <Card className="border-pink-500/20 bg-black">
+      <Card className="border-primary/20 bg-card">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Download className="h-5 w-5" />
@@ -145,7 +145,7 @@ export default function ExportTab({ validationStatus }: ExportTabProps) {
             <Button
               onClick={handleExport}
               disabled={isExporting}
-              className="bg-pink-500 hover:bg-pink-600"
+              className="bg-primary hover:bg-primary/90"
             >
               {isExporting ? (
                 <>
@@ -174,7 +174,7 @@ export default function ExportTab({ validationStatus }: ExportTabProps) {
       </Card>
 
       {/* Quick Actions */}
-      <Card className="border-cyan-500/20 bg-black">
+      <Card className="border-primary/20 bg-card">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <RefreshCw className="h-5 w-5" />

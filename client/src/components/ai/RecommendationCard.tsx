@@ -103,7 +103,7 @@ function RecommendationCard({
   return (
     <Card 
       className={cn(
-        "overflow-hidden transition-all hover:border-pink-500/50 cursor-pointer",
+        "overflow-hidden transition-all hover:border-primary/50 cursor-pointer",
         className
       )}
       onClick={onClick}
@@ -149,7 +149,7 @@ function RecommendationCard({
               className={cn(
                 "text-xs",
                 resource.isAIBased 
-                  ? "bg-gradient-to-r from-pink-500/10 to-cyan-500/10 text-pink-500 border-pink-500/30" 
+                  ? "bg-gradient-to-r from-primary/10 to-primary/5 text-primary border-primary/30" 
                   : "bg-muted text-muted-foreground"
               )}
             >
@@ -241,7 +241,7 @@ function RecommendationCard({
           <Button
             variant="outline"
             size="sm"
-            className="w-full border-cyan-500/50 hover:bg-cyan-500/10 hover:border-cyan-500"
+            className="w-full border-primary/50 hover:bg-primary/10 hover:border-primary"
             onClick={(e) => {
               e.stopPropagation();
               onClick && onClick();

@@ -25,7 +25,7 @@ export default function MobileBottomSheet({
         side="bottom"
         className={cn(
           "h-[90vh] flex flex-col",
-          "rounded-t-2xl border-t border-pink-500/30",
+          "rounded-t-2xl border-t border-primary/30",
           "bg-gradient-to-b from-background to-background/95",
           "pb-[max(1rem,env(safe-area-inset-bottom))]",
           className
@@ -37,7 +37,7 @@ export default function MobileBottomSheet({
         {/* Header */}
         <SheetHeader className="pb-4 border-b border-border">
           <SheetTitle className="flex items-center gap-2 text-lg">
-            <Sparkles className="h-5 w-5 text-pink-500" />
+            <Sparkles className="h-5 w-5 text-primary" />
             {title}
           </SheetTitle>
           {description && (

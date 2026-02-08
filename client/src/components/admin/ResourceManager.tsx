@@ -445,7 +445,7 @@ export default function ResourceManager() {
 
   if (isLoading) {
     return (
-      <Card className="border-pink-500/20 bg-black">
+      <Card className="border-primary/20 bg-card">
         <CardHeader>
           <Skeleton className="h-8 w-64" />
         </CardHeader>
@@ -462,7 +462,7 @@ export default function ResourceManager() {
 
   return (
     <div className="space-y-4">
-      <Card className="border-pink-500/20 bg-black">
+      <Card className="border-primary/20 bg-card">
         <CardHeader>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -476,7 +476,7 @@ export default function ResourceManager() {
             </div>
             <Button 
               onClick={openCreateDialog}
-              className="bg-pink-500 hover:bg-pink-600"
+              className="bg-primary hover:bg-primary/90"
               data-testid="button-add-resource"
             >
               <Plus className="h-4 w-4 mr-2" />
@@ -530,7 +530,7 @@ export default function ResourceManager() {
           </form>
 
           {selectedResourceIds.length > 0 && (
-            <div className="flex items-center justify-between p-3 bg-gray-800 border border-pink-500/30 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-gray-800 border border-primary/30 rounded-lg">
               <div className="flex items-center gap-3">
                 <span className="text-sm font-medium text-gray-300">
                   {selectedResourceIds.length} {selectedResourceIds.length === 1 ? 'item' : 'items'} selected
@@ -668,7 +668,7 @@ export default function ResourceManager() {
                           href={resource.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-xs text-cyan-400 hover:underline flex items-center gap-1 truncate max-w-[300px]"
+                          className="text-xs text-primary hover:underline flex items-center gap-1 truncate max-w-[300px]"
                         >
                           {resource.url}
                           <ExternalLink className="h-3 w-3 flex-shrink-0" />
@@ -864,7 +864,7 @@ export default function ResourceManager() {
             <Button 
               onClick={handleSaveEdit}
               disabled={updateMutation.isPending}
-              className="bg-pink-500 hover:bg-pink-600"
+              className="bg-primary hover:bg-primary/90"
               data-testid="button-save-edit"
             >
               {updateMutation.isPending ? (
@@ -1004,7 +1004,7 @@ export default function ResourceManager() {
             <Button 
               onClick={handleCreate}
               disabled={createMutation.isPending}
-              className="bg-pink-500 hover:bg-pink-600"
+              className="bg-primary hover:bg-primary/90"
               data-testid="button-create-resource"
             >
               {createMutation.isPending ? (
