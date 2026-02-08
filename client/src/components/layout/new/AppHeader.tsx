@@ -1,8 +1,11 @@
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
-import { Search, Sun, Moon, Monitor, Palette, LogIn, LogOut, User, Bookmark, Shield } from "lucide-react";
+import { Search, Sun, Moon, Monitor, Palette, LogIn, LogOut, User, Bookmark, Shield, Shuffle, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useTheme } from "@/hooks/use-theme";
 import {
   DropdownMenu,
@@ -11,11 +14,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuSubContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -26,6 +24,11 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { useLocation } from "wouter";
 import { deslugify } from "@/lib/utils";
 
@@ -64,9 +67,23 @@ function getBreadcrumbs(path: string) {
 }
 
 export default function AppHeader({ onSearchOpen, user, onLogout }: AppHeaderProps) {
-  const { mode, setMode, accentColor, setAccentColor, availableColors } = useTheme();
+  const { mode, setMode, activeTheme, setThemeByValue, setCustomColor, randomizeTheme, presets, customHex } = useTheme();
   const [location] = useLocation();
   const crumbs = getBreadcrumbs(location);
+  const [hexInput, setHexInput] = useState(customHex || "");
+
+  useEffect(() => {
+    if (customHex) setHexInput(customHex);
+  }, [customHex]);
+
+  const handleHexSubmit = () => {
+    const hex = hexInput.trim();
+    if (/^#[0-9a-fA-F]{3}$/.test(hex) || /^#[0-9a-fA-F]{6}$/.test(hex)) {
+      setCustomColor(hex);
+    }
+  };
+
+  const isActivePreset = (value: string) => activeTheme.value === value;
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4">
@@ -104,43 +121,113 @@ export default function AppHeader({ onSearchOpen, user, onLogout }: AppHeaderPro
       </div>
 
       <div className="flex items-center gap-1">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-9 w-9">
-              {mode === "dark" ? <Moon className="h-4 w-4" /> : mode === "light" ? <Sun className="h-4 w-4" /> : <Monitor className="h-4 w-4" />}
+        <div className="flex items-center border rounded-md">
+          <Button
+            variant={mode === "light" ? "secondary" : "ghost"}
+            size="icon"
+            className="h-8 w-8 rounded-none rounded-l-md"
+            onClick={() => setMode("light")}
+            title="Light mode"
+          >
+            <Sun className="h-3.5 w-3.5" />
+          </Button>
+          <Button
+            variant={mode === "dark" ? "secondary" : "ghost"}
+            size="icon"
+            className="h-8 w-8 rounded-none border-x"
+            onClick={() => setMode("dark")}
+            title="Dark mode"
+          >
+            <Moon className="h-3.5 w-3.5" />
+          </Button>
+          <Button
+            variant={mode === "system" ? "secondary" : "ghost"}
+            size="icon"
+            className="h-8 w-8 rounded-none rounded-r-md"
+            onClick={() => setMode("system")}
+            title="System"
+          >
+            <Monitor className="h-3.5 w-3.5" />
+          </Button>
+        </div>
+
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-9 w-9 relative">
+              <Palette className="h-4 w-4" />
+              <span
+                className="absolute bottom-1 right-1 h-2.5 w-2.5 rounded-full border border-background"
+                style={{ backgroundColor: activeTheme.preview.accent }}
+              />
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>Appearance</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuRadioGroup value={mode} onValueChange={(v) => setMode(v as any)}>
-              <DropdownMenuRadioItem value="light">
-                <Sun className="mr-2 h-4 w-4" /> Light
-              </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="dark">
-                <Moon className="mr-2 h-4 w-4" /> Dark
-              </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="system">
-                <Monitor className="mr-2 h-4 w-4" /> System
-              </DropdownMenuRadioItem>
-            </DropdownMenuRadioGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuLabel>Accent Color</DropdownMenuLabel>
-            <div className="grid grid-cols-4 gap-1.5 p-2">
-              {availableColors.map((color) => (
-                <button
-                  key={color.value}
-                  onClick={() => setAccentColor(color.value)}
-                  className={`h-8 w-full rounded-md border-2 transition-all ${
-                    accentColor === color.value ? "border-foreground scale-110" : "border-transparent hover:border-muted-foreground/50"
-                  }`}
-                  style={{ backgroundColor: color.color.startsWith("hsl") ? color.color : `hsl(${color.color})` }}
-                  title={color.name}
-                />
-              ))}
+          </PopoverTrigger>
+          <PopoverContent align="end" className="w-72 p-4">
+            <div className="space-y-4">
+              <div>
+                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Theme</Label>
+                <div className="grid grid-cols-2 gap-2 mt-2">
+                  {presets.map((preset) => (
+                    <button
+                      key={preset.value}
+                      onClick={() => setThemeByValue(preset.value)}
+                      className={`relative flex flex-col items-start gap-1.5 rounded-lg border-2 p-3 text-left transition-all hover:bg-accent/50 ${
+                        isActivePreset(preset.value)
+                          ? "border-primary bg-accent/30"
+                          : "border-transparent bg-muted/30 hover:border-muted-foreground/30"
+                      }`}
+                    >
+                      {isActivePreset(preset.value) && (
+                        <Check className="absolute top-1.5 right-1.5 h-3.5 w-3.5 text-primary" />
+                      )}
+                      <div className="flex gap-1">
+                        <div className="h-5 w-5 rounded-full border" style={{ backgroundColor: preset.preview.accent }} />
+                        <div className="h-5 w-5 rounded-full border" style={{ backgroundColor: preset.preview.bg }} />
+                        <div className="h-5 w-5 rounded-full border" style={{ backgroundColor: preset.preview.text }} />
+                      </div>
+                      <span className="text-xs font-medium">{preset.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <Separator />
+
+              <div>
+                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Custom Color</Label>
+                <div className="flex gap-2 mt-2">
+                  <div className="relative flex-1">
+                    <Input
+                      value={hexInput}
+                      onChange={(e) => setHexInput(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && handleHexSubmit()}
+                      placeholder="#3b82f6"
+                      className="h-8 text-xs font-mono pl-8"
+                      maxLength={7}
+                    />
+                    <div
+                      className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 rounded border"
+                      style={{ backgroundColor: /^#[0-9a-fA-F]{3,6}$/.test(hexInput) ? hexInput : "transparent" }}
+                    />
+                  </div>
+                  <Button size="sm" variant="outline" className="h-8 px-3 text-xs" onClick={handleHexSubmit}>
+                    Apply
+                  </Button>
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-1">Enter any hex color (e.g. #ff6b35)</p>
+              </div>
+
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full gap-2 h-8 text-xs"
+                onClick={randomizeTheme}
+              >
+                <Shuffle className="h-3.5 w-3.5" />
+                Randomize Theme
+              </Button>
             </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          </PopoverContent>
+        </Popover>
 
         {user ? (
           <DropdownMenu>
