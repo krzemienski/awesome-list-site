@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AwesomeList } from "@/types/awesome-list";
 import AppSidebar from "./AppSidebar";
 import AppHeader from "./AppHeader";
 import SearchDialog from "@/components/ui/search-dialog";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface MainLayoutProps {
   awesomeList?: AwesomeList;
@@ -15,9 +16,10 @@ interface MainLayoutProps {
 
 export default function MainLayout({ awesomeList, isLoading, children, user, onLogout }: MainLayoutProps) {
   const [searchOpen, setSearchOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   return (
-    <SidebarProvider defaultOpen={true}>
+    <SidebarProvider defaultOpen={!isMobile}>
       <AppSidebar
         categories={awesomeList?.categories || []}
         resources={awesomeList?.resources || []}
@@ -30,11 +32,11 @@ export default function MainLayout({ awesomeList, isLoading, children, user, onL
           user={user}
           onLogout={onLogout}
         />
-        <main className="flex-1 p-4 md:p-6">
+        <main className="flex-1 min-w-0 overflow-x-hidden p-3 sm:p-4 md:p-6">
           {children}
         </main>
-        <footer className="border-t px-6 py-4">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-muted-foreground">
+        <footer className="border-t px-4 sm:px-6 py-3 sm:py-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs sm:text-sm text-muted-foreground">
             <p>
               Built with{" "}
               <a href="https://reactjs.org" target="_blank" rel="noopener noreferrer" className="font-medium underline underline-offset-4 hover:text-foreground">React</a>

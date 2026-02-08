@@ -257,11 +257,11 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
         description="Discover 2,000+ curated video development resources including codecs, players, tools, and libraries. Find the perfect solution for your video project."
       />
       
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">
+      <div className="space-y-1 sm:space-y-2">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
           Awesome Video Resources
         </h1>
-        <p className="text-muted-foreground">
+        <p className="text-sm sm:text-base text-muted-foreground">
           Explore {filteredCategories.length} categories with {totalResourceCount} curated resources
         </p>
       </div>
@@ -301,16 +301,16 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                 className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors border border-border bg-card text-card-foreground"
                 data-testid={`card-category-${category.slug}`}
               >
-                <CardHeader>
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-3">
-                      <Icon className="h-6 w-6" />
-                      <CardTitle className="text-lg">{category.name}</CardTitle>
+                <CardHeader className="p-4 sm:p-6">
+                  <div className="flex items-center justify-between gap-2 mb-1 sm:mb-2">
+                    <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                      <Icon className="h-5 w-5 sm:h-6 sm:w-6 shrink-0" />
+                      <CardTitle className="text-base sm:text-lg truncate">{category.name}</CardTitle>
                     </div>
-                    <Badge variant="secondary" data-testid={`badge-count-${category.slug}`}>{totalCount}</Badge>
+                    <Badge variant="secondary" className="shrink-0" data-testid={`badge-count-${category.slug}`}>{totalCount}</Badge>
                   </div>
                   {description && (
-                    <CardDescription className="text-sm">
+                    <CardDescription className="text-xs sm:text-sm line-clamp-2">
                       {description}
                     </CardDescription>
                   )}
@@ -322,13 +322,13 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
       </div>
 
       {/* AI Recommendations Section */}
-      <div className="mt-12">
-        <div className="mb-6">
-          <div className="flex items-center gap-3 mb-2">
-            <Sparkles className="h-6 w-6 text-primary" />
-            <h2 className="text-2xl font-bold">AI-Powered Recommendations</h2>
+      <div className="mt-8 sm:mt-12">
+        <div className="mb-4 sm:mb-6">
+          <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+            <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-primary shrink-0" />
+            <h2 className="text-xl sm:text-2xl font-bold">AI-Powered Recommendations</h2>
           </div>
-          <p className="text-muted-foreground">
+          <p className="text-sm sm:text-base text-muted-foreground">
             Get personalized resource recommendations based on your interests and learning goals
           </p>
         </div>

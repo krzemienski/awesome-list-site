@@ -348,7 +348,7 @@ export default function Category() {
   }
   
   return (
-    <div className="space-y-6 overflow-x-hidden max-w-full">
+    <div className="space-y-4 sm:space-y-6 overflow-x-hidden max-w-full">
       {/* SEO Head */}
       <SEOHead 
         title={`${categoryName} Resources - Awesome Video`}
@@ -356,7 +356,7 @@ export default function Category() {
       />
       
       {/* Header */}
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         <Link href="/">
           <Button variant="ghost" size="sm" className="gap-2" data-testid="button-back-home">
             <ArrowLeft className="h-4 w-4" />
@@ -364,16 +364,16 @@ export default function Category() {
           </Button>
         </Link>
         
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight truncate">
               {categoryName}
             </h1>
-            <p className="text-muted-foreground mt-1">
+            <p className="text-sm text-muted-foreground mt-0.5 sm:mt-1">
               {allResources.length} resources available
             </p>
           </div>
-          <Badge variant="secondary" className="text-lg px-4 py-2" data-testid="badge-count">
+          <Badge variant="secondary" className="text-sm sm:text-lg px-3 sm:px-4 py-1 sm:py-2 shrink-0" data-testid="badge-count">
             {allResources.length}
           </Badge>
         </div>
@@ -431,10 +431,10 @@ export default function Category() {
       </div>
       
       {/* Results Count and View Mode */}
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground" data-testid="text-results-count">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-xs sm:text-sm text-muted-foreground min-w-0 truncate" data-testid="text-results-count">
           Showing {filteredResources.length} of {allResources.length} resources
-          {selectedTags.length > 0 && ` (filtered by ${selectedTags.length} tag${selectedTags.length > 1 ? 's' : ''})`}
+          {selectedTags.length > 0 && ` (${selectedTags.length} tag${selectedTags.length > 1 ? 's' : ''})`}
         </p>
         <ViewModeToggle value={viewMode} onChange={handleViewModeChange} />
       </div>
@@ -466,10 +466,10 @@ export default function Category() {
       ) : (
         <div className={
           viewMode === "grid"
-            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 min-w-0"
+            ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 min-w-0"
             : viewMode === "list"
             ? "flex flex-col gap-2 min-w-0"
-            : "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-3 min-w-0"
+            : "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 min-w-0"
         }>
           {filteredResources.map((resource, index) => {
             const resourceId = `${slugify(resource.title)}-${index}`;
@@ -608,14 +608,14 @@ export default function Category() {
                 onClick={handleResourceClick}
                 data-testid={`card-resource-${resourceId}`}
               >
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-start gap-2">
-                    <span className="flex-1 min-w-0">{resource.title}</span>
-                    <div className="flex items-center gap-1 flex-shrink-0">
+                <CardHeader className="p-3 sm:p-4 md:p-6">
+                  <CardTitle className="text-base sm:text-lg flex items-start gap-2">
+                    <span className="flex-1 min-w-0 line-clamp-2">{resource.title}</span>
+                    <div className="flex items-center gap-0.5 flex-shrink-0">
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-8 w-8 p-0 min-h-[44px] min-w-[44px]"
+                        className="h-8 w-8 p-0 touch-manipulation"
                         onClick={handleExternalLink}
                         data-testid={`button-external-${resourceId}`}
                         title="Open in new tab"
@@ -627,7 +627,7 @@ export default function Category() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 w-8 p-0 min-h-[44px] min-w-[44px]"
+                          className="h-8 w-8 p-0 touch-manipulation"
                           onClick={(e) => handleSuggestEdit(e, resource)}
                           data-testid={`button-suggest-edit-${resourceId}`}
                           title="Suggest an edit"
@@ -639,23 +639,23 @@ export default function Category() {
                     </div>
                   </CardTitle>
                   {resource.description && (
-                    <CardDescription className="line-clamp-2">
+                    <CardDescription className="text-xs sm:text-sm line-clamp-2">
                       {resource.description}
                     </CardDescription>
                   )}
                 </CardHeader>
-                <CardContent>
-                  <div className="flex gap-2 flex-wrap">
+                <CardContent className="px-3 pb-3 pt-0 sm:px-4 sm:pb-4 md:px-6 md:pb-6">
+                  <div className="flex gap-1.5 sm:gap-2 flex-wrap">
                     {isDbResource(resource) && (
                       <Badge variant="outline" className="text-xs border-primary/30 text-primary">
                         View Details
                       </Badge>
                     )}
                     {resource.subcategory && (
-                      <Badge variant="outline">{resource.subcategory}</Badge>
+                      <Badge variant="outline" className="text-xs">{resource.subcategory}</Badge>
                     )}
                     {resource.subSubcategory && (
-                      <Badge variant="outline">{resource.subSubcategory}</Badge>
+                      <Badge variant="outline" className="text-xs">{resource.subSubcategory}</Badge>
                     )}
                     {resource.tags && resource.tags.slice(0, 3).map((tag, tagIndex) => (
                       <Badge key={tagIndex} variant="secondary" className="text-xs">

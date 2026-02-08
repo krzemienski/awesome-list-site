@@ -11,7 +11,7 @@ export default function About() {
         />
       </Helmet>
       
-      <h1 className="text-3xl font-bold tracking-tight mb-6">About</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-4 sm:mb-6">About</h1>
       
       <div className="prose dark:prose-invert">
         <section className="mb-8">

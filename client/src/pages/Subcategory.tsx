@@ -264,7 +264,7 @@ export default function Subcategory() {
   }
   
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 overflow-x-hidden max-w-full">
       {/* SEO Head */}
       <SEOHead
         title={`${subcategoryName} Resources - ${categoryName} - Awesome Video`}
@@ -285,7 +285,7 @@ export default function Subcategory() {
       />
 
       {/* Header */}
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         <Link href={`/category/${getCategorySlug(categoryName)}`}>
           <Button variant="ghost" size="sm" className="gap-2" data-testid="button-back-category">
             <ArrowLeft className="h-4 w-4" />
@@ -293,16 +293,16 @@ export default function Subcategory() {
           </Button>
         </Link>
         
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight truncate">
               {subcategoryName}
             </h1>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 sm:mt-1">
               Category: {categoryName}
             </p>
           </div>
-          <Badge variant="secondary" className="text-lg px-4 py-2" data-testid="badge-count">
+          <Badge variant="secondary" className="text-sm sm:text-lg px-3 sm:px-4 py-1 sm:py-2 shrink-0" data-testid="badge-count">
             {allResources.length}
           </Badge>
         </div>
@@ -353,12 +353,11 @@ export default function Subcategory() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {filteredResources.map((resource, index) => {
             const handleResourceClick = () => {
               window.open(resource.url, '_blank', 'noopener,noreferrer');
               
-              // Build detailed toast message
               let description = resource.description || '';
               if (!description && resource.tags && resource.tags.length > 0) {
                 description = `Tags: ${resource.tags.slice(0, 3).join(', ')}${resource.tags.length > 3 ? ', ...' : ''}`;
@@ -373,26 +372,26 @@ export default function Subcategory() {
             return (
               <Card 
                 key={`${resource.url}-${index}`}
-                className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors border border-border bg-card text-card-foreground"
+                className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors border border-border bg-card text-card-foreground min-w-0"
                 onClick={handleResourceClick}
                 data-testid={`card-resource-${index}`}
               >
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-start gap-2">
-                    <span className="flex-1">{resource.title}</span>
+                <CardHeader className="p-3 sm:p-4 md:p-6">
+                  <CardTitle className="text-base sm:text-lg flex items-start gap-2">
+                    <span className="flex-1 min-w-0 line-clamp-2">{resource.title}</span>
                     <ExternalLink className="h-4 w-4 flex-shrink-0 mt-1" />
                   </CardTitle>
                   {resource.description && (
-                    <CardDescription className="line-clamp-2">
+                    <CardDescription className="text-xs sm:text-sm line-clamp-2">
                       {resource.description}
                     </CardDescription>
                   )}
                 </CardHeader>
                 {(resource.subSubcategory || (resource.tags && resource.tags.length > 0)) && (
-                  <CardContent>
-                    <div className="flex gap-2 flex-wrap">
+                  <CardContent className="px-3 pb-3 pt-0 sm:px-4 sm:pb-4 md:px-6 md:pb-6">
+                    <div className="flex gap-1.5 sm:gap-2 flex-wrap">
                       {resource.subSubcategory && (
-                        <Badge variant="outline">{resource.subSubcategory}</Badge>
+                        <Badge variant="outline" className="text-xs">{resource.subSubcategory}</Badge>
                       )}
                       {resource.tags && resource.tags.slice(0, 3).map((tag, tagIndex) => (
                         <Badge key={tagIndex} variant="secondary" className="text-xs">

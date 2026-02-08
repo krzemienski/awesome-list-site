@@ -85,10 +85,13 @@ export default function AppHeader({ onSearchOpen, user, onLogout }: AppHeaderPro
 
   const isActivePreset = (value: string) => activeTheme.value === value;
 
+  const modeIcon = mode === "light" ? Sun : mode === "dark" ? Moon : Monitor;
+  const ModeIcon = modeIcon;
+
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4">
-      <SidebarTrigger className="-ml-1" />
-      <Separator orientation="vertical" className="mr-2 h-4" />
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-3 sm:px-4">
+      <SidebarTrigger className="-ml-1 shrink-0" />
+      <Separator orientation="vertical" className="mr-1 sm:mr-2 h-4 hidden sm:block" />
 
       <Breadcrumb className="hidden md:flex">
         <BreadcrumbList>
@@ -107,21 +110,23 @@ export default function AppHeader({ onSearchOpen, user, onLogout }: AppHeaderPro
         </BreadcrumbList>
       </Breadcrumb>
 
-      <div className="flex-1 mx-2">
+      <div className="flex-1 min-w-0 mx-1 sm:mx-2">
         <button
           onClick={onSearchOpen}
           className="w-full max-w-sm flex items-center h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors hover:bg-accent"
         >
-          <Search className="mr-2 h-4 w-4 text-muted-foreground" />
-          <span className="text-muted-foreground">Search resources...</span>
-          <kbd className="pointer-events-none ml-auto hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground sm:flex">
+          <Search className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
+          <span className="text-muted-foreground truncate hidden sm:inline">Search resources...</span>
+          <span className="text-muted-foreground truncate sm:hidden">Search...</span>
+          <kbd className="pointer-events-none ml-auto hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground md:flex">
             /
           </kbd>
         </button>
       </div>
 
-      <div className="flex items-center gap-1">
-        <div className="flex items-center border rounded-md">
+      <div className="flex items-center gap-1 shrink-0">
+        {/* Mode toggle - full on desktop, condensed on mobile */}
+        <div className="hidden sm:flex items-center border rounded-md">
           <Button
             variant={mode === "light" ? "secondary" : "ghost"}
             size="icon"
@@ -150,6 +155,22 @@ export default function AppHeader({ onSearchOpen, user, onLogout }: AppHeaderPro
             <Monitor className="h-3.5 w-3.5" />
           </Button>
         </div>
+
+        {/* Mobile mode toggle - single button cycles through modes */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9 sm:hidden"
+          onClick={() => {
+            const modes: ("light" | "dark" | "system")[] = ["light", "dark", "system"];
+            const currentIndex = modes.indexOf(mode);
+            const nextMode = modes[(currentIndex + 1) % modes.length];
+            setMode(nextMode);
+          }}
+          title={`Current: ${mode} mode`}
+        >
+          <ModeIcon className="h-4 w-4" />
+        </Button>
 
         <Popover>
           <PopoverTrigger asChild>
@@ -190,7 +211,44 @@ export default function AppHeader({ onSearchOpen, user, onLogout }: AppHeaderPro
                 </div>
               </div>
 
-              <Separator />
+              {/* Mode toggle in popover for mobile users */}
+              <div className="sm:hidden">
+                <Separator />
+                <div className="pt-3">
+                  <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Mode</Label>
+                  <div className="flex items-center border rounded-md mt-2">
+                    <Button
+                      variant={mode === "light" ? "secondary" : "ghost"}
+                      size="sm"
+                      className="flex-1 h-8 rounded-none rounded-l-md gap-1.5"
+                      onClick={() => setMode("light")}
+                    >
+                      <Sun className="h-3.5 w-3.5" />
+                      <span className="text-xs">Light</span>
+                    </Button>
+                    <Button
+                      variant={mode === "dark" ? "secondary" : "ghost"}
+                      size="sm"
+                      className="flex-1 h-8 rounded-none border-x gap-1.5"
+                      onClick={() => setMode("dark")}
+                    >
+                      <Moon className="h-3.5 w-3.5" />
+                      <span className="text-xs">Dark</span>
+                    </Button>
+                    <Button
+                      variant={mode === "system" ? "secondary" : "ghost"}
+                      size="sm"
+                      className="flex-1 h-8 rounded-none rounded-r-md gap-1.5"
+                      onClick={() => setMode("system")}
+                    >
+                      <Monitor className="h-3.5 w-3.5" />
+                      <span className="text-xs">Auto</span>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              <Separator className="hidden sm:block" />
 
               <div>
                 <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Custom Color</Label>
@@ -265,7 +323,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout }: AppHeaderPro
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <Button variant="ghost" size="sm" onClick={() => (window.location.href = "/api/login")} className="gap-2">
+          <Button variant="ghost" size="sm" onClick={() => (window.location.href = "/api/login")} className="gap-1.5 h-9 px-2 sm:px-3">
             <LogIn className="h-4 w-4" />
             <span className="hidden sm:inline">Login</span>
           </Button>

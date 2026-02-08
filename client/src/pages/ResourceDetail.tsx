@@ -214,7 +214,7 @@ export default function ResourceDetail() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6 max-w-5xl mx-auto px-4" aria-busy={true} aria-live="polite">
+      <div className="space-y-4 sm:space-y-6 max-w-5xl mx-auto px-0 sm:px-4" aria-busy={true} aria-live="polite">
         <Skeleton className="h-10 w-32" />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-4">
@@ -232,7 +232,7 @@ export default function ResourceDetail() {
 
   if (error || !resource) {
     return (
-      <div className="space-y-6 max-w-4xl mx-auto px-4">
+      <div className="space-y-4 sm:space-y-6 max-w-4xl mx-auto px-0 sm:px-4">
         <SEOHead title="Resource Not Found" />
         <div className="text-center py-12">
           <h2 className="text-2xl font-bold mb-4">Resource Not Found</h2>
@@ -249,7 +249,7 @@ export default function ResourceDetail() {
   }
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto px-4">
+    <div className="space-y-4 sm:space-y-6 max-w-5xl mx-auto px-0 sm:px-4 overflow-x-hidden">
       <SEOHead 
         title={`${resource.title} - Awesome Video`}
         description={resource.description || scrapedDescription || `View details for ${resource.title}`}
@@ -359,7 +359,7 @@ export default function ResourceDetail() {
                           }}
                         />
                       )}
-                      <h1 className="text-2xl md:text-3xl font-semibold leading-none tracking-tight" data-testid="text-resource-title">
+                      <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold leading-tight tracking-tight" data-testid="text-resource-title">
                         {resource.title}
                       </h1>
                     </div>
