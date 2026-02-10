@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import { Link } from "wouter";
 import { Search, Sun, Moon, Monitor, Palette, LogIn, LogOut, User, Bookmark, Shield, Shuffle, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -96,16 +96,16 @@ export default function AppHeader({ onSearchOpen, user, onLogout }: AppHeaderPro
       <Breadcrumb className="hidden md:flex">
         <BreadcrumbList>
           {crumbs.map((crumb, i) => (
-            <BreadcrumbItem key={crumb.href}>
-              {i < crumbs.length - 1 ? (
-                <>
+            <Fragment key={crumb.href}>
+              <BreadcrumbItem>
+                {i < crumbs.length - 1 ? (
                   <BreadcrumbLink href={crumb.href}>{crumb.label}</BreadcrumbLink>
-                  <BreadcrumbSeparator />
-                </>
-              ) : (
-                <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
-              )}
-            </BreadcrumbItem>
+                ) : (
+                  <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
+                )}
+              </BreadcrumbItem>
+              {i < crumbs.length - 1 && <BreadcrumbSeparator />}
+            </Fragment>
           ))}
         </BreadcrumbList>
       </Breadcrumb>

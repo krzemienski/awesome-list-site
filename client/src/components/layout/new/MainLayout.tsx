@@ -32,9 +32,9 @@ export default function MainLayout({ awesomeList, isLoading, children, user, onL
           user={user}
           onLogout={onLogout}
         />
-        <main className="flex-1 min-w-0 overflow-x-hidden p-3 sm:p-4 md:p-6">
+        <div className="flex-1 min-w-0 overflow-x-hidden p-3 sm:p-4 md:p-6">
           {children}
-        </main>
+        </div>
         <footer className="border-t px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs sm:text-sm text-muted-foreground">
             <p>
