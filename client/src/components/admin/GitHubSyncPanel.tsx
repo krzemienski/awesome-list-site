@@ -7,7 +7,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { GitBranch, Upload, RefreshCw, CheckCircle2, XCircle, Clock, ExternalLink, Activity } from "lucide-react";
+import { GitBranch, Download, Upload, RefreshCw, CheckCircle2, XCircle, Clock, ExternalLink, Activity } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -53,6 +53,33 @@ export default function GitHubSyncPanel() {
     queryKey: ['/api/github/sync-status'],
   });
 
+  const importMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest('/api/github/import', {
+        method: 'POST',
+        body: JSON.stringify({
+          repositoryUrl: repoUrl,
+          options: { forceOverwrite: false }
+        })
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/github/sync-history'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/github/sync-status'] });
+      toast({
+        title: "Import Started",
+        description: `Importing resources from ${repoUrl}`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Import Failed",
+        description: error.message || "Failed to start import",
+        variant: "destructive"
+      });
+    }
+  });
+
   const exportMutation = useMutation({
     mutationFn: async () => {
       return await apiRequest('/api/github/export', {
@@ -90,10 +117,10 @@ export default function GitHubSyncPanel() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <GitBranch className="h-5 w-5" />
-            GitHub Export
+            GitHub Sync
           </CardTitle>
           <CardDescription>
-            Export approved resources to GitHub as an awesome-lint compliant README
+            Import resources from and export to GitHub repositories
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -125,32 +152,62 @@ export default function GitHubSyncPanel() {
 
           <Separator />
 
-          <div className="space-y-2">
-            <h4 className="text-sm font-semibold flex items-center gap-2">
-              <Upload className="h-4 w-4" />
-              Export to GitHub
-            </h4>
-            <p className="text-xs text-muted-foreground mb-2">
-              Push approved resources to GitHub README with smart commit message
-            </p>
-            <Button
-              onClick={() => exportMutation.mutate()}
-              disabled={exportMutation.isPending || !repoUrl}
-              className="w-full"
-              data-testid="button-export-github"
-            >
-              {exportMutation.isPending ? (
-                <>
-                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                  Exporting...
-                </>
-              ) : (
-                <>
-                  <Upload className="h-4 w-4 mr-2" />
-                  Export to GitHub
-                </>
-              )}
-            </Button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <h4 className="text-sm font-semibold flex items-center gap-2">
+                <Download className="h-4 w-4" />
+                Import from GitHub
+              </h4>
+              <p className="text-xs text-muted-foreground mb-2">
+                Pull resources from the GitHub repository and update the database
+              </p>
+              <Button
+                onClick={() => importMutation.mutate()}
+                disabled={importMutation.isPending || !repoUrl}
+                className="w-full"
+                data-testid="button-import-github"
+              >
+                {importMutation.isPending ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                    Importing...
+                  </>
+                ) : (
+                  <>
+                    <Download className="h-4 w-4 mr-2" />
+                    Import Resources
+                  </>
+                )}
+              </Button>
+            </div>
+
+            <div className="space-y-2">
+              <h4 className="text-sm font-semibold flex items-center gap-2">
+                <Upload className="h-4 w-4" />
+                Export to GitHub
+              </h4>
+              <p className="text-xs text-muted-foreground mb-2">
+                Push approved resources to GitHub README with smart commit message
+              </p>
+              <Button
+                onClick={() => exportMutation.mutate()}
+                disabled={exportMutation.isPending || !repoUrl}
+                className="w-full"
+                data-testid="button-export-github"
+              >
+                {exportMutation.isPending ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                    Exporting...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-4 w-4 mr-2" />
+                    Export to GitHub
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -161,7 +218,7 @@ export default function GitHubSyncPanel() {
             <CardTitle className="flex items-center justify-between">
               <span className="flex items-center gap-2">
                 <Activity className="h-5 w-5" />
-                Export Status
+                Sync Status
               </span>
               {pendingJobs > 0 && (
                 <Badge variant="secondary" className="animate-pulse">
@@ -178,7 +235,7 @@ export default function GitHubSyncPanel() {
                 <AlertDescription className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="font-semibold">
-                      Last Export
+                        Last {lastSync.direction === 'export' ? 'Export' : 'Import'}
                     </span>
                     <Badge variant="outline">
                       <Clock className="h-3 w-3 mr-1" />
@@ -231,7 +288,7 @@ export default function GitHubSyncPanel() {
 
             {syncQueue && syncQueue.length > 0 && (
               <div className="space-y-2">
-                <h4 className="text-sm font-semibold">Recent Export Jobs</h4>
+                <h4 className="text-sm font-semibold">Recent Sync Jobs</h4>
                 <ScrollArea className="h-[200px] rounded border">
                   <div className="p-2 space-y-2">
                     {syncQueue.map((item) => (
@@ -269,10 +326,10 @@ export default function GitHubSyncPanel() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Clock className="h-5 w-5" />
-              Export History
+              Sync History
             </CardTitle>
             <CardDescription>
-              Complete history of GitHub exports
+              Complete history of GitHub synchronizations
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -282,7 +339,11 @@ export default function GitHubSyncPanel() {
                   <div key={sync.id} className="border rounded-lg p-4 space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Upload className="h-4 w-4 text-primary" />
+                        {sync.direction === 'export' ? (
+                          <Upload className="h-4 w-4 text-primary" />
+                        ) : (
+                          <Download className="h-4 w-4 text-primary" />
+                        )}
                         <span className="font-semibold capitalize">{sync.direction}</span>
                       </div>
                       <span className="text-xs text-muted-foreground">
