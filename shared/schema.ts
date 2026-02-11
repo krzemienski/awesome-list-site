@@ -1138,3 +1138,32 @@ export const insertEnrichmentQueueSchema = createInsertSchema(enrichmentQueue).p
 
 export type InsertEnrichmentQueue = z.infer<typeof insertEnrichmentQueueSchema>;
 export type EnrichmentQueueItem = typeof enrichmentQueue.$inferSelect;
+
+export interface LinkHealthJob {
+  id: number;
+  status: 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled';
+  totalLinks: number;
+  checkedLinks: number;
+  healthyLinks: number;
+  brokenLinks: number;
+  redirectLinks: number;
+  timeoutLinks: number;
+  errorMessage?: string;
+  startedAt?: string;
+  completedAt?: string;
+  createdAt: string;
+}
+
+export interface LinkHealthCheck {
+  id: number;
+  resourceId: number;
+  url: string;
+  status: 'healthy' | 'broken' | 'timeout' | 'redirect' | 'dns_failure';
+  httpStatus?: number;
+  responseTime?: number;
+  redirectUrl?: string;
+  errorMessage?: string;
+  consecutiveFailures: number;
+  flaggedForReview: boolean;
+  lastCheckedAt: string;
+}

@@ -2509,6 +2509,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ============= Link Health Check Routes =============
+  
+  // GET /api/admin/link-health/status - Get current/latest job status
+  app.get('/api/admin/link-health/status', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const { linkHealthService } = await import('./services/linkHealthService');
+      const job = linkHealthService.getLatestJob();
+      res.json({ success: true, job: job || null });
+    } catch (error) {
+      console.error('Error fetching link health status:', error);
+      res.status(500).json({ success: false, message: 'Failed to fetch link health status' });
+    }
+  });
+
+  // POST /api/admin/link-health/run - Start a new link health check
+  app.post('/api/admin/link-health/run', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const { linkHealthService } = await import('./services/linkHealthService');
+      const job = await linkHealthService.startCheck();
+      res.json({ success: true, job });
+    } catch (error: any) {
+      console.error('Error starting link health check:', error);
+      if (error.message?.includes('already running')) {
+        return res.status(409).json({ success: false, message: error.message });
+      }
+      res.status(500).json({ success: false, message: 'Failed to start link health check' });
+    }
+  });
+
+  // GET /api/admin/link-health/history - Get job history
+  app.get('/api/admin/link-health/history', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const { linkHealthService } = await import('./services/linkHealthService');
+      const history = linkHealthService.getJobHistory();
+      res.json({ success: true, jobs: history });
+    } catch (error) {
+      console.error('Error fetching link health history:', error);
+      res.status(500).json({ success: false, message: 'Failed to fetch link health history' });
+    }
+  });
+
+  // GET /api/admin/link-health/broken-links - Get broken links with optional filter
+  app.get('/api/admin/link-health/broken-links', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const { linkHealthService } = await import('./services/linkHealthService');
+      const filter = req.query.status as string;
+      const brokenLinks = linkHealthService.getBrokenLinks(filter);
+      res.json({ success: true, checks: brokenLinks });
+    } catch (error) {
+      console.error('Error fetching broken links:', error);
+      res.status(500).json({ success: false, message: 'Failed to fetch broken links' });
+    }
+  });
+
   // POST /api/admin/seed-database - Manual database seeding (optional)
   // Note: Database is automatically seeded on first startup. This endpoint is for:
   // - Re-seeding after data changes
