@@ -27,6 +27,7 @@ import SubmitResource from "@/pages/SubmitResource";
 import Journeys from "@/pages/Journeys";
 import JourneyDetail from "@/pages/JourneyDetail";
 import ResourceDetail from "@/pages/ResourceDetail";
+import ThemeSettings from "@/pages/ThemeSettings";
 
 import { processAwesomeListData } from "@/lib/parser";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
@@ -107,6 +108,7 @@ function Router() {
         <Route path="/profile" component={() => (<AuthGuard><Profile user={user} /></AuthGuard>)} />
         <Route path="/bookmarks" component={() => (<AuthGuard><Bookmarks /></AuthGuard>)} />
         <Route path="/admin" component={() => (<AdminGuard><AdminDashboard /></AdminGuard>)} />
+        <Route path="/settings/theme" component={ThemeSettings} />
         <Route component={NotFound} />
       </Switch>
     </MainLayout>

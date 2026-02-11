@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -52,20 +52,19 @@ export default function LinkHealthDashboard() {
   const queryClient = useQueryClient();
 
   const [statusFilter, setStatusFilter] = useState<'all' | 'broken' | 'timeout' | 'redirect'>('all');
+  const [isPolling, setIsPolling] = useState(false);
 
   const { data: statusData, isLoading: isStatusLoading } = useQuery<LinkHealthStatusResponse>({
     queryKey: ['/api/admin/link-health/status'],
-    refetchInterval: 5000
+    refetchInterval: isPolling ? 3000 : 60000
   });
 
   const { data: historyData } = useQuery<LinkHealthHistoryResponse>({
     queryKey: ['/api/admin/link-health/history'],
-    refetchInterval: 30000
   });
 
   const { data: brokenLinksData } = useQuery<BrokenLinksResponse>({
     queryKey: ['/api/admin/link-health/broken-links', statusFilter],
-    refetchInterval: 10000
   });
 
   const runCheckMutation = useMutation({
@@ -75,6 +74,7 @@ export default function LinkHealthDashboard() {
       });
     },
     onSuccess: () => {
+      setIsPolling(true);
       queryClient.invalidateQueries({ queryKey: ['/api/admin/link-health/status'] });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/link-health/history'] });
       toast({
@@ -95,6 +95,14 @@ export default function LinkHealthDashboard() {
   const jobs = historyData?.jobs || [];
   const isActiveJob = latestJob?.status === 'processing';
   const brokenLinks = brokenLinksData?.checks || [];
+
+  useEffect(() => {
+    setIsPolling(isActiveJob);
+    if (!isActiveJob && latestJob && ['completed', 'failed', 'cancelled'].includes(latestJob.status)) {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/link-health/history'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/link-health/broken-links'] });
+    }
+  }, [isActiveJob, latestJob?.status]);
 
   const calculateHealthPercentage = (job: LinkHealthJob | null | undefined) => {
     if (!job || !job.totalLinks || job.totalLinks === 0) return 0;

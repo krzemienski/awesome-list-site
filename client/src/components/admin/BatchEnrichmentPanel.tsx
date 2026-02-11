@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,9 +47,11 @@ export default function BatchEnrichmentPanel() {
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
+  const [isPolling, setIsPolling] = useState(false);
+
   const { data: jobsData, isLoading } = useQuery<JobsResponse>({
     queryKey: ['/api/enrichment/jobs'],
-    refetchInterval: 5000
+    refetchInterval: isPolling ? 3000 : false
   });
 
   const { data: selectedJobData } = useQuery<JobStatusResponse>({
@@ -66,6 +68,7 @@ export default function BatchEnrichmentPanel() {
       });
     },
     onSuccess: () => {
+      setIsPolling(true);
       queryClient.invalidateQueries({ queryKey: ['/api/enrichment/jobs'] });
       toast({
         title: "Batch enrichment started",
@@ -106,6 +109,10 @@ export default function BatchEnrichmentPanel() {
   const jobs = jobsData?.jobs || [];
   const activeJob = jobs.find(job => job.status === 'processing');
   const hasActiveJob = !!activeJob;
+
+  useEffect(() => {
+    setIsPolling(hasActiveJob);
+  }, [hasActiveJob]);
 
   const handleStartEnrichment = () => {
     if (batchSize < 1 || batchSize > 50) {

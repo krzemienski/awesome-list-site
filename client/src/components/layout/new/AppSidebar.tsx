@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { Home, Plus, BookOpen, Zap, Shield, ChevronRight, Folder } from "lucide-react";
+import { Home, Plus, BookOpen, Zap, Shield, ChevronRight, Folder, Palette } from "lucide-react";
 import { cn, slugify, getCategorySlug } from "@/lib/utils";
 import { Category, Resource } from "@/types/awesome-list";
 import { getCategoryIcon, getSubcategoryIcon, getSubSubcategoryIcon } from "@/config/navigation-icons";
@@ -107,6 +107,7 @@ export default function AppSidebar({ categories, resources, isLoading, user }: A
     { label: "Submit Resource", icon: Plus, href: "/submit" },
     { label: "Learning Journeys", icon: BookOpen, href: "/journeys" },
     { label: "Advanced", icon: Zap, href: "/advanced" },
+    { label: "Theme", icon: Palette, href: "/settings/theme" },
   ];
 
   return (

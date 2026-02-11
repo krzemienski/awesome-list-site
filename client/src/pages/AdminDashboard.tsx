@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Shield, Link, Sparkles } from "lucide-react";
@@ -27,13 +28,24 @@ export default function AdminDashboard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch validation status
-  const { data: validationStatus } = useQuery<ValidationStatus>({
-    queryKey: ['/api/admin/validation-status'],
-    refetchInterval: 30000 // Refresh every 30 seconds
+  const [activeTab, setActiveTab] = useState(() => {
+    if (typeof window !== "undefined") {
+      const hash = window.location.hash.replace("#", "");
+      if (hash) return hash;
+    }
+    return "approvals";
   });
 
-  // Validate awesome list
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    window.history.replaceState(null, "", `#${value}`);
+  };
+
+  const { data: validationStatus } = useQuery<ValidationStatus>({
+    queryKey: ['/api/admin/validation-status'],
+    refetchInterval: 30000
+  });
+
   const validateMutation = useMutation({
     mutationFn: async () => {
       const response = await apiRequest('/api/admin/validate', {
@@ -63,7 +75,6 @@ export default function AdminDashboard() {
     }
   });
 
-  // Check links
   const checkLinksMutation = useMutation({
     mutationFn: async () => {
       const response = await apiRequest('/api/admin/check-links', {
@@ -92,7 +103,6 @@ export default function AdminDashboard() {
     }
   });
 
-  // AdminGuard already verified role, but show loading for stats
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -104,7 +114,6 @@ export default function AdminDashboard() {
     );
   }
 
-  // Show error if stats failed to load
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -126,11 +135,9 @@ export default function AdminDashboard() {
         <p className="text-gray-400 mt-2">Manage resources, users, and system configuration</p>
       </div>
 
-      {/* Statistics Cards */}
       <AdminStats stats={stats} isLoading={isLoading} />
 
-      {/* Admin Tabs */}
-      <Tabs defaultValue="approvals" className="space-y-4">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
         <div className="w-full overflow-x-auto pb-2">
           <TabsList className="inline-flex h-10 items-center gap-1 bg-card border border-primary/20 p-1">
             <TabsTrigger value="approvals" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap" data-testid="tab-approvals">
@@ -180,32 +187,26 @@ export default function AdminDashboard() {
           </TabsList>
         </div>
 
-        {/* Approvals Tab */}
         <TabsContent value="approvals" data-testid="content-approvals">
           <PendingResources />
         </TabsContent>
 
-        {/* Edits Tab */}
         <TabsContent value="edits" data-testid="content-edits">
           <PendingEdits />
         </TabsContent>
 
-        {/* Enrichment Tab */}
         <TabsContent value="enrichment" data-testid="content-enrichment">
           <BatchEnrichmentPanel />
         </TabsContent>
 
-        {/* Export Tab */}
         <TabsContent value="export">
           <ExportTab validationStatus={validationStatus} />
         </TabsContent>
 
-        {/* Database Tab */}
         <TabsContent value="database">
           <DatabaseTab stats={stats} />
         </TabsContent>
 
-        {/* Validation Tab */}
         <TabsContent value="validation">
           <ValidationTab
             validationStatus={validationStatus || null}
