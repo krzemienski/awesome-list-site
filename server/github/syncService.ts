@@ -250,41 +250,11 @@ export class GitHubSyncService {
       console.log(`  - Errors: ${validationResult.errors.length}`);
       console.log(`  - Warnings: ${validationResult.warnings.length}`);
       
-      // REJECT if validation failed (has errors)
+      // Validation is informational during import - do NOT block
+      // External repos may not conform to our strict formatting rules
       if (!validationResult.valid) {
-        const errorSummary = validationResult.errors.slice(0, 5).map(e => 
-          `Line ${e.line}: [${e.rule}] ${e.message}`
-        ).join('\n');
-        
-        const errorMessage = `Import rejected: awesome-lint validation failed with ${validationResult.errors.length} error(s).\n\nFirst ${Math.min(5, validationResult.errors.length)} errors:\n${errorSummary}`;
-        
-        result.errors.push(errorMessage);
-        console.error('Import rejected due to validation errors');
-        
-        // Log failed import attempt
-        if (!options.dryRun) {
-          await storage.addToGithubSyncQueue({
-            repositoryUrl: repoUrl,
-            action: 'import',
-            status: 'failed',
-            resourceIds: [],
-            metadata: { 
-              error: 'Validation failed',
-              validationErrors: validationResult.errors.length,
-              validationWarnings: validationResult.warnings.length
-            } as any
-          });
-        }
-        
-        return result;
-      }
-      
-      // In strict mode, also reject if there are warnings
-      if (options.strictMode && validationResult.warnings.length > 0) {
-        const warningMessage = `Import rejected (strict mode): ${validationResult.warnings.length} warning(s) found. Disable strict mode to import with warnings.`;
-        result.errors.push(warningMessage);
-        console.error('Import rejected due to warnings in strict mode');
-        return result;
+        console.log(`⚠ Validation found ${validationResult.errors.length} formatting issues - proceeding with import anyway`);
+        console.log(`  (Validation is enforced on export, not import)`);
       }
       
       if (validationResult.warnings.length > 0) {
@@ -317,7 +287,7 @@ export class GitHubSyncService {
       
       // Create all category hierarchies
       const hierarchyIds = new Map<string, { categoryId: number; subcategoryId?: number; subSubcategoryId?: number }>();
-      for (const [key, hierarchy] of uniqueHierarchies) {
+      for (const [key, hierarchy] of Array.from(uniqueHierarchies.entries())) {
         try {
           const ids = await ensureCategoryHierarchy(
             hierarchy.category,
@@ -587,8 +557,11 @@ export class GitHubSyncService {
       // Get fresh Octokit client with Replit GitHub connection
       const octokit = await getGitHubClient();
       
-      // Parse repo info from URL
-      const repoMatch = repoUrl.match(/github\.com\/([^\/]+)\/([^\/\?#]+)/);
+      // Parse repo info from URL (supports both full URLs and owner/repo shorthand)
+      let repoMatch = repoUrl.match(/github\.com\/([^\/]+)\/([^\/\?#]+)/);
+      if (!repoMatch) {
+        repoMatch = repoUrl.match(/^([^\/]+)\/([^\/]+)$/);
+      }
       if (!repoMatch) {
         throw new Error(`Invalid GitHub repository URL: ${repoUrl}`);
       }
@@ -912,13 +885,21 @@ export class GitHubSyncService {
             dryRun: false
           });
 
+          const metadata = {
+            imported: [result.imported],
+            updated: [result.updated],
+            skipped: [result.skipped],
+            errors: result.errors.length
+          };
+
           if (result.errors.length === 0) {
-            await storage.updateGithubSyncStatus(item.id, 'completed');
+            await storage.updateGithubSyncStatus(item.id, 'completed', undefined, metadata);
           } else {
             await storage.updateGithubSyncStatus(
               item.id, 
-              'failed',
-              result.errors.join('; ')
+              result.imported > 0 || result.updated > 0 ? 'completed' : 'failed',
+              result.errors.slice(0, 3).join('; '),
+              metadata
             );
           }
         } else if (item.action === 'export') {
@@ -927,13 +908,19 @@ export class GitHubSyncService {
             createPullRequest: true
           });
 
+          const metadata = {
+            exported: result.exported,
+            errors: result.errors.length
+          };
+
           if (result.errors.length === 0) {
-            await storage.updateGithubSyncStatus(item.id, 'completed');
+            await storage.updateGithubSyncStatus(item.id, 'completed', undefined, metadata);
           } else {
             await storage.updateGithubSyncStatus(
               item.id,
               'failed',
-              result.errors.join('; ')
+              result.errors.join('; '),
+              metadata
             );
           }
         }

@@ -1,37 +1,49 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, RefreshCw, FileCheck, Link, Clock } from "lucide-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Download,
+  RefreshCw,
+  FileCheck,
+  Link,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
+  AlertTriangle,
+  ChevronDown,
+  ChevronUp
+} from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { ValidationStatus } from "@/components/admin/types/validation";
 
-/**
- * @description Props for the ExportTab component
- */
 interface ExportTabProps {
   validationStatus?: ValidationStatus;
 }
 
-/**
- * @description Handles exporting the awesome list to markdown format with quick action buttons.
- * Provides functionality to export markdown, run validation, and check links.
- * Extracted from the main Admin Dashboard component for better code organization.
- */
-export default function ExportTab({ validationStatus }: ExportTabProps) {
+export default function ExportTab({ validationStatus: propValidationStatus }: ExportTabProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isExporting, setIsExporting] = useState(false);
+  const [showErrors, setShowErrors] = useState(false);
+  const [showWarnings, setShowWarnings] = useState(false);
+
+  const { data: fetchedValidationStatus } = useQuery<ValidationStatus>({
+    queryKey: ['/api/admin/validation-status'],
+  });
+
+  const validationStatus = propValidationStatus || fetchedValidationStatus;
 
   const handleExport = async () => {
     try {
       setIsExporting(true);
       const response = await fetch('/api/admin/export', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
           title: 'Awesome Video',
@@ -41,11 +53,8 @@ export default function ExportTab({ validationStatus }: ExportTabProps) {
         })
       });
 
-      if (!response.ok) {
-        throw new Error('Export failed');
-      }
+      if (!response.ok) throw new Error('Export failed');
 
-      // Create download
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -141,7 +150,7 @@ export default function ExportTab({ validationStatus }: ExportTabProps) {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4">
             <Button
               onClick={handleExport}
               disabled={isExporting}
@@ -159,35 +168,11 @@ export default function ExportTab({ validationStatus }: ExportTabProps) {
                 </>
               )}
             </Button>
-            <span className="text-sm text-gray-400">
-              Generates awesome-lint compliant markdown file
-            </span>
-          </div>
 
-          {validationStatus?.lastUpdated && (
-            <div className="flex items-center gap-2 text-sm text-gray-400">
-              <Clock className="h-4 w-4" />
-              Last exported: {new Date(validationStatus.lastUpdated).toLocaleString()}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Quick Actions */}
-      <Card className="border-primary/20 bg-card">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <RefreshCw className="h-5 w-5" />
-            Quick Actions
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Button
               onClick={() => validateMutation.mutate()}
               disabled={validateMutation.isPending}
               variant="outline"
-              className="justify-start"
             >
               {validateMutation.isPending ? (
                 <>
@@ -206,7 +191,6 @@ export default function ExportTab({ validationStatus }: ExportTabProps) {
               onClick={() => checkLinksMutation.mutate()}
               disabled={checkLinksMutation.isPending}
               variant="outline"
-              className="justify-start"
             >
               {checkLinksMutation.isPending ? (
                 <>
@@ -221,8 +205,201 @@ export default function ExportTab({ validationStatus }: ExportTabProps) {
               )}
             </Button>
           </div>
+
+          {validationStatus?.lastUpdated && (
+            <div className="flex items-center gap-2 text-sm text-gray-400">
+              <Clock className="h-4 w-4" />
+              Last validated: {new Date(validationStatus.lastUpdated).toLocaleString()}
+            </div>
+          )}
         </CardContent>
       </Card>
+
+      {validationStatus?.awesomeLint && (
+        <Card className="border-primary/20 bg-card">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileCheck className="h-5 w-5" />
+              Validation Results
+            </CardTitle>
+            <CardDescription>
+              Awesome-lint compliance check on exported markdown
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center gap-4">
+                {validationStatus.awesomeLint.valid ? (
+                  <Badge variant="default" className="bg-green-500">
+                    <CheckCircle2 className="mr-1 h-3 w-3" />
+                    Passed
+                  </Badge>
+                ) : (
+                  <Badge variant="destructive">
+                    <XCircle className="mr-1 h-3 w-3" />
+                    Failed
+                  </Badge>
+                )}
+                <span className="text-sm text-gray-400">
+                  {validationStatus.awesomeLint.stats.totalResources} resources,{' '}
+                  {validationStatus.awesomeLint.stats.totalCategories} categories
+                </span>
+              </div>
+
+              {validationStatus.awesomeLint.errors.length > 0 && (
+                <div className="space-y-2">
+                  <button
+                    onClick={() => setShowErrors(!showErrors)}
+                    className="flex items-center gap-2 text-sm font-semibold text-red-400 hover:text-red-300"
+                  >
+                    {showErrors ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                    Errors ({validationStatus.awesomeLint.errors.length})
+                  </button>
+                  {showErrors && (
+                    <ScrollArea className="h-48 rounded-md border border-red-500/20 p-3">
+                      {validationStatus.awesomeLint.errors.map((error, i) => (
+                        <div key={i} className="mb-2 text-sm">
+                          <div className="flex items-start gap-2">
+                            <XCircle className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
+                            <div>
+                              <div className="font-mono text-xs text-gray-400">
+                                Line {error.line}: {error.rule}
+                              </div>
+                              <div className="text-gray-300">{error.message}</div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </ScrollArea>
+                  )}
+                </div>
+              )}
+
+              {validationStatus.awesomeLint.warnings.length > 0 && (
+                <div className="space-y-2">
+                  <button
+                    onClick={() => setShowWarnings(!showWarnings)}
+                    className="flex items-center gap-2 text-sm font-semibold text-yellow-400 hover:text-yellow-300"
+                  >
+                    {showWarnings ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                    Warnings ({validationStatus.awesomeLint.warnings.length})
+                  </button>
+                  {showWarnings && (
+                    <ScrollArea className="h-48 rounded-md border border-yellow-500/20 p-3">
+                      {validationStatus.awesomeLint.warnings.map((warning, i) => (
+                        <div key={i} className="mb-2 text-sm">
+                          <div className="flex items-start gap-2">
+                            <AlertTriangle className="h-4 w-4 text-yellow-500 mt-0.5 shrink-0" />
+                            <div>
+                              <div className="font-mono text-xs text-gray-400">
+                                Line {warning.line}: {warning.rule}
+                              </div>
+                              <div className="text-gray-300">{warning.message}</div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </ScrollArea>
+                  )}
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {validationStatus?.linkCheck && (
+        <Card className="border-primary/20 bg-card">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Link className="h-5 w-5" />
+              Link Check Results
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                  <div className="text-2xl font-bold text-green-500">
+                    {validationStatus.linkCheck.validLinks}
+                  </div>
+                  <div className="text-xs text-gray-400">Valid Links</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-red-500">
+                    {validationStatus.linkCheck.brokenLinks}
+                  </div>
+                  <div className="text-xs text-gray-400">Broken Links</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-yellow-500">
+                    {validationStatus.linkCheck.redirects}
+                  </div>
+                  <div className="text-xs text-gray-400">Redirects</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-gray-500">
+                    {validationStatus.linkCheck.errors}
+                  </div>
+                  <div className="text-xs text-gray-400">Errors</div>
+                </div>
+              </div>
+
+              {validationStatus.linkCheck.brokenResources &&
+               validationStatus.linkCheck.brokenResources.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-semibold text-red-400">
+                    Broken Links ({validationStatus.linkCheck.brokenResources.length})
+                  </h4>
+                  <ScrollArea className="h-64 rounded-md border border-red-500/20">
+                    <div className="p-3">
+                      {validationStatus.linkCheck.brokenResources.map((link, i) => (
+                        <div key={i} className="mb-3 pb-3 border-b border-gray-800 last:border-0">
+                          <div className="flex items-start gap-2">
+                            <XCircle className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
+                            <div className="flex-1">
+                              <div className="font-semibold text-sm text-gray-300">
+                                {link.resourceTitle || 'Unknown Resource'}
+                              </div>
+                              <div className="text-xs text-gray-400 font-mono break-all">
+                                {link.url}
+                              </div>
+                              <div className="text-xs text-red-400 mt-1">
+                                {link.status} {link.statusText}
+                                {link.error && ` - ${link.error}`}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </div>
+              )}
+
+              {validationStatus.linkCheck.summary && (
+                <div className="text-xs text-gray-400">
+                  Average response time: {validationStatus.linkCheck.summary.averageResponseTime.toFixed(0)}ms
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {!validationStatus?.awesomeLint && !validationStatus?.linkCheck && (
+        <Card className="border-primary/20 bg-card">
+          <CardContent className="py-8">
+            <div className="text-center">
+              <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-400 mb-2">No validation results yet</p>
+              <p className="text-sm text-gray-500">
+                Click "Run Validation" above to check the exported markdown against awesome-lint rules
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

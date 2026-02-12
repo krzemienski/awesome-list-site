@@ -134,12 +134,12 @@ async function getJobStatus(req: AuthenticatedRequest, res: Response) {
       });
     }
 
-    const status = await enrichmentService.getJobStatus(jobId);
-    const queueItems = await storage.getEnrichmentQueueItems(jobId);
+    const job = await enrichmentService.getJobStatus(jobId);
+    const queueItems = await storage.getEnrichmentQueueItemsByJob(jobId);
 
     res.json({
       success: true,
-      status,
+      job,
       queueItems
     });
   } catch (error: any) {

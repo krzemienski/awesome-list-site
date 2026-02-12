@@ -3,13 +3,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Shield, Link, Sparkles } from "lucide-react";
 import { useAdmin } from "@/hooks/useAdmin";
-import { useToast } from "@/hooks/use-toast";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 import AdminStats from "@/components/admin/AdminStats";
 import ExportTab from "@/components/admin/ExportTab";
 import DatabaseTab from "@/components/admin/DatabaseTab";
-import ValidationTab from "@/components/admin/ValidationTab";
 import UsersTab from "@/components/admin/UsersTab";
 import AuditTab from "@/components/admin/AuditTab";
 import PendingResources from "@/components/admin/PendingResources";
@@ -21,12 +17,8 @@ import ResourceManager from "@/components/admin/ResourceManager";
 import CategoryManager from "@/components/admin/CategoryManager";
 import SubcategoryManager from "@/components/admin/SubcategoryManager";
 import SubSubcategoryManager from "@/components/admin/SubSubcategoryManager";
-import type { ValidationStatus } from "@/components/admin/types/validation";
-
 export default function AdminDashboard() {
   const { stats, isLoading, error } = useAdmin();
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
 
   const [activeTab, setActiveTab] = useState(() => {
     if (typeof window !== "undefined") {
@@ -40,68 +32,6 @@ export default function AdminDashboard() {
     setActiveTab(value);
     window.history.replaceState(null, "", `#${value}`);
   };
-
-  const { data: validationStatus } = useQuery<ValidationStatus>({
-    queryKey: ['/api/admin/validation-status'],
-    refetchInterval: 30000
-  });
-
-  const validateMutation = useMutation({
-    mutationFn: async () => {
-      const response = await apiRequest('/api/admin/validate', {
-        method: 'POST',
-        body: JSON.stringify({
-          title: 'Awesome Video',
-          description: 'A curated list of awesome video streaming resources, tools, frameworks, and learning materials.',
-          includeContributing: true,
-          includeLicense: true
-        })
-      });
-      return response;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/validation-status'] });
-      toast({
-        title: "Validation Complete",
-        description: "Awesome list validation has been completed.",
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Validation Failed",
-        description: "Failed to validate awesome list. Please try again.",
-        variant: "destructive",
-      });
-    }
-  });
-
-  const checkLinksMutation = useMutation({
-    mutationFn: async () => {
-      const response = await apiRequest('/api/admin/check-links', {
-        method: 'POST',
-        body: JSON.stringify({
-          timeout: 10000,
-          concurrent: 5,
-          retryCount: 1
-        })
-      });
-      return response;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/validation-status'] });
-      toast({
-        title: "Link Check Complete",
-        description: "All resource links have been checked.",
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Link Check Failed",
-        description: "Failed to check links. Please try again.",
-        variant: "destructive",
-      });
-    }
-  });
 
   if (isLoading) {
     return (
@@ -156,9 +86,6 @@ export default function AdminDashboard() {
             <TabsTrigger value="database" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap">
               Database
             </TabsTrigger>
-            <TabsTrigger value="validation" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap">
-              Validation
-            </TabsTrigger>
             <TabsTrigger value="resources" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap">
               Resources
             </TabsTrigger>
@@ -200,19 +127,11 @@ export default function AdminDashboard() {
         </TabsContent>
 
         <TabsContent value="export">
-          <ExportTab validationStatus={validationStatus} />
+          <ExportTab />
         </TabsContent>
 
         <TabsContent value="database">
           <DatabaseTab stats={stats} />
-        </TabsContent>
-
-        <TabsContent value="validation">
-          <ValidationTab
-            validationStatus={validationStatus || null}
-            validateMutation={validateMutation}
-            checkLinksMutation={checkLinksMutation}
-          />
         </TabsContent>
 
         <TabsContent value="resources">

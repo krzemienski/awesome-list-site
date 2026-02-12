@@ -118,10 +118,9 @@ async function importFromGitHub(req: AuthenticatedRequest, res: Response) {
     // Add to queue for processing
     const queueItem = await storage.addToGithubSyncQueue({
       repositoryUrl,
-      direction: 'import',
+      action: 'import',
       status: 'pending',
-      options,
-      createdAt: new Date(),
+      metadata: options,
     });
 
     // Process queue in background
@@ -174,10 +173,9 @@ async function exportToGitHub(req: AuthenticatedRequest, res: Response) {
     // Add to queue for processing
     const queueItem = await storage.addToGithubSyncQueue({
       repositoryUrl,
-      direction: 'export',
+      action: 'export',
       status: 'pending',
-      options,
-      createdAt: new Date(),
+      metadata: options,
     });
 
     // Process queue in background

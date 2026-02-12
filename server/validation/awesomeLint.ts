@@ -142,13 +142,13 @@ export class AwesomeLintValidator {
    * Validate list items follow the correct format
    */
   private validateListItems(): void {
-    const listItemPattern = /^- \[([^\]]+)\]\(([^)]+)\)( - (.+))?$/;
+    const listItemPattern = /^[-*] \[([^\]]+)\]\(([^)]+)\)\s*([-–]\s*(.+))?$/;
     
     for (let i = 0; i < this.lines.length; i++) {
       const line = this.lines[i].trim();
       
-      // Skip non-list items
-      if (!line.startsWith('- [')) {
+      // Skip non-list items (accept both - and * markers)
+      if (!line.startsWith('- [') && !line.startsWith('* [')) {
         continue;
       }
 
@@ -316,11 +316,12 @@ export class AwesomeLintValidator {
     }
 
     // Check for consistent list markers (should use - not *)
+    // Only warn, don't error - many valid awesome lists use * markers
     for (let i = 0; i < this.lines.length; i++) {
       const line = this.lines[i].trim();
       
       if (line.startsWith('* ')) {
-        this.addError(i + 1, 'list-marker', 'Use "-" for list items, not "*"');
+        this.addWarning(i + 1, 'list-marker', 'Prefer "-" for list items instead of "*"');
       }
     }
 
@@ -384,7 +385,7 @@ export class AwesomeLintValidator {
    * Count the number of resources
    */
   private countResources(): number {
-    return this.lines.filter(line => line.trim().match(/^- \[.+\]\(.+\)/)).length;
+    return this.lines.filter(line => line.trim().match(/^[-*] \[.+\]\(.+\)/)).length;
   }
 
   /**

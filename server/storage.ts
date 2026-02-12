@@ -207,7 +207,7 @@ export interface IStorage {
   // GitHub Sync Queue
   addToGithubSyncQueue(item: InsertGithubSyncQueue): Promise<GithubSyncQueue>;
   getGithubSyncQueue(status?: string): Promise<GithubSyncQueue[]>;
-  updateGithubSyncStatus(id: number, status: string, errorMessage?: string): Promise<void>;
+  updateGithubSyncStatus(id: number, status: string, errorMessage?: string, metadata?: any): Promise<void>;
   
   // GitHub Sync History
   getLastSyncHistory(repositoryUrl: string, direction: 'export' | 'import'): Promise<GithubSyncHistory | undefined>;
@@ -1442,14 +1442,18 @@ export class DatabaseStorage implements IStorage {
     return await query.orderBy(asc(githubSyncQueue.createdAt));
   }
   
-  async updateGithubSyncStatus(id: number, status: string, errorMessage?: string): Promise<void> {
+  async updateGithubSyncStatus(id: number, status: string, errorMessage?: string, metadata?: any): Promise<void> {
+    const updateData: any = {
+      status,
+      errorMessage,
+      processedAt: status === 'completed' || status === 'failed' ? new Date() : null
+    };
+    if (metadata !== undefined) {
+      updateData.metadata = metadata;
+    }
     await db
       .update(githubSyncQueue)
-      .set({
-        status,
-        errorMessage,
-        processedAt: status === 'completed' || status === 'failed' ? new Date() : null
-      })
+      .set(updateData)
       .where(eq(githubSyncQueue.id, id));
   }
   
@@ -2020,7 +2024,7 @@ export class MemStorage implements IStorage {
     throw new Error("Not implemented in memory storage");
   }
   async getGithubSyncQueue(status?: string): Promise<GithubSyncQueue[]> { return []; }
-  async updateGithubSyncStatus(id: number, status: string, errorMessage?: string): Promise<void> {}
+  async updateGithubSyncStatus(id: number, status: string, errorMessage?: string, metadata?: any): Promise<void> {}
   
   async getLastSyncHistory(repositoryUrl: string, direction: 'export' | 'import'): Promise<GithubSyncHistory | undefined> {
     return undefined;

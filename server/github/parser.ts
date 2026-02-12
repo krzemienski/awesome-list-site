@@ -169,8 +169,8 @@ export class AwesomeListParser {
    * - * [Name](url) - Description (with bullet)
    */
   private parseResourceLine(line: string): { title: string; url: string; description: string } | null {
-    // Remove leading bullet points and whitespace
-    const cleanLine = line.replace(/^[\s*-]+/, '').trim();
+    // Remove leading bullet points (both - and *) and whitespace
+    const cleanLine = line.replace(/^[\s*\-]+/, '').trim();
     
     // Match [title](url) followed by separator and description
     const resourceRegex = /^\[([^\]]+)\]\(([^)]+)\)\s*[-–:]\s*(.+)$/;
@@ -221,7 +221,7 @@ export class AwesomeListParser {
     }
     
     // Skip TOC link lines (they link to section anchors, not external URLs)
-    if (this.inTableOfContents && line.trim().startsWith('- [') && line.includes('](#')) {
+    if (this.inTableOfContents && (line.trim().startsWith('- [') || line.trim().startsWith('* [')) && line.includes('](#')) {
       return true;
     }
     
