@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Shield, Link, Sparkles } from "lucide-react";
+import { Shield, Link, Sparkles, Brain } from "lucide-react";
 import { useAdmin } from "@/hooks/useAdmin";
 import AdminStats from "@/components/admin/AdminStats";
 import ExportTab from "@/components/admin/ExportTab";
@@ -17,6 +17,7 @@ import ResourceManager from "@/components/admin/ResourceManager";
 import CategoryManager from "@/components/admin/CategoryManager";
 import SubcategoryManager from "@/components/admin/SubcategoryManager";
 import SubSubcategoryManager from "@/components/admin/SubSubcategoryManager";
+import ResearcherTab from "@/components/admin/ResearcherTab";
 export default function AdminDashboard() {
   const { stats, isLoading, error } = useAdmin();
 
@@ -80,6 +81,10 @@ export default function AdminDashboard() {
               <Sparkles className="h-4 w-4 mr-1" />
               Enrichment
             </TabsTrigger>
+            <TabsTrigger value="researcher" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap">
+              <Brain className="h-4 w-4 mr-1" />
+              Researcher
+            </TabsTrigger>
             <TabsTrigger value="export" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap">
               Export
             </TabsTrigger>
@@ -124,6 +129,10 @@ export default function AdminDashboard() {
 
         <TabsContent value="enrichment" data-testid="content-enrichment">
           <BatchEnrichmentPanel />
+        </TabsContent>
+
+        <TabsContent value="researcher">
+          <ResearcherTab />
         </TabsContent>
 
         <TabsContent value="export">
