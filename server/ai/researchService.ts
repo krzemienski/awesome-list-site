@@ -131,7 +131,7 @@ class ResearchService {
   private async getExistingResourcesByCategory(category: string, limit: number = 20): Promise<any[]> {
     const result = await db.select({ title: resources.title, url: resources.url, description: resources.description })
       .from(resources)
-      .where(eq(resources.category, category))
+      .where(sql`LOWER(${resources.category}) LIKE LOWER(${'%' + category + '%'})`)
       .limit(limit);
     return result;
   }
