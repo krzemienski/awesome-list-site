@@ -1,0 +1,226 @@
+[
+  {
+    "id": 3629,
+    "name": "AV1",
+    "slug": "av1",
+    "subcategoryId": 2191,
+    "resourceCount": 5
+  },
+  {
+    "id": 3638,
+    "name": "Advertising",
+    "slug": "advertising",
+    "subcategoryId": 2195,
+    "resourceCount": 0
+  },
+  {
+    "id": 3634,
+    "name": "Android",
+    "slug": "android",
+    "subcategoryId": 2193,
+    "resourceCount": 10
+  },
+  {
+    "id": 3636,
+    "name": "Audio",
+    "slug": "audio",
+    "subcategoryId": 2194,
+    "resourceCount": 8
+  },
+  {
+    "id": 3647,
+    "name": "CDN Integration",
+    "slug": "cdn-integration",
+    "subcategoryId": 2199,
+    "resourceCount": 1
+  },
+  {
+    "id": 3632,
+    "name": "Chromecast",
+    "slug": "chromecast",
+    "subcategoryId": 2192,
+    "resourceCount": 1
+  },
+  {
+    "id": 3646,
+    "name": "Cloud Platforms",
+    "slug": "cloud-platforms",
+    "subcategoryId": 2199,
+    "resourceCount": 4
+  },
+  {
+    "id": 3650,
+    "name": "Conferences",
+    "slug": "conferences",
+    "subcategoryId": 2203,
+    "resourceCount": 0
+  },
+  {
+    "id": 3621,
+    "name": "DASH",
+    "slug": "dash",
+    "subcategoryId": 2188,
+    "resourceCount": 48
+  },
+  {
+    "id": 3625,
+    "name": "FFMPEG",
+    "slug": "ffmpeg",
+    "subcategoryId": 2190,
+    "resourceCount": 65
+  },
+  {
+    "id": 3643,
+    "name": "HDR Guidelines",
+    "slug": "hdr-guidelines",
+    "subcategoryId": 2197,
+    "resourceCount": 1
+  },
+  {
+    "id": 3627,
+    "name": "HEVC",
+    "slug": "hevc",
+    "subcategoryId": 2191,
+    "resourceCount": 10
+  },
+  {
+    "id": 3620,
+    "name": "HLS",
+    "slug": "hls",
+    "subcategoryId": 2188,
+    "resourceCount": 60
+  },
+  {
+    "id": 3641,
+    "name": "MPEG & Forums",
+    "slug": "mpeg-forums",
+    "subcategoryId": 2196,
+    "resourceCount": 6
+  },
+  {
+    "id": 3640,
+    "name": "Official Specs",
+    "slug": "official-specs",
+    "subcategoryId": 2196,
+    "resourceCount": 3
+  },
+  {
+    "id": 3648,
+    "name": "Online Forums",
+    "slug": "online-forums",
+    "subcategoryId": 2202,
+    "resourceCount": 2
+  },
+  {
+    "id": 3644,
+    "name": "Origin Servers",
+    "slug": "origin-servers",
+    "subcategoryId": 2198,
+    "resourceCount": 1
+  },
+  {
+    "id": 3626,
+    "name": "Other Encoders",
+    "slug": "other-encoders",
+    "subcategoryId": 2190,
+    "resourceCount": 0
+  },
+  {
+    "id": 3651,
+    "name": "Podcasts & Webinars",
+    "slug": "podcasts-webinars",
+    "subcategoryId": 2203,
+    "resourceCount": 2
+  },
+  {
+    "id": 3639,
+    "name": "Quality & Testing",
+    "slug": "quality-testing",
+    "subcategoryId": 2195,
+    "resourceCount": 36
+  },
+  {
+    "id": 3622,
+    "name": "RIST",
+    "slug": "rist",
+    "subcategoryId": 2189,
+    "resourceCount": 1
+  },
+  {
+    "id": 3624,
+    "name": "RTMP",
+    "slug": "rtmp",
+    "subcategoryId": 2189,
+    "resourceCount": 0
+  },
+  {
+    "id": 3630,
+    "name": "Roku",
+    "slug": "roku",
+    "subcategoryId": 2192,
+    "resourceCount": 26
+  },
+  {
+    "id": 3623,
+    "name": "SRT",
+    "slug": "srt",
+    "subcategoryId": 2189,
+    "resourceCount": 0
+  },
+  {
+    "id": 3649,
+    "name": "Slack & Meetups",
+    "slug": "slack-meetups",
+    "subcategoryId": 2202,
+    "resourceCount": 0
+  },
+  {
+    "id": 3631,
+    "name": "Smart TVs",
+    "slug": "smart-tvs",
+    "subcategoryId": 2192,
+    "resourceCount": 3
+  },
+  {
+    "id": 3645,
+    "name": "Storage Solutions",
+    "slug": "storage-solutions",
+    "subcategoryId": 2198,
+    "resourceCount": 3
+  },
+  {
+    "id": 3637,
+    "name": "Subtitles & Captions",
+    "slug": "subtitles-captions",
+    "subcategoryId": 2194,
+    "resourceCount": 38
+  },
+  {
+    "id": 3628,
+    "name": "VP9",
+    "slug": "vp9",
+    "subcategoryId": 2191,
+    "resourceCount": 1
+  },
+  {
+    "id": 3642,
+    "name": "Vendor Docs",
+    "slug": "vendor-docs",
+    "subcategoryId": 2197,
+    "resourceCount": 1
+  },
+  {
+    "id": 3635,
+    "name": "Web Players",
+    "slug": "web-players",
+    "subcategoryId": 2193,
+    "resourceCount": 23
+  },
+  {
+    "id": 3633,
+    "name": "iOS/tvOS",
+    "slug": "iostvos",
+    "subcategoryId": 2193,
+    "resourceCount": 30
+  }
+]

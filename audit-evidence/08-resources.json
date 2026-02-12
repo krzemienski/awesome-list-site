@@ -1,0 +1,154 @@
+{
+  "resources": [
+    {
+      "id": 186687,
+      "title": "DVBSnoop",
+      "url": "http://dvbsnoop.sourceforge.net/",
+      "description": "An analyzer and debugging tool for MPEG transport streams and DVB broadcasts. It allows inspection of packet structure, tables (PAT, PMT, etc.), and payload of digital video streams.",
+      "category": "Media Tools",
+      "subcategory": null,
+      "subSubcategory": null,
+      "status": "approved",
+      "submittedBy": null,
+      "approvedBy": null,
+      "approvedAt": null,
+      "githubSynced": false,
+      "lastSyncedAt": null,
+      "metadata": {
+        "tags": [
+          "analysis",
+          "debugging",
+          "transport-stream",
+          "dvb",
+          "mpeg",
+          "inspection"
+        ],
+        "sourceCategories": [
+          "media-tools"
+        ]
+      },
+      "createdAt": "2026-01-20T20:31:17.348Z",
+      "updatedAt": "2026-01-20T20:31:17.348Z"
+    },
+    {
+      "id": 186686,
+      "title": "DTube",
+      "url": "https://d.tube/",
+      "description": "A decentralized video platform built on blockchain (Steem/LBRY), offering an alternative to YouTube where videos are distributed via a peer-to-peer network and blockchain stores metadata and rewards.",
+      "category": "Infrastructure & Delivery",
+      "subcategory": null,
+      "subSubcategory": null,
+      "status": "approved",
+      "submittedBy": null,
+      "approvedBy": null,
+      "approvedAt": null,
+      "githubSynced": false,
+      "lastSyncedAt": null,
+      "metadata": {
+        "tags": [
+          "blockchain",
+          "decentralized",
+          "peer-to-peer",
+          "video platform",
+          "distributed infrastructure"
+        ],
+        "sourceCategories": [
+          "infrastructure-delivery"
+        ]
+      },
+      "createdAt": "2026-01-20T20:31:17.265Z",
+      "updatedAt": "2026-01-20T20:31:17.265Z"
+    },
+    {
+      "id": 186685,
+      "title": "PyAV",
+      "url": "https://github.com/PyAV-Org/PyAV",
+      "description": "A Pythonic binding for FFmpeg’s libraries (Libav). PyAV allows Python programs to read, write, and manipulate video and audio data by leveraging the powerful FFmpeg backend.",
+      "category": "Encoding & Codecs",
+      "subcategory": "Encoding Tools",
+      "subSubcategory": null,
+      "status": "approved",
+      "submittedBy": null,
+      "approvedBy": null,
+      "approvedAt": null,
+      "githubSynced": false,
+      "lastSyncedAt": null,
+      "metadata": {
+        "tags": [
+          "ffmpeg",
+          "python",
+          "encoding",
+          "video-processing",
+          "library"
+        ],
+        "sourceCategories": [
+          "encoding-tools"
+        ]
+      },
+      "createdAt": "2026-01-20T20:31:17.223Z",
+      "updatedAt": "2026-01-20T20:31:17.223Z"
+    },
+    {
+      "id": 186684,
+      "title": "MMAction2",
+      "url": "https://github.com/open-mmlab/mmaction2",
+      "description": "An open source toolkit for video understanding by OpenMMLab. It supports state-of-the-art models for action recognition, temporal action detection, and spatio-temporal detection in videos.",
+      "category": "Media Tools",
+      "subcategory": null,
+      "subSubcategory": null,
+      "status": "approved",
+      "submittedBy": null,
+      "approvedBy": null,
+      "approvedAt": null,
+      "githubSynced": false,
+      "lastSyncedAt": null,
+      "metadata": {
+        "tags": [
+          "machine learning",
+          "computer vision",
+          "action recognition",
+          "video analysis",
+          "AI"
+        ],
+        "sourceCategories": [
+          "media-tools"
+        ]
+      },
+      "createdAt": "2026-01-20T20:31:17.140Z",
+      "updatedAt": "2026-01-20T20:31:17.140Z"
+    },
+    {
+      "id": 186683,
+      "title": "libmpeg2",
+      "url": "http://libmpeg2.sourceforge.net/",
+      "description": "A free library for decoding MPEG-1 and MPEG-2 video streams. It's lightweight and portable, used in several open source media players for MPEG-2 playback.",
+      "category": "Encoding & Codecs",
+      "subcategory": null,
+      "subSubcategory": null,
+      "status": "approved",
+      "submittedBy": null,
+      "approvedBy": null,
+      "approvedAt": null,
+      "githubSynced": false,
+      "lastSyncedAt": null,
+      "metadata": {
+        "tags": [
+          "codec",
+          "mpeg",
+          "decoding",
+          "library",
+          "open-source"
+        ],
+        "sourceCategories": [
+          "encoding-codecs"
+        ]
+      },
+      "createdAt": "2026-01-20T20:31:17.097Z",
+      "updatedAt": "2026-01-20T20:31:17.097Z"
+    }
+  ],
+  "total": 1949,
+  "page": 1,
+  "limit": 5,
+  "totalPages": 390
+}

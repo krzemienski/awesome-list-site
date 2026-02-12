@@ -1,0 +1,135 @@
+[
+  {
+    "id": 2188,
+    "name": "Adaptive Streaming",
+    "slug": "adaptive-streaming",
+    "categoryId": 1084,
+    "resourceCount": 139
+  },
+  {
+    "id": 2195,
+    "name": "Ads & QoE",
+    "slug": "ads-qoe",
+    "categoryId": 1087,
+    "resourceCount": 45
+  },
+  {
+    "id": 2194,
+    "name": "Audio & Subtitles",
+    "slug": "audio-subtitles",
+    "categoryId": 1087,
+    "resourceCount": 56
+  },
+  {
+    "id": 2199,
+    "name": "Cloud & CDN",
+    "slug": "cloud-cdn",
+    "categoryId": 1089,
+    "resourceCount": 9
+  },
+  {
+    "id": 2191,
+    "name": "Codecs",
+    "slug": "codecs",
+    "categoryId": 1085,
+    "resourceCount": 27
+  },
+  {
+    "id": 2202,
+    "name": "Community Groups",
+    "slug": "community-groups",
+    "categoryId": 1091,
+    "resourceCount": 4
+  },
+  {
+    "id": 2201,
+    "name": "DRM",
+    "slug": "drm",
+    "categoryId": 1090,
+    "resourceCount": 17
+  },
+  {
+    "id": 2190,
+    "name": "Encoding Tools",
+    "slug": "encoding-tools",
+    "categoryId": 1085,
+    "resourceCount": 225
+  },
+  {
+    "id": 2203,
+    "name": "Events & Conferences",
+    "slug": "events-conferences",
+    "categoryId": 1091,
+    "resourceCount": 6
+  },
+  {
+    "id": 2200,
+    "name": "FFMPEG & Tools",
+    "slug": "ffmpeg-tools",
+    "categoryId": 1090,
+    "resourceCount": 0
+  },
+  {
+    "id": 2192,
+    "name": "Hardware Players",
+    "slug": "hardware-players",
+    "categoryId": 1086,
+    "resourceCount": 35
+  },
+  {
+    "id": 2185,
+    "name": "Introduction",
+    "slug": "introduction",
+    "categoryId": 1083,
+    "resourceCount": 3
+  },
+  {
+    "id": 2186,
+    "name": "Learning Resources",
+    "slug": "learning-resources",
+    "categoryId": 1083,
+    "resourceCount": 36
+  },
+  {
+    "id": 2193,
+    "name": "Mobile & Web Players",
+    "slug": "mobile-web-players",
+    "categoryId": 1086,
+    "resourceCount": 78
+  },
+  {
+    "id": 2196,
+    "name": "Specs & Standards",
+    "slug": "specs-standards",
+    "categoryId": 1088,
+    "resourceCount": 34
+  },
+  {
+    "id": 2198,
+    "name": "Streaming Servers",
+    "slug": "streaming-servers",
+    "categoryId": 1089,
+    "resourceCount": 35
+  },
+  {
+    "id": 2189,
+    "name": "Transport Protocols",
+    "slug": "transport-protocols",
+    "categoryId": 1084,
+    "resourceCount": 9
+  },
+  {
+    "id": 2187,
+    "name": "Tutorials & Case Studies",
+    "slug": "tutorials-case-studies",
+    "categoryId": 1083,
+    "resourceCount": 59
+  },
+  {
+    "id": 2197,
+    "name": "Vendors & HDR",
+    "slug": "vendors-hdr",
+    "categoryId": 1088,
+    "resourceCount": 5
+  }
+]

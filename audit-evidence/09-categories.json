@@ -1,0 +1,56 @@
+[
+  {
+    "id": 1091,
+    "name": "Community & Events",
+    "slug": "community-events",
+    "resourceCount": 91
+  },
+  {
+    "id": 1085,
+    "name": "Encoding & Codecs",
+    "slug": "encoding-codecs",
+    "resourceCount": 372
+  },
+  {
+    "id": 1090,
+    "name": "General Tools",
+    "slug": "general-tools",
+    "resourceCount": 95
+  },
+  {
+    "id": 1089,
+    "name": "Infrastructure & Delivery",
+    "slug": "infrastructure-delivery",
+    "resourceCount": 183
+  },
+  {
+    "id": 1083,
+    "name": "Intro & Learning",
+    "slug": "intro-learning",
+    "resourceCount": 227
+  },
+  {
+    "id": 1087,
+    "name": "Media Tools",
+    "slug": "media-tools",
+    "resourceCount": 304
+  },
+  {
+    "id": 1086,
+    "name": "Players & Clients",
+    "slug": "players-clients",
+    "resourceCount": 263
+  },
+  {
+    "id": 1084,
+    "name": "Protocols & Transport",
+    "slug": "protocols-transport",
+    "resourceCount": 242
+  },
+  {
+    "id": 1088,
+    "name": "Standards & Industry",
+    "slug": "standards-industry",
+    "resourceCount": 172
+  }
+]

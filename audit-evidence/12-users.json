@@ -1,0 +1,38 @@
+{
+  "users": [
+    {
+      "id": "test-user-123",
+      "email": "test@example.com",
+      "password": null,
+      "firstName": "Test",
+      "lastName": "User",
+      "profileImageUrl": null,
+      "role": "user",
+      "createdAt": "2025-11-18T17:11:55.202Z",
+      "updatedAt": "2025-11-18T17:11:55.202Z"
+    },
+    {
+      "id": "d460f5e7-a085-4083-96a2-2f20dc9315c4",
+      "email": "admin@example.com",
+      "password": "$2b$10$tir8aUqFqPuqSKgeu2MjmublaVY6FM.tvF8FZTMTCTpBFN.ZwDANy",
+      "firstName": "Admin",
+      "lastName": "User",
+      "profileImageUrl": null,
+      "role": "admin",
+      "createdAt": "2025-11-18T16:40:48.993Z",
+      "updatedAt": "2026-02-01T06:58:22.889Z"
+    },
+    {
+      "id": "17784443",
+      "email": "krzemienski@gmail.com",
+      "password": "$2b$10$4oCr.UJXfgqSdR.zzozMy..vaDtp7ayfPFPWqpQUPXnERVZRYgfle",
+      "firstName": "Nick",
+      "lastName": "Krzemienski",
+      "profileImageUrl": null,
+      "role": "admin",
+      "createdAt": "2025-11-18T08:31:10.962Z",
+      "updatedAt": "2026-02-11T18:48:18.522Z"
+    }
+  ],
+  "total": 3
+}
