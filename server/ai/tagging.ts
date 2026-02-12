@@ -55,7 +55,12 @@ Respond with JSON in this format:
       max_tokens: 300
     });
 
-    const result = JSON.parse((response.content[0] as any).text || '{}');
+    let rawText = (response.content[0] as any).text || '{}';
+    const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error('No JSON object found in AI response');
+    }
+    const result = JSON.parse(jsonMatch[0]);
     
     return {
       tags: result.tags || [],
