@@ -167,8 +167,9 @@ export class AwesomeLintValidator {
 
       // Validate description if present
       if (description) {
-        // Check description starts with capital
-        if (description[0] !== description[0].toUpperCase()) {
+        const lowercaseExceptions = ['macOS', 'iOS', 'iPad', 'iPhone', 'npm', 'webpack', 'ffmpeg', 'x264', 'x265', 'libav', 'youtube-dl', 'yt-dlp', 'esbuild', 'vite', 'deno', 'node', 'jQuery'];
+        const startsWithException = lowercaseExceptions.some(term => description.startsWith(term));
+        if (!startsWithException && description[0] !== description[0].toUpperCase()) {
           this.addError(i + 1, 'description-capital', 'Description must start with a capital letter');
         }
 
