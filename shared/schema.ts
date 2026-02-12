@@ -1167,3 +1167,84 @@ export interface LinkHealthCheck {
   flaggedForReview: boolean;
   lastCheckedAt: string;
 }
+
+export const researchJobs = pgTable(
+  "research_jobs",
+  {
+    id: serial("id").primaryKey(),
+    status: text("status").notNull().default("pending"),
+    prompt: text("prompt").notNull(),
+    categoryFocus: text("category_focus"),
+    maxBudgetUsd: text("max_budget_usd").default("1.00"),
+    maxTurns: integer("max_turns").default(30),
+    totalDiscoveries: integer("total_discoveries").default(0),
+    approvedDiscoveries: integer("approved_discoveries").default(0),
+    rejectedDiscoveries: integer("rejected_discoveries").default(0),
+    duplicatesSkipped: integer("duplicates_skipped").default(0),
+    totalInputTokens: integer("total_input_tokens").default(0),
+    totalOutputTokens: integer("total_output_tokens").default(0),
+    estimatedCostUsd: text("estimated_cost_usd").default("0.00"),
+    turnsUsed: integer("turns_used").default(0),
+    agentLog: jsonb("agent_log").$type<Array<{ role: string; content: string; timestamp: string }>>().default([]),
+    errorMessage: text("error_message"),
+    startedBy: varchar("started_by").references(() => users.id),
+    startedAt: timestamp("started_at"),
+    completedAt: timestamp("completed_at"),
+    createdAt: timestamp("created_at").defaultNow(),
+  },
+  (table) => [
+    index("idx_research_jobs_status").on(table.status),
+    index("idx_research_jobs_started_by").on(table.startedBy),
+  ]
+);
+
+export const insertResearchJobSchema = createInsertSchema(researchJobs).pick({
+  prompt: true,
+  categoryFocus: true,
+  maxBudgetUsd: true,
+  maxTurns: true,
+  startedBy: true,
+});
+
+export type InsertResearchJob = z.infer<typeof insertResearchJobSchema>;
+export type ResearchJob = typeof researchJobs.$inferSelect;
+
+export const researchDiscoveries = pgTable(
+  "research_discoveries",
+  {
+    id: serial("id").primaryKey(),
+    jobId: integer("job_id").references(() => researchJobs.id, { onDelete: "cascade" }).notNull(),
+    title: text("title").notNull(),
+    url: text("url").notNull(),
+    description: text("description"),
+    suggestedCategory: text("suggested_category"),
+    suggestedSubcategory: text("suggested_subcategory"),
+    confidence: integer("confidence").default(0),
+    reasoning: text("reasoning"),
+    status: text("status").notNull().default("pending_review"),
+    approvedAt: timestamp("approved_at"),
+    rejectedAt: timestamp("rejected_at"),
+    rejectionReason: text("rejection_reason"),
+    createdResourceId: integer("created_resource_id").references(() => resources.id),
+    createdAt: timestamp("created_at").defaultNow(),
+  },
+  (table) => [
+    index("idx_research_discoveries_job_id").on(table.jobId),
+    index("idx_research_discoveries_status").on(table.status),
+    index("idx_research_discoveries_url").on(table.url),
+  ]
+);
+
+export const insertResearchDiscoverySchema = createInsertSchema(researchDiscoveries).pick({
+  jobId: true,
+  title: true,
+  url: true,
+  description: true,
+  suggestedCategory: true,
+  suggestedSubcategory: true,
+  confidence: true,
+  reasoning: true,
+});
+
+export type InsertResearchDiscovery = z.infer<typeof insertResearchDiscoverySchema>;
+export type ResearchDiscovery = typeof researchDiscoveries.$inferSelect;
