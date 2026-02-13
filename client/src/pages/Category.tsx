@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import SEOHead from "@/components/layout/SEOHead";
-import TagFilter from "@/components/ui/tag-filter";
 import AdvancedFilter from "@/components/ui/advanced-filter";
 import { ViewModeToggle, ViewMode } from "@/components/ui/view-mode-toggle";
 import { SuggestEditDialog } from "@/components/ui/suggest-edit-dialog";
@@ -28,29 +27,18 @@ export default function Category() {
   const { isAuthenticated } = useAuth();
   const [location, setLocation] = useLocation();
 
-  // Helper to get current URL search params
   const getSearchParams = () => new URLSearchParams(window.location.search);
 
-  // Initialize state from URL params
   const [searchTerm, setSearchTerm] = useState(() => getSearchParams().get("search") || "");
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>(() => getSearchParams().get("subcategory") || "all");
   const [selectedTags, setSelectedTags] = useState<string[]>(() => {
     const tags = getSearchParams().get("tags");
     return tags ? tags.split(",") : [];
   });
-  const [selectedResourceTypes, setSelectedResourceTypes] = useState<string[]>(() => {
-    const types = getSearchParams().get("resourceType");
-    return types ? types.split(",") : [];
-  });
-  const [selectedDifficulties, setSelectedDifficulties] = useState<string[]>(() => {
-    const difficulties = getSearchParams().get("difficulty");
-    return difficulties ? difficulties.split(",") : [];
-  });
-  const [sortBy, setSortBy] = useState(() => getSearchParams().get("sortBy") || "category");
+  const [sortBy, setSortBy] = useState(() => getSearchParams().get("sortBy") || "default");
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [resourceToEdit, setResourceToEdit] = useState<DbResource | null>(null);
   
-  // View mode with localStorage persistence
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('awesome-list-view-mode');
@@ -61,7 +49,6 @@ export default function Category() {
     return 'grid';
   });
   
-  // Persist view mode to localStorage
   const handleViewModeChange = (mode: ViewMode) => {
     setViewMode(mode);
     localStorage.setItem('awesome-list-view-mode', mode);
@@ -69,16 +56,14 @@ export default function Category() {
   
   const { toast } = useToast();
   
-  // Fetch awesome list data - use same query as homepage
   const { data: rawData, isLoading, error } = useQuery({
     queryKey: ["awesome-list-data"],
     queryFn: fetchStaticAwesomeList,
-    staleTime: 1000 * 60 * 60, // 1 hour
+    staleTime: 1000 * 60 * 60,
   });
   
   const awesomeList = rawData ? processAwesomeListData(rawData) : undefined;
   
-  // Fetch approved database resources
   const { data: dbData } = useQuery<{resources: any[], total: number}>({
     queryKey: ['/api/resources', { status: 'approved' }],
     enabled: !!awesomeList,
@@ -86,24 +71,19 @@ export default function Category() {
   
   const dbResources = dbData?.resources || [];
   
-  // Find the current category and its resources
   const currentCategory = awesomeList?.categories.find(cat => 
     cat.slug === slug
   );
   
   const categoryName = currentCategory ? currentCategory.name : deslugify(slug || "");
   
-  // Merge static and database resources for this category
   const allResources: Resource[] = useMemo(() => {
     if (!currentCategory) return [];
     
-    // Start with static resources
     const staticResources = currentCategory.resources;
     
-    // Filter database resources for this category and map to Resource type (defensive: match by name OR slug)
     const categoryDbResources = dbResources
       .filter(r => {
-        // Match by display name OR slug
         const matchesName = r.category === categoryName;
         const matchesSlug = r.category?.toLowerCase().replace(/\s+&\s+/g, '-').replace(/\s+/g, '-') === slug;
         return matchesName || matchesSlug;
@@ -119,11 +99,9 @@ export default function Category() {
         subSubcategory: r.subSubcategory || undefined,
       }));
     
-    // Merge and return
     return [...staticResources, ...categoryDbResources];
   }, [currentCategory, dbResources, categoryName]);
   
-  // Extract unique subcategories for filter
   const subcategories = useMemo(() => {
     const uniqueSubcategories = new Set<string>();
     allResources.forEach(resource => {
@@ -134,39 +112,22 @@ export default function Category() {
     return Array.from(uniqueSubcategories).sort();
   }, [allResources]);
 
-  // Calculate resource type counts
-  const resourceTypeCounts = useMemo(() => {
-    const counts: Record<string, number> = {};
-    allResources.forEach(resource => {
-      const dbId = typeof resource.id === 'string' && resource.id.startsWith('db-') ? parseInt(resource.id.replace('db-', '')) : resource.id;
-      const dbResource = dbResources.find(dr => dr.id === dbId);
-      const resourceType = dbResource?.metadata?.resourceType;
-      if (resourceType) {
-        counts[resourceType] = (counts[resourceType] || 0) + 1;
-      }
+  const availableTags = useMemo(() => {
+    const tagCounts: Record<string, number> = {};
+    allResources.forEach((r) => {
+      const tags = r.tags || [];
+      tags.forEach((tag: string) => {
+        tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+      });
     });
-    return counts;
-  }, [allResources, dbResources]);
-
-  // Calculate difficulty counts
-  const difficultyCounts = useMemo(() => {
-    const counts: Record<string, number> = {};
-    allResources.forEach(resource => {
-      const dbId = typeof resource.id === 'string' && resource.id.startsWith('db-') ? parseInt(resource.id.replace('db-', '')) : resource.id;
-      const dbResource = dbResources.find(dr => dr.id === dbId);
-      const difficulty = dbResource?.metadata?.difficulty;
-      if (difficulty) {
-        counts[difficulty] = (counts[difficulty] || 0) + 1;
-      }
-    });
-    return counts;
-  }, [allResources, dbResources]);
+    return Object.entries(tagCounts)
+      .map(([tag, count]) => ({ tag, count }))
+      .sort((a, b) => b.count - a.count);
+  }, [allResources]);
   
-  // Filter and sort resources
   const filteredResources = useMemo(() => {
     let results = [...allResources];
 
-    // Search filter
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
       results = results.filter(r =>
@@ -175,39 +136,16 @@ export default function Category() {
       );
     }
 
-    // Subcategory filter
     if (selectedSubcategory !== "all") {
       results = results.filter(r => r.subcategory === selectedSubcategory);
     }
 
-    // Tag filter
     if (selectedTags.length > 0) {
       results = results.filter(r =>
         r.tags && r.tags.some(tag => selectedTags.includes(tag))
       );
     }
 
-    // Resource type filter
-    if (selectedResourceTypes.length > 0) {
-      results = results.filter(r => {
-        const dbId = typeof r.id === 'string' && r.id.startsWith('db-') ? parseInt(r.id.replace('db-', '')) : r.id;
-        const dbResource = dbResources.find(dr => dr.id === dbId);
-        const resourceType = dbResource?.metadata?.resourceType;
-        return resourceType && selectedResourceTypes.includes(resourceType);
-      });
-    }
-
-    // Difficulty filter
-    if (selectedDifficulties.length > 0) {
-      results = results.filter(r => {
-        const dbId = typeof r.id === 'string' && r.id.startsWith('db-') ? parseInt(r.id.replace('db-', '')) : r.id;
-        const dbResource = dbResources.find(dr => dr.id === dbId);
-        const difficulty = dbResource?.metadata?.difficulty;
-        return difficulty && selectedDifficulties.includes(difficulty);
-      });
-    }
-
-    // Sort
     if (sortBy === "name-asc") {
       results.sort((a, b) => a.title.localeCompare(b.title));
     } else if (sortBy === "name-desc") {
@@ -215,29 +153,24 @@ export default function Category() {
     }
 
     return results;
-  }, [allResources, searchTerm, selectedSubcategory, selectedTags, selectedResourceTypes, selectedDifficulties, sortBy, dbResources]);
+  }, [allResources, searchTerm, selectedSubcategory, selectedTags, sortBy]);
   
-  // Update URL when filters change
   useEffect(() => {
     const params = new URLSearchParams();
 
     if (searchTerm) params.set("search", searchTerm);
     if (selectedSubcategory && selectedSubcategory !== "all") params.set("subcategory", selectedSubcategory);
     if (selectedTags.length > 0) params.set("tags", selectedTags.join(","));
-    if (selectedResourceTypes.length > 0) params.set("resourceType", selectedResourceTypes.join(","));
-    if (selectedDifficulties.length > 0) params.set("difficulty", selectedDifficulties.join(","));
-    if (sortBy && sortBy !== "category") params.set("sortBy", sortBy);
+    if (sortBy && sortBy !== "default") params.set("sortBy", sortBy);
 
     const newSearch = params.toString();
     const newPath = `/category/${slug}${newSearch ? `?${newSearch}` : ""}`;
 
-    // Only update if the path changed
     if (location !== newPath) {
       window.history.replaceState({}, "", newPath);
     }
-  }, [searchTerm, selectedSubcategory, selectedTags, selectedResourceTypes, selectedDifficulties, sortBy, slug, location]);
+  }, [searchTerm, selectedSubcategory, selectedTags, sortBy, slug, location]);
 
-  // Sync state from URL on popstate (browser back/forward)
   useEffect(() => {
     const handlePopState = () => {
       const params = getSearchParams();
@@ -245,31 +178,24 @@ export default function Category() {
       setSelectedSubcategory(params.get("subcategory") || "all");
       const tags = params.get("tags");
       setSelectedTags(tags ? tags.split(",") : []);
-      const types = params.get("resourceType");
-      setSelectedResourceTypes(types ? types.split(",") : []);
-      const difficulties = params.get("difficulty");
-      setSelectedDifficulties(difficulties ? difficulties.split(",") : []);
-      setSortBy(params.get("sortBy") || "category");
+      setSortBy(params.get("sortBy") || "default");
     };
 
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
   }, []);
 
-  // Track category view
   useEffect(() => {
     if (categoryName && !isLoading) {
       trackCategoryView(categoryName);
     }
   }, [categoryName, isLoading]);
   
-  // Helper to check if resource is from database (has db- prefix or numeric ID)
   const isDbResource = (resource: Resource) => {
     const idStr = String(resource.id);
     return typeof resource.id === 'number' || /^\d+$/.test(idStr) || idStr.startsWith('db-');
   };
   
-  // Helper to get database ID from resource (handles db- prefix)
   const getDbId = (resource: Resource) => {
     const idStr = String(resource.id);
     if (typeof resource.id === 'number') return resource.id;
@@ -277,7 +203,6 @@ export default function Category() {
     return parseInt(idStr, 10);
   };
   
-  // Helper to convert category resource to DbResource for edit dialog
   const toDbResource = (resource: Resource, dbResource: any): DbResource => ({
     id: getDbId(resource),
     title: resource.title,
@@ -297,7 +222,6 @@ export default function Category() {
     updatedAt: dbResource?.updatedAt || new Date(),
   });
   
-  // Handle suggest edit button click
   const handleSuggestEdit = (e: React.MouseEvent, resource: Resource) => {
     e.stopPropagation();
     if (!isDbResource(resource)) return;
@@ -349,13 +273,11 @@ export default function Category() {
   
   return (
     <div className="space-y-4 sm:space-y-6 overflow-x-hidden max-w-full">
-      {/* SEO Head */}
       <SEOHead 
         title={`${categoryName} Resources - Awesome Video`}
         description={`Browse ${allResources.length} video development resources in the ${categoryName} category.`}
       />
       
-      {/* Header */}
       <div className="space-y-3 sm:space-y-4">
         <Link href="/">
           <Button variant="ghost" size="sm" className="gap-2" data-testid="button-back-home">
@@ -379,10 +301,8 @@ export default function Category() {
         </div>
       </div>
       
-      {/* Filters Bar */}
       <div className="flex flex-col gap-4 min-w-0">
         <div className="flex flex-col md:flex-row gap-4 min-w-0">
-          {/* Search */}
           <div className="relative flex-1 min-w-0">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -394,7 +314,6 @@ export default function Category() {
             />
           </div>
           
-          {/* Subcategory Filter */}
           {subcategories.length > 0 && (
             <Select value={selectedSubcategory} onValueChange={setSelectedSubcategory}>
               <SelectTrigger className="w-full md:w-[200px]" data-testid="select-subcategory-filter">
@@ -410,27 +329,15 @@ export default function Category() {
           )}
         </div>
 
-        {/* Advanced Filter */}
         <AdvancedFilter
-          selectedResourceTypes={selectedResourceTypes}
-          selectedDifficulties={selectedDifficulties}
-          sortBy={sortBy}
-          resourceTypeCounts={resourceTypeCounts}
-          difficultyCounts={difficultyCounts}
-          onResourceTypesChange={setSelectedResourceTypes}
-          onDifficultiesChange={setSelectedDifficulties}
-          onSortChange={setSortBy}
-        />
-
-        {/* Tag Filter */}
-        <TagFilter
-          resources={allResources}
           selectedTags={selectedTags}
+          sortBy={sortBy}
+          availableTags={availableTags}
           onTagsChange={setSelectedTags}
+          onSortChange={setSortBy}
         />
       </div>
       
-      {/* Results Count and View Mode */}
       <div className="flex items-center justify-between gap-2">
         <p className="text-xs sm:text-sm text-muted-foreground min-w-0 truncate" data-testid="text-results-count">
           Showing {filteredResources.length} of {allResources.length} resources
@@ -439,24 +346,21 @@ export default function Category() {
         <ViewModeToggle value={viewMode} onChange={handleViewModeChange} />
       </div>
       
-      {/* Resources Display */}
       {filteredResources.length === 0 ? (
         <div className="text-center py-12">
           <h3 className="text-lg font-semibold mb-2">No resources found</h3>
           <p className="text-muted-foreground mb-4">
-            {searchTerm || selectedSubcategory !== "all" || selectedTags.length > 0 || selectedResourceTypes.length > 0 || selectedDifficulties.length > 0
+            {searchTerm || selectedSubcategory !== "all" || selectedTags.length > 0
               ? "Try adjusting your filters to see more results."
               : "There are no resources in this category yet."}
           </p>
-          {(searchTerm || selectedSubcategory !== "all" || selectedTags.length > 0 || selectedResourceTypes.length > 0 || selectedDifficulties.length > 0) && (
+          {(searchTerm || selectedSubcategory !== "all" || selectedTags.length > 0) && (
             <Button
               variant="outline"
               onClick={() => {
                 setSearchTerm("");
                 setSelectedSubcategory("all");
                 setSelectedTags([]);
-                setSelectedResourceTypes([]);
-                setSelectedDifficulties([]);
               }}
             >
               Clear all filters

@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import SEOHead from "@/components/layout/SEOHead";
-import TagFilter from "@/components/ui/tag-filter";
 import AdvancedFilter from "@/components/ui/advanced-filter";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { deslugify } from "@/lib/utils";
@@ -23,34 +22,22 @@ export default function SubSubcategory() {
   const { toast } = useToast();
   const [location, setLocation] = useLocation();
 
-  // Helper to get current URL search params
   const getSearchParams = () => new URLSearchParams(window.location.search);
 
-  // Initialize state from URL params
   const [selectedTags, setSelectedTags] = useState<string[]>(() => {
     const tags = getSearchParams().get("tags");
     return tags ? tags.split(",") : [];
   });
-  const [selectedResourceTypes, setSelectedResourceTypes] = useState<string[]>(() => {
-    const types = getSearchParams().get("resourceType");
-    return types ? types.split(",") : [];
-  });
-  const [selectedDifficulties, setSelectedDifficulties] = useState<string[]>(() => {
-    const difficulties = getSearchParams().get("difficulty");
-    return difficulties ? difficulties.split(",") : [];
-  });
-  const [sortBy, setSortBy] = useState(() => getSearchParams().get("sortBy") || "category");
+  const [sortBy, setSortBy] = useState(() => getSearchParams().get("sortBy") || "default");
   
-  // Fetch awesome list data - use same query as homepage
   const { data: rawData, isLoading, error } = useQuery({
     queryKey: ["awesome-list-data"],
     queryFn: fetchStaticAwesomeList,
-    staleTime: 1000 * 60 * 60, // 1 hour
+    staleTime: 1000 * 60 * 60,
   });
   
   const awesomeList = rawData ? processAwesomeListData(rawData) : undefined;
   
-  // Fetch approved database resources
   const { data: dbData } = useQuery<{resources: any[], total: number}>({
     queryKey: ['/api/resources', { status: 'approved' }],
     enabled: !!awesomeList,
@@ -58,14 +45,12 @@ export default function SubSubcategory() {
   
   const dbResources = dbData?.resources || [];
   
-  // Find the current sub-subcategory and its resources
   let currentSubSubcategory = null;
   let parentCategory = null;
   let parentSubcategory = null;
   let staticResources: Resource[] = [];
   
   if (awesomeList && slug) {
-    // Find matching sub-subcategory across all categories
     for (const category of awesomeList.categories) {
       for (const subcategory of category.subcategories || []) {
         if (subcategory.subSubcategories) {
@@ -89,12 +74,9 @@ export default function SubSubcategory() {
   const categoryName = parentCategory ? parentCategory.name : "";
   const subcategoryName = parentSubcategory ? parentSubcategory.name : "";
   
-  // Merge static and database resources for this sub-subcategory
   const allResources: Resource[] = useMemo(() => {
-    // Filter database resources for this sub-subcategory and map to Resource type (defensive: match by name OR slug)
     const subSubcategoryDbResources = dbResources
       .filter(r => {
-        // Match by display name OR slug
         const matchesName = r.subSubcategory === subSubcategoryName;
         const matchesSlug = r.subSubcategory?.toLowerCase().replace(/\s+&\s+/g, '-').replace(/\s+/g, '-') === slug;
         return matchesName || matchesSlug;
@@ -110,74 +92,31 @@ export default function SubSubcategory() {
         subSubcategory: r.subSubcategory || undefined,
       }));
 
-    // Merge and return
     return [...staticResources, ...subSubcategoryDbResources];
   }, [staticResources, dbResources, subSubcategoryName]);
 
-  // Calculate resource type counts
-  const resourceTypeCounts = useMemo(() => {
-    const counts: Record<string, number> = {};
-    allResources.forEach(resource => {
-      const dbId = typeof resource.id === 'string' && resource.id.startsWith('db-')
-        ? parseInt(resource.id.replace('db-', ''))
-        : resource.id;
-      const dbResource = dbResources.find(dr => dr.id === dbId);
-      const resourceType = dbResource?.metadata?.resourceType;
-      if (resourceType) {
-        counts[resourceType] = (counts[resourceType] || 0) + 1;
-      }
+  const availableTags = useMemo(() => {
+    const tagCounts: Record<string, number> = {};
+    allResources.forEach((r) => {
+      const tags = r.tags || [];
+      tags.forEach((tag: string) => {
+        tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+      });
     });
-    return counts;
-  }, [allResources, dbResources]);
+    return Object.entries(tagCounts)
+      .map(([tag, count]) => ({ tag, count }))
+      .sort((a, b) => b.count - a.count);
+  }, [allResources]);
 
-  // Calculate difficulty counts
-  const difficultyCounts = useMemo(() => {
-    const counts: Record<string, number> = {};
-    allResources.forEach(resource => {
-      const dbId = typeof resource.id === 'string' && resource.id.startsWith('db-')
-        ? parseInt(resource.id.replace('db-', ''))
-        : resource.id;
-      const dbResource = dbResources.find(dr => dr.id === dbId);
-      const difficulty = dbResource?.metadata?.difficulty;
-      if (difficulty) {
-        counts[difficulty] = (counts[difficulty] || 0) + 1;
-      }
-    });
-    return counts;
-  }, [allResources, dbResources]);
-
-  // Filter and sort resources
   const filteredResources = useMemo(() => {
     let results = [...allResources];
 
-    // Tag filter
     if (selectedTags.length > 0) {
       results = results.filter(r =>
         r.tags && r.tags.some(tag => selectedTags.includes(tag))
       );
     }
 
-    // Resource type filter
-    if (selectedResourceTypes.length > 0) {
-      results = results.filter(r => {
-        const dbId = typeof r.id === 'string' && r.id.startsWith('db-') ? parseInt(r.id.replace('db-', '')) : r.id;
-        const dbResource = dbResources.find(dr => dr.id === dbId);
-        const resourceType = dbResource?.metadata?.resourceType;
-        return resourceType && selectedResourceTypes.includes(resourceType);
-      });
-    }
-
-    // Difficulty filter
-    if (selectedDifficulties.length > 0) {
-      results = results.filter(r => {
-        const dbId = typeof r.id === 'string' && r.id.startsWith('db-') ? parseInt(r.id.replace('db-', '')) : r.id;
-        const dbResource = dbResources.find(dr => dr.id === dbId);
-        const difficulty = dbResource?.metadata?.difficulty;
-        return difficulty && selectedDifficulties.includes(difficulty);
-      });
-    }
-
-    // Sort
     if (sortBy === "name-asc") {
       results.sort((a, b) => a.title.localeCompare(b.title));
     } else if (sortBy === "name-desc") {
@@ -185,44 +124,34 @@ export default function SubSubcategory() {
     }
 
     return results;
-  }, [allResources, selectedTags, selectedResourceTypes, selectedDifficulties, sortBy, dbResources]);
+  }, [allResources, selectedTags, sortBy]);
   
-  // Update URL when filters change
   useEffect(() => {
     const params = new URLSearchParams();
 
     if (selectedTags.length > 0) params.set("tags", selectedTags.join(","));
-    if (selectedResourceTypes.length > 0) params.set("resourceType", selectedResourceTypes.join(","));
-    if (selectedDifficulties.length > 0) params.set("difficulty", selectedDifficulties.join(","));
-    if (sortBy && sortBy !== "category") params.set("sortBy", sortBy);
+    if (sortBy && sortBy !== "default") params.set("sortBy", sortBy);
 
     const newSearch = params.toString();
     const newPath = `/sub-subcategory/${slug}${newSearch ? `?${newSearch}` : ""}`;
 
-    // Only update if the path changed
     if (location !== newPath) {
       window.history.replaceState({}, "", newPath);
     }
-  }, [selectedTags, selectedResourceTypes, selectedDifficulties, sortBy, slug, location]);
+  }, [selectedTags, sortBy, slug, location]);
 
-  // Sync state from URL on popstate (browser back/forward)
   useEffect(() => {
     const handlePopState = () => {
       const params = getSearchParams();
       const tags = params.get("tags");
       setSelectedTags(tags ? tags.split(",") : []);
-      const types = params.get("resourceType");
-      setSelectedResourceTypes(types ? types.split(",") : []);
-      const difficulties = params.get("difficulty");
-      setSelectedDifficulties(difficulties ? difficulties.split(",") : []);
-      setSortBy(params.get("sortBy") || "category");
+      setSortBy(params.get("sortBy") || "default");
     };
 
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
   }, []);
 
-  // Track sub-subcategory view
   useEffect(() => {
     if (subSubcategoryName && !isLoading) {
       trackCategoryView(`${categoryName} > ${subcategoryName} > ${subSubcategoryName}`);
@@ -270,13 +199,11 @@ export default function SubSubcategory() {
   
   return (
     <div className="space-y-4 sm:space-y-6 overflow-x-hidden max-w-full">
-      {/* SEO Head */}
       <SEOHead 
         title={`${subSubcategoryName} Resources - ${subcategoryName} - ${categoryName} - Awesome Video`}
         description={`Browse ${allResources.length} ${subSubcategoryName} resources in the ${subcategoryName} category.`}
       />
       
-      {/* Header */}
       <div className="space-y-3 sm:space-y-4">
         <Link href={parentSubcategory?.slug ? `/subcategory/${parentSubcategory.slug}` : "/"}>
           <Button variant="ghost" size="sm" className="gap-2" data-testid="button-back-subcategory">
@@ -313,36 +240,23 @@ export default function SubSubcategory() {
         </div>
       </div>
       
-      {/* Advanced Filter */}
       <AdvancedFilter
-        selectedResourceTypes={selectedResourceTypes}
-        selectedDifficulties={selectedDifficulties}
+        selectedTags={selectedTags}
         sortBy={sortBy}
-        resourceTypeCounts={resourceTypeCounts}
-        difficultyCounts={difficultyCounts}
-        onResourceTypesChange={setSelectedResourceTypes}
-        onDifficultiesChange={setSelectedDifficulties}
+        availableTags={availableTags}
+        onTagsChange={setSelectedTags}
         onSortChange={setSortBy}
       />
-
-      {/* Tag Filter */}
-      <TagFilter
-        resources={allResources}
-        selectedTags={selectedTags}
-        onTagsChange={setSelectedTags}
-      />
       
-      {/* Results Count */}
       {allResources.length > 0 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground" data-testid="text-results-count">
             Showing {filteredResources.length} of {allResources.length} resources
-            {(selectedTags.length > 0 || selectedResourceTypes.length > 0 || selectedDifficulties.length > 0) && ' (filtered)'}
+            {selectedTags.length > 0 && ' (filtered)'}
           </p>
         </div>
       )}
       
-      {/* Resources Grid */}
       {allResources.length === 0 ? (
         <div className="text-center py-12">
           <h3 className="text-lg font-semibold mb-2">No resources found</h3>
