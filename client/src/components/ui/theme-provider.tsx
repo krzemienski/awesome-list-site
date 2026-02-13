@@ -1,6 +1,15 @@
 import { createContext, useEffect, useState, useCallback, ReactNode } from "react";
 import { themePresets, applyTheme, buildCustomTheme, generateRandomTheme, type ThemePreset } from "@/lib/shadcn-themes";
 
+export const FONT_OPTIONS = [
+  { value: "inter", label: "Inter", family: "'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif", description: "Clean and modern, great readability" },
+  { value: "dm-sans", label: "DM Sans", family: "'DM Sans', ui-sans-serif, system-ui, sans-serif", description: "Geometric, friendly and professional" },
+  { value: "source-sans", label: "Source Sans 3", family: "'Source Sans 3', ui-sans-serif, system-ui, sans-serif", description: "Adobe's open-source workhorse" },
+  { value: "ibm-plex", label: "IBM Plex Sans", family: "'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif", description: "Corporate, highly legible" },
+  { value: "jetbrains", label: "JetBrains Mono", family: "'JetBrains Mono', ui-monospace, monospace", description: "Developer-focused monospace" },
+  { value: "system", label: "System Default", family: "ui-sans-serif, system-ui, -apple-system, sans-serif", description: "Uses your device's native font" },
+] as const;
+
 type ThemeProviderState = {
   activeTheme: ThemePreset;
   setThemeByValue: (value: string) => void;
@@ -8,6 +17,8 @@ type ThemeProviderState = {
   randomizeTheme: () => void;
   presets: ThemePreset[];
   customHex: string;
+  activeFont: string;
+  setFont: (fontValue: string) => void;
 };
 
 const initialState: ThemeProviderState = {
@@ -17,14 +28,27 @@ const initialState: ThemeProviderState = {
   randomizeTheme: () => null,
   presets: themePresets,
   customHex: "",
+  activeFont: "inter",
+  setFont: () => null,
 };
 
 export const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
+
+function applyFont(fontValue: string) {
+  const fontOption = FONT_OPTIONS.find(f => f.value === fontValue);
+  if (!fontOption) return;
+  document.documentElement.style.setProperty('--font-sans', fontOption.family);
+}
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [customHex, setCustomHexState] = useState<string>(() => {
     if (typeof window === "undefined") return "";
     return localStorage.getItem("theme-custom-hex") || "";
+  });
+
+  const [activeFont, setActiveFont] = useState<string>(() => {
+    if (typeof window === "undefined") return "inter";
+    return localStorage.getItem("app-font") || "inter";
   });
 
   const [activeTheme, setActiveTheme] = useState<ThemePreset>(() => {
@@ -70,6 +94,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     setActiveTheme(theme);
   }, []);
 
+  const setFont = useCallback((fontValue: string) => {
+    setActiveFont(fontValue);
+    localStorage.setItem("app-font", fontValue);
+    applyFont(fontValue);
+  }, []);
+
   useEffect(() => {
     const root = document.documentElement;
     root.classList.remove("light");
@@ -80,6 +110,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     applyTheme(activeTheme);
   }, [activeTheme]);
 
+  useEffect(() => {
+    applyFont(activeFont);
+  }, [activeFont]);
+
   return (
     <ThemeProviderContext.Provider value={{
       activeTheme,
@@ -88,6 +122,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       randomizeTheme,
       presets: themePresets,
       customHex,
+      activeFont,
+      setFont,
     }}>
       {children}
     </ThemeProviderContext.Provider>

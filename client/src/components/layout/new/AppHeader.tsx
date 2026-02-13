@@ -116,7 +116,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout }: AppHeaderPro
         </Button>
 
         {user ? (
-          <DropdownMenu>
+          <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                 <Avatar className="h-8 w-8">
@@ -125,7 +125,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout }: AppHeaderPro
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end">
+            <DropdownMenuContent className="w-56" align="end" sideOffset={8}>
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium">{user.name || user.email}</p>
@@ -133,19 +133,19 @@ export default function AppHeader({ onSearchOpen, user, onLogout }: AppHeaderPro
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link href="/profile"><User className="mr-2 h-4 w-4" /> Profile</Link>
+              <DropdownMenuItem onSelect={() => setLocation("/profile")} className="min-h-[44px]">
+                <User className="mr-2 h-4 w-4" /> Profile
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/bookmarks"><Bookmark className="mr-2 h-4 w-4" /> Bookmarks</Link>
+              <DropdownMenuItem onSelect={() => setLocation("/bookmarks")} className="min-h-[44px]">
+                <Bookmark className="mr-2 h-4 w-4" /> Bookmarks
               </DropdownMenuItem>
               {user.role === "admin" && (
-                <DropdownMenuItem asChild>
-                  <Link href="/admin"><Shield className="mr-2 h-4 w-4" /> Admin</Link>
+                <DropdownMenuItem onSelect={() => setLocation("/admin")} className="min-h-[44px]">
+                  <Shield className="mr-2 h-4 w-4" /> Admin
                 </DropdownMenuItem>
               )}
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={onLogout}>
+              <DropdownMenuItem onSelect={onLogout} className="min-h-[44px]">
                 <LogOut className="mr-2 h-4 w-4" /> Sign Out
               </DropdownMenuItem>
             </DropdownMenuContent>

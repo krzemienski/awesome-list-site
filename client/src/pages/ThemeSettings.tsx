@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTheme } from "@/hooks/use-theme";
+import { FONT_OPTIONS } from "@/components/ui/theme-provider";
 import { getThemeCssExport } from "@/lib/shadcn-themes";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,11 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Check, Copy, Shuffle, Palette, ArrowLeft } from "lucide-react";
+import { Check, Copy, Shuffle, Palette, ArrowLeft, Type } from "lucide-react";
 import { Link } from "wouter";
 
 export default function ThemeSettings() {
-  const { activeTheme, setThemeByValue, setCustomColor, randomizeTheme, presets, customHex } = useTheme();
+  const { activeTheme, setThemeByValue, setCustomColor, randomizeTheme, presets, customHex, activeFont, setFont } = useTheme();
   const { toast } = useToast();
   const [hexInput, setHexInput] = useState(customHex || "");
   const [copied, setCopied] = useState(false);
@@ -52,10 +53,55 @@ export default function ThemeSettings() {
           <div>
             <h1 className="text-2xl font-bold">Theme Settings</h1>
             <p className="text-muted-foreground text-sm mt-0.5">
-              Choose a dark theme or create your own. Active: <Badge variant="outline" className="ml-1">{activeTheme.name}</Badge>
+              Customize colors and fonts. Active: <Badge variant="outline" className="ml-1">{activeTheme.name}</Badge>
             </p>
           </div>
         </div>
+      </div>
+
+      <div className="mb-10">
+        <div className="flex items-center gap-2 mb-4">
+          <Type className="h-5 w-5 text-primary" />
+          <h2 className="text-lg font-semibold">Font</h2>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {FONT_OPTIONS.map((font) => (
+            <Card
+              key={font.value}
+              className={`cursor-pointer transition-all hover:ring-2 hover:ring-primary/50 ${
+                activeFont === font.value ? "ring-2 ring-primary" : ""
+              }`}
+              onClick={() => {
+                setFont(font.value);
+                toast({ title: "Font changed", description: `Now using ${font.label}` });
+              }}
+            >
+              <CardContent className="p-4">
+                <div className="flex items-start justify-between mb-2">
+                  <div>
+                    <h3 className="font-semibold text-sm">{font.label}</h3>
+                    <p className="text-xs text-muted-foreground">{font.description}</p>
+                  </div>
+                  {activeFont === font.value && (
+                    <div className="shrink-0 h-6 w-6 rounded-full bg-primary flex items-center justify-center">
+                      <Check className="h-3.5 w-3.5 text-primary-foreground" />
+                    </div>
+                  )}
+                </div>
+                <div
+                  className="text-sm mt-2 p-2 rounded bg-muted/50 border"
+                  style={{ fontFamily: font.family }}
+                >
+                  The quick brown fox jumps over the lazy dog. 0123456789
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      <div className="mb-6">
+        <h2 className="text-lg font-semibold mb-4">Color Theme</h2>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-8">
