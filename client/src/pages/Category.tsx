@@ -465,42 +465,24 @@ export default function Category() {
               return (
                 <Card
                   key={`${resource.url}-${index}`}
-                  className="cursor-pointer hover:bg-accent transition-colors border border-border bg-card p-3 min-w-0"
+                  className="cursor-pointer hover:bg-accent transition-colors border border-border bg-card p-2.5 sm:p-3 min-w-0 touch-manipulation"
                   onClick={handleResourceClick}
                   data-testid={`card-resource-${resourceId}`}
                 >
-                  <div className="flex items-start gap-2 min-w-0">
-                    <span className="font-medium text-sm line-clamp-2 flex-1 min-w-0">{resource.title}</span>
-                    <div className="flex items-center gap-1 flex-shrink-0">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-7 w-7 p-0 min-h-[44px] min-w-[44px] touch-manipulation"
-                        onClick={handleExternalLink}
-                        data-testid={`button-external-${resourceId}`}
-                        title="Open in new tab"
-                        aria-label="Open in new tab"
-                      >
-                        <ExternalLink className="h-3.5 w-3.5" />
-                      </Button>
-                      {isDbResource(resource) && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-7 w-7 p-0 min-h-[44px] min-w-[44px] touch-manipulation"
-                          onClick={(e) => handleSuggestEdit(e, resource)}
-                          data-testid={`button-suggest-edit-${resourceId}`}
-                          title="Suggest an edit"
-                          aria-label="Suggest an edit"
-                        >
-                          <Edit className="h-3.5 w-3.5" />
-                        </Button>
-                      )}
-                    </div>
+                  <div className="flex items-start gap-1.5 min-w-0">
+                    <span className="font-medium text-xs sm:text-sm line-clamp-2 flex-1 min-w-0">{resource.title}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0 shrink-0 touch-manipulation min-h-[44px] min-w-[44px] -mr-1.5"
+                      onClick={handleExternalLink}
+                      data-testid={`button-external-${resourceId}`}
+                      title="Open in new tab"
+                      aria-label="Open in new tab"
+                    >
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    </Button>
                   </div>
-                  {resource.subcategory && (
-                    <Badge variant="outline" className="text-xs mt-2">{resource.subcategory}</Badge>
-                  )}
                 </Card>
               );
             }

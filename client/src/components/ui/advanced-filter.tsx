@@ -40,11 +40,11 @@ export default function AdvancedFilter({
   const hasSelectedFilters = selectedTags.length > 0;
 
   return (
-    <div className="flex items-center gap-2 flex-wrap">
+    <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
       {availableTags.length > 0 && (
         <Popover open={isOpen} onOpenChange={setIsOpen}>
           <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="min-h-[44px]">
+            <Button variant="outline" size="sm" className="min-h-[44px] flex-1 sm:flex-none">
               <SlidersHorizontal className="h-4 w-4 mr-2" />
               Filter by Tag
               {hasSelectedFilters && (
@@ -57,7 +57,7 @@ export default function AdvancedFilter({
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-full sm:w-80 p-0" align="start">
+          <PopoverContent className="w-[calc(100vw-2rem)] sm:w-80 p-0" align="start">
             <div className="p-4 border-b">
               <div className="flex items-center justify-between">
                 <h4 className="font-medium">Filter by Tags</h4>
@@ -116,7 +116,7 @@ export default function AdvancedFilter({
       )}
 
       <Select value={sortBy} onValueChange={onSortChange}>
-        <SelectTrigger className="w-[180px] min-h-[44px]">
+        <SelectTrigger className="w-full sm:w-[180px] min-h-[44px] flex-1 sm:flex-none">
           <SelectValue placeholder="Sort by" />
         </SelectTrigger>
         <SelectContent>
@@ -129,22 +129,23 @@ export default function AdvancedFilter({
       </Select>
 
       {hasSelectedFilters && (
-        <>
-          <div className="text-sm text-muted-foreground">Filtered:</div>
-          <div className="flex gap-1 flex-wrap">
-            {selectedTags.map((tag) => (
-              <Badge
-                key={tag}
-                variant="default"
-                className="min-h-[44px] text-xs cursor-pointer hover:bg-destructive hover:text-destructive-foreground px-3 flex items-center"
-                onClick={() => toggleTag(tag)}
-              >
-                <span>{tag}</span>
-                <X className="h-3 w-3 ml-1" />
-              </Badge>
-            ))}
-          </div>
-        </>
+        <div className="flex gap-1.5 flex-wrap items-center w-full sm:w-auto">
+          <span className="text-xs text-muted-foreground">Active:</span>
+          {selectedTags.map((tag) => (
+            <Badge
+              key={tag}
+              variant="default"
+              className="text-xs cursor-pointer hover:bg-destructive hover:text-destructive-foreground px-2 py-1 flex items-center gap-1 touch-manipulation"
+              onClick={() => toggleTag(tag)}
+            >
+              {tag}
+              <X className="h-3 w-3" />
+            </Badge>
+          ))}
+          <Button variant="ghost" size="sm" onClick={clearAll} className="text-xs h-7 px-2">
+            Clear
+          </Button>
+        </div>
       )}
     </div>
   );

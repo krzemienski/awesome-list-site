@@ -193,7 +193,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
         onSortChange={setSortBy}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         {filteredCategories.map((category) => {
           const Icon = categoryIcons[category.name] || FileText;
           const totalCount = category.displayCount;
@@ -213,7 +213,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
               data-testid={`link-category-${category.slug}`}
             >
               <Card
-                className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors border border-border bg-card text-card-foreground"
+                className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors border border-border bg-card text-card-foreground touch-manipulation"
                 data-testid={`card-category-${category.slug}`}
               >
                 <CardHeader className="p-4 sm:p-6">

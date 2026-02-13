@@ -66,7 +66,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout }: AppHeaderPro
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-3 sm:px-4">
-      <SidebarTrigger className="-ml-1 shrink-0" />
+      <SidebarTrigger className="-ml-1 shrink-0 min-h-[44px] min-w-[44px]" />
       <Separator orientation="vertical" className="mr-1 sm:mr-2 h-4 hidden sm:block" />
 
       <Breadcrumb className="hidden md:flex">
@@ -89,7 +89,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout }: AppHeaderPro
       <div className="flex-1 min-w-0 mx-1 sm:mx-2">
         <button
           onClick={onSearchOpen}
-          className="w-full max-w-sm flex items-center h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors hover:bg-accent"
+          className="w-full max-w-sm flex items-center h-10 sm:h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors hover:bg-accent touch-manipulation"
         >
           <Search className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
           <span className="text-muted-foreground truncate hidden sm:inline">Search resources...</span>
@@ -104,7 +104,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout }: AppHeaderPro
         <Button
           variant="ghost"
           size="icon"
-          className="h-9 w-9 relative"
+          className="h-9 w-9 min-h-[44px] min-w-[44px] relative touch-manipulation"
           onClick={() => setLocation("/settings/theme")}
           title="Theme Settings"
         >

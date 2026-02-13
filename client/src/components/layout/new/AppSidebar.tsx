@@ -214,26 +214,29 @@ export default function AppSidebar({ categories, resources, isLoading, user }: A
                         className="group/collapsible"
                       >
                         <SidebarMenuItem>
+                          <SidebarMenuButton
+                            tooltip={cat.name}
+                            isActive={isActive(catPath)}
+                            onClick={() => navigate(catPath)}
+                            className="pr-1"
+                          >
+                            <CategoryIcon className="size-4" />
+                            <span className="truncate">{cat.name}</span>
+                            <Badge variant="secondary" className="ml-auto text-xs tabular-nums">
+                              {totalCount}
+                            </Badge>
+                          </SidebarMenuButton>
                           <CollapsibleTrigger asChild>
-                            <SidebarMenuButton tooltip={cat.name}>
-                              <CategoryIcon className="size-4" />
-                              <span className="truncate">{cat.name}</span>
-                              <Badge variant="secondary" className="ml-auto text-xs tabular-nums">
-                                {totalCount}
-                              </Badge>
-                              <ChevronRight className="ml-1 size-4 shrink-0 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                            </SidebarMenuButton>
+                            <button
+                              className="absolute right-1 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-accent min-h-[44px] min-w-[44px] flex items-center justify-center touch-manipulation z-10"
+                              aria-label={`Expand ${cat.name}`}
+                              data-testid={`expand-cat-${cat.slug || getCategorySlug(cat.name)}`}
+                            >
+                              <ChevronRight className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                            </button>
                           </CollapsibleTrigger>
                           <CollapsibleContent>
                             <SidebarMenuSub>
-                              <SidebarMenuSubItem>
-                                <SidebarMenuSubButton
-                                  isActive={isActive(catPath)}
-                                  onClick={() => navigate(catPath)}
-                                >
-                                  <span>All {cat.name}</span>
-                                </SidebarMenuSubButton>
-                              </SidebarMenuSubItem>
                               {cat.subcategories?.map((sub) => {
                                 const SubIcon = getSubcategoryIcon(sub.name);
                                 const subPath = `/subcategory/${sub.slug || slugify(sub.name)}`;
@@ -268,26 +271,28 @@ export default function AppSidebar({ categories, resources, isLoading, user }: A
                                     }
                                     className="group/sub"
                                   >
-                                    <SidebarMenuSubItem>
+                                    <SidebarMenuSubItem className="relative">
+                                      <SidebarMenuSubButton
+                                        isActive={isActive(subPath)}
+                                        onClick={() => navigate(subPath)}
+                                        className="pr-8"
+                                      >
+                                        <span className="truncate">{sub.name}</span>
+                                        <span className="ml-auto text-xs text-muted-foreground tabular-nums">
+                                          {subCount}
+                                        </span>
+                                      </SidebarMenuSubButton>
                                       <CollapsibleTrigger asChild>
-                                        <SidebarMenuSubButton>
-                                          <span className="truncate">{sub.name}</span>
-                                          <span className="ml-auto text-xs text-muted-foreground tabular-nums">
-                                            {subCount}
-                                          </span>
-                                          <ChevronRight className="ml-1 size-3 shrink-0 transition-transform duration-200 group-data-[state=open]/sub:rotate-90" />
-                                        </SidebarMenuSubButton>
+                                        <button
+                                          className="absolute right-0 top-1/2 -translate-y-1/2 p-1 rounded-md hover:bg-accent min-h-[36px] min-w-[36px] flex items-center justify-center touch-manipulation z-10"
+                                          aria-label={`Expand ${sub.name}`}
+                                          data-testid={`expand-sub-${sub.slug || slugify(sub.name)}`}
+                                        >
+                                          <ChevronRight className="size-3 shrink-0 transition-transform duration-200 group-data-[state=open]/sub:rotate-90" />
+                                        </button>
                                       </CollapsibleTrigger>
                                       <CollapsibleContent>
                                         <SidebarMenuSub>
-                                          <SidebarMenuSubItem>
-                                            <SidebarMenuSubButton
-                                              isActive={isActive(subPath)}
-                                              onClick={() => navigate(subPath)}
-                                            >
-                                              <span>All {sub.name}</span>
-                                            </SidebarMenuSubButton>
-                                          </SidebarMenuSubItem>
                                           {sub.subSubcategories?.map((subSub) => {
                                             const ssPath = `/sub-subcategory/${subSub.slug || slugify(subSub.name)}`;
                                             const ssCount = getTotalResourceCount(subSub);
