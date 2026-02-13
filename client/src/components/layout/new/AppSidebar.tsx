@@ -20,6 +20,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import {
   Collapsible,
@@ -68,6 +69,7 @@ export default function AppSidebar({ categories, resources, isLoading, user }: A
   const [location, setLocation] = useLocation();
   const [openCategories, setOpenCategories] = useState<string[]>([]);
   const [openSubcategories, setOpenSubcategories] = useState<string[]>([]);
+  const { setOpenMobile } = useSidebar();
 
   const filtered = filterCategories(categories);
 
@@ -98,6 +100,7 @@ export default function AppSidebar({ categories, resources, isLoading, user }: A
 
   const navigate = (path: string) => {
     setLocation(path);
+    setOpenMobile(false);
   };
 
   const isActive = (path: string) => location === path;
