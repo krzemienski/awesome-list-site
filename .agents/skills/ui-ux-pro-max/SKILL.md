@@ -1,6 +1,7 @@
 ---
-name: ui-ux-pro-max
+name: ck:ui-ux-pro-max
 description: "UI/UX design intelligence. 50 styles, 21 palettes, 50 font pairings, 20 charts, 9 stacks (React, Next.js, Vue, Svelte, SwiftUI, React Native, Flutter, Tailwind, shadcn/ui). Actions: plan, build, create, design, implement, review, fix, improve, optimize, enhance, refactor, check UI/UX code. Projects: website, landing page, dashboard, admin panel, e-commerce, SaaS, portfolio, blog, mobile app, .html, .tsx, .vue, .svelte. Elements: button, modal, navbar, sidebar, card, table, form, chart. Styles: glassmorphism, claymorphism, minimalism, brutalism, neumorphism, bento grid, dark mode, responsive, skeuomorphism, flat design. Topics: color palette, accessibility, animation, layout, typography, font pairing, spacing, hover, shadow, gradient. Integrations: shadcn/ui MCP for component search and examples."
+argument-hint: "[action] [element|project]"
 ---
 
 # UI/UX Pro Max - Design Intelligence
@@ -135,7 +136,7 @@ Extract key information from user request:
 **Always start with `--design-system`** to get comprehensive recommendations with reasoning:
 
 ```bash
-python3 skills/ui-ux-pro-max/scripts/search.py "<product_type> <industry> <keywords>" --design-system [-p "Project Name"]
+python3 $HOME/.claude/skills/ui-ux-pro-max/scripts/search.py "<product_type> <industry> <keywords>" --design-system [-p "Project Name"]
 ```
 
 This command:
@@ -146,41 +147,7 @@ This command:
 
 **Example:**
 ```bash
-python3 skills/ui-ux-pro-max/scripts/search.py "beauty spa wellness service" --design-system -p "Serenity Spa"
-```
-
-### Step 2b: Persist Design System (Master + Overrides Pattern)
-
-To save the design system for **hierarchical retrieval across sessions**, add `--persist`:
-
-```bash
-python3 skills/ui-ux-pro-max/scripts/search.py "<query>" --design-system --persist -p "Project Name"
-```
-
-This creates:
-- `design-system/MASTER.md` — Global Source of Truth with all design rules
-- `design-system/pages/` — Folder for page-specific overrides
-
-**With page-specific override:**
-```bash
-python3 skills/ui-ux-pro-max/scripts/search.py "<query>" --design-system --persist -p "Project Name" --page "dashboard"
-```
-
-This also creates:
-- `design-system/pages/dashboard.md` — Page-specific deviations from Master
-
-**How hierarchical retrieval works:**
-1. When building a specific page (e.g., "Checkout"), first check `design-system/pages/checkout.md`
-2. If the page file exists, its rules **override** the Master file
-3. If not, use `design-system/MASTER.md` exclusively
-
-**Context-aware retrieval prompt:**
-```
-I am building the [Page Name] page. Please read design-system/MASTER.md.
-Also check if design-system/pages/[page-name].md exists.
-If the page file exists, prioritize its rules.
-If not, use the Master rules exclusively.
-Now, generate the code...
+python3 $HOME/.claude/skills/ui-ux-pro-max/scripts/search.py "beauty spa wellness service" --design-system -p "Serenity Spa"
 ```
 
 ### Step 3: Supplement with Detailed Searches (as needed)
@@ -188,7 +155,7 @@ Now, generate the code...
 After getting the design system, use domain searches to get additional details:
 
 ```bash
-python3 skills/ui-ux-pro-max/scripts/search.py "<keyword>" --domain <domain> [-n <max_results>]
+python3 $HOME/.claude/skills/ui-ux-pro-max/scripts/search.py "<keyword>" --domain <domain> [-n <max_results>]
 ```
 
 **When to use detailed searches:**
@@ -206,10 +173,10 @@ python3 skills/ui-ux-pro-max/scripts/search.py "<keyword>" --domain <domain> [-n
 Get implementation-specific best practices. If user doesn't specify a stack, **default to `html-tailwind`**.
 
 ```bash
-python3 skills/ui-ux-pro-max/scripts/search.py "<keyword>" --stack html-tailwind
+python3 $HOME/.claude/skills/ui-ux-pro-max/scripts/search.py "<keyword>" --stack html-tailwind
 ```
 
-Available stacks: `html-tailwind`, `react`, `nextjs`, `vue`, `svelte`, `swiftui`, `react-native`, `flutter`, `shadcn`, `jetpack-compose`
+Available stacks: `html-tailwind`, `react`, `nextjs`, `vue`, `svelte`, `swiftui`, `react-native`, `flutter`, `shadcn`
 
 ---
 
@@ -243,7 +210,6 @@ Available stacks: `html-tailwind`, `react`, `nextjs`, `vue`, `svelte`, `swiftui`
 | `react-native` | Components, Navigation, Lists |
 | `flutter` | Widgets, State, Layout, Theming |
 | `shadcn` | shadcn/ui components, theming, forms, patterns |
-| `jetpack-compose` | Composables, Modifiers, State Hoisting, Recomposition |
 
 ---
 
@@ -260,7 +226,7 @@ Available stacks: `html-tailwind`, `react`, `nextjs`, `vue`, `svelte`, `swiftui`
 ### Step 2: Generate Design System (REQUIRED)
 
 ```bash
-python3 skills/ui-ux-pro-max/scripts/search.py "beauty spa wellness service elegant" --design-system -p "Serenity Spa"
+python3 $HOME/.claude/skills/ui-ux-pro-max/scripts/search.py "beauty spa wellness service elegant" --design-system -p "Serenity Spa"
 ```
 
 **Output:** Complete design system with pattern, style, colors, typography, effects, and anti-patterns.
@@ -269,16 +235,16 @@ python3 skills/ui-ux-pro-max/scripts/search.py "beauty spa wellness service eleg
 
 ```bash
 # Get UX guidelines for animation and accessibility
-python3 skills/ui-ux-pro-max/scripts/search.py "animation accessibility" --domain ux
+python3 $HOME/.claude/skills/ui-ux-pro-max/scripts/search.py "animation accessibility" --domain ux
 
 # Get alternative typography options if needed
-python3 skills/ui-ux-pro-max/scripts/search.py "elegant luxury serif" --domain typography
+python3 $HOME/.claude/skills/ui-ux-pro-max/scripts/search.py "elegant luxury serif" --domain typography
 ```
 
 ### Step 4: Stack Guidelines
 
 ```bash
-python3 skills/ui-ux-pro-max/scripts/search.py "layout responsive form" --stack html-tailwind
+python3 $HOME/.claude/skills/ui-ux-pro-max/scripts/search.py "layout responsive form" --stack html-tailwind
 ```
 
 **Then:** Synthesize design system + detailed searches and implement the design.
@@ -291,10 +257,10 @@ The `--design-system` flag supports two output formats:
 
 ```bash
 # ASCII box (default) - best for terminal display
-python3 skills/ui-ux-pro-max/scripts/search.py "fintech crypto" --design-system
+python3 $HOME/.claude/skills/ui-ux-pro-max/scripts/search.py "fintech crypto" --design-system
 
 # Markdown - best for documentation
-python3 skills/ui-ux-pro-max/scripts/search.py "fintech crypto" --design-system -f markdown
+python3 $HOME/.claude/skills/ui-ux-pro-max/scripts/search.py "fintech crypto" --design-system -f markdown
 ```
 
 ---
@@ -384,3 +350,116 @@ Before delivering UI code, verify these items:
 - [ ] Form inputs have labels
 - [ ] Color is not the only indicator
 - [ ] `prefers-reduced-motion` respected
+
+## Canvas Design Patterns
+
+Philosophy-driven visual design for museum-quality compositions and brand materials.
+
+### Design Philosophy
+- **Visual communication over text**: Let composition, color, and form convey meaning
+- **Systematic patterns**: Build from repeatable design tokens and spatial relationships
+- **Minimal text integration**: When text is needed, treat it as a visual element with deliberate placement
+- **Refined aesthetics**: Every detail matters — spacing, alignment, color relationships
+
+### Composition Principles
+- Use visual hierarchy through scale, contrast, and position
+- Build from a consistent grid system
+- Apply intentional whitespace as a design element
+- Create focal points through color and form contrast
+
+### Multi-Page Design Systems
+- Maintain consistent tokens (colors, spacing, typography) across pages
+- Use a shared component vocabulary (cards, navigation, sections)
+- Design transitions and visual flow between pages
+
+## shadcn/ui Component Patterns
+
+Quick reference for the shadcn/ui component library (Radix UI + Tailwind CSS).
+
+### Setup
+```bash
+npx shadcn@latest init          # Initialize project
+npx shadcn@latest add button card dialog form  # Add components
+```
+
+### Core Stack
+- **Components**: Pre-built accessible components via Radix UI primitives
+- **Styling**: Tailwind CSS utility classes with CSS variable theming
+- **Distribution**: Copy-paste model (components live in your codebase at `@/components/ui/`)
+
+### Theme & Dark Mode
+- CSS variables for theming (`--background`, `--foreground`, `--primary`, etc.)
+- Dark mode via `next-themes` or class-based toggling
+- Customize colors in `globals.css` under `:root` and `.dark`
+
+### Key Component Categories
+| Category | Components |
+|----------|-----------|
+| Forms | Button, Input, Select, Checkbox, RadioGroup, Switch, Form (react-hook-form + zod) |
+| Layout | Card, Tabs, Accordion, Separator, NavigationMenu |
+| Overlays | Dialog, Drawer, Popover, Tooltip, DropdownMenu, Command |
+| Feedback | Alert, Toast, Progress, Skeleton, Badge |
+| Data | Table, DataTable (TanStack), Avatar |
+
+### Form Pattern (react-hook-form + zod)
+```tsx
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
+
+const schema = z.object({ email: z.string().email(), password: z.string().min(8) })
+
+export function LoginForm() {
+  const form = useForm({ resolver: zodResolver(schema), defaultValues: { email: "", password: "" } })
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(console.log)} className="space-y-6">
+        <FormField control={form.control} name="email" render={({ field }) => (
+          <FormItem>
+            <FormLabel>Email</FormLabel>
+            <FormControl><Input type="email" {...field} /></FormControl>
+            <FormMessage />
+          </FormItem>
+        )} />
+        <Button type="submit" className="w-full">Sign In</Button>
+      </form>
+    </Form>
+  )
+}
+```
+
+### Accessibility
+- All Radix primitives include ARIA attributes, keyboard navigation, and focus management
+- Add `focus-visible:ring-2` for keyboard focus states
+- Use `aria-label` on icon-only buttons
+- Form validation messages auto-associated via FormMessage
+
+## Anti-Patterns
+
+| Pattern | Why It's Wrong | Do This Instead |
+|---------|---------------|-----------------|
+| Using emojis as UI icons | Emojis render inconsistently across platforms and look unprofessional | Use SVG icons from consistent sets: Heroicons, Lucide, Simple Icons |
+| Skipping the `--design-system` search | Ad-hoc color/font choices lack cohesion and produce inconsistent UIs | Always start with `--design-system` to get reasoned recommendations |
+| Using `cursor: default` on clickable elements | Users can't tell what's interactive — breaks discoverability | Add `cursor-pointer` to ALL clickable/hoverable elements |
+| Glass cards with `bg-white/10` in light mode | Too transparent — content becomes unreadable against light backgrounds | Use `bg-white/80` or higher opacity for glass effects in light mode |
+| Using `scale` transforms for hover states | Scale transforms shift surrounding layout and cause visual jank | Use color/opacity transitions for hover feedback; avoid layout-shifting transforms |
+
+## When NOT to Use
+
+- Backend API development with no UI component
+- CLI tools or terminal-only applications
+- Data processing or ETL pipelines
+- When the user explicitly provides a complete design system (no search needed)
+
+## Conflicts
+
+- `visual-inspection` — Complementary: ui-ux-pro-max guides design decisions; visual-inspection verifies the built result. Use both together.
+- `web-design-guidelines` — Overlapping UI guidance. Use ui-ux-pro-max for design system generation (styles, palettes, fonts). Use web-design-guidelines for Vercel-specific interface compliance auditing.
+- `tailwind-v4-shadcn` — Complementary: ui-ux-pro-max selects the design system; tailwind-v4-shadcn implements it with Tailwind v4 + shadcn/ui specifics.
+
+## Related Skills
+- `shadcn-ui` — implement UI components using shadcn/ui after completing the design system search
+- `tailwind-v4-shadcn` — production-tested Tailwind v4 setup when using the html-tailwind or shadcn stack
+- `visual-inspection` — systematic visual QA protocol to verify the built UI meets the design spec
+- `web-design-guidelines` — audit the final UI against Vercel web interface guidelines for compliance
