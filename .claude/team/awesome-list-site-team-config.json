@@ -1,0 +1,15 @@
+{
+  "version": "1.0",
+  "generatedBy": "ecc-tools",
+  "profile": "research",
+  "sharedSkills": [
+    ".claude/skills/awesome-list-site/SKILL.md",
+    ".agents/skills/awesome-list-site/SKILL.md"
+  ],
+  "commandFiles": [
+    ".claude/commands/feature-development.md",
+    ".claude/commands/refactoring.md",
+    ".claude/commands/add-ai-powered-feature.md"
+  ],
+  "updatedAt": "2026-03-22T20:17:05.111Z"
+}
