@@ -92,8 +92,8 @@ export class RecommendationEngine {
     try {
       const [dbPreferences, viewHistory, interactions, journeyProgressList] = await Promise.all([
         storage.getUserPreferences(userProfile.userId),
-        storage.getUserViewHistory(userProfile.userId),
-        storage.getUserInteractions(userProfile.userId),
+        typeof (storage as any).getUserViewHistory === 'function' ? (storage as any).getUserViewHistory(userProfile.userId) : Promise.resolve([]),
+        typeof (storage as any).getUserInteractions === 'function' ? (storage as any).getUserInteractions(userProfile.userId) : Promise.resolve([]),
         storage.listUserJourneyProgress(userProfile.userId)
       ]);
 
@@ -194,17 +194,24 @@ export class RecommendationEngine {
         const awesomeListData = storage.getAwesomeListData();
         if (awesomeListData && awesomeListData.resources) {
           // Convert awesome list resources to database Resource format
-          resources = awesomeListData.resources.map((r: any, index: number) => ({
+          resources = awesomeListData.resources.map((r: Resource, index: number) => ({
             id: index + 1,
-            title: r.title || r.name || 'Untitled',
+            title: r.title || 'Untitled',
             url: r.url,
             description: r.description || '',
             category: r.category,
             subcategory: r.subcategory,
             subSubcategory: r.subSubcategory,
             status: 'approved',
-            createdAt: new Date()
-          }));
+            createdAt: new Date(),
+            metadata: null,
+            updatedAt: new Date(),
+            submittedBy: null,
+            approvedBy: null,
+            approvedAt: null,
+            githubSynced: false,
+            lastSyncedAt: null,
+          } as Resource));
         }
       }
 
@@ -212,7 +219,7 @@ export class RecommendationEngine {
       const [favorites, bookmarks, completedJourneyResources] = await Promise.all([
         this.getUserFavorites(enrichedProfile.userId),
         this.getUserBookmarks(enrichedProfile.userId),
-        storage.getCompletedJourneyResources(enrichedProfile.userId)
+        typeof (storage as any).getCompletedJourneyResources === 'function' ? (storage as any).getCompletedJourneyResources(enrichedProfile.userId) : Promise.resolve([])
       ]);
 
       // Update enriched profile with actual data

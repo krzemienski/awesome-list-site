@@ -93,7 +93,7 @@ export default function Category() {
         title: r.title,
         description: r.description || '',
         url: r.url,
-        tags: r.metadata?.tags || [],
+        tags: Array.isArray(r.metadata?.tags) ? r.metadata.tags as string[] : [],
         category: r.category,
         subcategory: r.subcategory || undefined,
         subSubcategory: r.subSubcategory || undefined,

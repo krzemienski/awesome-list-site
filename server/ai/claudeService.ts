@@ -2,37 +2,39 @@
  * ============================================================================
  * CLAUDE SERVICE - AI-Powered Resource Analysis
  * ============================================================================
- * 
+ *
  * This service provides Claude AI integration for automated resource analysis
  * and metadata extraction. It uses the Anthropic API with intelligent caching
  * and rate limiting for cost-effective operation.
- * 
+ *
  * CAPABILITIES:
  * - URL Content Analysis: Extracts title, description, tags from web pages
  * - Category Suggestion: Recommends appropriate categories based on content
  * - Quality Scoring: Evaluates resource relevance and quality (1-10 scale)
  * - Batch Processing: Sequential processing with configurable batch sizes
- * 
+ * - Multi-Model Support: Haiku, Sonnet, Opus models with automatic cost tracking
+ *
  * SECURITY:
  * - ALLOWED_DOMAINS whitelist prevents SSRF attacks
  * - Only known video/dev resource domains can be analyzed
  * - API key managed through Replit secrets
- * 
+ *
  * CACHING:
  * - Response cache (1 hour TTL): Deduplicates identical requests
  * - Analysis cache (24 hour TTL): Stores URL analysis results
  * - LRU eviction when cache exceeds MAX_CACHE_SIZE
- * 
+ *
  * RATE LIMITING:
  * - Request counting for usage monitoring
  * - Configurable delays between batch requests
  * - Graceful handling of API rate limit errors
- * 
+ *
  * COST OPTIMIZATION:
- * - Uses Claude Haiku 4.5 (fastest, cheapest model)
+ * - Uses Claude Haiku 3.5 by default (fastest, cheapest model)
  * - Caching reduces redundant API calls
  * - Batch mode processes resources efficiently
- * 
+ * - Real-time cost tracking per model
+ *
  * See /docs/ADMIN-GUIDE.md for enrichment workflow documentation.
  * ============================================================================
  */
@@ -43,18 +45,122 @@ import Anthropic from '@anthropic-ai/sdk';
 const DEFAULT_MODEL_STR = "claude-haiku-4-5"; // Claude Haiku 4.5 (October 2025) - 4-5x faster, 1/3 cost
 // </important_do_not_delete>
 
+// Model definitions with pricing (per 1M tokens)
+export const CLAUDE_MODELS = {
+  'claude-3-5-haiku': { id: 'claude-haiku-4-5', inputCost: 0.25, outputCost: 1.25, maxTokens: 8192 },
+  'claude-3-5-sonnet': { id: 'claude-sonnet-4-5', inputCost: 3.00, outputCost: 15.00, maxTokens: 8192 },
+  'claude-3-opus': { id: 'claude-sonnet-4-5', inputCost: 15.00, outputCost: 75.00, maxTokens: 4096 },
+} as const;
+
+export type ClaudeModelKey = keyof typeof CLAUDE_MODELS;
+export const DEFAULT_MODEL: ClaudeModelKey = 'claude-3-5-haiku';
+
 /**
- * Trusted domains for Claude URL analysis (video streaming related)
- * This allowlist approach provides complete SSRF protection by only allowing
- * known, trusted domains for video streaming and development resources.
+ * Trusted domains for Claude URL analysis
+ * Expanded for AI research capabilities including:
+ * - Developer resources (repos, packages, docs)
+ * - News and blogs (tech news, developer blogs)
+ * - Academic (papers, standards)
+ * - Video/streaming (original focus)
  */
 const ALLOWED_DOMAINS = [
+  // Code repositories
   'github.com',
+  'gitlab.com',
+  'bitbucket.org',
+  'codeberg.org',
+  'sr.ht',
+
+  // Package registries
+  'npmjs.com',
+  'pypi.org',
+  'crates.io',
+  'rubygems.org',
+  'packagist.org',
+  'nuget.org',
+  'pkg.go.dev',
+  'hex.pm',
+  'pub.dev',
+
+  // CDNs
+  'unpkg.com',
+  'cdn.jsdelivr.net',
+  'cdnjs.cloudflare.com',
+
+  // Developer Q&A
+  'stackoverflow.com',
+  'stackexchange.com',
+  'serverfault.com',
+  'superuser.com',
+
+  // Developer blogs/platforms
+  'medium.com',
+  'dev.to',
+  'hashnode.dev',
+  'hackernoon.com',
+  'freecodecamp.org',
+  'css-tricks.com',
+  'smashingmagazine.com',
+
+  // Documentation sites
+  'developer.mozilla.org',
+  'docs.microsoft.com',
+  'learn.microsoft.com',
+  'cloud.google.com',
+  'aws.amazon.com',
+  'docs.aws.amazon.com',
+  'firebase.google.com',
+  'developer.apple.com',
+  'developers.google.com',
+  'reactjs.org',
+  'vuejs.org',
+  'angular.io',
+  'svelte.dev',
+  'nextjs.org',
+  'nodejs.org',
+  'python.org',
+  'rust-lang.org',
+  'go.dev',
+  'typescriptlang.org',
+
+  // Standards organizations
+  'w3.org',
+  'ietf.org',
+  'whatwg.org',
+  'ecma-international.org',
+
+  // Academic/research
+  'arxiv.org',
+  'acm.org',
+  'dl.acm.org',
+  'ieee.org',
+  'ieeexplore.ieee.org',
+  'researchgate.net',
+  'scholar.google.com',
+
+  // Tech news
+  'techcrunch.com',
+  'wired.com',
+  'arstechnica.com',
+  'theverge.com',
+  'infoq.com',
+  'thenewstack.io',
+
+  // Community/social
+  'reddit.com',
+  'news.ycombinator.com',
+  'lobste.rs',
+  'twitter.com',
+  'x.com',
+
+  // Video/streaming (original focus)
   'youtube.com',
   'youtu.be',
   'vimeo.com',
   'twitch.tv',
   'dailymotion.com',
+
+  // Video streaming tech
   'bitmovin.com',
   'cloudflare.com',
   'akamai.com',
@@ -65,17 +171,24 @@ const ALLOWED_DOMAINS = [
   'mux.com',
   'jwplayer.com',
   'videojs.com',
-  'npmjs.com',
-  'unpkg.com',
-  'cdn.jsdelivr.net',
-  'stackoverflow.com',
-  'medium.com',
-  'dev.to',
-  'docs.microsoft.com',
-  'developer.mozilla.org',
-  'w3.org',
-  'ietf.org',
-  'whatwg.org'
+  'brightcove.com',
+  'kaltura.com',
+
+  // Cloud providers
+  'vercel.com',
+  'netlify.com',
+  'heroku.com',
+  'digitalocean.com',
+  'render.com',
+  'railway.app',
+  'fly.io',
+
+  // AI/ML
+  'openai.com',
+  'anthropic.com',
+  'huggingface.co',
+  'tensorflow.org',
+  'pytorch.org',
 ];
 
 interface CacheEntry {
@@ -86,6 +199,18 @@ interface CacheEntry {
 interface AnalysisCache {
   result: any;
   timestamp: number;
+}
+
+export interface APICallResult<T = string> {
+  data: T | null;
+  usage: {
+    inputTokens: number;
+    outputTokens: number;
+    costUsd: number;
+    model: ClaudeModelKey;
+  } | null;
+  cached: boolean;
+  error?: string;
 }
 
 export class ClaudeService {
@@ -99,10 +224,16 @@ export class ClaudeService {
   private requestCount = 0;
   private lastRequestTime = 0;
   private readonly RATE_LIMIT_DELAY = 1000; // 1 second between requests
+  private totalCosts: { [key in ClaudeModelKey]: { calls: number; inputTokens: number; outputTokens: number; costUsd: number } };
 
   private constructor() {
     this.responseCache = new Map();
     this.analysisCache = new Map();
+    this.totalCosts = {
+      'claude-3-5-haiku': { calls: 0, inputTokens: 0, outputTokens: 0, costUsd: 0 },
+      'claude-3-5-sonnet': { calls: 0, inputTokens: 0, outputTokens: 0, costUsd: 0 },
+      'claude-3-opus': { calls: 0, inputTokens: 0, outputTokens: 0, costUsd: 0 },
+    };
     this.initializeClient();
   }
 
@@ -144,59 +275,109 @@ export class ClaudeService {
   }
 
   /**
-   * Generate a response using Claude with caching and rate limiting
+   * Calculate cost for a given model and token usage
+   */
+  public calculateCost(model: ClaudeModelKey, inputTokens: number, outputTokens: number): number {
+    const pricing = CLAUDE_MODELS[model];
+    return (inputTokens * pricing.inputCost / 1_000_000) + (outputTokens * pricing.outputCost / 1_000_000);
+  }
+
+  /**
+   * Generate a response using Claude with caching, rate limiting, and cost tracking
    */
   public async generateResponse(
     prompt: string,
     maxTokens: number = 1000,
-    systemPrompt?: string
-  ): Promise<string | null> {
+    systemPrompt?: string,
+    model?: ClaudeModelKey
+  ): Promise<APICallResult<string>> {
+    const selectedModel = model || DEFAULT_MODEL;
+    const modelConfig = CLAUDE_MODELS[selectedModel];
+
     if (!this.isAvailable()) {
       console.log('Claude service not available, returning null');
-      return null;
+      return {
+        data: null,
+        usage: null,
+        cached: false,
+        error: 'Claude service not available'
+      };
     }
 
-    // Create cache key from prompt
-    const cacheKey = this.createCacheKey(prompt + (systemPrompt || ''));
+    // Create cache key from prompt and model
+    const cacheKey = this.createCacheKey(prompt + (systemPrompt || '') + selectedModel);
 
     // Check cache first
     const cached = this.getFromCache(cacheKey);
     if (cached) {
       console.log('Returning cached Claude response');
-      return cached;
+      return {
+        data: cached,
+        usage: null,
+        cached: true
+      };
     }
 
     // Apply rate limiting
     await this.applyRateLimit();
 
     try {
-      console.log('Generating new Claude response...');
-      const response = await this.anthropic!.messages.create({
-        model: DEFAULT_MODEL_STR,
-        system: systemPrompt || "You are a helpful AI assistant specializing in video development and streaming technologies.",
-        messages: [
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
-        max_tokens: maxTokens
-      });
+      console.log(`Generating new Claude response using ${selectedModel}...`);
+
+      // Adjust timeout for Opus (needs longer processing time)
+      const timeout = selectedModel === 'claude-3-opus' ? 60000 : 30000;
+
+      const response = await Promise.race([
+        this.anthropic!.messages.create({
+          model: modelConfig.id,
+          system: systemPrompt || "You are a helpful AI assistant specializing in video development and streaming technologies.",
+          messages: [
+            {
+              role: 'user',
+              content: prompt
+            }
+          ],
+          max_tokens: Math.min(maxTokens, modelConfig.maxTokens)
+        }),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('Request timeout')), timeout)
+        )
+      ]);
 
       const responseText = (response.content[0] as any).text || '';
-      
+
+      // Extract usage information
+      const inputTokens = response.usage.input_tokens || 0;
+      const outputTokens = response.usage.output_tokens || 0;
+      const costUsd = this.calculateCost(selectedModel, inputTokens, outputTokens);
+
+      // Update cumulative cost tracking
+      this.totalCosts[selectedModel].calls++;
+      this.totalCosts[selectedModel].inputTokens += inputTokens;
+      this.totalCosts[selectedModel].outputTokens += outputTokens;
+      this.totalCosts[selectedModel].costUsd += costUsd;
+
       // Cache the response
       this.addToCache(cacheKey, responseText);
-      
+
       // Update request tracking
       this.requestCount++;
       this.lastRequestTime = Date.now();
 
-      return responseText;
+      return {
+        data: responseText,
+        usage: {
+          inputTokens,
+          outputTokens,
+          costUsd,
+          model: selectedModel
+        },
+        cached: false
+      };
 
     } catch (error: any) {
       console.error('Claude API error:', error.message || error);
-      
+
       // Handle specific error types
       if (error.status === 429) {
         console.log('Rate limited by Claude API, backing off...');
@@ -206,8 +387,31 @@ export class ClaudeService {
         this.anthropic = null;
       }
 
-      return null;
+      return {
+        data: null,
+        usage: null,
+        cached: false,
+        error: error.message || 'Unknown error'
+      };
     }
+  }
+
+  /**
+   * Get cumulative cost statistics
+   */
+  public getCostStats(): typeof this.totalCosts {
+    return { ...this.totalCosts };
+  }
+
+  /**
+   * Reset cost statistics
+   */
+  public resetCostStats(): void {
+    this.totalCosts = {
+      'claude-3-5-haiku': { calls: 0, inputTokens: 0, outputTokens: 0, costUsd: 0 },
+      'claude-3-5-sonnet': { calls: 0, inputTokens: 0, outputTokens: 0, costUsd: 0 },
+      'claude-3-opus': { calls: 0, inputTokens: 0, outputTokens: 0, costUsd: 0 },
+    };
   }
 
   /**
@@ -312,12 +516,12 @@ export class ClaudeService {
     if (!this.isAvailable()) return false;
 
     try {
-      const response = await this.generateResponse(
+      const result = await this.generateResponse(
         'Say "Hello" in one word',
         10,
         'You are a test assistant. Respond with exactly one word.'
       );
-      return response !== null && response.length > 0;
+      return result.data !== null && result.data.length > 0;
     } catch (error) {
       console.error('Claude connection test failed:', error);
       return false;
@@ -330,14 +534,15 @@ export class ClaudeService {
   public async batchProcess(
     prompts: string[],
     maxTokensPerPrompt: number = 500,
-    systemPrompt?: string
-  ): Promise<(string | null)[]> {
-    const results: (string | null)[] = [];
+    systemPrompt?: string,
+    model?: ClaudeModelKey
+  ): Promise<APICallResult<string>[]> {
+    const results: APICallResult<string>[] = [];
 
     for (const prompt of prompts) {
-      const response = await this.generateResponse(prompt, maxTokensPerPrompt, systemPrompt);
+      const response = await this.generateResponse(prompt, maxTokensPerPrompt, systemPrompt, model);
       results.push(response);
-      
+
       // Add delay between batch requests to respect rate limits
       if (prompts.indexOf(prompt) < prompts.length - 1) {
         await new Promise(resolve => setTimeout(resolve, this.RATE_LIMIT_DELAY));
@@ -415,7 +620,7 @@ export class ClaudeService {
     const hostname = parsedUrl.hostname.toLowerCase();
     const isAllowed = ALLOWED_DOMAINS.some(allowedDomain => {
       // Match exact domain or subdomain
-      return hostname === allowedDomain || 
+      return hostname === allowedDomain ||
              hostname === `www.${allowedDomain}` ||
              hostname.endsWith(`.${allowedDomain}`);
     });
@@ -436,14 +641,14 @@ export class ClaudeService {
 
     try {
       let pageContent = '';
-      
+
       try {
         const fetch = (await import('node-fetch')).default;
-        
+
         // Fetch with safeguards - timeout handling
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
-        
+
         const response = await fetch(url, {
           signal: controller.signal,
           headers: {
@@ -452,26 +657,26 @@ export class ClaudeService {
           redirect: 'follow',
           follow: 5
         });
-        
+
         clearTimeout(timeoutId);
-        
+
         if (!response.ok) {
           throw new Error(`Failed to fetch URL: ${response.status}`);
         }
-        
+
         // Size limit check
         const contentLength = response.headers.get('content-length');
         if (contentLength && parseInt(contentLength) > 5 * 1024 * 1024) {
           throw new Error('Content too large (max 5MB)');
         }
-        
+
         const html = await response.text();
-        
+
         // Additional size check after fetching
         if (html.length > 5 * 1024 * 1024) {
           throw new Error('Content too large (max 5MB)');
         }
-        
+
         // Extract text content from HTML
         pageContent = html
           .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
@@ -527,17 +732,17 @@ Return ONLY valid JSON with this structure:
   "keyTopics": ["...", "..."]
 }`;
 
-      const response = await this.generateResponse(
+      const result = await this.generateResponse(
         prompt,
         2000,
         'You are an expert in video streaming technologies, codecs, protocols, and development tools. Analyze resources accurately and return structured JSON metadata.'
       );
 
-      if (!response) {
+      if (!result.data) {
         return null;
       }
 
-      let jsonMatch = response.match(/\{[\s\S]*\}/);
+      let jsonMatch = result.data.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
         console.error('No JSON found in Claude response');
         return null;
@@ -549,7 +754,7 @@ Return ONLY valid JSON with this structure:
       const sanitizedResult = {
         suggestedTitle: (parsed.suggestedTitle || '').substring(0, 200),
         suggestedDescription: (parsed.suggestedDescription || '').substring(0, 2000),
-        suggestedTags: Array.isArray(parsed.suggestedTags) 
+        suggestedTags: Array.isArray(parsed.suggestedTags)
           ? parsed.suggestedTags.slice(0, 20).map((tag: any) => String(tag).substring(0, 50))
           : [],
         suggestedCategory: parsed.suggestedCategory || '',

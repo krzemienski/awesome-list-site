@@ -1,99 +1,115 @@
 /**
- * Centralized Error Handling Middleware
+ * ============================================================================
+ * ERRORHANDLER.TS - Centralized Express Error Handling Middleware
+ * ============================================================================
  *
- * Express error middleware that provides consistent error responses across the API.
- * Handles ApiError instances, ZodError validation errors, and generic errors.
+ * This module provides centralized error handling for the Express application.
+ * It processes different error types and returns consistent JSON responses.
  *
- * Features:
- * - Consistent JSON error responses
- * - Appropriate HTTP status codes
- * - Error logging with detail levels
- * - Stack traces in development mode only
- * - Validation error formatting
- * - Prevents duplicate responses
+ * ERROR HANDLING:
+ * - AppError instances: Returns statusCode and message from the error
+ * - ZodError instances: Converts to 422 validation error with field details
+ * - Unknown errors: Returns 500 Internal Server Error
+ *
+ * LOGGING:
+ * - Client errors (4xx): Logged as info with basic message
+ * - Server errors (5xx): Logged as errors with full stack trace
+ * - Validation errors: Logged with field-level details
+ *
+ * USAGE:
+ * ```typescript
+ * import { errorHandler } from './middleware/errorHandler';
+ *
+ * // Register as the last middleware in Express
+ * app.use(errorHandler);
+ * ```
+ *
+ * See errors.ts for available error classes and asyncHandler.ts for async route handling.
+ * ============================================================================
  */
 
-import type { Request, Response, NextFunction } from 'express';
-import { ZodError } from 'zod';
-import { ApiError } from '../errors/ApiError';
+import type { Request, Response, NextFunction } from "express";
+import { AppError, ValidationError } from "./errors";
+import { ZodError } from "zod";
 
 /**
- * Express error handling middleware
- * Must have 4 parameters (err, req, res, next) to be recognized as error middleware
+ * Centralized error handling middleware for Express
  *
- * @param err - The error object
- * @param req - Express request object
+ * @description Processes all errors thrown in the application and returns
+ * consistent JSON responses. Handles AppError instances, ZodError validation
+ * errors, and unknown errors with appropriate status codes and logging.
+ *
+ * @param err - Error object to handle
+ * @param _req - Express request object (unused but required for error middleware signature)
  * @param res - Express response object
- * @param next - Express next function
+ * @param _next - Express next function (unused but required for error middleware signature)
+ * @returns void - Sends JSON response to client
+ *
+ * @example
+ * ```typescript
+ * import { errorHandler } from './middleware/errorHandler';
+ * app.use(errorHandler);
+ * ```
  */
 export function errorHandler(
-  err: any,
-  req: Request,
+  err: Error,
+  _req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ): void {
-  // Prevent duplicate error responses
-  if (res.headersSent) {
-    return next(err);
-  }
-
-  // Default to 500 Internal Server Error
-  let statusCode = 500;
-  let message = 'Internal Server Error';
-  let errors: any = undefined;
-
-  // Handle ApiError instances (custom error classes)
-  if (err instanceof ApiError) {
-    statusCode = err.statusCode;
-    message = err.message;
-    errors = err.errors;
-  }
   // Handle Zod validation errors
-  else if (err instanceof ZodError) {
-    statusCode = 400;
-    message = 'Validation failed';
-    errors = err.errors;
-  }
-  // Handle generic errors
-  else if (err instanceof Error) {
-    message = err.message || 'Internal Server Error';
-    // Check for common error status code properties
-    statusCode = (err as any).status || (err as any).statusCode || 500;
-  }
+  if (err instanceof ZodError) {
+    const validationError = new ValidationError(
+      "Validation failed",
+      err.errors
+    );
 
-  // Log errors based on severity
-  const isDevelopment = process.env.NODE_ENV !== 'production';
-  const logPrefix = `[ERROR ${statusCode}] ${req.method} ${req.path}`;
-
-  if (statusCode >= 500) {
-    // Server errors - log with full details
-    console.error(logPrefix, {
-      message,
-      errors,
-      stack: err.stack,
-      url: req.url,
-      method: req.method,
+    res.status(validationError.statusCode).json({
+      message: validationError.message,
+      errors: validationError.errors,
     });
-  } else if (isDevelopment) {
-    // Client errors - log in development only
-    console.log(logPrefix, message, errors);
+
+    console.error("Validation error:", {
+      message: validationError.message,
+      errors: validationError.errors,
+    });
+
+    return;
   }
 
-  // Build error response
-  const errorResponse: any = {
-    message,
-  };
+  // Handle AppError instances (operational errors)
+  if (err instanceof AppError) {
+    res.status(err.statusCode).json({
+      message: err.message,
+      ...(err instanceof ValidationError && err.errors ? { errors: err.errors } : {}),
+    });
 
-  // Include validation errors if present
-  if (errors) {
-    errorResponse.errors = errors;
+    // Only log non-client errors (5xx) as errors
+    if (err.statusCode >= 500) {
+      console.error("Application error:", {
+        message: err.message,
+        statusCode: err.statusCode,
+        stack: err.stack,
+      });
+    } else {
+      console.log(`Client error (${err.statusCode}):`, err.message);
+    }
+
+    return;
   }
 
-  // Include stack trace in development mode only
-  if (isDevelopment && err.stack) {
-    errorResponse.stack = err.stack;
-  }
+  // Handle unknown/unexpected errors (non-operational)
+  console.error("Unexpected error:", {
+    message: err.message,
+    stack: err.stack,
+    error: err,
+  });
 
-  // Send error response
-  res.status(statusCode).json(errorResponse);
+  // Don't leak error details in production for unknown errors
+  const message =
+    process.env.NODE_ENV === "production"
+      ? "Internal Server Error"
+      : err.message || "Internal Server Error";
+
+  res.status(500).json({ message });
 }

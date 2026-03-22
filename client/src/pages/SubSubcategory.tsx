@@ -11,6 +11,7 @@ import AdvancedFilter from "@/components/ui/advanced-filter";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { deslugify } from "@/lib/utils";
 import { Resource } from "@/types/awesome-list";
+import type { Resource as DbResource } from "@shared/schema";
 import NotFound from "@/pages/not-found";
 import { processAwesomeListData } from "@/lib/parser";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
@@ -86,7 +87,7 @@ export default function SubSubcategory() {
         title: r.title,
         description: r.description || '',
         url: r.url,
-        tags: r.metadata?.tags || [],
+        tags: Array.isArray(r.metadata?.tags) ? r.metadata.tags as string[] : [],
         category: r.category,
         subcategory: r.subcategory || undefined,
         subSubcategory: r.subSubcategory || undefined,

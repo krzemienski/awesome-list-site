@@ -1,8 +1,25 @@
+// Google Analytics gtag types
+type GtagCommand = 'config' | 'event' | 'js' | 'set';
+type GtagConfigParams = {
+  page_path?: string;
+  [key: string]: unknown;
+};
+type GtagEventParams = {
+  event_category?: string;
+  event_label?: string;
+  value?: number;
+  [key: string]: unknown;
+};
+
 // Define the gtag function globally
 declare global {
   interface Window {
-    dataLayer: any[];
-    gtag: (...args: any[]) => void;
+    dataLayer: Array<unknown>;
+    gtag: (
+      command: GtagCommand,
+      targetIdOrEventName: string | Date,
+      params?: GtagConfigParams | GtagEventParams
+    ) => void;
   }
 }
 

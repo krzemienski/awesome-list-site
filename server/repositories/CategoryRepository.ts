@@ -1,226 +1,403 @@
 /**
  * ============================================================================
- * CATEGORY REPOSITORY - CRUD Operations for Categories
+ * CATEGORY REPOSITORY - Category Hierarchy Data Access Layer
  * ============================================================================
  *
- * This repository provides type-safe CRUD operations for top-level categories.
- * Categories are the root level of the hierarchy and can contain subcategories.
+ * This module provides the data access layer for category hierarchy operations.
+ * It encapsulates all database queries related to the 3-level category hierarchy:
+ * category → subcategory → sub-subcategory.
  *
- * DESIGN PATTERN:
- * - Wraps HierarchyRepository with category-specific configuration
- * - Root-level entity (no parent ID)
- * - Validates against subcategories before deletion
- * - Enforces global slug uniqueness
+ * KEY OPERATIONS:
+ * - Categories: CRUD operations for top-level categories
+ * - Subcategories: CRUD operations for second-level categories
+ * - Sub-subcategories: CRUD operations for third-level categories
+ * - Resource Counting: Get resource counts at each hierarchy level
  *
- * HIERARCHY POSITION:
- * - Categories (root)
- *   └── Subcategories
- *       └── Sub-subcategories
- *
- * USAGE:
- * ```typescript
- * const categoryRepo = new CategoryRepository(db);
- *
- * // List all categories
- * const categories = await categoryRepo.list();
- *
- * // Get category by slug
- * const category = await categoryRepo.getBySlug('javascript');
- *
- * // Create new category
- * const newCategory = await categoryRepo.create({
- *   name: 'JavaScript',
- *   slug: 'javascript'
- * });
- * ```
+ * DESIGN NOTES:
+ * - Enforces referential integrity (can't delete categories with resources)
+ * - Validates slug uniqueness at each hierarchy level
+ * - Uses Drizzle ORM for type-safe database operations
+ * - Supports hierarchical queries and filtering
  * ============================================================================
  */
 
-import { db as dbInstance } from "../db";
-import { eq, sql } from "drizzle-orm";
 import {
   categories,
   subcategories,
+  subSubcategories,
   resources,
   type Category,
   type InsertCategory,
+  type Subcategory,
+  type InsertSubcategory,
+  type SubSubcategory,
+  type InsertSubSubcategory,
 } from "@shared/schema";
-import { HierarchyRepository } from "./HierarchyRepository";
+import { db } from "../db";
+import { eq, and, sql, asc } from "drizzle-orm";
 
 /**
- * Repository for category CRUD operations
- *
- * Provides type-safe database operations for categories with validation
- * against subcategories and resources before deletion.
+ * Repository class for category hierarchy database operations
  */
 export class CategoryRepository {
-  private hierarchyRepo: HierarchyRepository<Category, InsertCategory>;
-
-  /**
-   * Creates a new CategoryRepository instance
-   *
-   * @param db - Drizzle database instance
-   */
-  constructor(private db: typeof dbInstance) {
-    // Initialize HierarchyRepository with category-specific configuration
-    this.hierarchyRepo = new HierarchyRepository<Category, InsertCategory>(
-      db,
-      categories,
-      {
-        idColumn: categories.id,
-        nameColumn: categories.name,
-        slugColumn: categories.slug,
-        // No parentIdColumn - categories are root level
-        resourceColumn: resources.category,
-        checkChildrenFn: async (categoryId: number) => {
-          // Check if category has any subcategories
-          const [result] = await db
-            .select({ count: sql<number>`count(*)::int` })
-            .from(subcategories)
-            .where(eq(subcategories.categoryId, categoryId));
-
-          return {
-            count: result?.count ?? 0,
-            childType: "subcategories",
-          };
-        },
-      }
-    );
-  }
+  // =========================================================================
+  // CATEGORY OPERATIONS
+  // =========================================================================
 
   /**
    * List all categories
-   *
-   * Returns all categories ordered by name (ascending).
-   *
-   * @returns Array of all categories
-   *
-   * @example
-   * const categories = await repo.list();
+   * @returns Array of all categories ordered by name
    */
-  async list(): Promise<Category[]> {
-    return this.hierarchyRepo.list();
+  async listCategories(): Promise<Category[]> {
+    return await db.select().from(categories).orderBy(asc(categories.name));
   }
 
   /**
-   * Get category by ID
-   *
-   * Retrieves a single category by its primary key.
-   *
-   * @param id - The primary key of the category to retrieve
-   * @returns The category if found, undefined otherwise
-   *
-   * @example
-   * const category = await repo.getById(1);
+   * Get a category by its ID
+   * @param id - Category ID
+   * @returns Category object or undefined if not found
    */
-  async getById(id: number): Promise<Category | undefined> {
-    return this.hierarchyRepo.getById(id);
+  async getCategory(id: number): Promise<Category | undefined> {
+    const [category] = await db.select().from(categories).where(eq(categories.id, id));
+    return category;
   }
 
   /**
-   * Get category by name
-   *
-   * Retrieves a category by its exact name. Names are globally unique.
-   *
-   * @param name - The exact name of the category to find
-   * @returns The category if found, undefined otherwise
-   *
-   * @example
-   * const category = await repo.getByName('JavaScript');
+   * Get a category by its name
+   * @param name - Category name
+   * @returns Category object or undefined if not found
    */
-  async getByName(name: string): Promise<Category | undefined> {
-    return this.hierarchyRepo.getByName(name);
+  async getCategoryByName(name: string): Promise<Category | undefined> {
+    const [category] = await db.select().from(categories).where(eq(categories.name, name));
+    return category;
   }
 
   /**
-   * Get category by slug
-   *
-   * Retrieves a category by its URL-friendly slug. Slugs are globally unique.
-   *
-   * @param slug - The URL-friendly slug to search for
-   * @returns The category if found, undefined otherwise
-   *
-   * @example
-   * const category = await repo.getBySlug('javascript');
+   * Get a category by its slug
+   * @param slug - Category slug (URL-safe identifier)
+   * @returns Category object or undefined if not found
    */
-  async getBySlug(slug: string): Promise<Category | undefined> {
-    return this.hierarchyRepo.getBySlug(slug);
+  async getCategoryBySlug(slug: string): Promise<Category | undefined> {
+    const [category] = await db.select().from(categories).where(eq(categories.slug, slug));
+    return category;
   }
 
   /**
    * Create a new category
-   *
-   * Validates slug uniqueness before creating the category.
-   * Slugs must be globally unique across all categories.
-   *
-   * @param data - The category data to insert (must include name and slug)
-   * @returns The newly created category with all columns populated
-   * @throws {Error} If a category with the same slug already exists
-   *
-   * @example
-   * const newCategory = await repo.create({
-   *   name: 'JavaScript',
-   *   slug: 'javascript'
-   * });
+   * @param category - Category data to insert
+   * @returns The created category
+   * @throws Error if slug already exists
    */
-  async create(data: InsertCategory): Promise<Category> {
-    return this.hierarchyRepo.create(data);
+  async createCategory(category: InsertCategory): Promise<Category> {
+    // Check for slug uniqueness
+    const [existing] = await db
+      .select()
+      .from(categories)
+      .where(eq(categories.slug, category.slug));
+
+    if (existing) {
+      throw new Error(`Category with slug "${category.slug}" already exists`);
+    }
+
+    const [newCategory] = await db.insert(categories).values(category).returning();
+    return newCategory;
   }
 
   /**
-   * Update a category
-   *
-   * Updates one or more fields of an existing category. Only the fields
-   * provided in the data object will be modified.
-   *
-   * @param id - The primary key of the category to update
-   * @param data - Partial category data containing only the fields to update
-   * @returns The updated category with all columns populated
-   * @throws {Error} If the category with the given ID does not exist
-   *
-   * @example
-   * const updated = await repo.update(1, {
-   *   name: 'JavaScript & TypeScript'
-   * });
+   * Update an existing category
+   * @param id - Category ID to update
+   * @param category - Partial category data to update
+   * @returns Updated category object
    */
-  async update(id: number, data: Partial<InsertCategory>): Promise<Category> {
-    return this.hierarchyRepo.update(id, data);
+  async updateCategory(id: number, category: Partial<InsertCategory>): Promise<Category> {
+    const [updatedCategory] = await db
+      .update(categories)
+      .set(category)
+      .where(eq(categories.id, id))
+      .returning();
+    return updatedCategory;
   }
 
   /**
-   * Delete a category (with validation)
-   *
-   * Performs validation before deletion to prevent orphaned data:
-   * 1. Checks if category has any associated resources
-   * 2. Checks if category has any subcategories
-   *
-   * Only deletes if both validations pass.
-   *
-   * @param id - The primary key of the category to delete
-   * @throws {Error} If category not found
-   * @throws {Error} If category has associated resources
-   * @throws {Error} If category has subcategories
-   *
-   * @example
-   * // This will fail if the category has subcategories or resources
-   * await repo.delete(1);
+   * Delete a category
+   * @param id - Category ID to delete
+   * @throws Error if category has resources or subcategories
    */
-  async delete(id: number): Promise<void> {
-    return this.hierarchyRepo.delete(id);
+  async deleteCategory(id: number): Promise<void> {
+    // Check if category has any resources
+    const category = await this.getCategory(id);
+    if (!category) {
+      throw new Error('Category not found');
+    }
+
+    const resourceCount = await this.getCategoryResourceCount(category.name);
+    if (resourceCount > 0) {
+      throw new Error(`Cannot delete category "${category.name}" because it has ${resourceCount} resources`);
+    }
+
+    // Check if category has any subcategories
+    const subcategoryList = await this.listSubcategories(id);
+    if (subcategoryList.length > 0) {
+      throw new Error(`Cannot delete category "${category.name}" because it has ${subcategoryList.length} subcategories`);
+    }
+
+    await db.delete(categories).where(eq(categories.id, id));
   }
 
   /**
-   * Get count of resources in this category
-   *
-   * Counts how many resources are assigned to this category.
-   *
-   * @param name - The category name to count resources for
-   * @returns Number of resources in this category
-   *
-   * @example
-   * const count = await repo.getResourceCount('JavaScript');
+   * Get the count of resources in a category
+   * @param categoryName - Name of the category
+   * @returns Number of resources in the category
    */
-  async getResourceCount(name: string): Promise<number> {
-    return this.hierarchyRepo.getResourceCount(name);
+  async getCategoryResourceCount(categoryName: string): Promise<number> {
+    const [result] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(resources)
+      .where(eq(resources.category, categoryName));
+    return result?.count ?? 0;
+  }
+
+  // =========================================================================
+  // SUBCATEGORY OPERATIONS
+  // =========================================================================
+
+  /**
+   * List subcategories, optionally filtered by category
+   * @param categoryId - Optional category ID to filter by
+   * @returns Array of subcategories ordered by name
+   */
+  async listSubcategories(categoryId?: number): Promise<Subcategory[]> {
+    let query = db.select().from(subcategories);
+
+    if (categoryId) {
+      query = query.where(eq(subcategories.categoryId, categoryId)) as any;
+    }
+
+    return await query.orderBy(asc(subcategories.name));
+  }
+
+  /**
+   * Get a subcategory by its ID
+   * @param id - Subcategory ID
+   * @returns Subcategory object or undefined if not found
+   */
+  async getSubcategory(id: number): Promise<Subcategory | undefined> {
+    const [subcategory] = await db.select().from(subcategories).where(eq(subcategories.id, id));
+    return subcategory;
+  }
+
+  /**
+   * Get a subcategory by name and category
+   * @param name - Subcategory name
+   * @param categoryId - Parent category ID
+   * @returns Subcategory object or undefined if not found
+   */
+  async getSubcategoryByName(name: string, categoryId: number): Promise<Subcategory | undefined> {
+    const [subcategory] = await db
+      .select()
+      .from(subcategories)
+      .where(and(eq(subcategories.name, name), eq(subcategories.categoryId, categoryId)));
+    return subcategory;
+  }
+
+  /**
+   * Create a new subcategory
+   * @param subcategory - Subcategory data to insert
+   * @returns The created subcategory
+   * @throws Error if slug already exists in the same category
+   */
+  async createSubcategory(subcategory: InsertSubcategory): Promise<Subcategory> {
+    // Check for slug uniqueness within the same category
+    if (subcategory.categoryId) {
+      const [existing] = await db
+        .select()
+        .from(subcategories)
+        .where(
+          and(
+            eq(subcategories.slug, subcategory.slug),
+            eq(subcategories.categoryId, subcategory.categoryId)
+          )
+        );
+
+      if (existing) {
+        throw new Error(`Subcategory with slug "${subcategory.slug}" already exists in this category`);
+      }
+    }
+
+    const [newSubcategory] = await db.insert(subcategories).values(subcategory).returning();
+    return newSubcategory;
+  }
+
+  /**
+   * Update an existing subcategory
+   * @param id - Subcategory ID to update
+   * @param subcategory - Partial subcategory data to update
+   * @returns Updated subcategory object
+   */
+  async updateSubcategory(id: number, subcategory: Partial<InsertSubcategory>): Promise<Subcategory> {
+    const [updatedSubcategory] = await db
+      .update(subcategories)
+      .set(subcategory)
+      .where(eq(subcategories.id, id))
+      .returning();
+    return updatedSubcategory;
+  }
+
+  /**
+   * Delete a subcategory
+   * @param id - Subcategory ID to delete
+   * @throws Error if subcategory has resources or sub-subcategories
+   */
+  async deleteSubcategory(id: number): Promise<void> {
+    // Check if subcategory has any resources
+    const subcategory = await this.getSubcategory(id);
+    if (!subcategory) {
+      throw new Error('Subcategory not found');
+    }
+
+    const resourceCount = await this.getSubcategoryResourceCount(subcategory.name);
+    if (resourceCount > 0) {
+      throw new Error(`Cannot delete subcategory "${subcategory.name}" because it has ${resourceCount} resources`);
+    }
+
+    // Check if subcategory has any sub-subcategories
+    const subSubcategoryList = await this.listSubSubcategories(id);
+    if (subSubcategoryList.length > 0) {
+      throw new Error(`Cannot delete subcategory "${subcategory.name}" because it has ${subSubcategoryList.length} sub-subcategories`);
+    }
+
+    await db.delete(subcategories).where(eq(subcategories.id, id));
+  }
+
+  /**
+   * Get the count of resources in a subcategory
+   * @param subcategoryName - Name of the subcategory
+   * @returns Number of resources in the subcategory
+   */
+  async getSubcategoryResourceCount(subcategoryName: string): Promise<number> {
+    const [result] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(resources)
+      .where(eq(resources.subcategory, subcategoryName));
+    return result?.count ?? 0;
+  }
+
+  // =========================================================================
+  // SUB-SUBCATEGORY OPERATIONS
+  // =========================================================================
+
+  /**
+   * List sub-subcategories, optionally filtered by subcategory
+   * @param subcategoryId - Optional subcategory ID to filter by
+   * @returns Array of sub-subcategories ordered by name
+   */
+  async listSubSubcategories(subcategoryId?: number): Promise<SubSubcategory[]> {
+    let query = db.select().from(subSubcategories);
+
+    if (subcategoryId) {
+      query = query.where(eq(subSubcategories.subcategoryId, subcategoryId)) as any;
+    }
+
+    return await query.orderBy(asc(subSubcategories.name));
+  }
+
+  /**
+   * Get a sub-subcategory by its ID
+   * @param id - Sub-subcategory ID
+   * @returns Sub-subcategory object or undefined if not found
+   */
+  async getSubSubcategory(id: number): Promise<SubSubcategory | undefined> {
+    const [subSubcategory] = await db.select().from(subSubcategories).where(eq(subSubcategories.id, id));
+    return subSubcategory;
+  }
+
+  /**
+   * Get a sub-subcategory by name and subcategory
+   * @param name - Sub-subcategory name
+   * @param subcategoryId - Parent subcategory ID
+   * @returns Sub-subcategory object or undefined if not found
+   */
+  async getSubSubcategoryByName(name: string, subcategoryId: number): Promise<SubSubcategory | undefined> {
+    const [subSubcategory] = await db
+      .select()
+      .from(subSubcategories)
+      .where(and(eq(subSubcategories.name, name), eq(subSubcategories.subcategoryId, subcategoryId)));
+    return subSubcategory;
+  }
+
+  /**
+   * Create a new sub-subcategory
+   * @param subSubcategory - Sub-subcategory data to insert
+   * @returns The created sub-subcategory
+   * @throws Error if slug already exists in the same subcategory
+   */
+  async createSubSubcategory(subSubcategory: InsertSubSubcategory): Promise<SubSubcategory> {
+    // Check for slug uniqueness within the same subcategory
+    if (subSubcategory.subcategoryId) {
+      const [existing] = await db
+        .select()
+        .from(subSubcategories)
+        .where(
+          and(
+            eq(subSubcategories.slug, subSubcategory.slug),
+            eq(subSubcategories.subcategoryId, subSubcategory.subcategoryId)
+          )
+        );
+
+      if (existing) {
+        throw new Error(`Sub-subcategory with slug "${subSubcategory.slug}" already exists in this subcategory`);
+      }
+    }
+
+    const [newSubSubcategory] = await db.insert(subSubcategories).values(subSubcategory).returning();
+    return newSubSubcategory;
+  }
+
+  /**
+   * Update an existing sub-subcategory
+   * @param id - Sub-subcategory ID to update
+   * @param subSubcategory - Partial sub-subcategory data to update
+   * @returns Updated sub-subcategory object
+   */
+  async updateSubSubcategory(id: number, subSubcategory: Partial<InsertSubSubcategory>): Promise<SubSubcategory> {
+    const [updatedSubSubcategory] = await db
+      .update(subSubcategories)
+      .set(subSubcategory)
+      .where(eq(subSubcategories.id, id))
+      .returning();
+    return updatedSubSubcategory;
+  }
+
+  /**
+   * Delete a sub-subcategory
+   * @param id - Sub-subcategory ID to delete
+   * @throws Error if sub-subcategory has resources
+   */
+  async deleteSubSubcategory(id: number): Promise<void> {
+    // Check if sub-subcategory has any resources
+    const subSubcategory = await this.getSubSubcategory(id);
+    if (!subSubcategory) {
+      throw new Error('Sub-subcategory not found');
+    }
+
+    const resourceCount = await this.getSubSubcategoryResourceCount(subSubcategory.name);
+    if (resourceCount > 0) {
+      throw new Error(`Cannot delete sub-subcategory "${subSubcategory.name}" because it has ${resourceCount} resources`);
+    }
+
+    await db.delete(subSubcategories).where(eq(subSubcategories.id, id));
+  }
+
+  /**
+   * Get the count of resources in a sub-subcategory
+   * @param subSubcategoryName - Name of the sub-subcategory
+   * @returns Number of resources in the sub-subcategory
+   */
+  async getSubSubcategoryResourceCount(subSubcategoryName: string): Promise<number> {
+    const [result] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(resources)
+      .where(eq(resources.subSubcategory, subSubcategoryName));
+    return result?.count ?? 0;
   }
 }

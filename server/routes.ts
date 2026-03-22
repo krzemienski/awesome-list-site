@@ -31,7 +31,19 @@
 
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import {
+  UserRepository,
+  ResourceRepository,
+  CategoryRepository,
+  TagRepository,
+  LearningJourneyRepository,
+  UserFeatureRepository,
+  AuditRepository,
+  GithubSyncRepository,
+  EnrichmentRepository,
+  AdminRepository,
+  LegacyRepository,
+} from "./repositories";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { setupLocalAuth } from "./localAuth";
 import passport from "passport";
@@ -50,14 +62,25 @@ import { validateAwesomeList, formatValidationReport } from "./validation/awesom
 import { checkResourceLinks, formatLinkCheckReport } from "./validation/linkChecker";
 import { seedDatabase } from "./seed";
 import { enrichmentService } from "./ai/enrichmentService";
-import { freeTierLimiter, dynamicRateLimiter } from "./middleware/rateLimit";
-import { registerPublicApiRoutes } from "./api/public";
-import { swaggerSpec } from "./openapi";
-import swaggerUi from "swagger-ui-express";
-import crypto from "crypto";
-import bcrypt from "bcryptjs";
 
 const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md";
+
+// ============================================================================
+// REPOSITORY INSTANCES - Direct Usage of Domain Repositories
+// ============================================================================
+// Instead of using the storage facade, we instantiate repositories directly
+// for better modularity and clearer dependencies.
+const userRepo = new UserRepository();
+const resourceRepo = new ResourceRepository();
+const categoryRepo = new CategoryRepository();
+const tagRepo = new TagRepository();
+const learningJourneyRepo = new LearningJourneyRepository();
+const userFeatureRepo = new UserFeatureRepository();
+const auditRepo = new AuditRepository();
+const githubSyncRepo = new GithubSyncRepository();
+const enrichmentRepo = new EnrichmentRepository();
+const adminRepo = new AdminRepository();
+const legacyRepo = new LegacyRepository();
 
 // Middleware to check if user is admin
 const isAdmin = async (req: any, res: Response, next: any) => {
@@ -66,31 +89,22 @@ const isAdmin = async (req: any, res: Response, next: any) => {
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-
-    const user = await storage.getUser(userId);
+    
+    const user = await userRepo.getUser(userId);
     if (!user || user.role !== 'admin') {
       return res.status(403).json({ message: "Forbidden: Admin access required" });
     }
-
+    
     next();
   } catch (error) {
     res.status(500).json({ message: "Error checking admin status" });
   }
 };
 
-// Helper function to generate secure API keys
-function generateApiKey(): string {
-  // Generate a 32-byte random string and encode as base64url (URL-safe)
-  return crypto.randomBytes(32).toString('base64')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=/g, '');
-}
-
 // SEO route handlers - now uses database-driven data
 async function generateSitemap(req: any, res: any) {
   try {
-    const awesomeListData = await storage.getAwesomeListFromDatabase();
+    const awesomeListData = await legacyRepo.getAwesomeListFromDatabase();
     
     if (!awesomeListData || !awesomeListData.categories.length) {
       return res.status(404).send('Sitemap not available - database empty');
@@ -168,7 +182,7 @@ async function generateOpenGraphImage(req: any, res: any) {
     
     if (!count || !pageTitle) {
       try {
-        const awesomeListData = await storage.getAwesomeListFromDatabase();
+        const awesomeListData = await legacyRepo.getAwesomeListFromDatabase();
         if (!pageTitle) pageTitle = awesomeListData?.title || 'Awesome Video';
         if (!count) count = awesomeListData?.resources?.length?.toString() || '2600+';
       } catch {
@@ -347,7 +361,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log('[local/login] Session saved successfully, session ID:', req.sessionID);
           
           // Fetch user from database to get the role
-          const dbUser = await storage.getUser(user.claims.sub);
+          const dbUser = await userRepo.getUser(user.claims.sub);
           
           console.log('[local/login] Returning user response with role:', dbUser?.role);
           
@@ -390,7 +404,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!dbUser) {
         const userId = req.user.claims.sub;
         console.log('[/api/auth/user] dbUser not in session, fetching from DB, userId:', userId);
-        dbUser = await storage.getUser(userId);
+        dbUser = await userRepo.getUser(userId);
       }
       
       if (!dbUser) {
@@ -438,22 +452,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Note: /api/login, /api/callback are set up in setupAuth()
 
-  // ============= Public API Routes =============
-  // These routes are intended for external API access with rate limiting
-  // Rate limiting is applied based on API key tier or IP address (free tier)
-  // Routes are defined in server/api/public.ts for better organization
-
-  // Serve Swagger UI documentation at /api/docs
-  app.use('/api/docs', swaggerUi.serve);
-  app.get('/api/docs', swaggerUi.setup(swaggerSpec, {
-    customCss: '.swagger-ui .topbar { display: none }',
-    customSiteTitle: 'Awesome List Site - API Documentation',
-  }));
-
-  registerPublicApiRoutes(app);
-
   // ============= Resource Routes =============
-
+  
   // GET /api/resources - List approved resources (public)
   app.get('/api/resources', async (req, res) => {
     try {
@@ -462,20 +462,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const category = req.query.category as string;
       const subcategory = req.query.subcategory as string;
       const search = req.query.search as string;
-      const resourceType = req.query.resourceType as string;
-      const difficulty = req.query.difficulty as string;
-      const sortBy = req.query.sortBy as string;
 
-      const result = await storage.listResources({
+      const result = await resourceRepo.listResources({
         page,
         limit,
         status: 'approved',
         category,
         subcategory,
-        search,
-        resourceType,
-        difficulty,
-        sortBy
+        search
       });
 
       res.json(result);
@@ -484,31 +478,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: 'Failed to fetch resources' });
     }
   });
-  
+
+  // GET /api/resources/check-url - Check if URL already exists (public)
+  app.get('/api/resources/check-url', async (req, res) => {
+    try {
+      const url = req.query.url as string;
+
+      if (!url) {
+        return res.status(400).json({ message: 'URL parameter is required' });
+      }
+
+      const existingResource = await resourceRepo.getResourceByUrl(url);
+
+      if (existingResource) {
+        return res.json({
+          exists: true,
+          resource: {
+            id: existingResource.id,
+            title: existingResource.title,
+            status: existingResource.status,
+            category: existingResource.category,
+            subcategory: existingResource.subcategory
+          }
+        });
+      }
+
+      res.json({ exists: false });
+    } catch (error) {
+      console.error('Error checking URL:', error);
+      res.status(500).json({ message: 'Failed to check URL' });
+    }
+  });
+
   // GET /api/resources/:id - Get single resource
   app.get('/api/resources/:id', async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const resource = await storage.getResource(id);
-      
+      const resource = await resourceRepo.getResource(id);
+
       if (!resource) {
         return res.status(404).json({ message: 'Resource not found' });
       }
-      
+
       res.json(resource);
     } catch (error) {
       console.error('Error fetching resource:', error);
       res.status(500).json({ message: 'Failed to fetch resource' });
     }
   });
-  
+
   // POST /api/resources - Submit new resource (authenticated)
   app.post('/api/resources', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
       const resourceData = insertResourceSchema.parse(req.body);
       
-      const resource = await storage.createResource({
+      const resource = await resourceRepo.createResource({
         ...resourceData,
         submittedBy: userId,
         status: 'pending'
@@ -530,7 +555,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
       
-      const result = await storage.listResources({
+      const result = await resourceRepo.listResources({
         page,
         limit,
         status: 'pending'
@@ -549,7 +574,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const id = parseInt(req.params.id);
       const userId = req.user.claims.sub;
       
-      const resource = await storage.updateResourceStatus(id, 'approved', userId);
+      const resource = await resourceRepo.updateResourceStatus(id, 'approved', userId);
       res.json(resource);
     } catch (error) {
       console.error('Error approving resource:', error);
@@ -563,7 +588,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const id = parseInt(req.params.id);
       const userId = req.user.claims.sub;
       
-      const resource = await storage.updateResourceStatus(id, 'rejected', userId);
+      const resource = await resourceRepo.updateResourceStatus(id, 'rejected', userId);
       res.json(resource);
     } catch (error) {
       console.error('Error rejecting resource:', error);
@@ -582,7 +607,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Invalid resource ID' });
       }
       
-      const resource = await storage.getResource(resourceId);
+      const resource = await resourceRepo.getResource(resourceId);
       if (!resource) {
         return res.status(404).json({ message: 'Resource not found' });
       }
@@ -633,7 +658,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Use sanitized versions in createResourceEdit call
-      const edit = await storage.createResourceEdit({
+      const edit = await auditRepo.createResourceEdit({
         resourceId,
         submittedBy: userId,
         status: 'pending',
@@ -659,7 +684,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/categories - List all categories (public)
   app.get('/api/categories', async (req, res) => {
     try {
-      const categories = await storage.listCategories();
+      const categories = await categoryRepo.listCategories();
       res.json(categories);
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -693,7 +718,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      const subcategories = await storage.listSubcategories(categoryId);
+      const subcategories = await categoryRepo.listSubcategories(categoryId);
       res.json(subcategories);
     } catch (error) {
       console.error('Error fetching subcategories:', error);
@@ -727,7 +752,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      const subSubcategories = await storage.listSubSubcategories(subcategoryId);
+      const subSubcategories = await categoryRepo.listSubSubcategories(subcategoryId);
       res.json(subSubcategories);
     } catch (error) {
       console.error('Error fetching sub-subcategories:', error);
@@ -743,7 +768,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
       const resourceId = parseInt(req.params.resourceId);
       
-      await storage.addFavorite(userId, resourceId);
+      await userFeatureRepo.addFavorite(userId, resourceId);
       res.json({ message: 'Favorite added successfully' });
     } catch (error) {
       console.error('Error adding favorite:', error);
@@ -757,7 +782,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
       const resourceId = parseInt(req.params.resourceId);
       
-      await storage.removeFavorite(userId, resourceId);
+      await userFeatureRepo.removeFavorite(userId, resourceId);
       res.json({ message: 'Favorite removed successfully' });
     } catch (error) {
       console.error('Error removing favorite:', error);
@@ -769,7 +794,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/favorites', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const favorites = await storage.getUserFavorites(userId);
+      const favorites = await userFeatureRepo.getUserFavorites(userId);
       res.json(favorites);
     } catch (error) {
       console.error('Error fetching favorites:', error);
@@ -784,7 +809,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const resourceId = parseInt(req.params.resourceId);
       const { notes } = req.body;
       
-      await storage.addBookmark(userId, resourceId, notes);
+      await userFeatureRepo.addBookmark(userId, resourceId, notes);
       res.json({ message: 'Bookmark added successfully' });
     } catch (error) {
       console.error('Error adding bookmark:', error);
@@ -798,7 +823,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
       const resourceId = parseInt(req.params.resourceId);
       
-      await storage.removeBookmark(userId, resourceId);
+      await userFeatureRepo.removeBookmark(userId, resourceId);
       res.json({ message: 'Bookmark removed successfully' });
     } catch (error) {
       console.error('Error removing bookmark:', error);
@@ -810,7 +835,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/bookmarks', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const bookmarks = await storage.getUserBookmarks(userId);
+      const bookmarks = await userFeatureRepo.getUserBookmarks(userId);
       res.json(bookmarks);
     } catch (error) {
       console.error('Error fetching bookmarks:', error);
@@ -826,24 +851,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
 
       // Get total resources in catalog
-      const totalResourcesResult = await storage.listResources({ status: 'approved', limit: 1 });
+      const totalResourcesResult = await resourceRepo.listResources({ status: 'approved', limit: 1 });
       const totalResources = totalResourcesResult.total;
 
       // Get user's journey progress to count completed resources
-      const journeyProgress = await storage.listUserJourneyProgress(userId);
+      const journeyProgress = await learningJourneyRepo.listUserJourneyProgress(userId);
       const completedResources = journeyProgress.filter(p => p.completedAt !== null).length;
 
       // Get current learning path (most recently accessed journey)
       let currentPath: string | undefined;
       if (journeyProgress.length > 0) {
         const latestJourney = journeyProgress[0];
-        const journey = await storage.getLearningJourney(latestJourney.journeyId);
+        const journey = await learningJourneyRepo.getLearningJourney(latestJourney.journeyId);
         currentPath = journey?.title;
       }
 
       // Calculate streak days from favorites and bookmarks
-      const favorites = await storage.getUserFavorites(userId);
-      const bookmarks = await storage.getUserBookmarks(userId);
+      const favorites = await userFeatureRepo.getUserFavorites(userId);
+      const bookmarks = await userFeatureRepo.getUserBookmarks(userId);
       
       // Debug: Log sample data to verify timestamps are available
       if (favorites.length > 0) {
@@ -895,7 +920,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get skill level from user preferences
       let skillLevel = 'beginner';
       try {
-        const userPrefs = await storage.getUserPreferences(userId);
+        const userPrefs = await userFeatureRepo.getUserPreferences(userId);
         if (userPrefs?.skillLevel) {
           skillLevel = userPrefs.skillLevel;
         }
@@ -925,14 +950,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
 
       // Get user's submitted resources
-      const submittedResources = await storage.listResources({
+      const submittedResources = await resourceRepo.listResources({
         userId,
         page: 1,
         limit: 100
       });
 
       // Get user's suggested edits
-      const resourceEdits = await storage.getResourceEditsByUser(userId);
+      const resourceEdits = await auditRepo.getResourceEditsByUser(userId);
 
       res.json({
         resources: submittedResources.resources,
@@ -952,12 +977,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
 
       // Get user's journey progress
-      const journeyProgress = await storage.listUserJourneyProgress(userId);
+      const journeyProgress = await learningJourneyRepo.listUserJourneyProgress(userId);
 
       // Fetch journey details for each progress entry
       const journeysWithDetails = await Promise.all(
         journeyProgress.map(async (progress) => {
-          const journey = await storage.getLearningJourney(progress.journeyId);
+          const journey = await learningJourneyRepo.getLearningJourney(progress.journeyId);
           return {
             ...progress,
             journey
@@ -978,7 +1003,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/journeys', async (req: any, res) => {
     try {
       const category = req.query.category as string;
-      const journeys = await storage.listLearningJourneys(category);
+      const journeys = await learningJourneyRepo.listLearningJourneys(category);
       
       // Early return if no journeys
       if (journeys.length === 0) {
@@ -987,12 +1012,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // BATCH FETCH: Single query for all steps
       const journeyIds = journeys.map(j => j.id);
-      const stepsMap = await storage.listJourneyStepsBatch(journeyIds);
+      const stepsMap = await learningJourneyRepo.listJourneyStepsBatch(journeyIds);
       
       // If user is authenticated, batch fetch all progress
       if (req.user?.claims?.sub) {
         const userId = req.user.claims.sub;
-        const allProgress = await storage.listUserJourneyProgress(userId);
+        const allProgress = await learningJourneyRepo.listUserJourneyProgress(userId);
         
         // Create progress map for O(1) lookup
         const progressMap = new Map();
@@ -1053,13 +1078,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/journeys/:id', async (req: any, res) => {
     try {
       const id = parseInt(req.params.id);
-      const journey = await storage.getLearningJourney(id);
+      const journey = await learningJourneyRepo.getLearningJourney(id);
       
       if (!journey) {
         return res.status(404).json({ message: 'Journey not found' });
       }
       
-      const steps = await storage.listJourneySteps(id);
+      const steps = await learningJourneyRepo.listJourneySteps(id);
       
       // Count distinct stepNumbers for accurate step count (defensive: handle both strings and numbers)
       const uniqueStepNumbers = new Set(
@@ -1072,7 +1097,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // If user is authenticated, get their progress
       let progress = null;
       if (req.user?.claims?.sub) {
-        progress = await storage.getUserJourneyProgress(req.user.claims.sub, id);
+        progress = await learningJourneyRepo.getUserJourneyProgress(req.user.claims.sub, id);
       }
       
       res.json({
@@ -1097,7 +1122,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
       const journeyId = parseInt(req.params.id);
       
-      const progress = await storage.startUserJourney(userId, journeyId);
+      const progress = await learningJourneyRepo.startUserJourney(userId, journeyId);
       res.json(progress);
     } catch (error) {
       console.error('Error starting journey:', error);
@@ -1116,7 +1141,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Step ID is required' });
       }
       
-      const progress = await storage.updateUserJourneyProgress(userId, journeyId, stepId);
+      const progress = await learningJourneyRepo.updateUserJourneyProgress(userId, journeyId, stepId);
       res.json(progress);
     } catch (error) {
       console.error('Error updating journey progress:', error);
@@ -1130,7 +1155,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
       const journeyId = parseInt(req.params.id);
       
-      const progress = await storage.getUserJourneyProgress(userId, journeyId);
+      const progress = await learningJourneyRepo.getUserJourneyProgress(userId, journeyId);
       
       if (!progress) {
         return res.status(404).json({ message: 'Progress not found' });
@@ -1148,7 +1173,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/admin/stats - Dashboard statistics
   app.get('/api/admin/stats', isAuthenticated, isAdmin, async (req, res) => {
     try {
-      const stats = await storage.getAdminStats();
+      const stats = await adminRepo.getAdminStats();
       // Map backend property names to frontend expectations
       res.json({
         users: stats.totalUsers,
@@ -1168,7 +1193,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
       
-      const result = await storage.listUsers(page, limit);
+      const result = await userRepo.listUsers(page, limit);
       res.json(result);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -1181,122 +1206,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.params.id;
       const { role } = req.body;
-
+      
       if (!role || !['user', 'admin', 'moderator'].includes(role)) {
         return res.status(400).json({ message: 'Invalid role' });
       }
-
-      const user = await storage.updateUserRole(userId, role);
+      
+      const user = await userRepo.updateUserRole(userId, role);
       res.json(user);
     } catch (error) {
       console.error('Error updating user role:', error);
       res.status(500).json({ message: 'Failed to update user role' });
     }
   });
-
-  // ============= API Key Management Routes =============
-
-  // POST /api/admin/api-keys - Create a new API key
-  app.post('/api/admin/api-keys', isAuthenticated, isAdmin, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const { name, scopes, expiresAt } = req.body;
-
-      // Validate input
-      if (!name || name.trim().length === 0) {
-        return res.status(400).json({ message: 'API key name is required' });
-      }
-
-      // Generate a secure random API key
-      const plaintextKey = generateApiKey();
-
-      // Hash the key before storing
-      const hashedKey = await bcrypt.hash(plaintextKey, 10);
-
-      // Create API key in database
-      const apiKey = await storage.createApiKey({
-        userId,
-        key: hashedKey,
-        name: name.trim(),
-        scopes: scopes || ['read'],
-        expiresAt: expiresAt ? new Date(expiresAt) : undefined,
-      });
-
-      // Return the API key with plaintext key (only time it's shown)
-      res.json({
-        id: apiKey.id,
-        name: apiKey.name,
-        key: plaintextKey, // Only returned once during creation
-        scopes: apiKey.scopes,
-        createdAt: apiKey.createdAt,
-        expiresAt: apiKey.expiresAt,
-      });
-    } catch (error) {
-      console.error('Error creating API key:', error);
-      res.status(500).json({ message: 'Failed to create API key' });
-    }
-  });
-
-  // GET /api/admin/api-keys - List all API keys for current user
-  app.get('/api/admin/api-keys', isAuthenticated, isAdmin, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-
-      // Get all API keys for the user
-      const apiKeys = await storage.listApiKeys(userId);
-
-      // Return keys without the hashed key value (security)
-      const sanitizedKeys = apiKeys.map(key => ({
-        id: key.id,
-        name: key.name,
-        scopes: key.scopes,
-        createdAt: key.createdAt,
-        lastUsedAt: key.lastUsedAt,
-        expiresAt: key.expiresAt,
-        revokedAt: key.revokedAt,
-      }));
-
-      res.json({ apiKeys: sanitizedKeys });
-    } catch (error) {
-      console.error('Error listing API keys:', error);
-      res.status(500).json({ message: 'Failed to list API keys' });
-    }
-  });
-
-  // DELETE /api/admin/api-keys/:id - Revoke an API key
-  app.delete('/api/admin/api-keys/:id', isAuthenticated, isAdmin, async (req: any, res) => {
-    try {
-      const keyId = req.params.id;
-      const userId = req.user.claims.sub;
-
-      if (!keyId) {
-        return res.status(400).json({ message: 'API key ID is required' });
-      }
-
-      // Verify the key belongs to the user (for security)
-      const userKeys = await storage.listApiKeys(userId);
-      const keyExists = userKeys.some(key => key.id === keyId);
-
-      if (!keyExists) {
-        return res.status(404).json({ message: 'API key not found' });
-      }
-
-      // Revoke the key
-      await storage.revokeApiKey(keyId);
-
-      res.json({ message: 'API key revoked successfully' });
-    } catch (error) {
-      console.error('Error revoking API key:', error);
-      res.status(500).json({ message: 'Failed to revoke API key' });
-    }
-  });
-
+  
   // ============= Resource Approval Routes =============
   
   // GET /api/admin/pending-resources - Get all pending resources for approval
   app.get('/api/admin/pending-resources', isAuthenticated, isAdmin, async (req, res) => {
     try {
-      const result = await storage.getPendingResources();
+      const result = await resourceRepo.getPendingResources();
       
       res.json(result);
     } catch (error) {
@@ -1315,7 +1243,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Invalid resource ID' });
       }
       
-      const updatedResource = await storage.approveResource(resourceId, userId);
+      const updatedResource = await resourceRepo.approveResource(resourceId, userId);
       
       res.json(updatedResource);
     } catch (error) {
@@ -1339,8 +1267,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Rejection reason is required (minimum 10 characters)' });
       }
       
-      await storage.rejectResource(resourceId, userId, reason);
-      const updatedResource = await storage.getResource(resourceId);
+      await resourceRepo.rejectResource(resourceId, userId, reason);
+      const updatedResource = await resourceRepo.getResource(resourceId);
       
       res.json(updatedResource);
     } catch (error) {
@@ -1359,7 +1287,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Invalid resource ID' });
       }
       
-      const resource = await storage.getResource(resourceId);
+      const resource = await resourceRepo.getResource(resourceId);
       if (!resource) {
         return res.status(404).json({ message: 'Resource not found' });
       }
@@ -1385,9 +1313,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (validatedData.subSubcategory !== undefined) updateData.subSubcategory = validatedData.subSubcategory;
       if (validatedData.status !== undefined) updateData.status = validatedData.status;
       
-      const updatedResource = await storage.updateResource(resourceId, updateData);
+      const updatedResource = await resourceRepo.updateResource(resourceId, updateData);
       
-      await storage.logResourceAudit(
+      await auditRepo.logResourceAudit(
         resourceId,
         'updated',
         userId,
@@ -1412,16 +1340,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Invalid resource ID' });
       }
       
-      const resource = await storage.getResource(resourceId);
+      const resource = await resourceRepo.getResource(resourceId);
       if (!resource) {
         return res.status(404).json({ message: 'Resource not found' });
       }
       
       const resourceSnapshot = { title: resource.title, url: resource.url, category: resource.category };
       
-      await storage.deleteResource(resourceId);
+      await resourceRepo.deleteResource(resourceId);
       
-      await storage.logResourceAudit(
+      await auditRepo.logResourceAudit(
         resourceId,
         'deleted',
         userId,
@@ -1445,7 +1373,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const category = req.query.category as string;
       const status = req.query.status as string;
       
-      const result = await storage.listResources({
+      const result = await resourceRepo.listResources({
         page,
         limit,
         search,
@@ -1487,7 +1415,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const validatedData = validationResult.data;
       
-      const newResource = await storage.createResource({
+      const newResource = await resourceRepo.createResource({
         title: validatedData.title,
         url: validatedData.url,
         description: validatedData.description || '',
@@ -1498,7 +1426,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         submittedBy: userId
       });
       
-      await storage.logResourceAudit(
+      await auditRepo.logResourceAudit(
         newResource.id,
         'created',
         userId,
@@ -1518,11 +1446,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/admin/resource-edits - Get all pending resource edits (admin only)
   app.get('/api/admin/resource-edits', isAuthenticated, isAdmin, async (req, res) => {
     try {
-      const edits = await storage.getPendingResourceEdits();
+      const edits = await auditRepo.getPendingResourceEdits();
       
       const editsWithResources = await Promise.all(
         edits.map(async (edit) => {
-          const resource = await storage.getResource(edit.resourceId);
+          const resource = await resourceRepo.getResource(edit.resourceId);
           return {
             ...edit,
             resource
@@ -1547,7 +1475,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Invalid edit ID' });
       }
       
-      await storage.approveResourceEdit(editId, userId);
+      await auditRepo.approveResourceEdit(editId, userId);
       
       res.json({ message: 'Edit approved and merged successfully' });
     } catch (error: any) {
@@ -1579,7 +1507,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Rejection reason is required (minimum 10 characters)' });
       }
       
-      await storage.rejectResourceEdit(editId, userId, reason);
+      await auditRepo.rejectResourceEdit(editId, userId, reason);
       
       res.json({ message: 'Edit rejected successfully' });
     } catch (error: any) {
@@ -1622,11 +1550,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/admin/categories - List all categories
   app.get('/api/admin/categories', isAuthenticated, isAdmin, async (req, res) => {
     try {
-      const categories = await storage.listCategories();
+      const categories = await categoryRepo.listCategories();
       
       const categoriesWithCounts = await Promise.all(
         categories.map(async (cat) => {
-          const count = await storage.getCategoryResourceCount(cat.name);
+          const count = await categoryRepo.getCategoryResourceCount(cat.name);
           return { ...cat, resourceCount: count };
         })
       );
@@ -1652,9 +1580,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const newCategory = await storage.createCategory(validationResult.data);
+      const newCategory = await categoryRepo.createCategory(validationResult.data);
       
-      await storage.logResourceAudit(
+      await auditRepo.logResourceAudit(
         null,
         'category_created',
         req.user.claims.sub,
@@ -1694,14 +1622,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const existingCategory = await storage.getCategory(categoryId);
+      const existingCategory = await categoryRepo.getCategory(categoryId);
       if (!existingCategory) {
         return res.status(404).json({ message: 'Category not found' });
       }
       
-      const updatedCategory = await storage.updateCategory(categoryId, validationResult.data);
+      const updatedCategory = await categoryRepo.updateCategory(categoryId, validationResult.data);
       
-      await storage.logResourceAudit(
+      await auditRepo.logResourceAudit(
         null,
         'category_updated',
         req.user.claims.sub,
@@ -1725,21 +1653,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Invalid category ID' });
       }
       
-      const category = await storage.getCategory(categoryId);
+      const category = await categoryRepo.getCategory(categoryId);
       if (!category) {
         return res.status(404).json({ message: 'Category not found' });
       }
       
-      const resourceCount = await storage.getCategoryResourceCount(category.name);
+      const resourceCount = await categoryRepo.getCategoryResourceCount(category.name);
       if (resourceCount > 0) {
         return res.status(400).json({ 
           message: `Cannot delete category with ${resourceCount} resources. Please reassign or delete resources first.` 
         });
       }
       
-      await storage.deleteCategory(categoryId);
+      await categoryRepo.deleteCategory(categoryId);
       
-      await storage.logResourceAudit(
+      await auditRepo.logResourceAudit(
         null,
         'category_deleted',
         req.user.claims.sub,
@@ -1761,11 +1689,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const categoryId = req.query.categoryId ? parseInt(req.query.categoryId as string) : undefined;
       
-      const subcategories = await storage.listSubcategories(categoryId);
+      const subcategories = await categoryRepo.listSubcategories(categoryId);
       
       const subcategoriesWithCounts = await Promise.all(
         subcategories.map(async (sub) => {
-          const count = await storage.getSubcategoryResourceCount(sub.name);
+          const count = await categoryRepo.getSubcategoryResourceCount(sub.name);
           return { ...sub, resourceCount: count };
         })
       );
@@ -1796,14 +1724,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Category ID is required' });
       }
       
-      const category = await storage.getCategory(categoryId);
+      const category = await categoryRepo.getCategory(categoryId);
       if (!category) {
         return res.status(404).json({ message: 'Parent category not found' });
       }
       
-      const newSubcategory = await storage.createSubcategory(validationResult.data);
+      const newSubcategory = await categoryRepo.createSubcategory(validationResult.data);
       
-      await storage.logResourceAudit(
+      await auditRepo.logResourceAudit(
         null,
         'subcategory_created',
         req.user.claims.sub,
@@ -1843,21 +1771,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const existingSubcategory = await storage.getSubcategory(subcategoryId);
+      const existingSubcategory = await categoryRepo.getSubcategory(subcategoryId);
       if (!existingSubcategory) {
         return res.status(404).json({ message: 'Subcategory not found' });
       }
       
       if (validationResult.data.categoryId !== undefined && validationResult.data.categoryId !== null) {
-        const category = await storage.getCategory(validationResult.data.categoryId);
+        const category = await categoryRepo.getCategory(validationResult.data.categoryId);
         if (!category) {
           return res.status(404).json({ message: 'Parent category not found' });
         }
       }
       
-      const updatedSubcategory = await storage.updateSubcategory(subcategoryId, validationResult.data);
+      const updatedSubcategory = await categoryRepo.updateSubcategory(subcategoryId, validationResult.data);
       
-      await storage.logResourceAudit(
+      await auditRepo.logResourceAudit(
         null,
         'subcategory_updated',
         req.user.claims.sub,
@@ -1881,21 +1809,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Invalid subcategory ID' });
       }
       
-      const subcategory = await storage.getSubcategory(subcategoryId);
+      const subcategory = await categoryRepo.getSubcategory(subcategoryId);
       if (!subcategory) {
         return res.status(404).json({ message: 'Subcategory not found' });
       }
       
-      const resourceCount = await storage.getSubcategoryResourceCount(subcategory.name);
+      const resourceCount = await categoryRepo.getSubcategoryResourceCount(subcategory.name);
       if (resourceCount > 0) {
         return res.status(400).json({ 
           message: `Cannot delete subcategory with ${resourceCount} resources. Please reassign or delete resources first.` 
         });
       }
       
-      await storage.deleteSubcategory(subcategoryId);
+      await categoryRepo.deleteSubcategory(subcategoryId);
       
-      await storage.logResourceAudit(
+      await auditRepo.logResourceAudit(
         null,
         'subcategory_deleted',
         req.user.claims.sub,
@@ -1917,11 +1845,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const subcategoryId = req.query.subcategoryId ? parseInt(req.query.subcategoryId as string) : undefined;
       
-      const subSubcategories = await storage.listSubSubcategories(subcategoryId);
+      const subSubcategories = await categoryRepo.listSubSubcategories(subcategoryId);
       
       const subSubcategoriesWithCounts = await Promise.all(
         subSubcategories.map(async (subSub) => {
-          const count = await storage.getSubSubcategoryResourceCount(subSub.name);
+          const count = await categoryRepo.getSubSubcategoryResourceCount(subSub.name);
           return { ...subSub, resourceCount: count };
         })
       );
@@ -1952,14 +1880,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Subcategory ID is required' });
       }
       
-      const subcategory = await storage.getSubcategory(subcategoryId);
+      const subcategory = await categoryRepo.getSubcategory(subcategoryId);
       if (!subcategory) {
         return res.status(404).json({ message: 'Parent subcategory not found' });
       }
       
-      const newSubSubcategory = await storage.createSubSubcategory(validationResult.data);
+      const newSubSubcategory = await categoryRepo.createSubSubcategory(validationResult.data);
       
-      await storage.logResourceAudit(
+      await auditRepo.logResourceAudit(
         null,
         'sub_subcategory_created',
         req.user.claims.sub,
@@ -1999,21 +1927,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const existingSubSubcategory = await storage.getSubSubcategory(subSubcategoryId);
+      const existingSubSubcategory = await categoryRepo.getSubSubcategory(subSubcategoryId);
       if (!existingSubSubcategory) {
         return res.status(404).json({ message: 'Sub-subcategory not found' });
       }
       
       if (validationResult.data.subcategoryId !== undefined && validationResult.data.subcategoryId !== null) {
-        const subcategory = await storage.getSubcategory(validationResult.data.subcategoryId);
+        const subcategory = await categoryRepo.getSubcategory(validationResult.data.subcategoryId);
         if (!subcategory) {
           return res.status(404).json({ message: 'Parent subcategory not found' });
         }
       }
       
-      const updatedSubSubcategory = await storage.updateSubSubcategory(subSubcategoryId, validationResult.data);
+      const updatedSubSubcategory = await categoryRepo.updateSubSubcategory(subSubcategoryId, validationResult.data);
       
-      await storage.logResourceAudit(
+      await auditRepo.logResourceAudit(
         null,
         'sub_subcategory_updated',
         req.user.claims.sub,
@@ -2037,21 +1965,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Invalid sub-subcategory ID' });
       }
       
-      const subSubcategory = await storage.getSubSubcategory(subSubcategoryId);
+      const subSubcategory = await categoryRepo.getSubSubcategory(subSubcategoryId);
       if (!subSubcategory) {
         return res.status(404).json({ message: 'Sub-subcategory not found' });
       }
       
-      const resourceCount = await storage.getSubSubcategoryResourceCount(subSubcategory.name);
+      const resourceCount = await categoryRepo.getSubSubcategoryResourceCount(subSubcategory.name);
       if (resourceCount > 0) {
         return res.status(400).json({ 
           message: `Cannot delete sub-subcategory with ${resourceCount} resources. Please reassign or delete resources first.` 
         });
       }
       
-      await storage.deleteSubSubcategory(subSubcategoryId);
+      await categoryRepo.deleteSubSubcategory(subSubcategoryId);
       
-      await storage.logResourceAudit(
+      await auditRepo.logResourceAudit(
         null,
         'sub_subcategory_deleted',
         req.user.claims.sub,
@@ -2100,7 +2028,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Add to queue for processing
-      const queueItem = await storage.addToGithubSyncQueue({
+      const queueItem = await githubSyncRepo.addToGithubSyncQueue({
         repositoryUrl,
         action: 'import',
         status: 'pending',
@@ -2138,7 +2066,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Add to queue for processing
-      const queueItem = await storage.addToGithubSyncQueue({
+      const queueItem = await githubSyncRepo.addToGithubSyncQueue({
         repositoryUrl,
         action: 'export',
         status: 'pending',
@@ -2170,7 +2098,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/github/sync-status', isAuthenticated, isAdmin, async (req, res) => {
     try {
       const status = req.query.status as string;
-      const queueItems = await storage.getGithubSyncQueue(status);
+      const queueItems = await githubSyncRepo.getGithubSyncQueue(status);
       
       res.json({
         total: queueItems.length,
@@ -2186,7 +2114,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/github/sync-status/:id', isAuthenticated, isAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const queueItems = await storage.getGithubSyncQueue();
+      const queueItems = await githubSyncRepo.getGithubSyncQueue();
       const item = queueItems.find(q => q.id === id);
       
       if (!item) {
@@ -2203,7 +2131,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/github/sync-history - Get all sync history
   app.get('/api/github/sync-history', isAuthenticated, isAdmin, async (req, res) => {
     try {
-      const history = await storage.getSyncHistory();
+      const history = await githubSyncRepo.getSyncHistory();
       
       res.json(history.sort((a, b) => 
         new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
@@ -2242,7 +2170,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/admin/export', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
       // Get all approved resources
-      const resources = await storage.getAllApprovedResources();
+      const resources = await resourceRepo.getAllApprovedResources();
       
       // Get export options from request body
       // NOTE: websiteUrl is undefined by default to avoid including internal dev URLs
@@ -2294,14 +2222,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         syncQueue,
         users
       ] = await Promise.all([
-        storage.listResources({ limit: 100000 }), // Get all resources regardless of status
-        storage.listCategories(),
-        storage.listSubcategories(),
-        storage.listSubSubcategories(),
-        storage.listTags(),
-        storage.listLearningJourneys(),
-        storage.getGithubSyncQueue(),
-        storage.listUsers(1, 10000)
+        resourceRepo.listResources({ limit: 100000 }), // Get all resources regardless of status
+        categoryRepo.listCategories(),
+        categoryRepo.listSubcategories(),
+        categoryRepo.listSubSubcategories(),
+        tagRepo.listTags(),
+        learningJourneyRepo.listLearningJourneys(),
+        githubSyncRepo.getGithubSyncQueue(),
+        userRepo.listUsers(1, 10000)
       ]);
       
       const resources = allResources.resources;
@@ -2309,7 +2237,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Get journey steps for each journey
       const journeyIds = learningJourneys.map((j: any) => j.id);
-      const stepsMap = await storage.listJourneyStepsBatch(journeyIds);
+      const stepsMap = await learningJourneyRepo.listJourneyStepsBatch(journeyIds);
       
       // Attach steps to journeys
       const journeysWithSteps = learningJourneys.map((journey: any) => ({
@@ -2392,7 +2320,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/admin/validate', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
       // Get all approved resources
-      const resources = await storage.getAllApprovedResources();
+      const resources = await resourceRepo.getAllApprovedResources();
       
       // Get export options from request body
       // NOTE: websiteUrl undefined to avoid including dev URLs; includeLicense false per awesome-lint
@@ -2421,7 +2349,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validationResult = validateAwesomeList(markdown);
       
       // Store validation result for later retrieval
-      await storage.storeValidationResult({
+      await legacyRepo.storeValidationResult({
         type: 'awesome-lint',
         result: validationResult,
         markdown,
@@ -2446,7 +2374,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/admin/check-links', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
       // Get all approved resources
-      const resources = await storage.getAllApprovedResources();
+      const resources = await resourceRepo.getAllApprovedResources();
       
       // Get check options from request body
       const {
@@ -2470,7 +2398,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       // Store link check result for later retrieval
-      await storage.storeValidationResult({
+      await legacyRepo.storeValidationResult({
         type: 'link-check',
         result: linkCheckReport,
         timestamp: linkCheckReport.timestamp
@@ -2496,7 +2424,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/admin/validation-status - Get last validation results
   app.get('/api/admin/validation-status', isAuthenticated, isAdmin, async (req, res) => {
     try {
-      const validationResults = await storage.getLatestValidationResults();
+      const validationResults = await legacyRepo.getLatestValidationResults();
       
       res.json({
         awesomeLint: validationResults.awesomeLint || null,
@@ -2686,7 +2614,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/enrichment/jobs', isAuthenticated, isAdmin, async (req, res) => {
     try {
       const limit = parseInt(req.query.limit as string) || 50;
-      const jobs = await storage.listEnrichmentJobs(limit);
+      const jobs = await enrichmentRepo.listEnrichmentJobs(limit);
       
       res.json({
         success: true,
@@ -2714,7 +2642,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const job = await storage.getEnrichmentJob(jobId);
+      const job = await enrichmentRepo.getEnrichmentJob(jobId);
       
       if (!job) {
         return res.json({
@@ -2863,7 +2791,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/awesome-list", async (req, res) => {
     try {
       // Use database-driven hierarchy (replaces static JSON)
-      const data = await storage.getAwesomeListFromDatabase();
+      const data = await legacyRepo.getAwesomeListFromDatabase();
       
       if (!data || !data.resources || data.resources.length === 0) {
         console.warn('⚠️ No resources in database - database may need seeding');
@@ -2928,7 +2856,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`Switching to list: ${rawUrl}`);
       const data = await fetchAwesomeList(rawUrl);
-      storage.setAwesomeListData(data);
+      legacyRepo.setAwesomeListData(data);
       
       console.log(`Successfully switched to list with ${data.resources.length} resources`);
       res.json(data);
@@ -3157,7 +3085,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
  * These tasks are non-blocking and run in the background.
  * 
  * NOTE: /api/awesome-list now serves data from the PostgreSQL database
- * directly via storage.getAwesomeListFromDatabase(). No static JSON loading required.
+ * directly via legacyRepo.getAwesomeListFromDatabase(). No static JSON loading required.
  */
 // Helper to retry database operations with exponential backoff (for Neon cold starts)
 async function withRetry<T>(
@@ -3195,8 +3123,8 @@ export async function runBackgroundInitialization(): Promise<void> {
     console.log('Checking if database needs seeding...');
 
     // Use retry logic for initial database check (handles Neon cold starts)
-    const categories = await withRetry(() => storage.listCategories());
-    const actualResourceCount = await withRetry(() => storage.getResourceCount());
+    const categories = await withRetry(() => categoryRepo.listCategories());
+    const actualResourceCount = await withRetry(() => resourceRepo.getResourceCount());
 
     // Only reseed if database is truly empty (both categories AND resources missing)
     // Don't reseed just because user added/removed items - preserve user changes

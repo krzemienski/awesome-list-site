@@ -39,7 +39,10 @@
 import { GitHubClient } from "./client";
 import { parseAwesomeList, convertToDbResources } from "./parser";
 import { AwesomeListFormatter, generateContributingMd } from "./formatter";
-import { storage } from "../storage";
+import { CategoryRepository } from "../repositories/CategoryRepository";
+import { ResourceRepository } from "../repositories/ResourceRepository";
+import { AuditRepository } from "../repositories/AuditRepository";
+import { GithubSyncRepository } from "../repositories/GithubSyncRepository";
 import { Resource, InsertResource, GithubSyncQueue } from "@shared/schema";
 import { getGitHubClient } from "./replitConnection";
 import { validateAwesomeList } from "../validation/awesomeLint";
@@ -101,6 +104,7 @@ function generateSlug(name: string): string {
  * Returns the IDs for the category, subcategory, and sub-subcategory
  */
 async function ensureCategoryHierarchy(
+  categoryRepo: CategoryRepository,
   categoryName: string,
   subcategoryName?: string,
   subSubcategoryName?: string
@@ -110,17 +114,17 @@ async function ensureCategoryHierarchy(
   subSubcategoryId?: number;
 }> {
   // 1. Ensure category exists
-  let category = await storage.getCategoryByName(categoryName);
+  let category = await categoryRepo.getCategoryByName(categoryName);
   if (!category) {
     try {
-      category = await storage.createCategory({
+      category = await categoryRepo.createCategory({
         name: categoryName,
         slug: generateSlug(categoryName),
       });
       console.log(`  Created category: ${categoryName}`);
     } catch (e: any) {
       // May already exist due to race condition, try to fetch again
-      category = await storage.getCategoryByName(categoryName);
+      category = await categoryRepo.getCategoryByName(categoryName);
       if (!category) {
         throw new Error(`Failed to create or find category: ${categoryName} - ${e.message}`);
       }
@@ -130,10 +134,10 @@ async function ensureCategoryHierarchy(
   // 2. Ensure subcategory exists (if provided)
   let subcategory;
   if (subcategoryName) {
-    subcategory = await storage.getSubcategoryByName(subcategoryName, category.id);
+    subcategory = await categoryRepo.getSubcategoryByName(subcategoryName, category.id);
     if (!subcategory) {
       try {
-        subcategory = await storage.createSubcategory({
+        subcategory = await categoryRepo.createSubcategory({
           name: subcategoryName,
           slug: generateSlug(subcategoryName),
           categoryId: category.id,
@@ -141,7 +145,7 @@ async function ensureCategoryHierarchy(
         console.log(`  Created subcategory: ${subcategoryName} under ${categoryName}`);
       } catch (e: any) {
         // May already exist due to race condition
-        subcategory = await storage.getSubcategoryByName(subcategoryName, category.id);
+        subcategory = await categoryRepo.getSubcategoryByName(subcategoryName, category.id);
         if (!subcategory) {
           throw new Error(`Failed to create or find subcategory: ${subcategoryName} - ${e.message}`);
         }
@@ -152,10 +156,10 @@ async function ensureCategoryHierarchy(
   // 3. Ensure sub-subcategory exists (if provided)
   let subSubcategory;
   if (subSubcategoryName && subcategory) {
-    subSubcategory = await storage.getSubSubcategoryByName(subSubcategoryName, subcategory.id);
+    subSubcategory = await categoryRepo.getSubSubcategoryByName(subSubcategoryName, subcategory.id);
     if (!subSubcategory) {
       try {
-        subSubcategory = await storage.createSubSubcategory({
+        subSubcategory = await categoryRepo.createSubSubcategory({
           name: subSubcategoryName,
           slug: generateSlug(subSubcategoryName),
           subcategoryId: subcategory.id,
@@ -163,7 +167,7 @@ async function ensureCategoryHierarchy(
         console.log(`  Created sub-subcategory: ${subSubcategoryName} under ${subcategoryName}`);
       } catch (e: any) {
         // May already exist due to race condition
-        subSubcategory = await storage.getSubSubcategoryByName(subSubcategoryName, subcategory.id);
+        subSubcategory = await categoryRepo.getSubSubcategoryByName(subSubcategoryName, subcategory.id);
         if (!subSubcategory) {
           throw new Error(`Failed to create or find sub-subcategory: ${subSubcategoryName} - ${e.message}`);
         }
@@ -181,10 +185,18 @@ async function ensureCategoryHierarchy(
 export class GitHubSyncService {
   private client: GitHubClient;
   private websiteUrl: string;
+  private categoryRepo: CategoryRepository;
+  private resourceRepo: ResourceRepository;
+  private auditRepo: AuditRepository;
+  private syncRepo: GithubSyncRepository;
 
   constructor(githubToken?: string) {
     this.client = new GitHubClient(githubToken);
     this.websiteUrl = process.env.WEBSITE_URL || 'https://awesome-list.com';
+    this.categoryRepo = new CategoryRepository();
+    this.resourceRepo = new ResourceRepository();
+    this.auditRepo = new AuditRepository();
+    this.syncRepo = new GithubSyncRepository();
   }
 
   /**
@@ -290,6 +302,7 @@ export class GitHubSyncService {
       for (const [key, hierarchy] of Array.from(uniqueHierarchies.entries())) {
         try {
           const ids = await ensureCategoryHierarchy(
+            this.categoryRepo,
             hierarchy.category,
             hierarchy.subcategory,
             hierarchy.subSubcategory
@@ -325,7 +338,7 @@ export class GitHubSyncService {
                   importedAt: new Date().toISOString(),
                 };
                 
-                const created = await storage.createResource({
+                const created = await this.resourceRepo.createResource({
                   ...conflict.resource,
                   metadata,
                   status: 'approved',
@@ -334,7 +347,7 @@ export class GitHubSyncService {
                 result.resources.push(created);
                 
                 // Log the import
-                await storage.logResourceAudit(
+                await this.auditRepo.logResourceAudit(
                   created.id,
                   'imported',
                   undefined,
@@ -359,7 +372,7 @@ export class GitHubSyncService {
                   lastUpdatedAt: new Date().toISOString(),
                 };
                 
-                const updated = await storage.updateResource(
+                const updated = await this.resourceRepo.updateResource(
                   conflict.resource.id,
                   {
                     ...conflict.resource,
@@ -369,7 +382,7 @@ export class GitHubSyncService {
                 result.resources.push(updated);
                 
                 // Log the update
-                await storage.logResourceAudit(
+                await this.auditRepo.logResourceAudit(
                   updated.id,
                   'updated',
                   undefined,
@@ -395,7 +408,7 @@ export class GitHubSyncService {
       
       // Add to sync queue for tracking
       if (!options.dryRun) {
-        await storage.addToGithubSyncQueue({
+        await this.syncRepo.addToGithubSyncQueue({
           repositoryUrl: repoUrl,
           action: 'import',
           status: 'completed',
@@ -415,7 +428,7 @@ export class GitHubSyncService {
       
       // Log failed import
       if (!options.dryRun) {
-        await storage.addToGithubSyncQueue({
+        await this.syncRepo.addToGithubSyncQueue({
           repositoryUrl: repoUrl,
           action: 'import',
           status: 'failed',
@@ -573,7 +586,7 @@ export class GitHubSyncService {
       const repoTitle = repoInfo.name.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
 
       // Fetch all approved resources using storage method
-      const currentResources = await storage.getAllApprovedResources();
+      const currentResources = await this.resourceRepo.getAllApprovedResources();
 
       if (currentResources.length === 0) {
         throw new Error('No approved resources to export');
@@ -582,7 +595,7 @@ export class GitHubSyncService {
       console.log(`Exporting ${currentResources.length} approved resources...`);
 
       // Get last sync history to calculate diff
-      const lastSync = await storage.getLastSyncHistory(repoUrl, 'export');
+      const lastSync = await this.syncRepo.getLastSyncHistory(repoUrl, 'export');
       const lastSnapshot = lastSync?.snapshot?.resources as Resource[] || [];
 
       // Calculate diff: added, updated, removed
@@ -715,7 +728,7 @@ export class GitHubSyncService {
       const resourceIds = currentResources.map(r => r.id);
       await Promise.all(
         resourceIds.map(id => 
-          storage.updateResource(id, { 
+          this.resourceRepo.updateResource(id, { 
             githubSynced: true, 
             lastSyncedAt: new Date() 
           } as Partial<InsertResource>)
@@ -723,7 +736,7 @@ export class GitHubSyncService {
       );
 
       // Store sync history with snapshot and diff counts
-      await storage.saveSyncHistory({
+      await this.syncRepo.saveSyncHistory({
         repositoryUrl: repoUrl,
         direction: 'export',
         commitSha: newCommit.sha,
@@ -750,7 +763,7 @@ export class GitHubSyncService {
       });
 
       // Log the export
-      await storage.logResourceAudit(
+      await this.auditRepo.logResourceAudit(
         null,
         'exported',
         undefined,
@@ -766,7 +779,7 @@ export class GitHubSyncService {
       );
 
       // Add to sync queue
-      await storage.addToGithubSyncQueue({
+      await this.syncRepo.addToGithubSyncQueue({
         repositoryUrl: repoUrl,
         action: 'export',
         status: 'completed',
@@ -801,7 +814,7 @@ export class GitHubSyncService {
 
       // Log failed export via updateGithubSyncStatus if queue item exists
       // Or log in metadata if creating new queue item
-      await storage.addToGithubSyncQueue({
+      await this.syncRepo.addToGithubSyncQueue({
         repositoryUrl: repoUrl,
         action: 'export',
         status: 'failed',
@@ -866,7 +879,7 @@ export class GitHubSyncService {
   async processQueue(): Promise<void> {
     console.log('Processing GitHub sync queue...');
     
-    const queueItems = await storage.getGithubSyncQueue('pending');
+    const queueItems = await this.syncRepo.getGithubSyncQueue('pending');
     
     if (queueItems.length === 0) {
       console.log('No pending items in sync queue');
@@ -878,7 +891,7 @@ export class GitHubSyncService {
     for (const item of queueItems) {
       try {
         // Update status to processing
-        await storage.updateGithubSyncStatus(item.id, 'processing');
+        await this.syncRepo.updateGithubSyncStatus(item.id, 'processing');
 
         if (item.action === 'import') {
           const result = await this.importFromGitHub(item.repositoryUrl, {
@@ -893,9 +906,9 @@ export class GitHubSyncService {
           };
 
           if (result.errors.length === 0) {
-            await storage.updateGithubSyncStatus(item.id, 'completed', undefined, metadata);
+            await this.syncRepo.updateGithubSyncStatus(item.id, 'completed', undefined, metadata);
           } else {
-            await storage.updateGithubSyncStatus(
+            await this.syncRepo.updateGithubSyncStatus(
               item.id, 
               result.imported > 0 || result.updated > 0 ? 'completed' : 'failed',
               result.errors.slice(0, 3).join('; '),
@@ -914,9 +927,9 @@ export class GitHubSyncService {
           };
 
           if (result.errors.length === 0) {
-            await storage.updateGithubSyncStatus(item.id, 'completed', undefined, metadata);
+            await this.syncRepo.updateGithubSyncStatus(item.id, 'completed', undefined, metadata);
           } else {
-            await storage.updateGithubSyncStatus(
+            await this.syncRepo.updateGithubSyncStatus(
               item.id,
               'failed',
               result.errors.join('; '),
@@ -926,7 +939,7 @@ export class GitHubSyncService {
         }
       } catch (error: any) {
         console.error(`Error processing queue item ${item.id}:`, error);
-        await storage.updateGithubSyncStatus(
+        await this.syncRepo.updateGithubSyncStatus(
           item.id,
           'failed',
           error.message
@@ -942,7 +955,7 @@ export class GitHubSyncService {
    */
   private async checkConflict(resource: Partial<Resource>): Promise<ConflictResolution> {
     // Check if resource with same URL exists
-    const existingResources = await storage.listResources({
+    const existingResources = await this.resourceRepo.listResources({
       limit: 1000,
       status: 'approved'
     });
@@ -997,7 +1010,7 @@ export class GitHubSyncService {
    * Get sync history for a repository
    */
   async getSyncHistory(repoUrl: string): Promise<GithubSyncQueue[]> {
-    const allItems = await storage.getGithubSyncQueue();
+    const allItems = await this.syncRepo.getGithubSyncQueue();
     return allItems.filter(item => item.repositoryUrl === repoUrl);
   }
 

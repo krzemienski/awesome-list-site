@@ -1,12 +1,29 @@
 /* Scroll behavior */
 html {
   scroll-behavior: smooth;
-  overflow-x: hidden;
+  overflow-x: hidden !important;
+  scroll-padding-top: 80px;
+  max-width: 100%;
+  width: 100%;
 }
 
 body {
-  overflow-x: hidden;
+  overflow-x: hidden !important;
   min-height: 100vh;
+  overscroll-behavior: none;
+  max-width: 100%;
+  width: 100%;
+  position: relative;
+}
+
+#root {
+  overflow-x: hidden !important;
+  max-width: 100%;
+  width: 100%;
+}
+
+html, body, #root {
+  overflow-x: clip !important;
 }
 
 * {

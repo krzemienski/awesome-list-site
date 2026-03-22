@@ -75,7 +75,7 @@ export default function BatchEnrichmentPanel() {
         description: "AI enrichment job has been queued successfully."
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "Failed to start enrichment",
         description: error.message || "An error occurred while starting the job.",
@@ -97,7 +97,7 @@ export default function BatchEnrichmentPanel() {
         description: "Enrichment job has been cancelled."
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "Failed to cancel job",
         description: error.message || "An error occurred while cancelling the job.",

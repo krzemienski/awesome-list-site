@@ -57,7 +57,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 max-w-full overflow-x-hidden">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-primary font-mono flex items-center gap-2">
           <Shield className="h-8 w-8" />
@@ -116,6 +116,9 @@ export default function AdminDashboard() {
             <TabsTrigger value="audit" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap">
               Audit
             </TabsTrigger>
+            <TabsTrigger value="research" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap">
+              Research
+            </TabsTrigger>
           </TabsList>
         </div>
 
@@ -173,6 +176,13 @@ export default function AdminDashboard() {
 
         <TabsContent value="audit">
           <AuditTab />
+        </TabsContent>
+
+        <TabsContent value="research">
+          <div className="space-y-6">
+            <CostDashboard />
+            <ResearchPanel />
+          </div>
         </TabsContent>
       </Tabs>
     </div>

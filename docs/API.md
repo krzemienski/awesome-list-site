@@ -266,6 +266,139 @@ GET /api/enrichment/jobs/:id            # Get job status
 DELETE /api/enrichment/jobs/:id         # Cancel job
 ```
 
+### Research API
+
+AI-powered research jobs for resource analysis and discovery.
+
+#### Start Research Job
+```
+POST /api/research/jobs
+```
+
+Start a new AI research job.
+
+**Request Body:**
+```json
+{
+  "awesomeListId": 1,
+  "jobType": "validation" | "enrichment" | "discovery" | "trend_analysis",
+  "model": "claude-3-5-haiku" | "claude-3-5-sonnet" | "claude-3-opus",
+  "config": {
+    "depth": "shallow" | "medium" | "deep",
+    "focusAreas": ["string"],
+    "maxSources": 20
+  }
+}
+```
+
+**Response (201):**
+```json
+{
+  "jobId": "uuid",
+  "status": "pending",
+  "message": "Research job queued successfully"
+}
+```
+
+#### List Research Jobs
+```
+GET /api/research/jobs?status=processing&jobType=validation&limit=20&offset=0
+```
+
+Query parameters:
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| status | string | Filter by status (pending, processing, completed, failed) |
+| jobType | string | Filter by job type |
+| limit | number | Items per page (default: 20) |
+| offset | number | Pagination offset (default: 0) |
+
+**Response:**
+```json
+{
+  "jobs": [...],
+  "pagination": { "limit": 20, "offset": 0, "total": 100 }
+}
+```
+
+#### Get Job Status
+```
+GET /api/research/jobs/:id
+```
+
+**Response:**
+```json
+{
+  "id": "uuid",
+  "status": "processing",
+  "jobType": "validation",
+  "modelUsed": "claude-3-5-sonnet",
+  "progress": 45,
+  "totalInputTokens": 15000,
+  "totalOutputTokens": 3000,
+  "totalCostUsd": 0.09,
+  "webSourcesScraped": 5,
+  "totalFindings": 12,
+  "startedAt": "2024-01-15T10:30:00Z",
+  "completedAt": null,
+  "errorMessage": null
+}
+```
+
+#### Get Job Report
+```
+GET /api/research/jobs/:id/report
+```
+
+Returns the generated research report with findings and recommendations.
+
+#### Cancel Job
+```
+DELETE /api/research/jobs/:id
+```
+
+Cancel a running research job.
+
+#### Get Cost Statistics
+```
+GET /api/research/costs?startDate=2024-01-01&endDate=2024-01-31
+```
+
+Query parameters:
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| startDate | string | Start date (ISO 8601 format) |
+| endDate | string | End date (ISO 8601 format) |
+
+**Response:**
+```json
+{
+  "byModel": {
+    "claude-3-5-haiku": { "calls": 100, "tokens": 500000, "costUsd": 0.75 },
+    "claude-3-5-sonnet": { "calls": 20, "tokens": 100000, "costUsd": 1.80 },
+    "claude-3-opus": { "calls": 5, "tokens": 50000, "costUsd": 4.50 }
+  },
+  "byDay": [
+    { "date": "2024-01-15", "costUsd": 2.30 }
+  ],
+  "total": { "costUsd": 7.05, "jobCount": 125 }
+}
+```
+
+#### Apply Finding
+```
+POST /api/research/findings/:id/apply
+```
+
+Apply a research finding (e.g., update resource metadata).
+
+#### Dismiss Finding
+```
+POST /api/research/findings/:id/dismiss
+```
+
+Dismiss a research finding without applying changes.
+
 ---
 
 ## AI-Powered Endpoints

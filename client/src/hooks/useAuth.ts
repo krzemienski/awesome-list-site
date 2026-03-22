@@ -20,9 +20,9 @@ export function useAuth() {
   const { data, isLoading, error } = useQuery<AuthResponse>({
     queryKey: ['/api/auth/user'],
     staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: (failureCount, error: any) => {
+    retry: (failureCount, error: unknown) => {
       // Don't retry on 401 - user is simply not authenticated
-      if (error?.status === 401) return false;
+      if (error && typeof error === 'object' && 'status' in error && error.status === 401) return false;
       return failureCount < 3;
     }
   });

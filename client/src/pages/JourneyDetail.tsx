@@ -97,7 +97,7 @@ export default function JourneyDetail() {
         description: "You've successfully enrolled in this learning journey.",
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "Failed to Start Journey",
         description: error.message || "Something went wrong. Please try again.",
@@ -125,7 +125,7 @@ export default function JourneyDetail() {
         description: "Great job! Keep going to complete the journey.",
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "Failed to Update Progress",
         description: error.message || "Something went wrong. Please try again.",

@@ -6,11 +6,21 @@ import SearchDialog from "@/components/ui/search-dialog";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 
+interface User {
+  id: string;
+  email?: string;
+  name?: string;
+  avatar?: string;
+  provider?: string;
+  role?: string;
+  createdAt?: string;
+}
+
 interface MainLayoutProps {
   awesomeList?: AwesomeList;
   isLoading: boolean;
   children: React.ReactNode;
-  user?: any;
+  user?: User;
   onLogout?: () => void;
 }
 

@@ -22,6 +22,7 @@
  * - admin: Administrative operations
  * - github-sync: GitHub synchronization
  * - enrichment: AI-powered resource enrichment
+ * - research: AI-powered research and analysis
  *
  * USAGE:
  * Import specific modules as needed:
@@ -40,3 +41,4 @@ export { journeysModule } from './journeys';
 export { adminModule } from './admin';
 export { githubSyncModule } from './github-sync';
 export { enrichmentModule } from './enrichment';
+export { researchModule } from './research';

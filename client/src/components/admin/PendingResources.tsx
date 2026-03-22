@@ -13,20 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CheckCircle2, XCircle, Eye, ExternalLink, Calendar, User, FolderTree } from "lucide-react";
-
-interface Resource {
-  id: number;
-  title: string;
-  url: string;
-  description: string;
-  category: string;
-  subcategory?: string;
-  subSubcategory?: string;
-  status: string;
-  submittedBy?: string;
-  createdAt: string;
-  updatedAt?: string;
-}
+import type { Resource } from "@shared/schema";
 
 interface PendingResourcesResponse {
   resources: Resource[];
@@ -66,7 +53,7 @@ export default function PendingResources() {
       setApproveDialogOpen(false);
       setResourceToApprove(null);
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "Approval Failed",
         description: error.message || "Failed to approve resource. Please try again.",
@@ -93,7 +80,7 @@ export default function PendingResources() {
       setResourceToReject(null);
       setRejectionReason("");
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "Rejection Failed",
         description: error.message || "Failed to reject resource. Please try again.",
@@ -143,8 +130,9 @@ export default function PendingResources() {
     return text.substring(0, maxLength) + "...";
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+  const formatDate = (date: Date | null) => {
+    if (!date) return 'Unknown';
+    return new Date(date).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'

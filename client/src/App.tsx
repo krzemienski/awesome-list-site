@@ -92,7 +92,7 @@ function Router() {
   }
 
   return (
-    <MainLayout awesomeList={awesomeList} isLoading={isLoading} user={user} onLogout={logout}>
+    <MainLayout awesomeList={awesomeList} isLoading={isLoading} user={user ?? undefined} onLogout={logout}>
       <Switch>
         <Route path="/" component={() => <Home awesomeList={awesomeList} isLoading={isLoading} />} />
         <Route path="/login" component={Login} />
