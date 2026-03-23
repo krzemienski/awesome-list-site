@@ -167,13 +167,9 @@ export class EnrichmentService {
   }
 
   async processBatch(jobId: number, batch: any[]): Promise<void> {
-    const job = await this.enrichmentRepo.getEnrichmentJob(jobId);
-    if (!job) {
-      throw new Error(`Job ${jobId} not found`);
-    }
-
     for (const queueItem of batch) {
-      if (job.status === 'cancelled') {
+      const currentJobCheck = await this.enrichmentRepo.getEnrichmentJob(jobId);
+      if (!currentJobCheck || currentJobCheck.status === 'cancelled') {
         console.log(`Job ${jobId} was cancelled, stopping batch processing`);
         break;
       }

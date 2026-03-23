@@ -1219,6 +1219,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // ============= Audit Log Routes =============
+
+  // GET /api/admin/audit-logs - List audit log entries
+  app.get('/api/admin/audit-logs', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 50;
+      const resourceId = req.query.resourceId ? parseInt(req.query.resourceId as string) : null;
+      
+      const logs = await auditRepo.getResourceAuditLog(
+        resourceId && !isNaN(resourceId) ? resourceId : null,
+        limit
+      );
+      res.json({ logs, total: logs.length });
+    } catch (error) {
+      console.error('Error fetching audit logs:', error);
+      res.status(500).json({ message: 'Failed to fetch audit logs' });
+    }
+  });
+
   // ============= Resource Approval Routes =============
   
   // GET /api/admin/pending-resources - Get all pending resources for approval
