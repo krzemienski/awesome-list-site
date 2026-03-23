@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { useParams, Link, useLocation } from "wouter";
+import { safeGetItem, safeSetItem } from "@/lib/safeStorage";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -41,7 +42,7 @@ export default function Category() {
   
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('awesome-list-view-mode');
+      const saved = safeGetItem('awesome-list-view-mode');
       if (saved === 'grid' || saved === 'list' || saved === 'compact') {
         return saved;
       }
@@ -51,7 +52,7 @@ export default function Category() {
   
   const handleViewModeChange = (mode: ViewMode) => {
     setViewMode(mode);
-    localStorage.setItem('awesome-list-view-mode', mode);
+    safeSetItem('awesome-list-view-mode', mode);
   };
   
   const { toast } = useToast();

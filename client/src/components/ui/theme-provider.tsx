@@ -1,5 +1,6 @@
 import { createContext, useEffect, useState, useCallback, ReactNode } from "react";
 import { themePresets, applyTheme, buildCustomTheme, generateRandomTheme, type ThemePreset } from "@/lib/shadcn-themes";
+import { safeGetItem, safeSetItem, safeRemoveItem } from "@/lib/safeStorage";
 
 export const FONT_OPTIONS = [
   { value: "inter", label: "Inter", family: "'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif", description: "Clean and modern, great readability" },
@@ -43,23 +44,23 @@ function applyFont(fontValue: string) {
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [customHex, setCustomHexState] = useState<string>(() => {
     if (typeof window === "undefined") return "";
-    return localStorage.getItem("theme-custom-hex") || "";
+    return safeGetItem("theme-custom-hex") || "";
   });
 
   const [activeFont, setActiveFont] = useState<string>(() => {
     if (typeof window === "undefined") return "inter";
-    return localStorage.getItem("app-font") || "inter";
+    return safeGetItem("app-font") || "inter";
   });
 
   const [activeTheme, setActiveTheme] = useState<ThemePreset>(() => {
     if (typeof window === "undefined") return themePresets[0];
-    const saved = localStorage.getItem("theme-preset") || "cyberpunk";
+    const saved = safeGetItem("theme-preset") || "cyberpunk";
     if (saved === "custom") {
-      const hex = localStorage.getItem("theme-custom-hex") || "#3b82f6";
+      const hex = safeGetItem("theme-custom-hex") || "#3b82f6";
       return buildCustomTheme(hex);
     }
     if (saved === "random") {
-      const savedTheme = localStorage.getItem("theme-random-json");
+      const savedTheme = safeGetItem("theme-random-json");
       if (savedTheme) {
         try { return JSON.parse(savedTheme); } catch {}
       }
@@ -73,30 +74,30 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     if (preset) {
       setActiveTheme(preset);
       setCustomHexState("");
-      localStorage.setItem("theme-preset", value);
-      localStorage.removeItem("theme-custom-hex");
+      safeSetItem("theme-preset", value);
+      safeRemoveItem("theme-custom-hex");
     }
   }, []);
 
   const setCustomColor = useCallback((hex: string) => {
     if (!/^#[0-9a-fA-F]{6}$/.test(hex) && !/^#[0-9a-fA-F]{3}$/.test(hex)) return;
     setCustomHexState(hex);
-    localStorage.setItem("theme-custom-hex", hex);
+    safeSetItem("theme-custom-hex", hex);
     const theme = buildCustomTheme(hex);
     setActiveTheme(theme);
-    localStorage.setItem("theme-preset", "custom");
+    safeSetItem("theme-preset", "custom");
   }, []);
 
   const randomizeTheme = useCallback(() => {
     const theme = generateRandomTheme();
-    localStorage.setItem("theme-random-json", JSON.stringify(theme));
-    localStorage.setItem("theme-preset", "random");
+    safeSetItem("theme-random-json", JSON.stringify(theme));
+    safeSetItem("theme-preset", "random");
     setActiveTheme(theme);
   }, []);
 
   const setFont = useCallback((fontValue: string) => {
     setActiveFont(fontValue);
-    localStorage.setItem("app-font", fontValue);
+    safeSetItem("app-font", fontValue);
     applyFont(fontValue);
   }, []);
 

@@ -1,4 +1,5 @@
 import { useState, lazy, Suspense } from "react";
+import { safeSetItem } from "@/lib/safeStorage";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { Menu, Search, Github, Sun, Moon, Palette, List, BarChart3, User, LogIn, LogOut, Bookmark, Shield } from "lucide-react";
@@ -57,7 +58,7 @@ export default function TopBar({
 
   const handleThemeApply = (customTheme: CustomTheme) => {
     setCurrentCustomTheme(customTheme);
-    localStorage.setItem('applied-custom-theme', JSON.stringify(customTheme));
+    safeSetItem('applied-custom-theme', JSON.stringify(customTheme));
   };
   
   return (

@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { safeGetItem } from "@/lib/safeStorage";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -77,9 +78,9 @@ export default function AnalyticsDashboard({
 
   // Load analytics data from localStorage
   useEffect(() => {
-    const views = localStorage.getItem('resource-views');
-    const clicks = localStorage.getItem('resource-clicks');
-    const searches = localStorage.getItem('search-history');
+    const views = safeGetItem('resource-views');
+    const clicks = safeGetItem('resource-clicks');
+    const searches = safeGetItem('search-history');
     
     if (views) setViewData(JSON.parse(views));
     if (clicks) setClickData(JSON.parse(clicks));

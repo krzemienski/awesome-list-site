@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { safeGetItem } from "@/lib/safeStorage";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -59,8 +60,8 @@ export default function CommunityMetrics({ resources, categories, className }: C
   const [trackingData, setTrackingData] = useState<{views: Record<string, number>, clicks: Record<string, number>}>({views: {}, clicks: {}});
   
   useEffect(() => {
-    const views = localStorage.getItem('resource-views');
-    const clicks = localStorage.getItem('resource-clicks');
+    const views = safeGetItem('resource-views');
+    const clicks = safeGetItem('resource-clicks');
     setTrackingData({
       views: views ? JSON.parse(views) : {},
       clicks: clicks ? JSON.parse(clicks) : {}

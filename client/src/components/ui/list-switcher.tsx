@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { safeGetItem, safeSetItem } from "@/lib/safeStorage";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -171,7 +172,7 @@ export default function ListSwitcher({
 
   // Load custom lists from localStorage
   useEffect(() => {
-    const saved = localStorage.getItem('custom-awesome-lists');
+    const saved = safeGetItem('custom-awesome-lists');
     if (saved) {
       try {
         setCustomLists(JSON.parse(saved));
@@ -183,7 +184,7 @@ export default function ListSwitcher({
 
   // Save custom lists to localStorage
   const saveCustomLists = (lists: AwesomeListConfig[]) => {
-    localStorage.setItem('custom-awesome-lists', JSON.stringify(lists));
+    safeSetItem('custom-awesome-lists', JSON.stringify(lists));
     setCustomLists(lists);
   };
 

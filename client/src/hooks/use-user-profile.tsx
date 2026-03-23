@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { safeGetItem, safeSetItem, safeRemoveItem } from "@/lib/safeStorage";
 
 interface UserProfile {
   userId: string;
@@ -32,14 +33,13 @@ export function useUserProfile() {
 
   // Generate or retrieve user ID
   useEffect(() => {
-    let userId = localStorage.getItem('awesome-video-user-id');
+    let userId = safeGetItem('awesome-video-user-id');
     if (!userId) {
       userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      localStorage.setItem('awesome-video-user-id', userId);
+      safeSetItem('awesome-video-user-id', userId);
     }
 
-    // Load existing profile from localStorage
-    const savedProfile = localStorage.getItem('awesome-video-user-profile');
+    const savedProfile = safeGetItem('awesome-video-user-profile');
     if (savedProfile) {
       try {
         const parsedProfile = JSON.parse(savedProfile);
@@ -58,7 +58,7 @@ export function useUserProfile() {
   // Save profile to localStorage whenever it changes
   useEffect(() => {
     if (isLoaded && userProfile.userId) {
-      localStorage.setItem('awesome-video-user-profile', JSON.stringify(userProfile));
+      safeSetItem('awesome-video-user-profile', JSON.stringify(userProfile));
     }
   }, [userProfile, isLoaded]);
 
@@ -103,7 +103,7 @@ export function useUserProfile() {
   const clearProfile = () => {
     const userId = userProfile.userId;
     setUserProfile({ ...DEFAULT_PROFILE, userId });
-    localStorage.removeItem('awesome-video-user-profile');
+    safeRemoveItem('awesome-video-user-profile');
   };
 
   return {

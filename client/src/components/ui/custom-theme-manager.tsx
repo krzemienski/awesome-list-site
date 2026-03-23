@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { safeGetItem, safeSetItem } from "@/lib/safeStorage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -108,7 +109,7 @@ export default function CustomThemeManager({
 
   // Load custom themes from localStorage on mount
   useEffect(() => {
-    const savedThemes = localStorage.getItem('custom-themes');
+    const savedThemes = safeGetItem('custom-themes');
     if (savedThemes) {
       try {
         setCustomThemes(JSON.parse(savedThemes));
@@ -120,7 +121,7 @@ export default function CustomThemeManager({
 
   // Save custom themes to localStorage
   const saveThemes = (themes: CustomTheme[]) => {
-    localStorage.setItem('custom-themes', JSON.stringify(themes));
+    safeSetItem('custom-themes', JSON.stringify(themes));
     setCustomThemes(themes);
   };
 

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState, useEffect } from "react";
+import { safeGetItem, safeSetItem, safeRemoveItem } from "@/lib/safeStorage";
 
 export interface UserProfile {
   userId: string;
@@ -85,7 +86,7 @@ export function useAIRecommendations(
       setLocalCache(data);
       // Cache in localStorage for persistence
       if (typeof window !== 'undefined') {
-        localStorage.setItem('ai_recommendations_cache', JSON.stringify({
+        safeSetItem('ai_recommendations_cache', JSON.stringify({
           data,
           timestamp: Date.now()
         }));
@@ -120,7 +121,7 @@ export function useAIRecommendations(
   // Load from local cache on mount
   useEffect(() => {
     if (autoLoad && !localCache && typeof window !== 'undefined') {
-      const cached = localStorage.getItem('ai_recommendations_cache');
+      const cached = safeGetItem('ai_recommendations_cache');
       if (cached) {
         const { data, timestamp } = JSON.parse(cached);
         if (Date.now() - timestamp < cacheTime) {
@@ -149,7 +150,7 @@ export function useAIRecommendations(
     clearCache: () => {
       setLocalCache(null);
       if (typeof window !== 'undefined') {
-        localStorage.removeItem('ai_recommendations_cache');
+        safeRemoveItem('ai_recommendations_cache');
       }
     },
     

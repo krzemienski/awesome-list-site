@@ -18,6 +18,7 @@ import CategoryManager from "@/components/admin/CategoryManager";
 import SubcategoryManager from "@/components/admin/SubcategoryManager";
 import SubSubcategoryManager from "@/components/admin/SubSubcategoryManager";
 import ResearcherTab from "@/components/admin/ResearcherTab";
+import { CostDashboard, ResearchPanel } from "@/components/admin/research";
 export default function AdminDashboard() {
   const { stats, isLoading, error } = useAdmin();
 
