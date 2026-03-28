@@ -1,0 +1,431 @@
+# Instincts generated from https://github.com/krzemienski/awesome-list-site
+# Generated: 2026-03-22T20:17:20.985Z
+# Version: 2.0
+# NOTE: This file supplements (does not replace) any existing curated instincts.
+# High-confidence manually curated instincts should be preserved alongside these.
+
+---
+id: awesome-list-site-commit-length
+trigger: "when writing a commit message"
+confidence: 0.6
+domain: git
+source: repo-analysis
+source_repo: https://github.com/krzemienski/awesome-list-site
+---
+
+# Awesome List Site Commit Length
+
+## Action
+
+Write moderate-length commit messages (~59 characters)
+
+## Evidence
+
+- Average commit message length: 59 chars
+- Based on 500 commits
+
+---
+id: awesome-list-site-naming-files
+trigger: "when creating a new file"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/krzemienski/awesome-list-site
+---
+
+# Awesome List Site Naming Files
+
+## Action
+
+Use camelCase naming convention
+
+## Evidence
+
+- Analyzed file naming patterns in repository
+- Dominant pattern: camelCase
+
+---
+id: awesome-list-site-import-alias
+trigger: "when importing modules"
+confidence: 0.85
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/krzemienski/awesome-list-site
+---
+
+# Awesome List Site Import Alias
+
+## Action
+
+Use path aliases (@/, ~/) instead of relative imports
+
+## Evidence
+
+- Import analysis shows alias pattern
+- Example: import { x } from '@/lib/x'
+
+---
+id: awesome-list-site-export-style
+trigger: "when exporting from a module"
+confidence: 0.7
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/krzemienski/awesome-list-site
+---
+
+# Awesome List Site Export Style
+
+## Action
+
+Prefer default exports
+
+## Evidence
+
+- Export pattern analysis
+- Dominant style: default
+
+---
+id: awesome-list-site-arch-type-based
+trigger: "when adding new code"
+confidence: 0.8
+domain: architecture
+source: repo-analysis
+source_repo: https://github.com/krzemienski/awesome-list-site
+---
+
+# Awesome List Site Arch Type Based
+
+## Action
+
+Place code in the appropriate type folder (components/, services/, utils/, etc.)
+
+## Evidence
+
+- Type-based module organization detected
+- Folders: 
+
+---
+id: awesome-list-site-test-separate
+trigger: "when writing tests"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/krzemienski/awesome-list-site
+---
+
+# Awesome List Site Test Separate
+
+## Action
+
+Place tests in the tests/ or __tests__/ directory, mirroring src structure
+
+## Evidence
+
+- Separate test directory pattern detected
+- Tests live in dedicated test folders
+
+---
+id: awesome-list-site-test-framework
+trigger: "when writing tests"
+confidence: 0.9
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/krzemienski/awesome-list-site
+---
+
+# Awesome List Site Test Framework
+
+## Action
+
+Use vitest as the test framework
+
+## Evidence
+
+- Test framework detected: vitest
+- File pattern: *.test.ts
+
+---
+id: awesome-list-site-test-naming
+trigger: "when creating a test file"
+confidence: 0.85
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/krzemienski/awesome-list-site
+---
+
+# Awesome List Site Test Naming
+
+## Action
+
+Name test files using the pattern: *.test.ts
+
+## Evidence
+
+- File pattern: *.test.ts
+- Consistent across test files
+
+---
+id: awesome-list-site-test-types
+trigger: "when planning tests for a feature"
+confidence: 0.7
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/krzemienski/awesome-list-site
+---
+
+# Awesome List Site Test Types
+
+## Action
+
+Write unit, integration, e2e tests to match project standards
+
+## Evidence
+
+- Test types detected: unit, integration, e2e
+- Coverage config: no
+
+---
+id: awesome-list-site-workflow-feature-development
+trigger: "when implementing a new feature"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/krzemienski/awesome-list-site
+---
+
+# Awesome List Site Workflow Feature Development
+
+## Action
+
+Follow the feature-development workflow:
+1. Add feature implementation
+2. Add tests for feature
+3. Update documentation
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~9x per month
+- Files: client/src/components/admin/research/*, client/src/components/admin/research/hooks/*, client/src/pages/*
+
+---
+id: awesome-list-site-workflow-refactoring
+trigger: "when refactoring code"
+confidence: 0.75
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/krzemienski/awesome-list-site
+---
+
+# Awesome List Site Workflow Refactoring
+
+## Action
+
+Follow the refactoring workflow:
+1. Ensure tests pass before refactor
+2. Refactor code structure
+3. Verify tests still pass
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~5x per month
+- Files: src/**/*
+
+---
+id: awesome-list-site-workflow-add-ai-powered-feature
+trigger: "when doing add ai powered feature"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/krzemienski/awesome-list-site
+---
+
+# Awesome List Site Workflow Add Ai Powered Feature
+
+## Action
+
+Follow the add-ai-powered-feature workflow:
+1. Create or update backend service file in server/ai/ (e.g., researchService.ts, enrichmentService.ts, tagging.ts)
+2. Add or update API endpoints in server/routes.ts
+3. Update or extend shared schema in shared/schema.ts
+4. Create or update admin UI components in client/src/components/admin/ (e.g., ResearchPanel.tsx, ResearcherTab.tsx, BatchEnrichmentPanel.tsx)
+5. Integrate new UI into client/src/pages/AdminDashboard.tsx
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: server/ai/*.ts, server/routes.ts, shared/schema.ts
+
+---
+id: awesome-list-site-workflow-admin-ui-panel-or-tab-addition
+trigger: "when doing admin ui panel or tab addition"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/krzemienski/awesome-list-site
+---
+
+# Awesome List Site Workflow Admin Ui Panel Or Tab Addition
+
+## Action
+
+Follow the admin-ui-panel-or-tab-addition workflow:
+1. Create new UI component(s) in client/src/components/admin/ (e.g., ResearchPanel.tsx, ExportTab.tsx, ValidationTab.tsx, GitHubSyncPanel.tsx)
+2. Optionally add supporting hooks/types in client/src/components/admin/ or subfolders
+3. Integrate the new component into client/src/pages/AdminDashboard.tsx
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: client/src/components/admin/*.ts*, client/src/pages/AdminDashboard.tsx
+
+---
+id: awesome-list-site-workflow-backend-api-endpoint-addition
+trigger: "when doing backend api endpoint addition"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/krzemienski/awesome-list-site
+---
+
+# Awesome List Site Workflow Backend Api Endpoint Addition
+
+## Action
+
+Follow the backend-api-endpoint-addition workflow:
+1. Create or update service/logic file in server/services/ or server/ai/
+2. Add new endpoint(s) to server/routes.ts
+3. Update shared/schema.ts if new data types are needed
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: server/services/*.ts, server/ai/*.ts, server/routes.ts
+
+---
+id: awesome-list-site-workflow-frontend-ui-refactor-or-enhancement
+trigger: "when doing frontend ui refactor or enhancement"
+confidence: 0.65
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/krzemienski/awesome-list-site
+---
+
+# Awesome List Site Workflow Frontend Ui Refactor Or Enhancement
+
+## Action
+
+Follow the frontend-ui-refactor-or-enhancement workflow:
+1. Update or refactor components in client/src/components/layout/ or client/src/components/ui/
+2. Update related page components in client/src/pages/
+3. Update CSS or style files in client/src/styles/ or client/src/index.css
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~3x per month
+- Files: client/src/components/layout/*.ts*, client/src/components/ui/*.ts*, client/src/pages/*.ts*
+
+---
+id: awesome-list-site-workflow-type-safety-and-typescript-improvement
+trigger: "when doing type safety and typescript improvement"
+confidence: 0.55
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/krzemienski/awesome-list-site
+---
+
+# Awesome List Site Workflow Type Safety And Typescript Improvement
+
+## Action
+
+Follow the type-safety-and-typescript-improvement workflow:
+1. Identify files with 'any' usage (server/*.ts, client/src/*.ts*)
+2. Replace 'any' with specific interfaces/types or 'unknown' where appropriate
+3. Update or create type definitions in shared/schema.ts or client/src/types/
+4. Run TypeScript compiler and fix errors
+5. Document or verify changes
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~1x per month
+- Files: server/**/*.ts, client/src/**/*.ts*, shared/schema.ts
+
+---
+id: awesome-list-site-workflow-repository-pattern-refactor
+trigger: "when doing repository pattern refactor"
+confidence: 0.55
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/krzemienski/awesome-list-site
+---
+
+# Awesome List Site Workflow Repository Pattern Refactor
+
+## Action
+
+Follow the repository-pattern-refactor workflow:
+1. Create repository classes in server/repositories/ (e.g., UserRepository.ts, ResourceRepository.ts, etc.)
+2. Update server/storage.ts to delegate to repositories
+3. Refactor server/routes.ts and service files to use repositories directly
+4. Update documentation (e.g., docs/ARCHITECTURE.md) to describe the new pattern
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~1x per month
+- Files: server/repositories/*.ts, server/storage.ts, server/routes.ts
+
+---
+id: awesome-list-site-workflow-add-or-update-shared-documentation
+trigger: "when doing add or update shared documentation"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/krzemienski/awesome-list-site
+---
+
+# Awesome List Site Workflow Add Or Update Shared Documentation
+
+## Action
+
+Follow the add-or-update-shared-documentation workflow:
+1. Create or update markdown documentation in docs/ or root
+2. Update or add specification or feature description files (e.g., SPECIFICATION.md, RESEARCH_FEATURE.md, DESIGN-SYSTEM.md, API.md)
+3. Optionally update DEVELOPMENT.md for dev workflow/tooling changes
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: docs/*.md, SPECIFICATION.md, RESEARCH_FEATURE.md
+
+---
+id: awesome-list-site-workflow-add-skill-or-workflow-to-agents
+trigger: "when doing add skill or workflow to agents"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/krzemienski/awesome-list-site
+---
+
+# Awesome List Site Workflow Add Skill Or Workflow To Agents
+
+## Action
+
+Follow the add-skill-or-workflow-to-agents workflow:
+1. Create new SKILL.md and supporting files in .agents/skills/<skill-name>/
+2. Add references, scripts, templates, and workflows as needed
+3. Optionally update skills-lock.json or related manifest
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: .agents/skills/*/SKILL.md, .agents/skills/*/references/*.md, .agents/skills/*/scripts/*
+
