@@ -11,11 +11,14 @@ import { test, expect, Page } from '@playwright/test';
  *      via the role dropdown, and assert the change is reflected in the API
  *      and the UI. The role is reverted in `afterAll` so tests are
  *      idempotent.
- *   3. Switch to the Audit tab, filter by a known resource id (one with a
- *      large existing audit history), and assert at least one log row
- *      renders.
+ *   3. Switch to the Audit tab, seed a fresh resource (which produces a
+ *      `created` audit entry), filter by that brand-new resource id, and
+ *      assert the row renders. The seeded resource is deleted in `afterAll`
+ *      so dev state stays tidy and the test does not depend on any
+ *      pre-existing data in the audit log.
  *
- * The tests are serial because they mutate (and revert) a shared user role.
+ * The tests are serial because they mutate (and revert) a shared user role
+ * and share the seeded resource id between setup and teardown.
  */
 
 const ADMIN_EMAIL = 'admin@example.com';
@@ -31,10 +34,10 @@ const BASE_URL = process.env.BASE_URL || 'http://localhost:5000';
 const TARGET_USER_ID = 'test-user-123';
 const TARGET_USER_EMAIL = 'test@example.com';
 
-// Resource id known to have an extensive audit-log history. The Audit tab's
-// filter searches by `resourceId`; this id is used to assert that at least
-// one row renders for a known-good filter value.
-const KNOWN_AUDIT_RESOURCE_ID = '186689';
+// Tracks the resource id created inside the Audit tab test so that the
+// afterAll teardown can delete it. Module-scoped so it is visible to the
+// teardown hook even though the resource is created inside a test body.
+let seededAuditResourceId: number | null = null;
 
 async function loginAsAdmin(page: Page) {
   // Use the page's request context so cookies propagate to subsequent navigations.
@@ -70,14 +73,38 @@ test.describe.serial('Admin Users & Audit tabs', () => {
   });
 
   test.afterAll(async ({ browser }) => {
-    // Restore the target user back to `user` regardless of test outcome.
-    // Pass baseURL explicitly so the manually-created context resolves
-    // relative URLs the same way the standard `page` fixture does.
+    // Restore the target user back to `user` and delete any resource the
+    // Audit tab test seeded, regardless of test outcome. Pass baseURL
+    // explicitly so the manually-created context resolves relative URLs
+    // the same way the standard `page` fixture does.
     const ctx = await browser.newContext({ baseURL: BASE_URL });
     const page = await ctx.newPage();
     try {
       await loginAsAdmin(page);
-      await setRole(page, TARGET_USER_ID, 'user');
+      // Best-effort role revert: don't throw if it fails so the resource
+      // cleanup below still runs.
+      try {
+        await setRole(page, TARGET_USER_ID, 'user');
+      } catch (err) {
+        console.warn('afterAll: failed to revert target user role', err);
+      }
+      if (seededAuditResourceId !== null) {
+        const id = seededAuditResourceId;
+        seededAuditResourceId = null;
+        const del = await page.request.delete(`/api/admin/resources/${id}`);
+        // The DELETE handler currently has a known issue where it returns
+        // 500 even though the underlying resource row is removed, so don't
+        // trust the status alone. Re-check via GET and only warn if the
+        // resource is genuinely still present after our delete attempt.
+        if (!del.ok() && del.status() !== 404) {
+          const verify = await page.request.get(`/api/resources/${id}`);
+          if (verify.status() !== 404) {
+            console.warn(
+              `afterAll: failed to delete seeded resource ${id}: delete=${del.status()} ${await del.text()}, verify=${verify.status()}`,
+            );
+          }
+        }
+      }
     } finally {
       await ctx.close();
     }
@@ -164,7 +191,43 @@ test.describe.serial('Admin Users & Audit tabs', () => {
     await setRole(page, TARGET_USER_ID, 'user');
   });
 
-  test('Audit tab: filter by known resource id renders at least one row', async ({ page }) => {
+  test('Audit tab: filter by freshly-seeded resource id renders its created row', async ({ page }) => {
+    // Seed a brand-new resource via the public POST /api/resources endpoint.
+    // ResourceRepository.createResource automatically writes a `created`
+    // entry to the audit log, so filtering by this fresh id is guaranteed
+    // to match exactly one row regardless of the state of the dev DB.
+    // A nonce in the URL avoids the unique-URL constraint across re-runs.
+    const nonce = `${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
+    const createRes = await page.request.post('/api/resources', {
+      data: {
+        title: `E2E Audit Seed ${nonce}`,
+        url: `https://example.invalid/e2e-audit-seed/${nonce}`,
+        description: 'Temporary resource created by admin-users-audit.spec.ts',
+        category: 'E2E Test',
+      },
+    });
+    expect(
+      createRes.ok(),
+      `failed to seed audit resource: ${createRes.status()} ${await createRes.text()}`,
+    ).toBeTruthy();
+    const createdResource = await createRes.json();
+    expect(typeof createdResource?.id).toBe('number');
+    seededAuditResourceId = createdResource.id as number;
+    const seededIdStr = String(seededAuditResourceId);
+
+    // Sanity-check via the API that an audit entry exists for this resource
+    // before we depend on it appearing in the UI. This surfaces seeding
+    // problems as a clear failure rather than a vague UI timeout.
+    const apiAudit = await page.request.get(
+      `/api/admin/audit-logs?resourceId=${seededIdStr}&limit=10`,
+    );
+    expect(apiAudit.ok()).toBeTruthy();
+    const apiAuditBody = await apiAudit.json();
+    expect(
+      Array.isArray(apiAuditBody.logs) && apiAuditBody.logs.length,
+      'no audit entry was logged for the freshly-seeded resource',
+    ).toBeGreaterThan(0);
+
     await page.goto('/admin#audit');
     await page.waitForLoadState('networkidle');
 
@@ -174,21 +237,21 @@ test.describe.serial('Admin Users & Audit tabs', () => {
 
     await expect(page.getByRole('heading', { name: /Audit Log/i })).toBeVisible();
 
-    // Enter the resource id into the filter input and submit the form.
+    // Enter the seeded resource id into the filter input and submit the form.
     const filterInput = page.getByPlaceholder(/Filter by Resource ID/i);
     await expect(filterInput).toBeVisible();
-    await filterInput.fill(KNOWN_AUDIT_RESOURCE_ID);
+    await filterInput.fill(seededIdStr);
     // Submit by pressing Enter so the form's onSubmit fires.
     await filterInput.press('Enter');
 
     // Wait for the filtered request to complete by polling the rendered rows.
-    // The Audit table has a header row plus one row per log entry; assert that
-    // at least one log row exists and that every visible resource cell points
-    // to our filtered id (formatted as "#186689" in the Resource column).
+    // The Audit table has a header row plus one row per log entry; assert
+    // that at least one log row exists for our freshly-seeded resource id
+    // (formatted as "#<id>" in the Resource column).
     const dataRows = page.locator('table tbody tr');
     await expect.poll(async () => await dataRows.count(), {
       timeout: 5000,
-      message: 'no audit log rows rendered for known resource id',
+      message: 'no audit log rows rendered for seeded resource id',
     }).toBeGreaterThan(0);
 
     // The "No audit log entries found" empty-state row should NOT be present.
@@ -196,7 +259,7 @@ test.describe.serial('Admin Users & Audit tabs', () => {
 
     // Sanity-check the first row's Resource cell shows our filter value.
     await expect(
-      page.getByText(`#${KNOWN_AUDIT_RESOURCE_ID}`).first(),
+      page.getByText(`#${seededIdStr}`).first(),
     ).toBeVisible();
   });
 });
