@@ -1,5 +1,7 @@
 # Storage Migration Verification Report
 
+> **Historical snapshot.** This report documents the Phase 3 repository-extraction work as it was on 2026-02-01. Since then, the modular `server/routes/*.ts` tree referenced in section 4 below has been consolidated into a single `server/routes.ts` file (see `replit.md` "Admin Panel Audit – Remaining Tabs" entry). The file paths in section 4 are kept verbatim as a record of the layout at the time of verification; for the current route surface, read `server/routes.ts` directly. The repository layer described in sections 1–3 (the `server/repositories/*.ts` files) is still in use and unchanged.
+
 ## Date: 2026-02-01
 ## Subtask: subtask-3-2 - Verify storage migration with existing tests
 
@@ -59,8 +61,8 @@ Sample verification shows proper delegation:
 - `createResource()` → `this.resourceRepo.create()` + audit log
 - And many more...
 
-### 4. Route Module Compatibility ✅
-All 10 route modules correctly import storage:
+### 4. Route Module Compatibility ✅ *(historical — see note at top of file)*
+At the time of this report, 10 route modules existed and correctly imported storage:
 - ✅ server/routes/admin.ts
 - ✅ server/routes/auth.ts
 - ✅ server/routes/bookmarks.ts
@@ -72,10 +74,12 @@ All 10 route modules correctly import storage:
 - ✅ server/routes/resources.ts
 - ✅ server/routes/seo.ts
 
-All use the pattern:
+All used the pattern:
 ```typescript
 import { storage } from "../storage";
 ```
+
+**Current layout.** Those 10 modules have since been collapsed into a single `server/routes.ts` file, which still imports `storage` the same way (`import { storage } from "./storage";`). The `IStorage` interface and the repository wiring verified in this report remain in effect — only the file boundary above the storage layer has changed.
 
 ### 5. IStorage Interface Preserved ✅
 The DatabaseStorage class maintains full compatibility with the IStorage interface, ensuring all existing code continues to work without changes.

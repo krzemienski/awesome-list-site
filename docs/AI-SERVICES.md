@@ -2,6 +2,8 @@
 
 Technical documentation for AI-powered resource analysis and enrichment in the Awesome Video Resource Viewer application.
 
+> **Route layout note.** Earlier drafts of this document referenced a modular route tree (`server/routes/admin.ts`, `server/routes/resources.ts`, `server/routes/search.ts`, `server/routes/ai.ts`, `server/routes/recommendations.ts`). That tree was removed during the admin-panel audit; **all HTTP route handlers now live in the single file `server/routes.ts`**, registered against the Express `app` instance returned by `registerRoutes(app)`. The code samples below have been updated to reflect that single-file layout. The AI service modules themselves still live under `server/ai/` (e.g. `server/ai/claudeService.ts`, `server/ai/enrichmentService.ts`, `server/ai/recommendationEngine.ts`, `server/ai/urlScraper.ts`).
+
 ## Overview
 
 The AI Services layer provides intelligent resource analysis, metadata extraction, and content enrichment using Anthropic's Claude API. The system is designed for cost-effective operation with comprehensive caching, rate limiting, and security controls.
@@ -2582,8 +2584,8 @@ private readonly ALLOWED_DOMAINS = [
 Batch enrichment and sensitive AI operations require admin role:
 
 ```typescript
-// server/routes/admin.ts
-router.post('/resources/enrich', requireAdmin, async (req, res) => {
+// server/routes.ts (admin batch-enrichment endpoint)
+app.post('/api/admin/enrichment/start', requireAdmin, async (req, res) => {
   // Only admins can trigger batch enrichment
 });
 ```
@@ -2601,10 +2603,10 @@ Practical examples for integrating AI services into your application workflow.
 Automatically enrich user-submitted resources with AI metadata:
 
 ```typescript
-// server/routes/resources.ts
-import { claudeService } from '../ai/claudeService';
+// server/routes.ts (resource submission endpoint)
+import { claudeService } from './ai/claudeService';
 
-router.post('/api/resources', requireAuth, async (req, res) => {
+app.post('/api/resources', requireAuth, async (req, res) => {
   const { url, title, description } = req.body;
 
   // Create initial resource
@@ -2649,8 +2651,8 @@ router.post('/api/resources', requireAuth, async (req, res) => {
 Use AI to validate and enhance user edit suggestions:
 
 ```typescript
-// server/routes/resources.ts
-router.post('/api/resources/:id/edits', requireAuth, async (req, res) => {
+// server/routes.ts (suggest-edit endpoint)
+app.post('/api/resources/:id/edits', requireAuth, async (req, res) => {
   const { proposedChanges, triggerClaudeAnalysis } = req.body;
   const resource = await storage.getResourceById(req.params.id);
 
@@ -2699,10 +2701,10 @@ router.post('/api/resources/:id/edits', requireAuth, async (req, res) => {
 Enhance search with AI-powered query understanding:
 
 ```typescript
-// server/routes/search.ts
-import { claudeService } from '../ai/claudeService';
+// server/routes.ts (search endpoint)
+import { claudeService } from './ai/claudeService';
 
-router.get('/api/search', async (req, res) => {
+app.get('/api/search', async (req, res) => {
   const { q } = req.query;
 
   // Standard keyword search
@@ -2752,10 +2754,10 @@ router.get('/api/search', async (req, res) => {
 Process large datasets with real-time progress updates:
 
 ```typescript
-// server/routes/admin.ts
-import { enrichmentService } from '../ai/enrichmentService';
+// server/routes.ts (admin batch-enrichment endpoint)
+import { enrichmentService } from './ai/enrichmentService';
 
-router.post('/api/admin/resources/enrich', requireAdmin, async (req, res) => {
+app.post('/api/admin/resources/enrich', requireAdmin, async (req, res) => {
   const { filters, options } = req.body;
 
   // Get resources to enrich
@@ -2782,7 +2784,7 @@ router.post('/api/admin/resources/enrich', requireAdmin, async (req, res) => {
 });
 
 // Check job status
-router.get('/api/admin/enrichment-jobs/:id', requireAdmin, async (req, res) => {
+app.get('/api/admin/enrichment-jobs/:id', requireAdmin, async (req, res) => {
   const job = await enrichmentService.getJob(req.params.id);
 
   res.json({
@@ -2813,10 +2815,10 @@ router.get('/api/admin/enrichment-jobs/:id', requireAdmin, async (req, res) => {
 Generate AI-powered recommendations based on user behavior:
 
 ```typescript
-// server/routes/recommendations.ts
-import { recommendationEngine } from '../ai/recommendationEngine';
+// server/routes.ts (recommendations endpoint)
+import { recommendationEngine } from './ai/recommendationEngine';
 
-router.get('/api/recommendations', requireAuth, async (req, res) => {
+app.get('/api/recommendations', requireAuth, async (req, res) => {
   const user = req.user;
 
   // Build user profile from activity
@@ -3211,8 +3213,8 @@ try {
 Expose errors to admins:
 
 ```typescript
-// server/routes/admin.ts
-router.get('/api/admin/ai-errors', requireAdmin, (req, res) => {
+// server/routes.ts (admin AI errors endpoint)
+app.get('/api/admin/ai-errors', requireAdmin, (req, res) => {
   const recent = aiErrorLogger.getRecent(50);
 
   res.json({
@@ -3570,8 +3572,8 @@ private async getCacheEntry(key: string): Promise<string | null> {
 For long responses, stream results to client:
 
 ```typescript
-// server/routes/ai.ts
-router.post('/api/ai/analyze-stream', requireAuth, async (req, res) => {
+// server/routes.ts (streaming AI analysis endpoint)
+app.post('/api/ai/analyze-stream', requireAuth, async (req, res) => {
   const { url } = req.body;
 
   res.setHeader('Content-Type', 'text/event-stream');
@@ -3658,8 +3660,8 @@ export interface AIMetrics {
 #### Dashboard Integration
 
 ```typescript
-// server/routes/admin.ts
-router.get('/api/admin/metrics/ai', requireAdmin, async (req, res) => {
+// server/routes.ts (admin AI metrics endpoint)
+app.get('/api/admin/metrics/ai', requireAdmin, async (req, res) => {
   const metrics = await aiMetricsCollector.getMetrics();
 
   res.json({
