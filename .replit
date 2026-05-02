@@ -47,3 +47,7 @@ args = "Start application"
 
 [agent]
 integrations = ["javascript_google_analytics:1.0.0", "javascript_anthropic:1.0.0", "javascript_anthropic_ai_integrations:1.0.0", "javascript_log_in_with_replit:1.0.0", "github:1.0.0"]
+
+[postMerge]
+path = "scripts/post-merge.sh"
+timeoutMs = 20000
