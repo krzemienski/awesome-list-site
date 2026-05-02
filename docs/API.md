@@ -266,138 +266,81 @@ GET /api/enrichment/jobs/:id            # Get job status
 DELETE /api/enrichment/jobs/:id         # Cancel job
 ```
 
-### Research API
+### AI Researcher API
 
-AI-powered research jobs for resource analysis and discovery.
+AI-powered discovery of new video / streaming resources. All endpoints
+require an authenticated admin. See `RESEARCH_FEATURE.md` for an overview.
 
 #### Start Research Job
 ```
-POST /api/research/jobs
+POST /api/researcher/start
 ```
-
-Start a new AI research job.
 
 **Request Body:**
 ```json
 {
-  "awesomeListId": 1,
-  "jobType": "validation" | "enrichment" | "discovery" | "trend_analysis",
-  "model": "claude-3-5-haiku" | "claude-3-5-sonnet" | "claude-3-opus",
-  "config": {
-    "depth": "shallow" | "medium" | "deep",
-    "focusAreas": ["string"],
-    "maxSources": 20
-  }
+  "prompt": "string (>= 10 chars)",
+  "categoryFocus": "optional string",
+  "maxBudgetUsd": "1.00",
+  "maxTurns": 30
 }
 ```
 
-**Response (201):**
+**Response:**
 ```json
 {
-  "jobId": "uuid",
-  "status": "pending",
-  "message": "Research job queued successfully"
+  "success": true,
+  "jobId": 123,
+  "message": "Research job started"
 }
 ```
 
 #### List Research Jobs
 ```
-GET /api/research/jobs?status=processing&jobType=validation&limit=20&offset=0
+GET /api/researcher/jobs
 ```
 
-Query parameters:
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| status | string | Filter by status (pending, processing, completed, failed) |
-| jobType | string | Filter by job type |
-| limit | number | Items per page (default: 20) |
-| offset | number | Pagination offset (default: 0) |
+Returns the list of research jobs.
 
-**Response:**
-```json
-{
-  "jobs": [...],
-  "pagination": { "limit": 20, "offset": 0, "total": 100 }
-}
+#### Get Job
+```
+GET /api/researcher/jobs/:id
 ```
 
-#### Get Job Status
-```
-GET /api/research/jobs/:id
-```
-
-**Response:**
-```json
-{
-  "id": "uuid",
-  "status": "processing",
-  "jobType": "validation",
-  "modelUsed": "claude-3-5-sonnet",
-  "progress": 45,
-  "totalInputTokens": 15000,
-  "totalOutputTokens": 3000,
-  "totalCostUsd": 0.09,
-  "webSourcesScraped": 5,
-  "totalFindings": 12,
-  "startedAt": "2024-01-15T10:30:00Z",
-  "completedAt": null,
-  "errorMessage": null
-}
-```
-
-#### Get Job Report
-```
-GET /api/research/jobs/:id/report
-```
-
-Returns the generated research report with findings and recommendations.
+Returns the job plus an `isActive` flag indicating whether the orchestrator
+is still processing it.
 
 #### Cancel Job
 ```
-DELETE /api/research/jobs/:id
+DELETE /api/researcher/jobs/:id
 ```
 
-Cancel a running research job.
+Cancels a running job.
 
-#### Get Cost Statistics
+#### List Discoveries
 ```
-GET /api/research/costs?startDate=2024-01-01&endDate=2024-01-31
+GET /api/researcher/discoveries?jobId=123
 ```
 
-Query parameters:
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| startDate | string | Start date (ISO 8601 format) |
-| endDate | string | End date (ISO 8601 format) |
+With `jobId`, returns discoveries for that job. Without `jobId`, returns
+all pending discoveries across jobs.
 
-**Response:**
+#### Approve Discovery
+```
+POST /api/researcher/discoveries/:id/approve
+```
+
+Approves a discovery and inserts it as a resource.
+
+#### Reject Discovery
+```
+POST /api/researcher/discoveries/:id/reject
+```
+
+**Request Body:**
 ```json
-{
-  "byModel": {
-    "claude-3-5-haiku": { "calls": 100, "tokens": 500000, "costUsd": 0.75 },
-    "claude-3-5-sonnet": { "calls": 20, "tokens": 100000, "costUsd": 1.80 },
-    "claude-3-opus": { "calls": 5, "tokens": 50000, "costUsd": 4.50 }
-  },
-  "byDay": [
-    { "date": "2024-01-15", "costUsd": 2.30 }
-  ],
-  "total": { "costUsd": 7.05, "jobCount": 125 }
-}
+{ "reason": "optional string" }
 ```
-
-#### Apply Finding
-```
-POST /api/research/findings/:id/apply
-```
-
-Apply a research finding (e.g., update resource metadata).
-
-#### Dismiss Finding
-```
-POST /api/research/findings/:id/dismiss
-```
-
-Dismiss a research finding without applying changes.
 
 ---
 

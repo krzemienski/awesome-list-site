@@ -183,7 +183,7 @@ Behind login: `/profile`, `/bookmarks`, `/admin` (with 11 tabs), and the populat
 **How they work.**
 - `/profile` — user info, role, joined date.
 - `/bookmarks` — list of saved resources.
-- `/admin` — tab registry in `client/src/pages/AdminDashboard.tsx`. Tabs include Categories, Subcategories, Sub-subcategories, Pending Resources, Pending Edits, Users, Audit, Export, Database, GitHub Sync, Link Health, Researcher, Research, Cost Dashboard, Stats, Enrichment.
+- `/admin` — tab registry in `client/src/pages/AdminDashboard.tsx`. Tabs include Categories, Subcategories, Sub-subcategories, Pending Resources, Pending Edits, Users, Audit, Export, Database, GitHub Sync, Link Health, Researcher, Stats, Enrichment.
 
 **Redesign principles for admin.**
 - Move from neon dashboard to **library catalogue**: white paper cards on cream, serif section headers, table rows at 52 px with zebra cream stripes.
