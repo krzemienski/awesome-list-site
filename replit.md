@@ -8,6 +8,13 @@ A production-ready React application for browsing and discovering over 2,600 cur
 
 ## Recent Changes
 
+### Admin Panel Audit – Remaining Tabs (May 2, 2026)
+- **Removed broken Research tab** from `client/src/pages/AdminDashboard.tsx`. `CostDashboard` + `ResearchPanel` were calling `/api/research/*` endpoints that were never wired up in `server/routes.ts` (the active routes file). The working `Researcher` tab (different component, hits `/api/researcher/*`) remains.
+- **Deleted dead client code**: removed entire `client/src/components/admin/research/` directory (CostDashboard, ResearchPanel, JobMonitor, ReportViewer, ResearchDashboard, ResearchJobsTable, etc.) — nothing else imported it.
+- **Removed duplicate / dead server route trees**: `server/routes.ts` is the only registered route surface. Deleted `server/routes/` directory (parallel modular files including duplicate `routes/admin/enrichment.ts`) and `server/modules/` directory (parallel module-architecture files including duplicate `modules/enrichment/routes.ts` and `modules/research/routes.ts`). None of these were imported anywhere.
+- **Audit verified**: Categories, Subcategories, Sub-Subcategories, Export, Database, GitHub Sync, Link Health, Researcher, Pending Resources/Edits, AdminStats, Users, Audit tabs all hit endpoints that exist in `server/routes.ts` and respond with 401 (auth required) when called unauthenticated.
+- **Fixed Resources tab bulk actions**: Added missing `POST /api/admin/resources/bulk/{approve,reject,delete}` endpoints in `server/routes.ts`. The `ResourceManager` UI was wired to call these but they were never implemented, so bulk approve/reject/delete buttons silently 200'd a Vite HTML page instead of mutating data.
+
 ### Deployment Fix & Re-Audit (February 2, 2026)
 - **Deployment Migration Fix**: Enhanced `server/index.ts` migration handling with:
   - Multi-path search for migrations folder

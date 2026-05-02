@@ -1383,6 +1383,118 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // POST /api/admin/resources/bulk/approve - Bulk approve resources
+  app.post('/api/admin/resources/bulk/approve', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { ids } = req.body as { ids?: unknown };
+
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ message: 'ids must be a non-empty array of resource IDs' });
+      }
+
+      const numericIds = ids
+        .map((id) => (typeof id === 'number' ? id : parseInt(String(id), 10)))
+        .filter((id) => !Number.isNaN(id));
+
+      if (numericIds.length === 0) {
+        return res.status(400).json({ message: 'No valid resource IDs provided' });
+      }
+
+      const results = await Promise.allSettled(
+        numericIds.map((id) => resourceRepo.approveResource(id, userId))
+      );
+
+      const succeeded = results.filter((r) => r.status === 'fulfilled').length;
+      const failed = results.length - succeeded;
+
+      res.json({ message: `Approved ${succeeded} resource(s)`, succeeded, failed });
+    } catch (error) {
+      console.error('Error in bulk approve:', error);
+      res.status(500).json({ message: 'Failed to bulk approve resources' });
+    }
+  });
+
+  // POST /api/admin/resources/bulk/reject - Bulk reject resources
+  app.post('/api/admin/resources/bulk/reject', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { ids, reason } = req.body as { ids?: unknown; reason?: string };
+
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ message: 'ids must be a non-empty array of resource IDs' });
+      }
+
+      if (!reason || typeof reason !== 'string' || reason.trim().length < 10) {
+        return res.status(400).json({ message: 'Rejection reason is required (minimum 10 characters)' });
+      }
+
+      const numericIds = ids
+        .map((id) => (typeof id === 'number' ? id : parseInt(String(id), 10)))
+        .filter((id) => !Number.isNaN(id));
+
+      if (numericIds.length === 0) {
+        return res.status(400).json({ message: 'No valid resource IDs provided' });
+      }
+
+      const results = await Promise.allSettled(
+        numericIds.map((id) => resourceRepo.rejectResource(id, userId, reason))
+      );
+
+      const succeeded = results.filter((r) => r.status === 'fulfilled').length;
+      const failed = results.length - succeeded;
+
+      res.json({ message: `Rejected ${succeeded} resource(s)`, succeeded, failed });
+    } catch (error) {
+      console.error('Error in bulk reject:', error);
+      res.status(500).json({ message: 'Failed to bulk reject resources' });
+    }
+  });
+
+  // POST /api/admin/resources/bulk/delete - Bulk delete resources
+  app.post('/api/admin/resources/bulk/delete', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { ids } = req.body as { ids?: unknown };
+
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ message: 'ids must be a non-empty array of resource IDs' });
+      }
+
+      const numericIds = ids
+        .map((id) => (typeof id === 'number' ? id : parseInt(String(id), 10)))
+        .filter((id) => !Number.isNaN(id));
+
+      if (numericIds.length === 0) {
+        return res.status(400).json({ message: 'No valid resource IDs provided' });
+      }
+
+      let succeeded = 0;
+      let failed = 0;
+      for (const id of numericIds) {
+        try {
+          const resource = await resourceRepo.getResource(id);
+          if (!resource) {
+            failed++;
+            continue;
+          }
+          const snapshot = { title: resource.title, url: resource.url, category: resource.category };
+          await resourceRepo.deleteResource(id);
+          await auditRepo.logResourceAudit(id, 'deleted', userId, snapshot, 'Resource deleted by admin (bulk)');
+          succeeded++;
+        } catch (err) {
+          console.error(`Error deleting resource ${id} in bulk:`, err);
+          failed++;
+        }
+      }
+
+      res.json({ message: `Deleted ${succeeded} resource(s)`, succeeded, failed });
+    } catch (error) {
+      console.error('Error in bulk delete:', error);
+      res.status(500).json({ message: 'Failed to bulk delete resources' });
+    }
+  });
+
   // GET /api/admin/resources - Get all resources for admin (with pagination and filters)
   app.get('/api/admin/resources', isAuthenticated, isAdmin, async (req, res) => {
     try {

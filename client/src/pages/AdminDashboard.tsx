@@ -18,7 +18,6 @@ import CategoryManager from "@/components/admin/CategoryManager";
 import SubcategoryManager from "@/components/admin/SubcategoryManager";
 import SubSubcategoryManager from "@/components/admin/SubSubcategoryManager";
 import ResearcherTab from "@/components/admin/ResearcherTab";
-import { CostDashboard, ResearchPanel } from "@/components/admin/research";
 export default function AdminDashboard() {
   const { stats, isLoading, error } = useAdmin();
 
@@ -117,9 +116,6 @@ export default function AdminDashboard() {
             <TabsTrigger value="audit" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap">
               Audit
             </TabsTrigger>
-            <TabsTrigger value="research" className="px-3 py-1.5 text-sm data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 whitespace-nowrap">
-              Research
-            </TabsTrigger>
           </TabsList>
         </div>
 
@@ -177,13 +173,6 @@ export default function AdminDashboard() {
 
         <TabsContent value="audit">
           <AuditTab />
-        </TabsContent>
-
-        <TabsContent value="research">
-          <div className="space-y-6">
-            <CostDashboard />
-            <ResearchPanel />
-          </div>
         </TabsContent>
       </Tabs>
     </div>
