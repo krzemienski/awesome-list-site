@@ -8,7 +8,7 @@ test.describe('Favorites/Bookmarks Flow', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to home page first
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test.describe('Bookmarks Page - Navigation', () => {
@@ -18,7 +18,7 @@ test.describe('Favorites/Bookmarks Flow', () => {
 
       if (await bookmarksLink.count() > 0) {
         await bookmarksLink.first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Verify navigation to bookmarks page
         expect(page.url()).toContain('/bookmarks');
@@ -31,7 +31,7 @@ test.describe('Favorites/Bookmarks Flow', () => {
     test('should display empty state when no bookmarks exist', async ({ page }) => {
       // Navigate to bookmarks page
       await page.goto('/bookmarks');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Check if page loaded
       const heading = page.getByRole('heading', { level: 1 });
@@ -58,7 +58,7 @@ test.describe('Favorites/Bookmarks Flow', () => {
     test('should show resource count in page description', async ({ page }) => {
       // Navigate to bookmarks page
       await page.goto('/bookmarks');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Check for description text
       const description = page.locator('p.text-muted-foreground');
@@ -75,14 +75,14 @@ test.describe('Favorites/Bookmarks Flow', () => {
     test('should navigate to explore from empty state', async ({ page }) => {
       // Navigate to bookmarks page
       await page.goto('/bookmarks');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Look for explore resources link in empty state
       const exploreLink = page.getByTestId('link-explore-resources');
 
       if (await exploreLink.isVisible().catch(() => false)) {
         await exploreLink.click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Should navigate to home page
         expect(page.url()).toMatch(/\/$|\/$/);
@@ -96,7 +96,7 @@ test.describe('Favorites/Bookmarks Flow', () => {
       // Navigate to first category to find resources
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Find resource cards
       const resourceCards = page.locator('[data-testid^="card-resource-"]');
@@ -122,7 +122,7 @@ test.describe('Favorites/Bookmarks Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Find resource cards
       const resourceCards = page.locator('[data-testid^="card-resource-"]');
@@ -162,7 +162,7 @@ test.describe('Favorites/Bookmarks Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Find bookmark buttons
       const bookmarkButtons = page.locator('[data-testid="button-bookmark"]');
@@ -204,7 +204,7 @@ test.describe('Favorites/Bookmarks Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Find bookmark buttons
       const bookmarkButtons = page.locator('[data-testid="button-bookmark"]');
@@ -244,7 +244,7 @@ test.describe('Favorites/Bookmarks Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Find bookmark buttons
       const bookmarkButtons = page.locator('[data-testid="button-bookmark"]');
@@ -283,7 +283,7 @@ test.describe('Favorites/Bookmarks Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Find bookmark buttons
       const bookmarkButtons = page.locator('[data-testid="button-bookmark"]');
@@ -315,7 +315,7 @@ test.describe('Favorites/Bookmarks Flow', () => {
     test('should display bookmarked resources', async ({ page }) => {
       // Navigate to bookmarks page
       await page.goto('/bookmarks');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Check for bookmark cards
       const bookmarkCards = page.locator('[data-testid^="bookmark-card-"]');
@@ -334,7 +334,7 @@ test.describe('Favorites/Bookmarks Flow', () => {
     test('should have sort dropdown on bookmarks page', async ({ page }) => {
       // Navigate to bookmarks page
       await page.goto('/bookmarks');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Check if there are bookmarks
       const bookmarkCards = page.locator('[data-testid^="bookmark-card-"]');
@@ -353,7 +353,7 @@ test.describe('Favorites/Bookmarks Flow', () => {
     test('should sort bookmarks by date (newest first)', async ({ page }) => {
       // Navigate to bookmarks page
       await page.goto('/bookmarks');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Check if there are multiple bookmarks
       const bookmarkCards = page.locator('[data-testid^="bookmark-card-"]');
@@ -384,7 +384,7 @@ test.describe('Favorites/Bookmarks Flow', () => {
     test('should sort bookmarks by date (oldest first)', async ({ page }) => {
       // Navigate to bookmarks page
       await page.goto('/bookmarks');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Check if there are multiple bookmarks
       const bookmarkCards = page.locator('[data-testid^="bookmark-card-"]');
@@ -415,7 +415,7 @@ test.describe('Favorites/Bookmarks Flow', () => {
     test('should sort bookmarks alphabetically (A-Z)', async ({ page }) => {
       // Navigate to bookmarks page
       await page.goto('/bookmarks');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Check if there are multiple bookmarks
       const bookmarkCards = page.locator('[data-testid^="bookmark-card-"]');
@@ -446,7 +446,7 @@ test.describe('Favorites/Bookmarks Flow', () => {
     test('should sort bookmarks by category', async ({ page }) => {
       // Navigate to bookmarks page
       await page.goto('/bookmarks');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Check if there are multiple bookmarks
       const bookmarkCards = page.locator('[data-testid^="bookmark-card-"]');
@@ -477,7 +477,7 @@ test.describe('Favorites/Bookmarks Flow', () => {
     test('should display bookmark notes indicator', async ({ page }) => {
       // Navigate to bookmarks page
       await page.goto('/bookmarks');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Check for bookmarks
       const bookmarkCards = page.locator('[data-testid^="bookmark-card-"]');
@@ -498,7 +498,7 @@ test.describe('Favorites/Bookmarks Flow', () => {
     test('should have proper heading hierarchy', async ({ page }) => {
       // Navigate to bookmarks page
       await page.goto('/bookmarks');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Check for h1
       const h1 = page.getByRole('heading', { level: 1 });
@@ -512,10 +512,10 @@ test.describe('Favorites/Bookmarks Flow', () => {
     test('should have accessible bookmark buttons', async ({ page }) => {
       // Navigate to first category
       await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Find bookmark buttons
       const bookmarkButtons = page.locator('[data-testid="button-bookmark"]');
@@ -539,7 +539,7 @@ test.describe('Favorites/Bookmarks Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Find bookmark buttons
       const bookmarkButtons = page.locator('[data-testid="button-bookmark"]');
@@ -582,7 +582,7 @@ test.describe('Favorites/Bookmarks Flow', () => {
 
       // Wait for navigation to complete
       await navigation;
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Eventually should show content
       const heading = page.getByRole('heading', { level: 1 });
@@ -598,7 +598,7 @@ test.describe('Favorites/Bookmarks Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Find a bookmark button
       const bookmarkButtons = page.locator('[data-testid="button-bookmark"]');
@@ -610,12 +610,12 @@ test.describe('Favorites/Bookmarks Flow', () => {
 
         // Navigate away and back
         await page.goto('/');
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Go back to category
         await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
         await page.locator('[data-testid^="link-category-"]').first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Check if bookmark state persisted
         const sameButton = page.locator('[data-testid="button-bookmark"]').first();
@@ -629,7 +629,7 @@ test.describe('Favorites/Bookmarks Flow', () => {
     test('should show bookmarked resource on bookmarks page', async ({ page }) => {
       // First, get count of current bookmarks
       await page.goto('/bookmarks');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       const initialBookmarks = page.locator('[data-testid^="bookmark-card-"]');
       const initialCount = await initialBookmarks.count();
@@ -649,7 +649,7 @@ test.describe('Favorites/Bookmarks Flow', () => {
 
       // Navigate to bookmarks page
       await page.goto('/bookmarks');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Verify page loads on mobile
       const heading = page.getByRole('heading', { level: 1 });
@@ -665,7 +665,7 @@ test.describe('Favorites/Bookmarks Flow', () => {
 
       // Navigate to bookmarks page
       await page.goto('/bookmarks');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Check for bookmark cards
       const bookmarkCards = page.locator('[data-testid^="bookmark-card-"]');
@@ -684,10 +684,10 @@ test.describe('Favorites/Bookmarks Flow', () => {
 
       // Navigate to first category
       await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Try to click bookmark button
       const bookmarkButtons = page.locator('[data-testid="button-bookmark"]');
@@ -717,7 +717,7 @@ test.describe('Favorites/Bookmarks Flow', () => {
 
       // Navigate to bookmarks page
       await page.goto('/bookmarks');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Page should still render with error state
       const body = await page.textContent('body');

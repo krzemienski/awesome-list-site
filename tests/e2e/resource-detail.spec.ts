@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Resource Detail Flow', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test.describe('Resource Detail Page - Basic Display', () => {
@@ -11,7 +11,7 @@ test.describe('Resource Detail Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Click first resource card
       const resourceCards = page.locator('[data-testid^="card-resource-"]');
@@ -23,7 +23,7 @@ test.describe('Resource Detail Flow', () => {
         const resourceHref = await resourceLink.getAttribute('href');
 
         await resourceLink.click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Verify navigation to resource detail page
         expect(page.url()).toContain('/resource/');
@@ -35,7 +35,7 @@ test.describe('Resource Detail Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Navigate to first resource
       const resourceCards = page.locator('[data-testid^="card-resource-"]');
@@ -43,7 +43,7 @@ test.describe('Resource Detail Flow', () => {
 
       if (cardCount > 0) {
         await resourceCards.first().locator('a').first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Verify resource detail page has main heading
         const h1 = page.getByRole('heading', { level: 1 });
@@ -60,7 +60,7 @@ test.describe('Resource Detail Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Navigate to first resource
       const resourceCards = page.locator('[data-testid^="card-resource-"]');
@@ -68,7 +68,7 @@ test.describe('Resource Detail Flow', () => {
 
       if (cardCount > 0) {
         await resourceCards.first().locator('a').first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Look for back button
         const backButton = page.locator('button:has-text("Back"), button:has(svg) >> text=/Back/i').first();
@@ -83,7 +83,7 @@ test.describe('Resource Detail Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Navigate to first resource
       const resourceCards = page.locator('[data-testid^="card-resource-"]');
@@ -91,7 +91,7 @@ test.describe('Resource Detail Flow', () => {
 
       if (cardCount > 0) {
         await resourceCards.first().locator('a').first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Look for breadcrumbs
         const breadcrumbs = page.locator('[data-testid="breadcrumbs"], nav[aria-label*="breadcrumb" i]');
@@ -106,7 +106,7 @@ test.describe('Resource Detail Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Navigate to first resource
       const resourceCards = page.locator('[data-testid^="card-resource-"]');
@@ -114,7 +114,7 @@ test.describe('Resource Detail Flow', () => {
 
       if (cardCount > 0) {
         await resourceCards.first().locator('a').first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Look for visit resource button
         const visitButton = page.locator('button:has-text("Visit Resource"), a:has-text("Visit Resource")');
@@ -129,7 +129,7 @@ test.describe('Resource Detail Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Navigate to first resource
       const resourceCards = page.locator('[data-testid^="card-resource-"]');
@@ -137,7 +137,7 @@ test.describe('Resource Detail Flow', () => {
 
       if (cardCount > 0) {
         await resourceCards.first().locator('a').first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Check for resource details container
         const pageContent = await page.textContent('body');
@@ -159,7 +159,7 @@ test.describe('Resource Detail Flow', () => {
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       const categorySlug = await page.locator('[data-testid^="link-category-"]').first().getAttribute('href');
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Navigate to first resource
       const resourceCards = page.locator('[data-testid^="card-resource-"]');
@@ -167,14 +167,14 @@ test.describe('Resource Detail Flow', () => {
 
       if (cardCount > 0) {
         await resourceCards.first().locator('a').first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Click back button
         const backButton = page.locator('button:has-text("Back"), button:has(svg) >> text=/Back/i').first();
 
         if (await backButton.count() > 0) {
           await backButton.click();
-          await page.waitForLoadState('networkidle');
+          await page.waitForLoadState('domcontentloaded');
 
           // Verify we're back on category page
           expect(page.url()).toContain(categorySlug || '/category/');
@@ -187,7 +187,7 @@ test.describe('Resource Detail Flow', () => {
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       const categorySlug = await page.locator('[data-testid^="link-category-"]').first().getAttribute('href');
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Navigate to first resource
       const resourceCards = page.locator('[data-testid^="card-resource-"]');
@@ -195,7 +195,7 @@ test.describe('Resource Detail Flow', () => {
 
       if (cardCount > 0) {
         await resourceCards.first().locator('a').first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Look for breadcrumb links
         const breadcrumbLinks = page.locator('[data-testid="breadcrumbs"] a, nav[aria-label*="breadcrumb" i] a');
@@ -204,7 +204,7 @@ test.describe('Resource Detail Flow', () => {
         if (breadcrumbCount > 0) {
           // Click first breadcrumb (should go to category)
           await breadcrumbLinks.first().click();
-          await page.waitForLoadState('networkidle');
+          await page.waitForLoadState('domcontentloaded');
 
           // Should navigate to category or home
           const url = page.url();
@@ -220,7 +220,7 @@ test.describe('Resource Detail Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Navigate to first resource
       const resourceCards = page.locator('[data-testid^="card-resource-"]');
@@ -228,7 +228,7 @@ test.describe('Resource Detail Flow', () => {
 
       if (cardCount > 0) {
         await resourceCards.first().locator('a').first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Look for share button
         const shareButton = page.locator('button:has-text("Share"), button[aria-label*="Share" i]');
@@ -243,7 +243,7 @@ test.describe('Resource Detail Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Navigate to first resource
       const resourceCards = page.locator('[data-testid^="card-resource-"]');
@@ -251,7 +251,7 @@ test.describe('Resource Detail Flow', () => {
 
       if (cardCount > 0) {
         await resourceCards.first().locator('a').first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Look for suggest edit button
         const editButton = page.locator('button:has-text("Suggest Edit"), button:has-text("Edit"), button[aria-label*="Edit" i]');
@@ -269,7 +269,7 @@ test.describe('Resource Detail Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Navigate to first resource
       const resourceCards = page.locator('[data-testid^="card-resource-"]');
@@ -277,7 +277,7 @@ test.describe('Resource Detail Flow', () => {
 
       if (cardCount > 0) {
         await resourceCards.first().locator('a').first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Look for favorite/bookmark buttons (may be hidden for non-authenticated users)
         const favoriteButton = page.locator('button:has-text("Favorite"), button[aria-label*="Favorite" i]');
@@ -297,7 +297,7 @@ test.describe('Resource Detail Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Navigate to first resource
       const resourceCards = page.locator('[data-testid^="card-resource-"]');
@@ -305,7 +305,7 @@ test.describe('Resource Detail Flow', () => {
 
       if (cardCount > 0) {
         await resourceCards.first().locator('a').first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Look for related resources section
         const relatedSection = page.locator('text=/Related Resources/i, text=/Similar Resources/i, text=/You might also like/i').first();
@@ -321,7 +321,7 @@ test.describe('Resource Detail Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Navigate to first resource
       const resourceCards = page.locator('[data-testid^="card-resource-"]');
@@ -329,7 +329,7 @@ test.describe('Resource Detail Flow', () => {
 
       if (cardCount > 0) {
         await resourceCards.first().locator('a').first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         const currentUrl = page.url();
 
@@ -341,7 +341,7 @@ test.describe('Resource Detail Flow', () => {
           // Click first related resource
           const relatedLink = relatedCards.first().locator('a').first();
           await relatedLink.click();
-          await page.waitForLoadState('networkidle');
+          await page.waitForLoadState('domcontentloaded');
 
           // Should navigate to different resource detail page
           const newUrl = page.url();
@@ -361,7 +361,7 @@ test.describe('Resource Detail Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Navigate to first resource
       const resourceCards = page.locator('[data-testid^="card-resource-"]');
@@ -369,7 +369,7 @@ test.describe('Resource Detail Flow', () => {
 
       if (cardCount > 0) {
         await resourceCards.first().locator('a').first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Check for h1
         const h1 = page.getByRole('heading', { level: 1 });
@@ -386,7 +386,7 @@ test.describe('Resource Detail Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Navigate to first resource
       const resourceCards = page.locator('[data-testid^="card-resource-"]');
@@ -394,7 +394,7 @@ test.describe('Resource Detail Flow', () => {
 
       if (cardCount > 0) {
         await resourceCards.first().locator('a').first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Look for back button
         const backButton = page.locator('button:has-text("Back")').first();
@@ -411,7 +411,7 @@ test.describe('Resource Detail Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Navigate to first resource
       const resourceCards = page.locator('[data-testid^="card-resource-"]');
@@ -419,7 +419,7 @@ test.describe('Resource Detail Flow', () => {
 
       if (cardCount > 0) {
         await resourceCards.first().locator('a').first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Tab through interactive elements
         await page.keyboard.press('Tab');
@@ -434,7 +434,7 @@ test.describe('Resource Detail Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Navigate to first resource
       const resourceCards = page.locator('[data-testid^="card-resource-"]');
@@ -442,7 +442,7 @@ test.describe('Resource Detail Flow', () => {
 
       if (cardCount > 0) {
         await resourceCards.first().locator('a').first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Look for action buttons
         const buttons = page.locator('button');
@@ -470,10 +470,10 @@ test.describe('Resource Detail Flow', () => {
 
       // Navigate to first category
       await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Navigate to first resource
       const resourceCards = page.locator('[data-testid^="card-resource-"]');
@@ -481,7 +481,7 @@ test.describe('Resource Detail Flow', () => {
 
       if (cardCount > 0) {
         await resourceCards.first().locator('a').first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Verify resource detail page loads on mobile
         const h1 = page.getByRole('heading', { level: 1 });
@@ -495,10 +495,10 @@ test.describe('Resource Detail Flow', () => {
 
       // Navigate to first category
       await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Navigate to first resource
       const resourceCards = page.locator('[data-testid^="card-resource-"]');
@@ -506,7 +506,7 @@ test.describe('Resource Detail Flow', () => {
 
       if (cardCount > 0) {
         await resourceCards.first().locator('a').first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Action buttons should still be accessible on mobile
         const buttons = page.locator('button');
@@ -522,10 +522,10 @@ test.describe('Resource Detail Flow', () => {
 
       // Navigate to first category
       await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Navigate to first resource
       const resourceCards = page.locator('[data-testid^="card-resource-"]');
@@ -533,7 +533,7 @@ test.describe('Resource Detail Flow', () => {
 
       if (cardCount > 0) {
         await resourceCards.first().locator('a').first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Breadcrumbs should be visible on mobile (or back button)
         const breadcrumbs = page.locator('[data-testid="breadcrumbs"], nav[aria-label*="breadcrumb" i]');
@@ -553,7 +553,7 @@ test.describe('Resource Detail Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Navigate to first resource
       const resourceCards = page.locator('[data-testid^="card-resource-"]');
@@ -564,7 +564,7 @@ test.describe('Resource Detail Flow', () => {
         await resourceCards.first().locator('a').first().click();
 
         // Wait for page to load
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Eventually should show content
         const h1 = page.getByRole('heading', { level: 1 });
@@ -577,7 +577,7 @@ test.describe('Resource Detail Flow', () => {
     test('should handle resource not found gracefully', async ({ page }) => {
       // Navigate to non-existent resource
       await page.goto('/resource/999999');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Should show 404 or error message
       const bodyText = await page.textContent('body');
@@ -593,7 +593,7 @@ test.describe('Resource Detail Flow', () => {
     test('should handle invalid resource ID gracefully', async ({ page }) => {
       // Navigate to invalid resource ID
       await page.goto('/resource/invalid-id-xyz');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Should show error message or 404
       const bodyText = await page.textContent('body');
@@ -614,7 +614,7 @@ test.describe('Resource Detail Flow', () => {
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       const categorySlug = await page.locator('[data-testid^="link-category-"]').first().getAttribute('href');
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Verify on category page
       expect(page.url()).toContain(categorySlug || '/category/');
@@ -625,7 +625,7 @@ test.describe('Resource Detail Flow', () => {
 
       if (cardCount > 0) {
         await resourceCards.first().locator('a').first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Verify on resource detail page
         expect(page.url()).toContain('/resource/');
@@ -637,7 +637,7 @@ test.describe('Resource Detail Flow', () => {
 
         if (await backButton.count() > 0) {
           await backButton.click();
-          await page.waitForLoadState('networkidle');
+          await page.waitForLoadState('domcontentloaded');
 
           // Should be back on category page
           expect(page.url()).toContain(categorySlug || '/category/');
@@ -649,7 +649,7 @@ test.describe('Resource Detail Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Navigate to first resource
       const resourceCards = page.locator('[data-testid^="card-resource-"]');
@@ -657,7 +657,7 @@ test.describe('Resource Detail Flow', () => {
 
       if (cardCount > 0) {
         await resourceCards.first().locator('a').first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         const firstResourceUrl = page.url();
 
@@ -668,7 +668,7 @@ test.describe('Resource Detail Flow', () => {
         if (relatedCount > 0) {
           // Click first related resource
           await relatedCards.first().locator('a').first().click();
-          await page.waitForLoadState('networkidle');
+          await page.waitForLoadState('domcontentloaded');
 
           // Should navigate to another resource page
           const secondResourceUrl = page.url();

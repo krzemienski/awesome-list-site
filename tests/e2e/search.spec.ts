@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Search and Discovery Flow', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test.describe('Home Page - Category Discovery', () => {
@@ -43,7 +43,7 @@ test.describe('Search and Discovery Flow', () => {
       const categorySlug = await firstCategoryLink.getAttribute('href');
 
       await firstCategoryLink.click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Verify navigation to category page
       expect(page.url()).toContain(categorySlug || '/category/');
@@ -252,7 +252,7 @@ test.describe('Search and Discovery Flow', () => {
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       const firstCategoryLink = page.locator('[data-testid^="link-category-"]').first();
       await firstCategoryLink.click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Verify category page elements
       await expect(page.getByRole('button', { name: /Back to all categories/i })).toBeVisible();
@@ -267,11 +267,11 @@ test.describe('Search and Discovery Flow', () => {
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       const firstCategoryLink = page.locator('[data-testid^="link-category-"]').first();
       await firstCategoryLink.click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Click back button
       await page.getByRole('button', { name: /Back to all categories/i }).click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Verify we're back on home page
       expect(page.url()).toMatch(/\/$|\/$/);
@@ -283,7 +283,7 @@ test.describe('Search and Discovery Flow', () => {
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       const firstCategoryLink = page.locator('[data-testid^="link-category-"]').first();
       await firstCategoryLink.click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Look for search/filter input
       const searchInput = page.locator('input[placeholder*="search" i], input[placeholder*="filter" i]');
@@ -299,7 +299,7 @@ test.describe('Search and Discovery Flow', () => {
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       const firstCategoryLink = page.locator('[data-testid^="link-category-"]').first();
       await firstCategoryLink.click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Look for view mode toggle buttons (grid/list/compact)
       const viewModeButtons = page.locator('button[aria-label*="view" i], button[data-testid*="view" i]');
@@ -318,7 +318,7 @@ test.describe('Search and Discovery Flow', () => {
 
       // Navigate to home
       await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Search button should be visible on mobile
       const searchButton = page.locator('button:has(svg):has-text("Search")');
@@ -335,7 +335,7 @@ test.describe('Search and Discovery Flow', () => {
 
       // Navigate to home
       await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Category cards should be visible
       const categoryCards = page.locator('[data-testid^="card-category-"]');
@@ -409,7 +409,7 @@ test.describe('Search and Discovery Flow', () => {
 
       // Wait for navigation to complete
       await navigation;
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Eventually should show content instead of skeleton
       await expect(page.getByRole('heading', { level: 1, name: /Awesome Video Resources/i })).toBeVisible();
@@ -423,7 +423,7 @@ test.describe('Search and Discovery Flow', () => {
 
       // Navigate to home
       await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Page should still render (static resources should work)
       // The app should handle the API failure gracefully

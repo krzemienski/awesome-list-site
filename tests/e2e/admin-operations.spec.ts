@@ -8,7 +8,7 @@ test.describe('Admin Operations Flow', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to admin dashboard
     await page.goto('/admin');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test.describe('Admin Dashboard - Access and Navigation', () => {
@@ -525,7 +525,7 @@ test.describe('Admin Operations Flow', () => {
 
       // Reload page
       await page.reload();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Verify heading is visible
       const heading = page.getByRole('heading', { level: 1 });
@@ -541,7 +541,7 @@ test.describe('Admin Operations Flow', () => {
 
       // Reload page
       await page.reload();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Check for tabs overflow container
       const tabsList = page.locator('[role="tablist"]');
@@ -557,7 +557,7 @@ test.describe('Admin Operations Flow', () => {
 
       // Reload page
       await page.reload();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Verify stats cards are visible
       const statsCards = page.locator('.text-2xl.font-bold.font-mono');
@@ -576,7 +576,7 @@ test.describe('Admin Operations Flow', () => {
 
       // Navigate to admin dashboard
       await page.goto('/admin');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Page should still render
       const body = await page.textContent('body');

@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Browse Categories Flow', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
   });
 
   test.describe('Category Page - Basic Navigation', () => {
@@ -17,7 +17,7 @@ test.describe('Browse Categories Flow', () => {
       const categoryName = await firstCategoryLink.textContent();
 
       await firstCategoryLink.click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Verify navigation to category page
       expect(page.url()).toContain(categorySlug || '/category/');
@@ -31,7 +31,7 @@ test.describe('Browse Categories Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Check for resource count badge
       const badge = page.locator('[data-testid="badge-count"]');
@@ -46,11 +46,11 @@ test.describe('Browse Categories Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Click back button
       await page.getByRole('button', { name: /Back to all categories/i }).click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Verify we're back on home page
       expect(page.url()).toMatch(/\/$|\/$/);
@@ -61,7 +61,7 @@ test.describe('Browse Categories Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Check for resource cards
       const resourceCards = page.locator('[data-testid^="card-resource-"]');
@@ -84,7 +84,7 @@ test.describe('Browse Categories Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Look for search input
       const searchInput = page.locator('input[placeholder*="Search" i]');
@@ -95,7 +95,7 @@ test.describe('Browse Categories Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Get initial resource count
       const initialCount = await page.locator('[data-testid^="card-resource-"]').count();
@@ -116,7 +116,7 @@ test.describe('Browse Categories Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Look for subcategory filter
       const subcategoryFilter = page.locator('[data-testid="select-subcategory"]');
@@ -132,7 +132,7 @@ test.describe('Browse Categories Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Look for sort dropdown
       const sortSelect = page.locator('[data-testid="select-sort"]');
@@ -143,7 +143,7 @@ test.describe('Browse Categories Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Apply a search filter
       const searchInput = page.locator('input[placeholder*="Search" i]');
@@ -163,7 +163,7 @@ test.describe('Browse Categories Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Apply a search filter
       const searchInput = page.locator('input[placeholder*="Search" i]');
@@ -189,7 +189,7 @@ test.describe('Browse Categories Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Look for view mode buttons (grid, list, compact)
       const viewModeButtons = page.locator('[data-testid^="view-mode-"]');
@@ -203,7 +203,7 @@ test.describe('Browse Categories Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Click list view button if it exists
       const listViewButton = page.locator('[data-testid="view-mode-list"]');
@@ -222,7 +222,7 @@ test.describe('Browse Categories Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Click compact view button if it exists
       const compactViewButton = page.locator('[data-testid="view-mode-compact"]');
@@ -241,7 +241,7 @@ test.describe('Browse Categories Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Click list view button if it exists
       const listViewButton = page.locator('[data-testid="view-mode-list"]');
@@ -262,7 +262,7 @@ test.describe('Browse Categories Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Look for subcategory links
       const subcategoryLinks = page.locator('[data-testid^="link-subcategory-"]');
@@ -272,7 +272,7 @@ test.describe('Browse Categories Flow', () => {
         // Click first subcategory
         const subcategorySlug = await subcategoryLinks.first().getAttribute('href');
         await subcategoryLinks.first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Verify navigation to subcategory page
         expect(page.url()).toContain(subcategorySlug || '/subcategory/');
@@ -287,7 +287,7 @@ test.describe('Browse Categories Flow', () => {
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       const categoryName = await page.locator('[data-testid^="link-category-"]').first().textContent();
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Look for subcategory links
       const subcategoryLinks = page.locator('[data-testid^="link-subcategory-"]');
@@ -295,7 +295,7 @@ test.describe('Browse Categories Flow', () => {
 
       if (subcategoryCount > 0) {
         await subcategoryLinks.first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Look for breadcrumbs
         const breadcrumbs = page.locator('[data-testid="breadcrumbs"], nav[aria-label="breadcrumb"], nav[aria-label="Breadcrumb"]');
@@ -311,7 +311,7 @@ test.describe('Browse Categories Flow', () => {
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       const categorySlug = await page.locator('[data-testid^="link-category-"]').first().getAttribute('href');
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Look for subcategory links
       const subcategoryLinks = page.locator('[data-testid^="link-subcategory-"]');
@@ -319,12 +319,12 @@ test.describe('Browse Categories Flow', () => {
 
       if (subcategoryCount > 0) {
         await subcategoryLinks.first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Click back button
         const backButton = page.getByRole('button', { name: /Back to/i }).first();
         await backButton.click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Verify we're back on category page
         expect(page.url()).toContain(categorySlug || '/category/');
@@ -335,7 +335,7 @@ test.describe('Browse Categories Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Look for subcategory links
       const subcategoryLinks = page.locator('[data-testid^="link-subcategory-"]');
@@ -343,7 +343,7 @@ test.describe('Browse Categories Flow', () => {
 
       if (subcategoryCount > 0) {
         await subcategoryLinks.first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Check for resource count badge
         const badge = page.locator('[data-testid="badge-count"]');
@@ -361,7 +361,7 @@ test.describe('Browse Categories Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Look for subcategory links
       const subcategoryLinks = page.locator('[data-testid^="link-subcategory-"]');
@@ -369,7 +369,7 @@ test.describe('Browse Categories Flow', () => {
 
       if (subcategoryCount > 0) {
         await subcategoryLinks.first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Look for tag filter component
         const tagFilter = page.locator('[data-testid="tag-filter"]');
@@ -385,7 +385,7 @@ test.describe('Browse Categories Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Look for subcategory links
       const subcategoryLinks = page.locator('[data-testid^="link-subcategory-"]');
@@ -393,7 +393,7 @@ test.describe('Browse Categories Flow', () => {
 
       if (subcategoryCount > 0) {
         await subcategoryLinks.first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Look for tag buttons
         const tagButtons = page.locator('[data-testid^="tag-"]');
@@ -426,7 +426,7 @@ test.describe('Browse Categories Flow', () => {
       const categoryLink = page.locator('[data-testid^="link-category-"]').first();
       const categorySlug = await categoryLink.getAttribute('href');
       await categoryLink.click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Verify on category page
       expect(page.url()).toContain(categorySlug || '/category/');
@@ -440,20 +440,20 @@ test.describe('Browse Categories Flow', () => {
         // Navigate to subcategory
         const subcategorySlug = await subcategoryLinks.first().getAttribute('href');
         await subcategoryLinks.first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Verify on subcategory page
         expect(page.url()).toContain(subcategorySlug || '/subcategory/');
 
         // Navigate back to category
         await page.getByRole('button', { name: /Back to/i }).first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
         expect(page.url()).toContain(categorySlug || '/category/');
       }
 
       // Navigate back to home
       await page.getByRole('button', { name: /Back to all categories/i }).click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       expect(page.url()).toMatch(/\/$|\/$/);
       await expect(page.getByRole('heading', { level: 1, name: /Awesome Video Resources/i })).toBeVisible();
     });
@@ -463,7 +463,7 @@ test.describe('Browse Categories Flow', () => {
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       const categorySlug = await page.locator('[data-testid^="link-category-"]').first().getAttribute('href');
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Look for subcategory links
       const subcategoryLinks = page.locator('[data-testid^="link-subcategory-"]');
@@ -471,7 +471,7 @@ test.describe('Browse Categories Flow', () => {
 
       if (subcategoryCount > 0) {
         await subcategoryLinks.first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Look for breadcrumb navigation
         const breadcrumbLinks = page.locator('[data-testid="breadcrumbs"] a, nav[aria-label*="breadcrumb" i] a');
@@ -480,7 +480,7 @@ test.describe('Browse Categories Flow', () => {
         if (breadcrumbCount > 0) {
           // Click first breadcrumb link (should go to category)
           await breadcrumbLinks.first().click();
-          await page.waitForLoadState('networkidle');
+          await page.waitForLoadState('domcontentloaded');
 
           // Should be back on category page
           expect(page.url()).toContain(categorySlug || '/category/');
@@ -494,7 +494,7 @@ test.describe('Browse Categories Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Check for resource cards
       const resourceCards = page.locator('[data-testid^="card-resource-"]');
@@ -515,7 +515,7 @@ test.describe('Browse Categories Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Check for resource cards
       const resourceCards = page.locator('[data-testid^="card-resource-"]');
@@ -537,7 +537,7 @@ test.describe('Browse Categories Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Check for resource cards
       const resourceCards = page.locator('[data-testid^="card-resource-"]');
@@ -559,7 +559,7 @@ test.describe('Browse Categories Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Check for h1
       const h1 = page.getByRole('heading', { level: 1 });
@@ -570,7 +570,7 @@ test.describe('Browse Categories Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Check back button
       const backButton = page.getByRole('button', { name: /Back to all categories/i });
@@ -585,7 +585,7 @@ test.describe('Browse Categories Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Check for resource links
       const resourceLinks = page.locator('[data-testid^="card-resource-"] a');
@@ -608,7 +608,7 @@ test.describe('Browse Categories Flow', () => {
       // Navigate to first category
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Tab through interactive elements
       await page.keyboard.press('Tab');
@@ -626,10 +626,10 @@ test.describe('Browse Categories Flow', () => {
 
       // Navigate to first category
       await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Verify category page loads on mobile
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
@@ -642,10 +642,10 @@ test.describe('Browse Categories Flow', () => {
 
       // Navigate to first category
       await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // View mode buttons should still be accessible
       const viewModeButtons = page.locator('[data-testid^="view-mode-"]');
@@ -661,10 +661,10 @@ test.describe('Browse Categories Flow', () => {
 
       // Navigate to first category
       await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
       await page.waitForSelector('[data-testid^="link-category-"]', { state: 'visible' });
       await page.locator('[data-testid^="link-category-"]').first().click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Look for subcategory links
       const subcategoryLinks = page.locator('[data-testid^="link-subcategory-"]');
@@ -672,7 +672,7 @@ test.describe('Browse Categories Flow', () => {
 
       if (subcategoryCount > 0) {
         await subcategoryLinks.first().click();
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         // Verify subcategory page loads on mobile
         await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
@@ -691,7 +691,7 @@ test.describe('Browse Categories Flow', () => {
       await categoryLink.click();
 
       // Wait for page to load
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Eventually should show content
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
@@ -702,7 +702,7 @@ test.describe('Browse Categories Flow', () => {
     test('should handle category not found gracefully', async ({ page }) => {
       // Navigate to non-existent category
       await page.goto('/category/nonexistent-category-xyz');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Should show 404 or error message
       const bodyText = await page.textContent('body');
@@ -718,7 +718,7 @@ test.describe('Browse Categories Flow', () => {
     test('should handle subcategory not found gracefully', async ({ page }) => {
       // Navigate to non-existent subcategory
       await page.goto('/subcategory/nonexistent-subcategory-xyz');
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
 
       // Should show 404 or error message
       const bodyText = await page.textContent('body');

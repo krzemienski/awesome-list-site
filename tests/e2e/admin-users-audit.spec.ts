@@ -122,7 +122,7 @@ test.describe.serial('Admin Users & Audit tabs', () => {
     expect(initialRole, `seed fixture missing: user ${TARGET_USER_ID}`).toBe('user');
 
     await page.goto('/admin#users');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // The Users tab trigger is rendered with the visible label "Users". Click
     // it to ensure that tab is active even if the URL hash didn't auto-select.
@@ -153,7 +153,7 @@ test.describe.serial('Admin Users & Audit tabs', () => {
       if ((await paginationContainer.count()) === 0) break;
       if (await nextPageBtn.isDisabled().catch(() => true)) break;
       await nextPageBtn.click();
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
     }
     const targetRow = targetRowSelector();
     await expect(targetRow, `target user ${TARGET_USER_EMAIL} not visible in any Users page`)
@@ -229,7 +229,7 @@ test.describe.serial('Admin Users & Audit tabs', () => {
     ).toBeGreaterThan(0);
 
     await page.goto('/admin#audit');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     const auditTab = page.getByRole('tab', { name: /^Audit$/ });
     await expect(auditTab).toBeVisible();

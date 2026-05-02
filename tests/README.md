@@ -414,9 +414,12 @@ await db.delete(schema.resources);     // Then parent tables
 **Problem**: Playwright tests fail intermittently
 
 **Solutions**:
-1. Add explicit waits:
+1. Add explicit waits — prefer `'domcontentloaded'` plus a visibility
+   assert. Avoid `'networkidle'`: the Vite dev server keeps an HMR
+   WebSocket and periodic polling open, so `'networkidle'` never fires
+   and the test will time out at the suite timeout.
    ```typescript
-   await page.waitForLoadState('networkidle');
+   await page.waitForLoadState('domcontentloaded');
    await page.waitForSelector('[data-testid="element"]');
    ```
 

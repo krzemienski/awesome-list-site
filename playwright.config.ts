@@ -65,25 +65,19 @@ export default defineConfig({
     },
   ],
 
-  // Run a production-built server before starting tests.
+  // Run the dev server before starting tests.
   //
-  // We deliberately don't use `npm run dev` here: Vite's middleware-mode
-  // dev server lazily compiles every ES module on first request and
-  // periodically triggers full-page reloads as it discovers new
-  // dependencies, which makes `page.waitForLoadState('networkidle')`
-  // (used liberally throughout the spec files) effectively unreliable.
-  // Building once and serving the static bundle gives the e2e suite a
-  // deterministic, fast, production-shaped target — which is what we
-  // actually want to verify in CI anyway.
-  //
-  // The server is started with NODE_ENV=test so it serves the built
-  // client (server/index.ts uses `serveStatic` for any non-development
-  // env) without trying to run production-only migrations on boot;
-  // `db:push` is responsible for the test schema in CI.
+  // The spec files no longer rely on `page.waitForLoadState('networkidle')`
+  // — they use `'domcontentloaded'` plus explicit visibility/poll asserts —
+  // so the Vite middleware-mode dev server's HMR WebSocket and on-demand
+  // module compilation no longer cause `beforeEach` hooks to time out.
+  // Running the dev server keeps the local feedback loop fast (no full
+  // production build per `test:e2e` invocation) and matches what
+  // contributors are already running locally.
   webServer: {
-    command: 'npm run build && NODE_ENV=test node dist/index.js',
+    command: 'npm run dev',
     url: 'http://localhost:5000',
     reuseExistingServer: !process.env.CI,
-    timeout: 240 * 1000,
+    timeout: 120 * 1000,
   },
 });
