@@ -138,3 +138,9 @@ id = "uZQbSP1Fjy0Ewm88AMfj3"
 uri = "file://screenshots/production/22_404_not_found.png"
 type = "image"
 title = "22 — 404 Not Found"
+
+[[outputs]]
+id = "2BtfAQKx2oYkZox5Becpw"
+uri = "file://screenshots/production/DESIGN-BRIEF.md"
+type = "text"
+title = "Claude Design Redesign Brief"
