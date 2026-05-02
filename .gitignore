@@ -85,3 +85,8 @@ attached_assets/
 
 # Auto Claude data directory
 .auto-claude/
+
+# Playwright test artifacts
+playwright-report/
+test-results/
+playwright/.cache/
