@@ -3206,6 +3206,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ status: "ok" });
   });
 
+  // JSON 404 fallback for unmatched /api/* routes.
+  // Must be registered after all other /api/* handlers so it only catches
+  // requests that no real route handled. Without this, unknown /api paths
+  // would fall through to Vite's HTML catch-all and return a 200 with the
+  // React app's HTML, masking client routing typos.
+  app.use('/api', (req, res) => {
+    res.status(404).json({ message: 'Not found' });
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
