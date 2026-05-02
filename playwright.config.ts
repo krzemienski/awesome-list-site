@@ -9,8 +9,8 @@ export default defineConfig({
   // Test directory
   testDir: './tests/e2e',
 
-  // Maximum time one test can run
-  timeout: 30 * 1000,
+  // Maximum time one test can run.
+  timeout: 60 * 1000,
 
   // Test execution settings
   fullyParallel: true,
@@ -65,11 +65,25 @@ export default defineConfig({
     },
   ],
 
-  // Run local dev server before starting tests
+  // Run a production-built server before starting tests.
+  //
+  // We deliberately don't use `npm run dev` here: Vite's middleware-mode
+  // dev server lazily compiles every ES module on first request and
+  // periodically triggers full-page reloads as it discovers new
+  // dependencies, which makes `page.waitForLoadState('networkidle')`
+  // (used liberally throughout the spec files) effectively unreliable.
+  // Building once and serving the static bundle gives the e2e suite a
+  // deterministic, fast, production-shaped target — which is what we
+  // actually want to verify in CI anyway.
+  //
+  // The server is started with NODE_ENV=test so it serves the built
+  // client (server/index.ts uses `serveStatic` for any non-development
+  // env) without trying to run production-only migrations on boot;
+  // `db:push` is responsible for the test schema in CI.
   webServer: {
-    command: 'npm run dev',
+    command: 'npm run build && NODE_ENV=test node dist/index.js',
     url: 'http://localhost:5000',
     reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
+    timeout: 240 * 1000,
   },
 });

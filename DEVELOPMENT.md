@@ -193,6 +193,51 @@ npm run type-check
 - `0` - No type errors
 - `2` - Type errors found
 
+### End-to-End Tests
+
+The Playwright e2e suite under `tests/e2e/` is run automatically on every push
+and PR via the `e2e-tests` job in `.github/workflows/test.yml`. To run it
+locally:
+
+```bash
+# 1. Install Playwright browser binaries (one-time setup, ~200MB)
+npx playwright install --with-deps
+
+# 2. Run the full e2e suite
+npm run test:e2e
+```
+
+`playwright.config.ts` is configured to build the app once and serve it on
+`http://localhost:5000` for you (`npm run build && NODE_ENV=test node dist/index.js`),
+so you do not need to start a server yourself. We deliberately use the
+production build instead of `npm run dev` because Vite's middleware-mode
+dev server lazily compiles each ES module on first request and triggers
+periodic full-page reloads as it discovers new dependencies, which makes
+`page.waitForLoadState('networkidle')` (used throughout the spec files)
+unreliable. The first run is slower because of the build; subsequent runs
+reuse the existing `dist/` output.
+
+If you already have a server running on `:5000` (e.g. `npm run dev` for
+manual debugging), Playwright will reuse it locally — set
+`reuseExistingServer: false` in the config if you want it to always
+rebuild.
+
+To run a single spec or filter by title:
+
+```bash
+npm run test:e2e -- tests/e2e/admin-users-audit.spec.ts
+npm run test:e2e -- --grep "Audit tab"
+```
+
+The `admin-users-audit.spec.ts` spec relies on the seeded
+`admin@example.com` / `admin123` admin and the `test-user-123` fixture
+user. If those are missing, run `tsx scripts/reset-admin-password.ts`
+and reseed the database first (see `tests/README.md` for full fixture
+requirements).
+
+Test artifacts (`playwright-report/`, `test-results/`) are git-ignored —
+do not commit them.
+
 ### Combined Quality Check
 
 Run all quality checks before committing:
