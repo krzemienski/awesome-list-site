@@ -1,0 +1,140 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "PlSr7uRJCrJ3teRZoQAgH"
+uri = "file://screenshots/production/INDEX.md"
+type = "text"
+title = "Production Screenshots Index"
+
+[[outputs]]
+id = "WTKqVioaNwKymgCJ9Pskn"
+uri = "file://screenshots/production/01_home.png"
+type = "image"
+title = "01 — Home"
+
+[[outputs]]
+id = "cZVKyJFi7QekXUTboQCNr"
+uri = "file://screenshots/production/02_about.png"
+type = "image"
+title = "02 — About"
+
+[[outputs]]
+id = "g0Y2wsPrOfo7-Z7GiXqr3"
+uri = "file://screenshots/production/03_advanced.png"
+type = "image"
+title = "03 — Advanced Features"
+
+[[outputs]]
+id = "uIkY0bVCHbJed1e-HAEBa"
+uri = "file://screenshots/production/04_learning_journeys.png"
+type = "image"
+title = "04 — Learning Journeys"
+
+[[outputs]]
+id = "yp0kyDd5Jcy7otFfUlrsy"
+uri = "file://screenshots/production/05_journey_detail.png"
+type = "image"
+title = "05 — Journey Detail"
+
+[[outputs]]
+id = "KfX5NF4f_f_XRi0P7rBxM"
+uri = "file://screenshots/production/06_login.png"
+type = "image"
+title = "06 — Login"
+
+[[outputs]]
+id = "HP35xAQY_sQsCfuLUcwFx"
+uri = "file://screenshots/production/07_submit_resource_authgate.png"
+type = "image"
+title = "07 — Submit Resource"
+
+[[outputs]]
+id = "-4MkcNZ9jcSRgauRt4Zt7"
+uri = "file://screenshots/production/08_theme_settings.png"
+type = "image"
+title = "08 — Theme Settings"
+
+[[outputs]]
+id = "Q4QuPoVBhU2YUnXakXOfv"
+uri = "file://screenshots/production/09_category_community-events.png"
+type = "image"
+title = "09 — Community & Events"
+
+[[outputs]]
+id = "2iTAQsMpC2YmtYQpW6etY"
+uri = "file://screenshots/production/10_category_encoding-codecs.png"
+type = "image"
+title = "10 — Encoding & Codecs"
+
+[[outputs]]
+id = "uj_qLv3u3-iXF4dyMX9km"
+uri = "file://screenshots/production/11_category_general-tools.png"
+type = "image"
+title = "11 — General Tools"
+
+[[outputs]]
+id = "lBE-aoUkBEibqE9S4yw1K"
+uri = "file://screenshots/production/12_category_infrastructure-delivery.png"
+type = "image"
+title = "12 — Infrastructure & Delivery"
+
+[[outputs]]
+id = "4WjAVqaMJ7fJWC-9B3nIv"
+uri = "file://screenshots/production/13_category_intro-learning.png"
+type = "image"
+title = "13 — Intro & Learning"
+
+[[outputs]]
+id = "VXO3dwB26h5g2c2bHOe2a"
+uri = "file://screenshots/production/14_category_media-tools.png"
+type = "image"
+title = "14 — Media Tools"
+
+[[outputs]]
+id = "TE9apsSzua5C6NiQVvLeR"
+uri = "file://screenshots/production/15_category_players-clients.png"
+type = "image"
+title = "15 — Players & Clients"
+
+[[outputs]]
+id = "is0ugO0m1wjDG89ZUKeA_"
+uri = "file://screenshots/production/16_category_protocols-transport.png"
+type = "image"
+title = "16 — Protocols & Transport"
+
+[[outputs]]
+id = "Np3PcvlRjT4cqDfpzKY-E"
+uri = "file://screenshots/production/17_category_standards-industry.png"
+type = "image"
+title = "17 — Standards & Industry"
+
+[[outputs]]
+id = "S66bM1Cdv4ijtK9BDRI7d"
+uri = "file://screenshots/production/18_subcategory_ai-ml-tools.png"
+type = "image"
+title = "18 — AI/ML Subcategory"
+
+[[outputs]]
+id = "mESthzXJixu01c5ele61h"
+uri = "file://screenshots/production/19_sub-subcategory_hls.png"
+type = "image"
+title = "19 — HLS Sub-subcategory"
+
+[[outputs]]
+id = "WrJNNuibssEUhXoPjudo0"
+uri = "file://screenshots/production/20_sub-subcategory_dash.png"
+type = "image"
+title = "20 — DASH Sub-subcategory"
+
+[[outputs]]
+id = "hMzFvpxfmCVwIMbQucy0U"
+uri = "file://screenshots/production/21_resource_detail.png"
+type = "image"
+title = "21 — Resource Detail"
+
+[[outputs]]
+id = "uZQbSP1Fjy0Ewm88AMfj3"
+uri = "file://screenshots/production/22_404_not_found.png"
+type = "image"
+title = "22 — 404 Not Found"
