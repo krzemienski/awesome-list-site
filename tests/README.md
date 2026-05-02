@@ -39,8 +39,23 @@ tests/
     ├── browse-categories.spec.ts
     ├── resource-detail.spec.ts
     ├── favorites.spec.ts
-    └── admin-operations.spec.ts
+    ├── admin-operations.spec.ts
+    └── admin-users-audit.spec.ts
 ```
+
+### Seeded fixtures required by `admin-users-audit.spec.ts`
+
+The Users/Audit e2e spec exercises the live admin endpoints, so it depends
+on the following data being present in the database the test runs against:
+
+| Fixture                        | Used for                                                  |
+| ------------------------------ | --------------------------------------------------------- |
+| Admin `admin@example.com` / `admin123` | Programmatic admin login. Provisioned by `scripts/reset-admin-password.ts`. |
+| Non-admin user `id=test-user-123` (`test@example.com`) | Target row whose role is toggled `user → moderator → user`. |
+| Resource id `186689`           | Known resource with many `resource_audit_log` entries; used by the Audit tab filter assertion. |
+
+If you run the spec against a fresh database, seed these (or update the
+constants at the top of `tests/e2e/admin-users-audit.spec.ts`) first.
 
 ### Test Frameworks
 
