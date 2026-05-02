@@ -79,7 +79,7 @@ All used the pattern:
 import { storage } from "../storage";
 ```
 
-**Current layout.** Those 10 modules have since been collapsed into a single `server/routes.ts` file, which still imports `storage` the same way (`import { storage } from "./storage";`). The `IStorage` interface and the repository wiring verified in this report remain in effect — only the file boundary above the storage layer has changed.
+**Current layout.** Those 10 modules have since been collapsed into a single `server/routes.ts` file. The repository layer verified in sections 1–3 of this report remains in effect; the consolidated route file accesses data through the repository classes directly (`import { ... } from "./repositories"`) rather than the legacy `import { storage } from "../storage"` pattern shown above. The repositories themselves (and the `IStorage` interface that originally composed them) are unchanged — only the route file boundary above the data layer has changed.
 
 ### 5. IStorage Interface Preserved ✅
 The DatabaseStorage class maintains full compatibility with the IStorage interface, ensuring all existing code continues to work without changes.
