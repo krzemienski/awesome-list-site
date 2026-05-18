@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Docs — Awesome.Video Design System</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<link rel="stylesheet" href="styles.css">
+
+<style>
+  .docs-shell { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+  .docs-nav {
+    border-right: var(--hairline-w) solid var(--border);
+    padding: 28px 22px;
+    position: sticky; top: 0;
+    align-self: flex-start;
+    height: 100vh; overflow-y: auto;
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+  }
+  .docs-nav-group { margin-bottom: 22px; }
+  .docs-nav-label {
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--text-3); margin-bottom: 10px; padding-left: 8px;
+  }
+  .docs-nav-item {
+    display: block; padding: 7px 10px; margin: 1px 0;
+    font-size: 13px; color: var(--text-2); text-decoration: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer; border: 1px solid transparent;
+    transition: all 140ms ease;
+    text-align: left; background: transparent; width: 100%; font-family: inherit;
+  }
+  .docs-nav-item:hover { color: var(--text); background: var(--surface); }
+  .docs-nav-item.active {
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+    border-color: color-mix(in srgb, var(--accent) 25%, var(--border));
+  }
+  .docs-main {
+    padding: 56px 64px 120px;
+    max-width: 920px;
+    width: 100%;
+  }
+  .docs-h1 {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    letter-spacing: var(--display-tracking);
+    line-height: 1.05;
+    font-size: clamp(40px, 5vw, 64px);
+    margin-bottom: 16px;
+  }
+  .docs-h2 {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    letter-spacing: var(--display-tracking);
+    font-size: 28px;
+    margin: 56px 0 18px;
+  }
+  .docs-h3 {
+    font-size: 17px; font-weight: 600;
+    margin: 32px 0 12px;
+  }
+  .docs-lead { font-size: 18px; color: var(--text-2); line-height: 1.6; max-width: 640px; margin-bottom: 32px; }
+  .docs-p { font-size: 14.5px; color: var(--text-2); line-height: 1.65; margin-bottom: 14px; max-width: 680px; }
+  .docs-ul { list-style: none; padding: 0; margin: 12px 0 18px; }
+  .docs-ul li {
+    font-size: 14px; color: var(--text-2); line-height: 1.6;
+    padding-left: 18px; position: relative; margin-bottom: 6px;
+  }
+  .docs-ul li::before {
+    content: '─'; position: absolute; left: 0; top: 0;
+    color: var(--accent); font-family: var(--font-mono);
+  }
+  .code-block {
+    background: var(--bg-2);
+    border: var(--hairline-w) solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 18px 20px;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.65;
+    color: var(--text);
+    overflow-x: auto;
+    margin: 12px 0 24px;
+    white-space: pre;
+  }
+  .code-block .c-key { color: var(--accent); }
+  .code-block .c-str { color: #aaff00; }
+  .code-block .c-com { color: var(--text-3); font-style: italic; }
+  .code-block .c-num { color: #5eddf2; }
+
+  .callout {
+    border-left: 2px solid var(--accent);
+    padding: 14px 18px;
+    background: color-mix(in srgb, var(--accent) 5%, transparent);
+    margin: 18px 0 24px;
+    font-size: 13.5px; color: var(--text-2); line-height: 1.6;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  }
+  .callout strong { color: var(--accent); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; display: block; margin-bottom: 6px; }
+  .docs-meta {
+    display: flex; gap: 14px; flex-wrap: wrap;
+    font-family: var(--font-mono); font-size: 10.5px;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--text-3); margin-bottom: 24px;
+    padding-bottom: 24px; border-bottom: var(--hairline-w) solid var(--border);
+  }
+  .docs-meta span { color: var(--accent); }
+  .docs-toc {
+    position: sticky; top: 28px;
+    font-size: 12px; padding-left: 18px;
+    border-left: var(--hairline-w) solid var(--border);
+  }
+
+  @media (max-width: 900px) {
+    .docs-shell { grid-template-columns: 1fr; }
+    .docs-nav { position: relative; height: auto; border-right: none; border-bottom: var(--hairline-w) solid var(--border); }
+    .docs-main { padding: 40px 24px 80px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="grain"></div>
+  <div id="root"></div>
+</div>
+
+<script type="text/babel" src="design-systems.jsx"></script>
+<script type="text/babel" src="docs-content-1.jsx"></script>
+<script type="text/babel" src="docs-content-2.jsx"></script>
+<script type="text/babel" src="docs.jsx"></script>
+</body>
+</html>
