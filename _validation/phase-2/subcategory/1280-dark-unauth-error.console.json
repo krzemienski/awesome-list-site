@@ -1,0 +1,275 @@
+{
+  "messages": [
+    {
+      "type": "debug",
+      "text": "[vite] connecting...",
+      "location": {
+        "url": "http://localhost:5000/@vite/client",
+        "lineNumber": 494,
+        "columnNumber": 8
+      }
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connected.",
+      "location": {
+        "url": "http://localhost:5000/@vite/client",
+        "lineNumber": 617,
+        "columnNumber": 14
+      }
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connecting...",
+      "location": {
+        "url": "http://localhost:5000/@vite/client",
+        "lineNumber": 494,
+        "columnNumber": 8
+      }
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connected.",
+      "location": {
+        "url": "http://localhost:5000/@vite/client",
+        "lineNumber": 617,
+        "columnNumber": 14
+      }
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connecting...",
+      "location": {
+        "url": "http://localhost:5000/@vite/client",
+        "lineNumber": 494,
+        "columnNumber": 8
+      }
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connected.",
+      "location": {
+        "url": "http://localhost:5000/@vite/client",
+        "lineNumber": 617,
+        "columnNumber": 14
+      }
+    },
+    {
+      "type": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "location": {
+        "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=e0fc0b7c",
+        "lineNumber": 21550,
+        "columnNumber": 24
+      }
+    },
+    {
+      "type": "error",
+      "text": "Warning: Invalid prop `%s` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.%s data-replit-metadata \n    at AppHeader (http://localhost:5000/src/components/layout/new/AppHeader.tsx:71:37)\n    at main\n    at _c9 (http://localhost:5000/src/components/ui/sidebar.tsx:458:48)\n    at div\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at http://localhost:5000/src/components/ui/sidebar.tsx:60:7\n    at MainLayout (http://localhost:5000/src/components/layout/new/MainLayout.tsx:24:38)\n    at Router (http://localhost:5000/src/App.tsx?v=tpVUHz7z2hcfZ88k0Tudx:51:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)\n    at App (http://localhost:5000/src/App.tsx?v=tpVUHz7z2hcfZ88k0Tudx:238:3)\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at QueryClientProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=e0fc0b7c:3168:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)",
+      "location": {
+        "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=e0fc0b7c",
+        "lineNumber": 63,
+        "columnNumber": 37
+      }
+    },
+    {
+      "type": "error",
+      "text": "Warning: Invalid prop `%s` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.%s data-replit-metadata \n    at AppHeader (http://localhost:5000/src/components/layout/new/AppHeader.tsx:71:37)\n    at main\n    at _c9 (http://localhost:5000/src/components/ui/sidebar.tsx:458:48)\n    at div\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at http://localhost:5000/src/components/ui/sidebar.tsx:60:7\n    at MainLayout (http://localhost:5000/src/components/layout/new/MainLayout.tsx:24:38)\n    at Router (http://localhost:5000/src/App.tsx?v=tpVUHz7z2hcfZ88k0Tudx:51:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)\n    at App (http://localhost:5000/src/App.tsx?v=tpVUHz7z2hcfZ88k0Tudx:238:3)\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at QueryClientProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=e0fc0b7c:3168:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)",
+      "location": {
+        "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=e0fc0b7c",
+        "lineNumber": 63,
+        "columnNumber": 37
+      }
+    },
+    {
+      "type": "error",
+      "text": "Warning: Invalid prop `%s` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.%s data-replit-metadata \n    at AppHeader (http://localhost:5000/src/components/layout/new/AppHeader.tsx:71:37)\n    at main\n    at _c9 (http://localhost:5000/src/components/ui/sidebar.tsx:458:48)\n    at div\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at http://localhost:5000/src/components/ui/sidebar.tsx:60:7\n    at MainLayout (http://localhost:5000/src/components/layout/new/MainLayout.tsx:24:38)\n    at Router (http://localhost:5000/src/App.tsx?v=tpVUHz7z2hcfZ88k0Tudx:51:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)\n    at App (http://localhost:5000/src/App.tsx?v=tpVUHz7z2hcfZ88k0Tudx:238:3)\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at QueryClientProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=e0fc0b7c:3168:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)",
+      "location": {
+        "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=e0fc0b7c",
+        "lineNumber": 63,
+        "columnNumber": 37
+      }
+    },
+    {
+      "type": "error",
+      "text": "Warning: Invalid prop `%s` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.%s data-replit-metadata \n    at AppHeader (http://localhost:5000/src/components/layout/new/AppHeader.tsx:71:37)\n    at main\n    at _c9 (http://localhost:5000/src/components/ui/sidebar.tsx:458:48)\n    at div\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at http://localhost:5000/src/components/ui/sidebar.tsx:60:7\n    at MainLayout (http://localhost:5000/src/components/layout/new/MainLayout.tsx:24:38)\n    at Router (http://localhost:5000/src/App.tsx?v=tpVUHz7z2hcfZ88k0Tudx:51:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)\n    at App (http://localhost:5000/src/App.tsx?v=tpVUHz7z2hcfZ88k0Tudx:238:3)\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at QueryClientProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=e0fc0b7c:3168:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)",
+      "location": {
+        "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=e0fc0b7c",
+        "lineNumber": 63,
+        "columnNumber": 37
+      }
+    },
+    {
+      "type": "error",
+      "text": "Warning: Invalid prop `%s` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.%s data-replit-metadata \n    at AppHeader (http://localhost:5000/src/components/layout/new/AppHeader.tsx:71:37)\n    at main\n    at _c9 (http://localhost:5000/src/components/ui/sidebar.tsx:458:48)\n    at div\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at http://localhost:5000/src/components/ui/sidebar.tsx:60:7\n    at MainLayout (http://localhost:5000/src/components/layout/new/MainLayout.tsx:24:38)\n    at Router (http://localhost:5000/src/App.tsx?v=tpVUHz7z2hcfZ88k0Tudx:51:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)\n    at App (http://localhost:5000/src/App.tsx?v=tpVUHz7z2hcfZ88k0Tudx:238:3)\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at QueryClientProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=e0fc0b7c:3168:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)",
+      "location": {
+        "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=e0fc0b7c",
+        "lineNumber": 63,
+        "columnNumber": 37
+      }
+    },
+    {
+      "type": "error",
+      "text": "Warning: Invalid prop `%s` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.%s data-replit-metadata \n    at AppHeader (http://localhost:5000/src/components/layout/new/AppHeader.tsx:71:37)\n    at main\n    at _c9 (http://localhost:5000/src/components/ui/sidebar.tsx:458:48)\n    at div\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at http://localhost:5000/src/components/ui/sidebar.tsx:60:7\n    at MainLayout (http://localhost:5000/src/components/layout/new/MainLayout.tsx:24:38)\n    at Router (http://localhost:5000/src/App.tsx?v=tpVUHz7z2hcfZ88k0Tudx:51:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)\n    at App (http://localhost:5000/src/App.tsx?v=tpVUHz7z2hcfZ88k0Tudx:238:3)\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at QueryClientProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=e0fc0b7c:3168:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)",
+      "location": {
+        "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=e0fc0b7c",
+        "lineNumber": 63,
+        "columnNumber": 37
+      }
+    },
+    {
+      "type": "error",
+      "text": "Warning: Invalid prop `%s` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.%s data-replit-metadata \n    at AppHeader (http://localhost:5000/src/components/layout/new/AppHeader.tsx:71:37)\n    at main\n    at _c9 (http://localhost:5000/src/components/ui/sidebar.tsx:458:48)\n    at div\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at http://localhost:5000/src/components/ui/sidebar.tsx:60:7\n    at MainLayout (http://localhost:5000/src/components/layout/new/MainLayout.tsx:24:38)\n    at Router (http://localhost:5000/src/App.tsx?v=tpVUHz7z2hcfZ88k0Tudx:51:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)\n    at App (http://localhost:5000/src/App.tsx?v=tpVUHz7z2hcfZ88k0Tudx:238:3)\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at QueryClientProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=e0fc0b7c:3168:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)",
+      "location": {
+        "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=e0fc0b7c",
+        "lineNumber": 63,
+        "columnNumber": 37
+      }
+    },
+    {
+      "type": "error",
+      "text": "Warning: Invalid prop `%s` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.%s data-replit-metadata \n    at AppHeader (http://localhost:5000/src/components/layout/new/AppHeader.tsx:71:37)\n    at main\n    at _c9 (http://localhost:5000/src/components/ui/sidebar.tsx:458:48)\n    at div\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at http://localhost:5000/src/components/ui/sidebar.tsx:60:7\n    at MainLayout (http://localhost:5000/src/components/layout/new/MainLayout.tsx:24:38)\n    at Router (http://localhost:5000/src/App.tsx?v=tpVUHz7z2hcfZ88k0Tudx:51:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)\n    at App (http://localhost:5000/src/App.tsx?v=tpVUHz7z2hcfZ88k0Tudx:238:3)\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at QueryClientProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=e0fc0b7c:3168:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)",
+      "location": {
+        "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=e0fc0b7c",
+        "lineNumber": 63,
+        "columnNumber": 37
+      }
+    },
+    {
+      "type": "error",
+      "text": "Warning: Invalid prop `%s` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.%s data-replit-metadata \n    at AppHeader (http://localhost:5000/src/components/layout/new/AppHeader.tsx:71:37)\n    at main\n    at _c9 (http://localhost:5000/src/components/ui/sidebar.tsx:458:48)\n    at div\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at http://localhost:5000/src/components/ui/sidebar.tsx:60:7\n    at MainLayout (http://localhost:5000/src/components/layout/new/MainLayout.tsx:24:38)\n    at Router (http://localhost:5000/src/App.tsx?v=tpVUHz7z2hcfZ88k0Tudx:51:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)\n    at App (http://localhost:5000/src/App.tsx?v=tpVUHz7z2hcfZ88k0Tudx:238:3)\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at QueryClientProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=e0fc0b7c:3168:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)",
+      "location": {
+        "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=e0fc0b7c",
+        "lineNumber": 63,
+        "columnNumber": 37
+      }
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connecting...",
+      "location": {
+        "url": "http://localhost:5000/@vite/client",
+        "lineNumber": 494,
+        "columnNumber": 8
+      }
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connected.",
+      "location": {
+        "url": "http://localhost:5000/@vite/client",
+        "lineNumber": 617,
+        "columnNumber": 14
+      }
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connecting...",
+      "location": {
+        "url": "http://localhost:5000/@vite/client",
+        "lineNumber": 494,
+        "columnNumber": 8
+      }
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connected.",
+      "location": {
+        "url": "http://localhost:5000/@vite/client",
+        "lineNumber": 617,
+        "columnNumber": 14
+      }
+    },
+    {
+      "type": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "location": {
+        "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=e0fc0b7c",
+        "lineNumber": 21550,
+        "columnNumber": 24
+      }
+    },
+    {
+      "type": "error",
+      "text": "Warning: Invalid prop `%s` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.%s data-replit-metadata \n    at AppHeader (http://localhost:5000/src/components/layout/new/AppHeader.tsx:71:37)\n    at main\n    at _c9 (http://localhost:5000/src/components/ui/sidebar.tsx:458:48)\n    at div\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at http://localhost:5000/src/components/ui/sidebar.tsx:60:7\n    at MainLayout (http://localhost:5000/src/components/layout/new/MainLayout.tsx:24:38)\n    at Router (http://localhost:5000/src/App.tsx?v=V3df4xduuCsSEuq98q1QO:51:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)\n    at App (http://localhost:5000/src/App.tsx?v=V3df4xduuCsSEuq98q1QO:238:3)\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at QueryClientProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=e0fc0b7c:3168:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)",
+      "location": {
+        "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=e0fc0b7c",
+        "lineNumber": 63,
+        "columnNumber": 37
+      }
+    },
+    {
+      "type": "error",
+      "text": "Warning: Invalid prop `%s` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.%s data-replit-metadata \n    at AppHeader (http://localhost:5000/src/components/layout/new/AppHeader.tsx:71:37)\n    at main\n    at _c9 (http://localhost:5000/src/components/ui/sidebar.tsx:458:48)\n    at div\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at http://localhost:5000/src/components/ui/sidebar.tsx:60:7\n    at MainLayout (http://localhost:5000/src/components/layout/new/MainLayout.tsx:24:38)\n    at Router (http://localhost:5000/src/App.tsx?v=V3df4xduuCsSEuq98q1QO:51:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)\n    at App (http://localhost:5000/src/App.tsx?v=V3df4xduuCsSEuq98q1QO:238:3)\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at QueryClientProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=e0fc0b7c:3168:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)",
+      "location": {
+        "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=e0fc0b7c",
+        "lineNumber": 63,
+        "columnNumber": 37
+      }
+    },
+    {
+      "type": "error",
+      "text": "Warning: Invalid prop `%s` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.%s data-replit-metadata \n    at AppHeader (http://localhost:5000/src/components/layout/new/AppHeader.tsx:71:37)\n    at main\n    at _c9 (http://localhost:5000/src/components/ui/sidebar.tsx:458:48)\n    at div\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at http://localhost:5000/src/components/ui/sidebar.tsx:60:7\n    at MainLayout (http://localhost:5000/src/components/layout/new/MainLayout.tsx:24:38)\n    at Router (http://localhost:5000/src/App.tsx?v=V3df4xduuCsSEuq98q1QO:51:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)\n    at App (http://localhost:5000/src/App.tsx?v=V3df4xduuCsSEuq98q1QO:238:3)\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at QueryClientProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=e0fc0b7c:3168:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)",
+      "location": {
+        "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=e0fc0b7c",
+        "lineNumber": 63,
+        "columnNumber": 37
+      }
+    },
+    {
+      "type": "error",
+      "text": "Warning: Invalid prop `%s` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.%s data-replit-metadata \n    at AppHeader (http://localhost:5000/src/components/layout/new/AppHeader.tsx:71:37)\n    at main\n    at _c9 (http://localhost:5000/src/components/ui/sidebar.tsx:458:48)\n    at div\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at http://localhost:5000/src/components/ui/sidebar.tsx:60:7\n    at MainLayout (http://localhost:5000/src/components/layout/new/MainLayout.tsx:24:38)\n    at Router (http://localhost:5000/src/App.tsx?v=V3df4xduuCsSEuq98q1QO:51:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)\n    at App (http://localhost:5000/src/App.tsx?v=V3df4xduuCsSEuq98q1QO:238:3)\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at QueryClientProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=e0fc0b7c:3168:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)",
+      "location": {
+        "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=e0fc0b7c",
+        "lineNumber": 63,
+        "columnNumber": 37
+      }
+    },
+    {
+      "type": "error",
+      "text": "Warning: Invalid prop `%s` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.%s data-replit-metadata \n    at AppHeader (http://localhost:5000/src/components/layout/new/AppHeader.tsx:71:37)\n    at main\n    at _c9 (http://localhost:5000/src/components/ui/sidebar.tsx:458:48)\n    at div\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at http://localhost:5000/src/components/ui/sidebar.tsx:60:7\n    at MainLayout (http://localhost:5000/src/components/layout/new/MainLayout.tsx:24:38)\n    at Router (http://localhost:5000/src/App.tsx?v=V3df4xduuCsSEuq98q1QO:51:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)\n    at App (http://localhost:5000/src/App.tsx?v=V3df4xduuCsSEuq98q1QO:238:3)\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at QueryClientProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=e0fc0b7c:3168:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)",
+      "location": {
+        "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=e0fc0b7c",
+        "lineNumber": 63,
+        "columnNumber": 37
+      }
+    },
+    {
+      "type": "error",
+      "text": "Warning: Invalid prop `%s` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.%s data-replit-metadata \n    at AppHeader (http://localhost:5000/src/components/layout/new/AppHeader.tsx:71:37)\n    at main\n    at _c9 (http://localhost:5000/src/components/ui/sidebar.tsx:458:48)\n    at div\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at http://localhost:5000/src/components/ui/sidebar.tsx:60:7\n    at MainLayout (http://localhost:5000/src/components/layout/new/MainLayout.tsx:24:38)\n    at Router (http://localhost:5000/src/App.tsx?v=V3df4xduuCsSEuq98q1QO:51:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)\n    at App (http://localhost:5000/src/App.tsx?v=V3df4xduuCsSEuq98q1QO:238:3)\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at QueryClientProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=e0fc0b7c:3168:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)",
+      "location": {
+        "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=e0fc0b7c",
+        "lineNumber": 63,
+        "columnNumber": 37
+      }
+    },
+    {
+      "type": "error",
+      "text": "Warning: Invalid prop `%s` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.%s data-replit-metadata \n    at AppHeader (http://localhost:5000/src/components/layout/new/AppHeader.tsx:71:37)\n    at main\n    at _c9 (http://localhost:5000/src/components/ui/sidebar.tsx:458:48)\n    at div\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at http://localhost:5000/src/components/ui/sidebar.tsx:60:7\n    at MainLayout (http://localhost:5000/src/components/layout/new/MainLayout.tsx:24:38)\n    at Router (http://localhost:5000/src/App.tsx?v=V3df4xduuCsSEuq98q1QO:51:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)\n    at App (http://localhost:5000/src/App.tsx?v=V3df4xduuCsSEuq98q1QO:238:3)\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at QueryClientProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=e0fc0b7c:3168:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)",
+      "location": {
+        "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=e0fc0b7c",
+        "lineNumber": 63,
+        "columnNumber": 37
+      }
+    },
+    {
+      "type": "error",
+      "text": "Warning: Invalid prop `%s` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.%s data-replit-metadata \n    at AppHeader (http://localhost:5000/src/components/layout/new/AppHeader.tsx:71:37)\n    at main\n    at _c9 (http://localhost:5000/src/components/ui/sidebar.tsx:458:48)\n    at div\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at http://localhost:5000/src/components/ui/sidebar.tsx:60:7\n    at MainLayout (http://localhost:5000/src/components/layout/new/MainLayout.tsx:24:38)\n    at Router (http://localhost:5000/src/App.tsx?v=V3df4xduuCsSEuq98q1QO:51:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)\n    at App (http://localhost:5000/src/App.tsx?v=V3df4xduuCsSEuq98q1QO:238:3)\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at QueryClientProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=e0fc0b7c:3168:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)",
+      "location": {
+        "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=e0fc0b7c",
+        "lineNumber": 63,
+        "columnNumber": 37
+      }
+    },
+    {
+      "type": "error",
+      "text": "Warning: Invalid prop `%s` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.%s data-replit-metadata \n    at AppHeader (http://localhost:5000/src/components/layout/new/AppHeader.tsx:71:37)\n    at main\n    at _c9 (http://localhost:5000/src/components/ui/sidebar.tsx:458:48)\n    at div\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at http://localhost:5000/src/components/ui/sidebar.tsx:60:7\n    at MainLayout (http://localhost:5000/src/components/layout/new/MainLayout.tsx:24:38)\n    at Router (http://localhost:5000/src/App.tsx?v=V3df4xduuCsSEuq98q1QO:51:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)\n    at App (http://localhost:5000/src/App.tsx?v=V3df4xduuCsSEuq98q1QO:238:3)\n    at Provider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c:38:15)\n    at TooltipProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c:160:5)\n    at QueryClientProvider (http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=e0fc0b7c:3168:3)\n    at ThemeProvider (http://localhost:5000/src/components/ui/theme-provider.tsx:45:33)",
+      "location": {
+        "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=e0fc0b7c",
+        "lineNumber": 63,
+        "columnNumber": 37
+      }
+    }
+  ],
+  "pageErrors": []
+}

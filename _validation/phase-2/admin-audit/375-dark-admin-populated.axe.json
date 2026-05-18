@@ -1,0 +1,4 @@
+{
+  "violations": [],
+  "error": "page.evaluate: Execution context was destroyed, most likely because of a navigation"
+}
