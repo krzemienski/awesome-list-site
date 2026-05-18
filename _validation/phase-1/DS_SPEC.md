@@ -164,6 +164,84 @@ full 35 as in-scope** — every system in `design-systems.jsx` actually
 declares all of them (modulo `--bg-atmosphere-size`, set only by Swiss),
 and Phase 3 will lint against the 35-token list, not the 30 minimum.
 
+### 1.8 Full per-token × per-system value matrix
+
+> Verbatim from `awesome-list-site-ds/design-systems.jsx` lines 14-267.
+> Rows = the 35 tokens in the contract. Columns = the 5 systems. Empty
+> cell = system does not explicitly set this token (only `--bg-atmosphere-size`
+> qualifies — set by Swiss only). Phase 3 lints the live app's effective
+> styles against this matrix.
+
+#### Surface
+
+| Token | Editorial | Terminal | Geist | Brutalist | Swiss |
+|---|---|---|---|---|---|
+| `--bg` | `#000000` | `#000000` | `#000000` | `#000000` | `#000000` |
+| `--bg-2` | `#070706` | `#040404` | `#0a0a0a` | `#0a0a0a` | `#050506` |
+| `--surface` | `rgba(244,243,238,0.025)` | `rgba(0,255,136,0.012)` | `rgba(255,255,255,0.04)` | `rgba(255,255,255,0.025)` | `rgba(250,250,248,0.018)` |
+| `--surface-2` | `rgba(244,243,238,0.05)` | `rgba(0,255,136,0.025)` | `rgba(255,255,255,0.07)` | `rgba(255,255,255,0.06)` | `rgba(250,250,248,0.04)` |
+| `--surface-3` | `rgba(244,243,238,0.08)` | `rgba(0,255,136,0.05)` | `rgba(255,255,255,0.1)` | `rgba(255,255,255,0.1)` | `rgba(250,250,248,0.07)` |
+| `--bg-atmosphere` | radial 1100×700 @ 88%/-8% accent 7% + radial 900×500 @ -8%/110% accent-2 6% | scanline `repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(255,255,255,0.018) 2px, rgba(255,255,255,0.018) 3px)` + radial 800×600 @ 50%/50% accent 4% | radial 1200×800 @ 50%/-20% white 3% | `none` | crossed-grid 1 px `linear-gradient(0deg, transparent calc(100%-1px), rgba(250,250,248,0.04) calc(100%-1px))` × 90deg |
+| `--bg-atmosphere-size` | — | — | — | — | `64px 64px, 64px 64px` |
+| `--grain-opacity` | `0.32` | `0.5` | `0` | `0.55` | `0.18` |
+
+#### Border
+
+| Token | Editorial | Terminal | Geist | Brutalist | Swiss |
+|---|---|---|---|---|---|
+| `--border` | `rgba(244,243,238,0.08)` | `rgba(232,232,224,0.14)` | `rgba(255,255,255,0.1)` | `rgba(245,245,240,0.85)` | `rgba(250,250,248,0.085)` |
+| `--border-strong` | `rgba(244,243,238,0.16)` | `rgba(232,232,224,0.32)` | `rgba(255,255,255,0.18)` | `rgba(245,245,240,1)` | `rgba(250,250,248,0.18)` |
+| `--hairline` | `rgba(244,243,238,0.06)` | `rgba(232,232,224,0.08)` | `rgba(255,255,255,0.07)` | `rgba(245,245,240,0.18)` | `rgba(250,250,248,0.05)` |
+| `--border-w` | `1px` | `1px` | `1px` | `2px` | `1px` |
+| `--hairline-w` | `1px` | `1px` | `1px` | `1px` | `0.5px` |
+
+#### Text
+
+| Token | Editorial | Terminal | Geist | Brutalist | Swiss |
+|---|---|---|---|---|---|
+| `--text` | `#f4f3ee` | `#e8e8e0` | `#fafafa` | `#f5f5f0` | `#fafaf8` |
+| `--text-2` | `rgba(244,243,238,0.66)` | `rgba(232,232,224,0.62)` | `rgba(250,250,250,0.62)` | `rgba(245,245,240,0.7)` | `rgba(250,250,248,0.62)` |
+| `--text-3` | `rgba(244,243,238,0.4)` | `rgba(232,232,224,0.36)` | `rgba(250,250,250,0.38)` | `rgba(245,245,240,0.4)` | `rgba(250,250,248,0.38)` |
+| `--text-4` | `rgba(244,243,238,0.22)` | `rgba(232,232,224,0.2)` | `rgba(250,250,250,0.2)` | `rgba(245,245,240,0.22)` | `rgba(250,250,248,0.2)` |
+
+#### Type
+
+| Token | Editorial | Terminal | Geist | Brutalist | Swiss |
+|---|---|---|---|---|---|
+| `--font-body` | `'Inter', system-ui, sans-serif` | `'IBM Plex Mono', ui-monospace, monospace` | `'Geist', 'Inter', system-ui, sans-serif` | `'Space Grotesk', system-ui, sans-serif` | `'Manrope', system-ui, sans-serif` |
+| `--font-display` | `'Fraunces', Georgia, serif` | `'IBM Plex Mono', ui-monospace, monospace` | `'Geist', 'Inter', system-ui, sans-serif` | `'Instrument Serif', 'Times New Roman', serif` | `'Manrope', system-ui, sans-serif` |
+| `--font-mono` | `'JetBrains Mono', ui-monospace, monospace` | `'IBM Plex Mono', ui-monospace, monospace` | `'JetBrains Mono', ui-monospace, monospace` | `'JetBrains Mono', ui-monospace, monospace` | `'IBM Plex Mono', ui-monospace, monospace` |
+| `--display-weight` | `500` | `600` | `600` | `400` | `700` |
+| `--display-tracking` | `-0.02em` | `-0.01em` | `-0.035em` | `-0.04em` | `-0.045em` |
+| `--display-leading` | `1.04` | `1.1` | `1.05` | `0.92` | `1` |
+| `--body-leading` | `1.6` | `1.55` | `1.55` | `1.5` | `1.55` |
+| `--eyebrow-tracking` | `0.18em` | `0.2em` | `0.06em` | `0.24em` | `0.14em` |
+| `--mono-size-step` | `11px` | `12px` | `11px` | `11px` | `10.5px` |
+
+#### Shape
+
+| Token | Editorial | Terminal | Geist | Brutalist | Swiss |
+|---|---|---|---|---|---|
+| `--radius` | `12px` | `0px` | `10px` | `0px` | `4px` |
+| `--radius-sm` | `8px` | `0px` | `6px` | `0px` | `2px` |
+| `--radius-pill` | `999px` | `0px` | `999px` | `0px` | `999px` |
+
+#### Shadow
+
+| Token | Editorial | Terminal | Geist | Brutalist | Swiss |
+|---|---|---|---|---|---|
+| `--shadow-sm` | `0 1px 2px rgba(0,0,0,0.3)` | `none` | `0 1px 2px rgba(0,0,0,0.4)` | `2px 2px 0 0 var(--text)` | `none` |
+| `--shadow` | `0 6px 24px -8px rgba(0,0,0,0.5)` | `none` | `0 0 0 1px rgba(255,255,255,0.04), 0 8px 24px rgba(0,0,0,0.4)` | `4px 4px 0 0 var(--text)` | `none` |
+| `--shadow-lg` | `0 24px 60px -20px rgba(0,0,0,0.7)` | `0 0 0 1px var(--accent), inset 0 0 60px color-mix(in srgb, var(--accent) 8%, transparent)` | `0 0 0 1px rgba(255,255,255,0.06), 0 24px 56px rgba(0,0,0,0.55)` | `8px 8px 0 0 var(--text)` | `0 24px 60px rgba(0,0,0,0.5)` |
+| `--shadow-accent` | `0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent), 0 12px 36px -12px color-mix(in srgb, var(--accent) 40%, transparent)` | `0 0 0 1px var(--accent), 0 0 24px color-mix(in srgb, var(--accent) 30%, transparent)` | `0 0 0 1px color-mix(in srgb, var(--accent) 50%, transparent), 0 0 32px color-mix(in srgb, var(--accent) 25%, transparent)` | `4px 4px 0 0 var(--accent)` | `0 0 0 1px var(--accent)` |
+
+#### Accent (set per page, not per system)
+
+| Token | All 5 systems |
+|---|---|
+| `--accent` | One of the 10 `ACCENTS[*].primary` values (default per system = `SYSTEM_DEFAULT_ACCENT[sys]`). |
+| `--accent-2` | The matching `ACCENTS[*].secondary` value. |
+
 ---
 
 ## 2 · The five systems

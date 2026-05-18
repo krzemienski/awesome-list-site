@@ -145,37 +145,151 @@ in DS, badges map to `.chip.bad` for the pending count).
 
 ## 5 · Env vars touched at runtime
 
-### 5.1 Frontend (`import.meta.env.VITE_*`)
+Exhaustive sweep via `rg "process\.env\.[A-Z_]+"` (server/, shared/) and
+`rg "import\.meta\.env\.[A-Z_]+"` (client/, shared/). "in `.env`" /
+"in `.env.local`" columns from `cat .env` and `cat .env.local`.
 
-| Var | File | Used for |
+### 5.1 Frontend (`import.meta.env.VITE_*`) — read in the browser bundle
+
+| Var | Source file(s) | In `.env`? | In `.env.local`? | Purpose |
+|---|---|---|---|---|
+| `VITE_GA_MEASUREMENT_ID` | `client/src/App.tsx:120`, `client/src/lib/analytics.ts:28,56` | ✅ `G-383541848` | — | GA init + pageview tracking. App warns to console if missing. |
+
+*(Other `VITE_*` vars in `.env` — `VITE_SITE_TITLE`,
+`VITE_SITE_DESCRIPTION`, `VITE_SITE_URL`, `VITE_DEFAULT_THEME`,
+`VITE_ALLOWED_HOSTS` — are **not currently read by any
+`import.meta.env.*` expression in `client/src/`**. They are read on the
+backend via `server/config.ts` for SSR/meta only. The `.env` file also
+sets `NODE_ENV=production` after `VITE_DEFAULT_THEME` on the same line,
+which is a config smell flagged for Phase 3.)*
+
+### 5.2 Backend (`process.env.*`) — read by the Express server
+
+#### Critical (server won't boot / feature breaks without)
+
+| Var | Source file(s) | In `.env`? | In `.env.local`? | Purpose |
+|---|---|---|---|---|
+| `DATABASE_URL` | `server/db/index.ts`, `server/index.ts:54,78`, `server/replitAuth.ts:25` | — (Replit-managed) | — | Postgres connection. Server exits if missing at boot. |
+| `SESSION_SECRET` | `server/replitAuth.ts:31` | — (Replit-managed) | — | Express session crypto. |
+| `REPL_ID` | `server/replitAuth.ts:15,146`, `server/routes.ts:308` | — (Replit-managed) | — | Replit Auth OIDC client id. |
+| `NODE_ENV` | `server/index.ts:135,165`, `server/replitAuth.ts:37`, `server/routes.ts:3255`, `server/middleware/errorHandler.ts:110`, `shared/categoryMapping.ts:40` | ✅ `production` (suffix glued to VITE_DEFAULT_THEME line) | — | Gates dev/prod error responses, cookie `secure`, migration verification. |
+| `PORT` | `server/index.ts:165` | — | ✅ `5000` | Listen port. Defaults 5000 if unset. |
+
+#### Integration credentials (graceful degradation — feature disabled when missing)
+
+| Var | Source file(s) | In `.env`? | In `.env.local`? | Purpose |
+|---|---|---|---|---|
+| `AI_INTEGRATIONS_ANTHROPIC_API_KEY` | `server/ai/claudeService.ts:251`, `server/ai/recommendations.ts:9,115,220` | — (Replit-managed via integration) | — | Claude — enrichment, recommendations. |
+| `AI_INTEGRATIONS_ANTHROPIC_BASE_URL` | `server/ai/claudeService.ts:252`, `server/ai/recommendations.ts:10` | — | — | Claude baseURL override. |
+| `ANTHROPIC_API_KEY` | `server/ai/claudeService.ts:251`, `server/ai/researchService.ts:244`, `server/ai/tagging.ts:4,22` | — | — | Fallback for above + research / tagging. |
+| **`AI_INTEGRATIONS_OPENAI_API_KEY`** | `server/ai/embeddingService.ts:80` | — | — | OpenAI embeddings (semantic search). |
+| **`AI_INTEGRATIONS_OPENAI_BASE_URL`** | `server/ai/embeddingService.ts:81` | — | — | OpenAI baseURL override. |
+| **`OPENAI_API_KEY`** | `server/ai/embeddingService.ts:80`, `server/config.ts:105-106` | — | — | Fallback + feature-flag for `ai_tags` / `ai_descriptions`. |
+| `GITHUB_TOKEN` | `server/github/client.ts:43` | — | — | GitHub API token. |
+| `GITHUB_REPO_URL` | `server/routes.ts:2315,2464` | — | — | Target repo for export. |
+| `REPLIT_CONNECTORS_HOSTNAME` | `server/github/replitConnection.ts:38` | — | — | Replit GitHub connection. |
+| `REPL_IDENTITY` | `server/github/replitConnection.ts:39,40` | — | — | Replit GitHub auth. |
+| `WEB_REPL_RENEWAL` | `server/github/replitConnection.ts:41,42` | — | — | Replit deployment token. |
+| `ISSUER_URL` | `server/replitAuth.ts:14` | — | — | Replit Auth issuer (defaults to `https://replit.com/oidc`). |
+| `WEBSITE_URL` | `server/github/syncService.ts:195` | — | — | Public site URL for export link backrefs. |
+| `AWESOME_RAW_URL` | `server/routes.ts:66`, `server/config.ts` | — | — | Initial seed source. |
+
+#### Server-side bridge for frontend meta (read via `server/config.ts`)
+
+`server/config.ts` reads `VITE_DEFAULT_THEME`, `VITE_GA_MEASUREMENT_ID`,
+`VITE_SITE_DESCRIPTION`, `VITE_SITE_TITLE`, `VITE_SITE_URL` from
+`process.env` (not `import.meta.env`) so they can be injected into SSR
+meta tags. All five are defined in `.env`.
+
+#### Dev-mode `.env.local` only
+
+| Var | Source | Purpose |
 |---|---|---|
-| `VITE_GA_MEASUREMENT_ID` | `client/src/App.tsx:120`, `client/src/lib/analytics.ts:28,56` | Google Analytics init + pageview tracking. Warns if missing. |
-| `VITE_SITE_TITLE` | `.env` | "Awesome Video" — SEO. |
-| `VITE_SITE_DESCRIPTION` | `.env` | SEO meta. |
-| `VITE_SITE_URL` | `.env` | Canonical URL / OG. |
-| `VITE_DEFAULT_THEME` | `.env` | Currently `dark`. **May conflict with DS boot script** — Phase 3 delta. |
-| `VITE_ALLOWED_HOSTS` | `.env` | Replit host allow-list. |
+| `VITE_HOST` | `.env.local` | Vite dev host bind (`0.0.0.0`). |
+| `HOST` | `.env.local` | Process host (`0.0.0.0`). |
+| `DANGEROUSLY_DISABLE_HOST_CHECK` | `.env.local` | Replit preview host bypass. |
+| `DISABLE_HOST_CHECK` | `.env.local` | Same, alt name. |
+| `WDS_SOCKET_HOST` | `.env.local` | Webpack-style HMR socket bind. |
 
-### 5.2 Backend (`process.env.*`)
+**None of the design-system work touches any of these.** DS migration
+is purely a frontend CSS + JS-bundle concern; no env contract changes.
 
-Critical (server won't boot / feature breaks without):
-- `DATABASE_URL` — Postgres (server/index.ts:54, 78; server/replitAuth.ts:25).
-- `SESSION_SECRET` — Express session crypto (server/replitAuth.ts:31).
-- `REPL_ID` — Replit Auth OIDC client id (server/replitAuth.ts:15, 146; routes.ts:308).
-- `NODE_ENV` — gates dev/prod error responses, cookie `secure`, atmosphere setup.
-- `PORT` — defaults 5000 (server/index.ts:165).
+---
 
-Integration credentials (graceful degradation):
-- `AI_INTEGRATIONS_ANTHROPIC_API_KEY` / `AI_INTEGRATIONS_ANTHROPIC_BASE_URL` — Claude (enrichment, recommendations).
-- `ANTHROPIC_API_KEY` — fallback for above + research/tagging.
-- `GITHUB_TOKEN`, `GITHUB_REPO_URL` — GitHub import/export.
-- `REPLIT_CONNECTORS_HOSTNAME`, `REPL_IDENTITY`, `WEB_REPL_RENEWAL` — Replit GitHub connection.
-- `ISSUER_URL` — Replit Auth (defaults to `https://replit.com/oidc`).
-- `WEBSITE_URL` — GitHub sync service.
-- `AWESOME_RAW_URL` — initial seed source.
+## 5a · Per-route data dependencies (TanStack Query)
 
-**None of the design-system work touches these.** DS migration is
-purely a frontend CSS + JS-bundle concern.
+Every `useQuery` / `useMutation` reachable from each page, including
+the cross-page `useAuth()` (always hits `/api/auth/user` — listed once
+here as the universal dependency rather than repeated 17 times). Hooks
+in mounted sub-components (e.g. the 14 admin tab panels) are inlined
+under the parent route.
+
+**Universal:** every page mounts `useAuth()` → `GET /api/auth/user`
+(staleTime 5 min; skips retry on 401). Counted once.
+
+| Route | Hook | Method | Endpoint | Purpose |
+|---|---|---|---|---|
+| `/` (Home) | `useQuery` | GET | `/api/awesome-list` (1h stale, via `fetchStaticAwesomeList`) | Hierarchical resource tree. |
+| `/login` | — | — | — | No data deps beyond `useAuth`. |
+| `/category/:slug` | `useQuery` | GET | `/api/awesome-list` | Hierarchy. |
+| `/category/:slug` | `useQuery` | GET | `/api/resources` | Filtered resources. |
+| `/subcategory/:slug` | `useQuery` | GET | `/api/awesome-list` + `/api/resources` | Same as Category. |
+| `/sub-subcategory/:slug` | `useQuery` | GET | `/api/awesome-list` + `/api/resources` | Same. |
+| `/resource/:id` | `useQuery` | GET | `/api/resources/:id` | Core resource record. |
+| `/resource/:id` | `useQuery` | GET | `/api/favorites` | Favorite status. |
+| `/resource/:id` | `useQuery` | GET | `/api/bookmarks` | Bookmark status. |
+| `/resource/:id` | `useQuery` | GET | `/api/resources/:id/related` | Related items. |
+| `/resource/:id` | `useMutation` | POST / DELETE | `/api/favorites/:id` | Toggle favorite. |
+| `/resource/:id` | `useMutation` | POST / DELETE | `/api/bookmarks/:id` | Toggle bookmark. |
+| `/resource/:id` | `useMutation` | POST | `/api/interactions` | Analytics. |
+| `/about` | — | — | — | Static. |
+| `/advanced` | `useQuery` | GET | `/api/awesome-list` | Full list for client-side filtering. |
+| `/submit` | `useQuery` | GET | `/api/categories` + `/api/subcategories` + `/api/subsubcategories` | Form selects. |
+| `/submit` | `useMutation` | POST | `/api/resources` | Submit new resource. |
+| `/journeys` | `useQuery` | GET | `/api/journeys` | List learning journeys. |
+| `/journey/:id` | `useQuery` | GET | `/api/journeys/:id` | Journey details + steps. |
+| `/journey/:id` | `useMutation` | POST | `/api/user/journeys/:id/start` | Enroll. |
+| `/journey/:id` | `useMutation` | POST | `/api/user/journeys/:id/steps/:sid` | Complete step. |
+| `/profile` | `useQuery` | GET | `/api/favorites` | User favorites. |
+| `/profile` | `useQuery` | GET | `/api/bookmarks` | User bookmarks. |
+| `/profile` | `useQuery` | GET | `/api/user/progress` | Learning stats. |
+| `/profile` | `useQuery` | GET | `/api/user/submissions` | Resources user submitted. |
+| `/profile` | `useQuery` | GET | `/api/user/journeys` | Enrolled journeys. |
+| `/profile` | `useQuery` | GET | `/api/recommendations` | AI suggestions. |
+| `/profile` | `useMutation` | POST | `/api/auth/logout` | Logout (via `useAuth`). |
+| `/bookmarks` | `useQuery` | GET | `/api/bookmarks` | User bookmarks list. |
+| `/admin` → `AdminStats` | `useQuery` (via `useAdmin`) | GET | `/api/admin/stats` | Dashboard counters (driving badge counts). |
+| `/admin` → `#approvals` (PendingResources) | `useQuery` | GET | `/api/admin/resources/pending` | Pending list. |
+| `/admin` → `#approvals` | `useMutation` | POST | `/api/admin/resources/:id/approve`, `/reject` | Single ops. |
+| `/admin` → `#approvals` | `useMutation` | POST | `/api/admin/resources/bulk/{approve,reject,delete}` | Bulk ops (added Feb 2026). |
+| `/admin` → `#edits` (PendingEdits) | `useQuery` | GET | `/api/admin/edits/pending` | Pending edits list. |
+| `/admin` → `#edits` | `useMutation` | POST | `/api/admin/edits/:id/approve`, `/reject` | Approve/reject single edit. |
+| `/admin` → `#enrichment` (BatchEnrichmentPanel) | `useQuery` | GET | `/api/admin/enrichment/jobs` | Job status list. |
+| `/admin` → `#enrichment` | `useMutation` | POST | `/api/admin/enrichment/start` | Kick off batch. |
+| `/admin` → `#researcher` (ResearcherTab) | `useQuery` | GET | `/api/researcher/jobs` | Research job list. |
+| `/admin` → `#researcher` | `useMutation` | POST | `/api/researcher/start` | Kick off research. |
+| `/admin` → `#export` (ExportTab) | `useQuery` | GET | `/api/admin/export-json`, validation status | Export status / preview. |
+| `/admin` → `#export` | `useMutation` | POST | `/api/admin/validation/run`, awesome-lint exports | Run validation / trigger export. |
+| `/admin` → `#database` (DatabaseTab) | — (uses `stats` prop) | — | — | Reads admin stats; mutations via `/api/admin/seed-database` etc. |
+| `/admin` → `#resources` (ResourceManager) | `useQuery` | GET | `/api/admin/resources` (paginated) | Resource grid. |
+| `/admin` → `#resources` | `useMutation` | PATCH / DELETE | `/api/admin/resources/:id`, bulk endpoints | Edit / delete. |
+| `/admin` → `#categories` (CategoryManager) | `useQuery` | GET | `/api/admin/categories` | CRUD list (via GenericCrudManager). |
+| `/admin` → `#categories` | `useMutation` | POST / PATCH / DELETE | `/api/admin/categories/:id?` | CRUD ops. |
+| `/admin` → `#subcategories` | `useQuery` / `useMutation` | GET / POST / PATCH / DELETE | `/api/admin/subcategories/*` | CRUD. |
+| `/admin` → `#subsubcategories` | `useQuery` / `useMutation` | GET / POST / PATCH / DELETE | `/api/admin/sub-subcategories/*` | CRUD. |
+| `/admin` → `#users` (UsersTab) | `useQuery` | GET | `/api/admin/users` | Paginated users. |
+| `/admin` → `#users` | `useMutation` | PUT | `/api/admin/users/:id/role` | Change role. |
+| `/admin` → `#github` (GitHubSyncPanel) | `useQuery` / `useMutation` | various | `/api/admin/github/*` | Sync status / trigger. |
+| `/admin` → `#linkhealth` | `useQuery` | GET | `/api/admin/link-health/status` (+ per-resource detail) | Link health overview. |
+| `/admin` → `#audit` (AuditTab) | `useQuery` | GET | `/api/admin/audit-logs` | Audit feed. |
+| `/settings/theme` | — | — | — | Local-state only. |
+| `*` (NotFound) | — | — | — | Static. |
+
+**Phase 2 implication:** every endpoint above must be reachable (or
+gracefully degraded with a 401/empty) for the corresponding route to
+render its non-loading state. Phase 2 baseline screenshots will only
+catch *visible* state — Phase 6 evidence sweep should also include
+network-tab snapshots for the admin tabs to verify each call lands.
 
 ---
 
