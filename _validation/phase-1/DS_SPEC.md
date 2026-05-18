@@ -75,7 +75,7 @@ under either choice.
 
 From `docs/04-tokens.md` + `design-systems.jsx` lines 8-267. Every
 component reads tokens via `var(--*)`. **No magic numbers, no hex codes
-outside `design-systems.js`.**
+outside `design-systems.jsx`.**
 
 ### 1.1 Surface (8)
 
@@ -153,7 +153,7 @@ outside `design-systems.js`.**
 **Contract total — reconciled.** The source `docs/04-tokens.md`
 "Reference" block headline reads *"Total: 28 system-defined + 2
 accent-defined = 30 active tokens per page"* and its parenthetical adds
-*"`design-systems.js` defines a few extras like `--bg-atmosphere-size`
+*"`design-systems.jsx` defines a few extras like `--bg-atmosphere-size`
 that not every system needs; the contract above is the minimum."* The
 full enumeration in §1.1–§1.7 above is **35 tokens** (Surface 8 + Border
 5 + Text 4 + Type 9 + Shape 3 + Shadow 4 + Accent 2). The discrepancy

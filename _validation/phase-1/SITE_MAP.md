@@ -1,5 +1,14 @@
 # Phase 1 · Site Map
 
+> **Confidence legend** (applies throughout this document):
+> - ✅ / *(confirmed)* — verified by reading the live source file cited.
+> - ❓ / *(verify in Phase 2)* — inferred from context, not directly
+>   read this phase. Phase 2 operators should observe and correct.
+>
+> Anything **not** marked ❓ is treated as confirmed source-of-truth for
+> downstream phases. Open questions are also collected in §9 *"What
+> Gate 1 leaves open."*
+
 > Every Wouter route, the component tree it mounts, auth gating, env
 > vars it touches, and the state matrix Phase 2 will screenshot. Plus
 > the Gate 1 verdict the user needs to approve before Phase 2 begins.
