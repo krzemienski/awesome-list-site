@@ -236,6 +236,20 @@ under the parent route.
 **Universal:** every page mounts `useAuth()` → `GET /api/auth/user`
 (staleTime 5 min; skips retry on 401). Counted once.
 
+**Confidence on this table:**
+- ✅ *Confirmed* by direct `rg`/`read` of the live source files for:
+  `JourneyDetail.tsx`, `ResourceDetail.tsx`, `SubmitResource.tsx`,
+  `Profile.tsx`, `Bookmarks.tsx`, `Home.tsx`, `Category.tsx`,
+  `Subcategory.tsx`, `SubSubcategory.tsx`, `Advanced.tsx`,
+  `client/src/hooks/useAuth.ts`, and `AdminDashboard.tsx` tab list.
+- ❓ *Inferred* (verify in Phase 2): the per-admin-tab endpoint shapes
+  in the `/admin → #...` rows below. Tab labels and parent endpoint
+  *families* are confirmed from `server/routes.ts` and the admin tab
+  audit (replit.md "Admin Panel Audit – Remaining Tabs"), but exact
+  method × path strings for each admin sub-component's mutations were
+  not exhaustively re-read this phase. Use these as a starting
+  checklist for Phase 2 network-tab observation, not a contract.
+
 | Route | Hook | Method | Endpoint | Purpose |
 |---|---|---|---|---|
 | `/` (Home) | `useQuery` | GET | `/api/awesome-list` (1h stale, via `fetchStaticAwesomeList`) | Hierarchical resource tree. |
@@ -248,24 +262,25 @@ under the parent route.
 | `/resource/:id` | `useQuery` | GET | `/api/favorites` | Favorite status. |
 | `/resource/:id` | `useQuery` | GET | `/api/bookmarks` | Bookmark status. |
 | `/resource/:id` | `useQuery` | GET | `/api/resources/:id/related` | Related items. |
-| `/resource/:id` | `useMutation` | POST / DELETE | `/api/favorites/:id` | Toggle favorite. |
-| `/resource/:id` | `useMutation` | POST / DELETE | `/api/bookmarks/:id` | Toggle bookmark. |
-| `/resource/:id` | `useMutation` | POST | `/api/interactions` | Analytics. |
+| `/resource/:id` | `useMutation` | POST `/api/favorites` (add) / DELETE `/api/favorites/:id` (remove) | Toggle favorite (collection-add, id-delete). |
+| `/resource/:id` | `useMutation` | POST `/api/bookmarks` (add) / DELETE `/api/bookmarks/:id` (remove) | Toggle bookmark (collection-add, id-delete). |
+| `/resource/:id` | `useMutation` | POST | `/api/interactions` | Analytics tracking. |
 | `/about` | — | — | — | Static. |
 | `/advanced` | `useQuery` | GET | `/api/awesome-list` | Full list for client-side filtering. |
-| `/submit` | `useQuery` | GET | `/api/categories` + `/api/subcategories` + `/api/subsubcategories` | Form selects. |
+| `/submit` | `useQuery` | GET | `/api/categories` + `/api/subcategories` + `/api/sub-subcategories` *(hyphenated)* | Form selects. |
+| `/submit` | `useQuery` | GET | `/api/resources/check-url?url=…` (debounced) | URL deduplication check. |
 | `/submit` | `useMutation` | POST | `/api/resources` | Submit new resource. |
 | `/journeys` | `useQuery` | GET | `/api/journeys` | List learning journeys. |
 | `/journey/:id` | `useQuery` | GET | `/api/journeys/:id` | Journey details + steps. |
-| `/journey/:id` | `useMutation` | POST | `/api/user/journeys/:id/start` | Enroll. |
-| `/journey/:id` | `useMutation` | POST | `/api/user/journeys/:id/steps/:sid` | Complete step. |
+| `/journey/:id` | `useMutation` | POST | `/api/journeys/:id/start` | Enroll in journey. |
+| `/journey/:id` | `useMutation` | PUT | `/api/journeys/:id/progress` (body: `{stepId}`) | Mark step complete. |
 | `/profile` | `useQuery` | GET | `/api/favorites` | User favorites. |
 | `/profile` | `useQuery` | GET | `/api/bookmarks` | User bookmarks. |
 | `/profile` | `useQuery` | GET | `/api/user/progress` | Learning stats. |
 | `/profile` | `useQuery` | GET | `/api/user/submissions` | Resources user submitted. |
 | `/profile` | `useQuery` | GET | `/api/user/journeys` | Enrolled journeys. |
 | `/profile` | `useQuery` | GET | `/api/recommendations` | AI suggestions. |
-| `/profile` | `useMutation` | POST | `/api/auth/logout` | Logout (via `useAuth`). |
+| `/profile` *(and any page using `useAuth().logout`)* | `fetch` POST | `/api/auth/logout` (then invalidates `/api/auth/user` and hard-redirects to `/`) | Logout via `useAuth` hook. |
 | `/bookmarks` | `useQuery` | GET | `/api/bookmarks` | User bookmarks list. |
 | `/admin` → `AdminStats` | `useQuery` (via `useAdmin`) | GET | `/api/admin/stats` | Dashboard counters (driving badge counts). |
 | `/admin` → `#approvals` (PendingResources) | `useQuery` | GET | `/api/admin/resources/pending` | Pending list. |
