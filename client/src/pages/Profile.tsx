@@ -211,16 +211,30 @@ export default function Profile({ user }: ProfileProps) {
     <div className="container mx-auto py-8 px-4 max-w-6xl">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-center gap-6 mb-8">
-        <Avatar className="h-24 w-24 border-2 border-primary">
+        <Avatar
+          className="h-24 w-24 ring-1"
+          style={{
+            boxShadow: '0 0 0 1px color-mix(in srgb, var(--accent) 40%, transparent)',
+          }}
+        >
           <AvatarImage src={user.avatar} alt={user.name} />
-          <AvatarFallback className="text-xl bg-gradient-to-br from-primary to-primary/80 text-white">
+          <AvatarFallback
+            className="text-xl font-display font-medium tracking-tight"
+            style={{
+              background: 'color-mix(in srgb, var(--accent) 14%, transparent)',
+              color: 'var(--accent)',
+            }}
+          >
             {getInitials(user.name)}
           </AvatarFallback>
         </Avatar>
-        
+
         <div className="flex-1 text-center sm:text-left">
-          <h1 className="text-3xl font-bold mb-2">{user.name || "User"}</h1>
-          <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground justify-center sm:justify-start">
+          <div className="eyebrow mb-2" aria-hidden>// Profile</div>
+          <h1 className="font-display text-3xl sm:text-4xl font-medium tracking-tight mb-2">
+            {user.name || "User"}
+          </h1>
+          <div className="flex flex-wrap items-center gap-4 text-sm justify-center sm:justify-start" style={{ color: 'var(--text-2)' }}>
             {user.email && (
               <span className="flex items-center gap-1">
                 <Mail className="h-4 w-4" />
@@ -234,7 +248,7 @@ export default function Profile({ user }: ProfileProps) {
               </span>
             )}
             {progress?.skillLevel && (
-              <Badge variant="secondary" className="capitalize">
+              <Badge variant="chip" className="capitalize">
                 {progress.skillLevel}
               </Badge>
             )}
@@ -273,7 +287,7 @@ export default function Profile({ user }: ProfileProps) {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-4 h-auto p-1">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="favorites">Favorites</TabsTrigger>
           <TabsTrigger value="bookmarks">Bookmarks</TabsTrigger>
@@ -309,11 +323,15 @@ export default function Profile({ user }: ProfileProps) {
                         {progress?.completedResources || 0} / {progress?.totalResources || 0}
                       </span>
                     </div>
-                    <div className="h-2 bg-muted rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-gradient-to-r from-primary to-primary/80 transition-all"
+                    <div
+                      className="h-2 rounded-full overflow-hidden"
+                      style={{ background: 'var(--surface-2)' }}
+                    >
+                      <div
+                        className="h-full transition-[width] duration-[var(--motion-base)] ease-[var(--motion-ease)]"
                         style={{
-                          width: `${((progress?.completedResources || 0) / (progress?.totalResources || 1)) * 100}%`
+                          width: `${((progress?.completedResources || 0) / (progress?.totalResources || 1)) * 100}%`,
+                          background: 'var(--accent)',
                         }}
                       />
                     </div>

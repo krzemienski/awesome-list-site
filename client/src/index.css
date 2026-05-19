@@ -51,6 +51,9 @@
   --font-sans: var(--font-body);
   --font-mono: var(--font-mono);
   --font-serif: var(--font-display);
+  /* Editorial alias: enable `font-display` / `font-body` Tailwind utilities. */
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
 
   /* Radius ladder — Editorial uses 8px / 12px (no longer collapsed). */
   --radius-sm: var(--radius-sm);

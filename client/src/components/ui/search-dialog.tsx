@@ -101,7 +101,10 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Search Resources</DialogTitle>
+          <div className="eyebrow" aria-hidden>// Search</div>
+          <DialogTitle className="font-display text-2xl font-medium tracking-tight">
+            Find <em className="not-italic" style={{ fontStyle: 'italic', color: 'var(--accent)' }}>resources</em>
+          </DialogTitle>
           <DialogDescription>
             Find packages, libraries, and tools in the awesome list.
           </DialogDescription>
@@ -185,11 +188,20 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
           </CommandList>
         </Command>
         
-        <DialogFooter>
-          <Button
-            variant="secondary"
-            onClick={() => setIsOpen(false)}
+        <DialogFooter className="flex items-center justify-between sm:justify-between gap-2">
+          <div
+            className="hidden sm:flex items-center gap-2 text-[10px] uppercase tracking-[0.18em]"
+            style={{ color: 'var(--text-2)', fontFamily: 'var(--font-mono)' }}
           >
+            <kbd
+              className="px-1.5 py-0.5 rounded border"
+              style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
+            >
+              esc
+            </kbd>
+            <span>to close</span>
+          </div>
+          <Button variant="secondary" onClick={() => setIsOpen(false)}>
             Cancel
           </Button>
         </DialogFooter>

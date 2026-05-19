@@ -109,13 +109,14 @@ export default function Bookmarks() {
       />
       
       <div className="space-y-2">
+        <div className="eyebrow" aria-hidden>// Saved</div>
         <div className="flex items-center gap-3">
-          <Bookmark className="h-8 w-8 text-primary" />
-          <h1 className="text-3xl font-bold tracking-tight">
-            My Bookmarks
+          <Bookmark className="h-8 w-8" style={{ color: 'var(--accent)' }} />
+          <h1 className="font-display text-3xl sm:text-4xl font-medium tracking-tight">
+            My <em className="not-italic" style={{ fontStyle: 'italic', color: 'var(--accent)' }}>Bookmarks</em>
           </h1>
         </div>
-        <p className="text-muted-foreground">
+        <p style={{ color: 'var(--text-2)' }}>
           {hasBookmarks
             ? `You have ${sortedBookmarks.length} saved ${sortedBookmarks.length === 1 ? 'resource' : 'resources'}`
             : 'Start bookmarking resources to build your personal collection'
@@ -155,21 +156,22 @@ export default function Bookmarks() {
           ))}
         </div>
       ) : (
-        <Card className="border-2 border-dashed border-primary/30 bg-primary/5">
+        <Card>
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="rounded-full bg-primary/10 p-6 mb-6">
-              <BookmarkX className="h-12 w-12 text-primary" />
+            <div
+              className="rounded-full p-6 mb-6"
+              style={{ background: 'color-mix(in srgb, var(--accent) 12%, transparent)' }}
+            >
+              <BookmarkX className="h-12 w-12" style={{ color: 'var(--accent)' }} />
             </div>
-            <h2 className="text-2xl font-bold mb-3 text-primary">No Bookmarks Yet</h2>
-            <p className="text-muted-foreground max-w-md mb-6">
-              Start exploring resources and bookmark the ones you want to save for later. 
+            <h2 className="font-display text-2xl font-medium tracking-tight mb-3">
+              No <em className="not-italic" style={{ fontStyle: 'italic', color: 'var(--accent)' }}>Bookmarks</em> Yet
+            </h2>
+            <p className="max-w-md mb-6" style={{ color: 'var(--text-2)' }}>
+              Start exploring resources and bookmark the ones you want to save for later.
               Click the bookmark icon on any resource card to add it to your collection.
             </p>
-            <Button
-              className="bg-primary text-white hover:bg-primary/90"
-              data-testid="link-explore-resources"
-              asChild
-            >
+            <Button data-testid="link-explore-resources" asChild>
               <Link href="/">
                 Explore Resources
               </Link>

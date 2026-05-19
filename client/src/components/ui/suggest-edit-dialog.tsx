@@ -321,24 +321,29 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Login Required</DialogTitle>
+            <div className="eyebrow" aria-hidden>// Auth required</div>
+            <DialogTitle className="font-display text-2xl font-medium tracking-tight">
+              Login <em className="not-italic" style={{ fontStyle: 'italic', color: 'var(--accent)' }}>required</em>
+            </DialogTitle>
             <DialogDescription>
               Please log in to suggest edits for this resource. This helps us maintain the quality of our curated list and track contributions.
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-4 py-4">
-            <div className="bg-muted p-4 border border-border">
-              <p className="text-sm text-muted-foreground mb-4">
-                We value your input! Once logged in, you can propose updates to titles, descriptions, categories, and more.
-              </p>
-              <Button 
-                className="w-full" 
-                onClick={() => window.location.href = "/auth"}
-                data-testid="button-login-redirect"
-              >
-                Go to Login
-              </Button>
-            </div>
+            <Card>
+              <CardContent className="p-4">
+                <p className="text-sm mb-4" style={{ color: 'var(--text-2)' }}>
+                  We value your input! Once logged in, you can propose updates to titles, descriptions, categories, and more.
+                </p>
+                <Button
+                  className="w-full"
+                  onClick={() => window.location.href = "/auth"}
+                  data-testid="button-login-redirect"
+                >
+                  Go to Login
+                </Button>
+              </CardContent>
+            </Card>
           </div>
           <DialogFooter>
             <Button variant="ghost" onClick={() => onOpenChange(false)}>
@@ -354,7 +359,13 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Suggest Edit for "{resource.title}"</DialogTitle>
+          <div className="eyebrow" aria-hidden>// Suggest edit</div>
+          <DialogTitle className="font-display text-2xl font-medium tracking-tight">
+            Suggest <em className="not-italic" style={{ fontStyle: 'italic', color: 'var(--accent)' }}>edit</em>
+            <span className="block text-sm font-body font-normal mt-1" style={{ color: 'var(--text-2)' }}>
+              for “{resource.title}”
+            </span>
+          </DialogTitle>
           <DialogDescription>
             Propose changes to this resource. Your suggestions will be reviewed by admins.
           </DialogDescription>
