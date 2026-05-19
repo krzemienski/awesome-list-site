@@ -66,7 +66,7 @@ export default function ThemeSettings() {
               >
                 SYSTEM:
               </span>{" "}
-              <span style={{ color: "var(--accent)" }}>Terminal</span>{" "}
+              <span style={{ color: "var(--accent)" }}>Editorial</span>{" "}
               <span style={{ color: "var(--text-3)" }}>·</span>{" "}
               <span
                 className="mono"
@@ -190,7 +190,7 @@ export default function ThemeSettings() {
           }}
         >
           The accent updates live and persists across reloads
-          (<code>localStorage["ds-accent"]</code>). The Terminal system is the
+          (<code>localStorage["ds-accent"]</code>). The Editorial system is the
           only DS skin shipped (Option A).
         </p>
       </section>

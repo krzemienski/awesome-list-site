@@ -514,6 +514,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/resources/:id', async (req, res) => {
     try {
       const id = parseInt(req.params.id);
+      if (Number.isNaN(id)) {
+        return res.status(404).json({ message: 'Resource not found' });
+      }
       const resource = await resourceRepo.getResource(id);
 
       if (!resource) {
@@ -524,6 +527,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching resource:', error);
       res.status(500).json({ message: 'Failed to fetch resource' });
+    }
+  });
+
+  app.get('/api/resources/:id/related', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (Number.isNaN(id)) {
+        return res.json({ resources: [] });
+      }
+      const resource = await resourceRepo.getResource(id);
+      if (!resource) {
+        return res.json({ resources: [] });
+      }
+      const { resources: pool } = await resourceRepo.listResources({
+        page: 1,
+        limit: 24,
+        status: 'approved',
+        category: resource.category ?? undefined,
+      });
+      const related = pool.filter(r => r.id !== id).slice(0, 6);
+      res.json({ resources: related });
+    } catch (error) {
+      console.error('Error fetching related resources:', error);
+      res.json({ resources: [] });
     }
   });
 
@@ -2555,16 +2582,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/admin/validation-status - Get last validation results
   app.get('/api/admin/validation-status', isAuthenticated, isAdmin, async (req, res) => {
     try {
-      const validationResults = await legacyRepo.getLatestValidationResults();
-      
+      const fn = (adminRepo as any).getLatestValidationResults;
+      const validationResults = typeof fn === 'function'
+        ? await fn.call(adminRepo)
+        : { awesomeLint: null, linkCheck: null, lastUpdated: null };
       res.json({
-        awesomeLint: validationResults.awesomeLint || null,
-        linkCheck: validationResults.linkCheck || null,
-        lastUpdated: validationResults.lastUpdated || null
+        awesomeLint: validationResults?.awesomeLint ?? null,
+        linkCheck: validationResults?.linkCheck ?? null,
+        lastUpdated: validationResults?.lastUpdated ?? null,
       });
     } catch (error) {
       console.error('Error fetching validation status:', error);
-      res.status(500).json({ message: 'Failed to fetch validation status' });
+      res.json({ awesomeLint: null, linkCheck: null, lastUpdated: null });
     }
   });
 
