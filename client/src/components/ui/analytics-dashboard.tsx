@@ -491,7 +491,7 @@ export default function AnalyticsDashboard({
                               <div className="text-sm text-muted-foreground">{term.count} searches</div>
                             </div>
                             <div className={`text-sm font-medium ${
-                              term.growth > 0 ? 'text-green-600' : term.growth < 0 ? 'text-red-600' : 'text-gray-600'
+                              term.growth > 0 ? 'text-green-500' : term.growth < 0 ? 'text-red-500' : 'text-[var(--text-2)]'
                             }`}>
                               {term.growth > 0 ? '+' : ''}{term.growth}%
                             </div>

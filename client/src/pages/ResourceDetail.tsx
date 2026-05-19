@@ -315,7 +315,7 @@ export default function ResourceDetail() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <Card className="border-primary/20 bg-card overflow-hidden">
+          <Card className="overflow-hidden">
             {hasOgImage && (
               <div className="relative w-full h-48 md:h-64 overflow-hidden bg-gradient-to-b from-primary/10 to-transparent">
                 {metadata.ogImageBlurhash && !imageLoaded && (
@@ -396,7 +396,7 @@ export default function ResourceDetail() {
                   </div>
                   
                   <Button
-                    className="bg-primary hover:bg-primary/90 flex-shrink-0 min-h-[44px]"
+                    className="flex-shrink-0 min-h-[44px]"
                     onClick={handleVisitResource}
                     data-testid="button-visit"
                   >
@@ -516,7 +516,7 @@ export default function ResourceDetail() {
         </div>
 
         <div className="space-y-6">
-          <Card className="border-primary/20 bg-card">
+          <Card>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <ExternalLink className="h-4 w-4 text-primary" />
@@ -525,7 +525,7 @@ export default function ResourceDetail() {
             </CardHeader>
             <CardContent className="space-y-3">
               <Button 
-                className="w-full bg-primary hover:bg-primary/90 min-h-[44px]" 
+                className="w-full min-h-[44px]" 
                 onClick={handleVisitResource}
               >
                 <ExternalLink className="h-4 w-4 mr-2" />
@@ -565,7 +565,7 @@ export default function ResourceDetail() {
           </Card>
 
           {filteredRelatedResources.length > 0 && (
-            <Card className="border-primary/20 bg-card">
+            <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <FolderTree className="h-4 w-4 text-primary" />
@@ -632,7 +632,7 @@ export default function ResourceDetail() {
           )}
 
           {scrapedTitle && (
-            <Card className="border-border bg-card/50">
+            <Card className="bg-[var(--surface-2)]">
               <CardHeader>
                 <CardTitle className="text-sm flex items-center gap-2 text-muted-foreground">
                   <ImageIcon className="h-4 w-4" />

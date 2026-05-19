@@ -259,7 +259,7 @@ export default function SubmitResource() {
             <CardContent className="flex flex-col gap-4">
               <Button 
                 onClick={() => window.location.href = '/api/login'}
-                className="w-full bg-primary hover:bg-primary/90"
+                className="w-full"
                 data-testid="button-login"
               >
                 <LogIn className="mr-2 h-4 w-4" />
@@ -532,7 +532,7 @@ export default function SubmitResource() {
                   <Button
                     type="submit"
                     disabled={submitMutation.isPending}
-                    className="flex-1 bg-primary hover:bg-primary/90"
+                    className="flex-1"
                     data-testid="button-submit"
                   >
                     {submitMutation.isPending ? (
