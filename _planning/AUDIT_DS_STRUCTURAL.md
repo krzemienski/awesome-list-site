@@ -124,73 +124,144 @@ These are project-level documentation gaps surfaced by the audit, separated from
 
 ## Appendix · Raw `rg` output (Stage 5 hardcoded-value sweep)
 
-> Lines below are the verbatim `rg -nH … client/src -g '!**/design-system.css' -g '!**/design-system.ts'` matches. A handful of multi-line `<Area>`/`<Line>`/`<Bar>` recharts blocks (analytics-dashboard.tsx :360-361, :386, :535-544) and the `export-tools.tsx :180-187` HTML-string block are grouped on single summary lines for readability; the underlying line numbers are preserved so anyone can `sed -n 'A,Bp'` to retrieve the full text. All other lines are verbatim.
+All output below is verbatim stdout from the listed `rg` commands as executed from the repo root. No lines were rewritten, grouped, or paraphrased. Every match cited in the findings above traces 1:1 to a line in this appendix.
 
-### Hex literals in `client/src` (excluding `design-system.css` / `design-system.ts`)
-```
-client/src/index.css:25:  --color-primary-foreground: #000000;
-client/src/index.css:32:  --color-destructive: #ff5c7a;
-client/src/index.css:33:  --color-destructive-foreground: #000000;
-client/src/index.css:38:  --color-chart-2: #34d08c;
-client/src/index.css:39:  --color-chart-3: #5eddf2;
-client/src/index.css:40:  --color-chart-4: #ffb84d;
-client/src/index.css:41:  --color-chart-5: #9d4edd;
-client/src/index.css:45:  --color-sidebar-primary-foreground: #000000;
-client/src/pages/ThemeSettings.tsx:99:            const primary = preset.dark?.primary || preset.light?.primary || "#000";
-client/src/pages/ThemeSettings.tsx:100:            const secondary = preset.dark?.secondary || preset.light?.secondary || "#444";
-client/src/pages/ThemeSettings.tsx:101:            const accent = preset.dark?.accent || preset.light?.accent || "#888";
-client/src/pages/Login.tsx:209:            <p className="text-[color:var(--warn,#ffb84d)]">
-client/src/lib/shadcn-themes.ts:16: preview: { bg: "#000000", sidebar: "#0a0a0a", accent: "#ff003c", text: "#ffffff", secondary: "#1a1a2e" }
-client/src/lib/shadcn-themes.ts:50: preview: { bg: "#09090b", sidebar: "#0a0a0a", accent: "#65a30d", text: "#fafafa", secondary: "#1c1c22" }
-client/src/lib/shadcn-themes.ts:84: preview: { bg: "#09090b", sidebar: "#0a0a0a", accent: "#ec4899", text: "#fafafa", secondary: "#1c1c22" }
-client/src/lib/shadcn-themes.ts:118: preview: { bg: "#0c0a09", sidebar: "#1c1917", accent: "#f472b6", text: "#fafaf9", secondary: "#292524" }
-client/src/lib/shadcn-themes.ts:152: preview: { bg: "#09090b", sidebar: "#0f0f23", accent: "#a855f7", text: "#fafafa", secondary: "#1e1b4b" }
-client/src/lib/shadcn-themes.ts:186: preview: { bg: "#0c0a09", sidebar: "#1c1917", accent: "#8b5cf6", text: "#fafaf9", secondary: "#292524" }
-client/src/lib/shadcn-themes.ts:286: preview: { bg: "#0a0a0a", sidebar: "#0a0a0a", accent: hex, text: "#fafafa", secondary: "#1c1c22" }
-client/src/lib/shadcn-themes.ts:335: preview: { bg: "#0a0a0a", sidebar: "#0a0a0a", accent: hex, text: "#fafafa", secondary: "#1c1c22" }
-client/src/components/admin/LinkHealthDashboard.tsx:345:                  stroke="#22c55e"
-client/src/components/admin/LinkHealthDashboard.tsx:352:                  stroke="#ef4444"
-client/src/components/admin/LinkHealthDashboard.tsx:359:                  stroke="#eab308"
-client/src/components/admin/LinkHealthDashboard.tsx:366:                  stroke="#f97316"
-client/src/components/layout/SEOHead.tsx:87:      <meta name="theme-color" content="#dc2626" />
-client/src/components/layout/SEOHead.tsx:88:      <meta name="msapplication-TileColor" content="#dc2626" />
-client/src/components/ui/theme-provider.tsx:59:      const hex = safeGetItem("theme-custom-hex") || "#3b82f6";
-client/src/components/ui/analytics-dashboard.tsx:65:  '#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6',
-client/src/components/ui/analytics-dashboard.tsx:66:  '#06b6d4', '#84cc16', '#f97316', '#ec4899', '#6366f1'
-client/src/components/ui/analytics-dashboard.tsx:360: <Area type="monotone" dataKey="views" stackId="1" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} />
-client/src/components/ui/analytics-dashboard.tsx:361: <Area type="monotone" dataKey="clicks" stackId="1" stroke="#10b981" fill="#10b981" fillOpacity={0.3} />
-client/src/components/ui/analytics-dashboard.tsx:386: <Bar dataKey="usage" fill="#8b5cf6" />
-client/src/components/ui/analytics-dashboard.tsx:535-544: <Line stroke="#3b82f6" dot={{ fill: '#3b82f6' }} … stroke="#10b981" dot={{ fill: '#10b981' }} />
-client/src/components/ui/color-palette-generator.tsx:397: value={options.baseColor || "#3b82f6"}
-client/src/components/ui/color-palette-generator.tsx:587: color: selectedPalette.colors[4] || '#ffffff'
-client/src/components/ui/export-tools.tsx:180-187: (HTML export template literal: #333,#666,#eee,#007acc,#f9f9f9,#e1e8ed,#999)
-client/src/components/ui/micro-interactions.tsx:232: color: isBookmarked ? "#fbbf24" : "currentColor"
-client/src/components/ui/micro-interactions.tsx:234: color: isBookmarked ? "#fbbf24" : "currentColor"
-client/src/components/ui/chart.tsx:55: (recharts attribute-selector strings: [stroke='#ccc'], [stroke='#fff'])
+### Command 1 · Hex literals in `client/src` (excluding DS files)
+
+```sh
+rg -nH '#[0-9a-fA-F]{3,8}\b' client/src \
+  -g '*.css' -g '*.ts' -g '*.tsx' -g '*.jsx' -g '*.js' \
+  -g '!**/design-system.css' -g '!**/design-system.ts'
 ```
 
-### Hardcoded `font-family: '…'` outside DS files
 ```
-(none found)
+client/src/index.css
+25:  --color-primary-foreground: #000000;
+32:  --color-destructive: #ff5c7a;
+33:  --color-destructive-foreground: #000000;
+38:  --color-chart-2: #34d08c;
+39:  --color-chart-3: #5eddf2;
+40:  --color-chart-4: #ffb84d;
+41:  --color-chart-5: #9d4edd;
+45:  --color-sidebar-primary-foreground: #000000;
+
+client/src/pages/ThemeSettings.tsx
+99:            const primary = preset.dark?.primary || preset.light?.primary || "#000";
+100:            const secondary = preset.dark?.secondary || preset.light?.secondary || "#444";
+101:            const accent = preset.dark?.accent || preset.light?.accent || "#888";
+
+client/src/lib/shadcn-themes.ts
+16:    preview: { bg: "#000000", sidebar: "#0a0a0a", accent: "#ff003c", text: "#ffffff", secondary: "#1a1a2e" },
+50:    preview: { bg: "#09090b", sidebar: "#0a0a0a", accent: "#65a30d", text: "#fafafa", secondary: "#1c1c22" },
+84:    preview: { bg: "#09090b", sidebar: "#0a0a0a", accent: "#ec4899", text: "#fafafa", secondary: "#1c1c22" },
+118:    preview: { bg: "#0c0a09", sidebar: "#1c1917", accent: "#f472b6", text: "#fafaf9", secondary: "#292524" },
+152:    preview: { bg: "#09090b", sidebar: "#0f0f23", accent: "#a855f7", text: "#fafafa", secondary: "#1e1b4b" },
+186:    preview: { bg: "#0c0a09", sidebar: "#1c1917", accent: "#f472b6", text: "#fafaf9", secondary: "#292524" },
+286:    preview: { bg: "#0a0a0a", sidebar: "#0a0a0a", accent: hex, text: "#fafafa", secondary: "#1c1c22" },
+335:    preview: { bg: "#0a0a0a", sidebar: "#0a0a0a", accent: hex, text: "#fafafa", secondary: "#1c1c22" },
+
+client/src/pages/Login.tsx
+209:            <p className="text-[color:var(--warn,#ffb84d)]">
+
+client/src/components/ui/theme-provider.tsx
+59:      const hex = safeGetItem("theme-custom-hex") || "#3b82f6";
+
+client/src/components/ui/analytics-dashboard.tsx
+65:  '#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6',
+66:  '#06b6d4', '#84cc16', '#f97316', '#ec4899', '#6366f1'
+360:                      <Area type="monotone" dataKey="views" stackId="1" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} />
+361:                      <Area type="monotone" dataKey="clicks" stackId="1" stroke="#10b981" fill="#10b981" fillOpacity={0.3} />
+386:                    <Bar dataKey="usage" fill="#8b5cf6" />
+535:                      stroke="#3b82f6" 
+537:                      dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
+542:                      stroke="#10b981" 
+544:                      dot={{ fill: '#10b981', strokeWidth: 2, r: 4 }}
+
+client/src/components/layout/SEOHead.tsx
+87:      <meta name="theme-color" content="#dc2626" />
+88:      <meta name="msapplication-TileColor" content="#dc2626" />
+
+client/src/components/ui/color-palette-generator.tsx
+397:                      value={options.baseColor || "#3b82f6"}
+587:                      color: selectedPalette.colors[4] || '#ffffff'
+
+client/src/components/admin/LinkHealthDashboard.tsx
+345:                  stroke="#22c55e"
+352:                  stroke="#ef4444"
+359:                  stroke="#eab308"
+366:                  stroke="#f97316"
+
+client/src/components/ui/export-tools.tsx
+180:        h1 { color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+181:        h2 { color: #666; margin-top: 30px; }
+182:        .resource { margin-bottom: 10px; padding: 10px; border-left: 3px solid #007acc; background: #f9f9f9; }
+184:        .resource-description { color: #666; margin-bottom: 5px; }
+186:        .tag { background: #e1e8ed; padding: 2px 6px; border-radius: 3px; font-size: 12px; margin-right: 5px; }
+187:        .footer { margin-top: 40px; text-align: center; color: #999; font-size: 14px; }
+
+client/src/components/ui/micro-interactions.tsx
+232:                animate={prefersReducedMotion ? { color: isBookmarked ? "#fbbf24" : "currentColor" } : {
+234:                  color: isBookmarked ? "#fbbf24" : "currentColor"
+
+client/src/components/ui/chart.tsx
+55:          "flex aspect-video justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-sector]:outline-none [&_.recharts-surface]:outline-none",
 ```
 
-### Hardcoded `border-radius: <N>px` outside DS files
-```
-client/src/styles/scrolling-fix.css:45:  border-radius: 3px;
-client/src/components/ui/export-tools.tsx:186:  border-radius: 3px;   (inside HTML export template — DS-OK)
+### Command 2 · Hardcoded `font-family: '…'` outside DS files
+
+```sh
+rg -nH "font-family:\s*['\"]" client/src \
+  -g '*.css' -g '*.ts' -g '*.tsx' -g '*.jsx' -g '*.js' \
+  -g '!**/design-system.css' -g '!**/design-system.ts'
 ```
 
-### Inline `style={{…}}` with hex literals in JSX
 ```
-(none found)
-```
-
-### `rgba(255,255,255,…)` (whiteish hardcodes) outside DS files
-```
-(none found)
+(no matches)
 ```
 
-### Skin-block selector count
+### Command 3 · Hardcoded `border-radius: <N>px` outside DS files
+
+```sh
+rg -nH 'border-radius:\s*\d+px' client/src \
+  -g '*.css' -g '*.ts' -g '*.tsx' -g '*.jsx' -g '*.js' \
+  -g '!**/design-system.css'
 ```
-client/src/styles/design-system.css: 55  ([data-system="editorial|terminal|geist|brutalist|swiss"] selectors)
+
+```
+client/src/styles/scrolling-fix.css
+45:  border-radius: 3px;
+
+client/src/components/ui/export-tools.tsx
+186:        .tag { background: #e1e8ed; padding: 2px 6px; border-radius: 3px; font-size: 12px; margin-right: 5px; }
+```
+
+### Command 4 · Inline `style={{…}}` with hex literals in JSX
+
+```sh
+rg -nH 'style=\{\{[^}]*#[0-9a-fA-F]{3,6}' client/src
+```
+
+```
+(no matches)
+```
+
+### Command 5 · `rgba(255,255,255,…)` (whiteish hardcodes) outside DS files
+
+```sh
+rg -nH 'rgba\(\s*255\s*,\s*255\s*,\s*255' client/src \
+  -g '!**/design-system.css' -g '!**/design-system.ts'
+```
+
+```
+(no matches)
+```
+
+### Command 6 · Per-system skin-block selector count
+
+```sh
+rg -c '\[data-system=' client/src/styles/design-system.css
+```
+
+```
+55
 ```
