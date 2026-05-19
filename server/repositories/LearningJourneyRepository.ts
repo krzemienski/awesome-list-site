@@ -55,6 +55,67 @@ export class LearningJourneyRepository {
   }
 
   /**
+   * List all learning journeys regardless of status (admin use).
+   * Orders by orderIndex then id so unset orderIndex values are stable.
+   */
+  async listAllLearningJourneys(): Promise<LearningJourney[]> {
+    return await db
+      .select()
+      .from(learningJourneys)
+      .orderBy(asc(learningJourneys.orderIndex), asc(learningJourneys.id));
+  }
+
+  /**
+   * Reorder steps for a journey.
+   * Accepts an array of step IDs in their new order and rewrites
+   * the stepNumber on each one (1-based). Performs the update inside
+   * a single transaction so partial reorders cannot leak.
+   *
+   * @param journeyId - Journey owning the steps
+   * @param orderedStepIds - Step IDs in their new desired order
+   * @returns The journey's steps after reordering
+   */
+  async reorderJourneySteps(
+    journeyId: number,
+    orderedStepIds: number[],
+  ): Promise<JourneyStep[]> {
+    if (orderedStepIds.length === 0) {
+      return this.listJourneySteps(journeyId);
+    }
+
+    // Verify every id belongs to this journey before touching anything.
+    const existing = await db
+      .select()
+      .from(journeySteps)
+      .where(eq(journeySteps.journeyId, journeyId));
+    const existingIds = new Set(existing.map((s) => s.id));
+    for (const id of orderedStepIds) {
+      if (!existingIds.has(id)) {
+        throw new Error(`Step ${id} does not belong to journey ${journeyId}`);
+      }
+    }
+
+    await db.transaction(async (tx) => {
+      // Two-phase update to avoid temporary uniqueness collisions if a
+      // future migration adds a unique constraint on (journeyId, stepNumber).
+      for (let i = 0; i < orderedStepIds.length; i++) {
+        await tx
+          .update(journeySteps)
+          .set({ stepNumber: -(i + 1) })
+          .where(eq(journeySteps.id, orderedStepIds[i]));
+      }
+      for (let i = 0; i < orderedStepIds.length; i++) {
+        await tx
+          .update(journeySteps)
+          .set({ stepNumber: i + 1 })
+          .where(eq(journeySteps.id, orderedStepIds[i]));
+      }
+    });
+
+    return this.listJourneySteps(journeyId);
+  }
+
+  /**
    * Get a learning journey by its ID
    * @param id - Journey ID
    * @returns Journey object or undefined if not found

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Shield, Link, Sparkles, Brain } from "lucide-react";
+import { Shield, Link, Sparkles, Brain, ListOrdered } from "lucide-react";
 import { useAdmin } from "@/hooks/useAdmin";
 import AdminStats from "@/components/admin/AdminStats";
 import ExportTab from "@/components/admin/ExportTab";
@@ -18,6 +18,7 @@ import CategoryManager from "@/components/admin/CategoryManager";
 import SubcategoryManager from "@/components/admin/SubcategoryManager";
 import SubSubcategoryManager from "@/components/admin/SubSubcategoryManager";
 import ResearcherTab from "@/components/admin/ResearcherTab";
+import JourneyStepsManager from "@/components/admin/JourneyStepsManager";
 export default function AdminDashboard() {
   const { stats, isLoading, error } = useAdmin();
 
@@ -97,6 +98,10 @@ export default function AdminDashboard() {
             <TabsTrigger value="categories" className="whitespace-nowrap" data-testid="tab-categories">Categories</TabsTrigger>
             <TabsTrigger value="subcategories" className="whitespace-nowrap" data-testid="tab-subcategories">Subcategories</TabsTrigger>
             <TabsTrigger value="subsubcategories" className="whitespace-nowrap" data-testid="tab-subsubcategories">Sub-Subcats</TabsTrigger>
+            <TabsTrigger value="journeys" className="whitespace-nowrap" data-testid="tab-journeys">
+              <ListOrdered className="h-4 w-4 mr-1" />
+              Journeys
+            </TabsTrigger>
             <TabsTrigger value="users" className="whitespace-nowrap">Users</TabsTrigger>
             <TabsTrigger value="github" className="whitespace-nowrap">GitHub</TabsTrigger>
             <TabsTrigger value="linkhealth" className="whitespace-nowrap">
@@ -145,6 +150,10 @@ export default function AdminDashboard() {
 
         <TabsContent value="subsubcategories" data-testid="content-subsubcategories">
           <SubSubcategoryManager />
+        </TabsContent>
+
+        <TabsContent value="journeys" data-testid="content-journeys">
+          <JourneyStepsManager />
         </TabsContent>
 
         <TabsContent value="users">
