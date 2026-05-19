@@ -1,0 +1,312 @@
+{
+  "applierReady": true,
+  "applierError": null,
+  "probe": {
+    "probe": {
+      "--bg": "#000000",
+      "--bg-2": "#040404",
+      "--surface": "rgba(0,255,136,0.012)",
+      "--surface-2": "rgba(0,255,136,0.025)",
+      "--surface-3": "rgba(0,255,136,0.05)",
+      "--grain-opacity": "0.5",
+      "--border": "rgba(232,232,224,0.14)",
+      "--border-strong": "rgba(232,232,224,0.32)",
+      "--hairline": "rgba(232,232,224,0.08)",
+      "--border-w": "1px",
+      "--hairline-w": "1px",
+      "--text": "#e8e8e0",
+      "--text-2": "rgba(232,232,224,0.62)",
+      "--text-3": "rgba(232,232,224,0.36)",
+      "--text-4": "rgba(232,232,224,0.2)",
+      "--font-body": "'IBM Plex Mono', ui-monospace, monospace",
+      "--font-display": "'IBM Plex Mono', ui-monospace, monospace",
+      "--font-mono": "'IBM Plex Mono', ui-monospace, monospace",
+      "--display-weight": "600",
+      "--display-tracking": "-0.01em",
+      "--display-leading": "1.1",
+      "--body-leading": "1.55",
+      "--eyebrow-tracking": "0.2em",
+      "--mono-size-step": "12px",
+      "--radius": "0px",
+      "--radius-sm": "0px",
+      "--radius-pill": "0px",
+      "--shadow-sm": "none",
+      "--shadow": "none",
+      "--shadow-lg": "0 0 0 1px #00ff88, inset 0 0 60px color-mix(in srgb, #00ff88 8%, transparent)",
+      "--shadow-accent": "0 0 0 1px #00ff88, 0 0 24px color-mix(in srgb, #00ff88 30%, transparent)",
+      "--accent": "#00ff88",
+      "--accent-2": "#39ff14",
+      "--bg-atmosphere": "repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(255,255,255,0.018) 2px, rgba(255,255,255,0.018) 3px),radial-gradient(ellipse 800px 600px at 50% 50%, color-mix(in srgb, #00ff88 4%, transparent), transparent 70%)",
+      "data-system": "terminal",
+      "data-accent": "matrix"
+    },
+    "htmlAttrs": {
+      "data-system": "terminal",
+      "data-accent": "matrix",
+      "class": "dark"
+    },
+    "computed": {
+      "body_bg": "rgb(0, 0, 0)",
+      "body_color": "rgb(232, 232, 224)",
+      "body_fontFamily": "\"IBM Plex Mono\", ui-monospace, monospace"
+    }
+  },
+  "conformance": {
+    "results": [
+      {
+        "token": "--bg",
+        "expected": "rgb(0, 0, 0)",
+        "got": "#000000",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--bg-2",
+        "expected": "rgb(4, 4, 4)",
+        "got": "#040404",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--surface",
+        "expected": "rgba(0, 255, 136, 0.012)",
+        "got": "rgba(0,255,136,0.012)",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--surface-2",
+        "expected": "rgba(0, 255, 136, 0.025)",
+        "got": "rgba(0,255,136,0.025)",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--surface-3",
+        "expected": "rgba(0, 255, 136, 0.05)",
+        "got": "rgba(0,255,136,0.05)",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--grain-opacity",
+        "expected": "0.5",
+        "got": "0.5",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--border",
+        "expected": "rgba(232, 232, 224, 0.14)",
+        "got": "rgba(232,232,224,0.14)",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--border-strong",
+        "expected": "rgba(232, 232, 224, 0.32)",
+        "got": "rgba(232,232,224,0.32)",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--hairline",
+        "expected": "rgba(232, 232, 224, 0.08)",
+        "got": "rgba(232,232,224,0.08)",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--border-w",
+        "expected": "1px",
+        "got": "1px",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--hairline-w",
+        "expected": "1px",
+        "got": "1px",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--text",
+        "expected": "rgb(232, 232, 224)",
+        "got": "#e8e8e0",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--text-2",
+        "expected": "rgba(232, 232, 224, 0.62)",
+        "got": "rgba(232,232,224,0.62)",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--text-3",
+        "expected": "rgba(232, 232, 224, 0.36)",
+        "got": "rgba(232,232,224,0.36)",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--text-4",
+        "expected": "rgba(232, 232, 224, 0.2)",
+        "got": "rgba(232,232,224,0.2)",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--font-body",
+        "expected": "IBM Plex Mono",
+        "got": "'IBM Plex Mono', ui-monospace, monospace",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--font-display",
+        "expected": "IBM Plex Mono",
+        "got": "'IBM Plex Mono', ui-monospace, monospace",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--font-mono",
+        "expected": "IBM Plex Mono",
+        "got": "'IBM Plex Mono', ui-monospace, monospace",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--display-weight",
+        "expected": "600",
+        "got": "600",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--display-tracking",
+        "expected": "-0.01em",
+        "got": "-0.01em",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--display-leading",
+        "expected": "1.1",
+        "got": "1.1",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--body-leading",
+        "expected": "1.55",
+        "got": "1.55",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--eyebrow-tracking",
+        "expected": "0.2em",
+        "got": "0.2em",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--mono-size-step",
+        "expected": "12px",
+        "got": "12px",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--radius",
+        "expected": "0px",
+        "got": "0px",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--radius-sm",
+        "expected": "0px",
+        "got": "0px",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--radius-pill",
+        "expected": "0px",
+        "got": "0px",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--shadow-sm",
+        "expected": "none",
+        "got": "none",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--shadow",
+        "expected": "none",
+        "got": "none",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--shadow-lg",
+        "expected": "0 0 0 1px",
+        "got": "0 0 0 1px #00ff88, inset 0 0 60px color-mix(in srgb, #00ff88 8%, transparent)",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--shadow-accent",
+        "expected": "0 0 0 1px",
+        "got": "0 0 0 1px #00ff88, 0 0 24px color-mix(in srgb, #00ff88 30%, transparent)",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--accent",
+        "expected": "rgb(0, 255, 136)",
+        "got": "#00ff88",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--accent-2",
+        "expected": "rgb(57, 255, 20)",
+        "got": "#39ff14",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--bg-atmosphere",
+        "expected": "repeating-linear-gradient",
+        "got": "repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(255,255,255,0.018) 2px, rgba(255,255,255,0.018) 3px),radial-gradient(ellipse 800px 600px at 50% 50%, color-mix(in srgb, #00ff88 4%, transparent), transparent 70%)",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "data-system",
+        "expected": "terminal",
+        "got": "terminal",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "data-accent",
+        "expected": "matrix",
+        "got": "matrix",
+        "pass": true,
+        "reason": ""
+      }
+    ],
+    "pass": 36,
+    "fail": 0
+  }
+}
