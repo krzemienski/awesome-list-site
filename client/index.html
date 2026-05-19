@@ -27,6 +27,69 @@
       })();
     </script>
 
+    <!--
+      Dev-only overlay suppressor.
+      The @replit/vite-plugin-runtime-error-modal plugin forwards server-side
+      Vite HMR WebSocket "Load failed" frames (frequent on mobile cellular)
+      to every connected client, which renders Vite's full-screen
+      <vite-error-overlay> and blocks the UI. The CSS rule in index.css
+      hides the host element, but on mobile Safari the overlay sometimes
+      ships its own inline style that still leaves a tap-blocker. This
+      MutationObserver removes the host element entirely the moment it is
+      inserted, and silences the offending unhandledrejection so the
+      overlay loop does not re-fire. No-op in production builds.
+    -->
+    <script>
+      (function () {
+        try {
+          var isDev = location.hostname.endsWith('.replit.dev') ||
+                      location.hostname === 'localhost' ||
+                      location.hostname.endsWith('.repl.co');
+          if (!isDev) return;
+
+          // Narrow regex: only match the specific Vite/HMR rejection
+          // signatures that drive the overlay loop. Avoid bare "fetch" or
+          // "vite" tokens so real app errors (incl. words like "invite"
+          // or React Query fetch failures) still surface in dev consoles.
+          var noisy = /(?:^|\b)(?:Load failed|Failed to fetch dynamically imported module|WebSocket (?:is closed|connection failed|error)|\[vite\]|vite-hmr|HMR connection lost)(?:\b|$)/i;
+          var stackHit = /\/@vite\/client|\/node_modules\/vite\//;
+
+          window.addEventListener('unhandledrejection', function (e) {
+            var reason = e && e.reason;
+            var msg = (reason && (reason.message || String(reason))) || '';
+            var stack = (reason && reason.stack) || '';
+            if (noisy.test(msg) || stackHit.test(stack)) e.preventDefault();
+          });
+
+          var kill = function (el) {
+            try { el.parentNode && el.parentNode.removeChild(el); } catch (_) {}
+          };
+          var sweep = function () {
+            document.querySelectorAll(
+              'vite-error-overlay, vite-plugin-checker-error-overlay'
+            ).forEach(kill);
+          };
+
+          if (document.body) sweep();
+          new MutationObserver(function (muts) {
+            for (var i = 0; i < muts.length; i++) {
+              var added = muts[i].addedNodes;
+              for (var j = 0; j < added.length; j++) {
+                var n = added[j];
+                if (n.nodeType === 1) {
+                  var tag = n.tagName && n.tagName.toLowerCase();
+                  if (tag === 'vite-error-overlay' ||
+                      tag === 'vite-plugin-checker-error-overlay') {
+                    kill(n);
+                  }
+                }
+              }
+            }
+          }).observe(document.documentElement, { childList: true, subtree: true });
+        } catch (e) {}
+      })();
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />

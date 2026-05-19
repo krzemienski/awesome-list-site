@@ -77,3 +77,17 @@
 }
 
 /* selection rule lives in design-system.css with proper color-mix alpha */
+
+/*
+  Dev-only: suppress Vite's runtime error overlay.
+  On mobile cellular the dev HMR WebSocket frequently disconnects and the
+  @replit/vite-plugin-runtime-error-modal plugin forwards the server-side
+  Receiver "Load failed" through Vite's HMR channel, which renders the
+  full-screen <vite-error-overlay> and blocks the entire UI. The underlying
+  app keeps working — only the dev overlay is in the way.
+  This rule only matches in dev (the custom element does not exist in prod).
+*/
+vite-error-overlay,
+vite-plugin-checker-error-overlay {
+  display: none !important;
+}
