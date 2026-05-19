@@ -139,10 +139,10 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
 
   return (
     <div className="space-y-4">
-      <Card className="border-primary/20 bg-card">
+      <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Download className="h-5 w-5" />
+          <CardTitle className="font-display font-medium tracking-tight flex items-center gap-2">
+            <Download className="h-5 w-5 text-[var(--accent)]" />
             Export Awesome List
           </CardTitle>
           <CardDescription>
@@ -154,7 +154,6 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
             <Button
               onClick={handleExport}
               disabled={isExporting}
-              className="bg-primary hover:bg-primary/90"
             >
               {isExporting ? (
                 <>
@@ -207,7 +206,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
           </div>
 
           {validationStatus?.lastUpdated && (
-            <div className="flex items-center gap-2 text-sm text-gray-400">
+            <div className="flex items-center gap-2 text-sm text-[var(--text-2)]">
               <Clock className="h-4 w-4" />
               Last validated: {new Date(validationStatus.lastUpdated).toLocaleString()}
             </div>
@@ -216,10 +215,10 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
       </Card>
 
       {validationStatus?.awesomeLint && (
-        <Card className="border-primary/20 bg-card">
+        <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileCheck className="h-5 w-5" />
+            <CardTitle className="font-display font-medium tracking-tight flex items-center gap-2">
+              <FileCheck className="h-5 w-5 text-[var(--accent)]" />
               Validation Results
             </CardTitle>
             <CardDescription>
@@ -230,7 +229,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
             <div className="space-y-4">
               <div className="flex items-center gap-4">
                 {validationStatus.awesomeLint.valid ? (
-                  <Badge variant="default" className="bg-green-500">
+                  <Badge variant="default" className="bg-green-600 hover:bg-green-600">
                     <CheckCircle2 className="mr-1 h-3 w-3" />
                     Passed
                   </Badge>
@@ -240,7 +239,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                     Failed
                   </Badge>
                 )}
-                <span className="text-sm text-gray-400">
+                <span className="text-sm text-[var(--text-2)]">
                   {validationStatus.awesomeLint.stats.totalResources} resources,{' '}
                   {validationStatus.awesomeLint.stats.totalCategories} categories
                 </span>
@@ -262,10 +261,10 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                           <div className="flex items-start gap-2">
                             <XCircle className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
                             <div>
-                              <div className="font-mono text-xs text-gray-400">
+                              <div className="font-mono text-xs text-[var(--text-2)]">
                                 Line {error.line}: {error.rule}
                               </div>
-                              <div className="text-gray-300">{error.message}</div>
+                              <div className="text-[var(--text)]">{error.message}</div>
                             </div>
                           </div>
                         </div>
@@ -291,10 +290,10 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                           <div className="flex items-start gap-2">
                             <AlertTriangle className="h-4 w-4 text-yellow-500 mt-0.5 shrink-0" />
                             <div>
-                              <div className="font-mono text-xs text-gray-400">
+                              <div className="font-mono text-xs text-[var(--text-2)]">
                                 Line {warning.line}: {warning.rule}
                               </div>
-                              <div className="text-gray-300">{warning.message}</div>
+                              <div className="text-[var(--text)]">{warning.message}</div>
                             </div>
                           </div>
                         </div>
@@ -309,7 +308,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
       )}
 
       {validationStatus?.linkCheck && (
-        <Card className="border-primary/20 bg-card">
+        <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Link className="h-5 w-5" />
@@ -323,25 +322,25 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                   <div className="text-2xl font-bold text-green-500">
                     {validationStatus.linkCheck.validLinks}
                   </div>
-                  <div className="text-xs text-gray-400">Valid Links</div>
+                  <div className="text-xs text-[var(--text-2)]">Valid Links</div>
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-red-500">
                     {validationStatus.linkCheck.brokenLinks}
                   </div>
-                  <div className="text-xs text-gray-400">Broken Links</div>
+                  <div className="text-xs text-[var(--text-2)]">Broken Links</div>
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-yellow-500">
                     {validationStatus.linkCheck.redirects}
                   </div>
-                  <div className="text-xs text-gray-400">Redirects</div>
+                  <div className="text-xs text-[var(--text-2)]">Redirects</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-gray-500">
+                  <div className="text-2xl font-bold text-[var(--text-2)]">
                     {validationStatus.linkCheck.errors}
                   </div>
-                  <div className="text-xs text-gray-400">Errors</div>
+                  <div className="text-xs text-[var(--text-2)]">Errors</div>
                 </div>
               </div>
 
@@ -354,14 +353,14 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
                   <ScrollArea className="h-64 rounded-md border border-red-500/20">
                     <div className="p-3">
                       {validationStatus.linkCheck.brokenResources.map((link, i) => (
-                        <div key={i} className="mb-3 pb-3 border-b border-gray-800 last:border-0">
+                        <div key={i} className="mb-3 pb-3 border-b border-[var(--border)] last:border-0">
                           <div className="flex items-start gap-2">
                             <XCircle className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
                             <div className="flex-1">
-                              <div className="font-semibold text-sm text-gray-300">
+                              <div className="font-semibold text-sm text-[var(--text)]">
                                 {link.resourceTitle || 'Unknown Resource'}
                               </div>
-                              <div className="text-xs text-gray-400 font-mono break-all">
+                              <div className="text-xs text-[var(--text-2)] font-mono break-all">
                                 {link.url}
                               </div>
                               <div className="text-xs text-red-400 mt-1">
@@ -378,7 +377,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
               )}
 
               {validationStatus.linkCheck.summary && (
-                <div className="text-xs text-gray-400">
+                <div className="text-xs text-[var(--text-2)]">
                   Average response time: {validationStatus.linkCheck.summary.averageResponseTime.toFixed(0)}ms
                 </div>
               )}
@@ -388,12 +387,12 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
       )}
 
       {!validationStatus?.awesomeLint && !validationStatus?.linkCheck && (
-        <Card className="border-primary/20 bg-card">
+        <Card>
           <CardContent className="py-8">
             <div className="text-center">
-              <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-400 mb-2">No validation results yet</p>
-              <p className="text-sm text-gray-500">
+              <AlertCircle className="h-12 w-12 text-[var(--text-2)] mx-auto mb-4" />
+              <p className="text-[var(--text-2)] mb-2">No validation results yet</p>
+              <p className="text-sm text-[var(--text-2)]">
                 Click "Run Validation" above to check the exported markdown against awesome-lint rules
               </p>
             </div>

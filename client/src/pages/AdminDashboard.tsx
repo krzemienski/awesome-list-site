@@ -38,8 +38,8 @@ export default function AdminDashboard() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading admin dashboard...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--accent)] mx-auto mb-4"></div>
+          <p className="text-[var(--text-2)]">Loading admin dashboard...</p>
         </div>
       </div>
     );
@@ -49,8 +49,8 @@ export default function AdminDashboard() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
-          <Shield className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <p className="text-red-500">Error loading admin dashboard</p>
+          <Shield className="h-12 w-12 text-[var(--accent)] mx-auto mb-4" />
+          <p className="text-[var(--accent)]">Error loading admin dashboard</p>
         </div>
       </div>
     );
@@ -58,64 +58,52 @@ export default function AdminDashboard() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-full overflow-x-hidden">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-primary font-mono flex items-center gap-2">
-          <Shield className="h-8 w-8" />
-          Admin Dashboard
+      <div className="mb-8 space-y-3">
+        <div className="eyebrow flex items-center gap-3">
+          <span aria-hidden="true" className="text-[var(--accent)]">──</span>
+          <span>Admin</span>
+          <span aria-hidden="true" className="text-[var(--text-2)]">·</span>
+          <span>Control Surface</span>
+        </div>
+        <h1 className="font-display font-medium tracking-tight text-3xl sm:text-4xl text-[var(--text)] flex items-center gap-3">
+          <Shield className="h-7 w-7 text-[var(--accent)]" />
+          <span><em className="not-italic font-display italic text-[var(--accent)]">Admin</em> Dashboard</span>
         </h1>
-        <p className="text-gray-400 mt-2">Manage resources, users, and system configuration</p>
+        <p className="text-sm sm:text-base text-[var(--text-2)]">Manage resources, users, and system configuration.</p>
       </div>
 
       <AdminStats stats={stats} isLoading={isLoading} />
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
         <div className="w-full overflow-x-auto pb-2">
-          <TabsList className="inline-flex h-10 items-center gap-1 bg-card border border-primary/20 p-1">
-            <TabsTrigger value="approvals" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap" data-testid="tab-approvals">
-              Approvals {stats?.pendingApprovals ? <Badge variant="destructive" className="ml-2">{stats.pendingApprovals}</Badge> : null}
+          <TabsList className="inline-flex w-max">
+            <TabsTrigger value="approvals" className="whitespace-nowrap" data-testid="tab-approvals">
+              Approvals {stats?.pendingApprovals ? <Badge variant="accent" className="ml-2">{stats.pendingApprovals}</Badge> : null}
             </TabsTrigger>
-            <TabsTrigger value="edits" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap" data-testid="tab-edits">
+            <TabsTrigger value="edits" className="whitespace-nowrap" data-testid="tab-edits">
               Edits
             </TabsTrigger>
-            <TabsTrigger value="enrichment" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap" data-testid="tab-enrichment">
+            <TabsTrigger value="enrichment" className="whitespace-nowrap" data-testid="tab-enrichment">
               <Sparkles className="h-4 w-4 mr-1" />
               Enrichment
             </TabsTrigger>
-            <TabsTrigger value="researcher" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap">
+            <TabsTrigger value="researcher" className="whitespace-nowrap">
               <Brain className="h-4 w-4 mr-1" />
               Researcher
             </TabsTrigger>
-            <TabsTrigger value="export" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap">
-              Export
-            </TabsTrigger>
-            <TabsTrigger value="database" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap">
-              Database
-            </TabsTrigger>
-            <TabsTrigger value="resources" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap">
-              Resources
-            </TabsTrigger>
-            <TabsTrigger value="categories" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap" data-testid="tab-categories">
-              Categories
-            </TabsTrigger>
-            <TabsTrigger value="subcategories" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap" data-testid="tab-subcategories">
-              Subcategories
-            </TabsTrigger>
-            <TabsTrigger value="subsubcategories" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap" data-testid="tab-subsubcategories">
-              Sub-Subcats
-            </TabsTrigger>
-            <TabsTrigger value="users" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap">
-              Users
-            </TabsTrigger>
-            <TabsTrigger value="github" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap">
-              GitHub
-            </TabsTrigger>
-            <TabsTrigger value="linkhealth" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap">
+            <TabsTrigger value="export" className="whitespace-nowrap">Export</TabsTrigger>
+            <TabsTrigger value="database" className="whitespace-nowrap">Database</TabsTrigger>
+            <TabsTrigger value="resources" className="whitespace-nowrap">Resources</TabsTrigger>
+            <TabsTrigger value="categories" className="whitespace-nowrap" data-testid="tab-categories">Categories</TabsTrigger>
+            <TabsTrigger value="subcategories" className="whitespace-nowrap" data-testid="tab-subcategories">Subcategories</TabsTrigger>
+            <TabsTrigger value="subsubcategories" className="whitespace-nowrap" data-testid="tab-subsubcategories">Sub-Subcats</TabsTrigger>
+            <TabsTrigger value="users" className="whitespace-nowrap">Users</TabsTrigger>
+            <TabsTrigger value="github" className="whitespace-nowrap">GitHub</TabsTrigger>
+            <TabsTrigger value="linkhealth" className="whitespace-nowrap">
               <Link className="h-4 w-4 mr-1" />
               Link Health
             </TabsTrigger>
-            <TabsTrigger value="audit" className="px-3 py-1.5 text-sm data-[state=active]:bg-primary/20 data-[state=active]:text-primary whitespace-nowrap">
-              Audit
-            </TabsTrigger>
+            <TabsTrigger value="audit" className="whitespace-nowrap">Audit</TabsTrigger>
           </TabsList>
         </div>
 

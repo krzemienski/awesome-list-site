@@ -78,7 +78,7 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
 
   return (
     <div className="space-y-4">
-      <Card className="border-primary/20 bg-card">
+      <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Database className="h-5 w-5" />
@@ -104,7 +104,7 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
               <Button
                 onClick={() => seedDatabaseMutation.mutate({ clearExisting: false })}
                 disabled={seedDatabaseMutation.isPending}
-                className="bg-primary hover:bg-primary/90"
+               
                 data-testid="button-seed-database"
               >
                 {seedDatabaseMutation.isPending ? (
@@ -119,7 +119,7 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
                   </>
                 )}
               </Button>
-              <span className="text-sm text-gray-400">
+              <span className="text-sm text-[var(--text-2)]">
                 Add new resources without removing existing data
               </span>
             </div>
@@ -143,7 +143,7 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
                   </>
                 )}
               </Button>
-              <span className="text-sm text-gray-400">
+              <span className="text-sm text-[var(--text-2)]">
                 Remove all data and re-populate (use with caution)
               </span>
             </div>
@@ -192,23 +192,23 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
             </Alert>
           )}
 
-          <div className="pt-4 border-t border-gray-800">
-            <h4 className="text-sm font-semibold text-gray-300 mb-2">Current Database Stats</h4>
+          <div className="pt-4 border-t border-[var(--border)]">
+            <h4 className="text-sm font-semibold text-[var(--text)] mb-2">Current Database Stats</h4>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               <div className="space-y-1">
-                <div className="text-xs text-gray-400">Resources</div>
+                <div className="text-xs text-[var(--text-2)]">Resources</div>
                 <div className="text-xl font-mono font-bold text-primary">
                   {stats?.resources || 0}
                 </div>
               </div>
               <div className="space-y-1">
-                <div className="text-xs text-gray-400">Users</div>
+                <div className="text-xs text-[var(--text-2)]">Users</div>
                 <div className="text-xl font-mono font-bold text-primary">
                   {stats?.users || 0}
                 </div>
               </div>
               <div className="space-y-1">
-                <div className="text-xs text-gray-400">Journeys</div>
+                <div className="text-xs text-[var(--text-2)]">Journeys</div>
                 <div className="text-xl font-mono font-bold text-primary">
                   {stats?.journeys || 0}
                 </div>

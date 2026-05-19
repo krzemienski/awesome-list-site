@@ -401,7 +401,7 @@ export default function ResourceManager() {
   const getStatusBadge = (status: string) => {
     const statusInfo = STATUS_OPTIONS.find(s => s.value === status);
     return (
-      <Badge className={`${statusInfo?.color || 'bg-gray-500'} text-white`}>
+      <Badge className={`${statusInfo?.color || 'bg-[var(--surface-3)]'} text-white`}>
         {statusInfo?.label || status}
       </Badge>
     );
@@ -445,7 +445,7 @@ export default function ResourceManager() {
 
   if (isLoading) {
     return (
-      <Card className="border-primary/20 bg-card">
+      <Card>
         <CardHeader>
           <Skeleton className="h-8 w-64" />
         </CardHeader>
@@ -462,7 +462,7 @@ export default function ResourceManager() {
 
   return (
     <div className="space-y-4">
-      <Card className="border-primary/20 bg-card">
+      <Card>
         <CardHeader>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -476,7 +476,7 @@ export default function ResourceManager() {
             </div>
             <Button 
               onClick={openCreateDialog}
-              className="bg-primary hover:bg-primary/90"
+             
               data-testid="button-add-resource"
             >
               <Plus className="h-4 w-4 mr-2" />
@@ -487,17 +487,17 @@ export default function ResourceManager() {
         <CardContent className="space-y-4">
           <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[var(--text-2)]" />
               <Input
                 placeholder="Search by title or URL..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-10 bg-gray-900 border-gray-700"
+                className="pl-10"
                 data-testid="input-search-resources"
               />
             </div>
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-full sm:w-48 bg-gray-900 border-gray-700" data-testid="select-category-filter">
+              <SelectTrigger className="w-full sm:w-48" data-testid="select-category-filter">
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
@@ -509,7 +509,7 @@ export default function ResourceManager() {
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full sm:w-36 bg-gray-900 border-gray-700" data-testid="select-status-filter">
+              <SelectTrigger className="w-full sm:w-36" data-testid="select-status-filter">
                 <SelectValue placeholder="All Status" />
               </SelectTrigger>
               <SelectContent>
@@ -530,9 +530,9 @@ export default function ResourceManager() {
           </form>
 
           {selectedResourceIds.length > 0 && (
-            <div className="flex items-center justify-between p-3 bg-gray-800 border border-primary/30 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-[var(--surface-2)] border border-[var(--accent)]/30 rounded-lg">
               <div className="flex items-center gap-3">
-                <span className="text-sm font-medium text-gray-300">
+                <span className="text-sm font-medium text-[var(--text)]">
                   {selectedResourceIds.length} {selectedResourceIds.length === 1 ? 'item' : 'items'} selected
                 </span>
                 <div className="flex gap-2">
@@ -575,7 +575,7 @@ export default function ResourceManager() {
                 size="sm"
                 variant="ghost"
                 onClick={() => setSelectedResourceIds([])}
-                className="text-gray-400 hover:text-white"
+                className="text-[var(--text-2)] hover:text-[var(--text)]"
                 data-testid="button-clear-selection"
               >
                 Clear Selection
@@ -656,7 +656,7 @@ export default function ResourceManager() {
                         aria-label={`Select resource ${resource.id}`}
                       />
                     </TableCell>
-                    <TableCell className="font-mono text-xs text-gray-400">
+                    <TableCell className="font-mono text-xs text-[var(--text-2)]">
                       {resource.id}
                     </TableCell>
                     <TableCell>
@@ -676,11 +676,11 @@ export default function ResourceManager() {
                       </div>
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
-                      <div className="text-sm text-gray-400">
+                      <div className="text-sm text-[var(--text-2)]">
                         {resource.category || "Uncategorized"}
                       </div>
                       {resource.subcategory && (
-                        <div className="text-xs text-gray-500">{resource.subcategory}</div>
+                        <div className="text-xs text-[var(--text-2)]">{resource.subcategory}</div>
                       )}
                     </TableCell>
                     <TableCell className="hidden lg:table-cell">
@@ -712,8 +712,8 @@ export default function ResourceManager() {
             </Table>
           </ScrollArea>
 
-          <div className="flex items-center justify-between pt-4 border-t border-gray-800">
-            <div className="text-sm text-gray-400">
+          <div className="flex items-center justify-between pt-4 border-t border-[var(--border)]">
+            <div className="text-sm text-[var(--text-2)]">
               Showing {((page - 1) * limit) + 1} - {Math.min(page * limit, data?.total || 0)} of {data?.total || 0} resources
             </div>
             <div className="flex items-center gap-2">
@@ -726,7 +726,7 @@ export default function ResourceManager() {
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <span className="text-sm text-gray-400">
+              <span className="text-sm text-[var(--text-2)]">
                 Page {page} of {data?.totalPages || 1}
               </span>
               <Button
@@ -744,7 +744,7 @@ export default function ResourceManager() {
       </Card>
 
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-        <DialogContent className="max-w-2xl bg-gray-900 border-gray-700">
+        <DialogContent className="max-w-2xl bg-[var(--surface-2)] border-[var(--border)]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Pencil className="h-5 w-5" />
@@ -761,7 +761,7 @@ export default function ResourceManager() {
                 id="edit-title"
                 value={editForm.title}
                 onChange={(e) => setEditForm(f => ({ ...f, title: e.target.value }))}
-                className="bg-gray-800 border-gray-600"
+                className="bg-[var(--surface)] border-[var(--border)]"
                 data-testid="input-edit-title"
               />
             </div>
@@ -771,7 +771,7 @@ export default function ResourceManager() {
                 id="edit-url"
                 value={editForm.url}
                 onChange={(e) => setEditForm(f => ({ ...f, url: e.target.value }))}
-                className="bg-gray-800 border-gray-600"
+                className="bg-[var(--surface)] border-[var(--border)]"
                 data-testid="input-edit-url"
               />
             </div>
@@ -781,7 +781,7 @@ export default function ResourceManager() {
                 id="edit-description"
                 value={editForm.description}
                 onChange={(e) => setEditForm(f => ({ ...f, description: e.target.value }))}
-                className="bg-gray-800 border-gray-600"
+                className="bg-[var(--surface)] border-[var(--border)]"
                 rows={3}
                 data-testid="input-edit-description"
               />
@@ -793,7 +793,7 @@ export default function ResourceManager() {
                   value={editForm.category} 
                   onValueChange={(v) => setEditForm(f => ({ ...f, category: v, subcategory: "", subSubcategory: "" }))}
                 >
-                  <SelectTrigger className="bg-gray-800 border-gray-600" data-testid="select-edit-category">
+                  <SelectTrigger className="bg-[var(--surface)] border-[var(--border)]" data-testid="select-edit-category">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
@@ -809,7 +809,7 @@ export default function ResourceManager() {
                   value={editForm.status} 
                   onValueChange={(v) => setEditForm(f => ({ ...f, status: v }))}
                 >
-                  <SelectTrigger className="bg-gray-800 border-gray-600" data-testid="select-edit-status">
+                  <SelectTrigger className="bg-[var(--surface)] border-[var(--border)]" data-testid="select-edit-status">
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -828,7 +828,7 @@ export default function ResourceManager() {
                   onValueChange={(v) => setEditForm(f => ({ ...f, subcategory: v, subSubcategory: "" }))}
                   disabled={!editForm.category || filteredSubcategories.length === 0}
                 >
-                  <SelectTrigger className="bg-gray-800 border-gray-600" data-testid="select-edit-subcategory">
+                  <SelectTrigger className="bg-[var(--surface)] border-[var(--border)]" data-testid="select-edit-subcategory">
                     <SelectValue placeholder={filteredSubcategories.length ? "Select subcategory" : "Select category first"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -845,7 +845,7 @@ export default function ResourceManager() {
                   onValueChange={(v) => setEditForm(f => ({ ...f, subSubcategory: v }))}
                   disabled={!editForm.subcategory || filteredSubSubcategories.length === 0}
                 >
-                  <SelectTrigger className="bg-gray-800 border-gray-600" data-testid="select-edit-subsubcategory">
+                  <SelectTrigger className="bg-[var(--surface)] border-[var(--border)]" data-testid="select-edit-subsubcategory">
                     <SelectValue placeholder={filteredSubSubcategories.length ? "Select sub-subcategory" : "Select subcategory first"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -864,7 +864,7 @@ export default function ResourceManager() {
             <Button 
               onClick={handleSaveEdit}
               disabled={updateMutation.isPending}
-              className="bg-primary hover:bg-primary/90"
+             
               data-testid="button-save-edit"
             >
               {updateMutation.isPending ? (
@@ -881,7 +881,7 @@ export default function ResourceManager() {
       </Dialog>
 
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-        <DialogContent className="max-w-2xl bg-gray-900 border-gray-700">
+        <DialogContent className="max-w-2xl bg-[var(--surface-2)] border-[var(--border)]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Plus className="h-5 w-5" />
@@ -898,7 +898,7 @@ export default function ResourceManager() {
                 id="create-title"
                 value={editForm.title}
                 onChange={(e) => setEditForm(f => ({ ...f, title: e.target.value }))}
-                className="bg-gray-800 border-gray-600"
+                className="bg-[var(--surface)] border-[var(--border)]"
                 placeholder="e.g., Video.js Player"
                 data-testid="input-create-title"
               />
@@ -909,7 +909,7 @@ export default function ResourceManager() {
                 id="create-url"
                 value={editForm.url}
                 onChange={(e) => setEditForm(f => ({ ...f, url: e.target.value }))}
-                className="bg-gray-800 border-gray-600"
+                className="bg-[var(--surface)] border-[var(--border)]"
                 placeholder="https://github.com/..."
                 data-testid="input-create-url"
               />
@@ -920,7 +920,7 @@ export default function ResourceManager() {
                 id="create-description"
                 value={editForm.description}
                 onChange={(e) => setEditForm(f => ({ ...f, description: e.target.value }))}
-                className="bg-gray-800 border-gray-600"
+                className="bg-[var(--surface)] border-[var(--border)]"
                 rows={3}
                 placeholder="Brief description of the resource..."
                 data-testid="input-create-description"
@@ -933,7 +933,7 @@ export default function ResourceManager() {
                   value={editForm.category} 
                   onValueChange={(v) => setEditForm(f => ({ ...f, category: v, subcategory: "", subSubcategory: "" }))}
                 >
-                  <SelectTrigger className="bg-gray-800 border-gray-600" data-testid="select-create-category">
+                  <SelectTrigger className="bg-[var(--surface)] border-[var(--border)]" data-testid="select-create-category">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
@@ -949,7 +949,7 @@ export default function ResourceManager() {
                   value={editForm.status} 
                   onValueChange={(v) => setEditForm(f => ({ ...f, status: v }))}
                 >
-                  <SelectTrigger className="bg-gray-800 border-gray-600" data-testid="select-create-status">
+                  <SelectTrigger className="bg-[var(--surface)] border-[var(--border)]" data-testid="select-create-status">
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -968,7 +968,7 @@ export default function ResourceManager() {
                   onValueChange={(v) => setEditForm(f => ({ ...f, subcategory: v, subSubcategory: "" }))}
                   disabled={!editForm.category || filteredSubcategories.length === 0}
                 >
-                  <SelectTrigger className="bg-gray-800 border-gray-600" data-testid="select-create-subcategory">
+                  <SelectTrigger className="bg-[var(--surface)] border-[var(--border)]" data-testid="select-create-subcategory">
                     <SelectValue placeholder={filteredSubcategories.length ? "Select subcategory" : "Select category first"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -985,7 +985,7 @@ export default function ResourceManager() {
                   onValueChange={(v) => setEditForm(f => ({ ...f, subSubcategory: v }))}
                   disabled={!editForm.subcategory || filteredSubSubcategories.length === 0}
                 >
-                  <SelectTrigger className="bg-gray-800 border-gray-600" data-testid="select-create-subsubcategory">
+                  <SelectTrigger className="bg-[var(--surface)] border-[var(--border)]" data-testid="select-create-subsubcategory">
                     <SelectValue placeholder={filteredSubSubcategories.length ? "Select sub-subcategory" : "Select subcategory first"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -1004,7 +1004,7 @@ export default function ResourceManager() {
             <Button 
               onClick={handleCreate}
               disabled={createMutation.isPending}
-              className="bg-primary hover:bg-primary/90"
+             
               data-testid="button-create-resource"
             >
               {createMutation.isPending ? (
@@ -1021,7 +1021,7 @@ export default function ResourceManager() {
       </Dialog>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="bg-gray-900 border-gray-700">
+        <AlertDialogContent className="bg-[var(--surface-2)] border-[var(--border)]">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-red-400">Delete Resource</AlertDialogTitle>
             <AlertDialogDescription>

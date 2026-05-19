@@ -176,12 +176,18 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
         description="Discover 2,000+ curated video development resources including codecs, players, tools, and libraries. Find the perfect solution for your video project."
       />
 
-      <div className="space-y-2 sm:space-y-3">
-        <div className="eyebrow">// Index</div>
-        <h1 className="font-display font-medium tracking-tight text-3xl sm:text-5xl leading-[1.04]">
-          Awesome <em className="not-italic font-display italic text-[var(--accent)]">Video</em> Resources
+      <div className="space-y-4 sm:space-y-6 pt-2 sm:pt-6">
+        <div className="eyebrow flex items-center gap-3">
+          <span aria-hidden="true" className="text-[var(--accent)]">──</span>
+          <span>Indexed</span>
+          <span aria-hidden="true" className="text-[var(--text-2)]">·</span>
+          <span>Atlas</span>
+        </div>
+        <h1 className="font-display italic font-medium tracking-tight text-[var(--text)] text-[clamp(3rem,11vw,8rem)] leading-[0.92]">
+          <span className="block">awesome</span>
+          <span className="block">.video</span>
         </h1>
-        <p className="text-sm sm:text-base text-[color:var(--text-2)] max-w-2xl">
+        <p className="text-sm sm:text-base text-[color:var(--text-2)] max-w-2xl pt-1">
           Explore {filteredCategories.length} categories with {totalResourceCount} curated resources for engineers building the modern video stack.
         </p>
       </div>
@@ -194,50 +200,68 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
         onSortChange={setSortBy}
       />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-        {filteredCategories.map((category) => {
+      <ol
+        className="border-t border-[var(--border)] mt-2"
+        data-testid="list-categories"
+      >
+        {filteredCategories.map((category, idx) => {
           const Icon = categoryIcons[category.name] || FileText;
           const totalCount = category.displayCount;
-
           const firstResource = category.resources[0];
           const description = firstResource?.description
-            ? firstResource.description.length > 100
-              ? `${firstResource.description.substring(0, 100)}...`
+            ? firstResource.description.length > 110
+              ? `${firstResource.description.substring(0, 110)}...`
               : firstResource.description
             : "";
+          const isHot = idx === 0;
 
           return (
-            <Link
+            <li
               key={category.slug}
-              href={`/category/${category.slug}`}
-              aria-label={`View ${category.name} category with ${totalCount} resources`}
-              data-testid={`link-category-${category.slug}`}
+              className="border-b border-[var(--border)] group"
             >
-              <Card
-                className="cursor-pointer touch-manipulation h-full"
-                data-testid={`card-category-${category.slug}`}
+              <Link
+                href={`/category/${category.slug}`}
+                aria-label={`View ${category.name} category with ${totalCount} resources`}
+                data-testid={`link-category-${category.slug}`}
+                className="flex items-baseline gap-4 sm:gap-6 py-5 sm:py-6 px-1 sm:px-2 transition-colors duration-[var(--motion-base)] ease-[var(--motion-ease)] hover:bg-[var(--surface)] rounded-[var(--radius-sm)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] focus-visible:bg-[var(--surface)]"
               >
-                <CardHeader className="p-4 sm:p-6">
-                  <div className="flex items-center justify-between gap-2 mb-1 sm:mb-2">
-                    <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-                      <Icon className="h-5 w-5 sm:h-6 sm:w-6 shrink-0 text-[var(--text-2)]" />
-                      <CardTitle className="font-display font-medium text-base sm:text-lg truncate tracking-tight">{category.name}</CardTitle>
-                    </div>
-                    <Badge variant="chip" data-testid={`badge-count-${category.slug}`}>
-                      {totalCount}
-                    </Badge>
-                  </div>
+                <span
+                  aria-hidden="true"
+                  className="font-mono text-xs sm:text-sm tabular-nums text-[var(--text-2)] tracking-wider shrink-0 w-8 sm:w-10"
+                >
+                  {String(idx + 1).padStart(2, "0")}
+                </span>
+                <Icon className="hidden sm:block h-5 w-5 shrink-0 text-[var(--text-2)] self-center transition-colors group-hover:text-[var(--accent)]" />
+                <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-baseline sm:gap-6">
+                  <span className="font-display font-medium tracking-tight text-xl sm:text-2xl text-[var(--text)] truncate">
+                    {category.name}
+                  </span>
                   {description && (
-                    <CardDescription className="text-xs sm:text-sm line-clamp-2">
+                    <span className="text-xs sm:text-sm text-[var(--text-2)] line-clamp-1 sm:flex-1 mt-1 sm:mt-0">
                       {description}
-                    </CardDescription>
+                    </span>
                   )}
-                </CardHeader>
-              </Card>
-            </Link>
+                </div>
+                <div className="flex items-center gap-3 sm:gap-4 shrink-0">
+                  <span
+                    className="font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--text-2)] tabular-nums"
+                    data-testid={`badge-count-${category.slug}`}
+                  >
+                    {totalCount}
+                  </span>
+                  {isHot && (
+                    <span
+                      aria-hidden="true"
+                      className="h-1.5 w-1.5 rounded-full bg-[var(--accent)] shrink-0"
+                    />
+                  )}
+                </div>
+              </Link>
+            </li>
           );
         })}
-      </div>
+      </ol>
 
       <div className="mt-8 sm:mt-12">
         <div className="mb-4 sm:mb-6 space-y-2">
