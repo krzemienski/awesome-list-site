@@ -32,7 +32,9 @@ export default function MainLayout({ awesomeList, isLoading, children, user, onL
     <SidebarProvider defaultOpen={!isMobile}>
       {/* CC-17 — Skip-link is the first focusable element on every page. */}
       <a href="#main" className="skip-link">Skip to main content</a>
-      {/* WP-1 — Editorial atmosphere: SVG grain overlay (page-bg gradient lives on body). */}
+      {/* WP-1 — Editorial atmosphere: SVG grain overlay + radial accent
+          atmosphere. The atmosphere gradient lives on body (handoff parity),
+          and .grain is the SVG fractal-noise overlay at 0.32 opacity. */}
       <div className="grain" aria-hidden="true" />
 
       <AppSidebar
