@@ -1248,3 +1248,16 @@ export const insertResearchDiscoverySchema = createInsertSchema(researchDiscover
 
 export type InsertResearchDiscovery = z.infer<typeof insertResearchDiscoverySchema>;
 export type ResearchDiscovery = typeof researchDiscoveries.$inferSelect;
+
+// Whitelist of fields editable via user-submitted resource edits.
+// Shared between routes.ts (sanitize incoming edits) and AuditRepository.ts (apply merged edits).
+export const EDITABLE_RESOURCE_FIELDS = [
+  'title',
+  'description',
+  'url',
+  'tags',
+  'category',
+  'subcategory',
+  'subSubcategory',
+] as const;
+export type EditableResourceField = typeof EDITABLE_RESOURCE_FIELDS[number];

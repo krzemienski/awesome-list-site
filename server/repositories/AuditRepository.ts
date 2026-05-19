@@ -29,6 +29,7 @@ import {
   resourceAuditLog,
   resourceEdits,
   resources,
+  EDITABLE_RESOURCE_FIELDS,
   type ResourceEdit,
   type InsertResourceEdit,
 } from "@shared/schema";
@@ -197,11 +198,11 @@ export class AuditRepository {
     }
 
     // SAFE MERGE: Only update whitelisted fields from proposedData
-    const EDITABLE_FIELDS = ['title', 'description', 'url', 'tags', 'category', 'subcategory', 'subSubcategory'];
+    // Shared whitelist with POST /api/resources/:id/edit — see @shared/schema EDITABLE_RESOURCE_FIELDS
     const updates: Record<string, any> = {};
 
     const proposedData = edit.proposedData as any;
-    for (const field of EDITABLE_FIELDS) {
+    for (const field of EDITABLE_RESOURCE_FIELDS) {
       if (proposedData && field in proposedData) {
         updates[field] = proposedData[field];
       }

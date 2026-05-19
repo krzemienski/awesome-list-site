@@ -51,7 +51,7 @@ import { fetchAwesomeList } from "./parser";
 import { fetchAwesomeVideoData } from "./awesome-video-parser-clean";
 import { RecommendationEngine, UserProfile } from "./recommendation-engine";
 import { fetchAwesomeLists, searchAwesomeLists } from "./github-api";
-import { insertResourceSchema } from "@shared/schema";
+import { insertResourceSchema, EDITABLE_RESOURCE_FIELDS } from "@shared/schema";
 import { z } from "zod";
 import { syncService } from "./github/syncService";
 import { recommendationEngine, UserProfile as AIUserProfile } from "./ai/recommendationEngine";
@@ -542,7 +542,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       const { resources: pool } = await resourceRepo.listResources({
         page: 1,
-        limit: 24,
+        limit: 7,
         status: 'approved',
         category: resource.category ?? undefined,
       });
@@ -644,11 +644,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // SECURITY FIX: Whitelist of editable fields only (ISSUE 1)
-      const EDITABLE_FIELDS = ['title', 'description', 'url', 'tags', 'category', 'subcategory', 'subSubcategory'];
-      
-      // Sanitize proposedData - only allow whitelisted fields
+      // Shared with AuditRepository merge path — see @shared/schema EDITABLE_RESOURCE_FIELDS
       const sanitizedProposedData: Record<string, any> = {};
-      for (const field of EDITABLE_FIELDS) {
+      for (const field of EDITABLE_RESOURCE_FIELDS) {
         if (proposedData && field in proposedData) {
           sanitizedProposedData[field] = proposedData[field];
         }
@@ -656,7 +654,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Sanitize proposedChanges
       const sanitizedChanges: Record<string, any> = {};
-      for (const field of EDITABLE_FIELDS) {
+      for (const field of EDITABLE_RESOURCE_FIELDS) {
         if (proposedChanges && field in proposedChanges) {
           sanitizedChanges[field] = proposedChanges[field];
         }
