@@ -1,197 +1,165 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## Guide
-
-- **[Unreleased]** - Changes that will be included in the next release
-- **[Added]** - New features and functionality
-- **[Changed]** - Changes to existing functionality
-- **[Deprecated]** - Features that will be removed in future versions
-- **[Removed]** - Features that have been deleted
-- **[Fixed]** - Bug fixes and corrections
-- **[Security]** - Security-related changes and improvements
-
-Sections are categorized by priority:
-- **P0 Critical** - Blocking issues, compliance failures, security concerns
-- **P1 High** - Significant functionality gaps, important user experience issues
-- **P2 Medium** - Minor improvements, edge case fixes
-- **P3 Low** - Nice-to-have enhancements, cosmetic improvements
+All notable changes to the Awesome Video Resource Viewer project. Newest entries first.
 
 ---
 
-## [Unreleased]
+## May 19, 2026
 
-### [2026-01-28] UI/UX Audit
+### Editorial + Crimson — Pixel-Perfect Alignment to Claude Design Handoff
+- **Audit vs `/tmp/handoff/.../uploads/01..21.png`**: identified that WP-4 over-applied Fraunces italic eyebrows/hero accents to Home/About/Login, while the reference renders plain bold Inter for all page headings (Editorial is a token system only).
+- **Home (`Home.tsx`)**: removed `// Indexed · Atlas` eyebrow + giant Fraunces italic "awesome.video" hero; replaced numbered `<ol>` row list with 3×3 `<Card>` grid (icon + count badge + plain bold title + 1-line description preview). Added empty-state card with "Clear filters" CTA when `filteredCategories` is empty. AI Recommendations heading switched to plain bold Inter.
+- **About (`About.tsx`)**: removed `// About the project` eyebrow + Fraunces italic "About **Awesome Video**"; now plain bold "About" h1 with crimson Sparkles icon. Stripped `font-display font-medium tracking-tight` from all five section `CardTitle`s.
+- **Login (`Login.tsx`)**: removed `// Authentication` eyebrow + Fraunces italic "Welcome **back**"; now plain bold "Welcome back" centered. Default-admin block rebuilt as plain tiny text under separator (was an eyebrow-styled surface card).
+- **Sidebar brand (`AppSidebar.tsx:129`)**: `font-display text-base font-medium tracking-tight` → `font-sans text-sm font-semibold tracking-tight` (plain bold Inter per reference).
+- **Theme Settings (`ThemeSettings.tsx`)**: full rebuild from 10-accent token swatch picker → Font picker (6 fonts: Inter / DM Sans / Source Sans 3 / IBM Plex Sans / JetBrains Mono / System Default, each with live sample-text preview) + Color Theme picker (6 presets: Cyberpunk / Limes / Black & Pink / Flat Pink / Purples / Flat Purples, each with primary/secondary/accent swatch row). Both grids properly wrapped in `role="radiogroup"` with aria-labels.
+- **theme-provider re-wiring (`theme-provider.tsx`)**: re-enabled `applyFont(activeFont)` effect (writes `--font-sans` globally). Added scoped accent applier effect that writes ONLY `--accent` and `--accent-2` from `activeTheme.dark.primary` — Editorial atmosphere (bg, surface ladder, text ladder, radii, shadows) stays locked. Default theme remains `cyberpunk` per existing localStorage key, but only its primary color leaks into the DS layer.
 
-Comprehensive accessibility, mobile optimization, and code quality improvements based on WCAG 2.1 AA compliance audit.
+### Editorial + Crimson Design System — WP-3 Layout/Header/Sidebar + WP-4 Pages
+- **WP-3 Layout/Header/Sidebar**: `AppHeader.tsx` — search trigger now a `rounded-lg` surface chip with crimson-tinted hover/focus border + eyebrow-styled `kbd`; header bg uses `color-mix(var(--bg) 85%)` for blur+transparency; breadcrumb map switched from `Fragment` to `flatMap` to eliminate the Replit dev-injector `data-replit-metadata` warning; `Fragment` import removed. `AppSidebar.tsx` — brand "Awesome Video" rendered in Fraunces `font-display font-medium tracking-tight`; resource count line uses mono eyebrow styling; both `SidebarGroupLabel`s adopt the `.eyebrow` class (mono 11px / 0.18em / crimson). `MainLayout` already correct from WP-1.
+- **WP-4 Pages (Home / About / Login)**:
+  - **`Home.tsx`** — added `// Index` eyebrow + Fraunces h1 with crimson italic "Video" accent word; removed manual hover/border/bg classes on category cards (DS Card already provides it); category title now Fraunces tracking-tight; count badge switched from `secondary` to new `chip` variant (mono uppercase 10px tracked); AI section heading rebuilt as eyebrow + Fraunces h2 with crimson italic "AI"; all secondary text moved to `var(--text-2)`.
+  - **`About.tsx`** — hero rebuilt with eyebrow + Fraunces h1 + crimson italic "Awesome Video"; removed five `border-{primary,accent}/20` overrides (DS handles borders); all five section `CardTitle`s adopt `font-display font-medium tracking-tight` + crimson section icons.
+  - **`Login.tsx`** — removed `bg-gradient-to-br from-background via-background to-muted` wrapper (was double-painting on top of `MainLayout`'s radial atmosphere); switched logo halo to `color-mix(var(--accent) 12%)` bg with crimson ring; added `// Authentication` eyebrow + Fraunces title with crimson italic "back"; separator label switched to mono 0.18em tracked; default-credentials block rebuilt as a real surface card (`var(--surface)` bg + `var(--border)` + `rounded-[var(--radius-sm)]`) instead of bare text on background.
+- **Fetch hardening (mobile reliability)**: `client/src/lib/static-data.ts` `fetchStaticAwesomeList` rewritten with `AbortController`-backed 45s timeout, 1 retry with linear backoff, explicit `credentials: 'same-origin'`, and a typed error message that surfaces the actual failure cause (`HTTP <status>`, `request timed out after Ns`, or content-type mismatch). Replaces Safari's opaque `"Load failed"` on flaky mobile networks with an actionable error in the existing ErrorPage card.
 
-#### Added
+### Editorial + Crimson Design System — WP-2 Primitives
+- **Scope**: token-mapped shadcn primitives already pick up Editorial colors/radii via the bridge in `client/src/index.css @theme inline`; WP-2 adds Editorial-specific micro-behaviors per DS_SPEC §primitives without scope-creeping into per-call rewrites.
+- **Card** (`client/src/components/ui/card.tsx`): default class now `shadow-[var(--shadow-sm)] transition-[...] duration-[var(--motion-base)] ease-[var(--motion-ease)] hover:border-[var(--border-strong)]` — soft DS shadow + 240ms hover border-lift.
+- **Input** (`client/src/components/ui/input.tsx`): `bg-background` → `bg-[var(--surface)]` (warm-ink alpha tint), added `transition-colors duration-[var(--motion-fast)]`, `hover:border-[var(--border-strong)]`, `focus-visible:border-[color-mix(in_srgb,var(--accent)_60%,transparent)]` for crimson-tinted focus.
+- **Select trigger** (`client/src/components/ui/select.tsx`): same surface + crimson-focus treatment as Input; added missing `rounded-lg` (was square in source).
+- **Dialog** (`client/src/components/ui/dialog.tsx`): now uses `rounded-[var(--radius)]` (12px Editorial), `bg-popover` (was `bg-background`), `shadow-[var(--shadow-lg)]` (Editorial soft 60px falloff).
+- **Tabs** (`client/src/components/ui/tabs.tsx`): `TabsList` rebuilt as a `rounded-full` pill on `var(--surface)` with hairline border; `TabsTrigger` active state = `bg-[var(--surface-3)]` + `text-[var(--accent)]` crimson ink + soft shadow — Editorial pill-tab aesthetic.
+- **Badge** (`client/src/components/ui/badge.tsx`): added two new variants per DS chip contract — `chip` (mono uppercase 10px tracking 0.12em on `var(--surface)` with text-2) and `accent` (crimson-tinted variant for hot chips). Existing `default/secondary/destructive/outline` variants unchanged; no breaking changes to call sites.
+- **Button** intentionally untouched — its variants already resolve Editorial through `bg-primary`/`border-input`/`rounded-lg` via the token bridge; per DS_SPEC the only required behaviors (44px touch target, hover bg-primary/90, active translateY) are already present.
 
-- **Reduced motion support**: `prefers-reduced-motion` media query implementation for users with motion sensitivity
-- **Safe area insets**: CSS safe area variables for notch devices (iPhone 13+, Android notches)
-- **viewport-fit=cover**: Enabled full-screen rendering on notched devices
-- **aria-busy attribute**: Loading state announcements for async operations
-- **Autocomplete attributes**: Form field metadata for password managers and autofill (login form: email, password fields)
-- **Breadcrumb navigation**: Semantic breadcrumb component for navigation hierarchy
-
-#### Changed
-
-- **Touch targets**: Increased all interactive elements to minimum 44px × 44px (WCAG 2.1 AA compliance)
-  - Avatar buttons: 40px → 44px
-  - Form inputs: Improved clickable area padding
-  - Mobile buttons: Minimum 48px × 48px on small screens
-
-- **Color contrast**: Fixed primary color contrast ratios
-  - Primary color: 4.2:1 → 4.5:1 (exceeds WCAG AA requirement of 4.5:1)
-  - Button text on primary background: Verified minimum 7:1 contrast
-  - Link colors: Updated for sufficient contrast in light and dark modes
-
-- **Responsive breakpoints**: Extended mobile styling to tablets
-  - Tablet CSS: 768px - 1023px (improved from 768px breakpoint)
-  - Sidebar behavior: Simplified for better 768-1024px range
-  - Compact view grid: Fixed `2xl:grid-cols-5` breakpoint
-
-- **Heading hierarchy**: Fixed semantic heading structure
-  - Page titles: Consistent `<h1>` usage
-  - Section headers: Proper `<h2>` nesting
-  - Subsection headers: Consistent `<h3>` usage
-  - All headings: Skip-level hierarchy eliminated
-
-- **Sidebar navigation**: Improved tablet view handling
-  - Sidebar collapse behavior: More predictable on 768-1024px
-  - Touch-friendly navigation: Increased spacing between menu items
-  - Mobile drawer: Enhanced swipe dismissal
-
-#### Fixed
-
-- **Orphaned components**: Removed 12 unused/dead component files that were causing maintainability issues
-  - Animation components no longer used in modern layout system
-  - Deprecated sidebar/app-layout components replaced by MainLayout
-  - Old tooltip and preview components superseded by newer implementations
-
-- **Dead animation code**: Removed unused Framer Motion animations
-  - Card morphing effects: Removed (not used in current design)
-  - Page transition animations: Removed (conflicted with Wouter routing)
-  - CSS animation duplicates: Consolidated to single animation definitions
-
-- **Dark theme inconsistency**: Fixed not-found page dark mode styling
-  - Background colors: Aligned with theme provider defaults
-  - Text contrast: Verified on dark backgrounds
-  - Button styling: Consistent with theme system
-
-- **Mobile CSS specificity**: Resolved conflicting media queries
-  - Tablet overrides: Now properly cascade for 768-1023px range
-  - Mobile-first approach: Verified at breakpoints (375px, 480px, 768px, 1024px)
-
-#### Removed
-
-**Orphaned Component Files (12 total):**
-
-Component files deleted:
-- `client/src/components/animations/card-morphing.tsx` - Unused animation effect
-- `client/src/components/animations/page-transition.tsx` - Conflicted with router
-- `client/src/components/app-sidebar.tsx` - Superseded by MainLayout
-- `client/src/components/layout/SidebarNav.tsx` - Old navigation component
-- `client/src/components/layout/app-layout.tsx` - Deprecated layout wrapper
-- `client/src/components/theme-provider-new.tsx` - Duplicate theme provider
-- `client/src/components/ui/interactive-resource-preview.tsx` - Unused preview component
-- `client/src/components/ui/mobile-resource-popover.tsx` - Replaced by Popover
-- `client/src/components/ui/resource-comparison.tsx` - Feature removed
-- `client/src/components/ui/resource-preview-tooltip.tsx` - Superseded by Tooltip
-- `client/src/components/ui/resource-tooltip.tsx` - Consolidated into Tooltip
-- `client/src/components/ui/skeleton-card.tsx` - Replaced by Skeleton
-
-These removals reduce bundle size by ~8KB (minified + gzipped) and eliminate dead code paths.
-
-#### Security
-
-- **Login form hardening**: Added autocomplete prevention where needed for sensitive fields
-- **WCAG compliance**: Ensures accessible UI is not bypassed by keyboard-only users
-
-#### Migration Guide
-
-**For developers:**
-
-1. **If using deleted animation components**: Replace with Framer Motion or native CSS animations in your component
-2. **If using old layout components**: Migrate to the `MainLayout` component wrapper
-3. **If using old tooltip/preview components**: Use shadcn/ui `Tooltip` and `Popover` components
-4. **Touch target verification**: Test your UI changes with 44px minimum tap targets on mobile
-
-**For users:**
-
-- Mobile and tablet experiences have been improved with better touch targets
-- Reduced motion option now respects system preferences (Settings > Accessibility > Reduce Motion)
-- Notched devices (e.g., iPhone 13+) now display content safely within screen boundaries
-
-#### Performance Impact
-
-- **Bundle size**: -8KB gzipped (removed dead code)
-- **Runtime**: No measurable change in page load time
-- **Accessibility**: WCAG 2.1 AA compliance achieved
-
-#### Testing
-
-All changes verified through:
-- [ ] Automated accessibility tests (axe DevTools)
-- [ ] Manual WCAG 2.1 AA compliance review
-- [ ] Cross-device testing (iPhone 14, Samsung Galaxy S23, iPad 10th gen)
-- [ ] Dark theme verification on all pages
-- [ ] Keyboard navigation testing (Tab, Shift+Tab, Enter, Escape)
-- [ ] Reduced motion preference testing
-- [ ] Notch device rendering (iOS Safari, Android Chrome)
-
-#### Known Issues
-
-None at this time. Please report accessibility issues to the development team.
-
-#### Related Documentation
-
-- [WCAG 2.1 Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
-- [Touch Target Sizing](https://www.interaction-design.org/literature/articles/touch-target-size)
-- [Apple Human Interface Guidelines - Accessibility](https://developer.apple.com/design/human-interface-guidelines/accessibility)
-- [Material Design - Accessibility](https://material.io/design/platform-guidance/android-bars.html#status-bar)
+### Editorial + Crimson Design System — WP-1 Foundations
+- **Scope locked**: applying Claude Design Editorial personality with Crimson accent only (single personality, no switcher).
+- **Token swap**: `client/src/styles/design-system.css` `:root` now carries Editorial values — warm-ink alpha surfaces on near-black, `#f4f3ee` text ladder, `#ff3d52` crimson accent, Fraunces (serif display) / Inter (body) / JetBrains Mono (code), 12px / 8px / 999px radius ladder, soft drop shadows, radial-gradient page atmosphere, SVG grain overlay at 0.32 opacity.
+- **Boot lock**: `client/index.html` boot script sets `<html data-system="editorial" data-accent="crimson">` before any module paints; Google Fonts link now loads Fraunces + Inter + JetBrains Mono.
+- **Runtime applier neutralized**: `client/src/lib/design-system.ts` previously pushed inline `style.setProperty('--bg', '#000')` etc. on `documentElement` at boot (Terminal values), which silently overrode the CSS layer. The self-init block is now a globals-only registration; `applyDesignSystem()` remains callable but isn't invoked at boot. `DESIGN_SYSTEMS` map now contains the Editorial config.
+- **Shadcn radius re-wired**: `client/src/index.css` `@theme inline` radius keys un-collapsed from `0` to the Editorial 8/12 px ladder so `rounded-*`, `<Card>`, `<Input>`, `<Dialog>` automatically pick up Editorial geometry without per-call class overrides.
+- **Atmosphere overlay**: `client/src/components/layout/new/MainLayout.tsx` now mounts a fixed `<div class="grain" />` overlay (`aria-hidden`, `pointer-events: none`).
+- **Legacy theme-provider effects disabled**: `client/src/components/ui/theme-provider.tsx` had two `useEffect`s that called `applyTheme(activeTheme)` and `applyFont(activeFont)` whenever `data-system !== 'terminal'` — i.e. exactly in our new Editorial mode. Those effects wrote inline CSS variables (`--font-sans`, `--radius`, theme color set) onto `documentElement`, silently overriding the DS layer. Both effects are now permanent no-ops; React state is preserved for the deferred /settings/theme picker UI.
+- **Planning artifacts**: `_planning/{DS_SPEC,SITE_MAP,DELTA_CATALOG,REMEDIATION_PLAN}.md` capture the Editorial+Crimson contract, current site inventory, 82-item delta catalog, and 8-work-package remediation plan with per-gate evidence requirements.
+- **Known issue (pre-existing, not migration-related)**: `AppHeader.tsx:75` uses `<Fragment>` inside a `.map()`; Replit's dev injector adds `data-replit-metadata` to those Fragments, producing a React warning. Tracked for a follow-up cleanup pass.
 
 ---
 
-## [1.0.0] - 2026-01-10
+## May 2, 2026
 
-### Added
-
-- Initial public release of Awesome Video Resource Viewer
-- 2,600+ curated video development resources
-- Advanced fuzzy search with keyboard shortcut (⌘K)
-- 3-level category navigation system
-- Learning journeys and guided paths
-- Bookmarks and favorites functionality
-- Dark theme with cyberpunk aesthetic
-- Admin dashboard for resource curation
-- GitHub import/export integration
-- AI-powered resource enrichment
-- Awesome-lint compliance validation
-- WCAG AAA mobile accessibility support
-- Complete API documentation (75+ endpoints)
-- Comprehensive admin guide
-- Authentication system (Replit OAuth + local email/password)
-
-### Technical
-
-- React 18 + TypeScript frontend
-- Express.js + TypeScript backend
-- PostgreSQL database (Neon)
-- Drizzle ORM for database management
-- Vite for fast development and builds
-- TanStack Query for state management
-- Tailwind CSS + shadcn/ui component library
-- Anthropic Claude AI integration
+### Admin Panel Audit – Remaining Tabs
+- **Removed broken Research tab** from `client/src/pages/AdminDashboard.tsx`. `CostDashboard` + `ResearchPanel` were calling `/api/research/*` endpoints that were never wired up in `server/routes.ts` (the active routes file). The working `Researcher` tab (different component, hits `/api/researcher/*`) remains.
+- **Deleted dead client code**: removed entire `client/src/components/admin/research/` directory (CostDashboard, ResearchPanel, JobMonitor, ReportViewer, ResearchDashboard, ResearchJobsTable, etc.) — nothing else imported it.
+- **Removed duplicate / dead server route trees**: `server/routes.ts` is the only registered route surface. Deleted `server/routes/` directory (parallel modular files including duplicate `routes/admin/enrichment.ts`) and `server/modules/` directory (parallel module-architecture files including duplicate `modules/enrichment/routes.ts` and `modules/research/routes.ts`). None of these were imported anywhere.
+- **Audit verified**: Categories, Subcategories, Sub-Subcategories, Export, Database, GitHub Sync, Link Health, Researcher, Pending Resources/Edits, AdminStats, Users, Audit tabs all hit endpoints that exist in `server/routes.ts` and respond with 401 (auth required) when called unauthenticated.
+- **Fixed Resources tab bulk actions**: Added missing `POST /api/admin/resources/bulk/{approve,reject,delete}` endpoints in `server/routes.ts`. The `ResourceManager` UI was wired to call these but they were never implemented, so bulk approve/reject/delete buttons silently 200'd a Vite HTML page instead of mutating data.
 
 ---
 
-## Footer
+## February 2, 2026
 
-For more information about our versioning strategy, see [SETUP.md](docs/SETUP.md) and [ARCHITECTURE.md](docs/ARCHITECTURE.md).
+### Deployment Fix & Re-Audit
+- **Deployment Migration Fix**: Enhanced `server/index.ts` migration handling with:
+  - Multi-path search for migrations folder
+  - Fail-fast verification when migrations missing - checks if database schema exists
+  - More precise PostgreSQL error handling (42P07 for "already exists")
+- **Generated Migrations**: Created proper Drizzle migrations with `meta/_journal.json`
+- **Re-Audit Completed**: Full 291-item checklist verified
+- **All Tests Passing**: API endpoints, database integrity, frontend UI, responsive design
+- **Current Data**: 9 categories, 19 subcategories, 32 sub-subcategories, 1949 resources
 
-For contribution guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md).
+---
+
+## February 1, 2026
+
+### Comprehensive Testing Audit
+- **Testing Scope**: 150+ individual test steps executed across all functionality
+- **Bug Fix**: Updated `isDbResource()` in Category.tsx to handle `db-` prefixed IDs correctly
+- **Security Testing**: SQL injection and XSS protection verified
+- **API Testing**: 15+ endpoints tested with authenticated and unauthenticated requests
+- **UI Testing**: All three screen sizes (400px, 768px, 1280px) verified
+- **Admin Panel**: All 11 tabs verified functional
+- **Database Integrity**: 0 orphaned resources, 1949 approved resources
+- **Feature Gap Identified**: SubSubcategory/Subcategory pages missing edit buttons
+- **Documentation**: Created comprehensive ISSUES-FOUND.md with all test results
+
+---
+
+## January 28, 2026
+
+### Production Readiness Audit
+- **Repository Cleanup**: Removed 263MB+ of dead weight (client/my-app/, test screenshots, 90+ obsolete test scripts)
+- **Documentation Suite**: Created comprehensive documentation in /docs:
+  - ARCHITECTURE.md - System design and data flows
+  - API.md - Complete API reference (75+ endpoints)
+  - SETUP.md - Development environment guide
+  - ADMIN-GUIDE.md - Administrator documentation
+  - CODE-MAP.md - Codebase navigation guide
+  - CONTRIBUTING.md - Contribution guidelines
+- **README Overhaul**: Updated with accurate feature list, documentation links, and quick start
+- **Essential Scripts Retained**: build-static.ts, reset-admin-password.ts, test-awesome-lint.ts, migrate-audit-log-original-resource-id.ts
+- **File Count**: Reduced from 2,517 to 216 essential project files (excluding node_modules, .git, .cache, .config)
+- **Size Reduction**: From 619MB to 2.7MB of project code (excluding dependencies)
+- **Removed**: 740 test screenshots, 142 attached_assets, obsolete test reports, unused parsers, stale build artifacts
+
+### Resource Details Page Implementation
+- **Comprehensive Resource Details Page**: New `/resource/:id` route displays full resource information including OG images, favicon, tags, scraped metadata, related resources, and share functionality
+- **Dual Navigation System**: Database resources (numeric IDs) navigate to details page; static resources open external links in new tab
+- **Navigation Bug Fix**: Fixed `isDbResource()` check in Category.tsx - was incorrectly looking for `db-` prefix, now correctly detects numeric IDs
+- **Universal Suggest Edit**: SuggestEditDialog now works for all users - authenticated users see edit form, unauthenticated users see login prompt with redirect
+- **Share Functionality**: Web Share API with clipboard fallback and error handling
+- **Responsive Design**: Tested across desktop (1280x720), tablet (768x1024), and mobile (400x720) with WCAG AAA touch targets
+
+---
+
+## January 22, 2026
+
+### Feature Updates
+- **Suggest Edit on Category Page**: Added suggest edit buttons to all three view modes (grid, list, compact) on the Category page. Edit buttons only appear for authenticated users and database-backed resources (id starts with "db-"). Clicking the edit button opens the SuggestEditDialog modal without triggering resource link navigation.
+
+---
+
+## January 21, 2026
+
+### Awesome-Lint Compliance Fixes
+- **Major Export Overhaul**: Reduced awesome-lint errors from 191+ to just 2 (unavoidable structural requirements)
+- **Badge Placement**: Badge now on same line as main heading per awesome-lint spec
+- **ToC Anchor Generation**: Fixed GitHub anchor format - "Community & Events" now correctly links to `#community--events`
+- **URL Deduplication**: Now handles http/https and www/non-www variations
+- **Description Sanitization**:
+  - Removes item name from description start (no-repeat-item-in-description)
+  - Skips empty/punctuation-only descriptions (awesome-list-item compliance)
+  - Handles underscore-containing tool names with "A " prefix for valid casing
+- **Unicode Quote Handling**: Converts curly quotes to straight quotes using Unicode escape sequences
+- **Spelling Corrections**: TensorFlow, CentOS, macOS, WebAssembly, FFmpeg, WebRTC, OpenAI, etc.
+- **Lowercase Starter Preservation**: macOS, npm, webpack, iOS terms preserved when starting descriptions
+- **Remaining 2 Errors**: awesome-contributing (requires CONTRIBUTING.md) and awesome-github (requires git repo) - expected for standalone exports
+
+---
+
+## January 20, 2026
+
+### Feature Updates
+- **View Mode Toggle**: Added three content card view modes (grid, list, compact) using ShadCN ToggleGroup component in the Category page
+- **JSON Export Endpoint**: Added `GET /api/admin/export-json` for full database backup including all resources (all statuses), users, category hierarchies, tags, learning journeys, and sync queue with schema documentation
+- **Tag Filtering Fix**: Fixed tag filtering by transforming resources to include `tags` at root level (extracted from `metadata.tags`) for frontend compatibility
+- **GitHub Import Improvements**:
+  - Added category hierarchy database integration with `ensureCategoryHierarchy()` function
+  - Resources now store hierarchy IDs (categoryId, subcategoryId, subSubcategoryId) in metadata
+  - Update path also populates hierarchy IDs for consistency
+
+---
+
+## December 4, 2025
+
+### Bug Fixes
+- **Bug #8 - Duplicate Slug Validation**: Fixed duplicate slug error handling to return proper 409 Conflict status code instead of 500 Internal Server Error. Applied to categories, subcategories, and sub-subcategories. Users now see clear error messages: "Category with slug 'X' already exists".
+
+---
+
+## System Health Check (as of December 4, 2025)
+- **Database Integrity**: 0 orphaned resources (100% data integrity maintained)
+- **Active Constraints**: 7 UNIQUE and FOREIGN KEY constraints properly enforced
+- **Current Data**: 9 categories, 19 subcategories, 32 sub-subcategories, 1,949 approved resources, 3 users
+- **API Status**: All endpoints responding correctly (authentication, awesome-list, admin)
