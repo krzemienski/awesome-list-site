@@ -1,1 +1,1 @@
-"{\"status\":200,\"email\":\"admin@example.com\"}"
+{"status":200,"email":"admin@example.com","role":"admin"}
