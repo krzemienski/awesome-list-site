@@ -98,6 +98,8 @@ All 27 slots are evaluated for every Phase-1 cell. Slots that produce zero delta
 
 ## 3 · Cross-cutting deltas (apply to every route × every component unless overridden)
 
+*The leading `#` column below is a non-schema row-ID prefix used only for cross-referencing CC-NN deltas from other tables; the canonical 8-column schema (`route | component | property | current value | target value | severity | remediation step | evidence`) starts at the `Route` column.*
+
 | # | Route | Component | Property | Current value | Target value | Severity | Remediation step | Evidence |
 |---|---|---|---|---|---|---|---|---|
 | CC-01 | * | * | 1 Tokens (color) — surface | `:root { --background: oklch(0% 0 0); --foreground: oklch(98% 0 0); --card: oklch(10% 0.005 0); --popover: oklch(7% 0.005 0); --muted: oklch(18% 0.01 0); --border: oklch(22% 0.02 0); --input: oklch(22% 0.02 0); }` | `--bg:#000; --bg-2:#0a0a0a; --surface:#0e0e0e; --surface-2:#141414; --text:#fff; --text-2:#bdbdbd; --text-3:#7a7a7a; --line:#1e1e1e; --line-2:#2a2a2a;` (DS_SPEC §3.1, Terminal column) | Critical (P0) | Add `client/src/styles/design-system.css` (DS_SPEC §10) defining these tokens. Delete the OKLCH block from `client/src/index.css`. Add a thin compatibility shim in `tailwind.config.ts` that aliases shadcn names to DS tokens so `bg-card` / `text-muted-foreground` callsites keep working. | `_validation/phase-2/BASELINE_REPORT.md`; `_validation/phase-2/home/1280-dark-unauth-populated.dom.html`; code: `client/src/index.css`. |
@@ -184,20 +186,22 @@ Phase-2 captured `error` state (test id resolves to 404).
 
 ### 4.6 `/profile` (slug `profile`)
 
-Phase-2 captured `populated` state (admin auth).
+Phase-2 captured **both** `gate` (unauth — redirect to `/login`) and `populated` (admin auth) states.
 
 | Route | Component | Property | Current value | Target value | Severity | Remediation step | Evidence |
 |---|---|---|---|---|---|---|---|
+| `/profile` | Unauth gate | 21 States — error / protected-route | `useAuth()` hook returns `!isAuthenticated`; component returns `<Redirect to="/login">` with no transitional UI. Phase-2 capture confirms gate produces same `/login` DOM, not an in-place "please sign in" panel. | Matches DS for protected routes — silent redirect to canonical sign-in. No DS-spec'd "auth-wall card" required for non-`/admin` routes. | INFO | Matches DS — no work. Behaviour shared with `/bookmarks` (§4.7 row 1). | `_validation/phase-2/profile/1280-dark-unauth-gate.dom.html`; code: `client/src/pages/Profile.tsx`. |
 | `/profile` | Page | 22 ARIA | Missing `<main>` + `<h1>` (axe `landmark-one-main`, `page-has-heading-one`). | CC-14. | High (P1) | CC-14. | `_validation/phase-2/profile/1280-dark-admin-populated.axe.json`. |
 | `/profile` | Avatar | 11 Variants | `<Avatar h-8 w-8>` `rounded-full`. | DS keeps avatars circular by exception (DS_SPEC §5.7). | INFO | Matches DS. | `_validation/phase-2/profile/1280-dark-admin-populated.dom.html`; code: `client/src/components/ui/avatar.tsx`. |
 | `/profile` | Fields | 11 Variants | `<Input>` (see §4.10). | `.field`. | High (P1) | §4.10 row 1. | `_validation/phase-2/BASELINE_REPORT.md`; `_validation/phase-2/submit/1280-dark-unauth-populated.dom.html`; code: `client/src/pages/Profile.tsx`. |
 
 ### 4.7 `/bookmarks` (slug `bookmarks`)
 
-Phase-2 captured `populated` state.
+Phase-2 captured **both** `gate` (unauth) and `populated` (admin auth) states.
 
 | Route | Component | Property | Current value | Target value | Severity | Remediation step | Evidence |
 |---|---|---|---|---|---|---|---|
+| `/bookmarks` | Unauth gate | 21 States — error / protected-route | `useAuth()` `!isAuthenticated` → `<Redirect to="/login">`; no transitional auth-wall card. Phase-2 gate capture renders the `/login` DOM. | Silent redirect to `/login` — matches DS for non-admin protected routes. No DS-spec'd "auth-wall" molecule required. | INFO | Matches DS — no work. Behaviour shared with `/profile` (§4.6 row 1). | `_validation/phase-2/bookmarks/1280-dark-unauth-gate.dom.html`; code: `client/src/pages/Bookmarks.tsx`. |
 | `/bookmarks` | Page | 22 ARIA | Missing `<main>` + `<h1>`. | CC-14. | High (P1) | CC-14. | `_validation/phase-2/bookmarks/1280-dark-admin-populated.axe.json`. |
 | `/bookmarks` | Resource cards | 11 Variants | Same `<Card>` as §4.1. | `.card`. | High (P1) | §4.1 row 2. | `_validation/phase-2/bookmarks/1280-dark-admin-populated.dom.html`; code: `client/src/pages/Bookmarks.tsx`. |
 | `/bookmarks` | Empty state | 20 States — empty | Not captured by Phase 2; component renders plain `<p>`. | `.empty-state`. | Medium (P2) | §4.1 row 7. | `_validation/phase-2/bookmarks/1280-dark-admin-populated.dom.html`; code: `client/src/pages/Bookmarks.tsx`. |
@@ -333,7 +337,7 @@ All rows use the full 8-column schema.
 
 | Route | Component | Property | Current value | Target value | Severity | Remediation step | Evidence |
 |---|---|---|---|---|---|---|---|
-| `admin#approvals` | Pending resource card | 11 Variants | `<Card>` + `<Badge variant="destructive">` count chip. | `.card` + `.chip.err`. | High (P1) | §4.1 row 2 + GAP-1. | `_validation/phase-2/admin-approvals/1280-dark-admin-populated.dom.html`. |
+| `admin#approvals` | Pending resource card | 11 Variants | `<Card>` + `<Badge variant="destructive">` count chip. | `.card` + `.chip.err` — `.chip.err` is DS GAP (see §7 GAP-1). | High (P1) | §4.1 row 2 + see §7 GAP-1. | `_validation/phase-2/admin-approvals/1280-dark-admin-populated.dom.html`. |
 | `admin#approvals` | Page | 22 ARIA | Missing `<main>` + `<h1>` (axe). | CC-14. | High (P1) | CC-14. | `_validation/phase-2/admin-approvals/1280-dark-admin-populated.axe.json`. |
 | `admin#approvals` | Bulk action buttons | 11 Variants | `<Button variant="default">` row. | `.btn.primary` / `.btn.danger`. | Medium (P2) | §5.6 row 1 + CC-02. | `_validation/phase-2/admin-approvals/1280-dark-admin-populated.dom.html`; code: `client/src/components/admin/PendingResources.tsx`. |
 
