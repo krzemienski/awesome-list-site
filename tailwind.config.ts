@@ -1,86 +1,85 @@
 import type { Config } from "tailwindcss";
 
+/*
+ * Dark-mode class collapsed (CC-10): Terminal is dark-only.
+ * `xs` breakpoint set to 375 px (CC-13): aligned with Phase-2 mobile viewport.
+ * Color keys aliased to DS tokens — see `client/src/styles/design-system.css`
+ * and the `@theme inline` block in `client/src/index.css`. Legacy shadcn
+ * callsites (`bg-card`, `border-input`, `text-primary`, etc.) compile against
+ * the DS surface.
+ */
 export default {
-  darkMode: ["class"],
   content: ["./client/index.html", "./client/src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
       screens: {
-        'xs': '480px',
+        'xs': '375px',
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        lg: "0",
+        md: "0",
+        sm: "0",
       },
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        background: "var(--bg)",
+        foreground: "var(--text)",
         card: {
-          DEFAULT: "var(--card)",
-          foreground: "var(--card-foreground)",
+          DEFAULT: "var(--surface)",
+          foreground: "var(--text)",
         },
         popover: {
-          DEFAULT: "var(--popover)",
-          foreground: "var(--popover-foreground)",
+          DEFAULT: "var(--bg-2)",
+          foreground: "var(--text)",
         },
         primary: {
-          DEFAULT: "var(--primary)",
-          foreground: "var(--primary-foreground)",
+          DEFAULT: "var(--accent)",
+          foreground: "#000000",
         },
         secondary: {
-          DEFAULT: "var(--secondary)",
-          foreground: "var(--secondary-foreground)",
+          DEFAULT: "var(--surface-2)",
+          foreground: "var(--text)",
         },
         muted: {
-          DEFAULT: "var(--muted)",
-          foreground: "var(--muted-foreground)",
+          DEFAULT: "var(--surface)",
+          foreground: "var(--text-2)",
         },
         accent: {
-          DEFAULT: "var(--accent)",
-          foreground: "var(--accent-foreground)",
+          DEFAULT: "var(--surface-2)",
+          foreground: "var(--text)",
         },
         destructive: {
-          DEFAULT: "var(--destructive)",
-          foreground: "var(--destructive-foreground)",
+          DEFAULT: "#ff5c7a",
+          foreground: "#000000",
         },
         border: "var(--border)",
-        input: "var(--input)",
-        ring: "var(--ring)",
+        input: "var(--border)",
+        ring: "var(--accent)",
         chart: {
-          "1": "var(--chart-1)",
-          "2": "var(--chart-2)",
-          "3": "var(--chart-3)",
-          "4": "var(--chart-4)",
-          "5": "var(--chart-5)",
+          "1": "var(--accent)",
+          "2": "#34d08c",
+          "3": "#5eddf2",
+          "4": "#ffb84d",
+          "5": "#9d4edd",
         },
         sidebar: {
-          DEFAULT: "var(--sidebar-background)",
-          foreground: "var(--sidebar-foreground)",
-          primary: "var(--sidebar-primary)",
-          "primary-foreground": "var(--sidebar-primary-foreground)",
-          accent: "var(--sidebar-accent)",
-          "accent-foreground": "var(--sidebar-accent-foreground)",
-          border: "var(--sidebar-border)",
-          ring: "var(--sidebar-ring)",
+          DEFAULT: "var(--bg)",
+          foreground: "var(--text)",
+          primary: "var(--accent)",
+          "primary-foreground": "#000000",
+          accent: "var(--surface-2)",
+          "accent-foreground": "var(--text)",
+          border: "var(--border)",
+          ring: "var(--accent)",
         },
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
         },
       },
       animation: {

@@ -1,6 +1,7 @@
 import { hydrateRoot, createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
+import "./lib/design-system";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,6 +10,9 @@ import { ThemeProvider } from "@/components/ui/theme-provider";
 
 // Force dark theme immediately
 document.documentElement.classList.add('dark');
+// CC-12 / GAP-9 — lucide icons default to 1.5 stroke per DS spec via CSS
+// (`.lucide { stroke-width: 1.5 }` lives in design-system.css). Per-instance
+// audit of explicit strokeWidth overrides is deferred to WP-6.
 
 // Types for SSR data
 interface QueryState {

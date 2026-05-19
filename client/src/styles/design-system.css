@@ -1,0 +1,151 @@
+/* =====================================================================
+   AWESOME.VIDEO DESIGN SYSTEM — FOUNDATION (WP-1)
+   Terminal-only (Option A). Component skins land in WP-2.
+   Sourced 1:1 from awesome-list-site-ds/{styles.css,design-systems.jsx}.
+   ===================================================================== */
+
+:root {
+  /* ----- Terminal defaults (overwritten on accent swap by applyDesignSystem) ----- */
+
+  /* Surface */
+  --bg:            #000000;
+  --bg-2:          #040404;
+  --surface:       rgba(0, 255, 136, 0.012);
+  --surface-2:     rgba(0, 255, 136, 0.025);
+  --surface-3:     rgba(0, 255, 136, 0.05);
+  --border:        rgba(232, 232, 224, 0.14);
+  --border-strong: rgba(232, 232, 224, 0.32);
+  --hairline:      rgba(232, 232, 224, 0.08);
+
+  /* Ink */
+  --text:   #e8e8e0;
+  --text-2: rgba(232, 232, 224, 0.62);
+  --text-3: rgba(232, 232, 224, 0.36);
+  --text-4: rgba(232, 232, 224, 0.2);
+
+  /* Accent (Matrix default — overwritten by ACCENTS table via applyDesignSystem) */
+  --accent:   #00ff88;
+  --accent-2: #39ff14;
+
+  /* Type — Terminal collapses all three families to IBM Plex Mono */
+  --font-body:    'IBM Plex Mono', ui-monospace, 'JetBrains Mono', monospace;
+  --font-display: 'IBM Plex Mono', ui-monospace, 'JetBrains Mono', monospace;
+  --font-mono:    'IBM Plex Mono', ui-monospace, 'JetBrains Mono', monospace;
+  --display-weight:   600;
+  --display-tracking: -0.01em;
+  --display-leading:  1.1;
+  --body-leading:     1.55;
+  --eyebrow-tracking: 0.2em;
+  --mono-size-step:   12px;
+
+  /* Shape — Terminal is square */
+  --radius:      0;
+  --radius-sm:   0;
+  --radius-pill: 0;
+  --border-w:    1px;
+  --hairline-w:  1px;
+
+  /* Shadow — Terminal has no drop shadows; accent glow only */
+  --shadow-sm:     none;
+  --shadow:        none;
+  --shadow-lg:     0 0 0 1px var(--accent), inset 0 0 60px color-mix(in srgb, var(--accent) 8%, transparent);
+  --shadow-accent: 0 0 0 1px var(--accent), 0 0 24px color-mix(in srgb, var(--accent) 30%, transparent);
+
+  /* Atmosphere — scanlines + faint accent vignette (CC-07) */
+  --bg-atmosphere:
+    repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(255, 255, 255, 0.018) 2px, rgba(255, 255, 255, 0.018) 3px),
+    radial-gradient(ellipse 800px 600px at 50% 50%, color-mix(in srgb, var(--accent) 4%, transparent), transparent 70%);
+  --bg-atmosphere-size: auto;
+  --grain-opacity: 0.5;
+
+  /* Motion tokens — CC-05 */
+  --motion-fast:   160ms;
+  --motion-base:   240ms;
+  --motion-slow:   400ms;
+  --motion-ease:   cubic-bezier(0.2, 0.65, 0.3, 1);
+}
+
+/* ============== BASE ============== */
+html,
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-image: var(--bg-atmosphere);
+  background-size: var(--bg-atmosphere-size);
+  background-attachment: fixed;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 35%, transparent);
+  color: #fff;
+}
+
+/* ============== SKIP-LINK (CC-17) ============== */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 8px;
+  z-index: 9999;
+  padding: 8px 14px;
+  background: var(--accent);
+  color: #000;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  border: 0;
+}
+.skip-link:focus,
+.skip-link:focus-visible {
+  top: 8px;
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ============== DISABLED UTILITY (CC-18) ============== */
+[disabled],
+[aria-disabled="true"],
+.is-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============== ICONOGRAPHY (CC-12 / GAP-9) ============== */
+.lucide,
+svg.lucide,
+[class*="lucide-"] {
+  stroke-width: 1.5;
+}
+
+/* ============== :ACTIVE PRESS (CC-06) ============== */
+button:active:not([disabled]):not([aria-disabled="true"]),
+.btn:active:not([disabled]):not([aria-disabled="true"]),
+[role="button"]:active:not([disabled]):not([aria-disabled="true"]) {
+  transform: translateY(1px);
+}
+
+/* ============== REDUCED MOTION (CC-05, CC-11) ============== */
+.no-anim,
+.no-anim *,
+.no-anim *::before,
+.no-anim *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

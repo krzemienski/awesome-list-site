@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { AwesomeList } from "@/types/awesome-list";
 import AppSidebar from "./AppSidebar";
 import AppHeader from "./AppHeader";
@@ -30,6 +30,9 @@ export default function MainLayout({ awesomeList, isLoading, children, user, onL
 
   return (
     <SidebarProvider defaultOpen={!isMobile}>
+      {/* CC-17 — Skip-link is the first focusable element on every page. */}
+      <a href="#main" className="skip-link">Skip to main content</a>
+
       <AppSidebar
         categories={awesomeList?.categories || []}
         resources={awesomeList?.resources || []}
@@ -42,11 +45,18 @@ export default function MainLayout({ awesomeList, isLoading, children, user, onL
           user={user}
           onLogout={onLogout}
         />
-        <div className="flex-1 min-w-0 overflow-x-hidden p-3 sm:p-4 md:p-6">
+        {/*
+          CC-14 (landmark half) — single <main id="main"> wrapping route content.
+          CC-16 — 1280 max-width with 48 px desktop gutters.
+        */}
+        <main
+          id="main"
+          className="flex-1 min-w-0 overflow-x-hidden mx-auto w-full max-w-[1280px] px-4 sm:px-6 md:px-12 py-8"
+        >
           {children}
-        </div>
+        </main>
         <footer className="border-t px-4 sm:px-6 py-3 sm:py-4">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs sm:text-sm text-muted-foreground">
+          <div className="mx-auto flex max-w-[1280px] flex-col items-center justify-between gap-2 text-xs sm:text-sm text-muted-foreground sm:flex-row">
             <p>
               Built with{" "}
               <a href="https://reactjs.org" target="_blank" rel="noopener noreferrer" className="font-medium underline underline-offset-4 hover:text-foreground">React</a>

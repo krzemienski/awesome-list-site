@@ -349,10 +349,15 @@ SidebarRail.displayName = "SidebarRail"
 
 const SidebarInset = React.forwardRef<
   HTMLDivElement,
-  React.ComponentProps<"main">
+  React.ComponentProps<"div">
 >(({ className, ...props }, ref) => {
+  /*
+   * DS Migration WP-1 (CC-14) — SidebarInset is the chrome wrapper, not the
+   * page landmark. The single <main id="main"> lives in MainLayout so axe's
+   * `landmark-one-main` rule passes globally.
+   */
   return (
-    <main
+    <div
       ref={ref}
       className={cn(
         "relative flex min-w-0 flex-1 flex-col bg-background overflow-x-hidden max-w-full",

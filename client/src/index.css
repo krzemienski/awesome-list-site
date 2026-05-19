@@ -1,147 +1,82 @@
+/*
+  Foundation order matters: DS tokens MUST load before Tailwind so the
+  @theme inline block below can alias shadcn color keys to DS tokens.
+*/
+@import './styles/design-system.css';
 @import './styles/mobile-optimizations.css';
 @import './styles/skeleton-animations.css';
 @import './styles/scrolling-fix.css';
 
 @import "tailwindcss";
 
-:root {
-  --background: oklch(0% 0 0);
-  --foreground: oklch(98% 0 0);
-  --card: oklch(10% 0.005 0);
-  --card-foreground: oklch(98% 0 0);
-  --popover: oklch(7% 0.005 0);
-  --popover-foreground: oklch(98% 0 0);
-  --primary: oklch(59% 0.28 18);
-  --primary-foreground: oklch(98% 0 0);
-  --secondary: oklch(18% 0.02 280);
-  --secondary-foreground: oklch(90% 0 0);
-  --muted: oklch(18% 0.01 0);
-  --muted-foreground: oklch(65% 0.01 0);
-  --accent: oklch(22% 0.03 280);
-  --accent-foreground: oklch(90% 0 0);
-  --destructive: oklch(55% 0.22 30);
-  --destructive-foreground: oklch(98% 0 0);
-  --border: oklch(22% 0.02 0);
-  --input: oklch(22% 0.02 0);
-  --ring: oklch(59% 0.28 18);
-  --chart-1: oklch(59% 0.28 18);
-  --chart-2: oklch(70% 0.18 150);
-  --chart-3: oklch(65% 0.2 260);
-  --chart-4: oklch(80% 0.15 85);
-  --chart-5: oklch(65% 0.22 300);
-  --sidebar: oklch(0% 0 0);
-  --sidebar-foreground: oklch(98% 0 0);
-  --sidebar-primary: oklch(59% 0.28 18);
-  --sidebar-primary-foreground: oklch(98% 0 0);
-  --sidebar-accent: oklch(22% 0.03 280);
-  --sidebar-accent-foreground: oklch(90% 0 0);
-  --sidebar-border: oklch(22% 0.02 0);
-  --sidebar-ring: oklch(59% 0.28 18);
-  --sidebar-background: oklch(0% 0 0);
-  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-serif: ui-serif, Georgia, serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
-  --radius: 0.25rem;
-}
-
-.dark {
-  --background: oklch(0% 0 0);
-  --foreground: oklch(98% 0 0);
-  --card: oklch(10% 0.005 0);
-  --card-foreground: oklch(98% 0 0);
-  --popover: oklch(7% 0.005 0);
-  --popover-foreground: oklch(98% 0 0);
-  --primary: oklch(59% 0.28 18);
-  --primary-foreground: oklch(98% 0 0);
-  --secondary: oklch(18% 0.02 280);
-  --secondary-foreground: oklch(90% 0 0);
-  --muted: oklch(18% 0.01 0);
-  --muted-foreground: oklch(65% 0.01 0);
-  --accent: oklch(22% 0.03 280);
-  --accent-foreground: oklch(90% 0 0);
-  --destructive: oklch(55% 0.22 30);
-  --destructive-foreground: oklch(98% 0 0);
-  --border: oklch(22% 0.02 0);
-  --input: oklch(22% 0.02 0);
-  --ring: oklch(59% 0.28 18);
-  --chart-1: oklch(59% 0.28 18);
-  --chart-2: oklch(70% 0.18 150);
-  --chart-3: oklch(65% 0.2 260);
-  --chart-4: oklch(80% 0.15 85);
-  --chart-5: oklch(65% 0.22 300);
-  --sidebar: oklch(0% 0 0);
-  --sidebar-foreground: oklch(98% 0 0);
-  --sidebar-primary: oklch(59% 0.28 18);
-  --sidebar-primary-foreground: oklch(98% 0 0);
-  --sidebar-accent: oklch(22% 0.03 280);
-  --sidebar-accent-foreground: oklch(90% 0 0);
-  --sidebar-border: oklch(22% 0.02 0);
-  --sidebar-ring: oklch(59% 0.28 18);
-  --sidebar-background: oklch(0% 0 0);
-}
-
+/*
+  Tailwind v4 @theme inline — map shadcn color keys to DS tokens.
+  Every `bg-card`, `border-input`, `text-primary`, `bg-muted` etc.
+  across the existing codebase resolves against the DS surface.
+*/
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
+  --color-card: var(--surface);
+  --color-card-foreground: var(--text);
+  --color-popover: var(--bg-2);
+  --color-popover-foreground: var(--text);
+  --color-primary: var(--accent);
+  --color-primary-foreground: #000000;
+  --color-secondary: var(--surface-2);
+  --color-secondary-foreground: var(--text);
+  --color-muted: var(--surface);
+  --color-muted-foreground: var(--text-2);
+  --color-accent: var(--surface-2);
+  --color-accent-foreground: var(--text);
+  --color-destructive: #ff5c7a;
+  --color-destructive-foreground: #000000;
   --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
+  --color-input: var(--border);
+  --color-ring: var(--accent);
+  --color-chart-1: var(--accent);
+  --color-chart-2: #34d08c;
+  --color-chart-3: #5eddf2;
+  --color-chart-4: #ffb84d;
+  --color-chart-5: #9d4edd;
+  --color-sidebar: var(--bg);
+  --color-sidebar-foreground: var(--text);
+  --color-sidebar-primary: var(--accent);
+  --color-sidebar-primary-foreground: #000000;
+  --color-sidebar-accent: var(--surface-2);
+  --color-sidebar-accent-foreground: var(--text);
+  --color-sidebar-border: var(--border);
+  --color-sidebar-ring: var(--accent);
 
-  --font-sans: var(--font-sans);
+  --font-sans: var(--font-body);
   --font-mono: var(--font-mono);
-  --font-serif: var(--font-serif);
+  --font-serif: var(--font-display);
 
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  /* Radius ladder collapsed to 0 — Terminal is square (CC-04). */
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
 }
 
 @layer base {
   * {
     @apply border-border;
   }
-  
+
   html, body {
-    background-color: var(--background);
-    color: var(--foreground);
+    background-color: var(--bg);
+    color: var(--text);
     font-feature-settings: "rlig" 1, "calt" 1;
-    font-family: var(--font-sans);
+    font-family: var(--font-body);
   }
-  
+
   code, pre, kbd, samp {
     font-family: var(--font-mono);
   }
 }
 
 ::selection {
-  background-color: var(--primary);
-  color: var(--primary-foreground);
+  background-color: var(--accent);
+  color: #000000;
 }
