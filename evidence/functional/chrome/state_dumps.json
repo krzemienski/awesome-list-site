@@ -1,0 +1,34 @@
+{
+  "baseline_A": {"accent":"#ff3d52","bodyText":1878,"btns":33,"font":"'Inter', ui-sans-serif, system","fontLS":null,"preset":null,"sidebarBtns":16},
+  "sidebar_expand_top_B": {"clicked":"expand-cat-community-events","subsAfter":2,"expandSubsAfter":2},
+  "sidebar_expand_sub_C": {"clicked":"expand-sub-community-groups","totalSubBtns":3},
+  "search_via_button_D": {"cmdInput":true,"dialog":1,"placeholder":"Search packages, libraries, and tools..."},
+  "search_via_cmdk_E": {"dialogAfterEsc":0,"dialogAfterCmdK":1,"cmdInputAfterCmdK":true},
+  "search_via_slash_F_FAIL": {"dialogAfterSlash":0,"comment":"FC-01 — / does not open the live dialog because App.tsx handler targets orphan state"},
+  "login_button_G": {"found":true,"text":"Login"},
+  "footer_about_H": {"found":true,"href":"/about"},
+  "category_route_I": {"url":"/category/players-clients","activeMenu":["Players & Clients221"],"breadcrumb":["Home","","Category","","Players Clients"]},
+  "theme_page_render_J": {"fontOptions":6,"themeOptions":6,"fontLabels":["Inter","DM Sans","Source Sans 3","IBM Plex Sans","JetBrains Mono","System Default"],"themeLabels_FAIL":[],"comment":"FC-03 — preset.label undefined → empty card titles"},
+  "font_cycle_K": [
+    {"pick":"font-option-inter","font":"'Inter', ui-sans-serif, system-ui, -appl","fontLS":"inter"},
+    {"pick":"font-option-dm-sans","font":"'DM Sans', ui-sans-serif, system-ui, san","fontLS":"dm-sans"},
+    {"pick":"font-option-source-sans","font":"'Source Sans 3', ui-sans-serif, system-u","fontLS":"source-sans"},
+    {"pick":"font-option-ibm-plex","font":"'IBM Plex Sans', ui-sans-serif, system-u","fontLS":"ibm-plex"},
+    {"pick":"font-option-jetbrains","font":"'JetBrains Mono', ui-monospace, monospac","fontLS":"jetbrains"},
+    {"pick":"font-option-system","font":"ui-sans-serif, system-ui, -apple-system,","fontLS":"system"}
+  ],
+  "color_cycle_L_FAIL": [
+    {"pick":"theme-option-cyberpunk","accent":"#ff3d52","accent2":"#b84dff","presetLS":"cyberpunk"},
+    {"pick":"theme-option-limes","accent":"#ff3d52","accent2":"#b84dff","presetLS":"limes"},
+    {"pick":"theme-option-black-pink","accent":"#ff3d52","accent2":"#b84dff","presetLS":"black-pink"},
+    {"pick":"theme-option-flat-pink","accent":"#ff3d52","accent2":"#b84dff","presetLS":"flat-pink"},
+    {"pick":"theme-option-purples","accent":"#ff3d52","accent2":"#b84dff","presetLS":"purples"},
+    {"pick":"theme-option-flat-purples","accent":"#ff3d52","accent2":"#b84dff","presetLS":"flat-purples"}
+  ],
+  "reload_persistence_M": {"fontLS":"dm-sans","presetLS":"limes","activeFontVar":"'DM Sans', ui-sans-serif, system-ui, san","activeAccentVar":"#ff3d52","comment":"font hydrates correctly; accent does not (FC-02)"},
+  "mobile_baseline_N": {"hamburger":true,"offcanvas":false,"sidebarVisible":false},
+  "mobile_drawer_open_O": {"sheet":1,"sidebarSheet":true,"visibleMenuBtns":16},
+  "mobile_drawer_close_P": {"dialogsAfterClose":0},
+  "skip_link_Q": {"present":true,"focused":true,"href":"#main","text":"Skip to main content","position":"absolute","top":"8px","left":"8px","zIndex":"9999","opacity":"1","clipPath":"none","transform":"none"},
+  "theme_dot_R": {"dotBg":"rgb(255, 0, 60)","dotInline":"background-color: rgb(255, 0, 60);"}
+}
