@@ -4,6 +4,7 @@ import { categories, subcategories, subSubcategories, resources, users, resource
 import { eq } from "drizzle-orm";
 import { hashPassword } from "./passwordUtils";
 import { mapCategoryName } from "@shared/categoryMapping";
+import { seedJourneyStepsForExisting } from "./cli/seedJourneyStepsForExisting";
 
 /**
  * Helper function to generate slugs from category names
@@ -425,6 +426,16 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
         console.error(`  ❌ ${errorMsg}`);
         result.errors.push(errorMsg);
       }
+    }
+
+    // Backfill canonical learning-journey steps so /journey/:id pages are
+    // never empty. Idempotent — no-ops when steps are already present.
+    try {
+      await seedJourneyStepsForExisting();
+    } catch (journeyErr: unknown) {
+      const msg = journeyErr instanceof Error ? journeyErr.message : 'Unknown error';
+      console.error(`  ⚠️ Journey-step backfill reported an issue: ${msg}`);
+      result.errors.push(`Journey-step backfill: ${msg}`);
     }
 
     console.log("\n✅ Database seeding completed!");
