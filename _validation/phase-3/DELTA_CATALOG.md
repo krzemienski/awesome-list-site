@@ -89,7 +89,7 @@ All 27 slots are evaluated for every Phase-1 cell. Slots that produce zero delta
 |---|---|---|
 | P0 | 7 | First paint of any DS surface: token surface, font, radius, boot script, design-system.css, design-system.ts, ThemeSettings rewire. |
 | P1 | 45 | All visible visual + behavioural deltas across atoms / molecules / layout. |
-| P2 | 28 | Token-name parity, ARIA gaps, missing variants, missing states. |
+| P2 | 29 | Token-name parity, ARIA gaps, missing variants, missing states. |
 | P3 | 12 | Polish (reduced-motion, icon stroke width, iconography sizing). |
 | INFO | 14 | Zero-delta cells (kept for §6 completeness). |
 | **DS GAP** | 9 | DS_SPEC silent — proposed resolutions in §7. |
