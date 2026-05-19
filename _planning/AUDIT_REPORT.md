@@ -487,3 +487,41 @@ Captured at 1280×720 against the running dev server (post-HMR of all three edit
 | `/journey/6` ("Video Streaming Fundamentals") | `screenshots/task40/journey-6.jpg` | Back button + breadcrumb `Home › Journey › 6` render. Header card shows crimson `BookOpen` (h-14, was empty/missing-glyph) on the left + green "Beginner" trophy badge on the right, then title + description + meta badges (8-10 hours / Intro & Learning / 0 steps) + auth alert ("Please log in…"). "Learning Path" empty-state alert below shows the Carve-out MR-XO-02 behavior (journey #6 has 0 published steps). |
 
 No browser console errors on any of the three routes (only vite HMR connect + React DevTools hint).
+
+---
+
+## Appendix E — Chrome (Sidebar / Header / MainLayout): fixes applied
+
+**Task #41** — Applied every BLOCK/FIX item in the §3.5 "Sidebar/Header/MainLayout chrome" bucket. Scope strictly limited to the persistent shell rendered around every page; no DS-primitive changes (deferred to Task #42).
+
+### Per-row resolution
+
+| Master ID | Severity | Code area | Resolution |
+|---|---|---|---|
+| MR-CH-01 | FIX | `AppSidebar.tsx:139,171` | Replaced `className="eyebrow"` on both `SidebarGroupLabel` instances ("Navigation" / "Categories") with `font-sans text-xs text-muted-foreground normal-case tracking-normal` — strips crimson + uppercase + 0.18em tracking, restores plain muted lowercase per reference. The `normal-case` + `tracking-normal` overrides ensure no inherited eyebrow-like treatment leaks from theme blocks (`[data-system="editorial"] .eyebrow { color: var(--accent); font-weight: 700; }`). |
+| MR-CH-02 | FIX | `AppSidebar.tsx:130` | Replaced brand resource-count span class `font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground` with `font-sans text-xs text-muted-foreground` — drops the mono + uppercase + wide-tracking eyebrow rhythm, renders plain "1952 resources" lowercase muted per reference. |
+| MR-CH-03 | FIX | `MainLayout.tsx:42-80` | Wrapped `AppSidebar + SidebarInset` subtree in `<div className="page contents">`. The `.page` class satisfies the DS handoff **structural-class / semantic contract** (`.page` defined at `design-system.css:107`) so DS sweeps and downstream tooling can locate the page boundary. **Caveat:** Tailwind's `contents` utility (`display: contents`) suppresses the element's own box, so `.page`'s container visuals (`position: relative`, min-height, background) are inert while the wrapper renders this way — atmosphere/background continues to come from the body-level rules established in WP-1. This is intentional: it keeps the existing `SidebarProvider` flex layout (sidebar + `SidebarInset` as flex siblings, with the `peer` / `peer-data-*` relationship intact) untouched. If a future DS pass requires `.page` container visuals to take effect, drop the `contents` utility and re-verify the flex/peer chain. Skip-link + `.grain` overlay remain siblings of the wrapper so they continue to render as the first focusable element + atmosphere overlay respectively. |
+| MR-CH-04 | FIX | `AppSidebar.tsx:109-117` | `isActive` comparator hardened: added `normalizePath()` helper that `decodeURIComponent`s both sides and strips a trailing `/` before exact comparison. Resolves the suspected encoded-slug / trailing-slash mismatch where leaf `SidebarMenuSubButton` failed to set `data-active="true"` on `/subcategory/*` and `/sub-subcategory/*` routes despite the rail expanding correctly. |
+| MR-CH-05 | FIX | (sweep) | Searched `client/src` for `.map(... => <>...)` shorthand without keys — **0 matches**. All remaining `<>` Fragment usages are conditional render returns (e.g. `Journeys.tsx:252,257` Button content; `JourneyDetail.tsx:262,302,402` route guards) — none are inside `.map()` callbacks, so none can produce a missing-key warning. WP-3 mitigation in `AppHeader.tsx:73` (`Fragment` → `flatMap`) was the only required site. Warning is closed at the chrome layer; if it recurs, source is outside the chrome bucket. |
+| MR-CH-06 | NIT | (none) | Verification-only — `/` kbd hint correctly hidden below `sm:` breakpoint per Tailwind responsive utility on `AppHeader.tsx:101-103`. |
+| MR-CH-07 | NIT | (none) | Verification-only — `AppHeader.tsx:118` accent dot reads correct `activeTheme.preview.accent` field; downstream paint is masked by MR-DS-02 (Task #42 territory). |
+| MR-CH-08 | NIT | (none) | Verification-only — skip-link + focus rings + mobile drawer dismissal paths all PASS per #34. |
+| MR-CH-09 | NIT | (none) | Verification-only — mobile reference drift is methodology metadata, not a code defect. |
+
+### Net code edits this task
+
+**3 files touched, 5 surgical edits**:
+- `AppSidebar.tsx` — 4 edits (brand count span class; 2× `SidebarGroupLabel` class; `isActive` comparator hardening with `normalizePath` helper).
+- `MainLayout.tsx` — 1 edit (`.page contents` wrapper around chrome subtree, with comment block).
+- `AppHeader.tsx` — 0 edits (already correct from WP-3; included in sweep for MR-CH-05).
+- `ui/sidebar.tsx` — 0 edits (DS-primitive; reserved for Task #42 per task spec out-of-scope clause).
+
+### Render verification evidence
+
+Captured at 1280×720 against running dev server (post-HMR of all edits):
+
+| Route | Observed |
+|---|---|
+| `/` | Sidebar brand reads "Awesome Video" (bold Inter) + "1952 resources" (plain muted lowercase, not crimson uppercase). "Navigation" + "Categories" `SidebarGroupLabel`s render as plain muted lowercase (no crimson, no uppercase tracking). Category list iterates 9 categories with icon + name + tabular count badge — unchanged from baseline. Header search chip + breadcrumb (Home) + theme dot + Login button render correctly. Accordion expand/collapse, mobile drawer trigger, search trigger, `/` kbd hint, skip-link, and focus rings all preserved per Task #34 verification. |
+
+No new browser console errors; no missing-key React warnings; `.page` wrapper applied with `display: contents` so existing flex layout established by `SidebarProvider` is unaltered.

@@ -103,7 +103,15 @@ export default function AppSidebar({ categories, resources, isLoading, user }: A
     setOpenMobile(false);
   };
 
-  const isActive = (path: string) => location === path;
+  const normalizePath = (p: string) => {
+    try {
+      const decoded = decodeURIComponent(p);
+      return decoded.length > 1 && decoded.endsWith("/") ? decoded.slice(0, -1) : decoded;
+    } catch {
+      return p;
+    }
+  };
+  const isActive = (path: string) => normalizePath(location) === normalizePath(path);
 
   const navItems = [
     { label: "Home", icon: Home, href: "/" },
@@ -124,7 +132,7 @@ export default function AppSidebar({ categories, resources, isLoading, user }: A
               </div>
               <div className="flex flex-col gap-0.5 leading-none">
                 <span className="font-sans text-sm font-semibold tracking-tight">Awesome Video</span>
-                <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground">{resources.length} resources</span>
+                <span className="font-sans text-xs text-muted-foreground">{resources.length} resources</span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -133,7 +141,7 @@ export default function AppSidebar({ categories, resources, isLoading, user }: A
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="eyebrow">Navigation</SidebarGroupLabel>
+          <SidebarGroupLabel className="font-sans text-xs text-muted-foreground normal-case tracking-normal">Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {navItems.map((item) => (
@@ -165,7 +173,7 @@ export default function AppSidebar({ categories, resources, isLoading, user }: A
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel className="eyebrow">Categories</SidebarGroupLabel>
+          <SidebarGroupLabel className="font-sans text-xs text-muted-foreground normal-case tracking-normal">Categories</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {isLoading

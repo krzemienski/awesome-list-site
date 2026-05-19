@@ -34,16 +34,19 @@ export default function MainLayout({ awesomeList, isLoading, children, user, onL
       <a href="#main" className="skip-link">Skip to main content</a>
       {/* WP-1 — Editorial atmosphere: SVG grain overlay + radial accent
           atmosphere. The atmosphere gradient lives on body (handoff parity),
-          and .grain is the SVG fractal-noise overlay at 0.32 opacity. */}
+          and .grain is the SVG fractal-noise overlay at 0.32 opacity.
+          MR-CH-03 — Wrap chrome subtree in `.page` to satisfy DS handoff
+          contract (page-level structural class required by Editorial DS). */}
       <div className="grain" aria-hidden="true" />
 
-      <AppSidebar
-        categories={awesomeList?.categories || []}
-        resources={awesomeList?.resources || []}
-        isLoading={isLoading}
-        user={user}
-      />
-      <SidebarInset>
+      <div className="page contents">
+        <AppSidebar
+          categories={awesomeList?.categories || []}
+          resources={awesomeList?.resources || []}
+          isLoading={isLoading}
+          user={user}
+        />
+        <SidebarInset>
         <AppHeader
           onSearchOpen={() => setSearchOpen(true)}
           user={user}
@@ -70,7 +73,8 @@ export default function MainLayout({ awesomeList, isLoading, children, user, onL
             <a href="/about" className="font-medium underline underline-offset-4 hover:text-foreground">About</a>
           </div>
         </footer>
-      </SidebarInset>
+        </SidebarInset>
+      </div>
       <SearchDialog
         isOpen={searchOpen}
         setIsOpen={setSearchOpen}
