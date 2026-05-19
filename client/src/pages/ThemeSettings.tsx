@@ -102,14 +102,15 @@ export default function ThemeSettings() {
         <div role="radiogroup" aria-label="Color theme" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {colorPresets.map((preset) => {
             const isActive = preset.value === activeTheme.value;
-            /* MR-DS-01 — ThemePreset exposes `name` + `preview.{accent,secondary,bg}`.
-             * Previous reader looked for `label` + `dark?/light?` (which don't exist
-             * on this shape), so every card rendered empty labels + identical
-             * fallback swatches. /* DS-OK: preview-only theme picker — hex
-             * literals come from the preset registry, not from runtime DS tokens. */
-            const primary = preset.preview?.accent || /* DS-OK */ "#000";
-            const secondary = preset.preview?.secondary || /* DS-OK */ "#444";
-            const bg = preset.preview?.bg || /* DS-OK */ "#888";
+            // MR-DS-01 — ThemePreset exposes `name` + `preview.{accent,secondary,bg}`.
+            // Previous reader looked for `label` + `dark?/light?` (which don't exist
+            // on this shape), so every card rendered empty labels + identical
+            // fallback swatches.
+            // DS-OK: preview-only theme picker — hex fallbacks below come from the
+            // preset registry intent, not from runtime DS tokens.
+            const primary = preset.preview?.accent || "#000";
+            const secondary = preset.preview?.secondary || "#444";
+            const bg = preset.preview?.bg || "#888";
             return (
               <button
                 key={preset.value}
