@@ -24,7 +24,7 @@ Scope note: this project ships a **single-personality** build (Editorial+Crimson
 | 2 | A system is applied | ✅ PASS | `client/index.html:21-22` synchronously sets `data-system="editorial"` + `data-accent="crimson"` on `<html>`. `--bg: #000000` resolves via `:root` in `design-system.css:16-68`. |
 | 3 | Synchronous boot, no FOUT | ✅ PASS | Apply happens in inline `<script>` in `<head>` (`index.html:17-28`), not deferred/module/useEffect. `design-system.ts` self-init is intentionally no-op for styles (line 150-157 comment), so no race with the CSS layer. |
 | 4 | Page chrome present | 🟡 PARTIAL | `.grain` ✅ present (`MainLayout.tsx:38`). `.page` wrapper ❌ absent — atmosphere is instead applied directly to `body` (`design-system.css:72-84`). Visual outcome matches handoff, but the structural contract drifts. See FIX #4. |
-| 5 | Hardcoded-value scan | 🟡 4 actionable violations + acceptable exceptions | See FIX #1, #2, #3 and NITs #1–#4. Raw `rg` output in appendix. |
+| 5 | Hardcoded-value scan | 🟡 7 actionable violations + acceptable exceptions | See FIX #1–#3, FIX #5–#8, and NITs #1–#6. Raw `rg` output in appendix. |
 | 6 | Component class compliance | ✅ PASS (scoped) | The app uses **shadcn primitives** (`<Button>`, `<Card>`, `<Input>`, `<Badge>`) instead of the handoff's raw `.btn`/`.card`/`.chip`/`.input` classes. shadcn's token bridge in `index.css` maps shadcn vars onto DS tokens. This is an architectural decision, not a per-occurrence violation. See Process note P1 (documentation gap). |
 | 7 | Accent discipline (one accent moment per surface) | ✅ PASS (static review) | Static review of `MainLayout.tsx`, `AppHeader.tsx`, `AppSidebar.tsx`, `Home.tsx`, `About.tsx`, `Login.tsx` confirms accent (`--accent` / Editorial crimson) is used only via the documented allow-list: active sidebar nav indicator (`design-system.css:319-326`, `353-356`), `.eyebrow` (`387-397`), `.live-dot` / `.caret` (`128-147`), active tab underline (`429-432`), `.card.glow:hover` halo (`178`), `::selection` (`88`), and `.btn.primary` accent fill (`243-249`). No stray accent on decorative borders, body underlines, or multi-button surfaces was observed in the static sweep. Re-verify under Stage 11 live-switch criteria N/A here. |
 | 8 | Text-tier discipline (no `--text-3`/`--text-4` on body copy) | ✅ PASS | Sweep across `client/src/pages/` and `client/src/components/layout/` returned zero hits for raw `text-3`/`text-4` usage on `<p>` / `<li>` body copy. Long-form copy uses `text-muted-foreground` (shadcn → DS bridge), which maps to `--text-2`, not `--text-3`. |
@@ -39,7 +39,7 @@ Scope note: this project ships a **single-personality** build (Editorial+Crimson
 ### 🔴 BLOCK (0)
 _None._
 
-### 🟡 FIX (4)
+### 🟡 FIX (8)
 
 1. **Stage 5 — `client/src/components/layout/SEOHead.tsx:87`**
    Offending value: `<meta name="theme-color" content="#dc2626" />` (Tailwind red-600, stale).
@@ -57,36 +57,37 @@ _None._
    Offending value: no element carries the `.page` class — atmosphere is applied to `body` instead (`design-system.css:72-84`).
    Replacement: wrap the `SidebarProvider` children in `<div className="page">…</div>` (the `.page` selector at `design-system.css:107-113` is already defined; just needs a host). Alternatively, document this divergence in `replit.md` if intentional, but until then it is a structural drift from the handoff contract.
 
-### 🟢 NIT (10)
+5. **Stage 5 — `client/src/components/admin/LinkHealthDashboard.tsx:345,352,359`** — recharts strokes `#22c55e` (Tailwind green-500), `#ef4444` (Tailwind red-500), `#eab308` (Tailwind yellow-500). Not DS status hexes despite carrying status semantics.
+   Replacement (per line): `:345 stroke="#22c55e"` → `stroke="#34d08c"` (DS ok); `:352 stroke="#ef4444"` → `stroke="#ff5c7a"` (DS bad); `:359 stroke="#eab308"` → `stroke="#ffb84d"` (DS warn). Literals required (recharts cannot read CSS vars). Tag the block with `/* DS-OK: status semantic */`.
 
-1. **Stage 5 — `client/src/components/admin/LinkHealthDashboard.tsx:345,352,359`** — recharts strokes `#22c55e`, `#ef4444`, `#eab308`. The first three are recharts series colors. **Acceptable** per Stage 5 rules (status-semantic), but should match the DS status hexes exactly. → Replace per line: `:345 stroke="#22c55e"` → `stroke="#34d08c"` (DS ok); `:352 stroke="#ef4444"` → `stroke="#ff5c7a"` (DS bad); `:359 stroke="#eab308"` → `stroke="#ffb84d"` (DS warn). Tag with `/* DS-OK: status semantic */`.
+6. **Stage 5 — `client/src/components/admin/LinkHealthDashboard.tsx:366`** — `stroke="#f97316"` (Tailwind orange-500). Does not map to any DS semantic.
+   Replacement: `stroke="#b84dff"` (literal value of `DESIGN_SYSTEMS.editorial.vars['--accent-2']` from `design-system.ts:33` — recharts cannot read CSS vars).
 
-2. **Stage 5 — `client/src/components/admin/LinkHealthDashboard.tsx:366`** — `stroke="#f97316"` (Tailwind orange-500) does not map to any DS semantic.
-   Replacement: `stroke="#b84dff"` (`DESIGN_SYSTEMS.editorial.vars['--accent-2']` literal — recharts cannot read CSS vars).
+7. **Stage 5 — `client/src/components/ui/analytics-dashboard.tsx:65-66, 360, 361, 386, 535, 537, 542, 544`** — palette array of 10 Tailwind hexes plus eight inline recharts `stroke`/`fill` props all using non-DS literals.
+   Replacement: extract `client/src/lib/charts/palette.ts` exporting `export const CHART_PALETTE = ['#ff3d52', '#b84dff', '#34d08c', '#ffb84d', '#5eddf2', '#ff5c7a', '#9d4edd', '#f4f3ee', '#34d08c', '#b84dff']` (derived from `DESIGN_SYSTEMS.editorial.vars` + status colors). Replace line 65-66 with `import { CHART_PALETTE } from '@/lib/charts/palette'`; replace each inline literal at `:360,361,386,535,537,542,544` with the corresponding `CHART_PALETTE[i]` constant.
 
-3. **Stage 5 — `client/src/components/ui/analytics-dashboard.tsx:65-66`** — palette array of 10 Tailwind hexes.
-   Replacement: extract to `client/src/lib/charts/palette.ts` exporting `export const CHART_PALETTE = ['#ff3d52', '#b84dff', '#34d08c', '#ffb84d', '#5eddf2', '#ff5c7a', '#9d4edd', '#f4f3ee', '#34d08c', '#b84dff']` (literals derived from `DESIGN_SYSTEMS.editorial.vars` + status colors). Then `import { CHART_PALETTE } from '@/lib/charts/palette'` and `const COLORS = CHART_PALETTE`. Same import then drives lines `:360-361` (`<Area stroke fill>`), `:386` (`<Bar fill>`), `:535-544` (`<Line stroke dot.fill>`).
+8. **Stage 5 — `client/src/styles/scrolling-fix.css:45`** — `border-radius: 3px` on a scrollbar-thumb fix. DS radii are `var(--radius)` (12px) / `var(--radius-sm)` (8px) / `var(--radius-pill)` (999px); 3px does not map cleanly.
+   Replacement: introduce `--radius-xs: 3px` in `design-system.css :root` (block at lines 45-50), then change `scrolling-fix.css:45` to `border-radius: var(--radius-xs);`.
 
-4. **Stage 5 — `client/src/components/ui/export-tools.tsx:180-187`** — hexes `#333`/`#666`/`#eee`/`#007acc`/`#f9f9f9`/`#e1e8ed`/`#999` and `border-radius: 3px` inside an HTML export template literal. **Acceptable** per Stage 5 — the output is a standalone exported document with no DS at runtime.
-   Replacement: prepend `/* DS-OK: standalone exported HTML, no runtime DS */` comment above the template literal.
+### 🟢 NIT (6) — DS-OK exceptions (no token replacement required)
 
-5. **Stage 5 — `client/src/lib/shadcn-themes.ts:16,50,84,118,152,186,286,335`** and `client/src/pages/ThemeSettings.tsx:99-101` — hex literals in a **theme-preset registry** + fallback colors for theme-picker preview swatches. **Acceptable** by definition (this file *describes* alternative themes; ThemeSettings is the theme picker UI).
-   Replacement: prepend `/* DS-OK: alternative theme registry */` at top of `shadcn-themes.ts`; `/* DS-OK: preview-only theme picker */` above the `ThemeSettings.tsx:99-101` fallback block.
+1. **Stage 5 — `client/src/components/ui/export-tools.tsx:180-187`** — hexes `#333`/`#666`/`#eee`/`#007acc`/`#f9f9f9`/`#e1e8ed`/`#999` and `border-radius: 3px` inside an HTML export template literal. DS-OK — output is a standalone exported document with no runtime DS.
+   Action: prepend `/* DS-OK: standalone exported HTML, no runtime DS */` comment above the template literal.
 
-6. **Stage 5 — `client/src/components/ui/chart.tsx:55`** — `#ccc`/`#fff` inside attribute selectors (`[stroke='#ccc']`) targeting recharts-injected SVG. **Acceptable** — selector strings matching recharts' own internal paint, not author paint.
-   Replacement: `/* DS-OK: recharts internal selector matchers */` comment above the line.
+2. **Stage 5 — `client/src/lib/shadcn-themes.ts:16,50,84,118,152,186,286,335`** and `client/src/pages/ThemeSettings.tsx:99-101` — hex literals in a **theme-preset registry** + fallback colors for theme-picker preview swatches. DS-OK by definition (this file *describes* alternative themes; ThemeSettings is the picker UI).
+   Action: prepend `/* DS-OK: alternative theme registry */` at top of `shadcn-themes.ts`; `/* DS-OK: preview-only theme picker */` above the `ThemeSettings.tsx:99-101` fallback block.
 
-7. **Stage 5 — `client/src/index.css:25,32,33,38-41,45`** — eight hex literals declared as `--color-*` CSS custom properties (e.g. `--color-destructive: #ff5c7a`, `--color-chart-2: #34d08c`). **Acceptable** — this is the shadcn↔DS token bridge; the literals are the *source* of tokens consumed elsewhere, and three of them (`#ff5c7a`, `#34d08c`, `#ffb84d`) are the DS status colors verbatim. The remaining (`#000000`, `#5eddf2`, `#9d4edd`) are also DS-aligned (text-on-accent black + accent-2 palette extension).
-   Replacement: prepend `/* DS-OK: shadcn↔DS token bridge */` comment above the `--color-*` block.
+3. **Stage 5 — `client/src/components/ui/chart.tsx:55`** — `#ccc`/`#fff` inside attribute selectors (`[stroke='#ccc']`) targeting recharts-injected SVG. DS-OK — selector strings matching recharts' own internal paint, not author paint.
+   Action: `/* DS-OK: recharts internal selector matchers */` comment above the line.
 
-8. **Stage 5 — `client/src/components/ui/theme-provider.tsx:59`** — `safeGetItem("theme-custom-hex") || "#3b82f6"` (UX default for a custom-color picker). **Acceptable** — pure UX fallback inside theme-tooling, not paint of the live DS surface.
-   Replacement: `/* DS-OK: color-picker default seed */` comment above the line.
+4. **Stage 5 — `client/src/index.css:25,32,33,38-41,45`** — eight hex literals declared as `--color-*` CSS custom properties (e.g. `--color-destructive: #ff5c7a`, `--color-chart-2: #34d08c`). DS-OK — shadcn↔DS token bridge; the literals are the *source* of tokens consumed elsewhere; three (`#ff5c7a`, `#34d08c`, `#ffb84d`) are the DS status colors verbatim; the remaining (`#000000`, `#5eddf2`, `#9d4edd`) are DS-aligned (text-on-accent black + accent-2 palette extension).
+   Action: prepend `/* DS-OK: shadcn↔DS token bridge */` comment above the `--color-*` block.
 
-9. **Stage 5 — `client/src/components/ui/color-palette-generator.tsx:397,587`** — color-picker default `"#3b82f6"` and palette-export fallback `"#ffffff"`. **Acceptable** — same rationale as NIT #8 (theme-tooling defaults).
-   Replacement: `/* DS-OK: palette-generator defaults */` comments above each line.
+5. **Stage 5 — `client/src/components/ui/theme-provider.tsx:59`** — `safeGetItem("theme-custom-hex") || "#3b82f6"` (UX default seed for a custom-color picker). DS-OK — pure UX fallback inside theme-tooling, not paint of the live DS surface.
+   Action: `/* DS-OK: color-picker default seed */` comment above the line.
 
-10. **Stage 5 — `client/src/styles/scrolling-fix.css:45`** — `border-radius: 3px` on a scrollbar-thumb fix. The DS radii are `var(--radius)` (12px) / `var(--radius-sm)` (8px) / `var(--radius-pill)` (999px); 3px does not map cleanly.
-    Replacement: introduce a `--radius-xs: 3px` token in `design-system.css :root` (or use `calc(var(--radius-sm) / 2.6)`), then change `scrolling-fix.css:45` to `border-radius: var(--radius-xs);`. If a new token is undesirable, tag `/* DS-OK: scrollbar-thumb micro-radius */` and document the intentional escape.
+6. **Stage 5 — `client/src/components/ui/color-palette-generator.tsx:397,587`** — color-picker default `"#3b82f6"` and palette-export fallback `"#ffffff"`. DS-OK — same rationale as NIT #5 (theme-tooling defaults).
+   Action: `/* DS-OK: palette-generator defaults */` comments above each line.
 
 ---
 
@@ -118,7 +119,9 @@ These are project-level documentation gaps surfaced by the audit, separated from
 2. **FIX #3** — token-swap `#fbbf24` → `var(--accent)` in `micro-interactions.tsx:232,234`. Trivial.
 3. **FIX #4** — wrap `MainLayout` children in `<div className="page">`. One-line restoration of the structural contract.
 4. **Process note P1** — add "Design-System scope" section to `replit.md` documenting the three intentional divergences. Eliminates Stage-6 false-positive noise for all future audits.
-5. **NIT #1–#10** — apply per-line replacements/tags above and prepend `/* DS-OK: <reason> */` to remaining intentional escapes so the next Stage-5 rg sweep auto-skips them.
+5. **FIX #5–#7** — token-swap LinkHealthDashboard recharts strokes and centralize analytics-dashboard chart palette into `client/src/lib/charts/palette.ts`.
+6. **FIX #8** — add `--radius-xs: 3px` token to DS root and replace the raw `3px` in `scrolling-fix.css:45`.
+7. **NIT #1–#6** — prepend `/* DS-OK: <reason> */` to remaining intentional escapes so the next Stage-5 rg sweep auto-skips them.
 
 ---
 
