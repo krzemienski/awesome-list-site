@@ -443,3 +443,15 @@ Applied by Task #38 against §3.2 (Category). Scope: shared `client/src/pages/Ca
 - No `Card` / `Badge` / `Button` primitive changes; all edits scoped to per-instance className overrides on the three pages. DS-primitive routing remains with Task #42.
 
 **Verification:** Dev workflow recompiled clean on each edit batch (`5:06:07 PM [vite] hmr update /src/pages/ResourceDetail.tsx`); no LSP/TS regressions. The 3 files together drive `/subcategory/:slug`, `/sub-subcategory/:slug`, and `/resource/:id` — all three routes share the same `MainLayout` chrome (Task #41 territory, untouched).
+
+### Appendix C — render verification evidence (added per code-review request)
+
+Captured at 1280×720 against the running dev server (post-HMR of all three edits):
+
+| Route | Screenshot | Observed |
+|---|---|---|
+| `/subcategory/ai-machine-learning-tools` (subcategory id 2243, parent "Media Tools") | `screenshots/task39/subcategory.jpg` | 7 resource cards in 3-col grid render at the tightened density (`p-3 sm:p-4`, no `md:p-6` tier). Title + description visible, sidebar accordion expanded to "AI & Machine Learning Tools". No layout shift, no overflow. |
+| `/sub-subcategory/av1` (sub-subcategory id 3629, parent "Codecs" → "Encoding & Codecs") | `screenshots/task39/subsubcategory.jpg` | 2 resource cards render at the same tightened density. Sort dropdown + count badge (no view-mode toggle — MR-DT-07 verified). Breadcrumb order `Encoding & Codecs › Codecs › AV1` correct (MR-DT-06). |
+| `/resource/186811` (Galène) | `screenshots/task39/resource.jpg` | Quick Actions card (Open Resource / Share This Page) renders adjacent to restyled Related Resources card (LiveKit / DTube / go2rtc visible). Related items now use token-based hover, no rounded corners, no ad-hoc green/blue. Header rhythm matches Quick Actions (`text-lg` + 4px primary icon). |
+
+No browser console errors on any of the three routes (only vite HMR connect + React DevTools hint).
