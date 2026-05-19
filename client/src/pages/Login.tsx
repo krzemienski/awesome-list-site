@@ -95,15 +95,18 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted p-4">
+    <div className="flex items-center justify-center min-h-[calc(100vh-12rem)] p-4">
       <Card className="w-full max-w-md" data-testid="login-card">
-        <CardHeader className="space-y-1">
-          <div className="flex items-center justify-center mb-4">
-            <div className="rounded-full bg-primary/10 p-3">
-              <LogIn className="h-6 w-6 text-primary" />
+        <CardHeader className="space-y-2">
+          <div className="flex items-center justify-center mb-2">
+            <div className="rounded-full bg-[color-mix(in_srgb,var(--accent)_12%,transparent)] p-3 ring-1 ring-[color-mix(in_srgb,var(--accent)_30%,transparent)]">
+              <LogIn className="h-6 w-6 text-[var(--accent)]" />
             </div>
           </div>
-          <CardTitle className="text-2xl text-center">Welcome back</CardTitle>
+          <div className="eyebrow text-center">// Authentication</div>
+          <CardTitle className="font-display font-medium text-3xl text-center tracking-tight">
+            Welcome <em className="not-italic font-display italic text-[var(--accent)]">back</em>
+          </CardTitle>
           <CardDescription className="text-center">
             Sign in to access the admin dashboard
           </CardDescription>
@@ -177,7 +180,7 @@ export default function Login() {
               <Separator className="w-full" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">
+              <span className="bg-[var(--bg-2)] px-2 text-[color:var(--text-2)] font-mono tracking-[0.18em]">
                 Or continue with
               </span>
             </div>
@@ -202,11 +205,11 @@ export default function Login() {
             </Button>
           </div>
 
-          <div className="text-center text-sm text-muted-foreground">
-            <p>Default admin credentials:</p>
-            <p className="font-mono text-xs mt-1">admin@example.com / admin123</p>
-            <p className="text-xs mt-1 text-yellow-600 dark:text-yellow-500">
-              ⚠️ Change password after first login
+          <div className="rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--surface)] p-3 text-center text-sm text-[color:var(--text-2)] space-y-1">
+            <p className="eyebrow">// Default admin</p>
+            <p className="font-mono text-xs">admin@example.com / admin123</p>
+            <p className="text-xs text-[color:var(--warn,#ffb84d)]">
+              Change password after first login
             </p>
           </div>
         </CardContent>

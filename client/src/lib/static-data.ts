@@ -5,24 +5,68 @@
  * Static JSON files have been deprecated in favor of database-driven content
  */
 
+/**
+ * Fetch the awesome-list payload with a per-attempt timeout and one retry.
+ * Surfaces the real failure cause (timeout, HTTP status, parse error) so the
+ * ErrorPage shows something more useful than Safari's opaque "Load failed".
+ */
+const AWESOME_LIST_TIMEOUT_MS = 45_000;
+const AWESOME_LIST_MAX_ATTEMPTS = 2;
+
+async function fetchWithTimeout(url: string, timeoutMs: number): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { signal: controller.signal, credentials: 'same-origin' });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export async function fetchStaticAwesomeList(): Promise<any> {
   // Check if we already have data from SSR
   if (typeof window !== 'undefined') {
-    // Check for SSR injected data
     if ((window as any).__INITIAL_DATA__) {
       const data = (window as any).__INITIAL_DATA__;
-      // Clear it after first use to prevent stale data
       (window as any).__INITIAL_DATA__ = undefined;
       return data;
     }
   }
-  
-  // Always fetch from database-backed API
-  const response = await fetch('/api/awesome-list');
-  if (!response.ok) {
-    throw new Error(`Failed to fetch from API: ${response.status}`);
+
+  const url = '/api/awesome-list';
+  let lastError: unknown;
+
+  for (let attempt = 1; attempt <= AWESOME_LIST_MAX_ATTEMPTS; attempt++) {
+    try {
+      const response = await fetchWithTimeout(url, AWESOME_LIST_TIMEOUT_MS);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status} ${response.statusText || ''} from ${url}`.trim());
+      }
+      try {
+        return await response.json();
+      } catch (parseErr) {
+        throw new Error(
+          `Invalid JSON from ${url} (got ${response.headers.get('content-type') || 'unknown'} ` +
+            `content-type). The dev preview may have returned an HTML auth page instead of the API.`
+        );
+      }
+    } catch (err) {
+      lastError = err;
+      const isAbort = err instanceof DOMException && err.name === 'AbortError';
+      const isLast = attempt === AWESOME_LIST_MAX_ATTEMPTS;
+      if (isLast) {
+        const why = isAbort
+          ? `request timed out after ${AWESOME_LIST_TIMEOUT_MS / 1000}s`
+          : err instanceof Error
+            ? err.message
+            : String(err);
+        throw new Error(`Could not load resources from ${url} — ${why} (attempt ${attempt}/${AWESOME_LIST_MAX_ATTEMPTS}).`);
+      }
+      await new Promise((r) => setTimeout(r, 500 * attempt));
+    }
   }
-  return await response.json();
+
+  throw lastError instanceof Error ? lastError : new Error(String(lastError));
 }
 
 export async function fetchSitemapData(): Promise<any> {

@@ -28,21 +28,24 @@ export default function About() {
         />
       </Helmet>
 
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-4">
-          <Sparkles className="h-8 w-8 text-primary" />
-          <h1 className="text-3xl font-bold">About</h1>
+      <div className="mb-10 space-y-3">
+        <div className="eyebrow">// About the project</div>
+        <div className="flex items-center gap-3">
+          <Sparkles className="h-8 w-8 text-[var(--accent)]" />
+          <h1 className="font-display font-medium text-4xl sm:text-5xl tracking-tight leading-[1.04]">
+            About <em className="not-italic font-display italic text-[var(--accent)]">Awesome Video</em>
+          </h1>
         </div>
-        <p className="text-lg text-muted-foreground max-w-3xl">
+        <p className="text-base sm:text-lg text-[color:var(--text-2)] max-w-3xl leading-relaxed">
           An SEO-friendly, mobile-first platform that transforms GitHub's curated "Awesome Lists"
           into beautiful, searchable websites.
         </p>
       </div>
 
-      <Card className="mb-6 border-primary/20">
+      <Card className="mb-6">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Rocket className="h-5 w-5 text-primary" />
+          <CardTitle className="flex items-center gap-2 font-display font-medium tracking-tight">
+            <Rocket className="h-5 w-5 text-[var(--accent)]" />
             What is this?
           </CardTitle>
           <CardDescription>
@@ -62,10 +65,10 @@ export default function About() {
       </Card>
 
       {/* Features Grid */}
-      <Card className="mb-6 border-accent/20">
+      <Card className="mb-6">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Zap className="h-5 w-5 text-accent" />
+          <CardTitle className="flex items-center gap-2 font-display font-medium tracking-tight">
+            <Zap className="h-5 w-5 text-[var(--accent)]" />
             Features
           </CardTitle>
           <CardDescription>
@@ -84,9 +87,9 @@ export default function About() {
               { icon: Keyboard, label: "Keyboard Shortcuts", desc: "Power user" },
               { icon: Component, label: "Component Library", desc: "shadcn/ui" }
             ].map((feature) => (
-              <Card key={feature.label} className="border-border/50">
+              <Card key={feature.label}>
                 <CardContent className="p-4">
-                  <feature.icon className="h-6 w-6 text-primary mb-2" />
+                  <feature.icon className="h-6 w-6 text-[var(--accent)] mb-2" />
                   <div className="font-semibold text-sm mb-1">{feature.label}</div>
                   <div className="text-xs text-muted-foreground">{feature.desc}</div>
                 </CardContent>
@@ -97,10 +100,10 @@ export default function About() {
       </Card>
 
       {/* Technology Stack */}
-      <Card className="mb-6 border-primary/20">
+      <Card className="mb-6">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Code2 className="h-5 w-5 text-primary" />
+          <CardTitle className="flex items-center gap-2 font-display font-medium tracking-tight">
+            <Code2 className="h-5 w-5 text-[var(--accent)]" />
             Technology Stack
           </CardTitle>
           <CardDescription>
@@ -160,10 +163,10 @@ export default function About() {
       </Card>
 
       {/* Accessibility */}
-      <Card className="mb-6 border-accent/20">
+      <Card className="mb-6">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Accessibility className="h-5 w-5 text-accent" />
+          <CardTitle className="flex items-center gap-2 font-display font-medium tracking-tight">
+            <Accessibility className="h-5 w-5 text-[var(--accent)]" />
             Accessibility First
           </CardTitle>
           <CardDescription>
@@ -190,10 +193,10 @@ export default function About() {
       </Card>
 
       {/* Credits */}
-      <Card className="border-primary/20">
+      <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Heart className="h-5 w-5 text-primary" />
+          <CardTitle className="flex items-center gap-2 font-display font-medium tracking-tight">
+            <Heart className="h-5 w-5 text-[var(--accent)]" />
             Credits
           </CardTitle>
           <CardDescription>
@@ -211,9 +214,9 @@ export default function About() {
                 href="https://github.com/sindresorhus/awesome"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-3 p-4 border border-border rounded hover:border-primary/50 transition-colors group"
+                className="flex items-center gap-3 p-4 border border-[var(--border)] bg-[var(--surface)] rounded-[var(--radius-sm)] hover:border-[color-mix(in_srgb,var(--accent)_60%,transparent)] transition-colors group"
               >
-                <Users className="h-5 w-5 text-primary group-hover:scale-110 transition-transform" />
+                <Users className="h-5 w-5 text-[var(--accent)] group-hover:scale-110 transition-transform" />
                 <div>
                   <div className="font-semibold text-sm">Awesome List</div>
                   <div className="text-xs text-muted-foreground">Community</div>
@@ -223,9 +226,9 @@ export default function About() {
                 href="https://ui.shadcn.com/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-3 p-4 border border-border rounded hover:border-accent/50 transition-colors group"
+                className="flex items-center gap-3 p-4 border border-[var(--border)] bg-[var(--surface)] rounded-[var(--radius-sm)] hover:border-[color-mix(in_srgb,var(--accent)_60%,transparent)] transition-colors group"
               >
-                <Component className="h-5 w-5 text-accent group-hover:scale-110 transition-transform" />
+                <Component className="h-5 w-5 text-[var(--accent)] group-hover:scale-110 transition-transform" />
                 <div>
                   <div className="font-semibold text-sm">shadcn/ui</div>
                   <div className="text-xs text-muted-foreground">Components</div>
@@ -235,9 +238,9 @@ export default function About() {
                 href="https://tailwindcss.com/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-3 p-4 border border-border rounded hover:border-primary/50 transition-colors group"
+                className="flex items-center gap-3 p-4 border border-[var(--border)] bg-[var(--surface)] rounded-[var(--radius-sm)] hover:border-[color-mix(in_srgb,var(--accent)_60%,transparent)] transition-colors group"
               >
-                <Wind className="h-5 w-5 text-primary group-hover:scale-110 transition-transform" />
+                <Wind className="h-5 w-5 text-[var(--accent)] group-hover:scale-110 transition-transform" />
                 <div>
                   <div className="font-semibold text-sm">Tailwind CSS</div>
                   <div className="text-xs text-muted-foreground">Styling</div>

@@ -176,12 +176,13 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
         description="Discover 2,000+ curated video development resources including codecs, players, tools, and libraries. Find the perfect solution for your video project."
       />
 
-      <div className="space-y-1 sm:space-y-2">
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-          Awesome Video Resources
+      <div className="space-y-2 sm:space-y-3">
+        <div className="eyebrow">// Index</div>
+        <h1 className="font-display font-medium tracking-tight text-3xl sm:text-5xl leading-[1.04]">
+          Awesome <em className="not-italic font-display italic text-[var(--accent)]">Video</em> Resources
         </h1>
-        <p className="text-sm sm:text-base text-muted-foreground">
-          Explore {filteredCategories.length} categories with {totalResourceCount} curated resources
+        <p className="text-sm sm:text-base text-[color:var(--text-2)] max-w-2xl">
+          Explore {filteredCategories.length} categories with {totalResourceCount} curated resources for engineers building the modern video stack.
         </p>
       </div>
 
@@ -213,16 +214,16 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
               data-testid={`link-category-${category.slug}`}
             >
               <Card
-                className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors border border-border bg-card text-card-foreground touch-manipulation"
+                className="cursor-pointer touch-manipulation h-full"
                 data-testid={`card-category-${category.slug}`}
               >
                 <CardHeader className="p-4 sm:p-6">
                   <div className="flex items-center justify-between gap-2 mb-1 sm:mb-2">
                     <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-                      <Icon className="h-5 w-5 sm:h-6 sm:w-6 shrink-0" />
-                      <CardTitle className="text-base sm:text-lg truncate">{category.name}</CardTitle>
+                      <Icon className="h-5 w-5 sm:h-6 sm:w-6 shrink-0 text-[var(--text-2)]" />
+                      <CardTitle className="font-display font-medium text-base sm:text-lg truncate tracking-tight">{category.name}</CardTitle>
                     </div>
-                    <Badge variant="secondary" className="shrink-0" data-testid={`badge-count-${category.slug}`}>
+                    <Badge variant="chip" data-testid={`badge-count-${category.slug}`}>
                       {totalCount}
                     </Badge>
                   </div>
@@ -239,13 +240,16 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
       </div>
 
       <div className="mt-8 sm:mt-12">
-        <div className="mb-4 sm:mb-6">
-          <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
-            <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-primary shrink-0" />
-            <h2 className="text-xl sm:text-2xl font-bold">AI-Powered Recommendations</h2>
+        <div className="mb-4 sm:mb-6 space-y-2">
+          <div className="eyebrow">// Personalized</div>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-[var(--accent)] shrink-0" />
+            <h2 className="font-display font-medium text-2xl sm:text-3xl tracking-tight">
+              <em className="not-italic font-display italic text-[var(--accent)]">AI</em>-Powered Recommendations
+            </h2>
           </div>
-          <p className="text-sm sm:text-base text-muted-foreground">
-            Get personalized resource recommendations based on your interests and learning goals
+          <p className="text-sm sm:text-base text-[color:var(--text-2)]">
+            Get personalized resource recommendations based on your interests and learning goals.
           </p>
         </div>
 
