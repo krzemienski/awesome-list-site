@@ -4,15 +4,33 @@
 
 System detected: `editorial` × `crimson`
 Files audited:
-- `client/index.html` (boot script, fonts)
+- `client/index.html` (boot script, font preload)
 - `client/src/main.tsx` (entry)
 - `client/src/index.css` (CSS import chain)
 - `client/src/styles/design-system.css` (tokens + components + skin block, 774 lines)
 - `client/src/lib/design-system.ts` (runtime applier)
 - `client/src/components/layout/new/MainLayout.tsx` (page chrome)
-- `client/src/pages/*.tsx`, `client/src/components/**/*.tsx` (hardcoded-value sweep)
+- `client/src/pages/*.tsx`, `client/src/components/**/*.tsx` (hardcoded-value + class-compliance sweep)
 
-Scope note: this project ships a **single-personality** build (Editorial+Crimson only) per WP-1. The other four systems (terminal/geist/brutalist/swiss) are intentionally removed from the TS applier but their skin blocks remain in CSS as dead-but-cheap code. Stage 10 still verifies the skin block; Stage 11 (live-switch verification across systems) is N/A and justified below.
+Scope note: this project ships a **single-personality** build (Editorial+Crimson only) per WP-1. Other systems (`terminal`/`geist`/`brutalist`/`swiss`) are intentionally removed from the TS applier (`design-system.ts:32-79` defines only `editorial`) but their skin blocks remain in CSS as dead-but-cheap code. Stage 11 (live cycle through systems) is therefore N/A and justified inline.
+
+---
+
+## Per-stage results (1–11)
+
+| # | Stage | Result | Notes |
+|---|---|---|---|
+| 1 | System files loaded | ✅ PASS | `index.css:5` `@import './styles/design-system.css'` is the first import (before Tailwind). `main.tsx:4` `import './lib/design-system'` registers `window.{DESIGN_SYSTEMS, ACCENTS, SYSTEM_DEFAULT_ACCENT, applyDesignSystem}` (`design-system.ts:152-157`). |
+| 2 | A system is applied | ✅ PASS | `client/index.html:21-22` synchronously sets `data-system="editorial"` + `data-accent="crimson"` on `<html>`. `--bg: #000000` resolves via `:root` in `design-system.css:16-68`. |
+| 3 | Synchronous boot, no FOUT | ✅ PASS | Apply happens in inline `<script>` in `<head>` (`index.html:17-28`), not deferred/module/useEffect. `design-system.ts` self-init is intentionally no-op for styles (line 150-157 comment), so no race with the CSS layer. |
+| 4 | Page chrome present | 🟡 PARTIAL | `.grain` ✅ present (`MainLayout.tsx:38`). `.page` wrapper ❌ absent — atmosphere is instead applied directly to `body` (`design-system.css:72-84`). Visual outcome matches handoff, but the structural contract drifts. See FIX #4. |
+| 5 | Hardcoded-value scan | 🟡 4 actionable violations + acceptable exceptions | See FIX #1, #2, #3 and NITs #1–#4. Raw `rg` output in appendix. |
+| 6 | Component class compliance | 🟢 Out-of-scope, documented gap | The app uses **shadcn primitives** (`<Button>`, `<Card>`, `<Input>`, `<Badge>`) instead of the handoff's raw `.btn`/`.card`/`.chip`/`.input` classes. shadcn's token bridge in `index.css` maps shadcn vars onto DS tokens. This is an architectural decision, not a per-occurrence violation. See FIX #5 (documentation gap). |
+| 7 | Accent discipline (one accent moment per surface) | ✅ PASS (static review) | Static review of `MainLayout.tsx`, `AppHeader.tsx`, `AppSidebar.tsx`, `Home.tsx`, `About.tsx`, `Login.tsx` confirms accent (`--accent` / Editorial crimson) is used only via the documented allow-list: active sidebar nav indicator (`design-system.css:319-326`, `353-356`), `.eyebrow` (`387-397`), `.live-dot` / `.caret` (`128-147`), active tab underline (`429-432`), `.card.glow:hover` halo (`178`), `::selection` (`88`), and `.btn.primary` accent fill (`243-249`). No stray accent on decorative borders, body underlines, or multi-button surfaces was observed in the static sweep. Re-verify under Stage 11 live-switch criteria N/A here. |
+| 8 | Text-tier discipline (no `--text-3`/`--text-4` on body copy) | ✅ PASS | Sweep across `client/src/pages/` and `client/src/components/layout/` returned zero hits for raw `text-3`/`text-4` usage on `<p>` / `<li>` body copy. Long-form copy uses `text-muted-foreground` (shadcn → DS bridge), which maps to `--text-2`, not `--text-3`. |
+| 9 | Fonts loaded | ✅ PASS | `index.html:102` requests Inter (body), Fraunces (display), JetBrains Mono (mono). Family names in the `<link>` query match the tokens in `design-system.css:35-37`. Four other systems' fonts (Geist/Instrument Serif/Space Grotesk/IBM Plex Mono+Sans/Manrope) are preloaded for any future flip. |
+| 10 | Per-system skin block intact | ✅ PASS | `rg -c '\[data-system=' client/src/styles/design-system.css` → **55** selectors (handoff baseline ≥15). All five system blocks present: editorial (546-549), terminal (552-582), geist (585-590), brutalist (593-634), swiss (637-654). |
+| 11 | Live switch test across all 5 systems | ⚪ N/A | Single-personality Editorial-only build per WP-1. `DESIGN_SYSTEMS['terminal'/'geist'/'brutalist'/'swiss']` are undefined in the TS applier (`design-system.ts:32-79`); calling `applyDesignSystem('terminal','matrix')` falls back to `editorial` by the `resolvedSystem` guard at `design-system.ts:116`. The cycle test cannot meaningfully run. Skin blocks in CSS are preserved for future re-introduction. |
 
 ---
 
@@ -21,56 +39,70 @@ Scope note: this project ships a **single-personality** build (Editorial+Crimson
 ### 🔴 BLOCK (0)
 _None._
 
-### 🟡 FIX (8)
+### 🟡 FIX (5)
 
-1. **Stage 5 — `client/src/components/layout/SEOHead.tsx:87`** — `<meta name="theme-color" content="#dc2626" />` is a stale generic crimson, not the Editorial accent. The browser chrome / PWA bar will paint Tailwind red-600 instead of the DS `#ff3d52`. → Replace with the Editorial accent literal `#ff3d52` (meta tags cannot read CSS vars, so a literal is required, but it must match `DESIGN_SYSTEMS.editorial.vars['--accent']` after crimson is applied). Same for line 88 `msapplication-TileColor`.
+1. **Stage 5 — `client/src/components/layout/SEOHead.tsx:87`**
+   Offending value: `<meta name="theme-color" content="#dc2626" />` (Tailwind red-600, stale).
+   Replacement: `<meta name="theme-color" content="#ff3d52" />` (literal required — meta cannot read CSS vars; literal must match `DESIGN_SYSTEMS.editorial.vars['--accent']` in `design-system.ts:32`).
 
-2. **Stage 5 — `client/src/components/ui/micro-interactions.tsx:232,234`** — bookmark "filled" color is hardcoded `#fbbf24` (Tailwind amber-400). This is a UI affordance, not a global semantic status. → Replace both with `var(--accent)` (or, if a separate "saved/starred" semantic is wanted, introduce a token rather than a hex).
+2. **Stage 5 — `client/src/components/layout/SEOHead.tsx:88`**
+   Offending value: `<meta name="msapplication-TileColor" content="#dc2626" />` (same stale crimson).
+   Replacement: `<meta name="msapplication-TileColor" content="#ff3d52" />`.
 
-3. **Stage 5 — `client/src/components/admin/LinkHealthDashboard.tsx:345,352,359,366`** — recharts series strokes are hardcoded `#22c55e` / `#ef4444` / `#eab308` / `#f97316`. The first three map naturally onto the DS semantic status palette (`#34d08c` ok, `#ff5c7a` bad, `#ffb84d` warn) which is acceptable per Stage 5's "acceptable hardcoded values" rule. The orange `#f97316` does not map and is a true violation. → Either swap the three to the DS status hexes (still hardcoded but acceptable) and replace `#f97316` with `var(--accent-2)`, or introduce three constants (`STATUS_OK_HEX`, `STATUS_WARN_HEX`, `STATUS_BAD_HEX`) re-exported from one place. Recharts cannot consume CSS vars directly so literals are unavoidable here.
+3. **Stage 5 — `client/src/components/ui/micro-interactions.tsx:232` and `:234`**
+   Offending value: `color: isBookmarked ? "#fbbf24" : "currentColor"` (Tailwind amber-400, not an Editorial token).
+   Replacement (both lines): swap the literal for the runtime accent — read `getComputedStyle(document.documentElement).getPropertyValue('--accent')` into a `useEffect`-cached variable, e.g. `color: isBookmarked ? "var(--accent)" : "currentColor"` (motion `animate` accepts CSS var strings).
 
-4. **Stage 5 — `client/src/components/ui/analytics-dashboard.tsx:65-66, 360-361, 386, 535-544`** — full chart palette + multiple `<Area>` / `<Bar>` / `<Line>` `stroke`/`fill` props are hardcoded `#3b82f6`, `#10b981`, `#ef4444`, `#f59e0b`, `#8b5cf6`, `#06b6d4`, `#84cc16`, `#f97316`, `#ec4899`, `#6366f1`. Same root cause as #3 (recharts can't read CSS vars). → Centralize a "data-viz palette" derived from `--accent` / `--accent-2` plus the three DS status colors, exported once from `client/src/lib/charts/palette.ts`, and consume by name. Even if the literals remain, at least one source of truth.
+4. **Stage 4 — `client/src/components/layout/new/MainLayout.tsx:31-79`**
+   Offending value: no element carries the `.page` class — atmosphere is applied to `body` instead (`design-system.css:72-84`).
+   Replacement: wrap the `SidebarProvider` children in `<div className="page">…</div>` (the `.page` selector at `design-system.css:107-113` is already defined; just needs a host). Alternatively, document this divergence in `replit.md` if intentional, but until then it is a structural drift from the handoff contract.
 
-5. **Stage 5 — `client/src/components/ui/export-tools.tsx:180-187`** — HTML export template literal contains `#333`, `#666`, `#eee`, `#007acc`, `#f9f9f9`, `#e1e8ed`, `#999`. These are **acceptable per Stage 5 rules** because the output is a standalone exported HTML document that has no relationship to the DS at runtime. → No change required; document as intentional with a `/* DS-OK: standalone export */` comment so future audits don't re-flag.
+5. **Stage 6 + Stage 4 — `replit.md` "DS adoption scope" section missing**
+   Offending state: there is no in-repo record of (a) shadcn primitives replacing raw `.btn`/`.card`/`.chip`/`.input` classes, (b) body-level atmosphere replacing `.page` wrapper, (c) single-personality Editorial-only build. As a result, every future Stage-6 sweep will keep flagging thousands of "stray" buttons.
+   Replacement: add a "Design-System scope" section to `replit.md` listing the three intentional divergences with rationale + the canonical mapping (shadcn `<Button variant="default">` ⇄ DS `.btn.primary`, shadcn `<Badge>` ⇄ DS `.chip`, etc.). This converts Stage 6 from "thousands of false positives" to "out-of-scope, documented."
 
-6. **Stage 5 — `client/src/pages/ThemeSettings.tsx:99-101`** — Theme-preset preview swatches fall back to `"#000"` / `"#444"` / `"#888"` when a preset has no dark/light primary defined. These are last-ditch fallbacks inside a theme-picker that previews **non-Editorial themes**, so the hardcoded fallbacks are intentional. → Acceptable; add `/* DS-OK: preview-only theme picker */` comment.
+### 🟢 NIT (6)
 
-7. **Stage 4 — `client/src/components/layout/new/MainLayout.tsx`** — `.grain` is present (line 38) but no element carries the `.page` class. The atmospheric radial gradient is instead applied directly to `body` in `design-system.css:72-83`. This works (body atmosphere paints) but diverges from the handoff contract that asks for an explicit `.page` wrapper. → Either wrap the entire layout (`<SidebarProvider>` children) in a single `<div className="page">…</div>`, or document this as an intentional structural divergence in `replit.md` (current state: undocumented). Severity 🟡 because the visual outcome matches, but a future system switch that relies on `.page` would break silently.
+1. **Stage 5 — `client/src/components/admin/LinkHealthDashboard.tsx:345,352,359`** — recharts strokes `#22c55e`, `#ef4444`, `#eab308`. The first three are recharts series colors. **Acceptable** per Stage 5 rules (status-semantic), but should match the DS status hexes exactly. → Replace per line: `:345 stroke="#22c55e"` → `stroke="#34d08c"` (DS ok); `:352 stroke="#ef4444"` → `stroke="#ff5c7a"` (DS bad); `:359 stroke="#eab308"` → `stroke="#ffb84d"` (DS warn). Tag with `/* DS-OK: status semantic */`.
 
-8. **Stage 6 — Component class compliance, widespread** — The handoff DS publishes `.btn`, `.btn.primary`, `.btn.ghost`, `.btn.icon`, `.chip`, `.card`, `.input`, `.tab`, `.eyebrow`, `.kbd` etc. as the canonical component layer. The Replit app uses **shadcn primitives** (`<Button>`, `<Card>`, `<Input>`, `<Badge>`) instead, with shadcn's own token bridge in `client/src/index.css`. The bridge appears to map shadcn vars to DS tokens, so the visual result is close, but the two component systems are not 1:1 (e.g. shadcn `<Button variant="default">` ≠ DS `.btn.primary` in border/weight/hover behavior). → This is an architectural choice not a defect, but it should be documented in `replit.md` under "DS adoption scope" so future audits know to skip raw `.btn`/`.chip` lookups. Severity 🟡 because the audit's Stage 6 selectors will keep returning thousands of "stray" buttons until the scope is recorded.
+2. **Stage 5 — `client/src/components/admin/LinkHealthDashboard.tsx:366`** — `stroke="#f97316"` (Tailwind orange-500) does not map to any DS semantic.
+   Replacement: `stroke="#b84dff"` (`DESIGN_SYSTEMS.editorial.vars['--accent-2']` literal — recharts cannot read CSS vars).
 
-### 🟢 NIT (3)
+3. **Stage 5 — `client/src/components/ui/analytics-dashboard.tsx:65-66`** — palette array of 10 Tailwind hexes.
+   Replacement: extract to `client/src/lib/charts/palette.ts` exporting `export const CHART_PALETTE = ['#ff3d52', '#b84dff', '#34d08c', '#ffb84d', '#5eddf2', '#ff5c7a', '#9d4edd', '#f4f3ee', '#34d08c', '#b84dff']` (literals derived from `DESIGN_SYSTEMS.editorial.vars` + status colors). Then `import { CHART_PALETTE } from '@/lib/charts/palette'` and `const COLORS = CHART_PALETTE`. Same import then drives lines `:360-361` (`<Area stroke fill>`), `:386` (`<Bar fill>`), `:535-544` (`<Line stroke dot.fill>`).
 
-1. **Stage 5 — `client/src/lib/shadcn-themes.ts`** (lines 16, 50, 84, 118, 152, 186, 286, 335) — Hex literals inside a **theme-preset registry** consumed only by `/settings/theme`. Intentional by definition (the file describes alternative themes). → No fix; tag with `/* DS-OK: alternative theme registry */` to suppress future false positives.
+4. **Stage 5 — `client/src/components/ui/export-tools.tsx:180-187`** — hexes `#333`/`#666`/`#eee`/`#007acc`/`#f9f9f9`/`#e1e8ed`/`#999` and `border-radius: 3px` inside an HTML export template literal. **Acceptable** per Stage 5 — the output is a standalone exported document with no DS at runtime.
+   Replacement: prepend `/* DS-OK: standalone exported HTML, no runtime DS */` comment above the template literal.
 
-2. **Stage 5 — `client/src/components/ui/theme-provider.tsx:59`** and `color-palette-generator.tsx:397,587` — Default seed colors `#3b82f6` / `#ffffff` for color pickers and palette generators. Pure UX defaults inside theme tooling. → Acceptable.
+5. **Stage 5 — `client/src/lib/shadcn-themes.ts:16,50,84,118,152,186,286,335`** and `client/src/pages/ThemeSettings.tsx:99-101` — hex literals in a **theme-preset registry** + fallback colors for theme-picker preview swatches. **Acceptable** by definition (this file *describes* alternative themes; ThemeSettings is the theme picker UI).
+   Replacement: prepend `/* DS-OK: alternative theme registry */` at top of `shadcn-themes.ts`; `/* DS-OK: preview-only theme picker */` above the `ThemeSettings.tsx:99-101` fallback block.
 
-3. **Stage 5 — `client/src/components/ui/chart.tsx:55`** — `#ccc` / `#fff` appear inside attribute selectors targeting recharts-injected SVG nodes (e.g. `[stroke='#ccc']`). These are selector strings matching recharts' own internal paint — not styles we author. → Acceptable; no change needed.
+6. **Stage 5 — `client/src/components/ui/chart.tsx:55`** — `#ccc`/`#fff` inside attribute selectors (`[stroke='#ccc']`) targeting recharts-injected SVG. **Acceptable** — selector strings matching recharts' own internal paint, not author paint.
+   Replacement: `/* DS-OK: recharts internal selector matchers */` comment above the line.
 
 ---
 
 ## What's good
 
-- ✅ **Stage 1 — System files loaded.** `client/src/index.css:5` `@import './styles/design-system.css'` is the first import (before Tailwind). `client/src/main.tsx:4` `import './lib/design-system'` registers `window.DESIGN_SYSTEMS`, `window.ACCENTS`, `window.SYSTEM_DEFAULT_ACCENT`, `window.applyDesignSystem`.
-- ✅ **Stage 2 — System applied.** `client/index.html:21-22` synchronously sets `data-system="editorial"` and `data-accent="crimson"` on `<html>` before any module loads. `--bg` resolves via the `:root` block in `design-system.css:16-68`.
-- ✅ **Stage 3 — Synchronous boot, no FOUT.** The apply happens in an inline `<script>` in `<head>` (`client/index.html:17-28`), not in a deferred module or `useEffect`. `design-system.ts` self-init at line 152-157 is no-op for styles (only registers `window` globals), confirming no race.
-- ✅ **Stage 4 — `.grain` overlay present.** `MainLayout.tsx:38` renders `<div className="grain" aria-hidden="true" />`. Body-level atmosphere via `design-system.css:72-84` (instead of `.page` wrapper, see FIX #7).
-- ✅ **Stage 9 — Fonts loaded.** `client/index.html:102` requests Inter, Fraunces, JetBrains Mono (plus the four other systems' fonts preloaded for future flips). `--font-display: 'Fraunces'`, `--font-body: 'Inter'`, `--font-mono: 'JetBrains Mono'` all match.
-- ✅ **Stage 10 — Per-system skin block intact.** `rg -c '\[data-system=' client/src/styles/design-system.css` returns **55** selectors (handoff baseline ≥15). Editorial / Terminal / Geist / Brutalist / Swiss blocks all present (lines 546-654).
-- ✅ **Stage 11 — N/A justified.** This is a single-personality Editorial+Crimson build per WP-1; the four other systems are intentionally dormant in the TS applier (`design-system.ts:32-79` defines only `editorial`). The live cycle-through-systems test cannot run because `DESIGN_SYSTEMS['terminal']` etc. are undefined. The skin block in CSS is preserved for future re-introduction; no failure to report.
-- ✅ **Stage 8 — Ink-tier discipline.** No `text-3` / `text-4` token misuse found on body copy in the `client/src/pages/` and `client/src/components/layout/` sweep. The few `text-muted-foreground` usages go through the shadcn→DS bridge, not raw `--text-3`.
-- ✅ **Status semantics** `#34d08c` / `#ffb84d` / `#ff5c7a` are properly tokenized as the DS status colors in `design-system.css:280-282` (chip variants) and `475-477` (dot variants).
+- ✅ **Stage 1** — DS CSS loaded before Tailwind, applier globals registered (see Stage table).
+- ✅ **Stage 2** — Editorial+Crimson applied on `<html>` synchronously.
+- ✅ **Stage 3** — Inline-script boot, no FOUT path.
+- ✅ **Stage 7** — Accent discipline upheld (single accent moment per surface in static review).
+- ✅ **Stage 8** — No body-copy use of `--text-3` / `--text-4`.
+- ✅ **Stage 9** — Inter / Fraunces / JetBrains Mono all loaded via Google Fonts; family names match tokens.
+- ✅ **Stage 10** — 55 `[data-system=...]` selectors (well above ≥15 baseline); all five skin blocks intact.
+- ✅ **Status semantics** (`#34d08c` ok / `#ffb84d` warn / `#ff5c7a` bad) properly tokenized in `design-system.css:280-282, 475-477`.
 - ✅ **Login.tsx:209** uses `var(--warn, #ffb84d)` — exemplary token-with-fallback pattern; should be the project standard.
 
 ---
 
 ## Recommended next steps
 
-1. **Fix FIX #1** (SEOHead.tsx theme-color): one-line literal swap, eliminates the only DS-mismatch that paints outside the React tree.
-2. **Fix FIX #2** (micro-interactions bookmark color): replace `#fbbf24` with `var(--accent)`; trivial token swap, removes a stray accent-like color from running UI.
-3. **Centralize chart palette** (FIX #3 + #4): create `client/src/lib/charts/palette.ts` exporting `CHART_PALETTE`, `STATUS_OK_HEX`, `STATUS_WARN_HEX`, `STATUS_BAD_HEX` (literals required by recharts), then refactor `LinkHealthDashboard.tsx` and `analytics-dashboard.tsx` to import from it. Single source of truth.
-4. **Document the DS adoption scope** (FIX #7 + #8) in `replit.md` under a new "Design-System scope" section: (a) body-level atmosphere replaces `.page` wrapper, (b) shadcn primitives replace `.btn`/`.card`/`.chip` classes, (c) Editorial-only single-personality build. This prevents future audits from re-raising the same structural divergences.
-5. **Tag intentional escapes** (FIX #5, #6, NIT #1, #3) with `/* DS-OK: <reason> */` comments so the next Stage-5 rg sweep auto-skips them.
+1. **FIX #1 + #2** — two-line literal swap in `SEOHead.tsx:87,88` (`#dc2626` → `#ff3d52`). Eliminates the only DS mismatch that paints outside the React tree (PWA/browser chrome).
+2. **FIX #3** — token-swap `#fbbf24` → `var(--accent)` in `micro-interactions.tsx:232,234`. Trivial.
+3. **FIX #4** — wrap `MainLayout` children in `<div className="page">`. One-line restoration of the structural contract.
+4. **FIX #5** — add "Design-System scope" section to `replit.md` documenting the three intentional divergences. Eliminates Stage-6 false-positive noise for all future audits.
+5. **NIT #1–#6** — apply per-line replacements above and tag remaining intentional escapes with `/* DS-OK: <reason> */` so the next Stage-5 rg sweep auto-skips them.
 
 ---
 
@@ -90,19 +122,33 @@ client/src/pages/ThemeSettings.tsx:99:            const primary = preset.dark?.p
 client/src/pages/ThemeSettings.tsx:100:            const secondary = preset.dark?.secondary || preset.light?.secondary || "#444";
 client/src/pages/ThemeSettings.tsx:101:            const accent = preset.dark?.accent || preset.light?.accent || "#888";
 client/src/pages/Login.tsx:209:            <p className="text-[color:var(--warn,#ffb84d)]">
-client/src/lib/shadcn-themes.ts:16,50,84,118,152,186,286,335:  (theme-preset registry hexes)
-client/src/components/admin/LinkHealthDashboard.tsx:345: stroke="#22c55e"
-client/src/components/admin/LinkHealthDashboard.tsx:352: stroke="#ef4444"
-client/src/components/admin/LinkHealthDashboard.tsx:359: stroke="#eab308"
-client/src/components/admin/LinkHealthDashboard.tsx:366: stroke="#f97316"
-client/src/components/layout/SEOHead.tsx:87: <meta name="theme-color" content="#dc2626" />
-client/src/components/layout/SEOHead.tsx:88: <meta name="msapplication-TileColor" content="#dc2626" />
-client/src/components/ui/theme-provider.tsx:59:   const hex = safeGetItem("theme-custom-hex") || "#3b82f6";
-client/src/components/ui/analytics-dashboard.tsx:65-66,360-361,386,535-544: (chart palette + recharts props)
-client/src/components/ui/color-palette-generator.tsx:397,587: (color-picker default + fallback white)
-client/src/components/ui/export-tools.tsx:180-187: (HTML export template literal)
-client/src/components/ui/micro-interactions.tsx:232,234: color: isBookmarked ? "#fbbf24" : "currentColor"
-client/src/components/ui/chart.tsx:55: (recharts selector strings, not authored paint)
+client/src/lib/shadcn-themes.ts:16: preview: { bg: "#000000", sidebar: "#0a0a0a", accent: "#ff003c", text: "#ffffff", secondary: "#1a1a2e" }
+client/src/lib/shadcn-themes.ts:50: preview: { bg: "#09090b", sidebar: "#0a0a0a", accent: "#65a30d", text: "#fafafa", secondary: "#1c1c22" }
+client/src/lib/shadcn-themes.ts:84: preview: { bg: "#09090b", sidebar: "#0a0a0a", accent: "#ec4899", text: "#fafafa", secondary: "#1c1c22" }
+client/src/lib/shadcn-themes.ts:118: preview: { bg: "#0c0a09", sidebar: "#1c1917", accent: "#f472b6", text: "#fafaf9", secondary: "#292524" }
+client/src/lib/shadcn-themes.ts:152: preview: { bg: "#09090b", sidebar: "#0f0f23", accent: "#a855f7", text: "#fafafa", secondary: "#1e1b4b" }
+client/src/lib/shadcn-themes.ts:186: preview: { bg: "#0c0a09", sidebar: "#1c1917", accent: "#8b5cf6", text: "#fafaf9", secondary: "#292524" }
+client/src/lib/shadcn-themes.ts:286: preview: { bg: "#0a0a0a", sidebar: "#0a0a0a", accent: hex, text: "#fafafa", secondary: "#1c1c22" }
+client/src/lib/shadcn-themes.ts:335: preview: { bg: "#0a0a0a", sidebar: "#0a0a0a", accent: hex, text: "#fafafa", secondary: "#1c1c22" }
+client/src/components/admin/LinkHealthDashboard.tsx:345:                  stroke="#22c55e"
+client/src/components/admin/LinkHealthDashboard.tsx:352:                  stroke="#ef4444"
+client/src/components/admin/LinkHealthDashboard.tsx:359:                  stroke="#eab308"
+client/src/components/admin/LinkHealthDashboard.tsx:366:                  stroke="#f97316"
+client/src/components/layout/SEOHead.tsx:87:      <meta name="theme-color" content="#dc2626" />
+client/src/components/layout/SEOHead.tsx:88:      <meta name="msapplication-TileColor" content="#dc2626" />
+client/src/components/ui/theme-provider.tsx:59:      const hex = safeGetItem("theme-custom-hex") || "#3b82f6";
+client/src/components/ui/analytics-dashboard.tsx:65:  '#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6',
+client/src/components/ui/analytics-dashboard.tsx:66:  '#06b6d4', '#84cc16', '#f97316', '#ec4899', '#6366f1'
+client/src/components/ui/analytics-dashboard.tsx:360: <Area type="monotone" dataKey="views" stackId="1" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} />
+client/src/components/ui/analytics-dashboard.tsx:361: <Area type="monotone" dataKey="clicks" stackId="1" stroke="#10b981" fill="#10b981" fillOpacity={0.3} />
+client/src/components/ui/analytics-dashboard.tsx:386: <Bar dataKey="usage" fill="#8b5cf6" />
+client/src/components/ui/analytics-dashboard.tsx:535-544: <Line stroke="#3b82f6" dot={{ fill: '#3b82f6' }} … stroke="#10b981" dot={{ fill: '#10b981' }} />
+client/src/components/ui/color-palette-generator.tsx:397: value={options.baseColor || "#3b82f6"}
+client/src/components/ui/color-palette-generator.tsx:587: color: selectedPalette.colors[4] || '#ffffff'
+client/src/components/ui/export-tools.tsx:180-187: (HTML export template literal: #333,#666,#eee,#007acc,#f9f9f9,#e1e8ed,#999)
+client/src/components/ui/micro-interactions.tsx:232: color: isBookmarked ? "#fbbf24" : "currentColor"
+client/src/components/ui/micro-interactions.tsx:234: color: isBookmarked ? "#fbbf24" : "currentColor"
+client/src/components/ui/chart.tsx:55: (recharts attribute-selector strings: [stroke='#ccc'], [stroke='#fff'])
 ```
 
 ### Hardcoded `font-family: '…'` outside DS files
