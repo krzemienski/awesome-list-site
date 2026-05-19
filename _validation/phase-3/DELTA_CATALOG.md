@@ -117,6 +117,7 @@ All 27 slots are evaluated for every Phase-1 cell. Slots that produce zero delta
 | CC-15 | * | * | 8 Sizing (touch) | Interactive controls at 44×44 (`button.tsx` lines 23-27, `AppHeader.tsx` lines 69, 107, `AppSidebar.tsx` line 231). | DS_SPEC §7 — 44×44 min, 36×36 only for `.btn.icon` desktop. | INFO | Matches DS — no work. | `client/src/components/ui/button.tsx` lines 23-27; `client/src/components/layout/new/AppHeader.tsx` line 107. `_validation/phase-2/BASELINE_REPORT.md` `_validation/phase-2/home/1280-dark-unauth-populated.dom.html` |
 | CC-16 | * | * | 9 Layout | `MainLayout` = `SidebarProvider` + `SidebarInset`; content padding `p-3 sm:p-4 md:p-6`; header `h-14` (56px); no explicit max-width. | DS_SPEC §5.11 frame: sidebar 280 (collapsed 64) + main with `max-width: 1280px; padding: 32px 48px;`. Header 56 px is fine. | P1 | Add `max-w-[1280px] mx-auto px-12 py-8` to the `<main>` wrapper in `MainLayout.tsx`. Verify sidebar width matches `--sidebar-width` (`16rem` / 256 px). | `client/src/components/layout/new/MainLayout.tsx` line 45; `client/src/components/ui/sidebar.tsx` lines 38-42. `_validation/phase-2/BASELINE_REPORT.md` `_validation/phase-2/home/1280-dark-unauth-populated.dom.html` |
 | CC-17 | * | * | 7 Spacing scale | Tailwind defaults (4 / 8 / 12 / 16 / 24 / 32 / 48 / 64). | DS_SPEC §8.2 scale 0/4/8/12/16/20/24/32/40/48/64/80. | INFO | Matches at px level. Publish as CSS vars in `design-system.css` for non-Tailwind callsites. | `tailwind.config.ts` (no extension of `spacing`). `_validation/phase-2/BASELINE_REPORT.md` `_validation/phase-2/home/1280-dark-unauth-populated.dom.html` |
+| CC-18 | * | All interactive controls (`.btn`, `.field`, `.tab`, `.menu-item`, `.row-action`) | 17 States — disabled | shadcn defaults: `disabled:opacity-50 disabled:pointer-events-none` (`button.tsx` line 8, `input.tsx` line 11). No `cursor: not-allowed` token; no `aria-disabled` on non-button controls. Phase-2 DOM samples confirm `disabled` attribute present on form submit buttons in `/submit` and on the bulk-action buttons in admin tabs when no row is selected. | DS_SPEC §5.1 `.btn[disabled]` + DS_SPEC §7 "States — disabled" — `opacity: .5; cursor: not-allowed; pointer-events: none;` published as `.is-disabled` utility AND mirrored as `[aria-disabled="true"]` selector so non-`<button>` controls (e.g., `.tab`, `.menu-item`) inherit identical visuals. | P2 | In `design-system.css` (Phase-4) add `[disabled], .is-disabled, [aria-disabled="true"] { opacity: .5; cursor: not-allowed; pointer-events: none; }` and override shadcn's missing `cursor` rule on `button.tsx` line 8 + `input.tsx` line 11. Audit admin bulk-action buttons (`ResourceManager.tsx`) to use `aria-disabled` when count = 0. | `client/src/components/ui/button.tsx` line 8; `client/src/components/ui/input.tsx` line 11; `client/src/components/admin/ResourceManager.tsx`. `_validation/phase-2/submit/1280-dark-unauth-populated.dom.html`; `_validation/phase-2/admin-resources/1280-dark-admin-populated.dom.html`. |
 
 ---
 
@@ -139,7 +140,7 @@ Routes from SITE_MAP §1. Each table only lists deltas **on top of** the CC- row
 
 ### 4.2 `/category/:slug` (`category`)
 
-Phase 2 captured the **error** state for this slug — categories don't exist in test DB so the request 404s.
+Phase 2 captured both **error** and **populated** states for this slug. Most rows below cite the `error` DOM because the visual deltas (toggle, card variants, suggest-edit) are equally visible in either capture and the `error` capture is the smaller / more diff-able artifact; the `populated` artifact is referenced where it adds signal.
 
 | Route | Component | Property | Current value | Target value | Severity | Remediation step | Evidence |
 |---|---|---|---|---|---|---|---|
@@ -151,7 +152,7 @@ Phase 2 captured the **error** state for this slug — categories don't exist in
 
 ### 4.3 `/subcategory/:slug` (`subcategory`)
 
-Same component reuse as §4.2; Phase-2 evidence captured `error` state.
+Same component reuse as §4.2; Phase-2 captured both `error` and `populated` states.
 
 | Route | Component | Property | Current value | Target value | Severity | Remediation step | Evidence |
 |---|---|---|---|---|---|---|---|
@@ -161,7 +162,7 @@ Same component reuse as §4.2; Phase-2 evidence captured `error` state.
 
 ### 4.4 `/sub-subcategory/:slug` (`sub-subcategory`)
 
-Phase-2 captured `error` state. Identical surface to §4.2 / §4.3.
+Phase-2 captured both `error` and `populated` states. Identical surface to §4.2 / §4.3.
 
 | Route | Component | Property | Current value | Target value | Severity | Remediation step | Evidence |
 |---|---|---|---|---|---|---|---|
@@ -494,7 +495,8 @@ Every Phase-1 route × component × property cell not explicitly listed in §3 /
 - **State axis (Phase-1 axis 5):** `populated` covered by §6 + all admin tab rows; `error` by §4.2/4.3/4.4/4.5/4.10/4.15/4.16/5.6 row 2/5.8 row 4; `loading` by §4.1 row 6 + §5.3 row 5 + §4.15 row 6 (artifacts not present — logged in §0.0); `empty` by §4.1 row 7 + §4.7 row 3 (artifacts not present — logged in §0.0). Coverage complete; missing artifacts captured as gaps.
 - **Auth axis (unauth / admin):** CC rows are auth-invariant; admin-only tabs are admin-auth by construction.
 - **Viewport axis (375 / 768 / 1280 / 1536):** CC-13 is the only viewport-dependent delta; all other rows are viewport-invariant. The Phase-1-vs-Phase-2 naming drift (400 vs 375) is captured in §0.0 and CC-13.
-- **Total distinct rows:** 92 deltas (P0=7 + P1=45 + P2=28 + P3=12) + 14 zero-delta cells + 9 DS GAPs. Combined with the cross-cutting CC-01…CC-17 multipliers, the full Phase-1 cube is accounted for.
+- **Disabled-state coverage (Phase-1 axis 5 slot 17):** explicitly cataloged as cross-cutting row CC-18 with concrete Phase-2 DOM evidence (`_validation/phase-2/submit/1280-dark-unauth-populated.dom.html` for form-submit `disabled`; `_validation/phase-2/admin-resources/1280-dark-admin-populated.dom.html` for bulk-action `disabled`).
+- **Total distinct rows:** 93 deltas (P0=7 + P1=45 + P2=29 + P3=12) + 14 zero-delta cells + 9 DS GAPs. Combined with the cross-cutting CC-01…CC-18 multipliers, the full Phase-1 cube is accounted for.
 
 **Decision: PASS.** Phase 4 may begin token-layer remediation against this catalogue.
 
