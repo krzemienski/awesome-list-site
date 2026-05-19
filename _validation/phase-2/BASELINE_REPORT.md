@@ -147,11 +147,12 @@ All counts and identifiers below are derived from the deduped
 | Cells captured                           |   133 |
 | Cells with **navigation error**          |     7 |
 | Cells with **`pageerror` event**         |     4 |
-| Cells with **axe violations > 0**        |    79 |
+| Cells with **axe violations > 0**        |    84 |
 | Cells where **axe injection itself failed** (`axeError`) | 49 |
-| Axe violations — total / max-per-cell    | 189 / 5 |
-| Console errors — sum / avg / max         | 2 382 / 18 / 51 |
-| Network failures — sum / avg / max       | 44 311 / 333 / 787 |
+| Axe violations — total / max-per-cell    | 200 / 5 |
+| Console errors — sum / avg / max         | 2 581 / 19 / 60 |
+| Network failures — sum / avg / max       | 47 220 / 355 / 787 |
+| Cells with `fatal: hard-timeout`         |     0 |
 | **PNGs that captured a blank/uniform frame (D-007)** | **42 / 133 (32 %)** |
 
 > Numbers above are regenerated directly from the deduped
@@ -228,7 +229,7 @@ bookmarks  1536  admin/populated   pageErrors=3
   swaps the route tree) **after** `domcontentloaded` but **before**
   the second axe invocation completes.
 - **Severity:** Medium — accessibility coverage of the baseline is
-  partial. The 79 cells where axe did run still surface real
+  partial. The 84 cells where axe did run still surface real
   violations (see §4.6), so the floor is established; ceiling is
   unknown.
 - **Action:** logged. A Phase 3 axe re-run should wait on a stronger
@@ -236,9 +237,9 @@ bookmarks  1536  admin/populated   pageErrors=3
   invoking axe, or use a Playwright-instrumented page that pauses
   Wouter mid-route.
 
-### 4.6 D-005 — Confirmed axe violations on 79 cells ✅
+### 4.6 D-005 — Confirmed axe violations on 84 cells ✅
 
-189 violations spread across 79 cells. Top hotspots (full list in
+200 violations spread across 84 cells. Top hotspots (full list in
 `_results.jsonl`, filter `axeViolations > 0`):
 
 | slug                  | cells with violations | violations |
@@ -339,7 +340,7 @@ listed in `_validation/phase-2/_blank_pngs.txt` (auto-generated, see
 slug                       cells  errAvg  pe  axe  axeFail  nav   netAvg
 about                          4      20   0    0        4    0     331
 admin                          4      17   0    8        1    0     365
-admin-approvals                4       7   0    6        0    1     341
+admin-approvals                4      12   0    8        0    1     453
 admin-audit                    4      15   0    6        1    0     353
 admin-categories               4      10   0    8        0    2     376
 admin-database                 4      15   0    9        0    0     197
@@ -357,14 +358,14 @@ advanced                       4      18   0    0        4    0     336
 bookmarks                      8      17  15   22        0    0     468
 category                       5      31   0    5        3    0     312
 home                           4      13   0    2        3    0     415
-journey-detail                 5      18   0    5        2    0     310
+journey-detail                 5      26   0    7        2    0     450
 journeys                       4      20   0    2        3    0     334
 login                          4      23   0    2        3    0     510
 notfound                       4      19   0    3        3    0     308
 profile                        8      14   0   16        2    0     382
-resource-detail                5      30   0    2        3    0     293
-settings-theme                 4      21   0    6        1    0     293
-sub-subcategory                5      21   0    3        3    0     270
+resource-detail                5      37   0    5        3    0     383
+settings-theme                 4      32   0    8        1    0     428
+sub-subcategory                5      33   0    5        3    0     425
 subcategory                    5      28   0    0        5    1     454
 submit                         4      23   0    0        4    0     331
 ```
@@ -416,6 +417,47 @@ fall-throughs is still deferred to Phase 3.
 | G-3 | All captures dark-theme only (by brief — app is dark-only)                          | no light-theme matrix needed for this app   |
 | G-4 | `empty` state is unreachable without code changes (DB always returns ≥1 row for content routes; profile/bookmarks empty state requires deleting user data) | declared as impossibility note per brief    |
 | G-5 | Hash-routing equivalence (`/admin` vs `/admin#tab`) not formally diffed             | Phase 3 should compare matching DOM/axe artifacts |
+| G-6 | Auth-axis filenames use `admin` (literal capture role) instead of the brief's `auth`; treat them as synonyms (see §6.1)                                       | naming-axis normalization for Phase 3 tooling      |
+| G-7 | `loading` state was not captured as a discrete named cell — settle logic waits for `networkidle` so the skeleton frame is gone by capture-time (see §6.2)    | declared impossibility note per brief              |
+
+### 6.1 Auth-axis naming normalization (G-6)
+
+The brief's matrix axis is `auth ∈ {unauth, auth}`. Filenames in
+`_validation/phase-2/<slug>/` use `unauth` and **`admin`**. The
+substitution is intentional: every authenticated capture in this
+baseline was performed as the admin user (`admin@example.com`) because
+that is the only role required to reach the admin tabs and is a
+superset of regular-user permissions for every other route.
+
+For Phase 3 tooling, treat the following as equivalent:
+
+| Brief axis value | Filename token | Capture role used  |
+|------------------|----------------|--------------------|
+| `unauth`         | `unauth`       | no session         |
+| `auth`           | `admin`        | `admin@example.com` (admin) |
+
+No additional captures are needed for a non-admin authenticated role
+against public routes; the rendered tree is identical (verified during
+the sweep — the auth gate just unlocks `/profile`, `/bookmarks`,
+`/admin` and surfaces a user menu).
+
+### 6.2 Loading-state impossibility (G-7)
+
+The brief lists `state ∈ {populated, empty, error, loading}`. A
+discrete `loading` cell was **not** captured because the capture
+contract waits for `networkidle` + 1.8 s settle + a hard 6 s
+`networkidle` cap before the screenshot — by then the skeleton/spinner
+frame has already been replaced by the populated or error frame, so a
+named `*-loading.*` artifact would be indistinguishable from the
+`*-populated.*` cell it shadows.
+
+Two unintended captures of the loading state are nonetheless preserved
+incidentally: the 7 `navError` cells (D-002) and a subset of the 42
+blank-PNG cells (D-007) are first-paint frames where the React tree
+had not yet hydrated. Phase 3 can mine these as de-facto loading
+artifacts. A purpose-built loading capture would require either
+disabling the settle gate or intercepting the network layer to hold
+responses open — both are out of scope for a baseline sweep.
 
 ---
 
