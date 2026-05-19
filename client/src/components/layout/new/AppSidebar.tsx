@@ -123,7 +123,7 @@ export default function AppSidebar({ categories, resources, isLoading, user }: A
                 <Folder className="size-4" />
               </div>
               <div className="flex flex-col gap-0.5 leading-none">
-                <span className="font-display text-base font-medium tracking-tight">Awesome Video</span>
+                <span className="font-sans text-sm font-semibold tracking-tight">Awesome Video</span>
                 <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground">{resources.length} resources</span>
               </div>
             </SidebarMenuButton>

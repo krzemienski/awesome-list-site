@@ -103,9 +103,8 @@ export default function Login() {
               <LogIn className="h-6 w-6 text-[var(--accent)]" />
             </div>
           </div>
-          <div className="eyebrow text-center">// Authentication</div>
-          <CardTitle className="font-display font-medium text-3xl text-center tracking-tight">
-            Welcome <em className="not-italic font-display italic text-[var(--accent)]">back</em>
+          <CardTitle className="font-sans font-bold text-3xl text-center tracking-tight">
+            Welcome back
           </CardTitle>
           <CardDescription className="text-center">
             Sign in to access the admin dashboard
@@ -205,10 +204,9 @@ export default function Login() {
             </Button>
           </div>
 
-          <div className="rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--surface)] p-3 text-center text-sm text-[color:var(--text-2)] space-y-1">
-            <p className="eyebrow">// Default admin</p>
-            <p className="font-mono text-xs">admin@example.com / admin123</p>
-            <p className="text-xs text-[color:var(--warn,#ffb84d)]">
+          <div className="text-center text-xs text-[color:var(--text-2)] space-y-1 pt-2">
+            <p>Default admin: <span className="font-mono">admin@example.com</span> / <span className="font-mono">admin123</span></p>
+            <p className="text-[color:var(--warn,#ffb84d)]">
               Change password after first login
             </p>
           </div>

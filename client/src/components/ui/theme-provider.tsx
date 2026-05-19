@@ -123,9 +123,20 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [activeTheme]);
 
   useEffect(() => {
-    /* no-op: applyFont(activeFont) intentionally disabled */
-    void activeFont;
+    applyFont(activeFont);
   }, [activeFont]);
+
+  useEffect(() => {
+    /* Apply preset accent color into DS tokens (--accent, --accent-2).
+     * We deliberately only touch accent tokens so the Editorial atmosphere
+     * (bg, surface ladder, text ladder, radii, fonts) stays intact. */
+    const root = document.documentElement;
+    const primary = activeTheme?.dark?.primary || activeTheme?.light?.primary;
+    if (primary) {
+      root.style.setProperty('--accent', primary);
+      root.style.setProperty('--accent-2', primary);
+    }
+  }, [activeTheme]);
 
   return (
     <ThemeProviderContext.Provider value={{

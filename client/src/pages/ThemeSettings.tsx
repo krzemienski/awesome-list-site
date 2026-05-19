@@ -1,197 +1,138 @@
-import { useEffect, useState } from "react";
+import { useContext } from "react";
 import { Link } from "wouter";
-import { ArrowLeft, Check, Palette } from "lucide-react";
-import { ACCENTS, applyDesignSystem, SYSTEM_DEFAULT_ACCENT } from "@/lib/design-system";
+import { ArrowLeft, Check, Palette, Type } from "lucide-react";
+import { ThemeProviderContext, FONT_OPTIONS } from "@/components/ui/theme-provider";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 
-/*
- * WP-1 §4.12 row 1 (P0) — Terminal-only accent picker.
- *
- * Option A locks the active design system to `terminal`; this page exposes the
- * 10-accent palette and writes through `applyDesignSystem('terminal', id)`,
- * which both updates `--accent` live and persists `ds-accent` in localStorage
- * so a reload retains the selection.
- *
- * Acceptance: AC-1.9. Verification gate: G4.1-g.
- */
 export default function ThemeSettings() {
+  const { activeFont, setFont, activeTheme, setThemeByValue, presets } = useContext(ThemeProviderContext);
   const { toast } = useToast();
-  const [activeAccent, setActiveAccent] = useState<string>(() => {
-    if (typeof window === "undefined") return SYSTEM_DEFAULT_ACCENT.terminal;
-    try {
-      return localStorage.getItem("ds-accent") || SYSTEM_DEFAULT_ACCENT.terminal;
-    } catch {
-      return SYSTEM_DEFAULT_ACCENT.terminal;
-    }
-  });
 
-  useEffect(() => {
-    /* Ensure we render in sync with whatever boot-script applied. */
-    const current = document.documentElement.getAttribute("data-accent");
-    if (current && current !== activeAccent) {
-      setActiveAccent(current);
-    }
-  }, [activeAccent]);
-
-  const handlePick = (accentId: string, accentName: string) => {
-    applyDesignSystem("terminal", accentId);
-    setActiveAccent(accentId);
-    toast({
-      title: "Accent applied",
-      description: `${accentName} is now the active accent.`,
-    });
+  const handlePickFont = (value: string, label: string) => {
+    setFont(value);
+    toast({ title: "Font applied", description: `${label} is now the active font.` });
   };
 
+  const handlePickTheme = (value: string, label: string) => {
+    setThemeByValue(value);
+    toast({ title: "Theme applied", description: `${label} is now the active color theme.` });
+  };
+
+  const colorPresets = presets.filter((p) =>
+    ["cyberpunk", "limes", "black-pink", "flat-pink", "purples", "flat-purples"].includes(p.value)
+  );
+
   return (
-    <div className="max-w-3xl">
-      <div className="mb-8">
+    <div className="max-w-4xl space-y-10">
+      <div>
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-4"
+          className="inline-flex items-center gap-1.5 text-sm text-[color:var(--text-2)] hover:text-[var(--text)] mb-4"
           data-testid="link-back-home"
         >
           <ArrowLeft className="h-4 w-4" />
           Back
         </Link>
         <div className="flex items-center gap-3">
-          <Palette className="h-7 w-7" style={{ color: "var(--accent)" }} />
-          <div>
-            <h1 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
-              Theme
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              <span
-                className="mono"
-                style={{ fontFamily: "var(--font-mono)", color: "var(--text-3)" }}
-              >
-                SYSTEM:
-              </span>{" "}
-              <span style={{ color: "var(--accent)" }}>Editorial</span>{" "}
-              <span style={{ color: "var(--text-3)" }}>·</span>{" "}
-              <span
-                className="mono"
-                style={{ fontFamily: "var(--font-mono)", color: "var(--text-3)" }}
-              >
-                ACCENT:
-              </span>{" "}
-              <span style={{ color: "var(--accent)" }}>
-                {ACCENTS.find((a) => a.id === activeAccent)?.name ?? activeAccent}
-              </span>
-            </p>
-          </div>
+          <Palette className="h-7 w-7 text-[var(--accent)]" />
+          <h1 className="font-sans font-bold text-3xl sm:text-4xl tracking-tight">
+            Theme Settings
+          </h1>
         </div>
+        <p className="text-sm sm:text-base text-[color:var(--text-2)] mt-2">
+          Customize the font and color theme of the site to match your preference.
+        </p>
       </div>
 
-      <section
-        data-testid="ds-picker"
-        data-system-row="terminal"
-        aria-label="Accent picker"
-      >
-        <div
-          className="mb-3 flex items-center gap-3 text-xs uppercase"
-          style={{
-            fontFamily: "var(--font-mono)",
-            letterSpacing: "var(--eyebrow-tracking)",
-            color: "var(--text-3)",
-          }}
-        >
-          <span style={{ color: "var(--accent)" }}>›</span>
-          <span>Accent · {ACCENTS.length} options</span>
+      {/* Font Picker */}
+      <section aria-label="Font picker" data-testid="font-picker">
+        <div className="flex items-center gap-2 mb-4">
+          <Type className="h-5 w-5 text-[var(--accent)]" />
+          <h2 className="font-sans font-semibold text-xl tracking-tight">Font</h2>
         </div>
-
-        <div
-          role="radiogroup"
-          aria-label="Accent color"
-          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3"
-        >
-          {ACCENTS.map((accent) => {
-            const isActive = accent.id === activeAccent;
+        <div role="radiogroup" aria-label="Font" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {FONT_OPTIONS.map((font) => {
+            const isActive = font.value === activeFont;
             return (
               <button
-                key={accent.id}
+                key={font.value}
                 type="button"
                 role="radio"
                 aria-checked={isActive}
-                data-testid={`accent-swatch-${accent.id}`}
-                data-accent-id={accent.id}
-                onClick={() => handlePick(accent.id, accent.name)}
-                className="group flex flex-col items-stretch text-left transition-colors"
+                onClick={() => handlePickFont(font.value, font.label)}
+                data-testid={`font-option-${font.value}`}
+                className="text-left rounded-[var(--radius)] border bg-[var(--surface)] p-4 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
                 style={{
-                  background: "var(--surface)",
-                  border: `1px solid ${isActive ? accent.primary : "var(--border)"}`,
-                  padding: "12px",
-                  minHeight: "44px",
-                  cursor: "pointer",
+                  borderColor: isActive ? "var(--accent)" : "var(--border)",
                   boxShadow: isActive
-                    ? `0 0 0 1px ${accent.primary}, 0 0 16px color-mix(in srgb, ${accent.primary} 30%, transparent)`
+                    ? "0 0 0 1px var(--accent), 0 0 16px color-mix(in srgb, var(--accent) 25%, transparent)"
                     : "none",
                 }}
               >
-                <div
-                  className="flex items-center justify-between mb-3"
-                  style={{ minHeight: "20px" }}
-                >
-                  <span
-                    style={{
-                      fontFamily: "var(--font-mono)",
-                      fontSize: "11px",
-                      letterSpacing: "0.12em",
-                      textTransform: "uppercase",
-                      color: isActive ? accent.primary : "var(--text-2)",
-                    }}
-                  >
-                    {accent.name}
-                  </span>
-                  {isActive && (
-                    <Check
-                      className="h-3.5 w-3.5"
-                      style={{ color: accent.primary }}
-                      aria-hidden
-                    />
-                  )}
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-semibold text-sm">{font.label}</span>
+                  {isActive && <Check className="h-4 w-4 text-[var(--accent)]" />}
                 </div>
-                <div className="flex h-8 w-full overflow-hidden">
-                  <div
-                    aria-hidden
-                    style={{
-                      flex: 2,
-                      background: accent.primary,
-                    }}
-                  />
-                  <div
-                    aria-hidden
-                    style={{
-                      flex: 1,
-                      background: accent.secondary,
-                    }}
-                  />
-                </div>
-                <code
-                  className="mt-2 block"
-                  style={{
-                    fontFamily: "var(--font-mono)",
-                    fontSize: "10.5px",
-                    color: "var(--text-3)",
-                  }}
+                <p
+                  className="text-base mb-1"
+                  style={{ fontFamily: font.family }}
                 >
-                  {accent.primary}
+                  The quick brown fox jumps over the lazy dog
+                </p>
+                <p className="text-xs text-[color:var(--text-2)]">{font.description}</p>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Color Theme Picker */}
+      <section aria-label="Color theme picker" data-testid="color-theme-picker">
+        <div className="flex items-center gap-2 mb-4">
+          <Palette className="h-5 w-5 text-[var(--accent)]" />
+          <h2 className="font-sans font-semibold text-xl tracking-tight">Color Theme</h2>
+        </div>
+        <div role="radiogroup" aria-label="Color theme" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {colorPresets.map((preset) => {
+            const isActive = preset.value === activeTheme.value;
+            const primary = preset.dark?.primary || preset.light?.primary || "#000";
+            const secondary = preset.dark?.secondary || preset.light?.secondary || "#444";
+            const accent = preset.dark?.accent || preset.light?.accent || "#888";
+            return (
+              <button
+                key={preset.value}
+                type="button"
+                role="radio"
+                aria-checked={isActive}
+                onClick={() => handlePickTheme(preset.value, preset.label)}
+                data-testid={`theme-option-${preset.value}`}
+                className="text-left rounded-[var(--radius)] border bg-[var(--surface)] p-4 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
+                style={{
+                  borderColor: isActive ? primary : "var(--border)",
+                  boxShadow: isActive
+                    ? `0 0 0 1px ${primary}, 0 0 16px color-mix(in srgb, ${primary} 25%, transparent)`
+                    : "none",
+                }}
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <span className="font-semibold text-sm">{preset.label}</span>
+                  {isActive && <Check className="h-4 w-4" style={{ color: primary }} />}
+                </div>
+                <div className="flex h-10 w-full overflow-hidden rounded-[var(--radius-sm)] mb-2">
+                  <div aria-hidden style={{ flex: 2, background: primary }} />
+                  <div aria-hidden style={{ flex: 1, background: secondary }} />
+                  <div aria-hidden style={{ flex: 1, background: accent }} />
+                </div>
+                <code className="block font-mono text-[10.5px] text-[color:var(--text-2)] tracking-wider">
+                  {primary}
                 </code>
               </button>
             );
           })}
         </div>
-
-        <p
-          className="mt-6 text-xs"
-          style={{
-            fontFamily: "var(--font-mono)",
-            color: "var(--text-3)",
-            lineHeight: 1.6,
-          }}
-        >
-          The accent updates live and persists across reloads
-          (<code>localStorage["ds-accent"]</code>). The Editorial system is the
-          only DS skin shipped (Option A).
+        <p className="mt-4 text-xs text-[color:var(--text-2)]">
+          Selections persist across reloads. The Editorial atmosphere stays intact &mdash; only the accent color shifts.
         </p>
       </section>
     </div>

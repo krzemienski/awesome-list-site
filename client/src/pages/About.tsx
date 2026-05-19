@@ -29,11 +29,10 @@ export default function About() {
       </Helmet>
 
       <div className="mb-10 space-y-3">
-        <div className="eyebrow">// About the project</div>
         <div className="flex items-center gap-3">
-          <Sparkles className="h-8 w-8 text-[var(--accent)]" />
-          <h1 className="font-display font-medium text-4xl sm:text-5xl tracking-tight leading-[1.04]">
-            About <em className="not-italic font-display italic text-[var(--accent)]">Awesome Video</em>
+          <Sparkles className="h-7 w-7 text-[var(--accent)]" />
+          <h1 className="font-sans font-bold text-4xl sm:text-5xl tracking-tight">
+            About
           </h1>
         </div>
         <p className="text-base sm:text-lg text-[color:var(--text-2)] max-w-3xl leading-relaxed">
@@ -44,7 +43,7 @@ export default function About() {
 
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 font-display font-medium tracking-tight">
+          <CardTitle className="flex items-center gap-2">
             <Rocket className="h-5 w-5 text-[var(--accent)]" />
             What is this?
           </CardTitle>
@@ -67,7 +66,7 @@ export default function About() {
       {/* Features Grid */}
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 font-display font-medium tracking-tight">
+          <CardTitle className="flex items-center gap-2">
             <Zap className="h-5 w-5 text-[var(--accent)]" />
             Features
           </CardTitle>
@@ -102,7 +101,7 @@ export default function About() {
       {/* Technology Stack */}
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 font-display font-medium tracking-tight">
+          <CardTitle className="flex items-center gap-2">
             <Code2 className="h-5 w-5 text-[var(--accent)]" />
             Technology Stack
           </CardTitle>
@@ -165,7 +164,7 @@ export default function About() {
       {/* Accessibility */}
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 font-display font-medium tracking-tight">
+          <CardTitle className="flex items-center gap-2">
             <Accessibility className="h-5 w-5 text-[var(--accent)]" />
             Accessibility First
           </CardTitle>
@@ -195,7 +194,7 @@ export default function About() {
       {/* Credits */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 font-display font-medium tracking-tight">
+          <CardTitle className="flex items-center gap-2">
             <Heart className="h-5 w-5 text-[var(--accent)]" />
             Credits
           </CardTitle>
