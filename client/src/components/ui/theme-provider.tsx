@@ -108,25 +108,23 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, []);
 
   /*
-   * DS Migration WP-1 — Option A (Terminal-only) gates the legacy
-   * applyTheme()/applyFont() side-effects: they would overwrite DS tokens
-   * (--bg, --text, --accent, --font-body) set by `applyDesignSystem`.
-   * When data-system is 'terminal' we let the DS own the surface; the React
-   * state stays around so the picker UI at /settings/theme can keep its
-   * presets-display affordance without leaking back into the live cascade.
+   * DS Migration (Editorial+Crimson single-personality build) — the legacy
+   * applyTheme()/applyFont() side-effects are permanently disabled. They
+   * would overwrite DS tokens (--bg, --text, --accent, --font-body,
+   * --radius, --font-sans) set by the CSS layer in design-system.css and
+   * the boot script in index.html. The DS owns the surface; React state
+   * stays around so the (deferred) picker UI at /settings/theme can keep
+   * its presets-display affordance without leaking back into the live
+   * cascade.
    */
-  const isTerminalSystem = () =>
-    typeof document !== "undefined" &&
-    document.documentElement.getAttribute("data-system") === "terminal";
-
   useEffect(() => {
-    if (isTerminalSystem()) return;
-    applyTheme(activeTheme);
+    /* no-op: applyTheme(activeTheme) intentionally disabled */
+    void activeTheme;
   }, [activeTheme]);
 
   useEffect(() => {
-    if (isTerminalSystem()) return;
-    applyFont(activeFont);
+    /* no-op: applyFont(activeFont) intentionally disabled */
+    void activeFont;
   }, [activeFont]);
 
   return (

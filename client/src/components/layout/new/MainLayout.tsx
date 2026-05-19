@@ -32,6 +32,8 @@ export default function MainLayout({ awesomeList, isLoading, children, user, onL
     <SidebarProvider defaultOpen={!isMobile}>
       {/* CC-17 — Skip-link is the first focusable element on every page. */}
       <a href="#main" className="skip-link">Skip to main content</a>
+      {/* WP-1 — Editorial atmosphere: SVG grain overlay (page-bg gradient lives on body). */}
+      <div className="grain" aria-hidden="true" />
 
       <AppSidebar
         categories={awesomeList?.categories || []}

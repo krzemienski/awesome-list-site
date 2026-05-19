@@ -8,6 +8,17 @@ A production-ready React application for browsing and discovering over 2,600 cur
 
 ## Recent Changes
 
+### Editorial + Crimson Design System — WP-1 Foundations (May 19, 2026)
+- **Scope locked**: applying Claude Design Editorial personality with Crimson accent only (single personality, no switcher).
+- **Token swap**: `client/src/styles/design-system.css` `:root` now carries Editorial values — warm-ink alpha surfaces on near-black, `#f4f3ee` text ladder, `#ff3d52` crimson accent, Fraunces (serif display) / Inter (body) / JetBrains Mono (code), 12px / 8px / 999px radius ladder, soft drop shadows, radial-gradient page atmosphere, SVG grain overlay at 0.32 opacity.
+- **Boot lock**: `client/index.html` boot script sets `<html data-system="editorial" data-accent="crimson">` before any module paints; Google Fonts link now loads Fraunces + Inter + JetBrains Mono.
+- **Runtime applier neutralized**: `client/src/lib/design-system.ts` previously pushed inline `style.setProperty('--bg', '#000')` etc. on `documentElement` at boot (Terminal values), which silently overrode the CSS layer. The self-init block is now a globals-only registration; `applyDesignSystem()` remains callable but isn't invoked at boot. `DESIGN_SYSTEMS` map now contains the Editorial config.
+- **Shadcn radius re-wired**: `client/src/index.css` `@theme inline` radius keys un-collapsed from `0` to the Editorial 8/12 px ladder so `rounded-*`, `<Card>`, `<Input>`, `<Dialog>` automatically pick up Editorial geometry without per-call class overrides.
+- **Atmosphere overlay**: `client/src/components/layout/new/MainLayout.tsx` now mounts a fixed `<div class="grain" />` overlay (`aria-hidden`, `pointer-events: none`).
+- **Legacy theme-provider effects disabled**: `client/src/components/ui/theme-provider.tsx` had two `useEffect`s that called `applyTheme(activeTheme)` and `applyFont(activeFont)` whenever `data-system !== 'terminal'` — i.e. exactly in our new Editorial mode. Those effects wrote inline CSS variables (`--font-sans`, `--radius`, theme color set) onto `documentElement`, silently overriding the DS layer. Both effects are now permanent no-ops; React state is preserved for the deferred /settings/theme picker UI.
+- **Planning artifacts**: `_planning/{DS_SPEC,SITE_MAP,DELTA_CATALOG,REMEDIATION_PLAN}.md` capture the Editorial+Crimson contract, current site inventory, 82-item delta catalog, and 8-work-package remediation plan with per-gate evidence requirements.
+- **Known issue (pre-existing, not migration-related)**: `AppHeader.tsx:75` uses `<Fragment>` inside a `.map()`; Replit's dev injector adds `data-replit-metadata` to those Fragments, producing a React warning. Tracked for a follow-up cleanup pass.
+
 ### Admin Panel Audit – Remaining Tabs (May 2, 2026)
 - **Removed broken Research tab** from `client/src/pages/AdminDashboard.tsx`. `CostDashboard` + `ResearchPanel` were calling `/api/research/*` endpoints that were never wired up in `server/routes.ts` (the active routes file). The working `Researcher` tab (different component, hits `/api/researcher/*`) remains.
 - **Deleted dead client code**: removed entire `client/src/components/admin/research/` directory (CostDashboard, ResearchPanel, JobMonitor, ReportViewer, ResearchDashboard, ResearchJobsTable, etc.) — nothing else imported it.

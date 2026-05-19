@@ -13,27 +13,23 @@
     <title>Awesome List Static Site</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>" />
 
-    <!-- DS no-FOUT boot script: pin data-system/data-accent before any module script paints. -->
+    <!-- DS no-FOUT boot script: lock to Editorial + Crimson before any module paints. -->
     <script>
       (function () {
         try {
-          var s = localStorage.getItem('ds-system') || 'terminal';
-          /* Option A locks to Terminal regardless of any legacy stored value. */
-          s = 'terminal';
-          var a = localStorage.getItem('ds-accent') || 'matrix';
           var root = document.documentElement;
-          root.setAttribute('data-system', s);
-          root.setAttribute('data-accent', a);
+          root.setAttribute('data-system', 'editorial');
+          root.setAttribute('data-accent', 'crimson');
           root.classList.add('dark');
           root.style.backgroundColor = '#000';
-          root.style.color = '#e8e8e0';
+          root.style.color = '#f4f3ee';
         } catch (e) {}
       })();
     </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
   </head>
   <body>
     <div id="root"><!--app-html--></div>

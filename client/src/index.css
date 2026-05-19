@@ -52,11 +52,11 @@
   --font-mono: var(--font-mono);
   --font-serif: var(--font-display);
 
-  /* Radius ladder collapsed to 0 — Terminal is square (CC-04). */
-  --radius-sm: 0;
-  --radius-md: 0;
-  --radius-lg: 0;
-  --radius-xl: 0;
+  /* Radius ladder — Editorial uses 8px / 12px (no longer collapsed). */
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius);
+  --radius-lg: var(--radius);
+  --radius-xl: var(--radius);
 }
 
 @layer base {
@@ -76,7 +76,4 @@
   }
 }
 
-::selection {
-  background-color: var(--accent);
-  color: #000000;
-}
+/* selection rule lives in design-system.css with proper color-mix alpha */

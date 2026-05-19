@@ -1,8 +1,18 @@
 /* =====================================================================
-   AWESOME.VIDEO DESIGN SYSTEM — RUNTIME APPLIER (WP-1)
-   Port of awesome-list-site-ds/design-systems.jsx, Terminal-only.
-   Side-effectful import: attaches globals, restores saved accent from
-   localStorage, applies once.
+   AWESOME.VIDEO DESIGN SYSTEM — RUNTIME APPLIER (WP-1, Editorial)
+   Single-personality build: Editorial + Crimson.
+
+   The CSS in client/src/styles/design-system.css already declares the
+   canonical Editorial token values at :root, and client/index.html sets
+   <html data-system="editorial" data-accent="crimson"> before any module
+   paints. This module therefore intentionally does NOT push inline styles
+   onto documentElement at boot — doing so would override the CSS layer
+   and re-introduce drift.
+
+   It still exports DESIGN_SYSTEMS / ACCENTS / applyDesignSystem because
+   /settings/theme and a few other surfaces consume them. applyDesignSystem
+   remains callable for future re-introduction of a switcher, but the
+   self-init block below is now a no-op.
    ===================================================================== */
 
 export interface DesignSystem {
@@ -19,57 +29,56 @@ export interface Accent {
   secondary: string;
 }
 
-/* Terminal — all other systems intentionally absent under Option A. */
 export const DESIGN_SYSTEMS: Record<string, DesignSystem> = {
-  terminal: {
-    name: 'Terminal',
-    tag: 'CRT · IBM Plex Mono',
-    desc: 'Mono-first terminal — square edges, scanlines, blinking carets.',
+  editorial: {
+    name: 'Editorial',
+    tag: 'Serif display · Fraunces / Inter',
+    desc: 'Refined editorial voice — italic accents, soft radii, warm ink on near-black.',
     vars: {
       '--bg':            '#000000',
-      '--bg-2':          '#040404',
-      '--surface':       'rgba(0,255,136,0.012)',
-      '--surface-2':     'rgba(0,255,136,0.025)',
-      '--surface-3':     'rgba(0,255,136,0.05)',
-      '--border':        'rgba(232,232,224,0.14)',
-      '--border-strong': 'rgba(232,232,224,0.32)',
-      '--hairline':      'rgba(232,232,224,0.08)',
+      '--bg-2':          '#0a0a0a',
+      '--surface':       'rgba(244,243,238,0.025)',
+      '--surface-2':     'rgba(244,243,238,0.05)',
+      '--surface-3':     'rgba(244,243,238,0.08)',
+      '--border':        'rgba(244,243,238,0.08)',
+      '--border-strong': 'rgba(244,243,238,0.16)',
+      '--hairline':      'rgba(244,243,238,0.06)',
 
-      '--text':   '#e8e8e0',
-      '--text-2': 'rgba(232,232,224,0.62)',
-      '--text-3': 'rgba(232,232,224,0.36)',
-      '--text-4': 'rgba(232,232,224,0.2)',
+      '--text':   '#f4f3ee',
+      '--text-2': 'rgba(244,243,238,0.66)',
+      '--text-3': 'rgba(244,243,238,0.4)',
+      '--text-4': 'rgba(244,243,238,0.22)',
 
-      '--font-body':    "'IBM Plex Mono', ui-monospace, monospace",
-      '--font-display': "'IBM Plex Mono', ui-monospace, monospace",
-      '--font-mono':    "'IBM Plex Mono', ui-monospace, monospace",
-      '--display-weight':   '600',
-      '--display-tracking': '-0.01em',
-      '--display-leading':  '1.1',
-      '--body-leading':     '1.55',
-      '--eyebrow-tracking': '0.2em',
-      '--mono-size-step':   '12px',
+      '--font-body':    "'Inter', system-ui, sans-serif",
+      '--font-display': "'Fraunces', Georgia, serif",
+      '--font-mono':    "'JetBrains Mono', ui-monospace, monospace",
+      '--display-weight':   '500',
+      '--display-tracking': '-0.02em',
+      '--display-leading':  '1.04',
+      '--body-leading':     '1.6',
+      '--eyebrow-tracking': '0.18em',
+      '--mono-size-step':   '11px',
 
-      '--radius':      '0px',
-      '--radius-sm':   '0px',
-      '--radius-pill': '0px',
+      '--radius':      '12px',
+      '--radius-sm':   '8px',
+      '--radius-pill': '999px',
       '--border-w':    '1px',
       '--hairline-w':  '1px',
 
-      '--shadow-sm':     'none',
-      '--shadow':        'none',
-      '--shadow-lg':     '0 0 0 1px var(--accent), inset 0 0 60px color-mix(in srgb, var(--accent) 8%, transparent)',
-      '--shadow-accent': '0 0 0 1px var(--accent), 0 0 24px color-mix(in srgb, var(--accent) 30%, transparent)',
+      '--shadow-sm':     '0 1px 2px rgba(0,0,0,0.3)',
+      '--shadow':        '0 6px 24px -8px rgba(0,0,0,0.5)',
+      '--shadow-lg':     '0 24px 60px -20px rgba(0,0,0,0.7)',
+      '--shadow-accent': '0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent), 0 12px 36px -12px color-mix(in srgb, var(--accent) 40%, transparent)',
 
       '--bg-atmosphere':
-        'repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(255,255,255,0.018) 2px, rgba(255,255,255,0.018) 3px),' +
-        'radial-gradient(ellipse 800px 600px at 50% 50%, color-mix(in srgb, var(--accent) 4%, transparent), transparent 70%)',
-      '--grain-opacity': '0.5',
+        'radial-gradient(ellipse 1200px 800px at 50% 0%, color-mix(in srgb, var(--accent) 5%, transparent), transparent 60%),' +
+        'radial-gradient(ellipse 800px 600px at 50% 100%, color-mix(in srgb, var(--accent-2) 3%, transparent), transparent 60%)',
+      '--grain-opacity': '0.32',
     },
   },
 };
 
-/* 10-accent palette — identical to upstream. */
+/* 10-accent palette retained for /settings/theme consumer compatibility. */
 export const ACCENTS: Accent[] = [
   { id: 'crimson', name: 'Crimson', primary: '#ff3d52', secondary: '#b84dff' },
   { id: 'magenta', name: 'Magenta', primary: '#ec4899', secondary: '#f472b6' },
@@ -84,7 +93,7 @@ export const ACCENTS: Accent[] = [
 ];
 
 export const SYSTEM_DEFAULT_ACCENT: Record<string, string> = {
-  terminal: 'matrix',
+  editorial: 'crimson',
 };
 
 declare global {
@@ -100,22 +109,16 @@ interface RootWithKeys extends HTMLElement {
   __appliedKeys?: string[];
 }
 
+/* Callable for future switcher reintroduction. NOT invoked at boot. */
 export function applyDesignSystem(systemId: string, accentId: string): void {
   if (typeof document === 'undefined') return;
 
-  /* Option A: hard-lock to Terminal regardless of input. */
-  const resolvedSystem = DESIGN_SYSTEMS[systemId] ? systemId : 'terminal';
+  const resolvedSystem = DESIGN_SYSTEMS[systemId] ? systemId : 'editorial';
   const sys = DESIGN_SYSTEMS[resolvedSystem];
 
-  /* Resolve accent: explicit valid → keep; else system default → matrix. */
   const validAccent = ACCENTS.find((x) => x.id === accentId);
-  const fallbackAccentId =
-    SYSTEM_DEFAULT_ACCENT[resolvedSystem] || 'matrix';
-  const a =
-    validAccent ||
-    ACCENTS.find((x) => x.id === fallbackAccentId) ||
-    ACCENTS[0];
-  const resolvedAccentId = a.id;
+  const fallbackAccentId = SYSTEM_DEFAULT_ACCENT[resolvedSystem] || 'crimson';
+  const a = validAccent || ACCENTS.find((x) => x.id === fallbackAccentId) || ACCENTS[0];
 
   const root = document.documentElement as RootWithKeys;
 
@@ -134,34 +137,21 @@ export function applyDesignSystem(systemId: string, accentId: string): void {
   root.__appliedKeys = applied;
 
   root.setAttribute('data-system', resolvedSystem);
-  root.setAttribute('data-accent', resolvedAccentId);
+  root.setAttribute('data-accent', a.id);
 
   try {
     localStorage.setItem('ds-system', resolvedSystem);
-    localStorage.setItem('ds-accent', resolvedAccentId);
+    localStorage.setItem('ds-accent', a.id);
   } catch {
-    /* localStorage may be unavailable (SSR / privacy mode) */
+    /* localStorage may be unavailable */
   }
 }
 
-/* Self-register: attach globals + restore saved accent (or default). */
+/* Self-register globals only. Do NOT apply inline styles at boot — the
+   CSS layer + index.html boot attributes already lock Editorial+Crimson. */
 if (typeof window !== 'undefined') {
   window.DESIGN_SYSTEMS = DESIGN_SYSTEMS;
   window.ACCENTS = ACCENTS;
   window.SYSTEM_DEFAULT_ACCENT = SYSTEM_DEFAULT_ACCENT;
   window.applyDesignSystem = applyDesignSystem;
-
-  let savedSystem = 'terminal';
-  let savedAccent = SYSTEM_DEFAULT_ACCENT.terminal;
-  try {
-    savedSystem = localStorage.getItem('ds-system') || 'terminal';
-    savedAccent =
-      localStorage.getItem('ds-accent') ||
-      SYSTEM_DEFAULT_ACCENT[savedSystem] ||
-      'matrix';
-  } catch {
-    /* ignore */
-  }
-  /* Lock to Terminal under Option A regardless of legacy values. */
-  applyDesignSystem('terminal', savedAccent);
 }

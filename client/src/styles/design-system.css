@@ -1,68 +1,80 @@
 /* =====================================================================
    AWESOME.VIDEO DESIGN SYSTEM — FOUNDATION (WP-1)
-   Terminal-only (Option A). Component skins land in WP-2.
+   Editorial + Crimson (single personality, no switcher).
    Sourced 1:1 from awesome-list-site-ds/{styles.css,design-systems.jsx}.
+   See _planning/DS_SPEC.md for the canonical token contract.
    ===================================================================== */
 
 :root {
-  /* ----- Terminal defaults (overwritten on accent swap by applyDesignSystem) ----- */
+  /* ----- Editorial defaults ----- */
 
-  /* Surface */
+  /* Surface — warm-ink alpha ladder on near-black */
   --bg:            #000000;
-  --bg-2:          #040404;
-  --surface:       rgba(0, 255, 136, 0.012);
-  --surface-2:     rgba(0, 255, 136, 0.025);
-  --surface-3:     rgba(0, 255, 136, 0.05);
-  --border:        rgba(232, 232, 224, 0.14);
-  --border-strong: rgba(232, 232, 224, 0.32);
-  --hairline:      rgba(232, 232, 224, 0.08);
+  --bg-2:          #0a0a0a;
+  --surface:       rgba(244, 243, 238, 0.025);
+  --surface-2:     rgba(244, 243, 238, 0.05);
+  --surface-3:     rgba(244, 243, 238, 0.08);
+  --border:        rgba(244, 243, 238, 0.08);
+  --border-strong: rgba(244, 243, 238, 0.16);
+  --hairline:      rgba(244, 243, 238, 0.06);
 
-  /* Ink */
-  --text:   #e8e8e0;
-  --text-2: rgba(232, 232, 224, 0.62);
-  --text-3: rgba(232, 232, 224, 0.36);
-  --text-4: rgba(232, 232, 224, 0.2);
+  /* Ink — warm off-white, not pure white */
+  --text:   #f4f3ee;
+  --text-2: rgba(244, 243, 238, 0.66);
+  --text-3: rgba(244, 243, 238, 0.4);
+  --text-4: rgba(244, 243, 238, 0.22);
 
-  /* Accent (Matrix default — overwritten by ACCENTS table via applyDesignSystem) */
-  --accent:   #00ff88;
-  --accent-2: #39ff14;
+  /* Accent — Crimson */
+  --accent:   #ff3d52;
+  --accent-2: #b84dff;
 
-  /* Type — Terminal collapses all three families to IBM Plex Mono */
-  --font-body:    'IBM Plex Mono', ui-monospace, 'JetBrains Mono', monospace;
-  --font-display: 'IBM Plex Mono', ui-monospace, 'JetBrains Mono', monospace;
-  --font-mono:    'IBM Plex Mono', ui-monospace, 'JetBrains Mono', monospace;
-  --display-weight:   600;
-  --display-tracking: -0.01em;
-  --display-leading:  1.1;
-  --body-leading:     1.55;
-  --eyebrow-tracking: 0.2em;
-  --mono-size-step:   12px;
+  /* Type — Editorial: serif display, sans body, mono code */
+  --font-body:    'Inter', system-ui, sans-serif;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, monospace;
+  --display-weight:   500;
+  --display-tracking: -0.02em;
+  --display-leading:  1.04;
+  --body-leading:     1.6;
+  --eyebrow-tracking: 0.18em;
+  --mono-size-step:   11px;
 
-  /* Shape — Terminal is square */
-  --radius:      0;
-  --radius-sm:   0;
-  --radius-pill: 0;
+  /* Shape — Editorial: rounded */
+  --radius:      12px;
+  --radius-sm:   8px;
+  --radius-pill: 999px;
   --border-w:    1px;
   --hairline-w:  1px;
 
-  /* Shadow — Terminal has no drop shadows; accent glow only */
-  --shadow-sm:     none;
-  --shadow:        none;
-  --shadow-lg:     0 0 0 1px var(--accent), inset 0 0 60px color-mix(in srgb, var(--accent) 8%, transparent);
-  --shadow-accent: 0 0 0 1px var(--accent), 0 0 24px color-mix(in srgb, var(--accent) 30%, transparent);
+  /* Shadow — Editorial: soft falloff */
+  --shadow-sm:     0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow:        0 6px 24px -8px rgba(0, 0, 0, 0.5);
+  --shadow-lg:     0 24px 60px -20px rgba(0, 0, 0, 0.7);
+  --shadow-accent: 0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent),
+                   0 12px 36px -12px color-mix(in srgb, var(--accent) 40%, transparent);
 
-  /* Atmosphere — scanlines + faint accent vignette (CC-07) */
+  /* Atmosphere — soft radial accent vignette (Editorial) */
   --bg-atmosphere:
-    repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(255, 255, 255, 0.018) 2px, rgba(255, 255, 255, 0.018) 3px),
-    radial-gradient(ellipse 800px 600px at 50% 50%, color-mix(in srgb, var(--accent) 4%, transparent), transparent 70%);
+    radial-gradient(ellipse 1200px 800px at 50% 0%, color-mix(in srgb, var(--accent) 5%, transparent), transparent 60%),
+    radial-gradient(ellipse 800px 600px at 50% 100%, color-mix(in srgb, var(--accent-2) 3%, transparent), transparent 60%);
   --bg-atmosphere-size: auto;
-  --grain-opacity: 0.5;
+  --grain-opacity: 0.32;
 
-  /* Motion tokens — CC-05 */
+  /* Motion tokens */
   --motion-fast:   160ms;
   --motion-base:   240ms;
   --motion-slow:   400ms;
   --motion-ease:   cubic-bezier(0.2, 0.65, 0.3, 1);
+}
+
+/* Lock to Editorial — defensive in case any legacy code sets a different data-system */
+html[data-system="terminal"],
+html[data-system="geist"],
+html[data-system="brutalist"],
+html[data-system="swiss"] {
+  /* No-op: defaults above are Editorial. We accept whatever data-system is set
+     for skin-rule purposes only. Skin block at bottom of this file fires on
+     [data-system="editorial"]. */
 }
 
 /* ============== BASE ============== */
@@ -73,6 +85,8 @@ body {
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "ss01", "cv11", "tnum";
+  line-height: var(--body-leading);
 }
 
 body {
@@ -86,6 +100,44 @@ body {
   color: #fff;
 }
 
+/* ============== TYPOGRAPHY HELPERS ============== */
+.display-h,
+.display {
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  letter-spacing: var(--display-tracking);
+  line-height: var(--display-leading);
+}
+.serif-italic {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+}
+.mono { font-family: var(--font-mono); }
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--mono-size-step);
+  letter-spacing: var(--eyebrow-tracking);
+  text-transform: uppercase;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+/* ============== PAGE ATMOSPHERE OVERLAY ============== */
+.grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: var(--grain-opacity, 0.32);
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>");
+}
+
 /* ============== SKIP-LINK (CC-17) ============== */
 .skip-link {
   position: absolute;
@@ -95,11 +147,12 @@ body {
   padding: 8px 14px;
   background: var(--accent);
   color: #000;
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: 13px;
   font-weight: 600;
   text-decoration: none;
   border: 0;
+  border-radius: var(--radius-sm);
 }
 .skip-link:focus,
 .skip-link:focus-visible {
@@ -148,4 +201,21 @@ button:active:not([disabled]):not([aria-disabled="true"]),
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* =====================================================================
+   EDITORIAL PER-SYSTEM SKINS
+   These are the rules tokens can't express (italic-accent, eyebrow weight).
+   Fire on <html data-system="editorial">.
+   ===================================================================== */
+
+[data-system="editorial"] .display-h em,
+[data-system="editorial"] .display em,
+[data-system="editorial"] .serif-italic {
+  color: var(--accent);
+}
+
+[data-system="editorial"] .eyebrow {
+  color: var(--accent);
+  font-weight: 700;
 }
