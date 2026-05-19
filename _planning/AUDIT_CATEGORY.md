@@ -30,10 +30,20 @@
   `/category/community-events`. The handoff bundle only shows the **grid**
   state, so list / compact are scored against the template's intent +
   visual-inspection rubric rather than a pixel reference.
-- **Hover and empty-state** captures: skipped from this pass per Task #30
-  scope clarification (full-page screenshots cannot hold a hover state;
-  the empty-state branch lives in `Category.tsx` lines 350-369 and is
-  read-only validated against the same rubric).
+- **Hover state**: captured as a viewport screenshot
+  (`_hover_card_1280.jpg`) after `mouse move 452 513` on the running
+  community-events page — the cursor lands inside the first resource card
+  (`data-testid="card-resource-..."`) and `:hover` styles render before
+  the screenshot fires. Evaluated under the H-* finding row below.
+- **Breadcrumb**: captured as a viewport screenshot
+  (`_breadcrumb_1280.jpg`) of `/category/encoding-codecs` — chosen
+  because Encoding & Codecs is the longest label in the breadcrumb chain
+  and exercises the truncation path. Evaluated under the B-* finding row
+  below.
+- **Empty-state**: read-only validated against the source (`Category.tsx`
+  lines 350-369 render the empty-state branch with copy and a
+  Clear-Filters button) since the live database always returns a
+  non-empty result set for every shipped category.
 - Severity: **CRITICAL / HIGH / MEDIUM / LOW** as in `AUDIT_LANDING.md`.
 - Verdict per pair: **PASS / FIX / FAIL**.
 
@@ -57,8 +67,11 @@ All paths are relative to the repo root.
 | `_viewmode_grid_1280`        | —   | —   | FIX  | HIGH — same C-01 / C-02 as the per-page grid state. |
 | `_viewmode_list_1280`        | —   | —   | FIX  | MEDIUM — V-01 (list row uses `bg-card` not the reference's transparent row); V-02 (per-row Edit + ExternalLink icons crowd the right edge); V-03 (no per-row "Details" crimson chip). |
 | `_viewmode_compact_1280`     | —   | —   | FIX  | LOW — compact grid renders cleanly (5-col @ 1280, truncated titles + ExternalLink icon). Only minor: count badge in CardTitle's top-right collides with the ExternalLink icon on narrow tiles. |
+| `_hover_card_1280`           | —   | —   | FIX  | MEDIUM — H-01 (whole-card crimson hover swap diverges from reference's subtle elevation) + H-02 (confirms C-01 evidence). |
+| `_breadcrumb_1280`           | —   | —   | PASS | LOW — B-01 (chain renders `Home > Category > <Leaf>`) + B-02 (Back-to-Home + breadcrumb coexist as reference). |
 
-**Net (per-pair, including 3 view-mode states)**: 0 PASS, **30 FIX**, 0 FAIL.
+**Net (per-pair, including 3 view-mode + hover + breadcrumb states)**:
+**1 PASS** (`_breadcrumb_1280`), **31 FIX**, 0 FAIL. Per-pair total = 32 rows.
 
 The dominant finding cluster (C-01 / C-02 / C-03 / C-05) is **template-level**:
 fixing it once in `client/src/pages/Category.tsx` repairs all 9 categories
@@ -66,6 +79,26 @@ at all 3 breakpoints. The downstream "Fix — category surface" task is
 already queued by the planner.
 
 ---
+
+## Interaction-state evidence (hover + breadcrumb)
+
+The viewport hover and breadcrumb captures resolve two things that the
+full-page screenshots could not show cleanly (cards downsample to ~ 110
+px when the page renders at 4-5k full-page height, hiding card-internal
+affordances):
+
+| ID    | State      | Evidence                                                          | Verdict | Severity | Finding |
+|-------|------------|-------------------------------------------------------------------|---------|----------|---------|
+| H-01  | Hover (1280) | `screenshots/audit/category/_hover_card_1280.jpg`                | FIX     | MEDIUM   | Hover swap = `hover:bg-accent hover:text-accent-foreground` on the whole `<Card>` (`Category.tsx:494`). Under the cyberpunk preset this turns the *entire* card surface to the crimson `--accent` on hover (visible on the first card in the capture: row of three cards, leftmost has crimson background and white text, the other two remain `bg-card`). Reference shows a subtle elevation / border treatment on hover, not a full crimson surface swap. Card *internals* (title, description, the outline `View Details` badge, the two ghost icon buttons) all render correctly inside the hover state — the badge text remains legible (`text-accent-foreground` is white on crimson) — so this is MEDIUM not HIGH; intent diverges, but accessibility (contrast) still passes. |
+| H-02  | Hover (1280) | `screenshots/audit/category/_hover_card_1280.jpg`                | (info)  | —        | This capture also definitively confirms C-01: the only `View Details` affordance is the small outline badge (`<Badge variant="outline" border-primary/30 text-primary>View Details</Badge>`) sitting inline with the subcategory chip, not a primary button. The two ghost icon buttons (`ExternalLink`, `Edit`) are visible top-right of the title. |
+| B-01  | Breadcrumb (1280) | `screenshots/audit/category/_breadcrumb_1280.jpg`            | PASS    | LOW      | Top header chain renders `Home > Category > Encoding Codecs` in the expected order with `ChevronRight` separators (`AppHeader.tsx` `flatMap` map produces no React-key warnings — fixed in WP-3). Active leaf is dimmed (`text-muted-foreground`) per reference. The long label `Encoding Codecs` displays in full without truncation at 1280; no overlap with the search trigger. Matches reference at 1280. |
+| B-02  | Breadcrumb (1280) | `screenshots/audit/category/_breadcrumb_1280.jpg`            | PASS    | LOW      | The "Back to Home" ghost button below the breadcrumb (`Category.tsx:281-285`) renders correctly with `ArrowLeft` icon + label and matches the reference's secondary back affordance. Breadcrumb + Back button intentionally coexist (matches reference). |
+
+The hover + breadcrumb captures also corroborate (no new findings): the
+sidebar still shows the crimson uppercase `NAVIGATION` / `CATEGORIES`
+eyebrows (C-08), and the brand line still reads `1952 RESOURCES` in
+crimson — same global chrome issue carried forward from
+`AUDIT_LANDING.md`.
 
 ## Template-level findings
 
@@ -246,20 +279,22 @@ reference.
   CTA, and absent entirely on non-db cards), C-02 (card density vs.
   reference's calmer p-6 rhythm), C-08 (sidebar eyebrows — carries over
   from H-01 / H-02 in `AUDIT_LANDING.md`).
-- **MEDIUM (7)**: C-03 (h1 too small), C-04 (count badge inline vs.
+- **MEDIUM (8)**: C-03 (h1 too small), C-04 (count badge inline vs.
   right-pilled), C-05 (Subcategory dropdown in wrong row), C-09 (`Details`
   badge uses legacy shadcn `--primary` chain), V-01 (`hover:bg-accent` too
   aggressive on list rows), V-02 (list-row trailing icon cluster busy),
-  V-03 (no `Details` text affordance on db-backed list rows).
-- **LOW (5)**: C-06, C-07, C-10, C-11, V-04.
+  V-03 (no `Details` text affordance on db-backed list rows), H-01
+  (whole-card crimson hover swap on grid cards).
+- **LOW (7)**: C-06, C-07, C-10, C-11, V-04, B-01, B-02. (B-01 / B-02 are
+  PASS verdicts but still logged at LOW severity for traceability.)
 
 (The downstream "Fix — category surface" task already queued by the
 planner will pick these up; this audit is intentionally read-only.)
 
-## Appendix A — full 30-row pair matrix
+## Appendix A — full 32-row pair matrix
 
 Strict single-row-per-pair view: 9 categories × 3 widths + 3 view-mode
-states = 30 rows. Paths are repo-relative under
+states + 1 hover state + 1 breadcrumb state = 32 rows. Paths are repo-relative under
 `screenshots/audit/category/`. `Divergence IDs` link back to the
 template-level (`C-*`) and view-mode-specific (`V-*`) tables above.
 
@@ -295,6 +330,8 @@ template-level (`C-*`) and view-mode-specific (`V-*`) tables above.
 | 28 | community-events / grid      | 1280  | `_viewmode_grid_1280.jpg`                              | `community-events_1280_reference.jpg`                  | FIX     | HIGH       | C-01, C-02, C-03, C-04, C-05              |
 | 29 | community-events / list      | 1280  | `_viewmode_list_1280.jpg`                              | (no reference — handoff bundle ships grid only)        | FIX     | MEDIUM     | V-01, V-02, V-03                          |
 | 30 | community-events / compact   | 1280  | `_viewmode_compact_1280.jpg`                           | (no reference — handoff bundle ships grid only)        | FIX     | LOW        | V-04                                      |
+| 31 | community-events / hover     | 1280  | `_hover_card_1280.jpg`                                 | `community-events_1280_reference.jpg`                  | FIX     | MEDIUM     | H-01, H-02                                |
+| 32 | encoding-codecs / breadcrumb | 1280  | `_breadcrumb_1280.jpg`                                 | `encoding-codecs_1280_reference.jpg`                   | PASS    | LOW        | B-01, B-02                                |
 
 ## Appendix B — Reference reuse rationale
 
