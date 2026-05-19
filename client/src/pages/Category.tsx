@@ -287,47 +287,50 @@ export default function Category() {
           </Button>
         </Link>
         
-        <div className="flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight truncate">
+        <div className="flex items-start justify-between gap-3 flex-wrap">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight truncate">
               {categoryName}
             </h1>
             <p className="text-sm text-muted-foreground mt-0.5 sm:mt-1">
               {allResources.length} resources available
             </p>
           </div>
-          <Badge variant="secondary" className="text-sm sm:text-lg px-3 sm:px-4 py-1 sm:py-2 shrink-0" data-testid="badge-count">
-            {allResources.length}
-          </Badge>
+          <div className="flex items-center gap-3 shrink-0">
+            {subcategories.length > 0 && (
+              <Select value={selectedSubcategory} onValueChange={setSelectedSubcategory}>
+                <SelectTrigger className="w-full md:w-[200px]" data-testid="select-subcategory-filter">
+                  <SelectValue placeholder="Filter by subcategory" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Subcategories</SelectItem>
+                  {subcategories.map(sub => (
+                    <SelectItem key={sub} value={sub}>{sub}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+            <Badge
+              variant="secondary"
+              className="rounded-full text-sm sm:text-base px-3 sm:px-4 py-1 tabular-nums"
+              data-testid="badge-count"
+            >
+              {allResources.length}
+            </Badge>
+          </div>
         </div>
       </div>
       
       <div className="flex flex-col gap-4 min-w-0">
-        <div className="flex flex-col md:flex-row gap-4 min-w-0">
-          <div className="relative flex-1 min-w-0">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search resources..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-              data-testid="input-search-resources"
-            />
-          </div>
-          
-          {subcategories.length > 0 && (
-            <Select value={selectedSubcategory} onValueChange={setSelectedSubcategory}>
-              <SelectTrigger className="w-full md:w-[200px]" data-testid="select-subcategory-filter">
-                <SelectValue placeholder="Filter by subcategory" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Subcategories</SelectItem>
-                {subcategories.map(sub => (
-                  <SelectItem key={sub} value={sub}>{sub}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
+        <div className="relative flex-1 min-w-0">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search resources..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+            data-testid="input-search-resources"
+          />
         </div>
 
         <AdvancedFilter
@@ -405,7 +408,7 @@ export default function Category() {
               return (
                 <div
                   key={`${resource.url}-${index}`}
-                  className="flex items-center gap-4 p-3 rounded-lg border border-border bg-card hover:bg-accent cursor-pointer transition-colors min-w-0"
+                  className="flex items-center gap-4 p-3 rounded-lg border border-border bg-transparent hover:border-[var(--accent)]/30 hover:shadow-md cursor-pointer transition-all min-w-0"
                   onClick={handleResourceClick}
                   data-testid={`card-resource-${resourceId}`}
                 >
@@ -413,7 +416,10 @@ export default function Category() {
                     <div className="flex items-center gap-2">
                       <span className="font-medium truncate">{resource.title}</span>
                       {isDbResource(resource) && (
-                        <Badge variant="outline" className="text-xs border-primary/30 text-primary">
+                        <Badge
+                          variant="outline"
+                          className="text-xs border-[color-mix(in_srgb,var(--accent)_30%,transparent)] text-[var(--accent)]"
+                        >
                           Details
                         </Badge>
                       )}
@@ -428,11 +434,6 @@ export default function Category() {
                     {resource.subcategory && (
                       <Badge variant="outline" className="text-xs hidden md:inline-flex">{resource.subcategory}</Badge>
                     )}
-                    {resource.tags && resource.tags.slice(0, 2).map((tag, tagIndex) => (
-                      <Badge key={tagIndex} variant="secondary" className="text-xs hidden lg:inline-flex">
-                        {tag}
-                      </Badge>
-                    ))}
                     <Button
                       variant="ghost"
                       size="sm"
@@ -466,7 +467,7 @@ export default function Category() {
               return (
                 <Card
                   key={`${resource.url}-${index}`}
-                  className="cursor-pointer hover:bg-accent transition-colors border border-border bg-card p-2.5 sm:p-3 min-w-0 touch-manipulation"
+                  className="cursor-pointer hover:border-[var(--accent)]/30 hover:shadow-md transition-all border border-border bg-card p-2.5 sm:p-3 min-w-0 touch-manipulation"
                   onClick={handleResourceClick}
                   data-testid={`card-resource-${resourceId}`}
                 >
@@ -491,11 +492,11 @@ export default function Category() {
             return (
               <Card
                 key={`${resource.url}-${index}`}
-                className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors border border-border bg-card text-card-foreground min-w-0"
+                className="cursor-pointer hover:border-[var(--accent)]/30 hover:shadow-md transition-all border border-border bg-card text-card-foreground min-w-0 flex flex-col"
                 onClick={handleResourceClick}
                 data-testid={`card-resource-${resourceId}`}
               >
-                <CardHeader className="p-3 sm:p-4 md:p-6">
+                <CardHeader className="p-6 space-y-2">
                   <CardTitle className="text-base sm:text-lg flex items-start gap-2">
                     <span className="flex-1 min-w-0 line-clamp-2">{resource.title}</span>
                     <div className="flex items-center gap-0.5 flex-shrink-0">
@@ -531,13 +532,8 @@ export default function Category() {
                     </CardDescription>
                   )}
                 </CardHeader>
-                <CardContent className="px-3 pb-3 pt-0 sm:px-4 sm:pb-4 md:px-6 md:pb-6">
+                <CardContent className="px-6 pb-3 pt-0 flex-1">
                   <div className="flex gap-1.5 sm:gap-2 flex-wrap">
-                    {isDbResource(resource) && (
-                      <Badge variant="outline" className="text-xs border-primary/30 text-primary">
-                        View Details
-                      </Badge>
-                    )}
                     {resource.subcategory && (
                       <Badge variant="outline" className="text-xs">{resource.subcategory}</Badge>
                     )}
@@ -556,6 +552,20 @@ export default function Category() {
                     )}
                   </div>
                 </CardContent>
+                <div className="px-6 pb-6 pt-2">
+                  <Button
+                    size="sm"
+                    className="w-full bg-[var(--accent)] text-[var(--accent-foreground,#000)] hover:bg-[color-mix(in_srgb,var(--accent)_88%,white)]"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleResourceClick();
+                    }}
+                    data-testid={`button-view-details-${resourceId}`}
+                  >
+                    {isDbResource(resource) ? "View Details" : "Open Resource"}
+                    <ExternalLink className="ml-2 h-3.5 w-3.5" />
+                  </Button>
+                </div>
               </Card>
             );
           })}
