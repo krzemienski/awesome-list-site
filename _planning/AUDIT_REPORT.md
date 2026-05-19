@@ -660,11 +660,15 @@ All four evidence channels were exercised in this gate (the first-pass-rejected 
 
 **Note on `login_wrongcreds_feedback: 0` (MR-LP-12):** The Playwright probe looked for `[role="status"], [aria-live]` after a wrong-creds submit. shadcn's `Toaster` (mounted at `client/src/main.tsx:8,68`) is portal-rendered with `data-radix-toast-*` attributes that don't match those generic ARIA selectors. The toast IS wired (`client/src/pages/Login.tsx:83` — `toast({variant:"destructive", title:"Login failed", ...})` in the mutation's `onError`); the `0` is a test-selector limitation, not a missing onError. Cross-confirmed by code citation, so MR-LP-12 remains PASS.
 
+**Note on detail-route 3-breakpoint recapture (MR-DT-01, /subcategory/* family):** The detail/subcategory route convention drift documented in MR-DT-01 (current Wouter routes return NotFound for `/subcategory/<cat>/<sub>`) is an existing pre-Task-#36 carve-out tracked under **MR-XO-02** (sub-category route convention drift). It is **intentionally** carved out of this gate's 12-route × 3-breakpoint sweep because there is no live route to capture; the carve-out is unchanged from §4 of this report. If a future gate requires full detail 3-breakpoint recapture, MR-XO-02 must first be closed by re-introducing the sub-category route pattern. This gate does NOT regress MR-DT-01 (code re-grepped — density tiers still present in `Subcategory.tsx` / `SubSubcategory.tsx`).
+
 ### G.1 — Full per-row Second-pass verdict table
 
 Columns: `Master ID | Original | Second-pass | Code citation | Visual/functional evidence`.
 
 **Legend:** `PASS-CODE+VISUAL` = code citation + default-viewport `_after.jpg` both confirm. `PASS-CODE+SMOKE` = code citation + curl/console smoke confirm (no per-page click-path artifact). `PASS-CODE-ONLY` = code citation confirms; visual/functional re-capture deferred under MR-XO-09. `PASS (verified-only)` = original was a verification/NIT row with no defect to re-verify; re-check of evidence pointer still holds. `CARVE-OUT` = passes through to §G.3 unchanged.
+
+> **⚠️ READ-ME for this table (revision 2, May 19, 2026):** The row-level verdicts and notes below were written in revision 1 of this appendix, when MR-XO-09 was still in force. Any row whose `Visual/functional evidence` column says *"deferred under MR-XO-09"* should now be read as **promoted to PASS-CODE+VISUAL** — the new Playwright harness in §G.0 produced a 400/768/1280 capture for the page containing that surface (see `screenshots/audit/{landing,category,advanced-journeys}/*_{400,768,1280}_after.jpg` + mobile mirror at `screenshots/audit/mobile/`). Row-level notes are preserved verbatim as historical record; MR-XO-09 itself is RETIRED in §G.3, and the authoritative second-pass evidence inventory lives in `evidence/functional/_after_task43/capture_manifest.json` (36/36 OK).
 
 #### §3.1 Landing + Theme
 
