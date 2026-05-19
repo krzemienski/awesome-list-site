@@ -76,7 +76,8 @@ const TERMINAL_TOKENS = [
   { name: '--shadow-lg',          expected: '0 0 0 1px',                      match: 'substr', sub: '0 0 0 1px' },
   { name: '--shadow-accent',      expected: '0 0 0 1px',                      match: 'substr', sub: '0 0 0 1px' },
   { name: '--accent',             expected: 'rgb(0, 255, 136)',              match: 'accent' },
-  { name: '--accent-2',           expected: '(matrix secondary)',             match: 'substr', sub: '' }, // presence-only
+  { name: '--accent-2',           expected: 'rgb(57, 255, 20)',              match: 'exact' }, // matrix secondary #39ff14
+  { name: '--bg-atmosphere',      expected: 'repeating-linear-gradient',     match: 'substr', sub: 'repeating-linear-gradient' },
   // Runtime attrs (read on <html>):
   { name: 'data-system',          expected: 'terminal',                       match: 'attr'   },
   { name: 'data-accent',          expected: 'matrix',                         match: 'attr'   },
@@ -299,18 +300,25 @@ async function captureCell(browser, axeSource, cell, adminStorage) {
   });
 
   let navError = null;
+  let applierReady = false;
+  let applierError = null;
   try {
     await page.goto(`${BASE_URL}${cell.path}`, { waitUntil: 'load', timeout: 25000 });
-    // Wait for DS applier to have run (writes 33 inline custom props on <html>).
-    await page.waitForFunction(
-      () => {
-        const html = document.documentElement;
-        const keys = html.__appliedKeys;
-        return Array.isArray(keys) && keys.length >= 30;
-      },
-      null,
-      { timeout: 10000 },
-    ).catch(() => {});
+    // HARD precondition: DS applier must have run (writes 33+ inline custom props on <html>).
+    try {
+      await page.waitForFunction(
+        () => {
+          const html = document.documentElement;
+          const keys = html.__appliedKeys;
+          return Array.isArray(keys) && keys.length >= 30;
+        },
+        null,
+        { timeout: 10000 },
+      );
+      applierReady = true;
+    } catch (e) {
+      applierError = `applier-readiness-timeout: ${String(e.message).slice(0, 200)}`;
+    }
     await page.waitForFunction(
       () => {
         const body = document.body;
@@ -322,13 +330,20 @@ async function captureCell(browser, axeSource, cell, adminStorage) {
       { timeout: 8000 },
     ).catch(() => {});
     await page.waitForLoadState('networkidle', { timeout: 6000 }).catch(() => {});
-    await page.waitForTimeout(2500);
-    // Extra safety: re-verify the applier ran even after settle
-    await page.waitForFunction(
-      () => Array.isArray(document.documentElement.__appliedKeys) && document.documentElement.__appliedKeys.length >= 30,
-      null,
-      { timeout: 5000 },
-    ).catch(() => {});
+    await page.waitForTimeout(2000);
+    // Re-verify applier still ready post-settle (covers HMR / late re-applies).
+    if (applierReady) {
+      try {
+        await page.waitForFunction(
+          () => Array.isArray(document.documentElement.__appliedKeys) && document.documentElement.__appliedKeys.length >= 30,
+          null,
+          { timeout: 3000 },
+        );
+      } catch (e) {
+        applierReady = false;
+        applierError = `applier-lost-after-settle: ${String(e.message).slice(0, 200)}`;
+      }
+    }
   } catch (e) {
     navError = String(e.message).slice(0, 500);
   }
@@ -391,6 +406,8 @@ async function captureCell(browser, axeSource, cell, adminStorage) {
     fs.writeFile(`${fileBase}.network.json`, JSON.stringify({ requests: networkRequests }, null, 2)),
     fs.writeFile(`${fileBase}.axe.json`,     JSON.stringify(axeResults, null, 2)),
     fs.writeFile(`${fileBase}.tokens.json`,  JSON.stringify({
+      applierReady,
+      applierError,
       probe: tokenProbe,
       conformance: tokenConformance,
     }, null, 2)),
@@ -411,6 +428,7 @@ async function captureCell(browser, axeSource, cell, adminStorage) {
   const summary = {
     slug: cell.slug, path: cell.path, vp: cell.vp, auth: cell.auth, state: cell.state,
     navError, screenshotErr,
+    applierReady, applierError,
     consoleErrors: errors, consoleWarnings: warnings,
     pageErrors: pageErrors.length,
     networkFailures: netFails,
@@ -446,10 +464,23 @@ async function run() {
   await fs.mkdir(OUT_ROOT, { recursive: true });
   const axeSource = await fs.readFile(AXE_PATH, 'utf8');
   const resultsPath = join(OUT_ROOT, '_results.jsonl');
+  const adminCachePath = join(OUT_ROOT, '.admin-state.json');
+  const skipMode = !process.argv.includes('--force');
 
-  console.log(`admin login...`);
-  const adminStorage = await loginAndGetStorageState();
-  console.log(`  ok (${adminStorage.cookies.length} cookies)`);
+  let adminStorage = null;
+  try {
+    const stat = await fs.stat(adminCachePath);
+    if (Date.now() - stat.mtimeMs < 10 * 60 * 1000) {
+      adminStorage = JSON.parse(await fs.readFile(adminCachePath, 'utf8'));
+      console.log(`admin login: reusing cached storage state (${adminStorage.cookies.length} cookies)`);
+    }
+  } catch {}
+  if (!adminStorage) {
+    console.log(`admin login...`);
+    adminStorage = await loginAndGetStorageState();
+    await fs.writeFile(adminCachePath, JSON.stringify(adminStorage));
+    console.log(`  ok (${adminStorage.cookies.length} cookies)`);
+  }
 
   const browser = await chromium.launch({
     headless: true,
@@ -465,8 +496,22 @@ async function run() {
     for (const i of indicesToRun) {
       const c = cells[i];
       const tag = `[${String(i).padStart(3, '0')}/${cells.length - 1}] ${c.slug} ${c.vp} ${c.auth}/${c.state}`;
+      if (skipMode) {
+        const base = cellFileBase(c);
+        try {
+          const tj = JSON.parse(await fs.readFile(`${base}.tokens.json`, 'utf8'));
+          const hasAll = await Promise.all(
+            ['.png', '.dom.html', '.console.json', '.network.json', '.axe.json', '.tokens.json']
+              .map(ext => fs.stat(`${base}${ext}`).then(() => true).catch(() => false))
+          ).then(arr => arr.every(Boolean));
+          if (hasAll && tj.applierReady === true && tj.conformance && tj.conformance.fail === 0 && tj.conformance.pass === TERMINAL_TOKENS.length) {
+            console.log(`${tag} ... skip (already captured, tok=${tj.conformance.pass}/${tj.conformance.pass})`);
+            continue;
+          }
+        } catch {}
+      }
       process.stdout.write(`${tag} ... `);
-      const HARD_TIMEOUT_MS = 35000;
+      const HARD_TIMEOUT_MS = 38000;
       try {
         const s = await Promise.race([
           captureCell(browser, axeSource, c, adminStorage),

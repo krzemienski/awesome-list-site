@@ -1,4 +1,6 @@
 {
+  "applierReady": true,
+  "applierError": null,
   "probe": {
     "probe": {
       "--bg": "#000000",
@@ -34,6 +36,7 @@
       "--shadow-accent": "0 0 0 1px #00ff88, 0 0 24px color-mix(in srgb, #00ff88 30%, transparent)",
       "--accent": "#00ff88",
       "--accent-2": "#39ff14",
+      "--bg-atmosphere": "repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(255,255,255,0.018) 2px, rgba(255,255,255,0.018) 3px),radial-gradient(ellipse 800px 600px at 50% 50%, color-mix(in srgb, #00ff88 4%, transparent), transparent 70%)",
       "data-system": "terminal",
       "data-accent": "matrix"
     },
@@ -276,8 +279,15 @@
       },
       {
         "token": "--accent-2",
-        "expected": "(matrix secondary)",
+        "expected": "rgb(57, 255, 20)",
         "got": "#39ff14",
+        "pass": true,
+        "reason": ""
+      },
+      {
+        "token": "--bg-atmosphere",
+        "expected": "repeating-linear-gradient",
+        "got": "repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(255,255,255,0.018) 2px, rgba(255,255,255,0.018) 3px),radial-gradient(ellipse 800px 600px at 50% 50%, color-mix(in srgb, #00ff88 4%, transparent), transparent 70%)",
         "pass": true,
         "reason": ""
       },
@@ -296,7 +306,7 @@
         "reason": ""
       }
     ],
-    "pass": 35,
+    "pass": 36,
     "fail": 0
   }
 }
