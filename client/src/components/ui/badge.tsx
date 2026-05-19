@@ -15,6 +15,10 @@ const badgeVariants = cva(
         destructive:
           "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
         outline: "text-foreground",
+        chip:
+          "border-[var(--border)] bg-[var(--surface)] text-[var(--text-2)] font-mono uppercase tracking-[0.12em] text-[10px] px-2 py-[3px] hover:border-[var(--border-strong)] hover:text-[var(--text)]",
+        accent:
+          "border-[color-mix(in_srgb,var(--accent)_30%,transparent)] bg-[color-mix(in_srgb,var(--accent)_12%,transparent)] text-[var(--accent)] font-mono uppercase tracking-[0.12em] text-[10px] px-2 py-[3px]",
       },
     },
     defaultVariants: {

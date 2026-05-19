@@ -8,6 +8,16 @@ A production-ready React application for browsing and discovering over 2,600 cur
 
 ## Recent Changes
 
+### Editorial + Crimson Design System — WP-2 Primitives (May 19, 2026)
+- **Scope**: token-mapped shadcn primitives already pick up Editorial colors/radii via the bridge in `client/src/index.css @theme inline`; WP-2 adds Editorial-specific micro-behaviors per DS_SPEC §primitives without scope-creeping into per-call rewrites.
+- **Card** (`client/src/components/ui/card.tsx`): default class now `shadow-[var(--shadow-sm)] transition-[...] duration-[var(--motion-base)] ease-[var(--motion-ease)] hover:border-[var(--border-strong)]` — soft DS shadow + 240ms hover border-lift.
+- **Input** (`client/src/components/ui/input.tsx`): `bg-background` → `bg-[var(--surface)]` (warm-ink alpha tint), added `transition-colors duration-[var(--motion-fast)]`, `hover:border-[var(--border-strong)]`, `focus-visible:border-[color-mix(in_srgb,var(--accent)_60%,transparent)]` for crimson-tinted focus.
+- **Select trigger** (`client/src/components/ui/select.tsx`): same surface + crimson-focus treatment as Input; added missing `rounded-lg` (was square in source).
+- **Dialog** (`client/src/components/ui/dialog.tsx`): now uses `rounded-[var(--radius)]` (12px Editorial), `bg-popover` (was `bg-background`), `shadow-[var(--shadow-lg)]` (Editorial soft 60px falloff).
+- **Tabs** (`client/src/components/ui/tabs.tsx`): `TabsList` rebuilt as a `rounded-full` pill on `var(--surface)` with hairline border; `TabsTrigger` active state = `bg-[var(--surface-3)]` + `text-[var(--accent)]` crimson ink + soft shadow — Editorial pill-tab aesthetic.
+- **Badge** (`client/src/components/ui/badge.tsx`): added two new variants per DS chip contract — `chip` (mono uppercase 10px tracking 0.12em on `var(--surface)` with text-2) and `accent` (crimson-tinted variant for hot chips). Existing `default/secondary/destructive/outline` variants unchanged; no breaking changes to call sites.
+- **Button** intentionally untouched — its variants already resolve Editorial through `bg-primary`/`border-input`/`rounded-lg` via the token bridge; per DS_SPEC the only required behaviors (44px touch target, hover bg-primary/90, active translateY) are already present.
+
 ### Editorial + Crimson Design System — WP-1 Foundations (May 19, 2026)
 - **Scope locked**: applying Claude Design Editorial personality with Crimson accent only (single personality, no switcher).
 - **Token swap**: `client/src/styles/design-system.css` `:root` now carries Editorial values — warm-ink alpha surfaces on near-black, `#f4f3ee` text ladder, `#ff3d52` crimson accent, Fraunces (serif display) / Inter (body) / JetBrains Mono (code), 12px / 8px / 999px radius ladder, soft drop shadows, radial-gradient page atmosphere, SVG grain overlay at 0.32 opacity.
