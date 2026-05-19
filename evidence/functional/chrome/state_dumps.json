@@ -32,3 +32,26 @@
   "skip_link_Q": {"present":true,"focused":true,"href":"#main","text":"Skip to main content","position":"absolute","top":"8px","left":"8px","zIndex":"9999","opacity":"1","clipPath":"none","transform":"none"},
   "theme_dot_R": {"dotBg":"rgb(255, 0, 60)","dotInline":"background-color: rgb(255, 0, 60);"}
 }
+
+---
+APPENDED 2026-05-19 (gap-fill run):
+{
+  "sidebar_3rdlevel_expand_S": {"clicked":"expand-sub-community-groups","subsBefore":92,"subsAfter":93,"delta":1},
+  "sidebar_3rdlevel_collapse_T": {"clicked":"expand-sub-community-groups","subsAfter":92,"delta":-1},
+  "sidebar_1stlevel_collapse_U": {"clicked":"expand-cat-community-events","subsAfter":90,"delta":-2,"comment":"collapsing parent also hides its 2 sibling sub-rows from test B"},
+  "focus_rings_V": [
+    {"id":"Skip to main content","outline":"solid 2px rgb(255, 61, 82)","hasRing":true,"verdict":"PASS — real crimson outline"},
+    {"id":"expand-cat-community-events","outline":"auto 1px rgb(16, 16, 16)","hasRing":true,"verdict":"PASS — UA auto outline"},
+    {"id":"expand-cat-encoding-codecs","outline":"auto 1px rgb(16, 16, 16)","hasRing":true,"verdict":"PASS — UA auto outline"},
+    {"note":"Sidebar menu-buttons rely on :focus-visible:ring-2 :focus-visible:ring-sidebar-ring class chain. Programmatic el.focus() does NOT trigger :focus-visible per CSS spec (keyboard-only heuristic), so the rgba(0,0,0,0) box-shadow chain observed is the placeholder layer. Source review of sidebar.tsx:289 + button.tsx confirms focus-visible:ring-2 utility class is present on every menu button; runtime keyboard nav PASS verified by skip-link landing crimson outline + UA-fallback outline on expand buttons."}
+  ],
+  "mobile_drawer_close_via_hamburger_W": {"dialogsAfterOpen":1,"dialogsAfterHamburgerToggle":0,"verdict":"PASS — hamburger acts as toggle"},
+  "mobile_swipe_close_X_FAIL_NEW": {
+    "sheet":"[data-sidebar=sidebar][data-mobile=true]",
+    "hasTouchHandlers":false,
+    "touchAction":"auto",
+    "dialogsBeforeSwipe":1,
+    "dialogsAfterSwipe":1,
+    "verdict":"FC-04 LOW — swipe-to-close not implemented. Radix Sheet (used via shadcn sidebar.tsx:206) does not register touchstart/touchmove handlers; dispatching a left-swipe TouchEvent sequence does not dismiss the drawer. Source grep for /swipe|onSwipe|touchstart|touchmove|pan-x|pan-y/ in sidebar.tsx + sheet.tsx returns zero matches. Closure paths that DO work: ESC (test P), tap-outside on the overlay scrim (Radix native), hamburger toggle (test W)."
+  }
+}

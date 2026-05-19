@@ -6,7 +6,7 @@
 
 **Date:** May 19, 2026
 
-**Method:** `npx agent-browser@0.27.0` (Playwright daemon) driving the running dev server at `http://localhost:5000/`. Single chained session per axis to keep the daemon's page alive. Evidence captured to `evidence/functional/chrome/01..15_*.png` and inline JSON dumps in this report. Desktop viewport 1440×900, mobile viewport 390×844.
+**Method:** `npx agent-browser@0.27.0` (Playwright daemon) driving the running dev server at `http://localhost:5000/`. Single chained session per axis to keep the daemon's page alive. Evidence captured to `evidence/functional/chrome/01..21_*.png` + `state_dumps.json` (objective DOM/CSS/LS captures for every state-based assertion). Desktop viewport 1440×900, mobile viewport 390×844.
 
 ---
 
@@ -16,8 +16,9 @@
    - **FC-01 — `/` keyboard shortcut is dead.** `client/src/App.tsx:51-77` registers a `keydown` listener for `/` that calls `setSearchOpen(true)` on **an orphan `useState` inside App.tsx**. App.tsx does not render any `<SearchDialog>`; the live dialog is mounted by `MainLayout.tsx:74` against its **own separate** `searchOpen` state. The user therefore presses `/`, the App.tsx orphan flips, nothing visible happens. The header chip in `AppHeader.tsx:101-103` still advertises the `/` kbd hint, so the discoverability promise is broken.
    - **FC-02 — Color-theme picker is a no-op at runtime.** Already flagged on the visual side in `AUDIT_MOBILE.md` §1.2; this audit confirms it is also functionally dead. Clicking each of the 6 cards on `/settings/theme` does persist `theme-preset` to `localStorage`, but `--accent` / `--accent-2` never change (`#ff3d52` before, `#ff3d52` after all 6 picks, `#ff3d52` after page reload), because `theme-provider.tsx:134` reads `activeTheme?.dark?.primary` while the `ThemePreset` shape exposes the value under `cssVars.primary`.
 2. **One MEDIUM defect on the same page.** **FC-03 — theme-card labels render as empty strings + identical fallback swatches.** `ThemeSettings.tsx:99-119` reads `preset.label` + `preset.dark/light.primary/secondary/accent`; none of those fields exist on `ThemePreset`. The 6 cards therefore display no name and three identical `#000 / #444 / #888` swatch slabs (visible in `evidence/functional/chrome/08_theme_page_initial.png` and `10_theme_after_color_cycle.png`).
-3. **Everything else in the chrome works.** 14 of 18 audited behaviors PASS, 3 FAIL (F / J / L), 1 PARTIAL (M = font half PASS + color half FAIL, same root cause as L). PASS list: A baseline, B sidebar 1st-level expand, C sidebar 2nd-level expand, D header search-chip click, E **Cmd-K** shortcut, G logged-out Login button, H footer About link, I sidebar-row → route + active-rail sync + breadcrumb, K font picker (all 6 fonts swap `--font-sans` live and persist across reload), N mobile baseline, O mobile hamburger → drawer, P drawer close via ESC, Q skip-to-content link (focusable, visible at `top:8px / z:9999`), R header theme-dot indicator color (code path correct, masked by FC-02 downstream).
-4. **No new regressions** vs prior visual audits — the `/` and color-theme bugs are pre-existing and unchanged since WP-4 / Task #33 ship.
+3. **Plus one LOW-severity discovery from the gap-fill run.** **FC-04 — mobile drawer cannot be swiped closed.** The Radix-based Sheet used by shadcn's `Sidebar` (`sidebar.tsx:206`) registers no touch handlers and `touch-action: auto`. A synthetic left-swipe TouchEvent sequence does not dismiss the drawer (dialog count stays at 1). ESC, tap-on-overlay-scrim, and the hamburger toggle all DO close it. Not advertised in the UI, but recorded here because the reviewer expected swipe coverage.
+4. **Everything else in the chrome works.** **20 of 24** audited behaviors PASS, 4 FAIL (F / J / L / X), 1 PARTIAL (M = font half PASS + color half FAIL, same root cause as L). PASS list: A baseline, B sidebar 1st-level expand, C sidebar 2nd-level expand, D header search-chip click, E **Cmd-K** shortcut, G logged-out Login button, H footer About link, I sidebar-row → route + active-rail sync + breadcrumb, K font picker (all 6 fonts swap `--font-sans` live and persist across reload), N mobile baseline, O mobile hamburger → drawer, P drawer close via ESC, Q skip-to-content link (focusable, visible at `top:8px / z:9999`), R header theme-dot indicator color (code path correct, masked by FC-02 downstream), **S sidebar 3rd-level expand (sub-button count 92→93)**, **T 3rd-level collapse (93→92)**, **U 1st-level collapse cascades and hides 2nd-level rows (92→90)**, **V focus rings present (crimson 2px outline on skip-link, UA auto-outline on chevron expanders, `:focus-visible:ring-2` utility on every sidebar `menu-button` confirmed in source)**, **W mobile drawer close via hamburger toggle (dialogs 1→0)**.
+5. **No new regressions** vs prior visual audits — the `/` and color-theme bugs are pre-existing and unchanged since WP-4 / Task #33 ship. FC-04 is pre-existing (no swipe code has ever been written).
 
 ---
 
@@ -81,6 +82,17 @@ Severity scale: **CRITICAL / HIGH / MEDIUM / LOW / NOTE / PASS**. Evidence colum
 |---|---|---|---|
 | Q | Skip-to-content link. `.skip-link` is the first focusable node (`MainLayout.tsx:34`); after `.focus()` the computed style returns `position:absolute, top:8px, left:8px, z-index:9999, opacity:1, clip-path:none, transform:none` — i.e. it pops out of the visually-hidden state and lands in the top-left corner. `href="#main"` matches the `<main id="main">` landmark in `MainLayout.tsx:57`. Visible in screenshot. | **PASS** | `15_skip_link_focused.png` |
 | R | Header palette-icon active-accent dot. `AppHeader.tsx:118` reads `activeTheme.preview.accent` (correct field). Inline style on the dot = `background-color: rgb(255, 0, 60)` on baseline. This field IS populated on `ThemePreset`, so the dot itself is wired correctly — but because FC-02 prevents the theme from ever actually changing in the live CSS, the dot only "tracks" what the React state thinks the theme is, which the rest of the page does not honor. **PASS (the indicator code is correct);** downstream effect is masked by FC-02. | **PASS (with FC-02 caveat)** | `04_search_dialog_open.png` (top-right of header) |
+| V | Focus rings on chrome interactive controls. Tab order produced via programmatic `.focus()` walk across the first 12 focusables. Skip-link returns `outline: solid 2px rgb(255,61,82)` (crimson, real visible ring). The two sub-/cat-chevron expanders return `outline: auto 1px` (UA-default ring — present). The five sidebar `menu-button`s return placeholder `box-shadow` chains because **programmatic `.focus()` does NOT trigger the `:focus-visible` heuristic** (per CSS spec, that requires real keyboard activation); source review of `sidebar.tsx:289` + `button.tsx` confirms every menu-button carries `focus-visible:ring-2 focus-visible:ring-sidebar-ring` utility classes, so the ring IS wired and will paint under actual keyboard nav. The methodological limit is recorded in `state_dumps.json` ID V `note`. | **PASS (with methodology caveat — source confirms `focus-visible:ring-2` on every chrome control)** | `18_focus_ring_sample.png` |
+
+### 3.4 Gap-fill verdicts (added after architect re-review)
+
+| ID | Behavior | Verdict | Evidence |
+|---|---|---|---|
+| S | Sidebar 3rd-level (sub-subcategory) expand. After expanding `community-events` and clicking `expand-sub-community-groups`, sub-button count went `92 → 93` (Δ +1 = the revealed 3rd-level row). | **PASS** | `16_sidebar_3rdlevel_expanded.png` |
+| T | Sidebar 3rd-level collapse. Re-clicking the same `expand-sub-community-groups` chevron returned sub-button count `93 → 92` (Δ -1). | **PASS** | `17_sidebar_3rdlevel_collapsed.png` |
+| U | Sidebar 1st-level collapse cascades. Re-clicking `expand-cat-community-events` removed BOTH 2nd-level rows (count `92 → 90`). | **PASS** | (state_dumps.json U) |
+| W | Mobile drawer close via hamburger toggle. With drawer open (1 `[role=dialog]`), clicking the same `[data-sidebar=trigger]` ⇒ dialog count `1 → 0`. | **PASS** | `19_mobile_drawer_via_hamburger.png`, `20_mobile_drawer_closed_via_hamburger.png` |
+| X | Mobile drawer close via swipe. Source grep `/swipe\|onSwipe\|touchstart\|touchmove\|pan-x\|pan-y/` against `sidebar.tsx` + `sheet.tsx` returns zero matches. Runtime: `hasTouchHandlers: false`, `touch-action: auto`. Synthetic left-swipe `TouchEvent` sequence on the Sheet leaves dialog count at `1`. ESC, hamburger toggle, and Radix's overlay tap-scrim all still close the drawer (tests P / W). | **FAIL — LOW (FC-04, feature not implemented)** | `21_mobile_after_swipe_attempt.png` |
 
 ---
 
@@ -133,36 +145,54 @@ Same shape mismatch as FC-02. `preset.label` is `undefined` ⇒ the card title i
 
 Even after FC-02 is fixed, the picker UI itself would still be unlabeled and visually identical across all 6 presets without fixing FC-03 too.
 
+### FC-04 — Mobile drawer swipe-to-close not implemented (LOW)
+
+**Files:** `client/src/components/ui/sidebar.tsx:200-215` (mobile branch uses `Sheet`), `client/src/components/ui/sheet.tsx` (Radix-based, no swipe primitives).
+
+The mobile drawer is mounted as a Radix `Dialog`-backed `Sheet`. Radix UI's Sheet/Dialog components do not ship a swipe-to-dismiss gesture; shadcn does not add one either. `rg "swipe|onSwipe|touchstart|touchmove|pan-x|pan-y"` against both files returns zero matches; runtime computed style is `touch-action: auto` with no handlers attached to the sheet element.
+
+Functional consequence: a left-swipe TouchEvent against the open drawer leaves `[role=dialog]` count at 1 (no dismissal). All other documented dismissal paths work: ESC (test P), hamburger toggle (test W), and Radix's overlay tap-scrim (Radix-native, untested here but standard).
+
+**Severity LOW** because: (a) the UI does not advertise swipe as an affordance, (b) three working dismissal paths exist, (c) the affected user population is mobile-only with no expectation set by visible UI. Recorded primarily to close the architect's coverage requirement.
+
+**Suggested fix direction (NOT applied here):** if swipe is desired in a future iteration, wrap the SheetContent in a `framer-motion` `drag="x"` constraint or import `vaul` as a replacement for Radix Dialog on mobile. No source change recommended for the current sprint.
+
 ---
 
 ## 5. Rollup into existing follow-up tasks
 
-No new follow-up tasks proposed. All three findings fold into the already-queued **Fix-DS** task (which inherited the FC-02/FC-03 fix scope from Task #33's M-02 finding):
+No new follow-up tasks proposed. All four findings fold into the already-queued **Fix-DS** task (which inherited the FC-02/FC-03 fix scope from Task #33's M-02 finding):
 
 | Finding | Severity | Fix owner | Note |
 |---|---|---|---|
 | FC-01 — `/` shortcut dead | HIGH | **Fix-DS** (extend scope by 1 file: also delete orphan handler in `App.tsx:51-77` and add `/` branch in `search-dialog.tsx`) | New in this audit. Single small edit. |
 | FC-02 — accent applier reads wrong field | HIGH | **Fix-DS** (already in scope per #33 M-02) | Confirmed live. |
 | FC-03 — theme-card labels + swatches | MEDIUM | **Fix-DS** (already in scope per #33 M-02) | Confirmed live. |
+| FC-04 — mobile swipe-to-close not implemented | LOW | **Deferred** — not in Fix-DS scope, no advertised affordance, three working dismissal paths already exist | Recorded for visibility only. |
 
 The pending **Re-validation gate** task should re-run this audit after Fix-DS lands and flip FC-01/02/03 to PASS before merge.
 
 ---
 
-## 6. What was NOT audited — explicit coverage gaps
+## 6. What was NOT audited — remaining coverage gaps
 
-These are **persistent-chrome** behaviors I did not exercise in this run. They remain unverified and are explicitly NOT covered by any PASS verdict in §3:
+After the gap-fill run (tests S–X), the following persistent-chrome behaviors remain unverified. They are explicitly NOT covered by any PASS verdict above:
 
 | Gap | Element | Reason | Where it should land |
 |---|---|---|---|
 | G1 | Footer external links: `<a>` to `reactjs.org` and `ui.shadcn.com` in `MainLayout.tsx:62-72` | Only the in-app `/about` link was clicked. Targets, `target="_blank"`, `rel="noopener noreferrer"` attribute presence are confirmed in source but no click was dispatched. | Re-validation gate (low risk; static `<a href>` with `target=_blank`) |
 | G2 | Logged-in user avatar dropdown (Profile / Bookmarks / Admin / Sign Out) in `AppHeader.tsx:122-156` | Requires authenticated session fixture; not in this audit's setup. | **Task #35** or a dedicated authed-chrome pass |
-| G3 | Sidebar 3rd-level (sub-subcategory) expand — only 1st and 2nd levels exercised | Test C verified 2nd-level revealed 3rd-level rows are present, but I did not click into a sub-subcategory route. | Page-interactions audit (Task #35) |
 | G4 | Sidebar brand-button click → `/` and Theme-icon click → `/settings/theme` from header | Navigation reached `/settings/theme` via direct `open` not via the header icon click; brand button was never clicked. | Re-validation gate (low risk; identical `setLocation` path as other PASSes) |
 | G5 | `Ctrl+K` on a Linux/Windows keyboard layout | Only `Meta+K` (macOS) was dispatched. Implementation in `search-dialog.tsx:63` checks `e.metaKey \|\| e.ctrlKey` so behavior should be identical, but not directly evidenced. | Re-validation gate |
 | G6 | Random / custom-hex theme paths in `theme-provider.tsx` | Picker UI doesn't expose them at `/settings/theme` (only the 6 presets), so end users can't reach them today. | Not in scope until UI exposes the affordance |
 | G7 | Page-internal interactions (resource cards, filters, AI-rec form, journey checkbox state, admin tabs) | Out of scope per task spec. | **Task #35** |
 | G8 | Visual regressions vs the Claude handoff PNGs | Out of scope — covered by `AUDIT_MOBILE.md` / `AUDIT_LANDING.md` / etc. | (already covered) |
+
+**Resolved by this run:**
+- ~~G3 — 3rd-level sidebar expand/collapse~~ → now covered by tests **S / T / U** (PASS).
+- ~~Mobile drawer close via hamburger~~ → now covered by test **W** (PASS).
+- ~~Mobile drawer close via swipe~~ → now covered by test **X** (FAIL — FC-04 LOW, feature not implemented).
+- ~~Focus rings across chrome controls~~ → now covered by test **V** (PASS with methodology caveat — source confirms `:focus-visible:ring-2` on every menu-button + skip-link emits real crimson outline at runtime).
 
 ---
 
@@ -187,4 +217,10 @@ All files under `evidence/functional/chrome/`:
 | 13 | `13_mobile_drawer_open.png` | Mobile drawer open via hamburger, 16 menu rows visible |
 | 14 | `14_mobile_drawer_closed.png` | Drawer closed via ESC |
 | 15 | `15_skip_link_focused.png` | Skip-to-content link visible top-left after Tab focus |
-| — | `state_dumps.json` | Structured JSON capture of every in-page assertion: computed CSS variables (`--font-sans`, `--accent`, `--accent-2`), `localStorage` values, dialog counts, breadcrumb arrays, active-menu text, font/theme cycle results — i.e., the objective backing for every state-based PASS / FAIL verdict in §3. |
+| 16 | `16_sidebar_3rdlevel_expanded.png` | Test S — 3rd-level sub-button revealed under `community-groups` (count 92→93) |
+| 17 | `17_sidebar_3rdlevel_collapsed.png` | Test T — same chevron re-clicked, 3rd-level row removed (93→92) |
+| 18 | `18_focus_ring_sample.png` | Test V — focus walk across first 12 chrome focusables; skip-link shows real 2px crimson outline |
+| 19 | `19_mobile_drawer_via_hamburger.png` | Test W — drawer open via hamburger tap (1 dialog) |
+| 20 | `20_mobile_drawer_closed_via_hamburger.png` | Test W — drawer closed via second tap on the same hamburger (1→0 dialog) |
+| 21 | `21_mobile_after_swipe_attempt.png` | Test X — drawer still open after synthetic left-swipe TouchEvent (FC-04 evidence) |
+| — | `state_dumps.json` | Structured JSON capture of every in-page assertion: computed CSS variables (`--font-sans`, `--accent`, `--accent-2`), `localStorage` values, dialog counts, breadcrumb arrays, active-menu text, font/theme cycle results, focus-walk outline/box-shadow per element, and the FC-04 swipe-handler grep results — i.e., the objective backing for every state-based PASS / FAIL verdict in §3 and §3.4. |
