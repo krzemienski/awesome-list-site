@@ -246,12 +246,12 @@ export default function SubmitResource() {
         </Helmet>
         
         <div className="container max-w-2xl mx-auto px-4 py-12">
-          <Card className="border-primary/20">
+          <Card className="border-[color-mix(in_srgb,var(--accent)_20%,transparent)]">
             <CardHeader className="text-center">
-              <div className="mx-auto mb-4 rounded-full bg-primary/10 p-4 w-fit">
-                <LogIn className="h-12 w-12 text-primary" />
+              <div className="mx-auto mb-4 w-fit">
+                <LogIn className="h-8 w-8 text-[var(--accent)]" />
               </div>
-              <CardTitle className="text-2xl">Authentication Required</CardTitle>
+              <CardTitle className="text-xl">Authentication Required</CardTitle>
               <CardDescription>
                 You need to be logged in to submit resources. Please login to continue.
               </CardDescription>

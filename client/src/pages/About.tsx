@@ -30,8 +30,8 @@ export default function About() {
 
       <div className="mb-10 space-y-3">
         <div className="flex items-center gap-3">
-          <Sparkles className="h-7 w-7 text-[var(--accent)]" />
-          <h1 className="font-sans font-bold text-4xl sm:text-5xl tracking-tight">
+          <Sparkles className="h-5 w-5 text-[var(--accent)]" />
+          <h1 className="font-sans font-bold text-3xl sm:text-4xl tracking-tight">
             About
           </h1>
         </div>
@@ -41,7 +41,7 @@ export default function About() {
         </p>
       </div>
 
-      <Card className="mb-6">
+      <Card className="mb-4">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Rocket className="h-5 w-5 text-[var(--accent)]" />
@@ -64,10 +64,10 @@ export default function About() {
       </Card>
 
       {/* Features Grid */}
-      <Card className="mb-6">
+      <Card className="mb-4">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Zap className="h-5 w-5 text-[var(--accent)]" />
+            <Zap className="h-5 w-5 text-[color:var(--text-2)]" />
             Features
           </CardTitle>
           <CardDescription>
@@ -85,10 +85,12 @@ export default function About() {
               { icon: Globe, label: "SEO Optimized", desc: "Discoverable" },
               { icon: Keyboard, label: "Keyboard Shortcuts", desc: "Power user" },
               { icon: Component, label: "Component Library", desc: "shadcn/ui" }
-            ].map((feature) => (
+            ].map((feature, idx) => (
               <Card key={feature.label}>
                 <CardContent className="p-4">
-                  <feature.icon className="h-6 w-6 text-[var(--accent)] mb-2" />
+                  <feature.icon
+                    className={`h-6 w-6 mb-2 ${idx < 4 ? "text-[var(--accent)]" : "text-[color:var(--text-2)]"}`}
+                  />
                   <div className="font-semibold text-sm mb-1">{feature.label}</div>
                   <div className="text-xs text-muted-foreground">{feature.desc}</div>
                 </CardContent>
@@ -99,10 +101,10 @@ export default function About() {
       </Card>
 
       {/* Technology Stack */}
-      <Card className="mb-6">
+      <Card className="mb-4">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Code2 className="h-5 w-5 text-[var(--accent)]" />
+            <Code2 className="h-5 w-5 text-[color:var(--text-2)]" />
             Technology Stack
           </CardTitle>
           <CardDescription>
@@ -113,21 +115,21 @@ export default function About() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-3">
               <div className="flex items-start gap-3">
-                <div className="h-2 w-2 bg-primary rounded-full mt-2" />
+                <div className="h-2 w-2 bg-[var(--accent)] rounded-full mt-2" />
                 <div>
                   <div className="font-semibold">React</div>
                   <div className="text-sm text-muted-foreground">UI component framework</div>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <div className="h-2 w-2 bg-accent rounded-full mt-2" />
+                <div className="h-2 w-2 rounded-full mt-2 border border-[var(--accent)] bg-transparent" />
                 <div>
                   <div className="font-semibold">Tailwind CSS</div>
                   <div className="text-sm text-muted-foreground">Utility-first styling</div>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <div className="h-2 w-2 bg-primary rounded-full mt-2" />
+                <div className="h-2 w-2 bg-[var(--accent)] rounded-full mt-2" />
                 <div>
                   <div className="font-semibold">shadcn/ui</div>
                   <div className="text-sm text-muted-foreground">Component primitives</div>
@@ -136,21 +138,21 @@ export default function About() {
             </div>
             <div className="space-y-3">
               <div className="flex items-start gap-3">
-                <div className="h-2 w-2 bg-accent rounded-full mt-2" />
+                <div className="h-2 w-2 rounded-full mt-2 border border-[var(--accent)] bg-transparent" />
                 <div>
                   <div className="font-semibold">Fuse.js</div>
                   <div className="text-sm text-muted-foreground">Fuzzy search engine</div>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <div className="h-2 w-2 bg-primary rounded-full mt-2" />
+                <div className="h-2 w-2 bg-[var(--accent)] rounded-full mt-2" />
                 <div>
                   <div className="font-semibold">Framer Motion</div>
                   <div className="text-sm text-muted-foreground">Smooth animations</div>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <div className="h-2 w-2 bg-accent rounded-full mt-2" />
+                <div className="h-2 w-2 rounded-full mt-2 border border-[var(--accent)] bg-transparent" />
                 <div>
                   <div className="font-semibold">TypeScript</div>
                   <div className="text-sm text-muted-foreground">Type safety</div>
@@ -162,10 +164,10 @@ export default function About() {
       </Card>
 
       {/* Accessibility */}
-      <Card className="mb-6">
+      <Card className="mb-4">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Accessibility className="h-5 w-5 text-[var(--accent)]" />
+            <Accessibility className="h-5 w-5 text-[color:var(--text-2)]" />
             Accessibility First
           </CardTitle>
           <CardDescription>
@@ -195,7 +197,7 @@ export default function About() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Heart className="h-5 w-5 text-[var(--accent)]" />
+            <Heart className="h-5 w-5 text-[color:var(--text-2)]" />
             Credits
           </CardTitle>
           <CardDescription>

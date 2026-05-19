@@ -362,3 +362,37 @@ Carve-outs (§4) are not in scope for any of the 6 Fix tasks.
 ---
 
 *Read-only. Audit consolidation complete. No code changes made. Next: planner advances one or more of the 6 already-queued Fix tasks; this report is the single source of truth for what each task owns.*
+
+---
+
+## Appendix A — Landing pages + Theme: fixes applied (Task #37, 2026-05-19)
+
+Applied by Task #37 against §3.1 (Landing pages + Theme). Scope: Home, About, Login, SubmitResource auth-gate, NotFound. ThemeSettings rows (MR-DS-01 / MR-DS-11/12/14/15/16) are owned by Task #42 (DS structural) per audit routing and were intentionally not touched here.
+
+| ID | File · symbol | Resolution |
+|---|---|---|
+| MR-LP-01 | `Home.tsx` categories grid + cards | Grid `gap-4` → `gap-3`; lead copy tightened to a single-line "N categories · M resources …" summary; per-card `CardHeader` padding `p-6` → `p-4` with `space-y-1.5`, icon `h-6 w-6` → `h-5 w-5`, title `text-lg` → `text-base`, description `text-xs`, internal gap `mb-2` → `mb-1` — so 3-up cards stop feeling oversized at desktop. |
+| MR-LP-02 | `About.tsx` hero | `h1` `text-4xl sm:text-5xl` → `text-3xl sm:text-4xl`; hero `Sparkles` `h-7 w-7` → `h-5 w-5`. |
+| MR-LP-03 | `About.tsx` section `CardTitle` icons | Restricted crimson (`text-[var(--accent)]`) to the hero `Sparkles` and the "What is this?" `Rocket`. `Zap` (Features), `Code2` (Tech Stack), `Accessibility`, and `Heart` (Credits) re-tinted to `text-[color:var(--text-2)]`. |
+| MR-LP-04 | `About.tsx` Features tiles | Per-tile icons no longer all crimson. First row (first 4 entries: Wind, Rocket, Search, Palette) keeps `text-[var(--accent)]`; remaining 4 tiles use `text-[color:var(--text-2)]`. Achieved via `idx < 4` conditional class. |
+| MR-LP-05 | `About.tsx` Tech Stack bullets | Replaced legacy `bg-primary`/`bg-accent` alternation with crimson-only system: filled `bg-[var(--accent)]` dots alternate with outlined `border border-[var(--accent)] bg-transparent` rings (3 filled + 3 outline across the two columns). |
+| MR-LP-06 | `Login.tsx` header icon | Removed the `rounded-full bg-[color-mix…]` bubble + `ring-1` wrap. Header now renders the bare crimson `<LogIn>` glyph centered above the title. |
+| MR-LP-07 | shadcn `Button` primary glow | Verified: `client/src/components/ui/button.tsx` default variant is `bg-primary text-primary-foreground hover:bg-primary/90` with no `shadow-*`, no `ring-*`, no `glow-*` utility. The "glow" perception in audit screenshots originated from the now-removed Login icon bubble (MR-LP-06) and SubmitResource auth-gate bubble (MR-LP-10). No Button-config edit needed. |
+| MR-LP-08 | `Login.tsx` default-admin block | Rebuilt as three stacked rows: eyebrow label ("Default admin"), `<code>`-wrapped credentials row, and a warning row using `AlertTriangle` + amber text. Added `AlertTriangle` import. |
+| MR-LP-09 | `SubmitResource.tsx` auth-gate Card | `border-primary/20` → `border-[color-mix(in_srgb,var(--accent)_20%,transparent)]`; icon color `text-primary` → `text-[var(--accent)]`. Crimson chain now matches the rest of the design system. |
+| MR-LP-10 | `SubmitResource.tsx` auth-gate icon | Removed the `rounded-full bg-primary/10 p-4` bubble; icon shrunk `h-12 w-12` → `h-8 w-8` and renders bare in `var(--accent)`. |
+| MR-LP-11 | `not-found.tsx:18` | `text-destructive` → `text-[var(--accent)]`; icon shrunk `h-8 w-8` → `h-6 w-6`. |
+| MR-LP-12 | `Login.tsx` `onSubmit` error path | **Verified PASS** — lines 75–80 already toast `{title:"Login failed", description: error.message ?? "Invalid email or password", variant:"destructive"}` on non-OK responses, plus an outer catch toasts "An error occurred during login." on network errors. No code change required; documented as recheck. |
+| MR-LP-13 NIT | `Home.tsx` Select chevron | **Deferred to Task #42 (DS structural).** Affordance lives in `client/src/components/ui/select.tsx` (shadcn `SelectTrigger` primitive). Changing the chevron's border/ring would touch every Select instance app-wide (Category/Subcategory/SubSubcategory/AdvancedFilter sort/admin forms), which is explicitly the DS-primitive scope owned by Task #42. Recorded here so #42 picks it up. |
+| MR-LP-14 NIT | `Home.tsx` hero lead | Resolved alongside MR-LP-01: copy shortened and `max-w-2xl` → `max-w-3xl` so it never wraps to 3 lines on common viewports. |
+| MR-LP-15 NIT | `About.tsx` card spacing | All `<Card className="mb-6">` instances (What is this, Features, Tech Stack, Accessibility) → `mb-4`. Credits is the last card and intentionally has no margin. |
+| MR-LP-16 NIT | `Login.tsx` "Welcome back" | `text-3xl` → `text-2xl` on `CardTitle` (Login is a focused single-action surface, doesn't need page-h1 weight). |
+| MR-LP-17 NIT | `SubmitResource.tsx` auth-gate title | `text-2xl` → `text-xl` on "Authentication Required". |
+| MR-LP-18 NIT | `not-found.tsx` `CardFooter` button gap | `CardFooter` `flex justify-end gap-4` → `gap-2`; the two action buttons (Browse Categories / Go Home) now sit in a tight pair instead of feeling parked at the corners. |
+| MR-LP-19 NIT | `not-found.tsx` `CardTitle` | Added explicit `text-xl` to step the title down one size and pair correctly with the smaller icon. |
+| MR-LP-20 NIT | `Home.tsx` tag filter empty-state | Verified handled inside `AdvancedFilter` itself (`client/src/components/ui/advanced-filter.tsx:44` wraps the Popover in `{availableTags.length > 0 && …}`). The Sort `Select` always renders next to it. Earlier draft of this fix wrapped the whole `<AdvancedFilter>` in a Home-side conditional, which hid the sort control too — that wrapper was reverted on architect review. Home now always renders `<AdvancedFilter>`; the component hides only the tag affordance when tags are absent. |
+
+**Out-of-scope rows acknowledged here, deferred to other tasks:**
+- MR-DS-01 (ThemeSettings field shape) and MR-DS-11/12/14/15/16 (theme picker plumbing) — owned by **Task #42 (DS structural)** per audit §3.6 routing. `ThemeSettings.tsx` is listed in Task #37's relevant-files only because the task name says "+ Theme"; no §3.1 row targets it.
+
+**Verification:** dev workflow (`Start application`) recompiled clean after the batch of edits (no LSP errors surfaced in workflow logs; HMR served on port 5000). No visual regressions expected on other routes — every change is local to the five pages listed above.

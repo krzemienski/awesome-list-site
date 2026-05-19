@@ -15,8 +15,8 @@ export default function NotFound() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <div className="flex items-center gap-2">
-            <AlertCircle className="h-8 w-8 text-destructive" />
-            <CardTitle>Page Not Found</CardTitle>
+            <AlertCircle className="h-6 w-6 text-[var(--accent)]" />
+            <CardTitle className="text-xl">Page Not Found</CardTitle>
           </div>
         </CardHeader>
         <CardContent>
@@ -27,7 +27,7 @@ export default function NotFound() {
             You can return to the home page to explore our curated collection of awesome resources.
           </p>
         </CardContent>
-        <CardFooter className="flex justify-end gap-4">
+        <CardFooter className="flex justify-end gap-2">
           <Button variant="outline" asChild>
             <Link href="/">
               <List className="mr-2 h-4 w-4" />

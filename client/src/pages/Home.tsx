@@ -180,8 +180,8 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
         <h1 className="font-sans font-bold tracking-tight text-[var(--text)] text-3xl sm:text-4xl">
           Awesome Video Resources
         </h1>
-        <p className="text-sm sm:text-base text-[color:var(--text-2)] max-w-2xl">
-          Explore {filteredCategories.length} categories with {totalResourceCount} curated resources for engineers building the modern video stack.
+        <p className="text-sm sm:text-base text-[color:var(--text-2)] max-w-3xl">
+          {filteredCategories.length} categories · {totalResourceCount} curated resources for the modern video stack.
         </p>
       </div>
 
@@ -212,7 +212,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
         </div>
       ) : (
       <div
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
         data-testid="list-categories"
       >
         {filteredCategories.map((category) => {
@@ -234,9 +234,9 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
               className="block outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] rounded-[var(--radius)]"
             >
               <Card className="h-full cursor-pointer">
-                <CardHeader>
-                  <div className="flex items-start justify-between gap-3 mb-2">
-                    <Icon className="h-6 w-6 text-[var(--accent)] shrink-0" />
+                <CardHeader className="p-4 space-y-1.5">
+                  <div className="flex items-start justify-between gap-3 mb-1">
+                    <Icon className="h-5 w-5 text-[var(--accent)] shrink-0" />
                     <Badge
                       variant="secondary"
                       className="tabular-nums shrink-0"
@@ -245,11 +245,11 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                       {totalCount}
                     </Badge>
                   </div>
-                  <CardTitle className="font-sans font-semibold text-lg tracking-tight">
+                  <CardTitle className="font-sans font-semibold text-base tracking-tight">
                     {category.name}
                   </CardTitle>
                   {description && (
-                    <CardDescription className="line-clamp-2">
+                    <CardDescription className="line-clamp-2 text-xs">
                       {description}
                     </CardDescription>
                   )}

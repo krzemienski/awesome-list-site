@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { LogIn, Mail, Lock, Chrome, Github } from "lucide-react";
+import { LogIn, Mail, Lock, Chrome, Github, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -99,11 +99,9 @@ export default function Login() {
       <Card className="w-full max-w-md" data-testid="login-card">
         <CardHeader className="space-y-2">
           <div className="flex items-center justify-center mb-2">
-            <div className="rounded-full bg-[color-mix(in_srgb,var(--accent)_12%,transparent)] p-3 ring-1 ring-[color-mix(in_srgb,var(--accent)_30%,transparent)]">
-              <LogIn className="h-6 w-6 text-[var(--accent)]" />
-            </div>
+            <LogIn className="h-6 w-6 text-[var(--accent)]" />
           </div>
-          <CardTitle className="font-sans font-bold text-3xl text-center tracking-tight">
+          <CardTitle className="font-sans font-bold text-2xl text-center tracking-tight">
             Welcome back
           </CardTitle>
           <CardDescription className="text-center">
@@ -204,10 +202,18 @@ export default function Login() {
             </Button>
           </div>
 
-          <div className="text-center text-xs text-[color:var(--text-2)] space-y-1 pt-2">
-            <p>Default admin: <span className="font-mono">admin@example.com</span> / <span className="font-mono">admin123</span></p>
-            <p className="text-[color:var(--warn,#ffb84d)]">
-              Change password after first login
+          <div className="space-y-2 pt-2 text-xs text-[color:var(--text-2)]">
+            <p className="eyebrow text-[10px] tracking-[0.18em] text-[color:var(--text-2)]">
+              Default admin
+            </p>
+            <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <code className="font-mono text-[var(--text)]">admin@example.com</code>
+              <span aria-hidden="true">/</span>
+              <code className="font-mono text-[var(--text)]">admin123</code>
+            </p>
+            <p className="flex items-start gap-2 text-[color:var(--warn,#ffb84d)]">
+              <AlertTriangle className="h-3.5 w-3.5 mt-[1px] shrink-0" />
+              <span>Change password after first login</span>
             </p>
           </div>
         </CardContent>
