@@ -1,0 +1,11 @@
+{
+  "theme_radios": 12,
+  "theme_active_readout": "Active: Cyberpunk",
+  "theme_active_after_click": "Active: Limes",
+  "search_via_cmdk": true,
+  "search_via_slash": true,
+  "advanced_tabs": 4,
+  "advanced_tab2_selected": "Export",
+  "category_view_details": 113,
+  "login_wrongcreds_feedback": 0
+}

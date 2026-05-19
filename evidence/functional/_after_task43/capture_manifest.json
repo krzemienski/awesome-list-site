@@ -1,0 +1,232 @@
+{
+  "timestamp": "2026-05-19T17:52:02.487Z",
+  "range": "all",
+  "captures": [
+    {
+      "route": "/",
+      "vp": "400",
+      "file": "screenshots/audit/landing/home_400_after.jpg",
+      "ok": true
+    },
+    {
+      "route": "/",
+      "vp": "768",
+      "file": "screenshots/audit/landing/home_768_after.jpg",
+      "ok": true
+    },
+    {
+      "route": "/",
+      "vp": "1280",
+      "file": "screenshots/audit/landing/home_1280_after.jpg",
+      "ok": true
+    },
+    {
+      "route": "/about",
+      "vp": "400",
+      "file": "screenshots/audit/landing/about_400_after.jpg",
+      "ok": true
+    },
+    {
+      "route": "/about",
+      "vp": "768",
+      "file": "screenshots/audit/landing/about_768_after.jpg",
+      "ok": true
+    },
+    {
+      "route": "/about",
+      "vp": "1280",
+      "file": "screenshots/audit/landing/about_1280_after.jpg",
+      "ok": true
+    },
+    {
+      "route": "/login",
+      "vp": "400",
+      "file": "screenshots/audit/landing/login_400_after.jpg",
+      "ok": true
+    },
+    {
+      "route": "/login",
+      "vp": "768",
+      "file": "screenshots/audit/landing/login_768_after.jpg",
+      "ok": true
+    },
+    {
+      "route": "/login",
+      "vp": "1280",
+      "file": "screenshots/audit/landing/login_1280_after.jpg",
+      "ok": true
+    },
+    {
+      "route": "/settings/theme",
+      "vp": "400",
+      "file": "screenshots/audit/landing/theme_400_after.jpg",
+      "ok": true
+    },
+    {
+      "route": "/settings/theme",
+      "vp": "768",
+      "file": "screenshots/audit/landing/theme_768_after.jpg",
+      "ok": true
+    },
+    {
+      "route": "/settings/theme",
+      "vp": "1280",
+      "file": "screenshots/audit/landing/theme_1280_after.jpg",
+      "ok": true
+    },
+    {
+      "route": "/submit",
+      "vp": "400",
+      "file": "screenshots/audit/landing/submit_400_after.jpg",
+      "ok": true
+    },
+    {
+      "route": "/submit",
+      "vp": "768",
+      "file": "screenshots/audit/landing/submit_768_after.jpg",
+      "ok": true
+    },
+    {
+      "route": "/submit",
+      "vp": "1280",
+      "file": "screenshots/audit/landing/submit_1280_after.jpg",
+      "ok": true
+    },
+    {
+      "route": "/not-a-real-route",
+      "vp": "400",
+      "file": "screenshots/audit/landing/notfound_400_after.jpg",
+      "ok": true
+    },
+    {
+      "route": "/not-a-real-route",
+      "vp": "768",
+      "file": "screenshots/audit/landing/notfound_768_after.jpg",
+      "ok": true
+    },
+    {
+      "route": "/not-a-real-route",
+      "vp": "1280",
+      "file": "screenshots/audit/landing/notfound_1280_after.jpg",
+      "ok": true
+    },
+    {
+      "route": "/category/encoding-codecs",
+      "vp": "400",
+      "error": "page.waitForTimeout: Target page, context or browser has been closed",
+      "ok": false
+    },
+    {
+      "route": "/category/encoding-codecs",
+      "vp": "768",
+      "error": "page.setViewportSize: Target page, context or browser has been closed",
+      "ok": false
+    },
+    {
+      "route": "/category/encoding-codecs",
+      "vp": "1280",
+      "error": "page.setViewportSize: Target page, context or browser has been closed",
+      "ok": false
+    },
+    {
+      "route": "/category/community-events",
+      "vp": "400",
+      "error": "page.setViewportSize: Target page, context or browser has been closed",
+      "ok": false
+    },
+    {
+      "route": "/category/community-events",
+      "vp": "768",
+      "error": "page.setViewportSize: Target page, context or browser has been closed",
+      "ok": false
+    },
+    {
+      "route": "/category/community-events",
+      "vp": "1280",
+      "error": "page.setViewportSize: Target page, context or browser has been closed",
+      "ok": false
+    },
+    {
+      "route": "/category/general-tools",
+      "vp": "400",
+      "error": "page.setViewportSize: Target page, context or browser has been closed",
+      "ok": false
+    },
+    {
+      "route": "/category/general-tools",
+      "vp": "768",
+      "error": "page.setViewportSize: Target page, context or browser has been closed",
+      "ok": false
+    },
+    {
+      "route": "/category/general-tools",
+      "vp": "1280",
+      "error": "page.setViewportSize: Target page, context or browser has been closed",
+      "ok": false
+    },
+    {
+      "route": "/advanced",
+      "vp": "400",
+      "error": "page.setViewportSize: Target page, context or browser has been closed",
+      "ok": false
+    },
+    {
+      "route": "/advanced",
+      "vp": "768",
+      "error": "page.setViewportSize: Target page, context or browser has been closed",
+      "ok": false
+    },
+    {
+      "route": "/advanced",
+      "vp": "1280",
+      "error": "page.setViewportSize: Target page, context or browser has been closed",
+      "ok": false
+    },
+    {
+      "route": "/journeys",
+      "vp": "400",
+      "error": "page.setViewportSize: Target page, context or browser has been closed",
+      "ok": false
+    },
+    {
+      "route": "/journeys",
+      "vp": "768",
+      "error": "page.setViewportSize: Target page, context or browser has been closed",
+      "ok": false
+    },
+    {
+      "route": "/journeys",
+      "vp": "1280",
+      "error": "page.setViewportSize: Target page, context or browser has been closed",
+      "ok": false
+    },
+    {
+      "route": "/journey/6",
+      "vp": "400",
+      "error": "page.setViewportSize: Target page, context or browser has been closed",
+      "ok": false
+    },
+    {
+      "route": "/journey/6",
+      "vp": "768",
+      "error": "page.setViewportSize: Target page, context or browser has been closed",
+      "ok": false
+    },
+    {
+      "route": "/journey/6",
+      "vp": "1280",
+      "error": "page.setViewportSize: Target page, context or browser has been closed",
+      "ok": false
+    }
+  ],
+  "consoleErrors": {},
+  "clickResults": {
+    "error": "page.setViewportSize: Target page, context or browser has been closed"
+  },
+  "summary": {
+    "visual_total": 36,
+    "visual_ok": 18,
+    "visual_fail": 18,
+    "console_warnings_total": 0
+  }
+}
