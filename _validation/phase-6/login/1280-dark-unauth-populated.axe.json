@@ -1,4 +1,4 @@
 {
   "violations": [],
-  "error": "retry: page.addScriptTag: Execution context was destroyed, most likely because of a navigation"
+  "error": "retry: page.evaluate: Execution context was destroyed, most likely because of a navigation."
 }

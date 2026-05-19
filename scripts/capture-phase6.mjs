@@ -189,6 +189,33 @@ async function probeTokens(page, expected) {
   }, expected);
 }
 
+// Normalize a CSS color/value string for tolerant comparison:
+//  - lowercase, strip whitespace
+//  - convert #rrggbb hex to rgb(r,g,b)
+//  - convert #rgb shorthand to rgb(r,g,b)
+//  - rgba with alpha preserved
+function normColor(v) {
+  if (v == null) return '';
+  let s = String(v).toLowerCase().replace(/\s+/g, '');
+  // #rrggbb → rgb(r,g,b)
+  const m6 = s.match(/^#([0-9a-f]{6})$/);
+  if (m6) {
+    const r = parseInt(m6[1].slice(0, 2), 16);
+    const g = parseInt(m6[1].slice(2, 4), 16);
+    const b = parseInt(m6[1].slice(4, 6), 16);
+    return `rgb(${r},${g},${b})`;
+  }
+  // #rgb → rgb(r,g,b)
+  const m3 = s.match(/^#([0-9a-f]{3})$/);
+  if (m3) {
+    const r = parseInt(m3[1][0] + m3[1][0], 16);
+    const g = parseInt(m3[1][1] + m3[1][1], 16);
+    const b = parseInt(m3[1][2] + m3[1][2], 16);
+    return `rgb(${r},${g},${b})`;
+  }
+  return s;
+}
+
 function evaluateTokenConformance(probe, htmlAttrs) {
   const results = [];
   let pass = 0, fail = 0;
@@ -199,14 +226,16 @@ function evaluateTokenConformance(probe, htmlAttrs) {
     if (got == null || got === '') {
       ok = false; reason = 'token-missing';
     } else if (t.match === 'exact') {
-      ok = String(got).trim() === t.expected;
+      ok = normColor(got) === normColor(t.expected);
       reason = ok ? '' : `expected '${t.expected}', got '${got}'`;
     } else if (t.match === 'substr') {
-      ok = t.sub === '' ? String(got).length > 0 : String(got).includes(t.sub);
+      const gotN = normColor(got);
+      const sub = t.sub === '' ? '' : t.sub.toLowerCase().replace(/\s+/g, '');
+      ok = sub === '' ? String(got).length > 0 : gotN.includes(sub);
       reason = ok ? '' : `expected to contain '${t.sub}', got '${got}'`;
     } else if (t.match === 'accent') {
-      const norm = String(got).replace(/\s/g, '');
-      ok = norm === 'rgb(0,255,136)' || norm === '#00ff88';
+      const norm = normColor(got);
+      ok = norm === 'rgb(0,255,136)';
       reason = ok ? '' : `expected Matrix #00ff88, got '${got}'`;
     } else if (t.match === 'attr') {
       ok = String(got) === t.expected;
@@ -271,7 +300,17 @@ async function captureCell(browser, axeSource, cell, adminStorage) {
 
   let navError = null;
   try {
-    await page.goto(`${BASE_URL}${cell.path}`, { waitUntil: 'domcontentloaded', timeout: 22000 });
+    await page.goto(`${BASE_URL}${cell.path}`, { waitUntil: 'load', timeout: 25000 });
+    // Wait for DS applier to have run (writes 33 inline custom props on <html>).
+    await page.waitForFunction(
+      () => {
+        const html = document.documentElement;
+        const keys = html.__appliedKeys;
+        return Array.isArray(keys) && keys.length >= 30;
+      },
+      null,
+      { timeout: 10000 },
+    ).catch(() => {});
     await page.waitForFunction(
       () => {
         const body = document.body;
@@ -280,10 +319,16 @@ async function captureCell(browser, axeSource, cell, adminStorage) {
         return txt.length > 4 && !/^Loading\.\.\.$/.test(txt) && !/^Verifying access/.test(txt);
       },
       null,
-      { timeout: 5000 },
+      { timeout: 8000 },
     ).catch(() => {});
     await page.waitForLoadState('networkidle', { timeout: 6000 }).catch(() => {});
-    await page.waitForTimeout(1500);
+    await page.waitForTimeout(2500);
+    // Extra safety: re-verify the applier ran even after settle
+    await page.waitForFunction(
+      () => Array.isArray(document.documentElement.__appliedKeys) && document.documentElement.__appliedKeys.length >= 30,
+      null,
+      { timeout: 5000 },
+    ).catch(() => {});
   } catch (e) {
     navError = String(e.message).slice(0, 500);
   }
