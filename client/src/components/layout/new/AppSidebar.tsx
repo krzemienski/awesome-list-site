@@ -123,8 +123,8 @@ export default function AppSidebar({ categories, resources, isLoading, user }: A
                 <Folder className="size-4" />
               </div>
               <div className="flex flex-col gap-0.5 leading-none">
-                <span className="font-semibold">Awesome Video</span>
-                <span className="text-xs text-muted-foreground">{resources.length} resources</span>
+                <span className="font-display text-base font-medium tracking-tight">Awesome Video</span>
+                <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground">{resources.length} resources</span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -133,7 +133,7 @@ export default function AppSidebar({ categories, resources, isLoading, user }: A
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupLabel className="eyebrow">Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {navItems.map((item) => (
@@ -165,7 +165,7 @@ export default function AppSidebar({ categories, resources, isLoading, user }: A
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Categories</SidebarGroupLabel>
+          <SidebarGroupLabel className="eyebrow">Categories</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {isLoading

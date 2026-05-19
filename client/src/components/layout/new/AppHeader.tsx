@@ -1,4 +1,3 @@
-import { Fragment } from "react";
 import { Link, useLocation } from "wouter";
 import { Search, Palette, LogIn, LogOut, User, Bookmark, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -65,36 +64,41 @@ export default function AppHeader({ onSearchOpen, user, onLogout }: AppHeaderPro
   const crumbs = getBreadcrumbs(location);
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-3 sm:px-4">
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-border bg-[color-mix(in_srgb,var(--bg)_85%,transparent)] backdrop-blur-md px-3 sm:px-4">
       <SidebarTrigger className="-ml-1 shrink-0 min-h-[44px] min-w-[44px]" />
       <Separator orientation="vertical" className="mr-1 sm:mr-2 h-4 hidden sm:block" />
 
       <Breadcrumb className="hidden md:flex">
         <BreadcrumbList>
-          {crumbs.map((crumb, i) => (
-            <Fragment key={crumb.href}>
-              <BreadcrumbItem>
-                {i < crumbs.length - 1 ? (
-                  <BreadcrumbLink href={crumb.href}>{crumb.label}</BreadcrumbLink>
-                ) : (
+          {crumbs.flatMap((crumb, i) => {
+            const isLast = i === crumbs.length - 1;
+            const nodes = [
+              <BreadcrumbItem key={`${crumb.href}-item`}>
+                {isLast ? (
                   <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
+                ) : (
+                  <BreadcrumbLink href={crumb.href}>{crumb.label}</BreadcrumbLink>
                 )}
-              </BreadcrumbItem>
-              {i < crumbs.length - 1 && <BreadcrumbSeparator />}
-            </Fragment>
-          ))}
+              </BreadcrumbItem>,
+            ];
+            if (!isLast) {
+              nodes.push(<BreadcrumbSeparator key={`${crumb.href}-sep`} />);
+            }
+            return nodes;
+          })}
         </BreadcrumbList>
       </Breadcrumb>
 
       <div className="flex-1 min-w-0 mx-1 sm:mx-2">
         <button
           onClick={onSearchOpen}
-          className="w-full max-w-sm flex items-center h-10 sm:h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors hover:bg-accent touch-manipulation"
+          className="w-full max-w-sm flex items-center h-10 sm:h-9 rounded-lg border border-input bg-[var(--surface)] px-3 py-1 text-sm transition-colors duration-[var(--motion-fast)] hover:border-[var(--border-strong)] focus-visible:outline-none focus-visible:border-[color-mix(in_srgb,var(--accent)_60%,transparent)] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 touch-manipulation"
+          aria-label="Open search"
         >
           <Search className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
           <span className="text-muted-foreground truncate hidden sm:inline">Search resources...</span>
           <span className="text-muted-foreground truncate sm:hidden">Search...</span>
-          <kbd className="pointer-events-none ml-auto hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground md:flex">
+          <kbd className="pointer-events-none ml-auto hidden h-5 select-none items-center gap-1 rounded-sm border border-border bg-[var(--surface-2)] px-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--text-2)] md:flex">
             /
           </kbd>
         </button>
