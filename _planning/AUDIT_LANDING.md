@@ -265,6 +265,50 @@ background and surface card parity OK. No overflow.
 (The downstream "Fix — landing pages + Theme" task already queued by the
 planner will pick these up; this audit is intentionally read-only.)
 
+---
+
+## Appendix A — 18-row pair matrix
+
+Strict single-row-per-pair view of the 6 pages × 3 widths. `Current` and
+`Reference` are repo-relative paths to JPEGs under
+`screenshots/audit/landing/`. `Divergence IDs` link back to the per-page
+divergence tables above for traceability.
+
+| # | Page             | Width | Current                                | Reference                                | Verdict | Worst sev. | Divergence IDs                       |
+|--:|------------------|------:|----------------------------------------|------------------------------------------|---------|------------|--------------------------------------|
+| 1 | Home (`/`)       | 400   | `home_400_current.jpg`                 | `home_400_reference.jpg`                 | FIX     | HIGH       | H-01, H-02, H-05, H-06               |
+| 2 | Home (`/`)       | 768   | `home_768_current.jpg`                 | `home_768_reference.jpg`                 | FIX     | HIGH       | H-01, H-02, H-05                     |
+| 3 | Home (`/`)       | 1280  | `home_1280_current.jpg`                | `home_1280_reference.jpg`                | FIX     | HIGH       | H-01, H-02, H-03, H-04, H-05         |
+| 4 | About (`/about`) | 400   | `about_400_current.jpg`                | `about_400_reference.jpg`                | FIX     | HIGH       | H-01, H-02, A-01, A-02, A-03, A-06   |
+| 5 | About (`/about`) | 768   | `about_768_current.jpg`                | `about_768_reference.jpg`                | FIX     | HIGH       | H-01, H-02, A-01, A-02, A-03, A-04, A-06 |
+| 6 | About (`/about`) | 1280  | `about_1280_current.jpg`               | `about_1280_reference.jpg`               | FIX     | HIGH       | H-01, H-02, A-01, A-02, A-03, A-04, A-05 |
+| 7 | Login (`/login`) | 400   | `login_400_current.jpg`                | `login_400_reference.jpg`                | FIX     | HIGH       | H-01, H-02, L-01, L-02, L-03, L-04, L-05 |
+| 8 | Login (`/login`) | 768   | `login_768_current.jpg`                | `login_768_reference.jpg`                | FIX     | HIGH       | H-01, H-02, L-01, L-02, L-03, L-04   |
+| 9 | Login (`/login`) | 1280  | `login_1280_current.jpg`               | `login_1280_reference.jpg`               | FIX     | HIGH       | H-01, H-02, L-01, L-02, L-03, L-04   |
+| 10 | Submit (`/submit`) | 400  | `submit_400_current.jpg`              | `submit_400_reference.jpg`               | FIX     | MEDIUM     | H-01, H-02, S-01, S-02, S-03, S-04, S-05 |
+| 11 | Submit (`/submit`) | 768  | `submit_768_current.jpg`              | `submit_768_reference.jpg`               | FIX     | MEDIUM     | H-01, H-02, S-01, S-02, S-03, S-04   |
+| 12 | Submit (`/submit`) | 1280 | `submit_1280_current.jpg`             | `submit_1280_reference.jpg`              | FIX     | MEDIUM     | H-01, H-02, S-01, S-02, S-03, S-04   |
+| 13 | Theme (`/settings/theme`) | 400 | `theme_400_current.jpg`         | `theme_400_reference.jpg`                | **FAIL**| **CRITICAL** | H-01, H-02, T-01, T-02, T-03, T-04, T-05, T-06 |
+| 14 | Theme (`/settings/theme`) | 768 | `theme_768_current.jpg`         | `theme_768_reference.jpg`                | **FAIL**| **CRITICAL** | H-01, H-02, T-01, T-02, T-03, T-04, T-05 |
+| 15 | Theme (`/settings/theme`) | 1280| `theme_1280_current.jpg`        | `theme_1280_reference.jpg`               | **FAIL**| **CRITICAL** | H-01, H-02, T-01, T-02, T-03, T-04, T-05 |
+| 16 | 404 (`/this-route-does-not-exist`) | 400 | `notfound_400_current.jpg` | `notfound_400_reference.jpg`             | FIX     | MEDIUM     | H-01, H-02, N-01, N-02, N-03, N-04, N-05 |
+| 17 | 404 (`/this-route-does-not-exist`) | 768 | `notfound_768_current.jpg` | `notfound_768_reference.jpg`             | FIX     | MEDIUM     | H-01, H-02, N-01, N-02, N-03, N-04   |
+| 18 | 404 (`/this-route-does-not-exist`) | 1280| `notfound_1280_current.jpg`| `notfound_1280_reference.jpg`            | FIX     | MEDIUM     | H-01, H-02, N-01, N-02, N-03, N-04   |
+
+## Appendix B — Reference reuse rationale
+
+Reference image filenames at 400 / 768 / 1280 for the same page are
+intentionally byte-identical copies of the desktop PNG. Per
+`_planning/REFERENCE_MAP.md` ("Use the PNGs in `uploads/` as the
+authoritative reference; only fall back to live-rendering the bundle when a
+PNG is missing or you need a hover/focus state") the handoff bundle does
+not ship per-breakpoint reference renders. The references are therefore
+the 1920×1080 desktop captures of `new.awesome.video` re-used as the
+parity target at all three widths. Findings tagged with `Width = 400 / 768`
+are scored against the responsive collapse of the *current* app and only
+record divergences that would also be flagged at 1280, with the exception
+of explicit responsive-fold notes (H-06, A-06, L-05, S-05, N-05).
+
 ## Methodology notes / known limits
 
 1. Per `_planning/REFERENCE_MAP.md` (Routing caveat), the handoff bundle
