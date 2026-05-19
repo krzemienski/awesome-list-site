@@ -104,6 +104,7 @@ export default function Advanced() {
               </CardDescription>
             </CardHeader>
             <CardContent>
+              {/* DS-OK: stat semantic colors (primary/blue/green/purple) intentionally honor the design reference; do not flatten in DS sweeps. */}
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
                 <Card className="lg:col-span-1">
                   <CardContent className="p-4">

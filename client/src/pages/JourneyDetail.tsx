@@ -212,7 +212,12 @@ export default function JourneyDetail() {
       <Card className="mb-8">
         <CardHeader>
           <div className="flex items-start justify-between mb-4">
-            <div className="text-6xl">{journey.icon || "📚"}</div>
+            <BookOpen
+              className="h-14 w-14 flex-shrink-0"
+              style={{ color: 'var(--accent)' }}
+              aria-hidden
+              data-testid="icon-journey-header"
+            />
             <div className="flex flex-col gap-2 items-end">
               <Badge 
                 variant="outline"

@@ -455,3 +455,35 @@ Captured at 1280×720 against the running dev server (post-HMR of all three edit
 | `/resource/186811` (Galène) | `screenshots/task39/resource.jpg` | Quick Actions card (Open Resource / Share This Page) renders adjacent to restyled Related Resources card (LiveKit / DTube / go2rtc visible). Related items now use token-based hover, no rounded corners, no ad-hoc green/blue. Header rhythm matches Quick Actions (`text-lg` + 4px primary icon). |
 
 No browser console errors on any of the three routes (only vite HMR connect + React DevTools hint).
+
+---
+
+## Appendix D — Advanced + Journeys fixes applied (Task #40)
+
+Scope: every row in §3.4 (MR-AJ-01..09), grouped by remediation action. Edits restricted to the three page files; no DS-primitive changes (Task #42 territory).
+
+| Master ID | Severity | File(s) touched | Resolution |
+|---|---|---|---|
+| MR-AJ-01 | FIX | `Journeys.tsx` (was line 177); `JourneyDetail.tsx` (was line 215) | Replaced `<div className="text-4xl">{journey.icon \|\| "📚"}</div>` (Journeys, h-10 footprint) and `<div className="text-6xl">{journey.icon \|\| "📚"}</div>` (JourneyDetail, h-14 footprint) with lucide `<BookOpen />` styled `color: var(--accent)`. `BookOpen` was already imported in both files. Always renders regardless of `journey.icon` value to eliminate the missing-glyph fallback that headless Chromium produced (no color-emoji font). |
+| MR-AJ-02 | FIX → **closed (no code change)** | `Advanced.tsx` Tabs | **No code change applied — formally closed as a test-harness artifact.** Per the audit's own caveat, real-mouse repro was required before patching the Tabs primitive. A Playwright real-browser test (not programmatic `.click()`) clicked each of the four `TabsTrigger`s in sequence (Explorer → Metrics → Export → AI Recommendations) and verified `data-state="active"` flipped to the clicked trigger and the corresponding `TabsContent` heading rendered ("Interactive Category Explorer" → "Community Analytics Dashboard" → "Multi-Format Export System" → AI Recommendations panel). All transitions succeeded. The previously reported failure was a side-effect of programmatic-click event dispatch in the original audit harness (Radix Tabs require a full pointer-event sequence), not a primitive defect. Downgraded from FIX to verification-only; routed to Re-validation gate for sign-off. |
+| MR-AJ-03 | NIT | (none) | Verification-only — resource-count drift (1953 ↔ 1952) is data, not code. Re-verify after next seed. |
+| MR-AJ-04 | NIT | `Advanced.tsx:110` | Added `{/* DS-OK: stat semantic colors (primary/blue/green/purple) intentionally honor the design reference; do not flatten in DS sweeps. */}` directly above the four-stat grid so the next DS sweep (Task #42) does not strip the colors. |
+| MR-AJ-05 | NIT | (none) | Verification-only — bottom CTA card matches reference. |
+| MR-AJ-06 | NIT | (none) | Verification-only — Journeys filter row matches reference. |
+| MR-AJ-07 | NIT | (none) | Verification-only — empty-state + auth alert match reference; gated on Carve-out MR-XO-02 (journey #6 has 0 published steps; data-side issue). |
+| MR-AJ-08 | NIT | (none) | Verification-only — methodology metadata for #35; not user-visible. |
+| MR-AJ-09 | NIT | (none) | Verification-only — mobile header right rail at 390 px renders cleanly. |
+
+Net code edits this task: **3 surgical edits** across **3 files** (Advanced.tsx, Journeys.tsx, JourneyDetail.tsx). 0 primitive/token changes.
+
+### Render verification evidence
+
+Captured at 1280×720 against the running dev server (post-HMR of all three edits):
+
+| Route | Screenshot | Observed |
+|---|---|---|
+| `/advanced` | `screenshots/task40/advanced.jpg` + Playwright real-click trace | Header `Sparkles` + h1 "Advanced Features" render; Tabs row shows all 4 triggers (Explorer active, Metrics / Export / AI Recommendations idle) with crimson Explorer label per Radix `data-state=active`. Stat row renders 4 colored cards (Categories crimson, Resources blue, Unique Tags green, Subcategories purple) — DS-OK comment now anchors that intent in source. Below, "Category Explorer" surface card renders cleanly. **Real-mouse interaction validation (Playwright)**: clicked Explorer → Metrics → Export → AI Recommendations in sequence; each click flipped `data-state="active"` to the clicked trigger and mounted the expected panel content ("Interactive Category Explorer" → "Community Analytics Dashboard" → "Multi-Format Export System" → AI Recommendations panel). All four transitions PASS — closes MR-AJ-02 as a programmatic-click artifact, not a primitive defect. No console errors. |
+| `/journeys` | `screenshots/task40/journeys.jpg` | Header `BookOpen` (crimson) + h1 "Learning Journeys" render. 6 journey cards in 3-col grid: each shows crimson `BookOpen` in the top-left slot (was empty/missing-glyph) + difficulty badge (green Beginner / amber Intermediate / red Advanced) in the top-right, then title, description, meta badges, and crimson "Start Journey" CTA. No missing-glyph rectangles anywhere. |
+| `/journey/6` ("Video Streaming Fundamentals") | `screenshots/task40/journey-6.jpg` | Back button + breadcrumb `Home › Journey › 6` render. Header card shows crimson `BookOpen` (h-14, was empty/missing-glyph) on the left + green "Beginner" trophy badge on the right, then title + description + meta badges (8-10 hours / Intro & Learning / 0 steps) + auth alert ("Please log in…"). "Learning Path" empty-state alert below shows the Carve-out MR-XO-02 behavior (journey #6 has 0 published steps). |
+
+No browser console errors on any of the three routes (only vite HMR connect + React DevTools hint).

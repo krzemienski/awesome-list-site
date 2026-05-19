@@ -174,7 +174,12 @@ export default function Journeys() {
               >
                 <CardHeader>
                   <div className="flex items-start justify-between mb-2">
-                    <div className="text-4xl">{journey.icon || "📚"}</div>
+                    <BookOpen
+                      className="h-10 w-10 flex-shrink-0"
+                      style={{ color: 'var(--accent)' }}
+                      aria-hidden
+                      data-testid={`icon-journey-${journey.id}`}
+                    />
                     <Badge 
                       variant="outline"
                       className={cn("text-xs capitalize", getDifficultyColor(journey.difficulty))}
