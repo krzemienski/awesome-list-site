@@ -39,7 +39,7 @@ Scope note: this project ships a **single-personality** build (Editorial+Crimson
 ### 🔴 BLOCK (0)
 _None._
 
-### 🟡 FIX (5)
+### 🟡 FIX (4)
 
 1. **Stage 5 — `client/src/components/layout/SEOHead.tsx:87`**
    Offending value: `<meta name="theme-color" content="#dc2626" />` (Tailwind red-600, stale).
@@ -56,10 +56,6 @@ _None._
 4. **Stage 4 — `client/src/components/layout/new/MainLayout.tsx:31-79`**
    Offending value: no element carries the `.page` class — atmosphere is applied to `body` instead (`design-system.css:72-84`).
    Replacement: wrap the `SidebarProvider` children in `<div className="page">…</div>` (the `.page` selector at `design-system.css:107-113` is already defined; just needs a host). Alternatively, document this divergence in `replit.md` if intentional, but until then it is a structural drift from the handoff contract.
-
-5. **Stage 6 + Stage 4 — `replit.md` "DS adoption scope" section missing**
-   Offending state: there is no in-repo record of (a) shadcn primitives replacing raw `.btn`/`.card`/`.chip`/`.input` classes, (b) body-level atmosphere replacing `.page` wrapper, (c) single-personality Editorial-only build. As a result, every future Stage-6 sweep will keep flagging thousands of "stray" buttons.
-   Replacement: add a "Design-System scope" section to `replit.md` listing the three intentional divergences with rationale + the canonical mapping (shadcn `<Button variant="default">` ⇄ DS `.btn.primary`, shadcn `<Badge>` ⇄ DS `.chip`, etc.). This converts Stage 6 from "thousands of false positives" to "out-of-scope, documented."
 
 ### 🟢 NIT (6)
 
@@ -79,6 +75,26 @@ _None._
 
 6. **Stage 5 — `client/src/components/ui/chart.tsx:55`** — `#ccc`/`#fff` inside attribute selectors (`[stroke='#ccc']`) targeting recharts-injected SVG. **Acceptable** — selector strings matching recharts' own internal paint, not author paint.
    Replacement: `/* DS-OK: recharts internal selector matchers */` comment above the line.
+
+7. **Stage 5 — `client/src/index.css:25,32,33,38-41,45`** — eight hex literals declared as `--color-*` CSS custom properties (e.g. `--color-destructive: #ff5c7a`, `--color-chart-2: #34d08c`). **Acceptable** — this is the shadcn↔DS token bridge; the literals are the *source* of tokens consumed elsewhere, and three of them (`#ff5c7a`, `#34d08c`, `#ffb84d`) are the DS status colors verbatim. The remaining (`#000000`, `#5eddf2`, `#9d4edd`) are also DS-aligned (text-on-accent black + accent-2 palette extension).
+   Replacement: prepend `/* DS-OK: shadcn↔DS token bridge */` comment above the `--color-*` block.
+
+8. **Stage 5 — `client/src/components/ui/theme-provider.tsx:59`** — `safeGetItem("theme-custom-hex") || "#3b82f6"` (UX default for a custom-color picker). **Acceptable** — pure UX fallback inside theme-tooling, not paint of the live DS surface.
+   Replacement: `/* DS-OK: color-picker default seed */` comment above the line.
+
+9. **Stage 5 — `client/src/components/ui/color-palette-generator.tsx:397,587`** — color-picker default `"#3b82f6"` and palette-export fallback `"#ffffff"`. **Acceptable** — same rationale as NIT #8 (theme-tooling defaults).
+   Replacement: `/* DS-OK: palette-generator defaults */` comments above each line.
+
+10. **Stage 5 — `client/src/styles/scrolling-fix.css:45`** — `border-radius: 3px` on a scrollbar-thumb fix. The DS radii are `var(--radius)` (12px) / `var(--radius-sm)` (8px) / `var(--radius-pill)` (999px); 3px does not map cleanly.
+    Replacement: introduce a `--radius-xs: 3px` token in `design-system.css :root` (or use `calc(var(--radius-sm) / 2.6)`), then change `scrolling-fix.css:45` to `border-radius: var(--radius-xs);`. If a new token is undesirable, tag `/* DS-OK: scrollbar-thumb micro-radius */` and document the intentional escape.
+
+---
+
+## Process notes (not findings)
+
+These are project-level documentation gaps surfaced by the audit, separated from per-line findings to keep the FIX list strictly code-value:
+
+- **P1. `replit.md` "Design-System scope" section is missing.** There is no in-repo record of (a) shadcn primitives replacing raw `.btn`/`.card`/`.chip`/`.input` classes (Stage 6), (b) body-level atmosphere replacing the `.page` wrapper (Stage 4), (c) single-personality Editorial-only build (Stage 11). Without this, every future Stage-6 sweep will keep flagging thousands of "stray" buttons as false positives. Action: add a "Design-System scope" section to `replit.md` listing the three intentional divergences with rationale plus the canonical shadcn↔DS mapping (e.g. shadcn `<Button variant="default">` ⇄ DS `.btn.primary`).
 
 ---
 
@@ -101,8 +117,8 @@ _None._
 1. **FIX #1 + #2** — two-line literal swap in `SEOHead.tsx:87,88` (`#dc2626` → `#ff3d52`). Eliminates the only DS mismatch that paints outside the React tree (PWA/browser chrome).
 2. **FIX #3** — token-swap `#fbbf24` → `var(--accent)` in `micro-interactions.tsx:232,234`. Trivial.
 3. **FIX #4** — wrap `MainLayout` children in `<div className="page">`. One-line restoration of the structural contract.
-4. **FIX #5** — add "Design-System scope" section to `replit.md` documenting the three intentional divergences. Eliminates Stage-6 false-positive noise for all future audits.
-5. **NIT #1–#6** — apply per-line replacements above and tag remaining intentional escapes with `/* DS-OK: <reason> */` so the next Stage-5 rg sweep auto-skips them.
+4. **Process note P1** — add "Design-System scope" section to `replit.md` documenting the three intentional divergences. Eliminates Stage-6 false-positive noise for all future audits.
+5. **NIT #1–#10** — apply per-line replacements/tags above and prepend `/* DS-OK: <reason> */` to remaining intentional escapes so the next Stage-5 rg sweep auto-skips them.
 
 ---
 
