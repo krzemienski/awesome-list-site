@@ -84,8 +84,9 @@ export default function SEOHead({
       )}
 
       {/* Additional SEO Meta Tags */}
-      <meta name="theme-color" content="#dc2626" />
-      <meta name="msapplication-TileColor" content="#dc2626" />
+      {/* MR-DS-04/05 — literal required (meta can't read CSS vars); matches DS --accent */}
+      <meta name="theme-color" content="#ff3d52" />
+      <meta name="msapplication-TileColor" content="#ff3d52" />
       <meta name="application-name" content={siteTitle} />
       <meta name="apple-mobile-web-app-title" content={siteTitle} />
       <meta name="apple-mobile-web-app-capable" content="yes" />

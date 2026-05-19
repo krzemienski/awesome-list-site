@@ -56,7 +56,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     if (typeof window === "undefined") return themePresets[0];
     const saved = safeGetItem("theme-preset") || "cyberpunk";
     if (saved === "custom") {
-      const hex = safeGetItem("theme-custom-hex") || "#3b82f6";
+      const hex = safeGetItem("theme-custom-hex") || /* DS-OK: color-picker default seed */ "#3b82f6";
       return buildCustomTheme(hex);
     }
     if (saved === "random") {
@@ -127,14 +127,19 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [activeFont]);
 
   useEffect(() => {
-    /* Apply preset accent color into DS tokens (--accent, --accent-2).
-     * We deliberately only touch accent tokens so the Editorial atmosphere
-     * (bg, surface ladder, text ladder, radii, fonts) stays intact. */
+    /* MR-DS-02 — Apply preset accent color into DS tokens
+     * (--accent, --accent-2). We deliberately only touch accent tokens so
+     * the Editorial atmosphere (bg, surface ladder, text ladder, radii,
+     * fonts) stays intact. ThemePreset exposes `preview.{accent,secondary}`
+     * as hex strings; the previous reader looked at `dark.primary` /
+     * `light.primary` which do not exist on this shape — picking any
+     * preset was a runtime no-op. */
     const root = document.documentElement;
-    const primary = activeTheme?.dark?.primary || activeTheme?.light?.primary;
+    const primary = activeTheme?.preview?.accent;
+    const secondary = activeTheme?.preview?.secondary || primary;
     if (primary) {
       root.style.setProperty('--accent', primary);
-      root.style.setProperty('--accent-2', primary);
+      root.style.setProperty('--accent-2', secondary);
     }
   }, [activeTheme]);
 

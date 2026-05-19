@@ -2,7 +2,6 @@ import { useContext } from "react";
 import { Link } from "wouter";
 import { ArrowLeft, Check, Palette, Type } from "lucide-react";
 import { ThemeProviderContext, FONT_OPTIONS } from "@/components/ui/theme-provider";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 
 export default function ThemeSettings() {
@@ -35,13 +34,18 @@ export default function ThemeSettings() {
           Back
         </Link>
         <div className="flex items-center gap-3">
-          <Palette className="h-7 w-7 text-[var(--accent)]" />
-          <h1 className="font-sans font-bold text-3xl sm:text-4xl tracking-tight">
+          <Palette className="h-6 w-6 text-[var(--accent)]" />
+          {/* MR-DS-15 — step h1 down one tier (was text-3xl sm:text-4xl) */}
+          <h1 className="font-sans font-bold text-2xl sm:text-2xl tracking-tight">
             Theme Settings
           </h1>
         </div>
+        {/* MR-DS-16 — append active-preset readout to header copy */}
         <p className="text-sm sm:text-base text-[color:var(--text-2)] mt-2">
-          Customize the font and color theme of the site to match your preference.
+          Customize the font and color theme of the site to match your preference.{" "}
+          <span className="text-[color:var(--text-3)]" data-testid="text-active-preset">
+            Active: {activeTheme.name}
+          </span>
         </p>
       </div>
 
@@ -70,17 +74,19 @@ export default function ThemeSettings() {
                     : "none",
                 }}
               >
-                <div className="flex items-center justify-between mb-2">
+                {/* MR-DS-11 — tile order: name → description → sample */}
+                <div className="flex items-center justify-between mb-1">
                   <span className="font-semibold text-sm">{font.label}</span>
                   {isActive && <Check className="h-4 w-4 text-[var(--accent)]" />}
                 </div>
+                <p className="text-xs text-[color:var(--text-2)] mb-2">{font.description}</p>
+                {/* MR-DS-14 — append digits to sample sentence */}
                 <p
-                  className="text-base mb-1"
+                  className="text-base"
                   style={{ fontFamily: font.family }}
                 >
-                  The quick brown fox jumps over the lazy dog
+                  The quick brown fox jumps over the lazy dog. 0123456789
                 </p>
-                <p className="text-xs text-[color:var(--text-2)]">{font.description}</p>
               </button>
             );
           })}
@@ -96,16 +102,21 @@ export default function ThemeSettings() {
         <div role="radiogroup" aria-label="Color theme" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {colorPresets.map((preset) => {
             const isActive = preset.value === activeTheme.value;
-            const primary = preset.dark?.primary || preset.light?.primary || "#000";
-            const secondary = preset.dark?.secondary || preset.light?.secondary || "#444";
-            const accent = preset.dark?.accent || preset.light?.accent || "#888";
+            /* MR-DS-01 — ThemePreset exposes `name` + `preview.{accent,secondary,bg}`.
+             * Previous reader looked for `label` + `dark?/light?` (which don't exist
+             * on this shape), so every card rendered empty labels + identical
+             * fallback swatches. /* DS-OK: preview-only theme picker — hex
+             * literals come from the preset registry, not from runtime DS tokens. */
+            const primary = preset.preview?.accent || /* DS-OK */ "#000";
+            const secondary = preset.preview?.secondary || /* DS-OK */ "#444";
+            const bg = preset.preview?.bg || /* DS-OK */ "#888";
             return (
               <button
                 key={preset.value}
                 type="button"
                 role="radio"
                 aria-checked={isActive}
-                onClick={() => handlePickTheme(preset.value, preset.label)}
+                onClick={() => handlePickTheme(preset.value, preset.name)}
                 data-testid={`theme-option-${preset.value}`}
                 className="text-left rounded-[var(--radius)] border bg-[var(--surface)] p-4 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
                 style={{
@@ -115,14 +126,15 @@ export default function ThemeSettings() {
                     : "none",
                 }}
               >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="font-semibold text-sm">{preset.label}</span>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-semibold text-sm">{preset.name}</span>
                   {isActive && <Check className="h-4 w-4" style={{ color: primary }} />}
                 </div>
+                <p className="text-xs text-[color:var(--text-2)] mb-2">{preset.description}</p>
                 <div className="flex h-10 w-full overflow-hidden rounded-[var(--radius-sm)] mb-2">
                   <div aria-hidden style={{ flex: 2, background: primary }} />
                   <div aria-hidden style={{ flex: 1, background: secondary }} />
-                  <div aria-hidden style={{ flex: 1, background: accent }} />
+                  <div aria-hidden style={{ flex: 1, background: bg }} />
                 </div>
                 <code className="block font-mono text-[10.5px] text-[color:var(--text-2)] tracking-wider">
                   {primary}

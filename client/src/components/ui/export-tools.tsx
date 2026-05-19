@@ -169,6 +169,7 @@ export default function ExportTools({ awesomeList, selectedCategory, className }
   };
 
   const generateHTML = (resources: Resource[]): string => {
+    /* MR-DS-17 — DS-OK: standalone exported HTML, no runtime DS */
     let content = `<!DOCTYPE html>
 <html lang="en">
 <head>

@@ -61,10 +61,9 @@ interface AnalyticsDashboardProps {
   onClose: () => void;
 }
 
-const COLORS = [
-  '#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6',
-  '#06b6d4', '#84cc16', '#f97316', '#ec4899', '#6366f1'
-];
+/* MR-DS-09 — palette extracted to client/src/lib/charts/palette.ts */
+import { CHART_PALETTE } from "@/lib/charts/palette";
+const COLORS = CHART_PALETTE;
 
 export default function AnalyticsDashboard({ 
   resources, 
@@ -357,8 +356,8 @@ export default function AnalyticsDashboard({
                       <Tooltip 
                         labelFormatter={(value) => new Date(value).toLocaleDateString()}
                       />
-                      <Area type="monotone" dataKey="views" stackId="1" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} />
-                      <Area type="monotone" dataKey="clicks" stackId="1" stroke="#10b981" fill="#10b981" fillOpacity={0.3} />
+                      <Area type="monotone" dataKey="views" stackId="1" stroke={CHART_PALETTE[0]} fill={CHART_PALETTE[0]} fillOpacity={0.3} />
+                      <Area type="monotone" dataKey="clicks" stackId="1" stroke={CHART_PALETTE[2]} fill={CHART_PALETTE[2]} fillOpacity={0.3} />
                     </AreaChart>
                   </ResponsiveContainer>
                 </CardContent>
@@ -383,7 +382,7 @@ export default function AnalyticsDashboard({
                     <Tooltip 
                       labelFormatter={(value) => `${value}:00 - ${value + 1}:00`}
                     />
-                    <Bar dataKey="usage" fill="#8b5cf6" />
+                    <Bar dataKey="usage" fill={CHART_PALETTE[1]} />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -532,16 +531,16 @@ export default function AnalyticsDashboard({
                     <Line 
                       type="monotone" 
                       dataKey="views" 
-                      stroke="#3b82f6" 
+                      stroke={CHART_PALETTE[0]} 
                       strokeWidth={2}
-                      dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
+                      dot={{ fill: CHART_PALETTE[0], strokeWidth: 2, r: 4 }}
                     />
                     <Line 
                       type="monotone" 
                       dataKey="clicks" 
-                      stroke="#10b981" 
+                      stroke={CHART_PALETTE[2]} 
                       strokeWidth={2}
-                      dot={{ fill: '#10b981', strokeWidth: 2, r: 4 }}
+                      dot={{ fill: CHART_PALETTE[2], strokeWidth: 2, r: 4 }}
                     />
                   </LineChart>
                 </ResponsiveContainer>

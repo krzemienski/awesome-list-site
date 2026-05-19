@@ -17,6 +17,9 @@
 @theme inline {
   --color-background: var(--bg);
   --color-foreground: var(--text);
+  /* MR-DS-20 — DS-OK: shadcn↔DS token bridge. Hex literals below
+     (#ff5c7a / #34d08c / #ffb84d / #000000) mirror DS status colors and
+     the on-accent ink color verbatim from design-system.css. */
   --color-card: var(--surface);
   --color-card-foreground: var(--text);
   --color-popover: var(--bg-2);

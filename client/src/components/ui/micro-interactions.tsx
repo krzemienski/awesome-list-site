@@ -229,9 +229,9 @@ export function AnimatedResourceCard({
               whileTap={prefersReducedMotion ? {} : { scale: 0.9 }}
             >
               <motion.div
-                animate={prefersReducedMotion ? { color: isBookmarked ? "#fbbf24" : "currentColor" } : {
+                animate={prefersReducedMotion ? { color: isBookmarked ? "var(--accent)" : "currentColor" } : {
                   scale: isBookmarked ? 1.2 : 1,
-                  color: isBookmarked ? "#fbbf24" : "currentColor"
+                  color: isBookmarked ? "var(--accent)" : "currentColor"
                 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >

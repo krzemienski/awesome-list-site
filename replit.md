@@ -23,6 +23,31 @@ A production-ready React application for browsing and discovering over 2,600 cur
 - **WP-3 Layout/Header/Sidebar**: `AppHeader.tsx` — search trigger now a `rounded-lg` surface chip with crimson-tinted hover/focus border + eyebrow-styled `kbd`; header bg uses `color-mix(var(--bg) 85%)` for blur+transparency; breadcrumb map switched from `Fragment` to `flatMap` to eliminate the Replit dev-injector `data-replit-metadata` warning. `AppSidebar.tsx` — brand line + `SidebarGroupLabel`s adopt the `.eyebrow` class. `MainLayout` already correct from WP-1.
 - **WP-4 Pages (Home / About / Login)**: hero rebuilds with eyebrow + Fraunces h1 + crimson italic accent; surfaces switched to design-system tokens; default-credentials block converted to a real surface card; mobile-fetch reliability hardened with `AbortController` timeout + retry + typed error messages in `static-data.ts`.
 
+## Design-System scope (MR-DS-13)
+
+The Awesome.Video DS contract documented in `docs/` + `HANDOFF.md` is implemented with three intentional, in-repo divergences from the canonical handoff. Every future Stage-5/Stage-6 DS sweep should treat these as architectural decisions, not per-occurrence violations:
+
+1. **shadcn/ui primitives replace raw `.btn / .card / .chip / .input`.** The runtime surfaces use `Button`, `Card`, `Badge`, `Input` (and other shadcn primitives) styled through the `client/src/index.css @theme inline` bridge that maps `--color-*` shadcn tokens onto DS tokens (`--accent`, `--bg`, `--surface`, etc.). Searching the DOM for stray `<button>` outside `.btn/.tab/.icon-btn` is expected to return many — that is shadcn working as designed. Class-compliance audits (DS Stage 6) should compare against the shadcn-bridge surface, not the raw handoff classes.
+2. **Body-level atmosphere + `.page contents` wrapper.** The `--bg-atmosphere` gradient is painted on `body` (handoff parity), and `MainLayout` wraps the chrome subtree in `<div className="page contents">` so the DS structural-class contract is satisfied without disturbing the `SidebarProvider` flex layout. The `contents` utility suppresses `.page`'s own box, so its container visuals (`position: relative`, min-height, background) are inert — atmosphere continues to come from body-level rules. If a future DS pass needs `.page` container visuals to take effect, drop the `contents` utility and re-verify the flex/peer chain.
+3. **Single-personality Editorial+Crimson build.** Only the `editorial` skin is wired into `client/index.html`'s boot script (`data-system="editorial" data-accent="crimson"`), and `applyDesignSystem` is exported for future re-use but never called at boot. The other four system skin blocks remain in `design-system.css` as cheap dead code per the handoff (do-not-strip), and the per-system fonts stay in the Google Fonts request for zero-round-trip flip.
+
+### Canonical shadcn ↔ DS class mapping
+
+| Handoff DS class | Runtime equivalent |
+|---|---|
+| `.btn` / `.btn.primary` / `.btn.ghost` / `.btn.icon` | `<Button variant="default|secondary|ghost|outline" />` |
+| `.card` / `.card.hoverable` / `.card.glow` | `<Card />` (+ tailwind `hover:` / shadow utilities) |
+| `.chip` / `.chip.accent` / `.chip.ok` / `.chip.warn` / `.chip.bad` | `<Badge variant="default|secondary|destructive|outline" />` (status variants extended ad-hoc) |
+| `.input` / `.select` / `.textarea` | `<Input />` / `<Select />` / `<Textarea />` |
+| `.eyebrow` | `.eyebrow` (kept literal — shadcn has no eyebrow primitive) |
+| `.kbd` | `<kbd className="…" />` (kept literal — shadcn has no kbd primitive) |
+| `.tabs` / `.tab` | `<Tabs />` / `<TabsTrigger />` |
+| `.table` | `<Table />` (data tables only — admin/analytics surfaces) |
+
+### Chart palette source of truth
+
+All recharts strokes/fills route through `client/src/lib/charts/palette.ts` (`CHART_PALETTE`). The 10-slot palette mirrors DS accents (`--accent`, `--accent-2`) + DS status semantics (`#34d08c`, `#ff5c7a`, `#ffb84d`, `#5eddf2`, `#9d4edd`) verbatim from `design-system.css`. Per-recharts component literals are intentional — recharts cannot read CSS vars from prop strings — and are tagged `/* DS-OK: ... */` where they appear.
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.

@@ -1,3 +1,7 @@
+/* MR-DS-18 — DS-OK: alternative theme registry. All hex literals in this
+ * file are the source of truth for the (deferred) theme picker; they are
+ * intentionally NOT routed through DS tokens because each preset defines
+ * its own complete OKLCH ladder. */
 export interface ThemePreset {
   name: string;
   value: string;

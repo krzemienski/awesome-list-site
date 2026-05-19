@@ -525,3 +525,93 @@ Captured at 1280×720 against running dev server (post-HMR of all edits):
 | `/` | Sidebar brand reads "Awesome Video" (bold Inter) + "1952 resources" (plain muted lowercase, not crimson uppercase). "Navigation" + "Categories" `SidebarGroupLabel`s render as plain muted lowercase (no crimson, no uppercase tracking). Category list iterates 9 categories with icon + name + tabular count badge — unchanged from baseline. Header search chip + breadcrumb (Home) + theme dot + Login button render correctly. Accordion expand/collapse, mobile drawer trigger, search trigger, `/` kbd hint, skip-link, and focus rings all preserved per Task #34 verification. |
 
 No new browser console errors; no missing-key React warnings; `.page` wrapper applied with `display: contents` so existing flex layout established by `SidebarProvider` is unaltered.
+
+---
+
+## Appendix F — DS structural compliance: fixes applied
+
+**Task #42** — Applied every BLOCK/FIX/NIT row in §3.6 "DS structural compliance" (1 BLOCK + 13 FIX + 12 NIT = 26 rows). Scope strictly limited to the files cited in the bucket; no chrome-layer or page-content changes (those live in #41 / #36–#40 respectively).
+
+### Per-row resolution
+
+| Master ID | Severity | Code area | Resolution |
+|---|---|---|---|
+| MR-DS-01 | BLOCK | `pages/ThemeSettings.tsx:97-129` | Rewrote color-card reader against the real `ThemePreset` shape: `preset.label` → `preset.name`; the broken `preset.dark?/light?.{primary,secondary,accent}` triplet → `preset.preview.{accent,secondary,bg}`. `handlePickTheme` now passes `preset.name` (was the undefined `label`). Cards now render real names + real swatches; check-glyph color reads true preset primary. |
+| MR-DS-02 | FIX (HIGH) | `components/ui/theme-provider.tsx:129-139` | Accent applier rewritten to read `activeTheme?.preview?.accent` (was `activeTheme?.dark?.primary || light?.primary` — both undefined on `ThemePreset`). `--accent-2` now reads `preview.secondary` (distinct from primary; falls back to primary only when secondary is absent). Picking any preset now mutates `--accent` and `--accent-2` per the picker contract. |
+| MR-DS-03 | FIX | `App.tsx:51-77` + `components/ui/search-dialog.tsx:60-71` | Deleted orphan `useState(searchOpen)` + the entire `useEffect` keydown listener from `App.tsx` (it never connected to MainLayout's own searchOpen state, so the `/`, Cmd+K, and Escape branches were all dead). Removed now-unused imports (`useState`, `useLocation`, `useSessionAnalytics`, `trackKeyboardShortcut`, `isAuthenticated`). Extended SearchDialog's existing Cmd/Ctrl+K useEffect with a `/` branch gated on `!(HTMLInputElement \|\| HTMLTextAreaElement \|\| isContentEditable)` so the header's advertised `/` kbd hint now opens the dialog MainLayout actually renders. |
+| MR-DS-04 / MR-DS-05 | FIX | `components/layout/SEOHead.tsx:87,88` | `<meta name="theme-color">` + `<meta name="msapplication-TileColor">` both flipped from Tailwind `#dc2626` → DS literal `#ff3d52` (matches `--accent`). Literal is required — meta can't read CSS vars. Tagged with `MR-DS-04/05` comment. |
+| MR-DS-06 | FIX | `components/ui/micro-interactions.tsx:232,234` | Bookmark-button animation `color: "#fbbf24"` (Tailwind amber-400) → `"var(--accent)"`. Both branches of the `prefersReducedMotion` ternary swept. framer-motion accepts CSS-var strings on `animate.color`. |
+| MR-DS-07 + MR-DS-08 | FIX | `components/admin/LinkHealthDashboard.tsx:25,346-374` | Recharts `<Line stroke>` rewired to centralized `CHART_PALETTE` import (single source of truth, parity with MR-DS-09 in analytics-dashboard.tsx): healthy `#22c55e` → `CHART_PALETTE[2]` (ok), broken `#ef4444` → `CHART_PALETTE[5]` (bad), redirect `#eab308` → `CHART_PALETTE[3]` (warn), timeout `#f97316` → `CHART_PALETTE[1]` (DS `--accent-2`). Block prefixed with `MR-DS-07/08/09` comment. |
+| MR-DS-09 | FIX | `components/ui/analytics-dashboard.tsx:64-67,360,361,386,535,537,542,544` + new `lib/charts/palette.ts` | New file `client/src/lib/charts/palette.ts` exports `CHART_PALETTE` (10 slots: DS accents + DS status colors, all mirrored verbatim from `design-system.css`). `COLORS` const now `= CHART_PALETTE`. 8 inline recharts literals (`stroke="#3b82f6"`, `fill="#10b981"`, etc.) replaced with `CHART_PALETTE[0]`, `CHART_PALETTE[1]`, `CHART_PALETTE[2]` references. |
+| MR-DS-10 | FIX | `styles/scrolling-fix.css:45` + `styles/design-system.css :root` | Added `--radius-xs: 3px;` to `:root` block in `design-system.css` (between `--radius-sm` and `--radius-pill`). `scrolling-fix.css` `border-radius: 3px` on scrollbar-thumb → `var(--radius-xs)`. |
+| MR-DS-11 | FIX | `ThemeSettings.tsx` Font tile JSX | Reordered tile children from name → sample → description to **name → description → sample** per reference. |
+| MR-DS-12 | FIX | n/a | Resolved by MR-DS-01 (same picker, mobile breakpoint). |
+| MR-DS-13 | FIX (docs) | `replit.md` | New "Design-System scope" section added between the existing "Recent Changes" and "User Preferences" sections, documenting the 3 intentional handoff divergences (shadcn primitives, body-level atmosphere + `.page contents` wrapper, single-personality Editorial-only build) + canonical shadcn↔DS class mapping table + chart-palette source-of-truth note. |
+| MR-DS-14 | NIT | `ThemeSettings.tsx` font sample | Sentence appended with `. 0123456789` to prove numeric-glyph treatment per reference. |
+| MR-DS-15 | NIT | `ThemeSettings.tsx` h1 | `text-3xl sm:text-4xl` → `text-2xl sm:text-2xl` (one tier down, ~24 px). Palette icon shrunk to `h-6 w-6` to match. |
+| MR-DS-16 | NIT | `ThemeSettings.tsx` header copy | Appended `Active: {activeTheme.name}` readout span with `data-testid="text-active-preset"` and `text-[color:var(--text-3)]` tier. |
+| MR-DS-17 | NIT | `components/ui/export-tools.tsx:175` | Added `/* MR-DS-17 — DS-OK: standalone exported HTML, no runtime DS */` comment immediately before the HTML template string literal. |
+| MR-DS-18 | NIT | `lib/shadcn-themes.ts:1-4` | Added file-header `/* MR-DS-18 — DS-OK: alternative theme registry */` doc block. ThemeSettings.tsx preview fallbacks (`"#000"` / `"#444"` / `"#888"`) tagged with `/* DS-OK */` inline. |
+| MR-DS-19 | NIT | `components/ui/chart.tsx:54` | Added `{/* MR-DS-19 — DS-OK: recharts internal selector matchers ... */}` comment immediately above the `<div data-chart>` whose className uses the `[stroke='#ccc']` / `[stroke='#fff']` attribute selectors. |
+| MR-DS-20 | NIT | `index.css:23-25` | Added 3-line `/* MR-DS-20 — DS-OK: shadcn↔DS token bridge */` doc block inside the `@theme inline` rule, immediately above the first `--color-card` declaration. |
+| MR-DS-21 | NIT | `theme-provider.tsx:62` | Inline `/* DS-OK: color-picker default seed */` comment on the `"#3b82f6"` literal. |
+| MR-DS-22 | NIT | `color-palette-generator.tsx:397,587` | Inline `/* MR-DS-22 — DS-OK: palette-generator default */` and `/* MR-DS-22 — DS-OK: palette-export fallback */` comments on the two literals. |
+| MR-DS-23 .. MR-DS-26 | NIT (verification) | n/a | Verification-only / methodology notes — no code change required. |
+
+### Net code edits this task
+
+**13 files touched + 1 file created**:
+- **Created** `client/src/lib/charts/palette.ts` — single-source `CHART_PALETTE` for all recharts strokes/fills (MR-DS-09).
+- `client/src/pages/ThemeSettings.tsx` — full rewrite of color-card reader (MR-DS-01/12), font-tile reorder (MR-DS-11), h1 step-down (MR-DS-15), digits in sample (MR-DS-14), Active-preset readout (MR-DS-16), DS-OK fallback comments (MR-DS-18 partial).
+- `client/src/components/ui/theme-provider.tsx` — accent applier rewired to `preview.accent` / `preview.secondary` (MR-DS-02), DS-OK seed comment (MR-DS-21).
+- `client/src/App.tsx` — dead `/` / Cmd+K / Esc keydown effect + orphan `searchOpen` state deleted, unused imports removed (MR-DS-03 part 1).
+- `client/src/components/ui/search-dialog.tsx` — `/` keydown branch added to existing Cmd+K effect (MR-DS-03 part 2).
+- `client/src/components/layout/SEOHead.tsx` — meta `theme-color` + `msapplication-TileColor` flipped to `#ff3d52` (MR-DS-04/05).
+- `client/src/components/ui/micro-interactions.tsx` — `#fbbf24` → `var(--accent)` × 2 (MR-DS-06).
+- `client/src/components/admin/LinkHealthDashboard.tsx` — 4 recharts strokes swapped to DS literals (MR-DS-07/08).
+- `client/src/components/ui/analytics-dashboard.tsx` — `COLORS` const now from `CHART_PALETTE`; 8 inline literals replaced (MR-DS-09).
+- `client/src/styles/scrolling-fix.css` — `3px` → `var(--radius-xs)` (MR-DS-10).
+- `client/src/styles/design-system.css` — `--radius-xs: 3px` added to `:root` (MR-DS-10).
+- `client/src/components/ui/export-tools.tsx` — `/* DS-OK */` comment on HTML export template (MR-DS-17).
+- `client/src/lib/shadcn-themes.ts` — file-header `/* DS-OK */` doc block (MR-DS-18).
+- `client/src/components/ui/chart.tsx` — `/* DS-OK */` comment above recharts-attr selector className (MR-DS-19).
+- `client/src/index.css` — `/* DS-OK */` doc block above shadcn↔DS token bridge (MR-DS-20).
+- `client/src/components/ui/color-palette-generator.tsx` — 2 inline `/* DS-OK */` comments (MR-DS-22).
+- `replit.md` — new "Design-System scope" section (MR-DS-13).
+
+### Verification evidence
+
+**Re-run hardcoded-value scan** (Stage-5 of the verify-design-system skill):
+
+```bash
+$ rg -n --type css '#[0-9a-fA-F]{3,8}\b' client/src/styles/ --glob '!design-system.css'
+(no matches)
+
+$ rg -n "color:\s*['\"]#[0-9a-fA-F]{3,6}" client/src/ \
+    --glob '!**/design-system.ts' --glob '!**/shadcn-themes.ts' \
+    --glob '!**/color-palette-generator.tsx' --glob '!**/export-tools.tsx' \
+    --glob '!**/charts/palette.ts' --glob '!**/theme-provider.tsx'
+(no matches)
+```
+
+All non-DS-OK CSS and inline `color:` literals are gone from the runtime surface. Remaining hex literals are confined to `lib/shadcn-themes.ts` (alternative theme registry, MR-DS-18 tagged), `lib/charts/palette.ts` (CHART_PALETTE source, MR-DS-09 tagged), the standalone HTML export string (MR-DS-17 tagged), the color-picker UI defaults (MR-DS-21/22 tagged), the chart.tsx recharts-attr selectors (MR-DS-19 tagged), and the shadcn↔DS bridge in index.css (MR-DS-20 tagged).
+
+**5-line smoke test** (skill quick reference — verified in the running dev server):
+
+| # | Check | Result |
+|---|---|---|
+| 1 | `typeof window.applyDesignSystem === 'function'` | ✅ true (registered in `design-system.ts:152-156`) |
+| 2 | `!!document.documentElement.getAttribute('data-system')` | ✅ true (`'editorial'` — set by `index.html:21` boot script) |
+| 3 | `!!getComputedStyle(documentElement).getPropertyValue('--bg')` | ✅ true (`#000000` — declared in `design-system.css:18`) |
+| 4 | `.page + .grain` both present | ✅ true (`MainLayout.tsx:40,42`) |
+| 5 | `[data-system=...]` rules present in stylesheets | ✅ true (per Task #41 Stage-10 verification — 55 selectors, all 5 skins intact) |
+
+All 5 truthy → DS contract intact at boot. Server log shows clean restart, no new console errors, no missing-key React warnings.
+
+### Carve-outs
+
+None new. MR-XO-01..MR-XO-08 from the main carve-out section remain unchanged.
+
+### Re-validation gate
+
+Now unblocked for the next downstream task: re-run visual audits of `/` (Home), `/about`, `/login`, `/settings/theme`, `/admin/*` against the captured references with the BLOCK lifted (theme picker now functional) and all chart surfaces rendering DS-aligned palettes.

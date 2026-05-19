@@ -23,6 +23,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { CHART_PALETTE } from "@/lib/charts/palette";
 import type { LinkHealthJob, LinkHealthCheck } from "@shared/schema";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
@@ -339,31 +340,33 @@ export default function LinkHealthDashboard() {
                 <YAxis label={{ value: 'Percentage (%)', angle: -90, position: 'insideLeft' }} />
                 <Tooltip />
                 <Legend />
+                {/* MR-DS-07/08/09 — strokes sourced from centralized CHART_PALETTE
+                    (ok=[2], bad=[5], warn=[3], --accent-2=[1]). */}
                 <Line
                   type="monotone"
                   dataKey="healthy"
-                  stroke="#22c55e"
+                  stroke={CHART_PALETTE[2]}
                   name="Healthy"
                   strokeWidth={2}
                 />
                 <Line
                   type="monotone"
                   dataKey="broken"
-                  stroke="#ef4444"
+                  stroke={CHART_PALETTE[5]}
                   name="Broken"
                   strokeWidth={2}
                 />
                 <Line
                   type="monotone"
                   dataKey="redirect"
-                  stroke="#eab308"
+                  stroke={CHART_PALETTE[3]}
                   name="Redirects"
                   strokeWidth={2}
                 />
                 <Line
                   type="monotone"
                   dataKey="timeout"
-                  stroke="#f97316"
+                  stroke={CHART_PALETTE[1]}
                   name="Timeouts"
                   strokeWidth={2}
                 />

@@ -394,7 +394,7 @@ export default function ColorPaletteGenerator({ isOpen, onClose, onPaletteGenera
                     <Label>Base Color (Optional)</Label>
                     <Input
                       type="color"
-                      value={options.baseColor || "#3b82f6"}
+                      value={options.baseColor || /* MR-DS-22 — DS-OK: palette-generator default */ "#3b82f6"}
                       onChange={(e) => setOptions(prev => ({ ...prev, baseColor: e.target.value }))}
                       className="w-full h-10"
                     />
@@ -584,7 +584,7 @@ export default function ColorPaletteGenerator({ isOpen, onClose, onPaletteGenera
                     <Card style={{ 
                       backgroundColor: selectedPalette.colors[0], 
                       borderColor: selectedPalette.colors[1],
-                      color: selectedPalette.colors[4] || '#ffffff'
+                      color: selectedPalette.colors[4] || /* MR-DS-22 — DS-OK: palette-export fallback */ '#ffffff'
                     }}>
                       <CardHeader>
                         <CardTitle style={{ color: selectedPalette.colors[2] }}>

@@ -48,6 +48,7 @@ const ChartContainer = React.forwardRef<
 
   return (
     <ChartContext.Provider value={{ config }}>
+      {/* MR-DS-19 — DS-OK: recharts internal selector matchers (#ccc / #fff are recharts-injected SVG defaults) */}
       <div
         data-chart={chartId}
         ref={ref}

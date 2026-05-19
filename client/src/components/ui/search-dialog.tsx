@@ -56,11 +56,23 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
     setResults(searchResults.slice(0, 15).map(result => result.item));
   }, [query, fuse]);
 
-  // Global keyboard shortcut listener (Cmd+K, Ctrl+K)
+  // Global keyboard shortcut listener (Cmd+K, Ctrl+K, and `/`)
+  // MR-DS-03 — `/` branch added (dead listener in App.tsx deleted) so the
+  // header's advertised `/` kbd hint actually opens this dialog.
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Check for Cmd+K (Mac) or Ctrl+K (Windows/Linux)
+      const target = e.target as Element | null;
+      const inField =
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        (target instanceof HTMLElement && target.isContentEditable);
+
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsOpen(true);
+        return;
+      }
+      if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey && !inField) {
         e.preventDefault();
         setIsOpen(true);
       }

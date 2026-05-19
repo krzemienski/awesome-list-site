@@ -1,10 +1,8 @@
-import { useState, useEffect } from "react";
-import { Switch, Route, useLocation } from "wouter";
+import { useEffect } from "react";
+import { Switch, Route } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { initGA } from "./lib/analytics";
 import { useAnalytics } from "./hooks/use-analytics";
-import { useSessionAnalytics } from "./hooks/use-session-analytics";
-import { trackKeyboardShortcut } from "./lib/analytics";
 import { useAuth } from "./hooks/useAuth";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 
@@ -34,11 +32,7 @@ import { fetchStaticAwesomeList } from "@/lib/static-data";
 
 function Router() {
   useAnalytics();
-  const sessionAnalytics = useSessionAnalytics();
-  const { user, isAuthenticated, isLoading: authLoading, logout } = useAuth();
-
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [location] = useLocation();
+  const { user, isLoading: authLoading, logout } = useAuth();
 
   const { data: rawData, isLoading, error } = useQuery({
     queryKey: ["awesome-list-data"],
@@ -48,33 +42,10 @@ function Router() {
 
   const awesomeList = rawData ? processAwesomeListData(rawData) : undefined;
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (
-        e.key === "/" &&
-        !e.ctrlKey &&
-        !e.metaKey &&
-        !(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)
-      ) {
-        e.preventDefault();
-        trackKeyboardShortcut("/", "open_search");
-        sessionAnalytics.incrementSearchesPerformed();
-        setSearchOpen(true);
-      }
-      if (e.key === "Escape" && searchOpen) {
-        trackKeyboardShortcut("Escape", "close_search");
-        setSearchOpen(false);
-      }
-      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
-        e.preventDefault();
-        trackKeyboardShortcut("Ctrl+K", "open_search");
-        sessionAnalytics.incrementSearchesPerformed();
-        setSearchOpen(true);
-      }
-    };
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [searchOpen]);
+  /* MR-DS-03 — Orphan `/` + Ctrl/Cmd+K listener removed. The header
+   * advertises the `/` kbd hint on the search chip; the real listener
+   * now lives in SearchDialog so the hint resolves to the dialog that
+   * MainLayout actually renders. */
 
   if (error) {
     return <ErrorPage error={error} />;
