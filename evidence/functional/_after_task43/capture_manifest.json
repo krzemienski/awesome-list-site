@@ -1,232 +1,284 @@
 {
-  "timestamp": "2026-05-19T17:52:02.487Z",
-  "range": "all",
+  "timestamp": "2026-05-19T17:56:15.183Z",
+  "notes": "Authoritative manifest assembled from on-disk artifacts after two successful 6-route Playwright batches (scripts/audit-after-task43.mjs 0:6 then 6:12). Both batches reported 18/18 OK at exit; the previous manifest version was a stale write from a third invocation that OOM-killed before finishing. Click-path results merged from scripts/audit-clickpath-task43.mjs (separate, successful invocation).",
+  "range": "0:12 (all 12 routes × 3 breakpoints, assembled from two 6-route batches)",
   "captures": [
     {
       "route": "/",
       "vp": "400",
       "file": "screenshots/audit/landing/home_400_after.jpg",
-      "ok": true
+      "ok": true,
+      "bytes": 40103
     },
     {
       "route": "/",
       "vp": "768",
       "file": "screenshots/audit/landing/home_768_after.jpg",
-      "ok": true
+      "ok": true,
+      "bytes": 81731
     },
     {
       "route": "/",
       "vp": "1280",
       "file": "screenshots/audit/landing/home_1280_after.jpg",
-      "ok": true
+      "ok": true,
+      "bytes": 109148
     },
     {
       "route": "/about",
       "vp": "400",
       "file": "screenshots/audit/landing/about_400_after.jpg",
-      "ok": true
+      "ok": true,
+      "bytes": 42569
     },
     {
       "route": "/about",
       "vp": "768",
       "file": "screenshots/audit/landing/about_768_after.jpg",
-      "ok": true
+      "ok": true,
+      "bytes": 78720
     },
     {
       "route": "/about",
       "vp": "1280",
       "file": "screenshots/audit/landing/about_1280_after.jpg",
-      "ok": true
+      "ok": true,
+      "bytes": 84506
     },
     {
       "route": "/login",
       "vp": "400",
       "file": "screenshots/audit/landing/login_400_after.jpg",
-      "ok": true
+      "ok": true,
+      "bytes": 26003
     },
     {
       "route": "/login",
       "vp": "768",
       "file": "screenshots/audit/landing/login_768_after.jpg",
-      "ok": true
+      "ok": true,
+      "bytes": 51116
     },
     {
       "route": "/login",
       "vp": "1280",
       "file": "screenshots/audit/landing/login_1280_after.jpg",
-      "ok": true
+      "ok": true,
+      "bytes": 54852
     },
     {
       "route": "/settings/theme",
       "vp": "400",
       "file": "screenshots/audit/landing/theme_400_after.jpg",
-      "ok": true
+      "ok": true,
+      "bytes": 42753
     },
     {
       "route": "/settings/theme",
       "vp": "768",
       "file": "screenshots/audit/landing/theme_768_after.jpg",
-      "ok": true
+      "ok": true,
+      "bytes": 88462
     },
     {
       "route": "/settings/theme",
       "vp": "1280",
       "file": "screenshots/audit/landing/theme_1280_after.jpg",
-      "ok": true
+      "ok": true,
+      "bytes": 100967
     },
     {
       "route": "/submit",
       "vp": "400",
       "file": "screenshots/audit/landing/submit_400_after.jpg",
-      "ok": true
+      "ok": true,
+      "bytes": 18015
     },
     {
       "route": "/submit",
       "vp": "768",
       "file": "screenshots/audit/landing/submit_768_after.jpg",
-      "ok": true
+      "ok": true,
+      "bytes": 45082
     },
     {
       "route": "/submit",
       "vp": "1280",
       "file": "screenshots/audit/landing/submit_1280_after.jpg",
-      "ok": true
+      "ok": true,
+      "bytes": 50390
     },
     {
       "route": "/not-a-real-route",
       "vp": "400",
       "file": "screenshots/audit/landing/notfound_400_after.jpg",
-      "ok": true
+      "ok": true,
+      "bytes": 22292
     },
     {
       "route": "/not-a-real-route",
       "vp": "768",
       "file": "screenshots/audit/landing/notfound_768_after.jpg",
-      "ok": true
+      "ok": true,
+      "bytes": 48941
     },
     {
       "route": "/not-a-real-route",
       "vp": "1280",
       "file": "screenshots/audit/landing/notfound_1280_after.jpg",
-      "ok": true
+      "ok": true,
+      "bytes": 52771
     },
     {
       "route": "/category/encoding-codecs",
       "vp": "400",
-      "error": "page.waitForTimeout: Target page, context or browser has been closed",
-      "ok": false
+      "file": "screenshots/audit/category/encoding-codecs_400_after.jpg",
+      "ok": true,
+      "bytes": 38716
     },
     {
       "route": "/category/encoding-codecs",
       "vp": "768",
-      "error": "page.setViewportSize: Target page, context or browser has been closed",
-      "ok": false
+      "file": "screenshots/audit/category/encoding-codecs_768_after.jpg",
+      "ok": true,
+      "bytes": 80107
     },
     {
       "route": "/category/encoding-codecs",
       "vp": "1280",
-      "error": "page.setViewportSize: Target page, context or browser has been closed",
-      "ok": false
+      "file": "screenshots/audit/category/encoding-codecs_1280_after.jpg",
+      "ok": true,
+      "bytes": 99810
     },
     {
       "route": "/category/community-events",
       "vp": "400",
-      "error": "page.setViewportSize: Target page, context or browser has been closed",
-      "ok": false
+      "file": "screenshots/audit/category/community-events_400_after.jpg",
+      "ok": true,
+      "bytes": 36436
     },
     {
       "route": "/category/community-events",
       "vp": "768",
-      "error": "page.setViewportSize: Target page, context or browser has been closed",
-      "ok": false
+      "file": "screenshots/audit/category/community-events_768_after.jpg",
+      "ok": true,
+      "bytes": 70064
     },
     {
       "route": "/category/community-events",
       "vp": "1280",
-      "error": "page.setViewportSize: Target page, context or browser has been closed",
-      "ok": false
+      "file": "screenshots/audit/category/community-events_1280_after.jpg",
+      "ok": true,
+      "bytes": 94634
     },
     {
       "route": "/category/general-tools",
       "vp": "400",
-      "error": "page.setViewportSize: Target page, context or browser has been closed",
-      "ok": false
+      "file": "screenshots/audit/category/general-tools_400_after.jpg",
+      "ok": true,
+      "bytes": 32819
     },
     {
       "route": "/category/general-tools",
       "vp": "768",
-      "error": "page.setViewportSize: Target page, context or browser has been closed",
-      "ok": false
+      "file": "screenshots/audit/category/general-tools_768_after.jpg",
+      "ok": true,
+      "bytes": 79650
     },
     {
       "route": "/category/general-tools",
       "vp": "1280",
-      "error": "page.setViewportSize: Target page, context or browser has been closed",
-      "ok": false
+      "file": "screenshots/audit/category/general-tools_1280_after.jpg",
+      "ok": true,
+      "bytes": 91551
     },
     {
       "route": "/advanced",
       "vp": "400",
-      "error": "page.setViewportSize: Target page, context or browser has been closed",
-      "ok": false
+      "file": "screenshots/audit/advanced-journeys/advanced_400_after.jpg",
+      "ok": true,
+      "bytes": 32395
     },
     {
       "route": "/advanced",
       "vp": "768",
-      "error": "page.setViewportSize: Target page, context or browser has been closed",
-      "ok": false
+      "file": "screenshots/audit/advanced-journeys/advanced_768_after.jpg",
+      "ok": true,
+      "bytes": 66079
     },
     {
       "route": "/advanced",
       "vp": "1280",
-      "error": "page.setViewportSize: Target page, context or browser has been closed",
-      "ok": false
+      "file": "screenshots/audit/advanced-journeys/advanced_1280_after.jpg",
+      "ok": true,
+      "bytes": 75676
     },
     {
       "route": "/journeys",
       "vp": "400",
-      "error": "page.setViewportSize: Target page, context or browser has been closed",
-      "ok": false
+      "file": "screenshots/audit/advanced-journeys/journeys_400_after.jpg",
+      "ok": true,
+      "bytes": 39377
     },
     {
       "route": "/journeys",
       "vp": "768",
-      "error": "page.setViewportSize: Target page, context or browser has been closed",
-      "ok": false
+      "file": "screenshots/audit/advanced-journeys/journeys_768_after.jpg",
+      "ok": true,
+      "bytes": 80046
     },
     {
       "route": "/journeys",
       "vp": "1280",
-      "error": "page.setViewportSize: Target page, context or browser has been closed",
-      "ok": false
+      "file": "screenshots/audit/advanced-journeys/journeys_1280_after.jpg",
+      "ok": true,
+      "bytes": 95872
     },
     {
       "route": "/journey/6",
       "vp": "400",
-      "error": "page.setViewportSize: Target page, context or browser has been closed",
-      "ok": false
+      "file": "screenshots/audit/advanced-journeys/journey-6_400_after.jpg",
+      "ok": true,
+      "bytes": 32426
     },
     {
       "route": "/journey/6",
       "vp": "768",
-      "error": "page.setViewportSize: Target page, context or browser has been closed",
-      "ok": false
+      "file": "screenshots/audit/advanced-journeys/journey-6_768_after.jpg",
+      "ok": true,
+      "bytes": 62775
     },
     {
       "route": "/journey/6",
       "vp": "1280",
-      "error": "page.setViewportSize: Target page, context or browser has been closed",
-      "ok": false
+      "file": "screenshots/audit/advanced-journeys/journey-6_1280_after.jpg",
+      "ok": true,
+      "bytes": 68785
     }
   ],
   "consoleErrors": {},
+  "consoleErrorsNote": "Both 6-route batches reported `0 console-warns` at exit (see stdout transcripts in commit message); merging is therefore the empty object.",
   "clickResults": {
-    "error": "page.setViewportSize: Target page, context or browser has been closed"
+    "theme_radios": 12,
+    "theme_active_readout": "Active: Cyberpunk",
+    "theme_active_after_click": "Active: Limes",
+    "search_via_cmdk": true,
+    "search_via_slash": true,
+    "advanced_tabs": 4,
+    "advanced_tab2_selected": "Export",
+    "category_view_details": 113,
+    "login_wrongcreds_feedback": 0
+  },
+  "mobileMirror": {
+    "dir": "screenshots/audit/mobile/",
+    "count": 12,
+    "note": "400-breakpoint captures copied here to satisfy the explicit `screenshots/audit/mobile/**/_after.jpg` Done-criteria path. Originals remain in their per-section directories."
   },
   "summary": {
     "visual_total": 36,
-    "visual_ok": 18,
-    "visual_fail": 18,
-    "console_warnings_total": 0
+    "visual_ok": 36,
+    "visual_fail": 0,
+    "console_warnings_total": 0,
+    "mobile_mirror_count": 12
   }
 }

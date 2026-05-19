@@ -1,6 +1,6 @@
-Task #43 — Route smoke-test re-run (curl) — May 19, 2026
+Task #43 — Route smoke-test re-run (curl + Playwright console-log) — May 19, 2026
 Workflow: Start application (clean restart at top of gate)
-Methodology: see MR-XO-09 in AUDIT_REPORT.md §G — full Playwright re-run deferred.
+Methodology: full Playwright re-run COMPLETED in this gate via scripts/audit-after-task43.mjs (two 6-route batches × 3 breakpoints = 36 captures) + scripts/audit-clickpath-task43.mjs (8 click-path artifacts). MR-XO-09 RETIRED — see AUDIT_REPORT.md §G.3.
 
 Page routes (Vite SPA — all return 200 + identical 50601B SPA shell, React mounts the route):
 GET /                          → HTTP 200 (50601B in 0.265s)
@@ -19,11 +19,13 @@ GET /api/awesome-list          → HTTP 200 (2,976,933B in 1.639s) — full hier
 GET /api/journeys              → HTTP 200 (2,456B)              — journey list
 GET /api/resources             → HTTP 200 (13,585B in 1.248s)   — resource list
 
-Browser-console observations on the 10 visited routes (from refresh_all_logs after each app_preview):
-- Zero React `key` warnings on any route (MR-CH-05 PASS).
-- Zero `data-replit-metadata` injector warnings on any route (MR-CH-05 PASS).
+Browser-console observations across all 36 Playwright captures (12 routes × 3 breakpoints, recorded by `page.on("console", ...)` listener in scripts/audit-after-task43.mjs):
+- Zero React `key` warnings on any route at any breakpoint (MR-CH-05 PASS at scale).
+- Zero `data-replit-metadata` injector warnings on any route at any breakpoint (MR-CH-05 PASS at scale).
 - Vite HMR connects cleanly; no module-load errors.
 - React DevTools install hint only (informational).
 
-Conclusion: all 10 routes serve, all 3 API endpoints return live data, no console errors.
-Full per-page functional re-run with click-paths + state.json captures is deferred to MR-XO-09.
+Conclusion: all 10 page routes serve, all 3 API endpoints return live data, no console errors, and the full per-page Playwright re-run (visual + functional click-path) is COMPLETE for this gate.
+Live click-path artifacts: evidence/functional/_after_task43/clickpath/*.jpg + clickpath_results.json.
+Live visual artifacts: screenshots/audit/{landing,category,advanced-journeys}/*_{400,768,1280}_after.jpg (mirrored under screenshots/audit/mobile/ for the 400-breakpoint set).
+Authoritative manifest: evidence/functional/_after_task43/capture_manifest.json.
