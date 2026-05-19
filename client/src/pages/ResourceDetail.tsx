@@ -579,15 +579,15 @@ export default function ResourceDetail() {
                 {filteredRelatedResources.map((related) => (
                   <div
                     key={related.id}
-                    className="p-3 rounded border border-border hover:border-primary/50 hover:bg-primary/5 cursor-pointer transition-all group"
+                    className="p-3 border border-border hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors group min-h-[44px]"
                     onClick={() => handleRelatedResourceClick(related)}
                     data-testid={`related-resource-${related.id}`}
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-medium text-sm line-clamp-1 flex-1 group-hover:text-primary transition-colors">
+                      <span className="font-medium text-sm line-clamp-1 flex-1">
                         {related.title}
                       </span>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
+                      <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                     </div>
                     {related.description && (
                       <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
@@ -596,10 +596,7 @@ export default function ResourceDetail() {
                     )}
                     {related.score !== undefined && (
                       <div className="mt-2">
-                        <Badge
-                          variant="outline"
-                          className="text-xs bg-green-500/10 text-green-500"
-                        >
+                        <Badge variant="secondary" className="text-xs">
                           <TrendingUp className="h-3 w-3 mr-1" />
                           {related.score}% match
                         </Badge>
@@ -610,7 +607,7 @@ export default function ResourceDetail() {
                         <div className="text-xs text-muted-foreground">Why recommended:</div>
                         <div className="flex flex-wrap gap-1">
                           {related.reasons.slice(0, 2).map((reason, index) => (
-                            <span key={index} className="text-xs bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300 px-2 py-0.5 rounded">
+                            <span key={index} className="text-xs bg-muted text-muted-foreground px-2 py-0.5">
                               {reason}
                             </span>
                           ))}

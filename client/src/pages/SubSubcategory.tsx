@@ -296,7 +296,7 @@ export default function SubSubcategory() {
                 onClick={handleResourceClick}
                 data-testid={`card-resource-${index}`}
               >
-                <CardHeader className="p-3 sm:p-4 md:p-6">
+                <CardHeader className="p-3 sm:p-4">
                   <CardTitle className="text-base sm:text-lg flex items-start gap-2">
                     <span className="flex-1 min-w-0 line-clamp-2">{resource.title}</span>
                     <ExternalLink className="h-4 w-4 flex-shrink-0 mt-1" />
@@ -308,7 +308,7 @@ export default function SubSubcategory() {
                   )}
                 </CardHeader>
                 {resource.tags && resource.tags.length > 0 && (
-                  <CardContent className="px-3 pb-3 pt-0 sm:px-4 sm:pb-4 md:px-6 md:pb-6">
+                  <CardContent className="px-3 pb-3 pt-0 sm:px-4 sm:pb-4">
                     <div className="flex gap-1.5 sm:gap-2 flex-wrap">
                       {resource.tags.slice(0, 3).map((tag, tagIndex) => (
                         <Badge key={tagIndex} variant="secondary" className="text-xs">

@@ -420,3 +420,26 @@ Applied by Task #38 against §3.2 (Category). Scope: shared `client/src/pages/Ca
 | MR-CT-13 NIT | `Category.tsx` compact view collision risk | Verified non-issue in current implementation. Compact tiles render only `[title (line-clamp-2)][ExternalLink button]`; there is no per-tile count badge in this view (count badges live in the page header band, not on cards). The "collision" the audit warned about would only appear if a future change adds a per-tile badge. Hover treatment updated under MR-CT-07 to be subtle so any future badge addition has visual headroom; no structural change today. |
 
 **Verification:** 9 category routes share this single template; the changes are layout-level (header band, filter composition, card structure, hover) and don't touch routing, data shape, or query keys. `viewMode` toggle still cycles grid/list/compact via the unchanged `<ViewModeToggle>`; localStorage persistence (`awesome-list-view-mode`) untouched. Dev workflow recompiled clean on each edit batch.
+
+---
+
+## Appendix C — Detail surface fixes applied (Task #39)
+
+**Date:** May 19, 2026. **Scope:** §3.3 (MR-DT-01..MR-DT-07 — 2 FIX + 5 NIT). **Files touched:** `client/src/pages/Subcategory.tsx`, `client/src/pages/SubSubcategory.tsx`, `client/src/pages/ResourceDetail.tsx`.
+
+| Master ID | Status | Resolution |
+|---|---|---|
+| MR-DT-01 FIX | ✅ Applied | `Subcategory.tsx:293,305` + `SubSubcategory.tsx:302,314` — tightened resource-card `CardHeader p-3 sm:p-4 md:p-6` → `p-3 sm:p-4` (one tier removed) and matching `CardContent px-3 pb-3 pt-0 sm:px-4 sm:pb-4 md:px-6 md:pb-6` → `px-3 pb-3 pt-0 sm:px-4 sm:pb-4`. Card height drops from ~130–160 px toward reference ~95–110 px on both list pages. |
+| MR-DT-02 FIX (decision: keep + restyle) | ✅ Applied | `ResourceDetail.tsx:582-620` — Related Resources items now use token-based hover (`hover:bg-accent hover:text-accent-foreground transition-colors`) instead of ad-hoc `hover:border-primary/50 hover:bg-primary/5`; removed `group-hover:text-primary` text-color swap on title + chevron; rounded corners dropped (`rounded` removed) to honor DS `--radius: 0`; added `min-h-[44px]` for WCAG touch target. Score `Badge` switched from hard-coded `bg-green-500/10 text-green-500` to plain `variant="secondary"`. Reasons pills swapped from `bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300 px-2 py-0.5 rounded` to token-based `bg-muted text-muted-foreground px-2 py-0.5`. Card header/title rhythm already matched Quick Actions (`text-lg flex items-center gap-2` + icon `h-4 w-4 text-primary`) — no header change needed. |
+| MR-DT-03 NIT | ✅ Verified | `Subcategory.tsx:222` + `SubSubcategory.tsx:234` h1 sizes (`text-xl sm:text-2xl md:text-3xl font-bold tracking-tight`) match reference at 1280 — no fix. |
+| MR-DT-04 NIT | ✅ Verified | Shared `deslugify` casing (`@/lib/utils`) consumed at `Subcategory.tsx:67` / `SubSubcategory.tsx:74` matches reference — no fix. |
+| MR-DT-05 NIT | ✅ Verified | `Subcategory.tsx:200-210` `Breadcrumbs` order `[categoryName → subcategoryName]` matches reference — no fix. |
+| MR-DT-06 NIT | ✅ Verified | `SubSubcategory.tsx:216-230` `Breadcrumbs` order `[categoryName → subcategoryName → subSubcategoryName]` matches reference — no fix. |
+| MR-DT-07 NIT | ✅ Verified | `SubSubcategory.tsx` renders sort dropdown + count badge in header band; no `<ViewModeToggle>` imported or used. Matches reference — no fix. |
+
+**Scope discipline:**
+- Resource-card hover (`hover:bg-accent hover:text-accent-foreground`) on `Subcategory.tsx:289` / `SubSubcategory.tsx:298` was **not** modified — §3.3 does not list a hover finding for the Detail surface, only for Category (MR-CT-07, owned by Task #38). The hover behavior already uses DS tokens here, so no remediation needed.
+- `suggest-edit-dialog.tsx` listed in task description as a "direct sub-component" — §3.3 has **no findings against it**. No edits made (consistent with Task #38's handling of phantom-scope `content/` components).
+- No `Card` / `Badge` / `Button` primitive changes; all edits scoped to per-instance className overrides on the three pages. DS-primitive routing remains with Task #42.
+
+**Verification:** Dev workflow recompiled clean on each edit batch (`5:06:07 PM [vite] hmr update /src/pages/ResourceDetail.tsx`); no LSP/TS regressions. The 3 files together drive `/subcategory/:slug`, `/sub-subcategory/:slug`, and `/resource/:id` — all three routes share the same `MainLayout` chrome (Task #41 territory, untouched).
