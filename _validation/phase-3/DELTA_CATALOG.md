@@ -28,6 +28,8 @@ So the Phase-1 state axis values `empty` and `loading` are **not** present as ar
 
 ## 0 · Schema, severity ladder, conventions
 
+**Severity mapping (task wording ↔ catalog code):** `P0 = Critical`, `P1 = High`, `P2 = Medium`, `P3 = Low`, `INFO = Informational (no fix required)`, `GAP = DS spec undefined`.
+
 | Column | Meaning |
 |---|---|
 | Route | A route from SITE_MAP §1 / §2 / §3, an admin tab id, or `*` (all routes). |
