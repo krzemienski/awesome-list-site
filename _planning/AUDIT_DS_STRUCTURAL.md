@@ -72,22 +72,22 @@ _None._
 ### 🟢 NIT (6) — DS-OK exceptions (no token replacement required)
 
 1. **Stage 5 — `client/src/components/ui/export-tools.tsx:180-187`** — hexes `#333`/`#666`/`#eee`/`#007acc`/`#f9f9f9`/`#e1e8ed`/`#999` and `border-radius: 3px` inside an HTML export template literal. DS-OK — output is a standalone exported document with no runtime DS.
-   Action: prepend `/* DS-OK: standalone exported HTML, no runtime DS */` comment above the template literal.
+   Replacement: N/A — DS-OK intentional escape. Action: prepend `/* DS-OK: standalone exported HTML, no runtime DS */` comment above the template literal.
 
 2. **Stage 5 — `client/src/lib/shadcn-themes.ts:16,50,84,118,152,186,286,335`** and `client/src/pages/ThemeSettings.tsx:99-101` — hex literals in a **theme-preset registry** + fallback colors for theme-picker preview swatches. DS-OK by definition (this file *describes* alternative themes; ThemeSettings is the picker UI).
-   Action: prepend `/* DS-OK: alternative theme registry */` at top of `shadcn-themes.ts`; `/* DS-OK: preview-only theme picker */` above the `ThemeSettings.tsx:99-101` fallback block.
+   Replacement: N/A — DS-OK intentional escape. Action: prepend `/* DS-OK: alternative theme registry */` at top of `shadcn-themes.ts`; `/* DS-OK: preview-only theme picker */` above the `ThemeSettings.tsx:99-101` fallback block.
 
 3. **Stage 5 — `client/src/components/ui/chart.tsx:55`** — `#ccc`/`#fff` inside attribute selectors (`[stroke='#ccc']`) targeting recharts-injected SVG. DS-OK — selector strings matching recharts' own internal paint, not author paint.
-   Action: `/* DS-OK: recharts internal selector matchers */` comment above the line.
+   Replacement: N/A — DS-OK intentional escape. Action: `/* DS-OK: recharts internal selector matchers */` comment above the line.
 
 4. **Stage 5 — `client/src/index.css:25,32,33,38-41,45`** — eight hex literals declared as `--color-*` CSS custom properties (e.g. `--color-destructive: #ff5c7a`, `--color-chart-2: #34d08c`). DS-OK — shadcn↔DS token bridge; the literals are the *source* of tokens consumed elsewhere; three (`#ff5c7a`, `#34d08c`, `#ffb84d`) are the DS status colors verbatim; the remaining (`#000000`, `#5eddf2`, `#9d4edd`) are DS-aligned (text-on-accent black + accent-2 palette extension).
-   Action: prepend `/* DS-OK: shadcn↔DS token bridge */` comment above the `--color-*` block.
+   Replacement: N/A — DS-OK intentional escape. Action: prepend `/* DS-OK: shadcn↔DS token bridge */` comment above the `--color-*` block.
 
 5. **Stage 5 — `client/src/components/ui/theme-provider.tsx:59`** — `safeGetItem("theme-custom-hex") || "#3b82f6"` (UX default seed for a custom-color picker). DS-OK — pure UX fallback inside theme-tooling, not paint of the live DS surface.
-   Action: `/* DS-OK: color-picker default seed */` comment above the line.
+   Replacement: N/A — DS-OK intentional escape. Action: `/* DS-OK: color-picker default seed */` comment above the line.
 
 6. **Stage 5 — `client/src/components/ui/color-palette-generator.tsx:397,587`** — color-picker default `"#3b82f6"` and palette-export fallback `"#ffffff"`. DS-OK — same rationale as NIT #5 (theme-tooling defaults).
-   Action: `/* DS-OK: palette-generator defaults */` comments above each line.
+   Replacement: N/A — DS-OK intentional escape. Action: `/* DS-OK: palette-generator defaults */` comments above each line.
 
 ---
 
