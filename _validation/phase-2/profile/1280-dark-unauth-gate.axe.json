@@ -1,4 +1,54 @@
 {
-  "violations": [],
-  "error": "page.addScriptTag: Execution context was destroyed, most likely because of a navigation"
+  "violations": [
+    {
+      "id": "button-name",
+      "impact": "critical",
+      "help": "Buttons must have discernible text",
+      "nodes": 6,
+      "targets": [
+        [
+          ".group-data-\\[collapsible\\=icon\\]\\:\\!p-2[data-size=\"default\"][data-active=\"false\"]"
+        ],
+        [
+          ".group-data-\\[collapsible\\=icon\\]\\:\\!p-2[data-size=\"default\"][data-active=\"false\"]"
+        ],
+        [
+          ".group-data-\\[collapsible\\=icon\\]\\:\\!p-2[data-size=\"default\"][data-active=\"false\"]"
+        ],
+        [
+          ".group-data-\\[collapsible\\=icon\\]\\:\\!p-2[data-size=\"default\"][data-active=\"false\"]"
+        ],
+        [
+          ".group-data-\\[collapsible\\=icon\\]\\:\\!p-2[data-size=\"default\"][data-active=\"false\"]"
+        ]
+      ]
+    },
+    {
+      "id": "page-has-heading-one",
+      "impact": "moderate",
+      "help": "Page should contain a level-one heading",
+      "nodes": 1,
+      "targets": [
+        [
+          "html"
+        ]
+      ]
+    },
+    {
+      "id": "region",
+      "impact": "moderate",
+      "help": "All page content should be contained by landmarks",
+      "nodes": 2,
+      "targets": [
+        [
+          ".min-w-0[data-component-name=\"SidebarGroup\"][data-sidebar=\"group\"]:nth-child(1) > .text-sidebar-foreground\\/70.transition-\\[margin\\,opacity\\].group-data-\\[collapsible\\=icon\\]\\:-mt-8"
+        ],
+        [
+          ".min-w-0[data-component-name=\"SidebarGroup\"][data-sidebar=\"group\"]:nth-child(2) > .text-sidebar-foreground\\/70.transition-\\[margin\\,opacity\\].group-data-\\[collapsible\\=icon\\]\\:-mt-8"
+        ]
+      ]
+    }
+  ],
+  "url": "http://localhost:5000/",
+  "timestamp": "2026-05-19T00:22:51.304Z"
 }

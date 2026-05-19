@@ -1,0 +1,39 @@
+{
+  "violations": [
+    {
+      "id": "landmark-one-main",
+      "impact": "moderate",
+      "help": "Document should have one main landmark",
+      "nodes": 1,
+      "targets": [
+        [
+          "html"
+        ]
+      ]
+    },
+    {
+      "id": "page-has-heading-one",
+      "impact": "moderate",
+      "help": "Page should contain a level-one heading",
+      "nodes": 1,
+      "targets": [
+        [
+          "html"
+        ]
+      ]
+    },
+    {
+      "id": "region",
+      "impact": "moderate",
+      "help": "All page content should be contained by landmarks",
+      "nodes": 1,
+      "targets": [
+        [
+          ":root"
+        ]
+      ]
+    }
+  ],
+  "url": "http://localhost:5000/bookmarks",
+  "timestamp": "2026-05-19T00:09:43.105Z"
+}

@@ -1,0 +1,45 @@
+# 42 cells whose PNG is a uniform-color (unpainted) frame (D-007).
+# Format: <slug>/<viewport>-dark-<auth>-<state>.png <bytes>
+# Heuristic: PNG size < 6000 bytes at any of the 4 viewports.
+admin-approvals/375-dark-admin-populated.png 2261
+admin-approvals/768-dark-admin-populated.png 4464
+admin-categories/375-dark-admin-populated.png 2261
+admin-edits/768-dark-admin-populated.png 4464
+admin-enrichment/375-dark-admin-populated.png 2261
+admin-enrichment/768-dark-admin-populated.png 4464
+admin-export/1280-dark-admin-populated.png 4713
+admin-export/768-dark-admin-populated.png 4464
+admin-github/768-dark-admin-populated.png 4464
+admin-researcher/1280-dark-admin-populated.png 4713
+admin-researcher/768-dark-admin-populated.png 4464
+admin-resources/1280-dark-admin-populated.png 4713
+admin-resources/375-dark-admin-populated.png 2261
+admin-subcategories/375-dark-admin-populated.png 2261
+admin-subcategories/768-dark-admin-populated.png 4464
+admin/768-dark-unauth-gate.png 4464
+advanced/375-dark-unauth-populated.png 2261
+bookmarks/1280-dark-admin-populated.png 4713
+bookmarks/375-dark-admin-populated.png 2261
+bookmarks/375-dark-unauth-gate.png 2261
+bookmarks/768-dark-admin-populated.png 4464
+bookmarks/768-dark-unauth-gate.png 4464
+category/1280-dark-unauth-error.png 4713
+category/375-dark-unauth-populated.png 5363
+category/768-dark-unauth-populated.png 4464
+home/1280-dark-unauth-populated.png 4713
+home/768-dark-unauth-populated.png 4464
+journey-detail/1280-dark-unauth-error.png 4713
+journey-detail/1280-dark-unauth-populated.png 4713
+journey-detail/375-dark-unauth-populated.png 2261
+journeys/375-dark-unauth-populated.png 5326
+login/1280-dark-unauth-populated.png 4713
+profile/1280-dark-admin-populated.png 4713
+profile/375-dark-unauth-gate.png 2261
+profile/768-dark-admin-populated.png 4464
+profile/768-dark-unauth-gate.png 4464
+resource-detail/1280-dark-unauth-error.png 4713
+resource-detail/375-dark-unauth-populated.png 2261
+settings-theme/1280-dark-unauth-populated.png 4713
+settings-theme/375-dark-unauth-populated.png 2261
+sub-subcategory/375-dark-unauth-populated.png 2261
+subcategory/375-dark-unauth-populated.png 2261

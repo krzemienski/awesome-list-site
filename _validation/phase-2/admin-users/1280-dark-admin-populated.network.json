@@ -8,6 +8,21 @@
       "ok": true
     },
     {
+      "url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap",
+      "method": "GET",
+      "resourceType": "stylesheet",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "https://replit.com/public/js/replit-dev-banner.js",
+      "method": "GET",
+      "resourceType": "script",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_BLOCKED_BY_ORB"
+    },
+    {
       "url": "http://localhost:5000/@vite/client",
       "method": "GET",
       "resourceType": "script",
@@ -15,14 +30,7 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/src/main.tsx?v=qU4yUYYSlfoHq_nBuCtGK",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@react-refresh",
+      "url": "http://localhost:5000/src/main.tsx?v=TEJ3jfTgkX5AhvNNnsIaR",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -30,6 +38,13 @@
     },
     {
       "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/vite/dist/client/env.mjs",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@react-refresh",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -50,28 +65,14 @@
       "ok": true
     },
     {
-      "url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap",
-      "method": "GET",
-      "resourceType": "stylesheet",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/App.tsx?v=qU4yUYYSlfoHq_nBuCtGK",
+      "url": "http://localhost:5000/src/App.tsx?v=TEJ3jfTgkX5AhvNNnsIaR",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
       "ok": true
     },
     {
-      "url": "http://localhost:5000/src/index.css?t=1779147888896&v=qU4yUYYSlfoHq_nBuCtGK",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/lib/queryClient.ts?v=qU4yUYYSlfoHq_nBuCtGK",
+      "url": "http://localhost:5000/src/lib/queryClient.ts?v=TEJ3jfTgkX5AhvNNnsIaR",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -85,6 +86,13 @@
       "ok": true
     },
     {
+      "url": "http://localhost:5000/src/components/ui/tooltip.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
       "url": "http://localhost:5000/src/components/ui/toaster.tsx",
       "method": "GET",
       "resourceType": "script",
@@ -92,7 +100,7 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/src/components/ui/tooltip.tsx",
+      "url": "http://localhost:5000/src/index.css?t=1779150307322&v=TEJ3jfTgkX5AhvNNnsIaR",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -120,21 +128,6 @@
       "ok": true
     },
     {
-      "url": "https://replit.com/public/js/replit-dev-banner.js",
-      "method": "GET",
-      "resourceType": "script",
-      "status": null,
-      "ok": false,
-      "failure": "net::ERR_BLOCKED_BY_ORB"
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
       "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react.js?v=e0fc0b7c",
       "method": "GET",
       "resourceType": "script",
@@ -142,14 +135,14 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/src/lib/analytics.ts",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=e0fc0b7c",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
       "ok": true
     },
     {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=e0fc0b7c",
+      "url": "http://localhost:5000/src/lib/analytics.ts",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -198,6 +191,13 @@
       "ok": true
     },
     {
+      "url": "http://localhost:5000/src/pages/Home.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
       "url": "http://localhost:5000/src/pages/Category.tsx",
       "method": "GET",
       "resourceType": "script",
@@ -206,13 +206,6 @@
     },
     {
       "url": "http://localhost:5000/src/pages/Subcategory.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/pages/Home.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -247,13 +240,6 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/src/pages/Profile.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
       "url": "http://localhost:5000/src/pages/AdminDashboard.tsx",
       "method": "GET",
       "resourceType": "script",
@@ -262,6 +248,20 @@
     },
     {
       "url": "http://localhost:5000/src/components/auth/AdminGuard.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/pages/Profile.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -289,13 +289,6 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/src/pages/ThemeSettings.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
       "url": "http://localhost:5000/src/pages/SubmitResource.tsx",
       "method": "GET",
       "resourceType": "script",
@@ -317,7 +310,7 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/src/lib/parser.ts",
+      "url": "http://localhost:5000/src/pages/ThemeSettings.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -331,21 +324,14 @@
       "ok": true
     },
     {
+      "url": "http://localhost:5000/src/lib/parser.ts",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
       "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-KBTYAULA.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/hooks/use-toast.ts",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/toast.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -366,7 +352,21 @@
       "ok": true
     },
     {
+      "url": "http://localhost:5000/src/hooks/use-toast.ts",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
       "url": "http://localhost:5000/src/lib/safeStorage.ts",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/toast.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -464,13 +464,6 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/zod.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
       "url": "http://localhost:5000/src/components/ui/input.tsx",
       "method": "GET",
       "resourceType": "script",
@@ -485,7 +478,7 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/src/components/ui/separator.tsx",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/zod.js?v=e0fc0b7c",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -499,14 +492,14 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/src/components/ui/badge.tsx",
+      "url": "http://localhost:5000/src/components/ui/separator.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
       "ok": true
     },
     {
-      "url": "http://localhost:5000/src/components/ui/select.tsx",
+      "url": "http://localhost:5000/src/components/ui/badge.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -527,14 +520,21 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/src/components/ui/view-mode-toggle.tsx",
+      "url": "http://localhost:5000/src/components/ui/select.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
       "ok": true
     },
     {
-      "url": "http://localhost:5000/src/components/ui/suggest-edit-dialog.tsx",
+      "url": "http://localhost:5000/src/components/ui/ai-recommendations-panel.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/view-mode-toggle.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -555,7 +555,7 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/src/components/ui/ai-recommendations-panel.tsx",
+      "url": "http://localhost:5000/src/components/ui/suggest-edit-dialog.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -563,6 +563,20 @@
     },
     {
       "url": "http://localhost:5000/src/components/ui/category-explorer.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/hooks/useAdmin.ts",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/resource/ResourceCard.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -583,21 +597,7 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/src/components/ui/scroll-area.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/resource/ResourceCard.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/avatar.tsx",
+      "url": "http://localhost:5000/src/components/admin/AdminStats.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -611,56 +611,7 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/src/components/resource/FavoriteButton.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/resource/BookmarkButton.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/hooks/useAdmin.ts",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/ai/RecommendationCard.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/admin/AdminStats.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/date-fns.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
       "url": "http://localhost:5000/src/components/admin/DatabaseTab.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/admin/ExportTab.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -675,6 +626,13 @@
     },
     {
       "url": "http://localhost:5000/src/components/admin/AuditTab.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/admin/ExportTab.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -709,13 +667,6 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/src/components/admin/BatchEnrichmentPanel.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
       "url": "http://localhost:5000/src/components/admin/CategoryManager.tsx",
       "method": "GET",
       "resourceType": "script",
@@ -723,11 +674,26 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/src/hooks/use-theme.ts",
+      "url": "http://localhost:5000/src/components/admin/BatchEnrichmentPanel.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
       "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/admin/ResourceManager.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/admin",
+      "method": "GET",
+      "resourceType": "document",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_ABORTED"
     },
     {
       "url": "http://localhost:5000/src/components/admin/SubcategoryManager.tsx",
@@ -744,14 +710,28 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/src/components/admin/ResourceManager.tsx",
+      "url": "http://localhost:5000/src/components/resource/FavoriteButton.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
       "ok": true
     },
     {
-      "url": "http://localhost:5000/src/components/ui/label.tsx",
+      "url": "http://localhost:5000/src/components/ui/scroll-area.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/avatar.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/resource/BookmarkButton.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -759,6 +739,13 @@
     },
     {
       "url": "http://localhost:5000/src/components/admin/ResearcherTab.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/ai/RecommendationCard.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -793,21 +780,14 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react-blurhash.js?v=e0fc0b7c",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/date-fns.js?v=e0fc0b7c",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
       "ok": true
     },
     {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/class-variance-authority.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-toast.js?v=e0fc0b7c",
+      "url": "http://localhost:5000/src/hooks/use-theme.ts",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -821,14 +801,14 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-STXEXCUC.js?v=e0fc0b7c",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react-blurhash.js?v=e0fc0b7c",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
       "ok": true
     },
     {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-O64WGQ22.js?v=e0fc0b7c",
+      "url": "http://localhost:5000/src/components/ui/label.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -836,6 +816,13 @@
     },
     {
       "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-KCFVMCIE.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-STXEXCUC.js?v=e0fc0b7c",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -863,18 +850,19 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-7QGJQHFX.js?v=e0fc0b7c",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-O64WGQ22.js?v=e0fc0b7c",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
       "ok": true
     },
     {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c",
+      "url": "http://localhost:5000/admin",
       "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
+      "resourceType": "document",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_ABORTED"
     },
     {
       "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-5ZB7HMJW.js?v=e0fc0b7c",
@@ -891,7 +879,21 @@
       "ok": true
     },
     {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-7QGJQHFX.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
       "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/clsx.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -905,7 +907,14 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/src/components/ui/collapsible.tsx",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/class-variance-authority.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-toast.js?v=e0fc0b7c",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -913,6 +922,28 @@
     },
     {
       "url": "http://localhost:5000/src/components/ui/dropdown-menu.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/tailwind-merge.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/admin",
+      "method": "GET",
+      "resourceType": "document",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/collapsible.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -933,28 +964,14 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/src/components/ui/command.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/tailwind-merge.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-slot.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
       "url": "http://localhost:5000/src/components/ui/dialog.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/command.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -968,7 +985,7 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/src/components/ui/sheet.tsx",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-slot.js?v=e0fc0b7c",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -982,182 +999,7 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-K2YWKIVN.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-separator.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-select.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/popover.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/checkbox.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/toggle-group.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tabs.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/hooks/useAIRecommendations.ts",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/hooks/use-user-profile.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/recommendation-feedback.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-scroll-area.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-avatar.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/table.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/alert-dialog.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/admin/configs/category-config.ts",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/admin/GenericCrudManager.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/recharts.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-label.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/admin/configs/subcategory-config.ts",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/admin/configs/subsubcategory-config.ts",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-U7P2NEEE.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-progress.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-QFOKTUWK.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-collapsible.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/cmdk.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-GTF7DNNX.js?v=e0fc0b7c",
+      "url": "http://localhost:5000/src/components/ui/sheet.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -1167,154 +1009,220 @@
       "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dialog.js?v=e0fc0b7c",
       "method": "GET",
       "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dropdown-menu.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-4RO2SXZU.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-6ZMM2PAV.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-BSY35VH6.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-43G6IMPT.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-popover.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-checkbox.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-toggle-group.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/toggle.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-75JJ6OS4.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-alert-dialog.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RE2ES4VP.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-LY7IHXCG.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-toggle.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/api/auth/user",
-      "method": "GET",
-      "resourceType": "fetch",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2",
-      "method": "GET",
-      "resourceType": "font",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "https://www.googletagmanager.com/gtag/js?id=Zha4%20383541848",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/api/awesome-list",
-      "method": "GET",
-      "resourceType": "fetch",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2",
-      "method": "GET",
-      "resourceType": "font",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/admin",
-      "method": "GET",
-      "resourceType": "document",
       "status": null,
       "ok": false,
       "failure": "net::ERR_ABORTED"
     },
     {
-      "url": "http://localhost:5000/api/admin/stats",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-collapsible.js?v=e0fc0b7c",
       "method": "GET",
-      "resourceType": "fetch",
+      "resourceType": "script",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/popover.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-U7P2NEEE.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-separator.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-progress.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-GTF7DNNX.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-K2YWKIVN.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-label.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tabs.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-scroll-area.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-QFOKTUWK.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5000/src/components/admin/configs/subcategory-config.ts",
+      "method": "GET",
+      "resourceType": "script",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-select.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/toggle-group.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5000/src/hooks/useAIRecommendations.ts",
+      "method": "GET",
+      "resourceType": "script",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dropdown-menu.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-avatar.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/checkbox.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5000/src/components/admin/GenericCrudManager.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/cmdk.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/recommendation-feedback.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/alert-dialog.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5000/src/components/admin/configs/category-config.ts",
+      "method": "GET",
+      "resourceType": "script",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5000/src/hooks/use-user-profile.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/recharts.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5000/src/components/admin/configs/subsubcategory-config.ts",
+      "method": "GET",
+      "resourceType": "script",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/table.tsx",
+      "method": "GET",
+      "resourceType": "script",
       "status": null,
       "ok": false,
       "failure": "net::ERR_ABORTED"
@@ -1334,20 +1242,6 @@
       "ok": true
     },
     {
-      "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2",
-      "method": "GET",
-      "resourceType": "font",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2",
-      "method": "GET",
-      "resourceType": "font",
-      "status": 200,
-      "ok": true
-    },
-    {
       "url": "http://localhost:5000/@vite/client",
       "method": "GET",
       "resourceType": "script",
@@ -1355,22 +1249,7 @@
       "ok": false
     },
     {
-      "url": "https://replit.com/public/js/replit-dev-banner.js",
-      "method": "GET",
-      "resourceType": "script",
-      "status": null,
-      "ok": false,
-      "failure": "net::ERR_BLOCKED_BY_ORB"
-    },
-    {
-      "url": "http://localhost:5000/@react-refresh",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/main.tsx?v=aHnKUW_8ZXDpyFlq9AjD7",
+      "url": "http://localhost:5000/src/main.tsx?v=Uu8TpjJ62jpsNNR6WNUtC",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -1412,6 +1291,14 @@
       "ok": true
     },
     {
+      "url": "https://replit.com/public/js/replit-dev-banner.js",
+      "method": "GET",
+      "resourceType": "script",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_BLOCKED_BY_ORB"
+    },
+    {
       "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=e0fc0b7c",
       "method": "GET",
       "resourceType": "script",
@@ -1426,6 +1313,13 @@
       "ok": true
     },
     {
+      "url": "http://localhost:5000/@react-refresh",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
       "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/vite/dist/client/env.mjs",
       "method": "GET",
       "resourceType": "script",
@@ -1433,7 +1327,7 @@
       "ok": false
     },
     {
-      "url": "http://localhost:5000/src/App.tsx?v=aHnKUW_8ZXDpyFlq9AjD7",
+      "url": "http://localhost:5000/src/App.tsx?v=Uu8TpjJ62jpsNNR6WNUtC",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -1454,7 +1348,21 @@
       "ok": true
     },
     {
+      "url": "http://localhost:5000/src/index.css?t=1779150313916&v=Uu8TpjJ62jpsNNR6WNUtC",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
       "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-CQ7JXR62.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/lib/queryClient.ts?v=Uu8TpjJ62jpsNNR6WNUtC",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -1566,1406 +1474,11 @@
       "ok": false
     },
     {
-      "url": "http://localhost:5000/src/lib/queryClient.ts?v=aHnKUW_8ZXDpyFlq9AjD7",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
       "url": "http://localhost:5000/src/components/ui/theme-provider.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 304,
       "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/lib/analytics.ts",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/index.css?t=1779147896803&v=aHnKUW_8ZXDpyFlq9AjD7",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/hooks/use-analytics.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/hooks/use-session-analytics.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/hooks/useAuth.ts",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/layout/new/MainLayout.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/pages/ErrorPage.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/pages/Login.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/pages/Home.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/lucide-react.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react-helmet.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react-hook-form.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@hookform_resolvers_zod.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/zod.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/pages/Category.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-PJ25BUVZ.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-K2YWKIVN.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/pages/Subcategory.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/pages/SubSubcategory.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/pages/About.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/pages/Advanced.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/pages/Profile.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/date-fns.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/pages/Bookmarks.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/pages/AdminDashboard.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/auth/AdminGuard.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/auth/AuthGuard.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/pages/Journeys.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/pages/SubmitResource.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/pages/not-found.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/pages/JourneyDetail.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/pages/ResourceDetail.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react-blurhash.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/pages/ThemeSettings.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/lib/utils.ts",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/clsx.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/tailwind-merge.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-U7P2NEEE.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/lib/parser.ts",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/lib/static-data.ts",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/hooks/use-toast.ts",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/toast.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-toast.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/class-variance-authority.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-QFOKTUWK.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/lib/shadcn-themes.ts",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/layout/new/AppSidebar.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/lib/safeStorage.ts",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/search-dialog.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/fuse__js.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/layout/new/AppHeader.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/lib/queryClient.ts",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/sidebar.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-slot.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-GTF7DNNX.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/hooks/use-mobile.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/button.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/card.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/input.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/form.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/separator.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-separator.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/skeleton.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/badge.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/layout/SEOHead.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/ai-recommendations-panel.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/advanced-filter.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/select.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-select.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-BSY35VH6.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-6ZMM2PAV.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-4RO2SXZU.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-43G6IMPT.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/view-mode-toggle.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/suggest-edit-dialog.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/breadcrumbs.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/tabs.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tabs.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-75JJ6OS4.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/category-explorer.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/avatar.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-avatar.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/scroll-area.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-scroll-area.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/resource/BookmarkButton.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/community-metrics.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/export-tools.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/resource/FavoriteButton.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ai/RecommendationCard.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/resource/ResourceCard.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/hooks/useAdmin.ts",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/admin/AdminStats.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/admin/ExportTab.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/admin/DatabaseTab.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/admin/UsersTab.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/admin/AuditTab.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/admin/PendingResources.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/admin/BatchEnrichmentPanel.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/admin/GitHubSyncPanel.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/admin/PendingEdits.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/admin/LinkHealthDashboard.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/recharts.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/admin/SubcategoryManager.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/admin/ResourceManager.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/admin/SubSubcategoryManager.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/admin/ResearcherTab.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/admin/CategoryManager.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/textarea.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/alert.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/hooks/useDebounce.ts",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/progress.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-progress.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/label.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-label.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/hooks/use-theme.ts",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/collapsible.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-collapsible.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/command.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/cmdk.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RE2ES4VP.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/config/navigation-icons.ts",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/dialog.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dialog.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/dropdown-menu.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dropdown-menu.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/breadcrumb.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/sheet.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/checkbox.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/hooks/useAIRecommendations.ts",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-checkbox.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/hooks/use-user-profile.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/recommendation-feedback.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/popover.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/toggle-group.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-popover.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-toggle-group.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-LY7IHXCG.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/table.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/alert-dialog.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/admin/GenericCrudManager.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-alert-dialog.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/admin/configs/subcategory-config.ts",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/admin/configs/subsubcategory-config.ts",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/admin/configs/category-config.ts",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/toggle.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-toggle.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "https://www.googletagmanager.com/gtag/js?id=Zha4%20383541848",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/api/auth/user",
-      "method": "GET",
-      "resourceType": "fetch",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/api/awesome-list",
-      "method": "GET",
-      "resourceType": "fetch",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/api/admin/stats",
-      "method": "GET",
-      "resourceType": "fetch",
-      "status": null,
-      "ok": false,
-      "failure": "net::ERR_ABORTED"
-    },
-    {
-      "url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap",
-      "method": "GET",
-      "resourceType": "stylesheet",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/admin",
-      "method": "GET",
-      "resourceType": "document",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "https://replit.com/public/js/replit-dev-banner.js",
-      "method": "GET",
-      "resourceType": "script",
-      "status": null,
-      "ok": false,
-      "failure": "net::ERR_BLOCKED_BY_ORB"
-    },
-    {
-      "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2",
-      "method": "GET",
-      "resourceType": "font",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2",
-      "method": "GET",
-      "resourceType": "font",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@vite/client",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@react-refresh",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/main.tsx?v=SIoYKn7fh7fAIyDSV6BdJ",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react-dom_client.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-QCHXOAYK.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WOOG5QLI.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-KBTYAULA.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/vite/dist/client/env.mjs",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/tooltip.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-GSV675XR.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-O64WGQ22.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-STXEXCUC.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-KCFVMCIE.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-SBO4SQHK.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-6MTKRYAT.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-PP5CJGVQ.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-7QGJQHFX.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-2NOUPWRX.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-5ZB7HMJW.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-JDYSANEB.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/toaster.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/App.tsx?v=SIoYKn7fh7fAIyDSV6BdJ",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-CQ7JXR62.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/theme-provider.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/lib/queryClient.ts?v=SIoYKn7fh7fAIyDSV6BdJ",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/lib/utils.ts",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/clsx.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/tailwind-merge.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-U7P2NEEE.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/index.css?t=1779147900961&v=SIoYKn7fh7fAIyDSV6BdJ",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/hooks/use-toast.ts",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/toast.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-toast.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/class-variance-authority.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/lucide-react.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-QFOKTUWK.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
     },
     {
       "url": "http://localhost:5000/src/lib/analytics.ts",
@@ -3008,6 +1521,13 @@
       "resourceType": "script",
       "status": 304,
       "ok": false
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/lucide-react.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
     },
     {
       "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react-helmet.js?v=e0fc0b7c",
@@ -3178,6 +1698,13 @@
       "ok": false
     },
     {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react-blurhash.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
       "url": "http://localhost:5000/src/pages/ThemeSettings.tsx",
       "method": "GET",
       "resourceType": "script",
@@ -3199,11 +1726,39 @@
       "ok": false
     },
     {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react-blurhash.js?v=e0fc0b7c",
+      "url": "http://localhost:5000/src/lib/utils.ts",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/clsx.js?v=e0fc0b7c",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
       "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/tailwind-merge.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/hooks/use-toast.ts",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/toast.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
     },
     {
       "url": "http://localhost:5000/src/lib/shadcn-themes.ts",
@@ -3218,6 +1773,20 @@
       "resourceType": "script",
       "status": 304,
       "ok": false
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-toast.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/class-variance-authority.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
     },
     {
       "url": "http://localhost:5000/src/lib/queryClient.ts",
@@ -3248,11 +1817,25 @@
       "ok": false
     },
     {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/fuse__js.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
       "url": "http://localhost:5000/src/components/ui/sidebar.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 304,
       "ok": false
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-slot.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
     },
     {
       "url": "http://localhost:5000/src/hooks/use-mobile.tsx",
@@ -3267,20 +1850,6 @@
       "resourceType": "script",
       "status": 304,
       "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/fuse__js.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-slot.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
     },
     {
       "url": "http://localhost:5000/src/components/ui/card.tsx",
@@ -3309,6 +1878,13 @@
       "resourceType": "script",
       "status": 304,
       "ok": false
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-separator.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
     },
     {
       "url": "http://localhost:5000/src/components/ui/skeleton.tsx",
@@ -3365,55 +1941,6 @@
       "resourceType": "script",
       "status": 304,
       "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-GTF7DNNX.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-separator.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-select.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-BSY35VH6.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-6ZMM2PAV.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-4RO2SXZU.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-43G6IMPT.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
     },
     {
       "url": "http://localhost:5000/src/components/ui/breadcrumbs.tsx",
@@ -3500,13 +2027,6 @@
       "ok": false
     },
     {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tabs.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
       "url": "http://localhost:5000/src/components/admin/AdminStats.tsx",
       "method": "GET",
       "resourceType": "script",
@@ -3514,7 +2034,266 @@
       "ok": false
     },
     {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-scroll-area.js?v=e0fc0b7c",
+      "url": "http://localhost:5000/src/components/admin/ExportTab.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/admin/DatabaseTab.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/admin/UsersTab.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/admin/AuditTab.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/admin/PendingResources.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/admin/PendingEdits.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/admin/BatchEnrichmentPanel.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/admin/GitHubSyncPanel.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/admin/LinkHealthDashboard.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/admin/ResourceManager.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/admin/CategoryManager.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/admin/SubcategoryManager.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/admin/SubSubcategoryManager.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/admin/ResearcherTab.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/textarea.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/alert.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/hooks/useDebounce.ts",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/progress.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/hooks/use-theme.ts",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-U7P2NEEE.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/label.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/config/navigation-icons.ts",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/collapsible.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-QFOKTUWK.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/dropdown-menu.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/breadcrumb.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/command.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/dialog.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/sheet.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-GTF7DNNX.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/checkbox.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/hooks/useAIRecommendations.ts",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/hooks/use-user-profile.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/recommendation-feedback.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/popover.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/toggle-group.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-select.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tabs.js?v=e0fc0b7c",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -3528,11 +2307,1107 @@
       "ok": true
     },
     {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-scroll-area.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/table.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/alert-dialog.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/admin/configs/category-config.ts",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/admin/GenericCrudManager.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/admin/configs/subcategory-config.ts",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/admin/configs/subsubcategory-config.ts",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-progress.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-label.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-collapsible.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/cmdk.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dropdown-menu.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dialog.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-checkbox.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-popover.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-toggle-group.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/recharts.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/toggle.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-6ZMM2PAV.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-4RO2SXZU.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
       "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-75JJ6OS4.js?v=e0fc0b7c",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
       "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-BSY35VH6.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-43G6IMPT.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-alert-dialog.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RE2ES4VP.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-LY7IHXCG.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-toggle.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/api/awesome-list",
+      "method": "GET",
+      "resourceType": "fetch",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:5000/api/auth/user",
+      "method": "GET",
+      "resourceType": "fetch",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "https://www.googletagmanager.com/gtag/js?id=Zha4%20383541848",
+      "method": "GET",
+      "resourceType": "script",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap",
+      "method": "GET",
+      "resourceType": "stylesheet",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "https://replit.com/public/js/replit-dev-banner.js",
+      "method": "GET",
+      "resourceType": "script",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_BLOCKED_BY_ORB"
+    },
+    {
+      "url": "http://localhost:5000/admin",
+      "method": "GET",
+      "resourceType": "document",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@react-refresh",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/main.tsx?v=FcWqZkAQ8hTgkzm0VbDIT",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react-dom_client.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-QCHXOAYK.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WOOG5QLI.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-KBTYAULA.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@vite/client",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/App.tsx?v=FcWqZkAQ8hTgkzm0VbDIT",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/lib/queryClient.ts?v=FcWqZkAQ8hTgkzm0VbDIT",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-CQ7JXR62.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/theme-provider.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/tooltip.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-GSV675XR.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-O64WGQ22.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-STXEXCUC.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-KCFVMCIE.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-SBO4SQHK.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-6MTKRYAT.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-PP5CJGVQ.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-7QGJQHFX.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-2NOUPWRX.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-5ZB7HMJW.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-JDYSANEB.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/toaster.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/vite/dist/client/env.mjs",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/index.css?t=1779150319925&v=FcWqZkAQ8hTgkzm0VbDIT",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/lib/analytics.ts",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/hooks/use-analytics.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/hooks/useAuth.ts",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/hooks/use-session-analytics.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/layout/new/MainLayout.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/pages/ErrorPage.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/lucide-react.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react-helmet.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-PJ25BUVZ.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/pages/Login.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react-hook-form.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@hookform_resolvers_zod.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/zod.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-K2YWKIVN.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/pages/Home.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/pages/Category.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/pages/Subcategory.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/pages/SubSubcategory.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/pages/About.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/pages/Advanced.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/pages/Profile.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/date-fns.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/pages/Bookmarks.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/pages/AdminDashboard.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/auth/AdminGuard.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/auth/AuthGuard.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/pages/not-found.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/pages/SubmitResource.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/pages/Journeys.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/pages/JourneyDetail.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/pages/ResourceDetail.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react-blurhash.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/pages/ThemeSettings.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/lib/parser.ts",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/lib/static-data.ts",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/lib/shadcn-themes.ts",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/lib/safeStorage.ts",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/lib/utils.ts",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/clsx.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/tailwind-merge.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-U7P2NEEE.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/hooks/use-toast.ts",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/toast.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-toast.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/class-variance-authority.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-QFOKTUWK.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/lib/queryClient.ts",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/layout/new/AppHeader.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/layout/new/AppSidebar.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/sidebar.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-slot.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-GTF7DNNX.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/hooks/use-mobile.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/search-dialog.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/fuse__js.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/button.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/card.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/input.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/form.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/separator.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-separator.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/skeleton.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/badge.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/layout/SEOHead.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/ai-recommendations-panel.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/advanced-filter.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/select.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-select.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-BSY35VH6.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-6ZMM2PAV.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-4RO2SXZU.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-43G6IMPT.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/view-mode-toggle.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/suggest-edit-dialog.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/breadcrumbs.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/tabs.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tabs.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-75JJ6OS4.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/category-explorer.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/community-metrics.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/export-tools.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/scroll-area.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-scroll-area.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/avatar.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-avatar.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/resource/FavoriteButton.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/resource/BookmarkButton.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/ai/RecommendationCard.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/resource/ResourceCard.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/hooks/useAdmin.ts",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/admin/AdminStats.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
     },
     {
       "url": "http://localhost:5000/src/components/admin/ExportTab.tsx",
@@ -3696,27 +3571,6 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/src/config/navigation-icons.ts",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/collapsible.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-collapsible.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
       "url": "http://localhost:5000/src/components/ui/dropdown-menu.tsx",
       "method": "GET",
       "resourceType": "script",
@@ -3738,6 +3592,48 @@
       "ok": false
     },
     {
+      "url": "http://localhost:5000/src/config/navigation-icons.ts",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/collapsible.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-collapsible.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/sheet.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dialog.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RE2ES4VP.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
       "url": "http://localhost:5000/src/components/ui/command.tsx",
       "method": "GET",
       "resourceType": "script",
@@ -3752,28 +3648,7 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RE2ES4VP.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
       "url": "http://localhost:5000/src/components/ui/dialog.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-dialog.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/sheet.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 304,
@@ -3857,6 +3732,13 @@
       "ok": false
     },
     {
+      "url": "http://localhost:5000/src/components/admin/configs/category-config.ts",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
       "url": "http://localhost:5000/src/components/ui/alert-dialog.tsx",
       "method": "GET",
       "resourceType": "script",
@@ -3872,13 +3754,6 @@
     },
     {
       "url": "http://localhost:5000/src/components/admin/GenericCrudManager.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/admin/configs/category-config.ts",
       "method": "GET",
       "resourceType": "script",
       "status": 304,
@@ -3913,13 +3788,6 @@
       "ok": true
     },
     {
-      "url": "https://www.googletagmanager.com/gtag/js?id=Zha4%20383541848",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
       "url": "http://localhost:5000/api/auth/user",
       "method": "GET",
       "resourceType": "fetch",
@@ -3927,14 +3795,35 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/api/admin/stats",
+      "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2",
+      "method": "GET",
+      "resourceType": "font",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "https://www.googletagmanager.com/gtag/js?id=Zha4%20383541848",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2",
+      "method": "GET",
+      "resourceType": "font",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/api/awesome-list",
       "method": "GET",
       "resourceType": "fetch",
       "status": 200,
       "ok": true
     },
     {
-      "url": "http://localhost:5000/api/awesome-list",
+      "url": "http://localhost:5000/api/admin/stats",
       "method": "GET",
       "resourceType": "fetch",
       "status": 200,
@@ -3944,9 +3833,8 @@
       "url": "http://localhost:5000/api/admin/users?page=1&limit=20",
       "method": "GET",
       "resourceType": "fetch",
-      "status": null,
-      "ok": false,
-      "failure": "net::ERR_ABORTED"
+      "status": 200,
+      "ok": true
     },
     {
       "url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap",
@@ -3999,7 +3887,14 @@
       "ok": false
     },
     {
-      "url": "http://localhost:5000/src/main.tsx?v=l6jTW2OARw4ZfKYN_Fe5L",
+      "url": "http://localhost:5000/@react-refresh",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/main.tsx?v=NvZ4dDhzviuAjB8Ab7Fy1",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -4053,13 +3948,6 @@
       "resourceType": "script",
       "status": 200,
       "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@react-refresh",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
     },
     {
       "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/vite/dist/client/env.mjs",
@@ -4174,14 +4062,7 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/src/components/ui/toaster.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/App.tsx?v=l6jTW2OARw4ZfKYN_Fe5L",
+      "url": "http://localhost:5000/src/App.tsx?v=NvZ4dDhzviuAjB8Ab7Fy1",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
@@ -4202,11 +4083,11 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/src/lib/queryClient.ts?v=l6jTW2OARw4ZfKYN_Fe5L",
+      "url": "http://localhost:5000/src/components/ui/toaster.tsx",
       "method": "GET",
       "resourceType": "script",
-      "status": 200,
-      "ok": true
+      "status": 304,
+      "ok": false
     },
     {
       "url": "http://localhost:5000/src/components/ui/theme-provider.tsx",
@@ -4214,6 +4095,13 @@
       "resourceType": "script",
       "status": 304,
       "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/lib/queryClient.ts?v=NvZ4dDhzviuAjB8Ab7Fy1",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
     },
     {
       "url": "http://localhost:5000/src/lib/utils.ts",
@@ -4244,55 +4132,6 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/src/hooks/use-toast.ts",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/index.css?t=1779147903973&v=l6jTW2OARw4ZfKYN_Fe5L",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/toast.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-toast.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/class-variance-authority.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/lucide-react.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-QFOKTUWK.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
       "url": "http://localhost:5000/src/lib/analytics.ts",
       "method": "GET",
       "resourceType": "script",
@@ -4305,6 +4144,13 @@
       "resourceType": "script",
       "status": 304,
       "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/index.css?t=1779150327220&v=NvZ4dDhzviuAjB8Ab7Fy1",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
     },
     {
       "url": "http://localhost:5000/src/hooks/use-session-analytics.tsx",
@@ -4335,11 +4181,60 @@
       "ok": false
     },
     {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/lucide-react.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react-helmet.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-PJ25BUVZ.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
       "url": "http://localhost:5000/src/pages/Login.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 304,
       "ok": false
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react-hook-form.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@hookform_resolvers_zod.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/zod.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-K2YWKIVN.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
     },
     {
       "url": "http://localhost:5000/src/pages/Home.tsx",
@@ -4391,6 +4286,13 @@
       "ok": false
     },
     {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/date-fns.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
       "url": "http://localhost:5000/src/pages/Bookmarks.tsx",
       "method": "GET",
       "resourceType": "script",
@@ -4405,60 +4307,11 @@
       "ok": false
     },
     {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react-helmet.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/react-hook-form.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@hookform_resolvers_zod.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/zod.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
       "url": "http://localhost:5000/src/components/auth/AdminGuard.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 304,
       "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/date-fns.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-PJ25BUVZ.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-K2YWKIVN.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
     },
     {
       "url": "http://localhost:5000/src/components/auth/AuthGuard.tsx",
@@ -4531,6 +4384,41 @@
       "ok": false
     },
     {
+      "url": "http://localhost:5000/src/hooks/use-toast.ts",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/toast.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-toast.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/class-variance-authority.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-QFOKTUWK.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
       "url": "http://localhost:5000/src/lib/shadcn-themes.ts",
       "method": "GET",
       "resourceType": "script",
@@ -4545,14 +4433,14 @@
       "ok": false
     },
     {
-      "url": "http://localhost:5000/src/lib/queryClient.ts",
+      "url": "http://localhost:5000/src/components/layout/new/AppSidebar.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 304,
       "ok": false
     },
     {
-      "url": "http://localhost:5000/src/components/layout/new/AppSidebar.tsx",
+      "url": "http://localhost:5000/src/lib/queryClient.ts",
       "method": "GET",
       "resourceType": "script",
       "status": 304,
@@ -4564,20 +4452,6 @@
       "resourceType": "script",
       "status": 304,
       "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/search-dialog.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/fuse__js.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
     },
     {
       "url": "http://localhost:5000/src/components/ui/sidebar.tsx",
@@ -4601,6 +4475,27 @@
       "ok": true
     },
     {
+      "url": "http://localhost:5000/src/components/ui/search-dialog.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/fuse__js.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/hooks/use-mobile.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
       "url": "http://localhost:5000/src/components/ui/button.tsx",
       "method": "GET",
       "resourceType": "script",
@@ -4616,13 +4511,6 @@
     },
     {
       "url": "http://localhost:5000/src/components/ui/input.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/hooks/use-mobile.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 304,
@@ -4658,13 +4546,6 @@
     },
     {
       "url": "http://localhost:5000/src/components/ui/badge.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/layout/SEOHead.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 304,
@@ -4725,6 +4606,13 @@
       "resourceType": "script",
       "status": 200,
       "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/layout/SEOHead.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
     },
     {
       "url": "http://localhost:5000/src/components/ui/view-mode-toggle.tsx",
@@ -4923,18 +4811,18 @@
       "ok": false
     },
     {
-      "url": "http://localhost:5000/src/components/admin/ResourceManager.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
       "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/recharts.js?v=e0fc0b7c",
       "method": "GET",
       "resourceType": "script",
       "status": 200,
       "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/admin/ResourceManager.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
     },
     {
       "url": "http://localhost:5000/src/components/admin/CategoryManager.tsx",
@@ -4944,14 +4832,14 @@
       "ok": false
     },
     {
-      "url": "http://localhost:5000/src/components/admin/SubcategoryManager.tsx",
+      "url": "http://localhost:5000/src/components/admin/SubSubcategoryManager.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 304,
       "ok": false
     },
     {
-      "url": "http://localhost:5000/src/components/admin/SubSubcategoryManager.tsx",
+      "url": "http://localhost:5000/src/components/admin/SubcategoryManager.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 304,
@@ -5063,27 +4951,6 @@
       "ok": false
     },
     {
-      "url": "http://localhost:5000/src/components/ui/command.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/dialog.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/cmdk.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
-    },
-    {
       "url": "http://localhost:5000/src/components/ui/sheet.tsx",
       "method": "GET",
       "resourceType": "script",
@@ -5105,14 +4972,28 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/src/components/ui/checkbox.tsx",
+      "url": "http://localhost:5000/src/components/ui/command.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 304,
       "ok": false
     },
     {
-      "url": "http://localhost:5000/src/hooks/useAIRecommendations.ts",
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/cmdk.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/dialog.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/checkbox.tsx",
       "method": "GET",
       "resourceType": "script",
       "status": 304,
@@ -5126,32 +5007,11 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/src/hooks/use-user-profile.tsx",
+      "url": "http://localhost:5000/src/hooks/useAIRecommendations.ts",
       "method": "GET",
       "resourceType": "script",
       "status": 304,
       "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/recommendation-feedback.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/ui/popover.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-popover.js?v=e0fc0b7c",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 200,
-      "ok": true
     },
     {
       "url": "http://localhost:5000/src/components/ui/toggle-group.tsx",
@@ -5175,7 +5035,56 @@
       "ok": true
     },
     {
+      "url": "http://localhost:5000/src/components/ui/popover.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-popover.js?v=e0fc0b7c",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:5000/src/components/ui/recommendation-feedback.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/hooks/use-user-profile.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
       "url": "http://localhost:5000/src/components/ui/table.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/admin/GenericCrudManager.tsx",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/admin/configs/subsubcategory-config.ts",
+      "method": "GET",
+      "resourceType": "script",
+      "status": 304,
+      "ok": false
+    },
+    {
+      "url": "http://localhost:5000/src/components/admin/configs/subcategory-config.ts",
       "method": "GET",
       "resourceType": "script",
       "status": 304,
@@ -5196,28 +5105,7 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/src/components/admin/GenericCrudManager.tsx",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
       "url": "http://localhost:5000/src/components/admin/configs/category-config.ts",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/admin/configs/subcategory-config.ts",
-      "method": "GET",
-      "resourceType": "script",
-      "status": 304,
-      "ok": false
-    },
-    {
-      "url": "http://localhost:5000/src/components/admin/configs/subsubcategory-config.ts",
       "method": "GET",
       "resourceType": "script",
       "status": 304,
@@ -5252,13 +5140,6 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/api/admin/stats",
-      "method": "GET",
-      "resourceType": "fetch",
-      "status": 200,
-      "ok": true
-    },
-    {
       "url": "http://localhost:5000/api/awesome-list",
       "method": "GET",
       "resourceType": "fetch",
@@ -5266,9 +5147,32 @@
       "ok": true
     },
     {
-      "url": "http://localhost:5000/api/admin/users?page=1&limit=20",
+      "url": "http://localhost:5000/api/admin/stats",
       "method": "GET",
       "resourceType": "fetch",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_ABORTED"
+    },
+    {
+      "url": "https://replit.com/public/js/replit-dev-banner.js",
+      "method": "GET",
+      "resourceType": "script",
+      "status": null,
+      "ok": false,
+      "failure": "net::ERR_BLOCKED_BY_ORB"
+    },
+    {
+      "url": "http://localhost:5000/admin",
+      "method": "GET",
+      "resourceType": "document",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap",
+      "method": "GET",
+      "resourceType": "stylesheet",
       "status": 200,
       "ok": true
     }

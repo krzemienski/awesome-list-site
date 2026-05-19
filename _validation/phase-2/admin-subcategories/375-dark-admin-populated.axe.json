@@ -1,0 +1,17 @@
+{
+  "violations": [
+    {
+      "id": "page-has-heading-one",
+      "impact": "moderate",
+      "help": "Page should contain a level-one heading",
+      "nodes": 1,
+      "targets": [
+        [
+          "html"
+        ]
+      ]
+    }
+  ],
+  "url": "http://localhost:5000/admin#subcategories",
+  "timestamp": "2026-05-19T00:16:17.867Z"
+}

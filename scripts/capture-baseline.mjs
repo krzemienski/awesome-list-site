@@ -71,26 +71,24 @@ function buildCells() {
   // --- Auth-required routes, BOTH unauth (gate) and admin (populated) ---
   // AuthGuard pages redirect to "/" with destructive toast on unauth.
   // AdminGuard renders <NotFound/> on unauth.
-  cells.push({ slug: 'profile',   path: '/profile',   auth: 'unauth', state: 'gate', vp: '1280' });
-  cells.push({ slug: 'bookmarks', path: '/bookmarks', auth: 'unauth', state: 'gate', vp: '1280' });
-  cells.push({ slug: 'admin',     path: '/admin',     auth: 'unauth', state: 'gate', vp: '1280' });
-  for (const vp of mobileDesktop) {
-    cells.push({ slug: 'profile',   path: '/profile',   auth: 'admin', state: 'populated', vp });
-    cells.push({ slug: 'bookmarks', path: '/bookmarks', auth: 'admin', state: 'populated', vp });
+  for (const vp of allVps) {
+    cells.push({ slug: 'profile',   path: '/profile',   auth: 'unauth', state: 'gate', vp });
+    cells.push({ slug: 'bookmarks', path: '/bookmarks', auth: 'unauth', state: 'gate', vp });
+    cells.push({ slug: 'admin',     path: '/admin',     auth: 'unauth', state: 'gate', vp });
+    cells.push({ slug: 'profile',   path: '/profile',   auth: 'admin',  state: 'populated', vp });
+    cells.push({ slug: 'bookmarks', path: '/bookmarks', auth: 'admin',  state: 'populated', vp });
   }
 
-  // --- Admin dashboard tabs (admin auth, 1280 + 375 spot-check on a few) ---
+  // --- Admin dashboard tabs (admin auth, full 4-viewport sweep) ---
   const TABS = [
     'approvals', 'edits', 'enrichment', 'researcher', 'export', 'database',
     'resources', 'categories', 'subcategories', 'subsubcategories',
     'users', 'github', 'linkhealth', 'audit',
   ];
   for (const tab of TABS) {
-    cells.push({ slug: `admin-${tab}`, path: `/admin#${tab}`, auth: 'admin', state: 'populated', vp: '1280', tab });
-  }
-  // Mobile spot-check on 3 representative tabs.
-  for (const tab of ['approvals', 'resources', 'audit']) {
-    cells.push({ slug: `admin-${tab}`, path: `/admin#${tab}`, auth: 'admin', state: 'populated', vp: '375', tab });
+    for (const vp of allVps) {
+      cells.push({ slug: `admin-${tab}`, path: `/admin#${tab}`, auth: 'admin', state: 'populated', vp, tab });
+    }
   }
 
   // --- Error / empty states reachable without code changes ---
@@ -182,8 +180,7 @@ async function captureCell(browser, axeSource, cell, adminStorage) {
 
   let navError = null;
   try {
-    await page.goto(`${BASE_URL}${cell.path}`, { waitUntil: 'domcontentloaded', timeout: 25000 });
-    // Wait for app to mount past full-screen spinner.
+    await page.goto(`${BASE_URL}${cell.path}`, { waitUntil: 'domcontentloaded', timeout: 22000 });
     await page.waitForFunction(
       () => {
         const body = document.body;
@@ -192,19 +189,18 @@ async function captureCell(browser, axeSource, cell, adminStorage) {
         return txt.length > 4 && !/^Loading\.\.\.$/.test(txt) && !/^Verifying access/.test(txt);
       },
       null,
-      { timeout: 7000 },
+      { timeout: 5000 },
     ).catch(() => {});
-    await page.waitForLoadState('networkidle', { timeout: 3500 }).catch(() => {});
-    await page.waitForTimeout(400);
+    await page.waitForLoadState('networkidle', { timeout: 6000 }).catch(() => {});
+    await page.waitForTimeout(1800);
   } catch (e) {
     navError = String(e.message).slice(0, 500);
   }
 
-  // axe scan
-  let axeResults = { violations: [], error: null };
-  try {
+  // axe scan with single retry on "Execution context destroyed" (Wouter re-render race).
+  async function runAxeOnce() {
     await page.addScriptTag({ content: axeSource });
-    axeResults = await page.evaluate(async () => {
+    return await page.evaluate(async () => {
       // eslint-disable-next-line no-undef
       const r = await window.axe.run(document, { resultTypes: ['violations'] });
       return {
@@ -216,8 +212,23 @@ async function captureCell(browser, axeSource, cell, adminStorage) {
         url: r.url, timestamp: r.timestamp,
       };
     });
+  }
+  let axeResults = { violations: [], error: null };
+  try {
+    axeResults = await runAxeOnce();
   } catch (e) {
-    axeResults = { violations: [], error: String(e.message).slice(0, 500) };
+    const msg = String(e.message || '');
+    if (/Execution context was destroyed|navigation/i.test(msg)) {
+      try {
+        await page.waitForLoadState('networkidle', { timeout: 4000 }).catch(() => {});
+        await page.waitForTimeout(600);
+        axeResults = await runAxeOnce();
+      } catch (e2) {
+        axeResults = { violations: [], error: `retry: ${String(e2.message).slice(0, 400)}` };
+      }
+    } else {
+      axeResults = { violations: [], error: msg.slice(0, 500) };
+    }
   }
 
   // DOM snapshot
@@ -264,8 +275,12 @@ async function run() {
     return;
   }
   const rangeArg = process.argv.find(a => a.startsWith('--range='));
+  const indicesArg = process.argv.find(a => a.startsWith('--indices='));
   let startIdx = 0, endIdx = cells.length - 1;
-  if (rangeArg) {
+  let explicitIndices = null;
+  if (indicesArg) {
+    explicitIndices = indicesArg.replace('--indices=', '').split(',').map(Number).filter(Number.isFinite);
+  } else if (rangeArg) {
     const [s, e] = rangeArg.replace('--range=', '').split(':').map(Number);
     startIdx = Number.isFinite(s) ? s : 0;
     endIdx = Number.isFinite(e) ? e : cells.length - 1;
@@ -284,13 +299,17 @@ async function run() {
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
   });
 
+  const indicesToRun = explicitIndices
+    ? explicitIndices.filter(i => i >= 0 && i < cells.length)
+    : Array.from({ length: endIdx - startIdx + 1 }, (_, k) => startIdx + k).filter(i => i < cells.length);
+
   const summaries = [];
   try {
-    for (let i = startIdx; i <= endIdx && i < cells.length; i++) {
+    for (const i of indicesToRun) {
       const c = cells[i];
       const tag = `[${String(i).padStart(3, '0')}/${cells.length - 1}] ${c.slug} ${c.vp} ${c.auth}/${c.state}`;
       process.stdout.write(`${tag} ... `);
-      const HARD_TIMEOUT_MS = 30000;
+      const HARD_TIMEOUT_MS = 35000;
       try {
         const s = await Promise.race([
           captureCell(browser, axeSource, c, adminStorage),
