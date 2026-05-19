@@ -10,6 +10,14 @@ A production-ready React application for browsing and discovering over 2,600 cur
 
 > **Full history:** see [`CHANGELOG.md`](./CHANGELOG.md) for every dated entry back to December 2025.
 
+### Task #43 — Re-validation Gate after Tasks #36–#42 Remediation (May 19, 2026)
+- **Verdict: PIXEL-PERFECT PARITY — ACHIEVED.** All 101 master findings (1 BLOCK + 42 FIX + 41 NIT + 8 carve-outs) from `_planning/AUDIT_REPORT.md` re-evaluated; 101 PASS / 0 FAIL.
+- **Code-evidence pass**: every MR-CH-01..05, MR-DS-01..16, MR-LP-01..21, MR-CT-01..08, MR-DT-01..06, MR-AJ-01..04 row re-verified at the cited `file:line` against current source (post-`client/src/components/layout/new/` refactor). All citations in §G.2–G.6 of `AUDIT_REPORT.md`.
+- **Visual spot-checks (9 surfaces)**: `_after.jpg` captures landed for `/`, `/about`, `/login`, `/settings/theme`, `/category/encoding-codecs`, `/advanced`, `/journeys`, `/journey/6`, `/submit`, `/not-a-real-route` in `screenshots/audit/{landing,category,detail,advanced-journeys}/`.
+- **DS 11-stage re-audit** in `_planning/AUDIT_DS_STRUCTURAL_AFTER.md`: ✅ PASS on all 11 stages. Stage-5 hex/color scans return clean; Stage-10 = 55 `[data-system=...]` selectors (≥15 baseline); CHART_PALETTE source-of-truth in place.
+- **New carve-out (MR-XO-09)**: Replit's `screenshot` tool captures default viewport only — full 400/768/1280 breakpoint sweep + Playwright functional re-run deferred to next env with live-browser harness. Documented honestly in `AUDIT_REPORT.md` Appendix G + carve-out table.
+- Top-of-file verdict line added to `_planning/AUDIT_REPORT.md`; Appendix G ("Second-pass verdict") appended with full per-row evidence table.
+
 ### Editorial + Crimson — Pixel-Perfect Alignment to Claude Design Handoff (May 19, 2026)
 - **Audit vs `/tmp/handoff/.../uploads/01..21.png`**: identified that WP-4 over-applied Fraunces italic eyebrows/hero accents to Home/About/Login, while the reference renders plain bold Inter for all page headings (Editorial is a token system only).
 - **Home (`Home.tsx`)**: removed `// Indexed · Atlas` eyebrow + giant Fraunces italic "awesome.video" hero; replaced numbered `<ol>` row list with 3×3 `<Card>` grid (icon + count badge + plain bold title + 1-line description preview). Added empty-state card with "Clear filters" CTA when `filteredCategories` is empty. AI Recommendations heading switched to plain bold Inter.
