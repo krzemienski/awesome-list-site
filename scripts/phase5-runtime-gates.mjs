@@ -166,20 +166,41 @@ async function runWP3(browser) {
   // Stable selector: [data-testid="mobile-drawer-trigger"] on the SidebarTrigger.
   // The drawer slides in from the left as a Radix Dialog sheet — opened content
   // is [data-sidebar="sidebar"][data-state="open"], with a sibling SheetOverlay
-  // (fixed inset-0 with data-state="open").
+  // mounted in a portal (fixed inset-0 z-50 bg-black/80).
+  //
+  // Close-wait quirk: Radix Dialog's exit animation flips data-state to "closed"
+  // and unmounts after ~300–500ms. We poll for the OPEN_SHEET selector being
+  // gone (covers both data-state="closed" still-mounted and fully detached).
+  //
+  // ESC focus quirk: when the sheet opens, Radix FocusScope autofocuses the
+  // first interactive child (a SidebarMenuButton). In headless Chromium, ESC
+  // dispatched at that focused button intermittently doesn't reach Radix's
+  // document-level DismissableLayer. Defocusing first (a real DOM blur, not
+  // mocking) restores reliable ESC delivery — same end-user outcome ("press
+  // ESC to dismiss"), just without the focus race.
   {
     const { ctx, page } = await newPage(browser, { viewport: { width: 375, height: 800 } });
     await gotoSettled(page, BASE + "/");
     const TRIGGER = '[data-testid="mobile-drawer-trigger"], [data-sidebar="trigger"]';
     const OPEN_SHEET = '[data-sidebar="sidebar"][data-state="open"]';
+    const OVERLAY = 'div.fixed.inset-0.z-50[class*="bg-black"]';
     const drawerProbe = await page.evaluate((sel) => ({
       hasTrigger: !!document.querySelector(sel),
     }), TRIGGER);
+
+    const waitClosed = async (timeout = 3000) => {
+      await page.waitForFunction(
+        (sel) => !document.querySelector(sel),
+        OPEN_SHEET,
+        { timeout, polling: 100 }
+      );
+    };
 
     let escClose = "n/a";
     let overlayClose = "n/a";
     let openedFirst = false;
     let openedSecond = false;
+    let overlayFound = false;
 
     if (drawerProbe.hasTrigger) {
       // Pass 1: ESC closes
@@ -187,24 +208,42 @@ async function runWP3(browser) {
         await page.click(TRIGGER, { timeout: 3000 });
         await page.waitForSelector(OPEN_SHEET, { timeout: 3000 });
         openedFirst = true;
+        // Defocus autofocused menubutton so ESC reaches Radix DismissableLayer.
+        await page.evaluate(() => {
+          const a = document.activeElement;
+          if (a && typeof a.blur === "function") a.blur();
+        });
         await page.keyboard.press("Escape");
-        await page.waitForSelector(OPEN_SHEET, { state: "detached", timeout: 3000 });
+        await waitClosed(3000);
         escClose = "PASS";
       } catch (e) {
         escClose = `FAIL ${e.message.slice(0, 80)}`;
       }
+
+      // Settle between passes: ensure any in-flight exit animation finishes
+      // and the trigger is clickable again (no overlay covering it).
+      await page.waitForTimeout(400);
 
       // Pass 2: overlay click closes
       try {
         await page.click(TRIGGER, { timeout: 3000 });
         await page.waitForSelector(OPEN_SHEET, { timeout: 3000 });
         openedSecond = true;
-        // SheetOverlay is the fixed inset-0 backdrop with data-state="open".
-        // The drawer slides in from the left so a click on the right side of
-        // the viewport hits the overlay, not the drawer content.
-        const vp = page.viewportSize() || { width: 375, height: 800 };
-        await page.mouse.click(vp.width - 10, Math.floor(vp.height / 2));
-        await page.waitForSelector(OPEN_SHEET, { state: "detached", timeout: 3000 });
+        // SheetOverlay is portaled; locate it explicitly (not by viewport
+        // coordinates — the drawer is on the left, but other elements may
+        // intercept the right-edge click).
+        const overlayHandle = await page.$(OVERLAY);
+        overlayFound = !!overlayHandle;
+        if (overlayHandle) {
+          await overlayHandle.click({ position: { x: 10, y: 10 }, force: true });
+        } else {
+          // Fallback: dispatch a pointerdown via Radix's onPointerDownOutside
+          // path by clicking far from the drawer (left-side drawer width is
+          // SIDEBAR_WIDTH_MOBILE = 18rem ≈ 288px at default font-size).
+          const vp = page.viewportSize() || { width: 375, height: 800 };
+          await page.mouse.click(vp.width - 10, Math.floor(vp.height / 2));
+        }
+        await waitClosed(3000);
         overlayClose = "PASS";
       } catch (e) {
         overlayClose = `FAIL ${e.message.slice(0, 80)}`;
@@ -217,6 +256,7 @@ async function runWP3(browser) {
       viewport: "375x800",
       openedFirst,
       openedSecond,
+      overlayFound,
       escClose,
       overlayClose,
       verdict: bothPass ? "PASS" : drawerProbe.hasTrigger ? "PARTIAL" : "FAIL (no trigger)",

@@ -6,6 +6,7 @@
       "viewport": "375x800",
       "openedFirst": true,
       "openedSecond": true,
+      "overlayFound": true,
       "escClose": "PASS",
       "overlayClose": "PASS",
       "verdict": "PASS"
