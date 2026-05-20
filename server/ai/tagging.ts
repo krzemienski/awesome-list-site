@@ -7,6 +7,7 @@ interface AITagSuggestion {
   tags: string[];
   category: string;
   subcategory?: string;
+  subSubcategory?: string;
   confidence: number;
 }
 
@@ -33,13 +34,15 @@ Please provide:
 1. 3-5 relevant tags (video technologies, codecs, streaming, processing features)
 2. A primary category focusing on video/multimedia (e.g., "Video Processing", "Streaming", "Codecs", "Players", "Editing")
 3. A subcategory if applicable
-4. Confidence score (0-1)
+4. A sub-subcategory if applicable (a more specific topic under the subcategory)
+5. Confidence score (0-1)
 
 Respond with JSON in this format:
 {
   "tags": ["tag1", "tag2", "tag3"],
   "category": "category name",
   "subcategory": "subcategory name or null",
+  "subSubcategory": "sub-subcategory name or null",
   "confidence": 0.85
 }`;
 
@@ -66,6 +69,7 @@ Respond with JSON in this format:
       tags: result.tags || [],
       category: result.category || 'Video Tools',
       subcategory: result.subcategory,
+      subSubcategory: result.subSubcategory,
       confidence: Math.max(0, Math.min(1, result.confidence || 0.5))
     };
 

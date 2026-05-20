@@ -1,8 +1,10 @@
 import { EnrichmentRepository } from '../repositories/EnrichmentRepository';
 import { ResourceRepository } from '../repositories/ResourceRepository';
 import { AuditRepository } from '../repositories/AuditRepository';
+import { CategoryRepository } from '../repositories/CategoryRepository';
 import { generateResourceTags } from './tagging';
 import { fetchUrlMetadata, type UrlMetadata } from './urlScraper';
+import { promoteEnrichmentSuggestions } from './promoteEnrichmentSuggestions';
 import type { EnrichmentJob } from '@shared/schema';
 
 type EnrichmentOutcome = 'success' | 'skipped' | 'failed';
@@ -34,11 +36,13 @@ export class EnrichmentService {
   private enrichmentRepo: EnrichmentRepository;
   private resourceRepo: ResourceRepository;
   private auditRepo: AuditRepository;
+  private categoryRepo: CategoryRepository;
 
   private constructor() {
     this.enrichmentRepo = new EnrichmentRepository();
     this.resourceRepo = new ResourceRepository();
     this.auditRepo = new AuditRepository();
+    this.categoryRepo = new CategoryRepository();
   }
 
   public static getInstance(): EnrichmentService {
@@ -300,6 +304,7 @@ export class EnrichmentService {
           suggestedTags: aiResult.tags,
           suggestedCategory: aiResult.category,
           suggestedSubcategory: aiResult.subcategory,
+          suggestedSubSubcategory: aiResult.subSubcategory,
           confidence: aiResult.confidence,
           aiModel: 'claude-haiku-4-5',
           
@@ -323,6 +328,26 @@ export class EnrichmentService {
         const updates: any = {
           metadata: enhancedMetadata
         };
+
+        // Promote AI hierarchy suggestions onto the resource's real columns
+        // (only filling blanks — never overwriting curated values) and make
+        // sure the implied sub_subcategories row exists, so the resource is
+        // actually reachable via category drilldowns instead of being
+        // stranded with only a metadata hint. See task #59.
+        const hierarchyUpdates = await promoteEnrichmentSuggestions(
+          this.categoryRepo,
+          {
+            category: resource.category,
+            subcategory: resource.subcategory,
+            subSubcategory: resource.subSubcategory,
+          },
+          {
+            category: aiResult.category,
+            subcategory: aiResult.subcategory,
+            subSubcategory: aiResult.subSubcategory,
+          },
+        );
+        Object.assign(updates, hierarchyUpdates);
 
         if (!resource.description || resource.description.trim() === '') {
           const description = this.generateDescriptionFromUrl(resource.url, resource.title);
