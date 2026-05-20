@@ -52,6 +52,7 @@ import { fetchAwesomeVideoData } from "./awesome-video-parser-clean";
 import { RecommendationEngine, UserProfile } from "./recommendation-engine";
 import { fetchAwesomeLists, searchAwesomeLists } from "./github-api";
 import { insertResourceSchema, EDITABLE_RESOURCE_FIELDS, insertJourneyStepSchema } from "@shared/schema";
+import { ensureSubSubcategoryExists } from "./repositories/ensureSubSubcategory";
 import { z } from "zod";
 import { syncService } from "./github/syncService";
 import { recommendationEngine, UserProfile as AIUserProfile } from "./ai/recommendationEngine";
@@ -656,7 +657,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.claims.sub;
       const resourceData = insertResourceSchema.parse(req.body);
-      
+
+      await ensureSubSubcategoryExists(
+        categoryRepo,
+        resourceData.category,
+        resourceData.subcategory,
+        resourceData.subSubcategory,
+      );
+
       const resource = await resourceRepo.createResource({
         ...resourceData,
         submittedBy: userId,
@@ -1656,7 +1664,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (validatedData.subcategory !== undefined) updateData.subcategory = validatedData.subcategory;
       if (validatedData.subSubcategory !== undefined) updateData.subSubcategory = validatedData.subSubcategory;
       if (validatedData.status !== undefined) updateData.status = validatedData.status;
-      
+
+      // Auto-create the implied sub_subcategories row so the resource never
+      // disappears from the category drilldown (task #57). Uses the post-update
+      // hierarchy values: prefer the incoming value, fall back to the resource's
+      // existing value.
+      await ensureSubSubcategoryExists(
+        categoryRepo,
+        updateData.category ?? resource.category,
+        updateData.subcategory ?? resource.subcategory,
+        updateData.subSubcategory ?? resource.subSubcategory,
+      );
+
       const updatedResource = await resourceRepo.updateResource(resourceId, updateData);
       
       await auditRepo.logResourceAudit(
@@ -1870,14 +1889,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const validatedData = validationResult.data;
-      
+
+      const resolvedCategory = validatedData.category || 'General Tools';
+      const resolvedSubcategory = validatedData.subcategory || null;
+      const resolvedSubSubcategory = validatedData.subSubcategory || null;
+
+      await ensureSubSubcategoryExists(
+        categoryRepo,
+        resolvedCategory,
+        resolvedSubcategory,
+        resolvedSubSubcategory,
+      );
+
       const newResource = await resourceRepo.createResource({
         title: validatedData.title,
         url: validatedData.url,
         description: validatedData.description || '',
-        category: validatedData.category || 'General Tools',
-        subcategory: validatedData.subcategory || null,
-        subSubcategory: validatedData.subSubcategory || null,
+        category: resolvedCategory,
+        subcategory: resolvedSubcategory,
+        subSubcategory: resolvedSubSubcategory,
         status: validatedData.status || 'approved',
         submittedBy: userId
       });

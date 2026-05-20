@@ -24,9 +24,13 @@ import {
   createTestAdmin,
   createTestResource,
   createTestCategory,
+  createTestSubcategory,
+  getTestDb,
   closeTestDb,
 } from '../../helpers/db-helper';
 import { hashPassword } from '../../../server/passwordUtils';
+import * as schema from '../../../shared/schema';
+import { and, eq } from 'drizzle-orm';
 
 describe('Admin API Integration Tests', () => {
   let app: Express;
@@ -573,6 +577,85 @@ describe('Admin API Integration Tests', () => {
         .expect(401);
 
       expect(response.body.message).toContain('Unauthorized');
+    });
+
+    it('auto-creates the sub_subcategories row implied by the resource tag (task #57)', async () => {
+      const db = getTestDb();
+      const category = await createTestCategory({ name: 'Encoding', slug: 'encoding' });
+      const subcategory = await createTestSubcategory(category.id, {
+        name: 'Codecs',
+        slug: 'codecs',
+      });
+
+      // Sanity: no sub_subcategories row exists yet for this hierarchy.
+      const before = await db
+        .select()
+        .from(schema.subSubcategories)
+        .where(eq(schema.subSubcategories.subcategoryId, subcategory.id));
+      expect(before).toHaveLength(0);
+
+      const newResource = {
+        title: 'AV1 Reference Encoder',
+        url: 'https://example.com/av1-ref',
+        description: 'AV1 codec test resource',
+        category: 'Encoding',
+        subcategory: 'Codecs',
+        subSubcategory: 'AV1',
+        status: 'approved',
+      };
+
+      await adminAgent.post('/api/admin/resources').send(newResource).expect(201);
+
+      // The free-form sub-subcategory text must now be a real row under the
+      // chosen subcategory, so category drilldowns can find the resource.
+      const after = await db
+        .select()
+        .from(schema.subSubcategories)
+        .where(
+          and(
+            eq(schema.subSubcategories.subcategoryId, subcategory.id),
+            eq(schema.subSubcategories.name, 'AV1'),
+          ),
+        );
+      expect(after).toHaveLength(1);
+      expect(after[0].slug).toBe('av1');
+    });
+
+    it('is idempotent when the implied sub_subcategories row already exists', async () => {
+      const db = getTestDb();
+      const category = await createTestCategory({ name: 'Players', slug: 'players' });
+      const subcategory = await createTestSubcategory(category.id, {
+        name: 'Web Players',
+        slug: 'web-players',
+      });
+      await db.insert(schema.subSubcategories).values({
+        name: 'HLS.js',
+        slug: 'hls-js',
+        subcategoryId: subcategory.id,
+      });
+
+      const newResource = {
+        title: 'HLS.js Demo',
+        url: 'https://example.com/hls-demo',
+        description: 'demo',
+        category: 'Players',
+        subcategory: 'Web Players',
+        subSubcategory: 'HLS.js',
+        status: 'approved',
+      };
+
+      await adminAgent.post('/api/admin/resources').send(newResource).expect(201);
+
+      const rows = await db
+        .select()
+        .from(schema.subSubcategories)
+        .where(
+          and(
+            eq(schema.subSubcategories.subcategoryId, subcategory.id),
+            eq(schema.subSubcategories.name, 'HLS.js'),
+          ),
+        );
+      expect(rows).toHaveLength(1);
     });
   });
 
