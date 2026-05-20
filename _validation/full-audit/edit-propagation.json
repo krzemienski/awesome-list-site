@@ -1,0 +1,71 @@
+{
+  "generatedAt": "2026-05-20T08:55:14.271Z",
+  "targetId": 186811,
+  "originalTitle": "Galène",
+  "mutatedTitle": "Galène [TASK53-AUDIT-1779267314063]",
+  "channels": {
+    "adminPut": 200,
+    "publicById": {
+      "ok": true,
+      "waited_ms": 4
+    },
+    "publicAwesomeList": {
+      "ok": true,
+      "waited_ms": 134
+    },
+    "revertVerified": {
+      "ok": true,
+      "waited_ms": 3
+    }
+  },
+  "overallPass": true,
+  "notes": "all channels green",
+  "events": [
+    {
+      "ts": "2026-05-20T08:55:14.036Z",
+      "step": "login",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "ts": "2026-05-20T08:55:14.063Z",
+      "step": "picked-target",
+      "id": 186811,
+      "original": {
+        "title": "Galène",
+        "description": "Lightweight, efficient SFU (Selective Forwarding Unit) WebRTC server written in "
+      }
+    },
+    {
+      "ts": "2026-05-20T08:55:14.084Z",
+      "step": "admin-put",
+      "status": 200
+    },
+    {
+      "ts": "2026-05-20T08:55:14.088Z",
+      "step": "public-by-id-reflects-edit",
+      "ok": true,
+      "waited": 4,
+      "timedOut": false
+    },
+    {
+      "ts": "2026-05-20T08:55:14.224Z",
+      "step": "public-awesome-list-reflects-edit",
+      "ok": true,
+      "waited": 134,
+      "timedOut": false,
+      "foundTitle": "Galène [TASK53-AUDIT-1779267314063]"
+    },
+    {
+      "ts": "2026-05-20T08:55:14.268Z",
+      "step": "admin-revert",
+      "status": 200
+    },
+    {
+      "ts": "2026-05-20T08:55:14.271Z",
+      "step": "public-reverted",
+      "ok": true,
+      "waited": 3
+    }
+  ]
+}

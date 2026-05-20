@@ -3585,6 +3585,17 @@ export async function runBackgroundInitialization(): Promise<void> {
   console.log(`🔄 Running background initialization (${isProduction ? 'production' : 'development'} mode)...`);
   console.log('📊 Note: /api/awesome-list now serves from PostgreSQL database');
 
+  // Orphan-job watchdog: any enrichment_jobs / github_sync_queue stuck in
+  // 'pending' or 'processing' for more than 5 minutes were almost certainly
+  // killed by the last server restart. Mark them failed so the admin UIs
+  // (Enrichment, GitHub) don't show fictitious "processing" forever.
+  try {
+    const { runOrphanWatchdogStartup } = await import('./jobs/orphanJobWatchdog');
+    await runOrphanWatchdogStartup();
+  } catch (err) {
+    console.error('Failed to import/run orphan watchdog (non-fatal):', err);
+  }
+
   // Both dev and production: Check and seed database if needed
   // This ensures data consistency across environments
   try {

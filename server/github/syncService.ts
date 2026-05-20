@@ -419,8 +419,35 @@ export class GitHubSyncService {
             skipped: [result.skipped] as [any, ...any[]]
           }
         });
+
+        // Persist canonical sync history row (Task #53 step 6)
+        try {
+          await this.syncRepo.saveSyncHistory({
+            repositoryUrl: repoUrl,
+            direction: 'import',
+            resourcesAdded: result.imported,
+            resourcesUpdated: result.updated,
+            resourcesRemoved: 0,
+            totalResources: result.imported + result.updated + result.skipped,
+            snapshot: {
+              imported: result.imported,
+              updated: result.updated,
+              skipped: result.skipped,
+              errors: result.errors.length,
+              warnings: result.warnings.length,
+              validationPassed: result.validationPassed,
+              resources: result.resources.map(r => ({ id: r.id, title: r.title, url: r.url })),
+            },
+            metadata: {
+              outcome: result.errors.length > 0 ? 'partial' : 'completed',
+              errorMessages: result.errors.slice(0, 10),
+            },
+          });
+        } catch (historyErr: any) {
+          console.error('Failed to write github_sync_history row (non-fatal):', historyErr?.message || historyErr);
+        }
       }
-      
+
     } catch (error: any) {
       const errorMsg = `Import failed: ${error.message}`;
       result.errors.push(errorMsg);
@@ -435,6 +462,20 @@ export class GitHubSyncService {
           resourceIds: [],
           metadata: { error: error.message }
         });
+        try {
+          await this.syncRepo.saveSyncHistory({
+            repositoryUrl: repoUrl,
+            direction: 'import',
+            resourcesAdded: 0,
+            resourcesUpdated: 0,
+            resourcesRemoved: 0,
+            totalResources: 0,
+            snapshot: { error: error.message },
+            metadata: { outcome: 'failed' },
+          });
+        } catch (historyErr: any) {
+          console.error('Failed to write github_sync_history failed row (non-fatal):', historyErr?.message || historyErr);
+        }
       }
     }
     

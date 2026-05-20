@@ -1,0 +1,215 @@
+{
+  "generatedAt": "2026-05-20T08:51:34.289Z",
+  "source": "Synthesized from screenshot inventory after Task #53 sweep harness",
+  "totalCaptures": 27,
+  "byBreakpoint": {
+    "375": 8,
+    "768": 8,
+    "1280": 11
+  },
+  "loadingSkeletonCaptures": [
+    "about",
+    "advanced",
+    "home",
+    "journey-detail",
+    "journeys",
+    "submit"
+  ],
+  "adminTabsCaptured": [
+    "admin-categories",
+    "admin-resources",
+    "admin-subcategories"
+  ],
+  "notes": "768 tier captures are loading-state skeletons (2.5s wait insufficient on first paint); 1280 tier captures all rendered fully. Admin tabs covered: resources, categories, subcategories. enrichment/github/link-health admin tabs not separately captured (rendered as part of /admin SPA — same as #resources).",
+  "records": [
+    {
+      "name": "about",
+      "viewport": "1280",
+      "size": 69923,
+      "looksBlank": false,
+      "screenshot": "screenshots/about_1280.jpg"
+    },
+    {
+      "name": "about",
+      "viewport": "375",
+      "size": 33233,
+      "looksBlank": false,
+      "screenshot": "screenshots/about_375.jpg"
+    },
+    {
+      "name": "about",
+      "viewport": "768",
+      "size": 5365,
+      "looksBlank": true,
+      "screenshot": "screenshots/about_768.jpg"
+    },
+    {
+      "name": "admin-categories",
+      "viewport": "1280",
+      "size": 61068,
+      "looksBlank": false,
+      "screenshot": "screenshots/admin-categories_1280.jpg"
+    },
+    {
+      "name": "admin-resources",
+      "viewport": "1280",
+      "size": 70699,
+      "looksBlank": false,
+      "screenshot": "screenshots/admin-resources_1280.jpg"
+    },
+    {
+      "name": "admin-subcategories",
+      "viewport": "1280",
+      "size": 64253,
+      "looksBlank": false,
+      "screenshot": "screenshots/admin-subcategories_1280.jpg"
+    },
+    {
+      "name": "advanced",
+      "viewport": "1280",
+      "size": 62574,
+      "looksBlank": false,
+      "screenshot": "screenshots/advanced_1280.jpg"
+    },
+    {
+      "name": "advanced",
+      "viewport": "375",
+      "size": 26640,
+      "looksBlank": false,
+      "screenshot": "screenshots/advanced_375.jpg"
+    },
+    {
+      "name": "advanced",
+      "viewport": "768",
+      "size": 5365,
+      "looksBlank": true,
+      "screenshot": "screenshots/advanced_768.jpg"
+    },
+    {
+      "name": "category",
+      "viewport": "1280",
+      "size": 81042,
+      "looksBlank": false,
+      "screenshot": "screenshots/category_1280.jpg"
+    },
+    {
+      "name": "category",
+      "viewport": "375",
+      "size": 30795,
+      "looksBlank": false,
+      "screenshot": "screenshots/category_375.jpg"
+    },
+    {
+      "name": "category",
+      "viewport": "768",
+      "size": 60642,
+      "looksBlank": false,
+      "screenshot": "screenshots/category_768.jpg"
+    },
+    {
+      "name": "home",
+      "viewport": "1280",
+      "size": 92543,
+      "looksBlank": false,
+      "screenshot": "screenshots/home_1280.jpg"
+    },
+    {
+      "name": "home",
+      "viewport": "375",
+      "size": 32787,
+      "looksBlank": false,
+      "screenshot": "screenshots/home_375.jpg"
+    },
+    {
+      "name": "home",
+      "viewport": "768",
+      "size": 5365,
+      "looksBlank": true,
+      "screenshot": "screenshots/home_768.jpg"
+    },
+    {
+      "name": "journey-detail",
+      "viewport": "1280",
+      "size": 59651,
+      "looksBlank": false,
+      "screenshot": "screenshots/journey-detail_1280.jpg"
+    },
+    {
+      "name": "journey-detail",
+      "viewport": "375",
+      "size": 26244,
+      "looksBlank": false,
+      "screenshot": "screenshots/journey-detail_375.jpg"
+    },
+    {
+      "name": "journey-detail",
+      "viewport": "768",
+      "size": 5365,
+      "looksBlank": true,
+      "screenshot": "screenshots/journey-detail_768.jpg"
+    },
+    {
+      "name": "journeys",
+      "viewport": "1280",
+      "size": 78679,
+      "looksBlank": false,
+      "screenshot": "screenshots/journeys_1280.jpg"
+    },
+    {
+      "name": "journeys",
+      "viewport": "375",
+      "size": 26875,
+      "looksBlank": false,
+      "screenshot": "screenshots/journeys_375.jpg"
+    },
+    {
+      "name": "journeys",
+      "viewport": "768",
+      "size": 5365,
+      "looksBlank": true,
+      "screenshot": "screenshots/journeys_768.jpg"
+    },
+    {
+      "name": "settings-theme",
+      "viewport": "1280",
+      "size": 85537,
+      "looksBlank": false,
+      "screenshot": "screenshots/settings-theme_1280.jpg"
+    },
+    {
+      "name": "settings-theme",
+      "viewport": "375",
+      "size": 35049,
+      "looksBlank": false,
+      "screenshot": "screenshots/settings-theme_375.jpg"
+    },
+    {
+      "name": "settings-theme",
+      "viewport": "768",
+      "size": 78348,
+      "looksBlank": false,
+      "screenshot": "screenshots/settings-theme_768.jpg"
+    },
+    {
+      "name": "submit",
+      "viewport": "1280",
+      "size": 57867,
+      "looksBlank": false,
+      "screenshot": "screenshots/submit_1280.jpg"
+    },
+    {
+      "name": "submit",
+      "viewport": "375",
+      "size": 29902,
+      "looksBlank": false,
+      "screenshot": "screenshots/submit_375.jpg"
+    },
+    {
+      "name": "submit",
+      "viewport": "768",
+      "size": 5365,
+      "looksBlank": true,
+      "screenshot": "screenshots/submit_768.jpg"
+    }
+  ]
+}
