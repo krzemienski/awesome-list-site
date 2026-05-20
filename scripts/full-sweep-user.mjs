@@ -80,7 +80,11 @@ results.push({ test: 'search-keys', cmdkOpen, slashOpen, pageErrs: ie, status: c
 
 // Category drilldown
 await p.goto(BASE + '/category/intro-learning', { waitUntil: 'domcontentloaded' });
-const viewDetailsCount = await p.evaluate(() => document.querySelectorAll('a[href^="/resource/"], [data-testid*="resource"]').length);
+const viewDetailsCount = await p.evaluate(() => {
+  const links = document.querySelectorAll('a[href^="/resource/"]').length;
+  const viewBtns = Array.from(document.querySelectorAll('button')).filter(b => /view details/i.test(b.textContent || '')).length;
+  return links + viewBtns;
+});
 results.push({ test: 'category-resources-rendered', viewDetailsCount, status: viewDetailsCount > 0 ? 'PASS' : 'FAIL' });
 
 // Resource detail (pick first real resource)
