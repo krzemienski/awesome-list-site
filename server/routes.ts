@@ -63,6 +63,8 @@ import { validateAwesomeList, formatValidationReport } from "./validation/awesom
 import { checkResourceLinks, formatLinkCheckReport } from "./validation/linkChecker";
 import { seedDatabase } from "./seed";
 import { enrichmentService } from "./ai/enrichmentService";
+import { db } from "./db";
+import { sql } from "drizzle-orm";
 
 const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md";
 
@@ -3177,6 +3179,99 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: false,
         message: 'Failed to cancel job',
         error: error.message
+      });
+    }
+  });
+
+  // POST /api/admin/enrichment/backfill-suggestions
+  // One-shot backfill: take resources that were enriched BEFORE task #59
+  // (so their AI category/subcategory guesses sit only in
+  // `metadata.suggestedCategory` / `suggestedSubcategory` /
+  // `suggestedSubSubcategory`) and promote those guesses onto the real
+  // hierarchy columns via `promoteEnrichmentSuggestions`, auto-creating any
+  // implied `sub_subcategories` rows. Idempotent — safe to re-run; only
+  // touches rows where a corresponding hierarchy column is still blank.
+  app.post('/api/admin/enrichment/backfill-suggestions', isAuthenticated, isAdmin, async (_req, res) => {
+    try {
+      const { promoteEnrichmentSuggestions } = await import('./ai/promoteEnrichmentSuggestions');
+
+      const candidates = await db.execute(sql`
+        SELECT id, category, subcategory, sub_subcategory AS "subSubcategory", metadata
+        FROM resources
+        WHERE status = 'approved'
+        AND (
+          (metadata->>'suggestedCategory' IS NOT NULL AND length(trim(metadata->>'suggestedCategory')) > 0)
+          OR (metadata->>'suggestedSubcategory' IS NOT NULL AND length(trim(metadata->>'suggestedSubcategory')) > 0)
+          OR (metadata->>'suggestedSubSubcategory' IS NOT NULL AND length(trim(metadata->>'suggestedSubSubcategory')) > 0)
+        )
+        AND (
+          category IS NULL OR length(trim(category)) = 0
+          OR subcategory IS NULL OR length(trim(subcategory)) = 0
+          OR sub_subcategory IS NULL OR length(trim(sub_subcategory)) = 0
+        )
+      `);
+
+      const rows: any[] = (candidates as any).rows ?? (candidates as any);
+
+      const subSubBefore = (await categoryRepo.listSubSubcategories()).length;
+
+      let scanned = 0;
+      let resourcesUpdated = 0;
+      const updatedIds: number[] = [];
+      const errors: { id: number; error: string }[] = [];
+
+      for (const row of rows) {
+        scanned++;
+        try {
+          const metadata = (row.metadata ?? {}) as Record<string, any>;
+          const updates = await promoteEnrichmentSuggestions(
+            categoryRepo,
+            {
+              category: row.category,
+              subcategory: row.subcategory,
+              subSubcategory: row.subSubcategory,
+            },
+            {
+              category: metadata.suggestedCategory,
+              subcategory: metadata.suggestedSubcategory,
+              subSubcategory: metadata.suggestedSubSubcategory,
+            },
+          );
+
+          if (Object.keys(updates).length > 0) {
+            await resourceRepo.updateResource(row.id, updates);
+            resourcesUpdated++;
+            updatedIds.push(row.id);
+          }
+        } catch (err: any) {
+          errors.push({ id: row.id, error: err?.message ?? String(err) });
+        }
+      }
+
+      const subSubAfter = (await categoryRepo.listSubSubcategories()).length;
+      const subSubcategoriesCreated = Math.max(0, subSubAfter - subSubBefore);
+
+      const report = {
+        scanned,
+        resourcesUpdated,
+        subSubcategoriesCreated,
+        updatedIds,
+        errors,
+      };
+
+      console.log('[backfill-suggestions] report:', JSON.stringify(report));
+
+      res.json({
+        success: true,
+        message: `Backfill complete: ${resourcesUpdated}/${scanned} resources updated, ${subSubcategoriesCreated} sub_subcategories created`,
+        report,
+      });
+    } catch (error: any) {
+      console.error('Error backfilling enrichment suggestions:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to backfill enrichment suggestions',
+        error: error.message,
       });
     }
   });
