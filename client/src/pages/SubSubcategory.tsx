@@ -163,6 +163,7 @@ export default function SubSubcategory() {
     return (
       <div className="space-y-6" aria-busy={true} aria-live="polite">
         <SEOHead title="Loading..." />
+        <h1 className="sr-only">Loading sub-subcategory…</h1>
         <div className="space-y-4">
           <Skeleton className="h-10 w-64" />
           <Skeleton className="h-6 w-48" />

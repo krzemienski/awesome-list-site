@@ -1,0 +1,218 @@
+{
+  "gate": "G4.4 (runtime)",
+  "batch": "a",
+  "asserts": {
+    "G4.4-a_h1_per_page": {
+      "batch_scope": "a",
+      "total": 8,
+      "passing": 8,
+      "failing": [],
+      "verdict": "PASS"
+    },
+    "G4.4-c_submit_field_error": {
+      "hasFieldError": false,
+      "ariaInvalid": 0,
+      "verdict": "INFO (no error surfaced)"
+    },
+    "G4.4-e_admin_gate": {
+      "hasAlertWarn": true,
+      "bodyHasLoginText": true,
+      "hasLoginLink": true,
+      "verdict": "PASS"
+    }
+  },
+  "perRoute": {
+    "home": {
+      "path": "/",
+      "h1Count": 1,
+      "h1Visible": 1,
+      "h1s": [
+        {
+          "text": "Awesome Video Resources",
+          "visible": true
+        }
+      ],
+      "mainCount": 1,
+      "dataSystem": "editorial",
+      "dataAccent": "crimson",
+      "hasEmptyState": false,
+      "hasAlertError": false,
+      "hasFieldError": false,
+      "hasToolbar": false,
+      "hasMenu": false,
+      "hasDiff": false,
+      "hasLog": false,
+      "hasTabs": false,
+      "hasSidebar": true,
+      "bodyText": 1848
+    },
+    "about": {
+      "path": "/about",
+      "h1Count": 1,
+      "h1Visible": 1,
+      "h1s": [
+        {
+          "text": "About",
+          "visible": true
+        }
+      ],
+      "mainCount": 1,
+      "dataSystem": "editorial",
+      "dataAccent": "crimson",
+      "hasEmptyState": false,
+      "hasAlertError": false,
+      "hasFieldError": false,
+      "hasToolbar": false,
+      "hasMenu": false,
+      "hasDiff": false,
+      "hasLog": false,
+      "hasTabs": false,
+      "hasSidebar": true,
+      "bodyText": 1906
+    },
+    "login": {
+      "path": "/login",
+      "h1Count": 1,
+      "h1Visible": 1,
+      "h1s": [
+        {
+          "text": "Sign in to Awesome Video",
+          "visible": true
+        }
+      ],
+      "mainCount": 1,
+      "dataSystem": "editorial",
+      "dataAccent": "crimson",
+      "hasEmptyState": false,
+      "hasAlertError": false,
+      "hasFieldError": false,
+      "hasToolbar": false,
+      "hasMenu": false,
+      "hasDiff": false,
+      "hasLog": false,
+      "hasTabs": false,
+      "hasSidebar": true,
+      "bodyText": 636
+    },
+    "settings-theme": {
+      "path": "/settings/theme",
+      "h1Count": 1,
+      "h1Visible": 1,
+      "h1s": [
+        {
+          "text": "Theme Settings",
+          "visible": true
+        }
+      ],
+      "mainCount": 1,
+      "dataSystem": "editorial",
+      "dataAccent": "crimson",
+      "hasEmptyState": false,
+      "hasAlertError": false,
+      "hasFieldError": false,
+      "hasToolbar": false,
+      "hasMenu": false,
+      "hasDiff": false,
+      "hasLog": false,
+      "hasTabs": false,
+      "hasSidebar": true,
+      "bodyText": 1710
+    },
+    "submit": {
+      "path": "/submit",
+      "h1Count": 1,
+      "h1Visible": 1,
+      "h1s": [
+        {
+          "text": "Submit a Resource — Authentication Required",
+          "visible": true
+        }
+      ],
+      "mainCount": 1,
+      "dataSystem": "editorial",
+      "dataAccent": "crimson",
+      "hasEmptyState": false,
+      "hasAlertError": false,
+      "hasFieldError": false,
+      "hasToolbar": false,
+      "hasMenu": false,
+      "hasDiff": false,
+      "hasLog": false,
+      "hasTabs": false,
+      "hasSidebar": true,
+      "bodyText": 607
+    },
+    "advanced": {
+      "path": "/advanced",
+      "h1Count": 1,
+      "h1Visible": 1,
+      "h1s": [
+        {
+          "text": "Advanced Features",
+          "visible": true
+        }
+      ],
+      "mainCount": 1,
+      "dataSystem": "editorial",
+      "dataAccent": "crimson",
+      "hasEmptyState": false,
+      "hasAlertError": false,
+      "hasFieldError": false,
+      "hasToolbar": false,
+      "hasMenu": false,
+      "hasDiff": false,
+      "hasLog": false,
+      "hasTabs": true,
+      "hasSidebar": true,
+      "bodyText": 10331
+    },
+    "journeys": {
+      "path": "/journeys",
+      "h1Count": 1,
+      "h1Visible": 1,
+      "h1s": [
+        {
+          "text": "Learning Journeys",
+          "visible": true
+        }
+      ],
+      "mainCount": 1,
+      "dataSystem": "editorial",
+      "dataAccent": "crimson",
+      "hasEmptyState": false,
+      "hasAlertError": false,
+      "hasFieldError": false,
+      "hasToolbar": false,
+      "hasMenu": false,
+      "hasDiff": false,
+      "hasLog": false,
+      "hasTabs": false,
+      "hasSidebar": true,
+      "bodyText": 1766
+    },
+    "journey-detail": {
+      "path": "/journey/6",
+      "h1Count": 1,
+      "h1Visible": 1,
+      "h1s": [
+        {
+          "text": "Video Streaming Fundamentals",
+          "visible": true
+        }
+      ],
+      "mainCount": 1,
+      "dataSystem": "editorial",
+      "dataAccent": "crimson",
+      "hasEmptyState": false,
+      "hasAlertError": true,
+      "hasFieldError": false,
+      "hasToolbar": false,
+      "hasMenu": false,
+      "hasDiff": false,
+      "hasLog": false,
+      "hasTabs": false,
+      "hasSidebar": true,
+      "bodyText": 801
+    }
+  }
+}

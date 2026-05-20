@@ -1,0 +1,20 @@
+{
+  "gate": "G4.3 (runtime)",
+  "asserts": {
+    "G4.3-a_drawer_dismiss": {
+      "hasTrigger": false,
+      "escClose": "n/a",
+      "overlayClose": "n/a",
+      "verdict": "PARTIAL"
+    },
+    "G4.3-b_search_keys": {
+      "cmdKOpen": false,
+      "slashOpen": true,
+      "verdict": "PASS"
+    },
+    "G4.3-c_view_modes": {
+      "hasViewToggle": true,
+      "verdict": "PASS (toggle present)"
+    }
+  }
+}

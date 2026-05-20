@@ -246,6 +246,7 @@ export default function SubmitResource() {
         </Helmet>
         
         <div className="container max-w-2xl mx-auto px-4 py-12">
+          <h1 className="sr-only">Submit a Resource — Authentication Required</h1>
           <Card className="border-[color-mix(in_srgb,var(--accent)_20%,transparent)]">
             <CardHeader className="text-center">
               <div className="mx-auto mb-4 w-fit">
@@ -298,6 +299,7 @@ export default function SubmitResource() {
       </Helmet>
 
       <div className="container max-w-2xl mx-auto px-4 py-12">
+        <h1 className="sr-only">Submit a Resource</h1>
         {/* Success Message */}
         {showSuccess && (
           <Card className="mb-6 border-green-500/20 bg-green-500/5">

@@ -16,7 +16,7 @@ export default function NotFound() {
         <CardHeader>
           <div className="flex items-center gap-2">
             <AlertCircle className="h-6 w-6 text-[var(--accent)]" />
-            <CardTitle className="text-xl">Page Not Found</CardTitle>
+            <h1 className="text-xl font-semibold leading-none tracking-tight">Page Not Found</h1>
           </div>
         </CardHeader>
         <CardContent>

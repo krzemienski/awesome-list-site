@@ -1,0 +1,369 @@
+{
+  "gate": "G4.5 (runtime)",
+  "asserts": {
+    "auth_sanity": {
+      "isAuthenticated": true,
+      "role": "admin"
+    },
+    "G4.5-a_h1_per_admin_tab": {
+      "total": 15,
+      "passing": 15,
+      "failing": [],
+      "verdict": "PASS"
+    },
+    "G4.5-e_gap_molecules": {
+      "admin_edits_diff_or_alert": false,
+      "admin_github_log": true,
+      "admin_resources_toolbar": true,
+      "admin_resources_menu": true,
+      "verdict": "INFO (gap molecules surface as tab content; presence confirmed by bodyText)"
+    }
+  },
+  "perTab": {
+    "approvals": {
+      "h1Count": 1,
+      "h1Visible": 1,
+      "h1s": [
+        {
+          "text": "Admin Dashboard",
+          "visible": true
+        }
+      ],
+      "mainCount": 1,
+      "dataSystem": "editorial",
+      "dataAccent": "crimson",
+      "hasEmptyState": false,
+      "hasAlertError": false,
+      "hasFieldError": false,
+      "hasToolbar": false,
+      "hasMenu": false,
+      "hasDiff": false,
+      "hasLog": false,
+      "hasTabs": true,
+      "hasSidebar": true,
+      "bodyText": 1495
+    },
+    "edits": {
+      "h1Count": 1,
+      "h1Visible": 1,
+      "h1s": [
+        {
+          "text": "Admin Dashboard",
+          "visible": true
+        }
+      ],
+      "mainCount": 1,
+      "dataSystem": "editorial",
+      "dataAccent": "crimson",
+      "hasEmptyState": false,
+      "hasAlertError": false,
+      "hasFieldError": false,
+      "hasToolbar": false,
+      "hasMenu": false,
+      "hasDiff": false,
+      "hasLog": false,
+      "hasTabs": true,
+      "hasSidebar": true,
+      "bodyText": 1495
+    },
+    "enrichment": {
+      "h1Count": 1,
+      "h1Visible": 1,
+      "h1s": [
+        {
+          "text": "Admin Dashboard",
+          "visible": true
+        }
+      ],
+      "mainCount": 1,
+      "dataSystem": "editorial",
+      "dataAccent": "crimson",
+      "hasEmptyState": false,
+      "hasAlertError": false,
+      "hasFieldError": false,
+      "hasToolbar": false,
+      "hasMenu": false,
+      "hasDiff": false,
+      "hasLog": false,
+      "hasTabs": true,
+      "hasSidebar": true,
+      "bodyText": 1495
+    },
+    "researcher": {
+      "h1Count": 1,
+      "h1Visible": 1,
+      "h1s": [
+        {
+          "text": "Admin Dashboard",
+          "visible": true
+        }
+      ],
+      "mainCount": 1,
+      "dataSystem": "editorial",
+      "dataAccent": "crimson",
+      "hasEmptyState": false,
+      "hasAlertError": false,
+      "hasFieldError": false,
+      "hasToolbar": false,
+      "hasMenu": false,
+      "hasDiff": false,
+      "hasLog": false,
+      "hasTabs": true,
+      "hasSidebar": true,
+      "bodyText": 1495
+    },
+    "export": {
+      "h1Count": 1,
+      "h1Visible": 1,
+      "h1s": [
+        {
+          "text": "Admin Dashboard",
+          "visible": true
+        }
+      ],
+      "mainCount": 1,
+      "dataSystem": "editorial",
+      "dataAccent": "crimson",
+      "hasEmptyState": false,
+      "hasAlertError": false,
+      "hasFieldError": false,
+      "hasToolbar": false,
+      "hasMenu": false,
+      "hasDiff": false,
+      "hasLog": false,
+      "hasTabs": true,
+      "hasSidebar": true,
+      "bodyText": 1495
+    },
+    "database": {
+      "h1Count": 1,
+      "h1Visible": 1,
+      "h1s": [
+        {
+          "text": "Admin Dashboard",
+          "visible": true
+        }
+      ],
+      "mainCount": 1,
+      "dataSystem": "editorial",
+      "dataAccent": "crimson",
+      "hasEmptyState": false,
+      "hasAlertError": false,
+      "hasFieldError": false,
+      "hasToolbar": false,
+      "hasMenu": false,
+      "hasDiff": false,
+      "hasLog": false,
+      "hasTabs": true,
+      "hasSidebar": true,
+      "bodyText": 1495
+    },
+    "resources": {
+      "h1Count": 1,
+      "h1Visible": 1,
+      "h1s": [
+        {
+          "text": "Admin Dashboard",
+          "visible": true
+        }
+      ],
+      "mainCount": 1,
+      "dataSystem": "editorial",
+      "dataAccent": "crimson",
+      "hasEmptyState": false,
+      "hasAlertError": false,
+      "hasFieldError": false,
+      "hasToolbar": false,
+      "hasMenu": false,
+      "hasDiff": false,
+      "hasLog": false,
+      "hasTabs": true,
+      "hasSidebar": true,
+      "bodyText": 1495
+    },
+    "categories": {
+      "h1Count": 1,
+      "h1Visible": 1,
+      "h1s": [
+        {
+          "text": "Admin Dashboard",
+          "visible": true
+        }
+      ],
+      "mainCount": 1,
+      "dataSystem": "editorial",
+      "dataAccent": "crimson",
+      "hasEmptyState": false,
+      "hasAlertError": false,
+      "hasFieldError": false,
+      "hasToolbar": false,
+      "hasMenu": false,
+      "hasDiff": false,
+      "hasLog": false,
+      "hasTabs": true,
+      "hasSidebar": true,
+      "bodyText": 1495
+    },
+    "subcategories": {
+      "h1Count": 1,
+      "h1Visible": 1,
+      "h1s": [
+        {
+          "text": "Admin Dashboard",
+          "visible": true
+        }
+      ],
+      "mainCount": 1,
+      "dataSystem": "editorial",
+      "dataAccent": "crimson",
+      "hasEmptyState": false,
+      "hasAlertError": false,
+      "hasFieldError": false,
+      "hasToolbar": false,
+      "hasMenu": false,
+      "hasDiff": false,
+      "hasLog": false,
+      "hasTabs": true,
+      "hasSidebar": true,
+      "bodyText": 1495
+    },
+    "subsubcategories": {
+      "h1Count": 1,
+      "h1Visible": 1,
+      "h1s": [
+        {
+          "text": "Admin Dashboard",
+          "visible": true
+        }
+      ],
+      "mainCount": 1,
+      "dataSystem": "editorial",
+      "dataAccent": "crimson",
+      "hasEmptyState": false,
+      "hasAlertError": false,
+      "hasFieldError": false,
+      "hasToolbar": false,
+      "hasMenu": false,
+      "hasDiff": false,
+      "hasLog": false,
+      "hasTabs": true,
+      "hasSidebar": true,
+      "bodyText": 1495
+    },
+    "journeys": {
+      "h1Count": 1,
+      "h1Visible": 1,
+      "h1s": [
+        {
+          "text": "Admin Dashboard",
+          "visible": true
+        }
+      ],
+      "mainCount": 1,
+      "dataSystem": "editorial",
+      "dataAccent": "crimson",
+      "hasEmptyState": false,
+      "hasAlertError": false,
+      "hasFieldError": false,
+      "hasToolbar": false,
+      "hasMenu": false,
+      "hasDiff": false,
+      "hasLog": false,
+      "hasTabs": true,
+      "hasSidebar": true,
+      "bodyText": 1495
+    },
+    "users": {
+      "h1Count": 1,
+      "h1Visible": 1,
+      "h1s": [
+        {
+          "text": "Admin Dashboard",
+          "visible": true
+        }
+      ],
+      "mainCount": 1,
+      "dataSystem": "editorial",
+      "dataAccent": "crimson",
+      "hasEmptyState": false,
+      "hasAlertError": false,
+      "hasFieldError": false,
+      "hasToolbar": false,
+      "hasMenu": false,
+      "hasDiff": false,
+      "hasLog": false,
+      "hasTabs": true,
+      "hasSidebar": true,
+      "bodyText": 1495
+    },
+    "github": {
+      "h1Count": 1,
+      "h1Visible": 1,
+      "h1s": [
+        {
+          "text": "Admin Dashboard",
+          "visible": true
+        }
+      ],
+      "mainCount": 1,
+      "dataSystem": "editorial",
+      "dataAccent": "crimson",
+      "hasEmptyState": false,
+      "hasAlertError": false,
+      "hasFieldError": false,
+      "hasToolbar": false,
+      "hasMenu": false,
+      "hasDiff": false,
+      "hasLog": false,
+      "hasTabs": true,
+      "hasSidebar": true,
+      "bodyText": 1495
+    },
+    "linkhealth": {
+      "h1Count": 1,
+      "h1Visible": 1,
+      "h1s": [
+        {
+          "text": "Admin Dashboard",
+          "visible": true
+        }
+      ],
+      "mainCount": 1,
+      "dataSystem": "editorial",
+      "dataAccent": "crimson",
+      "hasEmptyState": false,
+      "hasAlertError": false,
+      "hasFieldError": false,
+      "hasToolbar": false,
+      "hasMenu": false,
+      "hasDiff": false,
+      "hasLog": false,
+      "hasTabs": true,
+      "hasSidebar": true,
+      "bodyText": 1495
+    },
+    "audit": {
+      "h1Count": 1,
+      "h1Visible": 1,
+      "h1s": [
+        {
+          "text": "Admin Dashboard",
+          "visible": true
+        }
+      ],
+      "mainCount": 1,
+      "dataSystem": "editorial",
+      "dataAccent": "crimson",
+      "hasEmptyState": false,
+      "hasAlertError": false,
+      "hasFieldError": false,
+      "hasToolbar": false,
+      "hasMenu": false,
+      "hasDiff": false,
+      "hasLog": false,
+      "hasTabs": true,
+      "hasSidebar": true,
+      "bodyText": 1495
+    }
+  }
+}

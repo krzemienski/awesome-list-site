@@ -1,0 +1,218 @@
+{
+  "gate": "G4.4 (runtime)",
+  "batch": "b",
+  "asserts": {
+    "G4.4-a_h1_per_page": {
+      "batch_scope": "b",
+      "total": 8,
+      "passing": 8,
+      "failing": [],
+      "verdict": "PASS"
+    },
+    "G4.4-c_submit_field_error": {
+      "hasFieldError": false,
+      "ariaInvalid": 0,
+      "verdict": "INFO (no error surfaced)"
+    },
+    "G4.4-e_admin_gate": {
+      "hasAlertWarn": true,
+      "bodyHasLoginText": true,
+      "hasLoginLink": true,
+      "verdict": "PASS"
+    }
+  },
+  "perRoute": {
+    "category": {
+      "path": "/category/encoding-codecs",
+      "h1Count": 1,
+      "h1Visible": 1,
+      "h1s": [
+        {
+          "text": "Encoding & Codecs",
+          "visible": true
+        }
+      ],
+      "mainCount": 1,
+      "dataSystem": "editorial",
+      "dataAccent": "crimson",
+      "hasEmptyState": false,
+      "hasAlertError": false,
+      "hasFieldError": false,
+      "hasToolbar": false,
+      "hasMenu": false,
+      "hasDiff": false,
+      "hasLog": false,
+      "hasTabs": false,
+      "hasSidebar": true,
+      "bodyText": 33189
+    },
+    "subcategory": {
+      "path": "/category/encoding-codecs/encoders",
+      "h1Count": 1,
+      "h1Visible": 1,
+      "h1s": [
+        {
+          "text": "Page Not Found",
+          "visible": true
+        }
+      ],
+      "mainCount": 1,
+      "dataSystem": "editorial",
+      "dataAccent": "crimson",
+      "hasEmptyState": false,
+      "hasAlertError": false,
+      "hasFieldError": false,
+      "hasToolbar": false,
+      "hasMenu": false,
+      "hasDiff": false,
+      "hasLog": false,
+      "hasTabs": false,
+      "hasSidebar": true,
+      "bodyText": 1113
+    },
+    "sub-subcategory": {
+      "path": "/category/encoding-codecs/encoders/hevc",
+      "h1Count": 1,
+      "h1Visible": 1,
+      "h1s": [
+        {
+          "text": "Page Not Found",
+          "visible": true
+        }
+      ],
+      "mainCount": 1,
+      "dataSystem": "editorial",
+      "dataAccent": "crimson",
+      "hasEmptyState": false,
+      "hasAlertError": false,
+      "hasFieldError": false,
+      "hasToolbar": false,
+      "hasMenu": false,
+      "hasDiff": false,
+      "hasLog": false,
+      "hasTabs": false,
+      "hasSidebar": true,
+      "bodyText": 1113
+    },
+    "resource-detail": {
+      "path": "/resource/1",
+      "h1Count": 1,
+      "h1Visible": 1,
+      "h1s": [
+        {
+          "text": "Resource Not Found",
+          "visible": true
+        }
+      ],
+      "mainCount": 1,
+      "dataSystem": "editorial",
+      "dataAccent": "crimson",
+      "hasEmptyState": false,
+      "hasAlertError": false,
+      "hasFieldError": false,
+      "hasToolbar": false,
+      "hasMenu": false,
+      "hasDiff": false,
+      "hasLog": false,
+      "hasTabs": false,
+      "hasSidebar": true,
+      "bodyText": 551
+    },
+    "profile": {
+      "path": "/profile",
+      "h1Count": 1,
+      "h1Visible": 1,
+      "h1s": [
+        {
+          "text": "Awesome Video Resources",
+          "visible": true
+        }
+      ],
+      "mainCount": 1,
+      "dataSystem": "editorial",
+      "dataAccent": "crimson",
+      "hasEmptyState": false,
+      "hasAlertError": false,
+      "hasFieldError": false,
+      "hasToolbar": false,
+      "hasMenu": false,
+      "hasDiff": false,
+      "hasLog": false,
+      "hasTabs": false,
+      "hasSidebar": true,
+      "bodyText": 1907
+    },
+    "bookmarks": {
+      "path": "/bookmarks",
+      "h1Count": 1,
+      "h1Visible": 1,
+      "h1s": [
+        {
+          "text": "Awesome Video Resources",
+          "visible": true
+        }
+      ],
+      "mainCount": 1,
+      "dataSystem": "editorial",
+      "dataAccent": "crimson",
+      "hasEmptyState": false,
+      "hasAlertError": false,
+      "hasFieldError": false,
+      "hasToolbar": false,
+      "hasMenu": false,
+      "hasDiff": false,
+      "hasLog": false,
+      "hasTabs": false,
+      "hasSidebar": true,
+      "bodyText": 1907
+    },
+    "notfound": {
+      "path": "/not-a-real-route",
+      "h1Count": 1,
+      "h1Visible": 1,
+      "h1s": [
+        {
+          "text": "Page Not Found",
+          "visible": true
+        }
+      ],
+      "mainCount": 1,
+      "dataSystem": "editorial",
+      "dataAccent": "crimson",
+      "hasEmptyState": false,
+      "hasAlertError": false,
+      "hasFieldError": false,
+      "hasToolbar": false,
+      "hasMenu": false,
+      "hasDiff": false,
+      "hasLog": false,
+      "hasTabs": false,
+      "hasSidebar": true,
+      "bodyText": 662
+    },
+    "admin-gate": {
+      "path": "/admin",
+      "h1Count": 1,
+      "h1Visible": 1,
+      "h1s": [
+        {
+          "text": "Admin Dashboard",
+          "visible": true
+        }
+      ],
+      "mainCount": 1,
+      "dataSystem": "editorial",
+      "dataAccent": "crimson",
+      "hasEmptyState": false,
+      "hasAlertError": true,
+      "hasFieldError": false,
+      "hasToolbar": false,
+      "hasMenu": false,
+      "hasDiff": false,
+      "hasLog": false,
+      "hasTabs": false,
+      "hasSidebar": true,
+      "bodyText": 527
+    }
+  }
+}

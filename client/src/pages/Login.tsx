@@ -96,6 +96,7 @@ export default function Login() {
 
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-12rem)] p-4">
+      <h1 className="sr-only">Sign in to Awesome Video</h1>
       <Card className="w-full max-w-md" data-testid="login-card">
         <CardHeader className="space-y-2">
           <div className="flex items-center justify-center mb-2">

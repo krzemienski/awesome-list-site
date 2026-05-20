@@ -215,6 +215,7 @@ export default function ResourceDetail() {
   if (isLoading) {
     return (
       <div className="space-y-4 sm:space-y-6 max-w-5xl mx-auto px-0 sm:px-4" aria-busy={true} aria-live="polite">
+        <h1 className="sr-only">Loading resource…</h1>
         <Skeleton className="h-10 w-32" />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-4">
@@ -234,6 +235,7 @@ export default function ResourceDetail() {
     return (
       <div className="space-y-4 sm:space-y-6 max-w-4xl mx-auto px-0 sm:px-4">
         <SEOHead title="Resource Not Found" />
+        <h1 className="sr-only">Resource Not Found</h1>
         <div className="text-center py-12">
           <h2 className="text-2xl font-bold mb-4">Resource Not Found</h2>
           <p className="text-muted-foreground mb-6">The resource you're looking for doesn't exist or has been removed.</p>

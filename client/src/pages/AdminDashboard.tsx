@@ -3,6 +3,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Shield, Link, Sparkles, Brain, ListOrdered } from "lucide-react";
 import { useAdmin } from "@/hooks/useAdmin";
+import { useAuth } from "@/hooks/useAuth";
+import { Link as WLink } from "wouter";
 import AdminStats from "@/components/admin/AdminStats";
 import ExportTab from "@/components/admin/ExportTab";
 import DatabaseTab from "@/components/admin/DatabaseTab";
@@ -21,6 +23,8 @@ import ResearcherTab from "@/components/admin/ResearcherTab";
 import JourneyStepsManager from "@/components/admin/JourneyStepsManager";
 export default function AdminDashboard() {
   const { stats, isLoading, error } = useAdmin();
+  const { isAuthenticated, user, isLoading: authLoading } = useAuth();
+  const isAdmin = Boolean(user && (user as any).role === "admin");
 
   const [activeTab, setActiveTab] = useState(() => {
     if (typeof window !== "undefined") {
@@ -35,9 +39,29 @@ export default function AdminDashboard() {
     window.history.replaceState(null, "", `#${value}`);
   };
 
+  if (!authLoading && (!isAuthenticated || !isAdmin)) {
+    return (
+      <div className="container mx-auto px-4 py-8 max-w-2xl">
+        <h1 className="font-display font-medium tracking-tight text-2xl sm:text-3xl text-[var(--text)] mb-4 flex items-center gap-2">
+          <Shield className="h-6 w-6 text-[var(--accent)]" />
+          Admin Dashboard
+        </h1>
+        <div className="alert warn border border-[color-mix(in_srgb,var(--accent)_30%,transparent)] bg-[color-mix(in_srgb,var(--accent)_8%,transparent)] p-4 rounded-lg" role="alert">
+          <p className="text-sm text-[var(--text)] mb-3">
+            You must be signed in as an administrator to view this page.
+          </p>
+          <WLink href="/login" className="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent)] underline" data-testid="link-admin-login">
+            Sign in to continue →
+          </WLink>
+        </div>
+      </div>
+    );
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
+        <h1 className="sr-only">Admin Dashboard</h1>
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--accent)] mx-auto mb-4"></div>
           <p className="text-[var(--text-2)]">Loading admin dashboard...</p>

@@ -1,0 +1,46 @@
+{
+  "gate": "G4.2 (runtime)",
+  "asserts": {
+    "G4.2-a_primitive_classes_present": {
+      "samples": {
+        "/": {
+          "button": 33,
+          "card": true,
+          "input": false,
+          "eyebrow": false,
+          "chip_or_badge": true,
+          "tabs": false,
+          "anyBgToken": true
+        },
+        "/submit": {
+          "button": 32,
+          "card": true,
+          "input": false,
+          "eyebrow": false,
+          "chip_or_badge": true,
+          "tabs": false,
+          "anyBgToken": true
+        },
+        "/category/encoding-codecs": {
+          "button": 378,
+          "card": true,
+          "input": true,
+          "eyebrow": false,
+          "chip_or_badge": true,
+          "tabs": false,
+          "anyBgToken": true
+        }
+      },
+      "verdict": "PASS"
+    },
+    "G4.2-b_modal_keyboard": {
+      "opened": true,
+      "closedAfterEsc": true,
+      "verdict": "PASS"
+    },
+    "G4.2-c_disabled_states": {
+      "submitButtons": [],
+      "verdict": "INFO (no submit button found)"
+    }
+  }
+}

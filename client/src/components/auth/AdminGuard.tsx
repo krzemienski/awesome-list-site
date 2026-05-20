@@ -1,5 +1,6 @@
 import { useAuth } from "@/hooks/useAuth";
-import NotFound from "@/pages/not-found";
+import { Link as WLink } from "wouter";
+import { Shield } from "lucide-react";
 
 interface AdminGuardProps {
   children: React.ReactNode;
@@ -29,8 +30,23 @@ export default function AdminGuard({ children }: AdminGuardProps) {
   console.log('[AdminGuard] isAdmin check:', { user, role: user?.role, isAdmin });
   
   if (!isAdmin) {
-    console.log('[AdminGuard] Access denied - returning NotFound');
-    return <NotFound />;
+    console.log('[AdminGuard] Access denied - showing admin gate');
+    return (
+      <div className="container mx-auto px-4 py-8 max-w-2xl">
+        <h1 className="font-display font-medium tracking-tight text-2xl sm:text-3xl text-[var(--text)] mb-4 flex items-center gap-2">
+          <Shield className="h-6 w-6 text-[var(--accent)]" />
+          Admin Dashboard
+        </h1>
+        <div className="alert warn border border-[color-mix(in_srgb,var(--accent)_30%,transparent)] bg-[color-mix(in_srgb,var(--accent)_8%,transparent)] p-4 rounded-lg" role="alert">
+          <p className="text-sm text-[var(--text)] mb-3">
+            You must be signed in as an administrator to view this page.
+          </p>
+          <WLink href="/login" className="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent)] underline" data-testid="link-admin-login">
+            Sign in to continue →
+          </WLink>
+        </div>
+      </div>
+    );
   }
   
   console.log('[AdminGuard] Access granted - rendering admin children');
