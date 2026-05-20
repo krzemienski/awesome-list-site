@@ -333,15 +333,20 @@ Our database currently has ${this.existingUrls.size} resources. Begin by calling
     };
 
     const addLog = async (role: string, content: string, persistNow = false) => {
-      const entry = { role, content, timestamp: new Date().toISOString() };
+      // Hard cap per-entry at 8k chars to keep the agentLog JSON column
+      // bounded; the full payload is still on the server console.
+      const stored = content.length > 8000 ? content.slice(0, 8000) + `\n…[truncated, full ${content.length} chars in workflow logs]` : content;
+      const entry = { role, content: stored, timestamp: new Date().toISOString() };
       agentLog.push(entry);
-      // Mirror to server console so workflow logs aren't silent.
-      const preview = content.length > 240 ? content.slice(0, 240) + '…' : content;
-      console.log(`[research:${jobId}] [${role}] ${preview}`);
+      // Mirror to server console at full fidelity so workflow logs are the
+      // ground-truth record.
+      console.log(`[research:${jobId}] [${role}] ${content}`);
       if (persistNow) await persist();
     };
 
-    await addLog('system', `Research started. Model: ${RESEARCH_MODEL}, Budget: $${maxBudgetUsd}, Max turns: ${maxTurns}`, true);
+    await addLog('system', `Research started. Model: ${RESEARCH_MODEL}, Budget: $${maxBudgetUsd}, Max turns: ${maxTurns}, Existing URLs loaded: ${this.existingUrls.size}`, true);
+    if (categoryFocus) await addLog('system', `Focus area: ${categoryFocus}`);
+    await addLog('system', `System prompt (${systemPrompt.length} chars):\n${systemPrompt}`);
     await addLog('user', prompt);
 
     // Tool set sent to Claude. Includes Anthropic's native server-side web_search
@@ -363,6 +368,14 @@ Our database currently has ${this.existingUrls.size} resources. Begin by calling
         await persist({ status: 'cancelled', completedAt: new Date() });
         return;
       }
+
+      const turnNumber = turnsUsed + 1;
+      await addLog(
+        'system',
+        `→ Turn ${turnNumber}/${maxTurns} — sending request (messages: ${messages.length}, tools: ${toolsForClaude.length}, max_tokens: 4096)`,
+        true,
+      );
+      const turnStartedAt = Date.now();
 
       let response: Anthropic.Messages.Message;
       try {
@@ -403,6 +416,7 @@ Our database currently has ${this.existingUrls.size} resources. Begin by calling
       }
 
       turnsUsed++;
+      const turnDurationMs = Date.now() - turnStartedAt;
       totalInputTokens += response.usage.input_tokens;
       totalOutputTokens += response.usage.output_tokens;
       // Count Anthropic-billed web_search invocations for accurate cost tracking.
@@ -412,6 +426,20 @@ Our database currently has ${this.existingUrls.size} resources. Begin by calling
       webSearchCount += turnWebSearches;
 
       const currentCost = parseFloat(this.calculateCost(totalInputTokens, totalOutputTokens, webSearchCount));
+
+      // Per-turn diagnostics: response shape, token usage, stop reason, timing.
+      const blockTypeCounts: Record<string, number> = {};
+      for (const b of response.content as any[]) {
+        blockTypeCounts[b.type] = (blockTypeCounts[b.type] || 0) + 1;
+      }
+      await addLog(
+        'system',
+        `← Turn ${turnNumber} response in ${turnDurationMs}ms — stop_reason: ${response.stop_reason}, ` +
+        `usage: in=${response.usage.input_tokens} out=${response.usage.output_tokens} ` +
+        (response.usage.cache_creation_input_tokens ? `cache_create=${response.usage.cache_creation_input_tokens} ` : '') +
+        (response.usage.cache_read_input_tokens ? `cache_read=${response.usage.cache_read_input_tokens} ` : '') +
+        `| blocks: ${JSON.stringify(blockTypeCounts)} | running cost: $${currentCost.toFixed(4)}`,
+      );
       await persist();
 
       if (currentCost >= maxBudgetUsd) {
@@ -422,27 +450,48 @@ Our database currently has ${this.existingUrls.size} resources. Begin by calling
       const toolUseBlocks = response.content.filter(
         (block): block is Anthropic.Messages.ToolUseBlock => block.type === 'tool_use'
       );
-      const textBlocks = response.content.filter(
-        (block): block is Anthropic.Messages.TextBlock => block.type === 'text'
-      );
 
-      for (const tb of textBlocks) {
-        if (tb.text?.trim()) await addLog('assistant', tb.text);
-      }
-      if (turnWebSearches > 0) {
-        // Surface what the agent actually searched for, including snippets.
-        for (const block of response.content as any[]) {
-          if (block.type === 'server_tool_use' && block.name === 'web_search') {
-            await addLog('web_search', `query: ${JSON.stringify(block.input)}`);
-          }
-          if (block.type === 'web_search_tool_result') {
+      // Walk every content block in order so the log reflects the agent's
+      // actual reasoning + action sequence within the turn.
+      for (const block of response.content as any[]) {
+        switch (block.type) {
+          case 'text':
+            if (block.text?.trim()) await addLog('assistant', block.text);
+            break;
+          case 'thinking':
+            if (block.thinking?.trim()) await addLog('thinking', block.thinking);
+            break;
+          case 'server_tool_use':
+            if (block.name === 'web_search') {
+              await addLog('web_search', `query: ${JSON.stringify(block.input)}`);
+            } else {
+              await addLog('server_tool_use', `${block.name}(${JSON.stringify(block.input)})`);
+            }
+            break;
+          case 'web_search_tool_result': {
             const items = Array.isArray(block.content) ? block.content : [];
-            const summary = items
-              .slice(0, 5)
-              .map((it: any) => `• ${it.title || it.url || '(no title)'} — ${it.url || ''}`)
-              .join('\n');
-            await addLog('web_search_result', `${items.length} result(s)\n${summary}`);
+            if (items.length === 0 && block.content?.type === 'web_search_tool_result_error') {
+              await addLog('tool_error', `web_search error: ${block.content.error_code || JSON.stringify(block.content)}`);
+            } else {
+              // Log EVERY result so the user can audit exactly what the agent
+              // saw. Per-entry storage cap in addLog keeps the column bounded.
+              const lines = items.map((it: any, i: number) => {
+                const url = it.url || '';
+                const title = it.title || '(no title)';
+                const encrypted = it.encrypted_content ? ' [encrypted_content]' : '';
+                const page = it.page_age ? ` [page_age=${it.page_age}]` : '';
+                return `  ${i + 1}. ${title}\n     ${url}${page}${encrypted}`;
+              }).join('\n');
+              await addLog('web_search_result', `${items.length} result(s):\n${lines}`);
+            }
+            break;
           }
+          case 'tool_use':
+            // Client-side tool calls are also logged below in the dispatch
+            // loop with their results; skip here to avoid double entries.
+            break;
+          default:
+            await addLog('system', `Unrecognized content block type: ${block.type}`);
         }
       }
 
@@ -470,14 +519,17 @@ Our database currently has ${this.existingUrls.size} resources. Begin by calling
 
       const toolResults: Anthropic.Messages.ToolResultBlockParam[] = [];
       for (const toolBlock of toolUseBlocks) {
-        await addLog('tool_call', `${toolBlock.name}(${JSON.stringify(toolBlock.input).substring(0, 240)})`);
+        // Full input payload, not truncated — auditability over compactness.
+        await addLog('tool_call', `${toolBlock.name}(${JSON.stringify(toolBlock.input)})`);
+        const toolStarted = Date.now();
         try {
           const result = await this.handleToolCall(toolBlock.name, toolBlock.input, jobId);
-          await addLog('tool_result', `${toolBlock.name} → ${result.substring(0, 240)}`);
+          await addLog('tool_result', `${toolBlock.name} (${Date.now() - toolStarted}ms) → ${result}`);
           toolResults.push({ type: "tool_result", tool_use_id: toolBlock.id, content: result });
         } catch (err: any) {
           const errorMsg = err.message || String(err);
-          await addLog('tool_error', `${toolBlock.name} failed: ${errorMsg}`, true);
+          const stack = err?.stack ? `\n${err.stack}` : '';
+          await addLog('tool_error', `${toolBlock.name} failed after ${Date.now() - toolStarted}ms: ${errorMsg}${stack}`, true);
           toolResults.push({
             type: "tool_result",
             tool_use_id: toolBlock.id,
@@ -493,9 +545,19 @@ Our database currently has ${this.existingUrls.size} resources. Begin by calling
     }
 
     const finalCost = this.calculateCost(totalInputTokens, totalOutputTokens, webSearchCount);
+    // Final discovery count from DB (may have been updated mid-loop).
+    const [finalJob] = await db.select({
+      totalDiscoveries: researchJobs.totalDiscoveries,
+      duplicatesSkipped: researchJobs.duplicatesSkipped,
+    }).from(researchJobs).where(eq(researchJobs.id, jobId));
     await addLog(
       'system',
-      `Research completed. Turns: ${turnsUsed}, Web searches: ${webSearchCount}, Cost: $${finalCost}`,
+      `Research completed. Turns: ${turnsUsed}/${maxTurns}, ` +
+      `Web searches: ${webSearchCount}, ` +
+      `Discoveries saved: ${finalJob?.totalDiscoveries || 0}, ` +
+      `Duplicates skipped: ${finalJob?.duplicatesSkipped || 0}, ` +
+      `Total tokens: in=${totalInputTokens} out=${totalOutputTokens}, ` +
+      `Cost: $${finalCost}`,
     );
 
     await persist({ status: 'completed', completedAt: new Date() });
