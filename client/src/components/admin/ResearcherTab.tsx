@@ -8,7 +8,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
@@ -543,6 +543,9 @@ export default function ResearcherTab() {
                 </Badge>
               )}
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              Live agent log, token usage, cost, and discovery results for this research run.
+            </DialogDescription>
           </DialogHeader>
           {selectedJob && (
             <div className="space-y-4">
@@ -699,6 +702,9 @@ export default function ResearcherTab() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Reject Discovery</DialogTitle>
+            <DialogDescription>
+              Mark this discovered resource as rejected. Optionally include a reason for the audit trail.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
             <div>
