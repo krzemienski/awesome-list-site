@@ -1,7 +1,7 @@
 {
   "baseUrl": "http://localhost:5000",
-  "generatedAt": "2026-05-20T08:45:38.985Z",
-  "totalResourcesInHierarchy": 1710,
+  "generatedAt": "2026-05-20T09:14:16.197Z",
+  "totalResourcesInHierarchy": 1951,
   "totalResourcesInList": 1951,
   "rows": [
     {
@@ -61,6 +61,20 @@
       "resourceCount": 1
     },
     {
+      "level": 3,
+      "category": "Encoding & Codecs",
+      "subcategory": "Cloud-Based Encoding Solutions",
+      "subSubcategory": "Cloud Platforms",
+      "resourceCount": 1
+    },
+    {
+      "level": 3,
+      "category": "Encoding & Codecs",
+      "subcategory": "Cloud-Based Encoding Solutions",
+      "subSubcategory": "Subtitles & Captions",
+      "resourceCount": 1
+    },
+    {
       "level": 2,
       "category": "Encoding & Codecs",
       "subcategory": "Cloud-Based Encoding Solutions",
@@ -103,6 +117,27 @@
       "resourceCount": 1
     },
     {
+      "level": 3,
+      "category": "Encoding & Codecs",
+      "subcategory": "Containerization & Packaging Tools",
+      "subSubcategory": "Audio",
+      "resourceCount": 1
+    },
+    {
+      "level": 3,
+      "category": "Encoding & Codecs",
+      "subcategory": "Containerization & Packaging Tools",
+      "subSubcategory": "FFMPEG",
+      "resourceCount": 3
+    },
+    {
+      "level": 3,
+      "category": "Encoding & Codecs",
+      "subcategory": "Containerization & Packaging Tools",
+      "subSubcategory": "Origin Servers",
+      "resourceCount": 1
+    },
+    {
       "level": 2,
       "category": "Encoding & Codecs",
       "subcategory": "Containerization & Packaging Tools",
@@ -131,11 +166,25 @@
       "resourceCount": 78
     },
     {
+      "level": 3,
+      "category": "Encoding & Codecs",
+      "subcategory": "FFmpeg-Based Tools",
+      "subSubcategory": "FFMPEG",
+      "resourceCount": 18
+    },
+    {
       "level": 2,
       "category": "Encoding & Codecs",
       "subcategory": "FFmpeg-Based Tools",
       "subSubcategory": null,
       "resourceCount": 13
+    },
+    {
+      "level": 3,
+      "category": "Encoding & Codecs",
+      "subcategory": "Hardware Accelerated Transcoding",
+      "subSubcategory": "FFMPEG",
+      "resourceCount": 2
     },
     {
       "level": 2,
@@ -166,6 +215,13 @@
       "resourceCount": 0
     },
     {
+      "level": 3,
+      "category": "Encoding & Codecs",
+      "subcategory": "Open Source Encoder Projects",
+      "subSubcategory": "AV1",
+      "resourceCount": 2
+    },
+    {
       "level": 2,
       "category": "Encoding & Codecs",
       "subcategory": "Open Source Encoder Projects",
@@ -178,6 +234,13 @@
       "subcategory": "Real-Time Encoding Solutions",
       "subSubcategory": null,
       "resourceCount": 7
+    },
+    {
+      "level": 3,
+      "category": "Encoding & Codecs",
+      "subcategory": "Scripting & Automation Tools",
+      "subSubcategory": "FFMPEG",
+      "resourceCount": 2
     },
     {
       "level": 2,
@@ -208,11 +271,46 @@
       "resourceCount": 100
     },
     {
+      "level": 3,
+      "category": "General Tools",
+      "subcategory": "API Libraries & SDKs",
+      "subSubcategory": "FFMPEG",
+      "resourceCount": 2
+    },
+    {
+      "level": 3,
+      "category": "General Tools",
+      "subcategory": "API Libraries & SDKs",
+      "subSubcategory": "Quality & Testing",
+      "resourceCount": 1
+    },
+    {
+      "level": 3,
+      "category": "General Tools",
+      "subcategory": "API Libraries & SDKs",
+      "subSubcategory": "Roku",
+      "resourceCount": 2
+    },
+    {
       "level": 2,
       "category": "General Tools",
       "subcategory": "API Libraries & SDKs",
       "subSubcategory": null,
       "resourceCount": 3
+    },
+    {
+      "level": 3,
+      "category": "General Tools",
+      "subcategory": "Build Scripts & Automation",
+      "subSubcategory": "FFMPEG",
+      "resourceCount": 4
+    },
+    {
+      "level": 3,
+      "category": "General Tools",
+      "subcategory": "Build Scripts & Automation",
+      "subSubcategory": "Roku",
+      "resourceCount": 1
     },
     {
       "level": 2,
@@ -222,11 +320,25 @@
       "resourceCount": 1
     },
     {
+      "level": 3,
+      "category": "General Tools",
+      "subcategory": "Case Studies & Best Practices in DRM",
+      "subSubcategory": "HEVC",
+      "resourceCount": 1
+    },
+    {
       "level": 2,
       "category": "General Tools",
       "subcategory": "Case Studies & Best Practices in DRM",
       "subSubcategory": null,
       "resourceCount": 3
+    },
+    {
+      "level": 3,
+      "category": "General Tools",
+      "subcategory": "Command-line Utilities & Wrappers",
+      "subSubcategory": "Roku",
+      "resourceCount": 2
     },
     {
       "level": 2,
@@ -241,6 +353,13 @@
       "subcategory": "Community & Collaboration Platforms",
       "subSubcategory": null,
       "resourceCount": 2
+    },
+    {
+      "level": 3,
+      "category": "General Tools",
+      "subcategory": "Cross-Platform Media Tools",
+      "subSubcategory": "Audio",
+      "resourceCount": 1
     },
     {
       "level": 2,
@@ -271,11 +390,46 @@
       "resourceCount": 1
     },
     {
+      "level": 3,
+      "category": "General Tools",
+      "subcategory": "Docker & Containerization Tools",
+      "subSubcategory": "Cloud Platforms",
+      "resourceCount": 1
+    },
+    {
+      "level": 3,
+      "category": "General Tools",
+      "subcategory": "Docker & Containerization Tools",
+      "subSubcategory": "FFMPEG",
+      "resourceCount": 1
+    },
+    {
+      "level": 3,
+      "category": "General Tools",
+      "subcategory": "Docker & Containerization Tools",
+      "subSubcategory": "Storage Solutions",
+      "resourceCount": 1
+    },
+    {
       "level": 2,
       "category": "General Tools",
       "subcategory": "Docker & Containerization Tools",
       "subSubcategory": null,
       "resourceCount": 4
+    },
+    {
+      "level": 3,
+      "category": "General Tools",
+      "subcategory": "Encryption Tools for Streaming",
+      "subSubcategory": "DASH",
+      "resourceCount": 1
+    },
+    {
+      "level": 3,
+      "category": "General Tools",
+      "subcategory": "Encryption Tools for Streaming",
+      "subSubcategory": "HLS",
+      "resourceCount": 1
     },
     {
       "level": 2,
@@ -299,11 +453,25 @@
       "resourceCount": 2
     },
     {
+      "level": 3,
+      "category": "General Tools",
+      "subcategory": "Logging & Debugging Tools",
+      "subSubcategory": "Roku",
+      "resourceCount": 2
+    },
+    {
       "level": 2,
       "category": "General Tools",
       "subcategory": "Logging & Debugging Tools",
       "subSubcategory": null,
       "resourceCount": 3
+    },
+    {
+      "level": 3,
+      "category": "General Tools",
+      "subcategory": "Performance & Monitoring Tools",
+      "subSubcategory": "Quality & Testing",
+      "resourceCount": 1
     },
     {
       "level": 2,
@@ -327,11 +495,32 @@
       "resourceCount": 3
     },
     {
+      "level": 3,
+      "category": "General Tools",
+      "subcategory": "Test Content & Sample Streams",
+      "subSubcategory": "DASH",
+      "resourceCount": 2
+    },
+    {
+      "level": 3,
+      "category": "General Tools",
+      "subcategory": "Test Content & Sample Streams",
+      "subSubcategory": "HLS",
+      "resourceCount": 1
+    },
+    {
       "level": 2,
       "category": "General Tools",
       "subcategory": "Test Content & Sample Streams",
       "subSubcategory": null,
       "resourceCount": 7
+    },
+    {
+      "level": 3,
+      "category": "General Tools",
+      "subcategory": "Widevine FairPlay PlayReady Integrations",
+      "subSubcategory": "Android",
+      "resourceCount": 1
     },
     {
       "level": 2,
@@ -346,6 +535,13 @@
       "subcategory": null,
       "subSubcategory": null,
       "resourceCount": 74
+    },
+    {
+      "level": 3,
+      "category": "Infrastructure & Delivery",
+      "subcategory": "CDN Integration & Distribution",
+      "subSubcategory": "CDN Integration",
+      "resourceCount": 1
     },
     {
       "level": 2,
@@ -374,6 +570,13 @@
       "subcategory": "Cloud & CDN",
       "subSubcategory": null,
       "resourceCount": 0
+    },
+    {
+      "level": 3,
+      "category": "Infrastructure & Delivery",
+      "subcategory": "Edge Computing & Caching Solutions",
+      "subSubcategory": "HLS",
+      "resourceCount": 1
     },
     {
       "level": 2,
@@ -411,6 +614,13 @@
       "resourceCount": 9
     },
     {
+      "level": 3,
+      "category": "Infrastructure & Delivery",
+      "subcategory": "Streaming Analytics & Monitoring",
+      "subSubcategory": "Quality & Testing",
+      "resourceCount": 2
+    },
+    {
       "level": 2,
       "category": "Infrastructure & Delivery",
       "subcategory": "Streaming Analytics & Monitoring",
@@ -437,6 +647,13 @@
       "subcategory": "Streaming Servers",
       "subSubcategory": null,
       "resourceCount": 22
+    },
+    {
+      "level": 3,
+      "category": "Infrastructure & Delivery",
+      "subcategory": "VOD Streaming Servers",
+      "subSubcategory": "HLS",
+      "resourceCount": 1
     },
     {
       "level": 2,
@@ -472,6 +689,27 @@
       "subcategory": "Community Blogs & Forums",
       "subSubcategory": null,
       "resourceCount": 2
+    },
+    {
+      "level": 3,
+      "category": "Intro & Learning",
+      "subcategory": "Encoding & Transcoding Guides",
+      "subSubcategory": "Audio",
+      "resourceCount": 1
+    },
+    {
+      "level": 3,
+      "category": "Intro & Learning",
+      "subcategory": "Encoding & Transcoding Guides",
+      "subSubcategory": "FFMPEG",
+      "resourceCount": 3
+    },
+    {
+      "level": 3,
+      "category": "Intro & Learning",
+      "subcategory": "Encoding & Transcoding Guides",
+      "subSubcategory": "HEVC",
+      "resourceCount": 1
     },
     {
       "level": 2,
@@ -516,11 +754,32 @@
       "resourceCount": 25
     },
     {
+      "level": 3,
+      "category": "Intro & Learning",
+      "subcategory": "Video Streaming Tutorials",
+      "subSubcategory": "HLS",
+      "resourceCount": 1
+    },
+    {
       "level": 2,
       "category": "Intro & Learning",
       "subcategory": "Video Streaming Tutorials",
       "subSubcategory": null,
       "resourceCount": 10
+    },
+    {
+      "level": 3,
+      "category": "Intro & Learning",
+      "subcategory": "Webinars & Conference Talks",
+      "subSubcategory": "HLS",
+      "resourceCount": 1
+    },
+    {
+      "level": 3,
+      "category": "Intro & Learning",
+      "subcategory": "Webinars & Conference Talks",
+      "subSubcategory": "Podcasts & Webinars",
+      "resourceCount": 1
     },
     {
       "level": 2,
@@ -535,6 +794,13 @@
       "subcategory": null,
       "subSubcategory": null,
       "resourceCount": 121
+    },
+    {
+      "level": 3,
+      "category": "Media Tools",
+      "subcategory": "AI & Machine Learning Tools",
+      "subSubcategory": "FFMPEG",
+      "resourceCount": 1
     },
     {
       "level": 2,
@@ -584,6 +850,13 @@
       "subcategory": "Audio & Subtitles",
       "subSubcategory": null,
       "resourceCount": 2
+    },
+    {
+      "level": 3,
+      "category": "Media Tools",
+      "subcategory": "Audio Analysis & Processing",
+      "subSubcategory": "Audio",
+      "resourceCount": 3
     },
     {
       "level": 2,
@@ -642,6 +915,20 @@
       "resourceCount": 0
     },
     {
+      "level": 3,
+      "category": "Media Tools",
+      "subcategory": "Quality Analysis & Metrics",
+      "subSubcategory": "FFMPEG",
+      "resourceCount": 1
+    },
+    {
+      "level": 3,
+      "category": "Media Tools",
+      "subcategory": "Quality Analysis & Metrics",
+      "subSubcategory": "Quality & Testing",
+      "resourceCount": 11
+    },
+    {
       "level": 2,
       "category": "Media Tools",
       "subcategory": "Quality Analysis & Metrics",
@@ -654,6 +941,13 @@
       "subcategory": "Scene Detection & Segmentation",
       "subSubcategory": null,
       "resourceCount": 3
+    },
+    {
+      "level": 3,
+      "category": "Media Tools",
+      "subcategory": "Subtitle & Caption Tools",
+      "subSubcategory": "Subtitles & Captions",
+      "resourceCount": 16
     },
     {
       "level": 2,
@@ -670,11 +964,32 @@
       "resourceCount": 0
     },
     {
+      "level": 3,
+      "category": "Media Tools",
+      "subcategory": "VMAF PSNR SSIM Tools",
+      "subSubcategory": "Quality & Testing",
+      "resourceCount": 3
+    },
+    {
       "level": 2,
       "category": "Media Tools",
       "subcategory": "VMAF PSNR SSIM Tools",
       "subSubcategory": null,
       "resourceCount": 3
+    },
+    {
+      "level": 3,
+      "category": "Media Tools",
+      "subcategory": "Video Analytics & Benchmarking",
+      "subSubcategory": "FFMPEG",
+      "resourceCount": 2
+    },
+    {
+      "level": 3,
+      "category": "Media Tools",
+      "subcategory": "Video Analytics & Benchmarking",
+      "subSubcategory": "Quality & Testing",
+      "resourceCount": 2
     },
     {
       "level": 2,
@@ -689,6 +1004,13 @@
       "subcategory": null,
       "subSubcategory": null,
       "resourceCount": 159
+    },
+    {
+      "level": 3,
+      "category": "Players & Clients",
+      "subcategory": "Browser Extensions",
+      "subSubcategory": "Web Players",
+      "resourceCount": 1
     },
     {
       "level": 2,
@@ -710,6 +1032,13 @@
       "subcategory": "Embedded Players",
       "subSubcategory": null,
       "resourceCount": 1
+    },
+    {
+      "level": 3,
+      "category": "Players & Clients",
+      "subcategory": "Frameworks & UI Components",
+      "subSubcategory": "Web Players",
+      "resourceCount": 4
     },
     {
       "level": 2,
@@ -775,6 +1104,27 @@
       "resourceCount": 10
     },
     {
+      "level": 3,
+      "category": "Players & Clients",
+      "subcategory": "Mobile Players",
+      "subSubcategory": "Android",
+      "resourceCount": 3
+    },
+    {
+      "level": 3,
+      "category": "Players & Clients",
+      "subcategory": "Mobile Players",
+      "subSubcategory": "DASH",
+      "resourceCount": 1
+    },
+    {
+      "level": 3,
+      "category": "Players & Clients",
+      "subcategory": "Mobile Players",
+      "subSubcategory": "iOS/tvOS",
+      "resourceCount": 10
+    },
+    {
       "level": 2,
       "category": "Players & Clients",
       "subcategory": "Mobile Players",
@@ -789,11 +1139,46 @@
       "resourceCount": 1
     },
     {
+      "level": 3,
+      "category": "Players & Clients",
+      "subcategory": "Smart TV Players",
+      "subSubcategory": "Chromecast",
+      "resourceCount": 1
+    },
+    {
+      "level": 3,
+      "category": "Players & Clients",
+      "subcategory": "Smart TV Players",
+      "subSubcategory": "Roku",
+      "resourceCount": 6
+    },
+    {
+      "level": 3,
+      "category": "Players & Clients",
+      "subcategory": "Smart TV Players",
+      "subSubcategory": "Smart TVs",
+      "resourceCount": 3
+    },
+    {
       "level": 2,
       "category": "Players & Clients",
       "subcategory": "Smart TV Players",
       "subSubcategory": null,
       "resourceCount": 1
+    },
+    {
+      "level": 3,
+      "category": "Players & Clients",
+      "subcategory": "Web Players",
+      "subSubcategory": "HLS",
+      "resourceCount": 1
+    },
+    {
+      "level": 3,
+      "category": "Players & Clients",
+      "subcategory": "Web Players",
+      "subSubcategory": "Web Players",
+      "resourceCount": 4
     },
     {
       "level": 2,
@@ -845,11 +1230,32 @@
       "resourceCount": 4
     },
     {
+      "level": 3,
+      "category": "Protocols & Transport",
+      "subcategory": "DASH Manifest Tools",
+      "subSubcategory": "DASH",
+      "resourceCount": 8
+    },
+    {
       "level": 2,
       "category": "Protocols & Transport",
       "subcategory": "DASH Manifest Tools",
       "subSubcategory": null,
       "resourceCount": 0
+    },
+    {
+      "level": 3,
+      "category": "Protocols & Transport",
+      "subcategory": "DASH Tools",
+      "subSubcategory": "DASH",
+      "resourceCount": 20
+    },
+    {
+      "level": 3,
+      "category": "Protocols & Transport",
+      "subcategory": "DASH Tools",
+      "subSubcategory": "Subtitles & Captions",
+      "resourceCount": 1
     },
     {
       "level": 2,
@@ -859,11 +1265,46 @@
       "resourceCount": 2
     },
     {
+      "level": 3,
+      "category": "Protocols & Transport",
+      "subcategory": "HLS Manifest Parsers & Generators",
+      "subSubcategory": "HLS",
+      "resourceCount": 6
+    },
+    {
+      "level": 3,
+      "category": "Protocols & Transport",
+      "subcategory": "HLS Manifest Parsers & Generators",
+      "subSubcategory": "Subtitles & Captions",
+      "resourceCount": 1
+    },
+    {
       "level": 2,
       "category": "Protocols & Transport",
       "subcategory": "HLS Manifest Parsers & Generators",
       "subSubcategory": null,
       "resourceCount": 5
+    },
+    {
+      "level": 3,
+      "category": "Protocols & Transport",
+      "subcategory": "HLS Tools",
+      "subSubcategory": "FFMPEG",
+      "resourceCount": 2
+    },
+    {
+      "level": 3,
+      "category": "Protocols & Transport",
+      "subcategory": "HLS Tools",
+      "subSubcategory": "HLS",
+      "resourceCount": 27
+    },
+    {
+      "level": 3,
+      "category": "Protocols & Transport",
+      "subcategory": "HLS Tools",
+      "subSubcategory": "Quality & Testing",
+      "resourceCount": 1
     },
     {
       "level": 2,
@@ -915,6 +1356,27 @@
       "resourceCount": 85
     },
     {
+      "level": 3,
+      "category": "Standards & Industry",
+      "subcategory": "Adaptive Streaming Standards",
+      "subSubcategory": "DASH",
+      "resourceCount": 5
+    },
+    {
+      "level": 3,
+      "category": "Standards & Industry",
+      "subcategory": "Adaptive Streaming Standards",
+      "subSubcategory": "HLS",
+      "resourceCount": 3
+    },
+    {
+      "level": 3,
+      "category": "Standards & Industry",
+      "subcategory": "Adaptive Streaming Standards",
+      "subSubcategory": "Official Specs",
+      "resourceCount": 1
+    },
+    {
       "level": 2,
       "category": "Standards & Industry",
       "subcategory": "Adaptive Streaming Standards",
@@ -922,11 +1384,25 @@
       "resourceCount": 6
     },
     {
+      "level": 3,
+      "category": "Standards & Industry",
+      "subcategory": "Best Practices & Guidelines",
+      "subSubcategory": "HDR Guidelines",
+      "resourceCount": 1
+    },
+    {
       "level": 2,
       "category": "Standards & Industry",
       "subcategory": "Best Practices & Guidelines",
       "subSubcategory": null,
       "resourceCount": 9
+    },
+    {
+      "level": 3,
+      "category": "Standards & Industry",
+      "subcategory": "Closed Captioning & Subtitling Standards",
+      "subSubcategory": "Subtitles & Captions",
+      "resourceCount": 8
     },
     {
       "level": 2,
@@ -941,6 +1417,20 @@
       "subcategory": "DRM & Content Protection Standards",
       "subSubcategory": null,
       "resourceCount": 3
+    },
+    {
+      "level": 3,
+      "category": "Standards & Industry",
+      "subcategory": "Industry Forums & Standards Bodies",
+      "subSubcategory": "MPEG & Forums",
+      "resourceCount": 4
+    },
+    {
+      "level": 3,
+      "category": "Standards & Industry",
+      "subcategory": "Industry Forums & Standards Bodies",
+      "subSubcategory": "RIST",
+      "resourceCount": 1
     },
     {
       "level": 2,
@@ -990,6 +1480,41 @@
       "subcategory": "Vendors & HDR",
       "subSubcategory": null,
       "resourceCount": 0
+    },
+    {
+      "level": 3,
+      "category": "Standards & Industry",
+      "subcategory": "Video Codec Specifications",
+      "subSubcategory": "AV1",
+      "resourceCount": 1
+    },
+    {
+      "level": 3,
+      "category": "Standards & Industry",
+      "subcategory": "Video Codec Specifications",
+      "subSubcategory": "Audio",
+      "resourceCount": 1
+    },
+    {
+      "level": 3,
+      "category": "Standards & Industry",
+      "subcategory": "Video Codec Specifications",
+      "subSubcategory": "HEVC",
+      "resourceCount": 5
+    },
+    {
+      "level": 3,
+      "category": "Standards & Industry",
+      "subcategory": "Video Codec Specifications",
+      "subSubcategory": "MPEG & Forums",
+      "resourceCount": 1
+    },
+    {
+      "level": 3,
+      "category": "Standards & Industry",
+      "subcategory": "Video Codec Specifications",
+      "subSubcategory": "Official Specs",
+      "resourceCount": 1
     },
     {
       "level": 2,
