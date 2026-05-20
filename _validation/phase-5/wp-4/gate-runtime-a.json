@@ -10,9 +10,9 @@
       "verdict": "PASS"
     },
     "G4.4-c_submit_field_error": {
-      "hasFieldError": false,
-      "ariaInvalid": 0,
-      "verdict": "INFO (no error surfaced)"
+      "hasFieldError": true,
+      "ariaInvalid": 1,
+      "verdict": "PASS"
     },
     "G4.4-e_admin_gate": {
       "hasAlertWarn": true,
@@ -68,7 +68,7 @@
       "hasLog": false,
       "hasTabs": false,
       "hasSidebar": true,
-      "bodyText": 1906
+      "bodyText": 1895
     },
     "login": {
       "path": "/login",
@@ -124,7 +124,7 @@
       "h1Visible": 1,
       "h1s": [
         {
-          "text": "Submit a Resource — Authentication Required",
+          "text": "Submit a Resource",
           "visible": true
         }
       ],
@@ -132,7 +132,7 @@
       "dataSystem": "editorial",
       "dataAccent": "crimson",
       "hasEmptyState": false,
-      "hasAlertError": false,
+      "hasAlertError": true,
       "hasFieldError": false,
       "hasToolbar": false,
       "hasMenu": false,
@@ -140,7 +140,7 @@
       "hasLog": false,
       "hasTabs": false,
       "hasSidebar": true,
-      "bodyText": 607
+      "bodyText": 1409
     },
     "advanced": {
       "path": "/advanced",

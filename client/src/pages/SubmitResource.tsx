@@ -101,6 +101,7 @@ export default function SubmitResource() {
 
   const form = useForm<SubmitResourceFormData>({
     resolver: zodResolver(submitResourceSchema),
+    mode: "onTouched",
     defaultValues: {
       title: "",
       url: "",
@@ -111,6 +112,37 @@ export default function SubmitResource() {
       tags: "",
     },
   });
+
+  const FIELD_ORDER: Array<keyof SubmitResourceFormData> = [
+    "title",
+    "url",
+    "description",
+    "category",
+    "subcategory",
+    "subSubcategory",
+    "tags",
+  ];
+
+  const onInvalid = (errors: Record<string, unknown>) => {
+    const firstBad = FIELD_ORDER.find((name) => name in errors);
+    if (firstBad) {
+      try {
+        form.setFocus(firstBad);
+      } catch {
+        // Some controls (Select) cannot be focused programmatically; fall back
+        // to focusing the rendered input/trigger by name.
+        const el = document.querySelector<HTMLElement>(
+          `[name="${firstBad}"], [data-testid="input-${firstBad}"], [data-testid="select-${firstBad}"]`
+        );
+        el?.focus();
+      }
+    }
+    toast({
+      title: "Please fix the highlighted fields",
+      description: "Some required fields are missing or invalid.",
+      variant: "destructive",
+    });
+  };
 
   const selectedCategory = form.watch("category");
   const selectedSubcategory = form.watch("subcategory");
@@ -233,54 +265,19 @@ export default function SubmitResource() {
   });
 
   const onSubmit = (data: SubmitResourceFormData) => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Login required",
+        description: "Please log in to submit a resource.",
+        variant: "destructive",
+      });
+      window.location.href = "/api/login";
+      return;
+    }
     submitMutation.mutate(data);
   };
 
-  // Show auth required message for unauthenticated users
-  if (!authLoading && !isAuthenticated) {
-    return (
-      <>
-        <Helmet>
-          <title>Submit Resource - Login Required</title>
-          <meta name="description" content="Login to submit resources to the awesome list" />
-        </Helmet>
-        
-        <div className="container max-w-2xl mx-auto px-4 py-12">
-          <h1 className="sr-only">Submit a Resource — Authentication Required</h1>
-          <Card className="border-[color-mix(in_srgb,var(--accent)_20%,transparent)]">
-            <CardHeader className="text-center">
-              <div className="mx-auto mb-4 w-fit">
-                <LogIn className="h-8 w-8 text-[var(--accent)]" />
-              </div>
-              <CardTitle className="text-xl">Authentication Required</CardTitle>
-              <CardDescription>
-                You need to be logged in to submit resources. Please login to continue.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-4">
-              <Button 
-                onClick={() => window.location.href = '/api/login'}
-                className="w-full"
-                data-testid="button-login"
-              >
-                <LogIn className="mr-2 h-4 w-4" />
-                Login with Replit
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => setLocation('/')}
-                data-testid="button-back-home"
-              >
-                Back to Home
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </>
-    );
-  }
-
-  if (authLoading || categoriesLoading) {
+  if (authLoading) {
     return (
       <div className="container max-w-2xl mx-auto px-4 py-12">
         <div className="flex items-center justify-center">
@@ -330,7 +327,18 @@ export default function SubmitResource() {
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {!isAuthenticated && (
+                <Alert className="mb-6 border-yellow-500/50 bg-yellow-500/10" data-testid="alert-login-required">
+                  <LogIn className="h-4 w-4 text-yellow-500" />
+                  <AlertTitle className="text-yellow-500">Login required to submit</AlertTitle>
+                  <AlertDescription>
+                    You can preview the form, but you must{" "}
+                    <a href="/api/login" className="underline" data-testid="link-login">log in</a>{" "}
+                    to actually submit a resource.
+                  </AlertDescription>
+                </Alert>
+              )}
+              <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} className="space-y-6" noValidate>
                 {/* Title Field */}
                 <FormField
                   control={form.control}
