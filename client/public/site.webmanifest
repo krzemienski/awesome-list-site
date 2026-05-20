@@ -1,15 +1,15 @@
 {
-  "name": "Awesome List",
-  "short_name": "AwesomeList",
-  "description": "A curated list of awesome resources for developers",
+  "name": "Awesome Video",
+  "short_name": "Awesome Video",
+  "description": "The curated index of 2,600+ video development resources — players, encoders, codecs, streaming, AI, tools, and community.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#dc2626",
+  "background_color": "#000000",
+  "theme_color": "#ff3d52",
   "orientation": "portrait-primary",
   "scope": "/",
   "lang": "en",
-  "categories": ["productivity", "developer", "education"],
+  "categories": ["productivity", "developer", "education", "video"],
   "icons": [
     {
       "src": "/android-chrome-192x192.png",
@@ -34,26 +34,20 @@
     {
       "name": "Browse Categories",
       "short_name": "Categories",
-      "description": "Explore all resource categories",
-      "url": "/",
-      "icons": [
-        {
-          "src": "/android-chrome-192x192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "description": "Explore all video development categories",
+      "url": "/"
     },
     {
-      "name": "Advanced Features",
+      "name": "Learning Journeys",
+      "short_name": "Journeys",
+      "description": "Guided multi-step learning paths",
+      "url": "/journeys"
+    },
+    {
+      "name": "Advanced",
       "short_name": "Advanced",
-      "description": "Access category explorer and analytics",
-      "url": "/advanced",
-      "icons": [
-        {
-          "src": "/android-chrome-192x192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "description": "Category explorer, analytics, and export",
+      "url": "/advanced"
     }
   ]
 }

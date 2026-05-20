@@ -144,3 +144,21 @@ id = "2BtfAQKx2oYkZox5Becpw"
 uri = "file://screenshots/production/DESIGN-BRIEF.md"
 type = "text"
 title = "Claude Design Redesign Brief"
+
+[[outputs]]
+id = "Pn0ipKaKkkJgGSdlDad4J"
+uri = "file://screenshots/og/og-category-encoding.png"
+type = "image"
+title = "OG image — Category page (Editorial + Crimson)"
+
+[[outputs]]
+id = "LHNpXwtjp3EXFna1Oktw5"
+uri = "file://screenshots/og/og-home.png"
+type = "image"
+title = "OG image — Home"
+
+[[outputs]]
+id = "s0ozuTAC-jT7C0xRjDK2Q"
+uri = "file://screenshots/og/og-journey-streaming.png"
+type = "image"
+title = "OG image — Learning Journey"

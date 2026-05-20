@@ -21,10 +21,10 @@ export default function About() {
   return (
     <div className="container mx-auto px-4 py-8">
       <Helmet>
-        <title>About - Awesome List Static Site</title>
+        <title>About — Awesome Video</title>
         <meta
           name="description"
-          content="Learn about the Awesome List Static Site project, its features, and how it works."
+          content="Learn about Awesome Video, the open-source index of 2,600+ video development resources, and the team behind it."
         />
       </Helmet>
 
@@ -53,7 +53,7 @@ export default function About() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-foreground">
-            Awesome List Static Site is an SEO-friendly, mobile-first website that transforms
+            Awesome Video is an SEO-friendly, mobile-first website that transforms
             GitHub's curated "Awesome Lists" into beautiful, searchable websites.
           </p>
           <p className="text-muted-foreground">

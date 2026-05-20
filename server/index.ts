@@ -149,6 +149,14 @@ async function runMigrations() {
   // Centralized error handling middleware
   app.use(errorHandler);
 
+  // Per-route Open Graph / Twitter / SEO metadata injection.
+  // Must run AFTER registerRoutes (so /api/* and /og-image.png are handled by
+  // their real handlers, not intercepted) but BEFORE vite/static so the HTML
+  // response is rewritten with route-specific tags for crawlers that don't
+  // execute JavaScript (Twitter, Facebook, Slack, iMessage, LinkedIn, etc.).
+  const { ogInjectionMiddleware } = await import("./og-middleware");
+  app.use(ogInjectionMiddleware());
+
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes

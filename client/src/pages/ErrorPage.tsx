@@ -17,7 +17,7 @@ export default function ErrorPage({ error }: ErrorPageProps) {
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-10rem)]">
       <Helmet>
-        <title>Error - Awesome List Static Site</title>
+        <title>Error — Awesome Video</title>
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       

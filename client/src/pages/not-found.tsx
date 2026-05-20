@@ -8,7 +8,7 @@ export default function NotFound() {
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-10rem)]">
       <Helmet>
-        <title>404 - Page Not Found</title>
+        <title>404 — Page Not Found — Awesome Video</title>
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
 
