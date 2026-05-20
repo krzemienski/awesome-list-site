@@ -7,10 +7,11 @@ import type { ResearchJob, ResearchDiscovery } from '@shared/schema';
 import { CategoryRepository } from '../repositories/CategoryRepository';
 import { ensureSubSubcategoryExists } from '../repositories/ensureSubSubcategory';
 
-const RESEARCH_MODEL = "claude-sonnet-4-20250514";
+const RESEARCH_MODEL = "claude-sonnet-4-5";
 
 const COST_PER_INPUT_TOKEN = 3.0 / 1_000_000;
 const COST_PER_OUTPUT_TOKEN = 15.0 / 1_000_000;
+const COST_PER_WEB_SEARCH = 10.0 / 1000;
 
 interface ResearchToolDefinition {
   name: string;
@@ -224,12 +225,29 @@ class ResearchService {
 
     this.runResearchLoop(job.id, options.prompt, options.categoryFocus, options.maxTurns || 30, parseFloat(options.maxBudgetUsd || '1.00'))
       .catch(async (err) => {
-        console.error(`Research job ${job.id} failed:`, err);
-        await db.update(researchJobs).set({
-          status: 'failed',
-          errorMessage: err.message || String(err),
-          completedAt: new Date(),
-        }).where(eq(researchJobs.id, job.id));
+        const msg = err?.message || String(err);
+        console.error(`[research:${job.id}] FAILED:`, msg);
+        if (err?.stack) console.error(err.stack);
+        try {
+          // Append a final 'error' log entry so the UI shows what happened
+          // even when the failure happened before the loop persisted anything.
+          const [cur] = await db.select({ agentLog: researchJobs.agentLog })
+            .from(researchJobs).where(eq(researchJobs.id, job.id));
+          const existing = Array.isArray(cur?.agentLog) ? cur!.agentLog as any[] : [];
+          existing.push({
+            role: 'error',
+            content: `Job failed: ${msg}`,
+            timestamp: new Date().toISOString(),
+          });
+          await db.update(researchJobs).set({
+            status: 'failed',
+            errorMessage: msg,
+            agentLog: existing,
+            completedAt: new Date(),
+          }).where(eq(researchJobs.id, job.id));
+        } catch (persistErr: any) {
+          console.error(`[research:${job.id}] failed to persist failure:`, persistErr?.message);
+        }
       })
       .finally(() => {
         this.activeJobs.delete(job.id);
@@ -245,9 +263,16 @@ class ResearchService {
     maxTurns: number,
     maxBudgetUsd: number
   ): Promise<void> {
-    const apiKey = process.env.ANTHROPIC_API_KEY;
+    // Prefer the direct ANTHROPIC_API_KEY so the native server-side `web_search`
+    // tool (only available on the canonical Anthropic API endpoint) works. The
+    // gateway URL set by the Replit AI integration does not currently support
+    // the web_search server tool.
+    const apiKey = process.env.ANTHROPIC_API_KEY || process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY;
     if (!apiKey) {
-      throw new Error("ANTHROPIC_API_KEY not configured");
+      throw new Error(
+        "No Anthropic API key configured (ANTHROPIC_API_KEY or AI_INTEGRATIONS_ANTHROPIC_API_KEY). " +
+        "Set ANTHROPIC_API_KEY in Secrets, then restart the workflow."
+      );
     }
 
     const client = new Anthropic({ apiKey });
@@ -256,18 +281,29 @@ class ResearchService {
 
     const systemPrompt = `You are an expert resource researcher specializing in video streaming, video development, and multimedia technology. Your job is to discover NEW, high-quality resources (tools, libraries, platforms, tutorials, documentation) related to video streaming and development that are NOT already in our database.
 
+YOUR TOOLS:
+- web_search: Use the live web to find new resources. ALWAYS start here — do not rely on memory.
+- get_category_tree: Inspect the site taxonomy so you can categorize correctly.
+- get_existing_resources: Sample what's already in a category to identify gaps.
+- check_duplicate: Required before every save_discovery. Skips URLs already in the DB.
+- save_discovery: Persist a verified, non-duplicate resource for admin review.
+
+WORKFLOW (every turn):
+1. Plan or refine a web_search query targeted at the focus area.
+2. Read the top results. For each candidate, call check_duplicate with the URL.
+3. If new and high quality, call save_discovery with accurate metadata (title, url, description, suggested_category, suggested_subcategory, suggested_sub_subcategory, confidence 1-100, reasoning).
+4. Repeat with refined queries until you've exhausted promising leads or hit the budget.
+
 IMPORTANT RULES:
-1. ALWAYS use check_duplicate before saving any resource to avoid duplicates
-2. Focus on finding resources that are actively maintained and high-quality
-3. Search for various types: open-source libraries, commercial platforms, tutorials, documentation, developer tools, APIs
-4. Provide accurate descriptions and proper categorization
-5. Be thorough but efficient - aim for quality over quantity
-6. When you find a promising domain or topic, explore related resources
-7. Your confidence score should reflect how relevant and high-quality the resource is for video streaming/development
+1. NEVER fabricate URLs. Only save what you actually verified via web_search.
+2. ALWAYS check_duplicate before save_discovery.
+3. Prefer actively maintained, high-quality resources (recent commits, real docs, working sites).
+4. Variety matters: libraries, platforms, tutorials, docs, dev tools, APIs.
+5. Confidence reflects quality + relevance, not your enthusiasm.
 
-${categoryFocus ? `FOCUS AREA: Prioritize discovering resources related to "${categoryFocus}"` : 'Search across all video streaming and development categories.'}
+${categoryFocus ? `FOCUS AREA: Prioritize discovering resources related to "${categoryFocus}".` : 'Search across all video streaming and development categories.'}
 
-Our database currently has ${this.existingUrls.size} resources. Start by getting the category tree to understand our taxonomy, then systematically search for new resources.`;
+Our database currently has ${this.existingUrls.size} resources. Begin by calling get_category_tree, then run your first web_search.`;
 
     let messages: Anthropic.Messages.MessageParam[] = [
       { role: "user", content: prompt }
@@ -275,137 +311,201 @@ Our database currently has ${this.existingUrls.size} resources. Start by getting
 
     let totalInputTokens = 0;
     let totalOutputTokens = 0;
+    let webSearchCount = 0;
     let turnsUsed = 0;
     const agentLog: Array<{ role: string; content: string; timestamp: string }> = [];
 
-    const addLog = (role: string, content: string) => {
-      agentLog.push({ role, content, timestamp: new Date().toISOString() });
+    // Persist after every meaningful event so the UI can stream progress
+    // and so a hung turn still leaves a trail.
+    const persist = async (extra: Record<string, any> = {}) => {
+      try {
+        await db.update(researchJobs).set({
+          turnsUsed,
+          totalInputTokens,
+          totalOutputTokens,
+          estimatedCostUsd: this.calculateCost(totalInputTokens, totalOutputTokens, webSearchCount),
+          agentLog,
+          ...extra,
+        }).where(eq(researchJobs.id, jobId));
+      } catch (e: any) {
+        console.error(`[research:${jobId}] persist failed:`, e.message);
+      }
     };
 
-    addLog('system', `Research started. Budget: $${maxBudgetUsd}, Max turns: ${maxTurns}`);
-    addLog('user', prompt);
+    const addLog = async (role: string, content: string, persistNow = false) => {
+      const entry = { role, content, timestamp: new Date().toISOString() };
+      agentLog.push(entry);
+      // Mirror to server console so workflow logs aren't silent.
+      const preview = content.length > 240 ? content.slice(0, 240) + '…' : content;
+      console.log(`[research:${jobId}] [${role}] ${preview}`);
+      if (persistNow) await persist();
+    };
+
+    await addLog('system', `Research started. Model: ${RESEARCH_MODEL}, Budget: $${maxBudgetUsd}, Max turns: ${maxTurns}`, true);
+    await addLog('user', prompt);
+
+    // Tool set sent to Claude. Includes Anthropic's native server-side web_search
+    // (executed on Anthropic's side; results are returned inline in the assistant
+    // response, no client-side handler needed).
+    const toolsForClaude: any[] = [
+      {
+        type: "web_search_20250305",
+        name: "web_search",
+        max_uses: Math.max(5, maxTurns),
+      },
+      ...researchTools,
+    ];
 
     while (turnsUsed < maxTurns) {
       const activeJob = this.activeJobs.get(jobId);
       if (!activeJob || activeJob.abortController.signal.aborted) {
-        addLog('system', 'Job cancelled by user');
-        await db.update(researchJobs).set({
-          status: 'cancelled',
-          turnsUsed,
-          totalInputTokens,
-          totalOutputTokens,
-          estimatedCostUsd: this.calculateCost(totalInputTokens, totalOutputTokens),
-          agentLog,
-          completedAt: new Date(),
-        }).where(eq(researchJobs.id, jobId));
+        await addLog('system', 'Job cancelled by user');
+        await persist({ status: 'cancelled', completedAt: new Date() });
         return;
       }
 
+      let response: Anthropic.Messages.Message;
       try {
-        const response = await client.messages.create({
+        response = await client.messages.create({
           model: RESEARCH_MODEL,
           max_tokens: 4096,
           system: systemPrompt,
-          tools: researchTools as any,
+          tools: toolsForClaude,
           messages,
         });
-
-        turnsUsed++;
-        totalInputTokens += response.usage.input_tokens;
-        totalOutputTokens += response.usage.output_tokens;
-
-        const currentCost = parseFloat(this.calculateCost(totalInputTokens, totalOutputTokens));
-
-        await db.update(researchJobs).set({
-          turnsUsed,
-          totalInputTokens,
-          totalOutputTokens,
-          estimatedCostUsd: currentCost.toFixed(4),
-          agentLog,
-        }).where(eq(researchJobs.id, jobId));
-
-        if (currentCost >= maxBudgetUsd) {
-          addLog('system', `Budget limit reached ($${currentCost.toFixed(4)} >= $${maxBudgetUsd})`);
-          break;
-        }
-
-        const toolUseBlocks = response.content.filter(
-          (block): block is Anthropic.Messages.ToolUseBlock => block.type === 'tool_use'
-        );
-        const textBlocks = response.content.filter(
-          (block): block is Anthropic.Messages.TextBlock => block.type === 'text'
-        );
-
-        for (const tb of textBlocks) {
-          addLog('assistant', tb.text);
-        }
-
-        if (response.stop_reason === 'end_turn' && toolUseBlocks.length === 0) {
-          addLog('system', 'Agent completed research (end_turn)');
-          break;
-        }
-
-        if (toolUseBlocks.length === 0) {
-          addLog('system', 'No tool calls and stop reason: ' + response.stop_reason);
-          break;
-        }
-
-        messages.push({ role: "assistant", content: response.content });
-
-        const toolResults: Anthropic.Messages.ToolResultBlockParam[] = [];
-
-        for (const toolBlock of toolUseBlocks) {
-          addLog('tool_call', `${toolBlock.name}(${JSON.stringify(toolBlock.input).substring(0, 200)})`);
-
-          try {
-            const result = await this.handleToolCall(toolBlock.name, toolBlock.input, jobId);
-            addLog('tool_result', `${toolBlock.name} → ${result.substring(0, 200)}`);
-            toolResults.push({
-              type: "tool_result",
-              tool_use_id: toolBlock.id,
-              content: result,
-            });
-          } catch (err: any) {
-            const errorMsg = err.message || String(err);
-            addLog('tool_error', `${toolBlock.name} failed: ${errorMsg}`);
-            toolResults.push({
-              type: "tool_result",
-              tool_use_id: toolBlock.id,
-              content: JSON.stringify({ error: errorMsg }),
-              is_error: true,
-            });
-          }
-        }
-
-        messages.push({ role: "user", content: toolResults });
-
       } catch (err: any) {
-        addLog('error', `API error: ${err.message || String(err)}`);
-        if (err.status === 429) {
-          addLog('system', 'Rate limited, waiting 30s...');
+        // Anthropic SDK errors stash structured info in err.error?.error or err.message
+        const detail =
+          err?.error?.error?.message ||
+          err?.error?.message ||
+          err?.message ||
+          String(err);
+        const status = err?.status ? ` (HTTP ${err.status})` : '';
+        const errorLine = `Anthropic API error${status}: ${detail}`;
+        await addLog('error', errorLine, true);
+
+        if (err?.status === 429) {
+          await addLog('system', 'Rate limited, waiting 30s…', true);
           await new Promise(r => setTimeout(r, 30000));
           continue;
         }
-        throw err;
+        // Web-search-not-enabled or other 400s: surface and abort cleanly
+        // rather than retrying forever.
+        if (err?.status === 400 && /web_search/i.test(detail)) {
+          await addLog(
+            'error',
+            'Your Anthropic account does not have web_search enabled. ' +
+            'Enable it in https://console.anthropic.com/settings/usage or remove the web_search tool from researchService.ts.',
+            true,
+          );
+        }
+        throw new Error(errorLine);
       }
+
+      turnsUsed++;
+      totalInputTokens += response.usage.input_tokens;
+      totalOutputTokens += response.usage.output_tokens;
+      // Count Anthropic-billed web_search invocations for accurate cost tracking.
+      const turnWebSearches = response.content.filter(
+        (b: any) => b.type === 'server_tool_use' && b.name === 'web_search'
+      ).length;
+      webSearchCount += turnWebSearches;
+
+      const currentCost = parseFloat(this.calculateCost(totalInputTokens, totalOutputTokens, webSearchCount));
+      await persist();
+
+      if (currentCost >= maxBudgetUsd) {
+        await addLog('system', `Budget limit reached ($${currentCost.toFixed(4)} >= $${maxBudgetUsd})`, true);
+        break;
+      }
+
+      const toolUseBlocks = response.content.filter(
+        (block): block is Anthropic.Messages.ToolUseBlock => block.type === 'tool_use'
+      );
+      const textBlocks = response.content.filter(
+        (block): block is Anthropic.Messages.TextBlock => block.type === 'text'
+      );
+
+      for (const tb of textBlocks) {
+        if (tb.text?.trim()) await addLog('assistant', tb.text);
+      }
+      if (turnWebSearches > 0) {
+        // Surface what the agent actually searched for, including snippets.
+        for (const block of response.content as any[]) {
+          if (block.type === 'server_tool_use' && block.name === 'web_search') {
+            await addLog('web_search', `query: ${JSON.stringify(block.input)}`);
+          }
+          if (block.type === 'web_search_tool_result') {
+            const items = Array.isArray(block.content) ? block.content : [];
+            const summary = items
+              .slice(0, 5)
+              .map((it: any) => `• ${it.title || it.url || '(no title)'} — ${it.url || ''}`)
+              .join('\n');
+            await addLog('web_search_result', `${items.length} result(s)\n${summary}`);
+          }
+        }
+      }
+
+      // Always terminate when there are no client-side tool calls to answer.
+      // - end_turn: agent is done.
+      // - any other stop_reason with 0 client tool_use blocks: nothing to
+      //   feed back to Claude, so continuing would push an invalid history
+      //   (assistant-last with no user follow-up). Web_search runs entirely
+      //   server-side, so its results are already in this response.
+      if (toolUseBlocks.length === 0) {
+        await addLog(
+          'system',
+          response.stop_reason === 'end_turn'
+            ? 'Agent completed research (end_turn)'
+            : `No client tool calls; stop reason: ${response.stop_reason}`,
+          true,
+        );
+        break;
+      }
+
+      // Preserve the raw assistant content (including any server_tool_use +
+      // web_search_tool_result blocks) so Anthropic's required history
+      // contract is satisfied on the next request.
+      messages.push({ role: "assistant", content: response.content });
+
+      const toolResults: Anthropic.Messages.ToolResultBlockParam[] = [];
+      for (const toolBlock of toolUseBlocks) {
+        await addLog('tool_call', `${toolBlock.name}(${JSON.stringify(toolBlock.input).substring(0, 240)})`);
+        try {
+          const result = await this.handleToolCall(toolBlock.name, toolBlock.input, jobId);
+          await addLog('tool_result', `${toolBlock.name} → ${result.substring(0, 240)}`);
+          toolResults.push({ type: "tool_result", tool_use_id: toolBlock.id, content: result });
+        } catch (err: any) {
+          const errorMsg = err.message || String(err);
+          await addLog('tool_error', `${toolBlock.name} failed: ${errorMsg}`, true);
+          toolResults.push({
+            type: "tool_result",
+            tool_use_id: toolBlock.id,
+            content: JSON.stringify({ error: errorMsg }),
+            is_error: true,
+          });
+        }
+      }
+
+      // toolResults.length === toolUseBlocks.length by construction above,
+      // and toolUseBlocks.length > 0 (we'd have broken out otherwise).
+      messages.push({ role: "user", content: toolResults });
     }
 
-    const finalCost = this.calculateCost(totalInputTokens, totalOutputTokens);
-    addLog('system', `Research completed. Turns: ${turnsUsed}, Cost: $${finalCost}`);
+    const finalCost = this.calculateCost(totalInputTokens, totalOutputTokens, webSearchCount);
+    await addLog(
+      'system',
+      `Research completed. Turns: ${turnsUsed}, Web searches: ${webSearchCount}, Cost: $${finalCost}`,
+    );
 
-    await db.update(researchJobs).set({
-      status: 'completed',
-      turnsUsed,
-      totalInputTokens,
-      totalOutputTokens,
-      estimatedCostUsd: finalCost,
-      agentLog,
-      completedAt: new Date(),
-    }).where(eq(researchJobs.id, jobId));
+    await persist({ status: 'completed', completedAt: new Date() });
   }
 
-  private calculateCost(inputTokens: number, outputTokens: number): string {
-    const cost = (inputTokens * COST_PER_INPUT_TOKEN) + (outputTokens * COST_PER_OUTPUT_TOKEN);
+  private calculateCost(inputTokens: number, outputTokens: number, webSearchCount: number = 0): string {
+    const cost =
+      (inputTokens * COST_PER_INPUT_TOKEN) +
+      (outputTokens * COST_PER_OUTPUT_TOKEN) +
+      (webSearchCount * COST_PER_WEB_SEARCH);
     return cost.toFixed(4);
   }
 

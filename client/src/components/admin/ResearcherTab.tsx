@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -73,7 +73,6 @@ export default function ResearcherTab() {
   const [maxTurns, setMaxTurns] = useState(30);
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
   const [showJobDetails, setShowJobDetails] = useState(false);
-  const [showLog, setShowLog] = useState(false);
   const [rejectDialogId, setRejectDialogId] = useState<number | null>(null);
   const [rejectReason, setRejectReason] = useState("");
 
@@ -81,13 +80,19 @@ export default function ResearcherTab() {
 
   const { data: jobs, isLoading: jobsLoading } = useQuery<ResearchJob[]>({
     queryKey: ['/api/researcher/jobs'],
-    refetchInterval: isPolling ? 5000 : false,
+    refetchInterval: isPolling ? 3000 : false,
   });
 
   const { data: selectedJob } = useQuery<ResearchJob & { isActive: boolean }>({
     queryKey: ['/api/researcher/jobs', selectedJobId],
     enabled: !!selectedJobId,
-    refetchInterval: showJobDetails ? 3000 : false,
+    refetchInterval: (query) => {
+      const j = query.state.data as ResearchJob | undefined;
+      // Stream while job is still running, even if dialog is closed.
+      if (j && j.status === 'processing') return 2000;
+      if (showJobDetails) return 3000;
+      return false;
+    },
   });
 
   const { data: pendingDiscoveries } = useQuery<ResearchDiscovery[]>({
@@ -125,11 +130,16 @@ export default function ResearcherTab() {
         }),
       });
     },
-    onSuccess: () => {
+    onSuccess: (data: any) => {
       setIsPolling(true);
       queryClient.invalidateQueries({ queryKey: ['/api/researcher/jobs'] });
       queryClient.invalidateQueries({ queryKey: ['/api/researcher/discoveries'] });
-      toast({ title: "Research started", description: "AI researcher is now discovering new resources." });
+      // Auto-open the live log so the admin can see exactly what's happening.
+      if (data?.jobId) {
+        setSelectedJobId(data.jobId);
+        setShowJobDetails(true);
+      }
+      toast({ title: `Research job #${data?.jobId ?? ''} started`, description: "Live log opened — streaming updates every 2s." });
     },
     onError: (error: any) => {
       toast({ title: "Failed to start research", description: error.message, variant: "destructive" });
@@ -294,50 +304,63 @@ export default function ResearcherTab() {
                   <p className="text-sm text-muted-foreground text-center py-8">No active research jobs</p>
                 ) : (
                   <div className="space-y-3">
-                    {activeJobs.map(job => (
-                      <Card key={job.id} className="border-blue-500/20">
-                        <CardContent className="p-4 space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium">Job #{job.id}</span>
-                            {getStatusBadge(job.status)}
-                          </div>
-                          <p className="text-xs text-muted-foreground line-clamp-2">{job.prompt}</p>
-                          <div className="grid grid-cols-3 gap-2 text-xs">
-                            <div>
-                              <span className="text-muted-foreground">Found:</span>{' '}
-                              <span className="font-medium">{job.totalDiscoveries || 0}</span>
+                    {activeJobs.map(job => {
+                      const log = (job.agentLog as Array<{ role: string; content: string; timestamp: string }> | null) || [];
+                      const last = log[log.length - 1];
+                      return (
+                        <Card key={job.id} className="border-blue-500/20">
+                          <CardContent className="p-4 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-medium">Job #{job.id}</span>
+                              {getStatusBadge(job.status)}
                             </div>
-                            <div>
-                              <span className="text-muted-foreground">Turns:</span>{' '}
-                              <span className="font-medium">{job.turnsUsed || 0}/{job.maxTurns}</span>
+                            <p className="text-xs text-muted-foreground line-clamp-2">{job.prompt}</p>
+                            <div className="grid grid-cols-3 gap-2 text-xs">
+                              <div>
+                                <span className="text-muted-foreground">Found:</span>{' '}
+                                <span className="font-medium">{job.totalDiscoveries || 0}</span>
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground">Turns:</span>{' '}
+                                <span className="font-medium">{job.turnsUsed || 0}/{job.maxTurns}</span>
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground">Cost:</span>{' '}
+                                <span className="font-medium">${job.estimatedCostUsd || '0.00'}</span>
+                              </div>
                             </div>
-                            <div>
-                              <span className="text-muted-foreground">Cost:</span>{' '}
-                              <span className="font-medium">${job.estimatedCostUsd || '0.00'}</span>
+                            {job.maxTurns && (
+                              <Progress value={((job.turnsUsed || 0) / job.maxTurns) * 100} className="h-1" />
+                            )}
+                            {last && (
+                              <div
+                                className="text-[10px] font-mono p-2 rounded border bg-muted/30 line-clamp-2"
+                                title={last.content}
+                              >
+                                <Badge variant="outline" className="h-4 text-[9px] mr-1.5 align-middle">{last.role}</Badge>
+                                {last.content}
+                              </div>
+                            )}
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => { setSelectedJobId(job.id); setShowJobDetails(true); }}
+                              >
+                                <Eye className="w-3 h-3 mr-1" />Live Log
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => cancelMutation.mutate(job.id)}
+                              >
+                                <XCircle className="w-3 h-3 mr-1" />Cancel
+                              </Button>
                             </div>
-                          </div>
-                          {job.maxTurns && (
-                            <Progress value={((job.turnsUsed || 0) / job.maxTurns) * 100} className="h-1" />
-                          )}
-                          <div className="flex gap-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => { setSelectedJobId(job.id); setShowJobDetails(true); }}
-                            >
-                              <Eye className="w-3 h-3 mr-1" />Details
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => cancelMutation.mutate(job.id)}
-                            >
-                              <XCircle className="w-3 h-3 mr-1" />Cancel
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
                   </div>
                 )}
               </CardContent>
@@ -447,43 +470,57 @@ export default function ResearcherTab() {
                   </TableHeader>
                   <TableBody>
                     {jobs.map(job => (
-                      <TableRow key={job.id}>
-                        <TableCell className="font-medium">#{job.id}</TableCell>
-                        <TableCell>{getStatusBadge(job.status)}</TableCell>
-                        <TableCell className="max-w-[200px] truncate text-xs">{job.prompt}</TableCell>
-                        <TableCell>{job.totalDiscoveries || 0}</TableCell>
-                        <TableCell>
-                          <span className="text-green-400">{job.approvedDiscoveries || 0}</span>
-                          {' / '}
-                          <span className="text-red-400">{job.rejectedDiscoveries || 0}</span>
-                        </TableCell>
-                        <TableCell>${job.estimatedCostUsd || '0.00'}</TableCell>
-                        <TableCell>{job.turnsUsed || 0}/{job.maxTurns}</TableCell>
-                        <TableCell className="text-xs">
-                          {job.createdAt ? new Date(job.createdAt).toLocaleDateString() : '-'}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex gap-1">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => { setSelectedJobId(job.id); setShowJobDetails(true); }}
-                            >
-                              <Eye className="w-3 h-3" />
-                            </Button>
-                            {job.status === 'processing' && (
+                      <Fragment key={job.id}>
+                        <TableRow>
+                          <TableCell className="font-medium">#{job.id}</TableCell>
+                          <TableCell>{getStatusBadge(job.status)}</TableCell>
+                          <TableCell className="max-w-[200px] truncate text-xs">{job.prompt}</TableCell>
+                          <TableCell>{job.totalDiscoveries || 0}</TableCell>
+                          <TableCell>
+                            <span className="text-green-400">{job.approvedDiscoveries || 0}</span>
+                            {' / '}
+                            <span className="text-red-400">{job.rejectedDiscoveries || 0}</span>
+                          </TableCell>
+                          <TableCell>${job.estimatedCostUsd || '0.00'}</TableCell>
+                          <TableCell>{job.turnsUsed || 0}/{job.maxTurns}</TableCell>
+                          <TableCell className="text-xs">
+                            {job.createdAt ? new Date(job.createdAt).toLocaleDateString() : '-'}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex gap-1">
                               <Button
                                 size="sm"
                                 variant="ghost"
-                                className="text-destructive"
-                                onClick={() => cancelMutation.mutate(job.id)}
+                                onClick={() => { setSelectedJobId(job.id); setShowJobDetails(true); }}
                               >
-                                <XCircle className="w-3 h-3" />
+                                <Eye className="w-3 h-3" />
                               </Button>
-                            )}
-                          </div>
-                        </TableCell>
-                      </TableRow>
+                              {job.status === 'processing' && (
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="text-destructive"
+                                  onClick={() => cancelMutation.mutate(job.id)}
+                                >
+                                  <XCircle className="w-3 h-3" />
+                                </Button>
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                        {(job.status === 'failed' || (job.status === 'completed' && (job.totalDiscoveries || 0) === 0)) && job.errorMessage && (
+                          <TableRow>
+                            <TableCell colSpan={9} className="p-0">
+                              <Alert variant="destructive" className="rounded-none border-x-0 border-t-0">
+                                <AlertCircle className="w-4 h-4" />
+                                <AlertDescription className="text-xs font-mono break-all">
+                                  Job #{job.id}: {job.errorMessage}
+                                </AlertDescription>
+                              </Alert>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </Fragment>
                     ))}
                   </TableBody>
                 </Table>
@@ -494,11 +531,17 @@ export default function ResearcherTab() {
       </Tabs>
 
       <Dialog open={showJobDetails} onOpenChange={setShowJobDetails}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               Research Job #{selectedJob?.id}
               {selectedJob && getStatusBadge(selectedJob.status)}
+              {selectedJob?.isActive && (
+                <Badge variant="outline" className="text-[10px]">
+                  <RefreshCw className="w-3 h-3 mr-1 animate-spin" />
+                  Streaming
+                </Badge>
+              )}
             </DialogTitle>
           </DialogHeader>
           {selectedJob && (
@@ -543,37 +586,74 @@ export default function ResearcherTab() {
 
               <div className="flex items-center justify-between">
                 <Label className="text-xs text-muted-foreground">
-                  Turns: {selectedJob.turnsUsed || 0}/{selectedJob.maxTurns} |
-                  Input: {(selectedJob.totalInputTokens || 0).toLocaleString()} |
-                  Output: {(selectedJob.totalOutputTokens || 0).toLocaleString()} tokens
+                  Turns: {selectedJob.turnsUsed || 0}/{selectedJob.maxTurns} ·
+                  In: {(selectedJob.totalInputTokens || 0).toLocaleString()} ·
+                  Out: {(selectedJob.totalOutputTokens || 0).toLocaleString()} tok
                 </Label>
-                <Button variant="outline" size="sm" onClick={() => setShowLog(!showLog)}>
-                  {showLog ? 'Hide' : 'Show'} Log
-                </Button>
+                <Label className="text-xs text-muted-foreground">
+                  Agent Log
+                  {selectedJob.agentLog && (
+                    <span className="ml-1">
+                      ({(selectedJob.agentLog as any[]).length} entries)
+                    </span>
+                  )}
+                </Label>
               </div>
 
-              {showLog && selectedJob.agentLog && (
-                <ScrollArea className="h-[300px] border rounded p-2">
+              {selectedJob.agentLog && (selectedJob.agentLog as any[]).length > 0 ? (
+                <ScrollArea className="h-[420px] border rounded p-2 bg-black/40">
                   <div className="space-y-1 font-mono text-xs">
                     {(selectedJob.agentLog as Array<{ role: string; content: string; timestamp: string }>).map((entry, i) => (
-                      <div key={i} className="flex gap-2">
-                        <span className="text-muted-foreground shrink-0">
+                      <div key={i} className="flex gap-2 items-start">
+                        <span className="text-muted-foreground shrink-0 w-[68px]">
                           {new Date(entry.timestamp).toLocaleTimeString()}
                         </span>
-                        <Badge variant="outline" className="shrink-0 h-5 text-[10px]">{entry.role}</Badge>
-                        <span className={
-                          entry.role === 'error' ? 'text-red-400' :
-                          entry.role === 'system' ? 'text-yellow-400' :
-                          entry.role === 'tool_call' ? 'text-cyan-400' :
-                          entry.role === 'tool_result' ? 'text-green-400' :
-                          'text-foreground'
-                        }>
+                        <Badge
+                          variant="outline"
+                          className={
+                            "shrink-0 h-5 text-[10px] " +
+                            (entry.role === 'error' || entry.role === 'tool_error'
+                              ? 'border-red-500/50 text-red-400'
+                              : entry.role === 'system'
+                              ? 'border-yellow-500/50 text-yellow-400'
+                              : entry.role === 'tool_call'
+                              ? 'border-cyan-500/50 text-cyan-400'
+                              : entry.role === 'tool_result'
+                              ? 'border-green-500/50 text-green-400'
+                              : entry.role === 'web_search'
+                              ? 'border-purple-500/50 text-purple-400'
+                              : entry.role === 'web_search_result'
+                              ? 'border-purple-400/30 text-purple-300'
+                              : entry.role === 'assistant'
+                              ? 'border-blue-500/50 text-blue-300'
+                              : '')
+                          }
+                        >
+                          {entry.role}
+                        </Badge>
+                        <span
+                          className={
+                            'whitespace-pre-wrap break-words flex-1 ' +
+                            (entry.role === 'error' || entry.role === 'tool_error' ? 'text-red-400' :
+                             entry.role === 'system' ? 'text-yellow-300' :
+                             entry.role === 'tool_call' ? 'text-cyan-300' :
+                             entry.role === 'tool_result' ? 'text-green-300' :
+                             entry.role === 'web_search' ? 'text-purple-300' :
+                             entry.role === 'web_search_result' ? 'text-purple-200' :
+                             entry.role === 'assistant' ? 'text-blue-200' :
+                             'text-foreground')
+                          }
+                        >
                           {entry.content}
                         </span>
                       </div>
                     ))}
                   </div>
                 </ScrollArea>
+              ) : (
+                <div className="h-[120px] border rounded p-4 flex items-center justify-center text-xs text-muted-foreground">
+                  {selectedJob.isActive ? 'Waiting for first log entry…' : 'No log entries recorded.'}
+                </div>
               )}
 
               {jobDiscoveries && jobDiscoveries.length > 0 && (
