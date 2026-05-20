@@ -261,6 +261,7 @@ export const resourceEdits = pgTable(
       suggestedTags?: string[];
       suggestedCategory?: string;
       suggestedSubcategory?: string;
+      suggestedSubSubcategory?: string;
       confidence?: number;
       keyTopics?: string[];
     }>(),
@@ -1114,6 +1115,7 @@ export const enrichmentQueue = pgTable(
       suggestedTags?: string[];
       suggestedCategory?: string;
       suggestedSubcategory?: string;
+      suggestedSubSubcategory?: string;
       confidence?: number;
       keyTopics?: string[];
     }>(),
@@ -1219,6 +1221,7 @@ export const researchDiscoveries = pgTable(
     description: text("description"),
     suggestedCategory: text("suggested_category"),
     suggestedSubcategory: text("suggested_subcategory"),
+    suggestedSubSubcategory: text("suggested_sub_subcategory"),
     confidence: integer("confidence").default(0),
     reasoning: text("reasoning"),
     status: text("status").notNull().default("pending_review"),
@@ -1242,6 +1245,7 @@ export const insertResearchDiscoverySchema = createInsertSchema(researchDiscover
   description: true,
   suggestedCategory: true,
   suggestedSubcategory: true,
+  suggestedSubSubcategory: true,
   confidence: true,
   reasoning: true,
 });

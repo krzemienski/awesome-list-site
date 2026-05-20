@@ -4,6 +4,8 @@ import { db } from '../db';
 import { resources, categories, subcategories, subSubcategories, researchJobs, researchDiscoveries } from '@shared/schema';
 import { eq, sql } from 'drizzle-orm';
 import type { ResearchJob, ResearchDiscovery } from '@shared/schema';
+import { CategoryRepository } from '../repositories/CategoryRepository';
+import { ensureSubSubcategoryExists } from '../repositories/ensureSubSubcategory';
 
 const RESEARCH_MODEL = "claude-sonnet-4-20250514";
 
@@ -50,6 +52,7 @@ const researchTools: ResearchToolDefinition[] = [
         description: { type: "string", description: "Brief description of what this resource offers for video streaming/development" },
         suggested_category: { type: "string", description: "Best matching category from the existing category tree" },
         suggested_subcategory: { type: "string", description: "Best matching subcategory, or empty string if none fits" },
+        suggested_sub_subcategory: { type: "string", description: "Best matching sub-subcategory (level-3), or empty string if none fits. Use get_category_tree to see available sub-subcategories." },
         confidence: { type: "integer", description: "Confidence score 1-100 that this is a quality, relevant resource" },
         reasoning: { type: "string", description: "Brief explanation of why this resource is valuable and how you found it" }
       },
@@ -166,6 +169,7 @@ class ResearchService {
           description: toolInput.description || '',
           suggestedCategory: toolInput.suggested_category || '',
           suggestedSubcategory: toolInput.suggested_subcategory || '',
+          suggestedSubSubcategory: toolInput.suggested_sub_subcategory || '',
           confidence: toolInput.confidence || 50,
           reasoning: toolInput.reasoning || '',
           status: 'pending_review',
@@ -438,12 +442,24 @@ Our database currently has ${this.existingUrls.size} resources. Start by getting
     const [discovery] = await db.select().from(researchDiscoveries).where(eq(researchDiscoveries.id, discoveryId));
     if (!discovery) throw new Error("Discovery not found");
 
+    // Hierarchy guard (mirrors admin POST/PUT /api/admin/resources): if the AI
+    // suggested a level-3 hint, auto-create the matching sub_subcategories row
+    // so this direct-DB insert path can't reintroduce the orphaned-tag drift
+    // that tasks #55/#57 closed.
+    await ensureSubSubcategoryExists(
+      new CategoryRepository(),
+      discovery.suggestedCategory,
+      discovery.suggestedSubcategory,
+      discovery.suggestedSubSubcategory,
+    );
+
     const [newResource] = await db.insert(resources).values({
       title: discovery.title,
       url: discovery.url,
       description: discovery.description || '',
       category: discovery.suggestedCategory || 'Uncategorized',
       subcategory: discovery.suggestedSubcategory || null,
+      subSubcategory: discovery.suggestedSubSubcategory || null,
       status: 'approved',
       metadata: { source: 'ai_researcher', discoveryId: discovery.id, confidence: discovery.confidence },
     }).returning();

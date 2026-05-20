@@ -595,6 +595,7 @@ export class ClaudeService {
     suggestedTags: string[];
     suggestedCategory: string;
     suggestedSubcategory?: string;
+    suggestedSubSubcategory?: string;
     confidence: number;
     keyTopics: string[];
   } | null> {
@@ -718,8 +719,9 @@ Extract the following information in JSON format:
 3. suggestedTags: Array of 3-5 relevant technical tags (e.g., "HLS", "FFmpeg", "DASH", "WebRTC")
 4. suggestedCategory: Best fitting category from this list: ${categories.join(', ')}
 5. suggestedSubcategory: If applicable, suggest a subcategory (optional)
-6. confidence: Your confidence score (0.0-1.0) in these suggestions
-7. keyTopics: Array of 3-5 key topics or technologies covered
+6. suggestedSubSubcategory: If applicable, suggest a more specific sub-subcategory under the subcategory (optional, level-3 hint such as "HLS", "FFMPEG", "iOS/tvOS")
+7. confidence: Your confidence score (0.0-1.0) in these suggestions
+8. keyTopics: Array of 3-5 key topics or technologies covered
 
 Return ONLY valid JSON with this structure:
 {
@@ -728,6 +730,7 @@ Return ONLY valid JSON with this structure:
   "suggestedTags": ["...", "..."],
   "suggestedCategory": "...",
   "suggestedSubcategory": "...",
+  "suggestedSubSubcategory": "...",
   "confidence": 0.0,
   "keyTopics": ["...", "..."]
 }`;
@@ -759,6 +762,7 @@ Return ONLY valid JSON with this structure:
           : [],
         suggestedCategory: parsed.suggestedCategory || '',
         suggestedSubcategory: parsed.suggestedSubcategory,
+        suggestedSubSubcategory: parsed.suggestedSubSubcategory,
         confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.5,
         keyTopics: Array.isArray(parsed.keyTopics)
           ? parsed.keyTopics.slice(0, 10).map((topic: any) => String(topic).substring(0, 100))

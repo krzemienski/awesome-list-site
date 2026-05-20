@@ -83,6 +83,7 @@ interface ClaudeSuggestions {
   suggestedTags: string[];
   suggestedCategory: string;
   suggestedSubcategory?: string;
+  suggestedSubSubcategory?: string;
   confidence: number;
   keyTopics: string[];
 }
@@ -258,6 +259,24 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
       );
       if (matchingCategory) {
         form.setValue('category', matchingCategory.id.toString());
+        if (claudeSuggestions.suggestedSubcategory) {
+          const matchingSubcategory = subcategories.find(
+            s => s.categoryId === matchingCategory.id &&
+                 s.name.toLowerCase() === claudeSuggestions.suggestedSubcategory!.toLowerCase()
+          );
+          if (matchingSubcategory) {
+            form.setValue('subcategory', matchingSubcategory.id.toString());
+            if (claudeSuggestions.suggestedSubSubcategory) {
+              const matchingSubSub = subSubcategories.find(
+                ss => ss.subcategoryId === matchingSubcategory.id &&
+                      ss.name.toLowerCase() === claudeSuggestions.suggestedSubSubcategory!.toLowerCase()
+              );
+              if (matchingSubSub) {
+                form.setValue('subSubcategory', matchingSubSub.id.toString());
+              }
+            }
+          }
+        }
       }
     }
     
