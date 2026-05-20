@@ -325,6 +325,8 @@ function CategoryAccordion({
                         type="button"
                         onClick={() => toggleSub(subKey(sub.name))}
                         aria-label={`Toggle ${sub.name}`}
+                        aria-expanded={subOpen}
+                        data-state={subOpen ? "open" : "closed"}
                         data-testid={`expand-sub-${subSlug}`}
                         className="shrink-0 inline-flex items-center justify-center rounded-md hover:bg-[var(--surface)] text-[var(--text-3)] hover:text-[var(--text)]"
                         style={{ width: 22, minHeight: 36 }}
