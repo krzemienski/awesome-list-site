@@ -18,7 +18,6 @@ import { getCategoryIcon } from "@/config/navigation-icons";
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -780,59 +779,48 @@ export default function AppSidebar({
             </div>
           )}
         </div>
-      </SidebarContent>
 
-      <SidebarFooter
-        className="border-t p-0 group-data-[collapsible=icon]:hidden"
-      >
-        <div className="px-4 py-4">
-          <div
-            className="eyebrow mb-2"
-            style={{
-              fontSize: 9.5,
-              letterSpacing: 1.8,
-              color: "var(--text-3)",
-              fontWeight: 700,
-            }}
-          >
-            OPS
-          </div>
-          <div
-            className="font-mono leading-relaxed"
-            style={{ fontSize: 10.5, color: "var(--text-3)" }}
-          >
-            {resources.length.toLocaleString()} resources
-            <br />
+        {/* COMPACT FOOTER — lives inside the nav scroll region, single-line, secondary */}
+        <div
+          className="px-3 py-2 mt-2 flex items-center justify-between gap-2 group-data-[collapsible=icon]:hidden"
+          style={{
+            borderTop: "1px solid var(--border)",
+            fontFamily: "var(--font-mono)",
+            fontSize: 10,
+            color: "var(--text-3)",
+            letterSpacing: 0.3,
+          }}
+        >
+          <span className="truncate">
+            {resources.length.toLocaleString()} res ·{" "}
             {filtered.reduce(
               (n, c) => n + (c.subcategories?.length || 0),
               0,
             )}{" "}
-            subcategories
-            <br />
-            {totalCats} top-level
-            <br />
-            <a
-              href="/about"
-              onClick={(e) => {
-                e.preventDefault();
-                navigate("/about");
+            sub · {totalCats} cat
+          </span>
+          <a
+            href="/about"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate("/about");
+            }}
+            data-testid="footer-about"
+            className="inline-flex items-center gap-1 no-underline shrink-0"
+            style={{ color: "var(--accent)" }}
+            title="about & status"
+          >
+            <span
+              className="size-1.5 rounded-full inline-block"
+              style={{
+                background: "var(--accent)",
+                boxShadow: "0 0 6px var(--accent)",
               }}
-              data-testid="footer-about"
-              className="inline-flex items-center gap-1 mt-2 no-underline"
-              style={{ color: "var(--accent)" }}
-            >
-              <span
-                className="size-1.5 rounded-full inline-block"
-                style={{
-                  background: "var(--accent)",
-                  boxShadow: "0 0 6px var(--accent)",
-                }}
-              />
-              about & status
-            </a>
-          </div>
+            />
+            about
+          </a>
         </div>
-      </SidebarFooter>
+      </SidebarContent>
 
       <SidebarRail />
     </Sidebar>
