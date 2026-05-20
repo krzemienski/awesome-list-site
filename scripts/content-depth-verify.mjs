@@ -15,19 +15,23 @@ fs.mkdirSync(OUT_DIR, { recursive: true });
 const al = await fetch(`${BASE}/api/awesome-list`).then(r => r.json());
 
 const rows = [];
+const inHierarchy = new Set();
 let total = 0;
 let emptyLeaves = 0;
 for (const cat of al.categories) {
   const directCount = (cat.resources || []).length;
   total += directCount;
+  for (const p of cat.resources || []) inHierarchy.add(p.id);
   if (cat.subcategories?.length) {
     for (const sub of cat.subcategories) {
       const directSubCount = (sub.resources || []).length;
       total += directSubCount;
+      for (const p of sub.resources || []) inHierarchy.add(p.id);
       if (sub.subSubcategories?.length) {
         for (const subsub of sub.subSubcategories) {
           const c = (subsub.resources || []).length;
           total += c;
+          for (const p of subsub.resources || []) inHierarchy.add(p.id);
           rows.push({ level: 3, category: cat.name, subcategory: sub.name, subSubcategory: subsub.name, resourceCount: c });
           if (c === 0) emptyLeaves++;
         }
@@ -51,6 +55,20 @@ for (const r of list) {
   if (missing.length) contractFailures.push({ id: r.id, url: r.url, missing });
 }
 
+// Identify resources reachable via /api/resources but missing from every
+// (category → subcategory → sub-subcategory) bucket of /api/awesome-list.
+// Each such row is invisible in category browsing — the Task #55 failure mode.
+const missingFromHierarchy = list
+  .filter(r => !inHierarchy.has(r.id))
+  .map(r => ({
+    id: r.id,
+    url: r.url,
+    title: r.title,
+    category: r.category ?? null,
+    subcategory: r.subcategory ?? null,
+    sub_subcategory: r.sub_subcategory ?? r.subSubcategory ?? null,
+  }));
+
 const summary = {
   baseUrl: BASE,
   generatedAt: new Date().toISOString(),
@@ -60,6 +78,8 @@ const summary = {
   emptyLeafCount: emptyLeaves,
   emptyLeaves: rows.filter(r => r.level === 3 && r.resourceCount === 0),
   contractFailures,
+  missingFromHierarchyCount: missingFromHierarchy.length,
+  missingFromHierarchy,
 };
 
 fs.writeFileSync(path.join(OUT_DIR, 'depth-verify.json'), JSON.stringify(summary, null, 2));
@@ -91,7 +111,48 @@ if (contractFailures.length) {
   md.push('');
   for (const f of contractFailures.slice(0, 50)) md.push(`- id=${f.id} url=${f.url} missing=${f.missing.join(',')}`);
 }
+if (missingFromHierarchy.length) {
+  md.push('');
+  md.push('## Resources missing from the category hierarchy');
+  md.push('');
+  md.push('These resources are reachable via `/api/resources` and `/resource/:id` but never appear under any `/category/:slug` / `/subcategory/:slug` / `/sub-subcategory/:slug` page.');
+  md.push('');
+  const tupleCounts = new Map();
+  for (const r of missingFromHierarchy) {
+    const k = `${r.category ?? '∅'} || ${r.subcategory ?? '∅'} || ${r.sub_subcategory ?? '∅'}`;
+    tupleCounts.set(k, (tupleCounts.get(k) || 0) + 1);
+  }
+  md.push('| Count | Category | Subcategory | Sub-subcategory |');
+  md.push('|---:|---|---|---|');
+  for (const [k, n] of [...tupleCounts.entries()].sort((a, b) => b[1] - a[1])) {
+    const [c, s, ss] = k.split(' || ');
+    md.push(`| ${n} | ${c} | ${s} | ${ss} |`);
+  }
+}
 fs.writeFileSync(path.join(OUT_DIR, 'depth-verify.md'), md.join('\n'));
 
-console.log(`✅ wrote ${path.join(OUT_DIR, 'depth-verify.json')} + .md`);
-console.log(`   hierarchy=${total} list=${list.length} emptyLeaves=${emptyLeaves} contractFails=${contractFailures.length}`);
+console.log(`wrote ${path.join(OUT_DIR, 'depth-verify.json')} + .md`);
+console.log(`   hierarchy=${total} list=${list.length} emptyLeaves=${emptyLeaves} contractFails=${contractFailures.length} missingFromHierarchy=${missingFromHierarchy.length}`);
+
+// CI gate (Task #58): non-zero exit when hierarchy and list totals diverge.
+// Print every offending (category, subcategory, sub_subcategory) tuple so the
+// failing GitHub Actions log shows the exact rows to fix.
+if (total !== list.length) {
+  console.error('');
+  console.error(`FAIL: totalResourcesInHierarchy (${total}) !== totalResourcesInList (${list.length}).`);
+  console.error(`${missingFromHierarchy.length} resource(s) are reachable via /api/resources but absent from every category bucket of /api/awesome-list.`);
+  console.error('Offending (category, subcategory, sub_subcategory) tuples:');
+  const tupleCounts = new Map();
+  for (const r of missingFromHierarchy) {
+    const k = `${r.category ?? '∅'} || ${r.subcategory ?? '∅'} || ${r.sub_subcategory ?? '∅'}`;
+    tupleCounts.set(k, (tupleCounts.get(k) || 0) + 1);
+  }
+  for (const [k, n] of [...tupleCounts.entries()].sort((a, b) => b[1] - a[1])) {
+    console.error(`  ${String(n).padStart(4)} → ${k}`);
+  }
+  console.error('');
+  console.error(`See ${path.join(OUT_DIR, 'depth-verify.json')} (missingFromHierarchy) for full per-row detail.`);
+  process.exit(1);
+}
+
+console.log('PASS: every resource in /api/resources is reachable through the category hierarchy.');

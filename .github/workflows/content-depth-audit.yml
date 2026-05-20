@@ -1,0 +1,75 @@
+name: Content Depth Audit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "server/repositories/LegacyRepository.ts"
+      - "server/seed.ts"
+      - "server/cli/parse-list.ts"
+      - "server/github/parser.ts"
+      - "server/github/syncService.ts"
+      - "shared/schema.ts"
+      - "scripts/content-depth-verify.mjs"
+      - "scripts/reconcile-missing-subsubcategories.ts"
+      - ".github/workflows/content-depth-audit.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "server/repositories/LegacyRepository.ts"
+      - "server/seed.ts"
+      - "server/cli/parse-list.ts"
+      - "server/github/parser.ts"
+      - "server/github/syncService.ts"
+      - "shared/schema.ts"
+      - "scripts/content-depth-verify.mjs"
+      - "scripts/reconcile-missing-subsubcategories.ts"
+      - ".github/workflows/content-depth-audit.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "content-depth-audit-${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    name: Resources reachable through category hierarchy
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run content depth verifier
+        env:
+          BASE_URL: http://localhost:5000
+          AUDIT_BASE_URL: http://localhost:5000
+          DATABASE_URL: ${{ secrets.TEST_DATABASE_URL || 'postgresql://test:test@localhost:5432/test' }}
+          NODE_ENV: development
+          READY_TIMEOUT_S: "120"
+        run: bash scripts/content-depth-audit.sh
+
+      - name: Upload depth-verify artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: content-depth-audit-${{ github.run_id }}
+          path: |
+            _validation/full-audit/depth-verify.json
+            _validation/full-audit/depth-verify.md
+            /tmp/content-depth-dev.log
+          if-no-files-found: ignore
+          retention-days: 14
