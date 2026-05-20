@@ -1,0 +1,214 @@
+{
+  "results": [
+    {
+      "name": "login-result",
+      "status": "PASS",
+      "url": "http://localhost:5000/admin",
+      "consoleErrs": [],
+      "pageErrs": []
+    },
+    {
+      "name": "admin-dashboard",
+      "status": "PASS",
+      "url": "http://localhost:5000/admin",
+      "tabCount": 16,
+      "tabs": [
+        "Admin",
+        "Approvals 3",
+        "Edits",
+        "Enrichment",
+        "Researcher",
+        "Export",
+        "Database",
+        "Resources",
+        "Categories",
+        "Subcategories",
+        "Sub-Subcats",
+        "Journeys",
+        "Users",
+        "GitHub",
+        "Link Health",
+        "Audit"
+      ],
+      "consoleErrs": [],
+      "pageErrs": []
+    },
+    {
+      "name": "tab-approvals_3",
+      "status": "PASS",
+      "tab": "Approvals 3",
+      "panelExcerpt": "Pending Approvals\n3\nResources awaiting admin review\nTitle\tCategory\tDescription\tSubmitted\tActions\n\nAudit Test Resource 1779208836956\n\t\nCommunity & Even",
+      "buttonCount": 9,
+      "consoleErrs": [],
+      "pageErrs": []
+    },
+    {
+      "name": "tab-edits",
+      "status": "PASS",
+      "tab": "Edits",
+      "panelExcerpt": "Pending Edits\n4\nEdit suggestions awaiting review\nResource\tChanges\tAI Analysis\tSubmitted\tActions\n\n\nAVideo CDN Storage\n\nView Resource\n\t4 field(s)\tNo AI\t",
+      "buttonCount": 12,
+      "consoleErrs": [],
+      "pageErrs": []
+    },
+    {
+      "name": "tab-enrichment",
+      "status": "PASS",
+      "tab": "Enrichment",
+      "panelExcerpt": "Job Control\nConfigure and start a new batch enrichment job\nFilter\nUnenriched Only\n\nChoose which resources to enrich\n\nBatch Size\n\nResources per batch (",
+      "buttonCount": 23,
+      "consoleErrs": [],
+      "pageErrs": []
+    },
+    {
+      "name": "tab-researcher",
+      "status": "PASS",
+      "tab": "Researcher",
+      "panelExcerpt": "Launch Research\nReview Discoveries\n2\nJob History\nNew Research Job\nConfigure and launch an AI researcher to discover new video streaming resources\nRese",
+      "buttonCount": 5,
+      "consoleErrs": [],
+      "pageErrs": []
+    },
+    {
+      "name": "tab-export",
+      "status": "PASS",
+      "tab": "Export",
+      "panelExcerpt": "Export Awesome List\nGenerate and download the awesome list in markdown format\nExport Markdown\nRun Validation\nCheck All Links\n\nNo validation results ye",
+      "buttonCount": 3,
+      "consoleErrs": [],
+      "pageErrs": []
+    },
+    {
+      "name": "tab-database",
+      "status": "PASS",
+      "tab": "Database",
+      "panelExcerpt": "Database Management\nSeed the database with 2,011 video resources from awesome-video JSON\nDatabase Seeding\nThis operation will populate the PostgreSQL ",
+      "buttonCount": 2,
+      "consoleErrs": [],
+      "pageErrs": []
+    },
+    {
+      "name": "tab-resources",
+      "status": "PASS",
+      "tab": "Resources",
+      "panelExcerpt": "Resource Database Editor\nManage all 1955 resources in the database\nAdd Resource\nAll Categories\nAll Categories\nCommunity & Events\nEncoding & Codecs\nGen",
+      "buttonCount": 82,
+      "consoleErrs": [],
+      "pageErrs": []
+    },
+    {
+      "name": "tab-categories",
+      "status": "PASS",
+      "tab": "Categories",
+      "panelExcerpt": "Categories Manager\nManage top-level categories for organizing resources\nAdd Category\n\nShowing 1-9 of 9 categories\n\nID\tName\tSlug\tResources\tActions\n1091",
+      "buttonCount": 19,
+      "consoleErrs": [],
+      "pageErrs": []
+    },
+    {
+      "name": "tab-subcategories",
+      "status": "PASS",
+      "tab": "Subcategories",
+      "panelExcerpt": "Subcategories Manager\nManage subcategories within each category\nAdd Subcategory\n\nShowing 1-10 of 102 subcategories\n\nID\tName\tSlug\tCategory\tResources\tAc",
+      "buttonCount": 26,
+      "consoleErrs": [],
+      "pageErrs": []
+    },
+    {
+      "name": "tab-sub_subcats",
+      "status": "PASS",
+      "tab": "Sub-Subcats",
+      "panelExcerpt": "Sub-Subcategories Manager\nManage level 3 sub-subcategories. Sub-subcategories with resources cannot be deleted.\nAdd Sub-Subcategory\n\nShowing 1-10 of 3",
+      "buttonCount": 26,
+      "consoleErrs": [],
+      "pageErrs": []
+    },
+    {
+      "name": "tab-journeys",
+      "status": "PASS",
+      "tab": "Journeys",
+      "panelExcerpt": "Learning Journeys\nEdit the steps shown on each learning journey. Changes go live immediately.\nVideo Streaming Fundamentals\nIntro & Learning\n0 steps\n\nA",
+      "buttonCount": 5,
+      "consoleErrs": [],
+      "pageErrs": []
+    },
+    {
+      "name": "tab-users",
+      "status": "PASS",
+      "tab": "Users",
+      "panelExcerpt": "User Management\n3 registered users\nUser\tEmail\tRole\tJoined\tActions\n\nTest User\n\ttest@example.com\t\nuser\tNov 18, 2025\t\nUser\n\n\nAdmin User\n\tadmin@example.co",
+      "buttonCount": 3,
+      "consoleErrs": [],
+      "pageErrs": []
+    },
+    {
+      "name": "tab-github",
+      "status": "PASS",
+      "tab": "GitHub",
+      "panelExcerpt": "GitHub Sync\nImport resources from and export to GitHub repositories\nTarget Repository\n\nFormat: owner/repository (e.g., krzemienski/awesome-video)\n\nImp",
+      "buttonCount": 3,
+      "consoleErrs": [],
+      "pageErrs": []
+    },
+    {
+      "name": "tab-link_health",
+      "status": "PASS",
+      "tab": "Link Health",
+      "panelExcerpt": "Link Health Summary\nNo link health checks performed yet\n\nNo link health data available yet\n\nRun First Check\nProblem Links\nLinks that require attention",
+      "buttonCount": 2,
+      "consoleErrs": [],
+      "pageErrs": []
+    },
+    {
+      "name": "tab-audit",
+      "status": "PASS",
+      "tab": "Audit",
+      "panelExcerpt": "Audit Log\nView system activity and resource change history (50 entries)\n50 rows\n25 rows\n50 rows\n100 rows\n200 rows\nID\tAction\tResource\tBy\tChanges\tNotes\t",
+      "buttonCount": 3,
+      "consoleErrs": [],
+      "pageErrs": []
+    },
+    {
+      "name": "route__admin_researcher",
+      "status": "PASS",
+      "route": "/admin/researcher",
+      "http": 200,
+      "consoleErrs": [],
+      "pageErrs": []
+    },
+    {
+      "name": "route__admin_enrichment",
+      "status": "PASS",
+      "route": "/admin/enrichment",
+      "http": 200,
+      "consoleErrs": [],
+      "pageErrs": []
+    },
+    {
+      "name": "route__admin_github",
+      "status": "PASS",
+      "route": "/admin/github",
+      "http": 200,
+      "consoleErrs": [],
+      "pageErrs": []
+    },
+    {
+      "name": "route__admin_database",
+      "status": "PASS",
+      "route": "/admin/database",
+      "http": 200,
+      "consoleErrs": [],
+      "pageErrs": []
+    },
+    {
+      "name": "route__admin_link-health",
+      "status": "PASS",
+      "route": "/admin/link-health",
+      "http": 200,
+      "consoleErrs": [],
+      "pageErrs": []
+    }
+  ],
+  "totalConsoleErrs": 0,
+  "totalPageErrs": 0
+}

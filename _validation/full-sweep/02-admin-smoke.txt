@@ -1,0 +1,25 @@
+=== ADMIN API SMOKE ===
+HTTP:200 SIZE:62  /api/admin/stats
+HTTP:200 SIZE:825  /api/admin/users
+HTTP:200 SIZE:46766  /api/admin/audit-logs
+HTTP:200 SIZE:1804  /api/admin/pending-resources
+HTTP:200 SIZE:33206  /api/admin/resources
+HTTP:200 SIZE:7765  /api/admin/resource-edits
+HTTP:200 SIZE:770  /api/admin/categories
+HTTP:200 SIZE:11897  /api/admin/subcategories
+HTTP:200 SIZE:2914  /api/admin/sub-subcategories
+HTTP:200 SIZE:2314  /api/admin/journeys
+HTTP:200 SIZE:12  /api/admin/journeys/6/steps
+HTTP:200 SIZE:27  /api/admin/link-health/status
+HTTP:200 SIZE:26  /api/admin/link-health/history
+HTTP:200 SIZE:56  /api/admin/validation-status
+HTTP:200 SIZE:39434  /api/github/sync-status
+HTTP:200 SIZE:2  /api/github/sync-history
+HTTP:200 SIZE:10102  /api/enrichment/jobs
+HTTP:200 SIZE:14085  /api/researcher/jobs
+HTTP:200 SIZE:1917  /api/researcher/discoveries
+HTTP:200 SIZE:110  /api/user/progress
+HTTP:200 SIZE:6186  /api/user/submissions
+HTTP:200 SIZE:2  /api/user/journeys
+HTTP:200 SIZE:2  /api/favorites
+HTTP:200 SIZE:2  /api/bookmarks
