@@ -2,17 +2,17 @@
   "discovered": {
     "navs": 5,
     "cats": 9,
-    "subs": 92,
-    "subSubs": 20
+    "subs": 102,
+    "subSubs": 32
   },
-  "queueLen": 126,
+  "queueLen": 148,
   "totals": {
-    "checks": 126,
-    "passes": 126,
+    "checks": 148,
+    "passes": 148,
     "failures": 0
   },
-  "homeHash": "5ff4c3f5d5bb",
-  "elapsedSec": 48,
+  "homeHash": "33b30f2b1569",
+  "elapsedSec": 54,
   "results": [
     {
       "kind": "nav",
@@ -27,15 +27,15 @@
       "urlOk": true,
       "h1": "Awesome Video Resources",
       "h1Ok": true,
-      "bodyLen": 5033,
+      "bodyLen": 5464,
       "bodyOk": true,
-      "bodyHash": "5ff4c3f5d5bb",
+      "bodyHash": "33b30f2b1569",
       "distinctOk": true,
       "resourceCards": 13,
       "listItems": 2,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 211
+      "elapsedMs": 210
     },
     {
       "kind": "nav",
@@ -50,15 +50,15 @@
       "urlOk": true,
       "h1": "Submit a Resource",
       "h1Ok": true,
-      "bodyLen": 4594,
+      "bodyLen": 5025,
       "bodyOk": true,
-      "bodyHash": "0098da1ed8e9",
+      "bodyHash": "246d5657d9e2",
       "distinctOk": true,
       "resourceCards": 5,
       "listItems": 9,
       "paragraphs": 6,
       "contentOk": true,
-      "elapsedMs": 322
+      "elapsedMs": 314
     },
     {
       "kind": "nav",
@@ -73,15 +73,15 @@
       "urlOk": true,
       "h1": "Learning Journeys",
       "h1Ok": true,
-      "bodyLen": 4951,
+      "bodyLen": 5382,
       "bodyOk": true,
-      "bodyHash": "fbb02dbbba51",
+      "bodyHash": "a85a03105bb8",
       "distinctOk": true,
       "resourceCards": 8,
       "listItems": 4,
       "paragraphs": 2,
       "contentOk": true,
-      "elapsedMs": 281
+      "elapsedMs": 289
     },
     {
       "kind": "nav",
@@ -96,15 +96,15 @@
       "urlOk": true,
       "h1": "Advanced Features",
       "h1Ok": true,
-      "bodyLen": 13516,
+      "bodyLen": 13947,
       "bodyOk": true,
-      "bodyHash": "bb9ecc886c1f",
+      "bodyHash": "b1cced8f190d",
       "distinctOk": true,
       "resourceCards": 19,
       "listItems": 4,
       "paragraphs": 39,
       "contentOk": true,
-      "elapsedMs": 243
+      "elapsedMs": 258
     },
     {
       "kind": "nav",
@@ -119,15 +119,15 @@
       "urlOk": true,
       "h1": "Theme Settings",
       "h1Ok": true,
-      "bodyLen": 4895,
+      "bodyLen": 5326,
       "bodyOk": true,
-      "bodyHash": "bdaaa57fef5c",
+      "bodyHash": "e7abba58e230",
       "distinctOk": true,
       "resourceCards": 3,
       "listItems": 6,
       "paragraphs": 21,
       "contentOk": true,
-      "elapsedMs": 271
+      "elapsedMs": 280
     },
     {
       "kind": "cat",
@@ -144,15 +144,15 @@
       "urlOk": true,
       "h1": "Community & Events",
       "h1Ok": true,
-      "bodyLen": 31376,
+      "bodyLen": 31807,
       "bodyOk": true,
-      "bodyHash": "56645d1e2de4",
+      "bodyHash": "5d8f9b238b1f",
       "distinctOk": true,
       "resourceCards": 93,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 554
+      "elapsedMs": 560
     },
     {
       "kind": "cat",
@@ -169,15 +169,15 @@
       "urlOk": true,
       "h1": "Encoding & Codecs",
       "h1Ok": true,
-      "bodyLen": 35931,
+      "bodyLen": 36362,
       "bodyOk": true,
-      "bodyHash": "7ffa17f3ee83",
+      "bodyHash": "73fcbec62cb1",
       "distinctOk": true,
       "resourceCards": 117,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 573
+      "elapsedMs": 592
     },
     {
       "kind": "cat",
@@ -194,15 +194,15 @@
       "urlOk": true,
       "h1": "General Tools",
       "h1Ok": true,
-      "bodyLen": 27492,
+      "bodyLen": 27923,
       "bodyOk": true,
-      "bodyHash": "c82f563b38b6",
+      "bodyHash": "d4b274d14851",
       "distinctOk": true,
       "resourceCards": 79,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 546
+      "elapsedMs": 578
     },
     {
       "kind": "cat",
@@ -219,15 +219,15 @@
       "urlOk": true,
       "h1": "Infrastructure & Delivery",
       "h1Ok": true,
-      "bodyLen": 49865,
+      "bodyLen": 50296,
       "bodyOk": true,
-      "bodyHash": "dbd4e515f609",
+      "bodyHash": "9ec094f66b14",
       "distinctOk": true,
       "resourceCards": 132,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 574
+      "elapsedMs": 599
     },
     {
       "kind": "cat",
@@ -244,15 +244,15 @@
       "urlOk": true,
       "h1": "Intro & Learning",
       "h1Ok": true,
-      "bodyLen": 40755,
+      "bodyLen": 41186,
       "bodyOk": true,
-      "bodyHash": "551b7ec4d154",
+      "bodyHash": "56b5180eb6dc",
       "distinctOk": true,
       "resourceCards": 146,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 572
+      "elapsedMs": 567
     },
     {
       "kind": "cat",
@@ -269,15 +269,15 @@
       "urlOk": true,
       "h1": "Media Tools",
       "h1Ok": true,
-      "bodyLen": 48738,
+      "bodyLen": 49169,
       "bodyOk": true,
-      "bodyHash": "a4517b685d5e",
+      "bodyHash": "18b02996c6e6",
       "distinctOk": true,
       "resourceCards": 168,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 598
+      "elapsedMs": 574
     },
     {
       "kind": "cat",
@@ -294,15 +294,15 @@
       "urlOk": true,
       "h1": "Players & Clients",
       "h1Ok": true,
-      "bodyLen": 45556,
+      "bodyLen": 45987,
       "bodyOk": true,
-      "bodyHash": "769094d8ce4f",
+      "bodyHash": "01cd64d5ce08",
       "distinctOk": true,
       "resourceCards": 139,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 538
+      "elapsedMs": 575
     },
     {
       "kind": "cat",
@@ -319,15 +319,15 @@
       "urlOk": true,
       "h1": "Protocols & Transport",
       "h1Ok": true,
-      "bodyLen": 30478,
+      "bodyLen": 30909,
       "bodyOk": true,
-      "bodyHash": "8d6710fdbe0d",
+      "bodyHash": "bb960c7caeb0",
       "distinctOk": true,
       "resourceCards": 90,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 501
+      "elapsedMs": 531
     },
     {
       "kind": "cat",
@@ -344,15 +344,15 @@
       "urlOk": true,
       "h1": "Standards & Industry",
       "h1Ok": true,
-      "bodyLen": 49126,
+      "bodyLen": 49557,
       "bodyOk": true,
-      "bodyHash": "4b957b4c1810",
+      "bodyHash": "3a8fbaa4b104",
       "distinctOk": true,
       "resourceCards": 143,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 565
+      "elapsedMs": 520
     },
     {
       "kind": "sub",
@@ -369,15 +369,15 @@
       "urlOk": true,
       "h1": "Community Groups",
       "h1Ok": true,
-      "bodyLen": 3963,
+      "bodyLen": 4394,
       "bodyOk": true,
-      "bodyHash": "37331349acb3",
+      "bodyHash": "2d44d5725703",
       "distinctOk": true,
       "resourceCards": 4,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 262
+      "elapsedMs": 275
     },
     {
       "kind": "sub",
@@ -394,15 +394,15 @@
       "urlOk": true,
       "h1": "Events & Conferences",
       "h1Ok": true,
-      "bodyLen": 3986,
+      "bodyLen": 4417,
       "bodyOk": true,
-      "bodyHash": "7f0650b004d4",
+      "bodyHash": "15977a101b8e",
       "distinctOk": true,
       "resourceCards": 7,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 232
+      "elapsedMs": 239
     },
     {
       "kind": "sub",
@@ -419,15 +419,15 @@
       "urlOk": true,
       "h1": "Benchmarking & Performance Tools for Codecs",
       "h1Ok": true,
-      "bodyLen": 4099,
+      "bodyLen": 4530,
       "bodyOk": true,
-      "bodyHash": "d4325e6957c5",
+      "bodyHash": "f16873e823ee",
       "distinctOk": true,
       "resourceCards": 4,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 245
+      "elapsedMs": 226
     },
     {
       "kind": "sub",
@@ -444,15 +444,15 @@
       "urlOk": true,
       "h1": "Cloud-Based Encoding Solutions",
       "h1Ok": true,
-      "bodyLen": 5266,
+      "bodyLen": 5697,
       "bodyOk": true,
-      "bodyHash": "72d6279ecd71",
+      "bodyHash": "c36a8ec83b84",
       "distinctOk": true,
       "resourceCards": 13,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 270
+      "elapsedMs": 241
     },
     {
       "kind": "sub",
@@ -469,15 +469,15 @@
       "urlOk": true,
       "h1": "Codecs",
       "h1Ok": true,
-      "bodyLen": 5839,
+      "bodyLen": 6270,
       "bodyOk": true,
-      "bodyHash": "8911643ab62b",
+      "bodyHash": "a61c93485261",
       "distinctOk": true,
       "resourceCards": 12,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 231
+      "elapsedMs": 259
     },
     {
       "kind": "sub",
@@ -494,15 +494,15 @@
       "urlOk": true,
       "h1": "Comparative Analysis of Codecs",
       "h1Ok": true,
-      "bodyLen": 3887,
+      "bodyLen": 4318,
       "bodyOk": true,
-      "bodyHash": "f201f91b1de9",
+      "bodyHash": "7fd558d83fed",
       "distinctOk": true,
       "resourceCards": 4,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 231
+      "elapsedMs": 227
     },
     {
       "kind": "sub",
@@ -519,15 +519,15 @@
       "urlOk": true,
       "h1": "Containerization & Packaging Tools",
       "h1Ok": true,
-      "bodyLen": 7252,
+      "bodyLen": 7683,
       "bodyOk": true,
-      "bodyHash": "dcf8d5154e59",
+      "bodyHash": "7bc2bff3b890",
       "distinctOk": true,
       "resourceCards": 21,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 249
+      "elapsedMs": 245
     },
     {
       "kind": "sub",
@@ -544,15 +544,15 @@
       "urlOk": true,
       "h1": "Encoding Tools",
       "h1Ok": true,
-      "bodyLen": 17620,
+      "bodyLen": 18051,
       "bodyOk": true,
-      "bodyHash": "ae891ba08cf6",
+      "bodyHash": "c0d534ce2cff",
       "distinctOk": true,
       "resourceCards": 85,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 281
+      "elapsedMs": 257
     },
     {
       "kind": "sub",
@@ -569,15 +569,15 @@
       "urlOk": true,
       "h1": "FFmpeg-Based Tools",
       "h1Ok": true,
-      "bodyLen": 5349,
+      "bodyLen": 5780,
       "bodyOk": true,
-      "bodyHash": "70b220ecbed1",
+      "bodyHash": "8113de420113",
       "distinctOk": true,
       "resourceCards": 16,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 243
+      "elapsedMs": 249
     },
     {
       "kind": "sub",
@@ -594,15 +594,15 @@
       "urlOk": true,
       "h1": "Hardware Accelerated Transcoding",
       "h1Ok": true,
-      "bodyLen": 4169,
+      "bodyLen": 4600,
       "bodyOk": true,
-      "bodyHash": "7edb35a7c324",
+      "bodyHash": "cb2a241891cf",
       "distinctOk": true,
       "resourceCards": 5,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 238
+      "elapsedMs": 228
     },
     {
       "kind": "sub",
@@ -619,15 +619,15 @@
       "urlOk": true,
       "h1": "Hardware Codecs & Acceleration",
       "h1Ok": true,
-      "bodyLen": 4016,
+      "bodyLen": 4447,
       "bodyOk": true,
-      "bodyHash": "73e11a2b81d7",
+      "bodyHash": "183a9ca8e229",
       "distinctOk": true,
       "resourceCards": 5,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 226
+      "elapsedMs": 227
     },
     {
       "kind": "sub",
@@ -644,15 +644,40 @@
       "urlOk": true,
       "h1": "Multi-format Packaging Tools",
       "h1Ok": true,
-      "bodyLen": 4584,
+      "bodyLen": 5015,
       "bodyOk": true,
-      "bodyHash": "fff88f96da03",
+      "bodyHash": "98ba67e473e2",
       "distinctOk": true,
       "resourceCards": 9,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 234
+      "elapsedMs": 245
+    },
+    {
+      "kind": "sub",
+      "testid": "sub-next-generation-codecs-av1-vvc",
+      "name": "Next-Generation Codecs AV1 VVC (no resources yet)",
+      "expectedPath": "/subcategory/next-generation-codecs-av1-vvc",
+      "openVia": [
+        "accordion-cat-encoding-codecs"
+      ],
+      "ok": true,
+      "click": true,
+      "errors": [],
+      "url": "/subcategory/next-generation-codecs-av1-vvc",
+      "urlOk": true,
+      "h1": "Next-Generation Codecs AV1 VVC",
+      "h1Ok": true,
+      "bodyLen": 4295,
+      "bodyOk": true,
+      "bodyHash": "bea82a507c9d",
+      "distinctOk": true,
+      "resourceCards": 3,
+      "listItems": 6,
+      "paragraphs": 3,
+      "contentOk": true,
+      "elapsedMs": 231
     },
     {
       "kind": "sub",
@@ -669,15 +694,15 @@
       "urlOk": true,
       "h1": "Open Source Encoder Projects",
       "h1Ok": true,
-      "bodyLen": 4513,
+      "bodyLen": 4944,
       "bodyOk": true,
-      "bodyHash": "36d5e297c2ba",
+      "bodyHash": "7908cd90f737",
       "distinctOk": true,
       "resourceCards": 7,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 244
+      "elapsedMs": 235
     },
     {
       "kind": "sub",
@@ -694,15 +719,15 @@
       "urlOk": true,
       "h1": "Real-Time Encoding Solutions",
       "h1Ok": true,
-      "bodyLen": 4788,
+      "bodyLen": 5219,
       "bodyOk": true,
-      "bodyHash": "c30218a8efd8",
+      "bodyHash": "4aa59670e432",
       "distinctOk": true,
       "resourceCards": 10,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 233
+      "elapsedMs": 228
     },
     {
       "kind": "sub",
@@ -719,15 +744,15 @@
       "urlOk": true,
       "h1": "Scripting & Automation Tools",
       "h1Ok": true,
-      "bodyLen": 5386,
+      "bodyLen": 5817,
       "bodyOk": true,
-      "bodyHash": "2e5278df6c3e",
+      "bodyHash": "1832d574d921",
       "distinctOk": true,
       "resourceCards": 13,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 264
+      "elapsedMs": 262
     },
     {
       "kind": "sub",
@@ -744,15 +769,15 @@
       "urlOk": true,
       "h1": "Software Codecs",
       "h1Ok": true,
-      "bodyLen": 3844,
+      "bodyLen": 4275,
       "bodyOk": true,
-      "bodyHash": "5136b8b98edb",
+      "bodyHash": "8571cd2274fa",
       "distinctOk": true,
       "resourceCards": 4,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 230
+      "elapsedMs": 235
     },
     {
       "kind": "sub",
@@ -769,15 +794,15 @@
       "urlOk": true,
       "h1": "Software Transcoding Tools",
       "h1Ok": true,
-      "bodyLen": 5382,
+      "bodyLen": 5813,
       "bodyOk": true,
-      "bodyHash": "bc62cdebe808",
+      "bodyHash": "1623f5476e34",
       "distinctOk": true,
       "resourceCards": 16,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 236
+      "elapsedMs": 225
     },
     {
       "kind": "sub",
@@ -794,15 +819,15 @@
       "urlOk": true,
       "h1": "API Libraries & SDKs",
       "h1Ok": true,
-      "bodyLen": 3996,
+      "bodyLen": 4427,
       "bodyOk": true,
-      "bodyHash": "914cd648d5aa",
+      "bodyHash": "771d707593c7",
       "distinctOk": true,
       "resourceCards": 6,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 245
+      "elapsedMs": 240
     },
     {
       "kind": "sub",
@@ -819,15 +844,15 @@
       "urlOk": true,
       "h1": "Build Scripts & Automation",
       "h1Ok": true,
-      "bodyLen": 4154,
+      "bodyLen": 4585,
       "bodyOk": true,
-      "bodyHash": "5dc33cdfc3b3",
+      "bodyHash": "cf428c939143",
       "distinctOk": true,
       "resourceCards": 4,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 235
+      "elapsedMs": 233
     },
     {
       "kind": "sub",
@@ -844,9 +869,9 @@
       "urlOk": true,
       "h1": "Case Studies & Best Practices in DRM",
       "h1Ok": true,
-      "bodyLen": 4435,
+      "bodyLen": 4866,
       "bodyOk": true,
-      "bodyHash": "ff516186bf19",
+      "bodyHash": "faec5b3f0d6a",
       "distinctOk": true,
       "resourceCards": 6,
       "listItems": 6,
@@ -869,15 +894,15 @@
       "urlOk": true,
       "h1": "Command-line Utilities & Wrappers",
       "h1Ok": true,
-      "bodyLen": 4138,
+      "bodyLen": 4569,
       "bodyOk": true,
-      "bodyHash": "c3691aa05c01",
+      "bodyHash": "8993b6517ba0",
       "distinctOk": true,
       "resourceCards": 6,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 229
+      "elapsedMs": 232
     },
     {
       "kind": "sub",
@@ -894,15 +919,15 @@
       "urlOk": true,
       "h1": "Community & Collaboration Platforms",
       "h1Ok": true,
-      "bodyLen": 3991,
+      "bodyLen": 4422,
       "bodyOk": true,
-      "bodyHash": "6f6f155eb624",
+      "bodyHash": "95a4bd35c8ce",
       "distinctOk": true,
       "resourceCards": 5,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 232
+      "elapsedMs": 229
     },
     {
       "kind": "sub",
@@ -919,15 +944,15 @@
       "urlOk": true,
       "h1": "Cross-Platform Media Tools",
       "h1Ok": true,
-      "bodyLen": 4053,
+      "bodyLen": 4484,
       "bodyOk": true,
-      "bodyHash": "ac0194be8722",
+      "bodyHash": "f83029f73a37",
       "distinctOk": true,
       "resourceCards": 5,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 231
+      "elapsedMs": 238
     },
     {
       "kind": "sub",
@@ -944,15 +969,15 @@
       "urlOk": true,
       "h1": "DRM",
       "h1Ok": true,
-      "bodyLen": 4686,
+      "bodyLen": 5117,
       "bodyOk": true,
-      "bodyHash": "79715face23b",
+      "bodyHash": "223b1c2127d5",
       "distinctOk": true,
       "resourceCards": 8,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 232
+      "elapsedMs": 229
     },
     {
       "kind": "sub",
@@ -969,15 +994,15 @@
       "urlOk": true,
       "h1": "DRM Solutions & Implementations",
       "h1Ok": true,
-      "bodyLen": 4600,
+      "bodyLen": 5031,
       "bodyOk": true,
-      "bodyHash": "a1f3b1447e09",
+      "bodyHash": "2236d3be358d",
       "distinctOk": true,
       "resourceCards": 9,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 230
+      "elapsedMs": 240
     },
     {
       "kind": "sub",
@@ -994,15 +1019,15 @@
       "urlOk": true,
       "h1": "DRM Testing & Validation Tools",
       "h1Ok": true,
-      "bodyLen": 3991,
+      "bodyLen": 4422,
       "bodyOk": true,
-      "bodyHash": "eedc3c165e4f",
+      "bodyHash": "6b01aac78487",
       "distinctOk": true,
       "resourceCards": 4,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 229
+      "elapsedMs": 231
     },
     {
       "kind": "sub",
@@ -1019,15 +1044,15 @@
       "urlOk": true,
       "h1": "Docker & Containerization Tools",
       "h1Ok": true,
-      "bodyLen": 4352,
+      "bodyLen": 4783,
       "bodyOk": true,
-      "bodyHash": "93c585e50135",
+      "bodyHash": "8f7f6de30631",
       "distinctOk": true,
       "resourceCards": 7,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 239
+      "elapsedMs": 240
     },
     {
       "kind": "sub",
@@ -1044,15 +1069,40 @@
       "urlOk": true,
       "h1": "Encryption Tools for Streaming",
       "h1Ok": true,
-      "bodyLen": 4329,
+      "bodyLen": 4760,
       "bodyOk": true,
-      "bodyHash": "5f831821a866",
+      "bodyHash": "4cbd3c8dfdc3",
       "distinctOk": true,
       "resourceCards": 7,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 257
+      "elapsedMs": 241
+    },
+    {
+      "kind": "sub",
+      "testid": "sub-ffmpeg-tools",
+      "name": "FFMPEG & Tools (no resources yet)",
+      "expectedPath": "/subcategory/ffmpeg-tools",
+      "openVia": [
+        "accordion-cat-general-tools"
+      ],
+      "ok": true,
+      "click": true,
+      "errors": [],
+      "url": "/subcategory/ffmpeg-tools",
+      "urlOk": true,
+      "h1": "FFMPEG & Tools",
+      "h1Ok": true,
+      "bodyLen": 4233,
+      "bodyOk": true,
+      "bodyHash": "2d4e949146ca",
+      "distinctOk": true,
+      "resourceCards": 3,
+      "listItems": 6,
+      "paragraphs": 3,
+      "contentOk": true,
+      "elapsedMs": 230
     },
     {
       "kind": "sub",
@@ -1069,15 +1119,15 @@
       "urlOk": true,
       "h1": "Independent & Hobbyist Projects",
       "h1Ok": true,
-      "bodyLen": 4142,
+      "bodyLen": 4573,
       "bodyOk": true,
-      "bodyHash": "d48164cab04c",
+      "bodyHash": "d468f6f22a4c",
       "distinctOk": true,
       "resourceCards": 5,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 232
+      "elapsedMs": 234
     },
     {
       "kind": "sub",
@@ -1094,15 +1144,40 @@
       "urlOk": true,
       "h1": "Logging & Debugging Tools",
       "h1Ok": true,
-      "bodyLen": 4332,
+      "bodyLen": 4763,
       "bodyOk": true,
-      "bodyHash": "b74a4052333d",
+      "bodyHash": "f3fab714660a",
       "distinctOk": true,
       "resourceCards": 6,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 228
+      "elapsedMs": 234
+    },
+    {
+      "kind": "sub",
+      "testid": "sub-performance-monitoring-tools",
+      "name": "Performance & Monitoring Tools (no resources yet)",
+      "expectedPath": "/subcategory/performance-monitoring-tools",
+      "openVia": [
+        "accordion-cat-general-tools"
+      ],
+      "ok": true,
+      "click": true,
+      "errors": [],
+      "url": "/subcategory/performance-monitoring-tools",
+      "urlOk": true,
+      "h1": "Performance & Monitoring Tools",
+      "h1Ok": true,
+      "bodyLen": 4281,
+      "bodyOk": true,
+      "bodyHash": "b25b84867184",
+      "distinctOk": true,
+      "resourceCards": 3,
+      "listItems": 6,
+      "paragraphs": 3,
+      "contentOk": true,
+      "elapsedMs": 230
     },
     {
       "kind": "sub",
@@ -1119,15 +1194,15 @@
       "urlOk": true,
       "h1": "Research Projects & Academic Resources",
       "h1Ok": true,
-      "bodyLen": 3920,
+      "bodyLen": 4351,
       "bodyOk": true,
-      "bodyHash": "e2a6ae25503e",
+      "bodyHash": "ed32e370834b",
       "distinctOk": true,
       "resourceCards": 4,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 225
+      "elapsedMs": 256
     },
     {
       "kind": "sub",
@@ -1144,15 +1219,15 @@
       "urlOk": true,
       "h1": "Specialized Utility Scripts",
       "h1Ok": true,
-      "bodyLen": 4567,
+      "bodyLen": 4998,
       "bodyOk": true,
-      "bodyHash": "41a3c7226e83",
+      "bodyHash": "e10e567a1a0d",
       "distinctOk": true,
       "resourceCards": 6,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 224
+      "elapsedMs": 230
     },
     {
       "kind": "sub",
@@ -1169,15 +1244,15 @@
       "urlOk": true,
       "h1": "Test Content & Sample Streams",
       "h1Ok": true,
-      "bodyLen": 4567,
+      "bodyLen": 4998,
       "bodyOk": true,
-      "bodyHash": "30f52db710a9",
+      "bodyHash": "fcb63a9d706d",
       "distinctOk": true,
       "resourceCards": 12,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 244
+      "elapsedMs": 239
     },
     {
       "kind": "sub",
@@ -1194,15 +1269,15 @@
       "urlOk": true,
       "h1": "Widevine FairPlay PlayReady Integrations",
       "h1Ok": true,
-      "bodyLen": 3973,
+      "bodyLen": 4404,
       "bodyOk": true,
-      "bodyHash": "cb924eafa3a6",
+      "bodyHash": "224387df9ec7",
       "distinctOk": true,
       "resourceCards": 4,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 226
+      "elapsedMs": 228
     },
     {
       "kind": "sub",
@@ -1219,15 +1294,15 @@
       "urlOk": true,
       "h1": "CDN Integration & Distribution",
       "h1Ok": true,
-      "bodyLen": 5114,
+      "bodyLen": 5545,
       "bodyOk": true,
-      "bodyHash": "0705dc3e22a7",
+      "bodyHash": "8f15495a1380",
       "distinctOk": true,
       "resourceCards": 11,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 230
+      "elapsedMs": 244
     },
     {
       "kind": "sub",
@@ -1244,15 +1319,15 @@
       "urlOk": true,
       "h1": "Cloud & CDN",
       "h1Ok": true,
-      "bodyLen": 3829,
+      "bodyLen": 4260,
       "bodyOk": true,
-      "bodyHash": "1564125ccfc9",
+      "bodyHash": "8d7864369d88",
       "distinctOk": true,
       "resourceCards": 3,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 225
+      "elapsedMs": 234
     },
     {
       "kind": "sub",
@@ -1269,15 +1344,15 @@
       "urlOk": true,
       "h1": "Edge Computing & Caching Solutions",
       "h1Ok": true,
-      "bodyLen": 4866,
+      "bodyLen": 5297,
       "bodyOk": true,
-      "bodyHash": "836462197a17",
+      "bodyHash": "6b9e1488f1f6",
       "distinctOk": true,
       "resourceCards": 6,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 237
+      "elapsedMs": 231
     },
     {
       "kind": "sub",
@@ -1294,15 +1369,15 @@
       "urlOk": true,
       "h1": "Live Streaming Servers",
       "h1Ok": true,
-      "bodyLen": 6075,
+      "bodyLen": 6506,
       "bodyOk": true,
-      "bodyHash": "29a1296e02c0",
+      "bodyHash": "8d97e9538a75",
       "distinctOk": true,
       "resourceCards": 15,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 249
+      "elapsedMs": 252
     },
     {
       "kind": "sub",
@@ -1319,15 +1394,15 @@
       "urlOk": true,
       "h1": "Multi-CDN Management",
       "h1Ok": true,
-      "bodyLen": 3860,
+      "bodyLen": 4291,
       "bodyOk": true,
-      "bodyHash": "9901159c4c3b",
+      "bodyHash": "e2766551ff51",
       "distinctOk": true,
       "resourceCards": 4,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 225
+      "elapsedMs": 232
     },
     {
       "kind": "sub",
@@ -1344,15 +1419,15 @@
       "urlOk": true,
       "h1": "Peer-to-Peer Streaming Solutions",
       "h1Ok": true,
-      "bodyLen": 4112,
+      "bodyLen": 4543,
       "bodyOk": true,
-      "bodyHash": "0329330cdb67",
+      "bodyHash": "ee22ff0dd851",
       "distinctOk": true,
       "resourceCards": 4,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 224
+      "elapsedMs": 232
     },
     {
       "kind": "sub",
@@ -1369,15 +1444,15 @@
       "urlOk": true,
       "h1": "RTMPRTSPHTTP Protocol Servers",
       "h1Ok": true,
-      "bodyLen": 4753,
+      "bodyLen": 5184,
       "bodyOk": true,
-      "bodyHash": "af9e9b365fc8",
+      "bodyHash": "4032cd942b9c",
       "distinctOk": true,
       "resourceCards": 12,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 227
+      "elapsedMs": 240
     },
     {
       "kind": "sub",
@@ -1394,15 +1469,15 @@
       "urlOk": true,
       "h1": "Streaming Analytics & Monitoring",
       "h1Ok": true,
-      "bodyLen": 4635,
+      "bodyLen": 5066,
       "bodyOk": true,
-      "bodyHash": "122dd2857e0f",
+      "bodyHash": "c393c19c734d",
       "distinctOk": true,
       "resourceCards": 8,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 233
+      "elapsedMs": 230
     },
     {
       "kind": "sub",
@@ -1419,15 +1494,15 @@
       "urlOk": true,
       "h1": "Streaming Servers",
       "h1Ok": true,
-      "bodyLen": 7739,
+      "bodyLen": 8170,
       "bodyOk": true,
-      "bodyHash": "9f2b4dd2b4b9",
+      "bodyHash": "cc1a7164d232",
       "distinctOk": true,
       "resourceCards": 25,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 251
+      "elapsedMs": 241
     },
     {
       "kind": "sub",
@@ -1444,15 +1519,15 @@
       "urlOk": true,
       "h1": "VOD Streaming Servers",
       "h1Ok": true,
-      "bodyLen": 5776,
+      "bodyLen": 6205,
       "bodyOk": true,
-      "bodyHash": "c52f3a6a8dad",
+      "bodyHash": "206429d3155e",
       "distinctOk": true,
       "resourceCards": 18,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 242
+      "elapsedMs": 591
     },
     {
       "kind": "sub",
@@ -1469,15 +1544,15 @@
       "urlOk": true,
       "h1": "Books & Courses",
       "h1Ok": true,
-      "bodyLen": 4128,
+      "bodyLen": 4557,
       "bodyOk": true,
-      "bodyHash": "dbc1f10aa332",
+      "bodyHash": "b51a3dea4ade",
       "distinctOk": true,
       "resourceCards": 8,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 230
+      "elapsedMs": 451
     },
     {
       "kind": "sub",
@@ -1494,15 +1569,15 @@
       "urlOk": true,
       "h1": "Case Studies & Whitepapers",
       "h1Ok": true,
-      "bodyLen": 4414,
+      "bodyLen": 4843,
       "bodyOk": true,
-      "bodyHash": "bbe8fdce6aeb",
+      "bodyHash": "93b7c753cb26",
       "distinctOk": true,
       "resourceCards": 6,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 222
+      "elapsedMs": 257
     },
     {
       "kind": "sub",
@@ -1519,15 +1594,15 @@
       "urlOk": true,
       "h1": "Community Blogs & Forums",
       "h1Ok": true,
-      "bodyLen": 4160,
+      "bodyLen": 4591,
       "bodyOk": true,
-      "bodyHash": "73b06c0f8056",
+      "bodyHash": "22c51cba6ccd",
       "distinctOk": true,
       "resourceCards": 5,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 549
+      "elapsedMs": 254
     },
     {
       "kind": "sub",
@@ -1544,15 +1619,40 @@
       "urlOk": true,
       "h1": "Encoding & Transcoding Guides",
       "h1Ok": true,
-      "bodyLen": 5527,
+      "bodyLen": 5958,
       "bodyOk": true,
-      "bodyHash": "fd1507294b4c",
+      "bodyHash": "225be4b0e677",
       "distinctOk": true,
       "resourceCards": 15,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 280
+      "elapsedMs": 264
+    },
+    {
+      "kind": "sub",
+      "testid": "sub-introduction",
+      "name": "Introduction (no resources yet)",
+      "expectedPath": "/subcategory/introduction",
+      "openVia": [
+        "accordion-cat-intro-learning"
+      ],
+      "ok": true,
+      "click": true,
+      "errors": [],
+      "url": "/subcategory/introduction",
+      "urlOk": true,
+      "h1": "Introduction",
+      "h1Ok": true,
+      "bodyLen": 4236,
+      "bodyOk": true,
+      "bodyHash": "eca8bc2c9d15",
+      "distinctOk": true,
+      "resourceCards": 3,
+      "listItems": 6,
+      "paragraphs": 3,
+      "contentOk": true,
+      "elapsedMs": 261
     },
     {
       "kind": "sub",
@@ -1569,15 +1669,15 @@
       "urlOk": true,
       "h1": "Learning Resources",
       "h1Ok": true,
-      "bodyLen": 6815,
+      "bodyLen": 7246,
       "bodyOk": true,
-      "bodyHash": "6e5ca413352c",
+      "bodyHash": "8d491cb51882",
       "distinctOk": true,
       "resourceCards": 19,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 252
+      "elapsedMs": 247
     },
     {
       "kind": "sub",
@@ -1594,15 +1694,40 @@
       "urlOk": true,
       "h1": "Player Development Documentation",
       "h1Ok": true,
-      "bodyLen": 3990,
+      "bodyLen": 4421,
       "bodyOk": true,
-      "bodyHash": "d40c23d1d6aa",
+      "bodyHash": "2c773f43d496",
       "distinctOk": true,
       "resourceCards": 5,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 240
+      "elapsedMs": 241
+    },
+    {
+      "kind": "sub",
+      "testid": "sub-subtitle-caption-tutorials",
+      "name": "Subtitle & Caption Tutorials (no resources yet)",
+      "expectedPath": "/subcategory/subtitle-caption-tutorials",
+      "openVia": [
+        "accordion-cat-intro-learning"
+      ],
+      "ok": true,
+      "click": true,
+      "errors": [],
+      "url": "/subcategory/subtitle-caption-tutorials",
+      "urlOk": true,
+      "h1": "Subtitle & Caption Tutorials",
+      "h1Ok": true,
+      "bodyLen": 4282,
+      "bodyOk": true,
+      "bodyHash": "31ea57395ef0",
+      "distinctOk": true,
+      "resourceCards": 3,
+      "listItems": 6,
+      "paragraphs": 3,
+      "contentOk": true,
+      "elapsedMs": 245
     },
     {
       "kind": "sub",
@@ -1619,15 +1744,15 @@
       "urlOk": true,
       "h1": "Tutorials & Case Studies",
       "h1Ok": true,
-      "bodyLen": 9501,
+      "bodyLen": 9932,
       "bodyOk": true,
-      "bodyHash": "7fd45b0df662",
+      "bodyHash": "9f3ba760a610",
       "distinctOk": true,
       "resourceCards": 28,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 260
+      "elapsedMs": 279
     },
     {
       "kind": "sub",
@@ -1644,15 +1769,15 @@
       "urlOk": true,
       "h1": "Video Streaming Tutorials",
       "h1Ok": true,
-      "bodyLen": 5157,
+      "bodyLen": 5588,
       "bodyOk": true,
-      "bodyHash": "c584a074ff52",
+      "bodyHash": "5aea4b4913e6",
       "distinctOk": true,
       "resourceCards": 13,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 256
+      "elapsedMs": 264
     },
     {
       "kind": "sub",
@@ -1669,15 +1794,15 @@
       "urlOk": true,
       "h1": "Webinars & Conference Talks",
       "h1Ok": true,
-      "bodyLen": 4844,
+      "bodyLen": 5275,
       "bodyOk": true,
-      "bodyHash": "7404c676caab",
+      "bodyHash": "0dc6b443f38c",
       "distinctOk": true,
       "resourceCards": 9,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 281
+      "elapsedMs": 232
     },
     {
       "kind": "sub",
@@ -1694,15 +1819,15 @@
       "urlOk": true,
       "h1": "AI & Machine Learning Tools",
       "h1Ok": true,
-      "bodyLen": 4825,
+      "bodyLen": 5256,
       "bodyOk": true,
-      "bodyHash": "348a7ee99e47",
+      "bodyHash": "fe6c9c9fb02c",
       "distinctOk": true,
       "resourceCards": 10,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 460
+      "elapsedMs": 448
     },
     {
       "kind": "sub",
@@ -1719,15 +1844,15 @@
       "urlOk": true,
       "h1": "Ads & QoE",
       "h1Ok": true,
-      "bodyLen": 4040,
+      "bodyLen": 4471,
       "bodyOk": true,
-      "bodyHash": "c6ab4a86e1fc",
+      "bodyHash": "f6aa4e08e20c",
       "distinctOk": true,
       "resourceCards": 4,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 246
+      "elapsedMs": 240
     },
     {
       "kind": "sub",
@@ -1744,15 +1869,15 @@
       "urlOk": true,
       "h1": "Audio & Subtitles",
       "h1Ok": true,
-      "bodyLen": 4094,
+      "bodyLen": 4525,
       "bodyOk": true,
-      "bodyHash": "9c76f87b22a1",
+      "bodyHash": "d9cd9b45e78a",
       "distinctOk": true,
       "resourceCards": 5,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 234
+      "elapsedMs": 244
     },
     {
       "kind": "sub",
@@ -1769,15 +1894,15 @@
       "urlOk": true,
       "h1": "Audio Analysis & Processing",
       "h1Ok": true,
-      "bodyLen": 4061,
+      "bodyLen": 4492,
       "bodyOk": true,
-      "bodyHash": "f9c51b0a21bd",
+      "bodyHash": "71e626bcca18",
       "distinctOk": true,
       "resourceCards": 6,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 241
+      "elapsedMs": 239
     },
     {
       "kind": "sub",
@@ -1794,15 +1919,15 @@
       "urlOk": true,
       "h1": "Batch Processing & Automation",
       "h1Ok": true,
-      "bodyLen": 4309,
+      "bodyLen": 4740,
       "bodyOk": true,
-      "bodyHash": "3b0873f3f12d",
+      "bodyHash": "eee78b864607",
       "distinctOk": true,
       "resourceCards": 7,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 250
+      "elapsedMs": 240
     },
     {
       "kind": "sub",
@@ -1819,15 +1944,15 @@
       "urlOk": true,
       "h1": "Color Grading & Correction Tools",
       "h1Ok": true,
-      "bodyLen": 3941,
+      "bodyLen": 4372,
       "bodyOk": true,
-      "bodyHash": "b59970af2e79",
+      "bodyHash": "67c2d7519fd7",
       "distinctOk": true,
       "resourceCards": 4,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 255
+      "elapsedMs": 240
     },
     {
       "kind": "sub",
@@ -1844,15 +1969,15 @@
       "urlOk": true,
       "h1": "Color Science & Histogram Analysis",
       "h1Ok": true,
-      "bodyLen": 3908,
+      "bodyLen": 4339,
       "bodyOk": true,
-      "bodyHash": "cdfde05a209d",
+      "bodyHash": "3a514deb86b0",
       "distinctOk": true,
       "resourceCards": 4,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 233
+      "elapsedMs": 228
     },
     {
       "kind": "sub",
@@ -1869,9 +1994,9 @@
       "urlOk": true,
       "h1": "Conversion & Format Tools",
       "h1Ok": true,
-      "bodyLen": 3952,
+      "bodyLen": 4383,
       "bodyOk": true,
-      "bodyHash": "b5a456cee30d",
+      "bodyHash": "be9873c0ae54",
       "distinctOk": true,
       "resourceCards": 4,
       "listItems": 6,
@@ -1894,15 +2019,15 @@
       "urlOk": true,
       "h1": "Effects & Compositing Tools",
       "h1Ok": true,
-      "bodyLen": 3858,
+      "bodyLen": 4289,
       "bodyOk": true,
-      "bodyHash": "b9ab82c04ea2",
+      "bodyHash": "22d6d5ee22bf",
       "distinctOk": true,
       "resourceCards": 4,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 236
+      "elapsedMs": 233
     },
     {
       "kind": "sub",
@@ -1919,15 +2044,40 @@
       "urlOk": true,
       "h1": "Metadata Extraction & Management",
       "h1Ok": true,
-      "bodyLen": 5920,
+      "bodyLen": 6351,
       "bodyOk": true,
-      "bodyHash": "d48fa4f3f4de",
+      "bodyHash": "5888b2127b6a",
       "distinctOk": true,
       "resourceCards": 17,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 237
+      "elapsedMs": 259
+    },
+    {
+      "kind": "sub",
+      "testid": "sub-non-linear-editing-suites",
+      "name": "Non-linear Editing Suites (no resources yet)",
+      "expectedPath": "/subcategory/non-linear-editing-suites",
+      "openVia": [
+        "accordion-cat-media-tools"
+      ],
+      "ok": true,
+      "click": true,
+      "errors": [],
+      "url": "/subcategory/non-linear-editing-suites",
+      "urlOk": true,
+      "h1": "Non-linear Editing Suites",
+      "h1Ok": true,
+      "bodyLen": 4260,
+      "bodyOk": true,
+      "bodyHash": "8686a97e4631",
+      "distinctOk": true,
+      "resourceCards": 3,
+      "listItems": 6,
+      "paragraphs": 3,
+      "contentOk": true,
+      "elapsedMs": 245
     },
     {
       "kind": "sub",
@@ -1944,15 +2094,15 @@
       "urlOk": true,
       "h1": "Quality Analysis & Metrics",
       "h1Ok": true,
-      "bodyLen": 4624,
+      "bodyLen": 5055,
       "bodyOk": true,
-      "bodyHash": "78f84cb835ba",
+      "bodyHash": "ba0cb44c0191",
       "distinctOk": true,
       "resourceCards": 7,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 233
+      "elapsedMs": 242
     },
     {
       "kind": "sub",
@@ -1969,15 +2119,15 @@
       "urlOk": true,
       "h1": "Scene Detection & Segmentation",
       "h1Ok": true,
-      "bodyLen": 4160,
+      "bodyLen": 4591,
       "bodyOk": true,
-      "bodyHash": "8d343bc08714",
+      "bodyHash": "aac179cd9e53",
       "distinctOk": true,
       "resourceCards": 6,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 228
+      "elapsedMs": 243
     },
     {
       "kind": "sub",
@@ -1994,15 +2144,40 @@
       "urlOk": true,
       "h1": "Subtitle & Caption Tools",
       "h1Ok": true,
-      "bodyLen": 4826,
+      "bodyLen": 5257,
       "bodyOk": true,
-      "bodyHash": "ae5d442694f6",
+      "bodyHash": "31ea57395ef0",
       "distinctOk": true,
       "resourceCards": 11,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 243
+      "elapsedMs": 231
+    },
+    {
+      "kind": "sub",
+      "testid": "sub-trimming-cutting-tools",
+      "name": "Trimming & Cutting Tools (no resources yet)",
+      "expectedPath": "/subcategory/trimming-cutting-tools",
+      "openVia": [
+        "accordion-cat-media-tools"
+      ],
+      "ok": true,
+      "click": true,
+      "errors": [],
+      "url": "/subcategory/trimming-cutting-tools",
+      "urlOk": true,
+      "h1": "Trimming & Cutting Tools",
+      "h1Ok": true,
+      "bodyLen": 4255,
+      "bodyOk": true,
+      "bodyHash": "6bf3d6ebd288",
+      "distinctOk": true,
+      "resourceCards": 3,
+      "listItems": 6,
+      "paragraphs": 3,
+      "contentOk": true,
+      "elapsedMs": 235
     },
     {
       "kind": "sub",
@@ -2019,15 +2194,15 @@
       "urlOk": true,
       "h1": "VMAF PSNR SSIM Tools",
       "h1Ok": true,
-      "bodyLen": 4366,
+      "bodyLen": 4797,
       "bodyOk": true,
-      "bodyHash": "4eb95700da2a",
+      "bodyHash": "db1d10f887e9",
       "distinctOk": true,
       "resourceCards": 6,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 239
+      "elapsedMs": 262
     },
     {
       "kind": "sub",
@@ -2044,15 +2219,40 @@
       "urlOk": true,
       "h1": "Video Analytics & Benchmarking",
       "h1Ok": true,
-      "bodyLen": 4800,
+      "bodyLen": 5231,
       "bodyOk": true,
-      "bodyHash": "6300d90668d7",
+      "bodyHash": "0f3c4563df96",
       "distinctOk": true,
       "resourceCards": 6,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 256
+      "elapsedMs": 239
+    },
+    {
+      "kind": "sub",
+      "testid": "sub-browser-extensions",
+      "name": "Browser Extensions (no resources yet)",
+      "expectedPath": "/subcategory/browser-extensions",
+      "openVia": [
+        "accordion-cat-players-clients"
+      ],
+      "ok": true,
+      "click": true,
+      "errors": [],
+      "url": "/subcategory/browser-extensions",
+      "urlOk": true,
+      "h1": "Browser Extensions",
+      "h1Ok": true,
+      "bodyLen": 4257,
+      "bodyOk": true,
+      "bodyHash": "a4ac05eb8e5c",
+      "distinctOk": true,
+      "resourceCards": 3,
+      "listItems": 6,
+      "paragraphs": 3,
+      "contentOk": true,
+      "elapsedMs": 426
     },
     {
       "kind": "sub",
@@ -2069,15 +2269,15 @@
       "urlOk": true,
       "h1": "Desktop Players",
       "h1Ok": true,
-      "bodyLen": 4099,
+      "bodyLen": 4530,
       "bodyOk": true,
-      "bodyHash": "cb7f13aef25d",
+      "bodyHash": "d22918dd4df3",
       "distinctOk": true,
       "resourceCards": 6,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 431
+      "elapsedMs": 227
     },
     {
       "kind": "sub",
@@ -2094,15 +2294,15 @@
       "urlOk": true,
       "h1": "Embedded Players",
       "h1Ok": true,
-      "bodyLen": 3841,
+      "bodyLen": 4272,
       "bodyOk": true,
-      "bodyHash": "23b2576e79e3",
+      "bodyHash": "d7b4e83c7ec4",
       "distinctOk": true,
       "resourceCards": 4,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 227
+      "elapsedMs": 226
     },
     {
       "kind": "sub",
@@ -2119,15 +2319,15 @@
       "urlOk": true,
       "h1": "Frameworks & UI Components",
       "h1Ok": true,
-      "bodyLen": 4436,
+      "bodyLen": 4867,
       "bodyOk": true,
-      "bodyHash": "5449b2b96a87",
+      "bodyHash": "54265c17c9bf",
       "distinctOk": true,
       "resourceCards": 9,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 243
+      "elapsedMs": 249
     },
     {
       "kind": "sub",
@@ -2144,15 +2344,15 @@
       "urlOk": true,
       "h1": "Hardware Players",
       "h1Ok": true,
-      "bodyLen": 4068,
+      "bodyLen": 4499,
       "bodyOk": true,
-      "bodyHash": "7ea4c3aecb31",
+      "bodyHash": "48f7c66f55fc",
       "distinctOk": true,
       "resourceCards": 6,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 233
+      "elapsedMs": 230
     },
     {
       "kind": "sub",
@@ -2169,15 +2369,15 @@
       "urlOk": true,
       "h1": "Mobile & Web Players",
       "h1Ok": true,
-      "bodyLen": 5543,
+      "bodyLen": 5974,
       "bodyOk": true,
-      "bodyHash": "7cf9cc07d707",
+      "bodyHash": "09f066323531",
       "distinctOk": true,
       "resourceCards": 13,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 258
+      "elapsedMs": 251
     },
     {
       "kind": "sub",
@@ -2194,15 +2394,15 @@
       "urlOk": true,
       "h1": "Mobile Players",
       "h1Ok": true,
-      "bodyLen": 4225,
+      "bodyLen": 4656,
       "bodyOk": true,
-      "bodyHash": "7d51bae1da54",
+      "bodyHash": "40797d9ee99e",
       "distinctOk": true,
       "resourceCards": 6,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 241
+      "elapsedMs": 244
     },
     {
       "kind": "sub",
@@ -2219,15 +2419,15 @@
       "urlOk": true,
       "h1": "Set-top Box Players",
       "h1Ok": true,
-      "bodyLen": 3867,
+      "bodyLen": 4298,
       "bodyOk": true,
-      "bodyHash": "a6fcba83d110",
+      "bodyHash": "9b8e6aea4b82",
       "distinctOk": true,
       "resourceCards": 4,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 233
+      "elapsedMs": 229
     },
     {
       "kind": "sub",
@@ -2244,15 +2444,15 @@
       "urlOk": true,
       "h1": "Smart TV Players",
       "h1Ok": true,
-      "bodyLen": 3809,
+      "bodyLen": 4240,
       "bodyOk": true,
-      "bodyHash": "7f647585a0b7",
+      "bodyHash": "c96746f719ef",
       "distinctOk": true,
       "resourceCards": 4,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 238
+      "elapsedMs": 235
     },
     {
       "kind": "sub",
@@ -2269,15 +2469,15 @@
       "urlOk": true,
       "h1": "Web Players",
       "h1Ok": true,
-      "bodyLen": 4272,
+      "bodyLen": 4703,
       "bodyOk": true,
-      "bodyHash": "4edc24aca35b",
+      "bodyHash": "152f15949299",
       "distinctOk": true,
       "resourceCards": 8,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 229
+      "elapsedMs": 231
     },
     {
       "kind": "sub",
@@ -2294,15 +2494,15 @@
       "urlOk": true,
       "h1": "Adaptive Bitrate Algorithms & Tools",
       "h1Ok": true,
-      "bodyLen": 4175,
+      "bodyLen": 4606,
       "bodyOk": true,
-      "bodyHash": "ca761a09e5aa",
+      "bodyHash": "858d04e13f7d",
       "distinctOk": true,
       "resourceCards": 5,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 446
+      "elapsedMs": 433
     },
     {
       "kind": "sub",
@@ -2319,15 +2519,15 @@
       "urlOk": true,
       "h1": "Adaptive Streaming",
       "h1Ok": true,
-      "bodyLen": 5553,
+      "bodyLen": 5984,
       "bodyOk": true,
-      "bodyHash": "5675db2f42e1",
+      "bodyHash": "4978aebf6b39",
       "distinctOk": true,
       "resourceCards": 12,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 235
+      "elapsedMs": 234
     },
     {
       "kind": "sub",
@@ -2344,15 +2544,40 @@
       "urlOk": true,
       "h1": "CMAF & fMP4 Packaging",
       "h1Ok": true,
-      "bodyLen": 4356,
+      "bodyLen": 4787,
       "bodyOk": true,
-      "bodyHash": "4a43d91c7f35",
+      "bodyHash": "10dd9eaf0ccb",
       "distinctOk": true,
       "resourceCards": 7,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 226
+      "elapsedMs": 238
+    },
+    {
+      "kind": "sub",
+      "testid": "sub-dash-manifest-tools",
+      "name": "DASH Manifest Tools (no resources yet)",
+      "expectedPath": "/subcategory/dash-manifest-tools",
+      "openVia": [
+        "accordion-cat-protocols-transport"
+      ],
+      "ok": true,
+      "click": true,
+      "errors": [],
+      "url": "/subcategory/dash-manifest-tools",
+      "urlOk": true,
+      "h1": "DASH Manifest Tools",
+      "h1Ok": true,
+      "bodyLen": 4272,
+      "bodyOk": true,
+      "bodyHash": "1521d57349e1",
+      "distinctOk": true,
+      "resourceCards": 3,
+      "listItems": 6,
+      "paragraphs": 3,
+      "contentOk": true,
+      "elapsedMs": 225
     },
     {
       "kind": "sub",
@@ -2369,15 +2594,15 @@
       "urlOk": true,
       "h1": "DASH Tools",
       "h1Ok": true,
-      "bodyLen": 4042,
+      "bodyLen": 4473,
       "bodyOk": true,
-      "bodyHash": "7b072b9606f2",
+      "bodyHash": "9b2a14b65ec3",
       "distinctOk": true,
       "resourceCards": 5,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 230
+      "elapsedMs": 225
     },
     {
       "kind": "sub",
@@ -2394,15 +2619,15 @@
       "urlOk": true,
       "h1": "HLS Manifest Parsers & Generators",
       "h1Ok": true,
-      "bodyLen": 4257,
+      "bodyLen": 4688,
       "bodyOk": true,
-      "bodyHash": "3d826b7e54aa",
+      "bodyHash": "fad5ffb9140b",
       "distinctOk": true,
       "resourceCards": 9,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 237
+      "elapsedMs": 226
     },
     {
       "kind": "sub",
@@ -2419,15 +2644,15 @@
       "urlOk": true,
       "h1": "HLS Tools",
       "h1Ok": true,
-      "bodyLen": 4759,
+      "bodyLen": 5190,
       "bodyOk": true,
-      "bodyHash": "ef069930f848",
+      "bodyHash": "64d49a89f985",
       "distinctOk": true,
       "resourceCards": 13,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 253
+      "elapsedMs": 280
     },
     {
       "kind": "sub",
@@ -2444,15 +2669,15 @@
       "urlOk": true,
       "h1": "Low-Latency Streaming Tools",
       "h1Ok": true,
-      "bodyLen": 3981,
+      "bodyLen": 4412,
       "bodyOk": true,
-      "bodyHash": "cf7bdbf298fa",
+      "bodyHash": "fbb48f520f04",
       "distinctOk": true,
       "resourceCards": 4,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 236
+      "elapsedMs": 228
     },
     {
       "kind": "sub",
@@ -2469,15 +2694,15 @@
       "urlOk": true,
       "h1": "Transport Protocols",
       "h1Ok": true,
-      "bodyLen": 4197,
+      "bodyLen": 4628,
       "bodyOk": true,
-      "bodyHash": "f8ce43bd826e",
+      "bodyHash": "fcf84d4e2162",
       "distinctOk": true,
       "resourceCards": 5,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 234
+      "elapsedMs": 226
     },
     {
       "kind": "sub",
@@ -2494,15 +2719,15 @@
       "urlOk": true,
       "h1": "Adaptive Streaming Standards",
       "h1Ok": true,
-      "bodyLen": 4628,
+      "bodyLen": 5059,
       "bodyOk": true,
-      "bodyHash": "042dd01558f7",
+      "bodyHash": "4978aebf6b39",
       "distinctOk": true,
       "resourceCards": 9,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 435
+      "elapsedMs": 442
     },
     {
       "kind": "sub",
@@ -2519,15 +2744,40 @@
       "urlOk": true,
       "h1": "Best Practices & Guidelines",
       "h1Ok": true,
-      "bodyLen": 5410,
+      "bodyLen": 5841,
       "bodyOk": true,
-      "bodyHash": "8696ca7a5d0c",
+      "bodyHash": "376bcd192241",
       "distinctOk": true,
       "resourceCards": 12,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 246
+      "elapsedMs": 237
+    },
+    {
+      "kind": "sub",
+      "testid": "sub-closed-captioning-subtitling-standards",
+      "name": "Closed Captioning & Subtitling Standards (no resources yet)",
+      "expectedPath": "/subcategory/closed-captioning-subtitling-standards",
+      "openVia": [
+        "accordion-cat-standards-industry"
+      ],
+      "ok": true,
+      "click": true,
+      "errors": [],
+      "url": "/subcategory/closed-captioning-subtitling-standards",
+      "urlOk": true,
+      "h1": "Closed Captioning & Subtitling Standards",
+      "h1Ok": true,
+      "bodyLen": 4330,
+      "bodyOk": true,
+      "bodyHash": "9b1070a768d1",
+      "distinctOk": true,
+      "resourceCards": 3,
+      "listItems": 6,
+      "paragraphs": 3,
+      "contentOk": true,
+      "elapsedMs": 256
     },
     {
       "kind": "sub",
@@ -2544,15 +2794,15 @@
       "urlOk": true,
       "h1": "DRM & Content Protection Standards",
       "h1Ok": true,
-      "bodyLen": 4127,
+      "bodyLen": 4558,
       "bodyOk": true,
-      "bodyHash": "47dedcb492df",
+      "bodyHash": "4fe211c05795",
       "distinctOk": true,
       "resourceCards": 6,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 235
+      "elapsedMs": 223
     },
     {
       "kind": "sub",
@@ -2569,15 +2819,15 @@
       "urlOk": true,
       "h1": "Industry Forums & Standards Bodies",
       "h1Ok": true,
-      "bodyLen": 4893,
+      "bodyLen": 5324,
       "bodyOk": true,
-      "bodyHash": "f8226260c98b",
+      "bodyHash": "3b07d8fe2eb6",
       "distinctOk": true,
       "resourceCards": 9,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 227
+      "elapsedMs": 235
     },
     {
       "kind": "sub",
@@ -2594,15 +2844,15 @@
       "urlOk": true,
       "h1": "Specs & Standards",
       "h1Ok": true,
-      "bodyLen": 6025,
+      "bodyLen": 6456,
       "bodyOk": true,
-      "bodyHash": "4b6edcc6b144",
+      "bodyHash": "127328cc6959",
       "distinctOk": true,
       "resourceCards": 13,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 226
+      "elapsedMs": 230
     },
     {
       "kind": "sub",
@@ -2619,15 +2869,15 @@
       "urlOk": true,
       "h1": "Vendors & HDR",
       "h1Ok": true,
-      "bodyLen": 3818,
+      "bodyLen": 4249,
       "bodyOk": true,
-      "bodyHash": "4ad3a8052d9e",
+      "bodyHash": "e60e69a79c2a",
       "distinctOk": true,
       "resourceCards": 3,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 233
+      "elapsedMs": 222
     },
     {
       "kind": "sub",
@@ -2644,15 +2894,15 @@
       "urlOk": true,
       "h1": "Video Codec Specifications",
       "h1Ok": true,
-      "bodyLen": 5198,
+      "bodyLen": 5629,
       "bodyOk": true,
-      "bodyHash": "3122130d4325",
+      "bodyHash": "f85e2bbd4a99",
       "distinctOk": true,
       "resourceCards": 14,
       "listItems": 6,
       "paragraphs": 3,
       "contentOk": true,
-      "elapsedMs": 251
+      "elapsedMs": 240
     },
     {
       "kind": "subsub",
@@ -2670,15 +2920,67 @@
       "urlOk": true,
       "h1": "Online Forums",
       "h1Ok": true,
-      "bodyLen": 4124,
+      "bodyLen": 4555,
       "bodyOk": true,
-      "bodyHash": "8df3905ca688",
+      "bodyHash": "13259ef0c1d5",
       "distinctOk": true,
       "resourceCards": 5,
       "listItems": 6,
       "paragraphs": 2,
       "contentOk": true,
-      "elapsedMs": 642
+      "elapsedMs": 637
+    },
+    {
+      "kind": "subsub",
+      "testid": "subsub-slack-meetups",
+      "name": "Slack & Meetups (no resources yet)",
+      "expectedPath": "/sub-subcategory/slack-meetups",
+      "openVia": [
+        "accordion-cat-community-events",
+        "expand-sub-community-groups"
+      ],
+      "ok": true,
+      "click": true,
+      "errors": [],
+      "url": "/sub-subcategory/slack-meetups",
+      "urlOk": true,
+      "h1": "Slack & Meetups",
+      "h1Ok": true,
+      "bodyLen": 4241,
+      "bodyOk": true,
+      "bodyHash": "32580dc90c6d",
+      "distinctOk": true,
+      "resourceCards": 3,
+      "listItems": 6,
+      "paragraphs": 2,
+      "contentOk": true,
+      "elapsedMs": 243
+    },
+    {
+      "kind": "subsub",
+      "testid": "subsub-conferences",
+      "name": "Conferences (no resources yet)",
+      "expectedPath": "/sub-subcategory/conferences",
+      "openVia": [
+        "accordion-cat-community-events",
+        "expand-sub-events-conferences"
+      ],
+      "ok": true,
+      "click": true,
+      "errors": [],
+      "url": "/sub-subcategory/conferences",
+      "urlOk": true,
+      "h1": "Conferences",
+      "h1Ok": true,
+      "bodyLen": 4239,
+      "bodyOk": true,
+      "bodyHash": "ac4108405f27",
+      "distinctOk": true,
+      "resourceCards": 3,
+      "listItems": 6,
+      "paragraphs": 2,
+      "contentOk": true,
+      "elapsedMs": 433
     },
     {
       "kind": "subsub",
@@ -2696,15 +2998,15 @@
       "urlOk": true,
       "h1": "Podcasts & Webinars",
       "h1Ok": true,
-      "bodyLen": 3899,
+      "bodyLen": 4330,
       "bodyOk": true,
-      "bodyHash": "534859466182",
+      "bodyHash": "0ee2c4ed7c73",
       "distinctOk": true,
       "resourceCards": 4,
       "listItems": 6,
       "paragraphs": 2,
       "contentOk": true,
-      "elapsedMs": 439
+      "elapsedMs": 231
     },
     {
       "kind": "subsub",
@@ -2722,15 +3024,15 @@
       "urlOk": true,
       "h1": "AV1",
       "h1Ok": true,
-      "bodyLen": 3998,
+      "bodyLen": 4429,
       "bodyOk": true,
-      "bodyHash": "6859b3357786",
+      "bodyHash": "c1fb247ff5a1",
       "distinctOk": true,
       "resourceCards": 5,
       "listItems": 6,
       "paragraphs": 2,
       "contentOk": true,
-      "elapsedMs": 638
+      "elapsedMs": 770
     },
     {
       "kind": "subsub",
@@ -2748,15 +3050,15 @@
       "urlOk": true,
       "h1": "HEVC",
       "h1Ok": true,
-      "bodyLen": 4474,
+      "bodyLen": 4905,
       "bodyOk": true,
-      "bodyHash": "2243792cf9ae",
+      "bodyHash": "5732b97433f2",
       "distinctOk": true,
       "resourceCards": 6,
       "listItems": 6,
       "paragraphs": 2,
       "contentOk": true,
-      "elapsedMs": 247
+      "elapsedMs": 253
     },
     {
       "kind": "subsub",
@@ -2774,15 +3076,15 @@
       "urlOk": true,
       "h1": "VP9",
       "h1Ok": true,
-      "bodyLen": 3909,
+      "bodyLen": 4340,
       "bodyOk": true,
-      "bodyHash": "24c0cbf2292e",
+      "bodyHash": "7db4fbbf046c",
       "distinctOk": true,
       "resourceCards": 4,
       "listItems": 6,
       "paragraphs": 2,
       "contentOk": true,
-      "elapsedMs": 230
+      "elapsedMs": 253
     },
     {
       "kind": "subsub",
@@ -2800,15 +3102,67 @@
       "urlOk": true,
       "h1": "FFMPEG",
       "h1Ok": true,
-      "bodyLen": 7368,
+      "bodyLen": 7799,
       "bodyOk": true,
-      "bodyHash": "aeb21272942a",
+      "bodyHash": "3e161341c214",
       "distinctOk": true,
       "resourceCards": 27,
       "listItems": 6,
       "paragraphs": 2,
       "contentOk": true,
-      "elapsedMs": 455
+      "elapsedMs": 500
+    },
+    {
+      "kind": "subsub",
+      "testid": "subsub-other-encoders",
+      "name": "Other Encoders (no resources yet)",
+      "expectedPath": "/sub-subcategory/other-encoders",
+      "openVia": [
+        "accordion-cat-encoding-codecs",
+        "expand-sub-encoding-tools"
+      ],
+      "ok": true,
+      "click": true,
+      "errors": [],
+      "url": "/sub-subcategory/other-encoders",
+      "urlOk": true,
+      "h1": "Other Encoders",
+      "h1Ok": true,
+      "bodyLen": 4235,
+      "bodyOk": true,
+      "bodyHash": "5eec14defdc3",
+      "distinctOk": true,
+      "resourceCards": 3,
+      "listItems": 6,
+      "paragraphs": 2,
+      "contentOk": true,
+      "elapsedMs": 259
+    },
+    {
+      "kind": "subsub",
+      "testid": "subsub-cdn-integration",
+      "name": "CDN Integration (no resources yet)",
+      "expectedPath": "/sub-subcategory/cdn-integration",
+      "openVia": [
+        "accordion-cat-infrastructure-delivery",
+        "expand-sub-cloud-cdn"
+      ],
+      "ok": true,
+      "click": true,
+      "errors": [],
+      "url": "/sub-subcategory/cdn-integration",
+      "urlOk": true,
+      "h1": "CDN Integration",
+      "h1Ok": true,
+      "bodyLen": 4240,
+      "bodyOk": true,
+      "bodyHash": "949d2e040af1",
+      "distinctOk": true,
+      "resourceCards": 3,
+      "listItems": 6,
+      "paragraphs": 2,
+      "contentOk": true,
+      "elapsedMs": 644
     },
     {
       "kind": "subsub",
@@ -2826,15 +3180,41 @@
       "urlOk": true,
       "h1": "Cloud Platforms",
       "h1Ok": true,
-      "bodyLen": 4393,
+      "bodyLen": 4824,
       "bodyOk": true,
-      "bodyHash": "5da031bfddc0",
+      "bodyHash": "43601d8e9003",
       "distinctOk": true,
       "resourceCards": 5,
       "listItems": 6,
       "paragraphs": 2,
       "contentOk": true,
-      "elapsedMs": 629
+      "elapsedMs": 259
+    },
+    {
+      "kind": "subsub",
+      "testid": "subsub-origin-servers",
+      "name": "Origin Servers (no resources yet)",
+      "expectedPath": "/sub-subcategory/origin-servers",
+      "openVia": [
+        "accordion-cat-infrastructure-delivery",
+        "expand-sub-streaming-servers"
+      ],
+      "ok": true,
+      "click": true,
+      "errors": [],
+      "url": "/sub-subcategory/origin-servers",
+      "urlOk": true,
+      "h1": "Origin Servers",
+      "h1Ok": true,
+      "bodyLen": 4249,
+      "bodyOk": true,
+      "bodyHash": "5eafaa762f22",
+      "distinctOk": true,
+      "resourceCards": 3,
+      "listItems": 6,
+      "paragraphs": 2,
+      "contentOk": true,
+      "elapsedMs": 453
     },
     {
       "kind": "subsub",
@@ -2852,15 +3232,41 @@
       "urlOk": true,
       "h1": "Storage Solutions",
       "h1Ok": true,
-      "bodyLen": 4008,
+      "bodyLen": 4439,
       "bodyOk": true,
-      "bodyHash": "8a3c1c7dd8e0",
+      "bodyHash": "58ebab41d900",
       "distinctOk": true,
       "resourceCards": 5,
       "listItems": 6,
       "paragraphs": 2,
       "contentOk": true,
-      "elapsedMs": 438
+      "elapsedMs": 244
+    },
+    {
+      "kind": "subsub",
+      "testid": "subsub-advertising",
+      "name": "Advertising (no resources yet)",
+      "expectedPath": "/sub-subcategory/advertising",
+      "openVia": [
+        "accordion-cat-media-tools",
+        "expand-sub-ads-qoe"
+      ],
+      "ok": true,
+      "click": true,
+      "errors": [],
+      "url": "/sub-subcategory/advertising",
+      "urlOk": true,
+      "h1": "Advertising",
+      "h1Ok": true,
+      "bodyLen": 4210,
+      "bodyOk": true,
+      "bodyHash": "a8b17c4101ed",
+      "distinctOk": true,
+      "resourceCards": 3,
+      "listItems": 6,
+      "paragraphs": 2,
+      "contentOk": true,
+      "elapsedMs": 642
     },
     {
       "kind": "subsub",
@@ -2878,15 +3284,15 @@
       "urlOk": true,
       "h1": "Quality & Testing",
       "h1Ok": true,
-      "bodyLen": 6573,
+      "bodyLen": 7004,
       "bodyOk": true,
-      "bodyHash": "428eb482e301",
+      "bodyHash": "1595c35255aa",
       "distinctOk": true,
       "resourceCards": 19,
       "listItems": 6,
       "paragraphs": 2,
       "contentOk": true,
-      "elapsedMs": 435
+      "elapsedMs": 267
     },
     {
       "kind": "subsub",
@@ -2904,15 +3310,15 @@
       "urlOk": true,
       "h1": "Audio",
       "h1Ok": true,
-      "bodyLen": 3901,
+      "bodyLen": 4332,
       "bodyOk": true,
-      "bodyHash": "b6765a2a823a",
+      "bodyHash": "3ac1d2bcc02d",
       "distinctOk": true,
       "resourceCards": 4,
       "listItems": 6,
       "paragraphs": 2,
       "contentOk": true,
-      "elapsedMs": 422
+      "elapsedMs": 442
     },
     {
       "kind": "subsub",
@@ -2930,15 +3336,41 @@
       "urlOk": true,
       "h1": "Subtitles & Captions",
       "h1Ok": true,
-      "bodyLen": 6051,
+      "bodyLen": 6482,
       "bodyOk": true,
-      "bodyHash": "1e1c4472ae01",
+      "bodyHash": "4130f352a3ef",
       "distinctOk": true,
       "resourceCards": 14,
       "listItems": 6,
       "paragraphs": 2,
       "contentOk": true,
-      "elapsedMs": 235
+      "elapsedMs": 242
+    },
+    {
+      "kind": "subsub",
+      "testid": "subsub-chromecast",
+      "name": "Chromecast (no resources yet)",
+      "expectedPath": "/sub-subcategory/chromecast",
+      "openVia": [
+        "accordion-cat-players-clients",
+        "expand-sub-hardware-players"
+      ],
+      "ok": true,
+      "click": true,
+      "errors": [],
+      "url": "/sub-subcategory/chromecast",
+      "urlOk": true,
+      "h1": "Chromecast",
+      "h1Ok": true,
+      "bodyLen": 4227,
+      "bodyOk": true,
+      "bodyHash": "0fa0c57cd685",
+      "distinctOk": true,
+      "resourceCards": 3,
+      "listItems": 6,
+      "paragraphs": 2,
+      "contentOk": true,
+      "elapsedMs": 652
     },
     {
       "kind": "subsub",
@@ -2956,15 +3388,41 @@
       "urlOk": true,
       "h1": "Roku",
       "h1Ok": true,
-      "bodyLen": 4869,
+      "bodyLen": 5300,
       "bodyOk": true,
-      "bodyHash": "4dee35893165",
+      "bodyHash": "d6bd118cd5cf",
       "distinctOk": true,
       "resourceCards": 16,
       "listItems": 6,
       "paragraphs": 2,
       "contentOk": true,
-      "elapsedMs": 468
+      "elapsedMs": 259
+    },
+    {
+      "kind": "subsub",
+      "testid": "subsub-smart-tvs",
+      "name": "Smart TVs (no resources yet)",
+      "expectedPath": "/sub-subcategory/smart-tvs",
+      "openVia": [
+        "accordion-cat-players-clients",
+        "expand-sub-hardware-players"
+      ],
+      "ok": true,
+      "click": true,
+      "errors": [],
+      "url": "/sub-subcategory/smart-tvs",
+      "urlOk": true,
+      "h1": "Smart TVs",
+      "h1Ok": true,
+      "bodyLen": 4224,
+      "bodyOk": true,
+      "bodyHash": "4dc9cdc029bd",
+      "distinctOk": true,
+      "resourceCards": 3,
+      "listItems": 6,
+      "paragraphs": 2,
+      "contentOk": true,
+      "elapsedMs": 231
     },
     {
       "kind": "subsub",
@@ -2982,15 +3440,15 @@
       "urlOk": true,
       "h1": "Android",
       "h1Ok": true,
-      "bodyLen": 4855,
+      "bodyLen": 5286,
       "bodyOk": true,
-      "bodyHash": "704e739ce222",
+      "bodyHash": "806f9225731a",
       "distinctOk": true,
       "resourceCards": 9,
       "listItems": 6,
       "paragraphs": 2,
       "contentOk": true,
-      "elapsedMs": 457
+      "elapsedMs": 455
     },
     {
       "kind": "subsub",
@@ -3008,15 +3466,15 @@
       "urlOk": true,
       "h1": "Web Players",
       "h1Ok": true,
-      "bodyLen": 6075,
+      "bodyLen": 6506,
       "bodyOk": true,
-      "bodyHash": "a7e5477fb006",
+      "bodyHash": "e3d5739b7e30",
       "distinctOk": true,
       "resourceCards": 17,
       "listItems": 6,
       "paragraphs": 2,
       "contentOk": true,
-      "elapsedMs": 238
+      "elapsedMs": 269
     },
     {
       "kind": "subsub",
@@ -3034,15 +3492,15 @@
       "urlOk": true,
       "h1": "iOS/tvOS",
       "h1Ok": true,
-      "bodyLen": 6295,
+      "bodyLen": 6726,
       "bodyOk": true,
-      "bodyHash": "49e15d60cf3a",
+      "bodyHash": "653eb17c72fd",
       "distinctOk": true,
       "resourceCards": 23,
       "listItems": 6,
       "paragraphs": 2,
       "contentOk": true,
-      "elapsedMs": 731
+      "elapsedMs": 252
     },
     {
       "kind": "subsub",
@@ -3060,15 +3518,15 @@
       "urlOk": true,
       "h1": "DASH",
       "h1Ok": true,
-      "bodyLen": 5426,
+      "bodyLen": 5857,
       "bodyOk": true,
-      "bodyHash": "b5600c9a01aa",
+      "bodyHash": "480deb6a8d73",
       "distinctOk": true,
       "resourceCards": 14,
       "listItems": 6,
       "paragraphs": 2,
       "contentOk": true,
-      "elapsedMs": 695
+      "elapsedMs": 642
     },
     {
       "kind": "subsub",
@@ -3086,15 +3544,93 @@
       "urlOk": true,
       "h1": "HLS",
       "h1Ok": true,
-      "bodyLen": 5887,
+      "bodyLen": 6318,
       "bodyOk": true,
-      "bodyHash": "b1e5c626da23",
+      "bodyHash": "9d1f6a9bbe9d",
       "distinctOk": true,
       "resourceCards": 21,
       "listItems": 6,
       "paragraphs": 2,
       "contentOk": true,
-      "elapsedMs": 268
+      "elapsedMs": 264
+    },
+    {
+      "kind": "subsub",
+      "testid": "subsub-rist",
+      "name": "RIST (no resources yet)",
+      "expectedPath": "/sub-subcategory/rist",
+      "openVia": [
+        "accordion-cat-protocols-transport",
+        "expand-sub-transport-protocols"
+      ],
+      "ok": true,
+      "click": true,
+      "errors": [],
+      "url": "/sub-subcategory/rist",
+      "urlOk": true,
+      "h1": "RIST",
+      "h1Ok": true,
+      "bodyLen": 4219,
+      "bodyOk": true,
+      "bodyHash": "1e13363cda32",
+      "distinctOk": true,
+      "resourceCards": 3,
+      "listItems": 6,
+      "paragraphs": 2,
+      "contentOk": true,
+      "elapsedMs": 446
+    },
+    {
+      "kind": "subsub",
+      "testid": "subsub-rtmp",
+      "name": "RTMP (no resources yet)",
+      "expectedPath": "/sub-subcategory/rtmp",
+      "openVia": [
+        "accordion-cat-protocols-transport",
+        "expand-sub-transport-protocols"
+      ],
+      "ok": true,
+      "click": true,
+      "errors": [],
+      "url": "/sub-subcategory/rtmp",
+      "urlOk": true,
+      "h1": "RTMP",
+      "h1Ok": true,
+      "bodyLen": 4219,
+      "bodyOk": true,
+      "bodyHash": "054de167c9bb",
+      "distinctOk": true,
+      "resourceCards": 3,
+      "listItems": 6,
+      "paragraphs": 2,
+      "contentOk": true,
+      "elapsedMs": 235
+    },
+    {
+      "kind": "subsub",
+      "testid": "subsub-srt",
+      "name": "SRT (no resources yet)",
+      "expectedPath": "/sub-subcategory/srt",
+      "openVia": [
+        "accordion-cat-protocols-transport",
+        "expand-sub-transport-protocols"
+      ],
+      "ok": true,
+      "click": true,
+      "errors": [],
+      "url": "/sub-subcategory/srt",
+      "urlOk": true,
+      "h1": "SRT",
+      "h1Ok": true,
+      "bodyLen": 4216,
+      "bodyOk": true,
+      "bodyHash": "95caacf4c18e",
+      "distinctOk": true,
+      "resourceCards": 3,
+      "listItems": 6,
+      "paragraphs": 2,
+      "contentOk": true,
+      "elapsedMs": 240
     },
     {
       "kind": "subsub",
@@ -3112,15 +3648,15 @@
       "urlOk": true,
       "h1": "MPEG & Forums",
       "h1Ok": true,
-      "bodyLen": 4003,
+      "bodyLen": 4434,
       "bodyOk": true,
-      "bodyHash": "8a55fa2db3ba",
+      "bodyHash": "4b4ebebe0747",
       "distinctOk": true,
       "resourceCards": 4,
       "listItems": 6,
       "paragraphs": 2,
       "contentOk": true,
-      "elapsedMs": 664
+      "elapsedMs": 658
     },
     {
       "kind": "subsub",
@@ -3138,15 +3674,41 @@
       "urlOk": true,
       "h1": "Official Specs",
       "h1Ok": true,
-      "bodyLen": 3981,
+      "bodyLen": 4412,
       "bodyOk": true,
-      "bodyHash": "54d09836b0b3",
+      "bodyHash": "ba879992c144",
       "distinctOk": true,
       "resourceCards": 4,
       "listItems": 6,
       "paragraphs": 2,
       "contentOk": true,
-      "elapsedMs": 245
+      "elapsedMs": 234
+    },
+    {
+      "kind": "subsub",
+      "testid": "subsub-hdr-guidelines",
+      "name": "HDR Guidelines (no resources yet)",
+      "expectedPath": "/sub-subcategory/hdr-guidelines",
+      "openVia": [
+        "accordion-cat-standards-industry",
+        "expand-sub-vendors-hdr"
+      ],
+      "ok": true,
+      "click": true,
+      "errors": [],
+      "url": "/sub-subcategory/hdr-guidelines",
+      "urlOk": true,
+      "h1": "HDR Guidelines",
+      "h1Ok": true,
+      "bodyLen": 4236,
+      "bodyOk": true,
+      "bodyHash": "2d018c89ed5f",
+      "distinctOk": true,
+      "resourceCards": 3,
+      "listItems": 6,
+      "paragraphs": 2,
+      "contentOk": true,
+      "elapsedMs": 440
     },
     {
       "kind": "subsub",
@@ -3164,15 +3726,15 @@
       "urlOk": true,
       "h1": "Vendor Docs",
       "h1Ok": true,
-      "bodyLen": 3937,
+      "bodyLen": 4368,
       "bodyOk": true,
-      "bodyHash": "663fb38c3475",
+      "bodyHash": "d47444534f7b",
       "distinctOk": true,
       "resourceCards": 4,
       "listItems": 6,
       "paragraphs": 2,
       "contentOk": true,
-      "elapsedMs": 457
+      "elapsedMs": 238
     }
   ],
   "failures": []

@@ -64,15 +64,9 @@ function filterCategories(categories: Category[]) {
         ),
     )
     .map((cat) => {
-      const filteredSubcategories = cat.subcategories
-        ?.filter((sub) => getTotalResourceCount(sub) > 0)
-        .map((sub) => ({
-          ...sub,
-          subSubcategories: sub.subSubcategories?.filter(
-            (ss) => getTotalResourceCount(ss) > 0,
-          ),
-        }));
-      return { ...cat, subcategories: filteredSubcategories };
+      // Follow-up #51: keep zero-resource subs/subsubs visible (dimmed in UI)
+      // so users can see every category on the canonical awesome list.
+      return { ...cat, subcategories: cat.subcategories ?? [] };
     });
 }
 
@@ -124,9 +118,11 @@ function SubItem({
               borderColor:
                 "color-mix(in srgb, var(--accent) 25%, var(--border))",
             }
-          : undefined
+          : count === 0
+            ? { opacity: 0.45 }
+            : undefined
       }
-      title={label}
+      title={count === 0 ? `${label} (no resources yet)` : label}
     >
       <span className="flex-1 min-w-0 truncate">{label}</span>
       {typeof count === "number" && (
