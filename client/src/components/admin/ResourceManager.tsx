@@ -744,7 +744,7 @@ export default function ResourceManager() {
       </Card>
 
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-        <DialogContent className="max-w-2xl bg-[var(--surface-2)] border-[var(--border)]">
+        <DialogContent className="max-w-2xl bg-[var(--bg-2)] border-[var(--border)]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Pencil className="h-5 w-5" />
@@ -761,7 +761,7 @@ export default function ResourceManager() {
                 id="edit-title"
                 value={editForm.title}
                 onChange={(e) => setEditForm(f => ({ ...f, title: e.target.value }))}
-                className="bg-[var(--surface)] border-[var(--border)]"
+                className="bg-[var(--bg-2)] border-[var(--border)]"
                 data-testid="input-edit-title"
               />
             </div>
@@ -771,7 +771,7 @@ export default function ResourceManager() {
                 id="edit-url"
                 value={editForm.url}
                 onChange={(e) => setEditForm(f => ({ ...f, url: e.target.value }))}
-                className="bg-[var(--surface)] border-[var(--border)]"
+                className="bg-[var(--bg-2)] border-[var(--border)]"
                 data-testid="input-edit-url"
               />
             </div>
@@ -781,7 +781,7 @@ export default function ResourceManager() {
                 id="edit-description"
                 value={editForm.description}
                 onChange={(e) => setEditForm(f => ({ ...f, description: e.target.value }))}
-                className="bg-[var(--surface)] border-[var(--border)]"
+                className="bg-[var(--bg-2)] border-[var(--border)]"
                 rows={3}
                 data-testid="input-edit-description"
               />
@@ -793,7 +793,7 @@ export default function ResourceManager() {
                   value={editForm.category} 
                   onValueChange={(v) => setEditForm(f => ({ ...f, category: v, subcategory: "", subSubcategory: "" }))}
                 >
-                  <SelectTrigger className="bg-[var(--surface)] border-[var(--border)]" data-testid="select-edit-category">
+                  <SelectTrigger className="bg-[var(--bg-2)] border-[var(--border)]" data-testid="select-edit-category">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
@@ -809,7 +809,7 @@ export default function ResourceManager() {
                   value={editForm.status} 
                   onValueChange={(v) => setEditForm(f => ({ ...f, status: v }))}
                 >
-                  <SelectTrigger className="bg-[var(--surface)] border-[var(--border)]" data-testid="select-edit-status">
+                  <SelectTrigger className="bg-[var(--bg-2)] border-[var(--border)]" data-testid="select-edit-status">
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -828,7 +828,7 @@ export default function ResourceManager() {
                   onValueChange={(v) => setEditForm(f => ({ ...f, subcategory: v, subSubcategory: "" }))}
                   disabled={!editForm.category || filteredSubcategories.length === 0}
                 >
-                  <SelectTrigger className="bg-[var(--surface)] border-[var(--border)]" data-testid="select-edit-subcategory">
+                  <SelectTrigger className="bg-[var(--bg-2)] border-[var(--border)]" data-testid="select-edit-subcategory">
                     <SelectValue placeholder={filteredSubcategories.length ? "Select subcategory" : "Select category first"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -845,7 +845,7 @@ export default function ResourceManager() {
                   onValueChange={(v) => setEditForm(f => ({ ...f, subSubcategory: v }))}
                   disabled={!editForm.subcategory || filteredSubSubcategories.length === 0}
                 >
-                  <SelectTrigger className="bg-[var(--surface)] border-[var(--border)]" data-testid="select-edit-subsubcategory">
+                  <SelectTrigger className="bg-[var(--bg-2)] border-[var(--border)]" data-testid="select-edit-subsubcategory">
                     <SelectValue placeholder={filteredSubSubcategories.length ? "Select sub-subcategory" : "Select subcategory first"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -881,7 +881,7 @@ export default function ResourceManager() {
       </Dialog>
 
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-        <DialogContent className="max-w-2xl bg-[var(--surface-2)] border-[var(--border)]">
+        <DialogContent className="max-w-2xl bg-[var(--bg-2)] border-[var(--border)]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Plus className="h-5 w-5" />
@@ -898,7 +898,7 @@ export default function ResourceManager() {
                 id="create-title"
                 value={editForm.title}
                 onChange={(e) => setEditForm(f => ({ ...f, title: e.target.value }))}
-                className="bg-[var(--surface)] border-[var(--border)]"
+                className="bg-[var(--bg-2)] border-[var(--border)]"
                 placeholder="e.g., Video.js Player"
                 data-testid="input-create-title"
               />
@@ -909,7 +909,7 @@ export default function ResourceManager() {
                 id="create-url"
                 value={editForm.url}
                 onChange={(e) => setEditForm(f => ({ ...f, url: e.target.value }))}
-                className="bg-[var(--surface)] border-[var(--border)]"
+                className="bg-[var(--bg-2)] border-[var(--border)]"
                 placeholder="https://github.com/..."
                 data-testid="input-create-url"
               />
@@ -920,7 +920,7 @@ export default function ResourceManager() {
                 id="create-description"
                 value={editForm.description}
                 onChange={(e) => setEditForm(f => ({ ...f, description: e.target.value }))}
-                className="bg-[var(--surface)] border-[var(--border)]"
+                className="bg-[var(--bg-2)] border-[var(--border)]"
                 rows={3}
                 placeholder="Brief description of the resource..."
                 data-testid="input-create-description"
@@ -933,7 +933,7 @@ export default function ResourceManager() {
                   value={editForm.category} 
                   onValueChange={(v) => setEditForm(f => ({ ...f, category: v, subcategory: "", subSubcategory: "" }))}
                 >
-                  <SelectTrigger className="bg-[var(--surface)] border-[var(--border)]" data-testid="select-create-category">
+                  <SelectTrigger className="bg-[var(--bg-2)] border-[var(--border)]" data-testid="select-create-category">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
@@ -949,7 +949,7 @@ export default function ResourceManager() {
                   value={editForm.status} 
                   onValueChange={(v) => setEditForm(f => ({ ...f, status: v }))}
                 >
-                  <SelectTrigger className="bg-[var(--surface)] border-[var(--border)]" data-testid="select-create-status">
+                  <SelectTrigger className="bg-[var(--bg-2)] border-[var(--border)]" data-testid="select-create-status">
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -968,7 +968,7 @@ export default function ResourceManager() {
                   onValueChange={(v) => setEditForm(f => ({ ...f, subcategory: v, subSubcategory: "" }))}
                   disabled={!editForm.category || filteredSubcategories.length === 0}
                 >
-                  <SelectTrigger className="bg-[var(--surface)] border-[var(--border)]" data-testid="select-create-subcategory">
+                  <SelectTrigger className="bg-[var(--bg-2)] border-[var(--border)]" data-testid="select-create-subcategory">
                     <SelectValue placeholder={filteredSubcategories.length ? "Select subcategory" : "Select category first"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -985,7 +985,7 @@ export default function ResourceManager() {
                   onValueChange={(v) => setEditForm(f => ({ ...f, subSubcategory: v }))}
                   disabled={!editForm.subcategory || filteredSubSubcategories.length === 0}
                 >
-                  <SelectTrigger className="bg-[var(--surface)] border-[var(--border)]" data-testid="select-create-subsubcategory">
+                  <SelectTrigger className="bg-[var(--bg-2)] border-[var(--border)]" data-testid="select-create-subsubcategory">
                     <SelectValue placeholder={filteredSubSubcategories.length ? "Select sub-subcategory" : "Select subcategory first"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -1021,7 +1021,7 @@ export default function ResourceManager() {
       </Dialog>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="bg-[var(--surface-2)] border-[var(--border)]">
+        <AlertDialogContent className="bg-[var(--bg-2)] border-[var(--border)]">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-red-400">Delete Resource</AlertDialogTitle>
             <AlertDialogDescription>
