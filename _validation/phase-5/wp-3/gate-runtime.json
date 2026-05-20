@@ -2,10 +2,13 @@
   "gate": "G4.3 (runtime)",
   "asserts": {
     "G4.3-a_drawer_dismiss": {
-      "hasTrigger": false,
-      "escClose": "n/a",
-      "overlayClose": "n/a",
-      "verdict": "PARTIAL"
+      "hasTrigger": true,
+      "viewport": "375x800",
+      "openedFirst": true,
+      "openedSecond": true,
+      "escClose": "PASS",
+      "overlayClose": "PASS",
+      "verdict": "PASS"
     },
     "G4.3-b_search_keys": {
       "cmdKOpen": false,

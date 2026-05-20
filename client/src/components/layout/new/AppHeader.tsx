@@ -65,7 +65,11 @@ export default function AppHeader({ onSearchOpen, user, onLogout }: AppHeaderPro
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-border bg-[color-mix(in_srgb,var(--bg)_85%,transparent)] backdrop-blur-md px-3 sm:px-4">
-      <SidebarTrigger className="-ml-1 shrink-0 min-h-[44px] min-w-[44px]" />
+      <SidebarTrigger
+        className="-ml-1 shrink-0 min-h-[44px] min-w-[44px]"
+        data-testid="mobile-drawer-trigger"
+        aria-label="Toggle navigation menu"
+      />
       <Separator orientation="vertical" className="mr-1 sm:mr-2 h-4 hidden sm:block" />
 
       <Breadcrumb className="hidden md:flex">

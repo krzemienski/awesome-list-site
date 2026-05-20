@@ -162,27 +162,65 @@ async function runWP2(browser) {
 async function runWP3(browser) {
   const results = { gate: "G4.3 (runtime)", asserts: {} };
 
-  // G4.3-a: mobile drawer dismiss (overlay click + Esc)
+  // G4.3-a: mobile drawer dismiss (Esc + overlay click) at 375px viewport.
+  // Stable selector: [data-testid="mobile-drawer-trigger"] on the SidebarTrigger.
+  // The drawer slides in from the left as a Radix Dialog sheet — opened content
+  // is [data-sidebar="sidebar"][data-state="open"], with a sibling SheetOverlay
+  // (fixed inset-0 with data-state="open").
   {
     const { ctx, page } = await newPage(browser, { viewport: { width: 375, height: 800 } });
     await gotoSettled(page, BASE + "/");
-    const drawerProbe = await page.evaluate(() => {
-      const trigger = document.querySelector("[aria-label*='menu' i], [data-sidebar-trigger], button[aria-controls*='sidebar' i]");
-      return { hasTrigger: !!trigger };
-    });
-    let escClose = "n/a", overlayClose = "n/a";
+    const TRIGGER = '[data-testid="mobile-drawer-trigger"], [data-sidebar="trigger"]';
+    const OPEN_SHEET = '[data-sidebar="sidebar"][data-state="open"]';
+    const drawerProbe = await page.evaluate((sel) => ({
+      hasTrigger: !!document.querySelector(sel),
+    }), TRIGGER);
+
+    let escClose = "n/a";
+    let overlayClose = "n/a";
+    let openedFirst = false;
+    let openedSecond = false;
+
     if (drawerProbe.hasTrigger) {
+      // Pass 1: ESC closes
       try {
-        await page.click("[aria-label*='menu' i], [data-sidebar-trigger], button[aria-controls*='sidebar' i]", { timeout: 3000 });
-        await page.waitForTimeout(400);
-        const opened = await page.evaluate(() => !!document.querySelector("[data-state='open'][role='dialog'], [data-sidebar='sheet'][data-state='open']"));
+        await page.click(TRIGGER, { timeout: 3000 });
+        await page.waitForSelector(OPEN_SHEET, { timeout: 3000 });
+        openedFirst = true;
         await page.keyboard.press("Escape");
-        await page.waitForTimeout(300);
-        const closed = await page.evaluate(() => !document.querySelector("[data-state='open'][role='dialog'], [data-sidebar='sheet'][data-state='open']"));
-        escClose = opened && closed ? "PASS" : "PARTIAL";
-      } catch (e) { escClose = `ERR ${e.message.slice(0, 80)}`; }
+        await page.waitForSelector(OPEN_SHEET, { state: "detached", timeout: 3000 });
+        escClose = "PASS";
+      } catch (e) {
+        escClose = `FAIL ${e.message.slice(0, 80)}`;
+      }
+
+      // Pass 2: overlay click closes
+      try {
+        await page.click(TRIGGER, { timeout: 3000 });
+        await page.waitForSelector(OPEN_SHEET, { timeout: 3000 });
+        openedSecond = true;
+        // SheetOverlay is the fixed inset-0 backdrop with data-state="open".
+        // The drawer slides in from the left so a click on the right side of
+        // the viewport hits the overlay, not the drawer content.
+        const vp = page.viewportSize() || { width: 375, height: 800 };
+        await page.mouse.click(vp.width - 10, Math.floor(vp.height / 2));
+        await page.waitForSelector(OPEN_SHEET, { state: "detached", timeout: 3000 });
+        overlayClose = "PASS";
+      } catch (e) {
+        overlayClose = `FAIL ${e.message.slice(0, 80)}`;
+      }
     }
-    results.asserts["G4.3-a_drawer_dismiss"] = { ...drawerProbe, escClose, overlayClose, verdict: escClose === "PASS" ? "PASS" : "PARTIAL" };
+
+    const bothPass = escClose === "PASS" && overlayClose === "PASS";
+    results.asserts["G4.3-a_drawer_dismiss"] = {
+      ...drawerProbe,
+      viewport: "375x800",
+      openedFirst,
+      openedSecond,
+      escClose,
+      overlayClose,
+      verdict: bothPass ? "PASS" : drawerProbe.hasTrigger ? "PARTIAL" : "FAIL (no trigger)",
+    };
     await ctx.close();
   }
 
