@@ -248,15 +248,11 @@ export class ClaudeService {
    * Initialize the Anthropic client if API key is available
    */
   private initializeClient(): void {
-    const apiKey = process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY;
-    const baseURL = process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL;
+    const apiKey = process.env.ANTHROPIC_API_KEY;
 
     if (apiKey) {
       try {
-        this.anthropic = new Anthropic({
-          apiKey,
-          ...(baseURL && { baseURL })
-        });
+        this.anthropic = new Anthropic({ apiKey });
         console.log('Claude service initialized successfully');
       } catch (error) {
         console.error('Failed to initialize Claude service:', error);

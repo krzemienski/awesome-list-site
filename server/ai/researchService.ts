@@ -263,15 +263,13 @@ class ResearchService {
     maxTurns: number,
     maxBudgetUsd: number
   ): Promise<void> {
-    // Prefer the direct ANTHROPIC_API_KEY so the native server-side `web_search`
-    // tool (only available on the canonical Anthropic API endpoint) works. The
-    // gateway URL set by the Replit AI integration does not currently support
-    // the web_search server tool.
-    const apiKey = process.env.ANTHROPIC_API_KEY || process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY;
+    // Researcher MUST hit Anthropic's canonical API directly (no gateway, no
+    // baseURL override) because the native server-side `web_search` tool only
+    // runs on api.anthropic.com.
+    const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
       throw new Error(
-        "No Anthropic API key configured (ANTHROPIC_API_KEY or AI_INTEGRATIONS_ANTHROPIC_API_KEY). " +
-        "Set ANTHROPIC_API_KEY in Secrets, then restart the workflow."
+        "ANTHROPIC_API_KEY is not set. Add it in Secrets and restart the workflow."
       );
     }
 
