@@ -6,8 +6,8 @@ import { eq } from 'drizzle-orm';
 const jobId = await researchService.startResearchJob({
   prompt: 'Find ONE high-quality, currently-active resource related to WebRTC video streaming that is not already in our database. Verify via web_search.',
   categoryFocus: 'Players & Clients',
-  maxBudgetUsd: '0.30',
-  maxTurns: 4,
+  maxBudgetUsd: '0.60',
+  maxTurns: 8,
   startedBy: undefined,
 });
 console.log('started jobId =', jobId);
