@@ -86,6 +86,14 @@ export default function ResearcherTab() {
   const { data: selectedJob } = useQuery<ResearchJob & { isActive: boolean }>({
     queryKey: ['/api/researcher/jobs', selectedJobId],
     enabled: !!selectedJobId,
+    // Explicit queryFn — the default fetcher only reads queryKey[0] and would
+    // hit the LIST endpoint instead of /jobs/:id, leaving the popover bound
+    // to an array (everything undefined → "No log entries" forever).
+    queryFn: async () => {
+      const res = await fetch(`/api/researcher/jobs/${selectedJobId}`, { credentials: 'include' });
+      if (!res.ok) throw new Error(`Failed to fetch job ${selectedJobId}: ${res.status}`);
+      return res.json();
+    },
     refetchInterval: (query) => {
       const j = query.state.data as ResearchJob | undefined;
       // Stream while job is still running, even if dialog is closed.
