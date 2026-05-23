@@ -539,7 +539,113 @@ a { color: inherit; }
 }
 
 /* =====================================================================
-   PER-SYSTEM SKINS
+   PER-SYSTEM TOKEN OVERRIDES
+   Editorial tokens live at :root (above) and apply by default. Each of
+   the four other systems overrides the ~30 design tokens via attribute-
+   selector specificity ( :root[data-system="..."] beats :root ). The
+   switch is CSS-only: the boot script in index.html sets data-system +
+   data-accent before paint, so zero JS is needed to swap personalities.
+   Ported verbatim from project/design-system.js (handoff bundle).
+   ===================================================================== */
+
+:root[data-system="terminal"] {
+  --bg: #000000; --bg-2: #040404;
+  --surface: rgba(0,255,136,0.012); --surface-2: rgba(0,255,136,0.025); --surface-3: rgba(0,255,136,0.05);
+  --border: rgba(232,232,224,0.14); --border-strong: rgba(232,232,224,0.32); --hairline: rgba(232,232,224,0.08);
+  --text: #e8e8e0; --text-2: rgba(232,232,224,0.62); --text-3: rgba(232,232,224,0.36); --text-4: rgba(232,232,224,0.2);
+  --font-body: 'IBM Plex Mono', ui-monospace, monospace;
+  --font-display: 'IBM Plex Mono', ui-monospace, monospace;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --display-weight: 600; --display-tracking: -0.01em; --display-leading: 1.1;
+  --body-leading: 1.55; --eyebrow-tracking: 0.2em; --mono-size-step: 12px;
+  --radius: 0px; --radius-sm: 0px; --radius-pill: 0px; --border-w: 1px; --hairline-w: 1px;
+  --shadow-sm: none; --shadow: none;
+  --shadow-lg: 0 0 0 1px var(--accent), inset 0 0 60px color-mix(in srgb, var(--accent) 8%, transparent);
+  --shadow-accent: 0 0 0 1px var(--accent), 0 0 24px color-mix(in srgb, var(--accent) 30%, transparent);
+  --bg-atmosphere:
+    repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(255,255,255,0.018) 2px, rgba(255,255,255,0.018) 3px),
+    radial-gradient(ellipse 800px 600px at 50% 50%, color-mix(in srgb, var(--accent) 4%, transparent), transparent 70%);
+  --grain-opacity: 0.5;
+}
+
+:root[data-system="geist"] {
+  --bg: #000000; --bg-2: #0a0a0a;
+  --surface: rgba(255,255,255,0.04); --surface-2: rgba(255,255,255,0.07); --surface-3: rgba(255,255,255,0.1);
+  --border: rgba(255,255,255,0.1); --border-strong: rgba(255,255,255,0.18); --hairline: rgba(255,255,255,0.07);
+  --text: #fafafa; --text-2: rgba(250,250,250,0.62); --text-3: rgba(250,250,250,0.38); --text-4: rgba(250,250,250,0.2);
+  --font-body: 'Geist', 'Inter', system-ui, sans-serif;
+  --font-display: 'Geist', 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --display-weight: 600; --display-tracking: -0.035em; --display-leading: 1.05;
+  --body-leading: 1.55; --eyebrow-tracking: 0.06em; --mono-size-step: 11px;
+  --radius: 10px; --radius-sm: 6px; --radius-pill: 999px; --border-w: 1px; --hairline-w: 1px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.4);
+  --shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 8px 24px rgba(0,0,0,0.4);
+  --shadow-lg: 0 0 0 1px rgba(255,255,255,0.06), 0 24px 56px rgba(0,0,0,0.55);
+  --shadow-accent: 0 0 0 1px color-mix(in srgb, var(--accent) 50%, transparent), 0 0 32px color-mix(in srgb, var(--accent) 25%, transparent);
+  --bg-atmosphere: radial-gradient(ellipse 1200px 800px at 50% -20%, rgba(255,255,255,0.03), transparent 60%);
+  --grain-opacity: 0;
+}
+
+:root[data-system="brutalist"] {
+  --bg: #000000; --bg-2: #0a0a0a;
+  --surface: rgba(255,255,255,0.025); --surface-2: rgba(255,255,255,0.06); --surface-3: rgba(255,255,255,0.1);
+  --border: rgba(245,245,240,0.85); --border-strong: rgba(245,245,240,1); --hairline: rgba(245,245,240,0.18);
+  --text: #f5f5f0; --text-2: rgba(245,245,240,0.7); --text-3: rgba(245,245,240,0.4); --text-4: rgba(245,245,240,0.22);
+  --font-body: 'Space Grotesk', system-ui, sans-serif;
+  --font-display: 'Instrument Serif', 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --display-weight: 400; --display-tracking: -0.04em; --display-leading: 0.92;
+  --body-leading: 1.5; --eyebrow-tracking: 0.24em; --mono-size-step: 11px;
+  --radius: 0px; --radius-sm: 0px; --radius-pill: 0px; --border-w: 2px; --hairline-w: 1px;
+  --shadow-sm: 2px 2px 0 0 var(--text);
+  --shadow: 4px 4px 0 0 var(--text);
+  --shadow-lg: 8px 8px 0 0 var(--text);
+  --shadow-accent: 4px 4px 0 0 var(--accent);
+  --bg-atmosphere: none;
+  --grain-opacity: 0.55;
+}
+
+:root[data-system="swiss"] {
+  --bg: #000000; --bg-2: #050506;
+  --surface: rgba(250,250,248,0.018); --surface-2: rgba(250,250,248,0.04); --surface-3: rgba(250,250,248,0.07);
+  --border: rgba(250,250,248,0.085); --border-strong: rgba(250,250,248,0.18); --hairline: rgba(250,250,248,0.05);
+  --text: #fafaf8; --text-2: rgba(250,250,248,0.62); --text-3: rgba(250,250,248,0.38); --text-4: rgba(250,250,248,0.2);
+  --font-body: 'Manrope', system-ui, sans-serif;
+  --font-display: 'Manrope', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --display-weight: 700; --display-tracking: -0.045em; --display-leading: 1;
+  --body-leading: 1.55; --eyebrow-tracking: 0.14em; --mono-size-step: 10.5px;
+  --radius: 4px; --radius-sm: 2px; --radius-pill: 999px; --border-w: 1px; --hairline-w: 0.5px;
+  --shadow-sm: none; --shadow: none;
+  --shadow-lg: 0 24px 60px rgba(0,0,0,0.5);
+  --shadow-accent: 0 0 0 1px var(--accent);
+  --bg-atmosphere:
+    linear-gradient(0deg, transparent calc(100% - 1px), rgba(250,250,248,0.04) calc(100% - 1px)),
+    linear-gradient(90deg, transparent calc(100% - 1px), rgba(250,250,248,0.04) calc(100% - 1px));
+  --bg-atmosphere-size: 64px 64px, 64px 64px;
+  --grain-opacity: 0.18;
+}
+
+/* =====================================================================
+   ACCENT PALETTE — 10 accents shared across all systems.
+   Crimson (#ff3d52 / #b84dff) is the :root default; the nine others
+   override --accent + --accent-2 via attribute-selector specificity.
+   ===================================================================== */
+
+:root[data-accent="crimson"]  { --accent: #ff3d52; --accent-2: #b84dff; }
+:root[data-accent="magenta"]  { --accent: #ec4899; --accent-2: #f472b6; }
+:root[data-accent="orange"]   { --accent: #ff7a3d; --accent-2: #ffb84d; }
+:root[data-accent="amber"]    { --accent: #ffb84d; --accent-2: #ffd86b; }
+:root[data-accent="emerald"]  { --accent: #34d08c; --accent-2: #5ee6b8; }
+:root[data-accent="matrix"]   { --accent: #00ff88; --accent-2: #39ff14; }
+:root[data-accent="cyan"]     { --accent: #5eddf2; --accent-2: #7dd3fc; }
+:root[data-accent="violet"]   { --accent: #9d4edd; --accent-2: #c77dff; }
+:root[data-accent="lime"]     { --accent: #aaff00; --accent-2: #00ff88; }
+:root[data-accent="rose"]     { --accent: #ff7a8a; --accent-2: #ffb3c1; }
+
+/* =====================================================================
+   PER-SYSTEM COMPONENT SKINS
    These reach in and reshape components per system. Tokens carry most
    of the weight; this is for things tokens can't express.
    ===================================================================== */

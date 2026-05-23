@@ -34,16 +34,27 @@
     <meta name="twitter:image:alt" content="Awesome Video — curated video development resources" />
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>" />
 
-    <!-- DS no-FOUT boot script: lock to Editorial + Crimson before any module paints. -->
+    <!-- DS no-FOUT boot script: read persisted system + accent from
+         localStorage and apply them as html attributes BEFORE any module
+         paints. Per-system token blocks in design-system.css resolve via
+         attribute-selector specificity, so the entire personality swap
+         (tokens + skin) is in effect on the very first paint. Default:
+         Editorial + Crimson. -->
     <script>
       (function () {
         try {
+          var SYSTEMS = ['editorial', 'terminal', 'geist', 'brutalist', 'swiss'];
+          var ACCENTS  = ['crimson', 'magenta', 'orange', 'amber', 'emerald', 'matrix', 'cyan', 'violet', 'lime', 'rose'];
+          var sys = null, acc = null;
+          try { sys = localStorage.getItem('ds-system'); } catch (_) {}
+          try { acc = localStorage.getItem('ds-accent'); } catch (_) {}
+          if (SYSTEMS.indexOf(sys) === -1) sys = 'editorial';
+          if (ACCENTS.indexOf(acc)  === -1) acc = 'crimson';
           var root = document.documentElement;
-          root.setAttribute('data-system', 'editorial');
-          root.setAttribute('data-accent', 'crimson');
+          root.setAttribute('data-system', sys);
+          root.setAttribute('data-accent', acc);
           root.classList.add('dark');
           root.style.backgroundColor = '#000';
-          root.style.color = '#f4f3ee';
         } catch (e) {}
       })();
     </script>

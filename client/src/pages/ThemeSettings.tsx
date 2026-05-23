@@ -1,29 +1,31 @@
 import { useContext } from "react";
 import { Link } from "wouter";
-import { ArrowLeft, Check, Palette, Type } from "lucide-react";
-import { ThemeProviderContext, FONT_OPTIONS } from "@/components/ui/theme-provider";
+import { ArrowLeft, Check, Palette, Layers } from "lucide-react";
+import { ThemeProviderContext } from "@/components/ui/theme-provider";
 import { useToast } from "@/hooks/use-toast";
 
 export default function ThemeSettings() {
-  const { activeFont, setFont, activeTheme, setThemeByValue, presets } = useContext(ThemeProviderContext);
+  const { systemId, accentId, setSystem, setAccent, systems, accents } =
+    useContext(ThemeProviderContext);
   const { toast } = useToast();
 
-  const handlePickFont = (value: string, label: string) => {
-    setFont(value);
-    toast({ title: "Font applied", description: `${label} is now the active font.` });
+  const activeSystem = systems[systemId];
+  const activeAccent = accents.find((a) => a.id === accentId);
+
+  const handlePickSystem = (id: string) => {
+    setSystem(id);
+    const label = systems[id]?.name ?? id;
+    toast({ title: "Design system applied", description: `${label} is now active.` });
   };
 
-  const handlePickTheme = (value: string, label: string) => {
-    setThemeByValue(value);
-    toast({ title: "Theme applied", description: `${label} is now the active color theme.` });
+  const handlePickAccent = (id: string) => {
+    setAccent(id);
+    const label = accents.find((a) => a.id === id)?.name ?? id;
+    toast({ title: "Accent applied", description: `${label} is now the active accent.` });
   };
-
-  const colorPresets = presets.filter((p) =>
-    ["cyberpunk", "limes", "black-pink", "flat-pink", "purples", "flat-purples"].includes(p.value)
-  );
 
   return (
-    <div className="max-w-4xl space-y-10">
+    <div className="max-w-5xl space-y-10">
       <div>
         <Link
           href="/"
@@ -35,37 +37,39 @@ export default function ThemeSettings() {
         </Link>
         <div className="flex items-center gap-3">
           <Palette className="h-6 w-6 text-[var(--accent)]" />
-          {/* MR-DS-15 — step h1 down one tier (was text-3xl sm:text-4xl) */}
           <h1 className="font-sans font-bold text-2xl sm:text-2xl tracking-tight">
             Theme Settings
           </h1>
         </div>
-        {/* MR-DS-16 — append active-preset readout to header copy */}
         <p className="text-sm sm:text-base text-[color:var(--text-2)] mt-2">
-          Customize the font and color theme of the site to match your preference.{" "}
+          Pick a design system and an accent. Changes apply instantly and persist across reloads.{" "}
           <span className="text-[color:var(--text-3)]" data-testid="text-active-preset">
-            Active: {activeTheme.name}
+            Active: {activeSystem?.name ?? systemId} · {activeAccent?.name ?? accentId}
           </span>
         </p>
       </div>
 
-      {/* Font Picker */}
-      <section aria-label="Font picker" data-testid="font-picker">
+      {/* System Picker — 5 cards */}
+      <section aria-label="Design system picker" data-testid="system-picker">
         <div className="flex items-center gap-2 mb-4">
-          <Type className="h-5 w-5 text-[var(--accent)]" />
-          <h2 className="font-sans font-semibold text-xl tracking-tight">Font</h2>
+          <Layers className="h-5 w-5 text-[var(--accent)]" />
+          <h2 className="font-sans font-semibold text-xl tracking-tight">Design System</h2>
         </div>
-        <div role="radiogroup" aria-label="Font" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {FONT_OPTIONS.map((font) => {
-            const isActive = font.value === activeFont;
+        <div
+          role="radiogroup"
+          aria-label="Design system"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
+        >
+          {Object.entries(systems).map(([id, sys]) => {
+            const isActive = id === systemId;
             return (
               <button
-                key={font.value}
+                key={id}
                 type="button"
                 role="radio"
                 aria-checked={isActive}
-                onClick={() => handlePickFont(font.value, font.label)}
-                data-testid={`font-option-${font.value}`}
+                onClick={() => handlePickSystem(id)}
+                data-testid={`system-option-${id}`}
                 className="text-left rounded-[var(--radius)] border bg-[var(--surface)] p-4 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
                 style={{
                   borderColor: isActive ? "var(--accent)" : "var(--border)",
@@ -74,78 +78,67 @@ export default function ThemeSettings() {
                     : "none",
                 }}
               >
-                {/* MR-DS-11 — tile order: name → description → sample */}
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-semibold text-sm">{font.label}</span>
+                  <span className="font-semibold text-sm">{sys.name}</span>
                   {isActive && <Check className="h-4 w-4 text-[var(--accent)]" />}
                 </div>
-                <p className="text-xs text-[color:var(--text-2)] mb-2">{font.description}</p>
-                {/* MR-DS-14 — append digits to sample sentence */}
-                <p
-                  className="text-base"
-                  style={{ fontFamily: font.family }}
-                >
-                  The quick brown fox jumps over the lazy dog. 0123456789
-                </p>
+                <code className="block font-mono text-[10.5px] text-[color:var(--text-3)] tracking-wider uppercase mb-2">
+                  {sys.tag}
+                </code>
+                <p className="text-xs text-[color:var(--text-2)]">{sys.desc}</p>
               </button>
             );
           })}
         </div>
       </section>
 
-      {/* Color Theme Picker */}
-      <section aria-label="Color theme picker" data-testid="color-theme-picker">
+      {/* Accent Picker — 10 swatches */}
+      <section aria-label="Accent picker" data-testid="accent-picker">
         <div className="flex items-center gap-2 mb-4">
           <Palette className="h-5 w-5 text-[var(--accent)]" />
-          <h2 className="font-sans font-semibold text-xl tracking-tight">Color Theme</h2>
+          <h2 className="font-sans font-semibold text-xl tracking-tight">Accent</h2>
         </div>
-        <div role="radiogroup" aria-label="Color theme" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {colorPresets.map((preset) => {
-            const isActive = preset.value === activeTheme.value;
-            // MR-DS-01 — ThemePreset exposes `name` + `preview.{accent,secondary,bg}`.
-            // Previous reader looked for `label` + `dark?/light?` (which don't exist
-            // on this shape), so every card rendered empty labels + identical
-            // fallback swatches.
-            // DS-OK: preview-only theme picker — hex fallbacks below come from the
-            // preset registry intent, not from runtime DS tokens.
-            const primary = preset.preview?.accent || "#000";
-            const secondary = preset.preview?.secondary || "#444";
-            const bg = preset.preview?.bg || "#888";
+        <div
+          role="radiogroup"
+          aria-label="Accent"
+          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3"
+        >
+          {accents.map((a) => {
+            const isActive = a.id === accentId;
             return (
               <button
-                key={preset.value}
+                key={a.id}
                 type="button"
                 role="radio"
                 aria-checked={isActive}
-                onClick={() => handlePickTheme(preset.value, preset.name)}
-                data-testid={`theme-option-${preset.value}`}
-                className="text-left rounded-[var(--radius)] border bg-[var(--surface)] p-4 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
+                onClick={() => handlePickAccent(a.id)}
+                data-testid={`accent-option-${a.id}`}
+                className="text-left rounded-[var(--radius)] border bg-[var(--surface)] p-3 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
                 style={{
-                  borderColor: isActive ? primary : "var(--border)",
+                  borderColor: isActive ? a.primary : "var(--border)",
                   boxShadow: isActive
-                    ? `0 0 0 1px ${primary}, 0 0 16px color-mix(in srgb, ${primary} 25%, transparent)`
+                    ? `0 0 0 1px ${a.primary}, 0 0 14px color-mix(in srgb, ${a.primary} 25%, transparent)`
                     : "none",
                 }}
               >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-semibold text-sm">{preset.name}</span>
-                  {isActive && <Check className="h-4 w-4" style={{ color: primary }} />}
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-semibold text-sm">{a.name}</span>
+                  {isActive && <Check className="h-4 w-4" style={{ color: a.primary }} />}
                 </div>
-                <p className="text-xs text-[color:var(--text-2)] mb-2">{preset.description}</p>
-                <div className="flex h-10 w-full overflow-hidden rounded-[var(--radius-sm)] mb-2">
-                  <div aria-hidden style={{ flex: 2, background: primary }} />
-                  <div aria-hidden style={{ flex: 1, background: secondary }} />
-                  <div aria-hidden style={{ flex: 1, background: bg }} />
+                <div className="flex h-9 w-full overflow-hidden rounded-[var(--radius-sm)] mb-2">
+                  <div aria-hidden style={{ flex: 2, background: a.primary }} />
+                  <div aria-hidden style={{ flex: 1, background: a.secondary }} />
                 </div>
-                <code className="block font-mono text-[10.5px] text-[color:var(--text-2)] tracking-wider">
-                  {primary}
+                <code className="block font-mono text-[10.5px] text-[color:var(--text-3)] tracking-wider">
+                  {a.primary}
                 </code>
               </button>
             );
           })}
         </div>
         <p className="mt-4 text-xs text-[color:var(--text-2)]">
-          Selections persist across reloads. The Editorial atmosphere stays intact &mdash; only the accent color shifts.
+          Switching systems keeps your accent unless you were on that system&rsquo;s natural default
+          &mdash; in which case the accent nudges to the new system&rsquo;s natural default.
         </p>
       </section>
     </div>

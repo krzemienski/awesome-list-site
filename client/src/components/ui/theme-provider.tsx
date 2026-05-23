@@ -1,105 +1,52 @@
 import { createContext, useEffect, useState, useCallback, ReactNode } from "react";
-import { themePresets, applyTheme, buildCustomTheme, generateRandomTheme, type ThemePreset } from "@/lib/shadcn-themes";
-import { safeGetItem, safeSetItem, safeRemoveItem } from "@/lib/safeStorage";
-
-export const FONT_OPTIONS = [
-  { value: "inter", label: "Inter", family: "'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif", description: "Clean and modern, great readability" },
-  { value: "dm-sans", label: "DM Sans", family: "'DM Sans', ui-sans-serif, system-ui, sans-serif", description: "Geometric, friendly and professional" },
-  { value: "source-sans", label: "Source Sans 3", family: "'Source Sans 3', ui-sans-serif, system-ui, sans-serif", description: "Adobe's open-source workhorse" },
-  { value: "ibm-plex", label: "IBM Plex Sans", family: "'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif", description: "Corporate, highly legible" },
-  { value: "jetbrains", label: "JetBrains Mono", family: "'JetBrains Mono', ui-monospace, monospace", description: "Developer-focused monospace" },
-  { value: "system", label: "System Default", family: "ui-sans-serif, system-ui, -apple-system, sans-serif", description: "Uses your device's native font" },
-] as const;
+import {
+  DESIGN_SYSTEMS,
+  ACCENTS,
+  SYSTEM_DEFAULT_ACCENT,
+  DEFAULT_SYSTEM,
+  DEFAULT_ACCENT,
+  applyDesignSystem,
+  type DesignSystem,
+  type Accent,
+} from "@/lib/design-system";
+import { safeGetItem } from "@/lib/safeStorage";
 
 type ThemeProviderState = {
-  activeTheme: ThemePreset;
-  setThemeByValue: (value: string) => void;
-  setCustomColor: (hex: string) => void;
-  randomizeTheme: () => void;
-  presets: ThemePreset[];
-  customHex: string;
-  activeFont: string;
-  setFont: (fontValue: string) => void;
+  systemId: string;
+  accentId: string;
+  setSystem: (id: string) => void;
+  setAccent: (id: string) => void;
+  systems: Record<string, DesignSystem>;
+  accents: Accent[];
+  systemDefaultAccent: Record<string, string>;
 };
 
 const initialState: ThemeProviderState = {
-  activeTheme: themePresets[0],
-  setThemeByValue: () => null,
-  setCustomColor: () => null,
-  randomizeTheme: () => null,
-  presets: themePresets,
-  customHex: "",
-  activeFont: "inter",
-  setFont: () => null,
+  systemId: DEFAULT_SYSTEM,
+  accentId: DEFAULT_ACCENT,
+  setSystem: () => null,
+  setAccent: () => null,
+  systems: DESIGN_SYSTEMS,
+  accents: ACCENTS,
+  systemDefaultAccent: SYSTEM_DEFAULT_ACCENT,
 };
 
 export const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
-function applyFont(fontValue: string) {
-  const fontOption = FONT_OPTIONS.find(f => f.value === fontValue);
-  if (!fontOption) return;
-  document.documentElement.style.setProperty('--font-sans', fontOption.family);
+function readInitial(key: string, fallback: string, valid: (v: string) => boolean): string {
+  if (typeof window === "undefined") return fallback;
+  const saved = safeGetItem(key);
+  return saved && valid(saved) ? saved : fallback;
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [customHex, setCustomHexState] = useState<string>(() => {
-    if (typeof window === "undefined") return "";
-    return safeGetItem("theme-custom-hex") || "";
-  });
+  const [systemId, setSystemId] = useState<string>(() =>
+    readInitial("ds-system", DEFAULT_SYSTEM, (v) => v in DESIGN_SYSTEMS)
+  );
 
-  const [activeFont, setActiveFont] = useState<string>(() => {
-    if (typeof window === "undefined") return "inter";
-    return safeGetItem("app-font") || "inter";
-  });
-
-  const [activeTheme, setActiveTheme] = useState<ThemePreset>(() => {
-    if (typeof window === "undefined") return themePresets[0];
-    const saved = safeGetItem("theme-preset") || "cyberpunk";
-    if (saved === "custom") {
-      const hex = safeGetItem("theme-custom-hex") || /* DS-OK: color-picker default seed */ "#3b82f6";
-      return buildCustomTheme(hex);
-    }
-    if (saved === "random") {
-      const savedTheme = safeGetItem("theme-random-json");
-      if (savedTheme) {
-        try { return JSON.parse(savedTheme); } catch {}
-      }
-      return generateRandomTheme();
-    }
-    return themePresets.find(t => t.value === saved) || themePresets[0];
-  });
-
-  const setThemeByValue = useCallback((value: string) => {
-    const preset = themePresets.find(t => t.value === value);
-    if (preset) {
-      setActiveTheme(preset);
-      setCustomHexState("");
-      safeSetItem("theme-preset", value);
-      safeRemoveItem("theme-custom-hex");
-    }
-  }, []);
-
-  const setCustomColor = useCallback((hex: string) => {
-    if (!/^#[0-9a-fA-F]{6}$/.test(hex) && !/^#[0-9a-fA-F]{3}$/.test(hex)) return;
-    setCustomHexState(hex);
-    safeSetItem("theme-custom-hex", hex);
-    const theme = buildCustomTheme(hex);
-    setActiveTheme(theme);
-    safeSetItem("theme-preset", "custom");
-  }, []);
-
-  const randomizeTheme = useCallback(() => {
-    const theme = generateRandomTheme();
-    safeSetItem("theme-random-json", JSON.stringify(theme));
-    safeSetItem("theme-preset", "random");
-    setActiveTheme(theme);
-  }, []);
-
-  const setFont = useCallback((fontValue: string) => {
-    setActiveFont(fontValue);
-    safeSetItem("app-font", fontValue);
-    applyFont(fontValue);
-  }, []);
+  const [accentId, setAccentId] = useState<string>(() =>
+    readInitial("ds-accent", DEFAULT_ACCENT, (v) => ACCENTS.some((a) => a.id === v))
+  );
 
   useEffect(() => {
     const root = document.documentElement;
@@ -107,53 +54,40 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     root.classList.add("dark");
   }, []);
 
-  /*
-   * DS Migration (Editorial+Crimson single-personality build) — the legacy
-   * applyTheme()/applyFont() side-effects are permanently disabled. They
-   * would overwrite DS tokens (--bg, --text, --accent, --font-body,
-   * --radius, --font-sans) set by the CSS layer in design-system.css and
-   * the boot script in index.html. The DS owns the surface; React state
-   * stays around so the (deferred) picker UI at /settings/theme can keep
-   * its presets-display affordance without leaking back into the live
-   * cascade.
-   */
   useEffect(() => {
-    /* no-op: applyTheme(activeTheme) intentionally disabled */
-    void activeTheme;
-  }, [activeTheme]);
+    applyDesignSystem(systemId, accentId);
+  }, [systemId, accentId]);
 
-  useEffect(() => {
-    applyFont(activeFont);
-  }, [activeFont]);
+  const setSystem = useCallback((id: string) => {
+    if (!(id in DESIGN_SYSTEMS)) return;
+    setSystemId(id);
+    /* On system change, nudge the accent to the system's natural default
+       only if the user is still on the previous system's natural default.
+       Otherwise respect their explicit accent choice across systems. */
+    setAccentId((prev) => {
+      const prevDefault = SYSTEM_DEFAULT_ACCENT[systemId] || DEFAULT_ACCENT;
+      const newDefault  = SYSTEM_DEFAULT_ACCENT[id] || DEFAULT_ACCENT;
+      return prev === prevDefault ? newDefault : prev;
+    });
+  }, [systemId]);
 
-  useEffect(() => {
-    /* MR-DS-02 — Apply preset accent color into DS tokens
-     * (--accent, --accent-2). We deliberately only touch accent tokens so
-     * the Editorial atmosphere (bg, surface ladder, text ladder, radii,
-     * fonts) stays intact. ThemePreset exposes `preview.{accent,secondary}`
-     * as hex strings; the previous reader looked at `dark.primary` /
-     * `light.primary` which do not exist on this shape — picking any
-     * preset was a runtime no-op. */
-    const root = document.documentElement;
-    const primary = activeTheme?.preview?.accent;
-    const secondary = activeTheme?.preview?.secondary || primary;
-    if (primary) {
-      root.style.setProperty('--accent', primary);
-      root.style.setProperty('--accent-2', secondary);
-    }
-  }, [activeTheme]);
+  const setAccent = useCallback((id: string) => {
+    if (!ACCENTS.some((a) => a.id === id)) return;
+    setAccentId(id);
+  }, []);
 
   return (
-    <ThemeProviderContext.Provider value={{
-      activeTheme,
-      setThemeByValue,
-      setCustomColor,
-      randomizeTheme,
-      presets: themePresets,
-      customHex,
-      activeFont,
-      setFont,
-    }}>
+    <ThemeProviderContext.Provider
+      value={{
+        systemId,
+        accentId,
+        setSystem,
+        setAccent,
+        systems: DESIGN_SYSTEMS,
+        accents: ACCENTS,
+        systemDefaultAccent: SYSTEM_DEFAULT_ACCENT,
+      }}
+    >
       {children}
     </ThemeProviderContext.Provider>
   );

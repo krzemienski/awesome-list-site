@@ -34,7 +34,7 @@ export function render(context: SSRContext) {
 
   // Render the app to string with the pre-fetched data
   const html = renderToString(
-    <ThemeProvider defaultTheme="dark" storageKey="ui-theme">
+    <ThemeProvider>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Toaster />

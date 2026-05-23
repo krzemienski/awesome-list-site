@@ -59,7 +59,6 @@ function getBreadcrumbs(path: string) {
 }
 
 export default function AppHeader({ onSearchOpen, user, onLogout }: AppHeaderProps) {
-  const { activeTheme } = useTheme();
   const [location, setLocation] = useLocation();
   const crumbs = getBreadcrumbs(location);
 
@@ -119,7 +118,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout }: AppHeaderPro
           <Palette className="h-4 w-4" />
           <span
             className="absolute bottom-1 right-1 h-2.5 w-2.5 rounded-full border border-background"
-            style={{ backgroundColor: activeTheme.preview.accent }}
+            style={{ backgroundColor: "var(--accent)" }}
           />
         </Button>
 
