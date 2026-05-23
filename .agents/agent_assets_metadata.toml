@@ -162,3 +162,57 @@ id = "s0ozuTAC-jT7C0xRjDK2Q"
 uri = "file://screenshots/og/og-journey-streaming.png"
 type = "image"
 title = "OG image — Learning Journey"
+
+[[outputs]]
+id = "xIy3ikP019pb5H91CZZTX"
+uri = "file://evidence/design-system-proof/contact-sheets/cross_01_home.jpg"
+type = "image"
+title = "Home — all 5 systems side-by-side (Editorial · Terminal · Geist · Brutalist · Swiss)"
+
+[[outputs]]
+id = "odXqlLmQ1UOVcHQmorVF2"
+uri = "file://evidence/design-system-proof/contact-sheets/cross_04_theme_picker.jpg"
+type = "image"
+title = "Theme Picker — all 5 systems side-by-side"
+
+[[outputs]]
+id = "2Hqr49mKMUvRzPBG8jhlX"
+uri = "file://evidence/design-system-proof/contact-sheets/cross_07_category.jpg"
+type = "image"
+title = "Category page — all 5 systems side-by-side"
+
+[[outputs]]
+id = "4e6livuvO5hxFJL98d03L"
+uri = "file://evidence/design-system-proof/contact-sheets/editorial_contact.jpg"
+type = "image"
+title = "Editorial (Crimson) — 8 pages: Home / About / Login / Theme / Advanced / Journeys / Category / Submit"
+
+[[outputs]]
+id = "Brn-Bta3kDtnDC5g-hdBa"
+uri = "file://evidence/design-system-proof/contact-sheets/terminal_contact.jpg"
+type = "image"
+title = "Terminal (Matrix) — 8 pages"
+
+[[outputs]]
+id = "mfIhUdSjKZ2Ep6IbufTFu"
+uri = "file://evidence/design-system-proof/contact-sheets/geist_contact.jpg"
+type = "image"
+title = "Geist (Cyan) — 8 pages"
+
+[[outputs]]
+id = "iSSzRaqfT40eR6p8flnA_"
+uri = "file://evidence/design-system-proof/contact-sheets/brutalist_contact.jpg"
+type = "image"
+title = "Brutalist (Amber) — 8 pages"
+
+[[outputs]]
+id = "18efSoyjptsXlTfGb6dDX"
+uri = "file://evidence/design-system-proof/contact-sheets/swiss_contact.jpg"
+type = "image"
+title = "Swiss (Orange) — 8 pages"
+
+[[outputs]]
+id = "eDOjnpkoKE0Q5gb6c_7Zt"
+uri = "file://evidence/design-system-proof/manifest.json"
+type = "unspecified"
+title = "Capture manifest — 40 screenshots, applied tokens per capture, 0 console/page errors"

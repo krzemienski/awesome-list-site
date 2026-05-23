@@ -1,0 +1,606 @@
+{
+  "runAt": "2026-05-23T03:03:31.848Z",
+  "captures": [
+    {
+      "system": "editorial",
+      "accent": "crimson",
+      "route": "/",
+      "slug": "01_home",
+      "file": "evidence/design-system-proof/editorial/01_home.jpg",
+      "applied": {
+        "system": "editorial",
+        "accent": "crimson",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "Inter",
+        "accentVar": "#ff3d52",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "editorial",
+      "accent": "crimson",
+      "route": "/about",
+      "slug": "02_about",
+      "file": "evidence/design-system-proof/editorial/02_about.jpg",
+      "applied": {
+        "system": "editorial",
+        "accent": "crimson",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "Inter",
+        "accentVar": "#ff3d52",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "editorial",
+      "accent": "crimson",
+      "route": "/login",
+      "slug": "03_login",
+      "file": "evidence/design-system-proof/editorial/03_login.jpg",
+      "applied": {
+        "system": "editorial",
+        "accent": "crimson",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "Inter",
+        "accentVar": "#ff3d52",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "editorial",
+      "accent": "crimson",
+      "route": "/settings/theme",
+      "slug": "04_theme_picker",
+      "file": "evidence/design-system-proof/editorial/04_theme_picker.jpg",
+      "applied": {
+        "system": "editorial",
+        "accent": "crimson",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "Inter",
+        "accentVar": "#ff3d52",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "editorial",
+      "accent": "crimson",
+      "route": "/advanced",
+      "slug": "05_advanced",
+      "file": "evidence/design-system-proof/editorial/05_advanced.jpg",
+      "applied": {
+        "system": "editorial",
+        "accent": "crimson",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "Inter",
+        "accentVar": "#ff3d52",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "editorial",
+      "accent": "crimson",
+      "route": "/journeys",
+      "slug": "06_journeys",
+      "file": "evidence/design-system-proof/editorial/06_journeys.jpg",
+      "applied": {
+        "system": "editorial",
+        "accent": "crimson",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "Inter",
+        "accentVar": "#ff3d52",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "editorial",
+      "accent": "crimson",
+      "route": "/category/encoding-codecs",
+      "slug": "07_category",
+      "file": "evidence/design-system-proof/editorial/07_category.jpg",
+      "applied": {
+        "system": "editorial",
+        "accent": "crimson",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "Inter",
+        "accentVar": "#ff3d52",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "editorial",
+      "accent": "crimson",
+      "route": "/submit",
+      "slug": "08_submit",
+      "file": "evidence/design-system-proof/editorial/08_submit.jpg",
+      "applied": {
+        "system": "editorial",
+        "accent": "crimson",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "Inter",
+        "accentVar": "#ff3d52",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "terminal",
+      "accent": "matrix",
+      "route": "/",
+      "slug": "01_home",
+      "file": "evidence/design-system-proof/terminal/01_home.jpg",
+      "applied": {
+        "system": "terminal",
+        "accent": "matrix",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "IBM Plex Mono",
+        "accentVar": "#00ff88",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "terminal",
+      "accent": "matrix",
+      "route": "/about",
+      "slug": "02_about",
+      "file": "evidence/design-system-proof/terminal/02_about.jpg",
+      "applied": {
+        "system": "terminal",
+        "accent": "matrix",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "IBM Plex Mono",
+        "accentVar": "#00ff88",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "terminal",
+      "accent": "matrix",
+      "route": "/login",
+      "slug": "03_login",
+      "file": "evidence/design-system-proof/terminal/03_login.jpg",
+      "applied": {
+        "system": "terminal",
+        "accent": "matrix",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "IBM Plex Mono",
+        "accentVar": "#00ff88",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "terminal",
+      "accent": "matrix",
+      "route": "/settings/theme",
+      "slug": "04_theme_picker",
+      "file": "evidence/design-system-proof/terminal/04_theme_picker.jpg",
+      "applied": {
+        "system": "terminal",
+        "accent": "matrix",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "IBM Plex Mono",
+        "accentVar": "#00ff88",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "terminal",
+      "accent": "matrix",
+      "route": "/advanced",
+      "slug": "05_advanced",
+      "file": "evidence/design-system-proof/terminal/05_advanced.jpg",
+      "applied": {
+        "system": "terminal",
+        "accent": "matrix",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "IBM Plex Mono",
+        "accentVar": "#00ff88",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "terminal",
+      "accent": "matrix",
+      "route": "/journeys",
+      "slug": "06_journeys",
+      "file": "evidence/design-system-proof/terminal/06_journeys.jpg",
+      "applied": {
+        "system": "terminal",
+        "accent": "matrix",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "IBM Plex Mono",
+        "accentVar": "#00ff88",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "terminal",
+      "accent": "matrix",
+      "route": "/category/encoding-codecs",
+      "slug": "07_category",
+      "file": "evidence/design-system-proof/terminal/07_category.jpg",
+      "applied": {
+        "system": "terminal",
+        "accent": "matrix",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "IBM Plex Mono",
+        "accentVar": "#00ff88",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "terminal",
+      "accent": "matrix",
+      "route": "/submit",
+      "slug": "08_submit",
+      "file": "evidence/design-system-proof/terminal/08_submit.jpg",
+      "applied": {
+        "system": "terminal",
+        "accent": "matrix",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "IBM Plex Mono",
+        "accentVar": "#00ff88",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "geist",
+      "accent": "cyan",
+      "route": "/",
+      "slug": "01_home",
+      "file": "evidence/design-system-proof/geist/01_home.jpg",
+      "applied": {
+        "system": "geist",
+        "accent": "cyan",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "Geist",
+        "accentVar": "#5eddf2",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "geist",
+      "accent": "cyan",
+      "route": "/about",
+      "slug": "02_about",
+      "file": "evidence/design-system-proof/geist/02_about.jpg",
+      "applied": {
+        "system": "geist",
+        "accent": "cyan",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "Geist",
+        "accentVar": "#5eddf2",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "geist",
+      "accent": "cyan",
+      "route": "/login",
+      "slug": "03_login",
+      "file": "evidence/design-system-proof/geist/03_login.jpg",
+      "applied": {
+        "system": "geist",
+        "accent": "cyan",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "Geist",
+        "accentVar": "#5eddf2",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "geist",
+      "accent": "cyan",
+      "route": "/settings/theme",
+      "slug": "04_theme_picker",
+      "file": "evidence/design-system-proof/geist/04_theme_picker.jpg",
+      "applied": {
+        "system": "geist",
+        "accent": "cyan",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "Geist",
+        "accentVar": "#5eddf2",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "geist",
+      "accent": "cyan",
+      "route": "/advanced",
+      "slug": "05_advanced",
+      "file": "evidence/design-system-proof/geist/05_advanced.jpg",
+      "applied": {
+        "system": "geist",
+        "accent": "cyan",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "Geist",
+        "accentVar": "#5eddf2",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "geist",
+      "accent": "cyan",
+      "route": "/journeys",
+      "slug": "06_journeys",
+      "file": "evidence/design-system-proof/geist/06_journeys.jpg",
+      "applied": {
+        "system": "geist",
+        "accent": "cyan",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "Geist",
+        "accentVar": "#5eddf2",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "geist",
+      "accent": "cyan",
+      "route": "/category/encoding-codecs",
+      "slug": "07_category",
+      "file": "evidence/design-system-proof/geist/07_category.jpg",
+      "applied": {
+        "system": "geist",
+        "accent": "cyan",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "Geist",
+        "accentVar": "#5eddf2",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "geist",
+      "accent": "cyan",
+      "route": "/submit",
+      "slug": "08_submit",
+      "file": "evidence/design-system-proof/geist/08_submit.jpg",
+      "applied": {
+        "system": "geist",
+        "accent": "cyan",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "Geist",
+        "accentVar": "#5eddf2",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "brutalist",
+      "accent": "amber",
+      "route": "/",
+      "slug": "01_home",
+      "file": "evidence/design-system-proof/brutalist/01_home.jpg",
+      "applied": {
+        "system": "brutalist",
+        "accent": "amber",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "Space Grotesk",
+        "accentVar": "#ffb84d",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "brutalist",
+      "accent": "amber",
+      "route": "/about",
+      "slug": "02_about",
+      "file": "evidence/design-system-proof/brutalist/02_about.jpg",
+      "applied": {
+        "system": "brutalist",
+        "accent": "amber",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "Space Grotesk",
+        "accentVar": "#ffb84d",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "brutalist",
+      "accent": "amber",
+      "route": "/login",
+      "slug": "03_login",
+      "file": "evidence/design-system-proof/brutalist/03_login.jpg",
+      "applied": {
+        "system": "brutalist",
+        "accent": "amber",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "Space Grotesk",
+        "accentVar": "#ffb84d",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "brutalist",
+      "accent": "amber",
+      "route": "/settings/theme",
+      "slug": "04_theme_picker",
+      "file": "evidence/design-system-proof/brutalist/04_theme_picker.jpg",
+      "applied": {
+        "system": "brutalist",
+        "accent": "amber",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "Space Grotesk",
+        "accentVar": "#ffb84d",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "brutalist",
+      "accent": "amber",
+      "route": "/advanced",
+      "slug": "05_advanced",
+      "file": "evidence/design-system-proof/brutalist/05_advanced.jpg",
+      "applied": {
+        "system": "brutalist",
+        "accent": "amber",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "Space Grotesk",
+        "accentVar": "#ffb84d",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "brutalist",
+      "accent": "amber",
+      "route": "/journeys",
+      "slug": "06_journeys",
+      "file": "evidence/design-system-proof/brutalist/06_journeys.jpg",
+      "applied": {
+        "system": "brutalist",
+        "accent": "amber",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "Space Grotesk",
+        "accentVar": "#ffb84d",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "brutalist",
+      "accent": "amber",
+      "route": "/category/encoding-codecs",
+      "slug": "07_category",
+      "file": "evidence/design-system-proof/brutalist/07_category.jpg",
+      "applied": {
+        "system": "brutalist",
+        "accent": "amber",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "Space Grotesk",
+        "accentVar": "#ffb84d",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "brutalist",
+      "accent": "amber",
+      "route": "/submit",
+      "slug": "08_submit",
+      "file": "evidence/design-system-proof/brutalist/08_submit.jpg",
+      "applied": {
+        "system": "brutalist",
+        "accent": "amber",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "Space Grotesk",
+        "accentVar": "#ffb84d",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "swiss",
+      "accent": "orange",
+      "route": "/",
+      "slug": "01_home",
+      "file": "evidence/design-system-proof/swiss/01_home.jpg",
+      "applied": {
+        "system": "swiss",
+        "accent": "orange",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "Manrope",
+        "accentVar": "#ff7a3d",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "swiss",
+      "accent": "orange",
+      "route": "/about",
+      "slug": "02_about",
+      "file": "evidence/design-system-proof/swiss/02_about.jpg",
+      "applied": {
+        "system": "swiss",
+        "accent": "orange",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "Manrope",
+        "accentVar": "#ff7a3d",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "swiss",
+      "accent": "orange",
+      "route": "/login",
+      "slug": "03_login",
+      "file": "evidence/design-system-proof/swiss/03_login.jpg",
+      "applied": {
+        "system": "swiss",
+        "accent": "orange",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "Manrope",
+        "accentVar": "#ff7a3d",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "swiss",
+      "accent": "orange",
+      "route": "/settings/theme",
+      "slug": "04_theme_picker",
+      "file": "evidence/design-system-proof/swiss/04_theme_picker.jpg",
+      "applied": {
+        "system": "swiss",
+        "accent": "orange",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "Manrope",
+        "accentVar": "#ff7a3d",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "swiss",
+      "accent": "orange",
+      "route": "/advanced",
+      "slug": "05_advanced",
+      "file": "evidence/design-system-proof/swiss/05_advanced.jpg",
+      "applied": {
+        "system": "swiss",
+        "accent": "orange",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "Manrope",
+        "accentVar": "#ff7a3d",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "swiss",
+      "accent": "orange",
+      "route": "/journeys",
+      "slug": "06_journeys",
+      "file": "evidence/design-system-proof/swiss/06_journeys.jpg",
+      "applied": {
+        "system": "swiss",
+        "accent": "orange",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "Manrope",
+        "accentVar": "#ff7a3d",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "swiss",
+      "accent": "orange",
+      "route": "/category/encoding-codecs",
+      "slug": "07_category",
+      "file": "evidence/design-system-proof/swiss/07_category.jpg",
+      "applied": {
+        "system": "swiss",
+        "accent": "orange",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "Manrope",
+        "accentVar": "#ff7a3d",
+        "bgVar": "#000000"
+      }
+    },
+    {
+      "system": "swiss",
+      "accent": "orange",
+      "route": "/submit",
+      "slug": "08_submit",
+      "file": "evidence/design-system-proof/swiss/08_submit.jpg",
+      "applied": {
+        "system": "swiss",
+        "accent": "orange",
+        "bg": "rgb(0, 0, 0)",
+        "fontFamily": "Manrope",
+        "accentVar": "#ff7a3d",
+        "bgVar": "#000000"
+      }
+    }
+  ],
+  "errors": []
+}
