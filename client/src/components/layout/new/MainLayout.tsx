@@ -62,17 +62,6 @@ export default function MainLayout({ awesomeList, isLoading, children, user, onL
         >
           {children}
         </main>
-        <footer className="border-t px-4 sm:px-6 py-3 sm:py-4">
-          <div className="mx-auto flex max-w-[1280px] flex-col items-center justify-between gap-2 text-xs sm:text-sm text-muted-foreground sm:flex-row">
-            <p>
-              Built with{" "}
-              <a href="https://reactjs.org" target="_blank" rel="noopener noreferrer" className="font-medium underline underline-offset-4 hover:text-foreground">React</a>
-              {" "}and{" "}
-              <a href="https://ui.shadcn.com" target="_blank" rel="noopener noreferrer" className="font-medium underline underline-offset-4 hover:text-foreground">shadcn/ui</a>
-            </p>
-            <a href="/about" className="font-medium underline underline-offset-4 hover:text-foreground">About</a>
-          </div>
-        </footer>
         </SidebarInset>
       </div>
       <SearchDialog

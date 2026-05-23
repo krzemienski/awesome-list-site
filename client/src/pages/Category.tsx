@@ -552,19 +552,19 @@ export default function Category() {
                     )}
                   </div>
                 </CardContent>
-                <div className="px-6 pb-6 pt-2">
-                  <Button
-                    size="sm"
-                    className="w-full bg-[var(--accent)] text-[var(--accent-foreground,#000)] hover:bg-[color-mix(in_srgb,var(--accent)_88%,white)]"
+                <div className="px-6 pb-4 pt-1">
+                  <button
+                    type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleResourceClick();
                     }}
                     data-testid={`button-view-details-${resourceId}`}
+                    className="inline-flex items-center gap-1 text-xs font-medium text-[var(--accent)] hover:underline focus:outline-none focus-visible:underline"
                   >
                     {isDbResource(resource) ? "View Details" : "Open Resource"}
-                    <ExternalLink className="ml-2 h-3.5 w-3.5" />
-                  </Button>
+                    <ExternalLink className="h-3 w-3" />
+                  </button>
                 </div>
               </Card>
             );

@@ -9,8 +9,6 @@ import {
   ChevronRight,
   Folder,
   Palette,
-  Search,
-  X,
 } from "lucide-react";
 import { cn, slugify, getCategorySlug } from "@/lib/utils";
 import { Category, Resource } from "@/types/awesome-list";
@@ -18,6 +16,7 @@ import { getCategoryIcon } from "@/config/navigation-icons";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -400,20 +399,9 @@ export default function AppSidebar({
   const [location, setLocation] = useLocation();
   const [openCategories, setOpenCategories] = useState<string[]>([]);
   const [openSubcategories, setOpenSubcategories] = useState<string[]>([]);
-  const [filter, setFilter] = useState("");
   const { setOpenMobile } = useSidebar();
 
   const filtered = useMemo(() => filterCategories(categories), [categories]);
-
-  const visible = useMemo(() => {
-    if (!filter.trim()) return filtered;
-    const q = filter.trim().toLowerCase();
-    return filtered.filter(
-      (cat) =>
-        cat.name.toLowerCase().includes(q) ||
-        cat.subcategories?.some((sub) => sub.name.toLowerCase().includes(q)),
-    );
-  }, [filtered, filter]);
 
   /* auto-expand active category and subcategory on route change */
   useEffect(() => {
@@ -480,13 +468,6 @@ export default function AppSidebar({
   ];
 
   const totalCats = filtered.length;
-  const expandedCount = openCategories.length;
-  const allExpanded = expandedCount === totalCats && totalCats > 0;
-
-  const toggleAll = () => {
-    if (allExpanded) setOpenCategories([]);
-    else setOpenCategories(filtered.map((c) => c.name));
-  };
 
   return (
     <Sidebar collapsible="icon" variant="sidebar">
@@ -538,15 +519,13 @@ export default function AppSidebar({
         {/* QUICK NAV */}
         <div className="px-3 pt-4 pb-2 group-data-[collapsible=icon]:hidden">
           <div
-            className="eyebrow"
             style={{
-              fontSize: 9.5,
-              letterSpacing: 1.8,
+              fontSize: 12,
               color: "var(--text-3)",
-              fontWeight: 700,
+              fontWeight: 500,
             }}
           >
-            NAVIGATE
+            Navigation
           </div>
         </div>
         <div className="px-2 pb-2 group-data-[collapsible=icon]:hidden">
@@ -614,92 +593,16 @@ export default function AppSidebar({
 
         {/* CATEGORIES HEADER */}
         <div
-          className="px-3 pt-4 pb-2 flex items-center justify-between group-data-[collapsible=icon]:hidden"
-          style={{ borderTop: "1px solid var(--border)" }}
+          className="px-3 pt-4 pb-2 group-data-[collapsible=icon]:hidden"
         >
-          <div>
-            <div
-              className="eyebrow"
-              style={{
-                fontSize: 9.5,
-                letterSpacing: 1.8,
-                color: "var(--text-3)",
-                fontWeight: 700,
-              }}
-            >
-              BROWSE
-            </div>
-            <div
-              className="mt-1"
-              style={{ fontSize: 13.5, fontWeight: 600, color: "var(--text)" }}
-            >
-              Categories{" "}
-              <span style={{ color: "var(--text-3)", fontWeight: 400 }}>
-                · {totalCats}
-              </span>
-            </div>
-          </div>
-          {totalCats > 0 && (
-            <button
-              type="button"
-              onClick={toggleAll}
-              data-testid="toggle-expand-all"
-              className="font-mono hover:text-[var(--text)] text-[var(--text-3)] px-2 py-1 rounded hover:bg-[var(--surface)]"
-              style={{ fontSize: 10, letterSpacing: 0.4 }}
-              title={allExpanded ? "Collapse all" : "Expand all"}
-            >
-              {allExpanded ? "COLLAPSE" : "EXPAND"}
-            </button>
-          )}
-        </div>
-
-        {/* FILTER INPUT */}
-        <div className="px-3 pb-2 group-data-[collapsible=icon]:hidden">
-          <div className="relative">
-            <Search
-              className="size-3 absolute pointer-events-none"
-              style={{
-                left: 10,
-                top: "50%",
-                transform: "translateY(-50%)",
-                color: "var(--text-3)",
-              }}
-            />
-            <input
-              type="text"
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              placeholder="Filter categories…"
-              aria-label="Filter categories"
-              data-testid="sidebar-filter"
-              className="w-full"
-              style={{
-                background: "var(--surface)",
-                border: "1px solid var(--border)",
-                borderRadius: 6,
-                padding: "7px 28px 7px 28px",
-                color: "var(--text)",
-                fontFamily: "var(--font-mono)",
-                fontSize: 11,
-                outline: "none",
-              }}
-            />
-            {filter && (
-              <button
-                type="button"
-                onClick={() => setFilter("")}
-                aria-label="Clear filter"
-                className="absolute"
-                style={{
-                  right: 6,
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  color: "var(--text-3)",
-                }}
-              >
-                <X className="size-3" />
-              </button>
-            )}
+          <div
+            style={{
+              fontSize: 12,
+              color: "var(--text-3)",
+              fontWeight: 500,
+            }}
+          >
+            Categories
           </div>
         </div>
 
@@ -724,7 +627,7 @@ export default function AppSidebar({
                   </div>
                 </div>
               ))
-            : visible.map((cat) => {
+            : filtered.map((cat) => {
                 const isOpen = openCategories.includes(cat.name);
                 const catSlug = cat.slug || getCategorySlug(cat.name);
                 const catActive =
@@ -758,7 +661,7 @@ export default function AppSidebar({
                     isActive={catActive}
                     activePath={activePath}
                     navigate={navigate}
-                    matchQuery={filter}
+                    matchQuery=""
                     openSubs={openSubcategories}
                     toggleSub={(name) =>
                       setOpenSubcategories((prev) =>
@@ -770,57 +673,33 @@ export default function AppSidebar({
                   />
                 );
               })}
-          {!isLoading && visible.length === 0 && (
+          {!isLoading && filtered.length === 0 && (
             <div
               className="px-4 py-6 text-center"
               style={{ color: "var(--text-3)", fontSize: 12 }}
             >
-              No matching categories.
+              No categories.
             </div>
           )}
         </div>
 
-        {/* COMPACT FOOTER — lives inside the nav scroll region, single-line, secondary */}
-        <div
-          className="px-3 py-2 mt-2 flex items-center justify-between gap-2 group-data-[collapsible=icon]:hidden"
-          style={{
-            borderTop: "1px solid var(--border)",
-            fontFamily: "var(--font-mono)",
-            fontSize: 10,
-            color: "var(--text-3)",
-            letterSpacing: 0.3,
-          }}
-        >
-          <span className="truncate">
-            {resources.length.toLocaleString()} res ·{" "}
-            {filtered.reduce(
-              (n, c) => n + (c.subcategories?.length || 0),
-              0,
-            )}{" "}
-            sub · {totalCats} cat
-          </span>
-          <a
-            href="/about"
-            onClick={(e) => {
-              e.preventDefault();
-              navigate("/about");
-            }}
-            data-testid="footer-about"
-            className="inline-flex items-center gap-1 no-underline shrink-0"
-            style={{ color: "var(--accent)" }}
-            title="about & status"
-          >
-            <span
-              className="size-1.5 rounded-full inline-block"
-              style={{
-                background: "var(--accent)",
-                boxShadow: "0 0 6px var(--accent)",
-              }}
-            />
-            about
-          </a>
-        </div>
       </SidebarContent>
+      <SidebarFooter className="border-t p-2 group-data-[collapsible=icon]:hidden">
+        <a
+          href="/about"
+          onClick={(e) => {
+            e.preventDefault();
+            navigate("/about");
+          }}
+          data-testid="footer-about"
+          className="sub-item touch-manipulation min-h-[36px] no-underline w-full"
+        >
+          <span className="flex items-center gap-[10px] min-w-0">
+            <BookOpen className="size-[14px] shrink-0" />
+            <span className="truncate">About</span>
+          </span>
+        </a>
+      </SidebarFooter>
 
       <SidebarRail />
     </Sidebar>
