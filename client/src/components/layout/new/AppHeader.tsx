@@ -63,7 +63,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout }: AppHeaderPro
   const crumbs = getBreadcrumbs(location);
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-border bg-[color-mix(in_srgb,var(--bg)_85%,transparent)] backdrop-blur-md px-3 sm:px-4">
+    <header className="sticky top-0 z-30 flex h-14 md:h-[60px] items-center gap-2 md:gap-[18px] border-b border-border bg-[color-mix(in_srgb,var(--bg)_78%,transparent)] backdrop-blur-[14px] px-3 sm:px-6">
       <SidebarTrigger
         className="-ml-1 shrink-0 min-h-[44px] min-w-[44px]"
         data-testid="mobile-drawer-trigger"
