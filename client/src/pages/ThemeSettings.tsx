@@ -1,8 +1,12 @@
 import { useContext } from "react";
 import { Link } from "wouter";
-import { ArrowLeft, Check, Palette, Layers } from "lucide-react";
+import { ArrowLeft, Check, Palette, Layers, Eye, Sparkles, Zap } from "lucide-react";
 import { ThemeProviderContext } from "@/components/ui/theme-provider";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 
 export default function ThemeSettings() {
   const { systemId, accentId, setSystem, setAccent, systems, accents } =
@@ -140,6 +144,118 @@ export default function ThemeSettings() {
           Switching systems keeps your accent unless you were on that system&rsquo;s natural default
           &mdash; in which case the accent nudges to the new system&rsquo;s natural default.
         </p>
+      </section>
+
+      {/* Live Preview — current system × accent applied to real shadcn primitives */}
+      <section aria-label="Live preview" data-testid="theme-preview">
+        <div className="flex items-center gap-2 mb-4">
+          <Eye className="h-5 w-5 text-[var(--accent)]" />
+          <h2 className="font-sans font-semibold text-xl tracking-tight">Live Preview</h2>
+          <span className="ml-2 text-xs text-[color:var(--text-3)]">
+            {activeSystem?.name ?? systemId} · {activeAccent?.name ?? accentId}
+          </span>
+        </div>
+
+        <Card className="p-6 space-y-6 bg-[var(--surface)] border-[color:var(--border)]" data-testid="preview-card">
+          {/* Typography */}
+          <div className="space-y-2">
+            <code className="block font-mono text-[10.5px] text-[color:var(--text-3)] tracking-wider uppercase">
+              Typography
+            </code>
+            <h1 className="font-display text-3xl font-bold tracking-tight">
+              The quick brown fox <em className="text-[var(--accent)]">jumps</em> over
+            </h1>
+            <h3 className="font-sans text-lg font-semibold">Section heading</h3>
+            <p className="text-sm text-[color:var(--text-2)] max-w-2xl">
+              Body copy renders in the system&rsquo;s primary sans face. Accent color drives links,
+              focus rings, and emphasized words — try a different accent above to see this paragraph
+              re-tint instantly.
+            </p>
+            <code className="block font-mono text-xs text-[color:var(--text-3)]">
+              0123456789 · const x = await fetch(&apos;/api/resources&apos;);
+            </code>
+          </div>
+
+          {/* Buttons */}
+          <div className="space-y-2">
+            <code className="block font-mono text-[10.5px] text-[color:var(--text-3)] tracking-wider uppercase">
+              Buttons
+            </code>
+            <div className="flex flex-wrap gap-2">
+              <Button data-testid="preview-btn-default">
+                <Sparkles className="h-4 w-4 mr-1.5" />
+                Primary action
+              </Button>
+              <Button variant="secondary" data-testid="preview-btn-secondary">Secondary</Button>
+              <Button variant="outline" data-testid="preview-btn-outline">Outline</Button>
+              <Button variant="ghost" data-testid="preview-btn-ghost">Ghost</Button>
+              <Button variant="destructive" data-testid="preview-btn-destructive">Destructive</Button>
+              <Button size="icon" variant="outline" aria-label="Icon button" data-testid="preview-btn-icon">
+                <Zap className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Badges */}
+          <div className="space-y-2">
+            <code className="block font-mono text-[10.5px] text-[color:var(--text-3)] tracking-wider uppercase">
+              Badges
+            </code>
+            <div className="flex flex-wrap gap-2">
+              <Badge>Default</Badge>
+              <Badge variant="secondary">Secondary</Badge>
+              <Badge variant="outline">Outline</Badge>
+              <Badge variant="destructive">Destructive</Badge>
+              <Badge className="bg-[var(--accent)] text-[var(--bg)] hover:bg-[var(--accent)]">
+                Accent
+              </Badge>
+            </div>
+          </div>
+
+          {/* Input + Surface chips */}
+          <div className="space-y-2">
+            <code className="block font-mono text-[10.5px] text-[color:var(--text-3)] tracking-wider uppercase">
+              Form &amp; Surface
+            </code>
+            <div className="grid sm:grid-cols-2 gap-3">
+              <Input placeholder="Search resources…" data-testid="preview-input" />
+              <div className="flex items-center gap-2 rounded-[var(--radius)] border border-[color:var(--border)] bg-[var(--bg)] px-3 py-2 text-xs">
+                <span className="text-[color:var(--text-3)]">Try</span>
+                <kbd className="kbd font-mono">⌘K</kbd>
+                <span className="text-[color:var(--text-3)]">to open command palette</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Token swatches — proves the actual computed values */}
+          <div className="space-y-2">
+            <code className="block font-mono text-[10.5px] text-[color:var(--text-3)] tracking-wider uppercase">
+              Active Tokens
+            </code>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
+              {[
+                { label: "bg", varName: "--bg" },
+                { label: "surface", varName: "--surface" },
+                { label: "border", varName: "--border" },
+                { label: "accent", varName: "--accent" },
+                { label: "accent-2", varName: "--accent-2" },
+              ].map((t) => (
+                <div
+                  key={t.varName}
+                  className="rounded-[var(--radius-sm)] border border-[color:var(--border)] p-2"
+                  data-testid={`preview-token-${t.label}`}
+                >
+                  <div
+                    className="h-8 w-full rounded-[var(--radius-sm)] mb-1.5 border border-[color:var(--border)]"
+                    style={{ background: `var(${t.varName})` }}
+                  />
+                  <div className="font-mono text-[10.5px] text-[color:var(--text-3)]">{t.label}</div>
+                  <div className="font-mono text-[10.5px] text-[color:var(--text-2)]">{t.varName}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Card>
       </section>
     </div>
   );

@@ -216,3 +216,39 @@ id = "eDOjnpkoKE0Q5gb6c_7Zt"
 uri = "file://evidence/design-system-proof/manifest.json"
 type = "unspecified"
 title = "Capture manifest — 40 screenshots, applied tokens per capture, 0 console/page errors"
+
+[[outputs]]
+id = "4BZ_aSilwE9dSKqbkStna"
+uri = "file://evidence/design-system-proof/contact-sheets/cross_picker_with_preview.jpg"
+type = "image"
+title = "/settings/theme full page — all 5 systems side-by-side with new Live Preview section"
+
+[[outputs]]
+id = "iUMywZqfx6UO6UPjG8hAn"
+uri = "file://evidence/design-system-proof/editorial/04b_theme_picker_full.jpg"
+type = "image"
+title = "Editorial — full picker page with Live Preview"
+
+[[outputs]]
+id = "kx4gAf8HTf0YJoJKcf9ZY"
+uri = "file://evidence/design-system-proof/terminal/04b_theme_picker_full.jpg"
+type = "image"
+title = "Terminal — full picker page with Live Preview"
+
+[[outputs]]
+id = "OGbBOTIw52qRe9ZHVXe6P"
+uri = "file://evidence/design-system-proof/geist/04b_theme_picker_full.jpg"
+type = "image"
+title = "Geist — full picker page with Live Preview"
+
+[[outputs]]
+id = "qE-eog9iuJpjiJy9hVmZb"
+uri = "file://evidence/design-system-proof/brutalist/04b_theme_picker_full.jpg"
+type = "image"
+title = "Brutalist — full picker page with Live Preview"
+
+[[outputs]]
+id = "OqZuMIWozp5jIui-QvBxY"
+uri = "file://evidence/design-system-proof/swiss/04b_theme_picker_full.jpg"
+type = "image"
+title = "Swiss — full picker page with Live Preview"
