@@ -8,24 +8,11 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
-// I1 — Font override picker. Writes --font-sans on <html>; persists across reloads.
-const FONT_OPTIONS = [
-  { id: "system", name: "System default", stack: "" },
-  { id: "inter", name: "Inter", stack: "'Inter', system-ui, sans-serif" },
-  { id: "dm-sans", name: "DM Sans", stack: "'DM Sans', system-ui, sans-serif" },
-  { id: "source-sans", name: "Source Sans 3", stack: "'Source Sans 3', 'Source Sans Pro', system-ui, sans-serif" },
-  { id: "ibm-plex", name: "IBM Plex Sans", stack: "'IBM Plex Sans', system-ui, sans-serif" },
-  { id: "jetbrains", name: "JetBrains Mono", stack: "'JetBrains Mono', ui-monospace, monospace" },
-];
-const FONT_LS_KEY = "ds-font-override";
-function applyFontOverride(id: string) {
-  const opt = FONT_OPTIONS.find((f) => f.id === id) ?? FONT_OPTIONS[0];
-  if (opt.id === "system" || !opt.stack) {
-    document.documentElement.style.removeProperty("--font-sans");
-  } else {
-    document.documentElement.style.setProperty("--font-sans", opt.stack);
-  }
-}
+// I1 — Font override picker. Source-of-truth list + applier live in
+// `client/src/lib/font-options.ts`. The boot script in `client/index.html`
+// duplicates the same map inline for pre-paint application; verify-fixes.mjs
+// V11 asserts the two stay in sync.
+import { FONT_OPTIONS, FONT_LS_KEY, applyFontOverride } from "@/lib/font-options";
 
 export default function ThemeSettings() {
   const { systemId, accentId, setSystem, setAccent, systems, accents } =

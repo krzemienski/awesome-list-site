@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import {
   Home,
   Plus,
@@ -177,42 +177,29 @@ function CategoryAccordion({
     return h;
   }, [subs, openSubs]);
 
-  // Row activation = navigate to category page (single click, Enter, Space).
-  // Chevron is a separate inner button that ONLY toggles expand. This restores
-  // single-click navigation parity with ref 09/10 sidebars while keeping the
-  // P1 "no duplicate → arrow" + P4 "no All-in row" cleanups.
-  const rowActivate = () => navigate(catPath);
-  const rowKeyDown = (e: React.KeyboardEvent) => {
-    // Only handle keys focused on the row itself; ignore events bubbled
-    // up from the inner chevron <button> (which handles its own Enter/Space
-    // natively to toggle expand).
-    if (e.target !== e.currentTarget) return;
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      rowActivate();
-    }
-  };
-  const chevronToggle = (e: React.MouseEvent | React.KeyboardEvent) => {
-    e.stopPropagation();
-    onToggle();
-  };
+  // Semantic split (post-architect-review):
+  //  - The row is a <Link> (real navigation semantics; right-click/cmd-click
+  //    opens in new tab; assistive tech announces it as "link").
+  //  - The chevron is a sibling <button> with aria-expanded/aria-controls
+  //    pointing at the accordion body. It is the SOLE owner of disclosure
+  //    semantics — `aria-expanded` is no longer on the row.
+  //  - No nested interactive controls: Link and Button are siblings inside
+  //    a non-interactive flex container that keeps the row visual.
 
   return (
     <div className="accordion-item">
       <div
-        role="button"
-        tabIndex={0}
-        onClick={rowActivate}
-        onKeyDown={rowKeyDown}
-        className={cn("accordion-header", isActive && "active", "cursor-pointer")}
+        className={cn("accordion-header", isActive && "active", "flex items-center w-full")}
         data-testid={`accordion-cat-${catSlug}`}
         data-state={isOpen ? "open" : "closed"}
-        aria-expanded={subs.length > 0 ? isOpen : undefined}
-        aria-controls={subs.length > 0 ? `accordion-body-${catSlug}` : undefined}
-        aria-label={`Open ${cat.name} category page`}
         title={cat.name}
       >
-        <span className="flex items-center gap-[10px] min-w-0 flex-1">
+        <Link
+          href={catPath}
+          data-testid={`row-cat-${catSlug}`}
+          aria-label={`Open ${cat.name} category page`}
+          className="flex items-center gap-[10px] min-w-0 flex-1 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)] rounded-sm"
+        >
           <span
             className="flex items-center justify-center shrink-0"
             style={{
@@ -237,23 +224,23 @@ function CategoryAccordion({
           >
             {cat.name}
           </span>
-        </span>
-        <span className="flex items-center gap-2 shrink-0">
+        </Link>
+        <span className="flex items-center gap-2 shrink-0 pl-2">
           <span
             className="font-mono tabular-nums"
             style={{ fontSize: 10, color: "var(--text-3)" }}
           >
             {formatCount(totalCount)}
           </span>
-          {/* P1 — removed redundant "→" page-link span; sole chevron below is the
-              single right-arrow indicator per ref 01 sidebar. Clicking the count or
-              chevron expands; navigation to the category page happens via the
-              dedicated row click handler below. */}
+          {/* P1 — removed redundant "→" page-link span; chevron is the single
+              disclosure control per ref 01 sidebar. */}
           {subs.length > 0 && (
             <button
               type="button"
-              onClick={chevronToggle}
+              onClick={onToggle}
               aria-label={isOpen ? `Collapse ${cat.name}` : `Expand ${cat.name}`}
+              aria-expanded={isOpen}
+              aria-controls={`accordion-body-${catSlug}`}
               data-testid={`toggle-cat-${catSlug}`}
               className="inline-flex items-center justify-center w-6 h-6 rounded-sm hover:bg-[var(--surface-2)] focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
             >

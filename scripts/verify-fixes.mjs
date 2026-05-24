@@ -20,17 +20,35 @@ mkdirSync("screenshots/verify", { recursive: true });
   page.on("console", (m) => consoleMsgs.push(`[${m.type()}] ${m.text().slice(0, 200)}`));
   page.on("pageerror", (e) => consoleMsgs.push(`[pageerror] ${String(e).slice(0, 200)}`));
 
+  // Helper: read aria-expanded from the chevron <button> (post-refactor:
+  // disclosure semantics live on chevron, NOT on the row).
+  async function chevronExpanded(slug) {
+    return await page
+      .locator(`[data-testid="toggle-cat-${slug}"]`)
+      .getAttribute("aria-expanded");
+  }
+
   // ─── V1: sidebar row single-click navigates to category page ───────────
   await page.goto(BASE + "/", { waitUntil: "networkidle" });
-  await page.waitForSelector('[data-testid^="accordion-cat-"]', { timeout: 10000 });
-  const firstCat = await page.locator('[data-testid^="accordion-cat-"]').first();
-  const catTestId = await firstCat.getAttribute("data-testid");
-  const expectedSlug = catTestId.replace("accordion-cat-", "");
-  await firstCat.click();
+  await page.waitForSelector('[data-testid^="row-cat-"]', { timeout: 10000 });
+  const firstRow = page.locator('[data-testid^="row-cat-"]').first();
+  const rowTid = await firstRow.getAttribute("data-testid");
+  const expectedSlug = rowTid.replace("row-cat-", "");
+  // Assert it's a real <a> (semantic Link), not a div role=button
+  const rowTag = await firstRow.evaluate((el) => el.tagName.toLowerCase());
+  const rowHref = await firstRow.getAttribute("href");
+  await firstRow.click();
   await page.waitForTimeout(800);
   const urlAfterRowClick = page.url();
-  const navOk = urlAfterRowClick.includes(`/category/${expectedSlug}`);
-  record("V1-row-click-navigates", navOk, `clicked ${catTestId} → url=${urlAfterRowClick}`);
+  const navOk =
+    urlAfterRowClick.includes(`/category/${expectedSlug}`) &&
+    rowTag === "a" &&
+    rowHref === `/category/${expectedSlug}`;
+  record(
+    "V1-row-click-navigates",
+    navOk,
+    `tag=${rowTag}, href=${rowHref}, clicked → url=${urlAfterRowClick}`
+  );
   await page.screenshot({ path: "screenshots/verify/v1_after_row_click.jpg", type: "jpeg", quality: 70 });
 
   // ─── V2: chevron click toggles expand WITHOUT navigating ────────────────
@@ -39,28 +57,25 @@ mkdirSync("screenshots/verify", { recursive: true });
   const urlBefore = page.url();
   const firstToggle = page.locator('[data-testid^="toggle-cat-"]').first();
   const toggleTestId = await firstToggle.getAttribute("data-testid");
+  const toggleSlug = toggleTestId.replace("toggle-cat-", "");
   await firstToggle.click();
   await page.waitForTimeout(500);
   const urlAfterChevron = page.url();
   const stayedHome = urlBefore === urlAfterChevron;
-  // Verify expand state via aria-expanded on parent row
-  const catSlug2 = toggleTestId.replace("toggle-cat-", "");
-  const expandedAttr = await page
-    .locator(`[data-testid="accordion-cat-${catSlug2}"]`)
-    .getAttribute("aria-expanded");
+  const expandedAttr = await chevronExpanded(toggleSlug);
   record(
     "V2-chevron-toggles-not-navigates",
     stayedHome && expandedAttr === "true",
-    `url unchanged=${stayedHome}, aria-expanded=${expandedAttr}`
+    `url unchanged=${stayedHome}, chevron aria-expanded=${expandedAttr}`
   );
   await page.screenshot({ path: "screenshots/verify/v2_after_chevron_click.jpg", type: "jpeg", quality: 70 });
 
   // ─── V3: keyboard Enter on row navigates ────────────────────────────────
   await page.goto(BASE + "/", { waitUntil: "networkidle" });
-  await page.waitForSelector('[data-testid^="accordion-cat-"]');
-  const kbRow = page.locator('[data-testid^="accordion-cat-"]').first();
+  await page.waitForSelector('[data-testid^="row-cat-"]');
+  const kbRow = page.locator('[data-testid^="row-cat-"]').first();
   const kbRowTid = await kbRow.getAttribute("data-testid");
-  const kbExpectedSlug = kbRowTid.replace("accordion-cat-", "");
+  const kbExpectedSlug = kbRowTid.replace("row-cat-", "");
   await kbRow.focus();
   await page.keyboard.press("Enter");
   await page.waitForTimeout(800);
@@ -77,18 +92,44 @@ mkdirSync("screenshots/verify", { recursive: true });
   const urlBeforeKb = page.url();
   const kbToggle = page.locator('[data-testid^="toggle-cat-"]').first();
   const kbToggleTid = await kbToggle.getAttribute("data-testid");
+  const kbToggleSlug = kbToggleTid.replace("toggle-cat-", "");
   await kbToggle.focus();
   await page.keyboard.press("Enter");
   await page.waitForTimeout(500);
   const urlAfterKbToggle = page.url();
-  const kbToggleSlug = kbToggleTid.replace("toggle-cat-", "");
-  const kbExpanded = await page
-    .locator(`[data-testid="accordion-cat-${kbToggleSlug}"]`)
-    .getAttribute("aria-expanded");
+  const kbExpanded = await chevronExpanded(kbToggleSlug);
   record(
     "V4-keyboard-enter-on-chevron-toggles",
     urlBeforeKb === urlAfterKbToggle && kbExpanded === "true",
     `url unchanged=${urlBeforeKb === urlAfterKbToggle}, aria-expanded=${kbExpanded}`
+  );
+
+  // ─── V4b: Space on chevron toggles (covers Space-key parity gap) ────────
+  await page.goto(BASE + "/", { waitUntil: "networkidle" });
+  await page.waitForSelector('[data-testid^="toggle-cat-"]');
+  const spaceUrlBefore = page.url();
+  const spaceToggle = page.locator('[data-testid^="toggle-cat-"]').first();
+  const spaceToggleTid = await spaceToggle.getAttribute("data-testid");
+  const spaceSlug = spaceToggleTid.replace("toggle-cat-", "");
+  await spaceToggle.focus();
+  await page.keyboard.press("Space");
+  await page.waitForTimeout(500);
+  const spaceUrlAfter = page.url();
+  const spaceExpanded = await chevronExpanded(spaceSlug);
+  record(
+    "V4b-keyboard-space-on-chevron-toggles",
+    spaceUrlBefore === spaceUrlAfter && spaceExpanded === "true",
+    `url unchanged=${spaceUrlBefore === spaceUrlAfter}, aria-expanded=${spaceExpanded}`
+  );
+
+  // ─── V4c: collapse roundtrip — second click on chevron collapses ────────
+  await spaceToggle.click();
+  await page.waitForTimeout(400);
+  const collapsedExpanded = await chevronExpanded(spaceSlug);
+  record(
+    "V4c-collapse-roundtrip",
+    collapsedExpanded === "false",
+    `after second click, aria-expanded=${collapsedExpanded}`
   );
 
   // ─── V5: font override picker click writes localStorage AND --font-sans ──
@@ -162,6 +203,49 @@ mkdirSync("screenshots/verify", { recursive: true });
     !!activeTabColor && activeTabColor.text.includes("Explorer"),
     JSON.stringify(activeTabColor)
   );
+
+  // ─── V11: font map drift — boot script (index.html) must agree with
+  //          FONT_OPTIONS source-of-truth (client/src/lib/font-options.ts).
+  //          For every font id, set localStorage + hard reload + assert the
+  //          boot script's pre-paint application matches the TS module's
+  //          stack. Catches drift between the two definitions.
+  const { readFileSync } = await import("fs");
+  const fontOptionsSrc = readFileSync("client/src/lib/font-options.ts", "utf8");
+  // Crude but robust parse: collect each { id: "...", ..., stack: "..." }
+  const fontEntries = [
+    ...fontOptionsSrc.matchAll(/\{\s*id:\s*"([^"]+)"[^}]*?stack:\s*"([^"]*)"/g),
+  ].map((m) => ({ id: m[1], stack: m[2] }));
+  if (fontEntries.length === 0) {
+    record("V11-font-map-drift", false, "could not parse FONT_OPTIONS source");
+  } else {
+    const mismatches = [];
+    for (const f of fontEntries) {
+      await page.goto(BASE + "/", { waitUntil: "domcontentloaded" });
+      await page.evaluate((id) => localStorage.setItem("ds-font-override", id), f.id);
+      await page.goto(BASE + "/login", { waitUntil: "domcontentloaded" });
+      const applied = await page.evaluate(() =>
+        document.documentElement.style.getPropertyValue("--font-sans")
+      );
+      // "system" stack="" → boot script should leave --font-sans unset
+      if (f.id === "system") {
+        if (applied !== "") mismatches.push(`${f.id}: expected unset, got "${applied}"`);
+      } else if (applied !== f.stack) {
+        mismatches.push(`${f.id}: expected "${f.stack.slice(0, 40)}", got "${applied.slice(0, 40)}"`);
+      }
+    }
+    record(
+      "V11-font-map-drift",
+      mismatches.length === 0,
+      mismatches.length === 0
+        ? `all ${fontEntries.length} font ids agree between boot script and FONT_OPTIONS`
+        : mismatches.join(" | ")
+    );
+  }
+
+  // Reset to system before V10 checks
+  await page.goto(BASE + "/settings/theme", { waitUntil: "networkidle" });
+  await page.locator('[data-testid="font-option-system"]').click();
+  await page.waitForTimeout(300);
 
   // ─── V10: console error budget ──────────────────────────────────────────
   const realErrors = consoleMsgs.filter(

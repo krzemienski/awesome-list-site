@@ -59,7 +59,8 @@
           // I1 — font override: read ds-font-override from localStorage and
           // apply --font-sans pre-paint on EVERY route, so the override
           // persists across hard reloads regardless of which page boots.
-          // Must match FONT_OPTIONS in client/src/pages/ThemeSettings.tsx.
+          // Must match FONT_OPTIONS in client/src/lib/font-options.ts (source of truth).
+          // Drift is detected by scripts/verify-fixes.mjs V11.
           var FONT_STACKS = {
             'system':       '',
             'inter':        "'Inter', system-ui, sans-serif",
