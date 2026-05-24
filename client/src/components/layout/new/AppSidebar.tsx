@@ -183,6 +183,10 @@ function CategoryAccordion({
   // P1 "no duplicate → arrow" + P4 "no All-in row" cleanups.
   const rowActivate = () => navigate(catPath);
   const rowKeyDown = (e: React.KeyboardEvent) => {
+    // Only handle keys focused on the row itself; ignore events bubbled
+    // up from the inner chevron <button> (which handles its own Enter/Space
+    // natively to toggle expand).
+    if (e.target !== e.currentTarget) return;
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       rowActivate();
@@ -249,9 +253,6 @@ function CategoryAccordion({
             <button
               type="button"
               onClick={chevronToggle}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") chevronToggle(e);
-              }}
               aria-label={isOpen ? `Collapse ${cat.name}` : `Expand ${cat.name}`}
               data-testid={`toggle-cat-${catSlug}`}
               className="inline-flex items-center justify-center w-6 h-6 rounded-sm hover:bg-[var(--surface-2)] focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
