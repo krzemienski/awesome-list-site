@@ -181,7 +181,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
           Awesome Video Resources
         </h1>
         <p className="text-sm sm:text-base text-[color:var(--text-2)] max-w-3xl">
-          {filteredCategories.length} categories · {totalResourceCount} curated resources for the modern video stack.
+          Explore {filteredCategories.length} categories with {totalResourceCount} curated resources.
         </p>
       </div>
 

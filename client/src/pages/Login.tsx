@@ -203,14 +203,15 @@ export default function Login() {
             </Button>
           </div>
 
+          {/* P3 — sentence-case label, crimson mono creds per ref 06 */}
           <div className="space-y-2 pt-2 text-xs text-[color:var(--text-2)]">
-            <p className="eyebrow text-[10px] tracking-[0.18em] text-[color:var(--text-2)]">
-              Default admin
+            <p className="text-xs text-[color:var(--text-2)]">
+              Default admin credentials:
             </p>
             <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
-              <code className="font-mono text-[var(--text)]">admin@example.com</code>
-              <span aria-hidden="true">/</span>
-              <code className="font-mono text-[var(--text)]">admin123</code>
+              <code className="font-mono text-[color:var(--accent)]">admin@example.com</code>
+              <span aria-hidden="true" className="text-[color:var(--text-3)]">/</span>
+              <code className="font-mono text-[color:var(--accent)]">admin123</code>
             </p>
             <p className="flex items-start gap-2 text-[color:var(--warn,#ffb84d)]">
               <AlertTriangle className="h-3.5 w-3.5 mt-[1px] shrink-0" />

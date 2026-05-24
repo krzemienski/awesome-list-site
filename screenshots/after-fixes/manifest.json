@@ -1,0 +1,65 @@
+{
+  "captures": [
+    {
+      "route": "/",
+      "vp": "400",
+      "dest": "screenshots/after-fixes/home_400.jpg",
+      "ok": true
+    },
+    {
+      "route": "/",
+      "vp": "1280",
+      "dest": "screenshots/after-fixes/home_1280.jpg",
+      "ok": true
+    },
+    {
+      "route": "/login",
+      "vp": "400",
+      "dest": "screenshots/after-fixes/login_400.jpg",
+      "ok": true
+    },
+    {
+      "route": "/login",
+      "vp": "1280",
+      "dest": "screenshots/after-fixes/login_1280.jpg",
+      "ok": true
+    },
+    {
+      "route": "/settings/theme",
+      "vp": "400",
+      "dest": "screenshots/after-fixes/theme_400.jpg",
+      "ok": true
+    },
+    {
+      "route": "/settings/theme",
+      "vp": "1280",
+      "dest": "screenshots/after-fixes/theme_1280.jpg",
+      "ok": true
+    },
+    {
+      "route": "/advanced",
+      "vp": "400",
+      "dest": "screenshots/after-fixes/advanced_400.jpg",
+      "ok": true
+    },
+    {
+      "route": "/advanced",
+      "vp": "1280",
+      "dest": "screenshots/after-fixes/advanced_1280.jpg",
+      "ok": true
+    },
+    {
+      "route": "/category/encoding-codecs",
+      "vp": "400",
+      "dest": "screenshots/after-fixes/category-encoding_400.jpg",
+      "ok": true
+    },
+    {
+      "route": "/category/encoding-codecs",
+      "vp": "1280",
+      "dest": "screenshots/after-fixes/category-encoding_1280.jpg",
+      "ok": true
+    }
+  ],
+  "consoleErr": {}
+}

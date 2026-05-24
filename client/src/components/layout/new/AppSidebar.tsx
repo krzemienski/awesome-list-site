@@ -167,7 +167,7 @@ function CategoryAccordion({
 
   // approximate body height for max-height animation
   const expandedHeight = useMemo(() => {
-    let h = 56; // "All in" row + padding
+    let h = 8; // bottom padding only ("All in" row removed in P4)
     subs.forEach((sub) => {
       h += 36;
       if ((sub.subSubcategories || []).length > 0 && openSubs.includes(subKey(sub.name))) {
@@ -177,25 +177,35 @@ function CategoryAccordion({
     return h;
   }, [subs, openSubs]);
 
-  const headerClick = () => {
-    if (subs.length === 0) {
-      navigate(catPath);
-    } else {
-      onToggle();
+  // Row activation = navigate to category page (single click, Enter, Space).
+  // Chevron is a separate inner button that ONLY toggles expand. This restores
+  // single-click navigation parity with ref 09/10 sidebars while keeping the
+  // P1 "no duplicate → arrow" + P4 "no All-in row" cleanups.
+  const rowActivate = () => navigate(catPath);
+  const rowKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      rowActivate();
     }
+  };
+  const chevronToggle = (e: React.MouseEvent | React.KeyboardEvent) => {
+    e.stopPropagation();
+    onToggle();
   };
 
   return (
     <div className="accordion-item">
-      <button
-        type="button"
-        onClick={headerClick}
-        onDoubleClick={() => navigate(catPath)}
-        className={cn("accordion-header", isActive && "active")}
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={rowActivate}
+        onKeyDown={rowKeyDown}
+        className={cn("accordion-header", isActive && "active", "cursor-pointer")}
         data-testid={`accordion-cat-${catSlug}`}
         data-state={isOpen ? "open" : "closed"}
         aria-expanded={subs.length > 0 ? isOpen : undefined}
         aria-controls={subs.length > 0 ? `accordion-body-${catSlug}` : undefined}
+        aria-label={`Open ${cat.name} category page`}
         title={cat.name}
       >
         <span className="flex items-center gap-[10px] min-w-0 flex-1">
@@ -231,42 +241,33 @@ function CategoryAccordion({
           >
             {formatCount(totalCount)}
           </span>
+          {/* P1 — removed redundant "→" page-link span; sole chevron below is the
+              single right-arrow indicator per ref 01 sidebar. Clicking the count or
+              chevron expands; navigation to the category page happens via the
+              dedicated row click handler below. */}
           {subs.length > 0 && (
-            <span
-              role="button"
-              tabIndex={0}
-              aria-label={`Open ${cat.name}`}
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate(catPath);
-              }}
+            <button
+              type="button"
+              onClick={chevronToggle}
               onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  navigate(catPath);
-                }
+                if (e.key === "Enter" || e.key === " ") chevronToggle(e);
               }}
-              data-testid={`open-cat-${catSlug}`}
-              className="inline-flex items-center justify-center rounded-sm w-5 h-5 hover:bg-[var(--surface-2)] text-[var(--text-3)] hover:text-[var(--text)]"
-              style={{ fontSize: 10 }}
-              title={`Open ${cat.name} page`}
+              aria-label={isOpen ? `Collapse ${cat.name}` : `Expand ${cat.name}`}
+              data-testid={`toggle-cat-${catSlug}`}
+              className="inline-flex items-center justify-center w-6 h-6 rounded-sm hover:bg-[var(--surface-2)] focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
             >
-              →
-            </span>
-          )}
-          {subs.length > 0 && (
-            <ChevronRight
-              className="size-3 shrink-0"
-              style={{
-                transition: "transform 220ms cubic-bezier(0.2,0.65,0.3,1)",
-                transform: isOpen ? "rotate(90deg)" : "rotate(0deg)",
-                color: "var(--text-3)",
-              }}
-            />
+              <ChevronRight
+                className="size-3 shrink-0"
+                style={{
+                  transition: "transform 220ms cubic-bezier(0.2,0.65,0.3,1)",
+                  transform: isOpen ? "rotate(90deg)" : "rotate(0deg)",
+                  color: "var(--text-3)",
+                }}
+              />
+            </button>
           )}
         </span>
-      </button>
+      </div>
 
       {subs.length > 0 && (
         <div
@@ -275,14 +276,8 @@ function CategoryAccordion({
           style={{ maxHeight: isOpen ? expandedHeight : 0 }}
         >
           <div className="accordion-body-inner">
-            <SubItem
-              label={`All in ${cat.name} →`}
-              href={catPath}
-              active={activePath === catPath}
-              italic
-              onClick={() => navigate(catPath)}
-              testId={`sub-all-${catSlug}`}
-            />
+            {/* P4 — removed "All in {cat.name} →" link; not present in ref 09/10.
+                Users open the category page by clicking the category row itself. */}
             {subs
               .filter(
                 (sub) =>

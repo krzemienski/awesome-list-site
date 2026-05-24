@@ -1,0 +1,97 @@
+{
+  "results": [
+    {
+      "id": "E1-swap",
+      "pass": true,
+      "detail": "50/50 swaps wrote both data-attrs + --accent + persisted to localStorage",
+      "shot": "screenshots/functional/E1_final_swap.jpg"
+    },
+    {
+      "id": "E1-fouc",
+      "pass": true,
+      "detail": "pre-paint data-system=swiss, data-accent=rose",
+      "shot": null
+    },
+    {
+      "id": "E2-cmdk",
+      "pass": true,
+      "detail": "Cmd+K opens search dialog",
+      "shot": null
+    },
+    {
+      "id": "E2-slash",
+      "pass": true,
+      "detail": "/ keypress opens search dialog",
+      "shot": null
+    },
+    {
+      "id": "E2-btn",
+      "pass": true,
+      "detail": "header search button opens dialog",
+      "shot": null
+    },
+    {
+      "id": "E2-results",
+      "pass": true,
+      "detail": "15 fuse-search results for \"ffmpeg\"",
+      "shot": null
+    },
+    {
+      "id": "E3-cat-buttons",
+      "pass": false,
+      "detail": "0 category buttons present in sidebar",
+      "shot": null
+    },
+    {
+      "id": "E3-expand",
+      "pass": true,
+      "detail": "clicked Encoding & Codecs sidebar row",
+      "shot": "screenshots/functional/E3_sidebar_expanded.jpg"
+    },
+    {
+      "id": "E5-wrongcreds",
+      "pass": true,
+      "detail": "1 toast(s) shown for wrong creds",
+      "shot": "screenshots/functional/E5_login_wrong.jpg"
+    },
+    {
+      "id": "E6-unauth",
+      "pass": true,
+      "detail": "unauth shows login warning (gate=true, form=true)",
+      "shot": "screenshots/functional/E6_submit_unauth.jpg"
+    },
+    {
+      "id": "E7-viewdetails",
+      "pass": true,
+      "detail": "110 View Details buttons rendered",
+      "shot": null
+    },
+    {
+      "id": "E7-sort-present",
+      "pass": true,
+      "detail": "sort selector present",
+      "shot": null
+    },
+    {
+      "id": "E7-viewmode",
+      "pass": true,
+      "detail": "3 view-mode toggle buttons",
+      "shot": null
+    },
+    {
+      "id": "E7-nav-detail",
+      "pass": true,
+      "detail": "landed=http://localhost:5000/resource/184847; h1=\"AMD Advanced Media Acceleration (AMA) SDK\"; notFound=false",
+      "shot": "screenshots/functional/E7_resource_detail.jpg"
+    },
+    {
+      "id": "E8-drawer",
+      "pass": true,
+      "detail": "mobile menu button opens drawer",
+      "shot": "screenshots/functional/E8_mobile_drawer.jpg"
+    }
+  ],
+  "consoleErrs": [
+    "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+  ]
+}

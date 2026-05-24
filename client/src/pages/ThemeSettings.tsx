@@ -1,12 +1,31 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link } from "wouter";
-import { ArrowLeft, Check, Palette, Layers, Eye, Sparkles, Zap } from "lucide-react";
+import { ArrowLeft, Check, Palette, Layers, Eye, Sparkles, Zap, Type } from "lucide-react";
 import { ThemeProviderContext } from "@/components/ui/theme-provider";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+
+// I1 — Font override picker. Writes --font-sans on <html>; persists across reloads.
+const FONT_OPTIONS = [
+  { id: "system", name: "System default", stack: "" },
+  { id: "inter", name: "Inter", stack: "'Inter', system-ui, sans-serif" },
+  { id: "dm-sans", name: "DM Sans", stack: "'DM Sans', system-ui, sans-serif" },
+  { id: "source-sans", name: "Source Sans 3", stack: "'Source Sans 3', 'Source Sans Pro', system-ui, sans-serif" },
+  { id: "ibm-plex", name: "IBM Plex Sans", stack: "'IBM Plex Sans', system-ui, sans-serif" },
+  { id: "jetbrains", name: "JetBrains Mono", stack: "'JetBrains Mono', ui-monospace, monospace" },
+];
+const FONT_LS_KEY = "ds-font-override";
+function applyFontOverride(id: string) {
+  const opt = FONT_OPTIONS.find((f) => f.id === id) ?? FONT_OPTIONS[0];
+  if (opt.id === "system" || !opt.stack) {
+    document.documentElement.style.removeProperty("--font-sans");
+  } else {
+    document.documentElement.style.setProperty("--font-sans", opt.stack);
+  }
+}
 
 export default function ThemeSettings() {
   const { systemId, accentId, setSystem, setAccent, systems, accents } =
@@ -15,6 +34,22 @@ export default function ThemeSettings() {
 
   const activeSystem = systems[systemId];
   const activeAccent = accents.find((a) => a.id === accentId);
+
+  // I1 — Font override state
+  const [fontId, setFontId] = useState<string>(() => {
+    if (typeof window === "undefined") return "system";
+    return localStorage.getItem(FONT_LS_KEY) || "system";
+  });
+  useEffect(() => {
+    applyFontOverride(fontId);
+    localStorage.setItem(FONT_LS_KEY, fontId);
+  }, [fontId]);
+
+  const handlePickFont = (id: string) => {
+    setFontId(id);
+    const name = FONT_OPTIONS.find((f) => f.id === id)?.name ?? id;
+    toast({ title: "Font applied", description: `${name} is now active.` });
+  };
 
   const handlePickSystem = (id: string) => {
     setSystem(id);
@@ -40,13 +75,14 @@ export default function ThemeSettings() {
           Back
         </Link>
         <div className="flex items-center gap-3">
-          <Palette className="h-6 w-6 text-[var(--accent)]" />
+          {/* P5 — sparkle icon to match ref 08 */}
+          <Sparkles className="h-6 w-6 text-[var(--accent)]" />
           <h1 className="font-sans font-bold text-2xl sm:text-2xl tracking-tight">
             Theme Settings
           </h1>
         </div>
         <p className="text-sm sm:text-base text-[color:var(--text-2)] mt-2">
-          Pick a design system and an accent. Changes apply instantly and persist across reloads.{" "}
+          Pick a design system, accent, and (optionally) override the font. Changes apply instantly and persist across reloads.{" "}
           <span className="text-[color:var(--text-3)]" data-testid="text-active-preset">
             Active: {activeSystem?.name ?? systemId} · {activeAccent?.name ?? accentId}
           </span>
@@ -144,6 +180,54 @@ export default function ThemeSettings() {
           Switching systems keeps your accent unless you were on that system&rsquo;s natural default
           &mdash; in which case the accent nudges to the new system&rsquo;s natural default.
         </p>
+      </section>
+
+      {/* I1 — Font override picker (hybrid: keeps 5×10 picker above, adds per-system font override) */}
+      <section aria-label="Font override picker" data-testid="font-picker">
+        <div className="flex items-center gap-2 mb-2">
+          <Type className="h-5 w-5 text-[var(--accent)]" />
+          <h2 className="font-sans font-semibold text-xl tracking-tight">Font</h2>
+        </div>
+        <p className="text-xs text-[color:var(--text-2)] mb-4">
+          Override the system&rsquo;s default font. &ldquo;System default&rdquo; falls back to the active design system&rsquo;s bundled font.
+        </p>
+        <div
+          role="radiogroup"
+          aria-label="Font override"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
+        >
+          {FONT_OPTIONS.map((f) => {
+            const isActive = f.id === fontId;
+            return (
+              <button
+                key={f.id}
+                type="button"
+                role="radio"
+                aria-checked={isActive}
+                onClick={() => handlePickFont(f.id)}
+                data-testid={`font-option-${f.id}`}
+                className="text-left rounded-[var(--radius)] border bg-[var(--surface)] p-4 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
+                style={{
+                  borderColor: isActive ? "var(--accent)" : "var(--border)",
+                  boxShadow: isActive
+                    ? "0 0 0 1px var(--accent), 0 0 14px color-mix(in srgb, var(--accent) 25%, transparent)"
+                    : "none",
+                }}
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-semibold text-sm">{f.name}</span>
+                  {isActive && <Check className="h-4 w-4 text-[var(--accent)]" />}
+                </div>
+                <p
+                  className="text-sm text-[color:var(--text-2)]"
+                  style={{ fontFamily: f.stack || undefined }}
+                >
+                  The quick brown fox jumps over the lazy dog. 0123456789
+                </p>
+              </button>
+            );
+          })}
+        </div>
       </section>
 
       {/* Live Preview — current system × accent applied to real shadcn primitives */}

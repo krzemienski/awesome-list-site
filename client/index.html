@@ -55,6 +55,24 @@
           root.setAttribute('data-accent', acc);
           root.classList.add('dark');
           root.style.backgroundColor = '#000';
+
+          // I1 — font override: read ds-font-override from localStorage and
+          // apply --font-sans pre-paint on EVERY route, so the override
+          // persists across hard reloads regardless of which page boots.
+          // Must match FONT_OPTIONS in client/src/pages/ThemeSettings.tsx.
+          var FONT_STACKS = {
+            'system':       '',
+            'inter':        "'Inter', system-ui, sans-serif",
+            'dm-sans':      "'DM Sans', system-ui, sans-serif",
+            'source-sans':  "'Source Sans 3', 'Source Sans Pro', system-ui, sans-serif",
+            'ibm-plex':     "'IBM Plex Sans', system-ui, sans-serif",
+            'jetbrains':    "'JetBrains Mono', ui-monospace, monospace"
+          };
+          var fnt = null;
+          try { fnt = localStorage.getItem('ds-font-override'); } catch (_) {}
+          if (fnt && FONT_STACKS[fnt]) {
+            root.style.setProperty('--font-sans', FONT_STACKS[fnt]);
+          }
         } catch (e) {}
       })();
     </script>

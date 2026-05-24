@@ -62,6 +62,19 @@ export default function MainLayout({ awesomeList, isLoading, children, user, onL
         >
           {children}
         </main>
+        {/* R1 — minimal app footer (restored from T002 removal per ref 01/02/04/07) */}
+        <footer className="border-t border-[var(--border)] mt-auto">
+          <div className="mx-auto w-full max-w-[1280px] px-4 sm:px-6 md:px-12 py-4 flex items-center justify-between text-xs text-[color:var(--text-3)]">
+            <span>Built with React &amp; shadcn/ui</span>
+            <a
+              href="/about"
+              className="hover:text-[color:var(--text)] transition-colors"
+              data-testid="footer-about"
+            >
+              About
+            </a>
+          </div>
+        </footer>
         </SidebarInset>
       </div>
       <SearchDialog
