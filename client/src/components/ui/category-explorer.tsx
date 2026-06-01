@@ -258,7 +258,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
                           onClick={() => toggleCategoryExpansion(category.name)}
                           aria-label={isExpanded ? `Collapse ${category.name}` : `Expand ${category.name}`}
                           aria-expanded={isExpanded}
-                          className="h-8 w-8 p-0"
+                          className="h-8 w-8 p-0 min-h-[44px] min-w-[44px]"
                         >
                           <ChevronRight className={cn(
                             "h-4 w-4 transform transition-transform",
