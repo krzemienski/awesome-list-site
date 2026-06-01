@@ -65,43 +65,35 @@ export default function Category() {
   
   const awesomeList = rawData ? processAwesomeListData(rawData) : undefined;
   
-  const { data: dbData } = useQuery<{resources: any[], total: number}>({
-    queryKey: ['/api/resources', { status: 'approved' }],
-    enabled: !!awesomeList,
-  });
-  
-  const dbResources = dbData?.resources || [];
-  
-  const currentCategory = awesomeList?.categories.find(cat => 
+  const currentCategory = awesomeList?.categories.find(cat =>
     cat.slug === slug
   );
-  
+
   const categoryName = currentCategory ? currentCategory.name : deslugify(slug || "");
-  
+
+  // Source of truth: the resources table, scoped to this category server-side.
+  // The server filters by the category NAME and returns every approved resource
+  // assigned to it (including those that live under subcategories), so the count
+  // here matches the database and the sidebar — not just the direct/top-level
+  // resources carried by the static awesome-list tree.
+  const { data: dbData } = useQuery<{resources: any[], total: number}>({
+    queryKey: [`/api/resources?category=${encodeURIComponent(categoryName)}&limit=2000`],
+    enabled: !!categoryName,
+  });
+
   const allResources: Resource[] = useMemo(() => {
-    if (!currentCategory) return [];
-    
-    const staticResources = currentCategory.resources;
-    
-    const categoryDbResources = dbResources
-      .filter(r => {
-        const matchesName = r.category === categoryName;
-        const matchesSlug = r.category?.toLowerCase().replace(/\s+&\s+/g, '-').replace(/\s+/g, '-') === slug;
-        return matchesName || matchesSlug;
-      })
-      .map(r => ({
-        id: `db-${r.id}`,
-        title: r.title,
-        description: r.description || '',
-        url: r.url,
-        tags: Array.isArray(r.metadata?.tags) ? r.metadata.tags as string[] : [],
-        category: r.category,
-        subcategory: r.subcategory || undefined,
-        subSubcategory: r.subSubcategory || undefined,
-      }));
-    
-    return [...staticResources, ...categoryDbResources];
-  }, [currentCategory, dbResources, categoryName]);
+    const rows = dbData?.resources || [];
+    return rows.map(r => ({
+      id: `db-${r.id}`,
+      title: r.title,
+      description: r.description || '',
+      url: r.url,
+      tags: Array.isArray(r.metadata?.tags) ? r.metadata.tags as string[] : [],
+      category: r.category,
+      subcategory: r.subcategory || undefined,
+      subSubcategory: r.subSubcategory || undefined,
+    }));
+  }, [dbData]);
   
   const subcategories = useMemo(() => {
     const uniqueSubcategories = new Set<string>();
@@ -228,7 +220,7 @@ export default function Category() {
     if (!isDbResource(resource)) return;
     
     const dbId = getDbId(resource);
-    const dbResource = dbResources.find(r => r.id === dbId);
+    const dbResource = (dbData?.resources || []).find((r: any) => r.id === dbId);
     setResourceToEdit(toDbResource(resource, dbResource));
     setEditDialogOpen(true);
   };

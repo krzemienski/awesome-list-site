@@ -157,6 +157,27 @@ export class CategoryRepository {
     return result?.count ?? 0;
   }
 
+  /**
+   * Get approved-resource counts for every category in one query.
+   * @returns Map of category name -> approved resource count
+   */
+  async getResourceCountsByCategory(): Promise<Record<string, number>> {
+    const rows = await db
+      .select({
+        category: resources.category,
+        count: sql<number>`count(*)::int`,
+      })
+      .from(resources)
+      .where(eq(resources.status, "approved"))
+      .groupBy(resources.category);
+
+    const counts: Record<string, number> = {};
+    for (const row of rows) {
+      if (row.category) counts[row.category] = row.count;
+    }
+    return counts;
+  }
+
   // =========================================================================
   // SUBCATEGORY OPERATIONS
   // =========================================================================

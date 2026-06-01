@@ -158,7 +158,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout }: AppHeaderPro
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <Button variant="ghost" size="sm" onClick={() => (window.location.href = "/api/login")} className="gap-1.5 h-9 px-2 sm:px-3">
+          <Button variant="ghost" size="sm" onClick={() => setLocation("/login")} className="gap-1.5 h-9 px-2 sm:px-3">
             <LogIn className="h-4 w-4" />
             <span className="hidden sm:inline">Login</span>
           </Button>

@@ -817,7 +817,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/categories', async (req, res) => {
     try {
       const categories = await categoryRepo.listCategories();
-      res.json(categories);
+      // Attach the authoritative approved-resource count per category (single
+      // GROUP BY query) so the nav and landing page show DB-accurate counts
+      // instead of client-side static-tree sums.
+      const counts = await categoryRepo.getResourceCountsByCategory();
+      const enriched = categories.map((cat) => ({
+        ...cat,
+        resourceCount: counts[cat.name] ?? 0,
+      }));
+      res.json(enriched);
     } catch (error) {
       console.error('Error fetching categories:', error);
       res.status(500).json({ message: 'Failed to fetch categories' });

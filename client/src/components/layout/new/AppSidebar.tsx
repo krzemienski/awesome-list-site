@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useLocation, Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import {
   Home,
   Plus,
@@ -59,7 +60,13 @@ function filterCategories(categories: Category[]) {
         !cat.name.startsWith("List of") &&
         !["Contributing", "License", "External Links", "Anti-features"].includes(
           cat.name,
-        ),
+        ) &&
+        // Drop top-level categories that contain no resources at all (e.g. the
+        // "Categories"/"Projects"/"Resources" meta-entries). Mirrors the
+        // count>0 filter Home uses so the nav and landing page agree on which
+        // categories are real. Empty SUBcategories are still kept (dimmed)
+        // below — this only removes wholly empty top-level entries.
+        getTotalResourceCount(cat) > 0,
     )
     .map((cat) => {
       // Follow-up #51: keep zero-resource subs/subsubs visible (dimmed in UI)
@@ -147,6 +154,7 @@ function CategoryAccordion({
   matchQuery,
   openSubs,
   toggleSub,
+  dbCount,
 }: {
   cat: Category;
   isOpen: boolean;
@@ -157,13 +165,16 @@ function CategoryAccordion({
   matchQuery: string;
   openSubs: string[];
   toggleSub: (key: string) => void;
+  dbCount?: number;
 }) {
   const subKey = (subName: string) => `${cat.name}::${subName}`;
   const CategoryIcon = getCategoryIcon(cat.name);
   const catSlug = cat.slug || getCategorySlug(cat.name);
   const catPath = `/category/${catSlug}`;
   const subs = cat.subcategories || [];
-  const totalCount = getTotalResourceCount(cat);
+  // Prefer the authoritative DB count; fall back to the static tree sum until
+  // the /api/categories query resolves.
+  const totalCount = dbCount ?? getTotalResourceCount(cat);
 
   // approximate body height for max-height animation
   const expandedHeight = useMemo(() => {
@@ -386,6 +397,18 @@ export default function AppSidebar({
 
   const filtered = useMemo(() => filterCategories(categories), [categories]);
 
+  // Authoritative per-category approved-resource counts from the database,
+  // keyed by name, so the nav badges match the category pages and landing page.
+  const { data: dbCategories } = useQuery<Array<{ name: string; resourceCount: number }>>({
+    queryKey: ["/api/categories"],
+    staleTime: 1000 * 60 * 60,
+  });
+  const categoryCounts = useMemo(() => {
+    const map: Record<string, number> = {};
+    (dbCategories || []).forEach((c) => { map[c.name] = c.resourceCount; });
+    return map;
+  }, [dbCategories]);
+
   /* auto-expand active category and subcategory on route change */
   useEffect(() => {
     if (categories.length === 0) return;
@@ -490,7 +513,9 @@ export default function AppSidebar({
                     color: "var(--text-3)",
                   }}
                 >
-                  {resources.length.toLocaleString()} resources
+                  {isLoading || resources.length === 0
+                    ? "Loading…"
+                    : `${resources.length.toLocaleString()} resources`}
                 </span>
               </div>
             </SidebarMenuButton>
@@ -633,6 +658,7 @@ export default function AppSidebar({
                   <CategoryAccordion
                     key={cat.name}
                     cat={cat}
+                    dbCount={categoryCounts[cat.name]}
                     isOpen={isOpen}
                     onToggle={() =>
                       setOpenCategories((prev) =>
