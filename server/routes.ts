@@ -3825,9 +3825,15 @@ export async function runBackgroundInitialization(): Promise<void> {
     const categories = await withRetry(() => categoryRepo.listCategories());
     const actualResourceCount = await withRetry(() => resourceRepo.getResourceCount());
 
-    // Only reseed if database is truly empty (both categories AND resources missing)
-    // Don't reseed just because user added/removed items - preserve user changes
-    const needsReseeding = (categories.length === 0 && actualResourceCount === 0);
+    // Reseed when the database is empty OR when a prior seed died partway through
+    // (e.g. S3/network dropped after categories landed but before resources did).
+    // A healthy seed yields ~1950 resources; a count far below that with no user
+    // edits indicates a partial seed that should self-heal. Preserve genuine user
+    // changes by only treating a near-empty resource set as "needs reseeding".
+    const PARTIAL_SEED_THRESHOLD = 100;
+    const needsReseeding =
+      (categories.length === 0 && actualResourceCount === 0) ||
+      (categories.length > 0 && actualResourceCount < PARTIAL_SEED_THRESHOLD);
 
     if (needsReseeding) {
       console.log(`📦 Database needs seeding (categories: ${categories.length}, resources: ${actualResourceCount})...`);

@@ -1,10 +1,15 @@
 import fetch from 'node-fetch';
+import * as fs from 'fs';
+import * as path from 'path';
+import { fileURLToPath } from 'url';
 import { db } from "./db";
 import { categories, subcategories, subSubcategories, resources, users, resourceEdits } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import { hashPassword } from "./passwordUtils";
 import { mapCategoryName } from "@shared/categoryMapping";
 import { seedJourneyStepsForExisting } from "./cli/seedJourneyStepsForExisting";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
  * Helper function to generate slugs from category names
@@ -136,8 +141,8 @@ export interface SeedResult {
 
 async function seedAdminUser(): Promise<boolean> {
   try {
-    const adminEmail = "admin@example.com";
-    const adminPassword = "admin123";
+    const adminEmail = process.env.ADMIN_EMAIL || "admin@example.com";
+    const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
     
     const existingAdmin = await db.select().from(users).where(eq(users.email, adminEmail)).limit(1);
     
@@ -203,20 +208,39 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
       console.log("✅ Existing data cleared");
     }
 
-    // Fetch raw JSON data directly
-    console.log("📥 Fetching awesome-video data...");
-    const jsonUrl = "https://hack-ski.s3.us-east-1.amazonaws.com/av/recategorized_with_researchers_2010_projects.json";
-    const response = await fetch(jsonUrl);
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    const awesomeData = await response.json() as { 
-      title?: string; 
-      categories?: VideoCategory[]; 
+    // Load raw JSON data: vendored file first (offline + reproducible), S3 fallback.
+    console.log("📥 Loading awesome-video data...");
+    type AwesomeVideoData = {
+      title?: string;
+      categories?: VideoCategory[];
       projects?: { title: string; homepage: string; description: string; category: string[]; tags?: string[]; }[];
     };
+
+    // This module is bundled into dist/ at build time, so __dirname is /app/dist
+    // in the image while the vendored file ships at /app/server/seed-data. Probe
+    // the candidate locations rather than assuming one layout (dev vs bundled).
+    const seedFileName = "recategorized_with_researchers_2010_projects.json";
+    const vendoredCandidates = [
+      path.join(__dirname, "seed-data", seedFileName),
+      path.join(__dirname, "..", "server", "seed-data", seedFileName),
+      path.join(process.cwd(), "server", "seed-data", seedFileName),
+      path.join(process.cwd(), "seed-data", seedFileName),
+    ];
+    const vendoredPath = vendoredCandidates.find((p) => fs.existsSync(p));
+    let awesomeData: AwesomeVideoData;
+
+    if (vendoredPath) {
+      console.log(`📂 Using vendored seed data: ${vendoredPath}`);
+      awesomeData = JSON.parse(fs.readFileSync(vendoredPath, "utf-8")) as AwesomeVideoData;
+    } else {
+      const jsonUrl = "https://hack-ski.s3.us-east-1.amazonaws.com/av/recategorized_with_researchers_2010_projects.json";
+      console.log(`🌐 Vendored file absent, falling back to S3: ${jsonUrl}`);
+      const response = await fetch(jsonUrl);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      awesomeData = await response.json() as AwesomeVideoData;
+    }
     
     if (!awesomeData.categories || !awesomeData.projects) {
       throw new Error("Invalid data structure from awesome-video JSON");

@@ -85,6 +85,26 @@ async function runMigrations() {
     console.error('Database pool error during migration:', err.message);
   });
 
+  // Wait for the database to accept connections. In a fresh `docker compose up`
+  // the app can win the race against Postgres finishing init even with a
+  // healthcheck, so retry the first connection before migrating.
+  const maxAttempts = 30;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const probe = await pool.connect();
+      probe.release();
+      break;
+    } catch (err: any) {
+      if (attempt === maxAttempts) {
+        console.error(`Database not reachable after ${maxAttempts} attempts:`, err.message);
+        await pool.end();
+        throw err;
+      }
+      console.log(`⏳ Waiting for database (attempt ${attempt}/${maxAttempts})...`);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+    }
+  }
+
   // If no migrations folder found, verify database is already set up
   if (!migrationsFolder) {
     console.log('⚠️ No migrations folder found, checking if database is already configured...');
@@ -135,14 +155,14 @@ async function runMigrations() {
 (async () => {
   const isProduction = process.env.NODE_ENV === 'production';
 
-  // Run migrations before starting server in production
-  if (isProduction) {
-    try {
-      await runMigrations();
-    } catch (error) {
-      console.error('❌ Failed to run migrations, cannot start server');
-      process.exit(1);
-    }
+  // Run migrations before starting the server regardless of NODE_ENV. A fresh
+  // Docker volume needs the schema applied on first boot in any environment;
+  // gating this on production left dev/compose runs with an empty database.
+  try {
+    await runMigrations();
+  } catch (error) {
+    console.error('❌ Failed to run migrations, cannot start server');
+    process.exit(1);
   }
 
   const server = await registerRoutes(app);
