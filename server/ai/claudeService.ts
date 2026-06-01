@@ -17,7 +17,7 @@
  * SECURITY:
  * - ALLOWED_DOMAINS whitelist prevents SSRF attacks
  * - Only known video/dev resource domains can be analyzed
- * - API key managed through Replit secrets
+ * - API key managed through environment variables
  *
  * CACHING:
  * - Response cache (1 hour TTL): Deduplicates identical requests

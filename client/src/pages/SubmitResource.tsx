@@ -271,7 +271,7 @@ export default function SubmitResource() {
         description: "Please log in to submit a resource.",
         variant: "destructive",
       });
-      window.location.href = "/api/login";
+      window.location.href = "/login";
       return;
     }
     submitMutation.mutate(data);
@@ -333,7 +333,7 @@ export default function SubmitResource() {
                   <AlertTitle className="text-yellow-500">Login required to submit</AlertTitle>
                   <AlertDescription>
                     You can preview the form, but you must{" "}
-                    <a href="/api/login" className="underline" data-testid="link-login">log in</a>{" "}
+                    <a href="/login" className="underline" data-testid="link-login">log in</a>{" "}
                     to actually submit a resource.
                   </AlertDescription>
                 </Alert>

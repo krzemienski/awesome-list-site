@@ -154,7 +154,7 @@ export { AdminStats };
 // ============================================================================
 
 export interface IStorage {
-  // User operations (MANDATORY for Replit Auth)
+  // User operations (MANDATORY for auth)
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
 

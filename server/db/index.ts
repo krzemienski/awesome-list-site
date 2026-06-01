@@ -3,12 +3,12 @@ import pkg from 'pg';
 const { Pool } = pkg;
 import * as schema from '../../shared/schema';
 
-// Create PostgreSQL connection with limited pool for Neon serverless
+// Create PostgreSQL connection with a conservative pool.
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  max: 3, // Conservative limit for Neon free tier
+  max: 3,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 15000, // Longer timeout for Neon cold starts
+  connectionTimeoutMillis: 15000,
 });
 
 // Add error handler for connection issues

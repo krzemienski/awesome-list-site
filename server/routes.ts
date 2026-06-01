@@ -7,7 +7,7 @@
  * It defines 75+ REST endpoints organized into logical sections:
  * 
  * SECTIONS:
- * - Authentication: Replit OAuth + local admin login (/api/auth/*)
+ * - Authentication: local passport-local login (/api/auth/*)
  * - Resources: CRUD operations for video resources (/api/resources/*)
  * - Categories: Hierarchical category management (/api/categories/*)
  * - Admin: Dashboard, user management, auditing (/api/admin/*)
@@ -44,7 +44,7 @@ import {
   AdminRepository,
   LegacyRepository,
 } from "./repositories";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { getSession, isAuthenticated } from "./session";
 import { setupLocalAuth } from "./localAuth";
 import { hashPassword, comparePassword, validateEmail, validatePassword } from "./passwordUtils";
 import { checkLock, recordFailure, clearOnSuccess } from "./loginLockout";
@@ -405,29 +405,13 @@ function getSubSubcategoryTitleFromSlug(slug: string): string {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Set up authentication (OAuth and local)
-  // Only setup Replit OAuth if REPL_ID is available (running on Replit)
-  if (process.env.REPL_ID) {
-    await setupAuth(app);
-  } else {
-    // For local development, just setup session without Replit OAuth
-    const { getSession } = await import("./replitAuth");
-    app.set("trust proxy", 1);
-    app.use(getSession());
-    app.use(passport.initialize());
-    app.use(passport.session());
-
-    // Configure passport serialization for local auth
-    passport.serializeUser((user: any, done) => {
-      done(null, user);
-    });
-
-    passport.deserializeUser((user: any, done) => {
-      done(null, user);
-    });
-
-    console.log("Running in local mode - Replit OAuth disabled, use local auth at /api/auth/local/login");
-  }
+  // Session + passport-local authentication.
+  app.set("trust proxy", 1);
+  app.use(getSession());
+  app.use(passport.initialize());
+  app.use(passport.session());
+  passport.serializeUser((user: any, done) => done(null, user));
+  passport.deserializeUser((user: any, done) => done(null, user));
   setupLocalAuth();
 
   // Local authentication routes
@@ -540,7 +524,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Note: Database seeding and data initialization moved to runBackgroundInitialization()
   // This ensures the server starts quickly for production deployments
 
-  // ============= Auth Routes (from Replit Auth blueprint) =============
+  // ============= Auth Routes =============
   
   // GET /api/auth/user - Get current user (public endpoint)
   app.get('/api/auth/user', async (req: any, res) => {

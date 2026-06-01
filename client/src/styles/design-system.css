@@ -9,7 +9,7 @@
    Editorial but cheap to keep, and the HANDOFF explicitly says don't
    strip them.
 
-   Replit additions (skip-link, disabled util, lucide stroke, motion
+   Accessibility additions (skip-link, disabled util, lucide stroke, motion
    tokens, prefers-reduced-motion, no-anim toggle) live at the bottom.
    ===================================================================== */
 
@@ -61,7 +61,7 @@
   --bg-atmosphere-size: auto;
   --grain-opacity: 0.32;
 
-  /* Motion tokens (Replit addition — consumed by token-mapped primitives) */
+  /* Motion tokens (consumed by token-mapped primitives) */
   --motion-fast: 160ms;
   --motion-base: 240ms;
   --motion-slow: 400ms;
@@ -818,7 +818,7 @@ a { color: inherit; }
 }
 
 /* =====================================================================
-   REPLIT ADDITIONS — accessibility / dev-quality polish that didn't
+   ACCESSIBILITY ADDITIONS — accessibility / dev-quality polish that didn't
    exist in the demo prototype but is required in a production React/SPA.
    ===================================================================== */
 

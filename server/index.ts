@@ -168,7 +168,7 @@ async function runMigrations() {
     serveStatic(app);
   }
 
-  // Use PORT environment variable in production (Replit autoscale), fallback to 5000 in development
+  // Use PORT environment variable in production, fallback to 5000 in development.
   // Production deployments set PORT automatically for health checks
   const port = process.env.PORT ? parseInt(process.env.PORT) : 5000;
 

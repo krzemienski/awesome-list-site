@@ -30,11 +30,17 @@ interface ReplitConnectionSettings {
 let connectionSettings: ReplitConnectionSettings | undefined;
 
 async function getAccessToken(): Promise<string> {
+  // Off-platform (Docker, Railway, DigitalOcean) there is no connection
+  // service — a directly provisioned GITHUB_TOKEN is the token source.
+  if (process.env.GITHUB_TOKEN) {
+    return process.env.GITHUB_TOKEN;
+  }
+
   // Return cached token if still valid
   if (connectionSettings && connectionSettings.settings.expires_at && new Date(connectionSettings.settings.expires_at).getTime() > Date.now()) {
     return connectionSettings.settings.access_token || '';
   }
-  
+
   const hostname = process.env.REPLIT_CONNECTORS_HOSTNAME;
   const xReplitToken = process.env.REPL_IDENTITY 
     ? 'repl ' + process.env.REPL_IDENTITY 

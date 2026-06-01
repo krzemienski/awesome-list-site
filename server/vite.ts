@@ -24,8 +24,8 @@ export async function setupVite(app: Express, server: Server) {
     // Preserve `watch.ignored` (and any other server.* fields) from
     // vite.config.ts — otherwise replacing the entire `server` block here
     // strips the ignored-paths list and Vite's chokidar starts firing
-    // `[vite] page reload` on every write to ~/workspace/.local/state/**,
-    // which Replit touches ~1×/sec, producing an infinite reload loop.
+    // `[vite] page reload` on every write to high-churn workspace dirs,
+    // producing an infinite reload loop.
     ...(viteConfig.server ?? {}),
     middlewareMode: true,
     hmr: { server },

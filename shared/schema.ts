@@ -4,7 +4,7 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 /**
- * Session storage table for Replit Auth
+ * Session storage table for authentication
  *
  * Stores HTTP session data for authenticated users using Passport.js and connect-pg-simple.
  * Sessions are automatically cleaned up after expiration.
@@ -29,7 +29,7 @@ export const sessions = pgTable(
 /**
  * Users table for authentication and user management
  *
- * Supports both Replit OAuth and local authentication. Users can have different roles
+ * Supports local passport-local authentication. Users can have different roles
  * for authorization (user, admin, moderator).
  *
  * @property {string} id - UUID primary key, auto-generated using gen_random_uuid()

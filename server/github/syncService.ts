@@ -19,7 +19,7 @@
  * 1. Fetch all approved resources from database
  * 2. Format as awesome-lint compliant markdown using formatter.ts
  * 3. Validate output against awesome-lint before commit
- * 4. Create GitHub commit or pull request via Replit OAuth
+ * 4. Create GitHub commit or pull request via the GitHub connection
  * 5. Update sync status on exported resources
  * 
  * CONFLICT RESOLUTION:
@@ -608,7 +608,7 @@ export class GitHubSyncService {
     };
 
     try {
-      // Get fresh Octokit client with Replit GitHub connection
+      // Get fresh Octokit client from the GitHub connection
       const octokit = await getGitHubClient();
       
       // Parse repo info from URL (supports both full URLs and owner/repo shorthand)
