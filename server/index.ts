@@ -1,12 +1,13 @@
 import 'dotenv/config';
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes, runBackgroundInitialization } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
+import { serveStatic, log } from "./static";
 import { handleSSR } from "./ssr";
 import { errorHandler } from "./middleware/errorHandler";
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import pkg from 'pg';
+import { pool } from "./db";
 import { initializeLinkHealthScheduler } from "./jobs/linkHealthScheduler";
 import * as fs from 'fs';
 import * as path from 'path';
@@ -161,6 +162,11 @@ async function runMigrations() {
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
   if (app.get("env") === "development") {
+    // Lazy-load the vite-dependent module so the production bundle never
+    // statically imports the `vite` package (a devDependency stripped from the
+    // prod image). With esbuild --splitting this becomes a separate chunk that
+    // prod never loads.
+    const { setupVite } = await import("./vite");
     await setupVite(app, server);
   } else {
     // In production, add SSR handler before serving static files
@@ -198,4 +204,17 @@ async function runMigrations() {
     console.error(`❌ Server failed to start on port ${port}:`, err);
     process.exit(1);
   });
+
+  // Graceful shutdown: stop accepting connections, drain the DB pool, exit.
+  // docker compose down / orchestrator stop sends SIGTERM; without this the
+  // container is hard-killed after the grace period and the pool never closes.
+  const shutdown = (signal: string) => {
+    log(`received ${signal}, shutting down`);
+    server.close(() => {
+      pool.end().then(() => process.exit(0)).catch(() => process.exit(1));
+    });
+    setTimeout(() => process.exit(1), 10000).unref();
+  };
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT', () => shutdown('SIGINT'));
 })();
