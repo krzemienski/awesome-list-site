@@ -145,6 +145,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="subcategories"
+                aria-label="Show subcategories"
                 checked={showSubcategories}
                 onCheckedChange={(checked) => setShowSubcategories(checked === true)}
               />
@@ -255,6 +256,8 @@ export default function CategoryExplorer({ categories, resources, className }: C
                           variant="ghost"
                           size="sm"
                           onClick={() => toggleCategoryExpansion(category.name)}
+                          aria-label={isExpanded ? `Collapse ${category.name}` : `Expand ${category.name}`}
+                          aria-expanded={isExpanded}
                           className="h-8 w-8 p-0"
                         >
                           <ChevronRight className={cn(

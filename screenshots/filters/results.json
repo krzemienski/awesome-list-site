@@ -1,0 +1,52 @@
+[
+  {
+    "name": "F1-subcategory-filter",
+    "ok": true,
+    "detail": "opts=3, before=110 after=1, url=http://localhost:5000/category/encoding-codecs?subcategory=Codecs"
+  },
+  {
+    "name": "F2-search-within-category",
+    "ok": true,
+    "detail": "before=110 after=0 (expect fewer)"
+  },
+  {
+    "name": "F3-sort-selector",
+    "ok": true,
+    "detail": "opts=5, firstCard \"AMD Advanced Media A\" → \"xvcxvc is a modern a\", url=http://localhost:5000/category/encoding-codecs?sortBy=name-desc"
+  },
+  {
+    "name": "F4-view-mode-toggle",
+    "ok": true,
+    "detail": "3 view modes clickable (found 113)"
+  },
+  {
+    "name": "F5-tag-filter-works",
+    "ok": true,
+    "detail": "20 tag checkboxes; cards 110 → 5, url=http://localhost:5000/category/encoding-codecs?tags=codec"
+  },
+  {
+    "name": "F6-search-dialog-cmdk",
+    "ok": true,
+    "detail": "dialog count=1"
+  },
+  {
+    "name": "F7-search-dialog-results",
+    "ok": true,
+    "detail": "result items=15 for \"ffmpeg\""
+  },
+  {
+    "name": "F8-search-slash-key",
+    "ok": true,
+    "detail": "dialog after \"/\""
+  },
+  {
+    "name": "F9-theme-system-controls",
+    "ok": true,
+    "detail": "22 theme controls present"
+  },
+  {
+    "name": "F10-no-console-errors-during-filters",
+    "ok": true,
+    "detail": "errors=[]"
+  }
+]

@@ -96,6 +96,7 @@ export default function AdvancedFilter({
                         onClick={() => toggleTag(tag)}
                       >
                         <Checkbox
+                          aria-label={`Filter by ${tag}`}
                           checked={selectedTags.includes(tag)}
                           onCheckedChange={() => toggleTag(tag)}
                         />
