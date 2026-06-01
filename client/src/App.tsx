@@ -9,6 +9,7 @@ import { ThemeProvider } from "@/components/ui/theme-provider";
 import MainLayout from "@/components/layout/new/MainLayout";
 import ErrorPage from "@/pages/ErrorPage";
 import Login from "@/pages/Login";
+import Register from "@/pages/Register";
 import Home from "@/pages/Home";
 import Category from "@/pages/Category";
 import Subcategory from "@/pages/Subcategory";
@@ -67,6 +68,7 @@ function Router() {
       <Switch>
         <Route path="/" component={() => <Home awesomeList={awesomeList} isLoading={isLoading} />} />
         <Route path="/login" component={Login} />
+        <Route path="/register" component={Register} />
         <Route path="/category/:slug" component={Category} />
         <Route path="/subcategory/:slug" component={Subcategory} />
         <Route path="/sub-subcategory/:slug" component={SubSubcategory} />

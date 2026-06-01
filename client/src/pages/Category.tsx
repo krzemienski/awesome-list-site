@@ -291,7 +291,7 @@ export default function Category() {
           <div className="flex items-center gap-3 shrink-0">
             {subcategories.length > 0 && (
               <Select value={selectedSubcategory} onValueChange={setSelectedSubcategory}>
-                <SelectTrigger className="w-full md:w-[200px]" data-testid="select-subcategory-filter">
+                <SelectTrigger aria-label="Filter by subcategory" className="w-full md:w-[200px]" data-testid="select-subcategory-filter">
                   <SelectValue placeholder="Filter by subcategory" />
                 </SelectTrigger>
                 <SelectContent>

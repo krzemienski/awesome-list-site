@@ -202,18 +202,22 @@ export class ResourceRepository {
    * @param id - Resource ID to delete
    * @throws Error if resource not found
    */
-  async deleteResource(id: number): Promise<void> {
+  async deleteResource(id: number, performedBy?: string): Promise<void> {
     // Get resource before deletion for audit log
     const resource = await this.getResource(id);
     if (!resource) {
       throw new Error('Resource not found');
     }
 
-    // Log the deletion BEFORE deleting (foreign key constraint)
+    // Log the deletion BEFORE deleting: the audit row's resource_id FK references
+    // resources(id), so it must be written while the row still exists. This is the
+    // single source of the 'deleted' audit entry — callers must NOT log it again
+    // afterward, or the post-delete insert violates the FK and the delete reports a
+    // false 500 despite having succeeded.
     await this.logResourceAudit(
       id,
       'deleted',
-      undefined,
+      performedBy,
       { resource: { title: resource.title, url: resource.url, category: resource.category } },
       `Deleted resource: ${resource.title}`
     );
@@ -236,6 +240,19 @@ export class ResourceRepository {
       resources: pendingResources,
       total: pendingResources.length
     };
+  }
+
+  /**
+   * Get every approved resource as a flat array.
+   * Used by export, link-health, and awesome-lint validation, which operate on the
+   * full published set rather than a paginated page.
+   */
+  async getAllApprovedResources(): Promise<Resource[]> {
+    return await db
+      .select()
+      .from(resources)
+      .where(eq(resources.status, 'approved'))
+      .orderBy(desc(resources.createdAt));
   }
 
   /**

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -202,6 +202,13 @@ export default function Login() {
               GitHub
             </Button>
           </div>
+
+          <p className="text-center text-sm text-[color:var(--text-2)]">
+            Don't have an account?{" "}
+            <Link href="/register" className="text-[color:var(--accent)] hover:underline" data-testid="link-register">
+              Create account
+            </Link>
+          </p>
 
           {/* Default-credential hint is a local-development convenience only.
               Gated on import.meta.env.DEV so it never renders in production builds. */}

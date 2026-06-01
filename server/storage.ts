@@ -171,7 +171,7 @@ export interface IStorage {
   createResource(resource: InsertResource): Promise<Resource>;
   updateResource(id: number, resource: Partial<InsertResource>): Promise<Resource>;
   updateResourceStatus(id: number, status: string, approvedBy?: string): Promise<Resource>;
-  deleteResource(id: number): Promise<void>;
+  deleteResource(id: number, performedBy?: string): Promise<void>;
 
   // Pending resource approval
   getPendingResources(): Promise<{ resources: Resource[]; total: number }>;

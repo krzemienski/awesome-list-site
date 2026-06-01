@@ -90,3 +90,22 @@ attached_assets/
 playwright-report/
 test-results/
 playwright/.cache/
+
+# Agent / tooling working dirs (not part of the app)
+.claude/
+.omc/
+.anneal/
+.a5c/
+.agents/
+.mimirs/
+**/.mimirs/
+.planning/
+.remember/
+plans/
+
+# Audit evidence (generated, not source)
+audit-evidence/
+repomix-output.xml
+
+# Stray dash-named screenshot artifact
+--full-page
