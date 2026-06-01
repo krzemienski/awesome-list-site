@@ -22,6 +22,14 @@ export function getSession() {
     ttl: sessionTtl,
     tableName: "sessions",
   });
+  // Secure cookies require HTTPS. The container itself serves plain HTTP (the
+  // host port, the Docker healthcheck, and direct/non-proxied access are all
+  // http), so gating `secure` on NODE_ENV=production silently breaks every
+  // session inside Docker — the browser drops a Secure cookie sent over http,
+  // so login succeeds but no session persists. Drive it from an explicit flag
+  // instead: leave it off by default (works in Docker/local) and set
+  // COOKIE_SECURE=true only when running behind a TLS-terminating proxy.
+  const secureCookie = process.env.COOKIE_SECURE === "true";
   return session({
     secret: process.env.SESSION_SECRET!,
     store: sessionStore,
@@ -29,7 +37,7 @@ export function getSession() {
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: secureCookie,
       sameSite: "lax",
       maxAge: sessionTtl,
     },

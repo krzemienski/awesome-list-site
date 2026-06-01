@@ -32,6 +32,10 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-awesome_list}
       # Required — server/session.ts asserts SESSION_SECRET is set.
       SESSION_SECRET: ${SESSION_SECRET:?SESSION_SECRET is required}
+      # The container serves plain HTTP; a Secure cookie would be dropped by the
+      # browser and no session would persist. Keep false here; set true only
+      # behind a TLS-terminating proxy (Railway/DO).
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@example.com}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
       GITHUB_TOKEN: ${GITHUB_TOKEN:-}

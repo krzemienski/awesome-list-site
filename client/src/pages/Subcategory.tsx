@@ -39,8 +39,11 @@ export default function Subcategory() {
   
   const awesomeList = rawData ? processAwesomeListData(rawData) : undefined;
   
+  // Fetch the full resource set (default pagination returns only 20 rows, which
+  // silently undercounts the client-side subcategory filter below — e.g. Codecs
+  // showed 12 of its real 27). limit=2000 covers the whole seeded corpus.
   const { data: dbData } = useQuery<{resources: any[], total: number}>({
-    queryKey: ['/api/resources', { status: 'approved' }],
+    queryKey: ['/api/resources?limit=2000'],
     enabled: !!awesomeList,
   });
   
@@ -48,17 +51,15 @@ export default function Subcategory() {
   
   let currentSubcategory = null;
   let parentCategory = null;
-  let staticResources: Resource[] = [];
-  
+
   if (awesomeList && slug) {
     for (const category of awesomeList.categories) {
-      const subcategory = category.subcategories.find(sub => 
+      const subcategory = category.subcategories.find(sub =>
         sub.slug === slug
       );
       if (subcategory) {
         currentSubcategory = subcategory;
         parentCategory = category;
-        staticResources = subcategory.resources;
         break;
       }
     }
@@ -85,8 +86,11 @@ export default function Subcategory() {
         subSubcategory: r.subSubcategory || undefined,
       }));
 
-    return [...staticResources, ...subcategoryDbResources];
-  }, [staticResources, dbResources, subcategoryName]);
+    // DB is the single source of truth for counts (matches Category.tsx and the
+    // sidebar badges). Merging the legacy static JSON here double-counted every
+    // resource that exists in both — Codecs showed 38 instead of its real 27.
+    return subcategoryDbResources;
+  }, [dbResources, subcategoryName, slug]);
 
   const availableTags = useMemo(() => {
     const tagCounts: Record<string, number> = {};

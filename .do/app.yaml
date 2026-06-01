@@ -24,6 +24,11 @@ services:
       - key: PORT
         value: "5000"
         scope: RUN_AND_BUILD_TIME
+      # App Platform terminates TLS in front of the container, so enable Secure
+      # cookies here (the public origin is https).
+      - key: COOKIE_SECURE
+        value: "true"
+        scope: RUN_TIME
       - key: SESSION_SECRET
         scope: RUN_TIME
         type: SECRET

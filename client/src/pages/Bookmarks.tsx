@@ -28,6 +28,41 @@ export default function Bookmarks() {
     staleTime: 30000,
   });
 
+  // Must run before any early return — calling a hook after the isLoading/error
+  // returns changes the hook count between renders (React error #310) and
+  // white-screens the page when the query resolves.
+  const sortedBookmarks = useMemo(() => {
+    if (!bookmarks) return [];
+
+    const results = [...bookmarks];
+
+    if (sortBy === "name-asc") {
+      results.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sortBy === "name-desc") {
+      results.sort((a, b) => b.name.localeCompare(a.name));
+    } else if (sortBy === "category") {
+      results.sort((a, b) => {
+        const catA = a.category || "";
+        const catB = b.category || "";
+        return catA.localeCompare(catB);
+      });
+    } else if (sortBy === "date-desc") {
+      results.sort((a, b) => {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return dateB - dateA; // Newest first
+      });
+    } else if (sortBy === "date-asc") {
+      results.sort((a, b) => {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return dateA - dateB; // Oldest first
+      });
+    }
+
+    return results;
+  }, [bookmarks, sortBy]);
+
   if (isLoading) {
     return (
       <div className="space-y-6" aria-busy={true} aria-live="polite">
@@ -65,39 +100,6 @@ export default function Bookmarks() {
       </div>
     );
   }
-
-  // Sort bookmarks
-  const sortedBookmarks = useMemo(() => {
-    if (!bookmarks) return [];
-
-    const results = [...bookmarks];
-
-    if (sortBy === "name-asc") {
-      results.sort((a, b) => a.name.localeCompare(b.name));
-    } else if (sortBy === "name-desc") {
-      results.sort((a, b) => b.name.localeCompare(a.name));
-    } else if (sortBy === "category") {
-      results.sort((a, b) => {
-        const catA = a.category || "";
-        const catB = b.category || "";
-        return catA.localeCompare(catB);
-      });
-    } else if (sortBy === "date-desc") {
-      results.sort((a, b) => {
-        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-        return dateB - dateA; // Newest first
-      });
-    } else if (sortBy === "date-asc") {
-      results.sort((a, b) => {
-        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-        return dateA - dateB; // Oldest first
-      });
-    }
-
-    return results;
-  }, [bookmarks, sortBy]);
 
   const hasBookmarks = sortedBookmarks && sortedBookmarks.length > 0;
 

@@ -39,8 +39,11 @@ export default function SubSubcategory() {
   
   const awesomeList = rawData ? processAwesomeListData(rawData) : undefined;
   
+  // Fetch the full resource set (default pagination returns only 20 rows, which
+  // silently undercounts the client-side sub-subcategory filter below).
+  // limit=2000 covers the whole seeded corpus.
   const { data: dbData } = useQuery<{resources: any[], total: number}>({
-    queryKey: ['/api/resources', { status: 'approved' }],
+    queryKey: ['/api/resources?limit=2000'],
     enabled: !!awesomeList,
   });
   
@@ -49,8 +52,7 @@ export default function SubSubcategory() {
   let currentSubSubcategory = null;
   let parentCategory = null;
   let parentSubcategory = null;
-  let staticResources: Resource[] = [];
-  
+
   if (awesomeList && slug) {
     for (const category of awesomeList.categories) {
       for (const subcategory of category.subcategories || []) {
@@ -60,7 +62,6 @@ export default function SubSubcategory() {
               currentSubSubcategory = subSubcat;
               parentCategory = category;
               parentSubcategory = subcategory;
-              staticResources = subSubcat.resources;
               break;
             }
           }
@@ -93,8 +94,10 @@ export default function SubSubcategory() {
         subSubcategory: r.subSubcategory || undefined,
       }));
 
-    return [...staticResources, ...subSubcategoryDbResources];
-  }, [staticResources, dbResources, subSubcategoryName]);
+    // DB is the single source of truth for counts; merging the legacy static
+    // JSON double-counted resources present in both.
+    return subSubcategoryDbResources;
+  }, [dbResources, subSubcategoryName, slug]);
 
   const availableTags = useMemo(() => {
     const tagCounts: Record<string, number> = {};
