@@ -7,7 +7,10 @@ import { fetchUrlMetadata, type UrlMetadata } from './urlScraper';
 import { promoteEnrichmentSuggestions } from './promoteEnrichmentSuggestions';
 import type { EnrichmentJob } from '@shared/schema';
 
-type EnrichmentOutcome = 'success' | 'skipped' | 'failed';
+// 'degraded' = the resource was written, but the AI call failed and rule-based
+// fallback tagging was used. Distinct from 'success' (real AI) so a run where the
+// AI is down is not silently reported as fully successful.
+type EnrichmentOutcome = 'success' | 'degraded' | 'skipped' | 'failed';
 
 interface QueueBatchEnrichmentOptions {
   filter?: 'all' | 'unenriched';
@@ -199,6 +202,26 @@ export class EnrichmentService {
             processedAt: new Date()
           });
           
+        } else if (outcome === 'degraded') {
+          // Degraded: the resource WAS written, but via rule-based fallback
+          // because the AI call failed. Count it as processed + successful (data
+          // landed) yet track a separate degraded tally in job metadata (no
+          // schema column needed) so an AI-down run is visibly distinguished
+          // from a fully AI-enriched one.
+          const degradedCount = ((currentJob.metadata as any)?.degradedResources || 0) + 1;
+          await this.enrichmentRepo.updateEnrichmentJob(jobId, {
+            processedResources: (currentJob.processedResources || 0) + 1,
+            successfulResources: (currentJob.successfulResources || 0) + 1,
+            processedResourceIds: [...(currentJob.processedResourceIds || []), queueItem.resourceId],
+            metadata: { ...(currentJob.metadata as any || {}), degradedResources: degradedCount }
+          });
+
+          await this.enrichmentRepo.updateEnrichmentQueueItem(queueItem.id, {
+            status: 'degraded',
+            errorMessage: 'AI unavailable — rule-based fallback used',
+            processedAt: new Date()
+          });
+
         } else if (outcome === 'skipped') {
           // Skipped: Update processed and skipped counters
           await this.enrichmentRepo.updateEnrichmentJob(jobId, {
@@ -372,13 +395,15 @@ export class EnrichmentService {
 
         await this.auditRepo.logResourceAudit(
           resourceId,
-          'ai_enriched',
+          aiResult.aiUsed ? 'ai_enriched' : 'ai_enriched_degraded',
           undefined,
           { aiResult, updates },
-          `AI enrichment completed with confidence ${aiResult.confidence}`
+          aiResult.aiUsed
+            ? `AI enrichment completed with confidence ${aiResult.confidence}`
+            : `Enrichment completed via rule-based fallback (AI unavailable)`
         );
 
-        return 'success';
+        return aiResult.aiUsed ? 'success' : 'degraded';
       } catch (error: any) {
         lastError = error;
         retryCount++;

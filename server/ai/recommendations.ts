@@ -1,13 +1,12 @@
-import Anthropic from '@anthropic-ai/sdk';
 import { Resource } from '../../shared/schema';
+import { createAnthropicClient, isAnthropicConfigured } from './anthropicClient';
 
 // <important_do_not_delete>
 const DEFAULT_MODEL_STR = "claude-haiku-4-5"; // Claude Haiku 4.5 (October 2025) - 4-5x faster, 1/3 cost
 // </important_do_not_delete>
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+// Shared client supporting both x-api-key and Bearer-token (gateway/router) auth.
+const anthropic = createAnthropicClient();
 
 /**
  * AI response interfaces for type safety
@@ -111,8 +110,8 @@ export async function generateAIRecommendations(
   limit: number = 10
 ): Promise<AIRecommendationResult[]> {
   try {
-    if (!process.env.ANTHROPIC_API_KEY) {
-      console.warn('Anthropic API key not configured, falling back to rule-based recommendations');
+    if (!anthropic || !isAnthropicConfigured()) {
+      console.warn('Anthropic not configured, falling back to rule-based recommendations');
       return generateFallbackRecommendations(userProfile, availableResources, limit);
     }
 
@@ -216,8 +215,8 @@ export async function generateAILearningPaths(
   availableResources: Resource[]
 ): Promise<AILearningPath[]> {
   try {
-    if (!process.env.ANTHROPIC_API_KEY) {
-      console.warn('Anthropic API key not configured, falling back to rule-based learning paths');
+    if (!anthropic || !isAnthropicConfigured()) {
+      console.warn('Anthropic not configured, falling back to rule-based learning paths');
       return generateFallbackLearningPaths(userProfile, availableResources);
     }
 

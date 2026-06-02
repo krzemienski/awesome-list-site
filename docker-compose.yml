@@ -39,7 +39,12 @@ services:
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@example.com}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
       GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+      # Anthropic auth: supports the public API (x-api-key) or a gateway/router
+      # (Bearer token + custom base URL). All optional; AI features fall back to
+      # rule-based behavior when none are set.
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      ANTHROPIC_AUTH_TOKEN: ${ANTHROPIC_AUTH_TOKEN:-}
+      ANTHROPIC_BASE_URL: ${ANTHROPIC_BASE_URL:-}
     ports:
       - "5001:5000"
     depends_on:

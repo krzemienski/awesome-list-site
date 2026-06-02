@@ -1,7 +1,7 @@
-import Anthropic from '@anthropic-ai/sdk';
+import { createAnthropicClient, isAnthropicConfigured } from './anthropicClient';
 
-// Use Anthropic for AI-powered features
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+// Shared client supporting both x-api-key and Bearer-token (gateway/router) auth.
+const anthropic = createAnthropicClient();
 
 interface AITagSuggestion {
   tags: string[];
@@ -24,8 +24,8 @@ export async function generateResourceTags(
   url: string
 ): Promise<AITagSuggestion> {
   try {
-    if (!process.env.ANTHROPIC_API_KEY) {
-      throw new Error('Anthropic API key not configured');
+    if (!anthropic || !isAnthropicConfigured()) {
+      throw new Error('Anthropic not configured');
     }
 
     const prompt = `Analyze this video/multimedia software resource and suggest relevant tags and categorization:

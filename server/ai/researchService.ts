@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { createAnthropicClient, isAnthropicConfigured } from './anthropicClient';
 import { storage } from '../storage';
 import { db } from '../db';
 import { resources, categories, subcategories, subSubcategories, researchJobs, researchDiscoveries } from '@shared/schema';
@@ -394,11 +395,10 @@ class ResearchService {
     maxTurns: number,
     maxBudgetUsd: number
   ): Promise<void> {
-    const apiKey = process.env.ANTHROPIC_API_KEY;
-    if (!apiKey) {
-      throw new Error("ANTHROPIC_API_KEY is not set. Add it in Secrets and restart the workflow.");
+    const client = createAnthropicClient();
+    if (!client || !isAnthropicConfigured()) {
+      throw new Error("Anthropic is not configured. Set ANTHROPIC_API_KEY or ANTHROPIC_AUTH_TOKEN (with ANTHROPIC_BASE_URL for a gateway) and restart.");
     }
-    const client = new Anthropic({ apiKey });
 
     // Build the gap-aware, cacheable research context ONCE up front.
     const ctx = await this.buildResearchContext(categoryFocus);

@@ -40,6 +40,7 @@
  */
 
 import Anthropic from '@anthropic-ai/sdk';
+import { createAnthropicClient } from './anthropicClient';
 
 // <important_do_not_delete>
 const DEFAULT_MODEL_STR = "claude-haiku-4-5"; // Claude Haiku 4.5 (October 2025) - 4-5x faster, 1/3 cost
@@ -248,18 +249,16 @@ export class ClaudeService {
    * Initialize the Anthropic client if API key is available
    */
   private initializeClient(): void {
-    const apiKey = process.env.ANTHROPIC_API_KEY;
-
-    if (apiKey) {
-      try {
-        this.anthropic = new Anthropic({ apiKey });
+    try {
+      this.anthropic = createAnthropicClient();
+      if (this.anthropic) {
         console.log('Claude service initialized successfully');
-      } catch (error) {
-        console.error('Failed to initialize Claude service:', error);
-        this.anthropic = null;
+      } else {
+        console.log('Claude not configured - AI features will use fallback methods');
       }
-    } else {
-      console.log('Claude API key not found - AI features will use fallback methods');
+    } catch (error) {
+      console.error('Failed to initialize Claude service:', error);
+      this.anthropic = null;
     }
   }
 
