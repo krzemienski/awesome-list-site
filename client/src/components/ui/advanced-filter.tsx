@@ -117,7 +117,7 @@ export default function AdvancedFilter({
       )}
 
       <Select value={sortBy} onValueChange={onSortChange}>
-        <SelectTrigger className="w-full sm:w-[180px] min-h-[44px] flex-1 sm:flex-none">
+        <SelectTrigger aria-label="Sort resources" className="w-full sm:w-[180px] min-h-[44px] flex-1 sm:flex-none">
           <SelectValue placeholder="Sort by" />
         </SelectTrigger>
         <SelectContent>

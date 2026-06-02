@@ -11,7 +11,6 @@ import { ArrowLeft, ExternalLink } from "lucide-react";
 import AdvancedFilter from "@/components/ui/advanced-filter";
 import { deslugify, getCategorySlug } from "@/lib/utils";
 import { Resource } from "@/types/awesome-list";
-import type { Resource as DbResource } from "@shared/schema";
 import NotFound from "@/pages/not-found";
 import { processAwesomeListData } from "@/lib/parser";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
@@ -39,13 +38,6 @@ export default function Subcategory() {
   
   const awesomeList = rawData ? processAwesomeListData(rawData) : undefined;
   
-  const { data: dbData } = useQuery<{resources: any[], total: number}>({
-    queryKey: ['/api/resources', { status: 'approved' }],
-    enabled: !!awesomeList,
-  });
-  
-  const dbResources = dbData?.resources || [];
-  
   let currentSubcategory = null;
   let parentCategory = null;
   let staticResources: Resource[] = [];
@@ -58,7 +50,10 @@ export default function Subcategory() {
       if (subcategory) {
         currentSubcategory = subcategory;
         parentCategory = category;
-        staticResources = subcategory.resources;
+        staticResources = [
+          ...subcategory.resources,
+          ...(subcategory.subSubcategories || []).flatMap((ss) => ss.resources),
+        ];
         break;
       }
     }
@@ -68,25 +63,21 @@ export default function Subcategory() {
   const categoryName = parentCategory ? parentCategory.name : "";
   
   const allResources: Resource[] = useMemo(() => {
-    const subcategoryDbResources = dbResources
-      .filter(r => {
-        const matchesName = r.subcategory === subcategoryName;
-        const matchesSlug = r.subcategory?.toLowerCase().replace(/\s+&\s+/g, '-').replace(/\s+/g, '-') === slug;
-        return matchesName || matchesSlug;
-      })
-      .map(r => ({
-        id: `db-${r.id}`,
-        title: r.title,
-        description: r.description || '',
-        url: r.url,
-        tags: Array.isArray(r.metadata?.tags) ? r.metadata.tags as string[] : [],
-        category: r.category,
-        subcategory: r.subcategory || undefined,
-        subSubcategory: r.subSubcategory || undefined,
-      }));
-
-    return [...staticResources, ...subcategoryDbResources];
-  }, [staticResources, dbResources, subcategoryName]);
+    const seen = new Set<string>();
+    const normalized: Resource[] = [];
+    for (const r of staticResources) {
+      const key = `${r.id ?? ""}|${r.url ?? ""}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      normalized.push({
+        ...r,
+        tags: (r.tags && r.tags.length > 0)
+          ? r.tags
+          : (Array.isArray(r.metadata?.tags) ? (r.metadata.tags as string[]) : []),
+      });
+    }
+    return normalized;
+  }, [staticResources]);
 
   const availableTags = useMemo(() => {
     const tagCounts: Record<string, number> = {};

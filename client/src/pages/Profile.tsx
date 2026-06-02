@@ -32,6 +32,7 @@ import {
 import FavoriteButton from "@/components/resource/FavoriteButton";
 import BookmarkButton from "@/components/resource/BookmarkButton";
 import RecommendationCard from "@/components/ai/RecommendationCard";
+import ChangePasswordForm from "@/components/profile/ChangePasswordForm";
 import { useAuth } from "@/hooks/useAuth";
 import { formatDistanceToNow } from "date-fns";
 import { useLocation } from "wouter";
@@ -287,11 +288,12 @@ export default function Profile({ user }: ProfileProps) {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4 h-auto p-1">
+        <TabsList className="grid w-full grid-cols-5 h-auto p-1">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="favorites">Favorites</TabsTrigger>
           <TabsTrigger value="bookmarks">Bookmarks</TabsTrigger>
           <TabsTrigger value="submissions">Submissions</TabsTrigger>
+          <TabsTrigger value="security">Security</TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}
@@ -802,6 +804,11 @@ export default function Profile({ user }: ProfileProps) {
               </CardContent>
             </Card>
           </div>
+        </TabsContent>
+
+        {/* Security Tab */}
+        <TabsContent value="security" data-testid="tab-security">
+          <ChangePasswordForm />
         </TabsContent>
       </Tabs>
     </div>

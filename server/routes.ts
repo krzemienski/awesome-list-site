@@ -46,6 +46,8 @@ import {
 } from "./repositories";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { setupLocalAuth } from "./localAuth";
+import { hashPassword, comparePassword, validateEmail, validatePassword } from "./passwordUtils";
+import { checkLock, recordFailure, clearOnSuccess } from "./loginLockout";
 import passport from "passport";
 import { fetchAwesomeList } from "./parser";
 import { fetchAwesomeVideoData } from "./awesome-video-parser-clean";
@@ -430,13 +432,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Local authentication routes
   app.post("/api/auth/local/login", (req, res, next) => {
+    const loginEmail = typeof req.body?.email === "string" ? req.body.email : "";
+
+    // Brute-force guard: short-circuit while the account is in a cooldown window.
+    const lock = checkLock(loginEmail);
+    if (lock.locked) {
+      res.setHeader("Retry-After", String(lock.retryAfterSec));
+      return res.status(423).json({
+        message: "Account temporarily locked due to repeated failed login attempts. Try again later.",
+        retryAfter: lock.retryAfterSec,
+      });
+    }
+
     passport.authenticate('local', (err: any, user: any, info: any) => {
       if (err) {
         console.log('[local/login] Authentication error:', err);
         return res.status(500).json({ message: "Internal server error" });
       }
-      
+
       if (!user) {
+        // Count this failure toward the lockout threshold (generic message — no enumeration).
+        recordFailure(loginEmail);
         console.log('[local/login] Authentication failed:', info?.message);
         return res.status(401).json({ message: info?.message || "Invalid credentials" });
       }
@@ -459,7 +475,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
           
           console.log('[local/login] Session saved successfully, session ID:', req.sessionID);
-          
+
+          // Successful login clears any accumulated failure/lock state for this email.
+          clearOnSuccess(loginEmail);
+
           // Fetch user from database to get the role
           const dbUser = await userRepo.getUser(user.claims.sub);
           
@@ -478,6 +497,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       });
     })(req, res, next);
+  });
+
+  // Self-service account registration for local auth. Additive to the login cluster:
+  // creates a role=user account, never touches the existing login/session handlers.
+  // Email delivery (verification) is out of scope until an email transport is configured.
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const { email, password } = req.body ?? {};
+
+      if (typeof email !== "string" || typeof password !== "string") {
+        return res.status(400).json({ message: "Email and password are required" });
+      }
+      if (!validateEmail(email)) {
+        return res.status(400).json({ message: "Invalid email format" });
+      }
+      const pwCheck = validatePassword(password);
+      if (!pwCheck.valid) {
+        return res.status(400).json({ message: pwCheck.error || "Invalid password" });
+      }
+
+      const existing = await userRepo.getUserByEmail(email);
+      if (existing) {
+        return res.status(409).json({ message: "An account with this email already exists" });
+      }
+
+      const hashed = await hashPassword(password);
+      const created = await userRepo.upsertUser({ email, password: hashed, role: "user" });
+
+      // Never return the password hash.
+      return res.status(201).json({
+        id: created.id,
+        email: created.email,
+        role: created.role,
+      });
+    } catch (error) {
+      console.error("[/api/auth/register] Error:", error);
+      return res.status(500).json({ message: "Failed to create account" });
+    }
   });
 
   // Note: Database seeding and data initialization moved to runBackgroundInitialization()
@@ -817,7 +874,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/categories', async (req, res) => {
     try {
       const categories = await categoryRepo.listCategories();
-      res.json(categories);
+      // Attach the authoritative approved-resource count per category (single
+      // GROUP BY query) so the nav and landing page show DB-accurate counts
+      // instead of client-side static-tree sums.
+      const counts = await categoryRepo.getResourceCountsByCategory();
+      const enriched = categories.map((cat) => ({
+        ...cat,
+        resourceCount: counts[cat.name] ?? 0,
+      }));
+      res.json(enriched);
     } catch (error) {
       console.error('Error fetching categories:', error);
       res.status(500).json({ message: 'Failed to fetch categories' });
@@ -978,6 +1043,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= User Profile & Progress Routes =============
 
   // GET /api/user/progress - Get user's learning progress
+  // Change the current user's password and invalidate their OTHER sessions.
+  // Additive: requires an authenticated session; verifies the current password before changing.
+  app.post('/api/user/change-password', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { currentPassword, newPassword } = req.body ?? {};
+
+      if (typeof currentPassword !== 'string' || typeof newPassword !== 'string') {
+        return res.status(400).json({ message: 'Current and new password are required' });
+      }
+
+      const user = await userRepo.getUser(userId);
+      if (!user || !user.password) {
+        return res.status(400).json({ message: 'Password change is not available for this account' });
+      }
+
+      const currentValid = await comparePassword(currentPassword, user.password as string);
+      if (!currentValid) {
+        return res.status(401).json({ message: 'Current password is incorrect' });
+      }
+
+      const pwCheck = validatePassword(newPassword);
+      if (!pwCheck.valid) {
+        return res.status(400).json({ message: pwCheck.error || 'Invalid new password' });
+      }
+
+      const hashed = await hashPassword(newPassword);
+      await userRepo.upsertUser({ id: user.id, email: user.email, password: hashed, role: user.role });
+
+      // Invalidate every OTHER session for this user; keep the current one so the caller stays signed in.
+      // Session userId lives at sess->'passport'->'user'->'claims'->>'sub'.
+      const currentSid = req.sessionID;
+      const deleted = await db.execute(sql`
+        DELETE FROM sessions
+        WHERE sess->'passport'->'user'->'claims'->>'sub' = ${userId}
+          AND sid <> ${currentSid}
+      `);
+
+      return res.status(200).json({
+        message: 'Password changed successfully',
+        otherSessionsInvalidated: (deleted as any).rowCount ?? null,
+      });
+    } catch (error) {
+      console.error('[/api/user/change-password] Error:', error);
+      return res.status(500).json({ message: 'Failed to change password' });
+    }
+  });
+
   app.get('/api/user/progress', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
@@ -1588,7 +1701,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/admin/resources/:id/approve - Approve a pending resource
-  app.post('/api/admin/resources/:id/approve', isAuthenticated, isAdmin, async (req: any, res) => {
+  // :id is constrained to digits so it cannot shadow the literal /resources/bulk/* routes
+  // registered later (Express matches first-registered; an unconstrained :id would capture "bulk").
+  app.post('/api/admin/resources/:id(\\d+)/approve', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
       const resourceId = parseInt(req.params.id);
       const userId = req.user.claims.sub;
@@ -1607,7 +1722,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // POST /api/admin/resources/:id/reject - Reject a pending resource
-  app.post('/api/admin/resources/:id/reject', isAuthenticated, isAdmin, async (req: any, res) => {
+  // :id constrained to digits so it cannot shadow the literal /resources/bulk/* routes.
+  app.post('/api/admin/resources/:id(\\d+)/reject', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
       const resourceId = parseInt(req.params.id);
       const userId = req.user.claims.sub;
@@ -1710,18 +1826,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'Resource not found' });
       }
       
-      const resourceSnapshot = { title: resource.title, url: resource.url, category: resource.category };
-      
-      await resourceRepo.deleteResource(resourceId);
-      
-      await auditRepo.logResourceAudit(
-        resourceId,
-        'deleted',
-        userId,
-        resourceSnapshot,
-        'Resource deleted by admin'
-      );
-      
+      // deleteResource writes the 'deleted' audit row itself, before the row is
+      // removed, so the audit FK stays valid. Logging again here would insert a row
+      // referencing the now-deleted resource and throw, masking a successful delete
+      // as a 500.
+      await resourceRepo.deleteResource(resourceId, userId);
+
       res.json({ message: 'Resource deleted successfully' });
     } catch (error) {
       console.error('Error deleting resource:', error);
@@ -1824,9 +1934,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             failed++;
             continue;
           }
-          const snapshot = { title: resource.title, url: resource.url, category: resource.category };
-          await resourceRepo.deleteResource(id);
-          await auditRepo.logResourceAudit(id, 'deleted', userId, snapshot, 'Resource deleted by admin (bulk)');
+          // deleteResource records the 'deleted' audit row before removing the row,
+          // keeping the audit FK valid; a second log here would reference the deleted
+          // id and throw.
+          await resourceRepo.deleteResource(id, userId);
           succeeded++;
         } catch (err) {
           console.error(`Error deleting resource ${id} in bulk:`, err);

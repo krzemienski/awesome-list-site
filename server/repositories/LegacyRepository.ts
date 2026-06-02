@@ -108,31 +108,36 @@ export class LegacyRepository {
       .from(subSubcategories)
       .orderBy(asc(subSubcategories.name));
 
-    // Build hierarchical structure
+    // Build hierarchical structure.
+    //
+    // Completeness invariant (single source of truth for counts): every approved
+    // resource whose `category` matches a category MUST land in exactly one node
+    // of that category's subtree. A resource is placed in the deepest valid node
+    // its (subcategory, subSubcategory) strings map to; if either string does not
+    // map to a real node, the resource is folded back into its nearest valid
+    // ancestor instead of being silently dropped. This guarantees the recursive
+    // tree-sum equals the authoritative DB count `COUNT(*) WHERE category = X`
+    // ("mixed" categories that combine direct resources, mapped children, and
+    // orphaned references all reconcile), and that no resource is unreachable.
     const hierarchicalCategories: HierarchicalCategory[] = allCategories.map(cat => {
-      // Get resources directly in this category (no subcategory)
-      const categoryResources = allResources.filter(
-        r => r.category === cat.name && !r.subcategory && !r.subSubcategory
-      );
-
       // Get subcategories for this category
       const categorySubcategories = allSubcategories.filter(
         sub => sub.categoryId === cat.id
       );
 
+      // Track every resource placed somewhere inside this category's subtree so
+      // the remaining (true directs + orphans) can be folded into the category.
+      const placedIds = new Set<number>();
+
       // Build subcategory structure
       const hierarchicalSubcategories: HierarchicalSubcategory[] = categorySubcategories.map(sub => {
-        // Get resources in this subcategory (no sub-subcategory)
-        const subcategoryResources = allResources.filter(
-          r => r.category === cat.name &&
-               r.subcategory === sub.name &&
-               !r.subSubcategory
-        );
-
         // Get sub-subcategories for this subcategory
         const subcategorySubSubcategories = allSubSubcategories.filter(
           subsub => subsub.subcategoryId === sub.id
         );
+
+        // Resources placed into one of THIS subcategory's sub-subcategory nodes.
+        const subSubPlacedIds = new Set<number>();
 
         // Build sub-subcategory structure
         const hierarchicalSubSubcategories: HierarchicalSubSubcategory[] = subcategorySubSubcategories.map(subsub => {
@@ -142,13 +147,25 @@ export class LegacyRepository {
                  r.subcategory === sub.name &&
                  r.subSubcategory === subsub.name
           );
-
+          subSubcategoryResources.forEach(r => subSubPlacedIds.add(r.id));
           return {
             name: subsub.name,
             slug: subsub.slug,
             resources: subSubcategoryResources,
           };
         });
+
+        // Resources for this subcategory that did NOT land in one of its
+        // sub-subcategory nodes: true sub-level directs (no subSubcategory) plus
+        // any resource whose subSubcategory string is unmapped (folded up here,
+        // the nearest valid ancestor).
+        const subcategoryResources = allResources.filter(
+          r => r.category === cat.name &&
+               r.subcategory === sub.name &&
+               !subSubPlacedIds.has(r.id)
+        );
+        subcategoryResources.forEach(r => placedIds.add(r.id));
+        subSubPlacedIds.forEach(id => placedIds.add(id));
 
         return {
           name: sub.name,
@@ -157,6 +174,14 @@ export class LegacyRepository {
           subSubcategories: hierarchicalSubSubcategories,
         };
       });
+
+      // Direct category resources = every resource in this category not already
+      // placed in a subcategory/sub-subcategory node. Covers true directs (no
+      // subcategory) AND orphans whose subcategory string is unmapped, so the
+      // subtree stays complete and reachable.
+      const categoryResources = allResources.filter(
+        r => r.category === cat.name && !placedIds.has(r.id)
+      );
 
       return {
         name: cat.name,

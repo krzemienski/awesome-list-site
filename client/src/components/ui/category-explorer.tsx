@@ -94,7 +94,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
     const totalResources = category.resources.length;
     const subcategoryCount = category.subcategories?.length || 0;
     const uniqueTags = new Set(
-      category.resources.flatMap(r => r.tags || [])
+      category.resources.flatMap((r) => ((r as any).metadata?.tags as string[] | undefined) ?? r.tags ?? [])
     ).size;
 
     return { totalResources, subcategoryCount, uniqueTags };

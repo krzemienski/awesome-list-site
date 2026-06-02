@@ -11,7 +11,6 @@ import AdvancedFilter from "@/components/ui/advanced-filter";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { deslugify } from "@/lib/utils";
 import { Resource } from "@/types/awesome-list";
-import type { Resource as DbResource } from "@shared/schema";
 import NotFound from "@/pages/not-found";
 import { processAwesomeListData } from "@/lib/parser";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
@@ -38,13 +37,6 @@ export default function SubSubcategory() {
   });
   
   const awesomeList = rawData ? processAwesomeListData(rawData) : undefined;
-  
-  const { data: dbData } = useQuery<{resources: any[], total: number}>({
-    queryKey: ['/api/resources', { status: 'approved' }],
-    enabled: !!awesomeList,
-  });
-  
-  const dbResources = dbData?.resources || [];
   
   let currentSubSubcategory = null;
   let parentCategory = null;
@@ -76,25 +68,21 @@ export default function SubSubcategory() {
   const subcategoryName = parentSubcategory ? parentSubcategory.name : "";
   
   const allResources: Resource[] = useMemo(() => {
-    const subSubcategoryDbResources = dbResources
-      .filter(r => {
-        const matchesName = r.subSubcategory === subSubcategoryName;
-        const matchesSlug = r.subSubcategory?.toLowerCase().replace(/\s+&\s+/g, '-').replace(/\s+/g, '-') === slug;
-        return matchesName || matchesSlug;
-      })
-      .map(r => ({
-        id: `db-${r.id}`,
-        title: r.title,
-        description: r.description || '',
-        url: r.url,
-        tags: Array.isArray(r.metadata?.tags) ? r.metadata.tags as string[] : [],
-        category: r.category,
-        subcategory: r.subcategory || undefined,
-        subSubcategory: r.subSubcategory || undefined,
-      }));
-
-    return [...staticResources, ...subSubcategoryDbResources];
-  }, [staticResources, dbResources, subSubcategoryName]);
+    const seen = new Set<string>();
+    const normalized: Resource[] = [];
+    for (const r of staticResources) {
+      const key = `${r.id ?? ""}|${r.url ?? ""}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      normalized.push({
+        ...r,
+        tags: (r.tags && r.tags.length > 0)
+          ? r.tags
+          : (Array.isArray(r.metadata?.tags) ? (r.metadata.tags as string[]) : []),
+      });
+    }
+    return normalized;
+  }, [staticResources]);
 
   const availableTags = useMemo(() => {
     const tagCounts: Record<string, number> = {};

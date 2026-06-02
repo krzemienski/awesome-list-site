@@ -106,16 +106,24 @@ export default function JourneyDetail() {
     },
   });
 
-  // Mark step as complete mutation
+  // Mark step as complete mutation.
+  // A logical step maps to up to 3 backend rows (one per linked resource, all
+  // sharing the same stepNumber). The backend only sets completedAt once EVERY
+  // non-optional row id is in completedSteps, so completing a logical step must
+  // mark all of its row ids — otherwise the journey can never finalize.
   const completeStepMutation = useMutation({
-    mutationFn: async (stepId: number) => {
-      return await apiRequest(`/api/journeys/${id}/progress`, {
-        method: 'PUT',
-        body: JSON.stringify({ stepId }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+    mutationFn: async (stepIds: number[]) => {
+      let last;
+      for (const stepId of stepIds) {
+        last = await apiRequest(`/api/journeys/${id}/progress`, {
+          method: 'PUT',
+          body: JSON.stringify({ stepId }),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+      }
+      return last;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/journeys/${id}`] });
@@ -185,8 +193,33 @@ export default function JourneyDetail() {
 
   const isEnrolled = !!journey?.progress;
   const completedSteps = journey?.progress?.completedSteps || [];
-  const totalSteps = journey?.steps?.length || 0;
-  const completedCount = completedSteps.length;
+
+  // The API stores up to 3 resource rows per logical step (same stepNumber).
+  // Group them so each logical step renders once with all of its resources,
+  // and so counts match the backend's logical stepCount.
+  const logicalSteps = (() => {
+    const map = new Map<number, {
+      stepNumber: number;
+      title: string;
+      description: string;
+      isOptional: boolean;
+      rowIds: number[];
+      resources: NonNullable<JourneyStep["resource"]>[];
+    }>();
+    for (const s of journey?.steps || []) {
+      let g = map.get(s.stepNumber);
+      if (!g) {
+        g = { stepNumber: s.stepNumber, title: s.title, description: s.description, isOptional: s.isOptional, rowIds: [], resources: [] };
+        map.set(s.stepNumber, g);
+      }
+      g.rowIds.push(s.id);
+      if (s.resource) g.resources.push(s.resource);
+    }
+    return Array.from(map.values()).sort((a, b) => a.stepNumber - b.stepNumber);
+  })();
+
+  const totalSteps = logicalSteps.length;
+  const completedCount = logicalSteps.filter((g) => g.rowIds.some((rid) => completedSteps.includes(rid))).length;
   const progressPercent = totalSteps > 0 ? Math.round((completedCount / totalSteps) * 100) : 0;
   const isCompleted = !!journey?.progress?.completedAt;
 
@@ -313,22 +346,20 @@ export default function JourneyDetail() {
       <div className="space-y-4">
         <h2 className="text-xl sm:text-2xl font-bold mb-4">Learning Path</h2>
         
-        {journey.steps && journey.steps.length > 0 ? (
-          journey.steps
-            .sort((a: JourneyStep, b: JourneyStep) => a.stepNumber - b.stepNumber)
-            .map((step: JourneyStep, index: number) => {
-              const isStepCompleted = completedSteps.includes(step.id);
-              const isCurrentStep = journey?.progress?.currentStepId === step.id;
+        {logicalSteps.length > 0 ? (
+          logicalSteps.map((step, index: number) => {
+              const isStepCompleted = step.rowIds.some((rid) => completedSteps.includes(rid));
+              const isCurrentStep = step.rowIds.includes(journey?.progress?.currentStepId ?? -1);
 
               return (
                 <Card 
-                  key={step.id}
+                  key={step.stepNumber}
                   className={cn(
                     "transition-all",
                     isStepCompleted && "border-green-500/30 bg-green-500/5",
                     isCurrentStep && !isStepCompleted && "border-primary/50 shadow-lg"
                   )}
-                  data-testid={`card-step-${step.id}`}
+                  data-testid={`card-step-${step.stepNumber}`}
                 >
                   <CardContent className="p-4 sm:p-6">
                     <div className="flex items-start gap-3 sm:gap-4">
@@ -366,24 +397,28 @@ export default function JourneyDetail() {
                           </div>
                         </div>
 
-                        {/* Resource Link */}
-                        {step.resource && (
-                          <div className="mb-4 p-3 bg-muted/50 rounded-lg">
-                            <a 
-                              href={step.resource.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center gap-2 text-sm hover:text-primary transition-colors min-h-[44px] py-2"
-                              data-testid={`link-resource-${step.id}`}
-                            >
-                              <ExternalLink className="h-4 w-4 flex-shrink-0" />
-                              <span className="font-medium">{step.resource.title}</span>
-                            </a>
-                            {step.resource.description && (
-                              <p className="text-xs text-muted-foreground mt-1 ml-6">
-                                {step.resource.description}
-                              </p>
-                            )}
+                        {/* Resource Links */}
+                        {step.resources.length > 0 && (
+                          <div className="space-y-2 mb-4">
+                            {step.resources.map((resource) => (
+                              <div key={resource.id} className="p-3 bg-muted/50 rounded-lg">
+                                <a 
+                                  href={resource.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-2 text-sm hover:text-primary transition-colors min-h-[44px] py-2"
+                                  data-testid={`link-resource-${resource.id}`}
+                                >
+                                  <ExternalLink className="h-4 w-4 flex-shrink-0" />
+                                  <span className="font-medium">{resource.title}</span>
+                                </a>
+                                {resource.description && (
+                                  <p className="text-xs text-muted-foreground mt-1 ml-6">
+                                    {resource.description}
+                                  </p>
+                                )}
+                              </div>
+                            ))}
                           </div>
                         )}
 
@@ -392,9 +427,9 @@ export default function JourneyDetail() {
                           <Button 
                             variant="outline"
                             className="min-h-[44px]"
-                            onClick={() => completeStepMutation.mutate(step.id)}
+                            onClick={() => completeStepMutation.mutate(step.rowIds)}
                             disabled={completeStepMutation.isPending}
-                            data-testid={`button-complete-step-${step.id}`}
+                            data-testid={`button-complete-step-${step.stepNumber}`}
                           >
                             {completeStepMutation.isPending ? (
                               <>Marking as Complete...</>

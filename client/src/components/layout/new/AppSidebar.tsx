@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useLocation, Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import {
   Home,
   Plus,
@@ -59,7 +60,13 @@ function filterCategories(categories: Category[]) {
         !cat.name.startsWith("List of") &&
         !["Contributing", "License", "External Links", "Anti-features"].includes(
           cat.name,
-        ),
+        ) &&
+        // Drop top-level categories that contain no resources at all (e.g. the
+        // "Categories"/"Projects"/"Resources" meta-entries). Mirrors the
+        // count>0 filter Home uses so the nav and landing page agree on which
+        // categories are real. Empty SUBcategories are still kept (dimmed)
+        // below — this only removes wholly empty top-level entries.
+        getTotalResourceCount(cat) > 0,
     )
     .map((cat) => {
       // Follow-up #51: keep zero-resource subs/subsubs visible (dimmed in UI)
@@ -163,6 +170,10 @@ function CategoryAccordion({
   const catSlug = cat.slug || getCategorySlug(cat.name);
   const catPath = `/category/${catSlug}`;
   const subs = cat.subcategories || [];
+  // Single source of truth: the recursive tree-sum over the DB-derived
+  // /api/awesome-list hierarchy. The backend folds orphaned resources into the
+  // nearest valid node, so this always equals COUNT(*) WHERE category = X and
+  // always equals (direct + sum of child badges) — no "mixed validators".
   const totalCount = getTotalResourceCount(cat);
 
   // approximate body height for max-height animation
@@ -490,7 +501,9 @@ export default function AppSidebar({
                     color: "var(--text-3)",
                   }}
                 >
-                  {resources.length.toLocaleString()} resources
+                  {isLoading || resources.length === 0
+                    ? "Loading…"
+                    : `${resources.length.toLocaleString()} resources`}
                 </span>
               </div>
             </SidebarMenuButton>

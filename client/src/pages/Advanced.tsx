@@ -139,7 +139,7 @@ export default function Advanced() {
                   <CardContent className="p-4">
                     <div className="text-center">
                       <div className="text-2xl font-bold text-green-600">
-                        {new Set(awesomeList.resources.flatMap(r => r.tags || [])).size}
+                        {new Set(awesomeList.resources.flatMap((r) => ((r as any).metadata?.tags as string[] | undefined) ?? r.tags ?? [])).size}
                       </div>
                       <div className="text-sm text-muted-foreground">Unique Tags</div>
                     </div>

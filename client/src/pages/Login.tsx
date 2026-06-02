@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -203,21 +203,31 @@ export default function Login() {
             </Button>
           </div>
 
-          {/* P3 — sentence-case label, crimson mono creds per ref 06 */}
-          <div className="space-y-2 pt-2 text-xs text-[color:var(--text-2)]">
-            <p className="text-xs text-[color:var(--text-2)]">
-              Default admin credentials:
-            </p>
-            <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
-              <code className="font-mono text-[color:var(--accent)]">admin@example.com</code>
-              <span aria-hidden="true" className="text-[color:var(--text-3)]">/</span>
-              <code className="font-mono text-[color:var(--accent)]">admin123</code>
-            </p>
-            <p className="flex items-start gap-2 text-[color:var(--warn,#ffb84d)]">
-              <AlertTriangle className="h-3.5 w-3.5 mt-[1px] shrink-0" />
-              <span>Change password after first login</span>
-            </p>
-          </div>
+          <p className="text-center text-sm text-[color:var(--text-2)]">
+            Don't have an account?{" "}
+            <Link href="/register" className="text-[color:var(--accent)] hover:underline" data-testid="link-register">
+              Create account
+            </Link>
+          </p>
+
+          {/* Default-credential hint is a local-development convenience only.
+              Gated on import.meta.env.DEV so it never renders in production builds. */}
+          {import.meta.env.DEV && (
+            <div className="space-y-2 pt-2 text-xs text-[color:var(--text-2)]">
+              <p className="text-xs text-[color:var(--text-2)]">
+                Default admin credentials:
+              </p>
+              <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                <code className="font-mono text-[color:var(--accent)]">admin@example.com</code>
+                <span aria-hidden="true" className="text-[color:var(--text-3)]">/</span>
+                <code className="font-mono text-[color:var(--accent)]">admin123</code>
+              </p>
+              <p className="flex items-start gap-2 text-[color:var(--warn,#ffb84d)]">
+                <AlertTriangle className="h-3.5 w-3.5 mt-[1px] shrink-0" />
+                <span>Change password after first login</span>
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
