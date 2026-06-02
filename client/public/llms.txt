@@ -1,0 +1,36 @@
+# Awesome Video
+
+> A curated, searchable index of video development resources — players, encoders, codecs, streaming protocols, infrastructure, learning paths, and tools. Built from the community awesome-video list and enriched with categories, tags, and learning journeys.
+
+The site organizes every resource into a three-level hierarchy (category → subcategory → sub-subcategory) and exposes a public REST API under `/api`. Resource counts and category structure are served live from the database; treat the API as the source of truth for any number.
+
+## Browse
+
+- [Home](https://new.awesome.video/): All categories with live resource counts
+- [Advanced](https://new.awesome.video/advanced): Category explorer, analytics, link health, and bulk export
+- [Learning Journeys](https://new.awesome.video/journeys): Guided multi-step paths for video development
+- [About](https://new.awesome.video/about): Project background and contribution guide
+- [Submit a Resource](https://new.awesome.video/submit): Suggest a new tool, library, article, or course
+
+## Categories
+
+- [Community & Events](https://new.awesome.video/category/community-events)
+- [Encoding & Codecs](https://new.awesome.video/category/encoding-codecs)
+- [General Tools](https://new.awesome.video/category/general-tools)
+- [Infrastructure & Delivery](https://new.awesome.video/category/infrastructure-delivery)
+- [Intro & Learning](https://new.awesome.video/category/intro-learning)
+- [Media Tools](https://new.awesome.video/category/media-tools)
+- [Players & Clients](https://new.awesome.video/category/players-clients)
+- [Protocols & Transport](https://new.awesome.video/category/protocols-transport)
+- [Standards & Industry](https://new.awesome.video/category/standards-industry)
+
+## API
+
+- [Resources](https://new.awesome.video/api/resources): Paginated resources; supports `category`, `subcategory`, `subSubcategory`, `tag`, `search`, `limit`, `offset`
+- [Categories](https://new.awesome.video/api/categories): Category hierarchy with live `resourceCount`
+- [Tags](https://new.awesome.video/api/tags): All tags with usage counts
+
+## Notes
+
+- Crawl policy: see [robots.txt](https://new.awesome.video/robots.txt). API and admin routes are disallowed for crawling.
+- Sitemap: [sitemap.xml](https://new.awesome.video/sitemap.xml)

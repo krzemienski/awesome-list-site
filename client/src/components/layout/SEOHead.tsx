@@ -59,7 +59,10 @@ export default function SEOHead({
       <meta name="keywords" content={generateKeywords(awesomeList, category)} />
       <meta name="author" content={repoInfo ? `${repoInfo.owner} contributors` : "Awesome List Community"} />
       <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-      <link rel="canonical" href={currentUrl} />
+      {/* Canonical is owned server-side by og-middleware.ts (single source of
+          truth, absolute production URL, present in the initial HTML for
+          crawlers). A second react-helmet canonical here would emit the live
+          window.origin (e.g. localhost) and conflict with the server tag. */}
 
       {/* Open Graph Meta Tags */}
       <meta property="og:type" content={type} />
