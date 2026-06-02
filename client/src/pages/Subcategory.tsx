@@ -156,18 +156,31 @@ export default function Subcategory() {
   }, [subcategoryName, categoryName, isLoading]);
   
   if (isLoading) {
+    // Skeleton mirrors the loaded layout's vertical rhythm (breadcrumb, back
+    // button, title block, filter bar, results-count) so the card grid starts
+    // at the same Y offset — otherwise the header pops in on load and shoves
+    // the grid down (large cumulative layout shift).
     return (
-      <div className="space-y-6" aria-busy={true} aria-live="polite">
+      <div className="space-y-4 sm:space-y-6 overflow-x-hidden max-w-full" aria-busy={true} aria-live="polite">
         <SEOHead title="Loading..." />
         <h1 className="sr-only">Loading subcategory…</h1>
-        <div className="space-y-4">
-          <Skeleton className="h-10 w-64" />
-          <Skeleton className="h-6 w-48" />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Array.from({ length: 9 }).map((_, i) => (
-              <Skeleton key={i} className="h-32 w-full" />
-            ))}
+        <Skeleton className="h-5 w-48" />
+        <div className="space-y-3 sm:space-y-4">
+          <Skeleton className="h-9 w-40" />
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0 space-y-2">
+              <Skeleton className="h-8 w-64" />
+              <Skeleton className="h-4 w-40" />
+            </div>
+            <Skeleton className="h-10 w-12 shrink-0" />
           </div>
+        </div>
+        <Skeleton className="h-12 w-full" />
+        <Skeleton className="h-5 w-56" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+          {Array.from({ length: 9 }).map((_, i) => (
+            <Skeleton key={i} className="h-32 w-full" />
+          ))}
         </div>
       </div>
     );
@@ -272,31 +285,53 @@ export default function Subcategory() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {filteredResources.map((resource, index) => {
+            // Every resource here is DB-backed (id is "db-<n>", see allResources
+            // above), so the card body navigates to the internal detail page —
+            // matching Category.tsx. The external URL stays on its own button.
+            const dbId = parseInt(String(resource.id).replace(/^db-/, ""), 10);
+
             const handleResourceClick = () => {
-              window.open(resource.url, '_blank', 'noopener,noreferrer');
-              
-              let description = resource.description || '';
-              if (!description && resource.tags && resource.tags.length > 0) {
-                description = `Tags: ${resource.tags.slice(0, 3).join(', ')}${resource.tags.length > 3 ? ', ...' : ''}`;
+              if (Number.isFinite(dbId)) {
+                setLocation(`/resource/${dbId}`);
+              } else {
+                window.open(resource.url, '_blank', 'noopener,noreferrer');
+                toast({
+                  title: resource.title,
+                  description: 'Opening resource in new tab',
+                });
               }
-              
+            };
+
+            const handleExternalLink = (e: React.MouseEvent) => {
+              e.stopPropagation();
+              window.open(resource.url, '_blank', 'noopener,noreferrer');
               toast({
                 title: resource.title,
-                description: description || 'Opening resource in new tab',
+                description: 'Opening resource in new tab',
               });
             };
-            
+
             return (
-              <Card 
+              <Card
                 key={`${resource.url}-${index}`}
-                className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors border border-border bg-card text-card-foreground min-w-0"
+                className="cursor-pointer hover:border-[var(--accent)]/30 hover:shadow-md transition-all border border-border bg-card text-card-foreground min-w-0"
                 onClick={handleResourceClick}
-                data-testid={`card-resource-${index}`}
+                data-testid={`card-resource-${dbId}`}
               >
                 <CardHeader className="p-3 sm:p-4">
                   <CardTitle className="text-base sm:text-lg flex items-start gap-2">
                     <span className="flex-1 min-w-0 line-clamp-2">{resource.title}</span>
-                    <ExternalLink className="h-4 w-4 flex-shrink-0 mt-1" />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0 flex-shrink-0 -mt-1 -mr-1 touch-manipulation"
+                      onClick={handleExternalLink}
+                      data-testid={`button-external-${dbId}`}
+                      title="Open in new tab"
+                      aria-label="Open in new tab"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
                   </CardTitle>
                   {resource.description && (
                     <CardDescription className="text-xs sm:text-sm line-clamp-2">
