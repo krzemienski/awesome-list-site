@@ -9,6 +9,10 @@ interface AITagSuggestion {
   subcategory?: string;
   subSubcategory?: string;
   confidence: number;
+  // True when the tags came from the Claude API; false when the API failed and
+  // we fell back to rule-based tagging. Callers must use this to record honest
+  // provenance instead of always claiming AI output.
+  aiUsed: boolean;
 }
 
 /**
@@ -70,7 +74,8 @@ Respond with JSON in this format:
       category: result.category || 'Video Tools',
       subcategory: result.subcategory,
       subSubcategory: result.subSubcategory,
-      confidence: Math.max(0, Math.min(1, result.confidence || 0.5))
+      confidence: Math.max(0, Math.min(1, result.confidence || 0.5)),
+      aiUsed: true
     };
 
   } catch (error: unknown) {
@@ -118,6 +123,7 @@ function generateFallbackTags(title: string, description: string, url: string): 
   return {
     tags: tags.slice(0, 5), // Limit to 5 tags
     category,
-    confidence: 0.6 // Lower confidence for rule-based
+    confidence: 0.6, // Lower confidence for rule-based
+    aiUsed: false
   };
 }

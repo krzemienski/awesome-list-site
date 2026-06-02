@@ -11,8 +11,8 @@ Console baseline: only benign `Missing VITE_GA_MEASUREMENT_ID` warn (no GA key i
 | - | header | AdminStats load | GET /api/admin/stats 200; Users 1, Resources 1949, Journeys 0, Pending 0 | PASS | 01-dashboard-stats.png |
 | 1 | Approvals | load + empty state | 0 pending matches stats; "All Caught Up!" | PASS | 01-dashboard-stats.png |
 | 2 | Edits | load + empty state | GET resource-edits 304; "All Caught Up!" | PASS | (snapshot) |
-| 3 | Enrichment | load form | filter + batch-size + Start; Job History empty | PASS | (snapshot) |
-| 4 | Researcher | load form | Launch/Review/History subtabs; New Research Job form | PASS | 04-researcher.png |
+| 3 | Enrichment | **Start Enrichment (REALLY RUN)** | POST /api/enrichment/start 200; job 1 ran 31/31, live progress monitor (97%→100%), DB metadata written. Exposed + FIXED DEFECT-B (false AI provenance). Re-ran job 3 → honest `rule-based-fallback`. | PASS (functional) | 18-enrichment-running, 19-enrichment-completed, 20-enrichment-honest-provenance.png; defects.md DEFECT-B |
+| 4 | Researcher | **Launch Researcher (REALLY RUN)** | POST /api/researcher/start 200; job 1 ran turn 1/5 then failed HONESTLY on 401 (invalid key = env, not code). Status=failed, error surfaced in UI, cost $0.00. | PASS (functional; fails transparently) | 21-researcher-job-failed-honest.png |
 | 5a | Export | Export Markdown | POST /api/admin/export 200; 547,552 B text/markdown attachment | PASS | 05-export-markdown-done.png |
 | 5b | Export | Run Validation | POST /api/admin/validate **500→FIXED→200**; valid:true, 0 errors, 915 warnings, "1954 resources, 10 categories" | FIXED | 06-validate-FIXED.png; defects.md DEFECT-A |
 | 5c | Export | Check All Links | POST /api/admin/check-links **(shared bug)→200**; 1949 links, 1667 valid (85.5%), 221 broken, real report | FIXED | 06b-checklinks-toast.png (reqid=79) |
@@ -39,7 +39,10 @@ Console baseline: only benign `Missing VITE_GA_MEASUREMENT_ID` warn (no GA key i
 | Zero >=400 requests (steady state) | PASS — all GETs 200/304; only the 1 validate 500 (now fixed) | network logs reqid 71-91 |
 
 ## Result
-- 15/15 tabs PASS (1 with a HIGH defect found + FIXED in-flight)
+- 15/15 tabs PASS — **all action tabs now functionally exercised** (Enrichment + Researcher
+  actions actually triggered after reflection caught they were only render-checked).
 - Full CRUD cycle PASS + cleaned up (baseline restored)
 - Persistence across restart PASS
-- defects.md: 1 defect (DEFECT-A), 0 OPEN
+- defects.md: **2 defects (DEFECT-A, DEFECT-B), both HIGH, both FIXED, 0 OPEN**
+- 1 environment limitation noted (invalid ANTHROPIC_API_KEY → researcher fails honestly,
+  enrichment now degrades honestly); user controls the real key.

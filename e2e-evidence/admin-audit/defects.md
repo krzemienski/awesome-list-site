@@ -46,8 +46,54 @@
 
 ---
 
+## DEFECT-B (HIGH) — enrichment falsely reports AI success + fabricates provenance (FIXED)
+
+**Found:** by actually clicking "Start Enrichment" (which the first audit pass only
+render-checked — see reflect.md). Job 1 reported 31/31 "successful", but the server log
+showed "AI tagging failed: 401 invalid x-api-key" 6 times during the same run.
+
+**Root cause:**
+- `generateResourceTags` (server/ai/tagging.ts) catches ANY error from the Claude API
+  (including 401 auth failure) and silently returns rule-based fallback tags — no throw,
+  no signal to the caller.
+- `enrichmentService.enrichResource` (server/ai/enrichmentService.ts:300-309) then
+  unconditionally stamped `aiEnriched: true` + `aiModel: 'claude-haiku-4-5'` on EVERY
+  processed resource, regardless of whether the AI actually ran.
+- Net effect: when the API key is invalid, 100% of enrichment silently degrades to
+  rule-based tagging while the job + DB claim full AI success. False provenance — a
+  reviewer or downstream consumer believes Claude generated tags it never saw.
+
+**Distinction from environment:** the 401 itself is an environment issue (the container's
+ANTHROPIC_API_KEY is invalid; the user controls the real key — not fabricated here). The
+DEFECT is that the code LIES about it instead of recording the degradation. Researcher
+handles the identical 401 correctly: job → status=failed, error surfaced in UI
+(screenshot 21). Enrichment should be equally honest.
+
+**Fix:**
+- tagging.ts: `AITagSuggestion` gains `aiUsed: boolean`; success path returns
+  `aiUsed:true`, fallback returns `aiUsed:false`.
+- enrichmentService.ts: `aiEnriched: aiResult.aiUsed` and
+  `aiModel: aiResult.aiUsed ? 'claude-haiku-4-5' : 'rule-based-fallback'`.
+
+**Verified (after fix):**
+- Reset resource 1537 to an unenriched candidate, ran a real batch-1 job (job 3,
+  proc=1 ok=1) through the UI. DB now: `aiModel=rule-based-fallback`, `aiEnriched=false`,
+  tags `["ffmpeg"]` (rule-based) — honest provenance instead of the pre-fix
+  `claude-haiku-4-5`/`true` lie. Screenshot 20.
+- When the key is valid, aiUsed:true path stamps the real model (unchanged behavior).
+
+**Files changed:** server/ai/tagging.ts, server/ai/enrichmentService.ts
+**Build:** BUILD_EXIT=0; Docker app rebuilt + healthy.
+
+**Open product question (NOT a code bug):** should an AI-failed resource count as job
+"success" at all, or a distinct "degraded" outcome? Left as-is (counts as processed) since
+changing success semantics is a product decision — flagged for the user.
+
 ## Summary
-- 1 defect found (DEFECT-A, HIGH), 1 FIXED, **0 OPEN**.
+- 2 defects found (DEFECT-A + DEFECT-B, both HIGH), 2 FIXED, **0 OPEN**.
+- DEFECT-A: validate/check-links 500 (missing repo methods).
+- DEFECT-B: enrichment false AI-success + fabricated provenance — found only because the
+  reflection pass forced me to ACTUALLY run enrichment instead of render-checking it.
 - Defect was a real production bug: two admin actions (Run Validation, Check All Links)
   returned HTTP 500 due to missing repository methods after a storage→repository refactor.
 - Fix is root-cause (implemented the missing methods + corrected call-site receiver),

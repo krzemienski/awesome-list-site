@@ -296,17 +296,21 @@ export class EnrichmentService {
           resource.url
         );
 
-        // Merge URL metadata with AI results
+        // Merge URL metadata with AI results. Record provenance honestly: only
+        // claim AI enrichment + model when the Claude call actually succeeded.
+        // On fallback (e.g. API auth failure) the tags are rule-based, so mark
+        // aiEnriched:false and stamp the source as 'rule-based-fallback' instead
+        // of falsely attributing rule output to claude-haiku-4-5.
         const enhancedMetadata = {
           ...metadata,
-          aiEnriched: true,
+          aiEnriched: aiResult.aiUsed,
           aiEnrichedAt: new Date().toISOString(),
           suggestedTags: aiResult.tags,
           suggestedCategory: aiResult.category,
           suggestedSubcategory: aiResult.subcategory,
           suggestedSubSubcategory: aiResult.subSubcategory,
           confidence: aiResult.confidence,
-          aiModel: 'claude-haiku-4-5',
+          aiModel: aiResult.aiUsed ? 'claude-haiku-4-5' : 'rule-based-fallback',
           
           // Add URL metadata if available
           ...(urlMetadata && !urlMetadata.error && {
