@@ -27,6 +27,18 @@ export default function Advanced() {
     queryKey: ['/api/awesome-list'],
   });
 
+  // Authoritative per-category totals. The /api/awesome-list nested tree only
+  // carries category-level-direct resources (sub/sub-sub resources aren't
+  // bubbled up), so category.resources.length under-counts. /api/categories
+  // returns the true total per category — same source Home uses.
+  const { data: dbCategories } = useQuery<Array<{ name: string; resourceCount: number }>>({
+    queryKey: ["/api/categories"],
+  });
+  const categoryCounts = (dbCategories || []).reduce<Record<string, number>>((map, c) => {
+    map[c.name] = c.resourceCount;
+    return map;
+  }, {});
+
   // Select a featured resource for demonstration
   const featuredResource = awesomeList?.resources?.[0];
 
@@ -139,7 +151,11 @@ export default function Advanced() {
                   <CardContent className="p-4">
                     <div className="text-center">
                       <div className="text-2xl font-bold text-green-600">
-                        {new Set(awesomeList.resources.flatMap(r => r.tags || [])).size}
+                        {new Set(
+                          awesomeList.resources.flatMap(
+                            r => r.tags ?? (r.metadata as { tags?: string[] } | undefined)?.tags ?? []
+                          )
+                        ).size}
                       </div>
                       <div className="text-sm text-muted-foreground">Unique Tags</div>
                     </div>
@@ -159,9 +175,10 @@ export default function Advanced() {
             </CardContent>
           </Card>
 
-          <CategoryExplorer 
+          <CategoryExplorer
             categories={awesomeList.categories}
             resources={awesomeList.resources}
+            categoryCounts={categoryCounts}
           />
         </TabsContent>
 
@@ -218,9 +235,10 @@ export default function Advanced() {
             </CardContent>
           </Card>
 
-          <CommunityMetrics 
+          <CommunityMetrics
             resources={awesomeList.resources}
             categories={awesomeList.categories}
+            categoryCounts={categoryCounts}
           />
         </TabsContent>
 
@@ -257,7 +275,7 @@ export default function Advanced() {
             </CardContent>
           </Card>
 
-          <ExportTools awesomeList={awesomeList} />
+          <ExportTools awesomeList={awesomeList} categoryCounts={categoryCounts} />
         </TabsContent>
 
         <TabsContent value="recommendations" className="space-y-6">
@@ -279,8 +297,8 @@ export default function Advanced() {
             >
               Browse All Resources
             </a>
-            <a 
-              href="/category/web-frameworks" 
+            <a
+              href="/"
               className="inline-flex items-center gap-2 px-4 py-2 border border-border rounded-md hover:bg-accent transition-colors"
             >
               Explore Categories

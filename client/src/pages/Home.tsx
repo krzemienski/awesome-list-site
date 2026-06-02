@@ -255,7 +255,6 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
             <Link
               key={category.slug}
               href={`/category/${category.slug}`}
-              aria-label={`View ${category.name} category with ${totalCount} resources`}
               data-testid={`link-category-${category.slug}`}
               className="block outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] rounded-[var(--radius)]"
             >

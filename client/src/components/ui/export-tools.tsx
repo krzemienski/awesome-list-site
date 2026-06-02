@@ -20,6 +20,9 @@ import { AwesomeList, Resource, Category } from "@/types/awesome-list";
 interface ExportToolsProps {
   awesomeList: AwesomeList;
   selectedCategory?: string;
+  /** Authoritative per-category totals (name -> count). The nested
+   *  category.resources array under-counts, so prefer this for the selector label. */
+  categoryCounts?: Record<string, number>;
   className?: string;
 }
 
@@ -34,7 +37,7 @@ interface ExportOptions {
   selectedCategories: string[];
 }
 
-export default function ExportTools({ awesomeList, selectedCategory, className }: ExportToolsProps) {
+export default function ExportTools({ awesomeList, selectedCategory, categoryCounts, className }: ExportToolsProps) {
   const { toast } = useToast();
   const [exportOptions, setExportOptions] = useState<ExportOptions>({
     format: "markdown",
@@ -473,7 +476,7 @@ export default function ExportTools({ awesomeList, selectedCategory, className }
                   onCheckedChange={() => toggleCategory(category.name)}
                 />
                 <label htmlFor={`category-${category.name}`} className="text-sm cursor-pointer">
-                  {category.name} ({category.resources.length})
+                  {category.name} ({categoryCounts?.[category.name] ?? category.resources.length})
                 </label>
               </div>
             ))}

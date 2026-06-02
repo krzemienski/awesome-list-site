@@ -21,6 +21,10 @@ import { Resource, Category } from "@/types/awesome-list";
 interface CommunityMetricsProps {
   resources: Resource[];
   categories: Category[];
+  /** Authoritative per-category totals (name -> count). The nested
+   *  category.resources array under-counts because sub-level resources aren't
+   *  bubbled up, so prefer this map for any displayed per-category total. */
+  categoryCounts?: Record<string, number>;
   className?: string;
 }
 
@@ -53,7 +57,7 @@ interface CategoryMetric {
   completeness: number;
 }
 
-export default function CommunityMetrics({ resources, categories, className }: CommunityMetricsProps) {
+export default function CommunityMetrics({ resources, categories, categoryCounts, className }: CommunityMetricsProps) {
   const [selectedPeriod, setSelectedPeriod] = useState("7d");
 
   // Load tracking data from localStorage for real engagement metrics
@@ -145,10 +149,13 @@ export default function CommunityMetrics({ resources, categories, className }: C
       })
       .sort((a, b) => b.score - a.score);
 
-    // Calculate category metrics based on actual resource data
-    const totalCategoryResources = categories.reduce((sum, c) => sum + c.resources.length, 0);
+    // Calculate category metrics based on actual resource data. Prefer the
+    // authoritative DB total per category; the nested category.resources array
+    // under-counts (sub-level resources aren't bubbled up).
+    const countFor = (c: Category) => categoryCounts?.[c.name] ?? c.resources.length;
+    const totalCategoryResources = categories.reduce((sum, c) => sum + countFor(c), 0);
     const categoryMetrics: CategoryMetric[] = categories.map(category => {
-      const resourceCount = category.resources.length;
+      const resourceCount = countFor(category);
       // Engagement based on category's share of total resources
       const avgPerCategory = totalCategoryResources / Math.max(categories.length, 1);
       const engagement = Math.round((resourceCount / Math.max(avgPerCategory, 1)) * 100);
@@ -176,13 +183,21 @@ export default function CommunityMetrics({ resources, categories, className }: C
       return new Date(r.createdAt) > oneWeekAgo;
     }).length;
 
+    // Growth rate is a percentage: share of the catalog added in the last week.
+    // weeklyGrowth is a raw count, so it must be divided by the total — rendering
+    // the count itself with a "%" suffix overstates growth by orders of magnitude.
+    const growthRatePct = Math.round(
+      (recentlyAddedCount / Math.max(resources.length, 1)) * 100
+    );
+
     return {
       contributors,
       popularResources,
       categoryMetrics,
       totalContributions: resources.length,
       activeContributors: contributors.filter(c => c.contributions > 0).length,
-      weeklyGrowth: recentlyAddedCount
+      weeklyGrowth: recentlyAddedCount,
+      growthRatePct
     };
   }, [resources, categories, trackingData]);
 
@@ -257,9 +272,9 @@ export default function CommunityMetrics({ resources, categories, className }: C
                       <TrendingUp className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm text-muted-foreground">Growth Rate</span>
                     </div>
-                    <p className="text-2xl font-bold mt-1">+{metrics.weeklyGrowth}%</p>
+                    <p className="text-2xl font-bold mt-1">+{metrics.growthRatePct}%</p>
                     <p className="text-xs text-green-600 mt-1">
-                      Weekly average
+                      Added in the last 7 days
                     </p>
                   </CardContent>
                 </Card>

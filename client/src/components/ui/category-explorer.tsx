@@ -14,16 +14,25 @@ import { cn } from "@/lib/utils";
 interface CategoryExplorerProps {
   categories: Category[];
   resources: Resource[];
+  /** Authoritative per-category totals keyed by category name. The nested
+   *  category.resources array under-counts (sub-level resources aren't bubbled
+   *  up), so when this map has an entry it wins over category.resources.length. */
+  categoryCounts?: Record<string, number>;
   className?: string;
 }
 
-export default function CategoryExplorer({ categories, resources, className }: CategoryExplorerProps) {
+export default function CategoryExplorer({ categories, resources, categoryCounts, className }: CategoryExplorerProps) {
   const [, navigate] = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("name");
   const [showSubcategories, setShowSubcategories] = useState(true);
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
+
+  // Prefer the authoritative DB count when available; fall back to the nested
+  // tree length (which under-counts but is the only data we have offline).
+  const resolveCount = (category: Category) =>
+    categoryCounts?.[category.name] ?? category.resources.length;
 
   // Extract all unique tags
   const allTags = useMemo(() => {
@@ -58,17 +67,17 @@ export default function CategoryExplorer({ categories, resources, className }: C
         case "name":
           return a.name.localeCompare(b.name);
         case "count":
-          return b.resources.length - a.resources.length;
+          return resolveCount(b) - resolveCount(a);
         case "activity":
           // Sort by most recent or most popular (using resource count as proxy)
-          return b.resources.length - a.resources.length;
+          return resolveCount(b) - resolveCount(a);
         default:
           return 0;
       }
     });
 
     return filtered;
-  }, [categories, searchTerm, selectedTags, sortBy]);
+  }, [categories, searchTerm, selectedTags, sortBy, categoryCounts]);
 
   const toggleTag = (tag: string) => {
     setSelectedTags(prev => 
@@ -91,10 +100,12 @@ export default function CategoryExplorer({ categories, resources, className }: C
   };
 
   const getCategoryStats = (category: Category) => {
-    const totalResources = category.resources.length;
+    const totalResources = resolveCount(category);
     const subcategoryCount = category.subcategories?.length || 0;
     const uniqueTags = new Set(
-      category.resources.flatMap(r => r.tags || [])
+      category.resources.flatMap(
+        r => r.tags ?? (r.metadata as { tags?: string[] } | undefined)?.tags ?? []
+      )
     ).size;
 
     return { totalResources, subcategoryCount, uniqueTags };
@@ -286,9 +297,9 @@ export default function CategoryExplorer({ categories, resources, className }: C
                       </p>
                     </div>
                   ))}
-                  {category.resources.length > 3 && (
+                  {resolveCount(category) > 3 && (
                     <p className="text-xs text-muted-foreground">
-                      +{category.resources.length - 3} more resources
+                      +{resolveCount(category) - 3} more resources
                     </p>
                   )}
                 </div>
