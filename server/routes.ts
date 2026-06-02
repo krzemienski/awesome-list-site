@@ -166,6 +166,24 @@ async function generateSitemap(req: any, res: any) {
       });
     });
 
+    // Add individual resource detail pages. These are the deepest indexable
+    // content (one per approved resource) and were previously absent from the
+    // sitemap, leaving search engines no signal to discover them.
+    const { resources } = await resourceRepo.listResources({
+      page: 1,
+      limit: 100000,
+      status: 'approved',
+    });
+    resources.forEach(resource => {
+      sitemap += `
+  <url>
+    <loc>${baseUrl}/resource/${resource.id}</loc>
+    <lastmod>${currentDate}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>`;
+    });
+
     sitemap += `
 </urlset>`;
 
