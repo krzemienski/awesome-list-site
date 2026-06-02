@@ -113,7 +113,7 @@ export default function Journeys() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
           <span className="text-sm text-muted-foreground">Filter by category:</span>
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-full sm:w-[200px]" data-testid="select-category-filter">
+            <SelectTrigger className="w-full sm:w-[200px]" data-testid="select-category-filter" aria-label="Filter by category">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -137,7 +137,7 @@ export default function Journeys() {
           <div className="flex flex-col items-center gap-4">
             <BookOpen className="h-12 w-12 text-muted-foreground" />
             <div>
-              <h3 className="text-lg font-semibold mb-2">No journeys found</h3>
+              <h2 className="text-lg font-semibold mb-2">No journeys found</h2>
               <p className="text-sm text-muted-foreground">
                 {selectedCategory === "all" 
                   ? "No learning journeys are available at the moment." 

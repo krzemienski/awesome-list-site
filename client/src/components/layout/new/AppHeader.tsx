@@ -96,7 +96,6 @@ export default function AppHeader({ onSearchOpen, user, onLogout }: AppHeaderPro
         <button
           onClick={onSearchOpen}
           className="w-full max-w-sm flex items-center h-10 sm:h-9 rounded-lg border border-input bg-[var(--surface)] px-3 py-1 text-sm transition-colors duration-[var(--motion-fast)] hover:border-[var(--border-strong)] focus-visible:outline-none focus-visible:border-[color-mix(in_srgb,var(--accent)_60%,transparent)] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 touch-manipulation"
-          aria-label="Open search"
         >
           <Search className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
           <span className="text-muted-foreground truncate hidden sm:inline">Search resources...</span>

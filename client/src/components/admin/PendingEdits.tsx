@@ -198,7 +198,7 @@ export default function PendingEdits() {
         <CardContent>
           <div className="text-center py-12">
             <CheckCircle2 className="h-16 w-16 mx-auto mb-4 text-muted-foreground/50" />
-            <h3 className="text-lg font-semibold mb-2">All Caught Up!</h3>
+            <h2 className="text-lg font-semibold mb-2">All Caught Up!</h2>
             <p className="text-muted-foreground">
               There are no pending edits to review at this time.
             </p>
