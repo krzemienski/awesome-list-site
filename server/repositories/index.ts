@@ -50,7 +50,7 @@
 // Individual repositories will be exported here as they are created.
 // This file serves as a barrel export for all repository modules.
 
-export { UserRepository } from './UserRepository';
+export { UserRepository, type SafeUser } from './UserRepository';
 export { ResourceRepository } from './ResourceRepository';
 export { CategoryRepository } from './CategoryRepository';
 export { TagRepository } from './TagRepository';
