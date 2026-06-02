@@ -43,6 +43,7 @@ export interface ListResourceOptions {
   status?: string;
   category?: string;
   subcategory?: string;
+  subSubcategory?: string;
   userId?: string;
   search?: string;
 }
@@ -57,7 +58,7 @@ export class ResourceRepository {
    * @returns Object containing resources array and total count
    */
   async listResources(options: ListResourceOptions): Promise<{ resources: Resource[]; total: number }> {
-    const { page = 1, limit = 20, status, category, subcategory, userId, search } = options;
+    const { page = 1, limit = 20, status, category, subcategory, subSubcategory, userId, search } = options;
     const offset = (page - 1) * limit;
 
     let query = db.select().from(resources);
@@ -75,6 +76,10 @@ export class ResourceRepository {
 
     if (subcategory) {
       conditions.push(eq(resources.subcategory, subcategory));
+    }
+
+    if (subSubcategory) {
+      conditions.push(eq(resources.subSubcategory, subSubcategory));
     }
 
     if (userId) {

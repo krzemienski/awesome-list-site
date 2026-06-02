@@ -602,6 +602,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const limit = parseInt(req.query.limit as string) || 20;
       const category = req.query.category as string;
       const subcategory = req.query.subcategory as string;
+      const subSubcategory = req.query.subSubcategory as string;
       const search = req.query.search as string;
 
       const result = await resourceRepo.listResources({
@@ -610,6 +611,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: 'approved',
         category,
         subcategory,
+        subSubcategory,
         search
       });
 

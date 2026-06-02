@@ -1,0 +1,25 @@
+subSubcategory server-side filter — functional validation
+=========================================================
+Date: 2026-06-01
+Change: server/repositories/ResourceRepository.ts + server/routes.ts
+  - ListResourceOptions: added subSubcategory?: string
+  - listResources: added `if (subSubcategory) conditions.push(eq(resources.subSubcategory, subSubcategory))`
+  - routes.ts /api/resources: reads req.query.subSubcategory, passes to repo
+
+Before: /api/resources?subSubcategory=X ignored the param, returned total=1949 (all rows).
+After:  filters server-side, total matches DB exactly.
+
+Evidence (live system, docker compose app on :5001, db awesome_list):
+
+  DB truth:
+    HEVC                = 10
+    total_with_subsub   = 389
+    grand_total         = 1949
+
+  API /api/resources?subSubcategory=HEVC&limit=1          -> total 10   (DB 10)  PASS
+  API /api/resources?subSubcategory=Origin%20Servers&...  -> total 1    (DB 1)   PASS
+  API /api/resources?limit=1 (no filter)                  -> total 1949 (DB 1949) PASS
+
+All three hierarchy levels (category, subcategory, subSubcategory) now filter
+server-side identically. Client-side filtering on SubSubcategory.tsx is no longer
+load-bearing for correctness.
