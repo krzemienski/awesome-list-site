@@ -1,0 +1,27 @@
+=== Admin Audit Evidence Inventory ===
+Generated: 2026-06-01 21:00:20
+
+01-dashboard-stats.png                             632951 bytes
+04-researcher.png                                  832115 bytes
+05-export-markdown-done.png                        728004 bytes
+06-validate-FIXED.png                              794708 bytes
+06b-checklinks-toast.png                           670011 bytes
+07-resources.png                                   940725 bytes
+08-categories.png                                  796964 bytes
+09-subcategories.png                               828103 bytes
+10-subsubcategories.png                            865858 bytes
+11-journeys.png                                    559588 bytes
+12-users.png                                       635993 bytes
+13-github.png                                      879464 bytes
+14-linkhealth.png                                  675747 bytes
+15-audit.png                                       856595 bytes
+16-crud-create.png                                 803483 bytes
+17-crud-delete-cleanup.png                         796964 bytes
+defects.md                                         3158 bytes
+evidence-inventory.txt                             71 bytes
+inventory.md                                       2935 bytes
+matrix.md                                          3927 bytes
+VERDICT.md                                         3301 bytes
+
+Total files: 21
+Empty files (INVALID): 0

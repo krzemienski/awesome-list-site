@@ -33,6 +33,7 @@ import {
 } from "@shared/schema";
 import { db } from "../db";
 import { eq, sql } from "drizzle-orm";
+import type { ValidationStorageItem, ValidationResults } from "../storage";
 
 /**
  * Admin statistics interface
@@ -45,6 +46,18 @@ export interface AdminStats {
   totalJourneys: number;
   activeUsers: number;
 }
+
+/**
+ * Latest validation results, held in process memory and shared across all
+ * AdminRepository instances. Validation output (awesome-lint + link-check) is
+ * transient diagnostic data with no schema table, so it lives here rather than
+ * in the database; it is re-derivable on demand by re-running validation.
+ */
+const latestValidation: ValidationResults = {
+  awesomeLint: undefined,
+  linkCheck: undefined,
+  lastUpdated: undefined,
+};
 
 /**
  * Repository class for administrative operations
@@ -92,6 +105,30 @@ export class AdminRepository {
       totalCategories: categoryCount.count,
       totalJourneys: journeyCount.count,
       activeUsers: activeCount.count
+    };
+  }
+
+  /**
+   * Store the result of an awesome-lint or link-check run so the admin
+   * validation-status panel can retrieve the most recent outcome.
+   */
+  async storeValidationResult(result: ValidationStorageItem): Promise<void> {
+    if (result.type === 'awesome-lint') {
+      latestValidation.awesomeLint = result.result;
+    } else if (result.type === 'link-check') {
+      latestValidation.linkCheck = result.result;
+    }
+    latestValidation.lastUpdated = result.timestamp;
+  }
+
+  /**
+   * Get the most recent awesome-lint and link-check results.
+   */
+  async getLatestValidationResults(): Promise<ValidationResults> {
+    return {
+      awesomeLint: latestValidation.awesomeLint,
+      linkCheck: latestValidation.linkCheck,
+      lastUpdated: latestValidation.lastUpdated,
     };
   }
 }
