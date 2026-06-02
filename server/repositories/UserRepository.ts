@@ -29,6 +29,12 @@ import { db } from "../db";
 import { eq, desc, sql } from "drizzle-orm";
 
 /**
+ * A user safe to send to clients — the password hash is never included.
+ * Endpoints that return user data to the browser use this shape.
+ */
+export type SafeUser = Omit<User, "password">;
+
+/**
  * Repository class for user-related database operations
  */
 export class UserRepository {
@@ -99,15 +105,26 @@ export class UserRepository {
    * @param limit - Number of users per page
    * @returns Object containing users array and total count
    */
-  async listUsers(page = 1, limit = 20): Promise<{ users: User[]; total: number }> {
+  async listUsers(page = 1, limit = 20): Promise<{ users: SafeUser[]; total: number }> {
     const offset = (page - 1) * limit;
 
     const [totalResult] = await db
       .select({ count: sql<number>`count(*)::int` })
       .from(users);
 
+    // Never return the password hash to clients. Select explicit columns
+    // so a future schema addition can't silently re-leak credentials.
     const userList = await db
-      .select()
+      .select({
+        id: users.id,
+        email: users.email,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        profileImageUrl: users.profileImageUrl,
+        role: users.role,
+        createdAt: users.createdAt,
+        updatedAt: users.updatedAt,
+      })
       .from(users)
       .orderBy(desc(users.createdAt))
       .limit(limit)
