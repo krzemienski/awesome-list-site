@@ -104,7 +104,7 @@ export default function CategoryExplorer({ categories, resources, categoryCounts
     const subcategoryCount = category.subcategories?.length || 0;
     const uniqueTags = new Set(
       category.resources.flatMap(
-        r => r.tags ?? (r.metadata as { tags?: string[] } | undefined)?.tags ?? []
+        r => (r.metadata as { tags?: string[] } | undefined)?.tags ?? r.tags ?? []
       )
     ).size;
 
@@ -156,6 +156,7 @@ export default function CategoryExplorer({ categories, resources, categoryCounts
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="subcategories"
+                aria-label="Show subcategories"
                 checked={showSubcategories}
                 onCheckedChange={(checked) => setShowSubcategories(checked === true)}
               />
@@ -266,7 +267,9 @@ export default function CategoryExplorer({ categories, resources, categoryCounts
                           variant="ghost"
                           size="sm"
                           onClick={() => toggleCategoryExpansion(category.name)}
-                          className="h-8 w-8 p-0"
+                          aria-label={isExpanded ? `Collapse ${category.name}` : `Expand ${category.name}`}
+                          aria-expanded={isExpanded}
+                          className="h-8 w-8 p-0 min-h-[44px] min-w-[44px]"
                         >
                           <ChevronRight className={cn(
                             "h-4 w-4 transform transition-transform",

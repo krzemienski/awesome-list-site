@@ -11,7 +11,6 @@ import AdvancedFilter from "@/components/ui/advanced-filter";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { deslugify } from "@/lib/utils";
 import { Resource } from "@/types/awesome-list";
-import type { Resource as DbResource } from "@shared/schema";
 import NotFound from "@/pages/not-found";
 import { processAwesomeListData } from "@/lib/parser";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
@@ -46,9 +45,9 @@ export default function SubSubcategory() {
     queryKey: ['/api/resources?limit=2000'],
     enabled: !!awesomeList,
   });
-  
+
   const dbResources = dbData?.resources || [];
-  
+
   let currentSubSubcategory = null;
   let parentCategory = null;
   let parentSubcategory = null;

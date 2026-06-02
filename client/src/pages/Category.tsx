@@ -507,7 +507,7 @@ export default function Category() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-8 w-8 p-0 touch-manipulation"
+                        className="h-8 w-8 p-0 min-h-[44px] min-w-[44px] touch-manipulation"
                         onClick={handleExternalLink}
                         data-testid={`button-external-${resourceId}`}
                         title="Open in new tab"
@@ -519,7 +519,7 @@ export default function Category() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 w-8 p-0 touch-manipulation"
+                          className="h-8 w-8 p-0 min-h-[44px] min-w-[44px] touch-manipulation"
                           onClick={(e) => handleSuggestEdit(e, resource)}
                           data-testid={`button-suggest-edit-${resourceId}`}
                           title="Suggest an edit"

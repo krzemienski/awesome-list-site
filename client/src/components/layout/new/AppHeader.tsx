@@ -95,7 +95,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout }: AppHeaderPro
       <div className="flex-1 min-w-0 mx-1 sm:mx-2">
         <button
           onClick={onSearchOpen}
-          className="w-full max-w-sm flex items-center h-10 sm:h-9 rounded-lg border border-input bg-[var(--surface)] px-3 py-1 text-sm transition-colors duration-[var(--motion-fast)] hover:border-[var(--border-strong)] focus-visible:outline-none focus-visible:border-[color-mix(in_srgb,var(--accent)_60%,transparent)] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 touch-manipulation"
+          className="w-full max-w-sm flex items-center min-h-[44px] sm:min-h-0 h-11 sm:h-9 rounded-lg border border-input bg-[var(--surface)] px-3 py-1 text-sm transition-colors duration-[var(--motion-fast)] hover:border-[var(--border-strong)] focus-visible:outline-none focus-visible:border-[color-mix(in_srgb,var(--accent)_60%,transparent)] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 touch-manipulation"
         >
           <Search className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
           <span className="text-muted-foreground truncate hidden sm:inline">Search resources...</span>
@@ -157,7 +157,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout }: AppHeaderPro
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <Button variant="ghost" size="sm" onClick={() => setLocation("/login")} className="gap-1.5 h-9 px-2 sm:px-3">
+          <Button variant="ghost" size="sm" onClick={() => setLocation("/login")} className="gap-1.5 h-9 px-2 sm:px-3 min-h-[44px] min-w-[44px]">
             <LogIn className="h-4 w-4" />
             <span className="hidden sm:inline">Login</span>
           </Button>

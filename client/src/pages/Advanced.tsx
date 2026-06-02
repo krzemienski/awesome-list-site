@@ -153,7 +153,7 @@ export default function Advanced() {
                       <div className="text-2xl font-bold text-green-600">
                         {new Set(
                           awesomeList.resources.flatMap(
-                            r => r.tags ?? (r.metadata as { tags?: string[] } | undefined)?.tags ?? []
+                            r => (r.metadata as { tags?: string[] } | undefined)?.tags ?? r.tags ?? []
                           )
                         ).size}
                       </div>

@@ -154,7 +154,6 @@ function CategoryAccordion({
   matchQuery,
   openSubs,
   toggleSub,
-  dbCount,
 }: {
   cat: Category;
   isOpen: boolean;
@@ -165,16 +164,17 @@ function CategoryAccordion({
   matchQuery: string;
   openSubs: string[];
   toggleSub: (key: string) => void;
-  dbCount?: number;
 }) {
   const subKey = (subName: string) => `${cat.name}::${subName}`;
   const CategoryIcon = getCategoryIcon(cat.name);
   const catSlug = cat.slug || getCategorySlug(cat.name);
   const catPath = `/category/${catSlug}`;
   const subs = cat.subcategories || [];
-  // Prefer the authoritative DB count; fall back to the static tree sum until
-  // the /api/categories query resolves.
-  const totalCount = dbCount ?? getTotalResourceCount(cat);
+  // Single source of truth: the recursive tree-sum over the DB-derived
+  // /api/awesome-list hierarchy. The backend folds orphaned resources into the
+  // nearest valid node, so this always equals COUNT(*) WHERE category = X and
+  // always equals (direct + sum of child badges) — no "mixed validators".
+  const totalCount = getTotalResourceCount(cat);
 
   // approximate body height for max-height animation
   const expandedHeight = useMemo(() => {
@@ -396,18 +396,6 @@ export default function AppSidebar({
   const { setOpenMobile } = useSidebar();
 
   const filtered = useMemo(() => filterCategories(categories), [categories]);
-
-  // Authoritative per-category approved-resource counts from the database,
-  // keyed by name, so the nav badges match the category pages and landing page.
-  const { data: dbCategories } = useQuery<Array<{ name: string; resourceCount: number }>>({
-    queryKey: ["/api/categories"],
-    staleTime: 1000 * 60 * 60,
-  });
-  const categoryCounts = useMemo(() => {
-    const map: Record<string, number> = {};
-    (dbCategories || []).forEach((c) => { map[c.name] = c.resourceCount; });
-    return map;
-  }, [dbCategories]);
 
   /* auto-expand active category and subcategory on route change */
   useEffect(() => {
@@ -658,7 +646,6 @@ export default function AppSidebar({
                   <CategoryAccordion
                     key={cat.name}
                     cat={cat}
-                    dbCount={categoryCounts[cat.name]}
                     isOpen={isOpen}
                     onToggle={() =>
                       setOpenCategories((prev) =>
