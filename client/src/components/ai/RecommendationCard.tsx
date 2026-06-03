@@ -38,12 +38,14 @@ interface Resource {
 
 interface RecommendationCardProps {
   resource: Resource;
+  userId?: string;
   onClick?: () => void;
   className?: string;
 }
 
 function RecommendationCard({
   resource,
+  userId,
   onClick,
   className
 }: RecommendationCardProps) {
@@ -64,13 +66,24 @@ function RecommendationCard({
 
   const feedbackMutation = useMutation({
     mutationFn: async (feedbackType: 'helpful' | 'not_helpful') => {
-      return await apiRequest(`/api/recommendations/${resource.id}/feedback`, {
+      if (!userId) {
+        throw new Error('User must be logged in to provide feedback');
+      }
+      // The registered route is POST /api/recommendations/feedback (no :id
+      // segment) and expects { userId, resourceId, feedback } where feedback is
+      // the engine's interaction enum, not the UI's helpful/not_helpful label.
+      return await apiRequest('/api/recommendations/feedback', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify({ feedback: feedbackType })
+        body: JSON.stringify({
+          userId,
+          resourceId: Number(resource.id),
+          feedback: feedbackType === 'helpful' ? 'clicked' : 'dismissed',
+          rating: feedbackType === 'helpful' ? 5 : 1,
+        })
       });
     },
     onMutate: async (feedbackType) => {

@@ -157,13 +157,32 @@ export default function Profile({ user }: ProfileProps) {
     enabled: !!user
   });
 
-  // Fetch personalized recommendations
+  // Fetch personalized recommendations. The API returns a nested shape
+  // ({ resource: {...}, confidence, reason, type }); flatten it into the
+  // Recommendation shape the card consumes so titles, navigation, and the
+  // feedback resourceId all resolve instead of reading undefined fields.
   const { data: recommendations, isLoading: recommendationsLoading } = useQuery<Recommendation[]>({
     queryKey: ['/api/recommendations'],
     queryFn: async () => {
       const response = await fetch('/api/recommendations?limit=6', { credentials: 'include' });
       if (!response.ok) throw new Error('Failed to fetch recommendations');
-      return response.json();
+      const raw: Array<{
+        resource: { id: number; title: string; url: string; description?: string | null; category: string; metadata?: { tags?: string[] } | null };
+        confidence?: number;
+        reason?: string;
+        type?: string;
+      }> = await response.json();
+      return raw.map((item) => ({
+        id: String(item.resource.id),
+        name: item.resource.title,
+        url: item.resource.url,
+        description: item.resource.description || undefined,
+        category: item.resource.category,
+        tags: item.resource.metadata?.tags ?? [],
+        confidence: item.confidence,
+        matchReason: item.reason,
+        isAIBased: item.type === 'ai_based',
+      }));
     },
     enabled: !!user
   });
@@ -451,6 +470,7 @@ export default function Profile({ user }: ProfileProps) {
                     <RecommendationCard
                       key={recommendation.id}
                       resource={recommendation}
+                      userId={user?.id}
                       onClick={() => {
                         setLocation(`/resource/${recommendation.id}`);
                       }}
