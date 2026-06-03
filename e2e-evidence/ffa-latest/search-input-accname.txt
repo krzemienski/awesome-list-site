@@ -1,0 +1,65 @@
+input present: 1
+nodeId: 933
+AX role: combobox
+AX name (computed accessible name): ""
+AX name sources: [
+  {
+    "type": "relatedElement",
+    "attribute": "aria-labelledby",
+    "attributeValue": {
+      "type": "string",
+      "value": "radix-:rc:"
+    },
+    "invalid": true
+  },
+  {
+    "type": "attribute",
+    "attribute": "aria-label"
+  },
+  {
+    "type": "relatedElement",
+    "value": {
+      "type": "computedString",
+      "value": ""
+    },
+    "nativeSource": "labelfor",
+    "nativeSourceValue": {
+      "type": "nodeList",
+      "relatedNodes": [
+        {
+          "backendDOMNodeId": 927,
+          "idref": "radix-:rc:",
+          "text": ""
+        }
+      ]
+    }
+  },
+  {
+    "type": "attribute",
+    "attribute": "title",
+    "superseded": true
+  },
+  {
+    "type": "placeholder",
+    "value": {
+      "type": "computedString",
+      "value": "Search packages, libraries, and tools..."
+    },
+    "attribute": "placeholder",
+    "attributeValue": {
+      "type": "string",
+      "value": "Search packages, libraries, and tools..."
+    },
+    "superseded": true
+  },
+  {
+    "type": "placeholder",
+    "attribute": "aria-placeholder",
+    "superseded": true
+  },
+  {
+    "type": "attribute",
+    "attribute": "title",
+    "superseded": true
+  }
+]

@@ -1,0 +1,5 @@
+--- raw bodies captured this session ---
+{"user":null,"isAuthenticated":false}
+{"message":"Invalid email or password"}
+{"message":"Invalid email format"}
+{"success":true}

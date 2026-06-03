@@ -1,0 +1,13 @@
+=== ResourceDetail: get a real numeric id, then probe detail + related ===
+real id = 1949
+--- /api/resources/1949 ---
+is array? False | top keys: ['id', 'title', 'url', 'description', 'category', 'subcategory', 'subSubcategory', 'status', 'submittedBy', 'approvedBy', 'approvedAt', 'githubSynced', 'lastSyncedAt', 'metadata', 'createdAt', 'updatedAt']
+id: 1949 | title: DVBSnoop
+has .category: True | .status: approved | .url present: True
+metadata type: dict
+--- /api/resources/1949/related ---
+top keys: ['resources']
+resources is array: True | len: 6
+first related keys: ['id', 'title', 'url', 'description', 'category', 'subcategory', 'subSubcategory', 'status', 'submittedBy', 'approvedBy', 'approvedAt', 'githubSynced', 'lastSyncedAt', 'metadata', 'createdAt', 'updatedAt']
+--- /api/resources/db-1949 (direct deep-link with db- prefix) ---
+HTTP 404

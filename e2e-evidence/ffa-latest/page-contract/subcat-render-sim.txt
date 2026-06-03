@@ -1,0 +1,7 @@
+=== SIMULATE Subcategory page render (subcategory slug -> name -> filter full corpus) ===
+  /subcategory/community-groups: name='Community Groups' rendered=4
+  /subcategory/events-conferences: name='Events & Conferences' rendered=6
+  /subcategory/codecs: name='Codecs' rendered=27
+  /subcategory/encoding-tools: name='Encoding Tools' rendered=225
+  /subcategory/drm: name='DRM' rendered=17
+  /subcategory/ffmpeg-tools: name='FFMPEG & Tools' rendered=0

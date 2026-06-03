@@ -1,0 +1,17 @@
+===== edge-misc-404-and-phantom.txt =====
+PHANTOM ROUTE VERIFICATION (grep-flagged endpoints):
+
+/api/admin/platforms -> HTTP:404 | body: {"message":"Not found"}
+/api/admin/your-entities -> HTTP:404 | body: {"message":"Not found"}
+/api/check-email -> HTTP:404 | body: {"message":"Not found"}
+/api/resources/picker -> HTTP:404 | body: {"message":"Resource not found"}
+
+NOTE: platforms/your-entities/check-email = README/JSDoc examples only (NOT real frontend fetches).
+NOTE: /api/resources/picker = React Query queryKey array only; actual fetch is /api/resources/:id (App reads /api/resources?search). Verified client/src/components/admin/JourneyStepsManager.tsx:95-118
+
+check-url malformed url (=junk):
+{"exists":false}
+HTTP:200
+check-url empty url (=):
+{"message":"URL parameter is required"}
+HTTP:400

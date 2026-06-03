@@ -1,0 +1,20 @@
+Category page count (server-filtered /api/resources?category=NAME) vs /api/categories resourceCount
+Community & Events | category-endpoint total=91
+Encoding & Codecs | category-endpoint total=372
+General Tools | category-endpoint total=95
+Infrastructure & Delivery | category-endpoint total=183
+Intro & Learning | category-endpoint total=227
+Media Tools | category-endpoint total=304
+Players & Clients | category-endpoint total=263
+Protocols & Transport | category-endpoint total=242
+Standards & Industry | category-endpoint total=172
+--- /api/categories truth ---
+Community & Events | 91
+Encoding & Codecs | 372
+General Tools | 95
+Infrastructure & Delivery | 183
+Intro & Learning | 227
+Media Tools | 304
+Players & Clients | 263
+Protocols & Transport | 242
+Standards & Industry | 172

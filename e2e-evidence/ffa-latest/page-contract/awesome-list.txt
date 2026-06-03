@@ -1,0 +1,11 @@
+=== /api/awesome-list (pages read .categories/.resources/.title) ===
+TOP KEYS: ['title', 'description', 'repoUrl', 'resources', 'categories']
+title: Awesome Video
+categories len: 9
+resources len (top-level): 1949
+cat[0] keys: ['name', 'slug', 'resources', 'subcategories']
+cat[0] name/slug: Community & Events / community-events
+cat[0] resources len: 81
+cat[0] subcategories len: 2
+sub[0] keys: ['name', 'slug', 'resources', 'subSubcategories']
+sub[0] subSubcategories len: 2

@@ -1,0 +1,27 @@
+# Historical leak re-verify (unauth) 2026-06-02T23:38:31Z
+=== GET /api/admin/users (unauth) ===
+HTTP/1.1 401 Unauthorized
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 26
+ETag: W/"1a-pljHtlo127JYJR4E/RYOPb6ucbw"
+Date: Tue, 02 Jun 2026 23:38:31 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"message":"Unauthorized"}
+=== GET /api/admin/export-json (unauth) ===
+HTTP/1.1 401 Unauthorized
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 26
+ETag: W/"1a-pljHtlo127JYJR4E/RYOPb6ucbw"
+Date: Tue, 02 Jun 2026 23:38:31 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"message":"Unauthorized"}
+=== grep both raw bodies for hash/password ===
+bytes:       53
+bcrypt-hash matches: 0
+(0 matches = no leak)

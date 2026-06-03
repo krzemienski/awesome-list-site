@@ -1,0 +1,3 @@
+=== check-url ===
+{"exists":false}
+HTTP_STATUS:200

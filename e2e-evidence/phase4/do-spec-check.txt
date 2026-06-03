@@ -1,0 +1,1 @@
+yaml-ok (doctl absent — YAML parse + field checklist only)

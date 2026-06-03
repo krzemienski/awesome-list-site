@@ -1,0 +1,9 @@
+=== baseline default (no limit) ===
+http=200 bytes=13327
+returned 20 total 1949
+=== limit=100000 ===
+http=200 bytes=1429092
+returned 1949 total 1949
+=== limit=-5 ===
+http=200 bytes=1429092
+returned 1949 total 1949

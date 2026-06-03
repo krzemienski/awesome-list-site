@@ -1,0 +1,24 @@
+COUNT CORRECTNESS AUDIT — awesome-list-site (localhost:5001, seeded DB)
+======================================================================
+ALL displayed counts cross-checked against live /api. Verdict: counts CORRECT.
+
+PROVEN CORRECT:
+- /api/resources?limit=1 .total = 1949 (Home "curated resources" + Advanced "Resources" stat)
+- /api/categories = 9 categories, per-cat: CommEvents 91, Enc&Codecs 372, GenTools 95,
+  Infra 183, Intro 227, Media 304, Players 263, Protocols 242, Standards 172 (all match GT)
+- Home category cards: displayCount = categoryCounts[name] (=/api/categories) -> match
+- Sidebar category count = static recursive getTotalResourceCount == /api/categories (9/9 MATCH)
+- Sidebar subcategory counts == DB by-name (all match)
+- Sidebar+page subSubcategory counts == DB by-name (32 leaves, 0 mismatches)
+- Category page: /api/resources?category=NAME&limit=2000 total == /api/categories (9/9)
+- Subcategory page badge = DB rows where subcategory==name (proven per subcat)
+- SubSubcategory page badge = DB rows where subSubcategory==name (proven)
+- Internal consistency: sum(named-subcat)+no-subcat == category total (9/9 OK)
+- Advanced stats: Categories 9, Resources 1949, Subcategories 19 (sum cat.subcategories.length),
+  Unique Tags 2586 — all math sound
+- Spot: HEVC 10, AV1 5, VP9 1, FFMPEG 65, Origin Servers 1 (all GT match)
+
+FINDINGS (not wrong-count; empty advertised nav nodes — count shown = 0 = DB truth):
+- General Tools > "FFMPEG & Tools" (slug ffmpeg-tools): advertised in sidebar+tree, 0 resources.
+  General Tools' 95 rows = 78 no-subcat + 17 DRM; nothing named "FFMPEG & Tools".
+- Empty subSubcategory leaves: Slack & Meetups, Conferences, Other Encoders, Advertising, RTMP, SRT (=0)

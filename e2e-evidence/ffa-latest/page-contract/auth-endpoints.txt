@@ -1,0 +1,5 @@
+=== Auth-gated endpoints unauth behavior (ResourceDetail enables only when authed; verify no crash) ===
+/api/favorites (unauth) -> HTTP 401
+/api/bookmarks (unauth) -> HTTP 401
+/api/interactions POST (public route, no auth) ->
+  HTTP 200

@@ -1,0 +1,6 @@
+=== GET /api/resources/999999 ===
+{"message":"Resource not found"}
+HTTP:404
+=== GET /api/resources/abc (non-numeric) ===
+{"message":"Resource not found"}
+HTTP:404

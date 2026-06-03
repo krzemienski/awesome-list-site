@@ -1,0 +1,140 @@
+ Image awesome-list-site-app Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 564B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 2.19kB done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/node:20-alpine
+#3 DONE 0.5s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 911B done
+#4 DONE 0.0s
+
+#5 [builder 1/7] FROM docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293
+#5 DONE 0.0s
+
+#6 [internal] load build context
+#6 transferring context: 140.40MB 1.2s done
+#6 DONE 1.2s
+
+#7 [builder 3/7] WORKDIR /app
+#7 CACHED
+
+#8 [builder 4/7] COPY package.json pnpm-lock.yaml ./
+#8 CACHED
+
+#9 [builder 2/7] RUN corepack enable && corepack prepare pnpm@10.11.0 --activate
+#9 CACHED
+
+#10 [builder 5/7] RUN pnpm install --frozen-lockfile
+#10 CACHED
+
+#11 [builder 6/7] COPY . .
+#11 DONE 0.5s
+
+#12 [builder 7/7] RUN pnpm build
+#12 0.244 
+#12 0.244 > rest-express@1.0.0 build /app
+#12 0.244 > vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --splitting --outdir=dist
+#12 0.244 
+#12 0.344 vite v5.4.21 building for production...
+#12 0.376 transforming...
+#12 8.214 ✓ 2951 modules transformed.
+#12 8.381 warnings when minifying css:
+#12 8.381 ▲ [WARNING] "file" is not a known CSS property [unsupported-css-property]
+#12 8.381 
+#12 8.381     <stdin>:2:118683:
+#12 8.381       2 │ ...r-select:none}.\[file\:line\]{file:line}.\[path\:line\]{path:lin...
+#12 8.381         │                                  ~~~~
+#12 8.381         ╵                                  flex
+#12 8.381 
+#12 8.381   Did you mean "flex" instead?
+#12 8.381 
+#12 8.381 
+#12 8.542 rendering chunks...
+#12 8.551 computing gzip size...
+#12 8.571 ../dist/public/index.html                     8.98 kB │ gzip:   3.32 kB
+#12 8.571 ../dist/public/assets/index-r8Vgq7f_.css    167.72 kB │ gzip:  26.85 kB
+#12 8.571 ../dist/public/assets/index-CwUT96S-.js   1,425.87 kB │ gzip: 388.82 kB
+#12 8.571 
+#12 8.571 (!) Some chunks are larger than 500 kB after minification. Consider:
+#12 8.571 - Using dynamic import() to code-split the application
+#12 8.571 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+#12 8.571 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+#12 8.571 ✓ built in 8.21s
+#12 8.617 
+#12 8.617   dist/index.js                                  342.5kb
+#12 8.617   dist/chunk-3AEIYMHT.js                          57.9kb
+#12 8.617   dist/researchService-NPYG2CP7.js                30.3kb
+#12 8.617   dist/chunk-4LTZV7A3.js                          23.9kb
+#12 8.617   dist/og-middleware-FE2WJK3L.js                  11.5kb
+#12 8.617   dist/chunk-5HV4BHRF.js                          11.4kb
+#12 8.617   dist/chunk-MBCCQHMX.js                           9.5kb
+#12 8.617   dist/linkHealthService-TDXZHBWB.js               3.9kb
+#12 8.617   dist/vite-ROTZJSJ3.js                            3.4kb
+#12 8.617   dist/schema-Y2ZBL7FD.js                          2.1kb
+#12 8.617   dist/orphanJobWatchdog-4NIYVNVC.js               1.9kb
+#12 8.617   dist/chunk-WTLXNQQT.js                           1.4kb
+#12 8.617   dist/chunk-3RVJM5M6.js                           1.1kb
+#12 8.617   dist/chunk-5DWK3Z7X.js                           478b 
+#12 8.617   dist/chunk-MLKGABMK.js                           191b 
+#12 8.617   dist/promoteEnrichmentSuggestions-Z4BN4X77.js    173b 
+#12 8.617 
+#12 8.617 ⚡ Done in 10ms
+#12 DONE 8.6s
+
+#13 [production  4/12] RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001 -G nodejs
+#13 CACHED
+
+#14 [production  5/12] COPY package.json pnpm-lock.yaml ./
+#14 CACHED
+
+#15 [production  6/12] RUN pnpm install --prod --frozen-lockfile
+#15 CACHED
+
+#16 [production  7/12] COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
+#16 DONE 0.0s
+
+#17 [production  8/12] COPY --from=builder --chown=nodejs:nodejs /app/server ./server
+#17 DONE 0.0s
+
+#18 [production  9/12] COPY --from=builder --chown=nodejs:nodejs /app/shared ./shared
+#18 DONE 0.0s
+
+#19 [production 10/12] COPY --from=builder --chown=nodejs:nodejs /app/migrations ./migrations
+#19 DONE 0.0s
+
+#20 [production 11/12] COPY --from=builder --chown=nodejs:nodejs /app/drizzle.config.ts ./drizzle.config.ts
+#20 DONE 0.0s
+
+#21 [production 12/12] COPY --from=builder --chown=nodejs:nodejs /app/tsconfig.json ./tsconfig.json
+#21 DONE 0.0s
+
+#22 exporting to image
+#22 exporting layers 0.0s done
+#22 writing image sha256:288f02ce7127b21a56f5e7f1348a19578d72cc2a91762b73aeb8a3c2974dc6b6
+#22 writing image sha256:288f02ce7127b21a56f5e7f1348a19578d72cc2a91762b73aeb8a3c2974dc6b6 done
+#22 naming to docker.io/library/awesome-list-site-app done
+#22 DONE 0.0s
+
+#23 resolving provenance for metadata file
+#23 DONE 0.0s
+ Image awesome-list-site-app Built 
+ Network awesome-list-site_default Creating 
+ Network awesome-list-site_default Created 
+ Volume awesome-list-site_postgres_data Creating 
+ Volume awesome-list-site_postgres_data Created 
+ Container awesome-list-db Creating 
+ Container awesome-list-db Created 
+ Container awesome-list-app Creating 
+ Container awesome-list-app Created 
+ Container awesome-list-db Starting 
+ Container awesome-list-db Started 
+ Container awesome-list-db Waiting 
+ Container awesome-list-db Healthy 
+ Container awesome-list-app Starting 
+ Container awesome-list-app Started 

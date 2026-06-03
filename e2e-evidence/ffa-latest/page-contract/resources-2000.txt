@@ -1,0 +1,9 @@
+=== Sub/SubSub page source: /api/resources?limit=2000 (full corpus) ===
+total field: 1949
+resources len returned: 1949
+FFMPEG subcat count: None
+HEVC subsubcat count: 10
+AV1 subsubcat count: 5
+VP9 subsubcat count: 1
+origin-servers (subsub) count: None
+GROUND TRUTH: HEVC 10, FFMPEG 65, AV1 5, VP9 1, origin-servers 1

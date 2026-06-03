@@ -1,0 +1,36 @@
+############ REGISTER: missing-field body (expect 400, not 500) ############
+$ curl POST register {} (empty)
+HTTP/1.1 400 Bad Request
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 45
+ETag: W/"2d-xu7+uV0l2vKD05IjA0aWEJyDeEc"
+Date: Tue, 02 Jun 2026 23:34:27 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"message":"Email and password are required"}
+$ curl POST register missing password
+HTTP/1.1 400 Bad Request
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 45
+ETag: W/"2d-xu7+uV0l2vKD05IjA0aWEJyDeEc"
+Date: Tue, 02 Jun 2026 23:34:27 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"message":"Email and password are required"}
+$ curl POST register invalid email + short password (server-side validation?)
+HTTP/1.1 400 Bad Request
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 34
+ETag: W/"22-YA4eD/IUibRf5v2CqvJut5mOZSs"
+Date: Tue, 02 Jun 2026 23:34:27 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"message":"Invalid email format"}
+$ curl POST register completely malformed (non-JSON)
+status=500

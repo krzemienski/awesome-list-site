@@ -1,0 +1,7 @@
+=== SubSubcategory slug resolution: does awesome-list tree contain HEVC + Origin Servers nodes? ===
+total subSubcategory nodes in tree: 32
+  'AV1' slug='av1' (parent sub='Codecs')
+  'HEVC' slug='hevc' (parent sub='Codecs')
+  'VP9' slug='vp9' (parent sub='Codecs')
+  'FFMPEG' slug='ffmpeg' (parent sub='Encoding Tools')
+  'Origin Servers' slug='origin-servers' (parent sub='Streaming Servers')

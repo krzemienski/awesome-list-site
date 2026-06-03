@@ -1,0 +1,26 @@
+=== BASELINE ===
+total: 1949
+Community & Events 91
+Encoding & Codecs 372
+General Tools 95
+Infrastructure & Delivery 183
+Intro & Learning 227
+Media Tools 304
+Players & Clients 263
+Protocols & Transport 242
+Standards & Industry 172
+=== AFTER ===
+total: 1949
+Community & Events 91
+Encoding & Codecs 372
+General Tools 95
+Infrastructure & Delivery 183
+Intro & Learning 227
+Media Tools 304
+Players & Clients 263
+Protocols & Transport 242
+Standards & Industry 172
+=== DIFF baseline vs after categories ===
+BYTE-IDENTICAL: state unchanged
+=== resource id 1 still present? ===
+GET /api/resources/1 -> 200

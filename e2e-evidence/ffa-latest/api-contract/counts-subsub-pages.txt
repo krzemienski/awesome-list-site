@@ -1,0 +1,34 @@
+=== subSubcategory: sidebar static count vs subSub PAGE client-filter count vs DB-by-name ===
+'Online Forums' slug=online-forums: sidebar=2 | page=2 | db_byname=2
+'Slack & Meetups' slug=slack-meetups: sidebar=0 | page=0 | db_byname=0
+'Conferences' slug=conferences: sidebar=0 | page=0 | db_byname=0
+'Podcasts & Webinars' slug=podcasts-webinars: sidebar=2 | page=2 | db_byname=2
+'AV1' slug=av1: sidebar=5 | page=5 | db_byname=5
+'HEVC' slug=hevc: sidebar=10 | page=10 | db_byname=10
+'VP9' slug=vp9: sidebar=1 | page=1 | db_byname=1
+'FFMPEG' slug=ffmpeg: sidebar=65 | page=65 | db_byname=65
+'Other Encoders' slug=other-encoders: sidebar=0 | page=0 | db_byname=0
+'CDN Integration' slug=cdn-integration: sidebar=1 | page=1 | db_byname=1
+'Cloud Platforms' slug=cloud-platforms: sidebar=4 | page=4 | db_byname=4
+'Origin Servers' slug=origin-servers: sidebar=1 | page=1 | db_byname=1
+'Storage Solutions' slug=storage-solutions: sidebar=3 | page=3 | db_byname=3
+'Advertising' slug=advertising: sidebar=0 | page=0 | db_byname=0
+'Quality & Testing' slug=quality-testing: sidebar=36 | page=36 | db_byname=36
+'Audio' slug=audio: sidebar=8 | page=8 | db_byname=8
+'Subtitles & Captions' slug=subtitles-captions: sidebar=38 | page=38 | db_byname=38
+'Chromecast' slug=chromecast: sidebar=1 | page=1 | db_byname=1
+'Roku' slug=roku: sidebar=26 | page=26 | db_byname=26
+'Smart TVs' slug=smart-tvs: sidebar=3 | page=3 | db_byname=3
+'Android' slug=android: sidebar=10 | page=10 | db_byname=10
+'Web Players' slug=web-players: sidebar=23 | page=23 | db_byname=23
+'iOS/tvOS' slug=iostvos: sidebar=30 | page=30 | db_byname=30
+'DASH' slug=dash: sidebar=48 | page=48 | db_byname=48
+'HLS' slug=hls: sidebar=60 | page=60 | db_byname=60
+'RIST' slug=rist: sidebar=1 | page=1 | db_byname=1
+'RTMP' slug=rtmp: sidebar=0 | page=0 | db_byname=0
+'SRT' slug=srt: sidebar=0 | page=0 | db_byname=0
+'MPEG & Forums' slug=mpeg-forums: sidebar=6 | page=6 | db_byname=6
+'Official Specs' slug=official-specs: sidebar=3 | page=3 | db_byname=3
+'HDR Guidelines' slug=hdr-guidelines: sidebar=1 | page=1 | db_byname=1
+'Vendor Docs' slug=vendor-docs: sidebar=1 | page=1 | db_byname=1
+TOTAL MISMATCHES: 0

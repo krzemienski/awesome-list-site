@@ -1,0 +1,15 @@
+200  /api/health                               15b
+200  /api/awesome-list                         2862556b
+200  /api/categories                           742b
+200  /api/subcategories                        1397b
+200  /api/sub-subcategories                    2175b
+200  /api/resources                            13327b
+404  /api/public/categories                    23b
+404  /api/public/resources                     23b
+404  /api/public/tags                          23b
+404  /api/tags                                 23b
+200  /api/journeys                             2b
+200  /api/learning-paths/suggested             21053b
+200  /api/recommendations/init                 64b
+200  /api/recommendations                      7550b
+200  /sitemap.xml                              11205b

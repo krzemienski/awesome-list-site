@@ -1,0 +1,5 @@
+=== Advanced stats from /api/awesome-list (Categories, Resources, Unique Tags, Subcategories) ===
+Categories (categories.length): 9
+Resources (resources.length): 1949
+Subcategories (sum subcategories.length): 19
+Unique Tags: 2586

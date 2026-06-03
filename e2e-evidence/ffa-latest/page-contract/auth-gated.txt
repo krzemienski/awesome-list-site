@@ -1,0 +1,6 @@
+=== favorites/bookmarks unauth behavior (ResourceDetail gates on isAuthenticated) ===
+--- /api/favorites ---
+HTTP 401
+{"message":"Unauthorized"}
+--- /api/bookmarks ---
+HTTP 401

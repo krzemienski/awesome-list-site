@@ -1,0 +1,11 @@
+=== Category page count vs /api/categories for all 9 (server filter total) ===
+Community & Events         catAPI=  91 filter.total=  91 returned=  91 OK
+Encoding & Codecs          catAPI= 372 filter.total= 372 returned= 372 OK
+General Tools              catAPI=  95 filter.total=  95 returned=  95 OK
+Infrastructure & Delivery  catAPI= 183 filter.total= 183 returned= 183 OK
+Intro & Learning           catAPI= 227 filter.total= 227 returned= 227 OK
+Media Tools                catAPI= 304 filter.total= 304 returned= 304 OK
+Players & Clients          catAPI= 263 filter.total= 263 returned= 263 OK
+Protocols & Transport      catAPI= 242 filter.total= 242 returned= 242 OK
+Standards & Industry       catAPI= 172 filter.total= 172 returned= 172 OK
+ALL MATCH: True

@@ -1,0 +1,5 @@
+returned: 1949 total field: 1949
+  HEVC: 10 (expect 10) OK
+  AV1: 5 (expect 5) OK
+  VP9: 1 (expect 1) OK
+  FFMPEG subcat exists? False | Codecs: 27

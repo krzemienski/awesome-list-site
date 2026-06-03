@@ -1,0 +1,4 @@
+=== /api/resources?limit=1 (Home reads .total) ===
+TOP KEYS: ['resources', 'total']
+total field: 1949
+resources len: 1

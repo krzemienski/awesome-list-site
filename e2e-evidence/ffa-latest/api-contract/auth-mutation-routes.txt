@@ -1,0 +1,48 @@
+### auth-mutation routes (public) leak/behavior probe
+
+--- GET /api/auth/user (unauth, expect user:null) ---
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 37
+ETag: W/"25-52tCBtateiL36Jt3/evpzwc68m4"
+Date: Tue, 02 Jun 2026 23:14:20 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"user":null,"isAuthenticated":false}
+
+--- POST /api/auth/local/login bad creds (expect 401, no hash) ---
+HTTP/1.1 401 Unauthorized
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 57
+ETag: W/"39-vqVTLZ8tHXkBUSXpHnlL4RBnWGE"
+Date: Tue, 02 Jun 2026 23:14:20 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"message":"Password must be at least 8 characters long"}
+
+--- POST /api/auth/register existing/invalid (expect 4xx, no hash) ---
+HTTP/1.1 400 Bad Request
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 34
+ETag: W/"22-YA4eD/IUibRf5v2CqvJut5mOZSs"
+Date: Tue, 02 Jun 2026 23:14:20 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"message":"Invalid email format"}
+
+--- POST /api/auth/logout (unauth, expect success) ---
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 16
+ETag: W/"10-oV4hJxRVSENxc/wX8+mA4/Pe4tA"
+Set-Cookie: connect.sid=s%3ARGu674zx_Lf2nIM2wlap8Id90Oexb13f.tVNR53bjraAoDMltVXVZDU0g7T81ufV1cUcDU3TdgRc; Path=/; Expires=Tue, 09 Jun 2026 23:14:20 GMT
+
+### grep for hash markers across auth-mutation responses
+NO hash markers -> clean

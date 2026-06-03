@@ -1,0 +1,21 @@
+=== GET /api/auth/user (unauth) ===
+{"user":null,"isAuthenticated":false}
+HTTP:200
+=== POST /api/auth/login wrong pw ===
+{"message":"Not found"}
+HTTP:404
+=== POST /api/auth/register bad email ===
+{"message":"Invalid email format"}
+HTTP:400
+=== POST /api/auth/logout ===
+{"success":true}
+HTTP:200
+=== POST /api/auth/local/login wrong pw ===
+{"message":"Invalid email or password"}
+HTTP:401
+=== POST /api/auth/local/login no body ===
+{"message":"Missing credentials"}
+HTTP:401
+=== POST /api/auth/register valid-format email weak pw ===
+{"message":"Password must be at least 8 characters long"}
+HTTP:400

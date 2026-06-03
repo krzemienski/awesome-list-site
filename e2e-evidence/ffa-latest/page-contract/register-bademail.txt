@@ -1,0 +1,3 @@
+=== bad email ===
+{"message":"Invalid email format"}
+HTTP_STATUS:400

@@ -1,0 +1,7 @@
+=== leak check: should all 401 (not authed) / no account from bad input ===
+--- login attempt notanemail ---
+{"message":"Invalid email format"}
+HTTP_STATUS:401
+--- login attempt valid@example.com ---
+{"message":"Password must be at least 8 characters long"}
+HTTP_STATUS:401

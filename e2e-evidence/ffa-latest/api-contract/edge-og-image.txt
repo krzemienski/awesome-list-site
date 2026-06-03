@@ -1,0 +1,8 @@
+=== GET /og-image.png ===
+HTTP:200 CT:image/png SIZE:23735
+og.png: PNG image data, 1200 x 630, 8-bit/color RGBA, non-interlaced
+=== GET /og-image.svg ===
+HTTP:200 CT:image/svg+xml; charset=utf-8 SIZE:3345
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="glow" cx="18%" cy="2

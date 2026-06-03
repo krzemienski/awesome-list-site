@@ -1,0 +1,26 @@
+############ LOGIN: bad creds (expect 401, not 500) ############
+$ curl -sS -i -X POST http://localhost:5001/api/auth/local/login -H 'Content-Type: application/json' -d '{"email":"nope@nope.test","password":"wrongpassword123"}'
+HTTP/1.1 401 Unauthorized
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 39
+ETag: W/"27-Mm37A2ls1bgL0/D8e3MSpDLbow8"
+Date: Tue, 02 Jun 2026 23:34:16 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"message":"Invalid email or password"}
+############ LOGIN: malformed/missing-field (expect 4xx, not 500) ############
+$ curl POST login with empty body {}
+status=401
+$ curl POST login with missing password
+HTTP/1.1 401 Unauthorized
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 33
+ETag: W/"21-3ClehgzGjXZC/ELEDL3NRZaG0yo"
+Date: Tue, 02 Jun 2026 23:34:16 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"message":"Missing credentials"}

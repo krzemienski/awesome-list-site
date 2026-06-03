@@ -1,0 +1,13 @@
+=== FRESH limit edge cases (this run) ===
+--- limit=-5 ---
+HTTP-body total: 1949 returned: 1949
+  http:200
+--- limit=0 ---
+HTTP-body total: 1949 returned: 20
+  http:200
+--- limit=abc ---
+HTTP-body total: 1949 returned: 20
+  http:200
+--- limit=99999 ---
+HTTP-body total: 1949 returned: 1949
+  http:200

@@ -1,0 +1,3 @@
+NAME               IMAGE                   COMMAND                  SERVICE    CREATED          STATUS                    PORTS
+awesome-list-app   awesome-list-site-app   "docker-entrypoint.s…"   app        57 seconds ago   Up 45 seconds (healthy)   0.0.0.0:5001->5000/tcp, [::]:5001->5000/tcp
+awesome-list-db    postgres:16-alpine      "docker-entrypoint.s…"   postgres   57 seconds ago   Up 56 seconds (healthy)   0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp

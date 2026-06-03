@@ -1,0 +1,3 @@
+General Tools total rows: 95
+subcategory breakdown: {None: 78, 'DRM': 17}
+subSubcategory breakdown: {None: 95}

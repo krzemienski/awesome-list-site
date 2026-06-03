@@ -1,0 +1,4 @@
+=== /api/categories (shape: array of {name,resourceCount}?) ===
+TYPE: list
+LEN: 9
+SAMPLE: {"id": 9, "name": "Community & Events", "slug": "community-events", "resourceCount": 91}

@@ -1,0 +1,12 @@
+Explorer per-card 'X tags' = unique tags of category.resources (tree DIRECT only)
+
+category                 direct.res card_tags
+Community & Events               81       219
+Encoding & Codecs               120       299
+General Tools                    78       198
+Infrastructure & Delive         139       311
+Intro & Learning                129       288
+Media Tools                     203       541
+Players & Clients               150       305
+Protocols & Transport            94       191
+Standards & Industry            133       324

@@ -1,0 +1,21 @@
+# Unauthenticated GET probes 2026-06-02T23:38:15Z
+/api/user/progress                         -> HTTP 401 | {"message":"Unauthorized"}
+/api/user/submissions                      -> HTTP 401 | {"message":"Unauthorized"}
+/api/user/journeys                         -> HTTP 401 | {"message":"Unauthorized"}
+/api/favorites                             -> HTTP 401 | {"message":"Unauthorized"}
+/api/bookmarks                             -> HTTP 401 | {"message":"Unauthorized"}
+/api/admin/journeys                        -> HTTP 401 | {"message":"Unauthorized"}
+/api/admin/stats                           -> HTTP 401 | {"message":"Unauthorized"}
+/api/admin/users                           -> HTTP 401 | {"message":"Unauthorized"}
+/api/admin/audit-logs                      -> HTTP 401 | {"message":"Unauthorized"}
+/api/admin/pending-resources               -> HTTP 401 | {"message":"Unauthorized"}
+/api/admin/resources                       -> HTTP 401 | {"message":"Unauthorized"}
+/api/admin/resource-edits                  -> HTTP 401 | {"message":"Unauthorized"}
+/api/admin/categories                      -> HTTP 401 | {"message":"Unauthorized"}
+/api/admin/subcategories                   -> HTTP 401 | {"message":"Unauthorized"}
+/api/admin/sub-subcategories               -> HTTP 401 | {"message":"Unauthorized"}
+/api/admin/export-json                     -> HTTP 401 | {"message":"Unauthorized"}
+/api/admin/validation-status               -> HTTP 401 | {"message":"Unauthorized"}
+/api/admin/link-health/status              -> HTTP 401 | {"message":"Unauthorized"}
+/api/admin/link-health/history             -> HTTP 401 | {"message":"Unauthorized"}
+/api/admin/link-health/broken-links        -> HTTP 401 | {"message":"Unauthorized"}

@@ -1,0 +1,13 @@
+=== per-category: subcategory sum vs category total ===
+Community & Events: total=91 subSum=10 (no-subcat=81)
+Encoding & Codecs: total=372 subSum=252 (no-subcat=120)
+General Tools: total=95 subSum=17 (no-subcat=78)
+Infrastructure & Delivery: total=183 subSum=44 (no-subcat=139)
+Intro & Learning: total=227 subSum=98 (no-subcat=129)
+Media Tools: total=304 subSum=101 (no-subcat=203)
+Players & Clients: total=263 subSum=113 (no-subcat=150)
+Protocols & Transport: total=242 subSum=148 (no-subcat=94)
+Standards & Industry: total=172 subSum=39 (no-subcat=133)
+
+=== distinct subcategories: 18
+=== distinct categories: 9

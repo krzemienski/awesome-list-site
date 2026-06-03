@@ -1,0 +1,3 @@
+===== /api/health =====
+{"status":"ok"}
+HTTP 200 | ct=application/json; charset=utf-8

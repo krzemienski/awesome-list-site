@@ -1,0 +1,13 @@
+=== LOGIN admin@example.com ===
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 135
+ETag: W/"87-giM9+QgpA3S950f0px2JkqiObpY"
+Set-Cookie: connect.sid=s%3A9MMb5s282B628YGClprwWiXQJnhclvVg.%2Fvh7FoXw8CpxYy0AOIDJcwVYdg45z84h9fEhXqhCtrU; Path=/; Expires=Tue, 09 Jun 2026 23:16:35 GMT; HttpOnly; SameSite=Lax
+Date: Tue, 02 Jun 2026 23:16:35 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"user":{"id":"c6e7d1c6-9732-4373-acf2-4b5cb626439e","email":"admin@example.com","firstName":"Admin","lastName":"User","role":"admin"}}
+=== COOKIE JAR ===

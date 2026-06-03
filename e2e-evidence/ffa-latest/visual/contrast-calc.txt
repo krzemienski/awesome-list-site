@@ -1,0 +1,9 @@
+TOKEN                                              COMPOSITED RGB     RATIO   AA-normal(4.5) AA-large(3.0)
+--text-3 0.49 over #000(bg)                        (120, 119, 117)     4.69   PASS       PASS
+--text-3 0.49 over surface(#0a0a09~bg)             (120, 119, 117)     4.69   PASS       PASS
+--text-2 0.66 over #000                            (161, 160, 157)     8.03   PASS       PASS
+--text-3 0.49 over bg-2 #070706                    (123, 123, 120)     4.75   PASS       PASS
+variant l556 text-3 0.51 (232,232,224) /#000       (118, 118, 114)     4.60   PASS       PASS
+variant l576 text-3 0.48 (250,250,250) /#000       (120, 120, 120)     4.76   PASS       PASS
+variant l595 text-3 0.49 (245,245,240) /#000       (120, 120, 118)     4.75   PASS       PASS
+variant l614 text-3 0.48 (250,250,248) /#000       (120, 120, 119)     4.75   PASS       PASS

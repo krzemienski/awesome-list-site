@@ -1,0 +1,15 @@
+=== GET /sitemap.xml ===
+HTTP:200 CT:application/xml; charset=utf-8 SIZE:337530
+url-count: 2011
+loc-count: 2011
+resource-url-count: 1949
+category-url-count: 9
+first 6 lines:
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>http://localhost:5001/</loc>
+    <lastmod>2026-06-02</lastmod>
+    <changefreq>daily</changefreq>
+valid-xml-check:
+XML_PARSE_OK

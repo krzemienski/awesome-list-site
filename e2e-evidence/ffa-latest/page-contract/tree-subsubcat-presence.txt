@@ -1,0 +1,11 @@
+tree subcategory slugs count: 19
+tree subSubcategory slugs count: 32
+  subsub slug 'hevc' in tree? True   (also as subcat? False)
+  subsub slug 'av1' in tree? True   (also as subcat? False)
+  subsub slug 'vp9' in tree? True   (also as subcat? False)
+  subsub slug 'ffmpeg' in tree? True   (also as subcat? False)
+  subsub slug 'origin-servers' in tree? True   (also as subcat? False)
+
+sample subSubcat slugs in tree: ['advertising', 'android', 'audio', 'av1', 'cdn-integration', 'chromecast', 'cloud-platforms', 'conferences', 'dash', 'ffmpeg', 'hdr-guidelines', 'hevc', 'hls', 'iostvos', 'mpeg-forums', 'official-specs', 'online-forums', 'origin-servers', 'other-encoders', 'podcasts-webinars']
+
+ALL subcategory slugs in tree: ['adaptive-streaming', 'ads-qoe', 'audio-subtitles', 'cloud-cdn', 'codecs', 'community-groups', 'drm', 'encoding-tools', 'events-conferences', 'ffmpeg-tools', 'hardware-players', 'introduction', 'learning-resources', 'mobile-web-players', 'specs-standards', 'streaming-servers', 'transport-protocols', 'tutorials-case-studies', 'vendors-hdr']

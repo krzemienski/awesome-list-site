@@ -1,0 +1,6 @@
+DB resources with metadata.tags: 1948 of 1949
+DB unique tags: 2586
+tree top-level .tags present: 0
+tree .metadata.tags present: 1948
+sample tree resource keys: ['id', 'title', 'url', 'description', 'category', 'subcategory', 'subSubcategory', 'status', 'submittedBy', 'approvedBy', 'approvedAt', 'githubSynced', 'lastSyncedAt', 'metadata', 'createdAt', 'updatedAt']
+sample tree metadata: {"tags": ["RTMP", "WebRTC", "HLS"], "sourceCategories": ["protocols-transport"]}

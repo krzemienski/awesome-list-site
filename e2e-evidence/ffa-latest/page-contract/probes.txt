@@ -1,0 +1,17 @@
+=== T1 login bad creds (expect 401) ===
+HTTP=401
+=== T2 login empty body (expect 4xx) ===
+{"message":"Missing credentials"}
+HTTP=401
+=== T3 register missing field (expect 400 not 500) ===
+{"message":"Email and password are required"}
+HTTP=400
+=== T4 register bad email (expect 400) ===
+{"message":"Invalid email format"}
+HTTP=400
+=== T5 register no body at all (expect 400 not 500) ===
+{"message":"Email and password are required"}
+HTTP=400
+=== T6 register malformed JSON (expect 400 not 500) ===
+{"message":"Internal Server Error"}
+HTTP=500

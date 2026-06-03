@@ -1,0 +1,66 @@
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="glow" cx="18%" cy="22%" r="62%">
+      <stop offset="0%"   stop-color="#ff3d52" stop-opacity="0.28" />
+      <stop offset="55%"  stop-color="#ff3d52" stop-opacity="0.06" />
+      <stop offset="100%" stop-color="#ff3d52" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="surface" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#0e0d0c" stop-opacity="0.82" />
+      <stop offset="100%" stop-color="#0e0d0c" stop-opacity="0.55" />
+    </linearGradient>
+  </defs>
+
+  <!-- Editorial atmosphere: pure black + warm crimson radial glow -->
+  <rect width="1200" height="630" fill="#000000" />
+  <rect width="1200" height="630" fill="url(#glow)" />
+
+  <!-- Inset surface card with hairline border (matches DS .card surface) -->
+  <rect x="56" y="56" width="1088" height="518" rx="14"
+        fill="url(#surface)" stroke="rgba(244,243,238,0.12)" stroke-width="1" />
+
+  <!-- Eyebrow: Fraunces italic uppercase tracking-wide, crimson tinted -->
+  <text x="104" y="158" font-family="'Fraunces','Times New Roman',serif"
+        font-size="20" font-style="italic" font-weight="500"
+        fill="#ffb4be" letter-spacing="3" opacity="0.92">INDEX · AWESOME VIDEO</text>
+
+  <!-- Crimson hairline divider under eyebrow -->
+  <rect x="104" y="178" width="64" height="2" fill="#ff3d52" />
+
+  <!-- Primary title: Inter bold, warm off-white -->
+  <text x="104" y="266" font-family="'Inter','Helvetica Neue',sans-serif"
+        font-size="78" font-weight="800" fill="#f4f3ee"
+        letter-spacing="-2">Awesome Video</text>
+
+  <!-- Secondary line: Fraunces italic accent (matches About/Home hero) -->
+  <text x="104" y="332" font-family="'Fraunces','Times New Roman',serif"
+        font-size="36" font-style="italic" font-weight="500"
+        fill="#a8a4a0">Curated video development resources</text>
+
+  <!-- Footer row: brand mark + resource count chip -->
+  <g transform="translate(104, 478)">
+    <!-- AV monogram tile -->
+    <rect x="0" y="0" width="56" height="56" rx="10" fill="#ff3d52" />
+    <text x="28" y="38" font-family="'Inter','Helvetica Neue',sans-serif"
+          font-size="26" font-weight="800" fill="#000000"
+          text-anchor="middle">AV</text>
+
+    <!-- Brand wordmark: bold Inter + Fraunces italic ".video" accent -->
+    <text x="76" y="26" font-family="'Inter','Helvetica Neue',sans-serif"
+          font-size="22" font-weight="700" fill="#f4f3ee" letter-spacing="-0.5">awesome</text>
+    <text x="180" y="26" font-family="'Fraunces','Times New Roman',serif"
+          font-size="22" font-style="italic" font-weight="600" fill="#ff3d52">.video</text>
+    <text x="76" y="50" font-family="'Inter','Helvetica Neue',sans-serif"
+          font-size="14" font-weight="500" fill="#a8a4a0"
+          letter-spacing="1">new.awesome.video</text>
+  </g>
+
+  <!-- Resource count chip on the right (matches DS .chip surface) -->
+  <g transform="translate(936, 478)">
+    <rect x="0" y="0" width="160" height="56" rx="10"
+          fill="rgba(255,61,82,0.08)" stroke="#ff3d52" stroke-width="1" />
+    <text x="80" y="35" font-family="'Inter','Helvetica Neue',sans-serif"
+          font-size="18" font-weight="700" fill="#ff3d52"
+          text-anchor="middle" letter-spacing="0.5">1949+ resources</text>
+  </g>
+</svg>

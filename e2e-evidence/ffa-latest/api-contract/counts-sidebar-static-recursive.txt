@@ -1,0 +1,32 @@
+=== SIDEBAR category count (static recursive) vs /api/categories truth ===
+Community & Events: sidebar(static-recursive)=91 | api/categories=91 | MATCH
+Encoding & Codecs: sidebar(static-recursive)=372 | api/categories=372 | MATCH
+General Tools: sidebar(static-recursive)=95 | api/categories=95 | MATCH
+Infrastructure & Delivery: sidebar(static-recursive)=183 | api/categories=183 | MATCH
+Intro & Learning: sidebar(static-recursive)=227 | api/categories=227 | MATCH
+Media Tools: sidebar(static-recursive)=304 | api/categories=304 | MATCH
+Players & Clients: sidebar(static-recursive)=263 | api/categories=263 | MATCH
+Protocols & Transport: sidebar(static-recursive)=242 | api/categories=242 | MATCH
+Standards & Industry: sidebar(static-recursive)=172 | api/categories=172 | MATCH
+ALL MATCH: True
+
+=== SIDEBAR per-subcategory count (static recursive getTotalResourceCount(sub)) ===
+Community & Events > Community Groups: sidebar-subcount=4
+Community & Events > Events & Conferences: sidebar-subcount=6
+Encoding & Codecs > Codecs: sidebar-subcount=27
+Encoding & Codecs > Encoding Tools: sidebar-subcount=225
+General Tools > DRM: sidebar-subcount=17
+General Tools > FFMPEG & Tools: sidebar-subcount=0
+Infrastructure & Delivery > Cloud & CDN: sidebar-subcount=9
+Infrastructure & Delivery > Streaming Servers: sidebar-subcount=35
+Intro & Learning > Introduction: sidebar-subcount=3
+Intro & Learning > Learning Resources: sidebar-subcount=36
+Intro & Learning > Tutorials & Case Studies: sidebar-subcount=59
+Media Tools > Ads & QoE: sidebar-subcount=45
+Media Tools > Audio & Subtitles: sidebar-subcount=56
+Players & Clients > Hardware Players: sidebar-subcount=35
+Players & Clients > Mobile & Web Players: sidebar-subcount=78
+Protocols & Transport > Adaptive Streaming: sidebar-subcount=139
+Protocols & Transport > Transport Protocols: sidebar-subcount=9
+Standards & Industry > Specs & Standards: sidebar-subcount=34
+Standards & Industry > Vendors & HDR: sidebar-subcount=5

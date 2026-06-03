@@ -1,0 +1,60 @@
+Error authenticating: _GaxiosError: request to http://127.0.0.1:8319/v1internal:loadCodeAssist failed, reason: connect ECONNREFUSED 127.0.0.1:8319
+    at Gaxios._request (file:///opt/homebrew/Cellar/gemini-cli/0.44.0/libexec/lib/node_modules/@google/gemini-cli/bundle/chunk-BE42OOYM.js:20965:66)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async _OAuth2Client.requestAsync (file:///opt/homebrew/Cellar/gemini-cli/0.44.0/libexec/lib/node_modules/@google/gemini-cli/bundle/chunk-BE42OOYM.js:22924:17)
+    at async CodeAssistServer.requestPost (file:///opt/homebrew/Cellar/gemini-cli/0.44.0/libexec/lib/node_modules/@google/gemini-cli/bundle/chunk-BE42OOYM.js:307112:17)
+    at async CodeAssistServer.loadCodeAssist (file:///opt/homebrew/Cellar/gemini-cli/0.44.0/libexec/lib/node_modules/@google/gemini-cli/bundle/chunk-BE42OOYM.js:307022:14)
+    at async _doSetupUser (file:///opt/homebrew/Cellar/gemini-cli/0.44.0/libexec/lib/node_modules/@google/gemini-cli/bundle/chunk-BE42OOYM.js:307363:15) {
+  config: {
+    url: 'http://127.0.0.1:8319/v1internal:loadCodeAssist',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'User-Agent': 'GeminiCLI-tui/0.44.0/gemini-2.5-flash (darwin; arm64; terminal) google-api-nodejs-client/9.15.1',
+      Authorization: '<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.',
+      'x-goog-api-client': 'gl-node/26.0.0',
+      Accept: 'application/json'
+    },
+    responseType: 'json',
+    body: '{"metadata":{"ideType":"IDE_UNSPECIFIED","platform":"PLATFORM_UNSPECIFIED","pluginType":"GEMINI"}}',
+    retryConfig: {
+      retryDelay: 100,
+      retry: 3,
+      noResponseRetries: 3,
+      statusCodesToRetry: [Array],
+      currentRetryAttempt: 0,
+      httpMethodsToRetry: [Array],
+      retryDelayMultiplier: 2,
+      timeOfFirstRequest: 1780346263002,
+      totalTimeout: 9007199254740991,
+      maxRetryDelay: 9007199254740991
+    },
+    paramsSerializer: [Function: paramsSerializer],
+    validateStatus: [Function: validateStatus],
+    errorRedactor: [Function: defaultErrorRedactor]
+  },
+  response: undefined,
+  error: FetchError2: request to http://127.0.0.1:8319/v1internal:loadCodeAssist failed, reason: connect ECONNREFUSED 127.0.0.1:8319
+      at ClientRequest.<anonymous> (file:///opt/homebrew/Cellar/gemini-cli/0.44.0/libexec/lib/node_modules/@google/gemini-cli/bundle/chunk-BE42OOYM.js:19887:18)
+      at ClientRequest.emit (node:events:509:20)
+      at emitErrorEvent (node:_http_client:109:11)
+      at Socket.socketErrorListener (node:_http_client:593:5)
+      at Socket.emit (node:events:509:20)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    type: 'system',
+    errno: 'ECONNREFUSED',
+    code: 'ECONNREFUSED'
+  },
+  code: 'ECONNREFUSED',
+  Symbol(gaxios-gaxios-error): '6.7.1'
+}
+MCP issues detected. Run /mcp list for status.
+An unexpected critical error occurred:Error: request to http://127.0.0.1:8319/v1internal:loadCodeAssist failed, reason: connect ECONNREFUSED 127.0.0.1:8319
+    at Gaxios._request (file:///opt/homebrew/Cellar/gemini-cli/0.44.0/libexec/lib/node_modules/@google/gemini-cli/bundle/chunk-BE42OOYM.js:20965:66)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async _OAuth2Client.requestAsync (file:///opt/homebrew/Cellar/gemini-cli/0.44.0/libexec/lib/node_modules/@google/gemini-cli/bundle/chunk-BE42OOYM.js:22924:17)
+    at async CodeAssistServer.requestPost (file:///opt/homebrew/Cellar/gemini-cli/0.44.0/libexec/lib/node_modules/@google/gemini-cli/bundle/chunk-BE42OOYM.js:307112:17)
+    at async CodeAssistServer.loadCodeAssist (file:///opt/homebrew/Cellar/gemini-cli/0.44.0/libexec/lib/node_modules/@google/gemini-cli/bundle/chunk-BE42OOYM.js:307022:14)
+    at async _doSetupUser (file:///opt/homebrew/Cellar/gemini-cli/0.44.0/libexec/lib/node_modules/@google/gemini-cli/bundle/chunk-BE42OOYM.js:307363:15)

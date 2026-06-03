@@ -1,0 +1,21 @@
+=== client-style fetch (what JourneyDetail does for /journey/abc) ===
+HTTP/1.1 500 Internal Server Error
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 37
+ETag: W/"25-1PpKIFQBYb1wlP9TgsBKn1qLxAA"
+Date: Tue, 02 Jun 2026 23:37:44 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"message":"Failed to fetch journey"}
+=== other non-numeric variants (mistyped/bot-crawled) ===
+/api/journeys/1abc => 404
+/api/journeys/%20 => 500
+/api/journeys/null => 500
+/api/journeys/undefined => 500
+/api/journeys/1.5 => 404
+
+=== numeric valid range sanity: /api/journeys list ===
+/api/journeys (list) => 200
+[]

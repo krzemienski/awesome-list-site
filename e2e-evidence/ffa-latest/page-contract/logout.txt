@@ -1,0 +1,3 @@
+=== POST /api/auth/logout (unauth) ===
+{"success":true}
+HTTP 200

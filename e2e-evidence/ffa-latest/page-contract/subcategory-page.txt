@@ -1,0 +1,21 @@
+=== Subcategory page live counts for each real subcat slug ===
+Ground truth check: Codecs comment says 27
+  /subcategory/adaptive-streaming  (name='Adaptive Streaming') -> 139
+  /subcategory/ads-qoe  (name='Ads & QoE') -> 45
+  /subcategory/audio-subtitles  (name='Audio & Subtitles') -> 56
+  /subcategory/cloud-cdn  (name='Cloud & CDN') -> 9
+  /subcategory/codecs  (name='Codecs') -> 27
+  /subcategory/community-groups  (name='Community Groups') -> 4
+  /subcategory/drm  (name='DRM') -> 17
+  /subcategory/encoding-tools  (name='Encoding Tools') -> 225
+  /subcategory/events-conferences  (name='Events & Conferences') -> 6
+  /subcategory/ffmpeg-tools  (name='FFMPEG & Tools') -> 0
+  /subcategory/hardware-players  (name='Hardware Players') -> 35
+  /subcategory/introduction  (name='Introduction') -> 3
+  /subcategory/learning-resources  (name='Learning Resources') -> 36
+  /subcategory/mobile-web-players  (name='Mobile & Web Players') -> 78
+  /subcategory/specs-standards  (name='Specs & Standards') -> 34
+  /subcategory/streaming-servers  (name='Streaming Servers') -> 35
+  /subcategory/transport-protocols  (name='Transport Protocols') -> 9
+  /subcategory/tutorials-case-studies  (name='Tutorials & Case Studies') -> 59
+  /subcategory/vendors-hdr  (name='Vendors & HDR') -> 5

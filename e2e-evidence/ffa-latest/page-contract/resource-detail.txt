@@ -1,0 +1,4 @@
+===== /api/resources/:id numeric (ResourceDetail) =====
+id=1949 http=200
+keys: ['id', 'title', 'url', 'description', 'category', 'subcategory', 'subSubcategory', 'status', 'submittedBy', 'approvedBy', 'approvedAt', 'githubSynced', 'lastSyncedAt', 'metadata', 'createdAt', 'updatedAt']
+id: 1949 title: DVBSnoop status: approved

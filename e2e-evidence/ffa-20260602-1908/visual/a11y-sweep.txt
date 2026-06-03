@@ -1,0 +1,6 @@
+=== size=icon buttons total ===
+      10
+
+=== icon buttons: check each for aria-label/title within 3 lines ===
+client/src/pages/ThemeSettings.tsx:267:              <Button size="icon" variant="outline" aria-label="Icon button" data-testid="preview-btn-icon">
+client/src/components/admin/AuditTab.tsx:136:          <Button type="submit" variant="outline" size="icon">

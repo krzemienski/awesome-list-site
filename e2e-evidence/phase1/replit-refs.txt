@@ -1,0 +1,14 @@
+server/github/syncService.ts:import { getGitHubClient } from "./replitConnection";
+server/github/replitConnection.ts: * Replit GitHub Connection Helper
+server/github/replitConnection.ts: * Manages OAuth token retrieval from Replit's connection service
+server/github/replitConnection.ts:// Replit connection settings types
+server/github/replitConnection.ts:interface ReplitConnectionSettings {
+server/github/replitConnection.ts:let connectionSettings: ReplitConnectionSettings | undefined;
+server/github/replitConnection.ts:  const hostname = process.env.REPLIT_CONNECTORS_HOSTNAME;
+server/github/replitConnection.ts:  const xReplitToken = process.env.REPL_IDENTITY 
+server/github/replitConnection.ts:    ? 'repl ' + process.env.REPL_IDENTITY 
+server/github/replitConnection.ts:  if (!xReplitToken) {
+server/github/replitConnection.ts:    throw new Error('Replit identity token not found. GitHub connection may not be set up.');
+server/github/replitConnection.ts:  // Fetch connection settings from Replit
+server/github/replitConnection.ts:        'X_REPLIT_TOKEN': xReplitToken
+server/github/replitConnection.ts:    throw new Error('GitHub not connected via Replit. Please set up the GitHub connection.');

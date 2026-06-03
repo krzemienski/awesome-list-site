@@ -1,0 +1,74 @@
+{
+  "title": "Dockerize awesome-list-site & replace Replit",
+  "source_plan": "planning/dockerize-replace-replit/claude-ralph-loop-prompt.md",
+  "completion_promise": "ALL-SECTIONS-COMPLETE",
+  "stories": [
+    {
+      "id": "VG-0",
+      "title": "Branch setup",
+      "passes": true,
+      "acceptanceCriteria": [
+        "git branch --show-current == feat/dockerize-replace-replit",
+        "evidence at e2e-evidence/phase0/branch.txt"
+      ]
+    },
+    {
+      "id": "VG-1",
+      "title": "Replace Replit auth (subtractive) on passport-local",
+      "passes": true,
+      "acceptanceCriteria": [
+        "rg replit refs confined to server/github/replitConnection.ts + importer (e2e-evidence/phase1/replit-refs.txt)",
+        "pnpm build exit 0 (e2e-evidence/phase1/build.txt)",
+        "/api/auth/user returns isAuthenticated:true across cookie jar (e2e-evidence/phase1/auth-user.json)"
+      ]
+    },
+    {
+      "id": "VG-2",
+      "title": "Containerize + harden (non-root, healthcheck, shutdown)",
+      "passes": true,
+      "acceptanceCriteria": [
+        "docker compose up --build: both awesome-list-db + awesome-list-app healthy, no crash loop (e2e-evidence/phase2/ps.txt)",
+        "docker exec awesome-list-app whoami == nodejs (e2e-evidence/phase2/whoami.txt)",
+        "curl localhost:5001/api/health returns ok (e2e-evidence/phase2/health.json)",
+        "/app/migrations contains .sql files in image (e2e-evidence/phase2/migrations-present.txt)",
+        "SIGTERM/SIGINT graceful shutdown closes server + pool.end in server/index.ts"
+      ]
+    },
+    {
+      "id": "VG-3",
+      "title": "Re-baseline migrations + idempotent seed (HIGH RISK)",
+      "passes": true,
+      "acceptanceCriteria": [
+        "clean-volume up: no 42710/42P01/already-exists/does-not-exist in up.txt",
+        "seed completion line present (e2e-evidence/phase3/seed-done.txt)",
+        "research_discoveries + research_jobs + api_keys all non-NULL (missing-tables-check.txt)",
+        "cat-count == 9; res-total ~1949-1953",
+        "res-total after docker compose restart EQUALS res-total (idempotent + persistent)"
+      ]
+    },
+    {
+      "id": "VG-4",
+      "title": "Production deploy config (Railway + DO, no live deploy)",
+      "passes": true,
+      "acceptanceCriteria": [
+        "railway.json healthcheckPath==/api/health and build.builder==DOCKERFILE",
+        ".do/app.yaml exists + parses (service from Dockerfile, http_port 5000, health /api/health, secrets type SECRET)",
+        "vercel.json deleted",
+        "no non-/api /health route refs outside docs",
+        "no committed secret values"
+      ]
+    },
+    {
+      "id": "VG-5",
+      "title": "Exhaustive browser-driven functional audit + remediation loop",
+      "passes": true,
+      "acceptanceCriteria": [
+        "17 screens + 14 admin tabs audited at 7 breakpoints; matrix.md 100% PASS/FIXED",
+        "every cell: zero console errors, zero >=400 requests, overflow probe pass, counts==DB baseline",
+        "auth register/login/session/logout + one CRUD write persists across docker compose restart",
+        "M-02/FP-01/FP-02/FP-03/FX-04/FP-05 confirmed FIXED with screenshot evidence",
+        "defects.md zero OPEN"
+      ]
+    }
+  ]
+}

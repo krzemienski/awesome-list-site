@@ -1,0 +1,5 @@
+=== ResourceDetail invalid id paths (page shows 'Resource Not Found' on !ok) ===
+/api/resources/999999 -> HTTP 404
+/api/resources/abc -> HTTP 404
+/api/resources/db-1949 -> HTTP 404
+/api/resources/0 -> HTTP 404

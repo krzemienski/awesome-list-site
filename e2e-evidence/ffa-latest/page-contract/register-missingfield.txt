@@ -1,0 +1,3 @@
+=== missing password ===
+{"message":"Email and password are required"}
+HTTP_STATUS:400

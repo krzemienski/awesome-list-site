@@ -1,0 +1,485 @@
+ Image awesome-list-site-app Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 564B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 2.19kB done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/node:20-alpine
+#3 DONE 0.4s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 911B done
+#4 DONE 0.0s
+
+#5 [builder 1/7] FROM docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293
+#5 DONE 0.0s
+
+#6 [internal] load build context
+#6 transferring context: 142.90MB 1.3s done
+#6 DONE 1.3s
+
+#7 [builder 2/7] RUN corepack enable && corepack prepare pnpm@10.11.0 --activate
+#7 CACHED
+
+#8 [production  4/12] RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001 -G nodejs
+#8 CACHED
+
+#9 [builder 3/7] WORKDIR /app
+#9 CACHED
+
+#10 [builder 4/7] COPY package.json pnpm-lock.yaml ./
+#10 DONE 0.1s
+
+#11 [production  5/12] COPY package.json pnpm-lock.yaml ./
+#11 DONE 0.1s
+
+#12 [production  6/12] RUN pnpm install --prod --frozen-lockfile
+#12 0.433 Lockfile is up to date, resolution step is skipped
+#12 0.469 Progress: resolved 1, reused 0, downloaded 0, added 0
+#12 0.652 Packages: +595
+#12 0.652 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#12 1.471 Progress: resolved 595, reused 0, downloaded 58, added 58
+#12 2.154 
+#12 2.154    ╭──────────────────────────────────────────────╮
+#12 2.154    │                                              │
+#12 2.154    │     Update available! 10.11.0 → 11.5.0.      │
+#12 2.154    │     Changelog: https://pnpm.io/v/11.5.0      │
+#12 2.154    │   To update, run: corepack use pnpm@11.5.0   │
+#12 2.154    │                                              │
+#12 2.154    ╰──────────────────────────────────────────────╯
+#12 2.154 
+#12 2.472 Progress: resolved 595, reused 0, downloaded 158, added 158
+#12 3.472 Progress: resolved 595, reused 0, downloaded 227, added 227
+#12 4.472 Progress: resolved 595, reused 0, downloaded 303, added 303
+#12 5.472 Progress: resolved 595, reused 0, downloaded 354, added 354
+#12 6.472 Progress: resolved 595, reused 0, downloaded 372, added 372
+#12 7.473 Progress: resolved 595, reused 0, downloaded 421, added 421
+#12 8.473 Progress: resolved 595, reused 0, downloaded 476, added 476
+#12 9.474 Progress: resolved 595, reused 0, downloaded 538, added 538
+#12 ...
+
+#13 [builder 5/7] RUN pnpm install --frozen-lockfile
+#13 0.435 Lockfile is up to date, resolution step is skipped
+#13 0.499 Progress: resolved 1, reused 0, downloaded 0, added 0
+#13 0.713 Packages: +915
+#13 0.713 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#13 1.300 
+#13 1.300    ╭──────────────────────────────────────────────╮
+#13 1.300    │                                              │
+#13 1.300    │     Update available! 10.11.0 → 11.5.0.      │
+#13 1.300    │     Changelog: https://pnpm.io/v/11.5.0      │
+#13 1.300    │   To update, run: corepack use pnpm@11.5.0   │
+#13 1.300    │                                              │
+#13 1.300    ╰──────────────────────────────────────────────╯
+#13 1.300 
+#13 1.503 Progress: resolved 915, reused 0, downloaded 51, added 51
+#13 2.504 Progress: resolved 915, reused 0, downloaded 157, added 157
+#13 3.505 Progress: resolved 915, reused 0, downloaded 219, added 219
+#13 4.505 Progress: resolved 915, reused 0, downloaded 274, added 274
+#13 5.506 Progress: resolved 915, reused 0, downloaded 325, added 325
+#13 6.506 Progress: resolved 915, reused 0, downloaded 354, added 354
+#13 7.508 Progress: resolved 915, reused 0, downloaded 365, added 365
+#13 8.508 Progress: resolved 915, reused 0, downloaded 400, added 400
+#13 9.510 Progress: resolved 915, reused 0, downloaded 440, added 440
+#13 ...
+
+#12 [production  6/12] RUN pnpm install --prod --frozen-lockfile
+#12 10.48 Progress: resolved 595, reused 0, downloaded 562, added 562
+#12 11.48 Progress: resolved 595, reused 0, downloaded 582, added 582
+#12 12.48 Progress: resolved 595, reused 0, downloaded 585, added 585
+#12 13.48 Progress: resolved 595, reused 0, downloaded 587, added 587
+#12 15.11 Progress: resolved 595, reused 0, downloaded 588, added 587
+#12 16.11 Progress: resolved 595, reused 0, downloaded 588, added 588
+#12 18.20 Progress: resolved 595, reused 0, downloaded 589, added 588
+#12 19.20 Progress: resolved 595, reused 0, downloaded 590, added 590
+#12 ...
+
+#13 [builder 5/7] RUN pnpm install --frozen-lockfile
+#13 10.51 Progress: resolved 915, reused 0, downloaded 449, added 449
+#13 11.52 Progress: resolved 915, reused 0, downloaded 476, added 476
+#13 12.52 Progress: resolved 915, reused 0, downloaded 529, added 529
+#13 13.52 Progress: resolved 915, reused 0, downloaded 552, added 552
+#13 14.52 Progress: resolved 915, reused 0, downloaded 560, added 560
+#13 15.52 Progress: resolved 915, reused 0, downloaded 591, added 591
+#13 16.52 Progress: resolved 915, reused 0, downloaded 619, added 619
+#13 17.52 Progress: resolved 915, reused 0, downloaded 650, added 650
+#13 18.52 Progress: resolved 915, reused 0, downloaded 675, added 675
+#13 19.53 Progress: resolved 915, reused 0, downloaded 717, added 717
+#13 ...
+
+#12 [production  6/12] RUN pnpm install --prod --frozen-lockfile
+#12 20.20 Progress: resolved 595, reused 0, downloaded 591, added 591
+#12 ...
+
+#13 [builder 5/7] RUN pnpm install --frozen-lockfile
+#13 20.53 Progress: resolved 915, reused 0, downloaded 775, added 775
+#13 21.53 Progress: resolved 915, reused 0, downloaded 829, added 829
+#13 22.53 Progress: resolved 915, reused 0, downloaded 869, added 869
+#13 23.53 Progress: resolved 915, reused 0, downloaded 901, added 901
+#13 24.53 Progress: resolved 915, reused 0, downloaded 907, added 907
+#13 25.53 Progress: resolved 915, reused 0, downloaded 909, added 909
+#13 27.14 Progress: resolved 915, reused 0, downloaded 910, added 909
+#13 28.14 Progress: resolved 915, reused 0, downloaded 910, added 910
+#13 ...
+
+#12 [production  6/12] RUN pnpm install --prod --frozen-lockfile
+#12 30.22 Progress: resolved 595, reused 0, downloaded 592, added 591
+#12 31.22 Progress: resolved 595, reused 0, downloaded 593, added 593
+#12 32.22 Progress: resolved 595, reused 0, downloaded 594, added 594
+#12 36.91 Progress: resolved 595, reused 0, downloaded 595, added 594
+#12 36.98 Progress: resolved 595, reused 0, downloaded 595, added 595, done
+#12 37.16 
+#12 37.16 dependencies:
+#12 37.16 + @anthropic-ai/sdk 0.37.0
+#12 37.16 + @hookform/resolvers 3.10.0
+#12 37.16 + @jridgewell/trace-mapping 0.3.31
+#12 37.16 + @octokit/rest 22.0.1
+#12 37.16 + @radix-ui/react-accordion 1.2.12
+#12 37.16 + @radix-ui/react-alert-dialog 1.1.15
+#12 37.16 + @radix-ui/react-aspect-ratio 1.1.8
+#12 37.16 + @radix-ui/react-avatar 1.1.11
+#12 37.16 + @radix-ui/react-checkbox 1.3.3
+#12 37.16 + @radix-ui/react-collapsible 1.1.12
+#12 37.16 + @radix-ui/react-context-menu 2.2.16
+#12 37.16 + @radix-ui/react-dialog 1.1.15
+#12 37.16 + @radix-ui/react-dropdown-menu 2.1.16
+#12 37.16 + @radix-ui/react-hover-card 1.1.15
+#12 37.16 + @radix-ui/react-label 2.1.8
+#12 37.16 + @radix-ui/react-menubar 1.1.16
+#12 37.16 + @radix-ui/react-navigation-menu 1.2.14
+#12 37.16 + @radix-ui/react-popover 1.1.15
+#12 37.16 + @radix-ui/react-progress 1.1.8
+#12 37.16 + @radix-ui/react-radio-group 1.3.8
+#12 37.16 + @radix-ui/react-scroll-area 1.2.10
+#12 37.16 + @radix-ui/react-select 2.2.6
+#12 37.16 + @radix-ui/react-separator 1.1.8
+#12 37.16 + @radix-ui/react-slider 1.3.6
+#12 37.16 + @radix-ui/react-slot 1.2.4
+#12 37.16 + @radix-ui/react-switch 1.2.6
+#12 37.16 + @radix-ui/react-tabs 1.1.13
+#12 37.16 + @radix-ui/react-toast 1.2.15
+#12 37.16 + @radix-ui/react-toggle 1.1.10
+#12 37.16 + @radix-ui/react-toggle-group 1.1.11
+#12 37.16 + @radix-ui/react-tooltip 1.2.8
+#12 37.16 + @tailwindcss/postcss 4.2.4
+#12 37.16 + @tanstack/react-query 5.100.7
+#12 37.16 + @types/bcryptjs 2.4.6
+#12 37.16 + @types/js-yaml 4.0.9
+#12 37.16 + @types/react-helmet 6.1.11
+#12 37.16 + bcryptjs 3.0.3
+#12 37.16 + blurhash 2.0.5
+#12 37.16 + cheerio 1.2.0
+#12 37.16 + class-variance-authority 0.7.1
+#12 37.16 + clsx 2.1.1
+#12 37.16 + cmdk 1.1.1
+#12 37.16 + connect-pg-simple 10.0.0
+#12 37.16 + date-fns 3.6.0
+#12 37.16 + dotenv 17.4.2
+#12 37.16 + drizzle-orm 0.39.3
+#12 37.16 + drizzle-zod 0.7.1
+#12 37.16 + embla-carousel-react 8.6.0
+#12 37.16 + express 4.22.1
+#12 37.16 + express-rate-limit 7.5.1
+#12 37.16 + express-session 1.19.0
+#12 37.16 + framer-motion 11.18.2
+#12 37.16 + fuse.js 7.3.0
+#12 37.16 + input-otp 1.4.2
+#12 37.16 + js-yaml 4.1.1
+#12 37.16 + jsdom 27.4.0
+#12 37.16 + lucide-react 0.453.0
+#12 37.16 + nanoid 5.1.11
+#12 37.16 + next 15.5.15
+#12 37.16 + next-themes 0.4.6
+#12 37.16 + node-fetch 3.3.2
+#12 37.16 + openai 4.104.0
+#12 37.16 + passport 0.7.0
+#12 37.16 + passport-local 1.0.0
+#12 37.16 + pg 8.20.0
+#12 37.16 + puppeteer 24.42.0
+#12 37.16 + react 18.3.1
+#12 37.16 + react-blurhash 0.3.0
+#12 37.16 + react-day-picker 8.10.1
+#12 37.16 + react-dom 18.3.1
+#12 37.16 + react-helmet 6.1.0
+#12 37.16 + react-hook-form 7.75.0
+#12 37.16 + react-icons 5.6.0
+#12 37.16 + react-resizable-panels 2.1.9
+#12 37.16 + recharts 2.15.4
+#12 37.16 + remark 15.0.1
+#12 37.16 + remark-parse 11.0.0
+#12 37.16 + sharp 0.33.5
+#12 37.16 + swagger-ui-express 5.0.1
+#12 37.16 + tailwind-merge 2.6.1
+#12 37.16 + tailwindcss 4.2.4
+#12 37.16 + tailwindcss-animate 1.0.7
+#12 37.16 + tw-animate-css 1.4.0
+#12 37.16 + unist-util-visit 5.1.0
+#12 37.16 + vaul 1.1.2
+#12 37.16 + wouter 3.9.0
+#12 37.16 + ws 8.20.0
+#12 37.16 + zod 3.25.76
+#12 37.16 + zod-validation-error 3.5.4
+#12 37.16 
+#12 37.16 optionalDependencies:
+#12 37.16 + bufferutil 4.1.0
+#12 37.16 
+#12 37.16 devDependencies: skipped
+#12 37.16 
+#12 37.16 ╭ Warning ─────────────────────────────────────────────────────────────────────╮
+#12 37.16 │                                                                              │
+#12 37.16 │   Ignored build scripts: @scarf/scarf, bufferutil, puppeteer, sharp.         │
+#12 37.16 │   Run "pnpm approve-builds" to pick which dependencies should be allowed     │
+#12 37.16 │   to run scripts.                                                            │
+#12 37.16 │                                                                              │
+#12 37.16 ╰──────────────────────────────────────────────────────────────────────────────╯
+#12 37.16 
+#12 37.19 Done in 37s using pnpm v10.11.0
+#12 DONE 37.7s
+
+#13 [builder 5/7] RUN pnpm install --frozen-lockfile
+#13 32.04 Progress: resolved 915, reused 0, downloaded 911, added 910
+#13 33.04 Progress: resolved 915, reused 0, downloaded 911, added 911
+#13 34.04 Progress: resolved 915, reused 0, downloaded 914, added 914
+#13 40.59 Progress: resolved 915, reused 0, downloaded 915, added 914
+#13 40.60 Progress: resolved 915, reused 0, downloaded 915, added 915, done
+#13 40.95 
+#13 40.95 dependencies:
+#13 40.95 + @anthropic-ai/sdk 0.37.0
+#13 40.95 + @hookform/resolvers 3.10.0
+#13 40.95 + @jridgewell/trace-mapping 0.3.31
+#13 40.95 + @octokit/rest 22.0.1
+#13 40.95 + @radix-ui/react-accordion 1.2.12
+#13 40.95 + @radix-ui/react-alert-dialog 1.1.15
+#13 40.95 + @radix-ui/react-aspect-ratio 1.1.8
+#13 40.95 + @radix-ui/react-avatar 1.1.11
+#13 40.95 + @radix-ui/react-checkbox 1.3.3
+#13 40.95 + @radix-ui/react-collapsible 1.1.12
+#13 40.95 + @radix-ui/react-context-menu 2.2.16
+#13 40.95 + @radix-ui/react-dialog 1.1.15
+#13 40.95 + @radix-ui/react-dropdown-menu 2.1.16
+#13 40.95 + @radix-ui/react-hover-card 1.1.15
+#13 40.95 + @radix-ui/react-label 2.1.8
+#13 40.95 + @radix-ui/react-menubar 1.1.16
+#13 40.95 + @radix-ui/react-navigation-menu 1.2.14
+#13 40.95 + @radix-ui/react-popover 1.1.15
+#13 40.95 + @radix-ui/react-progress 1.1.8
+#13 40.95 + @radix-ui/react-radio-group 1.3.8
+#13 40.95 + @radix-ui/react-scroll-area 1.2.10
+#13 40.95 + @radix-ui/react-select 2.2.6
+#13 40.95 + @radix-ui/react-separator 1.1.8
+#13 40.95 + @radix-ui/react-slider 1.3.6
+#13 40.95 + @radix-ui/react-slot 1.2.4
+#13 40.95 + @radix-ui/react-switch 1.2.6
+#13 40.95 + @radix-ui/react-tabs 1.1.13
+#13 40.95 + @radix-ui/react-toast 1.2.15
+#13 40.95 + @radix-ui/react-toggle 1.1.10
+#13 40.95 + @radix-ui/react-toggle-group 1.1.11
+#13 40.95 + @radix-ui/react-tooltip 1.2.8
+#13 40.95 + @tailwindcss/postcss 4.2.4
+#13 40.95 + @tanstack/react-query 5.100.7
+#13 40.95 + @types/bcryptjs 2.4.6
+#13 40.95 + @types/js-yaml 4.0.9
+#13 40.95 + @types/react-helmet 6.1.11
+#13 40.95 + bcryptjs 3.0.3
+#13 40.95 + blurhash 2.0.5
+#13 40.95 + cheerio 1.2.0
+#13 40.95 + class-variance-authority 0.7.1
+#13 40.95 + clsx 2.1.1
+#13 40.95 + cmdk 1.1.1
+#13 40.95 + connect-pg-simple 10.0.0
+#13 40.95 + date-fns 3.6.0
+#13 40.95 + dotenv 17.4.2
+#13 40.95 + drizzle-orm 0.39.3
+#13 40.95 + drizzle-zod 0.7.1
+#13 40.95 + embla-carousel-react 8.6.0
+#13 40.95 + express 4.22.1
+#13 40.95 + express-rate-limit 7.5.1
+#13 40.95 + express-session 1.19.0
+#13 40.95 + framer-motion 11.18.2
+#13 40.95 + fuse.js 7.3.0
+#13 40.95 + input-otp 1.4.2
+#13 40.95 + js-yaml 4.1.1
+#13 40.95 + jsdom 27.4.0
+#13 40.95 + lucide-react 0.453.0
+#13 40.95 + nanoid 5.1.11
+#13 40.95 + next 15.5.15
+#13 40.95 + next-themes 0.4.6
+#13 40.95 + node-fetch 3.3.2
+#13 40.95 + openai 4.104.0
+#13 40.95 + passport 0.7.0
+#13 40.95 + passport-local 1.0.0
+#13 40.95 + pg 8.20.0
+#13 40.95 + puppeteer 24.42.0
+#13 40.95 + react 18.3.1
+#13 40.95 + react-blurhash 0.3.0
+#13 40.95 + react-day-picker 8.10.1
+#13 40.95 + react-dom 18.3.1
+#13 40.95 + react-helmet 6.1.0
+#13 40.95 + react-hook-form 7.75.0
+#13 40.95 + react-icons 5.6.0
+#13 40.95 + react-resizable-panels 2.1.9
+#13 40.95 + recharts 2.15.4
+#13 40.95 + remark 15.0.1
+#13 40.95 + remark-parse 11.0.0
+#13 40.95 + sharp 0.33.5
+#13 40.95 + swagger-ui-express 5.0.1
+#13 40.95 + tailwind-merge 2.6.1
+#13 40.95 + tailwindcss 4.2.4
+#13 40.95 + tailwindcss-animate 1.0.7
+#13 40.95 + tw-animate-css 1.4.0
+#13 40.95 + unist-util-visit 5.1.0
+#13 40.95 + vaul 1.1.2
+#13 40.95 + wouter 3.9.0
+#13 40.95 + ws 8.20.0
+#13 40.95 + zod 3.25.76
+#13 40.95 + zod-validation-error 3.5.4
+#13 40.95 
+#13 40.95 optionalDependencies:
+#13 40.95 + bufferutil 4.1.0
+#13 40.95 
+#13 40.95 devDependencies:
+#13 40.95 + @eslint/js 9.39.4
+#13 40.95 + @playwright/test 1.60.0
+#13 40.95 + @tailwindcss/vite 4.2.4
+#13 40.95 + @types/connect-pg-simple 7.0.3
+#13 40.95 + @types/express 4.17.21
+#13 40.95 + @types/express-session 1.19.0
+#13 40.95 + @types/node 20.16.11
+#13 40.95 + @types/passport 1.0.17
+#13 40.95 + @types/passport-local 1.0.38
+#13 40.95 + @types/react 18.3.28
+#13 40.95 + @types/react-dom 18.3.7
+#13 40.95 + @types/supertest 6.0.3
+#13 40.95 + @types/ws 8.18.1
+#13 40.95 + @vitejs/plugin-react 4.7.0
+#13 40.95 + @vitest/coverage-v8 2.1.9
+#13 40.95 + autoprefixer 10.5.0
+#13 40.95 + drizzle-kit 0.30.6
+#13 40.95 + esbuild 0.25.12
+#13 40.95 + eslint 9.39.4
+#13 40.95 + eslint-config-prettier 10.1.8
+#13 40.95 + eslint-plugin-react 7.37.5
+#13 40.95 + eslint-plugin-react-hooks 5.2.0
+#13 40.95 + eslint-plugin-react-refresh 0.4.26
+#13 40.95 + playwright 1.60.0
+#13 40.95 + postcss 8.5.13
+#13 40.95 + prettier 3.8.3
+#13 40.95 + supertest 7.2.2
+#13 40.95 + tsx 4.21.0
+#13 40.95 + typescript 5.6.3
+#13 40.95 + typescript-eslint 8.59.1
+#13 40.95 + vite 5.4.21
+#13 40.95 + vitest 2.1.9
+#13 40.95 
+#13 40.95 ╭ Warning ─────────────────────────────────────────────────────────────────────╮
+#13 40.95 │                                                                              │
+#13 40.95 │   Ignored build scripts: @scarf/scarf, bufferutil, esbuild, puppeteer,       │
+#13 40.95 │   sharp.                                                                     │
+#13 40.95 │   Run "pnpm approve-builds" to pick which dependencies should be allowed     │
+#13 40.95 │   to run scripts.                                                            │
+#13 40.95 │                                                                              │
+#13 40.95 ╰──────────────────────────────────────────────────────────────────────────────╯
+#13 40.95 
+#13 41.01 Done in 40.8s using pnpm v10.11.0
+#13 DONE 41.2s
+
+#14 [builder 6/7] COPY . .
+#14 DONE 0.6s
+
+#15 [builder 7/7] RUN pnpm build
+#15 0.308 
+#15 0.308 > rest-express@1.0.0 build /app
+#15 0.308 > vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --splitting --outdir=dist
+#15 0.308 
+#15 0.443 vite v5.4.21 building for production...
+#15 0.483 transforming...
+#15 35.72 ✓ 2951 modules transformed.
+#15 36.06 warnings when minifying css:
+#15 36.06 ▲ [WARNING] "file" is not a known CSS property [unsupported-css-property]
+#15 36.06 
+#15 36.06     <stdin>:2:118683:
+#15 36.06       2 │ ...r-select:none}.\[file\:line\]{file:line}.\[path\:line\]{path:lin...
+#15 36.06         │                                  ~~~~
+#15 36.06         ╵                                  flex
+#15 36.06 
+#15 36.06   Did you mean "flex" instead?
+#15 36.06 
+#15 36.06 
+#15 36.30 rendering chunks...
+#15 36.31 computing gzip size...
+#15 36.35 
+#15 36.35 (!) Some chunks are larger than 500 kB after minification. Consider:
+#15 36.35 - Using dynamic import() to code-split the application
+#15 36.35 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+#15 36.35 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+#15 36.35 ../dist/public/index.html                     8.98 kB │ gzip:   3.32 kB
+#15 36.35 ../dist/public/assets/index-r8Vgq7f_.css    167.72 kB │ gzip:  26.85 kB
+#15 36.35 ../dist/public/assets/index-CwUT96S-.js   1,425.87 kB │ gzip: 388.82 kB
+#15 36.35 ✓ built in 35.89s
+#15 36.43 
+#15 36.43   dist/index.js                                  340.9kb
+#15 36.43   dist/chunk-3AEIYMHT.js                          57.9kb
+#15 36.43   dist/researchService-NPYG2CP7.js                30.3kb
+#15 36.43   dist/chunk-4LTZV7A3.js                          23.9kb
+#15 36.43   dist/og-middleware-FE2WJK3L.js                  11.5kb
+#15 36.43   dist/chunk-5HV4BHRF.js                          11.4kb
+#15 36.43   dist/chunk-MBCCQHMX.js                           9.5kb
+#15 36.43   dist/linkHealthService-TDXZHBWB.js               3.9kb
+#15 36.43   dist/vite-ROTZJSJ3.js                            3.4kb
+#15 36.43   dist/schema-Y2ZBL7FD.js                          2.1kb
+#15 36.43   dist/orphanJobWatchdog-4NIYVNVC.js               1.9kb
+#15 36.43   dist/chunk-WTLXNQQT.js                           1.4kb
+#15 36.43   dist/chunk-3RVJM5M6.js                           1.1kb
+#15 36.43   dist/chunk-5DWK3Z7X.js                           478b 
+#15 36.43   dist/chunk-MLKGABMK.js                           191b 
+#15 36.43   dist/promoteEnrichmentSuggestions-Z4BN4X77.js    173b 
+#15 36.43 
+#15 36.43 ⚡ Done in 29ms
+#15 DONE 36.5s
+
+#16 [production  7/12] COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
+#16 DONE 0.0s
+
+#17 [production  8/12] COPY --from=builder --chown=nodejs:nodejs /app/server ./server
+#17 DONE 0.0s
+
+#18 [production  9/12] COPY --from=builder --chown=nodejs:nodejs /app/shared ./shared
+#18 DONE 0.0s
+
+#19 [production 10/12] COPY --from=builder --chown=nodejs:nodejs /app/migrations ./migrations
+#19 DONE 0.0s
+
+#20 [production 11/12] COPY --from=builder --chown=nodejs:nodejs /app/drizzle.config.ts ./drizzle.config.ts
+#20 DONE 0.0s
+
+#21 [production 12/12] COPY --from=builder --chown=nodejs:nodejs /app/tsconfig.json ./tsconfig.json
+#21 DONE 0.0s
+
+#22 exporting to image
+#22 exporting layers
+#22 exporting layers 4.1s done
+#22 writing image sha256:ff28295a937359bb6e5864b2e207ef7251c12511651bc33341a5d5455118897a
+#22 writing image sha256:ff28295a937359bb6e5864b2e207ef7251c12511651bc33341a5d5455118897a done
+#22 naming to docker.io/library/awesome-list-site-app done
+#22 DONE 4.1s
+
+#23 resolving provenance for metadata file
+#23 DONE 0.0s
+ Image awesome-list-site-app Built 
+ Network awesome-list-site_default Creating 
+ Network awesome-list-site_default Created 
+ Volume awesome-list-site_postgres_data Creating 
+ Volume awesome-list-site_postgres_data Created 
+ Container awesome-list-db Creating 
+ Container awesome-list-db Created 
+ Container awesome-list-app Creating 
+ Container awesome-list-app Created 
+ Container awesome-list-db Starting 
+ Container awesome-list-db Started 
+ Container awesome-list-db Waiting 
+ Container awesome-list-db Healthy 
+ Container awesome-list-app Starting 
+ Container awesome-list-app Started 

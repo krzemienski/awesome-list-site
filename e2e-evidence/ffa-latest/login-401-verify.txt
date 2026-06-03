@@ -1,0 +1,11 @@
+=== bad creds ===
+{"message":"Invalid email or password"}
+HTTP_STATUS:401
+
+=== empty body ===
+{"message":"Missing credentials"}
+HTTP_STATUS:401
+
+=== valid creds (control) ===
+{"user":{"id":"c6e7d1c6-9732-4373-acf2-4b5cb626439e","email":"admin@example.com","firstName":"Admin","lastName":"User","role":"admin"}}
+HTTP_STATUS:200

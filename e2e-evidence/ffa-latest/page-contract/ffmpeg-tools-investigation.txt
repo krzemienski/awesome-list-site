@@ -1,0 +1,41 @@
+# Independent reproduction: ffmpeg-tools-empty-subcat-node
+# Date: 2026-06-02  Base: http://localhost:5001
+
+## 1. Total + bucket counts (curl + python over /api/resources?limit=2000)
+$ curl -s 'http://localhost:5001/api/resources?limit=2000' | python3 ...
+total rows: 1949                 (matches ground truth 1949)
+subcategory == 'FFMPEG & Tools': 0
+subSubcategory == 'FFMPEG':      65   (matches ground truth FFMPEG=65)
+FFMPEG subsub parents: {('Encoding & Codecs','Encoding Tools'): 65}
+
+## 2. API filter probes (server-side count)
+$ curl -s '.../api/resources?subcategory=FFMPEG%20%26%20Tools&limit=2000'
+  count: 0   total field: 0
+$ curl -s '.../api/resources?subSubcategory=FFMPEG&limit=2000'
+  count: 65  total field: 65
+
+## 3. Tree node (/api/awesome-list)
+General Tools > FFMPEG & Tools  slug='ffmpeg-tools'  direct=0  subsub_resources=0  subsub_nodes=0
+=> tree advertises an empty subcategory node.
+
+## 4. Live page HTTP
+GET /subcategory/ffmpeg-tools     -> HTTP 200 (9301 bytes SSR shell)
+GET /sub-subcategory/ffmpeg       -> HTTP 200 (9243 bytes SSR shell)
+(SPA: counts hydrate client-side from /api/resources?limit=2000, proven above)
+
+## 5. Source contract
+client/src/pages/Subcategory.tsx:73-99
+  allResources = dbResources.filter(r => r.subcategory === subcategoryName  // 'FFMPEG & Tools'
+                                         || slugified subcategory === slug)
+  => 0 matches  => renders empty state ("No resources found / There are no resources in this subcategory yet") Subcategory.tsx:272-274
+client/src/components/layout/new/AppSidebar.tsx:71-74 comment: zero-resource subs kept visible (dimmed)
+  AppSidebar.tsx:125-130: count===0 => opacity 0.45 + title `${label} (no resources yet)`
+  AppSidebar.tsx:291 subCount = getTotalResourceCount(sub) => 0 for FFMPEG & Tools
+
+## VERDICT
+Reproduced exactly as claimed. Sidebar count (0) == page count (0). No wrong data shown.
+Empty node IS exposed in nav (dimmed, with "(no resources yet)" tooltip) and clicking lands on
+honest empty state. This is an honest-empty data-modeling node, NOT a contract/data bug.
+The 65 real FFMPEG resources are correctly reachable at /sub-subcategory/ffmpeg (count 65).
+Classification: LOW data-modeling observation. Per audit rules ("Theoretically odd but behaves
+correctly is NOT a finding"), this produces no wrong outcome for a real user.

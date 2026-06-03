@@ -1,0 +1,10 @@
+=== Subcategories advertised in tree but with 0 DB resources (would render empty) ===
+   ('General Tools', 'FFMPEG & Tools', 'ffmpeg-tools', 0)
+
+=== Same for sub-subcategories ===
+   ('Community & Events', 'Community Groups', 'Slack & Meetups', 'slack-meetups')
+   ('Community & Events', 'Events & Conferences', 'Conferences', 'conferences')
+   ('Encoding & Codecs', 'Encoding Tools', 'Other Encoders', 'other-encoders')
+   ('Media Tools', 'Ads & QoE', 'Advertising', 'advertising')
+   ('Protocols & Transport', 'Transport Protocols', 'RTMP', 'rtmp')
+   ('Protocols & Transport', 'Transport Protocols', 'SRT', 'srt')

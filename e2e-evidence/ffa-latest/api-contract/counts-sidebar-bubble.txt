@@ -1,0 +1,24 @@
+Sidebar subcategory count (getTotalResourceCount = direct + subsub) vs DB-count
+
+cat                    subcategory               sidebar    DB  MATCH
+Community & Events     Community Groups                4     4     OK
+Community & Events     Events & Conferences            6     6     OK
+Encoding & Codecs      Codecs                         27    27     OK
+Encoding & Codecs      Encoding Tools                225   225     OK
+General Tools          DRM                            17    17     OK
+General Tools          FFMPEG & Tools                  0     0     OK
+Infrastructure & Deli  Cloud & CDN                     9     9     OK
+Infrastructure & Deli  Streaming Servers              35    35     OK
+Intro & Learning       Introduction                    3     3     OK
+Intro & Learning       Learning Resources             36    36     OK
+Intro & Learning       Tutorials & Case Studie        59    59     OK
+Media Tools            Ads & QoE                      45    45     OK
+Media Tools            Audio & Subtitles              56    56     OK
+Players & Clients      Hardware Players               35    35     OK
+Players & Clients      Mobile & Web Players           78    78     OK
+Protocols & Transport  Adaptive Streaming            139   139     OK
+Protocols & Transport  Transport Protocols             9     9     OK
+Standards & Industry   Specs & Standards              34    34     OK
+Standards & Industry   Vendors & HDR                   5     5     OK
+
+Mismatched sidebar subcategory counts: 0 of 19

@@ -1,0 +1,56 @@
+Claude service initialized successfully
+(node:90020) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Re-optimizing dependencies because lockfile has changed
+6:06:31 PM [express] serving on port 5001 (development mode)
+🔄 Running background initialization (development mode)...
+📊 Note: /api/awesome-list now serves from PostgreSQL database
+Link health scheduler initialized (disabled)
+(node:90020) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+✅ Orphan watchdog: no stuck jobs found
+Checking if database needs seeding...
+✓ Database already populated: 12 categories, 1952 resources
+✅ Background initialization complete
+[/api/auth/user] Request received
+[/api/auth/user] isAuthenticated: false
+[/api/auth/user] req.user?.dbUser: undefined
+[/api/auth/user] req.user?.claims?.sub: undefined
+[/api/auth/user] User not authenticated, returning null
+6:06:40 PM [express] GET /api/auth/user 304 in 6ms :: {"user":null,"isAuthenticated":false}
+6:06:40 PM [express] GET /api/journeys 304 in 120ms :: []
+6:06:40 PM [express] GET /api/categories 304 in 151ms :: [{"id":1094,"name":"Categories","slug":"cat…
+📊 /api/awesome-list: 1952 resources, 12 categories
+6:06:40 PM [express] GET /api/awesome-list 304 in 765ms :: {"title":"Awesome Video","description":"A…
+6:06:50 PM [express] GET /api/health 200 in 1ms :: {"status":"ok"}
+6:06:50 PM [express] POST /api/auth/register 201 in 247ms :: {"id":"2af205e8-ca52-4fd8-9c9d-832216b5…
+[local/login] User authenticated, establishing session for: 2af205e8-ca52-4fd8-9c9d-832216b5b49b
+[local/login] Session established, saving to store...
+[local/login] Session saved successfully, session ID: Mioc40z3wLT2zRKZeu6rIgyWmzInuOC4
+[local/login] Returning user response with role: user
+6:06:51 PM [express] POST /api/auth/local/login 200 in 721ms :: {"user":{"id":"2af205e8-ca52-4fd8-9c…
+[/api/auth/user] Request received
+[/api/auth/user] isAuthenticated: true
+[/api/auth/user] req.user?.dbUser: undefined
+[/api/auth/user] req.user?.claims?.sub: 2af205e8-ca52-4fd8-9c9d-832216b5b49b
+[/api/auth/user] dbUser not in session, fetching from DB, userId: 2af205e8-ca52-4fd8-9c9d-832216b5b49b
+[/api/auth/user] DB user found: {
+  id: '2af205e8-ca52-4fd8-9c9d-832216b5b49b',
+  email: 'vg1-1780351610@example.com',
+  role: 'user'
+}
+[/api/auth/user] Returning user: {
+  id: '2af205e8-ca52-4fd8-9c9d-832216b5b49b',
+  email: 'vg1-1780351610@example.com',
+  name: 'vg1-1780351610',
+  avatar: null,
+  role: 'user',
+  createdAt: 2026-06-01T22:06:50.751Z
+}
+6:06:51 PM [express] GET /api/auth/user 200 in 93ms :: {"user":{"id":"2af205e8-ca52-4fd8-9c9d-832216…

@@ -1,0 +1,24 @@
+CLAIM: all-targets-registered (auditor said zero contract defects)
+DATE: 2026-06-02T23:16:27Z
+
+### DEFECT FOUND: RecommendationCard feedback posts to unregistered route
+client: client/src/components/ai/RecommendationCard.tsx:67  -> POST /api/recommendations/${resource.id}/feedback
+rendered in: client/src/pages/Profile.tsx:451 (ThumbsUp/Down buttons lines 202/225)
+server registered route: server/routes.ts:3650  POST /api/recommendations/feedback  (NO :id segment)
+
+### LIVE PROBE A (client-used path):
+$ curl -s -X POST http://localhost:5001/api/recommendations/123/feedback -H 'Content-Type: application/json' -d '{"feedback":"helpful"}'
+{"message":"Not found"}
+HTTP_STATUS=404
+
+### LIVE PROBE B (server-registered path):
+$ curl -s -X POST http://localhost:5001/api/recommendations/feedback -H 'Content-Type: application/json' -d '{"feedback":"helpful"}'
+{"error":"userId, resourceId, and feedback are required"}
+HTTP_STATUS=400
+
+### apiRequest throws on non-2xx (client/src/lib/queryClient.ts:4-9) -> onError toast 'Failed to submit feedback'
+
+### FALSE POSITIVES verified (auditor correct on these):
+- /api/check-email : ONLY in client/src/components/admin/README.md (doc placeholder), not real code
+- /api/admin/your-entities : README.md template only
+- journeys steps/reorder : registered (server/routes.ts:1424,1443,1563)
