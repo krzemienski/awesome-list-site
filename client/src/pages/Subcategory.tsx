@@ -2,25 +2,24 @@ import { useEffect, useState, useMemo } from "react";
 import { useParams, Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import SEOHead from "@/components/layout/SEOHead";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ArrowLeft, Search } from "lucide-react";
 import AdvancedFilter from "@/components/ui/advanced-filter";
+import ResourceCard from "@/components/resource/ResourceCard";
 import { deslugify, getCategorySlug } from "@/lib/utils";
 import { Resource } from "@/types/awesome-list";
 import NotFound from "@/pages/not-found";
 import { processAwesomeListData } from "@/lib/parser";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
 import { trackCategoryView } from "@/lib/analytics";
-import { useToast } from "@/hooks/use-toast";
 
 export default function Subcategory() {
   const { slug } = useParams<{ slug: string }>();
-  const { toast } = useToast();
-  const [location, setLocation] = useLocation();
+  const [location] = useLocation();
 
   const getSearchParams = () => new URLSearchParams(window.location.search);
 
@@ -29,6 +28,7 @@ export default function Subcategory() {
     return tags ? tags.split(",") : [];
   });
   const [sortBy, setSortBy] = useState(() => getSearchParams().get("sortBy") || "default");
+  const [searchTerm, setSearchTerm] = useState(() => getSearchParams().get("search") || "");
   
   const { data: rawData, isLoading, error } = useQuery({
     queryKey: ["awesome-list-data"],
@@ -95,6 +95,14 @@ export default function Subcategory() {
   const filteredResources = useMemo(() => {
     let results = [...allResources];
 
+    if (searchTerm) {
+      const q = searchTerm.toLowerCase();
+      results = results.filter(r =>
+        r.title.toLowerCase().includes(q) ||
+        r.description?.toLowerCase().includes(q)
+      );
+    }
+
     if (selectedTags.length > 0) {
       results = results.filter(r =>
         r.tags && r.tags.some(tag => selectedTags.includes(tag))
@@ -108,11 +116,12 @@ export default function Subcategory() {
     }
 
     return results;
-  }, [allResources, selectedTags, sortBy]);
+  }, [allResources, searchTerm, selectedTags, sortBy]);
   
   useEffect(() => {
     const params = new URLSearchParams();
 
+    if (searchTerm) params.set("search", searchTerm);
     if (selectedTags.length > 0) params.set("tags", selectedTags.join(","));
     if (sortBy && sortBy !== "default") params.set("sortBy", sortBy);
 
@@ -122,11 +131,12 @@ export default function Subcategory() {
     if (location !== newPath) {
       window.history.replaceState({}, "", newPath);
     }
-  }, [selectedTags, sortBy, slug, location]);
+  }, [searchTerm, selectedTags, sortBy, slug, location]);
 
   useEffect(() => {
     const handlePopState = () => {
       const params = getSearchParams();
+      setSearchTerm(params.get("search") || "");
       const tags = params.get("tags");
       setSelectedTags(tags ? tags.split(",") : []);
       setSortBy(params.get("sortBy") || "default");
@@ -225,6 +235,17 @@ export default function Subcategory() {
         </div>
       </div>
       
+      <div className="relative max-w-md">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search resources..."
+          className="pl-9 min-h-[44px]"
+          data-testid="input-search"
+        />
+      </div>
+
       <AdvancedFilter
         selectedTags={selectedTags}
         sortBy={sortBy}
@@ -258,61 +279,19 @@ export default function Subcategory() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-          {filteredResources.map((resource, index) => {
-            const handleResourceClick = () => {
-              window.open(resource.url, '_blank', 'noopener,noreferrer');
-              
-              let description = resource.description || '';
-              if (!description && resource.tags && resource.tags.length > 0) {
-                description = `Tags: ${resource.tags.slice(0, 3).join(', ')}${resource.tags.length > 3 ? ', ...' : ''}`;
-              }
-              
-              toast({
-                title: resource.title,
-                description: description || 'Opening resource in new tab',
-              });
-            };
-            
-            return (
-              <Card 
-                key={`${resource.url}-${index}`}
-                className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors border border-border bg-card text-card-foreground min-w-0"
-                onClick={handleResourceClick}
-                data-testid={`card-resource-${index}`}
-              >
-                <CardHeader className="p-3 sm:p-4">
-                  <CardTitle className="text-base sm:text-lg flex items-start gap-2">
-                    <span className="flex-1 min-w-0 line-clamp-2">{resource.title}</span>
-                    <ExternalLink className="h-4 w-4 flex-shrink-0 mt-1" />
-                  </CardTitle>
-                  {resource.description && (
-                    <CardDescription className="text-xs sm:text-sm line-clamp-2">
-                      {resource.description}
-                    </CardDescription>
-                  )}
-                </CardHeader>
-                {(resource.subSubcategory || (resource.tags && resource.tags.length > 0)) && (
-                  <CardContent className="px-3 pb-3 pt-0 sm:px-4 sm:pb-4">
-                    <div className="flex gap-1.5 sm:gap-2 flex-wrap">
-                      {resource.subSubcategory && (
-                        <Badge variant="outline" className="text-xs">{resource.subSubcategory}</Badge>
-                      )}
-                      {resource.tags && resource.tags.slice(0, 3).map((tag, tagIndex) => (
-                        <Badge key={tagIndex} variant="secondary" className="text-xs">
-                          {tag}
-                        </Badge>
-                      ))}
-                      {resource.tags && resource.tags.length > 3 && (
-                        <Badge variant="secondary" className="text-xs">
-                          +{resource.tags.length - 3}
-                        </Badge>
-                      )}
-                    </div>
-                  </CardContent>
-                )}
-              </Card>
-            );
-          })}
+          {filteredResources.map((resource, index) => (
+            <ResourceCard
+              key={`${resource.id ?? resource.url}-${index}`}
+              resource={{
+                id: resource.id != null ? String(resource.id) : "",
+                name: resource.title,
+                url: resource.url,
+                description: resource.description,
+                category: resource.subSubcategory || undefined,
+                tags: resource.tags,
+              }}
+            />
+          ))}
         </div>
       )}
     </div>
