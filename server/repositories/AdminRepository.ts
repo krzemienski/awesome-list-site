@@ -47,6 +47,37 @@ export interface AdminStats {
 }
 
 /**
+ * A single stored validation/link-check run.
+ */
+export interface ValidationStorageItem {
+  type: 'awesome-lint' | 'link-check';
+  result: any;
+  markdown?: string;
+  timestamp: string;
+}
+
+/**
+ * The latest validation results, keyed by run type.
+ */
+export interface ValidationResults {
+  awesomeLint?: any;
+  linkCheck?: any;
+  lastUpdated?: string;
+}
+
+/**
+ * In-memory holder for the most recent validation results. Validation status is
+ * ephemeral (regenerated on demand from the live resource set), so it does not
+ * warrant a database table — it only needs to survive between a validate/check
+ * run and the subsequent status read within the same server process.
+ */
+const latestValidationResults: ValidationResults = {
+  awesomeLint: null,
+  linkCheck: null,
+  lastUpdated: null,
+};
+
+/**
  * Repository class for administrative operations
  */
 export class AdminRepository {
@@ -93,5 +124,26 @@ export class AdminRepository {
       totalJourneys: journeyCount.count,
       activeUsers: activeCount.count
     };
+  }
+
+  /**
+   * Store the result of a validation or link-check run for later retrieval.
+   * @param result - The validation result to persist (awesome-lint or link-check)
+   */
+  async storeValidationResult(result: ValidationStorageItem): Promise<void> {
+    if (result.type === 'awesome-lint') {
+      latestValidationResults.awesomeLint = result.result;
+    } else if (result.type === 'link-check') {
+      latestValidationResults.linkCheck = result.result;
+    }
+    latestValidationResults.lastUpdated = result.timestamp;
+  }
+
+  /**
+   * Retrieve the most recent validation results.
+   * @returns The latest awesome-lint and link-check results with last-updated time
+   */
+  async getLatestValidationResults(): Promise<ValidationResults> {
+    return { ...latestValidationResults };
   }
 }

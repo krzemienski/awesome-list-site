@@ -2948,7 +2948,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validationResult = validateAwesomeList(markdown);
       
       // Store validation result for later retrieval
-      await legacyRepo.storeValidationResult({
+      await adminRepo.storeValidationResult({
         type: 'awesome-lint',
         result: validationResult,
         markdown,
@@ -2997,7 +2997,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       // Store link check result for later retrieval
-      await legacyRepo.storeValidationResult({
+      await adminRepo.storeValidationResult({
         type: 'link-check',
         result: linkCheckReport,
         timestamp: linkCheckReport.timestamp
