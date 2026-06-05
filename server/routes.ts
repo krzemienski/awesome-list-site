@@ -1650,7 +1650,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const limit = parseInt(req.query.limit as string) || 20;
       
       const result = await userRepo.listUsers(page, limit);
-      res.json(result);
+      // Never expose password hashes over the API, even to admins. Strip the
+      // password field from every user before sending the response.
+      const sanitizedUsers = result.users.map(({ password, ...rest }) => rest);
+      res.json({ ...result, users: sanitizedUsers });
     } catch (error) {
       console.error('Error fetching users:', error);
       res.status(500).json({ message: 'Failed to fetch users' });

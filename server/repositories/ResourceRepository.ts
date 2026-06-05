@@ -28,6 +28,8 @@
 import {
   resources,
   resourceAuditLog,
+  resourceEdits,
+  researchDiscoveries,
   type Resource,
   type InsertResource,
 } from "@shared/schema";
@@ -226,6 +228,20 @@ export class ResourceRepository {
       { resource: { title: resource.title, url: resource.url, category: resource.category } },
       `Deleted resource: ${resource.title}`
     );
+
+    // resource_edits FK to resources(id) has no ON DELETE CASCADE (unlike the
+    // other child tables), so any suggested/approved edit rows must be removed
+    // first or the resource delete fails with a foreign-key violation (false 500).
+    await db.delete(resourceEdits).where(eq(resourceEdits.resourceId, id));
+
+    // research_discoveries.created_resource_id is a nullable FK to resources(id)
+    // with no ON DELETE action, so it would also block the delete with a
+    // foreign-key violation (false 500). The discovery record itself is history
+    // worth keeping, so null the back-reference rather than deleting the row.
+    await db
+      .update(researchDiscoveries)
+      .set({ createdResourceId: null })
+      .where(eq(researchDiscoveries.createdResourceId, id));
 
     await db.delete(resources).where(eq(resources.id, id));
   }

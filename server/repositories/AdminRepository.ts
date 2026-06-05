@@ -48,6 +48,26 @@ export interface AdminStats {
 }
 
 /**
+ * A single stored validation/link-check run. Newer shape added on main to
+ * support both awesome-lint and link-check results through one entry point.
+ */
+export interface ValidationStorageItem {
+  type: 'awesome-lint' | 'link-check';
+  result: any;
+  markdown?: string;
+  timestamp: string;
+}
+
+/**
+ * The latest validation results, keyed by run type.
+ */
+export interface ValidationResults {
+  awesomeLint?: any;
+  linkCheck?: any;
+  lastUpdated?: string;
+}
+
+/**
  * Latest validation results, held in process memory and shared across all
  * AdminRepository instances. Validation output (awesome-lint + link-check) is
  * transient diagnostic data with no schema table, so it lives here rather than

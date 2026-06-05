@@ -2,25 +2,24 @@ import { useEffect, useState, useMemo } from "react";
 import { useParams, Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import SEOHead from "@/components/layout/SEOHead";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ArrowLeft, Search } from "lucide-react";
 import AdvancedFilter from "@/components/ui/advanced-filter";
+import ResourceCard from "@/components/resource/ResourceCard";
 import { deslugify, getCategorySlug } from "@/lib/utils";
 import { Resource } from "@/types/awesome-list";
 import NotFound from "@/pages/not-found";
 import { processAwesomeListData } from "@/lib/parser";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
 import { trackCategoryView } from "@/lib/analytics";
-import { useToast } from "@/hooks/use-toast";
 
 export default function Subcategory() {
   const { slug } = useParams<{ slug: string }>();
-  const { toast } = useToast();
-  const [location, setLocation] = useLocation();
+  const [location] = useLocation();
 
   const getSearchParams = () => new URLSearchParams(window.location.search);
 
@@ -29,6 +28,7 @@ export default function Subcategory() {
     return tags ? tags.split(",") : [];
   });
   const [sortBy, setSortBy] = useState(() => getSearchParams().get("sortBy") || "default");
+  const [searchTerm, setSearchTerm] = useState(() => getSearchParams().get("search") || "");
   
   const { data: rawData, isLoading, error } = useQuery({
     queryKey: ["awesome-list-data"],
@@ -107,6 +107,14 @@ export default function Subcategory() {
   const filteredResources = useMemo(() => {
     let results = [...allResources];
 
+    if (searchTerm) {
+      const q = searchTerm.toLowerCase();
+      results = results.filter(r =>
+        r.title.toLowerCase().includes(q) ||
+        r.description?.toLowerCase().includes(q)
+      );
+    }
+
     if (selectedTags.length > 0) {
       results = results.filter(r =>
         r.tags && r.tags.some(tag => selectedTags.includes(tag))
@@ -120,11 +128,12 @@ export default function Subcategory() {
     }
 
     return results;
-  }, [allResources, selectedTags, sortBy]);
+  }, [allResources, searchTerm, selectedTags, sortBy]);
   
   useEffect(() => {
     const params = new URLSearchParams();
 
+    if (searchTerm) params.set("search", searchTerm);
     if (selectedTags.length > 0) params.set("tags", selectedTags.join(","));
     if (sortBy && sortBy !== "default") params.set("sortBy", sortBy);
 
@@ -134,11 +143,12 @@ export default function Subcategory() {
     if (location !== newPath) {
       window.history.replaceState({}, "", newPath);
     }
-  }, [selectedTags, sortBy, slug, location]);
+  }, [searchTerm, selectedTags, sortBy, slug, location]);
 
   useEffect(() => {
     const handlePopState = () => {
       const params = getSearchParams();
+      setSearchTerm(params.get("search") || "");
       const tags = params.get("tags");
       setSelectedTags(tags ? tags.split(",") : []);
       setSortBy(params.get("sortBy") || "default");
@@ -250,6 +260,17 @@ export default function Subcategory() {
         </div>
       </div>
       
+      <div className="relative max-w-md">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search resources..."
+          className="pl-9 min-h-[44px]"
+          data-testid="input-search"
+        />
+      </div>
+
       <AdvancedFilter
         selectedTags={selectedTags}
         sortBy={sortBy}
@@ -284,7 +305,7 @@ export default function Subcategory() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {filteredResources.map((resource, index) => {
-            // Every resource here is DB-backed (id is "db-<n>", see allResources
+            // Every resource here is DB backed (id is "db-<n>", see allResources
             // above), so the card body navigates to the internal detail page —
             // matching Category.tsx. The external URL stays on its own button.
             const dbId = parseInt(String(resource.id).replace(/^db-/, ""), 10);
