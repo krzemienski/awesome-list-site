@@ -67,6 +67,7 @@ import { seedDatabase } from "./seed";
 import { enrichmentService } from "./ai/enrichmentService";
 import { db } from "./db";
 import { sql } from "drizzle-orm";
+import { registerPublicApiRoutes } from "./api/public";
 
 const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md";
 
@@ -431,6 +432,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   passport.serializeUser((user: any, done) => done(null, user));
   passport.deserializeUser((user: any, done) => done(null, user));
   setupLocalAuth();
+
+  // Public read-only API surface (rate-limited, documented in OpenAPI).
+  registerPublicApiRoutes(app);
 
   // Local authentication routes
   app.post("/api/auth/local/login", (req, res, next) => {
