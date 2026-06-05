@@ -32,7 +32,17 @@ interface AppHeaderProps {
 function getBreadcrumbs(path: string) {
   if (path === "/") return [{ label: "Home", href: "/" }];
   const segments = path.split("/").filter(Boolean);
-  const crumbs: { label: string; href: string }[] = [{ label: "Home", href: "/" }];
+  const crumbs: { label: string; href: string | null }[] = [{ label: "Home", href: "/" }];
+  // Base segments that have no standalone index route. Their breadcrumb crumb
+  // is a label only — linking to /<segment> would land on the 404 page.
+  const noIndexRoute = new Set([
+    "category",
+    "subcategory",
+    "sub-subcategory",
+    "resource",
+    "journey",
+    "settings",
+  ]);
   const routeLabels: Record<string, string> = {
     category: "Category",
     subcategory: "Subcategory",
@@ -50,9 +60,11 @@ function getBreadcrumbs(path: string) {
     settings: "Settings",
   };
   if (segments.length === 1) {
-    crumbs.push({ label: routeLabels[segments[0]] || deslugify(segments[0]), href: path });
+    const href = noIndexRoute.has(segments[0]) ? null : path;
+    crumbs.push({ label: routeLabels[segments[0]] || deslugify(segments[0]), href });
   } else if (segments.length >= 2) {
-    crumbs.push({ label: routeLabels[segments[0]] || deslugify(segments[0]), href: `/${segments[0]}` });
+    const parentHref = noIndexRoute.has(segments[0]) ? null : `/${segments[0]}`;
+    crumbs.push({ label: routeLabels[segments[0]] || deslugify(segments[0]), href: parentHref });
     crumbs.push({ label: deslugify(segments[1]), href: path });
   }
   return crumbs;
@@ -76,8 +88,8 @@ export default function AppHeader({ onSearchOpen, user, onLogout }: AppHeaderPro
           {crumbs.flatMap((crumb, i) => {
             const isLast = i === crumbs.length - 1;
             const nodes = [
-              <BreadcrumbItem key={`${crumb.href}-item`}>
-                {isLast ? (
+              <BreadcrumbItem key={`${crumb.href ?? crumb.label}-item`}>
+                {isLast || !crumb.href ? (
                   <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
                 ) : (
                   <BreadcrumbLink href={crumb.href}>{crumb.label}</BreadcrumbLink>
@@ -85,7 +97,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout }: AppHeaderPro
               </BreadcrumbItem>,
             ];
             if (!isLast) {
-              nodes.push(<BreadcrumbSeparator key={`${crumb.href}-sep`} />);
+              nodes.push(<BreadcrumbSeparator key={`${crumb.href ?? crumb.label}-sep`} />);
             }
             return nodes;
           })}
