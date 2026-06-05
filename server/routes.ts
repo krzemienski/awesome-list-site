@@ -626,6 +626,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const subcategory = req.query.subcategory as string;
       const subSubcategory = req.query.subSubcategory as string;
       const search = req.query.search as string;
+      // Tag filter: ?tag=foo OR ?tag=foo,bar (CSV = OR semantics, union).
+      const tagRaw = (req.query.tag as string) || undefined;
 
       const result = await resourceRepo.listResources({
         page,
@@ -634,7 +636,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         category,
         subcategory,
         subSubcategory,
-        search
+        search,
+        tag: tagRaw,
       });
 
       res.json(result);
@@ -1763,29 +1766,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const resourceId = parseInt(req.params.id);
       const userId = req.user.claims.sub;
-      
+
       if (isNaN(resourceId)) {
         return res.status(400).json({ message: 'Invalid resource ID' });
       }
-      
+
       const resource = await resourceRepo.getResource(resourceId);
       if (!resource) {
         return res.status(404).json({ message: 'Resource not found' });
       }
-      
+
       const updateSchema = insertResourceSchema.partial();
       const validationResult = updateSchema.safeParse(req.body);
-      
+
       if (!validationResult.success) {
-        return res.status(400).json({ 
-          message: 'Validation failed', 
-          errors: validationResult.error.errors 
+        return res.status(400).json({
+          message: 'Validation failed',
+          errors: validationResult.error.errors
         });
       }
-      
+
       const validatedData = validationResult.data;
       const updateData: Record<string, any> = {};
-      
+
       if (validatedData.title !== undefined) updateData.title = validatedData.title;
       if (validatedData.url !== undefined) updateData.url = validatedData.url;
       if (validatedData.description !== undefined) updateData.description = validatedData.description;
@@ -1806,7 +1809,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
       );
 
       const updatedResource = await resourceRepo.updateResource(resourceId, updateData);
-      
+
+      // Tag upsert: if `tags` array supplied, create any missing tags and
+      // replace the resource's tag set (idempotent — duplicate links are
+      // ignored by the junction PK). Empty array means "remove all tags".
+      let tagChangeApplied = false;
+      if (Array.isArray(req.body?.tags)) {
+        const desired = req.body.tags
+          .map((t: unknown) => (typeof t === "string" ? t.trim() : ""))
+          .filter((t: string) => t.length > 0);
+        const allTagRows = await tagRepo.listTags();
+        const byName = new Map(allTagRows.map(t => [t.name.toLowerCase(), t]));
+        const bySlug = new Map(allTagRows.map(t => [t.slug.toLowerCase(), t]));
+        const wantedIds: number[] = [];
+        for (const raw of desired) {
+          const slug = raw.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+          let tag = bySlug.get(slug) || byName.get(raw.toLowerCase());
+          if (!tag) {
+            try {
+              tag = await tagRepo.createTag({ name: raw, slug });
+            } catch {
+              // Race: another admin just created it; fall through and look it up.
+              const fresh = await tagRepo.listTags();
+              tag = fresh.find(t => t.slug === slug) || fresh.find(t => t.name.toLowerCase() === raw.toLowerCase());
+            }
+            if (tag) {
+              byName.set(tag.name.toLowerCase(), tag);
+              bySlug.set(tag.slug.toLowerCase(), tag);
+            }
+          }
+          if (tag) wantedIds.push(tag.id);
+        }
+        const currentLinks = await tagRepo.getResourceTags(resourceId);
+        const currentIds = new Set(currentLinks.map(t => t.id));
+        const wanted = new Set(wantedIds);
+        for (const id of wanted) {
+          if (!currentIds.has(id)) {
+            try { await tagRepo.addTagToResource(resourceId, id); tagChangeApplied = true; } catch {}
+          }
+        }
+        for (const id of currentIds) {
+          if (!wanted.has(id)) {
+            try { await tagRepo.removeTagFromResource(resourceId, id); tagChangeApplied = true; } catch {}
+          }
+        }
+        updateData.tags = desired;
+      }
+
       await auditRepo.logResourceAudit(
         resourceId,
         'updated',
@@ -1814,8 +1863,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         updateData,
         'Resource updated by admin'
       );
-      
-      res.json(updatedResource);
+
+      res.json({ ...updatedResource, tagsChanged: tagChangeApplied });
     } catch (error) {
       console.error('Error updating resource:', error);
       res.status(500).json({ message: 'Failed to update resource' });

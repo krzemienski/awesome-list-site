@@ -43,18 +43,22 @@ import Anthropic from '@anthropic-ai/sdk';
 import { createAnthropicClient } from './anthropicClient';
 
 // <important_do_not_delete>
-const DEFAULT_MODEL_STR = "claude-haiku-4-5"; // Claude Haiku 4.5 (October 2025) - 4-5x faster, 1/3 cost
+const DEFAULT_MODEL_STR = "cc/claude-opus-4-8"; // Local self-hosted gateway (localhost:20128) — Anthropic-compatible `cc/` namespace
 // </important_do_not_delete>
 
-// Model definitions with pricing (per 1M tokens)
+// Model definitions with pricing (per 1M tokens). The `id` is the model name
+// sent to the configured ANTHROPIC_BASE_URL. Local gateway (port 20128) uses
+// the `cc/` namespace; swap to bare `claude-*` ids if switching to api.anthropic.com.
 export const CLAUDE_MODELS = {
-  'claude-3-5-haiku': { id: 'claude-haiku-4-5', inputCost: 0.25, outputCost: 1.25, maxTokens: 8192 },
-  'claude-3-5-sonnet': { id: 'claude-sonnet-4-5', inputCost: 3.00, outputCost: 15.00, maxTokens: 8192 },
-  'claude-3-opus': { id: 'claude-sonnet-4-5', inputCost: 15.00, outputCost: 75.00, maxTokens: 4096 },
+  'claude-3-5-haiku': { id: 'cc/claude-haiku-4-5-20251001', inputCost: 0.25, outputCost: 1.25, maxTokens: 8192 },
+  'claude-3-5-sonnet': { id: 'cc/claude-sonnet-4-6', inputCost: 3.00, outputCost: 15.00, maxTokens: 8192 },
+  'claude-3-opus': { id: 'cc/claude-opus-4-8', inputCost: 15.00, outputCost: 75.00, maxTokens: 8192 },
 } as const;
 
 export type ClaudeModelKey = keyof typeof CLAUDE_MODELS;
-export const DEFAULT_MODEL: ClaudeModelKey = 'claude-3-5-haiku';
+// Default to Opus: higher quality analysis, fewer retries. The router cost is
+// the same regardless (cc/* routes through the local gateway subscription).
+export const DEFAULT_MODEL: ClaudeModelKey = 'claude-3-opus';
 
 /**
  * Trusted domains for Claude URL analysis

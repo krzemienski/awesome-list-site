@@ -34,7 +34,7 @@ import {
   type InsertResource,
 } from "@shared/schema";
 import { db } from "../db";
-import { eq, and, sql, desc, like, or } from "drizzle-orm";
+import { eq, and, sql, desc, like, or, inArray } from "drizzle-orm";
 
 /**
  * Options for listing resources with filtering and pagination
@@ -48,8 +48,8 @@ export interface ListResourceOptions {
   subSubcategory?: string;
   userId?: string;
   search?: string;
+  tags?: string[]; // OR semantics; post-DB filter via resource_tags join
 }
-
 /**
  * Repository class for resource-related database operations
  */
@@ -60,8 +60,14 @@ export class ResourceRepository {
    * @returns Object containing resources array and total count
    */
   async listResources(options: ListResourceOptions): Promise<{ resources: Resource[]; total: number }> {
-    const { page = 1, limit = 20, status, category, subcategory, subSubcategory, userId, search } = options;
+    const { page = 1, limit = 20, status, category, subcategory, subSubcategory, userId, search, tags, tag } = options;
     const offset = (page - 1) * limit;
+    // Normalize tag filter (CSV -> array)
+    const tagFilter: string[] = Array.isArray(tags)
+      ? tags
+      : (typeof tag === "string" && tag.includes(","))
+        ? tag.split(",").map(t => t.trim()).filter(Boolean)
+        : (typeof tag === "string" && tag.length > 0 ? [tag] : []);
 
     let query = db.select().from(resources);
     let countQuery = db.select({ count: sql<number>`count(*)::int` }).from(resources);
@@ -102,13 +108,42 @@ export class ResourceRepository {
       countQuery = countQuery.where(and(...conditions));
     }
 
-    const [totalResult] = await countQuery;
+    // Fetch a wider slice when filtering by tag so the final pagination reflects
+    // post-DB tag-join matches, not the narrower pre-join slice.
+    const expandedLimit = tagFilter.length > 0 ? Math.max(limit * 5, 200) : limit;
+    const expandedOffset = tagFilter.length > 0 ? 0 : offset;
     const resourceList = await query
       .orderBy(desc(resources.createdAt))
-      .limit(limit)
-      .offset(offset);
+      .limit(expandedLimit)
+      .offset(expandedOffset);
 
-    return { resources: resourceList, total: totalResult.count };
+    if (tagFilter.length === 0) {
+      const [totalResult] = await countQuery;
+      return { resources: resourceList, total: totalResult.count };
+    }
+
+    // Tag filter: OR semantics (matches any tag). Resolve tag IDs by name or slug,
+    // intersect against the junction table, then re-paginate in-memory.
+    const { tags: tagsTable, resourceTags } = await import("@shared/schema");
+    const tagRows = await db.select().from(tagsTable);
+    const wanted = new Set(tagFilter.map(t => t.toLowerCase()));
+    const tagIdByNameOrSlug = new Map<number, string>();
+    for (const row of tagRows) {
+      if (wanted.has(row.name.toLowerCase()) || wanted.has(row.slug.toLowerCase())) {
+        tagIdByNameOrSlug.set(row.id, row.slug);
+      }
+    }
+    if (tagIdByNameOrSlug.size === 0) {
+      return { resources: [], total: 0 };
+    }
+    const tagIds = Array.from(tagIdByNameOrSlug.keys());
+    const linkRows = await db.select().from(resourceTags).where(inArray(resourceTags.tagId, tagIds));
+    const allowedIds = new Set(linkRows.map(r => r.resourceId));
+    const filtered = resourceList.filter(r => allowedIds.has(r.id));
+    const total = filtered.length;
+    const start = offset;
+    const paged = filtered.slice(start, start + limit);
+    return { resources: paged, total };
   }
 
   /**
@@ -216,18 +251,27 @@ export class ResourceRepository {
       throw new Error('Resource not found');
     }
 
-    // Log the deletion BEFORE deleting: the audit row's resource_id FK references
-    // resources(id), so it must be written while the row still exists. This is the
-    // single source of the 'deleted' audit entry — callers must NOT log it again
-    // afterward, or the post-delete insert violates the FK and the delete reports a
-    // false 500 despite having succeeded.
-    await this.logResourceAudit(
-      id,
-      'deleted',
+    // The `resource_edits.resource_id` and `resource_audit_log.resource_id` FKs
+    // lack ON DELETE CASCADE in the migration, so a DELETE on resources would
+    // 500 with an FK violation when prior suggest-edit or audit rows exist.
+    // Strategy: insert a 'deleted' tombstone first (resourceId=null) so the
+    // permanent record survives; then drop the dependent rows; then drop the
+    // resource itself. resource_tags already cascades.
+    const { resourceEdits, resourceAuditLog } = await import("@shared/schema");
+
+    // Permanent 'deleted' tombstone — FK-safe (resourceId=null) so it outlives
+    // the actual row.
+    await db.insert(resourceAuditLog).values({
+      resourceId: null,
+      originalResourceId: id,
+      action: 'deleted',
       performedBy,
-      { resource: { title: resource.title, url: resource.url, category: resource.category } },
-      `Deleted resource: ${resource.title}`
-    );
+      changes: { resource: { title: resource.title, url: resource.url, category: resource.category } },
+      notes: `Deleted resource: ${resource.title}`
+    });
+
+    await db.delete(resourceEdits).where(eq(resourceEdits.resourceId, id));
+    await db.delete(resourceAuditLog).where(eq(resourceAuditLog.resourceId, id));
 
     // resource_edits FK to resources(id) has no ON DELETE CASCADE (unlike the
     // other child tables), so any suggested/approved edit rows must be removed

@@ -207,6 +207,11 @@ export const insertResourceSchema = createInsertSchema(resources).pick({
   status: true,
   submittedBy: true,
   metadata: true,
+}).extend({
+  title: z.string().trim().min(1, "Title is required").max(200, "Title must be 200 characters or fewer"),
+  description: z.string().trim().min(10, "Description must be at least 10 characters").max(1000, "Description must be 1000 characters or fewer"),
+  url: z.string().trim().url("Must be a valid URL (https://...)").max(2048, "URL too long"),
+  category: z.string().trim().min(1, "Category is required").max(120),
 });
 
 export type InsertResource = z.infer<typeof insertResourceSchema>;
