@@ -6,10 +6,11 @@
  * with the React app's HTML and mask client routing typos).
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterAll } from 'vitest';
 import express, { type Express } from 'express';
 import request from 'supertest';
 import { registerRoutes } from '../../../server/routes';
+import { closeTestDb } from '../../helpers/db-helper';
 
 describe('Unknown /api/* route JSON 404 fallback', () => {
   let app: Express;
@@ -19,6 +20,10 @@ describe('Unknown /api/* route JSON 404 fallback', () => {
     app.use(express.json());
     app.use(express.urlencoded({ extended: false }));
     await registerRoutes(app);
+  });
+
+  afterAll(async () => {
+    await closeTestDb();
   });
 
   it('returns a JSON 404 for an unknown GET /api/* path', async () => {
