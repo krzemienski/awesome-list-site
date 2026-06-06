@@ -29,21 +29,8 @@
  * ============================================================================
  */
 
-import type { Express, Request, Response } from "express";
+import type { Express } from "express";
 import { createServer, type Server } from "http";
-import {
-  UserRepository,
-  ResourceRepository,
-  CategoryRepository,
-  TagRepository,
-  LearningJourneyRepository,
-  UserFeatureRepository,
-  AuditRepository,
-  GithubSyncRepository,
-  EnrichmentRepository,
-  AdminRepository,
-  LegacyRepository,
-} from "./repositories";
 import { getSession, isAuthenticated } from "./session";
 import { setupLocalAuth } from "./localAuth";
 import { hashPassword, comparePassword, validateEmail, validatePassword } from "./passwordUtils";
@@ -71,41 +58,23 @@ import { registerPublicApiRoutes } from "./api/public";
 
 const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md";
 
-// ============================================================================
-// REPOSITORY INSTANCES - Direct Usage of Domain Repositories
-// ============================================================================
-// Instead of using the storage facade, we instantiate repositories directly
-// for better modularity and clearer dependencies.
-const userRepo = new UserRepository();
-const resourceRepo = new ResourceRepository();
-const categoryRepo = new CategoryRepository();
-const tagRepo = new TagRepository();
-const learningJourneyRepo = new LearningJourneyRepository();
-const userFeatureRepo = new UserFeatureRepository();
-const auditRepo = new AuditRepository();
-const githubSyncRepo = new GithubSyncRepository();
-const enrichmentRepo = new EnrichmentRepository();
-const adminRepo = new AdminRepository();
-const legacyRepo = new LegacyRepository();
-
-// Middleware to check if user is admin
-const isAdmin = async (req: any, res: Response, next: any) => {
-  try {
-    const userId = req.user?.claims?.sub;
-    if (!userId) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-    
-    const user = await userRepo.getUser(userId);
-    if (!user || user.role !== 'admin') {
-      return res.status(403).json({ message: "Forbidden: Admin access required" });
-    }
-    
-    next();
-  } catch (error) {
-    res.status(500).json({ message: "Error checking admin status" });
-  }
-};
+// Repository singletons + the isAdmin middleware now live in ./routes/deps.ts
+// so domain route modules can share the same instances without a circular
+// import back through this file.
+import {
+  userRepo,
+  resourceRepo,
+  categoryRepo,
+  tagRepo,
+  learningJourneyRepo,
+  userFeatureRepo,
+  auditRepo,
+  githubSyncRepo,
+  enrichmentRepo,
+  adminRepo,
+  legacyRepo,
+  isAdmin,
+} from "./routes/deps";
 
 // SEO route handlers - now uses database-driven data
 async function generateSitemap(req: any, res: any) {
