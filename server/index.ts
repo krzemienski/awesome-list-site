@@ -1,12 +1,13 @@
 import 'dotenv/config';
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes, runBackgroundInitialization } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
+import { serveStatic, log } from "./static";
 import { handleSSR } from "./ssr";
 import { errorHandler } from "./middleware/errorHandler";
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import pkg from 'pg';
+import { pool } from "./db";
 import { initializeLinkHealthScheduler } from "./jobs/linkHealthScheduler";
 import * as fs from 'fs';
 import * as path from 'path';
@@ -84,6 +85,26 @@ async function runMigrations() {
     console.error('Database pool error during migration:', err.message);
   });
 
+  // Wait for the database to accept connections. In a fresh `docker compose up`
+  // the app can win the race against Postgres finishing init even with a
+  // healthcheck, so retry the first connection before migrating.
+  const maxAttempts = 30;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const probe = await pool.connect();
+      probe.release();
+      break;
+    } catch (err: any) {
+      if (attempt === maxAttempts) {
+        console.error(`Database not reachable after ${maxAttempts} attempts:`, err.message);
+        await pool.end();
+        throw err;
+      }
+      console.log(`⏳ Waiting for database (attempt ${attempt}/${maxAttempts})...`);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+    }
+  }
+
   // If no migrations folder found, verify database is already set up
   if (!migrationsFolder) {
     console.log('⚠️ No migrations folder found, checking if database is already configured...');
@@ -134,14 +155,14 @@ async function runMigrations() {
 (async () => {
   const isProduction = process.env.NODE_ENV === 'production';
 
-  // Run migrations before starting server in production
-  if (isProduction) {
-    try {
-      await runMigrations();
-    } catch (error) {
-      console.error('❌ Failed to run migrations, cannot start server');
-      process.exit(1);
-    }
+  // Run migrations before starting the server regardless of NODE_ENV. A fresh
+  // Docker volume needs the schema applied on first boot in any environment;
+  // gating this on production left dev/compose runs with an empty database.
+  try {
+    await runMigrations();
+  } catch (error) {
+    console.error('❌ Failed to run migrations, cannot start server');
+    process.exit(1);
   }
 
   const server = await registerRoutes(app);
@@ -161,6 +182,11 @@ async function runMigrations() {
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
   if (app.get("env") === "development") {
+    // Lazy-load the vite-dependent module so the production bundle never
+    // statically imports the `vite` package (a devDependency stripped from the
+    // prod image). With esbuild --splitting this becomes a separate chunk that
+    // prod never loads.
+    const { setupVite } = await import("./vite");
     await setupVite(app, server);
   } else {
     // In production, add SSR handler before serving static files
@@ -168,7 +194,7 @@ async function runMigrations() {
     serveStatic(app);
   }
 
-  // Use PORT environment variable in production (Replit autoscale), fallback to 5000 in development
+  // Use PORT environment variable in production, fallback to 5000 in development.
   // Production deployments set PORT automatically for health checks
   const port = process.env.PORT ? parseInt(process.env.PORT) : 5000;
 
@@ -198,4 +224,17 @@ async function runMigrations() {
     console.error(`❌ Server failed to start on port ${port}:`, err);
     process.exit(1);
   });
+
+  // Graceful shutdown: stop accepting connections, drain the DB pool, exit.
+  // docker compose down / orchestrator stop sends SIGTERM; without this the
+  // container is hard-killed after the grace period and the pool never closes.
+  const shutdown = (signal: string) => {
+    log(`received ${signal}, shutting down`);
+    server.close(() => {
+      pool.end().then(() => process.exit(0)).catch(() => process.exit(1));
+    });
+    setTimeout(() => process.exit(1), 10000).unref();
+  };
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT', () => shutdown('SIGINT'));
 })();

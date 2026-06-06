@@ -1,0 +1,51 @@
+# Protected endpoint manifest (reconstructed from server/routes.ts)
+# Middleware: isAuthenticated (session.ts:51 -> 401) ; isAdmin (routes.ts:91 -> 401/403)
+
+## auth-mutation
+POST   /api/auth/local/login        (no guard; public login)
+POST   /api/auth/register           (no guard; public register)
+GET    /api/auth/user               (no guard; returns null if unauth)
+POST   /api/auth/logout             (no guard)
+
+## /api/user/* (isAuthenticated)
+POST   /api/user/change-password
+GET    /api/user/progress
+GET    /api/user/submissions
+GET    /api/user/journeys
+
+## /api/favorites* (isAuthenticated)
+POST   /api/favorites/:resourceId
+DELETE /api/favorites/:resourceId
+GET    /api/favorites
+
+## /api/bookmarks* (isAuthenticated)
+POST   /api/bookmarks/:resourceId
+DELETE /api/bookmarks/:resourceId
+GET    /api/bookmarks
+
+## /api/admin/* (isAuthenticated + isAdmin)  -- GET subset
+GET    /api/admin/journeys
+GET    /api/admin/journeys/:id/steps
+GET    /api/admin/stats
+GET    /api/admin/users           <-- historical leak target
+GET    /api/admin/audit-logs
+GET    /api/admin/pending-resources
+GET    /api/admin/resources
+GET    /api/admin/resource-edits
+GET    /api/admin/categories
+GET    /api/admin/subcategories
+GET    /api/admin/sub-subcategories
+GET    /api/admin/export-json     <-- historical leak target
+GET    /api/admin/validation-status
+GET    /api/admin/link-health/status
+GET    /api/admin/link-health/history
+GET    /api/admin/link-health/broken-links
+
+## /api/admin/* mutating (probe unauth only, expect reject, NO state change)
+PUT    /api/admin/users/:id/role
+POST   /api/admin/resources
+DELETE /api/admin/resources/:id
+POST   /api/admin/resources/bulk/delete
+POST   /api/admin/export
+POST   /api/admin/seed-database
+POST   /api/admin/import-github

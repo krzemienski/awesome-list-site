@@ -1,0 +1,30 @@
+############ SubmitResource POST /api/resources unauth (expect 401, NOT 500/404) ############
+$ curl -i POST /api/resources (no cookie, minimal body)
+HTTP/1.1 401 Unauthorized
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 26
+ETag: W/"1a-pljHtlo127JYJR4E/RYOPb6ucbw"
+Date: Tue, 02 Jun 2026 23:35:34 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+
+############ journeys/:id/edits route? (task mentioned /api/resources/:id/edits) ############
+POST /api/resources/1/edits (unauth) -> 401
+
+############ journeys/abc graceful-degradation: confirm 500 is non-ok (client throws->NotFound JSX) ############
+$ curl -i GET /api/journeys/abc
+HTTP/1.1 500 Internal Server Error
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 37
+ETag: W/"25-1PpKIFQBYb1wlP9TgsBKn1qLxAA"
+Date: Tue, 02 Jun 2026 23:35:34 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+
+############ Submit start/progress unauth (POST start, PUT progress) ############
+POST /api/journeys/1/start (unauth) -> 401
+PUT  /api/journeys/1/progress (unauth) -> 401

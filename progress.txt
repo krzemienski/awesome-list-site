@@ -1,0 +1,184 @@
+# Ralph Progress — Public/End-User Full Functional + Visual Audit
+
+## Run start
+- Task: exercise every public-side functionality + visual pass via Chrome DevTools, fix anything broken on the spot.
+- Source plan: e2e-evidence/public-fullrun/TEST-PLAN.md (user-approved, ~120 cases / 16 sections).
+- App: http://localhost:5001 containerized, both services healthy at start.
+- Baseline (restore at end): resources=1949, users=1, pending=0, edits=0, bookmarks=0, favorites=0.
+
+## Environment learnings (carry forward)
+- Single Chrome DevTools browser, sequential. httpOnly connect.sid not in document.cookie — drive via browser, not curl, for session-bound paths.
+- shadcn Tabs / hash routes: a tab CLICK re-renders; `#hash` URL nav alone can leave stale DOM. ALWAYS click the actual trigger, re-snapshot after mutations (uids go stale).
+- Screenshot integrity: identical byte counts = stale dupe. READ every screenshot; verify content, not existence. md5-dedupe at end.
+- Build via `pnpm build` (esbuild; ignores pre-existing TS type errors). Never `pnpm check`. Backend changes need container restart (no watch).
+- Admin already audited in prior run (e2e-evidence/admin-fullrun/VERDICT.md = PASS). Public side only here.
+
+## Story log
+(append per story: what tested, defects found+fixed, evidence paths, learnings)
+
+## PA-A Sidebar — PASS (iteration 1)
+- All 14 cases verified. 9 cats + exact counts. Row=link nav, chevron=button expand (correct a11y split).
+- A2 /category/encoding-codecs, A5 /subcategory/codecs, A6 /sub-subcategory/hevc all navigate.
+- A8 auto-expand active branch works on category AND sub-subcat routes.
+- A12 collapse + re-expand both directions work (header hamburger re-expands).
+- HEVC page = "Showing 10 of 10" (matches G baseline).
+- LEARNING: sidebar is PERSISTENT across SPA nav — its uids (48_*) stay stable; only main content gets new uids. BUT a collapsed sub-subcat list has parent max-height:0 so its links report a11y-visible yet are click-clipped (elementFromPoint hits sibling). Must expand the "Toggle X" button before clicking a nested sub-subcat link.
+- DEFECTS LOGGED (fix in their stories):
+  - D-DEFECT-1 (PA-D Home): duplicate "AI-Powered Recommendations" <h2> + panel self-header stacked (uid 48_278 section header + 48_280 panel header).
+  - I-DEFECT-1 (PA-I Advanced): "Unique Tags = 0" stat despite resources having tags — likely tag aggregation not wired in CategoryExplorer stats.
+- Evidence: A-01-home-sidebar-baseline.png, A-02-category-page-autoexpand.png, A-03-subsubcat-hevc-nav.png, A-04-sidebar-collapsed.png
+
+## PA-B Header — PASS (B6/B11 logout-gated, confirmed at PA-K)
+- B1 breadcrumb trail correct on every route; B2 crumb link nav works (Home crumb -> /).
+- B3 search opens dialog; B4 theme btn -> /settings/theme; B7 avatar dropdown opens (Profile/Bookmarks/Admin/SignOut, Admin admin-only).
+- B8 Profile -> /profile; B9 Bookmarks -> /bookmarks (clean empty state); B10 Admin href verified + proven in prior admin audit.
+- B5 mobile hamburger -> deferred to PA-P. B6 Login btn + B11 SignOut -> deferred to PA-K boundary (need logout).
+- LEARNING: radix dropdown needs a REAL pointer event (MCP click), synthetic .click() on trigger toggles it shut and portal items never mount. Use MCP click on avatar, then click menuitem uid.
+- Evidence: B-01-profile-via-dropdown.png, B-02-search-dialog-open.png, B-03-bookmarks-via-dropdown.png
+
+## PA-C Search Dialog — PASS
+- C1 input auto-focus; C2 `/` shortcut opens (Cmd-K same handler); C3 live fuse.js filter on "ffmpeg" (rich results w/ category breadcrumbs); C4 category path shown per result.
+- C5 selecting a result opens the EXTERNAL resource URL in a NEW TAB (by design: window.open(resource.url,'_blank')) — NOT internal nav. Verified 2 ffmpeg.org tabs opened. My initial "nothing happened" was a wrong-tab check; retracted C-DEFECT-1.
+- C6/C7 keyboard select fires same onSelect (Enter opened tab). C8 start-typing prompt; C9 "No results found" on zzzqqqxyz; C10 Esc closes.
+- LEARNING: search result = external link in new tab, not SPA nav. Must check list_pages for the new tab, not window.location.
+
+## NEW DEFECTS found incidentally (fix in their stories):
+- I-DEFECT-2 (PA-I Advanced CategoryExplorer): per-category resource counts UNDER-COUNT vs canonical (Community 81 vs 91, Encoding 120 vs 372, Media 203 vs 304, Players 150 vs 263). Likely counts only a page/slice.
+- I-DEFECT-3 (PA-I Advanced): footer "Explore Categories" link -> /category/web-frameworks (dead slug, not a real category here).
+
+## CRITICAL LEARNING (PA-D) — container bakes dist into the IMAGE
+- Dockerfile builder stage runs `pnpm build` and copies /app/dist INTO the image.
+- Therefore: host `pnpm build` + `docker compose restart app` does NOT update the served bundle. The container keeps serving the OLD baked dist.
+- CORRECT fix-deploy cycle for ANY client/server code change: `docker compose up -d --build app` (rebuilds the image), then wait health, then hard-reload the browser.
+- Detection trick: `grep -rc "<removed string>" dist/` on host shows 0 (host dist is fresh) yet the browser still shows it => stale container image.
+- This applies to EVERY code fix in this run (PA-D dup header, and any later PA-I/PA-* fixes).
+
+## PA-D Home — PASS (D-DEFECT-1 FIXED)
+- D-DEFECT-1: duplicate "AI-Powered Recommendations" header. ROOT CAUSE: Home.tsx wrapped <AIRecommendationsPanel> with its own <h2>+desc, and the panel renders its own CardTitle. FIX: removed Home's redundant outer header block (lines ~291-302) + orphaned Sparkles import. Advanced.tsx had no outer header so unaffected. Verified: header count 2->1 after image rebuild + hard reload.
+- D1 hero "9 categories / 1949"; D2 9 cards w/ counts; D3 tag dialog opens w/ real tags+counts (streaming 259, encoding 166...); D4 single tag "streaming" filters to 259 total (exact); D5 multi-tag streaming+encoding = OR union 409; D6 Clear all -> back to 1949; D7 Name A-Z alpha; D9 Most Resources desc (372->91); D8/D10 inverse mechanism; D11 filtered cards drop 0-match; D12 card->category (proven PA-A); D13 grid clean.
+- Evidence: D-01-home-dupheader-fixed.png, D-02-sort-most-resources.png, D-03-tag-filter-streaming.png
+- REINFORCES I-DEFECT-1: Home tag dialog proves tags exist richly; Advanced "0 tags" is definitely a bug.
+
+## RESUME 2026-06-02 — ENVIRONMENT PIVOT (Docker dead → host+Neon, CDP driver)
+- App was DOWN on resume: Docker daemon down; `open -a Docker`, `docker desktop start`, raw `com.docker.backend run` all fail. ROOT CAUSE: console user=root, NO Aqua/GUI session for uid 501. Docker Desktop engine STRUCTURALLY requires its GUI supervisor — raw backend boots the libkrun VM, reaches engine=running, then self-cancels 1.4s later because com.docker.build sub-service dies with "unmarshaling start request: unexpected EOF" (no GUI to pipe its start payload). No passwordless sudo. No colima/podman/lima. UNFIXABLE headlessly.
+- Internal postgres volume (held frozen 1949 baseline) is GONE with Docker's data dir.
+- PIVOT: run the SAME built artifact on host — `node dist/index.js` on :5001 against Neon. Boots clean. KEY FIX: must pass DATABASE_URL inline in env (repo pool server/db/index.ts:7 reads process.env.DATABASE_URL at MODULE-INIT, racing `import 'dotenv/config'`; in the container it was a real compose env var so timing never mattered; on host without it the repo pool defaults to localhost:5432 → ECONNREFUSED 500s on /api/resources). Launch cmd recorded below.
+- DATASET DIFFERS: Neon=1952 resources, split 88/337/152/208/210/280/255/215/207, users=4. Frozen container baseline was 1949 / 91/372/95/183/227/304/263/242/172 / users=1. Sub-subcats MATCH (HEVC=10,FFMPEG=65,origin=1). Per user decision, numeric cases RE-ANCHORED to live /api server counts (E19 invariant: UI==server). prd.json baseline updated + baseline_note added.
+- BROWSER CAP: chrome-devtools MCP launches its own Chrome which dies here ("Target closed") — same GUI-session blocker. SOLUTION: headless Chrome (`--headless=new --remote-debugging-port=9222`) WORKS from this shell (renders SSR DOM fine; CVDisplayLink errors are harmless no-monitor noise). Drive via Playwright connectOverCDP (playwright@1.60 + chromium installed). Smoke test PASSED: title resolved post-hydration, /api/categories returned 9 cats w/ counts. Driver harness written: e2e-evidence/public-fullrun/.driver.mjs (node .driver.mjs <step.mjs>).
+
+### HOST APP LAUNCH CMD (carry forward — relaunch if :5001 dies)
+DATABASE_URL="<neon url from .env line7>" PORT=5001 NODE_ENV=production COOKIE_SECURE=false ADMIN_EMAIL=admin@example.com ADMIN_PASSWORD=admin123 SESSION_SECRET="<from .env line1>" node dist/index.js
+### HEADLESS CHROME CDP (relaunch if 9222 dies)
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --disable-gpu --no-first-run --remote-debugging-port=9222 --user-data-dir=/tmp/chrome-audit-profile --window-size=1280,900 about:blank &
+
+## PA-E Category — PASS (host+Neon, /category/encoding-codecs server=337)
+- E1/E19: 337 article cards == "Showing 337 of 337" == /api/resources?category total 337. UI==server invariant holds.
+- E2: subcat select = All + 15 subcats. E3: "Codecs" -> 14 cards "Showing 14 of 337". E4: ?subcategory=Codecs persists across reload (14).
+- E6: sort Name A-Z reorders (PyAV -> "2501world/transcoding..."). E7: ?sortBy=name-asc persists across reload.
+- E8/E9/E10: view modes write localStorage awesome-list-view-mode = grid|list|compact. E11: compact persists across reload (still active).
+- E12: card (whole <article>, not a button) -> /resource/186685. E13: external btn (button-external-*) opens new tab github.com/PyAV-Org/PyAV.
+- E5: tag filter popover uses [role=checkbox] (NOT option/cmdk — earlier null was wrong selector). Tag "encoding"(66) -> "Showing 66 of 337" == 66 cards. Exact.
+- E17: ?subcategory=__nonexistent__ -> 0 cards, empty-state present, no crash.
+- E18 visual: grid/list/compact all READ + clean (no overflow/clipping, contrast OK, badge 337). E16 combine composes (subcat+tag+sort all URL/state-driven).
+- Evidence: E-01-category-grid-default.png, E-03-subcat-codecs-filtered.png, E-05-tag-filter.png, E-06-sort-name-asc.png, E-08/09/10-view-*.png, E-12-resource-detail-nav.png, E-17-empty-state.png
+- LEARNING (carry): card click target = the <article> itself (cursor-pointer onClick), only 1 button/card (Open-in-new-tab, data-testid=button-external-<slug>-<idx>). Tag popover = role=checkbox rows, label text e.g. "encoding66" (name+count concatenated). View-mode LS key = "awesome-list-view-mode". Sort/subcat use URL params ?sortBy= / ?subcategory=.
+
+## PA-F Subcategory — PASS (F5 DEFECT-1 FIXED) — /subcategory/codecs server=14
+- F1: 14 cards=="Showing 14 of 14"==/api/resources?subcategory=Codecs total 14.
+- F2: tag "open-source"(6) -> "Showing 6 of 14" == 6 cards (picked a <14 tag to actually prove filtering; codec=14 was a no-op).
+- F3: sort Name A-Z reorders (FFV1->AV1 Codec). F4: ?sortBy=name-asc persists across reload.
+- F5: **DEFECT-F1 FIXED** — card body click now -> /resource/186677 (was: opened external URL in new tab, never reached detail). F5b: external button (button-external-<id>) still opens new tab (ffmpeg.org/~michael/ffv1.html), 0 extra tabs on body click.
+- F6: breadcrumbs present — "Home>Subcategory>Codecs" + "Encoding & Codecs>Codecs" (category>subcategory). F7 empty-state handled by component (tag-filter empty branch). F8 visual: F-01 + F-05 READ, clean, active sidebar branch highlighted, no overflow.
+
+### DEFECT-F1 (FIXED) — Subcategory + SubSubcategory cards opened external URL instead of detail nav
+- ROOT CAUSE: client/src/pages/Subcategory.tsx (~L274) and SubSubcategory.tsx (~L281) rendered a BESPOKE inline <Card> whose handleResourceClick did window.open(resource.url,'_blank') — diverging from Category.tsx which uses setLocation(`/resource/${dbId}`). testid was index-based (card-resource-0) vs Category's id-based, the tell.
+- FIX: both pages — derive dbId = parseInt(String(resource.id).replace(/^db-/,'')) (allResources already maps id:`db-${r.id}`), card onClick -> setLocation(`/resource/${dbId}`); added a dedicated ExternalLink <Button> (data-testid=button-external-<id>, stopPropagation) for the external-open path. Mirrors Category.tsx contract exactly. testid now card-resource-<dbId>.
+- Files: client/src/pages/Subcategory.tsx, client/src/pages/SubSubcategory.tsx. Rebuilt (pnpm build, dist 01:09). Verified F5 + (will verify G5 next).
+- NOTE: pre-existing unused-import `DbResource` (line 14) in both files left untouched (not mine; esbuild ignores TS errors).
+- Evidence: F-01-subcategory-codecs.png, F-02-tag-filter.png, F-03-sort.png, F-05-detail-nav.png
+
+## PA-G Sub-subcategory — PASS (G5 = DEFECT-F1 fix verified here too)
+- G1: HEVC 10=="Showing 10 of 10"==API 10. FFMPEG 65=="Showing 65 of 65"==API 65. Exact baseline match.
+- G7: origin-servers 1=="Showing 1 of 1", card "Eyevinn/docker-jit-capture". Breadcrumb "Infrastructure & Delivery>Streaming Servers>Origin Servers" (full 3-level).
+- G2: tag "codec"(3) -> "Showing 3 of 10" == 3 cards. G3: sort Name A-Z reorders. G4: ?sortBy=name-asc persists across reload.
+- G5: card click -> /resource/186565, 0 extra tabs, isDetail=true. SubSubcategory.tsx fix (DEFECT-F1 sibling) CONFIRMED working. G6 breadcrumb correct. G8 visual G-07 READ clean.
+- Evidence: G-01-hevc.png, G-01b-ffmpeg.png, G-07-origin-servers.png, G-02-tag-filter.png, G-03-sort.png, G-05-detail-nav.png
+
+## PA-H Resource Detail — PASS (DEFECT-H1 FIXED) — /resource/186677 (FFV1 Codec)
+- H1 title/url/desc render. H2 button-back. H3 Visit -> ffmpeg.org target=_blank. H8 button-share (navigator.share + clipboard.writeText fallback + toast). H10 /resource/999999 -> NOT-FOUND-STATE no crash.
+- H4/H6: fav/bookmark buttons HIDDEN when logged-out (favPresent/bmPresent false) — acceptable ("prompts login/disabled"). Appear only logged-in (button-favorite, button-bookmark).
+- H5: favorite 0->1 (toast "Added")->0 restored. H7: bookmark 0->1->0. Both toggle BOTH ways + persist to DB. H9: related API=6, "Related Resources" section present + clickable (handleRelatedResourceClick->setLocation).
+- Baseline restored: favorites=0, bookmarks=0 (toggled back off in-test).
+
+### DEFECT-H1 (FIXED) — favorite/bookmark POST hit wrong URL + state-detection read wrong shape
+- ROOT CAUSE (empirical, network-traced): ResourceDetail.tsx inline favoriteMutation/bookmarkMutation POSTed to `/api/favorites` and `/api/bookmarks` (NO :resourceId) -> server route is POST /api/{favorites,bookmarks}/:resourceId -> **404**. Toast said "Added" optimistically but nothing persisted (verified: direct POST /api/favorites/186677 = 200 + GET reflects; UI POST /api/favorites = 404).
+- SECONDARY: isFavorite/isBookmarked read `favorites?.resourceIds?.includes(...)` but GET returns a flat array [{id,...}] (no resourceIds envelope) -> always false -> filled state never showed AND toggle-off (DELETE) branch never reached.
+- FIX (client/src/pages/ResourceDetail.tsx): POST now `/api/favorites/${id}` & `/api/bookmarks/${id}` (no body, matches DELETE + server). Detection now `favorites?.some(f=>f.id===parseInt(id))` / bookmarks same. Query types fixed {id:number}[].
+- Rebuilt (pnpm build, dist 01:19). Verified: H-05 screenshot shows "Favorited" filled + "Remove from Favorites" + toast "Added to favorites". Toggle restores to 0.
+- Evidence: H-01-detail-loggedout.png, H-05-favorite-toggled.png, H-07-bookmark-toggled.png, H-09-related.png, H-10-invalid-id.png
+
+## PA-I Advanced — PASS (I-DEFECT-1 + I-DEFECT-3 FIXED) — /advanced 4 tabs
+- I1/I5: 4 tabs (Explorer/Metrics/Export/AI Recommendations) switch via TabsTrigger. I6: explorer search "encoding" filters. 
+- I2: Metrics tab -> "Community Analytics Dashboard" (Activity High, Quality A+, Completeness 95%) + 67 chart SVGs. I3: Export tab -> Multi-Format Export (Markdown/JSON/CSV/PDF/HTML).
+- I7: "Export 1952 Resources" -> real file download "awesome-video.md" (captured via download event). I4: AI Recommendations renders ("Configure Your Preferences"), not crashed (degraded-acceptable).
+- I8 visual: I-01 (stats 12/1952/2068/177), I-02 (metrics dashboard) READ, clean.
+
+### DEFECT-I1 (FIXED) — "Unique Tags = 0" stat
+- ROOT CAUSE: Advanced.tsx:142 + category-explorer.tsx:96 read `r.tags || []`, but /api/awesome-list resources carry tags at `metadata.tags` (e.g. ["RTMP","WebRTC","HLS"]); top-level .tags is undefined -> Set empty -> 0. (Empirically: /api/awesome-list resources with non-empty .tags = 0; metadata.tags populated.)
+- FIX: both -> `r.tags ?? (r.metadata as {tags?:string[]})?.tags ?? []`. Result: 0 -> 2068 unique tags (verified screenshot I-01).
+### DEFECT-I3 (FIXED) — dead footer link
+- ROOT CAUSE: Advanced.tsx:287 "Explore Categories" href="/category/web-frameworks" — slug doesn't exist (real slugs: encoding-codecs etc.). categories[0] is meta "Categories" row so can't derive. 
+- FIX: href="/" (Home renders all 9 real category cards = the category explorer; honest, never 404).
+- Files: client/src/pages/Advanced.tsx, client/src/components/ui/category-explorer.tsx. Rebuilt.
+- NOTE: I-DEFECT-2 (explorer under-count) NOT reproduced on host+Neon — counts now DB-sourced (88/337/152... match sidebar per count-model-db-sourced). Resolved by prior count work.
+- Evidence: I-01-explorer.png, I-02-metrics.png, I-03-export.png, I-03b-export-action.png, I-04-ai-recommendations.png
+
+## PA-J Journeys — PASS (graceful empty path, no defects)
+- /api/journeys -> [] and DB learning_journeys=0 confirmed -> "0 journeys available" empty state is HONEST.
+- J1/J7: clean empty state, not blank — "No journeys found / No learning journeys are available at the moment" + book icon, centered card. J3: "0 journeys available" accurate. J2: "Filter by category: All Categories" select present (only "All Categories" since 0 journeys).
+- J4/J5/J6 (card click, detail nav, enroll->login): N/A — 0 journeys seeded; acceptance criteria explicitly gate these on "If journeys exist". J8 visual J-01 READ clean, sidebar "Learning Journeys" active.
+- Evidence: J-01-journeys-list.png. LEARNING: real endpoint is /api/journeys (not /api/learning-journeys).
+
+## PA-K Auth (Login + Register) — PASS (no defects)
+- K1: login form (input-email/input-password/button-login). K2: empty submit -> inline validation "Please enter a valid email address" + "Password must be at least 8 characters", stays /login.
+- K3: wrong creds (valid-format email + bad pw) -> POST /api/auth/local/login 401 "Invalid email or password" -> red toast "Login failed / Invalid email or password" (K-03 screenshot), NO nav (stays /login). [toast in sonner portal — DOM selector missed it but visual confirms]
+- K4: admin@example.com/admin123 -> 200, redirects to /admin (admin user), /api/auth/user=admin@example.com. K5: /login "Create account" link -> /register. K6: register form (email/password). K7: short pw "short" -> "Password must be at least 8 characters", stays /register. K8: /register "Sign in" link -> /login.
+- K9 visual: K-01 login + K-06 register both clean, centered card, "Welcome back"/"Create your account". 
+- Baseline: logged OUT confirmed (user:null) after run.
+- Evidence: K-01-login-form.png, K-02-empty-validation.png, K-03-wrong-creds.png, K-04-logged-in.png, K-06-register-form.png, K-07-short-pw.png
+- ENV LEARNING: headless chrome on :9222 crashed once mid-K (many tabs); relaunch cmd in pivot log works, app stays up (separate process). Reuse same --user-data-dir keeps session.
+
+## PA-L Submit Resource — PASS (no defects; baseline restored)
+- L1: logged-out /submit shows form PREVIEW + amber banner "Login required to submit / You can preview the form, but you must log in to actually submit". Login CTA present (graceful).
+- L2: logged-in form fields input-title/input-url/input-description(textarea)/input-tags + select-category + button-submit.
+- L3: cascade WORKS — pick "Encoding & Codecs" -> select-subcategory appears + populates (Codecs, Encoding Tools, FFmpeg-Based Tools...). Category->subcategory dependent select confirmed.
+- L4: empty submit -> inline errors ("Title is required", "Please enter a valid URL", "Description must be at least 10 characters") + toast "Please fix the highlighted fields". Stays /submit.
+- L5: valid submit -> POST /api/resources 201, status:pending (UI resource 186831 + diag 186832 both landed pending, verified via /api/admin/resources?search=PA-L). Success shown.
+- L6: cleanup — DELETE /api/admin/resources/{186831,186832} -> 200 each. Baseline VERIFIED restored: 1952 total, pending=0, approved=1952, no PA-L leftovers.
+- L7 visual: L-01 (login banner), L-03 (validation+cascade) READ, clean.
+- LEARNING: submit=POST /api/resources (isAuthenticated, sets status:pending). pending list=GET /api/resources/pending returns {resources,total} wrapper (NOT bare array). delete=DELETE /api/admin/resources/:id. Canonical search=GET /api/admin/resources?search=.
+- Evidence: L-01-loggedout.png, L-03-cascade.png, L-04-empty-validation.png, L-05-submitted.png
+
+## PA-M Profile + Bookmarks — PASS (no defects; baseline restored bookmarks=0)
+- M1 AuthGuard: logged-out /profile AND /bookmarks both redirect to / (home). Access guarded. [redirects to home not /login — guard intent satisfied].
+- M2: /profile renders — "Admin User", admin@example.com, "Joined 7 months ago", Settings+Logout, stat cards (0 Favorites/0 Bookmarks/0d Streak/0 Viewed), tabs Overview/Favorites/Bookmarks/Submissions/Security, Learning Progress 0/1952. M3/M4 favorites+bookmarks tabs present.
+- M5: Logout button present (profile header). M6: /bookmarks renders ("My Bookmarks"). M7: sort select "Date: Newest First". M8: empty state when 0.
+- M9: seed bookmark (POST 200) -> FFV1 card appears ("You have 1 saved resource") with filled-red bookmark icon (= remove affordance, icon-only) + heart + Open Link. Remove -> FFV1 gone, bmCountFinal=0. List updates.
+- M10 visual: M-02 profile + M-09 bookmark-present READ, clean.
+- Baseline restored: bookmarks=0, logged out (api 401). 
+- Evidence: M-01-profile-guard.png, M-02-profile.png, M-06-bookmarks-empty.png, M-09-bookmark-present.png
+
+## PA-N Theme Settings — PASS (no defects; N8 N/A by design)
+- ARCHITECTURE: this app is DARK-ONLY by design — theme = 5 "Design Systems" (Editorial/Terminal/Geist/Brutalist/Swiss) x Accent swatches x Font override. NO light mode (theme-provider.tsx:53 always root.classList.remove("light"); no .light CSS/tokens exist). So N2 "mode light/dark/system" maps to the Design-System picker (the actual mode mechanism).
+- N1: /settings/theme renders ("Theme Settings", "Active: Editorial · Crimson", Design System + Accent + Font sections).
+- N2: design-system switch applies LIVE — Editorial(Inter)->Terminal(data-system=terminal, IBM Plex Mono, matrix accent)->Geist(Geist font). Toast "Design system applied / Terminal is now active."
+- N3: accent crimson->emerald live (data-accent). 6+ accent swatches (Crimson/Magenta/Orange/Amber/Emerald/Matrix/Cyan/Violet/Lime/Rose). N4: font override changes body font-family live (verified Inter->IBM Plex Mono->Geist). 
+- N5: preview variants default/secondary/outline/ghost/destructive all present. N6: persist across reload via localStorage ds-system/ds-accent (Geist+emerald survived reload).
+- N7 dark whole-app visual: PASS — N-07 + all 30+ A-M screenshots, no white-on-dark, opaque cards, contrast OK. N8 light-mode: N/A — no light mode exists (dark-only product decision, not a defect; not fabricating a test).
+- Baseline restored: Editorial · Crimson, ds-accent=crimson ds-system=editorial.
+- Evidence: N-01-theme-page.png, N-02-terminal-system.png, N-07-dark-mode.png
+
+## PA-O About + 404 — PASS (no defects)
+- O1: /about renders (h1 "About", 5165 chars content). O2: external links target=_blank with correct hrefs — github.com/sindresorhus/awesome, ui.shadcn.com, tailwindcss.com.
+- O3: /this-route-does-not-exist-xyz -> "Page Not Found" card ("We couldn't find the page..."), no crash, sidebar persists. O4: two CTAs "Browse Categories" + "Go Home" (crimson), a[href="/"] present (4 incl sidebar).
+- Evidence: O-01-about.png, O-03-404.png

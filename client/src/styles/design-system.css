@@ -9,7 +9,7 @@
    Editorial but cheap to keep, and the HANDOFF explicitly says don't
    strip them.
 
-   Replit additions (skip-link, disabled util, lucide stroke, motion
+   Accessibility additions (skip-link, disabled util, lucide stroke, motion
    tokens, prefers-reduced-motion, no-anim toggle) live at the bottom.
    ===================================================================== */
 
@@ -26,7 +26,8 @@
 
   --text:   #f4f3ee;
   --text-2: rgba(244, 243, 238, 0.66);
-  --text-3: rgba(244, 243, 238, 0.4);
+  /* --text-3 alpha clears WCAG AA 4.5:1 on the near-black bg (was 0.4 → 3.4:1). */
+  --text-3: rgba(244, 243, 238, 0.49);
   --text-4: rgba(244, 243, 238, 0.22);
 
   --accent:   #ff3d52;
@@ -61,7 +62,7 @@
   --bg-atmosphere-size: auto;
   --grain-opacity: 0.32;
 
-  /* Motion tokens (Replit addition — consumed by token-mapped primitives) */
+  /* Motion tokens (consumed by token-mapped primitives) */
   --motion-fast: 160ms;
   --motion-base: 240ms;
   --motion-slow: 400ms;
@@ -552,7 +553,7 @@ a { color: inherit; }
   --bg: #000000; --bg-2: #040404;
   --surface: rgba(0,255,136,0.012); --surface-2: rgba(0,255,136,0.025); --surface-3: rgba(0,255,136,0.05);
   --border: rgba(232,232,224,0.14); --border-strong: rgba(232,232,224,0.32); --hairline: rgba(232,232,224,0.08);
-  --text: #e8e8e0; --text-2: rgba(232,232,224,0.62); --text-3: rgba(232,232,224,0.36); --text-4: rgba(232,232,224,0.2);
+  --text: #e8e8e0; --text-2: rgba(232,232,224,0.62); --text-3: rgba(232,232,224,0.51); --text-4: rgba(232,232,224,0.2);
   --font-body: 'IBM Plex Mono', ui-monospace, monospace;
   --font-display: 'IBM Plex Mono', ui-monospace, monospace;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
@@ -572,7 +573,7 @@ a { color: inherit; }
   --bg: #000000; --bg-2: #0a0a0a;
   --surface: rgba(255,255,255,0.04); --surface-2: rgba(255,255,255,0.07); --surface-3: rgba(255,255,255,0.1);
   --border: rgba(255,255,255,0.1); --border-strong: rgba(255,255,255,0.18); --hairline: rgba(255,255,255,0.07);
-  --text: #fafafa; --text-2: rgba(250,250,250,0.62); --text-3: rgba(250,250,250,0.38); --text-4: rgba(250,250,250,0.2);
+  --text: #fafafa; --text-2: rgba(250,250,250,0.62); --text-3: rgba(250,250,250,0.48); --text-4: rgba(250,250,250,0.2);
   --font-body: 'Geist', 'Inter', system-ui, sans-serif;
   --font-display: 'Geist', 'Inter', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
@@ -591,7 +592,7 @@ a { color: inherit; }
   --bg: #000000; --bg-2: #0a0a0a;
   --surface: rgba(255,255,255,0.025); --surface-2: rgba(255,255,255,0.06); --surface-3: rgba(255,255,255,0.1);
   --border: rgba(245,245,240,0.85); --border-strong: rgba(245,245,240,1); --hairline: rgba(245,245,240,0.18);
-  --text: #f5f5f0; --text-2: rgba(245,245,240,0.7); --text-3: rgba(245,245,240,0.4); --text-4: rgba(245,245,240,0.22);
+  --text: #f5f5f0; --text-2: rgba(245,245,240,0.7); --text-3: rgba(245,245,240,0.49); --text-4: rgba(245,245,240,0.22);
   --font-body: 'Space Grotesk', system-ui, sans-serif;
   --font-display: 'Instrument Serif', 'Times New Roman', serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
@@ -610,7 +611,7 @@ a { color: inherit; }
   --bg: #000000; --bg-2: #050506;
   --surface: rgba(250,250,248,0.018); --surface-2: rgba(250,250,248,0.04); --surface-3: rgba(250,250,248,0.07);
   --border: rgba(250,250,248,0.085); --border-strong: rgba(250,250,248,0.18); --hairline: rgba(250,250,248,0.05);
-  --text: #fafaf8; --text-2: rgba(250,250,248,0.62); --text-3: rgba(250,250,248,0.38); --text-4: rgba(250,250,248,0.2);
+  --text: #fafaf8; --text-2: rgba(250,250,248,0.62); --text-3: rgba(250,250,248,0.48); --text-4: rgba(250,250,248,0.2);
   --font-body: 'Manrope', system-ui, sans-serif;
   --font-display: 'Manrope', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
@@ -818,7 +819,7 @@ a { color: inherit; }
 }
 
 /* =====================================================================
-   REPLIT ADDITIONS — accessibility / dev-quality polish that didn't
+   ACCESSIBILITY ADDITIONS — accessibility / dev-quality polish that didn't
    exist in the demo prototype but is required in a production React/SPA.
    ===================================================================== */
 

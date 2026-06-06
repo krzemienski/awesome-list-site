@@ -1,0 +1,44 @@
+### Baseline before mutation probes
+GET /api/categories: [{"id":9,"name":"Community & Events","slug":"community-events","resourceCount":91},{"id":3,"name":"Encoding & Codecs","s
+
+### Unauthenticated mutation probes (expect 401/403, NO state change)
+401  POST /api/user/change-password
+  body: {"message":"Unauthorized"}
+
+401  POST /api/favorites/1
+  body: {"message":"Unauthorized"}
+
+401  DELETE /api/favorites/1
+  body: {"message":"Unauthorized"}
+
+401  POST /api/bookmarks/1
+  body: {"message":"Unauthorized"}
+
+401  DELETE /api/bookmarks/1
+  body: {"message":"Unauthorized"}
+
+401  PUT /api/admin/users/nonexistent/role
+  body: {"message":"Unauthorized"}
+
+401  POST /api/admin/resources
+  body: {"message":"Unauthorized"}
+
+401  DELETE /api/admin/resources/1
+  body: {"message":"Unauthorized"}
+
+401  POST /api/admin/resources/bulk/delete
+  body: {"message":"Unauthorized"}
+
+401  POST /api/admin/export
+  body: {"message":"Unauthorized"}
+
+401  POST /api/admin/seed-database
+  body: {"message":"Unauthorized"}
+
+401  POST /api/admin/import-github
+  body: {"message":"Unauthorized"}
+
+### After mutation probes
+GET /api/categories: [{"id":9,"name":"Community & Events","slug":"community-events","resourceCount":91},{"id":3,"name":"Encoding & Codecs","s
+
+STATE UNCHANGED -> no destructive effect

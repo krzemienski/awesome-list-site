@@ -1,0 +1,3 @@
+=== /api/interactions POST (ResourceDetail view tracking) ===
+{"status":"recorded"}
+HTTP 200

@@ -1,0 +1,5 @@
+===== /api/resources?category=Nonexistent =====
+{"resources":[],"total":0}
+HTTP 200 | ct=application/json; charset=utf-8
+===== /api/resources?limit=2000&category=Nonexistent =====
+resources_len= 0 total= 0

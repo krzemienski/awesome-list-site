@@ -1,0 +1,2 @@
+=== login WRONG pass, correct email field (expect 401, no hash) ===
+{"message":"Invalid email or password"} HTTP401

@@ -1,0 +1,13 @@
+cmdk-input count: 1
+{
+  "found": true,
+  "placeholder": "Search packages, libraries, and tools...",
+  "ariaLabel": null,
+  "ariaLabelledby": "radix-:rc:",
+  "role": "combobox",
+  "labelElText": "",
+  "labelElTextTrimmedLen": null,
+  "labelElHTML": "<label cmdk-label=\"\" for=\"radix-:rd:\" id=\"radix-:rc:\" style=\"position: absolute; width: 1px; height: 1px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px;\"></label>",
+  "inputOuterHTML": "<input class=\"flex h-11 bg-transparent text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 w-full pl-10 pr-4 py-2\" placeholder=\"Search packages, libraries, and tools...\" cmdk-input=\"\" autocomplete=\"off\" autocorrect=\"off\" spellcheck=\"false\" aria-autocomplete=\"list\" role=\"combobox\" aria-expanded=\"true\" aria-controls=\"radix-:rb:\" aria-labelledby=\"rad"
+}
+AX snapshot error: Cannot read properties of undefined (reading 'snapshot')

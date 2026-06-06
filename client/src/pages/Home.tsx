@@ -21,7 +21,6 @@ import {
   Server,
   Layers,
   Users,
-  Sparkles,
   LogIn,
 } from "lucide-react";
 
@@ -199,8 +198,8 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
   return (
     <div className="space-y-6">
       <SEOHead
-        title="Awesome Video Resources - 2,000+ Curated Development Tools"
-        description="Discover 2,000+ curated video development resources including codecs, players, tools, and libraries. Find the perfect solution for your video project."
+        title="Awesome Video Resources - Curated Development Tools"
+        description="Discover curated video development resources including codecs, players, tools, and libraries. Find the perfect solution for your video project."
       />
 
       <div className="space-y-3 pt-2 sm:pt-4">
@@ -256,7 +255,6 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
             <Link
               key={category.slug}
               href={`/category/${category.slug}`}
-              aria-label={`View ${category.name} category with ${totalCount} resources`}
               data-testid={`link-category-${category.slug}`}
               className="block outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] rounded-[var(--radius)]"
             >
@@ -289,18 +287,6 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
       )}
 
       <div className="mt-8 sm:mt-12">
-        <div className="mb-4 sm:mb-6 space-y-2">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Sparkles className="h-6 w-6 text-[var(--accent)] shrink-0" />
-            <h2 className="font-sans font-bold text-2xl sm:text-3xl tracking-tight">
-              AI-Powered Recommendations
-            </h2>
-          </div>
-          <p className="text-sm sm:text-base text-[color:var(--text-2)]">
-            Get personalized resource recommendations based on your interests and learning goals.
-          </p>
-        </div>
-
         {isAuthenticated ? (
           <AIRecommendationsPanel resources={awesomeList.resources} />
         ) : (

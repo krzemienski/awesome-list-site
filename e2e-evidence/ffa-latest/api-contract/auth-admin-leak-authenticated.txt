@@ -1,0 +1,16 @@
+### Authenticated admin re-verification of historical leak routes
+
+--- LOGIN as admin@example.com ---
+status=200 body={"user":{"id":"c6e7d1c6-9732-4373-acf2-4b5cb626439e","email":"admin@example.com","firstName":"Admin","lastName":"User","role":"admin"}}
+
+--- GET /api/admin/users (authed) full body ---
+{"users":[{"id":"c6e7d1c6-9732-4373-acf2-4b5cb626439e","email":"admin@example.com","firstName":"Admin","lastName":"User","profileImageUrl":null,"role":"admin","createdAt":"2026-06-01T22:38:08.759Z","updatedAt":"2026-06-01T22:38:08.759Z"}],"total":1}
+
+--- GET /api/admin/export-json (authed) head 1500 chars ---
+{"exportedAt":"2026-06-02T23:14:46.983Z","version":"1.0.0","schema":{"resources":"id, title, url, description, category, subcategory, subSubcategory, status, submittedBy, approvedBy, approvedAt, githubSynced, lastSyncedAt, metadata, createdAt, updatedAt","categories":"id, name, slug","subcategories":"id, name, slug, categoryId","subSubcategories":"id, name, slug, subcategoryId","tags":"id, name, slug","learningJourneys":"id, title, description, category, difficulty, estimatedHours, createdBy, createdAt, updatedAt"},"stats":{"resources":1949,"resourcesByStatus":{"approved":1949},"categories":9,"subcategories":19,"subSubcategories":32,"tags":0,"learningJourneys":0,"users":1,"syncQueueItems":0},"data":{"resources":[{"id":1949,"title":"DVBSnoop","url":"http://dvbsnoop.sourceforge.net/","description":"An analyzer and debugging tool for MPEG transport streams and DVB broadcasts. It allows inspection of packet structure, tables (PAT, PMT, etc.), and payload of digital video streams.","category":"Media Tools","subcategory":null,"subSubcategory":null,"status":"approved","submittedBy":null,"approvedBy":null,"approvedAt":null,"githubSynced":false,"lastSyncedAt":null,"metadata":{"tags":["analysis","debugging","transport-stream","dvb","mpeg","inspection"],"sourceCategories":["media-tools"]},"createdAt":"2026-06-01T22:38:09.609Z","updatedAt":"2026-06-01T22:38:09.609Z"},{"id":1948,"title":"DTube","url":"https://d.tube/","description":"A decentralized video platform built on blockchain (Stee
+
+--- GET /api/admin/export-json (authed) grep users block for password ---
+
+
+### grep ALL authed responses for hash markers
+NO hash/password markers in authed admin responses -> leak fixed CONFIRMED

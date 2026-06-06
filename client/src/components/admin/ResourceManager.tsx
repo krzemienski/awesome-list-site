@@ -39,10 +39,12 @@ interface ResourcesResponse {
   totalPages: number;
 }
 
+// Badge bg shades chosen so white text clears WCAG AA 4.5:1
+// (green/yellow-500 only reach ~2:1 with white). green-700=5.0, yellow-700=4.9, red-600=4.8.
 const STATUS_OPTIONS = [
-  { value: "approved", label: "Approved", color: "bg-green-500" },
-  { value: "pending", label: "Pending", color: "bg-yellow-500" },
-  { value: "rejected", label: "Rejected", color: "bg-red-500" }
+  { value: "approved", label: "Approved", color: "bg-green-700" },
+  { value: "pending", label: "Pending", color: "bg-yellow-700" },
+  { value: "rejected", label: "Rejected", color: "bg-red-600" }
 ];
 
 export default function ResourceManager() {
@@ -497,7 +499,7 @@ export default function ResourceManager() {
               />
             </div>
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-full sm:w-48" data-testid="select-category-filter">
+              <SelectTrigger className="w-full sm:w-48" data-testid="select-category-filter" aria-label="Filter by category">
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
@@ -509,7 +511,7 @@ export default function ResourceManager() {
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full sm:w-36" data-testid="select-status-filter">
+              <SelectTrigger className="w-full sm:w-36" data-testid="select-status-filter" aria-label="Filter by status">
                 <SelectValue placeholder="All Status" />
               </SelectTrigger>
               <SelectContent>
@@ -519,7 +521,7 @@ export default function ResourceManager() {
                 ))}
               </SelectContent>
             </Select>
-            <Button type="submit" variant="outline" data-testid="button-search">
+            <Button type="submit" variant="outline" data-testid="button-search" aria-label="Search resources">
               <Search className="h-4 w-4" />
             </Button>
             {(search || categoryFilter || statusFilter) && (
@@ -693,6 +695,7 @@ export default function ResourceManager() {
                           size="sm"
                           onClick={() => openEditDialog(resource)}
                           data-testid={`button-edit-${resource.id}`}
+                          aria-label={`Edit ${resource.title}`}
                         >
                           <Pencil className="h-4 w-4" />
                         </Button>
@@ -701,6 +704,7 @@ export default function ResourceManager() {
                           size="sm"
                           onClick={() => openDeleteDialog(resource)}
                           data-testid={`button-delete-${resource.id}`}
+                          aria-label={`Delete ${resource.title}`}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -723,6 +727,7 @@ export default function ResourceManager() {
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page <= 1}
                 data-testid="button-prev-page"
+                aria-label="Previous page"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -735,6 +740,7 @@ export default function ResourceManager() {
                 onClick={() => setPage(p => Math.min(data?.totalPages || 1, p + 1))}
                 disabled={page >= (data?.totalPages || 1)}
                 data-testid="button-next-page"
+                aria-label="Next page"
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>

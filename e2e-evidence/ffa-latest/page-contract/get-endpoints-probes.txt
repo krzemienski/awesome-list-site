@@ -1,0 +1,15 @@
+############ GET endpoints used by pages (non-destructive) ############
+GET /api/journeys -> 200
+GET /api/categories -> 200
+GET /api/subcategories -> 200
+GET /api/sub-subcategories -> 200
+GET /api/recommendations?limit=6 -> 200
+GET /api/resources/check-url?url=https%3A%2F%2Fexample.com -> 200
+
+--- /api/journeys body (confirm shape; expected 0 items) ---
+$ curl http://localhost:5001/api/journeys
+[]
+
+--- /api/journeys/:id with bogus id (JourneyDetail) ---
+GET /api/journeys/99999 -> 404
+GET /api/journeys/abc -> 500

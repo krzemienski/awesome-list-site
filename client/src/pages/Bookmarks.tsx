@@ -28,6 +28,9 @@ export default function Bookmarks() {
     staleTime: 30000,
   });
 
+  // Must run before any early return — calling a hook after the isLoading/error
+  // returns changes the hook count between renders (React error #310) and
+  // white-screens the page when the query resolves.
   const sortedBookmarks = useMemo(() => {
     if (!bookmarks) return [];
 
@@ -47,13 +50,13 @@ export default function Bookmarks() {
       results.sort((a, b) => {
         const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
         const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-        return dateB - dateA;
+        return dateB - dateA; // Newest first
       });
     } else if (sortBy === "date-asc") {
       results.sort((a, b) => {
         const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
         const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-        return dateA - dateB;
+        return dateA - dateB; // Oldest first
       });
     }
 

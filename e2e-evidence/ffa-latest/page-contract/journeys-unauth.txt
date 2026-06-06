@@ -1,0 +1,6 @@
+=== PUT /api/journeys/1/progress (unauth) ===
+{"message":"Unauthorized"}
+HTTP 401
+=== POST /api/journeys/1/start (unauth) ===
+{"message":"Unauthorized"}
+HTTP 401

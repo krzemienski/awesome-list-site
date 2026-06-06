@@ -1,0 +1,19 @@
+=== Suspect/grep-artifact endpoints (verify clean 404 JSON, not HTML/500) ===
+--- GET /api/admin/platforms ---
+{"message":"Not found"}
+HTTP:404 CT:application/json; charset=utf-8
+--- GET /api/admin/your-entities ---
+{"message":"Not found"}
+HTTP:404 CT:application/json; charset=utf-8
+--- GET /api/your-entities ---
+{"message":"Not found"}
+HTTP:404 CT:application/json; charset=utf-8
+--- GET /api/check-email?email=a@b.com ---
+{"message":"Not found"}
+HTTP:404 CT:application/json; charset=utf-8
+--- GET /api/resources/picker ---
+{"message":"Resource not found"}
+HTTP:404 CT:application/json; charset=utf-8
+--- GET /api/totally-bogus ---
+{"message":"Not found"}
+HTTP:404 CT:application/json; charset=utf-8

@@ -1,0 +1,5 @@
+=== GET /api/auth/user unauth (expect null/200, NO user data) ===
+{"user":null,"isAuthenticated":false} HTTP200
+=== POST /api/auth/local/login bad creds (expect 401, no hash leak) ===
+{"message":"Missing credentials"} HTTP401
+=== grep login response for hash tokens ===

@@ -70,16 +70,22 @@ export function useAIRecommendations(
     mutationFn: async (profile?: UserProfile): Promise<RecommendationsResponse> => {
       const url = `/api/recommendations?limit=${limit}`;
       const finalProfile = profile || userProfile;
-      
-      if (finalProfile) {
-        return await apiRequest(url, { 
-          method: 'POST', 
-          body: JSON.stringify(finalProfile) 
-        });
-      } else {
-        // Use GET for anonymous users
-        return await apiRequest(url, { method: 'GET' });
+
+      const raw = finalProfile
+        ? await apiRequest(url, { method: 'POST', body: JSON.stringify(finalProfile) })
+        : await apiRequest(url, { method: 'GET' });
+
+      // Both GET and POST return a bare RecommendationResult[]; the panel reads
+      // { recommendations, learningPaths }. Normalize so the success gate
+      // (recommendations.length > 0) actually fires instead of always seeing
+      // an empty array from `raw.recommendations` on a top-level array.
+      if (Array.isArray(raw)) {
+        return { recommendations: raw, learningPaths: [] };
       }
+      return {
+        recommendations: raw?.recommendations ?? [],
+        learningPaths: raw?.learningPaths ?? [],
+      };
     },
     onSuccess: (data) => {
       // Cache locally

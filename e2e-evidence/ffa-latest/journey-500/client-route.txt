@@ -1,0 +1,16 @@
+=== App.tsx journey route ===
+79:        <Route path="/journeys" component={Journeys} />
+80:        <Route path="/journey/:id" component={JourneyDetail} />
+
+=== JourneyDetail fetch / param usage ===
+3:import { useParams, useLocation } from "wouter";
+70:  const { id } = useParams<{ id: string }>();
+77:    queryKey: [`/api/journeys/${id}`],
+79:      const response = await fetch(`/api/journeys/${id}`);
+80:      if (!response.ok) throw new Error('Failed to fetch journey');
+88:      return await apiRequest(`/api/journeys/${id}/start`, {
+93:      queryClient.invalidateQueries({ queryKey: [`/api/journeys/${id}`] });
+94:      queryClient.invalidateQueries({ queryKey: ['/api/journeys'] });
+118:        last = await apiRequest(`/api/journeys/${id}/progress`, {
+129:      queryClient.invalidateQueries({ queryKey: [`/api/journeys/${id}`] });
+130:      queryClient.invalidateQueries({ queryKey: ['/api/journeys'] });

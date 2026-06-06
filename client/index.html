@@ -80,9 +80,8 @@
 
     <!--
       Dev-only overlay suppressor.
-      The @replit/vite-plugin-runtime-error-modal plugin forwards server-side
-      Vite HMR WebSocket "Load failed" frames (frequent on mobile cellular)
-      to every connected client, which renders Vite's full-screen
+      Vite forwards HMR WebSocket "Load failed" frames (frequent on mobile
+      cellular) to every connected client, which renders Vite's full-screen
       <vite-error-overlay> and blocks the UI. The CSS rule in index.css
       hides the host element, but on mobile Safari the overlay sometimes
       ships its own inline style that still leaves a tap-blocker. This
@@ -93,9 +92,8 @@
     <script>
       (function () {
         try {
-          var isDev = location.hostname.endsWith('.replit.dev') ||
-                      location.hostname === 'localhost' ||
-                      location.hostname.endsWith('.repl.co');
+          var isDev = location.hostname === 'localhost' ||
+                      location.hostname === '127.0.0.1';
           if (!isDev) return;
 
           // Narrow regex: only match the specific Vite/HMR rejection
@@ -155,7 +153,5 @@
   <body>
     <div id="root"><!--app-html--></div>
     <script type="module" src="/src/main.tsx"></script>
-    <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
-    <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
   </body>
 </html>

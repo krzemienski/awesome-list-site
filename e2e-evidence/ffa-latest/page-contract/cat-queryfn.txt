@@ -1,0 +1,2 @@
+=== Category page default-queryFn URL (templated key IS the URL) ===
+/api/resources?category=Encoding%20%26%20Codecs&limit=2000 -> 200

@@ -89,6 +89,7 @@ import {
   AdminRepository,
   LegacyRepository,
   type AdminStats,
+  type SafeUser,
 } from "./repositories";
 
 // ============================================================================
@@ -154,13 +155,13 @@ export { AdminStats };
 // ============================================================================
 
 export interface IStorage {
-  // User operations (MANDATORY for Replit Auth)
+  // User operations (MANDATORY for auth)
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
 
   // Additional user operations
   getUserByEmail(email: string): Promise<User | undefined>;
-  listUsers(page: number, limit: number): Promise<{ users: User[]; total: number }>;
+  listUsers(page: number, limit: number): Promise<{ users: SafeUser[]; total: number }>;
   updateUserRole(userId: string, role: string): Promise<User>;
 
   // Resource CRUD operations
@@ -365,7 +366,7 @@ export class DatabaseStorage implements IStorage {
     return this.userRepo.getUserByEmail(email);
   }
 
-  async listUsers(page: number, limit: number): Promise<{ users: User[]; total: number }> {
+  async listUsers(page: number, limit: number): Promise<{ users: SafeUser[]; total: number }> {
     return this.userRepo.listUsers(page, limit);
   }
 

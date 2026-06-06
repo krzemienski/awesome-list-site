@@ -1,0 +1,3 @@
+=== Home default-queryFn URLs resolve (queryKey[0] used as URL) ===
+/api/resources?limit=1 -> 200
+/api/categories -> 200

@@ -1,0 +1,7 @@
+total 40
+drwxr-xr-x    3 nodejs   nodejs        4096 Jun  1 00:17 .
+drwxr-xr-x    1 root     root          4096 Jun  1 22:31 ..
+-rw-r--r--    1 nodejs   nodejs       17309 May  2 02:52 0000_dry_kingpin.sql
+-rw-r--r--    1 nodejs   nodejs        1002 May  2 02:52 0027_add_api_keys_table.sql
+-rw-r--r--    1 nodejs   nodejs         368 Jun  1 00:17 0028_add_research_discovery_sub_subcategory.sql
+drwxr-xr-x    2 nodejs   nodejs        4096 May  2 02:52 meta

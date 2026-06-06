@@ -1,0 +1,3 @@
+=== POST /api/user/change-password (unauth) ===
+{"message":"Unauthorized"}
+HTTP 401

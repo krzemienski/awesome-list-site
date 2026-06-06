@@ -1,0 +1,2 @@
+ Container awesome-list-app Stopping 
+ Container awesome-list-app Stopped 

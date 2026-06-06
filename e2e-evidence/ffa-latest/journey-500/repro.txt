@@ -1,0 +1,26 @@
+=== non-numeric id: /api/journeys/abc ===
+HTTP/1.1 500 Internal Server Error
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 37
+ETag: W/"25-1PpKIFQBYb1wlP9TgsBKn1qLxAA"
+Date: Tue, 02 Jun 2026 23:37:19 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"message":"Failed to fetch journey"}
+=== valid-but-missing id: /api/journeys/99999 ===
+HTTP/1.1 404 Not Found
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 31
+ETag: W/"1f-gCOGs3v+3VBnT3WJA1OF/KIsAoU"
+Date: Tue, 02 Jun 2026 23:37:19 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"message":"Journey not found"}
+=== status-only abc ===
+abc => 500
+=== status-only 99999 ===
+99999 => 404

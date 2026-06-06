@@ -1,20 +1,18 @@
-version: '3.8'
-
 services:
   # PostgreSQL database service
   postgres:
     image: postgres:16-alpine
     container_name: awesome-list-db
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: awesome_list
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-awesome_list}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -30,9 +28,25 @@ services:
     environment:
       NODE_ENV: production
       PORT: 5000
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/awesome_list
+      # Compose-internal database (never the remote Neon URL from .env).
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-awesome_list}
+      # Required — server/session.ts asserts SESSION_SECRET is set.
+      SESSION_SECRET: ${SESSION_SECRET:?SESSION_SECRET is required}
+      # The container serves plain HTTP; a Secure cookie would be dropped by the
+      # browser and no session would persist. Keep false here; set true only
+      # behind a TLS-terminating proxy (Railway/DO).
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@example.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+      # Anthropic auth: supports the public API (x-api-key) or a gateway/router
+      # (Bearer token + custom base URL). All optional; AI features fall back to
+      # rule-based behavior when none are set.
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      ANTHROPIC_AUTH_TOKEN: ${ANTHROPIC_AUTH_TOKEN:-}
+      ANTHROPIC_BASE_URL: ${ANTHROPIC_BASE_URL:-}
     ports:
-      - "5000:5000"
+      - "5001:5000"
     depends_on:
       postgres:
         condition: service_healthy

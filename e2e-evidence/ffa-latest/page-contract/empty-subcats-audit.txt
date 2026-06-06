@@ -1,0 +1,10 @@
+=== How many tree subcategory nodes render EMPTY (0 matches in corpus)? ===
+total subcategory nav nodes: 19
+EMPTY-rendering subcategory nodes: 1
+  [EMPTY] cat='General Tools' /subcategory/ffmpeg-tools (name='FFMPEG & Tools') -> 0 resources
+--- non-empty (sample) ---
+  cat='Community & Events' /subcategory/community-groups -> 4
+  cat='Community & Events' /subcategory/events-conferences -> 6
+  cat='Encoding & Codecs' /subcategory/codecs -> 27
+  cat='Encoding & Codecs' /subcategory/encoding-tools -> 225
+  cat='General Tools' /subcategory/drm -> 17

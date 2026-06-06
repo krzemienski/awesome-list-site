@@ -40,60 +40,62 @@ function BookmarkButton({
   const { toast } = useToast();
 
   const bookmarkMutation = useMutation({
-    mutationFn: async (payload?: { notes?: string }) => {
-      if (!isBookmarked) {
-        // Add bookmark
+    // The action ("add" | "remove") is decided by the caller at click time and
+    // passed in explicitly. It must NOT be re-derived from `isBookmarked` here,
+    // because onMutate optimistically flips that state before mutationFn runs —
+    // re-reading it would fire the opposite request (a DELETE that becomes an
+    // upserting POST), leaving the row in place while the icon flips.
+    mutationFn: async (payload: { action: "add" | "remove"; notes?: string }) => {
+      if (payload.action === "add") {
         return await apiRequest(`/api/bookmarks/${resourceId}`, {
           method: "POST",
-          body: JSON.stringify(payload || {}),
+          body: JSON.stringify({ notes: payload.notes }),
           credentials: 'include'
         });
       } else {
-        // Remove bookmark
         return await apiRequest(`/api/bookmarks/${resourceId}`, {
           method: "DELETE",
           credentials: 'include'
         });
       }
     },
-    onMutate: async () => {
-      // Optimistic update for immediate feedback
-      if (!showNotesDialog || isBookmarked) {
-        setIsBookmarked(!isBookmarked);
+    onMutate: async (payload) => {
+      // Optimistic update for immediate feedback. Set state to the explicit
+      // target of the action rather than toggling the current value.
+      if (!showNotesDialog || payload.action === "remove") {
+        setIsBookmarked(payload.action === "add");
       }
     },
-    onSuccess: (data) => {
-      // Update with server response
-      if (data?.isBookmarked !== undefined) {
-        setIsBookmarked(data.isBookmarked);
-      }
+    onSuccess: (data, payload) => {
+      // Reflect the action we just performed (server returns a message only).
+      setIsBookmarked(payload.action === "add");
       if (data?.notes !== undefined) {
         setNotes(data.notes);
       }
-      
-      // Invalidate related queries
+
+      // Invalidate related queries so lists/detail refetch fresh state.
       queryClient.invalidateQueries({ queryKey: ['/api/bookmarks'] });
       queryClient.invalidateQueries({ queryKey: [`/api/resources/${resourceId}`] });
-      
+
       toast({
-        description: isBookmarked ? "Bookmark removed" : "Bookmark added",
+        description: payload.action === "add" ? "Bookmark added" : "Bookmark removed",
         duration: 2000
       });
-      
+
       // Close notes dialog if open
       setNotesDialogOpen(false);
       setTempNotes("");
     },
-    onError: (error) => {
-      // Revert optimistic update
-      setIsBookmarked(isBookmarked);
-      
+    onError: (error, payload) => {
+      // Revert optimistic update to the state before the action.
+      setIsBookmarked(payload.action === "remove");
+
       toast({
         title: "Error",
         description: "Failed to update bookmark. Please try again.",
         variant: "destructive"
       });
-      
+
       console.error("Bookmark mutation error:", error);
     }
   });
@@ -101,23 +103,23 @@ function BookmarkButton({
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (!isBookmarked && showNotesDialog) {
       // Open notes dialog for new bookmark
       setTempNotes(notes);
       setNotesDialogOpen(true);
     } else {
-      // Toggle bookmark directly
-      bookmarkMutation.mutate(undefined);
+      // Decide the action from the CURRENT state, captured before any optimistic flip.
+      bookmarkMutation.mutate({ action: isBookmarked ? "remove" : "add" });
     }
   };
 
   const handleSaveWithNotes = () => {
-    bookmarkMutation.mutate({ notes: tempNotes });
+    bookmarkMutation.mutate({ action: "add", notes: tempNotes });
   };
 
   const handleSaveWithoutNotes = () => {
-    bookmarkMutation.mutate(undefined);
+    bookmarkMutation.mutate({ action: "add" });
   };
 
   const iconSize = size === "sm" ? "h-4 w-4" : size === "lg" ? "h-6 w-6" : "h-5 w-5";

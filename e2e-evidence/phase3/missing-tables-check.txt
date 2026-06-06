@@ -1,0 +1,5 @@
+     to_regclass      |  to_regclass  | to_regclass 
+----------------------+---------------+-------------
+ research_discoveries | research_jobs | api_keys
+(1 row)
+

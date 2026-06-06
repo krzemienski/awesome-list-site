@@ -1,0 +1,6 @@
+===== /api/resources/:id NONEXISTENT (999999) =====
+{"message":"Resource not found"}
+HTTP 404 | ct=application/json; charset=utf-8
+===== /api/resources/:id NON-NUMERIC (abc) =====
+{"message":"Resource not found"}
+HTTP 404 | ct=application/json; charset=utf-8

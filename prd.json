@@ -1,0 +1,217 @@
+{
+  "title": "Public/End-User Full Functional + Visual Audit (awesome-list-site)",
+  "source_plan": "e2e-evidence/public-fullrun/TEST-PLAN.md",
+  "completion_promise": "PUBLIC-AUDIT-COMPLETE",
+  "baseline_note": "ENV PIVOT (resume 2026-06-02): Docker is unstartable headlessly (console user=root, no Aqua/GUI session for uid 501; Docker Desktop engine structurally needs its GUI supervisor — raw backend boots libkrun VM then self-cancels because com.docker.build dies with 'unmarshaling start request: unexpected EOF'). The audited compose stack used an INTERNAL postgres volume holding the frozen 1949 baseline; that volume is gone. The SAME built artifact (dist/, node dist/index.js) now runs on host:5001 against Neon. Per user decision (start-docker attempted + structurally blocked), audit proceeds on the equivalent host+Neon app with numeric cases RE-ANCHORED to live server counts (the E19 invariant: UI == /api server count), not the frozen 1949 figures.",
+  "baseline": {
+    "resources": 1952,
+    "users": 4,
+    "pending": 0,
+    "edits": 0,
+    "bookmarks": 0,
+    "favorites": 0,
+    "categoryCounts": "community-events=88,encoding-codecs=337,general-tools=152,infrastructure-delivery=208,intro-learning=210,media-tools=280,players-clients=255,protocols-transport=215,standards-industry=207",
+    "subSubcatSpotChecks": "HEVC=10,FFMPEG=65,origin-servers=1 (match frozen baseline)"
+  },
+  "method": "End-user via Playwright connectOverCDP against headless Chrome on 127.0.0.1:9222, driving the live host app http://localhost:5001 (Neon-backed, same dist/ artifact the container runs). Driver harness: e2e-evidence/public-fullrun/.driver.mjs. Every interaction fired, result asserted (DOM + screenshot + live /api data). Visual-inspection checklist on every screenshot. Numeric cases assert UI==live server count. Any FAIL -> root-cause -> fix in source -> rebuild (pnpm build) -> re-test until PASS. Restore seeded data at end.",
+  "stories": [
+    {
+      "id": "PA-A",
+      "title": "Global Sidebar (AppSidebar) - 14 cases",
+      "passes": true,
+      "acceptanceCriteria": [
+        "All 9 category rows render with counts matching DB badges (91/372/95/183/227/304/263/242/172)",
+        "Clicking a category ROW navigates to /category/:slug; clicking the CHEVRON expands without navigating",
+        "Expanded category reveals subcategories; expanded subcategory reveals sub-subcategories with counts",
+        "Nav items (Home/Submit/Journeys/Advanced/Theme) each navigate to the correct route; active item highlighted",
+        "Sidebar collapse/expand toggle works; auto-expand of active branch on route load works",
+        "Evidence: screenshots under e2e-evidence/public-fullrun/A-*.png, each READ + visual-inspected"
+      ]
+    },
+    {
+      "id": "PA-B",
+      "title": "Global Header (AppHeader) - 11 cases",
+      "passes": true,
+      "acceptanceCriteria": [
+        "Breadcrumb renders correct trail per route and crumb links navigate",
+        "Search button opens SearchDialog; Theme button -> /settings/theme",
+        "Logged-out shows Login button -> /login",
+        "Logged-in avatar dropdown shows Profile/Bookmarks/Admin(if admin)/Sign Out and each routes correctly; Sign Out logs out",
+        "Evidence: e2e-evidence/public-fullrun/B-*.png READ + visual-inspected"
+      ]
+    },
+    {
+      "id": "PA-C",
+      "title": "Search Dialog (command palette) - 10 cases",
+      "passes": true,
+      "acceptanceCriteria": [
+        "Opens via header button and via keyboard shortcut; input focuses",
+        "Typing a query (e.g. ffmpeg) filters results live; clicking a result navigates",
+        "Arrow-key navigation + Enter select work",
+        "No-match query shows empty state; Esc/backdrop closes dialog",
+        "Evidence: e2e-evidence/public-fullrun/C-*.png READ + visual-inspected"
+      ]
+    },
+    {
+      "id": "PA-D",
+      "title": "Home (/) - 13 cases",
+      "passes": true,
+      "acceptanceCriteria": [
+        "Hero shows correct N categories (9) and M total resources",
+        "9 category cards render with counts; clicking a card -> /category/:slug",
+        "Tag filter: single + multi select filters cards and updates counts; clear resets",
+        "All 4 sort modes (name-asc/name-desc/count-desc/count-asc) reorder cards correctly",
+        "Tag filter hides 0-match categories (displayCount>0)",
+        "Evidence: e2e-evidence/public-fullrun/D-*.png READ + visual-inspected (grid spacing/overflow clean)"
+      ]
+    },
+    {
+      "id": "PA-E",
+      "title": "Category page (/category/:slug) - richest filters - 19 cases",
+      "passes": true,
+      "acceptanceCriteria": [
+        "Resources render; count matches sidebar badge AND /api/resources?category server count",
+        "Subcategory dropdown populated + filters; selection persists to URL (?subcategory=) across reload",
+        "Tag filter + sort dropdown both work; sort persists to URL (?sortBy=) across reload",
+        "All 3 view modes (grid/list/compact) render cleanly and persist via localStorage across reload",
+        "Resource card click -> /resource/:id; external link opens resource URL",
+        "Combined filter (subcat + tag + sort) composes; empty result shows empty state (no crash)",
+        "Evidence: e2e-evidence/public-fullrun/E-*.png READ + visual-inspected in all 3 view modes"
+      ]
+    },
+    {
+      "id": "PA-F",
+      "title": "Subcategory page (/subcategory/:slug) - 8 cases",
+      "passes": true,
+      "acceptanceCriteria": [
+        "Resources render for subcategory; tag filter + sort work",
+        "Filters persist to URL across reload; card click -> detail",
+        "Breadcrumb shows category > subcategory",
+        "Evidence: e2e-evidence/public-fullrun/F-*.png READ + visual-inspected"
+      ]
+    },
+    {
+      "id": "PA-G",
+      "title": "Sub-subcategory page (/sub-subcategory/:slug) - 8 cases",
+      "passes": true,
+      "acceptanceCriteria": [
+        "Resources render with correct known counts (HEVC=10, FFMPEG=65, origin-servers=1)",
+        "Tag filter + sort work; filters persist to URL across reload",
+        "Card click -> detail; breadcrumb trail correct",
+        "Evidence: e2e-evidence/public-fullrun/G-*.png READ + visual-inspected"
+      ]
+    },
+    {
+      "id": "PA-H",
+      "title": "Resource Detail (/resource/:id) - 11 cases",
+      "passes": true,
+      "acceptanceCriteria": [
+        "Detail renders title/desc/url/meta correctly; back button returns; external Visit link opens URL",
+        "Favorite toggle (logged-in) adds/removes with toast; Bookmark toggle (logged-in) adds/removes with toast",
+        "Share button copies URL / share sheet with toast",
+        "Related resources (up to 6) render and are clickable; invalid id shows not-found (no crash)",
+        "Evidence: e2e-evidence/public-fullrun/H-*.png READ + visual-inspected"
+      ]
+    },
+    {
+      "id": "PA-I",
+      "title": "Advanced (/advanced) 4 sub-tabs - 8 cases",
+      "passes": true,
+      "acceptanceCriteria": [
+        "Explorer / Metrics / Export / AI Recommendations tabs each render via TabsTrigger switching",
+        "Explorer internal search/filter functional; Export produces output",
+        "AI panel renders (may degrade without AI - degraded is acceptable, crash is not)",
+        "Evidence: e2e-evidence/public-fullrun/I-*.png READ + visual-inspected per tab"
+      ]
+    },
+    {
+      "id": "PA-J",
+      "title": "Journeys (/journeys) + JourneyDetail (/journey/:id) - 8 cases",
+      "passes": true,
+      "acceptanceCriteria": [
+        "Journeys list renders (0 seeded -> graceful empty state, not blank); category filter Select works",
+        "If journeys exist: card click -> /journey/:id, back button -> /journeys, enroll(logged-out) -> /login",
+        "Empty-state messaging clean",
+        "Evidence: e2e-evidence/public-fullrun/J-*.png READ + visual-inspected"
+      ]
+    },
+    {
+      "id": "PA-K",
+      "title": "Auth: Login (/login) + Register (/register) - 9 cases",
+      "passes": true,
+      "acceptanceCriteria": [
+        "Login form renders; empty submit shows validation; wrong creds shows error toast with no nav",
+        "Valid login (admin@example.com) authenticates and redirects",
+        "Register form renders; short password (<8) shows validation; cross-links Login<->Register work",
+        "Evidence: e2e-evidence/public-fullrun/K-*.png READ + visual-inspected"
+      ]
+    },
+    {
+      "id": "PA-L",
+      "title": "Submit Resource (/submit) - 7 cases",
+      "passes": true,
+      "acceptanceCriteria": [
+        "Logged-out shows login CTA; logged-in shows full form with category/subcategory/sub-subcategory cascade selects",
+        "Empty submit shows validation; valid submit creates a pending resource with success toast",
+        "Submitted test resource is DELETED afterward to restore baseline (pending=0)",
+        "Evidence: e2e-evidence/public-fullrun/L-*.png READ + visual-inspected"
+      ]
+    },
+    {
+      "id": "PA-M",
+      "title": "Profile (/profile) + Bookmarks (/bookmarks) AuthGuard - 10 cases",
+      "passes": true,
+      "acceptanceCriteria": [
+        "Logged-out /profile and /bookmarks redirect to login (AuthGuard)",
+        "Logged-in /profile renders user info + favorites + bookmarks; logout button works",
+        "/bookmarks renders list; sort Select reorders; remove bookmark updates list; empty state clean",
+        "Any seeded bookmarks/favorites removed afterward to restore baseline (bookmarks=0, favorites=0)",
+        "Evidence: e2e-evidence/public-fullrun/M-*.png READ + visual-inspected"
+      ]
+    },
+    {
+      "id": "PA-N",
+      "title": "Theme Settings (/settings/theme) + global dark/light visual - 8 cases",
+      "passes": true,
+      "acceptanceCriteria": [
+        "Mode (light/dark/system), accent color, and font pickers each apply live and persist across reload",
+        "Preview buttons render all variants (default/secondary/outline/ghost/destructive)",
+        "Dark mode whole-app visual pass: no white-on-dark, contrast >=4.5:1 body text",
+        "Light mode whole-app visual pass: glass cards sufficiently opaque",
+        "Evidence: e2e-evidence/public-fullrun/N-*.png READ + visual-inspected (both modes)"
+      ]
+    },
+    {
+      "id": "PA-O",
+      "title": "About (/about) + 404 - 4 cases",
+      "passes": true,
+      "acceptanceCriteria": [
+        "/about renders content + external links (correct hrefs)",
+        "/nonexistent-route shows NotFound page (no crash) with a way back home",
+        "Evidence: e2e-evidence/public-fullrun/O-*.png READ + visual-inspected"
+      ]
+    },
+    {
+      "id": "PA-P",
+      "title": "Responsive viewports - 4 cases",
+      "passes": false,
+      "acceptanceCriteria": [
+        "Mobile 375px: sidebar collapses, hamburger opens nav, Home usable",
+        "Mobile category page: filters usable on small screen",
+        "Tablet 768px + desktop 1280px: no overflow/clipping",
+        "Evidence: e2e-evidence/public-fullrun/P-*.png READ + visual-inspected at each width"
+      ]
+    },
+    {
+      "id": "PA-Z",
+      "title": "Final: defects fixed, baselines restored, VERDICT written",
+      "passes": false,
+      "acceptanceCriteria": [
+        "Every defect found during PA-A..PA-P fixed in source, rebuilt, and re-tested to PASS (no deferred FAILs)",
+        "DB baselines restored exactly: resources=1949, users=1, pending=0, edits=0, bookmarks=0, favorites=0",
+        "e2e-evidence/public-fullrun/VERDICT.md written with per-case PASS/FAIL + evidence citations",
+        "evidence-inventory.txt lists all screenshots with byte counts; all screenshots are unique (no stale dupes)"
+      ]
+    }
+  ]
+}

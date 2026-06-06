@@ -1,0 +1,27 @@
+DEFECT C3-001 (HIGH): Profile 'Recommended for You' cards render broken
+Date: 2026-06-03T09:11:31Z
+
+API /api/recommendations returns: top-level keys = resource,confidence,reason,type,score
+  item.resource.id=1949, item.id=undefined, item.name=undefined, item.url=undefined
+
+Profile.tsx:113 types Recommendation as FLAT {id,name,url,description,category,tags}
+Profile.tsx:451 passes resource={recommendation} (the nested obj) to RecommendationCard
+RecommendationCard reads resource.name/.description/.category/.id/.url -> all undefined
+
+User-visible outcomes:
+  1. Card title blank (resource.name undefined)
+  2. Description shows 'No description available'
+  3. Category badge empty
+  4. onClick nav -> /resource/undefined (Profile.tsx:455 uses recommendation.id=undefined)
+  5. Feedback POST -> /api/recommendations/undefined/feedback => HTTP 404 (route is /api/recommendations/feedback, no :id)
+
+Live probes:
+  POST /api/recommendations/123/feedback  -> 404 (unregistered :id variant)
+  POST /api/recommendations/feedback      -> 400 (registered; needs userId,resourceId,feedback)
+
+=== FIX VERIFICATION (2026-06-03T09:16:09Z) — rebuilt container ===
+Cards now render real titles: DVBSnoop, DTube, PyAV, MMAction2, libmpeg2, Jubler (was blank pre-fix)
+Helpful click -> POST /api/recommendations/feedback -> HTTP 200 (was /api/recommendations/undefined/feedback -> 404)
+Optimistic UI: button green + thumb filled = true
+Backend recordFeedback: 200 for both clicked(rating5) and dismissed(rating1)
+Evidence: C3-001-profile-recommendations-FIXED.png, C3-001-feedback-helpful-active.png, recommendations-authed-shape.json

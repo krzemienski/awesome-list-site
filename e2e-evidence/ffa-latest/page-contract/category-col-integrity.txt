@@ -1,0 +1,11 @@
+=== Verify category column is populated on ALL rows (Category page filters by category col) ===
+rows total: 1949
+rows with NULL/empty category: 0
+category distribution: {'Media Tools': 304, 'Infrastructure & Delivery': 183, 'Encoding & Codecs': 372, 'Protocols & Transport': 242, 'Players & Clients': 263, 'Intro & Learning': 227, 'Community & Events': 91, 'Standards & Industry': 172, 'General Tools': 95}
+=== App.tsx: where does Home awesomeList prop come from ===
+32:import { fetchStaticAwesomeList } from "@/lib/static-data";
+39:    queryKey: ["awesome-list-data"],
+40:    queryFn: fetchStaticAwesomeList,
+44:  const awesomeList = rawData ? processAwesomeListData(rawData) : undefined;
+67:    <MainLayout awesomeList={awesomeList} isLoading={isLoading} user={user ?? undefined} onLogout={logout}>
+69:        <Route path="/" component={() => <Home awesomeList={awesomeList} isLoading={isLoading} />} />

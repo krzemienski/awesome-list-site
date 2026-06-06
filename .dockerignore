@@ -66,6 +66,12 @@ Thumbs.db
 attached_assets/
 logs/
 
+# Evidence + planning artifacts (build-context bloat)
+e2e-evidence/
+_planning/
+planning/
+reviews/
+
 # Archive files
 *.tar.gz
 *.zip

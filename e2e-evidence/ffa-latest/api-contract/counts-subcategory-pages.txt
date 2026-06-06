@@ -1,0 +1,21 @@
+=== Subcategory PAGE count (replicating client filter) ===
+subcatName | slug | matchesName_count | matchesNameOrSlug_count
+'Community Groups' | slug=community-groups | name=4 | either=4
+'Events & Conferences' | slug=events-conferences | name=6 | either=6
+'Codecs' | slug=codecs | name=27 | either=27
+'Encoding Tools' | slug=encoding-tools | name=225 | either=225
+'DRM' | slug=drm | name=17 | either=17
+'FFMPEG & Tools' | slug=ffmpeg-tools | name=0 | either=0  <<< ZERO
+'Cloud & CDN' | slug=cloud-cdn | name=9 | either=9
+'Streaming Servers' | slug=streaming-servers | name=35 | either=35
+'Introduction' | slug=introduction | name=3 | either=3
+'Learning Resources' | slug=learning-resources | name=36 | either=36
+'Tutorials & Case Studies' | slug=tutorials-case-studies | name=59 | either=59
+'Ads & QoE' | slug=ads-qoe | name=45 | either=45
+'Audio & Subtitles' | slug=audio-subtitles | name=56 | either=56
+'Hardware Players' | slug=hardware-players | name=35 | either=35
+'Mobile & Web Players' | slug=mobile-web-players | name=78 | either=78
+'Adaptive Streaming' | slug=adaptive-streaming | name=139 | either=139
+'Transport Protocols' | slug=transport-protocols | name=9 | either=9
+'Specs & Standards' | slug=specs-standards | name=34 | either=34
+'Vendors & HDR' | slug=vendors-hdr | name=5 | either=5

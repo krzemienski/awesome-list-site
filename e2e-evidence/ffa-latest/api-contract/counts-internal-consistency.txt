@@ -1,0 +1,9 @@
+Community & Events: total=91 | named-sub-sum=10 | no-subcat=81 | sum+none=91 OK
+Encoding & Codecs: total=372 | named-sub-sum=252 | no-subcat=120 | sum+none=372 OK
+General Tools: total=95 | named-sub-sum=17 | no-subcat=78 | sum+none=95 OK
+Infrastructure & Delivery: total=183 | named-sub-sum=44 | no-subcat=139 | sum+none=183 OK
+Intro & Learning: total=227 | named-sub-sum=98 | no-subcat=129 | sum+none=227 OK
+Media Tools: total=304 | named-sub-sum=101 | no-subcat=203 | sum+none=304 OK
+Players & Clients: total=263 | named-sub-sum=113 | no-subcat=150 | sum+none=263 OK
+Protocols & Transport: total=242 | named-sub-sum=148 | no-subcat=94 | sum+none=242 OK
+Standards & Industry: total=172 | named-sub-sum=39 | no-subcat=133 | sum+none=172 OK

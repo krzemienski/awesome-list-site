@@ -1,0 +1,5 @@
+/api/admin/journeys/:PARAM/steps/:PARAM
+/api/admin/journeys/:PARAM/steps/reorder
+/api/admin/your-entities
+/api/check-email
+/api/recommendations/:PARAM/feedback

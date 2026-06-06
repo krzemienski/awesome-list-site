@@ -1,0 +1,47 @@
+{
+  "name": "Awesome Video",
+  "short_name": "Awesome Video",
+  "description": "The curated index of 2,600+ video development resources — players, encoders, codecs, streaming, AI, tools, and community.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#ff3d52",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["productivity", "developer", "education", "video"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Browse Categories",
+      "short_name": "Categories",
+      "description": "Explore all video development categories",
+      "url": "/"
+    },
+    {
+      "name": "Learning Journeys",
+      "short_name": "Journeys",
+      "description": "Guided multi-step learning paths",
+      "url": "/journeys"
+    },
+    {
+      "name": "Advanced",
+      "short_name": "Advanced",
+      "description": "Category explorer, analytics, and export",
+      "url": "/advanced"
+    }
+  ]
+}

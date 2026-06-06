@@ -1,0 +1,6 @@
+=== Sidebar badge count for FFMPEG & Tools (getTotalResourceCount from tree) vs page render ===
+Sidebar badge (getTotalResourceCount) = 0
+Subcategory page render (allResources.length) = 0
+consistent
+=== Also: is General Tools category page count consistent? (/api/categories says 95) ===
+General Tools resources total: 95

@@ -1,0 +1,18 @@
+# Unauthenticated mutation probes (expect 401/403, NO state change) 2026-06-02T23:38:44Z
+## auth-mutation routes (public by design)
+POST   /api/auth/local/login                  -> HTTP 401 | {"message":"Invalid email or password"}
+POST   /api/auth/register                     -> HTTP 201 | {"id":"ffb42496-a170-4eb1-8f1a-f8ca4f038fb5","email":"audit_noop@x.com","role":"user"}
+POST   /api/auth/logout                       -> HTTP 200 | {"success":true}
+## protected mutations
+POST   /api/user/change-password              -> HTTP 401 | {"message":"Unauthorized"}
+POST   /api/favorites/1                       -> HTTP 401 | {"message":"Unauthorized"}
+DELETE /api/favorites/1                       -> HTTP 401 | {"message":"Unauthorized"}
+POST   /api/bookmarks/1                       -> HTTP 401 | {"message":"Unauthorized"}
+DELETE /api/bookmarks/1                       -> HTTP 401 | {"message":"Unauthorized"}
+PUT    /api/admin/users/abc/role              -> HTTP 401 | {"message":"Unauthorized"}
+POST   /api/admin/resources                   -> HTTP 401 | {"message":"Unauthorized"}
+DELETE /api/admin/resources/1                 -> HTTP 401 | {"message":"Unauthorized"}
+POST   /api/admin/resources/bulk/delete       -> HTTP 401 | {"message":"Unauthorized"}
+POST   /api/admin/export                      -> HTTP 401 | {"message":"Unauthorized"}
+POST   /api/admin/seed-database               -> HTTP 401 | {"message":"Unauthorized"}
+POST   /api/admin/import-github               -> HTTP 401 | {"message":"Unauthorized"}

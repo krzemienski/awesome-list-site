@@ -1,0 +1,24 @@
+=== Sidebar count (tree getTotalResourceCount) vs Subcategory PAGE count (DB filter) ===
+slug                         sidebar(tree)  page(DB)  match
+community-groups                         4         4  OK
+events-conferences                       6         6  OK
+codecs                                  27        27  OK
+encoding-tools                         225       225  OK
+drm                                     17        17  OK
+ffmpeg-tools                             0         0  OK
+cloud-cdn                                9         9  OK
+streaming-servers                       35        35  OK
+introduction                             3         3  OK
+learning-resources                      36        36  OK
+tutorials-case-studies                  59        59  OK
+ads-qoe                                 45        45  OK
+audio-subtitles                         56        56  OK
+hardware-players                        35        35  OK
+mobile-web-players                      78        78  OK
+adaptive-streaming                     139       139  OK
+transport-protocols                      9         9  OK
+specs-standards                         34        34  OK
+vendors-hdr                              5         5  OK
+
+MISMATCHES (sidebar count != subcategory page count):
+total mismatches: 0

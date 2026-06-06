@@ -1,0 +1,21 @@
+FINDING: Advanced > Explorer subcategory chips undercount (category-explorer.tsx:325)
+
+Render: {subcategory.name} ({subcategory.resources?.length || 0})
+Source: /api/awesome-list tree -> subcategory.resources holds DIRECT-only resources
+        (sub-subcategory resources are NOT bubbled up).
+Correct path exists in AppSidebar.tsx getTotalResourceCount (direct + subsub) which matches DB.
+
+LIVE PROOF (chrome-devtools evaluate_script on /advanced, Protocols & Transport expanded):
+  Explorer chips:  "Adaptive Streaming (31)"   "Transport Protocols (8)"
+  Sidebar (same page, uid 1_177/1_187): Adaptive Streaming 139, Transport Protocols 9
+  DB truth (curl /api/resources?limit=2000 | filter subcategory):
+    Adaptive Streaming = 139, Transport Protocols = 9
+
+14 of 19 subcategory chips are WRONG. Worst offenders:
+  Adaptive Streaming     chip 31  vs DB 139
+  Encoding Tools         chip 160 vs DB 225
+  Audio & Subtitles      chip 10  vs DB 56
+  Mobile & Web Players   chip 15  vs DB 78
+  Ads & QoE              chip 9   vs DB 45
+  Hardware Players       chip 5   vs DB 35
+(see counts-explorer-subcat-undercount.txt for full 19-row table)

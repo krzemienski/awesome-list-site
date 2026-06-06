@@ -1,0 +1,68 @@
+# Count Cross-Validation — mixed validators (DB vs API tree vs server filter)
+# Generated: 2026-06-02T00:21:59Z
+# DB total resources: 1949
+
+## CATEGORY level (DB vs API tree vs /api/categories badge vs server ?category= .total)
+LEVEL|NAME|DB|API_TREE|CAT_BADGE|SERVER|VERDICT
+category|Community & Events|91|91|91|91|PASS
+category|Encoding & Codecs|372|372|372|372|PASS
+category|General Tools|95|95|95|95|PASS
+category|Infrastructure & Delivery|183|183|183|183|PASS
+category|Intro & Learning|227|227|227|227|PASS
+category|Media Tools|304|304|304|304|PASS
+category|Players & Clients|263|263|263|263|PASS
+category|Protocols & Transport|242|242|242|242|PASS
+category|Standards & Industry|172|172|172|172|PASS
+CATEGORY_FAILS=0
+
+## SUBCATEGORY level (DB vs API tree vs server ?subcategory= .total)
+LEVEL|NAME|DB|API_TREE|SERVER|VERDICT
+subcategory|Adaptive Streaming|139|139|139|PASS
+subcategory|Ads & QoE|45|45|45|PASS
+subcategory|Audio & Subtitles|56|56|56|PASS
+subcategory|Cloud & CDN|9|9|9|PASS
+subcategory|Codecs|27|27|27|PASS
+subcategory|Community Groups|4|4|4|PASS
+subcategory|DRM|17|17|17|PASS
+subcategory|Encoding Tools|225|225|225|PASS
+subcategory|Events & Conferences|6|6|6|PASS
+subcategory|Hardware Players|35|35|35|PASS
+subcategory|Introduction|3|3|3|PASS
+subcategory|Learning Resources|36|36|36|PASS
+subcategory|Mobile & Web Players|78|78|78|PASS
+subcategory|Specs & Standards|34|34|34|PASS
+subcategory|Streaming Servers|35|35|35|PASS
+subcategory|Transport Protocols|9|9|9|PASS
+subcategory|Tutorials & Case Studies|59|59|59|PASS
+subcategory|Vendors & HDR|5|5|5|PASS
+SUBCATEGORY_FAILS=0
+
+## SUB-SUBCATEGORY level (DB vs API tree; server has NO sub-sub filter by design)
+LEVEL|NAME|DB|API_TREE|VERDICT
+sub_subcategory|AV1|5|5|PASS
+sub_subcategory|Android|10|10|PASS
+sub_subcategory|Audio|8|8|PASS
+sub_subcategory|CDN Integration|1|1|PASS
+sub_subcategory|Chromecast|1|1|PASS
+sub_subcategory|Cloud Platforms|4|4|PASS
+sub_subcategory|DASH|48|48|PASS
+sub_subcategory|FFMPEG|65|65|PASS
+sub_subcategory|HDR Guidelines|1|1|PASS
+sub_subcategory|HEVC|10|10|PASS
+sub_subcategory|HLS|60|60|PASS
+sub_subcategory|MPEG & Forums|6|6|PASS
+sub_subcategory|Official Specs|3|3|PASS
+sub_subcategory|Online Forums|2|2|PASS
+sub_subcategory|Origin Servers|1|1|PASS
+sub_subcategory|Podcasts & Webinars|2|2|PASS
+sub_subcategory|Quality & Testing|36|36|PASS
+sub_subcategory|RIST|1|1|PASS
+sub_subcategory|Roku|26|26|PASS
+sub_subcategory|Smart TVs|3|3|PASS
+sub_subcategory|Storage Solutions|3|3|PASS
+sub_subcategory|Subtitles & Captions|38|38|PASS
+sub_subcategory|VP9|1|1|PASS
+sub_subcategory|Vendor Docs|1|1|PASS
+sub_subcategory|Web Players|23|23|PASS
+sub_subcategory|iOS/tvOS|30|30|PASS
+SUBSUBCATEGORY_FAILS=0

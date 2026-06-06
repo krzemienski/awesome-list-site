@@ -1,0 +1,5 @@
+subSubcategory 'HEVC' = 10
+subSubcategory 'AV1' = 5
+subSubcategory 'VP9' = 1
+subSubcategory 'FFMPEG' = 65
+subSubcategory 'Origin Servers' = 1

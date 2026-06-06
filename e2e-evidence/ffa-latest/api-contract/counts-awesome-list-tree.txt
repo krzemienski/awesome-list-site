@@ -1,0 +1,8 @@
+top keys: ['title', 'description', 'repoUrl', 'resources', 'categories']
+title: Awesome Video
+categories: 9
+SUM subcategories (cat.subcategories.length): 19
+SUM subSubcategories: 32
+tree flat resource count: 1949
+unique tags in tree: 0
+top-level d.resources len: 1949

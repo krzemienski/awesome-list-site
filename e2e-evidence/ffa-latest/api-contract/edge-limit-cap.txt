@@ -1,0 +1,6 @@
+===== edge-limit-cap.txt =====
+$ curl 'http://localhost:5001/api/resources?limit=2000' -> total + actual array length
+
+$ curl 'http://localhost:5001/api/resources?limit=5000' (above total)
+total field: 1949
+resources array length: 1949

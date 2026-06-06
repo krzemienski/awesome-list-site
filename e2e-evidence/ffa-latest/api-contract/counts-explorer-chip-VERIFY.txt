@@ -1,0 +1,22 @@
+INDEPENDENT VERIFY — category-explorer.tsx:325 chip = subcategory.resources.length (DIRECT only)
+cat > subcat | CHIP(direct len) | DB-by-name | verdict
+Community & Events > Community Groups | chip=2 | db=4 | WRONG (delta 2)
+Community & Events > Events & Conferences | chip=4 | db=6 | WRONG (delta 2)
+Encoding & Codecs > Codecs | chip=11 | db=27 | WRONG (delta 16)
+Encoding & Codecs > Encoding Tools | chip=160 | db=225 | WRONG (delta 65)
+General Tools > DRM | chip=17 | db=17 | OK
+General Tools > FFMPEG & Tools | chip=0 | db=0 | OK
+Infrastructure & Delivery > Cloud & CDN | chip=4 | db=9 | WRONG (delta 5)
+Infrastructure & Delivery > Streaming Servers | chip=31 | db=35 | WRONG (delta 4)
+Intro & Learning > Introduction | chip=3 | db=3 | OK
+Intro & Learning > Learning Resources | chip=36 | db=36 | OK
+Intro & Learning > Tutorials & Case Studies | chip=59 | db=59 | OK
+Media Tools > Ads & QoE | chip=9 | db=45 | WRONG (delta 36)
+Media Tools > Audio & Subtitles | chip=10 | db=56 | WRONG (delta 46)
+Players & Clients > Hardware Players | chip=5 | db=35 | WRONG (delta 30)
+Players & Clients > Mobile & Web Players | chip=15 | db=78 | WRONG (delta 63)
+Protocols & Transport > Adaptive Streaming | chip=31 | db=139 | WRONG (delta 108)
+Protocols & Transport > Transport Protocols | chip=8 | db=9 | WRONG (delta 1)
+Standards & Industry > Specs & Standards | chip=25 | db=34 | WRONG (delta 9)
+Standards & Industry > Vendors & HDR | chip=3 | db=5 | WRONG (delta 2)
+WRONG ROWS: 14 of 19

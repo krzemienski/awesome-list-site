@@ -1,0 +1,5 @@
+===== edge-limit-2000-recheck.txt =====
+$ curl 'http://localhost:5001/api/resources?limit=2000' | count via grep on id field
+"total":1949
+id-occurrence-count (>=resource count): 1949
+total: 1949 | resources.length: 1949

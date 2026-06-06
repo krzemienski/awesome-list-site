@@ -1,0 +1,42 @@
+PUBLIC READ API AUDIT — http://localhost:5001 — Docker awesome-list-app (seeded)
+================================================================================
+STATUS MATRIX (live curl):
+200  /api/health                       {"status":"ok"}
+200  /api/awesome-list                 flat 1949, nested sum 1949, 9 cats (GT match)
+200  /api/categories                   9 cats, all resourceCounts match GT exactly
+200  /api/subcategories                19 (GT match)
+200  /api/sub-subcategories            32 (objs: id/name/slug/subcategoryId; NO resourceCount)
+200  /api/resources                    {resources[20], total:1949}; page/limit NOT echoed
+200  /api/resources?category=...       total 372 for Encoding & Codecs (correct filter)
+200  /api/resources?limit=5            honored
+200  /api/resources?page=2&limit=3     distinct ids from page1 (pagination works)
+200  /api/resources?search=ffmpeg      total 89 (fuzzy)
+200  /api/resources?subSubcategory=X   HEVC 10, FFMPEG 65, AV1 5, VP9 1, Origin Servers 1 (GT match)
+200  /api/resources?category=NoExist   total 0 (no leak-all)
+200  /api/resources/1949               id 1949 DVBSnoop
+200  /api/resources/1949/related       6 related
+404  /api/resource/1949   (singular)   {"message":"Not found"} - NOT registered, NOT called by frontend
+200  /api/journeys                     [] (empty, expected)
+404  /api/journeys/1                   {"message":"Journey not found"} (expected, empty)
+200  /api/learning-paths/suggested     list of 3
+200  /api/recommendations/init         {"status":"ready",...}
+200  /api/recommendations              array of 10 (public, no auth needed)
+200  /og-image.png                     PNG 1200x630 23740b
+200  /og-image.svg                     image/svg+xml
+200  /sitemap.xml                      11205b
+
+----- 404s on documented endpoints (route module never mounted) -----
+404  /api/public/categories            {"message":"Not found"}
+404  /api/public/resources             {"message":"Not found"}
+404  /api/public/tags                  {"message":"Not found"}
+404  /api/tags                         {"message":"Not found"}
+
+----- PAGINATION EDGE CASES (public /api/resources) -----
+500  /api/resources?page=-1&limit=3    {"message":"Failed to fetch resources"} <-- CRASH (negative SQL OFFSET)
+     root cause: ResourceRepository.ts:62  const offset = (page-1)*limit  -> .offset(-6) -> Postgres error
+200  /api/resources?page=0&limit=3     offset=-3 ... returns 200 (offset 0-3? actually (0-1)*3=-3 -> ??) NOTE: page=0 ok
+200  /api/resources?page=99999         returned 0, total 1949 (correct empty tail)
+200  /api/resources?limit=100000       returned ALL 1949 (no upper cap; 1.4MB payload)
+200  /api/resources?limit=-5           returned ALL 1949 (negative limit bypasses paging)
+200  /api/resources?limit=0            returned 20 (falls back to default via ||20)
+200  /api/resources?limit=abc          returned 20 (NaN -> default 20, OK)

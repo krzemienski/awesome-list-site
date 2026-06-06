@@ -1,0 +1,52 @@
+=== CLAIM: sitemap-missing-resource-urls — INDEPENDENT REPRODUCTION ===
+Date: 2026-06-02  Base: http://localhost:5001 (Docker awesome-list-app, seeded DB)
+
+--- 1. Sitemap total URL count ---
+$ curl -s http://localhost:5001/sitemap.xml | grep -o '<url>' | wc -l
+62
+
+--- 2. Sitemap /resource/ entries ---
+$ curl -s http://localhost:5001/sitemap.xml | grep -oE '<loc>[^<]*/resource/[^<]*</loc>' | wc -l
+0
+
+--- 3. Sitemap URL breakdown by type ---
+   1 /
+   1 /advanced
+   9 /category/*
+  19 /subcategory/*
+  32 /sub-subcategory/*
+  (=62; ZERO resource detail URLs)
+
+--- 4. Ground-truth total resources (two independent sources agree) ---
+$ curl -s "http://localhost:5001/api/resources" -> {"...,"total":1949}
+$ curl -s "http://localhost:5001/api/categories" -> sum(resourceCount)=1949 across 9 categories
+=> 1949 resource detail pages exist.
+
+--- 5. Resource detail routes serve 200 real SSR HTML (NOT generic SPA shell) ---
+$ curl -s -o /dev/null -w '%{http_code} %{content_type}' http://localhost:5001/resource/1     => 200 text/html; charset=UTF-8
+$ curl -s -o /dev/null -w '%{http_code} %{content_type}' http://localhost:5001/resource/1949  => 200 text/html; charset=UTF-8
+Per-resource SSR <title> proves distinct indexable content (not a static shell):
+  r1:    <title>MPEG Standards Documentation — Awesome Video</title>
+  r500:  <title>IHMC Video Codecs — Awesome Video</title>
+  r1949: <title>DVBSnoop — Awesome Video</title>
+og:title also matches per resource (server/og-middleware.ts handles /resource/:id).
+
+--- 6. Frontend route exists ---
+client/src/App.tsx:75  <Route path="/resource/:id" component={ResourceDetail} />
+
+--- 7. robots.txt WANTS resources crawled but only declares ONE sitemap ---
+$ curl -s http://localhost:5001/robots.txt | grep -iE 'Allow: /resource/|Sitemap:'
+  Allow: /resource/
+  Sitemap: https://new.awesome.video/sitemap.xml
+No resource sitemap / sitemap index exists:
+$ curl -s http://localhost:5001/sitemap-index.xml -> SPA HTML shell (text/html DOCTYPE), NOT a sitemap index.
+
+--- 8. Source root cause ---
+server/routes.ts generateSitemap() (lines ~110-178) iterates
+awesomeListData.categories -> subcategories -> subSubcategories only.
+Never iterates resources. No /resource/:id loc emitted.
+
+=== VERDICT: REAL. 1949 indexable resource detail pages have zero sitemap coverage. ===
+Severity: LOW (SEO discoverability; no crash/data-loss/security; pages still
+reachable via internal links + robots Allow). Crawlers can find them via crawl
+graph but get no sitemap signal for the deepest 1949 content pages.

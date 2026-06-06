@@ -1,0 +1,18 @@
+top keys: ['title', 'description', 'repoUrl', 'resources', 'categories']
+title: Awesome Video
+categories.length: 9
+resources.length (top-level): 1949
+SUM cat.subcategories.length: 19
+
+Unique Tags (static resources): 2586
+
+=== category names + subcat names (static tree) ===
+Community & Events (slug=community-events): 2 subs -> ['Community Groups', 'Events & Conferences']
+Encoding & Codecs (slug=encoding-codecs): 2 subs -> ['Codecs', 'Encoding Tools']
+General Tools (slug=general-tools): 2 subs -> ['DRM', 'FFMPEG & Tools']
+Infrastructure & Delivery (slug=infrastructure-delivery): 2 subs -> ['Cloud & CDN', 'Streaming Servers']
+Intro & Learning (slug=intro-learning): 3 subs -> ['Introduction', 'Learning Resources', 'Tutorials & Case Studies']
+Media Tools (slug=media-tools): 2 subs -> ['Ads & QoE', 'Audio & Subtitles']
+Players & Clients (slug=players-clients): 2 subs -> ['Hardware Players', 'Mobile & Web Players']
+Protocols & Transport (slug=protocols-transport): 2 subs -> ['Adaptive Streaming', 'Transport Protocols']
+Standards & Industry (slug=standards-industry): 2 subs -> ['Specs & Standards', 'Vendors & HDR']

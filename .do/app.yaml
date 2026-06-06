@@ -1,0 +1,55 @@
+# DigitalOcean App Platform spec for awesome-list-site.
+# Build from the repo Dockerfile; secrets injected at runtime (never baked into the image).
+# Managed Postgres (databases block) injects DATABASE_URL and provides automated daily
+# backups + point-in-time recovery (PITR) — the differentiator vs Railway.
+name: awesome-list-site
+region: nyc
+services:
+  - name: web
+    dockerfile_path: Dockerfile
+    source_dir: /
+    instance_size_slug: basic-xxs
+    instance_count: 1
+    http_port: 5000
+    health_check:
+      http_path: /api/health
+      initial_delay_seconds: 40
+      period_seconds: 30
+      timeout_seconds: 3
+      failure_threshold: 3
+    envs:
+      - key: NODE_ENV
+        value: production
+        scope: RUN_AND_BUILD_TIME
+      - key: PORT
+        value: "5000"
+        scope: RUN_AND_BUILD_TIME
+      # App Platform terminates TLS in front of the container, so enable Secure
+      # cookies here (the public origin is https).
+      - key: COOKIE_SECURE
+        value: "true"
+        scope: RUN_TIME
+      - key: SESSION_SECRET
+        scope: RUN_TIME
+        type: SECRET
+      - key: ADMIN_EMAIL
+        scope: RUN_TIME
+        type: SECRET
+      - key: ADMIN_PASSWORD
+        scope: RUN_TIME
+        type: SECRET
+      - key: GITHUB_TOKEN
+        scope: RUN_TIME
+        type: SECRET
+      - key: ANTHROPIC_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+      # DATABASE_URL is injected automatically from the managed database below.
+      - key: DATABASE_URL
+        scope: RUN_TIME
+        value: ${db.DATABASE_URL}
+databases:
+  - name: db
+    engine: PG
+    version: "16"
+    production: true

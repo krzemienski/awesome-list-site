@@ -1,0 +1,13 @@
+=== 12 UNAUTH MUTATION PROBES ===
+POST /api/user/change-password                          -> 401 {"message":"Unauthorized"}
+POST /api/favorites/1                                   -> 401 {"message":"Unauthorized"}
+DELETE /api/favorites/1                                 -> 401 {"message":"Unauthorized"}
+POST /api/bookmarks/1                                   -> 401 {"message":"Unauthorized"}
+DELETE /api/bookmarks/1                                 -> 401 {"message":"Unauthorized"}
+PUT /api/admin/users/1/role                             -> 401 {"message":"Unauthorized"}
+POST /api/admin/resources (create)                      -> 401 {"message":"Unauthorized"}
+DELETE /api/admin/resources/1                           -> 401 {"message":"Unauthorized"}
+POST /api/admin/resources/bulk/delete                   -> 401 {"message":"Unauthorized"}
+POST /api/admin/export                                  -> 401 {"message":"Unauthorized"}
+POST /api/admin/seed-database                           -> 401 {"message":"Unauthorized"}
+POST /api/admin/import-github                           -> 401 {"message":"Unauthorized"}

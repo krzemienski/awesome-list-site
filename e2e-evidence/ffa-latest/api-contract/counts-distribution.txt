@@ -1,0 +1,48 @@
+=== DISTINCT subcategory values: 18
+  'Adaptive Streaming': 139
+  'Ads & QoE': 45
+  'Audio & Subtitles': 56
+  'Cloud & CDN': 9
+  'Codecs': 27
+  'Community Groups': 4
+  'DRM': 17
+  'Encoding Tools': 225
+  'Events & Conferences': 6
+  'Hardware Players': 35
+  'Introduction': 3
+  'Learning Resources': 36
+  'Mobile & Web Players': 78
+  'Specs & Standards': 34
+  'Streaming Servers': 35
+  'Transport Protocols': 9
+  'Tutorials & Case Studies': 59
+  'Vendors & HDR': 5
+rows with no subcategory: 1127
+
+=== DISTINCT subSubcategory values: 26
+  'AV1': 5
+  'Android': 10
+  'Audio': 8
+  'CDN Integration': 1
+  'Chromecast': 1
+  'Cloud Platforms': 4
+  'DASH': 48
+  'FFMPEG': 65
+  'HDR Guidelines': 1
+  'HEVC': 10
+  'HLS': 60
+  'MPEG & Forums': 6
+  'Official Specs': 3
+  'Online Forums': 2
+  'Origin Servers': 1
+  'Podcasts & Webinars': 2
+  'Quality & Testing': 36
+  'RIST': 1
+  'Roku': 26
+  'Smart TVs': 3
+  'Storage Solutions': 3
+  'Subtitles & Captions': 38
+  'VP9': 1
+  'Vendor Docs': 1
+  'Web Players': 23
+  'iOS/tvOS': 30

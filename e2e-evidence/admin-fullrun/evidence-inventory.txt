@@ -1,0 +1,16 @@
+=== evidence inventory (file : bytes) — all unique, all viewed ===
+01-stats-approvals.png                             706809 bytes
+02-approve-done.png                                636839 bytes
+03-edit-rejected.png                               626081 bytes
+04-resource-edited.png                             1077810 bytes
+05-linkhealth-running.png                          866781 bytes
+06-users-2rows.png                                 714578 bytes
+07-users-role-changed-admin.png                    724575 bytes
+08-linkhealth-completed-dashboard.png              745862 bytes
+09-github-status-render.png                        880775 bytes
+10-audit-log-render.png                            856066 bytes
+11-database-stats-render.png                       1081418 bytes
+12-linkhealth-completed-222broken.png              742460 bytes
+inventory.md                                       5446 bytes
+VERDICT.md                                         6475 bytes
+evidence-inventory.txt                             963 bytes

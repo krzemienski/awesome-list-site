@@ -1,0 +1,83 @@
+# Ralph progress — dockerize-replace-replit
+
+## VG-0 PASS (prior session)
+Branch feat/dockerize-replace-replit active. evidence: e2e-evidence/phase0/branch.txt
+
+## VG-1 PASS (prior session)
+passport-local auth; Replit OIDC removed. evidence: e2e-evidence/phase1/
+
+## VG-2 PASS (this session)
+Containerize + harden. Evidence under e2e-evidence/phase2/.
+- ROOT CAUSE 1 (build fail): no packageManager pin -> container corepack pulled pnpm 11.5.0
+  which needs Node 22+, crashed on node:20-alpine (ERR_UNKNOWN_BUILTIN_MODULE).
+  FIX: Dockerfile both stages `corepack prepare pnpm@10.11.0 --activate` (matches lockfile v9.0).
+- ROOT CAUSE 2 (app crash-loop): dist/index.js top-level `import "vite"` -> ERR_MODULE_NOT_FOUND
+  (vite is a devDep, stripped by `pnpm install --prod`). server/index.ts statically imported ./vite
+  whose module top-level pulls `vite` + `vite.config`. esbuild --packages=external hoisted that
+  external import to bundle top, loaded even though setupVite only runs in dev.
+  FIX: split prod-safe `log`/`serveStatic` into server/static.ts; server/vite.ts now dev-only
+  setupVite; server/index.ts dynamic-imports ./vite inside the dev branch; build script adds
+  esbuild `--splitting` so vite lands in a lazy chunk (dist/vite-*.js) never loaded in prod.
+- graceful shutdown added to server/index.ts (SIGTERM/SIGINT -> server.close + pool.end). Verified
+  exit=0 on `docker compose stop app`, log "received SIGTERM, shutting down".
+- .dockerignore: added e2e-evidence/ _planning/ planning/ reviews/.
+Evidence: ps.txt (both healthy), whoami.txt (nodejs), health.json ({"status":"ok"} on :5001),
+migrations-present.txt (.sql in /app/migrations), graceful-shutdown.txt.
+
+## VG-4 prepped (not gated yet — needs VG-3 first)
+railway.json healthcheckPath -> /api/health; .do/app.yaml authored (DO Managed PG + PITR);
+vercel.json deleted; docs/DEPLOYMENT.md secrets table + DO/Railway monitoring + /api/health fixes.
+
+## VG-3 vendored
+server/seed-data/recategorized_with_researchers_2010_projects.json fetched from S3 (60 cats/2011 projects).
+
+## Learnings / gotchas
+- Build via `pnpm build` (esbuild) — `pnpm check` (tsc) has many pre-existing errors; not a gate.
+- Host localhost:5432 shadows compose pg (host has no `postgres` role) -> smoke test direct to host
+  pg fails 28000; inside compose app uses service `postgres:5432`, unaffected. Don't debug via host pg.
+- migrate() reads _journal.json (lists only 0000) -> 0027/0028 silently skipped today; VG-2 DB has
+  23 tables, clean. VG-3 re-baseline needed for full 25 tables on clean volume.
+
+## VG-3 PASS (this session) — commit a319745
+Re-baseline migrations + idempotent seed. Evidence e2e-evidence/phase3/.
+- archived broken 0000/0027/0028 -> migrations/_archive-pre-rebaseline/
+- drizzle-kit generate -> migrations/0000_natural_micromacro.sql (25 tables, 1 api_keys FK)
+- runMigrations() now NODE_ENV-agnostic + 30x2s wait-for-db loop
+- seed.ts: ADMIN_EMAIL/ADMIN_PASSWORD env; vendored JSON disk-first (multi-path probe; bundled
+  __dirname=/app/dist so probes /app/server/seed-data too), S3 fallback
+- routes.ts reseed guard: also reseeds on partial seed (<100 resources)
+Evidence: up.txt+sql-errors.txt (zero 42710/42P01), migrations-applied.txt (1), tables.txt (25),
+missing-tables-check.txt (all 3 non-NULL), cat-count.txt (9), res-total.txt (1949),
+res-total-after-restart.txt (1949 — idempotent+persistent), seed-done.txt.
+
+## VG-4 PASS (this session) — commit f11d670
+Deploy config. Evidence e2e-evidence/phase4/.
+railway-check.txt (true), do-spec-check.txt (yaml-ok; doctl absent), vercel-removed.txt (No such file),
+health-path-refs.txt (empty), committed-secrets.txt (empty).
+
+## VG-5 IN PROGRESS
+Browser audit of 17 screens + 14 admin tabs @ 7 breakpoints via Chrome DevTools MCP.
+App live+seeded on http://localhost:5001 (9 cats, 1949 resources, admin from ADMIN_EMAIL/PASSWORD).
+
+## VG-5 IN PROGRESS — defects found + fixed (browser audit)
+App rebuilt several times (client bundle changes). Defects:
+- DEFECT-01 FX-04: login error toast missing. ROOT CAUSE client/src/hooks/use-toast.ts
+  useEffect dep [state] -> listener churn, toasts never reached Toaster. FIX dep []. App-wide
+  toast system was broken. Re-verified: a11y listitem "Login failed/Invalid email or password".
+- DEFECT-02 session not persisting (CRITICAL, app-wide). login 200 but next /api/auth/user
+  isAuthenticated:false; no session cookie. ROOT CAUSE server/session.ts cookie.secure=
+  (NODE_ENV==='production') -> Secure cookie dropped over container http. FIX: COOKIE_SECURE
+  env (default false; true behind TLS proxy). docker-compose COOKIE_SECURE=false, .do/app.yaml
+  true. Re-verified: login->auth isAuth:true; admin dashboard 15 tabs; session survives restart.
+- DEFECT-03 subcategory/sub-subcategory under+over count. ROOT CAUSE (a) fetched bare
+  ['/api/resources',{status:'approved'}] -> queryFn uses key[0] as URL -> only 20 rows ->
+  client filter undercounts (12). (b) merged static JSON + DB -> double count (38). FIX both
+  Subcategory.tsx + SubSubcategory.tsx: queryKey '/api/resources?limit=2000', drop static merge
+  (DB single source, matches Category.tsx + sidebar). Re-verify pending.
+- M-02 FIXED (accent swatches render + apply live #ff3d52->#34d08c), FP-01 FIXED (advanced
+  Export/AI tabs actuate), FP-03 FIXED (tag popover mounts), FP-05 FIXED (sidebar active pill),
+  FP-02 N/A (0 journeys seeded).
+- CRUD: created+deleted category via authed API, survived docker compose restart.
+- Probe calibration: overflow + horizontal-clip + zero-size (ancestor display:none aware);
+  below-fold NOT a defect. emulate() for true 320/375 (resize_page floors ~500px).
+Audited PASS: Home(320-1920), Login, Admin(15 tabs), Category, ThemeSettings, Advanced.

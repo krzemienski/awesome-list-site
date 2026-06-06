@@ -1,0 +1,13 @@
+=== TREE subcategories with 0 DB resources (subcategory name match) ===
+  EMPTY SUB: cat=General Tools name='FFMPEG & Tools' slug=ffmpeg-tools dbCount=0
+
+=== TREE subSubcategories with 0 DB resources ===
+  EMPTY SUBSUB: Community & Events > Community Groups > 'Slack & Meetups' slug=slack-meetups dbCount=0
+  EMPTY SUBSUB: Community & Events > Events & Conferences > 'Conferences' slug=conferences dbCount=0
+  EMPTY SUBSUB: Encoding & Codecs > Encoding Tools > 'Other Encoders' slug=other-encoders dbCount=0
+  EMPTY SUBSUB: Media Tools > Ads & QoE > 'Advertising' slug=advertising dbCount=0
+  EMPTY SUBSUB: Protocols & Transport > Transport Protocols > 'RTMP' slug=rtmp dbCount=0
+  EMPTY SUBSUB: Protocols & Transport > Transport Protocols > 'SRT' slug=srt dbCount=0
+
+tree subs=19 db distinct sub=18
+tree subsub=32 db distinct subsub=26

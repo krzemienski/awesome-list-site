@@ -671,15 +671,19 @@ NODE_ENV=production
 ### Optional Variables
 
 ```bash
-# Server port (auto-detected on most platforms)
+# Server port (container listens here; host maps 5001 -> 5000 in docker-compose)
 PORT=5000
 
-# Content configuration
-AWESOME_RAW_URL=https://raw.githubusercontent.com/avelino/awesome-go/main/README.md
-GITHUB_REPO_URL=https://github.com/username/awesome-list-site
+# Session signing secret (REQUIRED in production — server/session.ts asserts it)
+SESSION_SECRET=<random-string>
 
-# Replit-specific (auto-detected on Replit)
-REPL_ID=<auto-set-by-replit>
+# Seeded admin credentials (fallback admin@example.com / admin123 in dev only)
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=<strong-password>
+
+# Integrations
+GITHUB_TOKEN=<github-pat>
+ANTHROPIC_API_KEY=<anthropic-key>
 ```
 
 ### Platform-Specific Notes
@@ -695,12 +699,12 @@ For detailed documentation of all environment variables, see [ENVIRONMENT.md](./
 
 ## Health Checks
 
-All platforms support the `/health` endpoint for monitoring:
+All platforms support the `/api/health` endpoint for monitoring:
 
 ### Endpoint
 
 ```bash
-GET /health
+GET /api/health
 ```
 
 ### Response
@@ -729,13 +733,66 @@ Unhealthy (503 Service Unavailable):
 
 Configure health checks on your platform:
 
-- **Vercel**: Not configurable (automatic)
-- **Railway**: `healthcheckPath: /health` in `railway.json`
+- **Railway**: `healthcheckPath: /api/health` in `railway.json`
+- **DigitalOcean App Platform**: `health_check.http_path: /api/health` in `.do/app.yaml`
 - **AWS ECS**: Set in task definition's `healthCheck`
 - **AWS ALB**: Configure target group health check path
 - **GCP Cloud Run**: Automatic via Cloud Run's health checking
 - **Azure**: Configure in Container Apps health probes
-- **Docker**: Built into Dockerfile `HEALTHCHECK`
+- **Docker**: Built into Dockerfile `HEALTHCHECK` (`node -e` GET on `/api/health`)
+
+## Production Deploy Targets (Railway + DigitalOcean)
+
+This repo ships two production-ready container configs. Both build from the
+repo `Dockerfile`; **no secret values are baked into the image** — every secret
+is injected at runtime by the platform.
+
+### Railway (`railway.json`)
+
+- `build.builder: DOCKERFILE` → builds the multi-stage `Dockerfile`.
+- `deploy.healthcheckPath: /api/health` → matches the real endpoint.
+- `restartPolicyType: ON_FAILURE`, `restartPolicyMaxRetries: 10`.
+- Railway's managed Postgres add-on auto-injects `DATABASE_URL` at runtime.
+- Remaining secrets set as **Railway variables** (runtime env, never in the image).
+
+### DigitalOcean App Platform (`.do/app.yaml`)
+
+- One `web` service built from `Dockerfile`, `http_port: 5000`.
+- `health_check.http_path: /api/health`.
+- All secrets declared as env entries with `type: SECRET`.
+- A `databases:` block provisions **DO Managed Postgres 16** and injects
+  `DATABASE_URL` via `${db.DATABASE_URL}`. DO Managed Postgres provides
+  **automated daily backups + point-in-time recovery (PITR)** — the main
+  differentiator vs Railway. To use an external database instead, drop the
+  `databases:` block and set `DATABASE_URL` as a `SECRET`.
+
+> `vercel.json` was removed: a 10s-maxDuration serverless function is a dead
+> end for a long-lived Express + SSR container that holds DB connections and
+> serves server-rendered HTML.
+
+### Secrets table
+
+| Variable | Secret? | Source at runtime |
+|----------|---------|-------------------|
+| `DATABASE_URL` | SECRET | Managed Postgres add-on (Railway) / `${db.DATABASE_URL}` (DO) / external SECRET |
+| `SESSION_SECRET` | SECRET | platform variable / `type: SECRET` |
+| `ADMIN_EMAIL` | SECRET | platform variable / `type: SECRET` |
+| `ADMIN_PASSWORD` | SECRET | platform variable / `type: SECRET` |
+| `GITHUB_TOKEN` | SECRET | platform variable / `type: SECRET` |
+| `ANTHROPIC_API_KEY` | SECRET | platform variable / `type: SECRET` |
+| `NODE_ENV` | not secret | set to `production` |
+| `PORT` | not secret | `5000` (container listens here) |
+
+None of the above are committed to the repo or baked into the Docker image —
+all are injected at runtime by the platform.
+
+### Monitoring
+
+- **Health endpoint:** `/api/health` on both platforms (DB-connectivity probe).
+- **Logs:** Railway deploy/runtime logs in the dashboard; DO App Platform
+  runtime logs via the dashboard or `doctl apps logs <app-id>`.
+- **Restart policy:** encoded in `railway.json` (`ON_FAILURE`, max 10 retries);
+  DO App Platform auto-restarts unhealthy containers by default.
 
 ## Troubleshooting
 

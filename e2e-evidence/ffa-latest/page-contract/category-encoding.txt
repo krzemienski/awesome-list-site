@@ -1,0 +1,6 @@
+=== Category page: /api/resources?category=Encoding%20%26%20Codecs&limit=2000 ===
+keys: ['resources', 'total']
+total: 372
+resources len: 372
+GROUND TRUTH expects 372
+distinct subcategories in this cat: ['Codecs', 'Encoding Tools']

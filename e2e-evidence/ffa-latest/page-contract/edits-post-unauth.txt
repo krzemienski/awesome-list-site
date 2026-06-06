@@ -1,0 +1,3 @@
+=== POST /api/resources/1/edits (unauth) ===
+{"message":"Unauthorized"}
+HTTP 401

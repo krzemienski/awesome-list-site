@@ -1,0 +1,4 @@
+===== /api/resources/:id/related shape =====
+keys: ['resources']
+resources is list: True len: 6
+sample keys: ['id', 'title', 'url', 'description', 'category', 'subcategory', 'subSubcategory', 'status', 'submittedBy', 'approvedBy', 'approvedAt', 'githubSynced', 'lastSyncedAt', 'metadata', 'createdAt', 'updatedAt']

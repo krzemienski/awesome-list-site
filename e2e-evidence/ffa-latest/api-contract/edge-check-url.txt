@@ -1,0 +1,9 @@
+===== /api/resources/check-url NO PARAM =====
+{"message":"URL parameter is required"}
+HTTP 400 | ct=application/json; charset=utf-8
+===== /api/resources/check-url ?url=https://github.com/krzemienski/awesome-video =====
+{"exists":true,"resource":{"id":339,"title":"Awesome Video: A Curated List of Streaming Video Tools and Resources","status":"approved","category":"Standards & Industry","subcategory":null}}
+HTTP 200 | ct=application/json; charset=utf-8
+===== /api/resources/check-url ?url=https://nonexistent-xyz-12345.example =====
+{"exists":false}
+HTTP 200 | ct=application/json; charset=utf-8

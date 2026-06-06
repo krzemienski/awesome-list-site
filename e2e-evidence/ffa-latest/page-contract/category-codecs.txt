@@ -1,0 +1,3 @@
+=== Category page subcategory dropdown source check (Codecs subcat under Encoding) ===
+subcategory breakdown within Encoding & Codecs: {'Encoding Tools': 225, 'Codecs': 27}
+Codecs rows: 27

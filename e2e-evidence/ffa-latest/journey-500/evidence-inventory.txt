@@ -1,0 +1,7 @@
+evidence-inventory for journey-nonnumeric-id-500
+captured: 2026-06-02T23:37:57Z
+
+e2e-evidence/ffa-latest/journey-500/client-route.txt       914 bytes
+e2e-evidence/ffa-latest/journey-500/evidence-inventory.txt       150 bytes
+e2e-evidence/ffa-latest/journey-500/repro.txt       732 bytes
+e2e-evidence/ffa-latest/journey-500/variants.txt       640 bytes

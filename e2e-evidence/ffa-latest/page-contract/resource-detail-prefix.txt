@@ -1,0 +1,2 @@
+===== /api/resources/db-1949 (page never sends this, but test prefix handling) =====
+id=db-1949 http=404

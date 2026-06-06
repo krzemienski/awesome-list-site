@@ -33,6 +33,7 @@ import {
 } from "@shared/schema";
 import { db } from "../db";
 import { eq, sql } from "drizzle-orm";
+import type { ValidationStorageItem, ValidationResults } from "../storage";
 
 /**
  * Admin statistics interface
@@ -47,7 +48,8 @@ export interface AdminStats {
 }
 
 /**
- * A single stored validation/link-check run.
+ * A single stored validation/link-check run. Newer shape added on main to
+ * support both awesome-lint and link-check results through one entry point.
  */
 export interface ValidationStorageItem {
   type: 'awesome-lint' | 'link-check';
@@ -66,15 +68,15 @@ export interface ValidationResults {
 }
 
 /**
- * In-memory holder for the most recent validation results. Validation status is
- * ephemeral (regenerated on demand from the live resource set), so it does not
- * warrant a database table — it only needs to survive between a validate/check
- * run and the subsequent status read within the same server process.
+ * Latest validation results, held in process memory and shared across all
+ * AdminRepository instances. Validation output (awesome-lint + link-check) is
+ * transient diagnostic data with no schema table, so it lives here rather than
+ * in the database; it is re-derivable on demand by re-running validation.
  */
-const latestValidationResults: ValidationResults = {
-  awesomeLint: null,
-  linkCheck: null,
-  lastUpdated: null,
+const latestValidation: ValidationResults = {
+  awesomeLint: undefined,
+  linkCheck: undefined,
+  lastUpdated: undefined,
 };
 
 /**
@@ -127,23 +129,26 @@ export class AdminRepository {
   }
 
   /**
-   * Store the result of a validation or link-check run for later retrieval.
-   * @param result - The validation result to persist (awesome-lint or link-check)
+   * Store the result of an awesome-lint or link-check run so the admin
+   * validation-status panel can retrieve the most recent outcome.
    */
   async storeValidationResult(result: ValidationStorageItem): Promise<void> {
     if (result.type === 'awesome-lint') {
-      latestValidationResults.awesomeLint = result.result;
+      latestValidation.awesomeLint = result.result;
     } else if (result.type === 'link-check') {
-      latestValidationResults.linkCheck = result.result;
+      latestValidation.linkCheck = result.result;
     }
-    latestValidationResults.lastUpdated = result.timestamp;
+    latestValidation.lastUpdated = result.timestamp;
   }
 
   /**
-   * Retrieve the most recent validation results.
-   * @returns The latest awesome-lint and link-check results with last-updated time
+   * Get the most recent awesome-lint and link-check results.
    */
   async getLatestValidationResults(): Promise<ValidationResults> {
-    return { ...latestValidationResults };
+    return {
+      awesomeLint: latestValidation.awesomeLint,
+      linkCheck: latestValidation.linkCheck,
+      lastUpdated: latestValidation.lastUpdated,
+    };
   }
 }

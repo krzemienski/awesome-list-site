@@ -1,0 +1,45 @@
+STATIC A11Y + VISUAL-CORRECTNESS SWEEP — awesome-list-site client/src
+Base URL: http://localhost:5001 (live, seeded). Real total verified = 1949.
+
+== LIVE BASELINE ==
+$ curl -s http://localhost:5001/api/categories  -> sum(resourceCount)=1949 (python verified)
+$ curl -s http://localhost:5001/ | grep <title> -> "Awesome Video — 1949+ curated video development resources"  (MATCHES real total, no contradiction)
+
+== CLASS 1: icon-only buttons missing accessible names ==
+size="icon" buttons inspected:
+  AuditTab.tsx:136  <Button variant="outline" size="icon"> + <Search/> only — NO aria-label/title/text  => OFFENDER (admin)
+  AuditTab.tsx:144-152 <Button size="icon" onClick=refetch> + <RefreshCw/> only — NO aria-label/title  => OFFENDER (admin)
+  GitHubSyncPanel.tsx:138 size="icon" has title="Reset to default"  => OK
+  JourneyStepsManager.tsx:435/446/479/488 all have aria-label  => OK
+  AppHeader.tsx:110 size="icon" has title="Theme Settings" + min-h/w 44px  => OK
+  AppHeader.tsx:127 avatar trigger no aria-label BUT wraps <Avatar><AvatarImage alt={user.name}>  => OK (named by alt)
+  sidebar.tsx:305 (shadcn primitive, has SidebarTrigger srOnly text upstream)  => OK
+Public-facing card icon buttons (Category/Subcategory/SubSubcategory) all carry aria-label + title + min-h-[44px] min-w-[44px]  => OK
+
+== CLASS 2: heading order ==
+Per-page h1/h2/h3 counts are inflated by mutually-exclusive conditional branches (loading/error/loaded), not on-screen duplicates.
+  ResourceDetail loaded: h1(title)->h2(sections)  OK
+  Subcategory/SubSubcategory: sr-only h1 in loading + real h1 loaded  OK
+  ErrorPage.tsx: ZERO heading elements — "Something went wrong" is <CardTitle> which renders <div> (card.tsx:36). No h1/landmark heading. => OFFENDER (route error fallback, noindex, low traffic)
+
+== CLASS 3: tap targets ==
+Public interactive icon buttons all include min-h-[44px] min-w-[44px] (Category.tsx:444/456/483/510/522, AppHeader.tsx:113, category-explorer.tsx:272). Admin square buttons (GenericCrudManager h-8 w-8, user-preferences h-6 w-6) lack 44px min but are desktop-admin only. No public-facing mobile tap-target violation found.
+
+== CLASS 4: contrast tokens (computed vs real --bg #000000) ==
+$ grep --bg design-system.css -> --bg: #000000 (pure black)
+WCAG ratios (alpha composited over #000):
+  --text-2 / muted-foreground (0.66): 8.03:1  PASS
+  --text-3 (0.49):                    4.69:1  PASS (clears AA 4.5; prior 0.4->0.49 fix holds)
+  --text-3 on --surface(#060606):     4.73:1  PASS
+  --text-4 (0.22): 1.72:1 FAIL as text — BUT grep var(--text-4) in design-system.css returns ZERO text-color usages (dead token). Not user-visible.
+No contrast offender.
+
+== CLASS 5: images / form labels ==
+Only <img> in app: ResourceDetail.tsx:353 favicon, alt="" (intentional decorative empty alt) => OK
+Forms (Login/Register/Profile/SubmitResource) use shadcn FormLabel which auto-wires htmlFor={formItemId} (form.tsx:99) to FormControl id (form.tsx:115) => properly labeled.
+search-dialog CommandInput (cmdk) has placeholder but NO aria-label; dialog itself named by DialogTitle "Find resources". Placeholder-as-label only => MINOR (LOW).
+
+== CLASS 6: hardcoded SEO/marketing numbers contradicting 1949 ==
+All "2000" hits are API query params (limit=2000 pagination) — not user-visible.
+list-switcher.tsx hardcoded stars(72000/220000)/contributors(2000) => component NOT imported anywhere (dead) => not user-visible.
+Live <title> uses "1949+" => consistent. NO contradiction found.

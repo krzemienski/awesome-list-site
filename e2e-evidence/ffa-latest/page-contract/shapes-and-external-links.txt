@@ -1,0 +1,15 @@
+############ About external links (HEAD, expect 2xx/3xx not 404) ############
+https://github.com/sindresorhus/awesome -> 200
+https://ui.shadcn.com/ -> 200
+https://tailwindcss.com/ -> 200
+
+############ SubmitResource dropdown sources: shape check ############
+--- /api/categories first item (needs id + name) ---
+[{"id":9,"name":"Community & Events","slug":"community-events","resourceCount":91},{"id":3,"name":"Encoding & Codecs","slug":"encoding-codecs","resourceCount":372},{"id":8,"name":"General Tools","slug":"general-tools","resourceCount":95},{"id":7,"name":"Infrastructure & Delivery","slug":"infrastructure-delivery","resourceCount":183},{"id":1,"name":"Intro & Learning","slug":"intro-learning","resour
+--- /api/subcategories first item ---
+[{"id":4,"name":"Adaptive Streaming","slug":"adaptive-streaming","categoryId":2},{"id":11,"name":"Ads & QoE","slug":"ads-qoe","categoryId":5},{"id":10,"name":"Audio & Subtitles","slug":"audio-subtitles","categoryId":5},{"id":15,"name":"Cloud & CDN","slug":"cloud-cdn","categoryId":7},{"id":7,"name":"
+
+--- /api/resources/check-url shape (needs .exists, .resource) ---
+{"exists":false}
+--- /api/recommendations shape ---
+[{"resource":{"id":1949,"title":"DVBSnoop","url":"http://dvbsnoop.sourceforge.net/","description":"An analyzer and debugging tool for MPEG transport streams and DVB broadcasts. It allows inspection of

@@ -1,0 +1,3 @@
+=== health ===
+HTTP 200
+{"status":"ok"}

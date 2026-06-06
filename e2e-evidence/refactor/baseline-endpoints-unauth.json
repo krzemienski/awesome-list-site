@@ -1,0 +1,277 @@
+{
+ "/api/admin/audit-logs": {
+  "path": "/api/admin/audit-logs",
+  "status": 401,
+  "topKeys": "message"
+ },
+ "/api/admin/categories": {
+  "path": "/api/admin/categories",
+  "status": 401,
+  "topKeys": "message"
+ },
+ "/api/admin/export-json": {
+  "path": "/api/admin/export-json",
+  "status": 401,
+  "topKeys": "message"
+ },
+ "/api/admin/journeys": {
+  "path": "/api/admin/journeys",
+  "status": 401,
+  "topKeys": "message"
+ },
+ "/api/admin/journeys/:id/steps": {
+  "path": "/api/admin/journeys/1949/steps",
+  "status": 401,
+  "topKeys": "message"
+ },
+ "/api/admin/link-health/broken-links": {
+  "path": "/api/admin/link-health/broken-links",
+  "status": 401,
+  "topKeys": "message"
+ },
+ "/api/admin/link-health/history": {
+  "path": "/api/admin/link-health/history",
+  "status": 401,
+  "topKeys": "message"
+ },
+ "/api/admin/link-health/status": {
+  "path": "/api/admin/link-health/status",
+  "status": 401,
+  "topKeys": "message"
+ },
+ "/api/admin/pending-resources": {
+  "path": "/api/admin/pending-resources",
+  "status": 401,
+  "topKeys": "message"
+ },
+ "/api/admin/resource-edits": {
+  "path": "/api/admin/resource-edits",
+  "status": 401,
+  "topKeys": "message"
+ },
+ "/api/admin/resources": {
+  "path": "/api/admin/resources",
+  "status": 401,
+  "topKeys": "message"
+ },
+ "/api/admin/stats": {
+  "path": "/api/admin/stats",
+  "status": 401,
+  "topKeys": "message"
+ },
+ "/api/admin/sub-subcategories": {
+  "path": "/api/admin/sub-subcategories",
+  "status": 401,
+  "topKeys": "message"
+ },
+ "/api/admin/subcategories": {
+  "path": "/api/admin/subcategories",
+  "status": 401,
+  "topKeys": "message"
+ },
+ "/api/admin/users": {
+  "path": "/api/admin/users",
+  "status": 401,
+  "topKeys": "message"
+ },
+ "/api/admin/validation-status": {
+  "path": "/api/admin/validation-status",
+  "status": 401,
+  "topKeys": "message"
+ },
+ "/api/auth/user": {
+  "path": "/api/auth/user",
+  "status": 200,
+  "topKeys": "isAuthenticated,user"
+ },
+ "/api/awesome-list": {
+  "path": "/api/awesome-list",
+  "status": 200,
+  "topKeys": "(non-json)"
+ },
+ "/api/bookmarks": {
+  "path": "/api/bookmarks",
+  "status": 401,
+  "topKeys": "message"
+ },
+ "/api/categories": {
+  "path": "/api/categories",
+  "status": 200,
+  "topKeys": "[list len=9]id,name,resourceCount,slug"
+ },
+ "/api/enrichment/jobs": {
+  "path": "/api/enrichment/jobs",
+  "status": 401,
+  "topKeys": "message"
+ },
+ "/api/enrichment/jobs/:id": {
+  "path": "/api/enrichment/jobs/1949",
+  "status": 401,
+  "topKeys": "message"
+ },
+ "/api/favorites": {
+  "path": "/api/favorites",
+  "status": 401,
+  "topKeys": "message"
+ },
+ "/api/github/awesome-lists": {
+  "path": "/api/github/awesome-lists",
+  "status": 200,
+  "topKeys": "(non-json)"
+ },
+ "/api/github/search": {
+  "path": "/api/github/search",
+  "status": 400,
+  "topKeys": "error"
+ },
+ "/api/github/sync-history": {
+  "path": "/api/github/sync-history",
+  "status": 401,
+  "topKeys": "message"
+ },
+ "/api/github/sync-status": {
+  "path": "/api/github/sync-status",
+  "status": 401,
+  "topKeys": "message"
+ },
+ "/api/github/sync-status/:id": {
+  "path": "/api/github/sync-status/1949",
+  "status": 401,
+  "topKeys": "message"
+ },
+ "/api/health": {
+  "path": "/api/health",
+  "status": 200,
+  "topKeys": "status"
+ },
+ "/api/journeys": {
+  "path": "/api/journeys",
+  "status": 200,
+  "topKeys": "[list len=0]"
+ },
+ "/api/journeys/:id": {
+  "path": "/api/journeys/1949",
+  "status": 404,
+  "topKeys": "message"
+ },
+ "/api/journeys/:id/progress": {
+  "path": "/api/journeys/1949/progress",
+  "status": 401,
+  "topKeys": "message"
+ },
+ "/api/learning-paths/suggested": {
+  "path": "/api/learning-paths/suggested",
+  "status": 200,
+  "topKeys": "(non-json)"
+ },
+ "/api/public/categories": {
+  "path": "/api/public/categories",
+  "status": 200,
+  "topKeys": "categories"
+ },
+ "/api/public/resources": {
+  "path": "/api/public/resources",
+  "status": 200,
+  "topKeys": "(non-json)"
+ },
+ "/api/public/resources/:id": {
+  "path": "/api/public/resources/1949",
+  "status": 200,
+  "topKeys": "approvedAt,approvedBy,category,createdAt,description,githubSynced,id,lastSyncedAt"
+ },
+ "/api/public/tags": {
+  "path": "/api/public/tags",
+  "status": 200,
+  "topKeys": "tags"
+ },
+ "/api/recommendations": {
+  "path": "/api/recommendations",
+  "status": 200,
+  "topKeys": "(non-json)"
+ },
+ "/api/recommendations/init": {
+  "path": "/api/recommendations/init",
+  "status": 200,
+  "topKeys": "message,status"
+ },
+ "/api/researcher/discoveries": {
+  "path": "/api/researcher/discoveries",
+  "status": 401,
+  "topKeys": "message"
+ },
+ "/api/researcher/jobs": {
+  "path": "/api/researcher/jobs",
+  "status": 401,
+  "topKeys": "message"
+ },
+ "/api/researcher/jobs/:id": {
+  "path": "/api/researcher/jobs/1949",
+  "status": 401,
+  "topKeys": "message"
+ },
+ "/api/resources": {
+  "path": "/api/resources",
+  "status": 200,
+  "topKeys": "(non-json)"
+ },
+ "/api/resources/:id": {
+  "path": "/api/resources/1949",
+  "status": 200,
+  "topKeys": "approvedAt,approvedBy,category,createdAt,description,githubSynced,id,lastSyncedAt"
+ },
+ "/api/resources/:id/related": {
+  "path": "/api/resources/1949/related",
+  "status": 200,
+  "topKeys": "(non-json)"
+ },
+ "/api/resources/check-url": {
+  "path": "/api/resources/check-url",
+  "status": 400,
+  "topKeys": "message"
+ },
+ "/api/resources/pending": {
+  "path": "/api/resources/pending",
+  "status": 404,
+  "topKeys": "message"
+ },
+ "/api/sub-subcategories": {
+  "path": "/api/sub-subcategories",
+  "status": 200,
+  "topKeys": "[list len=32]id,name,slug,subcategoryId"
+ },
+ "/api/subcategories": {
+  "path": "/api/subcategories",
+  "status": 200,
+  "topKeys": "[list len=19]categoryId,id,name,slug"
+ },
+ "/api/user/journeys": {
+  "path": "/api/user/journeys",
+  "status": 401,
+  "topKeys": "message"
+ },
+ "/api/user/progress": {
+  "path": "/api/user/progress",
+  "status": 401,
+  "topKeys": "message"
+ },
+ "/api/user/submissions": {
+  "path": "/api/user/submissions",
+  "status": 401,
+  "topKeys": "message"
+ },
+ "/og-image.png": {
+  "path": "/og-image.png",
+  "status": 200,
+  "topKeys": "(non-json)"
+ },
+ "/og-image.svg": {
+  "path": "/og-image.svg",
+  "status": 200,
+  "topKeys": "(non-json)"
+ },
+ "/sitemap.xml": {
+  "path": "/sitemap.xml",
+  "status": 200,
+  "topKeys": "(non-json)"
+ }
+}

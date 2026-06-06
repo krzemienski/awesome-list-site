@@ -1,7 +1,7 @@
-import Anthropic from '@anthropic-ai/sdk';
+import { createAnthropicClient, isAnthropicConfigured } from './anthropicClient';
 
-// Use Anthropic for AI-powered features
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+// Shared client supporting both x-api-key and Bearer-token (gateway/router) auth.
+const anthropic = createAnthropicClient();
 
 interface AITagSuggestion {
   tags: string[];
@@ -9,6 +9,10 @@ interface AITagSuggestion {
   subcategory?: string;
   subSubcategory?: string;
   confidence: number;
+  // True when the tags came from the Claude API; false when the API failed and
+  // we fell back to rule-based tagging. Callers must use this to record honest
+  // provenance instead of always claiming AI output.
+  aiUsed: boolean;
 }
 
 /**
@@ -20,8 +24,8 @@ export async function generateResourceTags(
   url: string
 ): Promise<AITagSuggestion> {
   try {
-    if (!process.env.ANTHROPIC_API_KEY) {
-      throw new Error('Anthropic API key not configured');
+    if (!anthropic || !isAnthropicConfigured()) {
+      throw new Error('Anthropic not configured');
     }
 
     const prompt = `Analyze this video/multimedia software resource and suggest relevant tags and categorization:
@@ -70,7 +74,8 @@ Respond with JSON in this format:
       category: result.category || 'Video Tools',
       subcategory: result.subcategory,
       subSubcategory: result.subSubcategory,
-      confidence: Math.max(0, Math.min(1, result.confidence || 0.5))
+      confidence: Math.max(0, Math.min(1, result.confidence || 0.5)),
+      aiUsed: true
     };
 
   } catch (error: unknown) {
@@ -118,6 +123,7 @@ function generateFallbackTags(title: string, description: string, url: string): 
   return {
     tags: tags.slice(0, 5), // Limit to 5 tags
     category,
-    confidence: 0.6 // Lower confidence for rule-based
+    confidence: 0.6, // Lower confidence for rule-based
+    aiUsed: false
   };
 }

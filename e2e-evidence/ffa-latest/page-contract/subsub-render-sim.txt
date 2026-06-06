@@ -1,0 +1,6 @@
+=== SIMULATE SubSubcategory page render counts (slug->name->filter full corpus) ===
+  /sub-subcategory/hevc: name='HEVC' rendered=10 expected=10 -> PASS
+  /sub-subcategory/ffmpeg: name='FFMPEG' rendered=65 expected=65 -> PASS
+  /sub-subcategory/av1: name='AV1' rendered=5 expected=5 -> PASS
+  /sub-subcategory/vp9: name='VP9' rendered=1 expected=1 -> PASS
+  /sub-subcategory/origin-servers: name='Origin Servers' rendered=1 expected=1 -> PASS

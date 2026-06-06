@@ -1,7 +1,7 @@
 /**
  * Type augmentations for Express
  */
-import type { SessionUser } from "./replitAuth";
+import type { SessionUser } from "./session";
 
 declare global {
   namespace Express {

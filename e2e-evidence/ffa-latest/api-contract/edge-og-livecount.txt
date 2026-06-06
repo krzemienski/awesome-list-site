@@ -1,0 +1,6 @@
+===== edge-og-livecount.txt =====
+resolveOgParams fallback hardcodes '2600+' (routes.ts:285,288) but DB total=1949
+$ live og-image.svg default (no params) - check embedded resource count text:
+1949+ resources
+$ og.png default served HTTP + bytes:
+HTTP:200 type:image/png bytes:23424
