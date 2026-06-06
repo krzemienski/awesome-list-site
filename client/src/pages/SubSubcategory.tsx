@@ -5,11 +5,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import SEOHead from "@/components/layout/SEOHead";
 import AdvancedFilter from "@/components/ui/advanced-filter";
 import ResourceCard from "@/components/resource/ResourceCard";
-import { ArrowLeft, Search } from "lucide-react";
+import { ArrowLeft, Search, ExternalLink } from "lucide-react";
 import { deslugify } from "@/lib/utils";
 import { Resource } from "@/types/awesome-list";
 import NotFound from "@/pages/not-found";
@@ -19,7 +21,8 @@ import { trackCategoryView } from "@/lib/analytics";
 
 export default function SubSubcategory() {
   const { slug } = useParams<{ slug: string }>();
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
+  const { toast } = useToast();
 
   const getSearchParams = () => new URLSearchParams(window.location.search);
 
