@@ -30,6 +30,54 @@ interface JobStatus {
   estimatedTimeRemaining?: string;
 }
 
+/**
+ * Build the scraped-metadata patch that gets merged over a resource's existing
+ * metadata during enrichment.
+ *
+ * Media-preservation contract: only fields the scrape actually returned are
+ * included, so spreading the result over existing metadata can never wipe media
+ * saved by an earlier successful run (a partial re-scrape leaves old values
+ * intact). ogImage + ogImageBlurhash are handled as a coupled unit:
+ *  - no fresh ogImage  → neither key is written (existing image + hash preserved)
+ *  - fresh ogImage + new hash → both written
+ *  - fresh, CHANGED ogImage but no new hash → hash is explicitly cleared
+ *    (undefined) so the stale placeholder can't outlive its image
+ *  - fresh, UNCHANGED ogImage but no new hash → hash left untouched (a transient
+ *    blurhash failure must not drop a good existing placeholder)
+ */
+export function buildScrapedFields(
+  urlMetadata: UrlMetadata | null,
+  existingMetadata: Record<string, any> = {}
+): Record<string, any> {
+  const scrapedFields: Record<string, any> = {};
+  if (urlMetadata && !urlMetadata.error) {
+    scrapedFields.urlScraped = true;
+    scrapedFields.urlScrapedAt = new Date().toISOString();
+    if (urlMetadata.ogImage) {
+      scrapedFields.ogImage = urlMetadata.ogImage;
+      if (urlMetadata.ogImageBlurhash) {
+        scrapedFields.ogImageBlurhash = urlMetadata.ogImageBlurhash;
+      } else if (urlMetadata.ogImage !== existingMetadata.ogImage) {
+        // Image changed but no new blurhash → drop the stale placeholder
+        // rather than keep a blur that no longer matches the image.
+        scrapedFields.ogImageBlurhash = undefined;
+      }
+    }
+    if (urlMetadata.title) scrapedFields.scrapedTitle = urlMetadata.title;
+    if (urlMetadata.description) scrapedFields.scrapedDescription = urlMetadata.description;
+    if (urlMetadata.ogTitle) scrapedFields.ogTitle = urlMetadata.ogTitle;
+    if (urlMetadata.ogDescription) scrapedFields.ogDescription = urlMetadata.ogDescription;
+    if (urlMetadata.twitterCard) scrapedFields.twitterCard = urlMetadata.twitterCard;
+    if (urlMetadata.twitterImage) scrapedFields.twitterImage = urlMetadata.twitterImage;
+    if (urlMetadata.favicon) scrapedFields.favicon = urlMetadata.favicon;
+    if (urlMetadata.author) scrapedFields.author = urlMetadata.author;
+    if (urlMetadata.keywords && urlMetadata.keywords.length > 0) {
+      scrapedFields.keywords = urlMetadata.keywords;
+    }
+  }
+  return scrapedFields;
+}
+
 export class EnrichmentService {
   private static instance: EnrichmentService;
   private processingJobs: Set<number> = new Set();
@@ -296,37 +344,9 @@ export class EnrichmentService {
           resource.url
         );
 
-        // Build the scraped-metadata patch. Only persist fields the scrape
-        // actually returned, so a later partial re-scrape can't wipe media that
-        // an earlier successful run saved. ogImage + ogImageBlurhash are written
-        // as a coupled unit (gated on a freshly scraped ogImage) so the blurhash
-        // placeholder can never go stale relative to its image.
-        const scrapedFields: Record<string, any> = {};
-        if (urlMetadata && !urlMetadata.error) {
-          scrapedFields.urlScraped = true;
-          scrapedFields.urlScrapedAt = new Date().toISOString();
-          if (urlMetadata.ogImage) {
-            scrapedFields.ogImage = urlMetadata.ogImage;
-            if (urlMetadata.ogImageBlurhash) {
-              scrapedFields.ogImageBlurhash = urlMetadata.ogImageBlurhash;
-            } else if (urlMetadata.ogImage !== (metadata as any).ogImage) {
-              // Image changed but no new blurhash → drop the stale placeholder
-              // rather than keep a blur that no longer matches the image.
-              scrapedFields.ogImageBlurhash = undefined;
-            }
-          }
-          if (urlMetadata.title) scrapedFields.scrapedTitle = urlMetadata.title;
-          if (urlMetadata.description) scrapedFields.scrapedDescription = urlMetadata.description;
-          if (urlMetadata.ogTitle) scrapedFields.ogTitle = urlMetadata.ogTitle;
-          if (urlMetadata.ogDescription) scrapedFields.ogDescription = urlMetadata.ogDescription;
-          if (urlMetadata.twitterCard) scrapedFields.twitterCard = urlMetadata.twitterCard;
-          if (urlMetadata.twitterImage) scrapedFields.twitterImage = urlMetadata.twitterImage;
-          if (urlMetadata.favicon) scrapedFields.favicon = urlMetadata.favicon;
-          if (urlMetadata.author) scrapedFields.author = urlMetadata.author;
-          if (urlMetadata.keywords && urlMetadata.keywords.length > 0) {
-            scrapedFields.keywords = urlMetadata.keywords;
-          }
-        }
+        // Only persist scraped fields the scrape actually returned, so a partial
+        // re-scrape can't wipe media saved by an earlier run. See buildScrapedFields.
+        const scrapedFields = buildScrapedFields(urlMetadata, metadata as Record<string, any>);
 
         // Merge URL metadata with AI results
         const enhancedMetadata = {
