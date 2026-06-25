@@ -67,6 +67,7 @@ import { seedDatabase } from "./seed";
 import { enrichmentService } from "./ai/enrichmentService";
 import { db } from "./db";
 import { sql } from "drizzle-orm";
+import { SITE_URL } from "./og-middleware";
 
 const AWESOME_RAW_URL = process.env.AWESOME_RAW_URL || "https://raw.githubusercontent.com/avelino/awesome-go/main/README.md";
 
@@ -107,74 +108,86 @@ const isAdmin = async (req: any, res: Response, next: any) => {
 };
 
 // SEO route handlers - now uses database-driven data
-async function generateSitemap(req: any, res: any) {
+//
+// Crawlability/indexation (Task #77): the sitemap enumerates EVERY public,
+// indexable route — the static pages (`/`, `/about`, `/advanced`, `/journeys`,
+// `/submit`), the full category taxonomy, and the long-tail detail pages
+// (`/resource/:id`, `/journey/:id`). It uses SITE_URL (the same canonical base
+// the metadata layer emits in og-middleware) so sitemap URLs and on-page
+// canonicals never disagree. DB problems degrade gracefully: dynamic sections
+// are skipped, but a valid XML document with the static routes is always
+// returned (never a 404 / 500 on an empty or unavailable DB).
+function xmlEscape(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
+async function generateSitemap(_req: any, res: any) {
+  const currentDate = new Date().toISOString().split('T')[0];
+  const baseUrl = SITE_URL.replace(/\/+$/, "");
+  const urls: string[] = [];
+
+  const addUrl = (path: string, changefreq: string, priority: string) => {
+    urls.push(`  <url>
+    <loc>${xmlEscape(baseUrl + path)}</loc>
+    <lastmod>${currentDate}</lastmod>
+    <changefreq>${changefreq}</changefreq>
+    <priority>${priority}</priority>
+  </url>`);
+  };
+
+  // Static, always-public routes. These are emitted unconditionally so the
+  // sitemap stays valid even when the database is empty or unreachable.
+  addUrl('/', 'daily', '1.0');
+  addUrl('/journeys', 'weekly', '0.7');
+  addUrl('/advanced', 'weekly', '0.6');
+  addUrl('/about', 'monthly', '0.5');
+  addUrl('/submit', 'monthly', '0.5');
+
+  // Category taxonomy + every approved resource detail page.
   try {
     const awesomeListData = await legacyRepo.getAwesomeListFromDatabase();
-    
-    if (!awesomeListData || !awesomeListData.categories.length) {
-      return res.status(404).send('Sitemap not available - database empty');
-    }
 
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-    const currentDate = new Date().toISOString().split('T')[0];
+    awesomeListData?.categories?.forEach(category => {
+      addUrl(`/category/${category.slug}`, 'weekly', '0.7');
 
-    let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>${baseUrl}/</loc>
-    <lastmod>${currentDate}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>${baseUrl}/advanced</loc>
-    <lastmod>${currentDate}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>`;
-
-    // Add category URLs from database
-    awesomeListData.categories.forEach(category => {
-      sitemap += `
-  <url>
-    <loc>${baseUrl}/category/${category.slug}</loc>
-    <lastmod>${currentDate}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>`;
-      
-      // Add subcategory URLs
       category.subcategories?.forEach(subcategory => {
-        sitemap += `
-  <url>
-    <loc>${baseUrl}/subcategory/${subcategory.slug}</loc>
-    <lastmod>${currentDate}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>`;
-        
-        // Add sub-subcategory URLs
+        addUrl(`/subcategory/${subcategory.slug}`, 'weekly', '0.6');
+
         subcategory.subSubcategories?.forEach(subSubcategory => {
-          sitemap += `
-  <url>
-    <loc>${baseUrl}/sub-subcategory/${subSubcategory.slug}</loc>
-    <lastmod>${currentDate}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>`;
+          addUrl(`/sub-subcategory/${subSubcategory.slug}`, 'weekly', '0.5');
         });
       });
     });
 
-    sitemap += `
+    awesomeListData?.resources?.forEach(resource => {
+      addUrl(`/resource/${resource.id}`, 'monthly', '0.5');
+    });
+  } catch (error) {
+    console.error('Error adding category/resource URLs to sitemap:', error);
+  }
+
+  // Published learning journeys.
+  try {
+    const journeys = await learningJourneyRepo.listLearningJourneys();
+    journeys?.forEach(journey => {
+      addUrl(`/journey/${journey.id}`, 'weekly', '0.6');
+    });
+  } catch (error) {
+    console.error('Error adding journey URLs to sitemap:', error);
+  }
+
+  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls.join('\n')}
 </urlset>`;
 
-    res.set('Content-Type', 'application/xml');
-    res.send(sitemap);
-  } catch (error) {
-    console.error('Error generating sitemap:', error);
-    res.status(500).send('Error generating sitemap');
-  }
+  res.set('Content-Type', 'application/xml');
+  res.send(sitemap);
 }
 
 /**

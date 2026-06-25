@@ -15,6 +15,20 @@ export interface RouteMeta {
   imageAlt: string;
   type: "website" | "article";
   keywords?: string;
+  /**
+   * When true the page is a soft-404 (an unknown/non-existent route served as
+   * the SPA shell). buildMetaTags then emits a static `noindex,nofollow` robots
+   * tag and OMITS the self-referencing canonical + og:url so search engines do
+   * not index the invalid URL. The HTTP status is set to 404 by the middleware.
+   */
+  noindex?: boolean;
+}
+
+/** A resolved route: its metadata plus whether the route actually exists. */
+interface ResolvedRoute {
+  meta: RouteMeta;
+  /** false → unknown route / missing entity → soft-404 (HTTP 404 + noindex). */
+  found: boolean;
 }
 
 function abs(path: string) {
@@ -47,16 +61,16 @@ function defaultMeta(url: string): RouteMeta {
 // Small TTL cache so we don't hit the DB on every crawler/browser HTML request.
 // Per-route metadata changes rarely (category renames, journey edits) — a 60s
 // window is fine and still keeps crawler previews fresh after a deploy.
-const META_CACHE = new Map<string, { meta: RouteMeta; expires: number }>();
+const META_CACHE = new Map<string, { value: ResolvedRoute; expires: number }>();
 const META_CACHE_TTL_MS = 60_000;
 const META_CACHE_MAX = 500;
 
-async function metaForUrl(url: string): Promise<RouteMeta> {
+async function resolveRoute(url: string): Promise<ResolvedRoute> {
   const key = url.split("?")[0];
   const now = Date.now();
   const cached = META_CACHE.get(key);
-  if (cached && cached.expires > now) return cached.meta;
-  const meta = await metaForUrlUncached(url);
+  if (cached && cached.expires > now) return cached.value;
+  const value = await resolveRouteUncached(url);
   if (META_CACHE.size >= META_CACHE_MAX) {
     // Simple eviction: drop the oldest ~10% entries
     const drop = Math.ceil(META_CACHE_MAX / 10);
@@ -66,11 +80,36 @@ async function metaForUrl(url: string): Promise<RouteMeta> {
       META_CACHE.delete(k);
     }
   }
-  META_CACHE.set(key, { meta, expires: now + META_CACHE_TTL_MS });
-  return meta;
+  META_CACHE.set(key, { value, expires: now + META_CACHE_TTL_MS });
+  return value;
 }
 
-async function metaForUrlUncached(url: string): Promise<RouteMeta> {
+// Soft-404 metadata: a known-shape page rendered for an unknown URL. Marked
+// noindex so buildMetaTags drops the self-referencing canonical/og:url and emits
+// a static robots noindex tag; the middleware additionally sets HTTP 404.
+function notFoundMeta(url: string): RouteMeta {
+  const m = defaultMeta(url);
+  m.title = `Page Not Found — ${SITE_NAME}`;
+  m.description = `The page you're looking for doesn't exist on ${SITE_NAME}. Browse the curated index of video development resources instead.`;
+  m.image = ogImage(SITE_NAME);
+  m.type = "website";
+  m.noindex = true;
+  return m;
+}
+
+// Decode a URL path segment without throwing on malformed percent-encoding.
+// A malformed segment (e.g. an incomplete "%E0%A4") can never match a real
+// slug/id, so returning the raw value lets the existence check fall through to
+// a proper soft-404 instead of bubbling a URIError up to the fail-open catch.
+function safeDecode(segment: string): string {
+  try {
+    return decodeURIComponent(segment);
+  } catch {
+    return segment;
+  }
+}
+
+async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
   const path = url.split("?")[0].replace(/\/+$/, "") || "/";
 
   // Home
@@ -84,10 +123,12 @@ async function metaForUrlUncached(url: string): Promise<RouteMeta> {
       m.description = `Browse ${resourceCount}+ tools, libraries, players, codecs, and learning resources across ${categoryCount}+ categories of video development.`;
       m.image = ogImage(SITE_NAME, "Home", resourceCount);
     } catch {}
-    return m;
+    return { meta: m, found: true };
   }
 
-  // Static page routes
+  // Static page routes (every fixed client route in App.tsx). These always
+  // resolve to a real page → HTTP 200, even when auth-gated (the SPA renders
+  // its own login/permission gate client-side).
   const staticRoutes: Record<string, Partial<RouteMeta>> = {
     "/about": {
       title: `About — ${SITE_NAME}`,
@@ -108,6 +149,10 @@ async function metaForUrlUncached(url: string): Promise<RouteMeta> {
     "/login": {
       title: `Sign In — ${SITE_NAME}`,
       description: `Sign in to ${SITE_NAME} to save bookmarks, submit resources, and personalize your learning journey.`,
+    },
+    "/register": {
+      title: `Create an Account — ${SITE_NAME}`,
+      description: `Create a ${SITE_NAME} account to save bookmarks, submit resources, and track your learning journeys.`,
     },
     "/profile": {
       title: `Profile — ${SITE_NAME}`,
@@ -130,87 +175,135 @@ async function metaForUrlUncached(url: string): Promise<RouteMeta> {
     const m = defaultMeta(path);
     Object.assign(m, staticRoutes[path]);
     m.image = ogImage(m.title.split(" — ")[0]);
-    return m;
+    return { meta: m, found: true };
   }
 
-  // /category/:slug
+  // /category/:slug — found only if the category exists.
   const catMatch = path.match(/^\/category\/([^\/]+)$/);
   if (catMatch) {
-    const slug = decodeURIComponent(catMatch[1]);
-    const m = defaultMeta(path);
+    const slug = safeDecode(catMatch[1]);
     try {
       const cat = await storage.getCategoryBySlug(slug);
       if (cat) {
+        const m = defaultMeta(path);
         const res = await storage
           .listResources({ category: cat.name, limit: 1, status: "published" } as any)
           .catch(() => ({ resources: [], total: 0 }));
         const count = (res as any)?.total ?? 0;
         m.title = `${cat.name} — ${SITE_NAME}`;
-        m.description = cat.description
-          ? `${cat.description} — ${count} curated resources on ${SITE_NAME}.`
-          : `Browse ${count} curated ${cat.name.toLowerCase()} resources for video development on ${SITE_NAME}.`;
+        m.description = `Browse ${count} curated ${cat.name.toLowerCase()} resources for video development on ${SITE_NAME}.`;
         m.image = ogImage(cat.name, cat.name, count);
         m.type = "article";
+        return { meta: m, found: true };
       }
-    } catch {}
-    return m;
+    } catch {
+      // DB error → fail open (treat as found) so a transient blip never marks a
+      // real page as a 404 for crawlers.
+      return { meta: defaultMeta(path), found: true };
+    }
+    return { meta: notFoundMeta(path), found: false };
   }
 
-  // /subcategory/:slug and /sub-subcategory/:slug
-  const subMatch = path.match(/^\/(?:subcategory|sub-subcategory)\/([^\/]+)$/);
+  // /subcategory/:slug — found only if the subcategory slug exists.
+  const subMatch = path.match(/^\/subcategory\/([^\/]+)$/);
   if (subMatch) {
-    const slug = decodeURIComponent(subMatch[1]);
-    const m = defaultMeta(path);
-    m.title = `${slug.replace(/-/g, " ")} — ${SITE_NAME}`;
-    m.description = `Curated video development resources in the ${slug.replace(/-/g, " ")} subcategory on ${SITE_NAME}.`;
-    m.image = ogImage(slug.replace(/-/g, " "));
-    m.type = "article";
-    return m;
+    const slug = safeDecode(subMatch[1]);
+    try {
+      const subs = await storage.listSubcategories();
+      const sub = subs.find((s) => s.slug === slug);
+      if (sub) {
+        const m = defaultMeta(path);
+        m.title = `${sub.name} — ${SITE_NAME}`;
+        m.description = `Curated video development resources in the ${sub.name} subcategory on ${SITE_NAME}.`;
+        m.image = ogImage(sub.name);
+        m.type = "article";
+        return { meta: m, found: true };
+      }
+    } catch {
+      return { meta: defaultMeta(path), found: true };
+    }
+    return { meta: notFoundMeta(path), found: false };
   }
 
-  // /resource/:id
+  // /sub-subcategory/:slug — found only if the sub-subcategory slug exists.
+  const subSubMatch = path.match(/^\/sub-subcategory\/([^\/]+)$/);
+  if (subSubMatch) {
+    const slug = safeDecode(subSubMatch[1]);
+    try {
+      const subSubs = await storage.listSubSubcategories();
+      const ss = subSubs.find((s) => s.slug === slug);
+      if (ss) {
+        const m = defaultMeta(path);
+        m.title = `${ss.name} — ${SITE_NAME}`;
+        m.description = `Curated video development resources in the ${ss.name} category on ${SITE_NAME}.`;
+        m.image = ogImage(ss.name);
+        m.type = "article";
+        return { meta: m, found: true };
+      }
+    } catch {
+      return { meta: defaultMeta(path), found: true };
+    }
+    return { meta: notFoundMeta(path), found: false };
+  }
+
+  // /resource/:id — found only if the resource exists.
   const resMatch = path.match(/^\/resource\/([^\/]+)$/);
   if (resMatch) {
-    const idNum = Number(decodeURIComponent(resMatch[1]));
-    const m = defaultMeta(path);
-    if (Number.isFinite(idNum)) {
+    const raw = safeDecode(resMatch[1]);
+    const idNum = Number(raw);
+    if (Number.isInteger(idNum) && idNum > 0) {
       try {
-        const resource = await storage.getResource(idNum).catch(() => undefined as any);
-        if (resource) {
+        const resource = await storage.getResource(idNum);
+        // Only approved resources are public/indexable (this mirrors the
+        // sitemap, which lists approved resources only). A pending/rejected/
+        // archived resource resolves to a soft-404 + noindex, no canonical.
+        if (resource && resource.status === "approved") {
+          const m = defaultMeta(path);
           m.title = `${resource.title} — ${SITE_NAME}`;
           m.description =
             (resource.description || "").slice(0, 280) ||
             `${resource.title} on ${SITE_NAME} — curated video development resource.`;
           m.image = (resource as any).imageUrl || ogImage(resource.title);
           m.type = "article";
+          return { meta: m, found: true };
         }
-      } catch {}
+      } catch {
+        return { meta: defaultMeta(path), found: true };
+      }
     }
-    return m;
+    return { meta: notFoundMeta(path), found: false };
   }
 
-  // /journey/:id
+  // /journey/:id — found only if the journey exists.
   const jMatch = path.match(/^\/journey\/([^\/]+)$/);
   if (jMatch) {
-    const idNum = Number(decodeURIComponent(jMatch[1]));
-    const m = defaultMeta(path);
-    if (Number.isFinite(idNum)) {
+    const raw = safeDecode(jMatch[1]);
+    const idNum = Number(raw);
+    if (Number.isInteger(idNum) && idNum > 0) {
       try {
-        const journey = await storage.getLearningJourney(idNum).catch(() => undefined as any);
-        if (journey) {
+        const journey = await storage.getLearningJourney(idNum);
+        // Only published journeys are public/indexable (this mirrors the
+        // sitemap, which lists published journeys only). A draft/archived
+        // journey resolves to a soft-404 + noindex, no canonical.
+        if (journey && journey.status === "published") {
+          const m = defaultMeta(path);
           m.title = `${journey.title} — Learning Journey — ${SITE_NAME}`;
           m.description = journey.description
             ? String(journey.description).slice(0, 280)
             : `Multi-step learning journey on ${SITE_NAME}: ${journey.title}.`;
           m.image = ogImage(journey.title, "Learning Journey");
           m.type = "article";
+          return { meta: m, found: true };
         }
-      } catch {}
+      } catch {
+        return { meta: defaultMeta(path), found: true };
+      }
     }
-    return m;
+    return { meta: notFoundMeta(path), found: false };
   }
 
-  return defaultMeta(path);
+  // Anything else is an unknown route → soft 404.
+  return { meta: notFoundMeta(path), found: false };
 }
 
 const META_BLOCK_MARKER = "<!--OG_META_INJECTED-->";
@@ -230,15 +323,21 @@ export function buildMetaTags(m: RouteMeta): string {
   const img = escapeHtml(m.image);
   const imgAlt = escapeHtml(m.imageAlt);
   const kw = escapeHtml(m.keywords || "");
+  // Soft-404 pages must NOT self-canonicalize the invalid URL and must be
+  // explicitly excluded from indexing. Real pages keep their canonical + og:url
+  // and stay indexable (default robots behaviour, no tag needed).
+  const robotsTag = m.noindex
+    ? `\n    <meta name="robots" content="noindex, nofollow" />`
+    : "";
+  const canonicalTag = m.noindex ? "" : `\n    <link rel="canonical" href="${u}" />`;
+  const ogUrlTag = m.noindex ? "" : `\n    <meta property="og:url" content="${u}" />`;
   return `${META_BLOCK_MARKER}
     <title>${t}</title>
     <meta name="description" content="${d}" />
-    ${kw ? `<meta name="keywords" content="${kw}" />` : ""}
-    <link rel="canonical" href="${u}" />
+    ${kw ? `<meta name="keywords" content="${kw}" />` : ""}${robotsTag}${canonicalTag}
     <meta property="og:type" content="${m.type}" />
     <meta property="og:site_name" content="${SITE_NAME}" />
-    <meta property="og:locale" content="en_US" />
-    <meta property="og:url" content="${u}" />
+    <meta property="og:locale" content="en_US" />${ogUrlTag}
     <meta property="og:title" content="${t}" />
     <meta property="og:description" content="${d}" />
     <meta property="og:image" content="${img}" />
@@ -288,6 +387,27 @@ export function ogInjectionMiddleware() {
     if (req.method !== "GET" && req.method !== "HEAD") return next();
     const urlPath = (req.originalUrl || req.url).split("?")[0];
 
+    // Reject malformed percent-encoding before anything else. Vite's dev
+    // transform middleware (in server/vite.ts, which we cannot edit) calls
+    // decodeURI() on the raw path and throws a URIError on malformed input;
+    // because this middleware is async, that downstream throw becomes an
+    // unhandledRejection that crashes the dev process. Guarding here — ahead of
+    // the API/asset skip block — keeps EVERY malformed GET/HEAD path (page,
+    // asset, or API-shaped) away from the crashing decoder, and answers the SEO
+    // contract (404 + noindex, no canonical) for malformed page URLs.
+    try {
+      decodeURI(urlPath);
+    } catch {
+      const m = notFoundMeta(urlPath);
+      res
+        .status(404)
+        .set("Content-Type", "text/html; charset=utf-8")
+        .end(
+          `<!doctype html><html lang="en"><head><meta charset="utf-8">\n    ${buildMetaTags(m)}</head><body></body></html>`,
+        );
+      return;
+    }
+
     // Skip API + Vite internals + static assets (have a file extension)
     if (
       urlPath.startsWith("/api") ||
@@ -299,12 +419,17 @@ export function ogInjectionMiddleware() {
       return next();
     }
 
-    let meta: RouteMeta | null = null;
+    let meta: RouteMeta;
+    let notFound = false;
     try {
-      meta = await metaForUrl(urlPath);
+      const resolved = await resolveRoute(urlPath);
+      meta = resolved.meta;
+      notFound = !resolved.found;
     } catch (e) {
       console.warn("[og-middleware] meta lookup failed for", urlPath, e);
+      // Fail open: never demote a real page to 404 on a transient lookup error.
       meta = defaultMeta(urlPath);
+      notFound = false;
     }
 
     // Wrap res.end / res.write to capture HTML and rewrite it.
@@ -331,6 +456,15 @@ export function ogInjectionMiddleware() {
     res.end = function (chunk?: any, ...args: any[]): any {
       if (chunk && checkHtml()) {
         chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+      }
+      // Soft-404: the downstream SPA handler (vite dev catch-all / static
+      // sendFile) hard-codes status 200. Because this middleware buffers the
+      // HTML and only flushes via origEnd below, headers are NOT yet sent here —
+      // so overriding the status now makes the 404 stick. Done in og-middleware
+      // (which already runs before the SPA fallback and owns the HTML rewrite)
+      // rather than in the framework-managed server/vite.ts.
+      if (notFound && checkHtml() && !res.headersSent) {
+        res.statusCode = 404;
       }
       if (checkHtml() && chunks.length) {
         try {
