@@ -209,21 +209,22 @@ export class AuditRepository {
           // Writing a bare `tags` key here is silently dropped by Drizzle, so the
           // tag edit never persists. Merge into existing metadata so sibling keys
           // (ogImage, favicon, blurhash, ...) survive. Normalize to a clean
-          // string[] (trimmed, non-empty, capped at 20 to match the submit route)
-          // so a malformed edit can't persist a non-array shape that breaks the
-          // tag filters that read metadata.tags.
-          const normalizedTags = Array.isArray(proposedData.tags)
-            ? proposedData.tags
-                .filter((t: unknown): t is string => typeof t === 'string')
-                .map((t: string) => t.trim())
-                .filter((t: string) => t.length > 0)
-                .slice(0, 20)
-            : [];
-          updates.metadata = {
-            ...((currentResource.metadata as Record<string, any> | null) ?? {}),
-            ...((updates.metadata as Record<string, any> | undefined) ?? {}),
-            tags: normalizedTags,
-          };
+          // string[] (trimmed, non-empty, capped at 20 to match the submit route).
+          // If the stored payload is malformed (not an array), skip the tags write
+          // entirely so we preserve the resource's existing tags rather than
+          // clearing them.
+          if (Array.isArray(proposedData.tags)) {
+            const normalizedTags = proposedData.tags
+              .filter((t: unknown): t is string => typeof t === 'string')
+              .map((t: string) => t.trim())
+              .filter((t: string) => t.length > 0)
+              .slice(0, 20);
+            updates.metadata = {
+              ...((currentResource.metadata as Record<string, any> | null) ?? {}),
+              ...((updates.metadata as Record<string, any> | undefined) ?? {}),
+              tags: normalizedTags,
+            };
+          }
         } else {
           updates[field] = proposedData[field];
         }

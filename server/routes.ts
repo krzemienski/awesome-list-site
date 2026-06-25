@@ -833,8 +833,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Description too long (max 2000 characters)' });
       }
       
-      if (sanitizedProposedData.tags && Array.isArray(sanitizedProposedData.tags) && sanitizedProposedData.tags.length > 20) {
-        return res.status(400).json({ message: 'Too many tags (max 20)' });
+      // tags is stored in metadata.tags (not a column). Reject non-array shapes
+      // up front and normalize to a clean string[] so malformed input can never
+      // be persisted and later break the tag filters that read metadata.tags.
+      if ('tags' in sanitizedProposedData) {
+        if (!Array.isArray(sanitizedProposedData.tags)) {
+          return res.status(400).json({ message: 'tags must be an array of strings' });
+        }
+        const normalizedTags = sanitizedProposedData.tags
+          .filter((t: unknown): t is string => typeof t === 'string')
+          .map((t: string) => t.trim())
+          .filter((t: string) => t.length > 0);
+        if (normalizedTags.length > 20) {
+          return res.status(400).json({ message: 'Too many tags (max 20)' });
+        }
+        sanitizedProposedData.tags = normalizedTags;
       }
       
       let aiMetadata = claudeMetadata;
