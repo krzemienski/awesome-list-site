@@ -201,7 +201,7 @@ export default function SubSubcategory() {
   return (
     <div className="space-y-4 sm:space-y-6 overflow-x-hidden max-w-full">
       <SEOHead 
-        title={`${subSubcategoryName} Resources - ${subcategoryName} - ${categoryName} - Awesome Video`}
+        title={`${subSubcategoryName} Resources - ${subcategoryName}`}
         description={`Browse ${allResources.length} ${subSubcategoryName} resources in the ${subcategoryName} category.`}
       />
       

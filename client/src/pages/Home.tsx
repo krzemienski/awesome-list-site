@@ -199,7 +199,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
   return (
     <div className="space-y-6">
       <SEOHead
-        title="Awesome Video Resources - 2,000+ Curated Development Tools"
+        title="2,000+ Curated Video Development Resources"
         description="Discover 2,000+ curated video development resources including codecs, players, tools, and libraries. Find the perfect solution for your video project."
       />
 

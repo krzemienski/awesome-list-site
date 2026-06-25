@@ -22,6 +22,13 @@ export interface RouteMeta {
    * not index the invalid URL. The HTTP status is set to 404 by the middleware.
    */
   noindex?: boolean;
+  /**
+   * Route-appropriate JSON-LD structured data (a single schema.org object or an
+   * array of them). buildMetaTags emits one `<script type="application/ld+json">`
+   * per object. Skipped entirely for soft-404 (noindex) pages so invalid URLs
+   * never ship rich-result markup.
+   */
+  structuredData?: unknown;
 }
 
 /** A resolved route: its metadata plus whether the route actually exists. */
@@ -97,6 +104,172 @@ function notFoundMeta(url: string): RouteMeta {
   return m;
 }
 
+// ---------------------------------------------------------------------------
+// JSON-LD structured data (Task #78)
+//
+// The server is the authority for route-appropriate schema.org markup: it is the
+// only thing non-rendering crawlers see, and it is injected into the same HTML a
+// rendering crawler later hydrates. The client SEOHead deliberately ships NO
+// JSON-LD so the two pipelines can never disagree.
+// ---------------------------------------------------------------------------
+
+type Crumb = { name: string; path?: string };
+
+function orgSchema() {
+  return { "@type": "Organization", name: SITE_NAME, url: SITE_URL + "/" };
+}
+
+function webSiteSchema(description: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: SITE_NAME,
+    url: SITE_URL + "/",
+    description,
+    inLanguage: "en-US",
+    publisher: orgSchema(),
+  };
+}
+
+function breadcrumbSchema(items: Crumb[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: items.map((it, i) => {
+      const li: Record<string, unknown> = {
+        "@type": "ListItem",
+        position: i + 1,
+        name: it.name,
+      };
+      // A ListItem URL must be absolute. The final (current) crumb may omit it.
+      if (it.path) li.item = abs(it.path);
+      return li;
+    }),
+  };
+}
+
+function collectionPageSchema(opts: {
+  name: string;
+  description: string;
+  path: string;
+  numberOfItems?: number;
+}) {
+  const cp: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: opts.name,
+    description: opts.description,
+    url: abs(opts.path),
+    inLanguage: "en-US",
+    isPartOf: { "@type": "WebSite", name: SITE_NAME, url: SITE_URL + "/" },
+  };
+  if (typeof opts.numberOfItems === "number") {
+    cp.mainEntity = { "@type": "ItemList", numberOfItems: opts.numberOfItems };
+  }
+  return cp;
+}
+
+function webPageSchema(opts: {
+  name: string;
+  description: string;
+  path: string;
+  mainEntity?: unknown;
+}) {
+  const wp: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: opts.name,
+    description: opts.description,
+    url: abs(opts.path),
+    inLanguage: "en-US",
+    isPartOf: { "@type": "WebSite", name: SITE_NAME, url: SITE_URL + "/" },
+  };
+  if (opts.mainEntity) wp.mainEntity = opts.mainEntity;
+  return wp;
+}
+
+// Recursive count of distinct resources under a taxonomy node. The hierarchical
+// tree (getAwesomeListFromDatabase) places every approved resource in exactly
+// ONE node, so summing each level's own `resources` array yields the accurate
+// total — unlike the prior `listResources({ status: "published" })` lookup,
+// which returned 0 because public resources are status "approved".
+function countNodeResources(node: any): number {
+  let n = Array.isArray(node?.resources) ? node.resources.length : 0;
+  for (const s of node?.subcategories ?? []) n += countNodeResources(s);
+  for (const ss of node?.subSubcategories ?? []) n += countNodeResources(ss);
+  return n;
+}
+
+// Module-level tree cache: taxonomy + resource breadcrumb resolution all need
+// the hierarchical tree. A 60s TTL (matching META_CACHE) keeps a full crawl of
+// hundreds of distinct taxonomy/resource URLs to one tree build per minute.
+let TREE_CACHE: { value: any; expires: number } | null = null;
+const TREE_CACHE_TTL_MS = 60_000;
+async function getTreeCached(): Promise<any> {
+  const now = Date.now();
+  if (TREE_CACHE && TREE_CACHE.expires > now) return TREE_CACHE.value;
+  const value = await storage.getAwesomeListFromDatabase();
+  TREE_CACHE = { value, expires: now + TREE_CACHE_TTL_MS };
+  return value;
+}
+
+type TaxoMatch = { name: string; path: string; count: number; crumbs: Crumb[] };
+
+function findCategory(tree: any, slug: string): TaxoMatch | null {
+  const cat = (tree?.categories ?? []).find((c: any) => c.slug === slug);
+  if (!cat) return null;
+  const path = `/category/${cat.slug}`;
+  return {
+    name: cat.name,
+    path,
+    count: countNodeResources(cat),
+    crumbs: [{ name: "Home", path: "/" }, { name: cat.name, path }],
+  };
+}
+
+function findSubcategory(tree: any, slug: string): TaxoMatch | null {
+  for (const cat of tree?.categories ?? []) {
+    const sub = (cat.subcategories ?? []).find((s: any) => s.slug === slug);
+    if (sub) {
+      const path = `/subcategory/${sub.slug}`;
+      return {
+        name: sub.name,
+        path,
+        count: countNodeResources(sub),
+        crumbs: [
+          { name: "Home", path: "/" },
+          { name: cat.name, path: `/category/${cat.slug}` },
+          { name: sub.name, path },
+        ],
+      };
+    }
+  }
+  return null;
+}
+
+function findSubSubcategory(tree: any, slug: string): TaxoMatch | null {
+  for (const cat of tree?.categories ?? []) {
+    for (const sub of cat.subcategories ?? []) {
+      const ss = (sub.subSubcategories ?? []).find((x: any) => x.slug === slug);
+      if (ss) {
+        const path = `/sub-subcategory/${ss.slug}`;
+        return {
+          name: ss.name,
+          path,
+          count: countNodeResources(ss),
+          crumbs: [
+            { name: "Home", path: "/" },
+            { name: cat.name, path: `/category/${cat.slug}` },
+            { name: sub.name, path: `/subcategory/${sub.slug}` },
+            { name: ss.name, path },
+          ],
+        };
+      }
+    }
+  }
+  return null;
+}
+
 // Decode a URL path segment without throwing on malformed percent-encoding.
 // A malformed segment (e.g. an incomplete "%E0%A4") can never match a real
 // slug/id, so returning the raw value lets the existence check fall through to
@@ -116,13 +289,14 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
   if (path === "/" || path === "") {
     const m = defaultMeta(path);
     try {
-      const data = await storage.getAwesomeListFromDatabase();
+      const data = await getTreeCached();
       const resourceCount = data?.resources?.length ?? 2600;
       const categoryCount = data?.categories?.length ?? 80;
       m.title = `${SITE_NAME} — ${resourceCount}+ curated video development resources`;
       m.description = `Browse ${resourceCount}+ tools, libraries, players, codecs, and learning resources across ${categoryCount}+ categories of video development.`;
       m.image = ogImage(SITE_NAME, "Home", resourceCount);
     } catch {}
+    m.structuredData = webSiteSchema(m.description);
     return { meta: m, found: true };
   }
 
@@ -175,6 +349,26 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
     const m = defaultMeta(path);
     Object.assign(m, staticRoutes[path]);
     m.image = ogImage(m.title.split(" — ")[0]);
+    if (path === "/journeys") {
+      try {
+        const journeys = await storage.listLearningJourneys();
+        const publishedCount = journeys.filter(
+          (j: any) => j.status === "published",
+        ).length;
+        m.structuredData = [
+          collectionPageSchema({
+            name: "Learning Journeys",
+            description: m.description,
+            path,
+            numberOfItems: publishedCount,
+          }),
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Learning Journeys", path },
+          ]),
+        ];
+      } catch {}
+    }
     return { meta: m, found: true };
   }
 
@@ -183,17 +377,22 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
   if (catMatch) {
     const slug = safeDecode(catMatch[1]);
     try {
-      const cat = await storage.getCategoryBySlug(slug);
-      if (cat) {
+      const found = findCategory(await getTreeCached(), slug);
+      if (found) {
         const m = defaultMeta(path);
-        const res = await storage
-          .listResources({ category: cat.name, limit: 1, status: "published" } as any)
-          .catch(() => ({ resources: [], total: 0 }));
-        const count = (res as any)?.total ?? 0;
-        m.title = `${cat.name} — ${SITE_NAME}`;
-        m.description = `Browse ${count} curated ${cat.name.toLowerCase()} resources for video development on ${SITE_NAME}.`;
-        m.image = ogImage(cat.name, cat.name, count);
+        m.title = `${found.name} — ${SITE_NAME}`;
+        m.description = `Browse ${found.count} curated ${found.name.toLowerCase()} resources for video development on ${SITE_NAME}.`;
+        m.image = ogImage(found.name, found.name, found.count);
         m.type = "article";
+        m.structuredData = [
+          collectionPageSchema({
+            name: found.name,
+            description: m.description,
+            path,
+            numberOfItems: found.count,
+          }),
+          breadcrumbSchema(found.crumbs),
+        ];
         return { meta: m, found: true };
       }
     } catch {
@@ -209,14 +408,22 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
   if (subMatch) {
     const slug = safeDecode(subMatch[1]);
     try {
-      const subs = await storage.listSubcategories();
-      const sub = subs.find((s) => s.slug === slug);
-      if (sub) {
+      const found = findSubcategory(await getTreeCached(), slug);
+      if (found) {
         const m = defaultMeta(path);
-        m.title = `${sub.name} — ${SITE_NAME}`;
-        m.description = `Curated video development resources in the ${sub.name} subcategory on ${SITE_NAME}.`;
-        m.image = ogImage(sub.name);
+        m.title = `${found.name} — ${SITE_NAME}`;
+        m.description = `Browse ${found.count} curated ${found.name.toLowerCase()} resources for video development on ${SITE_NAME}.`;
+        m.image = ogImage(found.name, found.name, found.count);
         m.type = "article";
+        m.structuredData = [
+          collectionPageSchema({
+            name: found.name,
+            description: m.description,
+            path,
+            numberOfItems: found.count,
+          }),
+          breadcrumbSchema(found.crumbs),
+        ];
         return { meta: m, found: true };
       }
     } catch {
@@ -230,14 +437,22 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
   if (subSubMatch) {
     const slug = safeDecode(subSubMatch[1]);
     try {
-      const subSubs = await storage.listSubSubcategories();
-      const ss = subSubs.find((s) => s.slug === slug);
-      if (ss) {
+      const found = findSubSubcategory(await getTreeCached(), slug);
+      if (found) {
         const m = defaultMeta(path);
-        m.title = `${ss.name} — ${SITE_NAME}`;
-        m.description = `Curated video development resources in the ${ss.name} category on ${SITE_NAME}.`;
-        m.image = ogImage(ss.name);
+        m.title = `${found.name} — ${SITE_NAME}`;
+        m.description = `Browse ${found.count} curated ${found.name.toLowerCase()} resources for video development on ${SITE_NAME}.`;
+        m.image = ogImage(found.name, found.name, found.count);
         m.type = "article";
+        m.structuredData = [
+          collectionPageSchema({
+            name: found.name,
+            description: m.description,
+            path,
+            numberOfItems: found.count,
+          }),
+          breadcrumbSchema(found.crumbs),
+        ];
         return { meta: m, found: true };
       }
     } catch {
@@ -265,6 +480,34 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
             `${resource.title} on ${SITE_NAME} — curated video development resource.`;
           m.image = (resource as any).imageUrl || ogImage(resource.title);
           m.type = "article";
+          const crumbs: Crumb[] = [{ name: "Home", path: "/" }];
+          try {
+            const tree = await getTreeCached();
+            const cat = (tree?.categories ?? []).find(
+              (c: any) => c.name === resource.category,
+            );
+            if (cat) crumbs.push({ name: cat.name, path: `/category/${cat.slug}` });
+          } catch {}
+          crumbs.push({ name: resource.title });
+          m.structuredData = [
+            webPageSchema({
+              name: resource.title,
+              description: m.description,
+              path,
+              mainEntity: {
+                "@type": "CreativeWork",
+                name: resource.title,
+                ...(resource.description
+                  ? { description: String(resource.description).slice(0, 500) }
+                  : {}),
+                url: resource.url,
+                ...((resource as any).imageUrl
+                  ? { image: (resource as any).imageUrl }
+                  : {}),
+              },
+            }),
+            breadcrumbSchema(crumbs),
+          ];
           return { meta: m, found: true };
         }
       } catch {
@@ -293,6 +536,26 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
             : `Multi-step learning journey on ${SITE_NAME}: ${journey.title}.`;
           m.image = ogImage(journey.title, "Learning Journey");
           m.type = "article";
+          m.structuredData = [
+            webPageSchema({
+              name: journey.title,
+              description: m.description,
+              path,
+              mainEntity: {
+                "@type": "Course",
+                name: journey.title,
+                ...(journey.description
+                  ? { description: String(journey.description).slice(0, 500) }
+                  : {}),
+                provider: orgSchema(),
+              },
+            }),
+            breadcrumbSchema([
+              { name: "Home", path: "/" },
+              { name: "Learning Journeys", path: "/journeys" },
+              { name: journey.title },
+            ]),
+          ];
           return { meta: m, found: true };
         }
       } catch {
@@ -316,6 +579,20 @@ function escapeHtml(s: string) {
     .replace(/>/g, "&gt;");
 }
 
+// Render JSON-LD as one <script> per schema object. `<` is escaped to its
+// unicode form so a value containing "</script>" can never break out of the
+// script element (the standard safe-embedding technique for JSON in <script>).
+function renderJsonLd(data: unknown): string {
+  const arr = Array.isArray(data) ? data : [data];
+  return arr
+    .filter(Boolean)
+    .map((d) => {
+      const json = JSON.stringify(d).replace(/</g, "\\u003c");
+      return `\n    <script type="application/ld+json">${json}</script>`;
+    })
+    .join("");
+}
+
 export function buildMetaTags(m: RouteMeta): string {
   const t = escapeHtml(m.title);
   const d = escapeHtml(m.description);
@@ -331,6 +608,10 @@ export function buildMetaTags(m: RouteMeta): string {
     : "";
   const canonicalTag = m.noindex ? "" : `\n    <link rel="canonical" href="${u}" />`;
   const ogUrlTag = m.noindex ? "" : `\n    <meta property="og:url" content="${u}" />`;
+  // Soft-404 pages ship no structured data — rich-result markup must only ever
+  // describe a real, indexable page.
+  const structuredDataTag =
+    m.noindex || !m.structuredData ? "" : renderJsonLd(m.structuredData);
   return `${META_BLOCK_MARKER}
     <title>${t}</title>
     <meta name="description" content="${d}" />
@@ -355,7 +636,7 @@ export function buildMetaTags(m: RouteMeta): string {
     <meta name="theme-color" content="#ff3d52" />
     <meta name="msapplication-TileColor" content="#ff3d52" />
     <meta name="application-name" content="${SITE_NAME}" />
-    <meta name="apple-mobile-web-app-title" content="${SITE_NAME}" />`;
+    <meta name="apple-mobile-web-app-title" content="${SITE_NAME}" />${structuredDataTag}`;
 }
 
 // Strip any existing <title>, og:*, twitter:*, name="description"/keywords, canonical

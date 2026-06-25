@@ -253,7 +253,7 @@ export default function ResourceDetail() {
   return (
     <div className="space-y-4 sm:space-y-6 max-w-5xl mx-auto px-0 sm:px-4 overflow-x-hidden">
       <SEOHead 
-        title={`${resource.title} - Awesome Video`}
+        title={`${resource.title}`}
         description={resource.description || scrapedDescription || `View details for ${resource.title}`}
       />
 

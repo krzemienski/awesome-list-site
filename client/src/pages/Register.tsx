@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
+import SEOHead from "@/components/layout/SEOHead";
 
 const registerSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -96,6 +97,10 @@ export default function Register() {
 
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-12rem)] p-4">
+      <SEOHead
+        title="Create an Account"
+        description="Create a free Awesome Video account to save bookmarks, submit resources, and track your learning journeys."
+      />
       <h1 className="sr-only">Create an Awesome Video account</h1>
       <Card className="w-full max-w-md" data-testid="register-card">
         <CardHeader className="space-y-2">

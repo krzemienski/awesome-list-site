@@ -12,6 +12,8 @@ interface SEOHeadProps {
   type?: "website" | "article";
 }
 
+const SITE_NAME = "Awesome Video";
+
 export default function SEOHead({
   title,
   description,
@@ -24,17 +26,27 @@ export default function SEOHead({
 }: SEOHeadProps) {
   // Generate dynamic SEO data based on the awesome list
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
-  const currentUrl = url || (typeof window !== 'undefined' ? window.location.href : baseUrl);
-  
-  const siteTitle = awesomeList?.title || "Awesome List";
+  // Canonical/og:url must be PATH-ONLY (drop ?query) so filtered views collapse
+  // onto a single indexable URL. Falls back to origin+pathname, never href.
+  const currentUrl =
+    url ||
+    (typeof window !== 'undefined'
+      ? `${window.location.origin}${window.location.pathname}`
+      : baseUrl);
+
+  const siteTitle = awesomeList?.title || SITE_NAME;
   const siteDescription = awesomeList?.description || "A curated list of awesome resources";
-  
+
+  // Idempotent title builder — never produces a double-brand suffix when the
+  // page already passes a title that includes the brand.
+  const withBrand = (t: string) => (t.includes(SITE_NAME) ? t : `${t} — ${SITE_NAME}`);
+
   // Generate dynamic title based on page context
-  const pageTitle = title 
-    ? `${title} | ${siteTitle}`
-    : category 
-    ? `${category} Resources | ${siteTitle}`
-    : siteTitle;
+  const pageTitle = title
+    ? withBrand(title)
+    : category
+    ? withBrand(`${category} Resources`)
+    : SITE_NAME;
 
   // Generate dynamic description
   const pageDescription = description || (
@@ -57,7 +69,7 @@ export default function SEOHead({
       <title>{pageTitle}</title>
       <meta name="description" content={pageDescription} />
       <meta name="keywords" content={generateKeywords(awesomeList, category)} />
-      <meta name="author" content={repoInfo ? `${repoInfo.owner} contributors` : "Awesome List Community"} />
+      <meta name="author" content={repoInfo ? `${repoInfo.owner} contributors` : `${SITE_NAME} contributors`} />
       <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
       <link rel="canonical" href={currentUrl} />
 
@@ -70,7 +82,7 @@ export default function SEOHead({
       <meta property="og:image:alt" content={`${siteTitle} - ${pageDescription.substring(0, 100)}...`} />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
-      <meta property="og:site_name" content={siteTitle} />
+      <meta property="og:site_name" content={SITE_NAME} />
       <meta property="og:locale" content="en_US" />
 
       {/* Twitter Card Meta Tags */}
@@ -87,8 +99,8 @@ export default function SEOHead({
       {/* MR-DS-04/05 — literal required (meta can't read CSS vars); matches DS --accent */}
       <meta name="theme-color" content="#ff3d52" />
       <meta name="msapplication-TileColor" content="#ff3d52" />
-      <meta name="application-name" content={siteTitle} />
-      <meta name="apple-mobile-web-app-title" content={siteTitle} />
+      <meta name="application-name" content={SITE_NAME} />
+      <meta name="apple-mobile-web-app-title" content={SITE_NAME} />
       <meta name="apple-mobile-web-app-capable" content="yes" />
       <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       <meta name="mobile-web-app-capable" content="yes" />
@@ -99,10 +111,9 @@ export default function SEOHead({
       <link rel="apple-touch-icon" href="/favicon.svg" />
       <link rel="manifest" href="/site.webmanifest" />
 
-      {/* Structured Data for Rich Snippets */}
-      <script type="application/ld+json">
-        {JSON.stringify(generateStructuredData(awesomeList, category, currentUrl, pageTitle, pageDescription))}
-      </script>
+      {/* Structured Data (JSON-LD) is emitted SERVER-SIDE by og-middleware so a
+          single route-appropriate schema is authoritative for crawlers. The
+          client deliberately ships none to avoid duplicate/conflicting graphs. */}
 
       {/* Additional Meta for iMessage and Social Previews */}
       <meta property="al:web:url" content={currentUrl} />
@@ -159,52 +170,4 @@ function generateKeywords(awesomeList?: AwesomeList, category?: string): string 
   }
 
   return baseKeywords.join(", ");
-}
-
-function generateStructuredData(
-  awesomeList?: AwesomeList, 
-  category?: string, 
-  url?: string, 
-  title?: string, 
-  description?: string
-) {
-  const baseData = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": title,
-    "description": description,
-    "url": url,
-    "inLanguage": "en-US",
-    "isAccessibleForFree": true,
-    "keywords": generateKeywords(awesomeList, category)
-  };
-
-  if (awesomeList) {
-    return {
-      ...baseData,
-      "@type": "CollectionPage",
-      "about": {
-        "@type": "Thing",
-        "name": awesomeList.title,
-        "description": awesomeList.description
-      },
-      "mainEntity": {
-        "@type": "ItemList",
-        "numberOfItems": awesomeList.resources?.length || 0,
-        "itemListElement": awesomeList.categories?.slice(0, 10).map((category, index) => ({
-          "@type": "ListItem",
-          "position": index + 1,
-          "name": category.name,
-          "description": `${category.resources?.length || 0} resources in ${category.name}`
-        })) || []
-      },
-      "publisher": {
-        "@type": "Organization",
-        "name": "Awesome List Community",
-        "url": url
-      }
-    };
-  }
-
-  return baseData;
 }
