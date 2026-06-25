@@ -142,15 +142,44 @@
     </script>
 
     <!--
-      Canonical font set — mirrors awesome-list-site handoff project/index.html
-      line 10. We currently render Editorial+Crimson (Inter / Fraunces / JetBrains
-      Mono), but the full per-system skin block is shipped in design-system.css,
-      so the other system fonts are preloaded for any future data-system flip
-      without an additional network round-trip.
+      Critical-path fonts: Editorial default only (Inter + Fraunces + JetBrains Mono).
+      Loaded non-blocking via rel="preload" so they never sit on the critical render
+      path. Alternate-system families (Geist, Instrument Serif, Space Grotesk,
+      IBM Plex Mono, IBM Plex Sans, Manrope) are injected after the page is
+      interactive by the inline script below — they are never needed for first paint.
     -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="preload" as="style"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+          onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript>
+      <link rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" />
+    </noscript>
+    <!--
+      Alternate-system font loader: injected after window load so the six
+      non-Editorial families (Geist / Instrument Serif / Space Grotesk /
+      IBM Plex Mono / IBM Plex Sans / Manrope) never block first paint.
+      They become available as soon as the browser is idle, which is fast
+      enough for any theme-switcher interaction.
+    -->
+    <script>
+      (function () {
+        var ALT_FONTS_URL = 'https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap';
+        function loadAltFonts() {
+          var link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = ALT_FONTS_URL;
+          document.head.appendChild(link);
+        }
+        if (document.readyState === 'complete') {
+          loadAltFonts();
+        } else {
+          window.addEventListener('load', loadAltFonts, { once: true });
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"><!--app-html--></div>
