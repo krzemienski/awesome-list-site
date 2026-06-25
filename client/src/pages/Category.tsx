@@ -158,8 +158,9 @@ export default function Category() {
 
     const newSearch = params.toString();
     const newPath = `/category/${slug}${newSearch ? `?${newSearch}` : ""}`;
+    const currentPath = `${window.location.pathname}${window.location.search}`;
 
-    if (location !== newPath) {
+    if (currentPath !== newPath) {
       window.history.replaceState({}, "", newPath);
     }
   }, [searchTerm, selectedSubcategory, selectedTags, sortBy, slug, location]);

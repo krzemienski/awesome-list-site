@@ -43,14 +43,15 @@ export class LearningJourneyRepository {
    * @returns Array of learning journeys ordered by index
    */
   async listLearningJourneys(category?: string): Promise<LearningJourney[]> {
-    let query = db.select().from(learningJourneys);
-
+    const conditions = [eq(learningJourneys.status, 'published')];
     if (category) {
-      query = query.where(eq(learningJourneys.category, category)) as any;
+      conditions.push(eq(learningJourneys.category, category));
     }
 
-    return await query
-      .where(eq(learningJourneys.status, 'published'))
+    return await db
+      .select()
+      .from(learningJourneys)
+      .where(and(...conditions))
       .orderBy(asc(learningJourneys.orderIndex));
   }
 

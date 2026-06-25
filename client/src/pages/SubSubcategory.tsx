@@ -132,8 +132,9 @@ export default function SubSubcategory() {
 
     const newSearch = params.toString();
     const newPath = `/sub-subcategory/${slug}${newSearch ? `?${newSearch}` : ""}`;
+    const currentPath = `${window.location.pathname}${window.location.search}`;
 
-    if (location !== newPath) {
+    if (currentPath !== newPath) {
       window.history.replaceState({}, "", newPath);
     }
   }, [searchTerm, selectedTags, sortBy, slug, location]);
