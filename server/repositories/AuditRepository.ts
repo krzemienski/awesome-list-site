@@ -204,7 +204,29 @@ export class AuditRepository {
     const proposedData = edit.proposedData as any;
     for (const field of EDITABLE_RESOURCE_FIELDS) {
       if (proposedData && field in proposedData) {
-        updates[field] = proposedData[field];
+        if (field === 'tags') {
+          // `tags` is not a column on `resources` — it is stored in metadata.tags.
+          // Writing a bare `tags` key here is silently dropped by Drizzle, so the
+          // tag edit never persists. Merge into existing metadata so sibling keys
+          // (ogImage, favicon, blurhash, ...) survive. Normalize to a clean
+          // string[] (trimmed, non-empty, capped at 20 to match the submit route)
+          // so a malformed edit can't persist a non-array shape that breaks the
+          // tag filters that read metadata.tags.
+          const normalizedTags = Array.isArray(proposedData.tags)
+            ? proposedData.tags
+                .filter((t: unknown): t is string => typeof t === 'string')
+                .map((t: string) => t.trim())
+                .filter((t: string) => t.length > 0)
+                .slice(0, 20)
+            : [];
+          updates.metadata = {
+            ...((currentResource.metadata as Record<string, any> | null) ?? {}),
+            ...((updates.metadata as Record<string, any> | undefined) ?? {}),
+            tags: normalizedTags,
+          };
+        } else {
+          updates[field] = proposedData[field];
+        }
       }
     }
 
