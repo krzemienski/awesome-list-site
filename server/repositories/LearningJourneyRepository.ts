@@ -24,6 +24,7 @@ import {
   learningJourneys,
   journeySteps,
   userJourneyProgress,
+  resources,
   type LearningJourney,
   type InsertLearningJourney,
   type JourneyStep,
@@ -164,12 +165,30 @@ export class LearningJourneyRepository {
    * @param journeyId - Journey ID
    * @returns Array of journey steps ordered by step number
    */
-  async listJourneySteps(journeyId: number): Promise<JourneyStep[]> {
-    return await db
-      .select()
+  async listJourneySteps(
+    journeyId: number
+  ): Promise<(JourneyStep & { resource?: { id: number; title: string; url: string; description: string | null } })[]> {
+    // Hydrate each step with its linked resource so the journey detail UI can
+    // render real, clickable resource links (the frontend reads step.resource).
+    const rows = await db
+      .select({
+        step: journeySteps,
+        resource: {
+          id: resources.id,
+          title: resources.title,
+          url: resources.url,
+          description: resources.description,
+        },
+      })
       .from(journeySteps)
+      .leftJoin(resources, eq(journeySteps.resourceId, resources.id))
       .where(eq(journeySteps.journeyId, journeyId))
       .orderBy(asc(journeySteps.stepNumber));
+
+    return rows.map((r) => ({
+      ...r.step,
+      resource: r.resource && r.resource.id != null ? r.resource : undefined,
+    }));
   }
 
   /**
