@@ -7,7 +7,13 @@ export async function handleSSR(req: Request, res: Response, next: NextFunction)
   // CRITICAL FIX: Disable SSR in production until we have proper server bundle
   // SSR was blocking serveStatic middleware, causing white screen
   // The client/index.html references /src/main.tsx which doesn't exist in dist/
-  // Let serveStatic serve the actual built Vite assets instead
+  // Let serveStatic serve the actual built Vite assets instead.
+  //
+  // Production SSR remains intentionally disabled (the build produces no server
+  // React bundle). Crawler/SEO visibility is instead handled by the prerender
+  // injector in server/og-middleware.ts (Task #80), which runs in BOTH dev and
+  // prod and writes route-appropriate semantic content into the SPA shell. The
+  // renderAppWithData() helper below is legacy scaffolding kept for reference.
   return next();
 }
 

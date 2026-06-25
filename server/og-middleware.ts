@@ -1,5 +1,13 @@
 import type { Request, Response, NextFunction } from "express";
 import { storage } from "./storage";
+import {
+  renderHomeContent,
+  renderTaxonomyContent,
+  renderResourceContent,
+  renderJourneysContent,
+  renderJourneyContent,
+  renderStaticPageContent,
+} from "./seo-content";
 
 export const SITE_URL =
   process.env.PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://new.awesome.video";
@@ -36,6 +44,13 @@ interface ResolvedRoute {
   meta: RouteMeta;
   /** false → unknown route / missing entity → soft-404 (HTTP 404 + noindex). */
   found: boolean;
+  /**
+   * Prerendered semantic body HTML for the SPA shell (Task #80). Present only
+   * for found, indexable public routes; injected into `<!--app-html-->` so
+   * non-JS crawlers see real content. Absent for soft-404s and auth/internal
+   * routes (those keep the empty shell).
+   */
+  bodyHtml?: string;
 }
 
 function abs(path: string) {
@@ -213,7 +228,13 @@ async function getTreeCached(): Promise<any> {
   return value;
 }
 
-type TaxoMatch = { name: string; path: string; count: number; crumbs: Crumb[] };
+type TaxoMatch = {
+  name: string;
+  path: string;
+  count: number;
+  crumbs: Crumb[];
+  node: any;
+};
 
 function findCategory(tree: any, slug: string): TaxoMatch | null {
   const cat = (tree?.categories ?? []).find((c: any) => c.slug === slug);
@@ -224,6 +245,7 @@ function findCategory(tree: any, slug: string): TaxoMatch | null {
     path,
     count: countNodeResources(cat),
     crumbs: [{ name: "Home", path: "/" }, { name: cat.name, path }],
+    node: cat,
   };
 }
 
@@ -241,6 +263,7 @@ function findSubcategory(tree: any, slug: string): TaxoMatch | null {
           { name: cat.name, path: `/category/${cat.slug}` },
           { name: sub.name, path },
         ],
+        node: sub,
       };
     }
   }
@@ -263,6 +286,7 @@ function findSubSubcategory(tree: any, slug: string): TaxoMatch | null {
             { name: sub.name, path: `/subcategory/${sub.slug}` },
             { name: ss.name, path },
           ],
+          node: ss,
         };
       }
     }
@@ -288,6 +312,7 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
   // Home
   if (path === "/" || path === "") {
     const m = defaultMeta(path);
+    let categories: { name: string; slug: string; count: number }[] = [];
     try {
       const data = await getTreeCached();
       const resourceCount = data?.resources?.length ?? 2600;
@@ -295,9 +320,19 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
       m.title = `${SITE_NAME} — ${resourceCount}+ curated video development resources`;
       m.description = `Browse ${resourceCount}+ tools, libraries, players, codecs, and learning resources across ${categoryCount}+ categories of video development.`;
       m.image = ogImage(SITE_NAME, "Home", resourceCount);
+      categories = (data?.categories ?? []).map((c: any) => ({
+        name: c.name,
+        slug: c.slug,
+        count: countNodeResources(c),
+      }));
     } catch {}
     m.structuredData = webSiteSchema(m.description);
-    return { meta: m, found: true };
+    const bodyHtml = renderHomeContent({
+      heading: SITE_NAME,
+      description: m.description,
+      categories,
+    });
+    return { meta: m, found: true, bodyHtml };
   }
 
   // Static page routes (every fixed client route in App.tsx). These always
@@ -349,27 +384,52 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
     const m = defaultMeta(path);
     Object.assign(m, staticRoutes[path]);
     m.image = ogImage(m.title.split(" — ")[0]);
+    let bodyHtml: string | undefined;
     if (path === "/journeys") {
       try {
         const journeys = await storage.listLearningJourneys();
-        const publishedCount = journeys.filter(
+        const published = journeys.filter(
           (j: any) => j.status === "published",
-        ).length;
+        );
         m.structuredData = [
           collectionPageSchema({
             name: "Learning Journeys",
             description: m.description,
             path,
-            numberOfItems: publishedCount,
+            numberOfItems: published.length,
           }),
           breadcrumbSchema([
             { name: "Home", path: "/" },
             { name: "Learning Journeys", path },
           ]),
         ];
+        bodyHtml = renderJourneysContent({
+          heading: "Learning Journeys",
+          description: m.description,
+          journeys: published.map((j: any) => ({
+            id: j.id,
+            title: j.title,
+            description: j.description,
+          })),
+        });
       } catch {}
+    } else if (path === "/about" || path === "/advanced") {
+      let categories: { name: string; slug: string; count: number }[] = [];
+      try {
+        const data = await getTreeCached();
+        categories = (data?.categories ?? []).slice(0, 12).map((c: any) => ({
+          name: c.name,
+          slug: c.slug,
+          count: countNodeResources(c),
+        }));
+      } catch {}
+      bodyHtml = renderStaticPageContent({
+        heading: m.title.split(" — ")[0],
+        description: m.description,
+        categories,
+      });
     }
-    return { meta: m, found: true };
+    return { meta: m, found: true, bodyHtml };
   }
 
   // /category/:slug — found only if the category exists.
@@ -393,7 +453,23 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
           }),
           breadcrumbSchema(found.crumbs),
         ];
-        return { meta: m, found: true };
+        const bodyHtml = renderTaxonomyContent({
+          heading: found.name,
+          description: m.description,
+          crumbs: found.crumbs,
+          childKind: "subcategory",
+          children: (found.node?.subcategories ?? []).map((s: any) => ({
+            name: s.name,
+            slug: s.slug,
+            count: countNodeResources(s),
+          })),
+          resources: (found.node?.resources ?? []).map((r: any) => ({
+            id: r.id,
+            title: r.title,
+            description: r.description,
+          })),
+        });
+        return { meta: m, found: true, bodyHtml };
       }
     } catch {
       // DB error → fail open (treat as found) so a transient blip never marks a
@@ -424,7 +500,23 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
           }),
           breadcrumbSchema(found.crumbs),
         ];
-        return { meta: m, found: true };
+        const bodyHtml = renderTaxonomyContent({
+          heading: found.name,
+          description: m.description,
+          crumbs: found.crumbs,
+          childKind: "sub-subcategory",
+          children: (found.node?.subSubcategories ?? []).map((s: any) => ({
+            name: s.name,
+            slug: s.slug,
+            count: countNodeResources(s),
+          })),
+          resources: (found.node?.resources ?? []).map((r: any) => ({
+            id: r.id,
+            title: r.title,
+            description: r.description,
+          })),
+        });
+        return { meta: m, found: true, bodyHtml };
       }
     } catch {
       return { meta: defaultMeta(path), found: true };
@@ -453,7 +545,17 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
           }),
           breadcrumbSchema(found.crumbs),
         ];
-        return { meta: m, found: true };
+        const bodyHtml = renderTaxonomyContent({
+          heading: found.name,
+          description: m.description,
+          crumbs: found.crumbs,
+          resources: (found.node?.resources ?? []).map((r: any) => ({
+            id: r.id,
+            title: r.title,
+            description: r.description,
+          })),
+        });
+        return { meta: m, found: true, bodyHtml };
       }
     } catch {
       return { meta: defaultMeta(path), found: true };
@@ -508,7 +610,13 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
             }),
             breadcrumbSchema(crumbs),
           ];
-          return { meta: m, found: true };
+          const bodyHtml = renderResourceContent({
+            heading: resource.title,
+            description: m.description,
+            crumbs,
+            url: resource.url,
+          });
+          return { meta: m, found: true, bodyHtml };
         }
       } catch {
         return { meta: defaultMeta(path), found: true };
@@ -556,7 +664,16 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
               { name: journey.title },
             ]),
           ];
-          return { meta: m, found: true };
+          const bodyHtml = renderJourneyContent({
+            heading: journey.title,
+            description: m.description,
+            crumbs: [
+              { name: "Home", path: "/" },
+              { name: "Learning Journeys", path: "/journeys" },
+              { name: journey.title },
+            ],
+          });
+          return { meta: m, found: true, bodyHtml };
         }
       } catch {
         return { meta: defaultMeta(path), found: true };
@@ -702,10 +819,12 @@ export function ogInjectionMiddleware() {
 
     let meta: RouteMeta;
     let notFound = false;
+    let bodyHtml: string | undefined;
     try {
       const resolved = await resolveRoute(urlPath);
       meta = resolved.meta;
       notFound = !resolved.found;
+      bodyHtml = resolved.bodyHtml;
     } catch (e) {
       console.warn("[og-middleware] meta lookup failed for", urlPath, e);
       // Fail open: never demote a real page to 404 on a transient lookup error.
@@ -753,6 +872,21 @@ export function ogInjectionMiddleware() {
           // Only rewrite if it looks like a full HTML document
           if (/<head[\s>]/i.test(html)) {
             html = rewriteHead(html, meta!);
+          }
+          // Task #80: inject prerendered semantic content into the SPA shell for
+          // found, indexable routes so non-JS crawlers (GPTBot, ClaudeBot,
+          // Googlebot's pre-render) see real headings, summaries, and internal
+          // links. main.tsx calls createRoot().render() on boot, which REPLACES
+          // this content — we never set __INITIAL_DATA__, so there is no
+          // hydration step (and no mismatch). The function form of replace()
+          // avoids `$` special-sequence interpretation in titles/descriptions.
+          if (
+            bodyHtml &&
+            !notFound &&
+            !meta!.noindex &&
+            html.includes("<!--app-html-->")
+          ) {
+            html = html.replace("<!--app-html-->", () => bodyHtml!);
           }
           const buf = Buffer.from(html, "utf-8");
           res.setHeader("content-length", buf.length);
