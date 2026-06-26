@@ -14,6 +14,12 @@ interface SEOHeadProps {
 
 const SITE_NAME = "Awesome Video";
 
+// Canonical base must match the server SITE_URL (server/og-middleware.ts) so the
+// client-hydrated canonical / og:url / og:image never drift to a non-apex host
+// (e.g. the old staging subdomain, a www host, or a preview domain). Like the
+// server, an env override (VITE_SITE_URL) wins; otherwise the official apex.
+const CANONICAL_BASE = (import.meta.env.VITE_SITE_URL || "https://awesome.video").replace(/\/+$/, "");
+
 export default function SEOHead({
   title,
   description,
@@ -25,14 +31,16 @@ export default function SEOHead({
   type = "website"
 }: SEOHeadProps) {
   // Generate dynamic SEO data based on the awesome list
-  const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+  const baseUrl = CANONICAL_BASE;
   // Canonical/og:url must be PATH-ONLY (drop ?query) so filtered views collapse
-  // onto a single indexable URL. Falls back to origin+pathname, never href.
+  // onto a single indexable URL, and must use the fixed apex base (never the
+  // live window.location.origin) so a request served from a non-apex host does
+  // not hydrate a host-specific canonical that contradicts the server.
   const currentUrl =
     url ||
     (typeof window !== 'undefined'
-      ? `${window.location.origin}${window.location.pathname}`
-      : baseUrl);
+      ? `${CANONICAL_BASE}${window.location.pathname}`
+      : CANONICAL_BASE);
 
   const siteTitle = awesomeList?.title || SITE_NAME;
   const siteDescription = awesomeList?.description || "A curated list of awesome resources";

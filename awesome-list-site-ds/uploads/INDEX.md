@@ -1,7 +1,7 @@
-# Production Screenshots — new.awesome.video
+# Production Screenshots — awesome.video
 
 Captured: May 2, 2026
-Production URL: https://new.awesome.video
+Production URL: https://awesome.video
 Total screenshots: 22
 
 ## Public Pages
