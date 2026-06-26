@@ -24,10 +24,14 @@ export interface RouteMeta {
   type: "website" | "article";
   keywords?: string;
   /**
-   * When true the page is a soft-404 (an unknown/non-existent route served as
-   * the SPA shell). buildMetaTags then emits a static `noindex,nofollow` robots
-   * tag and OMITS the self-referencing canonical + og:url so search engines do
-   * not index the invalid URL. The HTTP status is set to 404 by the middleware.
+   * When true the page is excluded from search: buildMetaTags emits a static
+   * `noindex,nofollow` robots tag and OMITS the self-referencing canonical +
+   * og:url. Two cases use this:
+   *   1. Soft-404s (unknown/non-existent route served as the SPA shell) — these
+   *      ALSO get HTTP 404 from the middleware because `found` is false.
+   *   2. Valid utility pages with no search value (e.g. /login, /register) —
+   *      these stay HTTP 200 because `found` is true; only the index signal is
+   *      suppressed. Prerendered body injection is skipped for any noindex page.
    */
   noindex?: boolean;
   /**
@@ -358,10 +362,16 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
     "/login": {
       title: `Sign In — ${SITE_NAME}`,
       description: `Sign in to ${SITE_NAME} to save bookmarks, submit resources, and personalize your learning journey.`,
+      // Utility auth page: thin, duplicate content with no search value. Mark
+      // noindex so it does not compete in search (buildMetaTags then also drops
+      // the canonical/og:url); the route still returns HTTP 200 (found: true).
+      noindex: true,
     },
     "/register": {
       title: `Create an Account — ${SITE_NAME}`,
       description: `Create an ${SITE_NAME} account to save bookmarks, submit resources, and track your learning journeys.`,
+      // Utility auth page — noindex for the same reason as /login.
+      noindex: true,
     },
     "/profile": {
       title: `Profile — ${SITE_NAME}`,
@@ -413,7 +423,7 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
           })),
         });
       } catch {}
-    } else if (path === "/about" || path === "/advanced") {
+    } else if (path === "/about" || path === "/advanced" || path === "/submit") {
       let categories: { name: string; slug: string; count: number }[] = [];
       try {
         const data = await getTreeCached();
