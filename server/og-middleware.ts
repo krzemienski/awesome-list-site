@@ -361,7 +361,7 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
     },
     "/register": {
       title: `Create an Account — ${SITE_NAME}`,
-      description: `Create a ${SITE_NAME} account to save bookmarks, submit resources, and track your learning journeys.`,
+      description: `Create an ${SITE_NAME} account to save bookmarks, submit resources, and track your learning journeys.`,
     },
     "/profile": {
       title: `Profile — ${SITE_NAME}`,

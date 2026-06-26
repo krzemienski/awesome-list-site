@@ -92,9 +92,9 @@ export default function Journeys() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <SEOHead 
+      <SEOHead
         title="Learning Journeys"
-        description="Explore structured learning paths to master new skills"
+        description="Guided multi-step learning paths for video development — from beginner streaming to advanced encoding pipelines. Learn on Awesome Video."
       />
       
       {/* Header */}

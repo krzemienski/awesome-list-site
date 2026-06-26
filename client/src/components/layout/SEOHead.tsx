@@ -13,6 +13,8 @@ interface SEOHeadProps {
 }
 
 const SITE_NAME = "Awesome Video";
+const SITE_TAGLINE =
+  "The curated index of 2,600+ video development resources — players, encoders, codecs, streaming, AI, tools, and community.";
 
 // Canonical base must match the server SITE_URL (server/og-middleware.ts) so the
 // client-hydrated canonical / og:url / og:image never drift to a non-apex host
@@ -36,14 +38,18 @@ export default function SEOHead({
   // onto a single indexable URL, and must use the fixed apex base (never the
   // live window.location.origin) so a request served from a non-apex host does
   // not hydrate a host-specific canonical that contradicts the server.
+  // NOTE: window.location.pathname never includes the query string, so faceted
+  // taxonomy pages (search/sort/tag params pushed via replaceState) always
+  // canonicalize back to the clean base route — matching the server's behaviour.
   const currentUrl =
     url ||
     (typeof window !== 'undefined'
       ? `${CANONICAL_BASE}${window.location.pathname}`
       : CANONICAL_BASE);
 
+  // siteTitle always resolves to the real brand ("Awesome Video") unless an
+  // awesomeList override is explicitly passed — which no public page does.
   const siteTitle = awesomeList?.title || SITE_NAME;
-  const siteDescription = awesomeList?.description || "A curated list of awesome resources";
 
   // Idempotent title builder — never produces a double-brand suffix when the
   // page already passes a title that includes the brand.
@@ -56,13 +62,14 @@ export default function SEOHead({
     ? withBrand(`${category} Resources`)
     : SITE_NAME;
 
-  // Generate dynamic description
+  // Generate dynamic description — all public pages supply an explicit
+  // description; these fallbacks only fire for transient loading states.
   const pageDescription = description || (
-    category 
-      ? `Discover ${resourceCount || 'amazing'} ${category.toLowerCase()} resources in our curated ${siteTitle}. Find the best tools, libraries, and frameworks.`
-      : awesomeList 
-      ? `${siteDescription} Explore ${awesomeList.resources?.length || '2750+'} carefully curated resources across ${awesomeList.categories?.length || '80+'} categories.`
-      : siteDescription
+    category
+      ? `Discover ${resourceCount || 'curated'} ${category.toLowerCase()} resources on ${SITE_NAME}. Find the best tools, libraries, and frameworks for video development.`
+      : awesomeList
+      ? `${awesomeList.description || SITE_TAGLINE} Explore ${awesomeList.resources?.length || '2600+'} carefully curated resources across ${awesomeList.categories?.length || '80+'} categories.`
+      : SITE_TAGLINE
   );
 
   // Generate social sharing image

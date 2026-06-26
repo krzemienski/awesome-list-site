@@ -225,9 +225,9 @@ export default function JourneyDetail() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <SEOHead 
-        title={`${journey.title} - Learning Journey`}
-        description={journey.description}
+      <SEOHead
+        title={`${journey.title} — Learning Journey`}
+        description={journey.description || `Multi-step learning journey on Awesome Video: ${journey.title}.`}
       />
       
       {/* Back Button */}

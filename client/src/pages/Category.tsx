@@ -267,9 +267,11 @@ export default function Category() {
   
   return (
     <div className="space-y-4 sm:space-y-6 overflow-x-hidden max-w-full">
-      <SEOHead 
+      <SEOHead
         title={`${categoryName} Resources`}
-        description={`Browse ${allResources.length} video development resources in the ${categoryName} category.`}
+        description={`Browse ${allResources.length} curated ${categoryName.toLowerCase()} resources for video development on Awesome Video.`}
+        category={categoryName}
+        resourceCount={allResources.length}
       />
       
       <div className="space-y-3 sm:space-y-4">
