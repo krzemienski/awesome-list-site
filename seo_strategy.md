@@ -25,8 +25,9 @@
 
 ## Technical SEO notes
 - Public routes are SPA-rendered in production; `server/ssr.ts` is currently disabled.
-- `server/og-middleware.ts` injects route-specific title, description, canonical, Open Graph, and Twitter tags into the HTML shell before it is served.
-- Social crawlers can see route-specific head metadata, but AI crawlers and other non-JavaScript bots still receive very little route body content in static HTML.
+- `server/og-middleware.ts` injects route-specific title, description, canonical, Open Graph, Twitter, and JSON-LD tags into the HTML shell before it is served.
+- Core discovery routes (`/`, taxonomy pages, resource pages, `/journeys`, and `/journey/:id`) also receive server-injected semantic body HTML for non-JavaScript crawlers.
+- Remaining utility/support routes such as `/submit`, `/login`, and `/register` still rely on client rendering for their body content unless explicitly prerendered or marked noindex.
 
 ## Dismissed categories
 - (None yet)
