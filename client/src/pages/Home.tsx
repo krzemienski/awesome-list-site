@@ -170,7 +170,6 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
   if (isLoading) {
     return (
       <div className="space-y-6" aria-busy={true} aria-live="polite">
-        <SEOHead title="Loading - Awesome Video Resources" />
         <div className="space-y-4">
           <Skeleton className="h-10 w-80" />
           <Skeleton className="h-6 w-96" />
@@ -187,7 +186,6 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
   if (!awesomeList) {
     return (
       <div className="space-y-6">
-        <SEOHead title="Error - Awesome Video Resources" />
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Error Loading Resources</h1>
           <p className="text-muted-foreground">Please try refreshing the page.</p>

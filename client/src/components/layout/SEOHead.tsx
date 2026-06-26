@@ -10,6 +10,13 @@ interface SEOHeadProps {
   category?: string;
   resourceCount?: number;
   type?: "website" | "article";
+  /**
+   * When true, emit a noindex/nofollow robots directive and omit the canonical
+   * link so this state matches the server's soft-404 contract (og-middleware
+   * marks missing resources noindex with no canonical). Used by error/not-found
+   * branches so client hydration never re-asserts indexability on a dead URL.
+   */
+  noindex?: boolean;
 }
 
 const SITE_NAME = "Awesome Video";
@@ -30,7 +37,8 @@ export default function SEOHead({
   awesomeList,
   category,
   resourceCount,
-  type = "website"
+  type = "website",
+  noindex = false
 }: SEOHeadProps) {
   // Generate dynamic SEO data based on the awesome list
   const baseUrl = CANONICAL_BASE;
@@ -85,14 +93,14 @@ export default function SEOHead({
       <meta name="description" content={pageDescription} />
       <meta name="keywords" content={generateKeywords(awesomeList, category)} />
       <meta name="author" content={repoInfo ? `${repoInfo.owner} contributors` : `${SITE_NAME} contributors`} />
-      <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-      <link rel="canonical" href={currentUrl} />
+      <meta name="robots" content={noindex ? "noindex, nofollow" : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"} />
+      {!noindex && <link rel="canonical" href={currentUrl} />}
 
       {/* Open Graph Meta Tags */}
       <meta property="og:type" content={type} />
       <meta property="og:title" content={pageTitle} />
       <meta property="og:description" content={pageDescription} />
-      <meta property="og:url" content={currentUrl} />
+      {!noindex && <meta property="og:url" content={currentUrl} />}
       <meta property="og:image" content={socialImage} />
       <meta property="og:image:alt" content={`${siteTitle} - ${pageDescription.substring(0, 100)}...`} />
       <meta property="og:image:width" content="1200" />
@@ -131,7 +139,7 @@ export default function SEOHead({
           client deliberately ships none to avoid duplicate/conflicting graphs. */}
 
       {/* Additional Meta for iMessage and Social Previews */}
-      <meta property="al:web:url" content={currentUrl} />
+      {!noindex && <meta property="al:web:url" content={currentUrl} />}
       {repoInfo && (
         <>
           <meta property="article:author" content={repoInfo.owner} />

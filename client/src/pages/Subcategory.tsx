@@ -156,7 +156,6 @@ export default function Subcategory() {
   if (isLoading) {
     return (
       <div className="space-y-6" aria-busy={true} aria-live="polite">
-        <SEOHead title="Loading..." />
         <h1 className="sr-only">Loading subcategory…</h1>
         <div className="space-y-4">
           <Skeleton className="h-10 w-64" />
@@ -174,7 +173,6 @@ export default function Subcategory() {
   if (error) {
     return (
       <div className="space-y-6">
-        <SEOHead title="Error" />
         <h1 className="sr-only">Subcategory error</h1>
         <div className="text-center py-12">
           <h2 className="text-xl font-semibold mb-2">Error Loading Subcategory</h2>

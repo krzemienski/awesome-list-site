@@ -234,7 +234,7 @@ export default function ResourceDetail() {
   if (error || !resource) {
     return (
       <div className="space-y-4 sm:space-y-6 max-w-4xl mx-auto px-0 sm:px-4">
-        <SEOHead title="Resource Not Found" />
+        <SEOHead title="Resource Not Found" noindex />
         <h1 className="sr-only">Resource Not Found</h1>
         <div className="text-center py-12">
           <h2 className="text-2xl font-bold mb-4">Resource Not Found</h2>
