@@ -341,7 +341,7 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
   const staticRoutes: Record<string, Partial<RouteMeta>> = {
     "/about": {
       title: `About — ${SITE_NAME}`,
-      description: `Learn about ${SITE_NAME}, the open-source index of video development resources, and the team behind it.`,
+      description: `Learn about ${SITE_NAME} — the web home of the awesome-video curated list by Nick Krzemienski — and awesome-list-site, the open-source platform that powers it.`,
     },
     "/advanced": {
       title: `Advanced — ${SITE_NAME}`,

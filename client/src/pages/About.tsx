@@ -14,7 +14,8 @@ import {
   Rocket,
   Heart,
   Users,
-  Github
+  Github,
+  ExternalLink
 } from "lucide-react";
 
 export default function About() {
@@ -24,7 +25,7 @@ export default function About() {
         <title>About — Awesome Video</title>
         <meta
           name="description"
-          content="Learn about Awesome Video, the open-source index of 2,600+ video development resources, and the team behind it."
+          content="Learn about Awesome Video — the web home of the awesome-video curated list by Nick Krzemienski — and awesome-list-site, the open-source platform that powers it."
         />
       </Helmet>
 
@@ -36,30 +37,81 @@ export default function About() {
           </h1>
         </div>
         <p className="text-base sm:text-lg text-[color:var(--text-2)] max-w-3xl leading-relaxed">
-          An SEO-friendly, mobile-first platform that transforms GitHub's curated "Awesome Lists"
-          into beautiful, searchable websites.
+          awesome.video is the web home of{" "}
+          <span className="font-semibold text-foreground">awesome-video</span> — a community-curated
+          list of the best streaming and video-development tools, frameworks, libraries, and learning
+          resources, maintained by Nick Krzemienski on GitHub.
         </p>
       </div>
 
+      {/* The source list & the platform */}
       <Card className="mb-4">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Rocket className="h-5 w-5 text-[var(--accent)]" />
-            What is this?
+            <Github className="h-5 w-5 text-[var(--accent)]" />
+            Open source at its core
           </CardTitle>
           <CardDescription>
-            Following the tradition of awesome repositories
+            The curated list that feeds this site, and the platform that renders it
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-foreground">
-            Awesome Video is an SEO-friendly, mobile-first website that transforms
-            GitHub's curated "Awesome Lists" into beautiful, searchable websites.
-          </p>
-          <p className="text-muted-foreground">
-            This project follows the tradition of the "awesome" repositories on GitHub,
-            which are community-curated lists of resources on various technologies and topics.
-          </p>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <a
+              href="https://github.com/krzemienski/awesome-video"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex flex-col gap-3 p-5 border border-[var(--border)] bg-[var(--surface)] rounded-[var(--radius-sm)] hover:border-[color-mix(in_srgb,var(--accent)_60%,transparent)] transition-colors"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Github className="h-5 w-5 text-[var(--accent)] group-hover:scale-110 transition-transform" />
+                  <span className="font-semibold">awesome-video</span>
+                </div>
+                <ExternalLink className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                A curated list of awesome streaming video tools, frameworks, libraries, and learning
+                resources. Every resource on this site is sourced from and kept in sync with this
+                repository.
+              </p>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span className="px-2 py-0.5 border border-[var(--border)] rounded-[var(--radius-sm)]">
+                  The source list
+                </span>
+                <span className="px-2 py-0.5 border border-[var(--border)] rounded-[var(--radius-sm)]">
+                  CC0-1.0
+                </span>
+              </div>
+            </a>
+            <a
+              href="https://github.com/krzemienski/awesome-list-site"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex flex-col gap-3 p-5 border border-[var(--border)] bg-[var(--surface)] rounded-[var(--radius-sm)] hover:border-[color-mix(in_srgb,var(--accent)_60%,transparent)] transition-colors"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Rocket className="h-5 w-5 text-[var(--accent)] group-hover:scale-110 transition-transform" />
+                  <span className="font-semibold">awesome-list-site</span>
+                </div>
+                <ExternalLink className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                The open-source platform that powers this site — it transforms any GitHub awesome list
+                into a sophisticated, interactive web dashboard with AI-powered enhancements, advanced
+                search, and modern UI components.
+              </p>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span className="px-2 py-0.5 border border-[var(--border)] rounded-[var(--radius-sm)]">
+                  The engine
+                </span>
+                <span className="px-2 py-0.5 border border-[var(--border)] rounded-[var(--radius-sm)]">
+                  MIT
+                </span>
+              </div>
+            </a>
+          </div>
         </CardContent>
       </Card>
 
@@ -212,15 +264,15 @@ export default function About() {
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <a
-                href="https://github.com/sindresorhus/awesome"
+                href="https://github.com/krzemienski"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 p-4 border border-[var(--border)] bg-[var(--surface)] rounded-[var(--radius-sm)] hover:border-[color-mix(in_srgb,var(--accent)_60%,transparent)] transition-colors group"
               >
                 <Users className="h-5 w-5 text-[var(--accent)] group-hover:scale-110 transition-transform" />
                 <div>
-                  <div className="font-semibold text-sm">Awesome List</div>
-                  <div className="text-xs text-muted-foreground">Community</div>
+                  <div className="font-semibold text-sm">Nick Krzemienski</div>
+                  <div className="text-xs text-muted-foreground">Maintainer</div>
                 </div>
               </a>
               <a
