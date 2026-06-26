@@ -280,7 +280,7 @@ export default function Advanced() {
               Browse All Resources
             </a>
             <a 
-              href="/category/web-frameworks" 
+              href={awesomeList.categories?.[0]?.slug ? `/category/${awesomeList.categories[0].slug}` : "/"} 
               className="inline-flex items-center gap-2 px-4 py-2 border border-border rounded-md hover:bg-accent transition-colors"
             >
               Explore Categories
