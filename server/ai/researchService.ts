@@ -463,8 +463,8 @@ Database state: ${ctx.totalResources} approved resources across ${ctx.totalDomai
     let totalCacheRead = 0;
     let webSearchCount = 0;
     let turnsUsed = 0;
-    let consecutiveZeroDiscoveryTurns = 0;
-    let lastDiscoveryCount = 0;
+    let consecutiveStallTurns = 0;
+    let totalDiscoveriesSaved = 0;
     const agentLog: Array<{ role: string; content: string; timestamp: string }> = [];
 
     const persist = async (extra: Record<string, any> = {}) => {
