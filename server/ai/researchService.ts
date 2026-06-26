@@ -425,15 +425,22 @@ ${ctx.focusUrlsBlock}
 
 ==== WORKFLOW ====
 
-1. If you haven't already, call get_coverage_gaps to confirm the top 3-5 gaps.
-2. Pick ONE specific gap (a subcategory with low count). Plan a web_search that targets THAT gap. Examples of good queries:
-   • "open source AV1 encoder benchmark 2025"   (gap: Benchmarking & Performance Tools for Codecs, n=1)
-   • "WebRTC player smart TV embedded"            (gap: Embedded Players, n=1)
-   • "peer-to-peer HLS streaming library"         (gap: Peer-to-Peer Streaming Solutions, n=1)
-3. AVOID queries that will return obvious already-covered hits (mediasoup, hls.js, ffmpeg, Bitmovin, etc — see SATURATED DOMAINS).
-4. For each candidate from web_search results, call check_duplicate(url) BEFORE saving.
-5. If new AND confidence ≥ 70, call save_discovery with full metadata.
-6. Pivot: if a search yields only duplicates, do NOT re-search the same term — pick a different gap from get_coverage_gaps.
+1. If you haven't already, call get_coverage_gaps to confirm the top gaps. Keep that list — you will rotate through SEVERAL gaps in one run, not just one.
+2. Pick ONE specific gap (a subcategory with low count). Plan a NARROW web_search that targets THAT gap (protocol + use-case + "open source"/"github"), e.g.:
+   • "open source AV1 encoder benchmark github"   (gap: Benchmarking & Performance Tools for Codecs)
+   • "WebRTC player smart TV embedded"            (gap: Embedded Players)
+   • "peer-to-peer HLS streaming library"         (gap: Peer-to-Peer Streaming Solutions)
+   Avoid broad "best X 2025" phrasing — it returns SEO listicles, not the tools themselves.
+3. MINE aggregators, don't discard them. A "Top 10…", awesome-list, or roundup is NOT savable itself, but the individual tools/projects it names usually ARE: pull the specific names out of the results, then web_search each one directly (its GitHub repo / official site) and evaluate THAT.
+4. High-yield venues when a generic search dries up:
+   • "site:github.com <topic>" — active open-source projects (prefer maintained repos)
+   • "<topic> site:news.ycombinator.com" — Show HN launches
+   • Demuxed / Mux / Streaming Media / IBC / NAB talks & write-ups — mine for named tools
+   • arxiv.org / dl.acm.org — new codec & streaming research, follow through to companion code
+   • other awesome-* lists adjacent to video — mine their entries
+5. AVOID re-surfacing already-covered hits (mediasoup, hls.js, ffmpeg, Bitmovin, etc — see SATURATED DOMAINS).
+6. For each candidate, call check_duplicate(url) BEFORE saving. If it's new, relevant, and quality (confidence ≥ 70), call save_discovery RIGHT THEN — never leave a fresh non-duplicate unsaved.
+7. Pivot, don't quit: if a search yields only duplicates/listicles, do NOT re-run the same term — switch to a different gap or a different venue from step 4. Keep going across multiple gaps until you've made several genuine, varied attempts.
 
 ==== HARD RULES ====
 
@@ -442,7 +449,7 @@ R2. ALWAYS check_duplicate BEFORE save_discovery.
 R3. Skip anything from the SATURATED DOMAINS list unless the specific resource is exceptional.
 R4. Skip generic "what is WebRTC" intro articles, marketing blog posts from streaming vendors, and SEO listicles. Prefer: actively maintained open-source projects, official docs from niche vendors, conference talks (Demuxed, IBC, NAB), academic papers (ACM/IEEE/arXiv), small specialized tools, individual developer blogs with real technical depth.
 R5. Confidence < 70 → don't save. Quality > quantity.
-R6. STOP early if you've saved 5+ high-quality discoveries OR if you've hit two consecutive search rounds with only duplicates.
+R6. Be persistent — do NOT quit at the first duplicates. The best resources live in the long tail. When a vein runs dry, pivot (different gap, mine a listicle's named tools, try GitHub/Show HN/arXiv) and keep searching. Only wind down once you've genuinely exhausted varied attempts across multiple gaps. Quality > quantity, but persistence is how you surface the new stuff.
 
 Database state: ${ctx.totalResources} approved resources across ${ctx.totalDomains} distinct domains.`;
 
@@ -497,12 +504,27 @@ Database state: ${ctx.totalResources} approved resources across ${ctx.totalDomai
 
     // Cache the tools array too (breakpoint on the last tool).
     const toolsForClaude: any[] = [
-      { type: "web_search_20250305", name: "web_search", max_uses: Math.min(maxTurns, 12) },
+      { type: "web_search_20250305", name: "web_search", max_uses: Math.max(15, Math.min(maxTurns * 2, 250)) },
       ...researchTools.slice(0, -1),
       { ...researchTools[researchTools.length - 1], cache_control: { type: 'ephemeral' } },
     ];
 
-    const HARD_STOP_DISCOVERIES = 5;
+    // Scale the discovery cap with budget so a large-budget run isn't capped at a
+    // handful of saves. The budget gate remains the primary cost control.
+    const HARD_STOP_DISCOVERIES = Math.max(10, Math.min(200, Math.round(maxBudgetUsd * 5)));
+
+    // Patience before giving up. We no longer bail at the first couple of
+    // duplicate-only turns; instead we escalate with a strategy-pivot nudge and
+    // only hard-stop after sustained stalling well past that nudge.
+    const STALL_NUDGE_THRESHOLD = 3;   // re-nudge every N consecutive unproductive search turns
+    const STALL_HARD_THRESHOLD = 8;    // give up only after this many consecutive unproductive search turns
+    const STALL_PIVOT_NUDGE =
+`STRATEGY PIVOT REQUIRED. Your recent searches only surfaced duplicates, listicles, or nothing savable. Do NOT repeat similar queries — change approach now:
+1. Pick a DIFFERENT under-served gap: call get_coverage_gaps again and choose a subcategory you have NOT searched yet this run.
+2. MINE aggregators instead of skipping them. A "Top 10…" listicle or awesome-list is not savable itself, but the individual tools it names usually are — extract specific project names, then web_search each one directly (its GitHub repo / official site) and check_duplicate it.
+3. Go to source-rich venues: "site:github.com <topic>", "<topic> site:news.ycombinator.com" (Show HN), Demuxed/Mux/Streaming Media talks, arxiv.org / dl.acm.org research with companion code, and other awesome-* lists adjacent to video.
+4. When check_duplicate returns false on a genuinely relevant, quality resource, SAVE it (confidence ≥ 70) before moving on — never leave a fresh non-duplicate unsaved.
+5. Make queries narrow and specific (protocol + use-case + "open source"/"github"), not broad "best X 2025" phrasing.`;
 
     while (turnsUsed < maxTurns) {
       const activeJob = this.activeJobs.get(jobId);
@@ -520,8 +542,8 @@ Database state: ${ctx.totalResources} approved resources across ${ctx.totalDomai
         await addLog('system', `Budget limit reached before turn ${turnsUsed + 1} ($${preTurnCost.toFixed(4)} >= $${maxBudgetUsd})`, true);
         break;
       }
-      if (lastDiscoveryCount >= HARD_STOP_DISCOVERIES) {
-        await addLog('system', `Hard stop: reached ${lastDiscoveryCount} discoveries (threshold ${HARD_STOP_DISCOVERIES}). Ending run to preserve quality and budget.`, true);
+      if (totalDiscoveriesSaved >= HARD_STOP_DISCOVERIES) {
+        await addLog('system', `Hard stop: reached ${totalDiscoveriesSaved} discoveries (threshold ${HARD_STOP_DISCOVERIES}). Ending run to preserve quality and budget.`, true);
         break;
       }
 
@@ -645,13 +667,17 @@ Database state: ${ctx.totalResources} approved resources across ${ctx.totalDomai
 
       const toolResults: Anthropic.Messages.ToolResultBlockParam[] = [];
       let turnDiscoveries = 0;
+      let turnNonDupCandidates = 0;
       for (const toolBlock of toolUseBlocks) {
         await addLog('tool_call', `${toolBlock.name}(${JSON.stringify(toolBlock.input)})`);
         const toolStarted = Date.now();
         try {
           const result = await this.handleToolCall(toolBlock.name, toolBlock.input, jobId);
           await addLog('tool_result', `${toolBlock.name} (${Date.now() - toolStarted}ms) → ${result}`);
-          if (toolBlock.name === 'save_discovery' && JSON.parse(result).saved) turnDiscoveries++;
+          let parsed: any = {};
+          try { parsed = JSON.parse(result); } catch { /* non-JSON tool result */ }
+          if (toolBlock.name === 'save_discovery' && parsed.saved) turnDiscoveries++;
+          if (toolBlock.name === 'check_duplicate' && parsed.isDuplicate === false) turnNonDupCandidates++;
           toolResults.push({ type: "tool_result", tool_use_id: toolBlock.id, content: result });
         } catch (err: any) {
           const errorMsg = err.message || String(err);
@@ -663,22 +689,37 @@ Database state: ${ctx.totalResources} approved resources across ${ctx.totalDomai
         }
       }
 
-      messages.push({ role: "user", content: toolResults });
+      totalDiscoveriesSaved += turnDiscoveries;
 
-      // Early-stop heuristic: 2 consecutive turns with web_search but 0 new
-      // discoveries → agent is stuck in a duplicate loop, bail.
-      const [jobRow] = await db.select({ totalDiscoveries: researchJobs.totalDiscoveries })
-        .from(researchJobs).where(eq(researchJobs.id, jobId));
-      const newSinceLast = (jobRow?.totalDiscoveries || 0) - lastDiscoveryCount;
-      lastDiscoveryCount = jobRow?.totalDiscoveries || 0;
-      if (turnWebSearches > 0 && newSinceLast === 0) {
-        consecutiveZeroDiscoveryTurns++;
-        if (consecutiveZeroDiscoveryTurns >= 2) {
-          await addLog('system', `Early stop: ${consecutiveZeroDiscoveryTurns} consecutive search turns with 0 new discoveries — agent is hitting duplicates only.`, true);
-          break;
-        }
-      } else if (newSinceLast > 0) {
-        consecutiveZeroDiscoveryTurns = 0;
+      // Stall tracking. A turn only counts as "stalling" when it ran web
+      // searches yet surfaced NEITHER a saved discovery NOR a single fresh
+      // (non-duplicate) candidate. Finding non-dup candidates — even ones not
+      // yet saved — means the agent is on a live trail, so reset the counter.
+      const productiveTurn = turnDiscoveries > 0 || turnNonDupCandidates > 0;
+      if (turnWebSearches > 0 && !productiveTurn) {
+        consecutiveStallTurns++;
+      } else if (productiveTurn) {
+        consecutiveStallTurns = 0;
+      }
+
+      // Escalate before quitting: when stalling, inject a strategy-pivot nudge
+      // (as a text block appended to the tool_result user turn, so role
+      // alternation stays valid) and let the agent try fresh angles. Re-nudge
+      // periodically; only hard-stop after sustained stalling past the nudges.
+      const stalledOut = consecutiveStallTurns >= STALL_HARD_THRESHOLD;
+      let pivotNudge: string | null = null;
+      if (!stalledOut && consecutiveStallTurns > 0 && consecutiveStallTurns % STALL_NUDGE_THRESHOLD === 0) {
+        pivotNudge = STALL_PIVOT_NUDGE;
+        await addLog('system', `Stall detected (${consecutiveStallTurns} consecutive unproductive search turns) — injecting strategy-pivot nudge instead of stopping.`, true);
+      }
+
+      const userContent: any[] = [...toolResults];
+      if (pivotNudge) userContent.push({ type: 'text', text: pivotNudge });
+      messages.push({ role: "user", content: userContent });
+
+      if (stalledOut) {
+        await addLog('system', `Early stop: ${consecutiveStallTurns} consecutive unproductive search turns even after strategy-pivot nudges — gaps appear exhausted for this run.`, true);
+        break;
       }
     }
 
