@@ -273,7 +273,7 @@ function buildOgSvg(pageTitle: string, category: string | undefined, count: stri
           font-size="22" font-style="italic" font-weight="600" fill="#ff3d52">.video</text>
     <text x="76" y="50" font-family="'Inter','Helvetica Neue',sans-serif"
           font-size="14" font-weight="500" fill="#a8a4a0"
-          letter-spacing="1">new.awesome.video</text>
+          letter-spacing="1">awesome.video</text>
   </g>
 
   <!-- Resource count chip on the right (matches DS .chip surface) -->

@@ -1,4 +1,4 @@
-# robots.txt for Awesome Video (https://new.awesome.video)
+# robots.txt for Awesome Video (https://awesome.video)
 
 User-agent: *
 Allow: /
@@ -21,7 +21,7 @@ Disallow: /bookmarks
 Disallow: /settings/
 
 # Sitemap (absolute URL — required by spec)
-Sitemap: https://new.awesome.video/sitemap.xml
+Sitemap: https://awesome.video/sitemap.xml
 
 Crawl-delay: 1
 

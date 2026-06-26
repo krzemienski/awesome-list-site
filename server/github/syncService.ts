@@ -192,7 +192,7 @@ export class GitHubSyncService {
 
   constructor(githubToken?: string) {
     this.client = new GitHubClient(githubToken);
-    this.websiteUrl = process.env.WEBSITE_URL || 'https://awesome-list.com';
+    this.websiteUrl = process.env.WEBSITE_URL || 'https://awesome.video';
     this.categoryRepo = new CategoryRepository();
     this.resourceRepo = new ResourceRepository();
     this.auditRepo = new AuditRepository();

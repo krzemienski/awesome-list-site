@@ -10,7 +10,7 @@ import {
 } from "./seo-content";
 
 export const SITE_URL =
-  process.env.PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://new.awesome.video";
+  process.env.PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://awesome.video";
 export const SITE_NAME = "Awesome Video";
 export const SITE_TAGLINE =
   "The curated index of 2,600+ video development resources — players, encoders, codecs, streaming, AI, tools, and community.";

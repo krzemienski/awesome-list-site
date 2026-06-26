@@ -30,7 +30,7 @@ async function testAwesomeLint() {
       description: 'A curated list of awesome video resources, tools, and learning materials.',
       includeContributing: true,
       includeLicense: true,
-      websiteUrl: 'https://awesome-video.replit.app',
+      websiteUrl: 'https://awesome.video',
       repoUrl: 'https://github.com/krzemienski/awesome-video'
     });
 

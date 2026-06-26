@@ -33,7 +33,7 @@ export async function fetchUrlMetadata(url: string, timeout: number = 10000): Pr
 
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; AwesomeVideoBot/1.0; +https://awesome-video.repl.co)',
+        'User-Agent': 'Mozilla/5.0 (compatible; AwesomeVideoBot/1.0; +https://awesome.video)',
         'Accept': 'text/html,application/xhtml+xml',
       },
       signal: controller.signal,
@@ -67,7 +67,7 @@ async function generateBlurhash(imageUrl: string): Promise<string | undefined> {
   try {
     const response = await fetch(imageUrl, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; AwesomeVideoBot/1.0; +https://awesome-video.repl.co)',
+        'User-Agent': 'Mozilla/5.0 (compatible; AwesomeVideoBot/1.0; +https://awesome.video)',
       },
       timeout: 5000,
       size: 2 * 1024 * 1024 // 2MB max for images

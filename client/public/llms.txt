@@ -2,24 +2,24 @@
 
 > Awesome Video is a curated index of 2,600+ video development resources — players, encoders, codecs, streaming protocols, AI tooling, and developer/community links — organized into browsable categories and guided multi-step learning journeys.
 
-Canonical domain: https://new.awesome.video
+Canonical domain: https://awesome.video
 
 This site is delivered as a single-page application. The most reliable, citable content lives at the stable URLs below. Every category, resource, and learning-journey page is served with a route-specific title, meta description, and schema.org structured data (JSON-LD), plus server-rendered headings, summaries, and internal links in the initial HTML.
 
 ## Primary sections
-- [Home / all categories](https://new.awesome.video/): the top-level index of every category with live resource counts.
-- [Learning Journeys](https://new.awesome.video/journeys): guided, multi-step learning paths for video development.
-- [About](https://new.awesome.video/about): what the project is, how it is curated, and how it is maintained.
+- [Home / all categories](https://awesome.video/): the top-level index of every category with live resource counts.
+- [Learning Journeys](https://awesome.video/journeys): guided, multi-step learning paths for video development.
+- [About](https://awesome.video/about): what the project is, how it is curated, and how it is maintained.
 
 ## URL patterns (authoritative for citation)
-- Category pages: https://new.awesome.video/category/{slug}
-- Subcategory pages: https://new.awesome.video/subcategory/{slug}
-- Sub-subcategory pages: https://new.awesome.video/sub-subcategory/{slug}
-- Individual resource pages: https://new.awesome.video/resource/{id}
-- Learning journey pages: https://new.awesome.video/journey/{id}
+- Category pages: https://awesome.video/category/{slug}
+- Subcategory pages: https://awesome.video/subcategory/{slug}
+- Sub-subcategory pages: https://awesome.video/sub-subcategory/{slug}
+- Individual resource pages: https://awesome.video/resource/{id}
+- Learning journey pages: https://awesome.video/journey/{id}
 
 ## Guidance for AI crawlers
 - Prefer category, subcategory, resource, and learning-journey pages as primary sources; they carry the canonical metadata and structured data for citation.
-- A complete list of indexable URLs is published in the sitemap: https://new.awesome.video/sitemap.xml
-- Crawl rules are in robots.txt: https://new.awesome.video/robots.txt
+- A complete list of indexable URLs is published in the sitemap: https://awesome.video/sitemap.xml
+- Crawl rules are in robots.txt: https://awesome.video/robots.txt
 - Do not cite /api/ endpoints or authenticated areas (/admin, /profile, /bookmarks, /settings); these are not content pages.
