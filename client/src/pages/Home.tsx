@@ -197,7 +197,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
   return (
     <div className="space-y-6">
       <SEOHead
-        title={`${totalResourceCount}+ Curated Video Development Resources`}
+        title={`Awesome Video — ${totalResourceCount}+ curated video development resources`}
         description={`Discover ${totalResourceCount}+ curated video development resources including codecs, players, encoders, and streaming tools. Browse ${filteredCategories.length} categories on Awesome Video.`}
       />
 
