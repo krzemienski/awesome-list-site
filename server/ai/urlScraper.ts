@@ -65,13 +65,18 @@ export async function fetchUrlMetadata(url: string, timeout: number = 10000): Pr
 
 async function generateBlurhash(imageUrl: string): Promise<string | undefined> {
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
     const response = await fetch(imageUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; AwesomeVideoBot/1.0; +https://awesome.video)',
       },
-      timeout: 5000,
+      signal: controller.signal,
       size: 2 * 1024 * 1024 // 2MB max for images
     });
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       return undefined;

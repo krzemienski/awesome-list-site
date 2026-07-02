@@ -64,12 +64,13 @@ export class GithubSyncRepository {
    * @param status - New status ('pending', 'processing', 'completed', 'failed')
    * @param errorMessage - Optional error message if status is 'failed'
    */
-  async updateGithubSyncStatus(id: number, status: string, errorMessage?: string): Promise<void> {
+  async updateGithubSyncStatus(id: number, status: string, errorMessage?: string, metadata?: Record<string, any>): Promise<void> {
     await db
       .update(githubSyncQueue)
       .set({
         status,
         errorMessage,
+        ...(metadata !== undefined ? { metadata } : {}),
         processedAt: status === 'completed' || status === 'failed' ? new Date() : null
       })
       .where(eq(githubSyncQueue.id, id));

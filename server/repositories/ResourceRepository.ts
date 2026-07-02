@@ -62,8 +62,8 @@ export class ResourceRepository {
     const { page = 1, limit = 20, status, category, subcategory, userId, search } = options;
     const offset = (page - 1) * limit;
 
-    let query = db.select().from(resources);
-    let countQuery = db.select({ count: sql<number>`count(*)::int` }).from(resources);
+    let query = db.select().from(resources).$dynamic();
+    let countQuery = db.select({ count: sql<number>`count(*)::int` }).from(resources).$dynamic();
 
     const conditions = [];
 

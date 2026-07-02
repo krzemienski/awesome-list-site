@@ -71,21 +71,21 @@ export default function ResourceRecommendations({
       resource: item.resource,
       score: item.score * 100, // Convert 0-1 to 0-100 for display
       confidence: item.confidence,
-      reasons: [item.reason],
+      reasons: item.reasons,
       relationshipType: item.relationshipType
     })) || [],
     prerequisites: relatedResourcesData?.prerequisites?.map(item => ({
       resource: item.resource,
       score: item.score * 100,
       confidence: item.confidence,
-      reasons: [item.reason],
+      reasons: item.reasons,
       relationshipType: item.relationshipType
     })) || [],
     nextSteps: relatedResourcesData?.nextSteps?.map(item => ({
       resource: item.resource,
       score: item.score * 100,
       confidence: item.confidence,
-      reasons: [item.reason],
+      reasons: item.reasons,
       relationshipType: item.relationshipType
     })) || []
   };

@@ -2,11 +2,9 @@ import type { ViteDevServer } from 'vite';
 import type { Request, Response, NextFunction } from 'express';
 import fs from 'fs';
 import path from 'path';
-import { LegacyRepository } from './repositories';
+import { storage } from './storage';
 
 export async function setupSSRDev(vite: ViteDevServer) {
-  const legacyRepo = new LegacyRepository();
-
   return async function ssrMiddleware(req: Request, res: Response, next: NextFunction) {
     const url = req.originalUrl;
 
@@ -32,7 +30,7 @@ export async function setupSSRDev(vite: ViteDevServer) {
       const { render } = await vite.ssrLoadModule('/src/entry-server.tsx');
 
       // Get awesome list data from storage
-      const awesomeListData = legacyRepo.getAwesomeListData();
+      const awesomeListData = storage.getAwesomeListData();
       
       // Render the app
       const { html, dehydratedState } = render({

@@ -62,7 +62,7 @@ export interface ValidationStorageItem {
 export interface ValidationResults {
   awesomeLint?: any;
   linkCheck?: any;
-  lastUpdated?: string;
+  lastUpdated?: string | null;
 }
 
 /**

@@ -199,7 +199,7 @@ export interface MultiSelectFieldConfig {
 /**
  * Default toolbar configuration for rich text editor
  */
-const DEFAULT_TOOLBAR: RichTextFieldConfig["toolbar"] = [
+const DEFAULT_TOOLBAR: NonNullable<RichTextFieldConfig["toolbar"]> = [
   "bold", "italic", "underline", "strikethrough", "link", "heading", "list", "orderedList", "quote", "code"
 ];
 
@@ -477,7 +477,7 @@ function MultiSelect({ value, onChange, config, id, "data-testid": testId }: Mul
             ) : (
               filteredOptions.map((option) => {
                 const isSelected = value.includes(option.value);
-                const isDisabled = !isSelected && maxItems && value.length >= maxItems;
+                const isDisabled = !isSelected && !!maxItems && value.length >= maxItems;
                 return (
                   <button
                     key={option.value}
@@ -682,13 +682,13 @@ export interface CustomFieldConfig {
  * ];
  * ```
  */
-export interface ColumnConfig {
+export interface ColumnConfig<T extends BaseEntityWithCount = BaseEntityWithCount> {
   key: string;
   label: string;
   width?: string;
   align?: "left" | "center" | "right";
   className?: string;
-  render?: (item: BaseEntityWithCount, parentData?: Record<string, BaseEntityWithCount[]>) => ReactNode;
+  render?: (item: T, parentData?: Record<string, BaseEntityWithCount[]>) => ReactNode;
   /** Field-level permissions - controls column visibility */
   permissions?: FieldPermissions;
 }
@@ -771,7 +771,7 @@ export interface GenericCrudManagerProps<T extends BaseEntityWithCount> {
   testIdEntity: string;
   testIdEntityPlural: string;
   parents?: ParentConfig[];
-  columns: ColumnConfig[];
+  columns: ColumnConfig<T>[];
   createDialogTitle: string;
   createDialogDescription: string;
   editDialogTitle: string;
@@ -2079,11 +2079,11 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     // Build payload (FormData if files present, otherwise JSON)
     if (shouldUseFormData && Object.values(fileData).some(f => f !== null)) {
       const formDataPayload = new FormData();
-      formDataPayload.append("name", formData.name);
-      formDataPayload.append("slug", formData.slug);
+      formDataPayload.append("name", String(formData.name));
+      formDataPayload.append("slug", String(formData.slug));
 
       parents.forEach(parent => {
-        formDataPayload.append(parent.fieldName, formData[parent.fieldName]);
+        formDataPayload.append(parent.fieldName, String(formData[parent.fieldName]));
       });
 
       // Add custom fields
@@ -2116,7 +2116,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       };
 
       parents.forEach(parent => {
-        payload[parent.fieldName] = parseInt(formData[parent.fieldName]);
+        payload[parent.fieldName] = parseInt(String(formData[parent.fieldName]));
       });
 
       // Add custom fields (non-file)
@@ -2148,7 +2148,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     const requiredFields = ["name", "slug", ...parents.map(p => p.fieldName)];
     const requiredCustomFields = customFields.filter(f => f.required && f.type !== "file").map(f => f.name);
 
-    const missingFields = [...requiredFields, ...requiredCustomFields].filter(field => !formData[field]?.trim());
+    const missingFields = [...requiredFields, ...requiredCustomFields].filter(field => !(formData[field] as string)?.trim());
 
     if (missingFields.length > 0) {
       const fieldLabels = missingFields.map(field => {
@@ -2188,11 +2188,11 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     // Build payload (FormData if files present, otherwise JSON)
     if (shouldUseFormData && Object.values(fileData).some(f => f !== null)) {
       const formDataPayload = new FormData();
-      formDataPayload.append("name", formData.name);
-      formDataPayload.append("slug", formData.slug);
+      formDataPayload.append("name", String(formData.name));
+      formDataPayload.append("slug", String(formData.slug));
 
       parents.forEach(parent => {
-        formDataPayload.append(parent.fieldName, formData[parent.fieldName]);
+        formDataPayload.append(parent.fieldName, String(formData[parent.fieldName]));
       });
 
       // Add custom fields
@@ -2229,7 +2229,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       };
 
       parents.forEach(parent => {
-        payload[parent.fieldName] = parseInt(formData[parent.fieldName]);
+        payload[parent.fieldName] = parseInt(String(formData[parent.fieldName]));
       });
 
       // Add custom fields (non-file)
@@ -2273,7 +2273,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
 
   const openEditDialog = (item: T) => {
     setSelectedItem(item);
-    const newFormData: Record<string, string> = {
+    const newFormData: Record<string, string | string[]> = {
       name: item.name,
       slug: item.slug
     };
@@ -2699,13 +2699,13 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
           <div className="space-y-4 py-4">
             {parents.map((parent, index) => {
               const options = getFilteredParentOptions(parent.fieldName);
-              const isDisabled = parent.filterBy && !formData[parent.filterBy];
+              const isDisabled = !!(parent.filterBy && !formData[parent.filterBy]);
 
               return (
                 <div key={parent.fieldName} className="space-y-2">
                   <Label htmlFor={`create-${parent.fieldName}`}>{parent.label}</Label>
                   <Select
-                    value={formData[parent.fieldName]}
+                    value={formData[parent.fieldName] as string}
                     onValueChange={(value) => handleParentChange(parent.fieldName, value)}
                     disabled={isDisabled}
                   >
@@ -2935,13 +2935,13 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
           <div className="space-y-4 py-4">
             {parents.map((parent, index) => {
               const options = getFilteredParentOptions(parent.fieldName);
-              const isDisabled = parent.filterBy && !formData[parent.filterBy];
+              const isDisabled = !!(parent.filterBy && !formData[parent.filterBy]);
 
               return (
                 <div key={parent.fieldName} className="space-y-2">
                   <Label htmlFor={`edit-${parent.fieldName}`}>{parent.label}</Label>
                   <Select
-                    value={formData[parent.fieldName]}
+                    value={formData[parent.fieldName] as string}
                     onValueChange={(value) => handleParentChange(parent.fieldName, value)}
                     disabled={isDisabled}
                   >

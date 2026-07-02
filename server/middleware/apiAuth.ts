@@ -98,7 +98,7 @@ export const requireApiKey: RequestHandler = async (req, res, next) => {
     };
 
     // Update lastUsedAt timestamp in background (don't await to avoid blocking)
-    storage.updateApiKeyLastUsed(apiKey.id).catch(err => {
+    storage.updateApiKeyLastUsed(apiKey.id).catch((err: any) => {
       // Silently log errors in background update (don't fail the request)
       console.error("Failed to update API key lastUsedAt:", err);
     });

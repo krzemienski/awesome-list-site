@@ -74,6 +74,8 @@ import {
   type InsertEnrichmentJob,
   type EnrichmentQueueItem,
   type InsertEnrichmentQueue,
+  type UserInteraction,
+  type ApiKey,
 } from "@shared/schema";
 
 import {
@@ -115,7 +117,7 @@ export interface ValidationStorageItem {
 export interface ValidationResults {
   awesomeLint?: any;
   linkCheck?: any;
-  lastUpdated?: string;
+  lastUpdated?: string | null;
 }
 
 // Hierarchical category structure for frontend
@@ -262,6 +264,10 @@ export interface IStorage {
 
   // User Preferences
   getUserPreferences(userId: string): Promise<any | undefined>;
+  getResourceInteractions(resourceId: number): Promise<UserInteraction[]>;
+  trackUserInteraction(userId: string, resourceId: number, interactionType: string, interactionValue?: number | null, metadata?: Record<string, any>): Promise<UserInteraction>;
+  getApiKey(key: string): Promise<ApiKey | undefined>;
+  updateApiKeyLastUsed(id: string): Promise<void>;
 
   // GitHub Sync Queue
   addToGithubSyncQueue(item: InsertGithubSyncQueue): Promise<GithubSyncQueue>;
@@ -638,7 +644,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateUserJourneyProgress(userId: string, journeyId: number, stepId: number): Promise<UserJourneyProgress> {
-    return this.userFeatureRepo.updateUserJourneyProgress(userId, journeyId, stepId);
+    return this.userFeatureRepo.updateUserJourneyProgress(
+      userId,
+      journeyId,
+      stepId,
+      (jid: number) => this.listJourneySteps(jid)
+    );
   }
 
   async getUserJourneyProgress(userId: string, journeyId: number): Promise<UserJourneyProgress | undefined> {
@@ -651,6 +662,22 @@ export class DatabaseStorage implements IStorage {
 
   async getUserPreferences(userId: string): Promise<any | undefined> {
     return this.userFeatureRepo.getUserPreferences(userId);
+  }
+
+  async getResourceInteractions(resourceId: number): Promise<UserInteraction[]> {
+    return this.userFeatureRepo.getResourceInteractions(resourceId);
+  }
+
+  async trackUserInteraction(userId: string, resourceId: number, interactionType: string, interactionValue?: number | null, metadata?: Record<string, any>): Promise<UserInteraction> {
+    return this.userFeatureRepo.trackUserInteraction(userId, resourceId, interactionType, interactionValue, metadata);
+  }
+
+  async getApiKey(key: string): Promise<ApiKey | undefined> {
+    return this.userRepo.getApiKey(key);
+  }
+
+  async updateApiKeyLastUsed(id: string): Promise<void> {
+    return this.userRepo.updateApiKeyLastUsed(id);
   }
 
   // ==========================================================================

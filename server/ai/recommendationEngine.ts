@@ -118,14 +118,14 @@ export class RecommendationEngine {
 
       // Enrich view history from userInteractions table
       if (viewHistory && viewHistory.length > 0) {
-        enrichedProfile.viewHistory = viewHistory.map(r => r.url);
+        enrichedProfile.viewHistory = viewHistory.map((r: any) => r.url);
       }
 
       // Extract completed resources and ratings from interactions
-      const completedInteractions = interactions.filter(i => i.interactionType === 'complete');
+      const completedInteractions = interactions.filter((i: any) => i.interactionType === 'complete');
       if (completedInteractions.length > 0) {
         const completedUrls = await Promise.all(
-          completedInteractions.map(async i => {
+          completedInteractions.map(async (i: any) => {
             const resource = await storage.getResource(i.resourceId);
             return resource?.url;
           })
@@ -134,7 +134,7 @@ export class RecommendationEngine {
       }
 
       // Extract ratings from interactions
-      const ratingInteractions = interactions.filter(i => i.interactionType === 'rate' && i.interactionValue !== null);
+      const ratingInteractions = interactions.filter((i: any) => i.interactionType === 'rate' && i.interactionValue !== null);
       if (ratingInteractions.length > 0) {
         const ratings: Record<string, number> = {};
         for (const interaction of ratingInteractions) {
@@ -226,10 +226,10 @@ export class RecommendationEngine {
       enrichedProfile.bookmarks = bookmarks.map(r => r.url);
 
       // Add completed journey resources to completedResources list
-      const completedJourneyUrls = completedJourneyResources.map(r => r.url);
+      const completedJourneyUrls = completedJourneyResources.map((r: any) => r.url);
       enrichedProfile.completedResources = [
         ...enrichedProfile.completedResources,
-        ...completedJourneyUrls.filter(url => !enrichedProfile.completedResources.includes(url))
+        ...completedJourneyUrls.filter((url: string) => !enrichedProfile.completedResources.includes(url))
       ];
 
       // Filter out already viewed/completed resources (including journey resources)

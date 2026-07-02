@@ -22,8 +22,10 @@
 
 import {
   users,
+  apiKeys,
   type User,
   type UpsertUser,
+  type ApiKey,
 } from "@shared/schema";
 import { db } from "../db";
 import { eq, desc, sql } from "drizzle-orm";
@@ -143,5 +145,29 @@ export class UserRepository {
   async createUser(userData: UpsertUser): Promise<User> {
     // Legacy method - use upsertUser instead for OAuth
     return this.upsertUser(userData);
+  }
+
+  /**
+   * Get an API key record by its raw key value
+   * @param key - The API key string
+   * @returns The ApiKey record or undefined if not found
+   */
+  async getApiKey(key: string): Promise<ApiKey | undefined> {
+    const [apiKey] = await db
+      .select()
+      .from(apiKeys)
+      .where(eq(apiKeys.key, key));
+    return apiKey;
+  }
+
+  /**
+   * Update the lastUsedAt timestamp for an API key
+   * @param id - The API key ID
+   */
+  async updateApiKeyLastUsed(id: string): Promise<void> {
+    await db
+      .update(apiKeys)
+      .set({ lastUsedAt: new Date() })
+      .where(eq(apiKeys.id, id));
   }
 }

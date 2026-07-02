@@ -27,10 +27,12 @@ import {
   userBookmarks,
   userJourneyProgress,
   userPreferences,
+  userInteractions,
   type Resource,
   type UserJourneyProgress,
   type InsertUserJourneyProgress,
   type UserPreferences,
+  type UserInteraction,
 } from "@shared/schema";
 import { db } from "../db";
 import { eq, and, desc } from "drizzle-orm";
@@ -208,7 +210,6 @@ export class UserFeatureRepository {
       .update(userJourneyProgress)
       .set({
         completedSteps,
-        isCompleted: allCompleted,
         completedAt: allCompleted ? new Date() : null,
         lastAccessedAt: new Date()
       })
@@ -278,6 +279,48 @@ export class UserFeatureRepository {
       .from(userPreferences)
       .where(eq(userPreferences.userId, userId));
     return prefs;
+  }
+
+  /**
+   * Get all interactions recorded for a resource
+   * @param resourceId - Resource ID
+   * @returns Array of UserInteraction records (most recent first)
+   */
+  async getResourceInteractions(resourceId: number): Promise<UserInteraction[]> {
+    return db
+      .select()
+      .from(userInteractions)
+      .where(eq(userInteractions.resourceId, resourceId))
+      .orderBy(desc(userInteractions.timestamp));
+  }
+
+  /**
+   * Record a user interaction with a resource
+   * @param userId - User ID
+   * @param resourceId - Resource ID
+   * @param interactionType - Interaction type (view, click, bookmark, rate, complete, dismiss)
+   * @param interactionValue - Optional numeric value (e.g. rating or time spent)
+   * @param metadata - Optional metadata object
+   * @returns The inserted UserInteraction record
+   */
+  async trackUserInteraction(
+    userId: string,
+    resourceId: number,
+    interactionType: string,
+    interactionValue?: number | null,
+    metadata?: Record<string, any>
+  ): Promise<UserInteraction> {
+    const [interaction] = await db
+      .insert(userInteractions)
+      .values({
+        userId,
+        resourceId,
+        interactionType,
+        interactionValue: interactionValue ?? null,
+        metadata: metadata ?? {},
+      })
+      .returning();
+    return interaction;
   }
 }
 

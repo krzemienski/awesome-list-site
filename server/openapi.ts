@@ -23,7 +23,8 @@
  * ============================================================================
  */
 
-import type { OpenAPIV3 } from 'swagger-ui-express';
+// NOTE: swagger-ui-express ships no type declarations, so the spec is typed as a
+// plain object. It remains a valid OpenAPI 3.0 document consumed by the YAML export.
 
 /**
  * OpenAPI 3.0 Specification for the Public API
@@ -36,7 +37,7 @@ import type { OpenAPIV3 } from 'swagger-ui-express';
  * Authentication: Bearer token (API key)
  * Rate Limiting: 60 requests/hour (free), 1000/hour (standard), 10000/hour (premium)
  */
-export const swaggerSpec: OpenAPIV3.Document = {
+export const swaggerSpec: Record<string, any> = {
   openapi: '3.0.0',
   info: {
     title: 'Awesome List Site - Public API',

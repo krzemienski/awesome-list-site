@@ -151,6 +151,35 @@ export async function setupAuth(app: Express) {
   });
 }
 
+/**
+ * Shape of the authenticated user attached to `req.user`.
+ *
+ * Two auth paths populate this: Replit OIDC (claims + tokens) and local
+ * email/password login (the DB user record). The fields are therefore all
+ * optional and an index signature keeps ad-hoc access permissive.
+ */
+export interface SessionUser {
+  claims?: {
+    sub?: string;
+    email?: string;
+    first_name?: string;
+    last_name?: string;
+    profile_image_url?: string;
+    exp?: number;
+    [key: string]: any;
+  };
+  access_token?: string;
+  refresh_token?: string;
+  expires_at?: number;
+  id?: string;
+  email?: string;
+  role?: string;
+  firstName?: string;
+  lastName?: string;
+  profileImageUrl?: string;
+  [key: string]: any;
+}
+
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
   const user = req.user as any;
 

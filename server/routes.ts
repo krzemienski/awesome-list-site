@@ -44,6 +44,7 @@ import {
   AdminRepository,
   LegacyRepository,
 } from "./repositories";
+import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { setupLocalAuth } from "./localAuth";
 import { hashPassword, comparePassword, validateEmail, validatePassword } from "./passwordUtils";
@@ -3599,7 +3600,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`Switching to list: ${rawUrl}`);
       const data = await fetchAwesomeList(rawUrl);
-      legacyRepo.setAwesomeListData(data);
+      storage.setAwesomeListData(data);
       
       console.log(`Successfully switched to list with ${data.resources.length} resources`);
       res.json(data);
@@ -3673,6 +3674,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         viewHistory: [],
         bookmarks: [],
         completedResources: [],
+        completedJourneys: [],
+        journeyProgress: [],
         ratings: {}
       };
 
@@ -3749,6 +3752,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         viewHistory: [],
         bookmarks: [],
         completedResources: [],
+        completedJourneys: [],
+        journeyProgress: [],
         ratings: {}
       };
 
