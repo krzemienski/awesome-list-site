@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import { storage } from "./storage";
+import { ABOUT_FAQS } from "@shared/faq";
 import {
   renderHomeContent,
   renderTaxonomyContent,
@@ -435,6 +436,27 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
           count: countNodeResources(c),
         }));
       } catch {}
+      if (path === "/about") {
+        // GEO: FAQPage schema (+ breadcrumb) markedly improves citation rates
+        // in AI answer engines. The Q&A text is shared verbatim with the
+        // client About page (shared/faq.ts) so schema, prerendered body, and
+        // hydrated DOM all carry identical content — no cloaking.
+        m.structuredData = [
+          {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: ABOUT_FAQS.map((f) => ({
+              "@type": "Question",
+              name: f.question,
+              acceptedAnswer: { "@type": "Answer", text: f.answer },
+            })),
+          },
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "About", path },
+          ]),
+        ];
+      }
       bodyHtml = renderStaticPageContent({
         heading: m.title.split(" — ")[0],
         description: m.description,
@@ -447,6 +469,7 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
               links: [{ path: "/login", label: "Sign in to submit a resource" }],
             }
           : {}),
+        ...(path === "/about" ? { faqs: ABOUT_FAQS } : {}),
         categories,
       });
     } else if (path === "/login" || path === "/register") {

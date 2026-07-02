@@ -215,6 +215,7 @@ export function renderStaticPageContent(opts: {
   paragraphs?: string[];
   links?: { path: string; label: string }[];
   categories?: { name: string; slug: string; count: number }[];
+  faqs?: { question: string; answer: string }[];
 }): string {
   const nav: LinkItem[] = [
     { href: internalHref("/"), label: "Home — all categories" },
@@ -233,10 +234,20 @@ export function renderStaticPageContent(opts: {
   const paras = (opts.paragraphs ?? [])
     .map((p) => `<p class="ssr-lead">${escapeHtml(p)}</p>`)
     .join("");
+  const faqHtml = (opts.faqs ?? []).length
+    ? `<h2>Frequently asked questions</h2>` +
+      (opts.faqs ?? [])
+        .map(
+          (f) =>
+            `<h3>${escapeHtml(f.question)}</h3><p>${escapeHtml(f.answer)}</p>`,
+        )
+        .join("")
+    : "";
   return shell(
     `<h1>${escapeHtml(opts.heading)}</h1>` +
       `<p class="ssr-lead">${escapeHtml(opts.description)}</p>` +
       paras +
+      faqHtml +
       `<h2>Explore</h2>${linkList(nav)}` +
       (cats.length ? `<h2>Top categories</h2>${linkList(cats)}` : ""),
   );

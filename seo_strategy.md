@@ -30,6 +30,12 @@
 - Utility/auth routes `/login` and `/register` return HTTP 200 but are marked `noindex` (robots `noindex,nofollow`, no canonical/og:url) so they do not compete in search; they still serve minimal prerendered body HTML (heading, explanatory copy, internal links) so non-JS and AI crawlers can read them.
 - Client hydration preserves the server head: loading branches on the home, taxonomy, and resource pages no longer emit placeholder `Loading…`/`Error` titles, and the missing-resource branch re-asserts the server's `noindex` soft-404 contract instead of a default indexable head.
 - The "Explore Categories" CTA on `/advanced` and other cross-page links are generated from the live taxonomy, so internal links cannot drift to non-existent category slugs.
+- Client-rendered page titles mirror the server's og-middleware templates exactly, so Googlebot's crawl pass (initial HTML) and render pass (hydrated DOM) capture identical title/description/canonical/robots signals.
+
+## GEO (Generative Engine Optimization)
+- `client/public/robots.txt` explicitly allows 13 AI crawlers (GPTBot, ChatGPT-User, OAI-SearchBot, PerplexityBot, Perplexity-User, ClaudeBot, Claude-Web, anthropic-ai, Google-Extended, Applebot-Extended, Meta-ExternalAgent, Amazonbot, cohere-ai) with the same private-route exclusions as the default group. Per robots spec, bots matching a named group ignore the `*` group, so the Disallows are replicated there.
+- `/about` carries FAQPage + BreadcrumbList JSON-LD. The 5 Q&As live in `shared/faq.ts` and are rendered identically in three places — the JSON-LD, the server-prerendered body, and the hydrated client About page — so there is no cloaking mismatch. FAQ answers use answer-first structure with concrete statistics (Princeton GEO methods).
+- `client/public/llms.txt` describes the site for LLM-based agents.
 
 ## Dismissed categories
 - (None yet)

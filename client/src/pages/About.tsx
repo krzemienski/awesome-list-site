@@ -15,8 +15,10 @@ import {
   Heart,
   Users,
   Github,
-  ExternalLink
+  ExternalLink,
+  HelpCircle
 } from "lucide-react";
+import { ABOUT_FAQS } from "@shared/faq";
 
 export default function About() {
   return (
@@ -300,6 +302,31 @@ export default function About() {
                 </div>
               </a>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* FAQ — content shared verbatim with the server's FAQPage schema (shared/faq.ts) */}
+      <Card className="mt-4">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <HelpCircle className="h-5 w-5 text-[var(--accent)]" />
+            Frequently asked questions
+          </CardTitle>
+          <CardDescription>
+            Quick answers about the site, the list, and how to contribute
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-6">
+            {ABOUT_FAQS.map((faq) => (
+              <div key={faq.question} className="space-y-1.5">
+                <h3 className="font-semibold text-sm">{faq.question}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {faq.answer}
+                </p>
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>
