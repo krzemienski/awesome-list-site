@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { useParams, Link, useLocation, Redirect } from "wouter";
+import { useParams, Link, useLocation, useSearch, Redirect } from "wouter";
 import { safeGetItem, safeSetItem } from "@/lib/safeStorage";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -71,8 +71,15 @@ export default function Category() {
   const { slug } = useParams<{ slug: string }>();
   const { isAuthenticated } = useAuth();
   const [location, setLocation] = useLocation();
+  const searchString = useSearch();
 
   const getSearchParams = () => new URLSearchParams(window.location.search);
+
+  // "General" view = resources assigned to this category but no subcategory.
+  // Driven by the reactive ?view=general query param (from the sidebar "General"
+  // row) so it updates even when only the query string changes.
+  const viewFilter = new URLSearchParams(searchString).get("view") || "";
+  const isGeneralView = viewFilter === "general";
 
   const [searchTerm, setSearchTerm] = useState(() => getSearchParams().get("search") || "");
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>(() => getSearchParams().get("subcategory") || "all");
@@ -173,7 +180,15 @@ export default function Category() {
       );
     }
 
-    if (selectedSubcategory !== "all") {
+    if (isGeneralView) {
+      // NOTE: the sidebar "General" badge counts direct resources PLUS any
+      // folded-back orphans (resources whose subcategory string maps to no real
+      // subcategory row — see LegacyRepository). This view shows only rows with
+      // no subcategory (!r.subcategory). Today the orphan set is empty so the two
+      // agree exactly; a resource written with an unmapped subcategory string
+      // would inflate the badge without appearing here.
+      results = results.filter(r => !r.subcategory);
+    } else if (selectedSubcategory !== "all") {
       results = results.filter(r => r.subcategory === selectedSubcategory);
     }
 
@@ -190,15 +205,37 @@ export default function Category() {
     }
 
     return results;
-  }, [allResources, searchTerm, selectedSubcategory, selectedTags, sortBy]);
-  
+  }, [allResources, searchTerm, selectedSubcategory, selectedTags, sortBy, isGeneralView]);
+
+  // The subcategory dropdown must also be the way OUT of "General" view (which is
+  // URL-driven via ?view=general). Navigating without the flag makes the reactive
+  // isGeneralView recompute to false. The sentinel "__general__" is the currently
+  // selected value while in General view, so picking "All Subcategories" or any
+  // real subcategory is always a genuine change that fires onValueChange.
+  const handleSubcategoryChange = (value: string) => {
+    if (value === "__general__") return; // already in General view
+    setSelectedSubcategory(value);
+    if (isGeneralView) {
+      const params = new URLSearchParams();
+      if (searchTerm) params.set("search", searchTerm);
+      if (value && value !== "all") params.set("subcategory", value);
+      if (selectedTags.length > 0) params.set("tags", selectedTags.join(","));
+      if (sortBy && sortBy !== "default") params.set("sortBy", sortBy);
+      const qs = params.toString();
+      setLocation(`/category/${slug}${qs ? `?${qs}` : ""}`);
+    }
+  };
+
   useEffect(() => {
     const params = new URLSearchParams();
 
     if (searchTerm) params.set("search", searchTerm);
-    if (selectedSubcategory && selectedSubcategory !== "all") params.set("subcategory", selectedSubcategory);
+    if (!isGeneralView && selectedSubcategory && selectedSubcategory !== "all") params.set("subcategory", selectedSubcategory);
     if (selectedTags.length > 0) params.set("tags", selectedTags.join(","));
     if (sortBy && sortBy !== "default") params.set("sortBy", sortBy);
+    // Preserve the reactive general-view flag so it survives replaceState writes
+    // triggered by other filter changes.
+    if (isGeneralView) params.set("view", "general");
 
     const newSearch = params.toString();
     const newPath = `/category/${slug}${newSearch ? `?${newSearch}` : ""}`;
@@ -207,7 +244,7 @@ export default function Category() {
     if (currentPath !== newPath) {
       window.history.replaceState({}, "", newPath);
     }
-  }, [searchTerm, selectedSubcategory, selectedTags, sortBy, slug, location]);
+  }, [searchTerm, selectedSubcategory, selectedTags, sortBy, slug, location, isGeneralView]);
 
   useEffect(() => {
     const handlePopState = () => {
@@ -357,11 +394,14 @@ export default function Category() {
           </div>
           <div className="flex items-center gap-3 shrink-0">
             {subcategories.length > 0 && (
-              <Select value={selectedSubcategory} onValueChange={setSelectedSubcategory}>
+              <Select value={isGeneralView ? "__general__" : selectedSubcategory} onValueChange={handleSubcategoryChange}>
                 <SelectTrigger aria-label="Filter by subcategory" className="w-full md:w-[200px]" data-testid="select-subcategory-filter">
                   <SelectValue placeholder="Filter by subcategory" />
                 </SelectTrigger>
                 <SelectContent>
+                  {isGeneralView && (
+                    <SelectItem value="__general__">General (no subcategory)</SelectItem>
+                  )}
                   <SelectItem value="all">All Subcategories</SelectItem>
                   {subcategories.map(sub => (
                     <SelectItem key={sub} value={sub}>{sub}</SelectItem>

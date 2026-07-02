@@ -699,7 +699,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // GET /api/resources/:id - Get single resource
-  app.get('/api/resources/:id', async (req, res) => {
+  // :id constrained to digits so literal sub-routes like /api/resources/pending and
+  // /api/resources/check-url are not shadowed by this dynamic param route.
+  app.get('/api/resources/:id(\\d+)', async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       if (Number.isNaN(id)) {

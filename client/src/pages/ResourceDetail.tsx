@@ -52,12 +52,12 @@ export default function ResourceDetail() {
     enabled: !!id
   });
 
-  const { data: favorites } = useQuery<{resourceIds: number[]}>({
+  const { data: favorites } = useQuery<Resource[]>({
     queryKey: ['/api/favorites'],
     enabled: isAuthenticated
   });
 
-  const { data: bookmarks } = useQuery<{resourceIds: number[]}>({
+  const { data: bookmarks } = useQuery<Resource[]>({
     queryKey: ['/api/bookmarks'],
     enabled: isAuthenticated
   });
@@ -72,18 +72,16 @@ export default function ResourceDetail() {
     enabled: !!id
   });
 
-  const isFavorite = favorites?.resourceIds?.includes(parseInt(id || '0')) ?? false;
-  const isBookmarked = bookmarks?.resourceIds?.includes(parseInt(id || '0')) ?? false;
+  const numericId = parseInt(id || '0');
+  const isFavorite = favorites?.some(f => f.id === numericId) ?? false;
+  const isBookmarked = bookmarks?.some(b => b.id === numericId) ?? false;
 
   const favoriteMutation = useMutation({
     mutationFn: async () => {
       if (isFavorite) {
         return apiRequest(`/api/favorites/${id}`, { method: 'DELETE' });
       }
-      return apiRequest('/api/favorites', {
-        method: 'POST',
-        body: JSON.stringify({ resourceId: parseInt(id || '0') })
-      });
+      return apiRequest(`/api/favorites/${id}`, { method: 'POST' });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/favorites'] });
@@ -99,10 +97,7 @@ export default function ResourceDetail() {
       if (isBookmarked) {
         return apiRequest(`/api/bookmarks/${id}`, { method: 'DELETE' });
       }
-      return apiRequest('/api/bookmarks', {
-        method: 'POST',
-        body: JSON.stringify({ resourceId: parseInt(id || '0') })
-      });
+      return apiRequest(`/api/bookmarks/${id}`, { method: 'POST' });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/bookmarks'] });

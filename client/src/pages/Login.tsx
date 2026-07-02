@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { LogIn, Mail, Lock, Chrome, Github, AlertTriangle } from "lucide-react";
+import { LogIn, Mail, Lock, Chrome, Github } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -68,9 +68,9 @@ export default function Login() {
           description: `Welcome back, ${result.user.email}!`,
         });
 
-        // Navigate to admin - use window.location to ensure fresh page load
-        // This guarantees the session cookie is sent with subsequent requests
-        window.location.href = "/admin";
+        // Route by role: admins land on the dashboard, everyone else on home.
+        // window.location ensures a fresh load so the session cookie is sent.
+        window.location.href = result.user?.role === "admin" ? "/admin" : "/";
       } else {
         const error = await response.json().catch(() => ({ message: "Invalid email or password" }));
         toast({

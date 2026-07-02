@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useLocation, Link } from "wouter";
+import { useLocation, useSearch, Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import {
   Home,
@@ -158,6 +158,7 @@ function CategoryAccordion({
   onToggle,
   isActive,
   activePath,
+  activeSearch,
   navigate,
   matchQuery,
   openSubs,
@@ -168,6 +169,7 @@ function CategoryAccordion({
   onToggle: () => void;
   isActive: boolean;
   activePath: string;
+  activeSearch: string;
   navigate: (path: string) => void;
   matchQuery: string;
   openSubs: string[];
@@ -184,6 +186,16 @@ function CategoryAccordion({
   // always equals (direct + sum of child badges) — no "mixed validators".
   const totalCount = getTotalResourceCount(cat);
 
+  // Resources assigned to this category but to no subcategory. They are real
+  // and reachable on the category page, but without a "General" line the child
+  // badges never sum to the category badge. Surfacing them here makes the sidebar
+  // math reconcile: sum(subcategory badges) + General badge === category badge.
+  const directCount = cat.resources?.length || 0;
+  const generalPath = `${catPath}?view=general`;
+  const generalActive =
+    activePath === catPath &&
+    new URLSearchParams(activeSearch).get("view") === "general";
+
   // approximate body height for max-height animation
   const expandedHeight = useMemo(() => {
     let h = 8; // bottom padding only ("All in" row removed in P4)
@@ -193,8 +205,9 @@ function CategoryAccordion({
         h += sub.subSubcategories!.length * 32 + 12;
       }
     });
+    if (directCount > 0) h += 36; // "General" row
     return h;
-  }, [subs, openSubs]);
+  }, [subs, openSubs, directCount]);
 
   // Semantic split (post-architect-review):
   //  - The row is a <Link> (real navigation semantics; right-click/cmd-click
@@ -254,7 +267,7 @@ function CategoryAccordion({
           </span>
           {/* P1 — removed redundant "→" page-link span; chevron is the single
               disclosure control per ref 01 sidebar. */}
-          {subs.length > 0 && (
+          {(subs.length > 0 || directCount > 0) && (
             <button
               type="button"
               onClick={onToggle}
@@ -278,7 +291,7 @@ function CategoryAccordion({
         </span>
       </div>
 
-      {subs.length > 0 && (
+      {(subs.length > 0 || directCount > 0) && (
         <div
           id={`accordion-body-${catSlug}`}
           className="accordion-body"
@@ -385,6 +398,20 @@ function CategoryAccordion({
                   </div>
                 );
               })}
+            {directCount > 0 &&
+              (!matchQuery ||
+                cat.name.toLowerCase().includes(matchQuery.toLowerCase()) ||
+                "general".includes(matchQuery.toLowerCase())) && (
+                <SubItem
+                  label="General"
+                  count={directCount}
+                  href={generalPath}
+                  active={generalActive}
+                  onClick={() => navigate(generalPath)}
+                  testId={`sub-general-${catSlug}`}
+                  italic
+                />
+              )}
           </div>
         </div>
       )}
@@ -401,6 +428,7 @@ export default function AppSidebar({
   user,
 }: AppSidebarProps) {
   const [location, setLocation] = useLocation();
+  const activeSearch = useSearch();
   const [openCategories, setOpenCategories] = useState<string[]>([]);
   const [openSubcategories, setOpenSubcategories] = useState<string[]>([]);
   const { setOpenMobile } = useSidebar();
@@ -666,6 +694,7 @@ export default function AppSidebar({
                     }
                     isActive={catActive}
                     activePath={activePath}
+                    activeSearch={activeSearch}
                     navigate={navigate}
                     matchQuery=""
                     openSubs={openSubcategories}
