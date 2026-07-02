@@ -10,6 +10,14 @@ A production-ready React application for browsing and discovering over 2,600 cur
 
 > **Full history:** see [`CHANGELOG.md`](./CHANGELOG.md) for every dated entry back to December 2025.
 
+### Production Dead-Link Sweep (July 2, 2026)
+- **Scan**: `scripts/prod-link-scan.ts` (new, resumable two-pass scanner) checked all 2,365 approved prod resources: pass 1 reuses `server/validation/linkChecker.ts`, pass 2 re-verifies failures with a browser UA. Classification counts + evidence in `.local/prod-link-scan/results.json`.
+- **Remediation (prod, reversible)**: 156 confirmed-dead resources set to `rejected` via the live admin API — 109 × HTTP 404/410, 24 × dead DNS, 16 × broken SSL, 7 × connection-dead (incl. openelec.tv, verified permanently down via web search). Approved total: 2,365 → 2,209. Nothing deleted; any can be re-approved from the admin panel.
+- **False positives kept approved**: 143 bot-block-only links (Medium, NAB Show, Cloudflare-protected) plus 10 connect-timeout links verified alive from an external vantage (trac.ffmpeg.org ×5, cta.tech ×2, jplayer.org ×2, forum.kaltura.org ×1 — datacenter-IP blocks, not dead). 7 of these were initially mis-rejected by a case-sensitive timeout check (`UND_ERR_CONNECT_TIMEOUT` fell into `dead_conn`) and re-approved after architect review; classifier now matches `/TIMEOUT|ABORT|EAI_AGAIN/i`.
+- **Bug fix (`ensureSubSubcategoryExists`)**: a resource whose `subSubcategory` text slugifies to an existing row's slug under a different display name (e.g. "iOStvOS" vs "iOS/tvOS") made `PUT /api/admin/resources/:id` 500 — the unique-constraint catch re-checked by name and rethrew. Added `CategoryRepository.getSubSubcategoryBySlug` and slug-based pre-check + catch re-check.
+- **API learning**: `POST /api/admin/resources/bulk/reject` only works on `pending` resources (returns HTTP 200 with `succeeded:0` for approved ones); status flips on approved resources use `PUT /api/resources/:id/reject|approve`.
+- **⚠️ Security follow-up needed**: production accepts the seeded default admin credentials from `server/seed.ts` — should be rotated/disabled.
+
 ### Functional Audit — Routing/Loading Fixes + Cross-Device QA (July 2, 2026)
 - **Nested `/category/:cat/:sub` 404s fixed** (only source was the Advanced-page category explorer): explorer sub chips now link to canonical `/subcategory/:slug`; App.tsx adds a wouter `<Redirect>` route for `/category/:slug/:subSlug` → `/subcategory/:subSlug` and `/recommendations` → `/`; og-middleware issues server-side 301s for both shapes (nested only when the subcategory exists in the cached tree — unknown slugs fall through to the standard soft-404).
 - **Category page "0 resources available" flash fixed**: the DB resources query's `isLoading` (`dbLoading`) now gates the skeleton branch alongside the static-tree loading state.

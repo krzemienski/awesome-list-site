@@ -347,6 +347,20 @@ export class CategoryRepository {
   }
 
   /**
+   * Get a sub-subcategory by slug and subcategory
+   * @param slug - Sub-subcategory slug
+   * @param subcategoryId - Parent subcategory ID
+   * @returns Sub-subcategory object or undefined if not found
+   */
+  async getSubSubcategoryBySlug(slug: string, subcategoryId: number): Promise<SubSubcategory | undefined> {
+    const [subSubcategory] = await db
+      .select()
+      .from(subSubcategories)
+      .where(and(eq(subSubcategories.slug, slug), eq(subSubcategories.subcategoryId, subcategoryId)));
+    return subSubcategory;
+  }
+
+  /**
    * Create a new sub-subcategory
    * @param subSubcategory - Sub-subcategory data to insert
    * @returns The created sub-subcategory

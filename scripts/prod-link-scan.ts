@@ -125,8 +125,10 @@ async function main() {
     if (typeof vs === "string") {
       if (vs.includes("ENOTFOUND")) return "dead_dns";
       if (vs.includes("ECONNREFUSED")) return "dead_refused";
-      if (vs.includes("CERT")) return "dead_ssl";
-      if (vs.includes("Abort") || vs.includes("Timeout")) return "timeout";
+      if (/CERT|LEAF_SIGNATURE/i.test(vs)) return "dead_ssl";
+      // Connect timeouts from a datacenter IP are the classic bot-block
+      // signature (e.g. UND_ERR_CONNECT_TIMEOUT) — never treat as dead.
+      if (/TIMEOUT|ABORT|EAI_AGAIN/i.test(vs)) return "timeout";
       return "dead_conn";
     }
     if (vs >= 200 && vs < 400) return "ok_botblock_only";

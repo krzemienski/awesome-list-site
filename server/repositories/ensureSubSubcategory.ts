@@ -51,15 +51,25 @@ export async function ensureSubSubcategoryExists(
   const existing = await categoryRepo.getSubSubcategoryByName(trimmedSubSub, subcategory.id);
   if (existing) return;
 
+  const slug = generateSlug(trimmedSubSub);
+
+  // A row with a different display name can still occupy the same slug
+  // (e.g. resource text "iOStvOS" vs hierarchy row "iOS/tvOS" both slugify to
+  // "iostvos"). The unique constraint is on (slug, subcategory_id), so treat a
+  // slug match as "already exists" rather than attempting a doomed insert.
+  const existingBySlug = await categoryRepo.getSubSubcategoryBySlug(slug, subcategory.id);
+  if (existingBySlug) return;
+
   try {
     await categoryRepo.createSubSubcategory({
       name: trimmedSubSub,
-      slug: generateSlug(trimmedSubSub),
+      slug,
       subcategoryId: subcategory.id,
     });
   } catch (err) {
-    // Race / unique-constraint: another writer just created it. Verify and swallow.
-    const after = await categoryRepo.getSubSubcategoryByName(trimmedSubSub, subcategory.id);
+    // Race / unique-constraint: another writer just created it. Verify by slug
+    // (name may differ for the same slug) and swallow if the row is present.
+    const after = await categoryRepo.getSubSubcategoryBySlug(slug, subcategory.id);
     if (!after) throw err;
   }
 }
