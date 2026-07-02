@@ -27,9 +27,46 @@ interface AppHeaderProps {
   onSearchOpen: () => void;
   user?: any;
   onLogout?: () => void;
+  categories?: any[];
 }
 
-function getBreadcrumbs(path: string) {
+// Resolve the true taxonomy parent chain for a category/subcategory/
+// sub-subcategory slug so each breadcrumb links to its REAL parent
+// (e.g. a subcategory's parent is its category, not a generic "/subcategory"
+// route that does not exist). Returns null when the tree has not loaded or the
+// slug is unknown, so the caller can fall back to the generic label chain.
+function taxonomyCrumbs(
+  kind: string,
+  slug: string,
+  categories: any[],
+): { label: string; href: string }[] | null {
+  if (!categories?.length) return null;
+  for (const cat of categories) {
+    if (kind === "category" && cat.slug === slug) {
+      return [{ label: cat.name, href: `/category/${cat.slug}` }];
+    }
+    for (const sub of cat.subcategories || []) {
+      if (kind === "subcategory" && sub.slug === slug) {
+        return [
+          { label: cat.name, href: `/category/${cat.slug}` },
+          { label: sub.name, href: `/subcategory/${sub.slug}` },
+        ];
+      }
+      for (const ss of sub.subSubcategories || []) {
+        if (kind === "sub-subcategory" && ss.slug === slug) {
+          return [
+            { label: cat.name, href: `/category/${cat.slug}` },
+            { label: sub.name, href: `/subcategory/${sub.slug}` },
+            { label: ss.name, href: `/sub-subcategory/${ss.slug}` },
+          ];
+        }
+      }
+    }
+  }
+  return null;
+}
+
+function getBreadcrumbs(path: string, categories: any[] = []) {
   if (path === "/") return [{ label: "Home", href: "/" }];
   const segments = path.split("/").filter(Boolean);
   const crumbs: { label: string; href: string }[] = [{ label: "Home", href: "/" }];
@@ -49,6 +86,14 @@ function getBreadcrumbs(path: string) {
     login: "Login",
     settings: "Settings",
   };
+  // Taxonomy routes get a real parent chain resolved from the tree.
+  if (
+    segments.length >= 2 &&
+    ["category", "subcategory", "sub-subcategory"].includes(segments[0])
+  ) {
+    const resolved = taxonomyCrumbs(segments[0], segments[1], categories);
+    if (resolved) return [...crumbs, ...resolved];
+  }
   if (segments.length === 1) {
     crumbs.push({ label: routeLabels[segments[0]] || deslugify(segments[0]), href: path });
   } else if (segments.length >= 2) {
@@ -58,9 +103,9 @@ function getBreadcrumbs(path: string) {
   return crumbs;
 }
 
-export default function AppHeader({ onSearchOpen, user, onLogout }: AppHeaderProps) {
+export default function AppHeader({ onSearchOpen, user, onLogout, categories }: AppHeaderProps) {
   const [location, setLocation] = useLocation();
-  const crumbs = getBreadcrumbs(location);
+  const crumbs = getBreadcrumbs(location, categories || []);
 
   return (
     <header className="sticky top-0 z-30 flex h-14 md:h-[60px] items-center gap-2 md:gap-[18px] border-b border-border bg-[color-mix(in_srgb,var(--bg)_78%,transparent)] backdrop-blur-[14px] px-3 sm:px-6">

@@ -51,6 +51,7 @@ export default function MainLayout({ awesomeList, isLoading, children, user, onL
           onSearchOpen={() => setSearchOpen(true)}
           user={user}
           onLogout={onLogout}
+          categories={awesomeList?.categories || []}
         />
         {/*
           CC-14 (landmark half) — single <main id="main"> wrapping route content.
