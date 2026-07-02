@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Switch, Route } from "wouter";
+import { Switch, Route, Redirect } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { initGA } from "./lib/analytics";
 import { useAnalytics } from "./hooks/use-analytics";
@@ -69,8 +69,14 @@ function Router() {
         <Route path="/" component={() => <Home awesomeList={awesomeList} isLoading={isLoading} />} />
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
+        <Route path="/category/:slug/:subSlug">
+          {(params) => <Redirect to={`/subcategory/${params.subSlug}`} replace />}
+        </Route>
         <Route path="/category/:slug" component={Category} />
         <Route path="/subcategory/:slug" component={Subcategory} />
+        <Route path="/recommendations">
+          <Redirect to="/" replace />
+        </Route>
         <Route path="/sub-subcategory/:slug" component={SubSubcategory} />
         <Route path="/resource/:id" component={ResourceDetail} />
         <Route path="/about" component={About} />

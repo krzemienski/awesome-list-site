@@ -1,10 +1,20 @@
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle, Home, List } from "lucide-react";
 import { Helmet } from "react-helmet";
 import { Link } from "wouter";
+import { trackEvent } from "@/lib/analytics";
 
 export default function NotFound() {
+  useEffect(() => {
+    trackEvent(
+      "page_not_found",
+      "navigation",
+      window.location.pathname + window.location.search,
+    );
+  }, []);
+
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-10rem)]">
       <Helmet>

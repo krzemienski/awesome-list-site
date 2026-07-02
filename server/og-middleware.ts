@@ -887,6 +887,28 @@ export function ogInjectionMiddleware() {
       return next();
     }
 
+    // Tolerant redirects for URL shapes that circulate but were never routes.
+    // Nested /category/:cat/:sub deep links 301 to the canonical flat
+    // /subcategory/:sub when the subcategory exists; unknown ones fall through
+    // to the normal resolver and get the standard 404 treatment.
+    const nestedSubMatch = urlPath.match(/^\/category\/[^\/]+\/([^\/]+)$/);
+    if (nestedSubMatch) {
+      const subSlug = safeDecode(nestedSubMatch[1]);
+      try {
+        const found = findSubcategory(await getTreeCached(), subSlug);
+        if (found) {
+          return res.redirect(301, `/subcategory/${encodeURIComponent(subSlug)}`);
+        }
+      } catch {
+        // tree lookup failed — fall through to the resolver's fail-open path
+      }
+      console.warn("[og-middleware] unresolvable nested category path:", urlPath);
+    }
+    if (urlPath === "/recommendations") {
+      // Personalized recommendations live on the home page (AI panel).
+      return res.redirect(301, "/");
+    }
+
     let meta: RouteMeta;
     let notFound = false;
     let bodyHtml: string | undefined;

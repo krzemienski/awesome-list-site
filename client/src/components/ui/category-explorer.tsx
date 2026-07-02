@@ -308,7 +308,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
                               key={subcategory.name}
                               variant="outline"
                               size="sm"
-                              onClick={() => navigate(`/category/${category.slug}/${subcategory.slug}`)}
+                              onClick={() => navigate(`/subcategory/${subcategory.slug}`)}
                               className="h-6 px-2 text-xs"
                             >
                               {subcategory.name} ({subcategory.resources?.length || 0})

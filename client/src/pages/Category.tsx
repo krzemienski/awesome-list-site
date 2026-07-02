@@ -76,7 +76,7 @@ export default function Category() {
   // assigned to it (including those that live under subcategories), so the count
   // here matches the database and the sidebar — not just the direct/top-level
   // resources carried by the static awesome-list tree.
-  const { data: dbData } = useQuery<{resources: any[], total: number}>({
+  const { data: dbData, isLoading: dbLoading } = useQuery<{resources: any[], total: number}>({
     queryKey: [`/api/resources?category=${encodeURIComponent(categoryName)}&limit=2000`],
     enabled: !!categoryName,
   });
@@ -226,7 +226,7 @@ export default function Category() {
     setEditDialogOpen(true);
   };
   
-  if (isLoading) {
+  if (isLoading || dbLoading) {
     return (
       <div className="space-y-6" aria-busy={true} aria-live="polite">
         <div className="space-y-4">
