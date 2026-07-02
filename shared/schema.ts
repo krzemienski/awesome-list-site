@@ -77,12 +77,12 @@ export type User = typeof users.$inferSelect;
  * API Keys table for programmatic API access
  *
  * Stores API keys for third-party integrations and programmatic access to resources.
- * Keys are hashed using bcrypt before storage for security. Only the plaintext key is
+ * Keys are hashed using SHA-256 before storage for security. Only the plaintext key is
  * shown once during creation.
  *
  * @property {string} id - UUID primary key, auto-generated using gen_random_uuid()
  * @property {string} userId - Reference to user who owns this API key (cascades on delete)
- * @property {string} key - Hashed API key using bcrypt (unique constraint)
+ * @property {string} key - SHA-256 hash of the API key (unique constraint)
  * @property {string} name - User-provided label/description for the key (e.g., "My IDE Extension")
  * @property {object} scopes - JSON array of permission scopes (e.g., ["read:resources", "read:tags"])
  * @property {timestamp} createdAt - When the API key was created
@@ -100,7 +100,8 @@ export type User = typeof users.$inferSelect;
  * - idx_api_keys_expires_at: Efficient expiration cleanup queries
  *
  * Security Notes:
- * - Keys are hashed with bcrypt before storage
+ * - Keys are hashed with SHA-256 before storage (deterministic, enables O(1) lookup;
+ *   safe because raw keys carry 256 bits of entropy — nothing to brute-force)
  * - Plaintext key only returned once during creation
  * - Revoked keys (revokedAt != null) cannot be used
  * - Expired keys (expiresAt < now) cannot be used

@@ -26,9 +26,11 @@ import {
   type User,
   type UpsertUser,
   type ApiKey,
+  type InsertApiKey,
 } from "@shared/schema";
 import { db } from "../db";
-import { eq, desc, sql } from "drizzle-orm";
+import { eq, and, desc, sql } from "drizzle-orm";
+import { generateApiKey, hashApiKey } from "../apiKeyUtils";
 
 /**
  * Repository class for user-related database operations
@@ -156,8 +158,57 @@ export class UserRepository {
     const [apiKey] = await db
       .select()
       .from(apiKeys)
-      .where(eq(apiKeys.key, key));
+      .where(eq(apiKeys.key, hashApiKey(key)));
     return apiKey;
+  }
+
+  /**
+   * Create a new API key for a user.
+   * Generates a high-entropy plaintext key, stores only its SHA-256 hash, and
+   * returns the plaintext exactly once (it can never be recovered afterwards).
+   * @returns The created record plus the one-time plaintext key.
+   */
+  async createApiKey(params: {
+    userId: string;
+    name: string;
+    scopes?: string[];
+    expiresAt?: Date | null;
+  }): Promise<{ apiKey: ApiKey; plaintextKey: string }> {
+    const plaintextKey = generateApiKey();
+    const insert: InsertApiKey = {
+      userId: params.userId,
+      key: hashApiKey(plaintextKey),
+      name: params.name,
+      scopes: params.scopes ?? [],
+      expiresAt: params.expiresAt ?? null,
+    };
+    const [apiKey] = await db.insert(apiKeys).values(insert).returning();
+    return { apiKey, plaintextKey };
+  }
+
+  /**
+   * List a user's API keys, newest first. The stored hash is never returned.
+   */
+  async listApiKeys(userId: string): Promise<Omit<ApiKey, "key">[]> {
+    const rows = await db
+      .select()
+      .from(apiKeys)
+      .where(eq(apiKeys.userId, userId))
+      .orderBy(desc(apiKeys.createdAt));
+    return rows.map(({ key, ...rest }) => rest);
+  }
+
+  /**
+   * Revoke (soft-delete) an API key owned by the given user.
+   * @returns true if a matching key was found and revoked.
+   */
+  async revokeApiKey(id: string, userId: string): Promise<boolean> {
+    const result = await db
+      .update(apiKeys)
+      .set({ revokedAt: new Date() })
+      .where(and(eq(apiKeys.id, id), eq(apiKeys.userId, userId)))
+      .returning({ id: apiKeys.id });
+    return result.length > 0;
   }
 
   /**

@@ -268,6 +268,9 @@ export interface IStorage {
   trackUserInteraction(userId: string, resourceId: number, interactionType: string, interactionValue?: number | null, metadata?: Record<string, any>): Promise<UserInteraction>;
   getApiKey(key: string): Promise<ApiKey | undefined>;
   updateApiKeyLastUsed(id: string): Promise<void>;
+  createApiKey(params: { userId: string; name: string; scopes?: string[]; expiresAt?: Date | null }): Promise<{ apiKey: ApiKey; plaintextKey: string }>;
+  listApiKeys(userId: string): Promise<Omit<ApiKey, "key">[]>;
+  revokeApiKey(id: string, userId: string): Promise<boolean>;
 
   // GitHub Sync Queue
   addToGithubSyncQueue(item: InsertGithubSyncQueue): Promise<GithubSyncQueue>;
@@ -678,6 +681,18 @@ export class DatabaseStorage implements IStorage {
 
   async updateApiKeyLastUsed(id: string): Promise<void> {
     return this.userRepo.updateApiKeyLastUsed(id);
+  }
+
+  async createApiKey(params: { userId: string; name: string; scopes?: string[]; expiresAt?: Date | null }): Promise<{ apiKey: ApiKey; plaintextKey: string }> {
+    return this.userRepo.createApiKey(params);
+  }
+
+  async listApiKeys(userId: string): Promise<Omit<ApiKey, "key">[]> {
+    return this.userRepo.listApiKeys(userId);
+  }
+
+  async revokeApiKey(id: string, userId: string): Promise<boolean> {
+    return this.userRepo.revokeApiKey(id, userId);
   }
 
   // ==========================================================================

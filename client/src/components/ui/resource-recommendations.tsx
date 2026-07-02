@@ -69,21 +69,21 @@ export default function ResourceRecommendations({
   const recommendations = {
     similar: relatedResourcesData?.similar?.map(item => ({
       resource: item.resource,
-      score: item.score * 100, // Convert 0-1 to 0-100 for display
+      score: item.score, // Server returns score on a 1-100 scale
       confidence: item.confidence,
       reasons: item.reasons,
       relationshipType: item.relationshipType
     })) || [],
     prerequisites: relatedResourcesData?.prerequisites?.map(item => ({
       resource: item.resource,
-      score: item.score * 100,
+      score: item.score,
       confidence: item.confidence,
       reasons: item.reasons,
       relationshipType: item.relationshipType
     })) || [],
     nextSteps: relatedResourcesData?.nextSteps?.map(item => ({
       resource: item.resource,
-      score: item.score * 100,
+      score: item.score,
       confidence: item.confidence,
       reasons: item.reasons,
       relationshipType: item.relationshipType

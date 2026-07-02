@@ -31,6 +31,7 @@
 import type { Express, Request, Response } from "express";
 import { storage } from "../storage";
 import { freeTierLimiter } from "../middleware/rateLimit";
+import { requireApiKey } from "../middleware/apiAuth";
 
 /**
  * Register all public API routes
@@ -354,5 +355,27 @@ export function registerPublicApiRoutes(app: Express): void {
       console.error('Error fetching public tags:', error);
       res.status(500).json({ message: 'Failed to fetch tags' });
     }
+  });
+
+  // ============= API Key Identity Route =============
+
+  /**
+   * GET /api/public/me
+   * Verify an API key. Requires a valid "Authorization: Bearer <key>" header.
+   * Returns the identity/metadata associated with the presented key. This is the
+   * canonical endpoint for a client to confirm its API key authenticates.
+   *
+   * Responses:
+   * - 200: { authenticated, userId, keyName, scopes }
+   * - 401: missing/invalid/revoked/expired key
+   */
+  app.get('/api/public/me', requireApiKey, (req: Request, res: Response) => {
+    const apiKey = (req as any).apiKey;
+    res.json({
+      authenticated: true,
+      userId: apiKey?.userId,
+      keyName: apiKey?.name,
+      scopes: apiKey?.scopes ?? [],
+    });
   });
 }

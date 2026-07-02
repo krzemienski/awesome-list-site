@@ -59,6 +59,8 @@ import { ensureSubSubcategoryExists } from "./repositories/ensureSubSubcategory"
 import { z } from "zod";
 import { syncService } from "./github/syncService";
 import { recommendationEngine, UserProfile as AIUserProfile } from "./ai/recommendationEngine";
+import { buildRelatedResources } from "./services/relatedResources";
+import { registerPublicApiRoutes } from "./api/public";
 import { learningPathGenerator } from "./ai/learningPathGenerator";
 import { claudeService } from "./ai/claudeService";
 import { AwesomeListFormatter } from "./github/formatter";
@@ -722,26 +724,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get('/api/resources/:id/related', async (req, res) => {
+    const empty = { similar: [], prerequisites: [], nextSteps: [], totalFound: 0 };
     try {
       const id = parseInt(req.params.id);
       if (Number.isNaN(id)) {
-        return res.json({ resources: [] });
+        return res.json(empty);
       }
+      const limit = Math.min(Math.max(parseInt(req.query.limit as string) || 5, 1), 10);
       const resource = await resourceRepo.getResource(id);
       if (!resource) {
-        return res.json({ resources: [] });
+        return res.json(empty);
       }
+      // Pull a pool of approved resources in the same category to rank against.
       const { resources: pool } = await resourceRepo.listResources({
         page: 1,
-        limit: 7,
+        limit: 60,
         status: 'approved',
         category: resource.category ?? undefined,
       });
-      const related = pool.filter(r => r.id !== id).slice(0, 6);
-      res.json({ resources: related });
+      res.json(buildRelatedResources(resource, pool, limit));
     } catch (error) {
       console.error('Error fetching related resources:', error);
-      res.json({ resources: [] });
+      res.json(empty);
     }
   });
 
@@ -1135,6 +1139,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('[/api/user/change-password] Error:', error);
       return res.status(500).json({ message: 'Failed to change password' });
+    }
+  });
+
+  // ---- API key management (session-authed) -------------------------------
+  // POST /api/user/api-keys — create a key; the plaintext is returned ONCE.
+  app.post('/api/user/api-keys', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { name, scopes, expiresInDays } = req.body ?? {};
+
+      if (typeof name !== 'string' || name.trim().length === 0) {
+        return res.status(400).json({ message: 'A non-empty "name" is required' });
+      }
+      if (scopes !== undefined && (!Array.isArray(scopes) || scopes.some((s: unknown) => typeof s !== 'string'))) {
+        return res.status(400).json({ message: '"scopes" must be an array of strings' });
+      }
+      let expiresAt: Date | null = null;
+      if (expiresInDays !== undefined && expiresInDays !== null) {
+        const days = Number(expiresInDays);
+        if (!Number.isFinite(days) || days <= 0) {
+          return res.status(400).json({ message: '"expiresInDays" must be a positive number' });
+        }
+        expiresAt = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+      }
+
+      const { apiKey, plaintextKey } = await storage.createApiKey({
+        userId,
+        name: name.trim(),
+        scopes: scopes ?? [],
+        expiresAt,
+      });
+
+      return res.status(201).json({
+        message: 'API key created. Copy it now — it will not be shown again.',
+        key: plaintextKey,
+        apiKey: {
+          id: apiKey.id,
+          name: apiKey.name,
+          scopes: apiKey.scopes,
+          createdAt: apiKey.createdAt,
+          expiresAt: apiKey.expiresAt,
+        },
+      });
+    } catch (error) {
+      console.error('[POST /api/user/api-keys] Error:', error);
+      return res.status(500).json({ message: 'Failed to create API key' });
+    }
+  });
+
+  // GET /api/user/api-keys — list the caller's keys (never returns the secret).
+  app.get('/api/user/api-keys', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const keys = await storage.listApiKeys(userId);
+      return res.json({ apiKeys: keys });
+    } catch (error) {
+      console.error('[GET /api/user/api-keys] Error:', error);
+      return res.status(500).json({ message: 'Failed to list API keys' });
+    }
+  });
+
+  // DELETE /api/user/api-keys/:id — revoke one of the caller's keys.
+  app.delete('/api/user/api-keys/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const revoked = await storage.revokeApiKey(req.params.id, userId);
+      if (!revoked) {
+        return res.status(404).json({ message: 'API key not found' });
+      }
+      return res.json({ message: 'API key revoked' });
+    } catch (error) {
+      console.error('[DELETE /api/user/api-keys/:id] Error:', error);
+      return res.status(500).json({ message: 'Failed to revoke API key' });
     }
   });
 
@@ -3823,6 +3900,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
   });
+
+  // Public developer API (read-only, rate-limited) + API-key identity endpoint.
+  // Registered here so its concrete /api/public/* routes are matched before the
+  // catch-all 404 below.
+  registerPublicApiRoutes(app);
 
   // JSON 404 fallback for unmatched /api/* routes.
   // Must be registered after all other /api/* handlers so it only catches
