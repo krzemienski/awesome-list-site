@@ -44,22 +44,20 @@ export class UserRepository {
 
   /**
    * Create or update a user (upsert operation)
-   * Special behavior: First user is automatically made an admin
+   *
+   * Note: there is intentionally NO first-user admin bootstrap here. Admin
+   * accounts are provisioned exclusively by the env-driven seeding path
+   * (seedAdminUser + ADMIN_PASSWORD secret) or by an existing admin via the
+   * role-management API. Auto-promoting the first registrant would let an
+   * anonymous caller of the public register endpoint claim admin on a fresh
+   * database.
    * @param userData - User data to insert or update
    * @returns The created or updated user
    */
   async upsertUser(userData: UpsertUser): Promise<User> {
-    // Check if this is the first user (bootstrap admin)
-    const [userCountResult] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(users);
-
-    const isFirstUser = userCountResult.count === 0;
-
-    // If this is the first user, make them an admin
     const userDataWithRole = {
       ...userData,
-      role: isFirstUser ? 'admin' : (userData.role || 'user'),
+      role: userData.role || 'user',
     };
 
     const [user] = await db
@@ -73,12 +71,6 @@ export class UserRepository {
         },
       })
       .returning();
-
-    // Log when first admin is created
-    if (isFirstUser) {
-      const displayName = user.email || (user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.firstName) || user.id;
-      console.log(`🔐 First user created as admin: ${displayName}`);
-    }
 
     return user;
   }
