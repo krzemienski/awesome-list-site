@@ -210,21 +210,17 @@ export default function Login() {
             </Link>
           </p>
 
-          {/* Default-credential hint is a local-development convenience only.
+          {/* Admin-account hint is a local-development convenience only.
               Gated on import.meta.env.DEV so it never renders in production builds. */}
           {import.meta.env.DEV && (
             <div className="space-y-2 pt-2 text-xs text-[color:var(--text-2)]">
               <p className="text-xs text-[color:var(--text-2)]">
-                Default admin credentials:
+                Local admin account:
               </p>
               <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
                 <code className="font-mono text-[color:var(--accent)]">admin@example.com</code>
                 <span aria-hidden="true" className="text-[color:var(--text-3)]">/</span>
-                <code className="font-mono text-[color:var(--accent)]">admin123</code>
-              </p>
-              <p className="flex items-start gap-2 text-[color:var(--warn,#ffb84d)]">
-                <AlertTriangle className="h-3.5 w-3.5 mt-[1px] shrink-0" />
-                <span>Change password after first login</span>
+                <span>the <code className="font-mono text-[color:var(--accent)]">ADMIN_PASSWORD</code> secret</span>
               </p>
             </div>
           )}

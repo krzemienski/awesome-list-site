@@ -5,7 +5,12 @@ import { hashPassword } from "../server/passwordUtils";
 
 async function resetAdminPassword() {
   const adminEmail = "admin@example.com";
-  const newPassword = "admin123";
+  const newPassword = process.env.ADMIN_PASSWORD;
+
+  if (!newPassword || newPassword.length < 8) {
+    console.error("❌ ADMIN_PASSWORD is not set (or is shorter than 8 characters). Set the ADMIN_PASSWORD secret and re-run.");
+    process.exit(1);
+  }
 
   try {
     console.log(`🔄 Resetting password for ${adminEmail}...`);

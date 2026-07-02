@@ -50,7 +50,7 @@ on the following data being present in the database the test runs against:
 
 | Fixture                        | Used for                                                  |
 | ------------------------------ | --------------------------------------------------------- |
-| Admin `admin@example.com` / `admin123` | Programmatic admin login. Provisioned by `scripts/reset-admin-password.ts`. |
+| Admin `admin@example.com` / `$ADMIN_PASSWORD` | Programmatic admin login. Password comes from the `ADMIN_PASSWORD` secret; provisioned by `scripts/reset-admin-password.ts`. |
 | Non-admin user `id=test-user-123` (`test@example.com`) | Target row whose role is toggled `user → moderator → user`. |
 | Resource id `186689`           | Known resource with many `resource_audit_log` entries; used by the Audit tab filter assertion. |
 

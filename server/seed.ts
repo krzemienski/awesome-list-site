@@ -137,12 +137,20 @@ export interface SeedResult {
 async function seedAdminUser(): Promise<boolean> {
   try {
     const adminEmail = "admin@example.com";
-    const adminPassword = "admin123";
-    
+    const adminPassword = process.env.ADMIN_PASSWORD;
+
+    if (!adminPassword || adminPassword.length < 8) {
+      console.warn(
+        `⚠️  ADMIN_PASSWORD is not set (or is shorter than 8 characters) — skipping admin user creation. ` +
+        `Set the ADMIN_PASSWORD secret to seed the local admin account (${adminEmail}).`
+      );
+      return false;
+    }
+
     const existingAdmin = await db.select().from(users).where(eq(users.email, adminEmail)).limit(1);
     
     if (existingAdmin.length > 0) {
-      console.log(`ℹ️  Default admin user already exists (${adminEmail})`);
+      console.log(`ℹ️  Admin user already exists (${adminEmail})`);
       return false;
     }
     
@@ -157,11 +165,10 @@ async function seedAdminUser(): Promise<boolean> {
     });
     
     console.log(`\n${'='.repeat(60)}`);
-    console.log(`🔐 DEFAULT ADMIN USER CREATED`);
+    console.log(`🔐 ADMIN USER CREATED`);
     console.log(`${'='.repeat(60)}`);
-    console.log(`Email:    ${adminEmail}`);
-    console.log(`Password: ${adminPassword}`);
-    console.log(`⚠️  IMPORTANT: Change this password after first login!`);
+    console.log(`Email: ${adminEmail}`);
+    console.log(`Password: (value of the ADMIN_PASSWORD secret — never logged)`);
     console.log(`${'='.repeat(60)}\n`);
 
     return true;

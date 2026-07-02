@@ -5,8 +5,9 @@ import { test, expect, Page } from '@playwright/test';
  *
  * These tests:
  *   1. Log in as an admin via the local auth endpoint (POST /api/auth/local/login).
- *      The admin account is the seeded admin@example.com / admin123 user that
- *      `scripts/reset-admin-password.ts` provisions.
+ *      The admin account is the seeded admin@example.com user whose password
+ *      comes from the ADMIN_PASSWORD env var (provisioned by
+ *      `scripts/reset-admin-password.ts`).
  *   2. Open the admin dashboard, switch to the Users tab, change a user's role
  *      via the role dropdown, and assert the change is reflected in the API
  *      and the UI. The role is reverted in `afterAll` so tests are
@@ -22,7 +23,10 @@ import { test, expect, Page } from '@playwright/test';
  */
 
 const ADMIN_EMAIL = 'admin@example.com';
-const ADMIN_PASSWORD = 'admin123';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? '';
+if (!ADMIN_PASSWORD) {
+  throw new Error('ADMIN_PASSWORD env var must be set to run admin e2e tests');
+}
 
 // Mirror the default baseURL configured in playwright.config.ts so contexts
 // created outside of the standard `page` fixture (e.g. in afterAll) also
