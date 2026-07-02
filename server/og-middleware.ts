@@ -31,7 +31,9 @@ export interface RouteMeta {
    *      ALSO get HTTP 404 from the middleware because `found` is false.
    *   2. Valid utility pages with no search value (e.g. /login, /register) —
    *      these stay HTTP 200 because `found` is true; only the index signal is
-   *      suppressed. Prerendered body injection is skipped for any noindex page.
+   *      suppressed. These may still opt in to prerendered body injection
+   *      (noindex governs indexing, not readability); soft-404s never receive
+   *      an injected body because `found` is false (`!notFound` guard).
    */
   noindex?: boolean;
   /**
@@ -436,7 +438,42 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
       bodyHtml = renderStaticPageContent({
         heading: m.title.split(" — ")[0],
         description: m.description,
+        ...(path === "/submit"
+          ? {
+              paragraphs: [
+                "Share a valuable video development tool, library, article, or course with the community. All submissions are reviewed before being published.",
+                "You can preview the submission form without an account, but you must log in to actually submit a resource.",
+              ],
+              links: [{ path: "/login", label: "Sign in to submit a resource" }],
+            }
+          : {}),
         categories,
+      });
+    } else if (path === "/login" || path === "/register") {
+      // Noindex utility pages still get a minimal readable body so non-JS
+      // crawlers (GPTBot, ClaudeBot, PerplexityBot, Applebot-Extended) see real
+      // content instead of an empty SPA shell. noindex governs indexing only —
+      // the pages remain crawlable and readable.
+      const isLogin = path === "/login";
+      bodyHtml = renderStaticPageContent({
+        heading: isLogin
+          ? "Sign in to Awesome Video"
+          : "Create an Awesome Video account",
+        description: m.description,
+        paragraphs: [
+          isLogin
+            ? "Welcome back. Sign in to access your bookmarks, submitted resources, and personalized learning journeys."
+            : "Join the community to submit and save resources. A free account lets you bookmark tools, suggest new resources, and track your learning journeys.",
+        ],
+        links: isLogin
+          ? [
+              { path: "/register", label: "Create an account" },
+              { path: "/submit", label: "Submit a resource" },
+            ]
+          : [
+              { path: "/login", label: "Sign in" },
+              { path: "/submit", label: "Submit a resource" },
+            ],
       });
     }
     return { meta: m, found: true, bodyHtml };
@@ -884,16 +921,18 @@ export function ogInjectionMiddleware() {
             html = rewriteHead(html, meta!);
           }
           // Task #80: inject prerendered semantic content into the SPA shell for
-          // found, indexable routes so non-JS crawlers (GPTBot, ClaudeBot,
-          // Googlebot's pre-render) see real headings, summaries, and internal
-          // links. main.tsx calls createRoot().render() on boot, which REPLACES
-          // this content — we never set __INITIAL_DATA__, so there is no
-          // hydration step (and no mismatch). The function form of replace()
-          // avoids `$` special-sequence interpretation in titles/descriptions.
+          // found routes so non-JS crawlers (GPTBot, ClaudeBot, Googlebot's
+          // pre-render) see real headings, summaries, and internal links.
+          // Noindex utility routes (/login, /register) are included on purpose:
+          // noindex governs indexing, not readability, and bodyHtml is only ever
+          // assigned to routes that deliberately opt in. main.tsx calls
+          // createRoot().render() on boot, which REPLACES this content — we
+          // never set __INITIAL_DATA__, so there is no hydration step (and no
+          // mismatch). The function form of replace() avoids `$`
+          // special-sequence interpretation in titles/descriptions.
           if (
             bodyHtml &&
             !notFound &&
-            !meta!.noindex &&
             html.includes("<!--app-html-->")
           ) {
             html = html.replace("<!--app-html-->", () => bodyHtml!);

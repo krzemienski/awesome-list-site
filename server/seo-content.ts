@@ -212,21 +212,31 @@ export function renderJourneyContent(opts: {
 export function renderStaticPageContent(opts: {
   heading: string;
   description: string;
+  paragraphs?: string[];
+  links?: { path: string; label: string }[];
   categories?: { name: string; slug: string; count: number }[];
 }): string {
   const nav: LinkItem[] = [
     { href: internalHref("/"), label: "Home — all categories" },
     { href: internalHref("/journeys"), label: "Learning journeys" },
     { href: internalHref("/about"), label: "About" },
+    ...(opts.links ?? []).map((l) => ({
+      href: internalHref(l.path),
+      label: l.label,
+    })),
   ];
   const cats: LinkItem[] = (opts.categories ?? []).map((c) => ({
     href: internalHref(`/category/${c.slug}`),
     label: c.name,
     meta: `${count(c.count)} resources`,
   }));
+  const paras = (opts.paragraphs ?? [])
+    .map((p) => `<p class="ssr-lead">${escapeHtml(p)}</p>`)
+    .join("");
   return shell(
     `<h1>${escapeHtml(opts.heading)}</h1>` +
       `<p class="ssr-lead">${escapeHtml(opts.description)}</p>` +
+      paras +
       `<h2>Explore</h2>${linkList(nav)}` +
       (cats.length ? `<h2>Top categories</h2>${linkList(cats)}` : ""),
   );
