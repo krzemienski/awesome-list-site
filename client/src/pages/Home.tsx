@@ -23,6 +23,7 @@ import {
   Users,
   Sparkles,
   LogIn,
+  Clapperboard,
 } from "lucide-react";
 
 interface HomeProps {
@@ -35,7 +36,7 @@ const categoryIcons: { [key: string]: any } = {
   "Protocols & Transport": Server,
   "Encoding & Codecs": Code,
   "Players & Clients": Play,
-  "Media Tools": Settings,
+  "Media Tools": Clapperboard,
   "Standards & Industry": Package,
   "Infrastructure & Delivery": Layers,
   "General Tools": Settings,
@@ -288,12 +289,16 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
 
       <div className="mt-8 sm:mt-12">
         <div className="mb-4 sm:mb-6 space-y-2">
-          <div className="flex items-center gap-2 sm:gap-3">
+          <Link
+            href="/recommendations"
+            className="flex items-center gap-2 sm:gap-3 no-underline text-inherit hover:text-[var(--accent)] transition-colors w-fit"
+            data-testid="link-recommendations-heading"
+          >
             <Sparkles className="h-6 w-6 text-[var(--accent)] shrink-0" />
             <h2 className="font-sans font-bold text-2xl sm:text-3xl tracking-tight">
               AI-Powered Recommendations
             </h2>
-          </div>
+          </Link>
           <p className="text-sm sm:text-base text-[color:var(--text-2)]">
             Get personalized resource recommendations based on your interests and learning goals.
           </p>
@@ -312,11 +317,17 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                 Sign in to unlock AI-powered recommendations tailored to your skill level and interests
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex flex-col sm:flex-row gap-3 sm:items-center">
               <Link href="/login">
                 <Button className="w-full sm:w-auto">
                   <LogIn className="mr-2 h-4 w-4" />
                   Login to Get Started
+                </Button>
+              </Link>
+              <Link href="/recommendations">
+                <Button variant="outline" className="w-full sm:w-auto" data-testid="button-browse-recommendations">
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  Browse recommendations
                 </Button>
               </Link>
             </CardContent>

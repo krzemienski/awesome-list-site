@@ -4,6 +4,18 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 
 ---
 
+## July 2, 2026
+
+### UX Audit Fix Batch — Missing Pages, Redirects, Navigation Polish, Dead-Link Telemetry
+- **New `/recommendations` page** (`client/src/pages/Recommendations.tsx`): authenticated users get the full `AIRecommendationsPanel` (reuses cached `["awesome-list-data"]`); anonymous users get a login CTA plus a "Popular picks" grid fed by `GET /api/recommendations` (returns a plain `RecommendationResult[]` array, same shape as the authed POST). Skeletons while loading, error state with retry (`retry: false` to respect the hourly rate limiter). Home's AI section header now links here, with a "Browse recommendations" outline button.
+- **New `/search` page** (`client/src/pages/Search.tsx`): 300ms-debounced input synced to `?q=`, hits `/api/resources?search=&limit=50`, renders `ResourceCard` grid with result count, loading skeletons, and empty state. Search dialog now pins a "View all results" item first so Enter jumps to `/search?q=…`.
+- **Redirects (client + server)**: `/settings` → `/settings/theme`, `/category` → `/` (wouter `<Redirect>` + og-middleware 301s). Flat `/category/:slug` where slug is actually a subcategory/sub-subcategory now 301s to the canonical `/subcategory/:slug` or `/sub-subcategory/:slug` (og-middleware tree lookup) with a matching client-side redirect in `Category.tsx`.
+- **Did-you-mean 404s**: unknown category slugs get a Levenshtein-based suggestion (distance ≤2 vs slug + hyphen tokens) — e.g. `/category/comunity` → "Did you mean Community & Events?" — rendered by a rebuilt `not-found.tsx` with optional `heading`/`suggestion` props.
+- **Dead-link telemetry**: `client/src/lib/route-monitor.ts` `reportDeadLink()` (DEV: console; prod: keepalive POST) fires from NotFound mount; new `POST /api/telemetry/dead-link` endpoint (zod-validated, 204/400).
+- **Visual/navigation polish**: Media Tools icon Settings→Clapperboard (was duplicating General Tools' gear) in Home + sidebar nav icons; sidebar category buttons get `title` tooltips; empty subcategories show italic "(empty)" label; header status dot removed; footer text contrast raised to `text-foreground/80`; skeletons use `bg-[var(--surface-3)]` (token defined across all 5 DS skins).
+- **`/recommendations` + `/search` registered in og-middleware `staticRoutes` as `noindex: true`** (thin/duplicative content stays out of the index); old `/recommendations` 301 removed.
+- **Validation**: `npm run build` clean; curl smoke (200s/301s/404, telemetry 204/400) all pass; Playwright click-paths verified (12 anon recommendation cards render, search-dialog Enter → `/search?q=ffmpeg`, 90 results); zero new console errors.
+
 ## May 19, 2026
 
 ### Editorial + Crimson — Pixel-Perfect Alignment to Claude Design Handoff

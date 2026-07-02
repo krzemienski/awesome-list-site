@@ -116,10 +116,6 @@ export default function AppHeader({ onSearchOpen, user, onLogout }: AppHeaderPro
           title="Theme Settings"
         >
           <Palette className="h-4 w-4" />
-          <span
-            className="absolute bottom-1 right-1 h-2.5 w-2.5 rounded-full border border-background"
-            style={{ backgroundColor: "var(--accent)" }}
-          />
         </Button>
 
         {user ? (

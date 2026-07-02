@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { useParams, Link, useLocation } from "wouter";
+import { useParams, Link, useLocation, Redirect } from "wouter";
 import { safeGetItem, safeSetItem } from "@/lib/safeStorage";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -22,6 +22,50 @@ import { fetchStaticAwesomeList } from "@/lib/static-data";
 import { trackCategoryView } from "@/lib/analytics";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+
+/** Classic Levenshtein edit distance (small inputs only — slugs/tokens). */
+function levenshtein(a: string, b: string): number {
+  if (a === b) return 0;
+  if (!a.length) return b.length;
+  if (!b.length) return a.length;
+  let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i++) {
+    const curr = [i];
+    for (let j = 1; j <= b.length; j++) {
+      curr[j] = Math.min(
+        prev[j] + 1,
+        curr[j - 1] + 1,
+        prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1),
+      );
+    }
+    prev = curr;
+  }
+  return prev[b.length];
+}
+
+/**
+ * "Did you mean …?" — fuzzy-match a bad category slug against the real
+ * category slugs (full slug AND each hyphen token, so "comunity" still
+ * finds "community-events") with edit distance ≤ 2.
+ */
+function findCategorySuggestion(
+  slug: string | undefined,
+  categories: Array<{ name: string; slug: string }>,
+): { label: string; href: string } | undefined {
+  if (!slug) return undefined;
+  const needle = slug.toLowerCase();
+  let best: { name: string; slug: string; dist: number } | undefined;
+  for (const cat of categories) {
+    const candidates = [cat.slug, ...cat.slug.split("-")];
+    const dist = Math.min(...candidates.map((c) => levenshtein(needle, c)));
+    if (dist <= 2 && (!best || dist < best.dist)) {
+      best = { name: cat.name, slug: cat.slug, dist };
+    }
+  }
+  return best
+    ? { label: `Did you mean ${best.name}?`, href: `/category/${best.slug}` }
+    : undefined;
+}
 
 export default function Category() {
   const { slug } = useParams<{ slug: string }>();
@@ -260,7 +304,29 @@ export default function Category() {
   }
   
   if (!currentCategory && !isLoading) {
-    return <NotFound />;
+    // Slug tolerance: the slug may belong to a subcategory or sub-subcategory
+    // (e.g. someone hand-edited /category/intro-learning → a sub slug).
+    // Redirect to the canonical page instead of 404ing.
+    if (awesomeList && slug) {
+      for (const cat of awesomeList.categories) {
+        for (const sub of cat.subcategories ?? []) {
+          if (sub.slug === slug) {
+            return <Redirect to={`/subcategory/${slug}`} replace />;
+          }
+          for (const subSub of sub.subSubcategories ?? []) {
+            if (subSub.slug === slug) {
+              return <Redirect to={`/sub-subcategory/${slug}`} replace />;
+            }
+          }
+        }
+      }
+    }
+    return (
+      <NotFound
+        heading="This page doesn't exist."
+        suggestion={findCategorySuggestion(slug, awesomeList?.categories ?? [])}
+      />
+    );
   }
   
   return (

@@ -388,6 +388,19 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
       title: `Theme Settings — ${SITE_NAME}`,
       description: `Customize the look and feel of ${SITE_NAME} — switch fonts and color themes.`,
     },
+    "/recommendations": {
+      title: `AI-Powered Recommendations — ${SITE_NAME}`,
+      description: `Personalized video development resource recommendations based on your interests and learning goals.`,
+      // Personalized/dynamic content — keep out of the index so the
+      // indexable set stays equal to the sitemap.
+      noindex: true,
+    },
+    "/search": {
+      title: `Search — ${SITE_NAME}`,
+      description: `Search 2,000+ curated video development tools, libraries, players, codecs, and learning resources.`,
+      // Search results pages are standard noindex (thin/duplicate content).
+      noindex: true,
+    },
     "/admin": {
       title: `Admin — ${SITE_NAME}`,
       description: `${SITE_NAME} admin panel.`,
@@ -904,8 +917,37 @@ export function ogInjectionMiddleware() {
       }
       console.warn("[og-middleware] unresolvable nested category path:", urlPath);
     }
-    if (urlPath === "/recommendations") {
-      // Personalized recommendations live on the home page (AI panel).
+    // Slug tolerance for single-level /category/:slug where the slug actually
+    // belongs to a subcategory or sub-subcategory — 301 to the canonical page
+    // (mirrors the client-side tolerance in Category.tsx). Real category slugs
+    // resolve normally below; unknown slugs fall through to the soft-404.
+    const flatCatMatch = urlPath.match(/^\/category\/([^\/]+)$/);
+    if (flatCatMatch) {
+      const maybeSlug = safeDecode(flatCatMatch[1]);
+      try {
+        const tree = await getTreeCached();
+        const isCategory = (tree?.categories ?? []).some(
+          (c: any) => c.slug === maybeSlug,
+        );
+        if (!isCategory) {
+          if (findSubcategory(tree, maybeSlug)) {
+            return res.redirect(301, `/subcategory/${encodeURIComponent(maybeSlug)}`);
+          }
+          if (findSubSubcategory(tree, maybeSlug)) {
+            return res.redirect(301, `/sub-subcategory/${encodeURIComponent(maybeSlug)}`);
+          }
+        }
+      } catch {
+        // tree lookup failed — fall through to the resolver's fail-open path
+      }
+    }
+    // /recommendations is now a real page (see staticRoutes) — no redirect.
+    if (urlPath === "/settings") {
+      // Bare /settings was never a route; canonical settings page is the theme page.
+      return res.redirect(301, "/settings/theme");
+    }
+    if (urlPath === "/category") {
+      // Bare /category (no slug) — send to the category overview on home.
       return res.redirect(301, "/");
     }
 

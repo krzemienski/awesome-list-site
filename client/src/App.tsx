@@ -27,6 +27,8 @@ import Journeys from "@/pages/Journeys";
 import JourneyDetail from "@/pages/JourneyDetail";
 import ResourceDetail from "@/pages/ResourceDetail";
 import ThemeSettings from "@/pages/ThemeSettings";
+import Recommendations from "@/pages/Recommendations";
+import Search from "@/pages/Search";
 
 import { processAwesomeListData } from "@/lib/parser";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
@@ -73,10 +75,12 @@ function Router() {
           {(params) => <Redirect to={`/subcategory/${params.subSlug}`} replace />}
         </Route>
         <Route path="/category/:slug" component={Category} />
-        <Route path="/subcategory/:slug" component={Subcategory} />
-        <Route path="/recommendations">
+        <Route path="/category">
           <Redirect to="/" replace />
         </Route>
+        <Route path="/subcategory/:slug" component={Subcategory} />
+        <Route path="/recommendations" component={Recommendations} />
+        <Route path="/search" component={Search} />
         <Route path="/sub-subcategory/:slug" component={SubSubcategory} />
         <Route path="/resource/:id" component={ResourceDetail} />
         <Route path="/about" component={About} />
@@ -88,7 +92,12 @@ function Router() {
         <Route path="/bookmarks" component={() => (<AuthGuard><Bookmarks /></AuthGuard>)} />
         <Route path="/admin" component={() => (<AdminGuard><AdminDashboard /></AdminGuard>)} />
         <Route path="/settings/theme" component={ThemeSettings} />
-        <Route component={NotFound} />
+        <Route path="/settings">
+          <Redirect to="/settings/theme" replace />
+        </Route>
+        <Route>
+          <NotFound />
+        </Route>
       </Switch>
     </MainLayout>
   );

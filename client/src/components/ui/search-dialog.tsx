@@ -139,8 +139,24 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
           
           <CommandList className="max-h-[300px] overflow-y-auto">
             {query.length >= 2 ? (
-              results.length > 0 ? (
+              <>
                 <CommandGroup>
+                  {/* Pinned first so plain Enter goes to the full search page. */}
+                  <CommandItem
+                    key="view-all-results"
+                    value={`view-all-${query}`}
+                    onSelect={() => {
+                      setIsOpen(false);
+                      navigate(`/search?q=${encodeURIComponent(query)}`);
+                    }}
+                    className="flex items-center gap-2 p-3 cursor-pointer"
+                    data-testid="search-view-all"
+                  >
+                    <Search className="h-4 w-4 shrink-0 text-[var(--accent)]" />
+                    <span className="text-sm font-medium">
+                      View all results for “{query}”
+                    </span>
+                  </CommandItem>
                   {results.map((resource, index) => (
                     <CommandItem
                       key={`${resource.title}-${resource.url}-${index}`}
@@ -179,15 +195,18 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
                     </CommandItem>
                   ))}
                 </CommandGroup>
-              ) : (
-                <div className="flex flex-col items-center justify-center h-[200px] text-center p-4">
-                  <div className="flex h-16 w-16 items-center justify-center bg-muted rounded-lg">
-                    <Search className="h-8 w-8 text-muted-foreground" />
+                {results.length === 0 && (
+                  <div className="flex flex-col items-center justify-center h-[160px] text-center p-4">
+                    <div className="flex h-16 w-16 items-center justify-center bg-muted rounded-lg">
+                      <Search className="h-8 w-8 text-muted-foreground" />
+                    </div>
+                    <h3 className="mt-4 text-sm font-semibold">No quick results found</h3>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      Press Enter to search all resources, or try different keywords
+                    </p>
                   </div>
-                  <h3 className="mt-4 text-sm font-semibold">No results found</h3>
-                  <p className="mt-2 text-xs text-muted-foreground">Try different keywords</p>
-                </div>
-              )
+                )}
+              </>
             ) : (
               <div className="flex flex-col items-center justify-center h-[200px] text-center p-4">
                 <div className="flex h-16 w-16 items-center justify-center bg-muted rounded-lg">

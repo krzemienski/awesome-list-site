@@ -649,6 +649,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // POST /api/telemetry/dead-link - Client-side 404 telemetry (public, fire-and-forget)
+  app.post('/api/telemetry/dead-link', (req, res) => {
+    const deadLinkSchema = z.object({
+      path: z.string().min(1).max(2000),
+      referrer: z.string().max(2000).nullable().optional(),
+      ts: z.string().max(64).optional(),
+    });
+    const parsed = deadLinkSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ message: 'Invalid payload' });
+    }
+    const { path, referrer, ts } = parsed.data;
+    console.warn(
+      `[dead-link] path=${JSON.stringify(path)} referrer=${JSON.stringify(referrer ?? '')} ts=${ts ?? new Date().toISOString()}`
+    );
+    res.status(204).end();
+  });
+
   // GET /api/resources/check-url - Check if URL already exists (public)
   app.get('/api/resources/check-url', async (req, res) => {
     try {

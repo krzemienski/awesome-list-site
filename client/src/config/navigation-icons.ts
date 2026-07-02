@@ -68,7 +68,9 @@ export const navigationIcons: NavigationIconMap = {
     "Protocols & Transport": Radio,
     "Encoding & Codecs": Film,
     "Players & Clients": Play,
-    "Media Tools": Wrench,
+    // Clapperboard (not Wrench/Settings) so Media Tools reads as media-related
+    // and is visually distinct from General Tools' gear across sidebar + home.
+    "Media Tools": Clapperboard,
     "Standards & Industry": FileText,
     "Infrastructure & Delivery": Server,
     "General Tools": Settings,

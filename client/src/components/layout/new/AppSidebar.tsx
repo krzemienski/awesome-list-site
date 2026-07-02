@@ -129,13 +129,21 @@ function SubItem({
       }
       title={count === 0 ? `${label} (no resources yet)` : label}
     >
-      <span className="flex-1 min-w-0 truncate">{label}</span>
+      <span className="flex-1 min-w-0 truncate" title={label}>{label}</span>
       {typeof count === "number" && (
         <span
           className="font-mono shrink-0 tabular-nums"
           style={{ fontSize: 10, color: "var(--text-3)" }}
         >
           {formatCount(count)}
+        </span>
+      )}
+      {count === 0 && (
+        <span
+          className="italic shrink-0"
+          style={{ fontSize: 10, color: "var(--text-3)" }}
+        >
+          (empty)
         </span>
       )}
     </a>
@@ -227,6 +235,7 @@ function CategoryAccordion({
           </span>
           <span
             className="truncate"
+            title={cat.name}
             style={{
               fontSize: 13,
               fontWeight: 500,
@@ -249,6 +258,7 @@ function CategoryAccordion({
             <button
               type="button"
               onClick={onToggle}
+              title={isOpen ? `Collapse ${cat.name}` : `Expand ${cat.name}`}
               aria-label={isOpen ? `Collapse ${cat.name}` : `Expand ${cat.name}`}
               aria-expanded={isOpen}
               aria-controls={`accordion-body-${catSlug}`}

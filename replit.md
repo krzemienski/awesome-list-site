@@ -10,6 +10,13 @@ A production-ready React application for browsing and discovering over 2,600 cur
 
 > **Full history:** see [`CHANGELOG.md`](./CHANGELOG.md) for every dated entry back to December 2025.
 
+### UX Audit Fix Batch — Pages, Redirects, Polish, Telemetry (July 2, 2026)
+- **New pages**: `/recommendations` (auth → `AIRecommendationsPanel`; anon → login CTA + "Popular picks" grid from `GET /api/recommendations`, which returns a plain `RecommendationResult[]` array — same shape as the authed POST) and `/search` (300ms-debounced `?q=`-synced input → `/api/resources?search=&limit=50`). Both registered in og-middleware `staticRoutes` with `noindex: true`; search dialog pins "View all results" first so Enter → `/search?q=…`.
+- **Redirects**: `/settings`→`/settings/theme`, `/category`→`/` (client `<Redirect>` + og-middleware 301s); flat `/category/:slug` matching a sub/sub-subcategory 301s to its canonical route (server tree lookup) with matching client redirect in `Category.tsx`.
+- **Did-you-mean 404s + telemetry**: unknown category slugs get Levenshtein suggestions (e.g. `/category/comunity` → "Did you mean Community & Events?"); rebuilt `not-found.tsx` fires `reportDeadLink()` (`lib/route-monitor.ts`, DEV console / prod keepalive POST) → new `POST /api/telemetry/dead-link` (zod, 204/400).
+- **Polish**: Media Tools icon gear→Clapperboard (deduped vs General Tools), sidebar tooltips + italic "(empty)" labels, header status dot removed, footer contrast `text-foreground/80`, skeletons on `--surface-3` (defined in all 5 DS skins).
+- **Validated**: build clean; curl smoke all pass; Playwright click-paths (12 anon rec cards, dialog-Enter → 90 search results); zero new console errors. Full detail in `CHANGELOG.md`.
+
 ### Admin Credential Rotation + Hardening (July 2, 2026)
 - **Prod + dev passwords rotated**: `admin@example.com` no longer accepts the old seeded default anywhere (verified 401 old / 200 new on both awesome.video and dev). New password lives in the `ADMIN_PASSWORD` secret (global). Prod rotated via `POST /api/user/change-password` (verifies current password, invalidates other sessions); dev via `scripts/reset-admin-password.ts`.
 - **No more hardcoded password in code**: `server/seed.ts` `seedAdminUser()` reads `ADMIN_PASSWORD` (skips creation if unset/<8 chars, never logs the value); `scripts/reset-admin-password.ts` requires the env var; `Login.tsx` dev-only hint references the secret instead of a literal; `tests/e2e/admin-users-audit.spec.ts` reads it from env.
