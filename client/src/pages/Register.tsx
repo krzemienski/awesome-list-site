@@ -100,6 +100,7 @@ export default function Register() {
       <SEOHead
         title="Create an Account"
         description="Create a free Awesome Video account to save bookmarks, submit resources, and track your learning journeys."
+        noindex
       />
       <h1 className="sr-only">Create an Awesome Video account</h1>
       <Card className="w-full max-w-md" data-testid="register-card">

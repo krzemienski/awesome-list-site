@@ -48,6 +48,7 @@ export default function Recommendations() {
       <SEOHead
         title="AI-Powered Recommendations — Awesome Video"
         description="Personalized video development resource recommendations based on your interests and learning goals."
+        noindex
       />
 
       <div className="space-y-2">
