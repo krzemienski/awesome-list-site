@@ -27,20 +27,24 @@ function FavoriteButton({
   const [favoriteCount, setFavoriteCount] = useState(initialCount);
   const { toast } = useToast();
 
+  // `remove` is captured at click time and passed as the mutation variable so
+  // the POST/DELETE decision never depends on the optimistic state flip below
+  // (reading the mutable `isFavorited` inside mutationFn caused removals to
+  // re-add because onMutate flipped it first).
   const favoriteMutation = useMutation({
-    mutationFn: async () => {
-      const method = isFavorited ? "DELETE" : "POST";
+    mutationFn: async (remove: boolean) => {
+      const method = remove ? "DELETE" : "POST";
       return await apiRequest(`/api/favorites/${resourceId}`, {
         method,
         credentials: 'include'
       });
     },
-    onMutate: async () => {
+    onMutate: async (remove: boolean) => {
       // Optimistic update
-      setIsFavorited(!isFavorited);
-      setFavoriteCount(prev => isFavorited ? Math.max(0, prev - 1) : prev + 1);
+      setIsFavorited(!remove);
+      setFavoriteCount(prev => remove ? Math.max(0, prev - 1) : prev + 1);
     },
-    onSuccess: (data) => {
+    onSuccess: (data, remove) => {
       // Update with server response if available
       if (data?.isFavorited !== undefined) {
         setIsFavorited(data.isFavorited);
@@ -54,13 +58,13 @@ function FavoriteButton({
       queryClient.invalidateQueries({ queryKey: [`/api/resources/${resourceId}`] });
       
       toast({
-        description: isFavorited ? "Removed from favorites" : "Added to favorites",
+        description: remove ? "Removed from favorites" : "Added to favorites",
         duration: 2000
       });
     },
-    onError: (error) => {
-      // Revert optimistic update
-      setIsFavorited(isFavorited);
+    onError: (error, remove) => {
+      // Revert optimistic update to the pre-click state
+      setIsFavorited(remove);
       setFavoriteCount(initialCount);
       
       toast({
@@ -76,7 +80,7 @@ function FavoriteButton({
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    favoriteMutation.mutate();
+    favoriteMutation.mutate(isFavorited);
   };
 
   const iconSize = size === "sm" ? "h-4 w-4" : size === "lg" ? "h-6 w-6" : "h-5 w-5";

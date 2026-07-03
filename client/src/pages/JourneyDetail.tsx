@@ -129,8 +129,8 @@ export default function JourneyDetail() {
       queryClient.invalidateQueries({ queryKey: [`/api/journeys/${id}`] });
       queryClient.invalidateQueries({ queryKey: ['/api/journeys'] });
       toast({
-        title: "Step Completed!",
-        description: "Great job! Keep going to complete the journey.",
+        title: "Progress Updated",
+        description: "Your journey progress has been saved.",
       });
     },
     onError: (error: Error) => {
@@ -443,10 +443,16 @@ export default function JourneyDetail() {
                         )}
 
                         {isStepCompleted && (
-                          <div className="flex items-center gap-2 text-sm text-green-500">
-                            <CheckCircle2 className="h-4 w-4" />
-                            <span className="font-medium">Completed</span>
-                          </div>
+                          <Button
+                            variant="ghost"
+                            className="min-h-[44px] px-2 text-green-500 hover:text-green-600"
+                            onClick={() => completeStepMutation.mutate(step.rowIds)}
+                            disabled={completeStepMutation.isPending}
+                            data-testid={`button-uncomplete-step-${step.stepNumber}`}
+                          >
+                            <CheckCircle2 className="h-4 w-4 mr-2" />
+                            {completeStepMutation.isPending ? "Updating..." : "Completed — Undo"}
+                          </Button>
                         )}
                       </div>
                     </div>

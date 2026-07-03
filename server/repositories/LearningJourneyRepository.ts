@@ -297,9 +297,14 @@ export class LearningJourneyRepository {
         )
       );
 
-    const completedSteps = current?.completedSteps || [];
-    if (!completedSteps.includes(stepId)) {
+    // Toggle: adding a step marks it complete; sending the same step id again
+    // removes it so users can un-complete a step and reduce their progress.
+    const completedSteps = current?.completedSteps ? [...current.completedSteps] : [];
+    const existingIdx = completedSteps.indexOf(stepId);
+    if (existingIdx === -1) {
       completedSteps.push(stepId);
+    } else {
+      completedSteps.splice(existingIdx, 1);
     }
 
     // Check if all steps are completed

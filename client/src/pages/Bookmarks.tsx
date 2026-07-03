@@ -11,13 +11,14 @@ import { Link } from "wouter";
 
 interface BookmarkedResource {
   id: string;
-  name: string;
+  title: string;
   url: string;
   description?: string;
   category?: string;
   tags?: string[];
   notes?: string;
   createdAt?: string;
+  bookmarkedAt?: string;
 }
 
 export default function Bookmarks() {
@@ -34,9 +35,9 @@ export default function Bookmarks() {
     const results = [...bookmarks];
 
     if (sortBy === "name-asc") {
-      results.sort((a, b) => a.name.localeCompare(b.name));
+      results.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
     } else if (sortBy === "name-desc") {
-      results.sort((a, b) => b.name.localeCompare(a.name));
+      results.sort((a, b) => (b.title || "").localeCompare(a.title || ""));
     } else if (sortBy === "category") {
       results.sort((a, b) => {
         const catA = a.category || "";
@@ -147,6 +148,7 @@ export default function Bookmarks() {
               key={resource.id}
               resource={{
                 ...resource,
+                name: resource.title,
                 isBookmarked: true,
                 bookmarkNotes: resource.notes,
               }}

@@ -39,13 +39,17 @@ function BookmarkButton({
   const [tempNotes, setTempNotes] = useState("");
   const { toast } = useToast();
 
+  // `remove` is captured at click time and passed as the mutation variable so
+  // the POST/DELETE decision never depends on the optimistic state flip below
+  // (reading the mutable `isBookmarked` inside mutationFn caused removals to
+  // re-add because onMutate flipped it first).
   const bookmarkMutation = useMutation({
-    mutationFn: async (payload?: { notes?: string }) => {
-      if (!isBookmarked) {
+    mutationFn: async (vars: { notes?: string; remove: boolean }) => {
+      if (!vars.remove) {
         // Add bookmark
         return await apiRequest(`/api/bookmarks/${resourceId}`, {
           method: "POST",
-          body: JSON.stringify(payload || {}),
+          body: JSON.stringify(vars.notes !== undefined ? { notes: vars.notes } : {}),
           credentials: 'include'
         });
       } else {
@@ -56,13 +60,11 @@ function BookmarkButton({
         });
       }
     },
-    onMutate: async () => {
+    onMutate: async (vars) => {
       // Optimistic update for immediate feedback
-      if (!showNotesDialog || isBookmarked) {
-        setIsBookmarked(!isBookmarked);
-      }
+      setIsBookmarked(!vars.remove);
     },
-    onSuccess: (data) => {
+    onSuccess: (data, vars) => {
       // Update with server response
       if (data?.isBookmarked !== undefined) {
         setIsBookmarked(data.isBookmarked);
@@ -76,7 +78,7 @@ function BookmarkButton({
       queryClient.invalidateQueries({ queryKey: [`/api/resources/${resourceId}`] });
       
       toast({
-        description: isBookmarked ? "Bookmark removed" : "Bookmark added",
+        description: vars.remove ? "Bookmark removed" : "Bookmark added",
         duration: 2000
       });
       
@@ -84,9 +86,9 @@ function BookmarkButton({
       setNotesDialogOpen(false);
       setTempNotes("");
     },
-    onError: (error) => {
-      // Revert optimistic update
-      setIsBookmarked(isBookmarked);
+    onError: (error, vars) => {
+      // Revert optimistic update to the pre-click state
+      setIsBookmarked(vars.remove);
       
       toast({
         title: "Error",
@@ -108,16 +110,16 @@ function BookmarkButton({
       setNotesDialogOpen(true);
     } else {
       // Toggle bookmark directly
-      bookmarkMutation.mutate(undefined);
+      bookmarkMutation.mutate({ remove: isBookmarked });
     }
   };
 
   const handleSaveWithNotes = () => {
-    bookmarkMutation.mutate({ notes: tempNotes });
+    bookmarkMutation.mutate({ notes: tempNotes, remove: false });
   };
 
   const handleSaveWithoutNotes = () => {
-    bookmarkMutation.mutate(undefined);
+    bookmarkMutation.mutate({ remove: false });
   };
 
   const iconSize = size === "sm" ? "h-4 w-4" : size === "lg" ? "h-6 w-6" : "h-5 w-5";
