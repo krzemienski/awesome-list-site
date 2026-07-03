@@ -38,12 +38,14 @@ interface Resource {
 
 interface RecommendationCardProps {
   resource: Resource;
+  userId?: string;
   onClick?: () => void;
   className?: string;
 }
 
 function RecommendationCard({
   resource,
+  userId,
   onClick,
   className
 }: RecommendationCardProps) {
@@ -64,13 +66,21 @@ function RecommendationCard({
 
   const feedbackMutation = useMutation({
     mutationFn: async (feedbackType: 'helpful' | 'not_helpful') => {
-      return await apiRequest(`/api/recommendations/${resource.id}/feedback`, {
+      if (!userId) {
+        throw new Error("User must be logged in to provide feedback");
+      }
+      return await apiRequest(`/api/recommendations/feedback`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify({ feedback: feedbackType })
+        body: JSON.stringify({
+          userId,
+          resourceId: Number(resource.id),
+          feedback: feedbackType === 'helpful' ? 'clicked' : 'dismissed',
+          rating: feedbackType === 'helpful' ? 5 : 1,
+        })
       });
     },
     onMutate: async (feedbackType) => {
@@ -201,7 +211,7 @@ function RecommendationCard({
                 e.stopPropagation();
                 feedbackMutation.mutate('helpful');
               }}
-              disabled={feedbackMutation.isPending}
+              disabled={feedbackMutation.isPending || !userId}
               aria-label="Mark as helpful"
             >
               <ThumbsUp
@@ -224,7 +234,7 @@ function RecommendationCard({
                 e.stopPropagation();
                 feedbackMutation.mutate('not_helpful');
               }}
-              disabled={feedbackMutation.isPending}
+              disabled={feedbackMutation.isPending || !userId}
               aria-label="Mark as not helpful"
             >
               <ThumbsDown
@@ -271,6 +281,7 @@ export default memo(RecommendationCard, (prevProps, nextProps) => {
     prevRes.isAIBased === nextRes.isAIBased &&
     prevRes.userFeedback === nextRes.userFeedback &&
     JSON.stringify(prevRes.tags || []) === JSON.stringify(nextRes.tags || []) &&
+    prevProps.userId === nextProps.userId &&
     prevProps.onClick === nextProps.onClick &&
     prevProps.className === nextProps.className
   );

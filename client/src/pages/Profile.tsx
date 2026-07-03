@@ -126,6 +126,7 @@ interface Recommendation {
   reason?: string;
   type?: string;
   score?: number;
+  aiGenerated?: boolean;
 }
 
 export default function Profile({ user }: ProfileProps) {
@@ -461,6 +462,7 @@ export default function Profile({ user }: ProfileProps) {
                   {recommendations.map((recommendation) => (
                     <RecommendationCard
                       key={recommendation.resource.id}
+                      userId={user?.id}
                       resource={{
                         id: String(recommendation.resource.id),
                         name: recommendation.resource.title,
@@ -469,7 +471,7 @@ export default function Profile({ user }: ProfileProps) {
                         category: recommendation.resource.category,
                         confidence: recommendation.confidence,
                         matchReason: recommendation.reason,
-                        isAIBased: recommendation.type ? recommendation.type.includes("ai") : false,
+                        isAIBased: recommendation.aiGenerated ?? recommendation.type !== "rule_based",
                       }}
                       onClick={() => {
                         setLocation(`/resource/${recommendation.resource.id}`);
