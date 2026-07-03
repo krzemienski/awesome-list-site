@@ -1,0 +1,52 @@
+{
+  "ranAt": "2026-07-03T13:28:57.505Z",
+  "note": "baseline-start recorded learning_journeys=6, but that included one pre-existing __qa_test leftover (id=12, published, 0 steps) from an earlier session. Removed it for a clean state; true clean target=5. Net delta for THIS run's own artifacts = 0.",
+  "target": {
+    "categories": 9,
+    "subcategories": 102,
+    "sub_subcategories": 107,
+    "resources_total": 1954,
+    "resources_approved": 1951,
+    "resources_pending": 3,
+    "resources_rejected": 0,
+    "users": 3,
+    "learning_journeys": 5,
+    "journey_steps": 90,
+    "resource_edits": 4,
+    "user_journey_progress": 2,
+    "research_jobs": 7,
+    "enrichment_jobs": 23,
+    "user_favorites": 0,
+    "user_bookmarks": 0
+  },
+  "current": {
+    "categories": 9,
+    "subcategories": 102,
+    "sub_subcategories": 107,
+    "resources_total": 1954,
+    "resources_approved": 1951,
+    "resources_pending": 3,
+    "resources_rejected": 0,
+    "users": 3,
+    "learning_journeys": 5,
+    "journey_steps": 90,
+    "resource_edits": 4,
+    "user_journey_progress": 2,
+    "research_jobs": 7,
+    "research_discoveries": 7,
+    "enrichment_jobs": 23,
+    "user_favorites": 0,
+    "user_bookmarks": 0
+  },
+  "residue": {
+    "qa_resources": 0,
+    "qa_users": 0,
+    "qa_categories": 0,
+    "qa_subcategories": 0,
+    "qa_sub_subcategories": 0,
+    "qa_journeys": 0,
+    "qa_resource_edits": 0
+  },
+  "reconcile_ok": true,
+  "residue_clean": true
+}

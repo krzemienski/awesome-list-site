@@ -62,7 +62,7 @@ export default function ResourceDetail() {
     enabled: isAuthenticated
   });
 
-  const { data: relatedResources } = useQuery<{resources: (Resource & {score?: number, reasons?: string[]})[]}>({
+  const { data: relatedResources } = useQuery<{ similar: { resource: Resource; score: number; reasons: string[] }[] }>({
     queryKey: ['/api/resources', id, 'related'],
     queryFn: async () => {
       const response = await fetch(`/api/resources/${id}/related`, { credentials: 'include' });
@@ -205,7 +205,9 @@ export default function ResourceDetail() {
   const urlScraped = metadata?.urlScraped;
   const tags = metadata?.tags as string[] | undefined;
 
-  const filteredRelatedResources = relatedResources?.resources?.slice(0, 6) || [];
+  const filteredRelatedResources = (relatedResources?.similar ?? [])
+    .slice(0, 6)
+    .map((item) => ({ ...item.resource, score: item.score, reasons: item.reasons }));
 
   if (isLoading) {
     return (
