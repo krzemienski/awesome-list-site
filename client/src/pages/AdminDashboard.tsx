@@ -6,6 +6,7 @@ import { useAdmin } from "@/hooks/useAdmin";
 import { useAuth } from "@/hooks/useAuth";
 import { Link as WLink } from "wouter";
 import AdminStats from "@/components/admin/AdminStats";
+import SEOHead from "@/components/layout/SEOHead";
 import ExportTab from "@/components/admin/ExportTab";
 import DatabaseTab from "@/components/admin/DatabaseTab";
 import UsersTab from "@/components/admin/UsersTab";
@@ -83,6 +84,11 @@ export default function AdminDashboard() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-full overflow-x-hidden">
+      <SEOHead
+        title="Admin"
+        description="Awesome Video admin panel."
+        noindex
+      />
       <div className="mb-8 space-y-3">
         <div className="eyebrow flex items-center gap-3">
           <span aria-hidden="true" className="text-[var(--accent)]">──</span>

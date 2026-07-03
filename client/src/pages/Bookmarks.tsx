@@ -67,6 +67,7 @@ export default function Bookmarks() {
         <SEOHead
           title="My Bookmarks - Loading"
           description="View your saved bookmarks"
+          noindex
         />
         <div className="space-y-4">
           <Skeleton className="h-10 w-64" />
@@ -87,6 +88,7 @@ export default function Bookmarks() {
         <SEOHead
           title="My Bookmarks - Error"
           description="View your saved bookmarks"
+          noindex
         />
         <div className="text-center py-12">
           <BookmarkX className="h-16 w-16 mx-auto text-destructive mb-4" />
@@ -106,6 +108,7 @@ export default function Bookmarks() {
       <SEOHead 
         title="My Bookmarks - Awesome Video Resources"
         description="View and manage your saved video development resource bookmarks"
+        noindex
       />
       
       <div className="space-y-2">

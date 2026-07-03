@@ -11,6 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import SEOHead from "@/components/layout/SEOHead";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -96,6 +97,11 @@ export default function Login() {
 
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-12rem)] p-4">
+      <SEOHead
+        title="Sign In"
+        description="Sign in to Awesome Video to save bookmarks, submit resources, and personalize your learning journey."
+        noindex
+      />
       <h1 className="sr-only">Sign in to Awesome Video</h1>
       <Card className="w-full max-w-md" data-testid="login-card">
         <CardHeader className="space-y-2">

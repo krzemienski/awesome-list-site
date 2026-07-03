@@ -36,6 +36,7 @@ import ChangePasswordForm from "@/components/profile/ChangePasswordForm";
 import { useAuth } from "@/hooks/useAuth";
 import { formatDistanceToNow } from "date-fns";
 import { useLocation } from "wouter";
+import SEOHead from "@/components/layout/SEOHead";
 
 interface ProfileProps {
   user?: any;
@@ -208,6 +209,11 @@ export default function Profile({ user }: ProfileProps) {
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-6xl">
+      <SEOHead
+        title="Profile"
+        description="Your Awesome Video profile, bookmarks, and learning progress."
+        noindex
+      />
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-center gap-6 mb-8">
         <Avatar

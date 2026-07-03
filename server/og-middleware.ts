@@ -379,14 +379,22 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
     "/profile": {
       title: `Profile — ${SITE_NAME}`,
       description: `Your ${SITE_NAME} profile, bookmarks, and learning progress.`,
+      // Personalized, auth-gated account page — noindex so it stays out of
+      // search (buildMetaTags then also drops the canonical/og:url); the route
+      // still returns HTTP 200 (found: true).
+      noindex: true,
     },
     "/bookmarks": {
       title: `Bookmarks — ${SITE_NAME}`,
       description: `Your saved video development resources on ${SITE_NAME}.`,
+      // Personalized, auth-gated account page — noindex like /profile.
+      noindex: true,
     },
     "/settings/theme": {
       title: `Theme Settings — ${SITE_NAME}`,
       description: `Customize the look and feel of ${SITE_NAME} — switch fonts and color themes.`,
+      // Utility settings page with no search value — noindex.
+      noindex: true,
     },
     "/recommendations": {
       title: `AI-Powered Recommendations — ${SITE_NAME}`,
@@ -404,6 +412,8 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
     "/admin": {
       title: `Admin — ${SITE_NAME}`,
       description: `${SITE_NAME} admin panel.`,
+      // Internal admin panel — noindex; must never appear in search results.
+      noindex: true,
     },
   };
   if (staticRoutes[path]) {

@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 // duplicates the same map inline for pre-paint application; verify-fixes.mjs
 // V11 asserts the two stay in sync.
 import { FONT_OPTIONS, FONT_LS_KEY, applyFontOverride } from "@/lib/font-options";
+import SEOHead from "@/components/layout/SEOHead";
 
 export default function ThemeSettings() {
   const { systemId, accentId, setSystem, setAccent, systems, accents } =
@@ -52,6 +53,11 @@ export default function ThemeSettings() {
 
   return (
     <div className="max-w-5xl space-y-10">
+      <SEOHead
+        title="Theme Settings"
+        description="Customize the look and feel of Awesome Video — switch fonts and color themes."
+        noindex
+      />
       <div>
         <Link
           href="/"
