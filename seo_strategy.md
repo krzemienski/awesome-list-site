@@ -9,6 +9,7 @@
 ## Out of scope
 - Authenticated dashboard and profile pages (`/profile`, `/bookmarks`)
 - Admin pages (`/admin/**`)
+- Utility account and settings pages (`/login`, `/register`, `/settings/theme`) except to verify they stay out of search
 - Authenticated settings and internal tooling
 - API endpoints except where they directly power crawl files such as `sitemap.xml`
 
@@ -28,6 +29,7 @@
 - `server/og-middleware.ts` injects route-specific title, description, canonical, Open Graph, Twitter, and JSON-LD tags into the HTML shell before it is served.
 - Core discovery routes (`/`, taxonomy pages, resource pages, `/journeys`, and `/journey/:id`) plus `/about`, `/advanced`, and `/submit` receive server-injected semantic body HTML (headings, descriptions, and internal links) for non-JavaScript and AI crawlers.
 - Utility/auth routes `/login` and `/register` return HTTP 200 but are marked `noindex` (robots `noindex,nofollow`, no canonical/og:url) so they do not compete in search; they still serve minimal prerendered body HTML (heading, explanatory copy, internal links) so non-JS and AI crawlers can read them.
+- Utility and internal routes should prefer a consistent `noindex` contract so search engines focus on discovery pages instead of account, settings, or admin screens.
 - Client hydration preserves the server head: loading branches on the home, taxonomy, and resource pages no longer emit placeholder `Loading…`/`Error` titles, and the missing-resource branch re-asserts the server's `noindex` soft-404 contract instead of a default indexable head.
 - The "Explore Categories" CTA on `/advanced` and other cross-page links are generated from the live taxonomy, so internal links cannot drift to non-existent category slugs.
 - Client-rendered page titles mirror the server's og-middleware templates exactly, so Googlebot's crawl pass (initial HTML) and render pass (hydrated DOM) capture identical title/description/canonical/robots signals.
