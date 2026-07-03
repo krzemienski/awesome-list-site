@@ -844,6 +844,38 @@ export class RecommendationEngine {
         `User marked recommendation as ${feedback_type}`
       );
 
+      // Map the qualitative feedback to a numeric rating and persist it as a
+      // 'rate' interaction so it actually moves future recommendation scoring.
+      // The rule-based engine treats ratings >= 4 as a positive category signal
+      // and ratings <= 2 as a negative one (see getRuleBasedRecommendations).
+      // 'already_known' is intentionally left as a neutral signal (no rating)
+      // because it says nothing about whether the user likes that category.
+      const ratingByFeedback: Record<typeof feedback_type, number | null> = {
+        helpful: 5,
+        not_helpful: 1,
+        irrelevant: 1,
+        already_known: null,
+      };
+      const rating = ratingByFeedback[feedback_type];
+      if (rating !== null) {
+        await storage.trackUserInteraction(
+          userId,
+          resourceId,
+          'rate',
+          rating,
+          { source: 'recommendation_detailed_feedback', feedback_type }
+        );
+        console.log('[FEEDBACK DEBUG] Stored detailed feedback rating interaction:', {
+          userId,
+          resourceId,
+          feedback_type,
+          rating,
+          impact: rating >= 4
+            ? 'positive - will boost similar resources'
+            : 'negative - will reduce similar resources',
+        });
+      }
+
       // Clear cache to trigger fresh recommendations based on feedback
       for (const [key] of Array.from(this.recommendationCache.entries())) {
         if (key.startsWith(userId)) {

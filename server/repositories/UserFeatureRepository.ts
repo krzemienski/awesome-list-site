@@ -295,6 +295,19 @@ export class UserFeatureRepository {
   }
 
   /**
+   * Get all interactions recorded for a user
+   * @param userId - User ID
+   * @returns Array of UserInteraction records (most recent first)
+   */
+  async getUserInteractions(userId: string): Promise<UserInteraction[]> {
+    return db
+      .select()
+      .from(userInteractions)
+      .where(eq(userInteractions.userId, userId))
+      .orderBy(desc(userInteractions.timestamp));
+  }
+
+  /**
    * Record a user interaction with a resource
    * @param userId - User ID
    * @param resourceId - Resource ID
