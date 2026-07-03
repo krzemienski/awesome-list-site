@@ -109,16 +109,23 @@ interface UserJourney {
   };
 }
 
-interface Recommendation {
-  id: string;
-  name: string;
+interface RecommendationResource {
+  id: number;
+  title: string;
   url: string;
   description?: string;
   category: string;
-  tags?: string[];
+  subcategory?: string;
+  subSubcategory?: string;
+  status?: string;
+}
+
+interface Recommendation {
+  resource: RecommendationResource;
   confidence?: number;
-  matchReason?: string;
-  isAIBased?: boolean;
+  reason?: string;
+  type?: string;
+  score?: number;
 }
 
 export default function Profile({ user }: ProfileProps) {
@@ -453,10 +460,19 @@ export default function Profile({ user }: ProfileProps) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {recommendations.map((recommendation) => (
                     <RecommendationCard
-                      key={recommendation.id}
-                      resource={recommendation}
+                      key={recommendation.resource.id}
+                      resource={{
+                        id: String(recommendation.resource.id),
+                        name: recommendation.resource.title,
+                        url: recommendation.resource.url,
+                        description: recommendation.resource.description,
+                        category: recommendation.resource.category,
+                        confidence: recommendation.confidence,
+                        matchReason: recommendation.reason,
+                        isAIBased: recommendation.type ? recommendation.type.includes("ai") : false,
+                      }}
                       onClick={() => {
-                        setLocation(`/resource/${recommendation.id}`);
+                        setLocation(`/resource/${recommendation.resource.id}`);
                       }}
                     />
                   ))}
