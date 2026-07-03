@@ -3813,6 +3813,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // POST /api/recommendations/:resourceId/feedback - Record thumbs up/down feedback on a recommendation
+  app.post("/api/recommendations/:resourceId/feedback", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      if (!userId) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+
+      const resourceId = parseInt(req.params.resourceId, 10);
+      if (isNaN(resourceId)) {
+        return res.status(400).json({ error: 'Invalid resource id' });
+      }
+
+      const { feedback } = req.body;
+      if (feedback !== 'helpful' && feedback !== 'not_helpful') {
+        return res.status(400).json({ error: "feedback must be 'helpful' or 'not_helpful'" });
+      }
+
+      await recommendationEngine.recordDetailedFeedback(userId, resourceId, feedback);
+
+      res.json({ status: 'success', message: 'Feedback recorded' });
+    } catch (error) {
+      console.error('Error recording recommendation feedback:', error);
+      res.status(500).json({ error: 'Failed to record feedback' });
+    }
+  });
+
   // GET /api/learning-paths/suggested - Get suggested learning paths
   app.get("/api/learning-paths/suggested", async (req, res) => {
     try {

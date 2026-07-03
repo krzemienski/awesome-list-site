@@ -125,8 +125,8 @@ interface Recommendation {
   confidence?: number;
   reason?: string;
   type?: string;
-  score?: number;
   aiGenerated?: boolean;
+  score?: number;
 }
 
 export default function Profile({ user }: ProfileProps) {
@@ -471,7 +471,7 @@ export default function Profile({ user }: ProfileProps) {
                         category: recommendation.resource.category,
                         confidence: recommendation.confidence,
                         matchReason: recommendation.reason,
-                        isAIBased: recommendation.aiGenerated ?? recommendation.type !== "rule_based",
+                        isAIBased: recommendation.aiGenerated ?? recommendation.type !== 'rule_based',
                       }}
                       onClick={() => {
                         setLocation(`/resource/${recommendation.resource.id}`);
