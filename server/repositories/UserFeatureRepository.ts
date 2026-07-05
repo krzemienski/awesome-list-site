@@ -35,7 +35,7 @@ import {
   type UserInteraction,
 } from "@shared/schema";
 import { db } from "../db";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, sql } from "drizzle-orm";
 
 /**
  * Repository class for user feature-related database operations
@@ -292,6 +292,31 @@ export class UserFeatureRepository {
       .from(userInteractions)
       .where(eq(userInteractions.resourceId, resourceId))
       .orderBy(desc(userInteractions.timestamp));
+  }
+
+  /**
+   * Get aggregate popularity scores for all resources in a SINGLE query.
+   * Replaces an N+1 pattern (one interactions query per resource) that
+   * saturated the DB connection pool for cold-start recommendations.
+   * Score weighting: view=1, bookmark=3, complete=5.
+   * @returns Array of { resourceId, score } for resources that have interactions
+   */
+  async getResourcePopularityScores(): Promise<Array<{ resourceId: number; score: number }>> {
+    const rows = await db
+      .select({
+        resourceId: userInteractions.resourceId,
+        viewCount: sql<number>`count(*) filter (where ${userInteractions.interactionType} = 'view')`,
+        bookmarkCount: sql<number>`count(*) filter (where ${userInteractions.interactionType} = 'bookmark')`,
+        completeCount: sql<number>`count(*) filter (where ${userInteractions.interactionType} = 'complete')`,
+      })
+      .from(userInteractions)
+      .groupBy(userInteractions.resourceId);
+
+    return rows.map((r) => ({
+      resourceId: r.resourceId,
+      score:
+        Number(r.viewCount) + Number(r.bookmarkCount) * 3 + Number(r.completeCount) * 5,
+    }));
   }
 
   /**

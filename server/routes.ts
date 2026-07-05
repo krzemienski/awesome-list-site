@@ -3759,7 +3759,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const result = await recommendationEngine.generateRecommendations(
         userProfile,
         limit,
-        false
+        false,
+        false // learning paths aren't used by this endpoint — skip the blocking AI call
       );
 
       res.json(result.recommendations || []);
@@ -3779,7 +3780,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const result = await recommendationEngine.generateRecommendations(
         userProfile,
         limit,
-        forceRefresh
+        forceRefresh,
+        false // learning paths aren't used by this endpoint — skip the blocking AI call
       );
 
       res.json(result.recommendations || []);

@@ -265,6 +265,7 @@ export interface IStorage {
   // User Preferences
   getUserPreferences(userId: string): Promise<any | undefined>;
   getResourceInteractions(resourceId: number): Promise<UserInteraction[]>;
+  getResourcePopularityScores(): Promise<Array<{ resourceId: number; score: number }>>;
   getUserInteractions(userId: string): Promise<UserInteraction[]>;
   trackUserInteraction(userId: string, resourceId: number, interactionType: string, interactionValue?: number | null, metadata?: Record<string, any>): Promise<UserInteraction>;
   getApiKey(key: string): Promise<ApiKey | undefined>;
@@ -670,6 +671,10 @@ export class DatabaseStorage implements IStorage {
 
   async getResourceInteractions(resourceId: number): Promise<UserInteraction[]> {
     return this.userFeatureRepo.getResourceInteractions(resourceId);
+  }
+
+  async getResourcePopularityScores(): Promise<Array<{ resourceId: number; score: number }>> {
+    return this.userFeatureRepo.getResourcePopularityScores();
   }
 
   async getUserInteractions(userId: string): Promise<UserInteraction[]> {

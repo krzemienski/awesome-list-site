@@ -68,7 +68,8 @@ export class RecommendationEngine {
   public async generateRecommendations(
     userProfile: UserProfile,
     limit: number = 10,
-    forceRefresh: boolean = false
+    forceRefresh: boolean = false,
+    includeLearningPaths: boolean = true
   ): Promise<{
     recommendations: RecommendationResult[];
     learningPaths: LearningPathRecommendation[];
@@ -174,7 +175,7 @@ export class RecommendationEngine {
       const cached = this.recommendationCache.get(cacheKey);
       if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
         // Also get learning paths using enriched profile
-        const learningPaths = await this.generateLearningPathRecommendations(enrichedProfile);
+        const learningPaths = includeLearningPaths ? await this.generateLearningPathRecommendations(enrichedProfile) : [];
         return {
           recommendations: cached.recommendations,
           learningPaths
@@ -319,7 +320,7 @@ export class RecommendationEngine {
           timestamp: Date.now()
         });
 
-        const learningPaths = await this.generateLearningPathRecommendations(enrichedProfile);
+        const learningPaths = includeLearningPaths ? await this.generateLearningPathRecommendations(enrichedProfile) : [];
 
         return {
           recommendations,
@@ -397,8 +398,9 @@ export class RecommendationEngine {
         timestamp: Date.now()
       });
 
-      // Generate learning path recommendations
-      const learningPaths = await this.generateLearningPathRecommendations(enrichedProfile);
+      // Generate learning path recommendations (skipped when the caller does
+      // not consume them — avoids a blocking ~9s Claude call on the hot path)
+      const learningPaths = includeLearningPaths ? await this.generateLearningPathRecommendations(enrichedProfile) : [];
 
       return {
         recommendations,
@@ -633,34 +635,17 @@ export class RecommendationEngine {
    */
   private async getPopularResources(resources: Resource[], limit: number): Promise<Resource[]> {
     try {
-      // Get interaction counts for all resources
-      const resourcePopularity = await Promise.all(
-        resources.map(async (resource) => {
-          try {
-            const interactions = await storage.getResourceInteractions(resource.id);
-            const viewCount = interactions.filter(i => i.interactionType === 'view').length;
-            const bookmarkCount = interactions.filter(i => i.interactionType === 'bookmark').length;
-            const completeCount = interactions.filter(i => i.interactionType === 'complete').length;
+      // Fetch interaction-based popularity for ALL resources in a single
+      // aggregate query. (Previously this fired one query per resource via
+      // Promise.all — ~2k concurrent queries that exhausted the DB pool and
+      // made cold-start recommendations hang.)
+      const scores = await storage.getResourcePopularityScores();
+      const scoreMap = new Map(scores.map(s => [s.resourceId, s.score]));
 
-            // Calculate weighted popularity score
-            // Views: 1 point, Bookmarks: 3 points, Completions: 5 points
-            const popularityScore = viewCount + (bookmarkCount * 3) + (completeCount * 5);
-
-            return {
-              resource,
-              popularityScore
-            };
-          } catch (error) {
-            return {
-              resource,
-              popularityScore: 0
-            };
-          }
-        })
-      );
-
-      // Sort by popularity and return top resources
-      return resourcePopularity
+      // Sort by popularity (0 for resources with no interactions, preserving
+      // input order among ties) and return the top `limit`.
+      return resources
+        .map(resource => ({ resource, popularityScore: scoreMap.get(resource.id) ?? 0 }))
         .sort((a, b) => b.popularityScore - a.popularityScore)
         .slice(0, limit)
         .map(item => item.resource);

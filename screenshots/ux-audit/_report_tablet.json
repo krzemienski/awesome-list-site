@@ -1,0 +1,13 @@
+[
+  {
+    "name": "recommendations",
+    "route": "/recommendations",
+    "httpStatus": 200,
+    "overflow": {
+      "scrollW": 768,
+      "clientW": 768,
+      "overflow": false
+    },
+    "errors": []
+  }
+]
