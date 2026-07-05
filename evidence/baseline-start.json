@@ -1,35 +1,40 @@
 {
-  "capturedAt": "2026-07-03",
-  "task": "Deep Functional + Responsive Validation (DV-001..165 + responsive + round-trips)",
-  "method": "executeSql against dev Postgres (single json_build_object query)",
-  "counts": {
-    "users": 3,
-    "resources_total": 1954,
-    "resources_approved": 1951,
-    "resources_pending": 3,
-    "resources_rejected": 0,
-    "learning_journeys": 6,
-    "journey_steps": 90,
-    "resource_edits_total": 4,
-    "resource_edits_pending": 4,
+  "snapshot": {
+    "api_keys": 0,
+    "awesome_lists": 0,
     "categories": 9,
-    "subcategories": 102,
-    "sub_subcategories": 107,
-    "user_favorites": 0,
-    "user_bookmarks": 0,
-    "user_journey_progress": 2,
+    "enrichment_jobs": 23,
+    "enrichment_queue": 57,
+    "github_sync_history": 0,
+    "github_sync_queue": 38,
+    "journey_steps": 90,
+    "learning_journeys": 5,
+    "research_discoveries": 7,
     "research_jobs": 7,
-    "enrichment_jobs": 23
+    "resource_audit_log": 3067,
+    "resource_edits": 4,
+    "resource_tags": 0,
+    "resources": 1954,
+    "sessions": 135,
+    "sub_subcategories": 107,
+    "subcategories": 102,
+    "tags": 0,
+    "user_bookmarks": 0,
+    "user_favorites": 0,
+    "user_interactions": 0,
+    "user_journey_progress": 2,
+    "user_preferences": 0,
+    "users": 3
   },
-  "residueChecks": {
-    "qa_users": 0,
-    "qa_resources": 0,
-    "qa_categories": 0,
-    "note": "No __qa_test residue at start; net-zero target = counts above."
-  },
-  "preExistingBaselineArtifacts": {
-    "pending_resources": 3,
-    "pending_resource_edits": 4,
-    "note": "These 3 pending resources + 4 pending edits are pre-existing baseline data; DO NOT delete during cleanup."
-  }
+  "resourcesByStatus": [
+    {
+      "status": "approved",
+      "n": 1951
+    },
+    {
+      "status": "pending",
+      "n": 3
+    }
+  ],
+  "qaResidueResources": 0
 }
