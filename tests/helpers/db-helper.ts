@@ -12,6 +12,7 @@ import pkg from 'pg';
 const { Pool } = pkg;
 import * as schema from '../../shared/schema';
 import { sql } from 'drizzle-orm';
+import { isTestDatabaseName } from './test-db-url';
 
 // Create a separate pool for tests
 let testPool: pkg.Pool | null = null;
@@ -50,6 +51,19 @@ export function getTestPool() {
  */
 export async function cleanupDatabase() {
   const db = getTestDb();
+
+  // Defense-in-depth: verify at the connection level that we are wired to a
+  // dedicated test database before deleting anything. Even if DATABASE_URL was
+  // mis-configured, this refuses to wipe a non-test (dev/prod) database.
+  const [{ current_database: currentDb }] = (
+    await db.execute<{ current_database: string }>(sql`SELECT current_database()`)
+  ).rows;
+  if (!isTestDatabaseName(currentDb)) {
+    throw new Error(
+      `cleanupDatabase refused to run: connected to "${currentDb}", which is not a ` +
+        `dedicated test database. This is a safety guard to prevent wiping dev/prod data.`,
+    );
+  }
 
   try {
     // Delete in order that respects foreign key constraints
