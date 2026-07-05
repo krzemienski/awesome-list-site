@@ -74,34 +74,35 @@ export default function Advanced() {
       {/* Feature Showcase */}
       {/* P6 — active tab gets bg + bottom border per ref 03 */}
       <Tabs defaultValue="explorer" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4 bg-[var(--surface)] border-b border-[var(--border)] rounded-none p-0 h-auto">
+        <TabsList className="flex w-full justify-start overflow-x-auto sm:grid sm:grid-cols-4 bg-[var(--surface)] border-b border-[var(--border)] rounded-none p-0 h-auto">
           <TabsTrigger
             value="explorer"
-            className="flex items-center gap-2 rounded-none border-b-2 border-transparent data-[state=active]:border-[var(--accent)] data-[state=active]:bg-[var(--surface-2)] data-[state=active]:text-[var(--accent)] py-3"
+            className="flex shrink-0 items-center gap-2 whitespace-nowrap rounded-none border-b-2 border-transparent data-[state=active]:border-[var(--accent)] data-[state=active]:bg-[var(--surface-2)] data-[state=active]:text-[var(--accent)] px-4 py-3"
           >
             <Compass className="h-4 w-4" />
             Explorer
           </TabsTrigger>
           <TabsTrigger
             value="metrics"
-            className="flex items-center gap-2 rounded-none border-b-2 border-transparent data-[state=active]:border-[var(--accent)] data-[state=active]:bg-[var(--surface-2)] data-[state=active]:text-[var(--accent)] py-3"
+            className="flex shrink-0 items-center gap-2 whitespace-nowrap rounded-none border-b-2 border-transparent data-[state=active]:border-[var(--accent)] data-[state=active]:bg-[var(--surface-2)] data-[state=active]:text-[var(--accent)] px-4 py-3"
           >
             <BarChart3 className="h-4 w-4" />
             Metrics
           </TabsTrigger>
           <TabsTrigger
             value="export"
-            className="flex items-center gap-2 rounded-none border-b-2 border-transparent data-[state=active]:border-[var(--accent)] data-[state=active]:bg-[var(--surface-2)] data-[state=active]:text-[var(--accent)] py-3"
+            className="flex shrink-0 items-center gap-2 whitespace-nowrap rounded-none border-b-2 border-transparent data-[state=active]:border-[var(--accent)] data-[state=active]:bg-[var(--surface-2)] data-[state=active]:text-[var(--accent)] px-4 py-3"
           >
             <Download className="h-4 w-4" />
             Export
           </TabsTrigger>
           <TabsTrigger
             value="recommendations"
-            className="flex items-center gap-2 rounded-none border-b-2 border-transparent data-[state=active]:border-[var(--accent)] data-[state=active]:bg-[var(--surface-2)] data-[state=active]:text-[var(--accent)] py-3"
+            className="flex shrink-0 items-center gap-2 whitespace-nowrap rounded-none border-b-2 border-transparent data-[state=active]:border-[var(--accent)] data-[state=active]:bg-[var(--surface-2)] data-[state=active]:text-[var(--accent)] px-4 py-3"
           >
             <Lightbulb className="h-4 w-4" />
-            AI Recommendations
+            <span className="sm:hidden">AI</span>
+            <span className="hidden sm:inline">AI Recommendations</span>
           </TabsTrigger>
         </TabsList>
 
