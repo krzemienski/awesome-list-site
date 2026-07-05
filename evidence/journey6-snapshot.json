@@ -1,0 +1,290 @@
+[
+{
+"id": 165,
+"journeyId": 6,
+"resourceId": 185380,
+"stepNumber": 1,
+"title": "Introduction to Video Streaming",
+"description": "Get oriented with the core concepts of digital video delivery: containers, codecs, bitrates, and how a video gets from a camera to a viewer's screen.",
+"isOptional": false,
+"createdAt": "2026-05-20T08:43:14.747Z",
+"resource": {
+"id": 185380,
+"title": "How To Stream Video: A Beginner's Guide",
+"url": "https://www.inetsolutions.org/how-to-stream-video-a-beginners-guide/",
+"description": "A beginner's guide covering the essentials of setting up audio and video sources, choosing streaming destinations, and understanding the basics of live streaming."
+}
+},
+{
+"id": 163,
+"journeyId": 6,
+"resourceId": 185372,
+"stepNumber": 2,
+"title": "Introduction to Video Streaming",
+"description": "Get oriented with the core concepts of digital video delivery: containers, codecs, bitrates, and how a video gets from a camera to a viewer's screen.",
+"isOptional": false,
+"createdAt": "2026-05-20T08:43:14.738Z",
+"resource": {
+"id": 185372,
+"title": "Video Encoding 101: A Beginner's Guide to Key Concepts",
+"url": "https://www.forasoft.com/blog/article/video-encoding-streaming-quality",
+"description": "An introductory guide that explains the fundamental concepts of video encoding, including compression techniques, color encoding, and the differences between various encoding approaches. It's a valuable resource for beginners seeking to understand the basics of video encoding."
+}
+},
+{
+"id": 164,
+"journeyId": 6,
+"resourceId": 185151,
+"stepNumber": 3,
+"title": "Introduction to Video Streaming",
+"description": "Get oriented with the core concepts of digital video delivery: containers, codecs, bitrates, and how a video gets from a camera to a viewer's screen.",
+"isOptional": false,
+"createdAt": "2026-05-20T08:43:14.744Z",
+"resource": {
+"id": 185151,
+"title": "Streaming Learning Center's Beginner's Guide to Live Streaming",
+"url": "https://streaminglearningcenter.com/learning/beginners-guide-to-live-streaming.html",
+"description": "A beginner-friendly guide that introduces the basics of live streaming, including equipment setup, encoding, and streaming protocols. This resource is ideal for those new to live streaming and looking to understand the foundational concepts."
+}
+},
+{
+"id": 166,
+"journeyId": 6,
+"resourceId": 185395,
+"stepNumber": 4,
+"title": "Understanding Video Codecs",
+"description": "Compare H.264, HEVC, VP9 and AV1. Learn why codec choice impacts quality, file size, device support and licensing cost.",
+"isOptional": false,
+"createdAt": "2026-05-20T08:43:14.750Z",
+"resource": {
+"id": 185395,
+"title": "How to Create a Video Streaming App: A Step-by-Step Guide to Building Your Own Platform",
+"url": "https://repurtech.com/how-to-create-a-video-streaming-app-a-step-by-step-guide-to-building-your-own-platform/",
+"description": "This guide by Repur Tech offers a comprehensive overview of building a video streaming platform. It discusses the basics of video streaming apps, essential features to include, technology stacks, design considerations, and monetization strategies. This resource is beneficial for developers aiming to create their own video streaming platforms."
+}
+},
+{
+"id": 167,
+"journeyId": 6,
+"resourceId": 185379,
+"stepNumber": 5,
+"title": "Understanding Video Codecs",
+"description": "Compare H.264, HEVC, VP9 and AV1. Learn why codec choice impacts quality, file size, device support and licensing cost.",
+"isOptional": false,
+"createdAt": "2026-05-20T08:43:14.752Z",
+"resource": {
+"id": 185379,
+"title": "How to Live Stream: Beginners Guide to Get Started",
+"url": "https://academy.wedio.com/how-to-live-stream/",
+"description": "A guide providing five simple steps to start live streaming, including choosing the right platform, setting up equipment, and engaging with your audience."
+}
+},
+{
+"id": 168,
+"journeyId": 6,
+"resourceId": 185378,
+"stepNumber": 6,
+"title": "Understanding Video Codecs",
+"description": "Compare H.264, HEVC, VP9 and AV1. Learn why codec choice impacts quality, file size, device support and licensing cost.",
+"isOptional": false,
+"createdAt": "2026-05-20T08:43:14.755Z",
+"resource": {
+"id": 185378,
+"title": "The Ultimate Live Streaming Setup Guide for Beginners",
+"url": "https://umatechnology.org/the-ultimate-live-streaming-setup-guide-for-beginners/",
+"description": "An in-depth guide exploring every facet of creating a professional-grade live streaming setup for beginners, covering equipment, software, platform choices, and best practices."
+}
+},
+{
+"id": 169,
+"journeyId": 6,
+"resourceId": 186414,
+"stepNumber": 7,
+"title": "Streaming Protocols Overview",
+"description": "Walk through HLS, DASH, RTMP and WebRTC. Understand which protocol fits live, on-demand and ultra-low-latency use cases.",
+"isOptional": false,
+"createdAt": "2026-05-20T08:43:14.758Z",
+"resource": {
+"id": 186414,
+"title": "FFmpeg Wiki: Streaming Guide",
+"url": "https://trac.ffmpeg.org/wiki/StreamingGuide",
+"description": "An official Wiki guide from FFmpeg explaining how to set up streaming using FFmpeg, including examples for streaming via RTMP to servers or using FFmpeg as a server for HLS/DASH."
+}
+},
+{
+"id": 170,
+"journeyId": 6,
+"resourceId": 186145,
+"stepNumber": 8,
+"title": "Streaming Protocols Overview",
+"description": "Walk through HLS, DASH, RTMP and WebRTC. Understand which protocol fits live, on-demand and ultra-low-latency use cases.",
+"isOptional": false,
+"createdAt": "2026-05-20T08:43:14.761Z",
+"resource": {
+"id": 186145,
+"title": "3 Cases from a Video Expert: Encoding Basics",
+"url": "https://link.medium.com/z6IDbLDWO7",
+"description": "Introduction"
+}
+},
+{
+"id": 171,
+"journeyId": 6,
+"resourceId": 186041,
+"stepNumber": 9,
+"title": "Streaming Protocols Overview",
+"description": "Walk through HLS, DASH, RTMP and WebRTC. Understand which protocol fits live, on-demand and ultra-low-latency use cases.",
+"isOptional": false,
+"createdAt": "2026-05-20T08:43:14.765Z",
+"resource": {
+"id": 186041,
+"title": "Introduction to H.264: (1) NAL Unit | Yumi Chan's Blog",
+"url": "https://yumichan.net/video-processing/video-compression/introduction-to-h264-nal-unit/",
+"description": "This article is to introduce H.264 and provide a overview of NAL Unit. It also explains NALU header byte which contains the basic information of a NALU."
+}
+},
+{
+"id": 174,
+"journeyId": 6,
+"resourceId": 185816,
+"stepNumber": 10,
+"title": "Players and Playback Basics",
+"description": "Explore how HTML5 players, MSE and adaptive bitrate switching deliver smooth playback across devices and network conditions.",
+"isOptional": false,
+"createdAt": "2026-05-20T08:43:14.773Z",
+"resource": {
+"id": 185816,
+"title": "Back to Basics: Encoding Definition and Adaptive Bitrate",
+"url": "https://bitmovin.com/encoding-definition-bitrates/?utm_campaign=Newsletter&utm_medium=email&_hsenc=p2ANqtz-8MPFxhR7snQrxPYM7Bl3UTEMgOh5ZXoDQCHjLl9lkskqE0IfBhEuz3us39Br-lvA_CnyNmQl6L5wqO6iKOfAJ8HznenQ&_hsmi=79678208&utm_content=79677632&utm_source=hs_email&hsCtaTracking=b8eb0e0a-f292-435e-8b99-719b75d81412%7C367afa65-d810-4c2e-aa2c-c87e897a8942",
+"description": "A tool or resource for encoding-transcoding-guides."
+}
+},
+{
+"id": 172,
+"journeyId": 6,
+"resourceId": 185846,
+"stepNumber": 11,
+"title": "Players and Playback Basics",
+"description": "Explore how HTML5 players, MSE and adaptive bitrate switching deliver smooth playback across devices and network conditions.",
+"isOptional": false,
+"createdAt": "2026-05-20T08:43:14.768Z",
+"resource": {
+"id": 185846,
+"title": "Video Coding Basics - How is this so efficient?",
+"url": "https://youtu.be/LDeL7-49qm4",
+"description": "An introduction to the basics of video coding"
+}
+},
+{
+"id": 173,
+"journeyId": 6,
+"resourceId": 185840,
+"stepNumber": 12,
+"title": "Players and Playback Basics",
+"description": "Explore how HTML5 players, MSE and adaptive bitrate switching deliver smooth playback across devices and network conditions.",
+"isOptional": false,
+"createdAt": "2026-05-20T08:43:14.770Z",
+"resource": {
+"id": 185840,
+"title": "Guide to Mobile Video Streaming with HLS",
+"url": "https://mux.com/blog/mobile-hls-guide/",
+"description": "HTTP Live Streaming, also known as HLS, is the most common format used today for streaming video. If you're building a video streaming application today, you should probably use HLS. Apple created the HLS standard in 2009, and it is the required streaming format for iOS devices. Since then, Android"
+}
+},
+{
+"id": 175,
+"journeyId": 6,
+"resourceId": 185799,
+"stepNumber": 13,
+"title": "Video Formats and Containers",
+"description": "Demystify MP4, fMP4, MKV, WebM and TS containers \u2014 what they hold, when to use each, and how they pair with codecs.",
+"isOptional": false,
+"createdAt": "2026-05-20T08:43:14.776Z",
+"resource": {
+"id": 185799,
+"title": "Quick Tutorial: How to Increase Volume in Audacity [2019 Update]",
+"url": "https://www.iskysoft.com/video-editing/how-to-increase-volume-in-audacity.html",
+"description": "How to increase volume in Audacity? This article will guide you to change volume in Audacity and its alternative tool. You can pick up one of them to edit volume in Audacity as you like."
+}
+},
+{
+"id": 176,
+"journeyId": 6,
+"resourceId": 185057,
+"stepNumber": 14,
+"title": "Video Formats and Containers",
+"description": "Demystify MP4, fMP4, MKV, WebM and TS containers \u2014 what they hold, when to use each, and how they pair with codecs.",
+"isOptional": false,
+"createdAt": "2026-05-20T08:43:14.779Z",
+"resource": {
+"id": 185057,
+"title": "Muvi's Guide to Setting Up a Video Streaming Server",
+"url": "https://www.muvi.com/blogs/video-streaming-server/",
+"description": "A detailed guide that walks users through the process of setting up their own video streaming server in five simple steps. It covers topics such as video streaming basics, types of video streaming, and the technical architecture involved."
+}
+},
+{
+"id": 177,
+"journeyId": 6,
+"resourceId": 185023,
+"stepNumber": 15,
+"title": "Video Formats and Containers",
+"description": "Demystify MP4, fMP4, MKV, WebM and TS containers \u2014 what they hold, when to use each, and how they pair with codecs.",
+"isOptional": false,
+"createdAt": "2026-05-20T08:43:14.782Z",
+"resource": {
+"id": 185023,
+"title": "Node.js Tutorial: How to Build a Video Streaming Application in 10 Minutes",
+"url": "https://hackernoon.com/nodejs-tutorial-how-to-build-a-video-streaming-application-in-10-minutes",
+"description": "This tutorial on HackerNoon provides a quick and practical guide to building a video streaming application using Node.js. It includes step-by-step instructions on setting up the server, serving HTML pages, and handling video streaming. This resource is particularly useful for developers looking to implement video streaming capabilities in their Node.js applications."
+}
+},
+{
+"id": 180,
+"journeyId": 6,
+"resourceId": 184876,
+"stepNumber": 16,
+"title": "Putting It All Together",
+"description": "Trace a complete streaming pipeline from ingest to playback so you can reason about every link in the chain before going deeper.",
+"isOptional": false,
+"createdAt": "2026-05-20T08:43:14.790Z",
+"resource": {
+"id": 184876,
+"title": "Matrox Video Learning Resources",
+"url": "https://video.matrox.com/en/learning/resources",
+"description": "A collection of technology guides, webinars, and on-site training seminars provided by Matrox Video experts. Topics include multi-channel encoding, AV over IP, streaming protocols, and KVM solutions, offering in-depth knowledge for both beginners and professionals."
+}
+},
+{
+"id": 179,
+"journeyId": 6,
+"resourceId": 184942,
+"stepNumber": 17,
+"title": "Putting It All Together",
+"description": "Trace a complete streaming pipeline from ingest to playback so you can reason about every link in the chain before going deeper.",
+"isOptional": false,
+"createdAt": "2026-05-20T08:43:14.787Z",
+"resource": {
+"id": 184942,
+"title": "PTZOptics Hive Tutorial Series",
+"url": "https://remoteproduction.com/the-best-resources-for-learning-remote-production-technology/",
+"description": "A YouTube tutorial series by PTZOptics focusing on remote camera control and cloud-based video production. The series offers step-by-step guides on effectively using Hive for managing remote productions, covering topics like camera linking and dynamic zoom."
+}
+},
+{
+"id": 178,
+"journeyId": 6,
+"resourceId": 184980,
+"stepNumber": 18,
+"title": "Putting It All Together",
+"description": "Trace a complete streaming pipeline from ingest to playback so you can reason about every link in the chain before going deeper.",
+"isOptional": false,
+"createdAt": "2026-05-20T08:43:14.785Z",
+"resource": {
+"id": 184980,
+"title": "Otterbein University Digital Video Tutorials",
+"url": "https://otterbein.libguides.com/ctl_video/videotutorials",
+"description": "A guide for faculty interested in digital video in its various forms, including digital storytelling student assignments, instructional videos, lecture capture, and video-based research projects. It offers a range of tutorials and resources for educators and developers alike."
+}
+}
+]

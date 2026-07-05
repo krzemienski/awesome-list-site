@@ -1,0 +1,26 @@
+{
+  "DV004_tag": "Filter by streaming",
+  "DV004_beforeSum": 1951,
+  "DV004_afterSum": 130,
+  "DV004_countsChanged": true,
+  "DV004_afterNarrowed": true,
+  "DV011_total": 337,
+  "DV011_tagA": "Filter by subcategory",
+  "DV011_countA": 337,
+  "DV011_narrowed": false,
+  "DV012_tagB": "Filter by encoding",
+  "DV012_countAB": 66,
+  "DV012_countB": 66,
+  "DV012_union": false,
+  "DV013_restored": 337,
+  "DV019_subOnly": 5,
+  "DV019_subPlusTag": 5,
+  "DV019_combined": true,
+  "DV029_url": "http://localhost:5000/subsubcategory/hevc",
+  "DV029_heading": "Page Not Found",
+  "DV029_cards": 0,
+  "DV029_resultsText": "n/a",
+  "_errors": [
+    "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ]
+}

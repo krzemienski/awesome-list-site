@@ -1,0 +1,27 @@
+{
+  "DV011_total": 337,
+  "tagCount": 20,
+  "DV011_tagA": "Filter by encoding",
+  "DV011_countA": 66,
+  "DV011_narrowed": true,
+  "DV012_tagB": "Filter by ffmpeg",
+  "DV012_countAB": 89,
+  "DV012_countB": 52,
+  "DV012_unionOK": true,
+  "DV013_restored": 337,
+  "DV019_subOnly": 5,
+  "DV019_subPlusTag": 0,
+  "DV019_combined": true,
+  "DV029_url": "http://localhost:5000/sub-subcategory/hevc",
+  "DV029_heading": "HEVC",
+  "DV029_cards": 3,
+  "DV029_resultsText": "Showing 3 of 3 resources",
+  "DV029_breadcrumbs": [
+    "Home",
+    "Encoding & Codecs",
+    "Codecs",
+    "Encoding & Codecs",
+    "Codecs"
+  ],
+  "_errors": []
+}

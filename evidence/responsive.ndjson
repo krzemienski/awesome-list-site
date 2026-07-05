@@ -43,3 +43,17 @@
 {"bp":1280,"route":"/submit","ok":true,"overflow":false,"sw":1280,"iw":1280,"drawer":"n/a","consoleErrors":[],"note":""}
 {"bp":1280,"route":"/settings/theme","ok":true,"overflow":false,"sw":1280,"iw":1280,"drawer":"n/a","consoleErrors":[],"note":""}
 {"bp":1280,"route":"/nonexistent-route-xyz","ok":false,"overflow":false,"sw":1280,"iw":1280,"drawer":"n/a","consoleErrors":["Failed to load resource: the server responded with a status of 404 (Not Found)"],"note":""}
+{"kind":"verdict","route":"/","breakpoints":[400,768,1280],"inspected":400,"finding":"none","verdict":"PASS — mobile drawer sidebar w/ category counts, no horizontal overflow, readable at all widths"}
+{"kind":"verdict","route":"/about","breakpoints":[400,768,1280],"inspected":"captures","finding":"none","verdict":"PASS — static content column reflows cleanly, no overflow"}
+{"kind":"verdict","route":"/advanced","breakpoints":[400,768,1280],"inspected":400,"finding":"minor","verdict":"WARN(minor, non-blocking) — at 400px the horizontal tab strip labels 'Export' and 'AI Recommendations' visually collide; strip is scrollable so all tabs reachable. Stat cards + explorer reflow fine. No fix applied (cosmetic, mobile-only, content reachable)."}
+{"kind":"verdict","route":"/category/community-events","breakpoints":[400,768,1280],"inspected":400,"finding":"none","verdict":"PASS — search/filter/sort/view-toggles fit one row, count badge visible, resource cards stack, no overflow"}
+{"kind":"verdict","route":"/subcategory/community-groups","breakpoints":[400,768,1280],"inspected":"captures","finding":"none","verdict":"PASS — breadcrumbs + card grid reflow, no overflow"}
+{"kind":"verdict","route":"/journeys","breakpoints":[400,768,1280],"inspected":"captures","finding":"none","verdict":"PASS — journey cards stack cleanly"}
+{"kind":"verdict","route":"/journey/6","breakpoints":[400,768,1280],"inspected":"captures","finding":"none","verdict":"PASS — step list + progress reflow, no overflow"}
+{"kind":"verdict","route":"/login","breakpoints":[400,768,1280],"inspected":"captures","finding":"none","verdict":"PASS — centered auth card, inputs full-width, no overflow"}
+{"kind":"verdict","route":"/submit","breakpoints":[400,768,1280],"inspected":400,"finding":"none","verdict":"PASS — labeled fields (title/url/description/category) full-width, helper text wraps, no overflow"}
+{"kind":"verdict","route":"/recommendations","breakpoints":[400,768,1280],"inspected":"captures","finding":"none","verdict":"PASS — anon login CTA + popular-picks grid reflow"}
+{"kind":"verdict","route":"/resource/186811","breakpoints":[400,768,1280],"inspected":400,"finding":"none","verdict":"PASS — action buttons (fav/bookmark/share/edit) + Visit fit, title/badges/description reflow, no overflow"}
+{"kind":"verdict","route":"/search?q=ffmpeg","breakpoints":[400,768,1280],"inspected":"captures","finding":"none","verdict":"PASS — debounced results list reflows, no overflow"}
+{"kind":"verdict","route":"/settings/theme","breakpoints":[400,768,1280],"inspected":400,"finding":"none","verdict":"PASS — design-system picker cards stack, active state (crimson border+check) visible, no overflow"}
+{"kind":"verdict","route":"/nonexistent-route-xyz","breakpoints":[400,768,1280],"inspected":"captures","finding":"none","verdict":"PASS — soft-404 with did-you-mean renders centered, no overflow"}

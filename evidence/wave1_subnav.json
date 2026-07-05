@@ -1,0 +1,24 @@
+{
+  "DV028_url": "http://localhost:5000/subcategory/encoding-tools",
+  "DV028_heading": "Encoding Tools",
+  "DV028_cards": 104,
+  "DV028_resultsText": "Showing 104 of 104 resources",
+  "DV030_breadcrumbs": [
+    "Home",
+    "Encoding & Codecs",
+    "",
+    "Encoding & Codecs"
+  ],
+  "DV032_sidebarRows": [
+    "Community & Events",
+    "Encoding & Codecs",
+    "General Tools",
+    "Infrastructure & Delivery",
+    "Intro & Learning",
+    "Media Tools",
+    "Players & Clients",
+    "Protocols & Transport",
+    "Standards & Industry"
+  ],
+  "_errors": []
+}

@@ -1,8 +1,6 @@
 {
-  "when": "2026-07-05T18:07:50.465Z",
-  "reconcileOk": true,
-  "residueClean": true,
-  "counts": {
+  "ts": "2026-07-05T22:43:22.736Z",
+  "snapshot": {
     "categories": 9,
     "subcategories": 102,
     "sub_subcategories": 107,
@@ -45,109 +43,13 @@
     "user_preferences": 0,
     "users": 3
   },
-  "reconcile": [
-    {
-      "key": "categories",
-      "now": 9,
-      "baseline": 9,
-      "ok": true
-    },
-    {
-      "key": "subcategories",
-      "now": 102,
-      "baseline": 102,
-      "ok": true
-    },
-    {
-      "key": "sub_subcategories",
-      "now": 107,
-      "baseline": 107,
-      "ok": true
-    },
-    {
-      "key": "resources",
-      "now": 1954,
-      "baseline": 1954,
-      "ok": true
-    },
-    {
-      "key": "users",
-      "now": 3,
-      "baseline": 3,
-      "ok": true
-    },
-    {
-      "key": "learning_journeys",
-      "now": 5,
-      "baseline": 5,
-      "ok": true
-    },
-    {
-      "key": "journey_steps",
-      "now": 90,
-      "baseline": 90,
-      "ok": true
-    },
-    {
-      "key": "resource_edits",
-      "now": 4,
-      "baseline": 4,
-      "ok": true
-    },
-    {
-      "key": "user_journey_progress",
-      "now": 2,
-      "baseline": 2,
-      "ok": true
-    },
-    {
-      "key": "research_jobs",
-      "now": 7,
-      "baseline": 7,
-      "ok": true
-    },
-    {
-      "key": "research_discoveries",
-      "now": 7,
-      "baseline": 7,
-      "ok": true
-    },
-    {
-      "key": "enrichment_jobs",
-      "now": 23,
-      "baseline": 23,
-      "ok": true
-    },
-    {
-      "key": "user_favorites",
-      "now": 0,
-      "baseline": 0,
-      "ok": true
-    },
-    {
-      "key": "user_bookmarks",
-      "now": 0,
-      "baseline": 0,
-      "ok": true
-    }
-  ],
-  "resourcesByStatus": [
-    {
-      "status": "approved",
-      "n": 1951
-    },
-    {
-      "status": "pending",
-      "n": 3
-    }
-  ],
   "residue": {
     "res_qa": 0,
     "user_qa": 0,
     "cat_qa": 0,
     "sub_qa": 0,
     "subsub_qa": 0,
-    "journey_qa": 0,
-    "edit_qa": 0
-  }
+    "jrn_qa": 0
+  },
+  "verdict": "RECONCILE_OK"
 }

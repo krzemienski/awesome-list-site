@@ -1,0 +1,1 @@
+GET /api/admin/resources -> 401
