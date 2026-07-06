@@ -1049,6 +1049,12 @@ export const enrichmentJobs = pgTable(
     failedResourceIds: jsonb("failed_resource_ids").$type<number[]>().default([]),
     errorMessage: text("error_message"),
     metadata: jsonb("metadata").$type<Record<string, any>>().default({}),
+    // Per-run agent config (Claude Agent SDK): model + custom endpoint + encrypted auth token.
+    // authTokenEncrypted packs ivHex:tagHex:cipherHex (AES-256-GCM). Null => use platform default (ANTHROPIC_API_KEY).
+    model: text("model"),
+    baseUrl: text("base_url"),
+    authTokenEncrypted: text("auth_token_encrypted"),
+    authTokenLast4: text("auth_token_last4"),
     startedBy: varchar("started_by").references(() => users.id),
     startedAt: timestamp("started_at"),
     completedAt: timestamp("completed_at"),
@@ -1065,6 +1071,8 @@ export const insertEnrichmentJobSchema = createInsertSchema(enrichmentJobs).pick
   filter: true,
   batchSize: true,
   startedBy: true,
+  model: true,
+  baseUrl: true,
 });
 
 export type InsertEnrichmentJob = z.infer<typeof insertEnrichmentJobSchema>;
@@ -1180,6 +1188,12 @@ export const researchJobs = pgTable(
     categoryFocus: text("category_focus"),
     maxBudgetUsd: text("max_budget_usd").default("1.00"),
     maxTurns: integer("max_turns").default(30),
+    // Per-run agent config (Claude Agent SDK): model + custom endpoint + encrypted auth token.
+    // authTokenEncrypted packs ivHex:tagHex:cipherHex (AES-256-GCM). Null => use platform default (ANTHROPIC_API_KEY).
+    model: text("model"),
+    baseUrl: text("base_url"),
+    authTokenEncrypted: text("auth_token_encrypted"),
+    authTokenLast4: text("auth_token_last4"),
     totalDiscoveries: integer("total_discoveries").default(0),
     approvedDiscoveries: integer("approved_discoveries").default(0),
     rejectedDiscoveries: integer("rejected_discoveries").default(0),
@@ -1207,6 +1221,8 @@ export const insertResearchJobSchema = createInsertSchema(researchJobs).pick({
   maxBudgetUsd: true,
   maxTurns: true,
   startedBy: true,
+  model: true,
+  baseUrl: true,
 });
 
 export type InsertResearchJob = z.infer<typeof insertResearchJobSchema>;
@@ -1253,6 +1269,53 @@ export const insertResearchDiscoverySchema = createInsertSchema(researchDiscover
 
 export type InsertResearchDiscovery = z.infer<typeof insertResearchDiscoverySchema>;
 export type ResearchDiscovery = typeof researchDiscoveries.$inferSelect;
+
+/**
+ * Agent Events table - Structured, persisted log of the Claude Agent SDK multi-agent runs.
+ *
+ * Polymorphic across both agent flows: (jobType, jobId) identifies the parent run
+ * (jobType 'research' -> research_jobs.id, 'enrichment' -> enrichment_jobs.id).
+ * Rows are appended in stream order (seq) as SDKMessages arrive from query(), and feed
+ * both the admin log viewer and the multi-agent communication graph.
+ *
+ * eventType: 'lifecycle' | 'message' | 'thinking' | 'tool_call' | 'tool_result'
+ *          | 'delegation' | 'delegation_result' | 'result' | 'error'
+ * actorType: 'orchestrator' | 'subagent' | 'tool' | 'system'
+ * For delegation edges, targetActor names the subagent being spawned/messaged.
+ */
+export const agentEvents = pgTable(
+  "agent_events",
+  {
+    id: serial("id").primaryKey(),
+    jobType: text("job_type").notNull(), // 'research' | 'enrichment'
+    jobId: integer("job_id").notNull(),
+    seq: integer("seq").notNull(),
+    actor: text("actor").notNull(),
+    actorType: text("actor_type").notNull(),
+    eventType: text("event_type").notNull(),
+    model: text("model"),
+    targetActor: text("target_actor"),
+    summary: text("summary"),
+    detail: jsonb("detail").$type<Record<string, any>>().default({}),
+    tokensIn: integer("tokens_in"),
+    tokensOut: integer("tokens_out"),
+    costUsd: text("cost_usd"),
+    durationMs: integer("duration_ms"),
+    ts: timestamp("ts").defaultNow(),
+  },
+  (table) => [
+    index("idx_agent_events_job").on(table.jobType, table.jobId),
+    index("idx_agent_events_job_seq").on(table.jobType, table.jobId, table.seq),
+  ]
+);
+
+export const insertAgentEventSchema = createInsertSchema(agentEvents).omit({
+  id: true,
+  ts: true,
+});
+
+export type InsertAgentEvent = z.infer<typeof insertAgentEventSchema>;
+export type AgentEvent = typeof agentEvents.$inferSelect;
 
 // Whitelist of fields editable via user-submitted resource edits.
 // Shared between routes.ts (sanitize incoming edits) and AuditRepository.ts (apply merged edits).
