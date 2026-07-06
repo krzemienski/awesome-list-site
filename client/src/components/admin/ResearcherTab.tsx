@@ -13,6 +13,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AgentEventLog } from "@/components/admin/AgentEventLog";
+import { AgentCommsGraph } from "@/components/admin/AgentCommsGraph";
 import {
   Search,
   Play,
@@ -29,6 +31,12 @@ import {
   ExternalLink,
   Activity,
   Zap,
+  Settings2,
+  ChevronDown,
+  ChevronRight,
+  Cpu,
+  Server,
+  KeyRound,
 } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -71,6 +79,10 @@ export default function ResearcherTab() {
   const [categoryFocus, setCategoryFocus] = useState("");
   const [maxBudget, setMaxBudget] = useState("1.00");
   const [maxTurns, setMaxTurns] = useState(30);
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [model, setModel] = useState("");
+  const [baseUrl, setBaseUrl] = useState("");
+  const [authToken, setAuthToken] = useState("");
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
   const [showJobDetails, setShowJobDetails] = useState(false);
   const [rejectDialogId, setRejectDialogId] = useState<number | null>(null);
@@ -135,6 +147,9 @@ export default function ResearcherTab() {
           categoryFocus: categoryFocus && categoryFocus !== 'all' ? categoryFocus : undefined,
           maxBudgetUsd: maxBudget,
           maxTurns,
+          model: model.trim() || undefined,
+          baseUrl: baseUrl.trim() || undefined,
+          authToken: authToken.trim() || undefined,
         }),
       });
     },
@@ -147,6 +162,7 @@ export default function ResearcherTab() {
         setSelectedJobId(data.jobId);
         setShowJobDetails(true);
       }
+      setAuthToken("");
       toast({ title: `Research job #${data?.jobId ?? ''} started`, description: "Live log opened — streaming updates every 2s." });
     },
     onError: (error: any) => {
@@ -281,6 +297,68 @@ export default function ResearcherTab() {
                   </div>
                 </div>
 
+                <div className="rounded-md border">
+                  <button
+                    type="button"
+                    onClick={() => setShowAdvanced(v => !v)}
+                    className="flex w-full items-center justify-between px-3 py-2 text-sm font-medium hover:bg-muted/50"
+                    data-testid="button-toggle-advanced-researcher"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Settings2 className="w-4 h-4 text-muted-foreground" />
+                      Custom Model &amp; Endpoint (optional)
+                    </span>
+                    {showAdvanced ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                  </button>
+                  {showAdvanced && (
+                    <div className="space-y-3 border-t px-3 py-3">
+                      <div>
+                        <Label htmlFor="research-model" className="flex items-center gap-1.5">
+                          <Cpu className="w-3.5 h-3.5 text-muted-foreground" />Model
+                        </Label>
+                        <Input
+                          id="research-model"
+                          value={model}
+                          onChange={(e) => setModel(e.target.value)}
+                          placeholder="claude-sonnet-4-5 (default)"
+                          className="mt-1 font-mono text-xs"
+                          data-testid="input-research-model"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="research-baseurl" className="flex items-center gap-1.5">
+                          <Server className="w-3.5 h-3.5 text-muted-foreground" />Base URL
+                        </Label>
+                        <Input
+                          id="research-baseurl"
+                          value={baseUrl}
+                          onChange={(e) => setBaseUrl(e.target.value)}
+                          placeholder="https://api.anthropic.com (default)"
+                          className="mt-1 font-mono text-xs"
+                          data-testid="input-research-baseurl"
+                        />
+                        <p className="mt-1 text-[11px] text-muted-foreground">Must be https and requires an auth token below. Leave blank to use the platform endpoint.</p>
+                      </div>
+                      <div>
+                        <Label htmlFor="research-token" className="flex items-center gap-1.5">
+                          <KeyRound className="w-3.5 h-3.5 text-muted-foreground" />Auth Token
+                        </Label>
+                        <Input
+                          id="research-token"
+                          type="password"
+                          value={authToken}
+                          onChange={(e) => setAuthToken(e.target.value)}
+                          placeholder="Required if a base URL is set (blank = platform key)"
+                          className="mt-1 font-mono text-xs"
+                          autoComplete="off"
+                          data-testid="input-research-token"
+                        />
+                        <p className="mt-1 text-[11px] text-muted-foreground">Encrypted at rest (AES-256-GCM). Only the last 4 characters are ever shown afterwards.</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 <Alert>
                   <Zap className="w-4 h-4" />
                   <AlertDescription>
@@ -354,6 +432,7 @@ export default function ResearcherTab() {
                                 size="sm"
                                 variant="outline"
                                 onClick={() => { setSelectedJobId(job.id); setShowJobDetails(true); }}
+                                data-testid={`button-research-details-${job.id}`}
                               >
                                 <Eye className="w-3 h-3 mr-1" />Live Log
                               </Button>
@@ -500,6 +579,7 @@ export default function ResearcherTab() {
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => { setSelectedJobId(job.id); setShowJobDetails(true); }}
+                                data-testid={`button-research-details-${job.id}`}
                               >
                                 <Eye className="w-3 h-3" />
                               </Button>
@@ -588,6 +668,21 @@ export default function ResearcherTab() {
                 </div>
               )}
 
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <Label className="text-xs text-muted-foreground">Model</Label>
+                  <p className="text-xs font-mono mt-1">{selectedJob.model || 'claude-sonnet-4-5 (default)'}</p>
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">Base URL</Label>
+                  <p className="text-xs font-mono mt-1 break-all">{selectedJob.baseUrl || 'Platform default'}</p>
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">Auth Token</Label>
+                  <p className="text-xs font-mono mt-1">{selectedJob.authTokenLast4 ? `••••${selectedJob.authTokenLast4}` : 'Platform key'}</p>
+                </div>
+              </div>
+
               {selectedJob.errorMessage && (
                 <Alert variant="destructive">
                   <AlertCircle className="w-4 h-4" />
@@ -666,6 +761,12 @@ export default function ResearcherTab() {
                   {selectedJob.isActive ? 'Waiting for first log entry…' : 'No log entries recorded.'}
                 </div>
               )}
+
+              <Separator />
+              <AgentCommsGraph jobType="research" jobId={selectedJob.id} isActive={selectedJob.isActive} />
+
+              <Separator />
+              <AgentEventLog jobType="research" jobId={selectedJob.id} isActive={selectedJob.isActive} />
 
               {jobDiscoveries && jobDiscoveries.length > 0 && (
                 <>

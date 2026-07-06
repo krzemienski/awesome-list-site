@@ -21,11 +21,19 @@ import {
   Clock,
   Info,
   Eye,
-  Activity
+  Activity,
+  Settings2,
+  ChevronDown,
+  ChevronRight,
+  Cpu,
+  Server,
+  KeyRound
 } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { AgentEventLog } from "@/components/admin/AgentEventLog";
+import { AgentCommsGraph } from "@/components/admin/AgentCommsGraph";
 import type { EnrichmentJob } from "@shared/schema";
 
 interface JobsResponse {
@@ -44,6 +52,10 @@ export default function BatchEnrichmentPanel() {
   
   const [filter, setFilter] = useState<'all' | 'unenriched'>('unenriched');
   const [batchSize, setBatchSize] = useState(10);
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [model, setModel] = useState("");
+  const [baseUrl, setBaseUrl] = useState("");
+  const [authToken, setAuthToken] = useState("");
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
@@ -57,11 +69,25 @@ export default function BatchEnrichmentPanel() {
   const { data: selectedJobData } = useQuery<JobStatusResponse>({
     queryKey: ['/api/enrichment/jobs', selectedJobId],
     enabled: !!selectedJobId && isDetailsModalOpen,
+    // Explicit queryFn — the default fetcher only reads queryKey[0] and would
+    // hit the LIST endpoint, leaving selectedJobData.job undefined (stats +
+    // config would all render defaults).
+    queryFn: async () => {
+      const res = await fetch(`/api/enrichment/jobs/${selectedJobId}`, { credentials: 'include' });
+      if (!res.ok) throw new Error(`Failed to fetch enrichment job ${selectedJobId}: ${res.status}`);
+      return res.json();
+    },
     refetchInterval: isDetailsModalOpen ? 5000 : false
   });
 
   const startMutation = useMutation({
-    mutationFn: async (config: { filter: 'all' | 'unenriched', batchSize: number }) => {
+    mutationFn: async (config: {
+      filter: 'all' | 'unenriched';
+      batchSize: number;
+      model?: string;
+      baseUrl?: string;
+      authToken?: string;
+    }) => {
       return await apiRequest('/api/enrichment/start', {
         method: 'POST',
         body: JSON.stringify(config)
@@ -69,6 +95,7 @@ export default function BatchEnrichmentPanel() {
     },
     onSuccess: () => {
       setIsPolling(true);
+      setAuthToken("");
       queryClient.invalidateQueries({ queryKey: ['/api/enrichment/jobs'] });
       toast({
         title: "Batch enrichment started",
@@ -123,7 +150,13 @@ export default function BatchEnrichmentPanel() {
       });
       return;
     }
-    startMutation.mutate({ filter, batchSize });
+    startMutation.mutate({
+      filter,
+      batchSize,
+      model: model.trim() || undefined,
+      baseUrl: baseUrl.trim() || undefined,
+      authToken: authToken.trim() || undefined,
+    });
   };
 
   const handleViewDetails = (jobId: number) => {
@@ -247,6 +280,72 @@ export default function BatchEnrichmentPanel() {
                 Resources per batch (1-50)
               </p>
             </div>
+          </div>
+
+          <div className="rounded-md border">
+            <button
+              type="button"
+              onClick={() => setShowAdvanced(v => !v)}
+              className="flex w-full items-center justify-between px-3 py-2 text-sm font-medium hover:bg-muted/50"
+              disabled={hasActiveJob}
+              data-testid="button-toggle-advanced-enrichment"
+            >
+              <span className="flex items-center gap-2">
+                <Settings2 className="w-4 h-4 text-muted-foreground" />
+                Custom Model &amp; Endpoint (optional)
+              </span>
+              {showAdvanced ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+            </button>
+            {showAdvanced && (
+              <div className="space-y-3 border-t px-3 py-3">
+                <div className="space-y-2">
+                  <Label htmlFor="enrich-model" className="flex items-center gap-1.5">
+                    <Cpu className="w-3.5 h-3.5 text-muted-foreground" />Model
+                  </Label>
+                  <Input
+                    id="enrich-model"
+                    value={model}
+                    onChange={(e) => setModel(e.target.value)}
+                    placeholder="claude-haiku-4-5 (default)"
+                    className="font-mono text-xs"
+                    disabled={hasActiveJob}
+                    data-testid="input-enrich-model"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="enrich-baseurl" className="flex items-center gap-1.5">
+                    <Server className="w-3.5 h-3.5 text-muted-foreground" />Base URL
+                  </Label>
+                  <Input
+                    id="enrich-baseurl"
+                    value={baseUrl}
+                    onChange={(e) => setBaseUrl(e.target.value)}
+                    placeholder="https://api.anthropic.com (default)"
+                    className="font-mono text-xs"
+                    disabled={hasActiveJob}
+                    data-testid="input-enrich-baseurl"
+                  />
+                  <p className="text-[11px] text-muted-foreground">Must be https and requires an auth token below. Leave blank to use the platform endpoint.</p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="enrich-token" className="flex items-center gap-1.5">
+                    <KeyRound className="w-3.5 h-3.5 text-muted-foreground" />Auth Token
+                  </Label>
+                  <Input
+                    id="enrich-token"
+                    type="password"
+                    value={authToken}
+                    onChange={(e) => setAuthToken(e.target.value)}
+                    placeholder="Required if a base URL is set (blank = platform key)"
+                    className="font-mono text-xs"
+                    autoComplete="off"
+                    disabled={hasActiveJob}
+                    data-testid="input-enrich-token"
+                  />
+                  <p className="text-[11px] text-muted-foreground">Encrypted at rest (AES-256-GCM). Only the last 4 characters are ever shown afterwards.</p>
+                </div>
+              </div>
+            )}
           </div>
 
           <Separator />
@@ -505,6 +604,18 @@ export default function BatchEnrichmentPanel() {
                       <div className="text-muted-foreground">Batch Size</div>
                       <div className="font-mono">{selectedJobData.job.batchSize || 10}</div>
                     </div>
+                    <div>
+                      <div className="text-muted-foreground">Model</div>
+                      <div className="font-mono">{selectedJobData.job.model || 'claude-haiku-4-5 (default)'}</div>
+                    </div>
+                    <div>
+                      <div className="text-muted-foreground">Base URL</div>
+                      <div className="font-mono break-all">{selectedJobData.job.baseUrl || 'Platform default'}</div>
+                    </div>
+                    <div>
+                      <div className="text-muted-foreground">Auth Token</div>
+                      <div className="font-mono">{selectedJobData.job.authTokenLast4 ? `••••${selectedJobData.job.authTokenLast4}` : 'Platform key'}</div>
+                    </div>
                   </div>
                 </div>
 
@@ -611,6 +722,23 @@ export default function BatchEnrichmentPanel() {
                         </AlertDescription>
                       </Alert>
                     </div>
+                  </>
+                )}
+
+                {selectedJobId && (
+                  <>
+                    <Separator />
+                    <AgentCommsGraph
+                      jobType="enrichment"
+                      jobId={selectedJobId}
+                      isActive={selectedJobData.job.status === 'processing' || selectedJobData.job.status === 'pending'}
+                    />
+                    <Separator />
+                    <AgentEventLog
+                      jobType="enrichment"
+                      jobId={selectedJobId}
+                      isActive={selectedJobData.job.status === 'processing' || selectedJobData.job.status === 'pending'}
+                    />
                   </>
                 )}
               </div>

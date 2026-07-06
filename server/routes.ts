@@ -68,6 +68,7 @@ import { validateAwesomeList, formatValidationReport } from "./validation/awesom
 import { checkResourceLinks, formatLinkCheckReport } from "./validation/linkChecker";
 import { seedDatabase } from "./seed";
 import { enrichmentService } from "./ai/enrichmentService";
+import { parseAgentConfigFromRequest, stripJobAuthSecret } from "./ai/agentRuntime";
 import { db } from "./db";
 import { sql } from "drizzle-orm";
 import { SITE_URL } from "./og-middleware";
@@ -3344,11 +3345,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { filter = 'unenriched', batchSize = 10 } = req.body;
       const userId = req.user?.claims?.sub;
-      
+
+      let agentConfig;
+      try {
+        agentConfig = await parseAgentConfigFromRequest(req.body);
+      } catch (cfgErr: any) {
+        return res.status(400).json({ success: false, message: cfgErr.message || 'Invalid agent configuration' });
+      }
+
       const jobId = await enrichmentService.queueBatchEnrichment({
         filter,
         batchSize,
-        startedBy: userId
+        startedBy: userId,
+        model: agentConfig.model,
+        baseUrl: agentConfig.baseUrl,
+        authTokenEncrypted: agentConfig.authTokenEncrypted,
+        authTokenLast4: agentConfig.authTokenLast4,
       });
       
       res.json({
@@ -3374,7 +3386,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({
         success: true,
-        jobs
+        jobs: jobs.map(stripJobAuthSecret)
       });
     } catch (error: any) {
       console.error('Error listing enrichment jobs:', error);
@@ -3409,7 +3421,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({
         success: true,
-        job
+        job: stripJobAuthSecret(job)
       });
     } catch (error: any) {
       console.error('Error getting job status:', error);
@@ -3418,6 +3430,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: 'Failed to get job status',
         error: error.message
       });
+    }
+  });
+
+  app.get('/api/enrichment/jobs/:id/events', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const jobId = parseInt(req.params.id);
+      if (Number.isNaN(jobId)) return res.status(400).json({ message: 'Invalid job ID' });
+      const { getAgentEvents } = await import('./ai/agentEvents');
+      const afterSeq = req.query.afterSeq !== undefined ? parseInt(req.query.afterSeq as string) : undefined;
+      const events = await getAgentEvents('enrichment', jobId, afterSeq);
+      res.json(events);
+    } catch (error: any) {
+      res.status(500).json({ message: 'Failed to get agent events', error: error.message });
     }
   });
   
@@ -3553,6 +3578,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ success: false, message: 'Prompt must be at least 10 characters' });
       }
 
+      let agentConfig;
+      try {
+        agentConfig = await parseAgentConfigFromRequest(req.body);
+      } catch (cfgErr: any) {
+        return res.status(400).json({ success: false, message: cfgErr.message || 'Invalid agent configuration' });
+      }
+
       const userId = req.user?.claims?.sub;
       const jobId = await researchService.startResearchJob({
         prompt: prompt.trim(),
@@ -3560,6 +3592,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         maxBudgetUsd: maxBudgetUsd || '1.00',
         maxTurns: maxTurns || 30,
         startedBy: userId,
+        model: agentConfig.model,
+        baseUrl: agentConfig.baseUrl,
+        authTokenEncrypted: agentConfig.authTokenEncrypted,
+        authTokenLast4: agentConfig.authTokenLast4,
       });
 
       res.json({ success: true, jobId, message: 'Research job started' });
@@ -3573,7 +3609,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { researchService } = await import('./ai/researchService');
       const jobs = await researchService.listJobs();
-      res.json(jobs);
+      res.json(jobs.map(stripJobAuthSecret));
     } catch (error: any) {
       res.status(500).json({ message: 'Failed to list research jobs', error: error.message });
     }
@@ -3584,9 +3620,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { researchService } = await import('./ai/researchService');
       const job = await researchService.getJob(parseInt(req.params.id));
       if (!job) return res.status(404).json({ message: 'Job not found' });
-      res.json({ ...job, isActive: researchService.isJobActive(job.id) });
+      res.json({ ...stripJobAuthSecret(job), isActive: researchService.isJobActive(job.id) });
     } catch (error: any) {
       res.status(500).json({ message: 'Failed to get job', error: error.message });
+    }
+  });
+
+  app.get('/api/researcher/jobs/:id/events', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const jobId = parseInt(req.params.id);
+      if (Number.isNaN(jobId)) return res.status(400).json({ message: 'Invalid job ID' });
+      const { getAgentEvents } = await import('./ai/agentEvents');
+      const afterSeq = req.query.afterSeq !== undefined ? parseInt(req.query.afterSeq as string) : undefined;
+      const events = await getAgentEvents('research', jobId, afterSeq);
+      res.json(events);
+    } catch (error: any) {
+      res.status(500).json({ message: 'Failed to get agent events', error: error.message });
     }
   });
 

@@ -1,6 +1,6 @@
 import dns from "dns/promises";
 import net from "net";
-import { decryptAuthToken } from "./configCrypto";
+import { decryptAuthToken, encryptAuthToken, isConfigEncryptionAvailable } from "./configCrypto";
 
 /**
  * Shared runtime helpers for the Claude Agent SDK multi-agent flows (Researcher + Enrichment):
@@ -99,15 +99,22 @@ export async function preflightBaseUrl(url: string, timeoutMs = 5000): Promise<P
 
 /**
  * Build the env map passed to query() options.env for a run. Starts from process.env so the
- * subprocess keeps PATH/HOME/etc, then applies per-run overrides. When a custom bearer token is
- * configured, ANTHROPIC_API_KEY is removed so the custom ANTHROPIC_AUTH_TOKEN is used unambiguously.
+ * subprocess keeps PATH/HOME/etc, then applies per-run overrides. Whenever a custom base URL is
+ * set, the platform ANTHROPIC_API_KEY is removed so it can NEVER travel to a third-party endpoint;
+ * the run authenticates only with the admin-supplied ANTHROPIC_AUTH_TOKEN (which
+ * parseAgentConfigFromRequest requires alongside any custom base URL).
  */
 export function buildAgentEnv(config: AgentRunConfig): Record<string, string> {
   const env: Record<string, string> = {};
   for (const [k, v] of Object.entries(process.env)) {
     if (typeof v === "string") env[k] = v;
   }
-  if (config.baseUrl) env.ANTHROPIC_BASE_URL = config.baseUrl;
+  if (config.baseUrl) {
+    env.ANTHROPIC_BASE_URL = config.baseUrl;
+    // Never send the platform key to a custom endpoint, even if (defensively) no
+    // token was configured — the API key is only valid against the platform host.
+    delete env.ANTHROPIC_API_KEY;
+  }
   if (config.authTokenEncrypted) {
     const token = decryptAuthToken(config.authTokenEncrypted);
     env.ANTHROPIC_AUTH_TOKEN = token;
@@ -118,4 +125,58 @@ export function buildAgentEnv(config: AgentRunConfig): Record<string, string> {
 
 export function resolveModel(config: AgentRunConfig, fallback: string): string {
   return config.model && config.model.trim() ? config.model.trim() : fallback;
+}
+
+export interface ParsedAgentConfig {
+  model: string | null;
+  baseUrl: string | null;
+  authTokenEncrypted: string | null;
+  authTokenLast4: string | null;
+}
+
+/**
+ * Parse + validate per-run agent config from an admin request body. A custom base URL is
+ * https/SSRF-validated (throws a user-facing message on failure) and a plaintext auth token is
+ * encrypted at rest via AES-256-GCM (only the last 4 chars are retained for display). Throws a
+ * user-facing Error on any invalid input so the caller can surface it as a 400.
+ */
+export async function parseAgentConfigFromRequest(body: any): Promise<ParsedAgentConfig> {
+  const model = typeof body?.model === "string" && body.model.trim() ? body.model.trim() : null;
+
+  let baseUrl: string | null = null;
+  const rawBaseUrl = typeof body?.baseUrl === "string" ? body.baseUrl.trim() : "";
+  if (rawBaseUrl) {
+    baseUrl = await validateBaseUrl(rawBaseUrl);
+  }
+
+  let authTokenEncrypted: string | null = null;
+  let authTokenLast4: string | null = null;
+  const rawToken = typeof body?.authToken === "string" ? body.authToken.trim() : "";
+  if (baseUrl && !rawToken) {
+    throw new Error(
+      "A custom base URL requires an auth token — the platform key is never sent to a custom endpoint.",
+    );
+  }
+  if (rawToken) {
+    if (!isConfigEncryptionAvailable()) {
+      throw new Error(
+        "Cannot store a custom auth token: server encryption key (CONFIG_ENCRYPTION_KEY) is not configured.",
+      );
+    }
+    const enc = encryptAuthToken(rawToken);
+    authTokenEncrypted = enc.encrypted;
+    authTokenLast4 = enc.last4;
+  }
+
+  return { model, baseUrl, authTokenEncrypted, authTokenLast4 };
+}
+
+/**
+ * Remove the encrypted auth-token blob from a job row before returning it to any client.
+ * The masked `authTokenLast4` field is preserved so the UI can show which token was used.
+ */
+export function stripJobAuthSecret<T extends Record<string, any>>(job: T): T {
+  if (!job || typeof job !== "object") return job;
+  const { authTokenEncrypted: _omit, ...rest } = job;
+  return rest as T;
 }

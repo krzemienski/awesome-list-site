@@ -1,32 +1,19 @@
-import Anthropic from '@anthropic-ai/sdk';
-import { storage } from '../storage';
 import { db } from '../db';
-import { resources, categories, subcategories, subSubcategories, researchJobs, researchDiscoveries } from '@shared/schema';
+import { resources, researchJobs, researchDiscoveries } from '@shared/schema';
 import { eq, sql } from 'drizzle-orm';
 import type { ResearchJob, ResearchDiscovery } from '@shared/schema';
 import { CategoryRepository } from '../repositories/CategoryRepository';
 import { ensureSubSubcategoryExists } from '../repositories/ensureSubSubcategory';
+import { tool, createSdkMcpServer } from '@anthropic-ai/claude-agent-sdk';
+import { z } from 'zod';
+import { AgentEventEmitter } from './agentEvents';
+import { runAgentQuery, type AgentDefinitionInput } from './runAgentQuery';
+import { DEFAULT_RESEARCH_MODEL, DEFAULT_ENRICHMENT_MODEL, resolveModel, type AgentRunConfig } from './agentRuntime';
 
-const RESEARCH_MODEL = "claude-sonnet-4-5";
-
-// Sonnet 4.5 pricing per million tokens
-const COST_PER_INPUT_TOKEN = 3.0 / 1_000_000;
-const COST_PER_OUTPUT_TOKEN = 15.0 / 1_000_000;
-const COST_PER_CACHE_WRITE = 3.75 / 1_000_000;   // 1.25x base input (ephemeral 5-min cache)
-const COST_PER_CACHE_READ = 0.30 / 1_000_000;    // 0.10x base input — the big lever
-const COST_PER_WEB_SEARCH = 10.0 / 1000;
-
-// Cap how much pre-computed context we inline. Caching makes this nearly free
-// on repeat turns, but we still want a finite upper bound on the system prompt.
+// Cap how much pre-computed context we inline into the orchestrator system prompt.
 const MAX_TAXONOMY_LINES = 200;
 const MAX_TOP_DOMAINS = 50;
 const MAX_FOCUS_URLS = 80;
-
-interface ResearchToolDefinition {
-  name: string;
-  description: string;
-  input_schema: Record<string, any>;
-}
 
 function normalizeUrl(url: string): string {
   try {
@@ -47,67 +34,9 @@ function domainOf(url: string): string {
   }
 }
 
-// Client-side tools. `get_category_tree` is intentionally removed — the full
-// taxonomy is now baked into the cached system prompt so it doesn't replay as
-// a 15k-char tool_result on every turn.
-const researchTools: ResearchToolDefinition[] = [
-  {
-    name: "check_duplicate",
-    description: "Check if a URL already exists in the database of known resources. Returns isDuplicate=true if already present. ALWAYS call this before save_discovery.",
-    input_schema: {
-      type: "object",
-      properties: {
-        url: { type: "string", description: "The URL to check for duplicates" }
-      },
-      required: ["url"]
-    }
-  },
-  {
-    name: "save_discovery",
-    description: "Persist a verified, NON-DUPLICATE resource for admin review. Only call after check_duplicate returns false AND you've actually seen the resource via web_search (no fabricated URLs).",
-    input_schema: {
-      type: "object",
-      properties: {
-        title: { type: "string", description: "Title of the resource" },
-        url: { type: "string", description: "URL of the resource" },
-        description: { type: "string", description: "Brief description of what this resource offers for video streaming/development" },
-        suggested_category: { type: "string", description: "Best matching category name from the taxonomy in the system prompt" },
-        suggested_subcategory: { type: "string", description: "Best matching subcategory, or empty string if none fits" },
-        suggested_sub_subcategory: { type: "string", description: "Best matching sub-subcategory (level-3), or empty string if none fits" },
-        confidence: { type: "integer", description: "Confidence score 1-100. Only save if >= 70." },
-        reasoning: { type: "string", description: "Why this is valuable AND why it's not redundant with the existing resources you've seen" }
-      },
-      required: ["title", "url", "description", "suggested_category", "confidence", "reasoning"]
-    }
-  },
-  {
-    name: "get_coverage_gaps",
-    description: "Return the most under-represented subcategories (resource_count ASC) with sample existing URLs so you can target real gaps and avoid proposing duplicates. Call this once near the start of a job to refine your search targets.",
-    input_schema: {
-      type: "object",
-      properties: {
-        limit: { type: "integer", description: "How many gap subcategories to return (default 15, max 30)" }
-      },
-      required: []
-    }
-  },
-  {
-    name: "get_existing_resources",
-    description: "Sample existing resources in a specific category or subcategory so you can avoid proposing duplicates. Use this when you're about to search a topic and want to know what's already covered.",
-    input_schema: {
-      type: "object",
-      properties: {
-        category: { type: "string", description: "Category or subcategory name to list resources from (case-insensitive substring match)" },
-        limit: { type: "integer", description: "Max resources to return (default 30, max 100)" }
-      },
-      required: ["category"]
-    }
-  }
-];
-
-interface ActiveJob {
-  jobId: number;
-  abortController: AbortController;
+function preview(text: string, n = 600): string {
+  const t = (text || '').trim();
+  return t.length > n ? t.slice(0, n) + '…' : t;
 }
 
 interface ResearchContext {
@@ -119,221 +48,274 @@ interface ResearchContext {
   totalDomains: number;
 }
 
+/**
+ * Build the gap-aware research context inlined into the orchestrator system
+ * prompt (taxonomy sorted gap-first, saturated domains, optional focus URLs)
+ * plus the in-memory existing-URL Set used by the check_duplicate tool.
+ */
+async function buildResearchContext(categoryFocus: string | undefined): Promise<ResearchContext> {
+  const [approvedRes, pendingDisc] = await Promise.all([
+    db.select({ url: resources.url, category: resources.category }).from(resources).where(eq(resources.status, 'approved')),
+    db.select({ url: researchDiscoveries.url }).from(researchDiscoveries),
+  ]);
+  const existingUrls = new Set<string>();
+  for (const r of approvedRes) existingUrls.add(normalizeUrl(r.url));
+  for (const d of pendingDisc) existingUrls.add(normalizeUrl(d.url));
+
+  const [taxRows, countRows] = await Promise.all([
+    db.execute<{ category: string; subcategory: string | null; sub_subcategory: string | null }>(sql`
+      SELECT c.name AS category, sc.name AS subcategory, ssc.name AS sub_subcategory
+        FROM categories c
+        LEFT JOIN subcategories sc ON sc.category_id = c.id
+        LEFT JOIN sub_subcategories ssc ON ssc.subcategory_id = sc.id
+       ORDER BY c.name, sc.name NULLS FIRST, ssc.name NULLS FIRST
+    `),
+    db.execute<{ category: string; subcategory: string | null; sub_subcategory: string | null; n: number }>(sql`
+      SELECT category, subcategory, sub_subcategory, COUNT(*)::int AS n
+        FROM resources
+       WHERE status = 'approved'
+       GROUP BY category, subcategory, sub_subcategory
+    `),
+  ]);
+  const key = (c?: string | null, s?: string | null, ss?: string | null) =>
+    `${(c || '').toLowerCase()}||${(s || '').toLowerCase()}||${(ss || '').toLowerCase()}`;
+  const countMap = new Map<string, number>();
+  for (const r of countRows.rows) countMap.set(key(r.category, r.subcategory, r.sub_subcategory), r.n);
+
+  const seen = new Set<string>();
+  const taxonomyEntries: Array<{ path: string; n: number }> = [];
+  const push = (cat: string, sub: string | null, ssc: string | null) => {
+    const k = key(cat, sub, ssc);
+    if (seen.has(k)) return;
+    seen.add(k);
+    const n = countMap.get(k) || 0;
+    const path = [cat, sub, ssc].filter(Boolean).join(' › ');
+    taxonomyEntries.push({ path, n });
+  };
+  for (const r of taxRows.rows) {
+    if (r.subcategory) push(r.category, r.subcategory, null);
+    push(r.category, r.subcategory, r.sub_subcategory);
+  }
+  taxonomyEntries.sort((a, b) => a.n - b.n || a.path.localeCompare(b.path));
+  const taxonomyLines = taxonomyEntries
+    .slice(0, MAX_TAXONOMY_LINES)
+    .map(e => `  ${String(e.n).padStart(3)}  ${e.path}`);
+  const taxonomyBlock = `TAXONOMY (resource_count  path) — sorted GAP-FIRST. Prioritize the top of this list:\n${taxonomyLines.join('\n')}`;
+
+  const domainCounts = new Map<string, number>();
+  for (const r of approvedRes) {
+    const d = domainOf(r.url);
+    if (d) domainCounts.set(d, (domainCounts.get(d) || 0) + 1);
+  }
+  const topDomains = [...domainCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, MAX_TOP_DOMAINS);
+  const domainsBlock =
+    `SATURATED DOMAINS (already heavily covered — DO NOT propose anything from these unless the specific resource is exceptional and clearly unique):\n` +
+    topDomains.map(([d, n]) => `  ${String(n).padStart(4)}  ${d}`).join('\n');
+
+  let focusUrlsBlock = '';
+  if (categoryFocus) {
+    const focusResources = approvedRes.filter(r => r.category.toLowerCase().includes(categoryFocus.toLowerCase()));
+    const sample = focusResources.slice(0, MAX_FOCUS_URLS).map(r => `  ${r.url}`).join('\n');
+    focusUrlsBlock = `\nEXISTING URLS IN FOCUS "${categoryFocus}" (${focusResources.length} total, showing ${Math.min(MAX_FOCUS_URLS, focusResources.length)}):\n${sample}`;
+  }
+
+  return {
+    existingUrls,
+    taxonomyBlock,
+    domainsBlock,
+    focusUrlsBlock,
+    totalResources: existingUrls.size,
+    totalDomains: domainCounts.size,
+  };
+}
+
+/** Gap-finder: the N most under-represented subcategories with sample existing URLs. */
+async function getCoverageGaps(limit: number): Promise<any[]> {
+  const lim = Math.max(1, Math.min(30, limit || 15));
+  const gapRows = await db.execute<{ category: string; subcategory: string; n: number; sample_urls: string[] }>(sql`
+    SELECT c.name AS category, sc.name AS subcategory, COUNT(r.id)::int AS n,
+           COALESCE(ARRAY_AGG(r.url) FILTER (WHERE r.url IS NOT NULL), ARRAY[]::text[]) AS sample_urls
+      FROM categories c
+      JOIN subcategories sc ON sc.category_id = c.id
+      LEFT JOIN resources r ON r.status = 'approved'
+                            AND LOWER(r.category) = LOWER(c.name)
+                            AND LOWER(COALESCE(r.subcategory, '')) = LOWER(sc.name)
+     GROUP BY c.name, sc.name
+     ORDER BY n ASC, c.name, sc.name
+     LIMIT ${lim}
+  `);
+  return gapRows.rows.map(row => ({
+    category: row.category,
+    subcategory: row.subcategory,
+    resource_count: row.n,
+    sample_existing_urls: (row.sample_urls || []).slice(0, 5),
+  }));
+}
+
+async function getExistingResourcesByCategory(category: string, limit = 30): Promise<any[]> {
+  const lim = Math.max(1, Math.min(100, limit || 30));
+  return db.select({ title: resources.title, url: resources.url, description: resources.description })
+    .from(resources)
+    .where(sql`(LOWER(${resources.category}) LIKE LOWER(${'%' + category + '%'})
+            OR LOWER(COALESCE(${resources.subcategory},'')) LIKE LOWER(${'%' + category + '%'}))
+           AND ${resources.status} = 'approved'`)
+    .limit(lim);
+}
+
+const STALL_PIVOT_NUDGE =
+`STRATEGY PIVOT REQUIRED. Recent candidates were all duplicates. Do NOT repeat similar searches — change approach now:
+1. Delegate a search for a DIFFERENT under-served gap (call get_coverage_gaps again and pick a subcategory not yet searched this run).
+2. Tell the scout to MINE aggregators: a "Top 10…"/awesome-list is not savable itself, but the individual tools it names usually are — have the scout extract specific project names and search each directly.
+3. Point the scout at source-rich venues: "site:github.com <topic>", Show HN, Demuxed/Mux/Streaming Media talks, arxiv.org / dl.acm.org with companion code.`;
+
+interface ActiveJob {
+  jobId: number;
+  abortController: AbortController;
+}
+
+interface ResearchRunContext {
+  jobId: number;
+  emitter: AgentEventEmitter;
+  existingUrls: Set<string>;
+  discoveryCap: number;
+  discoveriesSaved: number;
+  consecutiveDuplicates: number;
+  addLog: (role: string, content: string, persistNow?: boolean) => Promise<void>;
+}
+
 class ResearchService {
   private static instance: ResearchService;
   private activeJobs: Map<number, ActiveJob> = new Map();
-  private existingUrls: Set<string> = new Set();
 
   private constructor() {}
 
   static getInstance(): ResearchService {
-    if (!ResearchService.instance) {
-      ResearchService.instance = new ResearchService();
-    }
+    if (!ResearchService.instance) ResearchService.instance = new ResearchService();
     return ResearchService.instance;
   }
 
   /**
-   * Build the cacheable research context block injected into the system prompt.
-   * This replaces the old `get_category_tree` tool call entirely — the taxonomy
-   * lives in the cached system message so it costs ~10% of base on repeat turns
-   * instead of replaying as a 15k-char tool_result every turn.
+   * Per-run custom in-process MCP tools. Each tool closes over the run context
+   * (existing-URL set, counters, emitter) so there is NO shared singleton state
+   * across concurrent jobs. Tools emit their own tool_call/tool_result events.
    */
-  private async buildResearchContext(categoryFocus: string | undefined): Promise<ResearchContext> {
-    // 1. Existing URL set (for the in-memory check_duplicate tool)
-    const [approvedRes, pendingDisc] = await Promise.all([
-      db.select({ url: resources.url, category: resources.category }).from(resources).where(eq(resources.status, 'approved')),
-      db.select({ url: researchDiscoveries.url }).from(researchDiscoveries),
-    ]);
-    const existingUrls = new Set<string>();
-    for (const r of approvedRes) existingUrls.add(normalizeUrl(r.url));
-    for (const d of pendingDisc) existingUrls.add(normalizeUrl(d.url));
+  private buildResearchTools(ctx: ResearchRunContext) {
+    const emitCall = (name: string, input: any) =>
+      ctx.emitter.emit({ actor: 'orchestrator', actorType: 'orchestrator', eventType: 'tool_call', targetActor: name, summary: preview(JSON.stringify(input)) });
+    const emitResult = (name: string, out: string, ms: number) =>
+      ctx.emitter.emit({ actor: name, actorType: 'tool', eventType: 'tool_result', targetActor: 'orchestrator', summary: preview(out), durationMs: ms });
 
-    // 2. Taxonomy with per-leaf counts, sorted gap-first.
-    //    Built in JS from two queries so resources stored at subcategory level
-    //    (no sub_subcategory) are counted correctly even when the subcategory
-    //    has child sub_subcategories. Single SQL with LEFT JOIN to ssc would
-    //    drop those bare-subcategory rows.
-    const [taxRows, countRows] = await Promise.all([
-      db.execute<{ category: string; subcategory: string | null; sub_subcategory: string | null }>(sql`
-        SELECT c.name AS category, sc.name AS subcategory, ssc.name AS sub_subcategory
-          FROM categories c
-          LEFT JOIN subcategories sc ON sc.category_id = c.id
-          LEFT JOIN sub_subcategories ssc ON ssc.subcategory_id = sc.id
-         ORDER BY c.name, sc.name NULLS FIRST, ssc.name NULLS FIRST
-      `),
-      db.execute<{ category: string; subcategory: string | null; sub_subcategory: string | null; n: number }>(sql`
-        SELECT category,
-               subcategory,
-               sub_subcategory,
-               COUNT(*)::int AS n
-          FROM resources
-         WHERE status = 'approved'
-         GROUP BY category, subcategory, sub_subcategory
-      `),
-    ]);
-    const key = (c?: string | null, s?: string | null, ss?: string | null) =>
-      `${(c || '').toLowerCase()}||${(s || '').toLowerCase()}||${(ss || '').toLowerCase()}`;
-    const countMap = new Map<string, number>();
-    for (const r of countRows.rows) {
-      countMap.set(key(r.category, r.subcategory, r.sub_subcategory), r.n);
-    }
-    // Emit a row for every official taxonomy leaf PLUS a synthetic "bare subcat"
-    // row (ssc=null) so resources at subcategory level are surfaced too.
-    const seen = new Set<string>();
-    const taxonomyEntries: Array<{ path: string; n: number }> = [];
-    const push = (cat: string, sub: string | null, ssc: string | null) => {
-      const k = key(cat, sub, ssc);
-      if (seen.has(k)) return;
-      seen.add(k);
-      const n = countMap.get(k) || 0;
-      const path = [cat, sub, ssc].filter(Boolean).join(' › ');
-      taxonomyEntries.push({ path, n });
-    };
-    for (const r of taxRows.rows) {
-      if (r.subcategory) push(r.category, r.subcategory, null); // bare-subcat synthetic row
-      push(r.category, r.subcategory, r.sub_subcategory);
-    }
-    taxonomyEntries.sort((a, b) => a.n - b.n || a.path.localeCompare(b.path));
-    const taxonomyLines = taxonomyEntries
-      .slice(0, MAX_TAXONOMY_LINES)
-      .map(e => `  ${String(e.n).padStart(3)}  ${e.path}`);
-    const taxonomyBlock = `TAXONOMY (resource_count  path) — sorted GAP-FIRST. Prioritize the top of this list:\n${taxonomyLines.join('\n')}`;
-
-    // 3. Top saturated domains (soft blocklist)
-    const domainCounts = new Map<string, number>();
-    for (const r of approvedRes) {
-      const d = domainOf(r.url);
-      if (d) domainCounts.set(d, (domainCounts.get(d) || 0) + 1);
-    }
-    const topDomains = [...domainCounts.entries()]
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, MAX_TOP_DOMAINS);
-    const domainsBlock =
-      `SATURATED DOMAINS (already heavily covered — DO NOT propose anything from these unless the specific resource is exceptional and clearly unique):\n` +
-      topDomains.map(([d, n]) => `  ${String(n).padStart(4)}  ${d}`).join('\n');
-
-    // 4. If focused, dump existing URLs in that focus so the agent can read
-    //    BEFORE searching and refuse to propose what's already covered.
-    let focusUrlsBlock = '';
-    if (categoryFocus) {
-      const focusResources = approvedRes.filter(r =>
-        r.category.toLowerCase().includes(categoryFocus.toLowerCase())
-      );
-      const sample = focusResources.slice(0, MAX_FOCUS_URLS).map(r => `  ${r.url}`).join('\n');
-      focusUrlsBlock =
-        `\nEXISTING URLS IN FOCUS "${categoryFocus}" (${focusResources.length} total, showing ${Math.min(MAX_FOCUS_URLS, focusResources.length)}):\n${sample}`;
-    }
-
-    return {
-      existingUrls,
-      taxonomyBlock,
-      domainsBlock,
-      focusUrlsBlock,
-      totalResources: existingUrls.size,
-      totalDomains: domainCounts.size,
-    };
-  }
-
-  /** Tool: gap-finder. Returns the N most under-represented subcategories with sample URLs. */
-  private async getCoverageGaps(limit: number): Promise<any> {
-    const lim = Math.max(1, Math.min(30, limit || 15));
-    const gapRows = await db.execute<{
-      category: string; subcategory: string; n: number; sample_urls: string[];
-    }>(sql`
-      SELECT c.name AS category,
-             sc.name AS subcategory,
-             COUNT(r.id)::int AS n,
-             COALESCE(ARRAY_AGG(r.url) FILTER (WHERE r.url IS NOT NULL), ARRAY[]::text[]) AS sample_urls
-        FROM categories c
-        JOIN subcategories sc ON sc.category_id = c.id
-        LEFT JOIN resources r ON r.status = 'approved'
-                              AND LOWER(r.category) = LOWER(c.name)
-                              AND LOWER(COALESCE(r.subcategory, '')) = LOWER(sc.name)
-       GROUP BY c.name, sc.name
-       ORDER BY n ASC, c.name, sc.name
-       LIMIT ${lim}
-    `);
-    return gapRows.rows.map(row => ({
-      category: row.category,
-      subcategory: row.subcategory,
-      resource_count: row.n,
-      sample_existing_urls: (row.sample_urls || []).slice(0, 5),
-    }));
-  }
-
-  private async getExistingResourcesByCategory(category: string, limit: number = 30): Promise<any[]> {
-    const lim = Math.max(1, Math.min(100, limit || 30));
-    const result = await db.select({ title: resources.title, url: resources.url, description: resources.description })
-      .from(resources)
-      .where(sql`(LOWER(${resources.category}) LIKE LOWER(${'%' + category + '%'})
-              OR LOWER(COALESCE(${resources.subcategory},'')) LIKE LOWER(${'%' + category + '%'}))
-             AND ${resources.status} = 'approved'`)
-      .limit(lim);
-    return result;
-  }
-
-  private async handleToolCall(toolName: string, toolInput: any, jobId: number): Promise<string> {
-    switch (toolName) {
-      case "check_duplicate": {
-        const normalized = normalizeUrl(toolInput.url);
-        const isDuplicate = this.existingUrls.has(normalized);
+    const checkDuplicate = tool(
+      'check_duplicate',
+      'Check if a URL already exists in the database of known resources. Returns isDuplicate=true if already present. ALWAYS call this before save_discovery.',
+      { url: z.string().describe('The URL to check for duplicates') },
+      async ({ url }) => {
+        const started = Date.now();
+        await emitCall('check_duplicate', { url });
+        const normalized = normalizeUrl(url);
+        const isDuplicate = ctx.existingUrls.has(normalized);
         if (isDuplicate) {
+          ctx.consecutiveDuplicates++;
           await db.update(researchJobs)
             .set({ duplicatesSkipped: sql`${researchJobs.duplicatesSkipped} + 1` })
-            .where(eq(researchJobs.id, jobId));
+            .where(eq(researchJobs.id, ctx.jobId));
+        } else {
+          ctx.consecutiveDuplicates = 0;
         }
-        return JSON.stringify({ isDuplicate, normalizedUrl: normalized });
-      }
-
-      case "save_discovery": {
-        const normalized = normalizeUrl(toolInput.url);
-        if (this.existingUrls.has(normalized)) {
-          return JSON.stringify({ saved: false, reason: "URL already exists (duplicate detected — you should have caught this with check_duplicate)" });
+        let text = JSON.stringify({ isDuplicate, normalizedUrl: normalized });
+        if (isDuplicate && ctx.consecutiveDuplicates > 0 && ctx.consecutiveDuplicates % 3 === 0) {
+          text += `\n\n${STALL_PIVOT_NUDGE}`;
+          await ctx.addLog('system', `Stall nudge injected (${ctx.consecutiveDuplicates} consecutive duplicates).`);
         }
-        const conf = toolInput.confidence || 0;
-        if (conf < 70) {
-          return JSON.stringify({ saved: false, reason: `Confidence ${conf} < 70 threshold. Either find a higher-quality resource or raise confidence with justification.` });
+        await ctx.addLog('tool_result', `check_duplicate(${url}) → isDuplicate=${isDuplicate}`);
+        await emitResult('check_duplicate', text, Date.now() - started);
+        return { content: [{ type: 'text', text }] };
+      },
+    );
+
+    const saveDiscovery = tool(
+      'save_discovery',
+      "Persist a verified, NON-DUPLICATE resource for admin review. Only call after check_duplicate returns false AND the scout actually surfaced the resource via a real web search (no fabricated URLs).",
+      {
+        title: z.string(),
+        url: z.string(),
+        description: z.string(),
+        suggested_category: z.string().describe('Best matching category name from the taxonomy in the system prompt'),
+        suggested_subcategory: z.string().optional().describe('Best matching subcategory, or omit if none fits'),
+        suggested_sub_subcategory: z.string().optional().describe('Best matching sub-subcategory (level-3), or omit if none fits'),
+        confidence: z.number().describe('Confidence score 1-100. Only save if >= 70.'),
+        reasoning: z.string().describe("Why this is valuable AND why it's not redundant with existing resources"),
+      },
+      async (input) => {
+        const started = Date.now();
+        await emitCall('save_discovery', { url: input.url, title: input.title, confidence: input.confidence });
+        const normalized = normalizeUrl(input.url);
+        let text: string;
+        if (ctx.discoveriesSaved >= ctx.discoveryCap) {
+          text = JSON.stringify({ saved: false, reason: `Discovery cap of ${ctx.discoveryCap} reached for this run. Wrap up and stop searching.` });
+        } else if (ctx.existingUrls.has(normalized)) {
+          text = JSON.stringify({ saved: false, reason: 'URL already exists (duplicate — you should have caught this with check_duplicate)' });
+        } else if ((input.confidence || 0) < 70) {
+          text = JSON.stringify({ saved: false, reason: `Confidence ${input.confidence} < 70 threshold. Find a higher-quality resource or justify a higher confidence.` });
+        } else {
+          const [discovery] = await db.insert(researchDiscoveries).values({
+            jobId: ctx.jobId,
+            title: input.title,
+            url: input.url,
+            description: input.description || '',
+            suggestedCategory: input.suggested_category || '',
+            suggestedSubcategory: input.suggested_subcategory || '',
+            suggestedSubSubcategory: input.suggested_sub_subcategory || '',
+            confidence: Math.round(input.confidence),
+            reasoning: input.reasoning || '',
+            status: 'pending_review',
+          }).returning();
+          ctx.existingUrls.add(normalized);
+          ctx.discoveriesSaved++;
+          ctx.consecutiveDuplicates = 0;
+          await db.update(researchJobs)
+            .set({ totalDiscoveries: sql`${researchJobs.totalDiscoveries} + 1` })
+            .where(eq(researchJobs.id, ctx.jobId));
+          text = JSON.stringify({ saved: true, discoveryId: discovery.id });
+          await ctx.addLog('discovery', `Saved: ${input.title} — ${input.url} (confidence ${input.confidence})`, true);
         }
+        await emitResult('save_discovery', text, Date.now() - started);
+        return { content: [{ type: 'text', text }] };
+      },
+    );
 
-        const [discovery] = await db.insert(researchDiscoveries).values({
-          jobId,
-          title: toolInput.title,
-          url: toolInput.url,
-          description: toolInput.description || '',
-          suggestedCategory: toolInput.suggested_category || '',
-          suggestedSubcategory: toolInput.suggested_subcategory || '',
-          suggestedSubSubcategory: toolInput.suggested_sub_subcategory || '',
-          confidence: conf,
-          reasoning: toolInput.reasoning || '',
-          status: 'pending_review',
-        }).returning();
+    const coverageGaps = tool(
+      'get_coverage_gaps',
+      'Return the most under-represented subcategories (resource_count ASC) with sample existing URLs so you can target real gaps. Call this near the start and again when pivoting.',
+      { limit: z.number().optional().describe('How many gap subcategories to return (default 15, max 30)') },
+      async ({ limit }) => {
+        const started = Date.now();
+        await emitCall('get_coverage_gaps', { limit });
+        const gaps = await getCoverageGaps(limit || 15);
+        const text = JSON.stringify({ gaps });
+        await emitResult('get_coverage_gaps', `${gaps.length} gaps`, Date.now() - started);
+        return { content: [{ type: 'text', text }] };
+      },
+    );
 
-        this.existingUrls.add(normalized);
+    const existingResources = tool(
+      'get_existing_resources',
+      'Sample existing resources in a specific category/subcategory so you can avoid proposing duplicates before delegating a search.',
+      {
+        category: z.string().describe('Category or subcategory name (case-insensitive substring match)'),
+        limit: z.number().optional().describe('Max resources to return (default 30, max 100)'),
+      },
+      async ({ category, limit }) => {
+        const started = Date.now();
+        await emitCall('get_existing_resources', { category, limit });
+        const existing = await getExistingResourcesByCategory(category, limit || 30);
+        const text = JSON.stringify({ count: existing.length, resources: existing });
+        await emitResult('get_existing_resources', `${existing.length} resources`, Date.now() - started);
+        return { content: [{ type: 'text', text }] };
+      },
+    );
 
-        await db.update(researchJobs)
-          .set({ totalDiscoveries: sql`${researchJobs.totalDiscoveries} + 1` })
-          .where(eq(researchJobs.id, jobId));
-
-        return JSON.stringify({ saved: true, discoveryId: discovery.id });
-      }
-
-      case "get_coverage_gaps": {
-        const gaps = await this.getCoverageGaps(toolInput.limit || 15);
-        return JSON.stringify({ gaps });
-      }
-
-      case "get_existing_resources": {
-        const existing = await this.getExistingResourcesByCategory(
-          toolInput.category,
-          toolInput.limit || 30
-        );
-        return JSON.stringify({ count: existing.length, resources: existing });
-      }
-
-      default:
-        return JSON.stringify({ error: `Unknown tool: ${toolName}` });
-    }
+    return [checkDuplicate, saveDiscovery, coverageGaps, existingResources];
   }
 
   async startResearchJob(options: {
@@ -342,6 +324,10 @@ class ResearchService {
     maxBudgetUsd?: string;
     maxTurns?: number;
     startedBy?: string;
+    model?: string | null;
+    baseUrl?: string | null;
+    authTokenEncrypted?: string | null;
+    authTokenLast4?: string | null;
   }): Promise<number> {
     const [job] = await db.insert(researchJobs).values({
       prompt: options.prompt,
@@ -349,6 +335,10 @@ class ResearchService {
       maxBudgetUsd: options.maxBudgetUsd || '1.00',
       maxTurns: options.maxTurns || 30,
       startedBy: options.startedBy || null,
+      model: options.model || null,
+      baseUrl: options.baseUrl || null,
+      authTokenEncrypted: options.authTokenEncrypted || null,
+      authTokenLast4: options.authTokenLast4 || null,
       status: 'processing',
       startedAt: new Date(),
     }).returning();
@@ -356,20 +346,29 @@ class ResearchService {
     const abortController = new AbortController();
     this.activeJobs.set(job.id, { jobId: job.id, abortController });
 
-    this.runResearchLoop(job.id, options.prompt, options.categoryFocus, options.maxTurns || 30, parseFloat(options.maxBudgetUsd || '1.00'))
+    const config: AgentRunConfig = {
+      model: options.model || null,
+      baseUrl: options.baseUrl || null,
+      authTokenEncrypted: options.authTokenEncrypted || null,
+    };
+
+    this.runResearchLoop(
+      job.id,
+      options.prompt,
+      options.categoryFocus,
+      options.maxTurns || 30,
+      parseFloat(options.maxBudgetUsd || '1.00'),
+      config,
+      abortController,
+    )
       .catch(async (err) => {
         const msg = err?.message || String(err);
         console.error(`[research:${job.id}] FAILED:`, msg);
         if (err?.stack) console.error(err.stack);
         try {
-          const [cur] = await db.select({ agentLog: researchJobs.agentLog })
-            .from(researchJobs).where(eq(researchJobs.id, job.id));
-          const existing = Array.isArray(cur?.agentLog) ? cur!.agentLog as any[] : [];
-          existing.push({
-            role: 'error',
-            content: `Job failed: ${msg}`,
-            timestamp: new Date().toISOString(),
-          });
+          const [cur] = await db.select({ agentLog: researchJobs.agentLog }).from(researchJobs).where(eq(researchJobs.id, job.id));
+          const existing = Array.isArray(cur?.agentLog) ? (cur!.agentLog as any[]) : [];
+          existing.push({ role: 'error', content: `Job failed: ${msg}`, timestamp: new Date().toISOString() });
           await db.update(researchJobs).set({
             status: 'failed',
             errorMessage: msg,
@@ -392,31 +391,88 @@ class ResearchService {
     prompt: string,
     categoryFocus: string | undefined,
     maxTurns: number,
-    maxBudgetUsd: number
+    maxBudgetUsd: number,
+    config: AgentRunConfig,
+    abortController: AbortController,
   ): Promise<void> {
-    const apiKey = process.env.ANTHROPIC_API_KEY;
-    if (!apiKey) {
-      throw new Error("ANTHROPIC_API_KEY is not set. Add it in Secrets and restart the workflow.");
-    }
-    const client = new Anthropic({ apiKey });
+    const emitter = new AgentEventEmitter('research', jobId);
+    const ctx = await buildResearchContext(categoryFocus);
 
-    // Build the gap-aware, cacheable research context ONCE up front.
-    const ctx = await this.buildResearchContext(categoryFocus);
-    this.existingUrls = ctx.existingUrls;
+    const orchestratorModel = resolveModel(config, DEFAULT_RESEARCH_MODEL);
+    // When no custom model is set, use a cheaper model for the search scout.
+    // With a custom model/endpoint, use the same model for both so a single
+    // model needs to be served by the custom base URL.
+    const scoutModel = config.model && config.model.trim() ? orchestratorModel : DEFAULT_ENRICHMENT_MODEL;
 
-    // The system prompt is split into TWO blocks: a tiny dynamic intro + a
-    // large cacheable context block. Only the cacheable block gets a
-    // cache_control breakpoint, so every turn after the first reads it back
-    // at ~10% of base input cost.
-    const dynamicIntro =
-`You are an expert resource researcher for an "awesome video" curated list (1900+ resources on video streaming, video development, codecs, players, infrastructure, tools).
+    const agentLog: Array<{ role: string; content: string; timestamp: string }> = [];
+    const persist = async (extra: Record<string, any> = {}) => {
+      try {
+        await db.update(researchJobs).set({ agentLog, ...extra }).where(eq(researchJobs.id, jobId));
+      } catch (e: any) {
+        console.error(`[research:${jobId}] persist failed:`, e.message);
+      }
+    };
+    const addLog = async (role: string, content: string, persistNow = false) => {
+      const stored = content.length > 8000 ? content.slice(0, 8000) + `\n…[truncated, full ${content.length} chars in workflow logs]` : content;
+      agentLog.push({ role, content: stored, timestamp: new Date().toISOString() });
+      console.log(`[research:${jobId}] [${role}] ${content}`);
+      if (persistNow) await persist();
+    };
 
-YOUR ONE JOB: discover resources that are NOT already in our database and that fill REAL GAPS in our taxonomy.
+    const discoveryCap = Math.max(10, Math.min(200, Math.round(maxBudgetUsd * 5)));
+    const runCtx: ResearchRunContext = {
+      jobId,
+      emitter,
+      existingUrls: ctx.existingUrls,
+      discoveryCap,
+      discoveriesSaved: 0,
+      consecutiveDuplicates: 0,
+      addLog,
+    };
 
-${categoryFocus ? `FOCUS AREA THIS RUN: "${categoryFocus}".` : 'No focus area — pick the deepest gap from the taxonomy below.'}`;
+    await addLog('system', `Research started. Orchestrator: ${orchestratorModel}, Scout: ${scoutModel}, Budget: $${maxBudgetUsd}, Max turns: ${maxTurns}, Existing URLs: ${ctx.existingUrls.size}, Distinct domains: ${ctx.totalDomains}${config.baseUrl ? `, Base URL: ${config.baseUrl}` : ''}`, true);
+    if (categoryFocus) await addLog('system', `Focus: ${categoryFocus}`);
+    await addLog('user', prompt);
 
-    const cacheableContext =
-`==== STATIC RESEARCH CONTEXT (cached) ====
+    const tools = this.buildResearchTools(runCtx);
+    const mcpServer = createSdkMcpServer({ name: 'research', version: '1.0.0', tools });
+
+    const scout: AgentDefinitionInput = {
+      description: 'Web research scout. Runs targeted web searches and reports back concrete candidate resources (URL, title, one-line description) for the orchestrator to dedup and save.',
+      model: scoutModel,
+      tools: ['WebSearch'],
+      prompt:
+`You are a web research SCOUT for an "awesome video" curated list (video streaming, codecs, players, infrastructure, tools).
+
+The orchestrator will hand you a specific gap or set of search targets. Your job:
+1. Run NARROW, specific web searches for those targets (protocol + use-case + "open source"/"github"), not broad "best X 2025" phrasing.
+2. MINE aggregators: a "Top 10…"/awesome-list/roundup is not itself a good result, but the individual tools/projects it names usually are — pull those names out and search each one's official site / GitHub repo.
+3. High-yield venues: "site:github.com <topic>", "<topic> site:news.ycombinator.com" (Show HN), Demuxed/Mux/Streaming Media talks, arxiv.org / dl.acm.org research with companion code, other awesome-* lists.
+4. Report back a concise, structured list of CONCRETE candidates. For each: the real URL (exactly as it appeared in results — never fabricate), the title, and a one-line description of what it offers. Prefer actively-maintained OSS, official docs from niche vendors, conference talks, and academic papers with code. Skip generic intros, vendor marketing, and SEO listicles.
+
+SEARCH BUDGET — STRICT: run AT MOST 3-4 web searches for one delegation, then STOP searching and return your consolidated candidate list as your final message. Do NOT keep searching to be thorough — the orchestrator needs control back to dedup and save. Returning 5-15 solid candidates from 3-4 searches is a success; running 8+ searches is a failure even if you find more.
+
+Return ONLY candidates you actually saw in real search results. Do not dedup or judge saturation — that is the orchestrator's job.`,
+    };
+
+    const systemPrompt =
+`You are the ORCHESTRATOR of a two-agent research team for an "awesome video" curated list (1900+ resources on video streaming, video development, codecs, players, infrastructure, tools).
+
+YOUR ONE JOB: discover resources that are NOT already in our database and that fill REAL GAPS in our taxonomy, then persist them for admin review.
+
+${categoryFocus ? `FOCUS AREA THIS RUN: "${categoryFocus}".` : 'No focus area — pick the deepest gaps from the taxonomy below.'}
+
+==== YOUR TEAM ====
+
+You do NOT have direct web access. To search the web you MUST delegate to your "scout" subagent using the Task tool (subagent_type: "scout"). Give the scout a SPECIFIC gap and concrete search targets; it will return concrete candidate resources (URL, title, description). You then dedup and save the good ones.
+
+Your own tools (in-process):
+- get_coverage_gaps — the most under-served subcategories with sample URLs.
+- get_existing_resources — sample what already exists in a category before delegating.
+- check_duplicate — MUST be called on every candidate URL before saving.
+- save_discovery — persist a NEW, quality (confidence ≥ 70) candidate for admin review.
+
+==== STATIC RESEARCH CONTEXT ====
 
 ${ctx.taxonomyBlock}
 
@@ -425,351 +481,76 @@ ${ctx.focusUrlsBlock}
 
 ==== WORKFLOW ====
 
-1. If you haven't already, call get_coverage_gaps to confirm the top gaps. Keep that list — you will rotate through SEVERAL gaps in one run, not just one.
-2. Pick ONE specific gap (a subcategory with low count). Plan a NARROW web_search that targets THAT gap (protocol + use-case + "open source"/"github"), e.g.:
-   • "open source AV1 encoder benchmark github"   (gap: Benchmarking & Performance Tools for Codecs)
-   • "WebRTC player smart TV embedded"            (gap: Embedded Players)
-   • "peer-to-peer HLS streaming library"         (gap: Peer-to-Peer Streaming Solutions)
-   Avoid broad "best X 2025" phrasing — it returns SEO listicles, not the tools themselves.
-3. MINE aggregators, don't discard them. A "Top 10…", awesome-list, or roundup is NOT savable itself, but the individual tools/projects it names usually ARE: pull the specific names out of the results, then web_search each one directly (its GitHub repo / official site) and evaluate THAT.
-4. High-yield venues when a generic search dries up:
-   • "site:github.com <topic>" — active open-source projects (prefer maintained repos)
-   • "<topic> site:news.ycombinator.com" — Show HN launches
-   • Demuxed / Mux / Streaming Media / IBC / NAB talks & write-ups — mine for named tools
-   • arxiv.org / dl.acm.org — new codec & streaming research, follow through to companion code
-   • other awesome-* lists adjacent to video — mine their entries
-5. AVOID re-surfacing already-covered hits (mediasoup, hls.js, ffmpeg, Bitmovin, etc — see SATURATED DOMAINS).
-6. For each candidate, call check_duplicate(url) BEFORE saving. If it's new, relevant, and quality (confidence ≥ 70), call save_discovery RIGHT THEN — never leave a fresh non-duplicate unsaved.
-7. Pivot, don't quit: if a search yields only duplicates/listicles, do NOT re-run the same term — switch to a different gap or a different venue from step 4. Keep going across multiple gaps until you've made several genuine, varied attempts.
+1. Call get_coverage_gaps to confirm the top gaps. Keep the list — you will rotate through SEVERAL gaps in one run.
+2. Pick ONE specific gap (low count). Optionally call get_existing_resources for it to see what's already covered.
+3. Delegate to the scout (Task tool, subagent_type "scout") with that gap and concrete, narrow search targets.
+4. For EACH candidate the scout returns: call check_duplicate(url). If it's new, relevant, and quality (confidence ≥ 70), call save_discovery RIGHT THEN — never leave a fresh non-duplicate unsaved.
+5. Pivot, don't quit: when a gap yields only duplicates/listicles, get_coverage_gaps again, pick a DIFFERENT gap, and delegate a fresh scout search. Keep going across multiple gaps.
 
 ==== HARD RULES ====
 
-R1. NEVER fabricate URLs. Only save URLs that appeared in a real web_search result this run.
+R1. NEVER fabricate URLs. Only save URLs the scout surfaced from a real web search this run.
 R2. ALWAYS check_duplicate BEFORE save_discovery.
 R3. Skip anything from the SATURATED DOMAINS list unless the specific resource is exceptional.
-R4. Skip generic "what is WebRTC" intro articles, marketing blog posts from streaming vendors, and SEO listicles. Prefer: actively maintained open-source projects, official docs from niche vendors, conference talks (Demuxed, IBC, NAB), academic papers (ACM/IEEE/arXiv), small specialized tools, individual developer blogs with real technical depth.
+R4. Skip generic intro articles, vendor marketing, and SEO listicles. Prefer maintained OSS, niche official docs, conference talks (Demuxed/IBC/NAB), academic papers (ACM/IEEE/arXiv), specialized tools, and technically-deep developer blogs.
 R5. Confidence < 70 → don't save. Quality > quantity.
-R6. Be persistent — do NOT quit at the first duplicates. The best resources live in the long tail. When a vein runs dry, pivot (different gap, mine a listicle's named tools, try GitHub/Show HN/arXiv) and keep searching. Only wind down once you've genuinely exhausted varied attempts across multiple gaps. Quality > quantity, but persistence is how you surface the new stuff.
+R6. Be persistent — the best resources live in the long tail. When a vein runs dry, pivot (different gap, mine a listicle's named tools, GitHub/Show HN/arXiv) and keep delegating. Wind down only once you've genuinely exhausted varied attempts across multiple gaps.
 
-Database state: ${ctx.totalResources} approved resources across ${ctx.totalDomains} distinct domains.`;
+Database state: ${ctx.totalResources} approved resources across ${ctx.totalDomains} distinct domains. Discovery cap this run: ${discoveryCap}.`;
 
-    // Anthropic system prompt as structured blocks so we can attach a cache
-    // breakpoint to the large static block only.
-    const systemBlocks: Anthropic.Messages.TextBlockParam[] = [
-      { type: 'text', text: dynamicIntro },
-      { type: 'text', text: cacheableContext, cache_control: { type: 'ephemeral' } },
+    const allowedTools = [
+      'mcp__research__check_duplicate',
+      'mcp__research__save_discovery',
+      'mcp__research__get_coverage_gaps',
+      'mcp__research__get_existing_resources',
+      'Task', 'TaskCreate', 'TaskGet', 'TaskList', 'TaskOutput', 'TaskStop', 'TaskUpdate',
+      'SendMessage', 'ReportFindings',
     ];
 
-    let messages: Anthropic.Messages.MessageParam[] = [
-      { role: "user", content: prompt }
-    ];
+    const result = await runAgentQuery({
+      jobType: 'research',
+      jobId,
+      emitter,
+      prompt,
+      systemPrompt,
+      model: orchestratorModel,
+      config,
+      mcpServers: { research: mcpServer },
+      agents: { scout },
+      allowedTools,
+      maxTurns,
+      maxBudgetUsd,
+      abortController,
+      log: addLog,
+    });
 
-    let totalInputTokens = 0;       // non-cached input
-    let totalOutputTokens = 0;
-    let totalCacheCreate = 0;
-    let totalCacheRead = 0;
-    let webSearchCount = 0;
-    let turnsUsed = 0;
-    let consecutiveStallTurns = 0;
-    let totalDiscoveriesSaved = 0;
-    const agentLog: Array<{ role: string; content: string; timestamp: string }> = [];
-
-    const persist = async (extra: Record<string, any> = {}) => {
-      try {
-        await db.update(researchJobs).set({
-          turnsUsed,
-          totalInputTokens,
-          totalOutputTokens,
-          estimatedCostUsd: this.calculateCost(totalInputTokens, totalOutputTokens, webSearchCount, totalCacheCreate, totalCacheRead),
-          agentLog,
-          ...extra,
-        }).where(eq(researchJobs.id, jobId));
-      } catch (e: any) {
-        console.error(`[research:${jobId}] persist failed:`, e.message);
-      }
-    };
-
-    const addLog = async (role: string, content: string, persistNow = false) => {
-      const stored = content.length > 8000 ? content.slice(0, 8000) + `\n…[truncated, full ${content.length} chars in workflow logs]` : content;
-      const entry = { role, content: stored, timestamp: new Date().toISOString() };
-      agentLog.push(entry);
-      console.log(`[research:${jobId}] [${role}] ${content}`);
-      if (persistNow) await persist();
-    };
-
-    await addLog('system', `Research started. Model: ${RESEARCH_MODEL}, Budget: $${maxBudgetUsd}, Max turns: ${maxTurns}, Existing URLs: ${ctx.existingUrls.size}, Distinct domains: ${ctx.totalDomains}`, true);
-    if (categoryFocus) await addLog('system', `Focus: ${categoryFocus} (${ctx.focusUrlsBlock ? 'existing URLs inlined into cached context' : 'no existing URLs in focus'})`);
-    await addLog('system', `System prompt: dynamic_intro=${dynamicIntro.length} chars + cached_context=${cacheableContext.length} chars (taxonomy=${ctx.taxonomyBlock.length}, domains=${ctx.domainsBlock.length}, focus_urls=${ctx.focusUrlsBlock.length})`);
-    await addLog('user', prompt);
-
-    // Cache the tools array too (breakpoint on the last tool).
-    const toolsForClaude: any[] = [
-      { type: "web_search_20250305", name: "web_search", max_uses: Math.max(15, Math.min(maxTurns * 2, 250)) },
-      ...researchTools.slice(0, -1),
-      { ...researchTools[researchTools.length - 1], cache_control: { type: 'ephemeral' } },
-    ];
-
-    // Scale the discovery cap with budget so a large-budget run isn't capped at a
-    // handful of saves. The budget gate remains the primary cost control.
-    const HARD_STOP_DISCOVERIES = Math.max(10, Math.min(200, Math.round(maxBudgetUsd * 5)));
-
-    // Patience before giving up. We no longer bail at the first couple of
-    // duplicate-only turns; instead we escalate with a strategy-pivot nudge and
-    // only hard-stop after sustained stalling well past that nudge.
-    const STALL_NUDGE_THRESHOLD = 3;   // re-nudge every N consecutive unproductive search turns
-    const STALL_HARD_THRESHOLD = 8;    // give up only after this many consecutive unproductive search turns
-    const STALL_PIVOT_NUDGE =
-`STRATEGY PIVOT REQUIRED. Your recent searches only surfaced duplicates, listicles, or nothing savable. Do NOT repeat similar queries — change approach now:
-1. Pick a DIFFERENT under-served gap: call get_coverage_gaps again and choose a subcategory you have NOT searched yet this run.
-2. MINE aggregators instead of skipping them. A "Top 10…" listicle or awesome-list is not savable itself, but the individual tools it names usually are — extract specific project names, then web_search each one directly (its GitHub repo / official site) and check_duplicate it.
-3. Go to source-rich venues: "site:github.com <topic>", "<topic> site:news.ycombinator.com" (Show HN), Demuxed/Mux/Streaming Media talks, arxiv.org / dl.acm.org research with companion code, and other awesome-* lists adjacent to video.
-4. When check_duplicate returns false on a genuinely relevant, quality resource, SAVE it (confidence ≥ 70) before moving on — never leave a fresh non-duplicate unsaved.
-5. Make queries narrow and specific (protocol + use-case + "open source"/"github"), not broad "best X 2025" phrasing.`;
-
-    while (turnsUsed < maxTurns) {
-      const activeJob = this.activeJobs.get(jobId);
-      if (!activeJob || activeJob.abortController.signal.aborted) {
-        await addLog('system', 'Job cancelled by user');
-        await persist({ status: 'cancelled', completedAt: new Date() });
-        return;
-      }
-
-      // Budget gate at the TOP of the loop (not after the API response) so we
-      // never abort a turn that has already produced save_discovery tool_use
-      // blocks — those would be lost without execution.
-      const preTurnCost = parseFloat(this.calculateCost(totalInputTokens, totalOutputTokens, webSearchCount, totalCacheCreate, totalCacheRead));
-      if (preTurnCost >= maxBudgetUsd) {
-        await addLog('system', `Budget limit reached before turn ${turnsUsed + 1} ($${preTurnCost.toFixed(4)} >= $${maxBudgetUsd})`, true);
-        break;
-      }
-      if (totalDiscoveriesSaved >= HARD_STOP_DISCOVERIES) {
-        await addLog('system', `Hard stop: reached ${totalDiscoveriesSaved} discoveries (threshold ${HARD_STOP_DISCOVERIES}). Ending run to preserve quality and budget.`, true);
-        break;
-      }
-
-      const turnNumber = turnsUsed + 1;
-      await addLog(
-        'system',
-        `→ Turn ${turnNumber}/${maxTurns} — request (messages: ${messages.length}, tools: ${toolsForClaude.length}, max_tokens: 1500, cache: enabled)`,
-        true,
-      );
-      const turnStartedAt = Date.now();
-
-      let response: Anthropic.Messages.Message;
-      try {
-        response = await client.messages.create({
-          model: RESEARCH_MODEL,
-          max_tokens: 1500,
-          system: systemBlocks,
-          tools: toolsForClaude,
-          messages,
-        });
-      } catch (err: any) {
-        const detail =
-          err?.error?.error?.message || err?.error?.message || err?.message || String(err);
-        const status = err?.status ? ` (HTTP ${err.status})` : '';
-        const errorLine = `Anthropic API error${status}: ${detail}`;
-        await addLog('error', errorLine, true);
-
-        if (err?.status === 429) {
-          await addLog('system', 'Rate limited, waiting 30s…', true);
-          await new Promise(r => setTimeout(r, 30000));
-          continue;
-        }
-        if (err?.status === 400 && /web_search/i.test(detail)) {
-          await addLog('error',
-            'Your Anthropic account does not have web_search enabled. Enable it at https://console.anthropic.com/settings/usage.',
-            true);
-        }
-        throw new Error(errorLine);
-      }
-
-      turnsUsed++;
-      const turnDurationMs = Date.now() - turnStartedAt;
-      totalInputTokens += response.usage.input_tokens;
-      totalOutputTokens += response.usage.output_tokens;
-      totalCacheCreate += response.usage.cache_creation_input_tokens || 0;
-      totalCacheRead += response.usage.cache_read_input_tokens || 0;
-      const turnWebSearches = response.content.filter(
-        (b: any) => b.type === 'server_tool_use' && b.name === 'web_search'
-      ).length;
-      webSearchCount += turnWebSearches;
-
-      const currentCost = parseFloat(this.calculateCost(totalInputTokens, totalOutputTokens, webSearchCount, totalCacheCreate, totalCacheRead));
-
-      const blockTypeCounts: Record<string, number> = {};
-      for (const b of response.content as any[]) {
-        blockTypeCounts[b.type] = (blockTypeCounts[b.type] || 0) + 1;
-      }
-      await addLog(
-        'system',
-        `← Turn ${turnNumber} in ${turnDurationMs}ms — stop: ${response.stop_reason}, ` +
-        `tokens: in=${response.usage.input_tokens} out=${response.usage.output_tokens}` +
-        (response.usage.cache_creation_input_tokens ? ` cache_write=${response.usage.cache_creation_input_tokens}` : '') +
-        (response.usage.cache_read_input_tokens ? ` cache_read=${response.usage.cache_read_input_tokens}` : '') +
-        ` | blocks: ${JSON.stringify(blockTypeCounts)} | cost: $${currentCost.toFixed(4)}`,
-      );
-      await persist();
-
-      const toolUseBlocks = response.content.filter(
-        (block): block is Anthropic.Messages.ToolUseBlock => block.type === 'tool_use'
-      );
-
-      for (const block of response.content as any[]) {
-        switch (block.type) {
-          case 'text':
-            if (block.text?.trim()) await addLog('assistant', block.text);
-            break;
-          case 'thinking':
-            if (block.thinking?.trim()) await addLog('thinking', block.thinking);
-            break;
-          case 'server_tool_use':
-            if (block.name === 'web_search') {
-              await addLog('web_search', `query: ${JSON.stringify(block.input)}`);
-            } else {
-              await addLog('server_tool_use', `${block.name}(${JSON.stringify(block.input)})`);
-            }
-            break;
-          case 'web_search_tool_result': {
-            const items = Array.isArray(block.content) ? block.content : [];
-            if (items.length === 0 && block.content?.type === 'web_search_tool_result_error') {
-              await addLog('tool_error', `web_search error: ${block.content.error_code || JSON.stringify(block.content)}`);
-            } else {
-              const lines = items.map((it: any, i: number) => {
-                const url = it.url || '';
-                const title = it.title || '(no title)';
-                const page = it.page_age ? ` [page_age=${it.page_age}]` : '';
-                return `  ${i + 1}. ${title}\n     ${url}${page}`;
-              }).join('\n');
-              await addLog('web_search_result', `${items.length} result(s):\n${lines}`);
-            }
-            break;
-          }
-          case 'tool_use':
-            break;
-          default:
-            await addLog('system', `Unrecognized content block type: ${block.type}`);
-        }
-      }
-
-      if (toolUseBlocks.length === 0) {
-        await addLog(
-          'system',
-          response.stop_reason === 'end_turn'
-            ? 'Agent completed research (end_turn)'
-            : `No client tool calls; stop reason: ${response.stop_reason}`,
-          true,
-        );
-        break;
-      }
-
-      messages.push({ role: "assistant", content: response.content });
-
-      const toolResults: Anthropic.Messages.ToolResultBlockParam[] = [];
-      let turnDiscoveries = 0;
-      let turnNonDupCandidates = 0;
-      for (const toolBlock of toolUseBlocks) {
-        await addLog('tool_call', `${toolBlock.name}(${JSON.stringify(toolBlock.input)})`);
-        const toolStarted = Date.now();
-        try {
-          const result = await this.handleToolCall(toolBlock.name, toolBlock.input, jobId);
-          await addLog('tool_result', `${toolBlock.name} (${Date.now() - toolStarted}ms) → ${result}`);
-          let parsed: any = {};
-          try { parsed = JSON.parse(result); } catch { /* non-JSON tool result */ }
-          if (toolBlock.name === 'save_discovery' && parsed.saved) turnDiscoveries++;
-          if (toolBlock.name === 'check_duplicate' && parsed.isDuplicate === false) turnNonDupCandidates++;
-          toolResults.push({ type: "tool_result", tool_use_id: toolBlock.id, content: result });
-        } catch (err: any) {
-          const errorMsg = err.message || String(err);
-          await addLog('tool_error', `${toolBlock.name} failed after ${Date.now() - toolStarted}ms: ${errorMsg}`, true);
-          toolResults.push({
-            type: "tool_result", tool_use_id: toolBlock.id,
-            content: JSON.stringify({ error: errorMsg }), is_error: true,
-          });
-        }
-      }
-
-      totalDiscoveriesSaved += turnDiscoveries;
-
-      // Stall tracking. A turn only counts as "stalling" when it ran web
-      // searches yet surfaced NEITHER a saved discovery NOR a single fresh
-      // (non-duplicate) candidate. Finding non-dup candidates — even ones not
-      // yet saved — means the agent is on a live trail, so reset the counter.
-      const productiveTurn = turnDiscoveries > 0 || turnNonDupCandidates > 0;
-      if (turnWebSearches > 0 && !productiveTurn) {
-        consecutiveStallTurns++;
-      } else if (productiveTurn) {
-        consecutiveStallTurns = 0;
-      }
-
-      // Escalate before quitting: when stalling, inject a strategy-pivot nudge
-      // (as a text block appended to the tool_result user turn, so role
-      // alternation stays valid) and let the agent try fresh angles. Re-nudge
-      // periodically; only hard-stop after sustained stalling past the nudges.
-      const stalledOut = consecutiveStallTurns >= STALL_HARD_THRESHOLD;
-      let pivotNudge: string | null = null;
-      if (!stalledOut && consecutiveStallTurns > 0 && consecutiveStallTurns % STALL_NUDGE_THRESHOLD === 0) {
-        pivotNudge = STALL_PIVOT_NUDGE;
-        await addLog('system', `Stall detected (${consecutiveStallTurns} consecutive unproductive search turns) — injecting strategy-pivot nudge instead of stopping.`, true);
-      }
-
-      const userContent: any[] = [...toolResults];
-      if (pivotNudge) userContent.push({ type: 'text', text: pivotNudge });
-      messages.push({ role: "user", content: userContent });
-
-      if (stalledOut) {
-        await addLog('system', `Early stop: ${consecutiveStallTurns} consecutive unproductive search turns even after strategy-pivot nudges — gaps appear exhausted for this run.`, true);
-        break;
-      }
-    }
-
-    const finalCost = this.calculateCost(totalInputTokens, totalOutputTokens, webSearchCount, totalCacheCreate, totalCacheRead);
     const [finalJob] = await db.select({
       totalDiscoveries: researchJobs.totalDiscoveries,
       duplicatesSkipped: researchJobs.duplicatesSkipped,
     }).from(researchJobs).where(eq(researchJobs.id, jobId));
 
-    const cacheHitRate = (totalCacheRead + totalInputTokens) > 0
-      ? (totalCacheRead / (totalCacheRead + totalInputTokens) * 100).toFixed(1)
-      : '0.0';
     await addLog(
       'system',
-      `Research completed. Turns: ${turnsUsed}/${maxTurns}, ` +
-      `Web searches: ${webSearchCount}, ` +
-      `Discoveries saved: ${finalJob?.totalDiscoveries || 0}, ` +
+      `Research ${result.aborted ? 'cancelled' : 'completed'} (${result.subtype || 'done'}). Turns: ${result.numTurns}/${maxTurns}, ` +
+      `Web searches: ${result.webSearchCount}, Discoveries saved: ${finalJob?.totalDiscoveries || 0}, ` +
       `Duplicates skipped: ${finalJob?.duplicatesSkipped || 0}, ` +
-      `Tokens: in=${totalInputTokens} out=${totalOutputTokens} cache_write=${totalCacheCreate} cache_read=${totalCacheRead} (cache hit rate ${cacheHitRate}%), ` +
-      `Cost: $${finalCost}`,
+      `Tokens: in=${result.tokensIn} out=${result.tokensOut}, Cost: $${result.totalCostUsd.toFixed(4)}`,
     );
 
-    await persist({ status: 'completed', completedAt: new Date() });
-  }
-
-  private calculateCost(
-    inputTokens: number,
-    outputTokens: number,
-    webSearchCount: number = 0,
-    cacheCreateTokens: number = 0,
-    cacheReadTokens: number = 0,
-  ): string {
-    const cost =
-      (inputTokens * COST_PER_INPUT_TOKEN) +
-      (outputTokens * COST_PER_OUTPUT_TOKEN) +
-      (cacheCreateTokens * COST_PER_CACHE_WRITE) +
-      (cacheReadTokens * COST_PER_CACHE_READ) +
-      (webSearchCount * COST_PER_WEB_SEARCH);
-    return cost.toFixed(4);
+    await persist({
+      status: result.aborted ? 'cancelled' : 'completed',
+      turnsUsed: result.numTurns,
+      totalInputTokens: result.tokensIn,
+      totalOutputTokens: result.tokensOut,
+      estimatedCostUsd: result.totalCostUsd.toFixed(4),
+      completedAt: new Date(),
+    });
   }
 
   async cancelJob(jobId: number): Promise<void> {
     const activeJob = this.activeJobs.get(jobId);
-    if (activeJob) {
-      activeJob.abortController.abort();
-    }
-    await db.update(researchJobs).set({
-      status: 'cancelled',
-      completedAt: new Date(),
-    }).where(eq(researchJobs.id, jobId));
+    if (activeJob) activeJob.abortController.abort();
+    await db.update(researchJobs).set({ status: 'cancelled', completedAt: new Date() }).where(eq(researchJobs.id, jobId));
     this.activeJobs.delete(jobId);
   }
 
@@ -778,7 +559,7 @@ Database state: ${ctx.totalResources} approved resources across ${ctx.totalDomai
     return job;
   }
 
-  async listJobs(limit: number = 20): Promise<ResearchJob[]> {
+  async listJobs(limit = 20): Promise<ResearchJob[]> {
     return db.select().from(researchJobs).orderBy(sql`${researchJobs.createdAt} DESC`).limit(limit);
   }
 
