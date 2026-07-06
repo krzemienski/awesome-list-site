@@ -30,13 +30,13 @@
 - Core discovery routes (`/`, taxonomy pages, resource pages, `/journeys`, and `/journey/:id`) plus `/about`, `/advanced`, and `/submit` receive server-injected semantic body HTML (headings, descriptions, and internal links) for non-JavaScript and AI crawlers.
 - Utility/auth routes `/login` and `/register` return HTTP 200 but are marked `noindex` (robots `noindex,nofollow`, no canonical/og:url) so they do not compete in search; they still serve minimal prerendered body HTML (heading, explanatory copy, internal links) so non-JS and AI crawlers can read them.
 - Utility and internal routes should prefer a consistent `noindex` contract so search engines focus on discovery pages instead of account, settings, or admin screens.
-- Client hydration preserves the server head: loading branches on the home, taxonomy, and resource pages no longer emit placeholder `Loading…`/`Error` titles, and the missing-resource branch re-asserts the server's `noindex` soft-404 contract instead of a default indexable head.
+- Client hydration preserves the server head on the main discovery routes, and the missing-resource branch re-asserts the server's `noindex` soft-404 contract instead of a default indexable head.
 - The "Explore Categories" CTA on `/advanced` and other cross-page links are generated from the live taxonomy, so internal links cannot drift to non-existent category slugs.
-- Client-rendered page titles mirror the server's og-middleware templates exactly, so Googlebot's crawl pass (initial HTML) and render pass (hydrated DOM) capture identical title/description/canonical/robots signals.
+- Most client-rendered page titles mirror the server's og-middleware templates, but `/advanced` and `/submit` still use separate hand-authored `react-helmet` metadata and should be aligned before relying on full crawl/render parity.
 
 ## GEO (Generative Engine Optimization)
 - `client/public/robots.txt` explicitly allows 13 AI crawlers (GPTBot, ChatGPT-User, OAI-SearchBot, PerplexityBot, Perplexity-User, ClaudeBot, Claude-Web, anthropic-ai, Google-Extended, Applebot-Extended, Meta-ExternalAgent, Amazonbot, cohere-ai) with the same private-route exclusions as the default group. Per robots spec, bots matching a named group ignore the `*` group, so the Disallows are replicated there.
-- `/about` carries FAQPage + BreadcrumbList JSON-LD. The 5 Q&As live in `shared/faq.ts` and are rendered identically in three places — the JSON-LD, the server-prerendered body, and the hydrated client About page — so there is no cloaking mismatch. FAQ answers use answer-first structure with concrete statistics (Princeton GEO methods).
+- `/about` carries FAQPage + BreadcrumbList JSON-LD. The shared Q&As in `shared/faq.ts` are rendered identically in the JSON-LD, the server-prerendered body, and the hydrated client About page, so there is no cloaking mismatch.
 - `client/public/llms.txt` describes the site for LLM-based agents.
 
 ## Dismissed categories
