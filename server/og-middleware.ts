@@ -1,6 +1,13 @@
 import type { Request, Response, NextFunction } from "express";
 import { storage } from "./storage";
 import { ABOUT_FAQS } from "@shared/faq";
+import { MAINTAINER } from "@shared/about-content";
+import {
+  homeSeoTitle,
+  homeSeoDescription,
+  categorySeoTitleCore,
+  categorySeoDescription,
+} from "@shared/seo-templates";
 import {
   renderHomeContent,
   renderTaxonomyContent,
@@ -164,7 +171,32 @@ function notFoundMeta(url: string): RouteMeta {
 type Crumb = { name: string; path?: string };
 
 function orgSchema() {
-  return { "@type": "Organization", name: SITE_NAME, url: SITE_URL + "/" };
+  // @id lets any future top-level Organization node dedupe cleanly against this
+  // one when it is nested as WebSite.publisher. logo points at the real,
+  // publicly-served brand asset (favicon.svg is scalable, so it satisfies the
+  // ≥112px logo requirement); founder/sameAs carry verifiable E-E-A-T links
+  // only (GitHub) — no fabricated profiles.
+  return {
+    "@type": "Organization",
+    "@id": SITE_URL + "/#organization",
+    name: SITE_NAME,
+    url: SITE_URL + "/",
+    logo: {
+      "@type": "ImageObject",
+      url: SITE_URL + "/favicon.svg",
+    },
+    description:
+      "A free, curated directory of video development resources — encoders, players, codecs, streaming tools, specifications, and learning materials.",
+    founder: {
+      "@type": "Person",
+      name: MAINTAINER.name,
+      url: MAINTAINER.profileUrl,
+    },
+    sameAs: [
+      "https://github.com/krzemienski/awesome-video",
+      "https://github.com/krzemienski",
+    ],
+  };
 }
 
 function webSiteSchema(description: string) {
@@ -176,6 +208,17 @@ function webSiteSchema(description: string) {
     description,
     inLanguage: "en-US",
     publisher: orgSchema(),
+    // SearchAction enables the Google sitelinks search box. It targets the
+    // in-app /search route; that route is noindex, which is fine — the search
+    // box drives users into live results, it does not need the target indexed.
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: SITE_URL + "/search?q={search_term_string}",
+      },
+      "query-input": "required name=search_term_string",
+    },
   };
 }
 
@@ -351,8 +394,8 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
       const data = await getTreeCached();
       const resourceCount = data?.resources?.length ?? 2000;
       const categoryCount = data?.categories?.length ?? 80;
-      m.title = `${SITE_NAME} — ${resourceCount}+ curated video development resources`;
-      m.description = `Browse ${resourceCount}+ tools, libraries, players, codecs, and learning resources across ${categoryCount}+ categories of video development.`;
+      m.title = homeSeoTitle(resourceCount);
+      m.description = homeSeoDescription(resourceCount, categoryCount);
       m.image = ogImage(SITE_NAME, "Home", resourceCount);
       categories = (data?.categories ?? []).map((c: any) => ({
         name: c.name,
@@ -569,7 +612,9 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
               },
             }
           : {}),
-        ...(path === "/about" ? { faqs: ABOUT_FAQS } : {}),
+        ...(path === "/about"
+          ? { faqs: ABOUT_FAQS, paragraphs: MAINTAINER.bio }
+          : {}),
         categories,
       });
     } else if (path === "/login" || path === "/register") {
@@ -662,8 +707,8 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
       const found = findCategory(await getTreeCached(), slug);
       if (found) {
         const m = defaultMeta(path);
-        m.title = `${found.name} — ${SITE_NAME}`;
-        m.description = `Browse ${found.count} curated ${found.name.toLowerCase()} resources for video development on ${SITE_NAME}.`;
+        m.title = `${categorySeoTitleCore(found.name, slug)} — ${SITE_NAME}`;
+        m.description = categorySeoDescription(found.name, slug, found.count);
         m.image = ogImage(found.name, found.name, found.count);
         m.type = "article";
         m.structuredData = [

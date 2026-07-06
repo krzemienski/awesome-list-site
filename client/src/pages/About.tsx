@@ -19,6 +19,7 @@ import {
   HelpCircle
 } from "lucide-react";
 import { ABOUT_FAQS } from "@shared/faq";
+import { MAINTAINER } from "@shared/about-content";
 
 export default function About() {
   return (
@@ -45,6 +46,40 @@ export default function About() {
           resources, maintained by Nick Krzemienski on GitHub.
         </p>
       </div>
+
+      {/* Author / E-E-A-T bio — text shared verbatim with the server SSR body
+          (shared/about-content.ts) and the site's Organization.founder schema. */}
+      <Card className="mb-4">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5 text-[var(--accent)]" />
+            About the maintainer
+          </CardTitle>
+          <CardDescription>{MAINTAINER.role}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {MAINTAINER.bio.map((paragraph) => (
+              <p
+                key={paragraph.slice(0, 32)}
+                className="text-sm text-muted-foreground leading-relaxed"
+              >
+                {paragraph}
+              </p>
+            ))}
+            <a
+              href={MAINTAINER.profileUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent)] hover:underline"
+            >
+              <Github className="h-4 w-4" />
+              {MAINTAINER.name} on GitHub
+              <ExternalLink className="h-3.5 w-3.5" />
+            </a>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* The source list & the platform */}
       <Card className="mb-4">

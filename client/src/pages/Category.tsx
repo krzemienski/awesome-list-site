@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import SEOHead from "@/components/layout/SEOHead";
+import { categorySeoTitleCore, categorySeoDescription } from "@shared/seo-templates";
 import AdvancedFilter from "@/components/ui/advanced-filter";
 import { ViewModeToggle, ViewMode } from "@/components/ui/view-mode-toggle";
 import { SuggestEditDialog } from "@/components/ui/suggest-edit-dialog";
@@ -437,8 +438,8 @@ export default function Category() {
   return (
     <div className="space-y-4 sm:space-y-6 overflow-x-hidden max-w-full">
       <SEOHead
-        title={categoryName}
-        description={`Browse ${allResources.length} curated ${categoryName.toLowerCase()} resources for video development on Awesome Video.`}
+        title={categorySeoTitleCore(categoryName, slug)}
+        description={categorySeoDescription(categoryName, slug, allResources.length)}
         category={categoryName}
         resourceCount={allResources.length}
       />

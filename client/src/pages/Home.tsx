@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { CardContent } from "@/components/ui/card";
 import { AwesomeList, Category, Resource } from "@/types/awesome-list";
 import SEOHead from "@/components/layout/SEOHead";
+import { homeSeoTitle, homeSeoDescription } from "@shared/seo-templates";
 import AIRecommendationsPanel from "@/components/ui/ai-recommendations-panel";
 import AdvancedFilter from "@/components/ui/advanced-filter";
 import { useAuth } from "@/hooks/useAuth";
@@ -176,8 +177,8 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
   return (
     <div className="space-y-6">
       <SEOHead
-        title={`Awesome Video — ${totalResourceCount}+ curated video development resources`}
-        description={`Discover ${totalResourceCount}+ curated video development resources including codecs, players, encoders, and streaming tools. Browse ${filteredCategories.length} categories on Awesome Video.`}
+        title={homeSeoTitle(totalResourceCount)}
+        description={homeSeoDescription(totalResourceCount, awesomeList.categories.length)}
       />
 
       <div className="space-y-3 pt-2 sm:pt-4">
