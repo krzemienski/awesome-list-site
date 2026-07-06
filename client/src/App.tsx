@@ -29,6 +29,7 @@ import ResourceDetail from "@/pages/ResourceDetail";
 import ThemeSettings from "@/pages/ThemeSettings";
 import Recommendations from "@/pages/Recommendations";
 import Search from "@/pages/Search";
+import Categories from "@/pages/Categories";
 
 import { processAwesomeListData } from "@/lib/parser";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
@@ -71,10 +72,17 @@ function Router() {
         <Route path="/" component={() => <Home awesomeList={awesomeList} isLoading={isLoading} />} />
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
+        <Route path="/auth/login">
+          <Redirect to="/login" replace />
+        </Route>
+        <Route path="/auth/register">
+          <Redirect to="/register" replace />
+        </Route>
         <Route path="/category/:slug/:subSlug">
           {(params) => <Redirect to={`/subcategory/${params.subSlug}`} replace />}
         </Route>
         <Route path="/category/:slug" component={Category} />
+        <Route path="/categories" component={() => <Categories awesomeList={awesomeList} isLoading={isLoading} />} />
         <Route path="/category">
           <Redirect to="/" replace />
         </Route>
@@ -82,6 +90,9 @@ function Router() {
         <Route path="/recommendations" component={Recommendations} />
         <Route path="/search" component={Search} />
         <Route path="/sub-subcategory/:slug" component={SubSubcategory} />
+        <Route path="/subsubcategory/:slug">
+          {(params) => <Redirect to={`/sub-subcategory/${params.slug}`} replace />}
+        </Route>
         <Route path="/resource/:id" component={ResourceDetail} />
         <Route path="/about" component={About} />
         <Route path="/advanced" component={Advanced} />

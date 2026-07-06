@@ -582,19 +582,30 @@ export default function ResourceDetail() {
             </CardContent>
           </Card>
 
-          {filteredRelatedResources.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <FolderTree className="h-4 w-4 text-primary" />
-                  Related Resources
-                </CardTitle>
-                <CardDescription>
-                  Resources you might find interesting
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {filteredRelatedResources.map((related) => (
+          {/* BUG-011: always render the Related section. When the related
+              endpoint returns no matches, show an explicit empty state instead
+              of dropping the whole card (which read as a broken/missing section
+              in the QA audit). */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <FolderTree className="h-4 w-4 text-primary" />
+                Related Resources
+              </CardTitle>
+              <CardDescription>
+                Resources you might find interesting
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {filteredRelatedResources.length === 0 && (
+                <p
+                  className="text-sm text-muted-foreground"
+                  data-testid="related-empty-state"
+                >
+                  No related resources yet. Explore more in this category below.
+                </p>
+              )}
+              {filteredRelatedResources.map((related) => (
                   <div
                     key={related.id}
                     className="p-3 border border-border hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors group min-h-[44px]"
@@ -644,7 +655,6 @@ export default function ResourceDetail() {
                 )}
               </CardContent>
             </Card>
-          )}
 
           {scrapedTitle && (
             <Card className="bg-[var(--surface-2)]">

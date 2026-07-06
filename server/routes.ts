@@ -147,6 +147,7 @@ async function generateSitemap(_req: any, res: any) {
   // Static, always-public routes. These are emitted unconditionally so the
   // sitemap stays valid even when the database is empty or unreachable.
   addUrl('/', 'daily', '1.0');
+  addUrl('/categories', 'weekly', '0.7');
   addUrl('/journeys', 'weekly', '0.7');
   addUrl('/advanced', 'weekly', '0.6');
   addUrl('/about', 'monthly', '0.5');
@@ -299,10 +300,10 @@ async function resolveOgParams(req: any) {
     try {
       const data = await legacyRepo.getAwesomeListFromDatabase();
       if (!pageTitle) pageTitle = 'Awesome Video';
-      if (!count) count = `${data?.resources?.length ?? 2600}+`;
+      if (!count) count = `${data?.resources?.length ?? 2000}+`;
     } catch {
       pageTitle = pageTitle || 'Awesome Video';
-      count = count || '2600+';
+      count = count || '2000+';
     }
   }
   return { pageTitle: pageTitle!, category, count: count! };

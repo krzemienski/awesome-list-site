@@ -101,9 +101,31 @@ function linkList(items: LinkItem[], external = false): string {
   return `<ul class="ssr-list">${lis}</ul>`;
 }
 
-// Cap on listed resource links per taxonomy page — bounds the prerendered HTML
-// size on large categories. The full set remains discoverable via the sitemap.
-const MAX_RESOURCE_LINKS = 100;
+// Resource links listed per taxonomy page. Large taxonomy nodes are paginated
+// via ?page=N (BUG-001/004/010) so every resource is reachable, not just the
+// first 100. The canonical URL always points at page 1 (set in og-middleware).
+const PAGE_SIZE = 100;
+
+// Prev / "Page X of Y" / Next navigation with ?page=N links. Rendered only when
+// a basePath is supplied and there is more than one page.
+function pagination(
+  basePath: string | undefined,
+  page: number,
+  totalPages: number,
+): string {
+  if (!basePath || totalPages <= 1) return "";
+  const href = (p: number) =>
+    internalHref(p <= 1 ? basePath : `${basePath}?page=${p}`);
+  const parts: string[] = [];
+  if (page > 1)
+    parts.push(`<a href="${href(page - 1)}" rel="prev">← Previous</a>`);
+  parts.push(`<span class="ssr-page">Page ${page} of ${totalPages}</span>`);
+  if (page < totalPages)
+    parts.push(`<a href="${href(page + 1)}" rel="next">Next →</a>`);
+  return `<nav class="ssr-pagination" aria-label="Pagination">${parts.join(
+    '<span class="ssr-sep">·</span>',
+  )}</nav>`;
+}
 
 export interface TaxoNode {
   name: string;
@@ -137,27 +159,101 @@ export function renderTaxonomyContent(opts: {
   childKind?: "subcategory" | "sub-subcategory";
   children?: { name: string; slug: string; count: number }[];
   resources?: { id: number; title: string; description?: string }[];
+  page?: number;
+  basePath?: string;
 }): string {
-  const childLinks: LinkItem[] = (opts.children ?? []).map((c) => ({
-    href: internalHref(`/${opts.childKind}/${c.slug}`),
-    label: c.name,
-    meta: `${count(c.count)} resources`,
-  }));
-  const resLinks: LinkItem[] = (opts.resources ?? [])
-    .slice(0, MAX_RESOURCE_LINKS)
-    .map((r) => ({
-      href: internalHref(`/resource/${r.id}`),
-      label: r.title,
-      desc: snippet(r.description),
+  // BUG-006: hide empty child nodes from navigation (0-resource subcategories /
+  // sub-subcategories). No-op on clean data; removes dead links on dirty data.
+  const childLinks: LinkItem[] = (opts.children ?? [])
+    .filter((c) => c.count > 0)
+    .map((c) => ({
+      href: internalHref(`/${opts.childKind}/${c.slug}`),
+      label: c.name,
+      meta: `${count(c.count)} resources`,
     }));
+
+  // BUG-001/004/010: paginate the resource list so ?page=N returns a distinct
+  // slice and every resource is reachable (not just the first 100).
+  const allRes = opts.resources ?? [];
+  const total = allRes.length;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const page = Math.min(Math.max(1, opts.page ?? 1), totalPages);
+  const startIdx = (page - 1) * PAGE_SIZE;
+  const pageRes = allRes.slice(startIdx, startIdx + PAGE_SIZE);
+  const resLinks: LinkItem[] = pageRes.map((r) => ({
+    href: internalHref(`/resource/${r.id}`),
+    label: r.title,
+    desc: snippet(r.description),
+  }));
   const childHeading =
     opts.childKind === "sub-subcategory" ? "Topics" : "Subcategories";
+  const resHeading =
+    total > 0
+      ? `Resources <span class="ssr-meta">(showing ${count(
+          startIdx + 1,
+        )}–${count(startIdx + pageRes.length)} of ${count(total)})</span>`
+      : "Resources";
+  const pager = pagination(opts.basePath, page, totalPages);
   return shell(
     crumbsHtml(opts.crumbs) +
       `<h1>${escapeHtml(opts.heading)}</h1>` +
       `<p class="ssr-lead">${escapeHtml(opts.description)}</p>` +
       (childLinks.length ? `<h2>${childHeading}</h2>${linkList(childLinks)}` : "") +
-      (resLinks.length ? `<h2>Resources</h2>${linkList(resLinks)}` : ""),
+      (resLinks.length ? `<h2>${resHeading}</h2>${linkList(resLinks)}${pager}` : ""),
+  );
+}
+
+// SSR search results (BUG-002). /search?q= is noindex, but crawlers and non-JS
+// clients still get real results instead of an empty shell. The query is
+// escaped; results are capped by the caller.
+export function renderSearchContent(opts: {
+  query: string;
+  results: { id: number; title: string; description?: string }[];
+}): string {
+  const q = String(opts.query ?? "").trim();
+  const heading = q ? `Search results for “${escapeHtml(q)}”` : "Search";
+  const links: LinkItem[] = opts.results.map((r) => ({
+    href: internalHref(`/resource/${r.id}`),
+    label: r.title,
+    desc: snippet(r.description),
+  }));
+  const body = !q
+    ? `<p class="ssr-lead">Enter a search term to find curated video development resources.</p>`
+    : links.length
+      ? `<p class="ssr-lead">${count(links.length)} result${
+          links.length === 1 ? "" : "s"
+        } for “${escapeHtml(q)}”.</p><h2>Results</h2>${linkList(links)}`
+      : `<p class="ssr-lead">No results found for “${escapeHtml(
+          q,
+        )}”. Try a different term or browse the categories below.</p>`;
+  return shell(
+    `<h1>${heading}</h1>` +
+      body +
+      `<h2>Browse</h2>${linkList([
+        { href: internalHref("/categories"), label: "All categories" },
+        { href: internalHref("/journeys"), label: "Learning journeys" },
+      ])}`,
+  );
+}
+
+// SSR categories overview (BUG-007): a real /categories page listing every
+// top-level category with its resource count.
+export function renderCategoriesContent(opts: {
+  heading: string;
+  description: string;
+  crumbs: Crumb[];
+  categories: { name: string; slug: string; count: number }[];
+}): string {
+  const links: LinkItem[] = opts.categories.map((c) => ({
+    href: internalHref(`/category/${c.slug}`),
+    label: c.name,
+    meta: `${count(c.count)} resources`,
+  }));
+  return shell(
+    crumbsHtml(opts.crumbs) +
+      `<h1>${escapeHtml(opts.heading)}</h1>` +
+      `<p class="ssr-lead">${escapeHtml(opts.description)}</p>` +
+      (links.length ? `<h2>All categories</h2>${linkList(links)}` : ""),
   );
 }
 
@@ -216,6 +312,19 @@ export function renderStaticPageContent(opts: {
   links?: { path: string; label: string }[];
   categories?: { name: string; slug: string; count: number }[];
   faqs?: { question: string; answer: string }[];
+  form?: {
+    action: string;
+    heading?: string;
+    submitLabel: string;
+    fields: {
+      name: string;
+      label: string;
+      type?: "text" | "url" | "textarea" | "select";
+      placeholder?: string;
+      required?: boolean;
+      options?: string[];
+    }[];
+  };
 }): string {
   const nav: LinkItem[] = [
     { href: internalHref("/"), label: "Home — all categories" },
@@ -243,10 +352,37 @@ export function renderStaticPageContent(opts: {
         )
         .join("")
     : "";
+  // BUG-015: emit a real <form> so non-JS crawlers see the submission fields
+  // (labels, inputs, select) rather than an empty SPA shell. The client
+  // hydrates its own interactive form over this markup.
+  const formHtml = opts.form
+    ? `<h2>${escapeHtml(opts.form.heading ?? "Submit a resource")}</h2>` +
+      `<form class="ssr-form" action="${escapeHtml(opts.form.action)}" method="post">` +
+      opts.form.fields
+        .map((f) => {
+          const id = `ssr-${f.name}`;
+          const req = f.required ? " required" : "";
+          const label = `<label for="${id}">${escapeHtml(f.label)}</label>`;
+          if (f.type === "textarea") {
+            return `<p>${label}<textarea id="${id}" name="${escapeHtml(f.name)}" placeholder="${escapeHtml(f.placeholder ?? "")}"${req}></textarea></p>`;
+          }
+          if (f.type === "select") {
+            const opts2 = (f.options ?? [])
+              .map((o) => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`)
+              .join("");
+            return `<p>${label}<select id="${id}" name="${escapeHtml(f.name)}"${req}>${opts2}</select></p>`;
+          }
+          return `<p>${label}<input id="${id}" name="${escapeHtml(f.name)}" type="${escapeHtml(f.type ?? "text")}" placeholder="${escapeHtml(f.placeholder ?? "")}"${req} /></p>`;
+        })
+        .join("") +
+      `<p><button type="submit">${escapeHtml(opts.form.submitLabel)}</button></p>` +
+      `</form>`
+    : "";
   return shell(
     `<h1>${escapeHtml(opts.heading)}</h1>` +
       `<p class="ssr-lead">${escapeHtml(opts.description)}</p>` +
       paras +
+      formHtml +
       faqHtml +
       `<h2>Explore</h2>${linkList(nav)}` +
       (cats.length ? `<h2>Top categories</h2>${linkList(cats)}` : ""),

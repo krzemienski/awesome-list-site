@@ -69,9 +69,20 @@ function filterCategories(categories: Category[]) {
         getTotalResourceCount(cat) > 0,
     )
     .map((cat) => {
-      // Follow-up #51: keep zero-resource subs/subsubs visible (dimmed in UI)
-      // so users can see every category on the canonical awesome list.
-      return { ...cat, subcategories: cat.subcategories ?? [] };
+      // BUG-006: hide wholly empty subcategories / sub-subcategories from the
+      // nav. (This reverses follow-up #51's "keep dimmed empties visible"
+      // decision.) On the clean dev tree every node has resources so this is a
+      // no-op; on prod it removes the empty rows the QA audit flagged. Counts
+      // still reconcile because an empty node contributes 0 to the parent sum.
+      const subcategories = (cat.subcategories ?? [])
+        .map((sub) => ({
+          ...sub,
+          subSubcategories: (sub.subSubcategories ?? []).filter(
+            (ss) => getTotalResourceCount(ss) > 0,
+          ),
+        }))
+        .filter((sub) => getTotalResourceCount(sub) > 0);
+      return { ...cat, subcategories };
     });
 }
 

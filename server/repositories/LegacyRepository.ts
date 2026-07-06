@@ -86,11 +86,26 @@ export class LegacyRepository {
    */
   async getAwesomeListFromDatabase(): Promise<AwesomeListData> {
     // Fetch all approved resources
-    const allResources = await db
+    const allResourcesRaw = await db
       .select()
       .from(resources)
       .where(eq(resources.status, 'approved'))
       .orderBy(asc(resources.title));
+
+    // Dedup by normalized URL (BUG-005). Duplicate rows for the same resource
+    // (same URL, different id/description) inflate category/subcategory counts
+    // and render twice on prod. This is a no-op on clean data (0 URL dupes on
+    // dev) and repairs the rendered tree + counts + sitemap + client on dirty
+    // data. One tree is the single source of truth for all of them.
+    const seenUrls = new Set<string>();
+    const allResources = allResourcesRaw.filter((r) => {
+      const raw = typeof r.url === 'string' ? r.url.trim().toLowerCase() : '';
+      const key = raw.replace(/\/+$/, '');
+      if (!key) return true; // no URL → cannot dedup, keep it
+      if (seenUrls.has(key)) return false;
+      seenUrls.add(key);
+      return true;
+    });
 
     // Fetch all categories, subcategories, and sub-subcategories
     const allCategories = await db

@@ -3,15 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover" />
-    <!--
-      Default OG/Twitter tags below are the fallback shipped in the static
-      bundle. At request time, server/og-middleware.ts rewrites the <head>
-      with route-specific metadata (title/description/image/canonical) so
-      social crawlers (Twitter, Facebook, Slack, iMessage, LinkedIn, etc.)
-      see correct previews for every page on https://awesome.video.
-    -->
     <title>Awesome Video — Curated video development resources</title>
-    <meta name="description" content="The curated index of 2,600+ video development resources — players, encoders, codecs, streaming, AI, tools, and community." />
+    <meta name="description" content="The curated index of 2,000+ video development resources — players, encoders, codecs, streaming, AI, tools, and community." />
     <meta name="keywords" content="video development, ffmpeg, hls, dash, video players, encoders, codecs, streaming, video ai, awesome video" />
     <link rel="canonical" href="https://awesome.video/" />
     <meta property="og:type" content="website" />
@@ -19,7 +12,7 @@
     <meta property="og:locale" content="en_US" />
     <meta property="og:url" content="https://awesome.video/" />
     <meta property="og:title" content="Awesome Video — Curated video development resources" />
-    <meta property="og:description" content="The curated index of 2,600+ video development resources — players, encoders, codecs, streaming, AI, tools, and community." />
+    <meta property="og:description" content="The curated index of 2,000+ video development resources — players, encoders, codecs, streaming, AI, tools, and community." />
     <meta property="og:image" content="https://awesome.video/og-image.png" />
     <meta property="og:image:secure_url" content="https://awesome.video/og-image.png" />
     <meta property="og:image:type" content="image/png" />
@@ -29,7 +22,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@awesome_video" />
     <meta name="twitter:title" content="Awesome Video — Curated video development resources" />
-    <meta name="twitter:description" content="The curated index of 2,600+ video development resources — players, encoders, codecs, streaming, AI, tools, and community." />
+    <meta name="twitter:description" content="The curated index of 2,000+ video development resources — players, encoders, codecs, streaming, AI, tools, and community." />
     <meta name="twitter:image" content="https://awesome.video/og-image.png" />
     <meta name="twitter:image:alt" content="Awesome Video — curated video development resources" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
@@ -37,12 +30,6 @@
     <link rel="apple-touch-icon" href="/favicon.svg" />
     <link rel="manifest" href="/site.webmanifest" />
 
-    <!-- DS no-FOUT boot script: read persisted system + accent from
-         localStorage and apply them as html attributes BEFORE any module
-         paints. Per-system token blocks in design-system.css resolve via
-         attribute-selector specificity, so the entire personality swap
-         (tokens + skin) is in effect on the very first paint. Default:
-         Editorial + Crimson. -->
     <script>
       (function () {
         try {
@@ -81,18 +68,6 @@
       })();
     </script>
 
-    <!--
-      Dev-only overlay suppressor.
-      The @replit/vite-plugin-runtime-error-modal plugin forwards server-side
-      Vite HMR WebSocket "Load failed" frames (frequent on mobile cellular)
-      to every connected client, which renders Vite's full-screen
-      <vite-error-overlay> and blocks the UI. The CSS rule in index.css
-      hides the host element, but on mobile Safari the overlay sometimes
-      ships its own inline style that still leaves a tap-blocker. This
-      MutationObserver removes the host element entirely the moment it is
-      inserted, and silences the offending unhandledrejection so the
-      overlay loop does not re-fire. No-op in production builds.
-    -->
     <script>
       (function () {
         try {
@@ -144,13 +119,6 @@
       })();
     </script>
 
-    <!--
-      Critical-path fonts: Editorial default only (Inter + Fraunces + JetBrains Mono).
-      Loaded non-blocking via rel="preload" so they never sit on the critical render
-      path. Alternate-system families (Geist, Instrument Serif, Space Grotesk,
-      IBM Plex Mono, IBM Plex Sans, Manrope) are injected after the page is
-      interactive by the inline script below — they are never needed for first paint.
-    -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preload" as="style"
@@ -160,13 +128,6 @@
       <link rel="stylesheet"
             href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" />
     </noscript>
-    <!--
-      Alternate-system font loader: injected after window load so the six
-      non-Editorial families (Geist / Instrument Serif / Space Grotesk /
-      IBM Plex Mono / IBM Plex Sans / Manrope) never block first paint.
-      They become available as soon as the browser is idle, which is fast
-      enough for any theme-switcher interaction.
-    -->
     <script>
       (function () {
         var ALT_FONTS_URL = 'https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap';
@@ -187,7 +148,6 @@
   <body>
     <div id="root"><!--app-html--></div>
     <script type="module" src="/src/main.tsx"></script>
-    <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
     <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
   </body>
 </html>

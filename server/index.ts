@@ -17,6 +17,38 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+
+// BUG-020: don't advertise the Express server via the X-Powered-By header.
+app.disable("x-powered-by");
+
+// BUG-019: baseline security headers. The always-on set is safe in every
+// environment; the stricter frame/CSP policy is production-only so it never
+// interferes with the Replit dev iframe / Vite HMR.
+app.use((_req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader(
+    "Permissions-Policy",
+    "camera=(), microphone=(), geolocation=()",
+  );
+  if (process.env.NODE_ENV === "production") {
+    res.setHeader("X-Frame-Options", "DENY");
+    res.setHeader(
+      "Content-Security-Policy",
+      [
+        "default-src 'self'",
+        "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+        "font-src 'self' https://fonts.gstatic.com",
+        "img-src 'self' data: https:",
+        "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com",
+        "frame-ancestors 'none'",
+      ].join("; "),
+    );
+  }
+  next();
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 

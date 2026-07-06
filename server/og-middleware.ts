@@ -8,13 +8,15 @@ import {
   renderJourneysContent,
   renderJourneyContent,
   renderStaticPageContent,
+  renderSearchContent,
+  renderCategoriesContent,
 } from "./seo-content";
 
 export const SITE_URL =
   process.env.PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://awesome.video";
 export const SITE_NAME = "Awesome Video";
 export const SITE_TAGLINE =
-  "The curated index of 2,600+ video development resources — players, encoders, codecs, streaming, AI, tools, and community.";
+  "The curated index of 2,000+ video development resources — players, encoders, codecs, streaming, AI, tools, and community.";
 
 export interface RouteMeta {
   title: string;
@@ -94,8 +96,32 @@ const META_CACHE = new Map<string, { value: ResolvedRoute; expires: number }>();
 const META_CACHE_TTL_MS = 60_000;
 const META_CACHE_MAX = 500;
 
+// Parse a 1-based ?page= param; anything not an integer > 1 collapses to page 1
+// so the cache key and rendered slice stay canonical.
+function parsePage(url: string): number {
+  const q = url.split("?")[1] || "";
+  const n = Number(new URLSearchParams(q).get("page"));
+  return Number.isInteger(n) && n > 1 ? n : 1;
+}
+
+// Parse and bound the ?q= search term (BUG-002). Capped so an attacker cannot
+// blow up the rendered HTML; escaping happens at render time.
+function parseQueryParam(url: string): string {
+  const q = url.split("?")[1] || "";
+  return (new URLSearchParams(q).get("q") || "").trim().slice(0, 100);
+}
+
 async function resolveRoute(url: string): Promise<ResolvedRoute> {
-  const key = url.split("?")[0];
+  const cleanPath = url.split("?")[0].replace(/\/+$/, "") || "/";
+  // /search is query-driven with an unbounded key space — never cache it
+  // (cache poisoning / unbounded memory). Always resolve fresh.
+  if (cleanPath === "/search") {
+    return resolveRouteUncached(url);
+  }
+  // Only ?page= differentiates cacheable routes; fold it into the key so page 2
+  // is not served page 1's cached body (BUG-001). All other params are ignored.
+  const page = parsePage(url);
+  const key = page > 1 ? `${cleanPath}?page=${page}` : cleanPath;
   const now = Date.now();
   const cached = META_CACHE.get(key);
   if (cached && cached.expires > now) return cached.value;
@@ -315,6 +341,7 @@ function safeDecode(segment: string): string {
 
 async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
   const path = url.split("?")[0].replace(/\/+$/, "") || "/";
+  const page = parsePage(url);
 
   // Home
   if (path === "/" || path === "") {
@@ -322,7 +349,7 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
     let categories: { name: string; slug: string; count: number }[] = [];
     try {
       const data = await getTreeCached();
-      const resourceCount = data?.resources?.length ?? 2600;
+      const resourceCount = data?.resources?.length ?? 2000;
       const categoryCount = data?.categories?.length ?? 80;
       m.title = `${SITE_NAME} — ${resourceCount}+ curated video development resources`;
       m.description = `Browse ${resourceCount}+ tools, libraries, players, codecs, and learning resources across ${categoryCount}+ categories of video development.`;
@@ -409,6 +436,12 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
       // Search results pages are standard noindex (thin/duplicate content).
       noindex: true,
     },
+    "/categories": {
+      // BUG-007: real overview page listing every top-level category. Indexable
+      // (a genuine hub page) — description/counts are filled in dynamically.
+      title: `All Categories — ${SITE_NAME}`,
+      description: `Browse all categories of curated video development resources on ${SITE_NAME} — players, encoders, codecs, streaming, AI, tools, and more.`,
+    },
     "/admin": {
       title: `Admin — ${SITE_NAME}`,
       description: `${SITE_NAME} admin panel.`,
@@ -490,6 +523,50 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
                 "You can preview the submission form without an account, but you must log in to actually submit a resource.",
               ],
               links: [{ path: "/login", label: "Sign in to submit a resource" }],
+              // BUG-015: real form markup for non-JS crawlers.
+              form: {
+                action: "/submit",
+                heading: "Submit a resource",
+                submitLabel: "Submit resource",
+                fields: [
+                  {
+                    name: "title",
+                    label: "Title",
+                    type: "text" as const,
+                    placeholder: "e.g., FFmpeg - Video encoding tool",
+                    required: true,
+                  },
+                  {
+                    name: "url",
+                    label: "URL",
+                    type: "url" as const,
+                    placeholder: "https://example.com/resource",
+                    required: true,
+                  },
+                  {
+                    name: "description",
+                    label: "Description",
+                    type: "textarea" as const,
+                    placeholder:
+                      "Describe what this resource is about and why it's useful...",
+                    required: true,
+                  },
+                  {
+                    name: "category",
+                    label: "Category",
+                    type: "select" as const,
+                    required: true,
+                    options: categories.map((c) => c.name),
+                  },
+                  {
+                    name: "tags",
+                    label: "Tags",
+                    type: "text" as const,
+                    placeholder:
+                      "e.g., video, encoding, streaming (comma-separated)",
+                  },
+                ],
+              },
             }
           : {}),
         ...(path === "/about" ? { faqs: ABOUT_FAQS } : {}),
@@ -520,6 +597,58 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
               { path: "/login", label: "Sign in" },
               { path: "/submit", label: "Submit a resource" },
             ],
+      });
+    } else if (path === "/search") {
+      // BUG-002: render real SSR search results for ?q= (still noindex).
+      const q = parseQueryParam(url);
+      let results: { id: number; title: string; description?: string }[] = [];
+      if (q) {
+        try {
+          const { resources } = await storage.listResources({
+            page: 1,
+            limit: 50,
+            status: "approved",
+            search: q,
+          });
+          results = (resources ?? []).map((r: any) => ({
+            id: r.id,
+            title: r.title,
+            description: r.description,
+          }));
+        } catch {}
+      }
+      bodyHtml = renderSearchContent({ query: q, results });
+    } else if (path === "/categories") {
+      // BUG-007: overview page listing every top-level category with its count.
+      let cats: { name: string; slug: string; count: number }[] = [];
+      try {
+        const data = await getTreeCached();
+        cats = (data?.categories ?? []).map((c: any) => ({
+          name: c.name,
+          slug: c.slug,
+          count: countNodeResources(c),
+        }));
+      } catch {}
+      m.structuredData = [
+        collectionPageSchema({
+          name: "All Categories",
+          description: m.description,
+          path,
+          numberOfItems: cats.length,
+        }),
+        breadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "All Categories", path },
+        ]),
+      ];
+      bodyHtml = renderCategoriesContent({
+        heading: "All Categories",
+        description: m.description,
+        crumbs: [
+          { name: "Home", path: "/" },
+          { name: "All Categories", path },
+        ],
+        categories: cats,
       });
     }
     return { meta: m, found: true, bodyHtml };
@@ -561,6 +690,8 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
             title: r.title,
             description: r.description,
           })),
+          page,
+          basePath: path,
         });
         return { meta: m, found: true, bodyHtml };
       }
@@ -608,6 +739,8 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
             title: r.title,
             description: r.description,
           })),
+          page,
+          basePath: path,
         });
         return { meta: m, found: true, bodyHtml };
       }
@@ -647,6 +780,8 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
             title: r.title,
             description: r.description,
           })),
+          page,
+          basePath: path,
         });
         return { meta: m, found: true, bodyHtml };
       }
@@ -968,12 +1103,30 @@ export function ogInjectionMiddleware() {
       // /account was never a route; canonical is the profile page (BUG-016).
       return res.redirect(301, "/profile");
     }
+    // BUG-009: /auth/* aliases were never routes — 301 to the canonical pages.
+    if (urlPath === "/auth/register") {
+      return res.redirect(301, "/register");
+    }
+    if (urlPath === "/auth/login") {
+      return res.redirect(301, "/login");
+    }
+    // BUG-008: the no-hyphen /subsubcategory/:slug 301s to the canonical
+    // /sub-subcategory/:slug (a circulating URL shape that was never a route).
+    const noHyphenSubSub = urlPath.match(/^\/subsubcategory\/([^\/]+)$/);
+    if (noHyphenSubSub) {
+      return res.redirect(
+        301,
+        `/sub-subcategory/${encodeURIComponent(safeDecode(noHyphenSubSub[1]))}`,
+      );
+    }
 
     let meta: RouteMeta;
     let notFound = false;
     let bodyHtml: string | undefined;
     try {
-      const resolved = await resolveRoute(urlPath);
+      // Pass the full URL (with ?page=/?q=) so the resolver can paginate and
+      // render search results; resolveRoute keys its cache on path + page.
+      const resolved = await resolveRoute(req.originalUrl || req.url);
       meta = resolved.meta;
       notFound = !resolved.found;
       bodyHtml = resolved.bodyHtml;
