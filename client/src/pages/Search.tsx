@@ -55,7 +55,7 @@ export default function Search() {
   } = useQuery<{ resources: DbResource[]; total: number }>({
     queryKey: ["/api/resources", "search", trimmed],
     queryFn: async () =>
-      apiRequest(`/api/resources?search=${encodeURIComponent(trimmed)}&limit=50`, {
+      apiRequest(`/api/resources?search=${encodeURIComponent(trimmed)}&limit=200`, {
         method: "GET",
       }),
     enabled: trimmed.length >= 2,
@@ -68,7 +68,7 @@ export default function Search() {
     <div className="space-y-6">
       <SEOHead
         title={trimmed ? `Search: ${trimmed} — Awesome Video` : "Search — Awesome Video"}
-        description="Search 2,000+ curated video development tools, libraries, players, codecs, and learning resources."
+        description="Search 1,800+ curated video development tools, libraries, players, codecs, and learning resources."
         noindex
       />
 

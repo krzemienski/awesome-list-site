@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover" />
     <title>Awesome Video — Curated video development resources</title>
-    <meta name="description" content="The curated index of 2,000+ video development resources — players, encoders, codecs, streaming, AI, tools, and community." />
+    <meta name="description" content="The curated index of 1,800+ video development resources — players, encoders, codecs, streaming, AI, tools, and community." />
     <meta name="keywords" content="video development, ffmpeg, hls, dash, video players, encoders, codecs, streaming, video ai, awesome video" />
     <link rel="canonical" href="https://awesome.video/" />
     <meta property="og:type" content="website" />
@@ -12,7 +12,7 @@
     <meta property="og:locale" content="en_US" />
     <meta property="og:url" content="https://awesome.video/" />
     <meta property="og:title" content="Awesome Video — Curated video development resources" />
-    <meta property="og:description" content="The curated index of 2,000+ video development resources — players, encoders, codecs, streaming, AI, tools, and community." />
+    <meta property="og:description" content="The curated index of 1,800+ video development resources — players, encoders, codecs, streaming, AI, tools, and community." />
     <meta property="og:image" content="https://awesome.video/og-image.png" />
     <meta property="og:image:secure_url" content="https://awesome.video/og-image.png" />
     <meta property="og:image:type" content="image/png" />
@@ -22,7 +22,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@awesome_video" />
     <meta name="twitter:title" content="Awesome Video — Curated video development resources" />
-    <meta name="twitter:description" content="The curated index of 2,000+ video development resources — players, encoders, codecs, streaming, AI, tools, and community." />
+    <meta name="twitter:description" content="The curated index of 1,800+ video development resources — players, encoders, codecs, streaming, AI, tools, and community." />
     <meta name="twitter:image" content="https://awesome.video/og-image.png" />
     <meta name="twitter:image:alt" content="Awesome Video — curated video development resources" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
@@ -148,6 +148,21 @@
   <body>
     <div id="root"><!--app-html--></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
+    <script>
+      // The Replit dev banner is a development-only convenience. Inject it only
+      // on Replit/dev hosts so production (awesome.video) never requests it.
+      (function () {
+        try {
+          var isDev = location.hostname.endsWith('.replit.dev') ||
+                      location.hostname === 'localhost' ||
+                      location.hostname.endsWith('.repl.co');
+          if (!isDev) return;
+          var s = document.createElement('script');
+          s.type = 'text/javascript';
+          s.src = 'https://replit.com/public/js/replit-dev-banner.js';
+          document.body.appendChild(s);
+        } catch (e) {}
+      })();
+    </script>
   </body>
 </html>
