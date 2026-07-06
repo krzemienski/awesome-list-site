@@ -176,9 +176,13 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
 
   return (
     <div className="space-y-6">
+      {/* Home title/description counts MUST read the same flat tree arrays the
+          server reads (data.resources.length / data.categories.length in
+          og-middleware), NOT the filtered per-category sum (totalResourceCount) —
+          otherwise the crawl-pass and render-pass <title> could disagree. */}
       <SEOHead
-        title={homeSeoTitle(totalResourceCount)}
-        description={homeSeoDescription(totalResourceCount, awesomeList.categories.length)}
+        title={homeSeoTitle(awesomeList.resources.length)}
+        description={homeSeoDescription(awesomeList.resources.length, awesomeList.categories.length)}
       />
 
       <div className="space-y-3 pt-2 sm:pt-4">
