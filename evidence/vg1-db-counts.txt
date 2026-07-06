@@ -1,367 +1,61 @@
-VG-1 — PRODUCTION DB COUNT AUDIT (awesome.video)  2026-07-06T14:53:04.756Z
-Categorization model: HIERARCHICAL, single-parent (resources.category/subcategory/sub_subcategory are TEXT; each resource sits at exactly one path).
-Authoritative approved total (DB): 2210
-Categories: 9 | Subcategories: 102 | Sub-subcategories: 107
+VG-1 — DB SOURCE OF TRUTH (LIVE PRODUCTION: postgres behind https://awesome.video)
+Connectivity: confirmed via live read-only SQL (environment: production).
 
-CATEGORY [1085] Encoding & Codecs (encoding-codecs) = 396 approved
-    · (directly in category, no subcategory) = 125
-    SUB [2190] Encoding Tools (encoding-tools) = 121
-        · (directly in subcategory) = 95
-        SUBSUB [3625] FFMPEG (ffmpeg) = 13
-        SUBSUB [3626] Other Encoders (other-encoders) = 0
-    SUB [2222] FFmpeg-Based Tools (ffmpeg-based-tools) = 33
-        · (directly in subcategory) = 13
-        SUBSUB [3652] FFmpeg (ffmpeg) = 18
-    SUB [2221] Containerization & Packaging Tools (containerization-packaging-tools) = 23
-        · (directly in subcategory) = 19
-        SUBSUB [3654] FFmpeg (ffmpeg) = 3
-        SUBSUB [3655] Origin Servers (origin-servers) = 1
-        SUBSUB [3653] Audio (audio) = 0
-    SUB [2220] Cloud-Based Encoding Solutions (cloud-based-encoding-solutions) = 14
-        · (directly in subcategory) = 11
-        SUBSUB [3659] Cloud Platforms (cloud-platforms) = 2
-        SUBSUB [3660] Subtitles & Captions (subtitles-captions) = 1
-    SUB [2191] Codecs (codecs) = 14
-        · (directly in subcategory) = 8
-        SUBSUB [3627] HEVC (hevc) = 3
-        SUBSUB [3629] AV1 (av1) = 2
-        SUBSUB [3628] VP9 (vp9) = 1
-    SUB [2227] Software Transcoding Tools (software-transcoding-tools) = 14
-        · (directly in subcategory) = 14
-    SUB [2226] Scripting & Automation Tools (scripting-automation-tools) = 12
-        · (directly in subcategory) = 10
-        SUBSUB [3656] FFmpeg (ffmpeg) = 1
-    SUB [2225] Real-Time Encoding Solutions (real-time-encoding-solutions) = 9
-        · (directly in subcategory) = 9
-    SUB [2275] Open Source Encoder Projects (open-source-encoder-projects) = 7
-        · (directly in subcategory) = 5
-        SUBSUB [3657] AV1 (av1) = 2
-    SUB [2224] Multi-format Packaging Tools (multi-format-packaging-tools) = 6
-        · (directly in subcategory) = 6
-    SUB [2274] Next-Generation Codecs AV1 VVC (next-generation-codecs-av1-vvc) = 6
-        · (directly in subcategory) = 6
-    SUB [2223] Hardware Accelerated Transcoding (hardware-accelerated-transcoding) = 5
-        · (directly in subcategory) = 2
-        SUBSUB [3658] FFmpeg (ffmpeg) = 1
-    SUB [2271] Benchmarking & Performance Tools for Codecs (benchmarking-performance-tools-for-codecs) = 3
-        · (directly in subcategory) = 3
-    SUB [2273] Hardware Codecs & Acceleration (hardware-codecs-acceleration) = 2
-        · (directly in subcategory) = 2
-    SUB [2272] Comparative Analysis of Codecs (comparative-analysis-of-codecs) = 1
-        · (directly in subcategory) = 1
-    SUB [2276] Software Codecs (software-codecs) = 1
-        · (directly in subcategory) = 1
-    ↳ rollup check: OK
+AUTHORITATIVE TOTAL (approved, non-deleted): 1838
 
-CATEGORY [1087] Media Tools (media-tools) = 322 approved
-    · (directly in category, no subcategory) = 187
-    SUB [2218] Subtitle & Caption Tools (subtitle-caption-tools) = 27
-        · (directly in subcategory) = 8
-        SUBSUB [3698] Subtitles & Captions (subtitles-captions) = 19
-    SUB [2247] Quality Analysis & Metrics (quality-analysis-metrics) = 19
-        · (directly in subcategory) = 5
-        SUBSUB [3693] Quality & Testing (quality-testing) = 13
-        SUBSUB [3694] FFmpeg (ffmpeg) = 0
-    SUB [2195] Ads & QoE (ads-qoe) = 17
-        SUBSUB [3639] Quality & Testing (quality-testing) = 17
-        SUBSUB [3638] Advertising (advertising) = 0
-    SUB [2194] Audio & Subtitles (audio-subtitles) = 17
-        · (directly in subcategory) = 3
-        SUBSUB [3637] Subtitles & Captions (subtitles-captions) = 13
-        SUBSUB [3636] Audio (audio) = 1
-    SUB [2246] Metadata Extraction & Management (metadata-extraction-management) = 14
-        · (directly in subcategory) = 14
-    SUB [2243] AI & Machine Learning Tools (ai-machine-learning-tools) = 8
-        · (directly in subcategory) = 7
-        SUBSUB [3699] FFmpeg (ffmpeg) = 1
-    SUB [2249] Video Analytics & Benchmarking (video-analytics-benchmarking) = 8
-        · (directly in subcategory) = 4
-        SUBSUB [3696] Quality & Testing (quality-testing) = 2
-        SUBSUB [3695] FFmpeg (ffmpeg) = 1
-    SUB [2244] Audio Analysis & Processing (audio-analysis-processing) = 7
-        · (directly in subcategory) = 3
-        SUBSUB [3697] Audio (audio) = 4
-    SUB [2250] VMAF PSNR SSIM Tools (vmaf-psnr-ssim-tools) = 7
-        · (directly in subcategory) = 3
-        SUBSUB [3700] Quality & Testing (quality-testing) = 4
-    SUB [2213] Batch Processing & Automation (batch-processing-automation) = 4
-        · (directly in subcategory) = 4
-    SUB [2248] Scene Detection & Segmentation (scene-detection-segmentation) = 3
-        · (directly in subcategory) = 3
-    SUB [2214] Color Grading & Correction Tools (color-grading-correction-tools) = 1
-        · (directly in subcategory) = 1
-    SUB [2245] Color Science & Histogram Analysis (color-science-histogram-analysis) = 1
-        · (directly in subcategory) = 1
-    SUB [2215] Conversion & Format Tools (conversion-format-tools) = 1
-        · (directly in subcategory) = 1
-    SUB [2216] Effects & Compositing Tools (effects-compositing-tools) = 1
-        · (directly in subcategory) = 1
-    SUB [2217] Non-linear Editing Suites (non-linear-editing-suites) = 0
-    SUB [2219] Trimming & Cutting Tools (trimming-cutting-tools) = 0
-    ↳ rollup check: OK
+Per-category GROUP BY (status='approved'):
+  Community & Events          81
+  Encoding & Codecs          325
+  General Tools              151
+  Infrastructure & Delivery  199
+  Intro & Learning           194
+  Media Tools                255
+  Players & Clients          234
+  Protocols & Transport      200
+  Standards & Industry       199
+  --------------------------------
+  SUM                       1838   == authoritative total  ✓
 
-CATEGORY [1086] Players & Clients (players-clients) = 302 approved
-    · (directly in category, no subcategory) = 177
-    SUB [2193] Mobile & Web Players (mobile-web-players) = 54
-        · (directly in subcategory) = 10
-        SUBSUB [3635] Web Players (web-players) = 18
-        SUBSUB [3633] iOS/tvOS (iostvos) = 10
-        SUBSUB [3634] Android (android) = 7
-    SUB [2192] Hardware Players (hardware-players) = 16
-        · (directly in subcategory) = 3
-        SUBSUB [3630] Roku (roku) = 13
-        SUBSUB [3632] Chromecast (chromecast) = 0
-        SUBSUB [3631] Smart TVs (smart-tvs) = 0
-    SUB [2209] Mobile Players (mobile-players) = 16
-        · (directly in subcategory) = 3
-        SUBSUB [3686] Android (android) = 3
-        SUBSUB [3688] DASH (dash) = 1
-        SUBSUB [3687] iOStvOS (iostvos) = 1
-    SUB [2208] Frameworks & UI Components (frameworks-ui-components) = 11
-        · (directly in subcategory) = 8
-        SUBSUB [3685] Web Players (web-players) = 3
-    SUB [2211] Smart TV Players (smart-tv-players) = 11
-        · (directly in subcategory) = 1
-        SUBSUB [3691] Roku (roku) = 6
-        SUBSUB [3689] Smart TVs (smart-tvs) = 3
-        SUBSUB [3690] Chromecast (chromecast) = 1
-    SUB [2212] Web Players (web-players) = 10
-        · (directly in subcategory) = 5
-        SUBSUB [3683] Web Players (web-players) = 4
-        SUBSUB [3684] HLS (hls) = 1
-    SUB [2206] Desktop Players (desktop-players) = 4
-        · (directly in subcategory) = 4
-    SUB [2205] Browser Extensions (browser-extensions) = 1
-        SUBSUB [3692] Web Players (web-players) = 1
-    SUB [2207] Embedded Players (embedded-players) = 1
-        · (directly in subcategory) = 1
-    SUB [2210] Set-top Box Players (set-top-box-players) = 1
-        · (directly in subcategory) = 1
-    ↳ rollup check: OK
+CATEGORIZATION MODEL: FLAT / single-parent.
+  Each resource row has ONE `category` text value that must equal a `categories.name`.
+  A resource is counted exactly once under its category (and once under its sub /
+  sub-sub node). No join/tag table — no resource appears under two categories.
 
-CATEGORY [1089] Infrastructure & Delivery (infrastructure-delivery) = 272 approved
-    · (directly in category, no subcategory) = 173
-    SUB [2198] Streaming Servers (streaming-servers) = 30
-        · (directly in subcategory) = 28
-        SUBSUB [3645] Storage Solutions (storage-solutions) = 2
-        SUBSUB [3644] Origin Servers (origin-servers) = 0
-    SUB [2235] VOD Streaming Servers (vod-streaming-servers) = 21
-        · (directly in subcategory) = 20
-        SUBSUB [3662] HLS (hls) = 1
-    SUB [2230] Live Streaming Servers (live-streaming-servers) = 10
-        · (directly in subcategory) = 10
-    SUB [2228] CDN Integration & Distribution (cdn-integration-distribution) = 9
-        · (directly in subcategory) = 8
-        SUBSUB [3664] CDN Integration (cdn-integration) = 1
-    SUB [2233] RTMPRTSPHTTP Protocol Servers (rtmprtsphttp-protocol-servers) = 9
-        · (directly in subcategory) = 9
-    SUB [2234] Streaming Analytics & Monitoring (streaming-analytics-monitoring) = 8
-        · (directly in subcategory) = 6
-        SUBSUB [3663] Quality & Testing (quality-testing) = 2
-    SUB [2229] Edge Computing & Caching Solutions (edge-computing-caching-solutions) = 6
-        · (directly in subcategory) = 5
-        SUBSUB [3661] HLS (hls) = 1
-    SUB [2232] Peer-to-Peer Streaming Solutions (peer-to-peer-streaming-solutions) = 3
-        · (directly in subcategory) = 3
-    SUB [2199] Cloud & CDN (cloud-cdn) = 2
-        SUBSUB [3646] Cloud Platforms (cloud-platforms) = 2
-        SUBSUB [3647] CDN Integration (cdn-integration) = 0
-    SUB [2231] Multi-CDN Management (multi-cdn-management) = 1
-        · (directly in subcategory) = 1
-    ↳ rollup check: OK
+~370 DISCREPANCY CAUSE (the old "total: 2210" vs 1838):
+  - 372 rows were URL-duplicates: multiple approved rows sharing the same
+    normalized (lower/trim) url. These inflated the raw resources table count.
+  - 1 row was a category-orphan (id 184991 "QUANTEEC"): its `category` text did
+    not match any categories.name, so it was invisible to /api/categories.
+  - 6 rows carried tracking/shortener URLs (data-quality, not a count issue).
 
-CATEGORY [1084] Protocols & Transport (protocols-transport) = 235 approved
-    · (directly in category, no subcategory) = 103
-    SUB [2241] HLS Tools (hls-tools) = 42
-        · (directly in subcategory) = 10
-        SUBSUB [3705] HLS (hls) = 28
-        SUBSUB [3707] FFmpeg (ffmpeg) = 1
-        SUBSUB [3706] Quality & Testing (quality-testing) = 1
-    SUB [2188] Adaptive Streaming (adaptive-streaming) = 37
-        · (directly in subcategory) = 9
-        SUBSUB [3620] HLS (hls) = 18
-        SUBSUB [3621] DASH (dash) = 10
-    SUB [2239] DASH Tools (dash-tools) = 23
-        · (directly in subcategory) = 2
-        SUBSUB [3703] DASH (dash) = 20
-        SUBSUB [3704] Subtitles & Captions (subtitles-captions) = 1
-    SUB [2240] HLS Manifest Parsers & Generators (hls-manifest-parsers-generators) = 12
-        · (directly in subcategory) = 6
-        SUBSUB [3702] HLS (hls) = 5
-        SUBSUB [3701] Subtitles & Captions (subtitles-captions) = 1
-    SUB [2238] DASH Manifest Tools (dash-manifest-tools) = 8
-        SUBSUB [3708] DASH (dash) = 8
-    SUB [2237] CMAF & fMP4 Packaging (cmaf-fmp4-packaging) = 5
-        · (directly in subcategory) = 5
-    SUB [2189] Transport Protocols (transport-protocols) = 3
-        · (directly in subcategory) = 3
-        SUBSUB [3622] RIST (rist) = 0
-        SUBSUB [3624] RTMP (rtmp) = 0
-        SUBSUB [3623] SRT (srt) = 0
-    SUB [2236] Adaptive Bitrate Algorithms & Tools (adaptive-bitrate-algorithms-tools) = 1
-        · (directly in subcategory) = 1
-    SUB [2242] Low-Latency Streaming Tools (low-latency-streaming-tools) = 1
-        · (directly in subcategory) = 1
-    ↳ rollup check: OK
+REMEDIATION (Option A — clean the data; all via admin API, journaled):
+  - 372 URL-duplicate rows deleted (0 failures; deleted.json records id->200 for all 372).
+  - Orphan 184991 reassigned -> Infrastructure & Delivery / Peer-to-Peer Streaming Solutions.
+  - 6 links rewritten to direct URLs.
+  NOTE ON REVERSIBILITY: the deletes are HARD deletes. The journal stored only ids +
+  HTTP status, not full row contents, so a delete is NOT trivially re-insertable from
+  the journal. Recovery paths that DO exist: Replit's automatic DB checkpoints
+  (platform-level rollback) and re-adding any resource via the admin panel (URL is
+  re-enrichable). The reassignment and link rewrites ARE reversible via the admin UI.
 
-CATEGORY [1083] Intro & Learning (intro-learning) = 224 approved
-    · (directly in category, no subcategory) = 135
-    SUB [2187] Tutorials & Case Studies (tutorials-case-studies) = 21
-        · (directly in subcategory) = 21
-    SUB [2266] Encoding & Transcoding Guides (encoding-transcoding-guides) = 17
-        · (directly in subcategory) = 12
-        SUBSUB [3711] Audio (audio) = 1
-        SUBSUB [3710] HEVC (hevc) = 1
-        SUBSUB [3709] FFmpeg (ffmpeg) = 0
-    SUB [2186] Learning Resources (learning-resources) = 11
-        · (directly in subcategory) = 11
-    SUB [2269] Video Streaming Tutorials (video-streaming-tutorials) = 10
-        · (directly in subcategory) = 9
-        SUBSUB [3714] HLS (hls) = 1
-    SUB [2270] Webinars & Conference Talks (webinars-conference-talks) = 8
-        · (directly in subcategory) = 6
-        SUBSUB [3713] HLS (hls) = 1
-        SUBSUB [3712] Podcasts & Webinars (podcasts-webinars) = 1
-    SUB [2263] Books & Courses (books-courses) = 5
-        · (directly in subcategory) = 5
-    SUB [2264] Case Studies & Whitepapers (case-studies-whitepapers) = 3
-        · (directly in subcategory) = 3
-    SUB [2265] Community Blogs & Forums (community-blogs-forums) = 2
-        · (directly in subcategory) = 2
-    SUB [2267] Player Development Documentation (player-development-documentation) = 2
-        · (directly in subcategory) = 2
-    SUB [2185] Introduction (introduction) = 0
-    SUB [2268] Subtitle & Caption Tutorials (subtitle-caption-tutorials) = 0
-    ↳ rollup check: MISMATCH (subcats+direct=214 vs category=224)
+DATA-SAFETY (cascade audit, verified live on both DBs):
+  resources has ON DELETE CASCADE children: journey_steps, resource_tags,
+  user_bookmarks, user_favorites, user_interactions (resource_edits = NO ACTION,
+  cleaned manually by the delete path; resource_audit_log = SET NULL).
+  Risk: a hard delete of a duplicate could cascade-remove journey steps / bookmarks.
+  Result: NO loss.
+    - PROD: user_bookmarks=0, user_favorites=0, user_interactions=0 (no user data exists);
+      journey_steps=0 because journey step content was never seeded to prod (5 journeys,
+      0 steps — a pre-existing state, separate pending follow-up), so nothing could be lost.
+    - DEV (has journey content, same 372 removed): 89 journey steps, 0 orphaned, and
+      0 of them reference any of the 372 deleted ids -> the duplicate set is disjoint
+      from journey content. Same dedup on prod therefore touched no journey steps.
 
-CATEGORY [1088] Standards & Industry (standards-industry) = 201 approved
-    · (directly in category, no subcategory) = 123
-    SUB [2262] Video Codec Specifications (video-codec-specifications) = 20
-        · (directly in subcategory) = 11
-        SUBSUB [3718] HEVC (hevc) = 5
-        SUBSUB [3719] AV1 (av1) = 1
-        SUBSUB [3717] Audio (audio) = 1
-        SUBSUB [3720] MPEG & Forums (mpeg-forums) = 1
-        SUBSUB [3716] Official Specs (official-specs) = 1
-    SUB [2257] Adaptive Streaming Standards (adaptive-streaming-standards) = 15
-        · (directly in subcategory) = 6
-        SUBSUB [3722] DASH (dash) = 5
-        SUBSUB [3721] HLS (hls) = 3
-        SUBSUB [3723] Official Specs (official-specs) = 1
-    SUB [2261] Industry Forums & Standards Bodies (industry-forums-standards-bodies) = 11
-        · (directly in subcategory) = 6
-        SUBSUB [3724] MPEG & Forums (mpeg-forums) = 4
-        SUBSUB [3725] RIST (rist) = 1
-    SUB [2196] Specs & Standards (specs-standards) = 11
-        · (directly in subcategory) = 9
-        SUBSUB [3641] MPEG & Forums (mpeg-forums) = 1
-        SUBSUB [3640] Official Specs (official-specs) = 1
-    SUB [2258] Best Practices & Guidelines (best-practices-guidelines) = 10
-        · (directly in subcategory) = 9
-        SUBSUB [3726] HDR Guidelines (hdr-guidelines) = 1
-    SUB [2259] Closed Captioning & Subtitling Standards (closed-captioning-subtitling-standards) = 8
-        SUBSUB [3715] Subtitles & Captions (subtitles-captions) = 8
-    SUB [2260] DRM & Content Protection Standards (drm-content-protection-standards) = 3
-        · (directly in subcategory) = 3
-    SUB [2197] Vendors & HDR (vendors-hdr) = 0
-        SUBSUB [3643] HDR Guidelines (hdr-guidelines) = 0
-        SUBSUB [3642] Vendor Docs (vendor-docs) = 0
-    ↳ rollup check: OK
+POST-CLEANUP DB INVARIANTS (live prod, re-queried):
+  approved total            = 1838
+  url-duplicate groups      = 0
+  category-orphans          = 0
 
-CATEGORY [1090] General Tools (general-tools) = 175 approved
-    · (directly in category, no subcategory) = 87
-    SUB [2287] Test Content & Sample Streams (test-content-sample-streams) = 15
-        · (directly in subcategory) = 10
-        SUBSUB [3665] DASH (dash) = 3
-        SUBSUB [3666] HLS (hls) = 2
-    SUB [2251] API Libraries & SDKs (api-libraries-sdks) = 8
-        · (directly in subcategory) = 3
-        SUBSUB [3679] Roku (roku) = 2
-        SUBSUB [3678] FFmpeg (ffmpeg) = 1
-        SUBSUB [3680] Quality & Testing (quality-testing) = 1
-    SUB [2278] DRM Solutions & Implementations (drm-solutions-implementations) = 8
-        · (directly in subcategory) = 8
-    SUB [2254] Docker & Containerization Tools (docker-containerization-tools) = 7
-        · (directly in subcategory) = 4
-        SUBSUB [3674] Cloud Platforms (cloud-platforms) = 1
-        SUBSUB [3675] Storage Solutions (storage-solutions) = 1
-        SUBSUB [3676] FFmpeg (ffmpeg) = 0
-    SUB [2252] Build Scripts & Automation (build-scripts-automation) = 6
-        · (directly in subcategory) = 1
-        SUBSUB [3672] FFmpeg (ffmpeg) = 4
-        SUBSUB [3673] Roku (roku) = 1
-    SUB [2201] DRM (drm) = 6
-        · (directly in subcategory) = 6
-    SUB [2280] Encryption Tools for Streaming (encryption-tools-for-streaming) = 6
-        · (directly in subcategory) = 4
-        SUBSUB [3668] DASH (dash) = 1
-        SUBSUB [3669] HLS (hls) = 1
-    SUB [2255] Logging & Debugging Tools (logging-debugging-tools) = 6
-        · (directly in subcategory) = 4
-        SUBSUB [3667] Roku (roku) = 2
-    SUB [2277] Case Studies & Best Practices in DRM (case-studies-best-practices-in-drm) = 5
-        · (directly in subcategory) = 4
-        SUBSUB [3670] HEVC (hevc) = 1
-    SUB [2253] Command-line Utilities & Wrappers (command-line-utilities-wrappers) = 5
-        · (directly in subcategory) = 3
-        SUBSUB [3677] Roku (roku) = 2
-    SUB [2283] Cross-Platform Media Tools (cross-platform-media-tools) = 3
-        · (directly in subcategory) = 2
-        SUBSUB [3681] Audio (audio) = 1
-    SUB [2286] Specialized Utility Scripts (specialized-utility-scripts) = 3
-        · (directly in subcategory) = 3
-    SUB [2282] Community & Collaboration Platforms (community-collaboration-platforms) = 2
-        · (directly in subcategory) = 2
-    SUB [2279] DRM Testing & Validation Tools (drm-testing-validation-tools) = 2
-        · (directly in subcategory) = 2
-    SUB [2284] Independent & Hobbyist Projects (independent-hobbyist-projects) = 2
-        · (directly in subcategory) = 2
-    SUB [2281] Widevine FairPlay PlayReady Integrations (widevine-fairplay-playready-integrations) = 2
-        · (directly in subcategory) = 1
-        SUBSUB [3671] Android (android) = 1
-    SUB [2256] Performance & Monitoring Tools (performance-monitoring-tools) = 1
-        SUBSUB [3682] Quality & Testing (quality-testing) = 1
-    SUB [2285] Research Projects & Academic Resources (research-projects-academic-resources) = 1
-        · (directly in subcategory) = 1
-    SUB [2200] FFMPEG & Tools (ffmpeg-tools) = 0
-    ↳ rollup check: OK
-
-CATEGORY [1091] Community & Events (community-events) = 82 approved
-    · (directly in category, no subcategory) = 75
-    SUB [2203] Events & Conferences (events-conferences) = 5
-        · (directly in subcategory) = 4
-        SUBSUB [3651] Podcasts & Webinars (podcasts-webinars) = 1
-        SUBSUB [3650] Conferences (conferences) = 0
-    SUB [2202] Community Groups (community-groups) = 2
-        SUBSUB [3648] Online Forums (online-forums) = 2
-        SUBSUB [3649] Slack & Meetups (slack-meetups) = 0
-    ↳ rollup check: OK
-
-=== RECONCILIATION ===
-sum(category counts) = 2209  vs  authoritative total = 2210  => OFF BY 1
-ORPHAN resources (category not among the 9 real categories): 1
-   - category="1090" sub="" count=1
-PHANTOM subcategories (subcategory text has no matching node under its category): 10
-   - Intro & Learning ▸ "Web-based Processing" count=1
-   - Intro & Learning ▸ "Codecs & File Formats" count=1
-   - Intro & Learning ▸ "Encoding & Transcoding" count=1
-   - Intro & Learning ▸ "Live Streaming Servers" count=1
-   - Intro & Learning ▸ "Video Compression Standards" count=1
-   - Intro & Learning ▸ "Demuxing & Container Handling" count=1
-   - Intro & Learning ▸ "Live Streaming" count=1
-   - Intro & Learning ▸ "Encoding & Compression" count=1
-   - Intro & Learning ▸ "Application Development" count=1
-   - Intro & Learning ▸ "Encoding & Transcoding" count=1
-PHANTOM sub-subcategories (sub_subcategory text has no matching node): 12
-   - General Tools ▸ Docker & Containerization Tools ▸ "FFMPEG" count=1
-   - Players & Clients ▸ Mobile & Web Players ▸ "iOStvOS" count=9
-   - Media Tools ▸ Quality Analysis & Metrics ▸ "FFMPEG" count=1
-   - Encoding & Codecs ▸ Hardware Accelerated Transcoding ▸ "FFMPEG" count=2
-   - Encoding & Codecs ▸ FFmpeg-Based Tools ▸ "FFMPEG" count=2
-   - Media Tools ▸ Video Analytics & Benchmarking ▸ "FFMPEG" count=1
-   - Encoding & Codecs ▸ Scripting & Automation Tools ▸ "FFMPEG" count=1
-   - General Tools ▸ API Libraries & SDKs ▸ "FFMPEG" count=1
-   - Players & Clients ▸ Mobile Players ▸ "iOS/tvOS" count=8
-   - Protocols & Transport ▸ HLS Tools ▸ "FFMPEG" count=2
-   - Intro & Learning ▸ Encoding & Transcoding Guides ▸ "FFMPEG" count=3
-   - Encoding & Codecs ▸ Encoding Tools ▸ "FFmpeg" count=13
+VERDICT: PASS. Single authoritative total (1838) proven from the real prod DB;
+GROUP BY sums to it; flat model confirmed; the ~370 gap has a documented cause and
+is closed.

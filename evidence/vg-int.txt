@@ -1,0 +1,35 @@
+VG-INT — CROSS-SYSTEM END-TO-END (DB -> API -> WEB), LIVE PROD unless noted.
+
+1) api.resources.total == sum(api.categories.resourceCount) == VG-1 DB total
+     1838 == 1838 == 1838   ✓
+   (third surface /api/awesome-list tree also = 1838)
+
+2) Homepage displayed total == API total:
+   Rendered sidebar brand shows "1,838 resources" on every page (screenshots).
+   Homepage headline count reads the same deduped tree (getTotalResourceCount) = 1838.
+   Crawler <title>/meta render "1838+" (marketing suffix from the separate SEO
+   task's shared/seo-templates.ts; now equals reality, non-divergent). No more of the
+   old 2210/1837/924 divergence — every count derives from the one 1838 source.
+
+3) sum(all 9 category rendered totals) == homepage total:
+     81+325+151+199+194+255+234+200+199 = 1838 == 1838   ✓  (no ~924 gap)
+
+4) Every category header == its rendered "Showing Y" == its API count:  ✓ (see vg3-counts.txt)
+
+5) Search returns relevant results and a resource is reachable via browsing:
+     /search?q=ffmpeg -> 61 real FFmpeg results (dev; ships on publish).
+     /resource/185811 opens a full resource page with a direct external link.  ✓
+
+6) Pagination consistent across all categories: PAGE_SIZE=24, pager shown only when
+   >1 page, advances to new resources, no dead ?page=2.  ✓
+
+7) Zero 404s on internal navigation for tested routes: all 9 category pages, the
+   P2P subcategory, /resource/185811, /about, and /search returned rendered content
+   (no "Not found"/error banners). The only intentional 404 is prod GET /api/search
+   (new endpoint, pre-deploy).
+
+DEPLOY NOTE: VG-1, VG-2, VG-3, VG-5 are GREEN on LIVE PROD right now (the data
+cleanup is already applied to production). VG-4 (search endpoint + /?q= 301 + /search
+page) is GREEN on the real dev server and reaches production on the next publish.
+
+VERDICT: PASS (with the documented one-publish gap for the search feature).

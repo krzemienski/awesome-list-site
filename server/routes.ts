@@ -674,6 +674,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // GET /api/search?q= - Public JSON search across approved resources. A thin
+  // alias over listResources so the /search UI page and external/API callers
+  // share one search path (and /api/search no longer 404s). Results are deduped
+  // by normalized URL so near-duplicate rows never surface twice. Shape:
+  // { query, total, results }.
+  app.get('/api/search', async (req, res) => {
+    try {
+      const q = (((req.query.q as string) || (req.query.search as string)) || '').trim();
+      if (q.length < 2) {
+        return res.json({ query: q, total: 0, results: [] });
+      }
+      const limit = Math.min(Math.max(parseInt(req.query.limit as string) || 100, 1), 200);
+      const { resources, total } = await resourceRepo.listResources({
+        page: 1,
+        limit,
+        status: 'approved',
+        search: q,
+      });
+      const seen = new Set<string>();
+      const results = [] as typeof resources;
+      for (const r of resources) {
+        const key = (r.url || '').trim().toLowerCase().replace(/\/+$/, '') || `id:${r.id}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        results.push(r);
+      }
+      // `total` is the true match count from the repo (post-cleanup there are no
+      // URL-duplicate rows, so it equals the deduped count); `results` is this page.
+      res.json({ query: q, total, results });
+    } catch (error) {
+      console.error('Error searching resources:', error);
+      res.status(500).json({ message: 'Failed to search resources' });
+    }
+  });
+
   // POST /api/telemetry/dead-link - Client-side 404 telemetry (public, fire-and-forget)
   app.post('/api/telemetry/dead-link', (req, res) => {
     const deadLinkSchema = z.object({

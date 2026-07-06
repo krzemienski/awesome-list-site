@@ -1,0 +1,17 @@
+VG-2 — API RECONCILIATION (LIVE PRODUCTION https://awesome.video)
+
+GET /api/resources        .total                       = 1838
+GET /api/categories       sum([].resourceCount)        = 1838
+GET /api/awesome-list     deduped tree total           = 1838   (third surface)
+
+Per-category /api/categories resourceCount (matches VG-1 GROUP BY exactly):
+  Community & Events 81 | Encoding & Codecs 325 | General Tools 151 |
+  Infrastructure & Delivery 199 | Intro & Learning 194 | Media Tools 255 |
+  Players & Clients 234 | Protocols & Transport 200 | Standards & Industry 199
+  => 1838
+
+All three independent API surfaces (raw resources total, categories aggregation,
+deduped hierarchy tree) equal 1838 and equal the VG-1 authoritative total.
+No category returns a count contradicting its DB GROUP BY value.
+
+VERDICT: PASS.

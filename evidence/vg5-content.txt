@@ -1,0 +1,25 @@
+VG-5 — CONTENT LINKS, BREADCRUMBS, FEATURE-LIST (REAL BROWSER, LIVE PROD)
+Screenshots READ + verified.
+
+1) Resource /resource/185811 (evidence/vg5-resource-185811.png):
+   Title "Inca — Message Tracing and Loss Detection For Streaming Data @Netflix".
+   Rendered URL:
+     https://medium.com/@NetflixTechBlog/inca-message-tracing-and-loss-detection-for-streaming-data-netflix-de4836fc38c9
+   Anchors on page scanned: link-shortener count = 0 (no link.medium.com / bit.ly /
+   t.co / goo.gl / tinyurl). Direct Netflix tech-blog target present = true.
+
+2) Breadcrumbs (evidence/vg5-subcategory-p2p.png):
+   /subcategory/peer-to-peer-streaming-solutions renders breadcrumb
+     Home > Infrastructure & Delivery > Peer-to-Peer Streaming Solutions
+   matching the real hierarchy. "Showing 3 of 3 resources" (QUANTEEC, Wifibroadcast,
+   simple-peer). Sidebar highlights the same node with count 3.
+
+3) Feature-list reconciliation (evidence/vg5-about.png):
+   About > Features grid advertises exactly: Responsive Design, Fast Performance,
+   Fuzzy Search, Multiple Themes, Accessible, SEO Optimized, Keyboard Shortcuts,
+   Component Library. It does NOT claim "AI recommendations" or a "grid/list view
+   toggle" — so no feature is advertised without shipping. (Those features DO exist
+   elsewhere: the grid/list/compact toggle on category pages and the AI panel at
+   /recommendations — so copy and UI are consistent either way.)
+
+VERDICT: PASS.

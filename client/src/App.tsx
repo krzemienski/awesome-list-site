@@ -69,7 +69,11 @@ function Router() {
   return (
     <MainLayout awesomeList={awesomeList} isLoading={isLoading} user={user ?? undefined} onLogout={logout}>
       <Switch>
-        <Route path="/" component={() => <Home awesomeList={awesomeList} isLoading={isLoading} />} />
+        <Route path="/" component={() => {
+          const q = new URLSearchParams(window.location.search).get("q");
+          if (q && q.trim()) return <Redirect to={`/search?q=${encodeURIComponent(q.trim())}`} replace />;
+          return <Home awesomeList={awesomeList} isLoading={isLoading} />;
+        }} />
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
         <Route path="/auth/login">

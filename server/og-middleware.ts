@@ -1131,6 +1131,15 @@ export function ogInjectionMiddleware() {
         // tree lookup failed — fall through to the resolver's fail-open path
       }
     }
+    // /?q=term was silently rendering the homepage; 301 it to the real search
+    // results page so search is a first-class, linkable route (VG-4).
+    if (urlPath === "/") {
+      const qs = (req.originalUrl || req.url).split("?")[1] || "";
+      const q = new URLSearchParams(qs).get("q");
+      if (q && q.trim()) {
+        return res.redirect(301, `/search?q=${encodeURIComponent(q.trim())}`);
+      }
+    }
     // /recommendations is now a real page (see staticRoutes) — no redirect.
     if (urlPath === "/settings") {
       // Bare /settings was never a route; canonical settings page is the theme page.
