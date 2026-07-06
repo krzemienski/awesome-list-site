@@ -1,0 +1,15 @@
+AUTHORITATIVE CORRECTED COUNTS (dedup by URL + orphan reassigned)  2026-07-06T15:01:12.872Z
+Unique approved total: 1838   (raw rows: 2210, duplicate rows removed: 372)
+Orphans remaining: 0
+
+CATEGORY                      RAW(now)   CORRECTED(unique)
+  Encoding & Codecs              396          326
+  Media Tools                    322          255
+  Players & Clients              302          234
+  Protocols & Transport          235          200
+  Infrastructure & Delivery      272          199
+  Standards & Industry           201          199
+  Intro & Learning               224          193
+  General Tools                  175          151
+  Community & Events              82           81
+  TOTAL                         2209         1838

@@ -1,0 +1,13 @@
+/api/resources keys: resources,total
+/api/resources.total = 2210
+/api/categories n = 9
+sum resourceCount = 2209
+    Community & Events = 82
+    Encoding & Codecs = 396
+    General Tools = 175
+    Infrastructure & Delivery = 272
+    Intro & Learning = 224
+    Media Tools = 322
+    Players & Clients = 302
+    Protocols & Transport = 235
+    Standards & Industry = 201
