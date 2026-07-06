@@ -28,6 +28,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { trackSelectContent, trackShare, trackResourceFavorite } from "@/lib/analytics";
 import { useToast } from "@/hooks/use-toast";
 import { slugify } from "@/lib/utils";
 import { Blurhash } from "react-blurhash";
@@ -84,6 +85,10 @@ export default function ResourceDetail() {
       return apiRequest(`/api/favorites/${id}`, { method: 'POST' });
     },
     onSuccess: () => {
+      // isFavorite reflects state BEFORE this toggle, so the new action is its inverse.
+      if (resource) {
+        trackResourceFavorite(resource.title, resource.category ?? 'uncategorized', isFavorite ? 'remove' : 'add');
+      }
       queryClient.invalidateQueries({ queryKey: ['/api/favorites'] });
       toast({
         title: isFavorite ? "Removed from favorites" : "Added to favorites",
@@ -138,9 +143,23 @@ export default function ResourceDetail() {
     }
   }, [resource?.id, user?.id]);
 
+  // GA4 select_content — fires for all visitors when a resource detail loads.
+  useEffect(() => {
+    if (resource) {
+      trackSelectContent('resource', resource.id, {
+        content_name: resource.title,
+        content_category: resource.category,
+      });
+    }
+  }, [resource?.id]);
+
   const handleShare = async () => {
     const url = window.location.href;
-    if (navigator.share) {
+    const canWebShare = typeof navigator.share === 'function';
+    if (resource) {
+      trackShare(canWebShare ? 'web_share' : 'clipboard', 'resource', resource.id);
+    }
+    if (canWebShare) {
       try {
         await navigator.share({
           title: resource?.title,

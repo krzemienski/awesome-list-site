@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import SEOHead from "@/components/layout/SEOHead";
+import { trackLogin } from "@/lib/analytics";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -47,7 +48,10 @@ export default function Login() {
 
       if (response.ok) {
         const result = await response.json();
-        
+
+        // GA4 conversion: successful local sign-in.
+        trackLogin('password');
+
         // Set the query data BEFORE showing toast or navigating
         // This ensures the AdminGuard sees the authenticated user immediately
         queryClient.setQueryData(['/api/auth/user'], {

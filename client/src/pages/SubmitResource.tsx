@@ -30,6 +30,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useDebounce } from "@/hooks/useDebounce";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { trackGenerateLead } from "@/lib/analytics";
 import { Helmet } from "react-helmet";
 
 // Form validation schema
@@ -240,7 +241,14 @@ export default function SubmitResource() {
         }),
       });
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
+      // GA4 conversion: resource submission completed.
+      const category = categories.find((c) => c.id === parseInt(variables.category));
+      trackGenerateLead({
+        content_type: 'resource_submission',
+        category: category?.name,
+      });
+
       setShowSuccess(true);
       form.reset();
       toast({

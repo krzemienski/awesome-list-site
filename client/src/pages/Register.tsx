@@ -11,6 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import SEOHead from "@/components/layout/SEOHead";
+import { trackSignUp } from "@/lib/analytics";
 
 const registerSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -50,6 +51,9 @@ export default function Register() {
         });
         return;
       }
+
+      // GA4 conversion: account successfully created.
+      trackSignUp('password');
 
       // Account created — sign in immediately through the existing local-login flow so the
       // session payload is produced by the canonical handler (no hand-rolled session shape).

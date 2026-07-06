@@ -7,6 +7,7 @@ import { useLocation } from "wouter";
 import Fuse from "fuse.js";
 import { Resource } from "@/types/awesome-list";
 import { trackSearch, trackResourceClick, trackPerformance } from "@/lib/analytics";
+import { useDebounce } from "@/hooks/useDebounce";
 
 interface SearchDialogProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ interface SearchDialogProps {
 export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDialogProps) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Resource[]>([]);
+  const debouncedQuery = useDebounce(query, 600);
   const [, navigate] = useLocation();
   const inputRef = useRef<HTMLInputElement>(null);
   const linkClickingRef = useRef(false);
@@ -38,23 +40,26 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
     });
   }, [resources]);
 
-  // Search when query changes
+  // Live search results — instant, runs on every keystroke (not tracked).
   useEffect(() => {
     if (!query || query.length < 2 || !fuse) {
       setResults([]);
       return;
     }
-
-    const startTime = performance.now();
-    const searchResults = fuse!.search(query);
-    const endTime = performance.now();
-    
-    // Track search analytics
-    trackSearch(query, searchResults.length);
-    trackPerformance('search_time', endTime - startTime);
-    
+    const searchResults = fuse.search(query);
     setResults(searchResults.slice(0, 15).map(result => result.item));
   }, [query, fuse]);
+
+  // Track the search once the user pauses typing (debounced) so a single search
+  // emits exactly one `search` event instead of one per keystroke.
+  useEffect(() => {
+    if (!debouncedQuery || debouncedQuery.length < 2 || !fuse) return;
+    const startTime = performance.now();
+    const searchResults = fuse.search(debouncedQuery);
+    const endTime = performance.now();
+    trackSearch(debouncedQuery, searchResults.length);
+    trackPerformance('search_time', endTime - startTime);
+  }, [debouncedQuery, fuse]);
 
   // Global keyboard shortcut listener (Cmd+K, Ctrl+K, and `/`)
   // MR-DS-03 — `/` branch added (dead listener in App.tsx deleted) so the

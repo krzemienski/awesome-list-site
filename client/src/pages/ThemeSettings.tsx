@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 // duplicates the same map inline for pre-paint application; verify-fixes.mjs
 // V11 asserts the two stay in sync.
 import { FONT_OPTIONS, FONT_LS_KEY, applyFontOverride } from "@/lib/font-options";
+import { trackThemeChange } from "@/lib/analytics";
 import SEOHead from "@/components/layout/SEOHead";
 
 export default function ThemeSettings() {
@@ -36,18 +37,21 @@ export default function ThemeSettings() {
   const handlePickFont = (id: string) => {
     setFontId(id);
     const name = FONT_OPTIONS.find((f) => f.id === id)?.name ?? id;
+    trackThemeChange(name, 'font');
     toast({ title: "Font applied", description: `${name} is now active.` });
   };
 
   const handlePickSystem = (id: string) => {
     setSystem(id);
     const label = systems[id]?.name ?? id;
+    trackThemeChange(label, 'system');
     toast({ title: "Design system applied", description: `${label} is now active.` });
   };
 
   const handlePickAccent = (id: string) => {
     setAccent(id);
     const label = accents.find((a) => a.id === id)?.name ?? id;
+    trackThemeChange(label, 'color');
     toast({ title: "Accent applied", description: `${label} is now the active accent.` });
   };
 
