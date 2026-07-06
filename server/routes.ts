@@ -48,13 +48,15 @@ import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { setupLocalAuth } from "./localAuth";
 import { hashPassword, comparePassword, validateEmail, validatePassword } from "./passwordUtils";
-import { checkLock, recordFailure, clearOnSuccess } from "./loginLockout";
+import { checkLock, recordFailure, clearOnSuccess, allowResetRequest } from "./loginLockout";
+import { sendPasswordResetEmail } from "./email";
+import crypto from "crypto";
 import passport from "passport";
 import { fetchAwesomeList } from "./parser";
 import { fetchAwesomeVideoData } from "./awesome-video-parser-clean";
 import { RecommendationEngine, UserProfile } from "./recommendation-engine";
 import { fetchAwesomeLists, searchAwesomeLists } from "./github-api";
-import { insertResourceSchema, EDITABLE_RESOURCE_FIELDS, insertJourneyStepSchema } from "@shared/schema";
+import { insertResourceSchema, EDITABLE_RESOURCE_FIELDS, insertJourneyStepSchema, passwordResetTokens } from "@shared/schema";
 import { ensureSubSubcategoryExists } from "./repositories/ensureSubSubcategory";
 import { z } from "zod";
 import { syncService } from "./github/syncService";
@@ -552,6 +554,118 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("[/api/auth/register] Error:", error);
       return res.status(500).json({ message: "Failed to create account" });
+    }
+  });
+
+  // Self-service password reset — request stage. ALWAYS responds with the same
+  // generic 200 (no account enumeration) and does the token/email work
+  // fire-and-forget so response timing doesn't leak whether the account exists.
+  // OAuth-only accounts (no local password) are silently skipped. Throttled per
+  // email AND per IP before any lookup.
+  app.post("/api/auth/forgot-password", async (req, res) => {
+    const GENERIC = { message: "If an account with that email exists, we've sent a password reset link." };
+    try {
+      const email = typeof req.body?.email === "string" ? req.body.email.trim() : "";
+      if (!email || !validateEmail(email)) {
+        return res.status(400).json({ message: "A valid email address is required" });
+      }
+
+      const ip =
+        req.headers["x-forwarded-for"]?.toString().split(",")[0].trim() ||
+        req.ip ||
+        "unknown";
+      if (!allowResetRequest(email, ip)) {
+        res.setHeader("Retry-After", "900");
+        return res.status(429).json({ message: "Too many reset requests. Please try again in a little while." });
+      }
+
+      // Respond immediately with the generic message; do the real work after.
+      res.status(200).json(GENERIC);
+
+      // Fire-and-forget so DB/email latency can't be used to enumerate accounts.
+      void (async () => {
+        try {
+          const user = await userRepo.getUserByEmail(email);
+          if (!user || !user.password || !user.email) return; // no account, or OAuth-only
+
+          const rawToken = crypto.randomBytes(32).toString("hex");
+          const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
+          const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+          await db.insert(passwordResetTokens).values({ userId: user.id, tokenHash, expiresAt });
+
+          const base = (process.env.SITE_URL || `${req.protocol}://${req.get("host")}`).replace(/\/+$/, "");
+          const resetUrl = `${base}/reset-password?token=${rawToken}`;
+          await sendPasswordResetEmail(user.email, resetUrl);
+        } catch (e) {
+          console.error("[/api/auth/forgot-password] async work error:", e);
+        }
+      })();
+    } catch (error) {
+      console.error("[/api/auth/forgot-password] Error:", error);
+      if (!res.headersSent) return res.status(200).json(GENERIC);
+    }
+  });
+
+  // Self-service password reset — redemption stage. Validates the new password
+  // FIRST (so a weak password never burns a valid token), then atomically claims
+  // the token in a single UPDATE ... RETURNING (closes the double-use race). On
+  // success it rotates the password, kills ALL of the user's sessions (the person
+  // resetting is not signed in), voids their other outstanding tokens, and clears
+  // any login lockout.
+  app.post("/api/auth/reset-password", async (req, res) => {
+    try {
+      const { token, newPassword } = req.body ?? {};
+      if (typeof token !== "string" || !token || typeof newPassword !== "string") {
+        return res.status(400).json({ message: "Token and new password are required" });
+      }
+
+      const pwCheck = validatePassword(newPassword);
+      if (!pwCheck.valid) {
+        return res.status(400).json({ message: pwCheck.error || "Invalid password" });
+      }
+
+      const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+
+      // Atomic single-use claim: only succeeds if unused AND unexpired.
+      const claim = await db.execute(sql`
+        UPDATE password_reset_tokens
+        SET used_at = now()
+        WHERE token_hash = ${tokenHash} AND used_at IS NULL AND expires_at > now()
+        RETURNING user_id
+      `);
+      const claimedRows = (claim as any).rows ?? [];
+      if (claimedRows.length === 0) {
+        return res.status(400).json({ message: "This reset link is invalid or has expired. Please request a new one." });
+      }
+      const userId = claimedRows[0].user_id as string;
+
+      const user = await userRepo.getUser(userId);
+      if (!user) {
+        return res.status(400).json({ message: "This reset link is invalid or has expired. Please request a new one." });
+      }
+
+      const hashed = await hashPassword(newPassword);
+      await userRepo.upsertUser({ id: user.id, email: user.email, password: hashed, role: user.role });
+
+      // Kill EVERY session for this user (no current-session exclusion — the
+      // resetter is not authenticated) and void their other pending tokens.
+      await db.execute(sql`
+        DELETE FROM sessions
+        WHERE sess->'passport'->'user'->'claims'->>'sub' = ${userId}
+      `);
+      await db.execute(sql`
+        DELETE FROM password_reset_tokens
+        WHERE user_id = ${userId} AND used_at IS NULL
+      `);
+
+      // Let them sign in immediately even if the account was in a lockout window.
+      if (user.email) clearOnSuccess(user.email);
+
+      return res.status(200).json({ message: "Your password has been reset. You can now sign in." });
+    } catch (error) {
+      console.error("[/api/auth/reset-password] Error:", error);
+      return res.status(500).json({ message: "Failed to reset password" });
     }
   });
 

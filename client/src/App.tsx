@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import { Switch, Route, Redirect } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { initGA } from "./lib/analytics";
@@ -18,7 +18,6 @@ import About from "@/pages/About";
 import Advanced from "@/pages/Advanced";
 import Profile from "@/pages/Profile";
 import Bookmarks from "@/pages/Bookmarks";
-import AdminDashboard from "@/pages/AdminDashboard";
 import AdminGuard from "@/components/auth/AdminGuard";
 import AuthGuard from "@/components/auth/AuthGuard";
 import NotFound from "@/pages/not-found";
@@ -30,6 +29,12 @@ import ThemeSettings from "@/pages/ThemeSettings";
 import Recommendations from "@/pages/Recommendations";
 import Search from "@/pages/Search";
 import Categories from "@/pages/Categories";
+import Settings from "@/pages/Settings";
+
+// Admin dashboard is the only heavy, role-gated surface. Lazy-load it so the
+// entire admin tree (and its /api/admin/* fetch strings) lands in a separate
+// chunk that regular visitors never download.
+const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
 
 import { processAwesomeListData } from "@/lib/parser";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
@@ -103,6 +108,9 @@ function Router() {
         <Route path="/submit" component={SubmitResource} />
         <Route path="/journeys" component={Journeys} />
         <Route path="/journey/:id" component={JourneyDetail} />
+        <Route path="/journey">
+          <Redirect to="/journeys" replace />
+        </Route>
         <Route path="/profile" component={() => (<AuthGuard><Profile user={user} /></AuthGuard>)} />
         <Route path="/bookmarks" component={() => (<AuthGuard><Bookmarks /></AuthGuard>)} />
         <Route path="/favorites">
@@ -111,11 +119,15 @@ function Router() {
         <Route path="/account">
           <Redirect to="/profile" replace />
         </Route>
-        <Route path="/admin" component={() => (<AdminGuard><AdminDashboard /></AdminGuard>)} />
+        <Route path="/admin" component={() => (
+          <AdminGuard>
+            <Suspense fallback={<div className="p-8 text-center text-muted-foreground">Loading…</div>}>
+              <AdminDashboard />
+            </Suspense>
+          </AdminGuard>
+        )} />
         <Route path="/settings/theme" component={ThemeSettings} />
-        <Route path="/settings">
-          <Redirect to="/settings/theme" replace />
-        </Route>
+        <Route path="/settings" component={Settings} />
         <Route>
           <NotFound />
         </Route>

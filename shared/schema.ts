@@ -130,6 +130,34 @@ export type InsertApiKey = typeof apiKeys.$inferInsert;
 export type ApiKey = typeof apiKeys.$inferSelect;
 
 /**
+ * Password reset tokens for the self-service "forgot password" flow.
+ *
+ * Only the SHA-256 hash of the single-use token is stored (never the raw token,
+ * which is emailed to the user) — same defense-in-depth pattern as api_keys.
+ * A token is valid only while used_at IS NULL AND expires_at > now(); it is
+ * atomically claimed (single UPDATE ... RETURNING) at redemption to close the
+ * double-use race. Rows cascade-delete with the owning user.
+ */
+export const passwordResetTokens = pgTable(
+  "password_reset_tokens",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+    tokenHash: varchar("token_hash").notNull().unique(),
+    expiresAt: timestamp("expires_at").notNull(),
+    usedAt: timestamp("used_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_password_reset_tokens_user_id").on(table.userId),
+    index("idx_password_reset_tokens_expires_at").on(table.expiresAt),
+  ]
+);
+
+export type InsertPasswordResetToken = typeof passwordResetTokens.$inferInsert;
+export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
+
+/**
  * Resources table - Core content entity
  *
  * Stores curated video resources with approval workflow and GitHub synchronization.

@@ -71,3 +71,53 @@ export function clearOnSuccess(email: string): void {
 export function _resetAll(): void {
   attempts.clear();
 }
+
+// ---- Forgot-password request throttle -------------------------------------
+// Unlike the login lockout above (which counts FAILURES), forgot-password must
+// throttle SUCCESSFUL requests: each accepted request sends an email and writes
+// a token row, so an unthrottled endpoint is an email/DB-spam vector. Separate
+// per-email and per-IP budgets over a sliding 15-minute window. Same in-memory,
+// non-durable caveat as the lockout above.
+const RESET_MAX_PER_EMAIL = 3;
+const RESET_MAX_PER_IP = 15;
+const RESET_WINDOW_MS = 15 * 60 * 1000;
+
+interface ResetBucket {
+  count: number;
+  windowStart: number;
+}
+
+const resetByEmail = new Map<string, ResetBucket>();
+const resetByIp = new Map<string, ResetBucket>();
+
+function withinBudget(map: Map<string, ResetBucket>, key: string, max: number, now: number): boolean {
+  const rec = map.get(key);
+  return !rec || now - rec.windowStart > RESET_WINDOW_MS || rec.count < max;
+}
+
+function consume(map: Map<string, ResetBucket>, key: string, now: number): void {
+  const rec = map.get(key);
+  if (!rec || now - rec.windowStart > RESET_WINDOW_MS) {
+    map.set(key, { count: 1, windowStart: now });
+  } else {
+    rec.count += 1;
+  }
+}
+
+/**
+ * Consume one forgot-password request budget for (email, ip). Returns false if
+ * EITHER the per-email or per-IP budget is exhausted (and consumes from neither
+ * in that case, so a full IP budget can't burn a fresh email's budget). Applied
+ * BEFORE any account lookup so throttling never depends on — or leaks — whether
+ * the account exists.
+ */
+export function allowResetRequest(email: string, ip: string): boolean {
+  const now = Date.now();
+  const e = normalize(email);
+  const ipKey = ip || "unknown";
+  if (!withinBudget(resetByEmail, e, RESET_MAX_PER_EMAIL, now)) return false;
+  if (!withinBudget(resetByIp, ipKey, RESET_MAX_PER_IP, now)) return false;
+  consume(resetByEmail, e, now);
+  consume(resetByIp, ipKey, now);
+  return true;
+}

@@ -125,8 +125,14 @@ function parseQueryParam(url: string): string {
 async function resolveRoute(url: string): Promise<ResolvedRoute> {
   const cleanPath = url.split("?")[0].replace(/\/+$/, "") || "/";
   // /search is query-driven with an unbounded key space — never cache it
-  // (cache poisoning / unbounded memory). Always resolve fresh.
-  if (cleanPath === "/search") {
+  // (cache poisoning / unbounded memory). /reset-password and /forgot-password
+  // carry a secret token in the query; never let a token-bearing URL become a
+  // cache key. All are cheap to resolve fresh. Always bypass the cache.
+  if (
+    cleanPath === "/search" ||
+    cleanPath === "/reset-password" ||
+    cleanPath === "/forgot-password"
+  ) {
     return resolveRouteUncached(url);
   }
   // Only ?page= differentiates cacheable routes; fold it into the key so page 2
@@ -450,6 +456,19 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
       // Utility auth page — noindex for the same reason as /login.
       noindex: true,
     },
+    "/forgot-password": {
+      title: `Reset Your Password — ${SITE_NAME}`,
+      description: `Request a password reset link for your ${SITE_NAME} account.`,
+      // Utility auth page — noindex like /login; route still returns HTTP 200.
+      noindex: true,
+    },
+    "/reset-password": {
+      title: `Set a New Password — ${SITE_NAME}`,
+      description: `Choose a new password for your ${SITE_NAME} account.`,
+      // Token-bearing auth page — noindex; the token stays out of the cache key
+      // (resolveRoute bypasses the cache for this path).
+      noindex: true,
+    },
     "/profile": {
       title: `Profile — ${SITE_NAME}`,
       description: `Your ${SITE_NAME} profile, bookmarks, and learning progress.`,
@@ -462,6 +481,12 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
       title: `Bookmarks — ${SITE_NAME}`,
       description: `Your saved video development resources on ${SITE_NAME}.`,
       // Personalized, auth-gated account page — noindex like /profile.
+      noindex: true,
+    },
+    "/settings": {
+      title: `Settings — ${SITE_NAME}`,
+      description: `Manage your ${SITE_NAME} preferences — appearance, account, security, and saved resources.`,
+      // Utility settings hub with no search value — noindex.
       noindex: true,
     },
     "/settings/theme": {
@@ -1145,9 +1170,11 @@ export function ogInjectionMiddleware() {
       }
     }
     // /recommendations is now a real page (see staticRoutes) — no redirect.
-    if (urlPath === "/settings") {
-      // Bare /settings was never a route; canonical settings page is the theme page.
-      return res.redirect(301, "/settings/theme");
+    // /settings is now a real hub page (see staticRoutes) — no redirect.
+    if (/^\/journey\/?$/.test(urlPath)) {
+      // Bare /journey (no id) — canonical listing is /journeys. Exact-match so
+      // this never hijacks the /journey/:id detail route.
+      return res.redirect(301, "/journeys");
     }
     if (urlPath === "/category") {
       // Bare /category (no slug) — send to the category overview on home.
