@@ -632,9 +632,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
-      const category = req.query.category as string;
-      const subcategory = req.query.subcategory as string;
+      let category = req.query.category as string;
+      let subcategory = req.query.subcategory as string;
       const search = req.query.search as string;
+
+      // Accept category/subcategory as either the display NAME (what the client
+      // sends) or a URL slug (e.g. ?category=encoding-codecs — BUG-022). Real
+      // names contain spaces/capitals/'&', so a value matching the slug shape is
+      // resolved to its canonical name; anything else passes through unchanged
+      // (no wasted query for the common name-based calls). Subcategory slugs are
+      // unique only per category, so they resolve only once the category does.
+      const SLUG_SHAPE = /^[a-z0-9-]+$/;
+      let resolvedCategory: { id: number; name: string } | undefined;
+      if (category && SLUG_SHAPE.test(category)) {
+        const cat = await categoryRepo.getCategoryBySlug(category);
+        if (cat) {
+          resolvedCategory = cat;
+          category = cat.name;
+        }
+      }
+      if (subcategory && SLUG_SHAPE.test(subcategory) && resolvedCategory) {
+        const sub = await categoryRepo.getSubcategoryBySlug(subcategory, resolvedCategory.id);
+        if (sub) subcategory = sub.name;
+      }
 
       const result = await resourceRepo.listResources({
         page,
@@ -704,7 +724,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/resources/:id - Get single resource
   // :id constrained to digits so literal sub-routes like /api/resources/pending and
   // /api/resources/check-url are not shadowed by this dynamic param route.
-  app.get('/api/resources/:id(\\d+)', async (req, res) => {
+  // Mounted on both the canonical plural path and the singular alias
+  // /api/resource/:id (BUG-014) via a shared handler.
+  const getResourceByIdHandler = async (req: any, res: any) => {
     try {
       const id = parseInt(req.params.id);
       if (Number.isNaN(id)) {
@@ -721,7 +743,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('Error fetching resource:', error);
       res.status(500).json({ message: 'Failed to fetch resource' });
     }
-  });
+  };
+  app.get('/api/resources/:id(\\d+)', getResourceByIdHandler);
+  app.get('/api/resource/:id(\\d+)', getResourceByIdHandler);
 
   app.get('/api/resources/:id/related', async (req, res) => {
     const empty = { similar: [], prerequisites: [], nextSteps: [], totalFound: 0 };
@@ -750,7 +774,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // POST /api/resources - Submit new resource (authenticated)
-  app.post('/api/resources', isAuthenticated, async (req: any, res) => {
+  // Mounted on both the canonical path and the /api/submit alias (BUG-019) via a
+  // shared handler so both inherit the identical auth + validation chain.
+  const createResourceHandler = async (req: any, res: any) => {
     try {
       const userId = req.user.claims.sub;
       const resourceData = insertResourceSchema.parse(req.body);
@@ -776,7 +802,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('Error creating resource:', error);
       res.status(500).json({ message: 'Failed to create resource' });
     }
-  });
+  };
+  app.post('/api/resources', isAuthenticated, createResourceHandler);
+  app.post('/api/submit', isAuthenticated, createResourceHandler);
   
   // GET /api/resources/pending - List pending resources (admin only)
   app.get('/api/resources/pending', isAuthenticated, isAdmin, async (req, res) => {

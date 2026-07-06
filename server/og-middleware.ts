@@ -960,6 +960,14 @@ export function ogInjectionMiddleware() {
       // Bare /category (no slug) — send to the category overview on home.
       return res.redirect(301, "/");
     }
+    if (urlPath === "/favorites") {
+      // /favorites was never a route; canonical is the bookmarks page (BUG-015).
+      return res.redirect(301, "/bookmarks");
+    }
+    if (urlPath === "/account") {
+      // /account was never a route; canonical is the profile page (BUG-016).
+      return res.redirect(301, "/profile");
+    }
 
     let meta: RouteMeta;
     let notFound = false;

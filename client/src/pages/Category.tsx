@@ -67,6 +67,25 @@ function findCategorySuggestion(
     : undefined;
 }
 
+/** How many resource cards render per page (BUG-007 client-side pagination). */
+const PAGE_SIZE = 24;
+
+/**
+ * Normalize the sort URL param. The canonical AdvancedFilter values
+ * ("default", "name-asc", "name-desc", "count-asc", "count-desc") pass through
+ * unchanged so a reload/back-button restores the select; the ?sort= alias plus
+ * the bare shorthand "name"/"asc"/"desc" map onto name ordering (BUG-006).
+ */
+const CANONICAL_SORTS = new Set(["default", "name-asc", "name-desc", "count-asc", "count-desc"]);
+function normalizeSort(value: string | null): string {
+  if (!value) return "default";
+  const v = value.toLowerCase();
+  if (CANONICAL_SORTS.has(v)) return v;
+  if (v === "name" || v === "asc") return "name-asc";
+  if (v === "desc") return "name-desc";
+  return "default";
+}
+
 export default function Category() {
   const { slug } = useParams<{ slug: string }>();
   const { isAuthenticated } = useAuth();
@@ -84,10 +103,16 @@ export default function Category() {
   const [searchTerm, setSearchTerm] = useState(() => getSearchParams().get("search") || "");
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>(() => getSearchParams().get("subcategory") || "all");
   const [selectedTags, setSelectedTags] = useState<string[]>(() => {
-    const tags = getSearchParams().get("tags");
-    return tags ? tags.split(",") : [];
+    // Canonical ?tags= (comma-separated) OR the ?tag= singular alias (BUG-005).
+    const tags = getSearchParams().get("tags") || getSearchParams().get("tag");
+    return tags ? tags.split(",").map((t) => t.trim()).filter(Boolean) : [];
   });
-  const [sortBy, setSortBy] = useState(() => getSearchParams().get("sortBy") || "default");
+  // Canonical ?sortBy= OR the ?sort= alias / bare "name" (BUG-006), normalized.
+  const [sortBy, setSortBy] = useState(() => normalizeSort(getSearchParams().get("sortBy") || getSearchParams().get("sort")));
+  const [page, setPage] = useState(() => {
+    const p = parseInt(getSearchParams().get("page") || "1", 10);
+    return Number.isFinite(p) && p > 0 ? p : 1;
+  });
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [resourceToEdit, setResourceToEdit] = useState<DbResource | null>(null);
   
@@ -207,6 +232,28 @@ export default function Category() {
     return results;
   }, [allResources, searchTerm, selectedSubcategory, selectedTags, sortBy, isGeneralView]);
 
+  // ----- Client-side pagination (BUG-007) -----
+  const totalPages = Math.max(1, Math.ceil(filteredResources.length / PAGE_SIZE));
+  // Clamp for RENDERING only; the raw `page` state (which may briefly exceed the
+  // range while data loads or filters shrink) is preserved so deep-linked ?page=
+  // survives the initial empty render.
+  const currentPage = Math.min(Math.max(page, 1), totalPages);
+  const pagedResources = useMemo(
+    () => filteredResources.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
+    [filteredResources, currentPage],
+  );
+
+  // Once real data is present, pull an out-of-range page back into bounds so the
+  // URL/controls never reference a page that no longer exists. Guarded on loaded,
+  // non-empty results so it never clobbers a deep link during the loading render.
+  useEffect(() => {
+    // filteredResources derives from the DB query (dbData/dbLoading), so gate on
+    // dbLoading; isLoading covers the static tree used earlier in render.
+    if (!isLoading && !dbLoading && filteredResources.length > 0 && page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [isLoading, dbLoading, filteredResources.length, page, totalPages]);
+
   // The subcategory dropdown must also be the way OUT of "General" view (which is
   // URL-driven via ?view=general). Navigating without the flag makes the reactive
   // isGeneralView recompute to false. The sentinel "__general__" is the currently
@@ -215,6 +262,7 @@ export default function Category() {
   const handleSubcategoryChange = (value: string) => {
     if (value === "__general__") return; // already in General view
     setSelectedSubcategory(value);
+    setPage(1);
     if (isGeneralView) {
       const params = new URLSearchParams();
       if (searchTerm) params.set("search", searchTerm);
@@ -233,6 +281,9 @@ export default function Category() {
     if (!isGeneralView && selectedSubcategory && selectedSubcategory !== "all") params.set("subcategory", selectedSubcategory);
     if (selectedTags.length > 0) params.set("tags", selectedTags.join(","));
     if (sortBy && sortBy !== "default") params.set("sortBy", sortBy);
+    // Only the canonical ?tags=/?sortBy= params are written, so a ?tag=/?sort=
+    // alias used on arrival is normalized away after the first sync.
+    if (page > 1) params.set("page", String(page));
     // Preserve the reactive general-view flag so it survives replaceState writes
     // triggered by other filter changes.
     if (isGeneralView) params.set("view", "general");
@@ -244,16 +295,18 @@ export default function Category() {
     if (currentPath !== newPath) {
       window.history.replaceState({}, "", newPath);
     }
-  }, [searchTerm, selectedSubcategory, selectedTags, sortBy, slug, location, isGeneralView]);
+  }, [searchTerm, selectedSubcategory, selectedTags, sortBy, page, slug, location, isGeneralView]);
 
   useEffect(() => {
     const handlePopState = () => {
       const params = getSearchParams();
       setSearchTerm(params.get("search") || "");
       setSelectedSubcategory(params.get("subcategory") || "all");
-      const tags = params.get("tags");
-      setSelectedTags(tags ? tags.split(",") : []);
-      setSortBy(params.get("sortBy") || "default");
+      const tags = params.get("tags") || params.get("tag");
+      setSelectedTags(tags ? tags.split(",").map((t) => t.trim()).filter(Boolean) : []);
+      setSortBy(normalizeSort(params.get("sortBy") || params.get("sort")));
+      const p = parseInt(params.get("page") || "1", 10);
+      setPage(Number.isFinite(p) && p > 0 ? p : 1);
     };
 
     window.addEventListener("popstate", handlePopState);
@@ -426,7 +479,7 @@ export default function Category() {
           <Input
             placeholder="Search resources..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
             className="pl-10"
             data-testid="input-search-resources"
           />
@@ -436,8 +489,8 @@ export default function Category() {
           selectedTags={selectedTags}
           sortBy={sortBy}
           availableTags={availableTags}
-          onTagsChange={setSelectedTags}
-          onSortChange={setSortBy}
+          onTagsChange={(tags) => { setSelectedTags(tags); setPage(1); }}
+          onSortChange={(value) => { setSortBy(value); setPage(1); }}
         />
       </div>
       
@@ -464,6 +517,7 @@ export default function Category() {
                 setSearchTerm("");
                 setSelectedSubcategory("all");
                 setSelectedTags([]);
+                setPage(1);
               }}
             >
               Clear all filters
@@ -478,7 +532,7 @@ export default function Category() {
             ? "flex flex-col gap-2 min-w-0"
             : "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 min-w-0"
         }>
-          {filteredResources.map((resource, index) => {
+          {pagedResources.map((resource, index) => {
             const resourceId = `${slugify(resource.title)}-${index}`;
             
             const handleResourceClick = () => {
@@ -668,6 +722,32 @@ export default function Category() {
               </Card>
             );
           })}
+        </div>
+      )}
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-3 pt-6" data-testid="pagination-controls">
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={currentPage <= 1}
+            onClick={() => setPage(currentPage - 1)}
+            data-testid="button-prev-page"
+          >
+            Previous
+          </Button>
+          <span className="text-sm text-muted-foreground" data-testid="text-page-indicator">
+            Page {currentPage} of {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={currentPage >= totalPages}
+            onClick={() => setPage(currentPage + 1)}
+            data-testid="button-next-page"
+          >
+            Next
+          </Button>
         </div>
       )}
       

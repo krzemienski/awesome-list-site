@@ -340,13 +340,16 @@ export default function SubmitResource() {
                   <LogIn className="h-4 w-4 text-yellow-500" />
                   <AlertTitle className="text-yellow-500">Login required to submit</AlertTitle>
                   <AlertDescription>
-                    You can preview the form, but you must{" "}
+                    The form below is read-only. Please{" "}
                     <a href="/api/login" className="underline" data-testid="link-login">log in</a>{" "}
-                    to actually submit a resource.
+                    to submit a resource.
                   </AlertDescription>
                 </Alert>
               )}
               <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} className="space-y-6" noValidate>
+                {/* Fields are disabled for logged-out visitors — they can see the
+                    form layout as a preview but cannot fill or submit it (BUG-018). */}
+                <fieldset disabled={!isAuthenticated} className="space-y-6 border-0 p-0 m-0 min-w-0">
                 {/* Title Field */}
                 <FormField
                   control={form.control}
@@ -545,11 +548,13 @@ export default function SubmitResource() {
                   )}
                 />
 
+                </fieldset>
+
                 {/* Submit Button */}
                 <div className="flex gap-3 pt-4">
                   <Button
                     type="submit"
-                    disabled={submitMutation.isPending}
+                    disabled={submitMutation.isPending || !isAuthenticated}
                     className="flex-1"
                     data-testid="button-submit"
                   >

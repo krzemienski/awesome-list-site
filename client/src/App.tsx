@@ -90,6 +90,12 @@ function Router() {
         <Route path="/journey/:id" component={JourneyDetail} />
         <Route path="/profile" component={() => (<AuthGuard><Profile user={user} /></AuthGuard>)} />
         <Route path="/bookmarks" component={() => (<AuthGuard><Bookmarks /></AuthGuard>)} />
+        <Route path="/favorites">
+          <Redirect to="/bookmarks" replace />
+        </Route>
+        <Route path="/account">
+          <Redirect to="/profile" replace />
+        </Route>
         <Route path="/admin" component={() => (<AdminGuard><AdminDashboard /></AdminGuard>)} />
         <Route path="/settings/theme" component={ThemeSettings} />
         <Route path="/settings">

@@ -222,6 +222,22 @@ export class CategoryRepository {
   }
 
   /**
+   * Get a subcategory by its slug within a category.
+   * Subcategory slugs are unique only per category, so the parent category id is
+   * required to disambiguate.
+   * @param slug - Subcategory slug (URL-safe identifier)
+   * @param categoryId - Parent category ID
+   * @returns Subcategory object or undefined if not found
+   */
+  async getSubcategoryBySlug(slug: string, categoryId: number): Promise<Subcategory | undefined> {
+    const [subcategory] = await db
+      .select()
+      .from(subcategories)
+      .where(and(eq(subcategories.slug, slug), eq(subcategories.categoryId, categoryId)));
+    return subcategory;
+  }
+
+  /**
    * Create a new subcategory
    * @param subcategory - Subcategory data to insert
    * @returns The created subcategory
