@@ -37,7 +37,7 @@ const journeyTemplates: JourneyTemplate[] = [
     title: "Video Streaming Fundamentals",
     difficulty: "beginner",
     estimatedDuration: "8-10 hours",
-    category: "Intro & Learning",
+    category: "Introduction & Learning",
     searchKeywords: ["intro", "fundamental", "beginner", "learning", "tutorial", "basics"]
   },
   {

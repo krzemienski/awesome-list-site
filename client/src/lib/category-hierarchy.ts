@@ -357,14 +357,14 @@ export const HIERARCHICAL_CATEGORIES: HierarchicalCategory[] = [
   },
   {
     cid: "5",
-    title: "Intro & Learning",
+    title: "Introduction & Learning",
     slug: "intro-learning",
     level: 1,
     num_children: 3,
     direct_projects: 129,
     total_projects: 229,
     is_top_level: true,
-    path: "Intro & Learning",
+    path: "Introduction & Learning",
     children: [
       {
         cid: "5.1",
@@ -377,7 +377,7 @@ export const HIERARCHICAL_CATEGORIES: HierarchicalCategory[] = [
         direct_projects: 4,
         total_projects: 4,
         is_top_level: false,
-        path: "Intro & Learning > Introduction"
+        path: "Introduction & Learning > Introduction"
       },
       {
         cid: "5.2",
@@ -390,7 +390,7 @@ export const HIERARCHICAL_CATEGORIES: HierarchicalCategory[] = [
         direct_projects: 36,
         total_projects: 36,
         is_top_level: false,
-        path: "Intro & Learning > Learning Resources"
+        path: "Introduction & Learning > Learning Resources"
       },
       {
         cid: "5.3", 
@@ -403,7 +403,7 @@ export const HIERARCHICAL_CATEGORIES: HierarchicalCategory[] = [
         direct_projects: 60,
         total_projects: 60,
         is_top_level: false,
-        path: "Intro & Learning > Tutorials & Case Studies"
+        path: "Introduction & Learning > Tutorials & Case Studies"
       }
     ]
   },
@@ -866,7 +866,7 @@ export function mapLegacyCategoryToHierarchical(legacyName: string): Hierarchica
     "Encoding & Codecs": "encoding-codecs", 
     "General Tools": "general-tools",
     "Infrastructure & Delivery": "infrastructure-delivery",
-    "Intro & Learning": "intro-learning",
+    "Introduction & Learning": "intro-learning",
     "Media Tools": "media-tools",
     "Players & Clients": "players-clients",
     "Protocols & Transport": "protocols-transport",

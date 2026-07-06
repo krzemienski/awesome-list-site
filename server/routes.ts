@@ -350,7 +350,7 @@ function getCategoryTitleFromSlug(slug: string): string {
     'encoding-codecs': 'Encoding & Codecs',
     'general-tools': 'General Tools',
     'infrastructure-delivery': 'Infrastructure & Delivery',
-    'intro-learning': 'Intro & Learning',
+    'intro-learning': 'Introduction & Learning',
     'media-tools': 'Media Tools',
     'players-clients': 'Players & Clients',
     'protocols-transport': 'Protocols & Transport',

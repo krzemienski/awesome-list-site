@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import { Link } from "wouter";
-import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { AwesomeList, Category } from "@/types/awesome-list";
@@ -45,32 +44,17 @@ export default function Categories({ awesomeList, isLoading }: CategoriesProps) 
     );
   }, [awesomeList?.categories]);
 
-  // Authoritative per-category approved-resource counts from the database, so
-  // this hub agrees with the landing page, category pages, and sidebar.
-  const { data: dbCategories } = useQuery<
-    Array<{ name: string; resourceCount: number }>
-  >({
-    queryKey: ["/api/categories"],
-    staleTime: 1000 * 60 * 60,
-  });
-
-  const categoryCounts = useMemo(() => {
-    const map: Record<string, number> = {};
-    (dbCategories || []).forEach((c) => {
-      map[c.name] = c.resourceCount;
-    });
-    return map;
-  }, [dbCategories]);
-
+  // Counts come from the single deduplicated tree (same source as the sidebar,
+  // header, category pages, and SSR) so every surface agrees.
   const categories = useMemo(
     () =>
       baseCategories
         .map((cat) => ({
           ...cat,
-          displayCount: categoryCounts[cat.name] ?? getTotalResourceCount(cat),
+          displayCount: getTotalResourceCount(cat),
         }))
         .sort((a, b) => a.name.localeCompare(b.name)),
-    [baseCategories, categoryCounts],
+    [baseCategories],
   );
 
   return (

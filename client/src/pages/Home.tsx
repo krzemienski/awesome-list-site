@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
 import { Link } from "wouter";
-import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -32,7 +31,7 @@ interface HomeProps {
 }
 
 const categoryIcons: { [key: string]: any } = {
-  "Intro & Learning": FileText,
+  "Introduction & Learning": FileText,
   "Protocols & Transport": Server,
   "Encoding & Codecs": Code,
   "Players & Clients": Play,
@@ -102,25 +101,12 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
       .sort((a, b) => b.count - a.count);
   }, [baseCategories]);
 
-  // Authoritative per-category approved-resource counts from the database,
-  // keyed by category name. Used for the resting (no-tag-filter) card counts so
-  // the landing page agrees with the category pages and the sidebar.
-  const { data: dbCategories } = useQuery<Array<{ name: string; resourceCount: number }>>({
-    queryKey: ["/api/categories"],
-    staleTime: 1000 * 60 * 60,
-  });
-
-  const categoryCounts = useMemo(() => {
-    const map: Record<string, number> = {};
-    (dbCategories || []).forEach((c) => { map[c.name] = c.resourceCount; });
-    return map;
-  }, [dbCategories]);
-
   const filteredCategories = useMemo(() => {
     let cats = baseCategories.map((cat) => {
       if (selectedTags.length === 0) {
-        // Prefer the DB count; fall back to the client tree sum until it loads.
-        const displayCount = categoryCounts[cat.name] ?? getTotalResourceCount(cat);
+        // Counts come from the single deduplicated tree (same source as the
+        // sidebar, header, category pages, and SSR) so every surface agrees.
+        const displayCount = getTotalResourceCount(cat);
         return { ...cat, displayCount };
       }
       const allRes = getAllResources(cat);
@@ -153,20 +139,12 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
     return cats;
   }, [baseCategories, selectedTags, sortBy]);
 
-  // Authoritative resource total from the database (single source of truth).
-  // The client-side tree sum under-counts because the static awesome-list tree
-  // does not carry every approved DB resource; the resources table does.
-  const { data: resourceMeta } = useQuery<{ total: number }>({
-    queryKey: ["/api/resources?limit=1"],
-    staleTime: 1000 * 60 * 60,
-  });
-
-  const clientTreeCount = useMemo(() => {
+  // Total comes from the same deduplicated tree as the per-category counts, the
+  // sidebar, and SSR — one source of truth, so the sum of the cards equals the
+  // headline total (the raw resources table double-counts near-duplicate URLs).
+  const totalResourceCount = useMemo(() => {
     return baseCategories.reduce((sum, cat) => sum + getTotalResourceCount(cat), 0);
   }, [baseCategories]);
-
-  // Prefer the DB total; fall back to the client tree sum until it loads.
-  const totalResourceCount = resourceMeta?.total ?? clientTreeCount;
 
   if (isLoading) {
     return (

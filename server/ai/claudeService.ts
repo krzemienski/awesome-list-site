@@ -695,7 +695,7 @@ export class ClaudeService {
         'Encoding & Codecs',
         'General Tools',
         'Infrastructure & Delivery',
-        'Intro & Learning',
+        'Introduction & Learning',
         'Media Tools',
         'Players & Clients',
         'Protocols & Transport',

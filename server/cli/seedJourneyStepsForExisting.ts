@@ -15,7 +15,7 @@ interface JourneyPlan {
 const JOURNEY_PLANS: JourneyPlan[] = [
   {
     journeyTitle: "Video Streaming Fundamentals",
-    category: "Intro & Learning",
+    category: "Introduction & Learning",
     searchKeywords: ["intro", "fundamental", "beginner", "learning", "tutorial", "basics", "guide", "primer", "overview"],
     steps: [
       { title: "Introduction to Video Streaming", description: "Get oriented with the core concepts of digital video delivery: containers, codecs, bitrates, and how a video gets from a camera to a viewer's screen." },

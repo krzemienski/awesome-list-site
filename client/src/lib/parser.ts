@@ -102,7 +102,7 @@ export function processAwesomeListData(data: unknown): AwesomeList {
     { name: "Encoding & Codecs", slug: "encoding-codecs" },
     { name: "General Tools", slug: "general-tools" },
     { name: "Infrastructure & Delivery", slug: "infrastructure-delivery" },
-    { name: "Intro & Learning", slug: "intro-learning" },
+    { name: "Introduction & Learning", slug: "intro-learning" },
     { name: "Media Tools", slug: "media-tools" },
     { name: "Players & Clients", slug: "players-clients" },
     { name: "Protocols & Transport", slug: "protocols-transport" },
@@ -214,10 +214,10 @@ function mapToTopLevelCategory(categoryName: string): string {
     "Origin Servers": "Infrastructure & Delivery",
     "Storage Solutions": "Infrastructure & Delivery",
     
-    // Intro & Learning - Total should be 229
-    "Introduction": "Intro & Learning",
-    "Learning Resources": "Intro & Learning",
-    "Tutorials & Case Studies": "Intro & Learning",
+    // Introduction & Learning - Total should be 229
+    "Introduction": "Introduction & Learning",
+    "Learning Resources": "Introduction & Learning",
+    "Tutorials & Case Studies": "Introduction & Learning",
     
     // Media Tools - Total should be 317
     "Ads & QoE": "Media Tools",

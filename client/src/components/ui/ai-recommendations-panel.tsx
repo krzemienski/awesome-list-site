@@ -55,7 +55,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 const AVAILABLE_CATEGORIES = [
   "Encoding & Codecs",
-  "Intro & Learning",
+  "Introduction & Learning",
   "Protocols & Transport",
   "Players & Clients",
   "Media Tools",

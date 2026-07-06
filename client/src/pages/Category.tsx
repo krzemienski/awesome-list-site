@@ -147,29 +147,45 @@ export default function Category() {
 
   const categoryName = currentCategory ? currentCategory.name : deslugify(slug || "");
 
-  // Source of truth: the resources table, scoped to this category server-side.
-  // The server filters by the category NAME and returns every approved resource
-  // assigned to it (including those that live under subcategories), so the count
-  // here matches the database and the sidebar — not just the direct/top-level
-  // resources carried by the static awesome-list tree.
-  const { data: dbData, isLoading: dbLoading } = useQuery<{resources: any[], total: number}>({
-    queryKey: [`/api/resources?category=${encodeURIComponent(categoryName)}&limit=2000`],
-    enabled: !!categoryName,
-  });
+  // Source of truth: the single deduplicated tree (GET /api/awesome-list), the
+  // same source the sidebar, header, home cards, and SSR use. Flatten every
+  // approved resource under this category (direct + subcategory + sub-sub) so the
+  // count and the rendered list match everywhere and no near-duplicate URL rows
+  // (which the raw resources table still carries) render as duplicate cards.
+  const treeResources = useMemo(() => {
+    if (!currentCategory) return [] as any[];
+    const flat = [
+      ...(((currentCategory as any).resources as any[]) || []),
+      ...((((currentCategory as any).subcategories as any[]) || []).flatMap((sub: any) => [
+        ...((sub.resources as any[]) || []),
+        ...(((sub.subSubcategories as any[]) || []).flatMap(
+          (ss: any) => (ss.resources as any[]) || [],
+        )),
+      ])),
+    ];
+    const seen = new Set<string>();
+    const out: any[] = [];
+    for (const r of flat) {
+      const key = `${r.id ?? ""}|${r.url ?? ""}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(r);
+    }
+    return out;
+  }, [currentCategory]);
 
   const allResources: Resource[] = useMemo(() => {
-    const rows = dbData?.resources || [];
-    return rows.map(r => ({
-      id: `db-${r.id}`,
+    return treeResources.map((r: any) => ({
+      id: r.id,
       title: r.title,
       description: r.description || '',
       url: r.url,
-      tags: Array.isArray(r.metadata?.tags) ? r.metadata.tags as string[] : [],
+      tags: Array.isArray(r.metadata?.tags) ? (r.metadata.tags as string[]) : [],
       category: r.category,
       subcategory: r.subcategory || undefined,
       subSubcategory: r.subSubcategory || undefined,
     }));
-  }, [dbData]);
+  }, [treeResources]);
   
   const subcategories = useMemo(() => {
     const uniqueSubcategories = new Set<string>();
@@ -247,12 +263,11 @@ export default function Category() {
   // URL/controls never reference a page that no longer exists. Guarded on loaded,
   // non-empty results so it never clobbers a deep link during the loading render.
   useEffect(() => {
-    // filteredResources derives from the DB query (dbData/dbLoading), so gate on
-    // dbLoading; isLoading covers the static tree used earlier in render.
-    if (!isLoading && !dbLoading && filteredResources.length > 0 && page > totalPages) {
+    // filteredResources derives from the deduplicated tree (isLoading covers it).
+    if (!isLoading && filteredResources.length > 0 && page > totalPages) {
       setPage(totalPages);
     }
-  }, [isLoading, dbLoading, filteredResources.length, page, totalPages]);
+  }, [isLoading, filteredResources.length, page, totalPages]);
 
   // The subcategory dropdown must also be the way OUT of "General" view (which is
   // URL-driven via ?view=general). Navigating without the flag makes the reactive
@@ -355,12 +370,12 @@ export default function Category() {
     if (!isDbResource(resource)) return;
     
     const dbId = getDbId(resource);
-    const dbResource = (dbData?.resources || []).find((r: any) => r.id === dbId);
+    const dbResource = treeResources.find((r: any) => r.id === dbId);
     setResourceToEdit(toDbResource(resource, dbResource));
     setEditDialogOpen(true);
   };
   
-  if (isLoading || dbLoading) {
+  if (isLoading) {
     return (
       <div className="space-y-6" aria-busy={true} aria-live="polite">
         <div className="space-y-4">
