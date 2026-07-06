@@ -1,0 +1,10 @@
+{
+  "id": 6,
+  "title": "Video Streaming Fundamentals",
+  "steps_len": 18,
+  "first_step": {
+    "stepNumber": 1,
+    "title": "Introduction to Video Streaming",
+    "hasDesc": true
+  }
+}
