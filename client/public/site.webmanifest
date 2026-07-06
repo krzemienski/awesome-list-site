@@ -1,7 +1,7 @@
 {
   "name": "Awesome Video",
   "short_name": "Awesome Video",
-  "description": "The curated index of 2,600+ video development resources — players, encoders, codecs, streaming, AI, tools, and community.",
+  "description": "The curated index of video development resources — players, encoders, codecs, streaming, AI, tools, and community.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",

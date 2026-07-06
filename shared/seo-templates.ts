@@ -77,3 +77,14 @@ export function categorySeoDescription(
     ? fn(count)
     : `Browse ${count} curated ${name.toLowerCase()} resources for video development on ${SITE_NAME}.`;
 }
+
+// Static utility pages ---------------------------------------------------
+// Shared verbatim between server/og-middleware.ts (crawl-time HTML) and the
+// client pages' SEOHead usage (post-hydration DOM) so both passes agree.
+export const advancedSeoTitle = `Advanced — ${SITE_NAME}`;
+export const advancedSeoDescription =
+  `Power-user tools for ${SITE_NAME}: category explorer, analytics dashboard, link health, and bulk export.`;
+
+export const submitSeoTitle = `Submit a Resource — ${SITE_NAME}`;
+export const submitSeoDescription =
+  `Suggest a new video development tool, library, article, or course for inclusion in ${SITE_NAME}.`;

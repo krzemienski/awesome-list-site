@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Helmet } from "react-helmet";
+import SEOHead from "@/components/layout/SEOHead";
+import { advancedSeoTitle, advancedSeoDescription } from "@shared/seo-templates";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import CategoryExplorer from "@/components/ui/category-explorer";
@@ -55,10 +56,7 @@ export default function Advanced() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <Helmet>
-        <title>Advanced Features - {awesomeList.title}</title>
-        <meta name="description" content="Explore advanced features including category explorer, community metrics, export tools, and AI-powered recommendations" />
-      </Helmet>
+      <SEOHead title={advancedSeoTitle} description={advancedSeoDescription} />
 
       {/* Header */}
       <div className="mb-8">

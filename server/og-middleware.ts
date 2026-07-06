@@ -7,6 +7,10 @@ import {
   homeSeoDescription,
   categorySeoTitleCore,
   categorySeoDescription,
+  advancedSeoTitle,
+  advancedSeoDescription,
+  submitSeoTitle,
+  submitSeoDescription,
 } from "@shared/seo-templates";
 import {
   renderHomeContent,
@@ -421,16 +425,16 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
       description: `Learn about ${SITE_NAME} — the web home of the awesome-video curated list by Nick Krzemienski — and awesome-list-site, the open-source platform that powers it.`,
     },
     "/advanced": {
-      title: `Advanced — ${SITE_NAME}`,
-      description: `Power-user tools for ${SITE_NAME}: category explorer, analytics dashboard, link health, and bulk export.`,
+      title: advancedSeoTitle,
+      description: advancedSeoDescription,
     },
     "/journeys": {
       title: `Learning Journeys — ${SITE_NAME}`,
       description: `Guided multi-step learning paths for video development — from beginner streaming to advanced encoding pipelines.`,
     },
     "/submit": {
-      title: `Submit a Resource — ${SITE_NAME}`,
-      description: `Suggest a new video development tool, library, article, or course for inclusion in ${SITE_NAME}.`,
+      title: submitSeoTitle,
+      description: submitSeoDescription,
     },
     "/login": {
       title: `Sign In — ${SITE_NAME}`,

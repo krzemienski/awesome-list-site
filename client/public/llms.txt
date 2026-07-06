@@ -1,6 +1,6 @@
 # Awesome Video
 
-> Awesome Video is a curated index of 2,600+ video development resources — players, encoders, codecs, streaming protocols, AI tooling, and developer/community links — organized into browsable categories and guided multi-step learning journeys.
+> Awesome Video is a curated index of video development resources — players, encoders, codecs, streaming protocols, AI tooling, and developer/community links — organized into browsable categories and guided multi-step learning journeys. The current resource count is always visible live at https://awesome.video/ and https://awesome.video/api/awesome-list.
 
 Canonical domain: https://awesome.video
 

@@ -31,7 +31,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useDebounce } from "@/hooks/useDebounce";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { trackGenerateLead } from "@/lib/analytics";
-import { Helmet } from "react-helmet";
+import SEOHead from "@/components/layout/SEOHead";
+import { submitSeoTitle, submitSeoDescription } from "@shared/seo-templates";
 
 // Form validation schema
 const submitResourceSchema = z.object({
@@ -298,10 +299,7 @@ export default function SubmitResource() {
 
   return (
     <>
-      <Helmet>
-        <title>Submit Resource | Awesome Video</title>
-        <meta name="description" content="Submit a new resource to the awesome video list for community review" />
-      </Helmet>
+      <SEOHead title={submitSeoTitle} description={submitSeoDescription} />
 
       <div className="container max-w-2xl mx-auto px-4 py-12">
         <h1 className="sr-only">Submit a Resource</h1>
