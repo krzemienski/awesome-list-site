@@ -68,8 +68,13 @@ export async function sendPasswordResetEmail(
     `</body></html>`;
 
   try {
-    // Lazy import: the package only exists once the Gmail integration is added.
-    const { ReplitConnectors } = await import("@replit/connectors-sdk");
+    // Lazy import via an indirect specifier: the @replit/connectors-sdk package
+    // only exists once the Gmail integration is added, so a literal import would
+    // break typecheck/boot beforehand. Node resolves this at runtime; if the
+    // package (or binding) is missing it throws and we fall through to the
+    // dev/console fallback below.
+    const pkg = "@replit/connectors-sdk";
+    const { ReplitConnectors } = (await import(/* @vite-ignore */ pkg)) as any;
     const connectors = new ReplitConnectors();
     const raw = base64url(buildMimeMessage(to, subject, html, text));
     const resp: any = await connectors.proxy(

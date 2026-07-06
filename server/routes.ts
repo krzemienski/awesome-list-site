@@ -594,7 +594,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
           await db.insert(passwordResetTokens).values({ userId: user.id, tokenHash, expiresAt });
 
-          const base = (process.env.SITE_URL || `${req.protocol}://${req.get("host")}`).replace(/\/+$/, "");
+          // In production always use the server-authoritative SITE_URL — never
+          // the client-controlled Host header (password-reset poisoning vector).
+          // The Host fallback is dev-only so the localhost console link works.
+          const base = (
+            process.env.NODE_ENV === "production"
+              ? SITE_URL
+              : process.env.SITE_URL || `${req.protocol}://${req.get("host")}`
+          ).replace(/\/+$/, "");
           const resetUrl = `${base}/reset-password?token=${rawToken}`;
           await sendPasswordResetEmail(user.email, resetUrl);
         } catch (e) {
