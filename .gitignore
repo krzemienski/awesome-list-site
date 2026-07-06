@@ -109,3 +109,7 @@ repomix-output.xml
 
 # Stray dash-named screenshot artifact
 --full-page
+
+# Never commit captured session cookies / auth artifacts
+evidence/cookies-*.txt
+evidence/**/cookies-*.txt
