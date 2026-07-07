@@ -34,7 +34,7 @@ import {
   type InsertResource,
 } from "@shared/schema";
 import { db } from "../db";
-import { eq, and, sql, desc, like, or } from "drizzle-orm";
+import { eq, and, sql, desc, ilike, or } from "drizzle-orm";
 
 /**
  * Options for listing resources with filtering and pagination
@@ -86,8 +86,8 @@ export class ResourceRepository {
     if (search) {
       conditions.push(
         or(
-          like(resources.title, `%${search}%`),
-          like(resources.description, `%${search}%`)
+          ilike(resources.title, `%${search}%`),
+          ilike(resources.description, `%${search}%`)
         )
       );
     }
