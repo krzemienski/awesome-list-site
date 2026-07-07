@@ -1,0 +1,1 @@
+Baseline: Malformed approve/reject body → 500 instead of 400

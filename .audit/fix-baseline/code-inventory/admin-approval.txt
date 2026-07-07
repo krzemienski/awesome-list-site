@@ -1,0 +1,60 @@
+server/routes.ts:158:  // Category taxonomy + every approved resource detail page.
+server/routes.ts:753:  // GET /api/resources - List approved resources (public)
+server/routes.ts:785:        status: 'approved',
+server/routes.ts:798:  // GET /api/search?q= - Public JSON search across approved resources. A thin
+server/routes.ts:813:        status: 'approved',
+server/routes.ts:920:      // Pull a pool of approved resources in the same category to rank against.
+server/routes.ts:924:        status: 'approved',
+server/routes.ts:986:  // PUT /api/resources/:id/approve - Approve resource (admin)
+server/routes.ts:987:  app.put('/api/resources/:id/approve', isAuthenticated, isAdmin, async (req: any, res) => {
+server/routes.ts:992:      const resource = await resourceRepo.updateResourceStatus(id, 'approved', userId);
+server/routes.ts:996:      res.status(500).json({ message: 'Failed to approve resource' });
+server/routes.ts:1000:  // PUT /api/resources/:id/reject - Reject resource (admin)
+server/routes.ts:1001:  app.put('/api/resources/:id/reject', isAuthenticated, isAdmin, async (req: any, res) => {
+server/routes.ts:1006:      const resource = await resourceRepo.updateResourceStatus(id, 'rejected', userId);
+server/routes.ts:1009:      console.error('Error rejecting resource:', error);
+server/routes.ts:1010:      res.status(500).json({ message: 'Failed to reject resource' });
+server/routes.ts:1114:      // Attach the authoritative approved-resource count per category (single
+server/routes.ts:1409:      const totalResourcesResult = await resourceRepo.listResources({ status: 'approved', limit: 1 });
+server/routes.ts:2016:  // POST /api/admin/resources/:id/approve - Approve a pending resource
+server/routes.ts:2019:  app.post('/api/admin/resources/:id(\\d+)/approve', isAuthenticated, isAdmin, async (req: any, res) => {
+server/routes.ts:2028:      const updatedResource = await resourceRepo.approveResource(resourceId, userId);
+server/routes.ts:2033:      res.status(500).json({ message: 'Failed to approve resource' });
+server/routes.ts:2037:  // POST /api/admin/resources/:id/reject - Reject a pending resource
+server/routes.ts:2039:  app.post('/api/admin/resources/:id(\\d+)/reject', isAuthenticated, isAdmin, async (req: any, res) => {
+server/routes.ts:2053:      await resourceRepo.rejectResource(resourceId, userId, reason);
+server/routes.ts:2058:      console.error('Error rejecting resource:', error);
+server/routes.ts:2059:      res.status(500).json({ message: 'Failed to reject resource' });
+server/routes.ts:2155:  // POST /api/admin/resources/bulk/approve - Bulk approve resources
+server/routes.ts:2156:  app.post('/api/admin/resources/bulk/approve', isAuthenticated, isAdmin, async (req: any, res) => {
+server/routes.ts:2174:        numericIds.map((id) => resourceRepo.approveResource(id, userId))
+server/routes.ts:2182:      console.error('Error in bulk approve:', error);
+server/routes.ts:2183:      res.status(500).json({ message: 'Failed to bulk approve resources' });
+server/routes.ts:2187:  // POST /api/admin/resources/bulk/reject - Bulk reject resources
+server/routes.ts:2188:  app.post('/api/admin/resources/bulk/reject', isAuthenticated, isAdmin, async (req: any, res) => {
+server/routes.ts:2210:        numericIds.map((id) => resourceRepo.rejectResource(id, userId, reason))
+server/routes.ts:2218:      console.error('Error in bulk reject:', error);
+server/routes.ts:2219:      res.status(500).json({ message: 'Failed to bulk reject resources' });
+server/routes.ts:2337:        status: validatedData.status || 'approved',
+server/routes.ts:2380:  // POST /api/admin/resource-edits/:id/approve - Approve an edit (admin only)
+server/routes.ts:2381:  app.post('/api/admin/resource-edits/:id/approve', isAuthenticated, isAdmin, async (req: any, res) => {
+server/routes.ts:2390:      await auditRepo.approveResourceEdit(editId, userId);
+server/routes.ts:2392:      res.json({ message: 'Edit approved and merged successfully' });
+server/routes.ts:2403:      res.status(500).json({ message: error.message || 'Failed to approve edit' });
+server/routes.ts:2407:  // POST /api/admin/resource-edits/:id/reject - Reject an edit (admin only)
+server/routes.ts:2408:  app.post('/api/admin/resource-edits/:id/reject', isAuthenticated, isAdmin, async (req: any, res) => {
+server/routes.ts:2422:      await auditRepo.rejectResourceEdit(editId, userId, reason);
+server/routes.ts:2424:      res.json({ message: 'Edit rejected successfully' });
+server/routes.ts:2426:      console.error('Error rejecting edit:', error);
+server/routes.ts:2427:      res.status(500).json({ message: error.message || 'Failed to reject edit' });
+server/routes.ts:2971:  // POST /api/github/export - Export approved resources to GitHub
+server/routes.ts:3084:      // Get all approved resources
+server/routes.ts:3126:      // Get ALL data from database (not just approved resources)
+server/routes.ts:3192:          resources: "id, title, url, description, category, subcategory, subSubcategory, status, submittedBy, approvedBy, approvedAt, githubSynced, lastSyncedAt, metadata, createdAt, updatedAt",
+server/routes.ts:3234:      // Get all approved resources
+server/routes.ts:3288:      // Get all approved resources
+server/routes.ts:3466:          message: 'Import rejected: awesome-lint validation failed',
+server/routes.ts:3649:        WHERE status = 'approved'
+server/routes.ts:3822:  app.post('/api/researcher/discoveries/:id/approve', isAuthenticated, isAdmin, async (req, res) => {
+server/routes.ts:3825:      const discovery = await researchService.approveDiscovery(parseInt(req.params.id));
+server/routes.ts:3828:      res.status(500).json({ message: 'Failed to approve discovery', error: error.message });

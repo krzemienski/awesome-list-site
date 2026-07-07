@@ -1,0 +1,1 @@
+Baseline: Duplicate URL → 500 instead of 409

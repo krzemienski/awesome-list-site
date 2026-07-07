@@ -412,17 +412,18 @@ function CategoryAccordion({
             {directCount > 0 &&
               (!matchQuery ||
                 cat.name.toLowerCase().includes(matchQuery.toLowerCase()) ||
-                "general".includes(matchQuery.toLowerCase())) && (
+                "uncategorized".includes(matchQuery.toLowerCase())) && (
                 <SubItem
-                  label="General"
+                  label="Uncategorized"
                   count={directCount}
                   href={generalPath}
                   active={generalActive}
                   onClick={() => navigate(generalPath)}
-                  testId={`sub-general-${catSlug}`}
+                  testId={`sub-uncategorized-${catSlug}`}
                   italic
                 />
               )}
+
           </div>
         </div>
       )}

@@ -1,0 +1,1 @@
+Baseline: Sidebar shows synthetic General subcategory

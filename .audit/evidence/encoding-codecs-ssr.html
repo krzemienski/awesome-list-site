@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!--OG_META_INJECTED-->
+    <title>Video Encoding Tools &amp; Codecs (AV1, HEVC, H.264) — Awesome Video</title>
+    <meta name="description" content="Browse 328 curated video encoding tools and codec resources — FFmpeg, AV1, HEVC/H.265, H.264, and VP9 encoders for developers on Awesome Video." />
+    <meta name="keywords" content="video development, ffmpeg, hls, dash, video players, encoders, codecs, streaming, video ai, awesome video" />
+    <link rel="canonical" href="https://awesome.video/category/encoding-codecs" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="Awesome Video" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="https://awesome.video/category/encoding-codecs" />
+    <meta property="og:title" content="Video Encoding Tools &amp; Codecs (AV1, HEVC, H.264) — Awesome Video" />
+    <meta property="og:description" content="Browse 328 curated video encoding tools and codec resources — FFmpeg, AV1, HEVC/H.265, H.264, and VP9 encoders for developers on Awesome Video." />
+    <meta property="og:image" content="https://awesome.video/og-image.png?title=Encoding+%26+Codecs&amp;category=Encoding+%26+Codecs&amp;resourceCount=328" />
+    <meta property="og:image:secure_url" content="https://awesome.video/og-image.png?title=Encoding+%26+Codecs&amp;category=Encoding+%26+Codecs&amp;resourceCount=328" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Awesome Video — curated video development resources" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@awesome_video" />
+    <meta name="twitter:title" content="Video Encoding Tools &amp; Codecs (AV1, HEVC, H.264) — Awesome Video" />
+    <meta name="twitter:description" content="Browse 328 curated video encoding tools and codec resources — FFmpeg, AV1, HEVC/H.265, H.264, and VP9 encoders for developers on Awesome Video." />
+    <meta name="twitter:image" content="https://awesome.video/og-image.png?title=Encoding+%26+Codecs&amp;category=Encoding+%26+Codecs&amp;resourceCount=328" />
+    <meta name="twitter:image:alt" content="Awesome Video — curated video development resources" />
+    <meta name="theme-color" content="#ff3d52" />
+    <meta name="msapplication-TileColor" content="#ff3d52" />
+    <meta name="application-name" content="Awesome Video" />
+    <meta name="apple-mobile-web-app-title" content="Awesome Video" />
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"CollectionPage","name":"Encoding & Codecs","description":"Browse 328 curated video encoding tools and codec resources — FFmpeg, AV1, HEVC/H.265, H.264, and VP9 encoders for developers on Awesome Video.","url":"https://awesome.video/category/encoding-codecs","inLanguage":"en-US","isPartOf":{"@type":"WebSite","name":"Awesome Video","url":"https://awesome.video/"},"mainEntity":{"@type":"ItemList","numberOfItems":328}}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://awesome.video/"},{"@type":"ListItem","position":2,"name":"Encoding & Codecs","item":"https://awesome.video/category/encoding-codecs"}]}</script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover" />
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <script>
+      (function () {
+        try {
+          var SYSTEMS = ['editorial', 'terminal', 'geist', 'brutalist', 'swiss'];
+          var ACCENTS  = ['crimson', 'magenta', 'orange', 'amber', 'emerald', 'matrix', 'cyan', 'violet', 'lime', 'rose'];
+          var sys = null, acc = null;
+          try { sys = localStorage.getItem('ds-system'); } catch (_) {}
+          try { acc = localStorage.getItem('ds-accent'); } catch (_) {}
+          if (SYSTEMS.indexOf(sys) === -1) sys = 'editorial';
+          if (ACCENTS.indexOf(acc)  === -1) acc = 'crimson';
+          var root = document.documentElement;
+          root.setAttribute('data-system', sys);
+          root.setAttribute('data-accent', acc);
+          root.classList.add('dark');
+          root.style.backgroundColor = '#000';
+
+          // I1 — font override: read ds-font-override from localStorage and
+          // apply --font-sans pre-paint on EVERY route, so the override
+          // persists across hard reloads regardless of which page boots.
+          // Must match FONT_OPTIONS in client/src/lib/font-options.ts (source of truth).
+          // Drift is detected by scripts/verify-fixes.mjs V11.
+          var FONT_STACKS = {
+            'system':       '',
+            'inter':        "'Inter', system-ui, sans-serif",
+            'dm-sans':      "'DM Sans', system-ui, sans-serif",
+            'source-sans':  "'Source Sans 3', 'Source Sans Pro', system-ui, sans-serif",
+            'ibm-plex':     "'IBM Plex Sans', system-ui, sans-serif",
+            'jetbrains':    "'JetBrains Mono', ui-monospace, monospace"
+          };
+          var fnt = null;
+          try { fnt = localStorage.getItem('ds-font-override'); } catch (_) {}
+          if (fnt && FONT_STACKS[fnt]) {
+            root.style.setProperty('--font-sans', FONT_STACKS[fnt]);
+          }
+        } catch (e) {}
+      })();
+    </script>
+
+    <script>
+      (function () {
+        try {
+          var isDev = location.hostname.endsWith('.replit.dev') ||
+                      location.hostname === 'localhost' ||
+                      location.hostname.endsWith('.repl.co');
+          if (!isDev) return;
+
+          // Narrow regex: only match the specific Vite/HMR rejection
+          // signatures that drive the overlay loop. Avoid bare "fetch" or
+          // "vite" tokens so real app errors (incl. words like "invite"
+          // or React Query fetch failures) still surface in dev consoles.
+          var noisy = /(?:^|\b)(?:Load failed|Failed to fetch dynamically imported module|WebSocket (?:is closed|connection failed|error)|\[vite\]|vite-hmr|HMR connection lost)(?:\b|$)/i;
+          var stackHit = /\/@vite\/client|\/node_modules\/vite\//;
+
+          window.addEventListener('unhandledrejection', function (e) {
+            var reason = e && e.reason;
+            var msg = (reason && (reason.message || String(reason))) || '';
+            var stack = (reason && reason.stack) || '';
+            if (noisy.test(msg) || stackHit.test(stack)) e.preventDefault();
+          });
+
+          var kill = function (el) {
+            try { el.parentNode && el.parentNode.removeChild(el); } catch (_) {}
+          };
+          var sweep = function () {
+            document.querySelectorAll(
+              'vite-error-overlay, vite-plugin-checker-error-overlay'
+            ).forEach(kill);
+          };
+
+          if (document.body) sweep();
+          new MutationObserver(function (muts) {
+            for (var i = 0; i < muts.length; i++) {
+              var added = muts[i].addedNodes;
+              for (var j = 0; j < added.length; j++) {
+                var n = added[j];
+                if (n.nodeType === 1) {
+                  var tag = n.tagName && n.tagName.toLowerCase();
+                  if (tag === 'vite-error-overlay' ||
+                      tag === 'vite-plugin-checker-error-overlay') {
+                    kill(n);
+                  }
+                }
+              }
+            }
+          }).observe(document.documentElement, { childList: true, subtree: true });
+        } catch (e) {}
+      })();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preload" as="style"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+          onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript>
+      <link rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" />
+    </noscript>
+    <script>
+      (function () {
+        var ALT_FONTS_URL = 'https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap';
+        function loadAltFonts() {
+          var link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = ALT_FONTS_URL;
+          document.head.appendChild(link);
+        }
+        if (document.readyState === 'complete') {
+          loadAltFonts();
+        } else {
+          window.addEventListener('load', loadAltFonts, { once: true });
+        }
+      })();
+    </script>
+    <script type="module" crossorigin src="/assets/index-BFm9aE7z.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-BcE6i1Y4.css">
+  </head>
+  <body>
+    <div id="root"><style>#ssr-seo-content{background:#000;color:#e6e6ea;min-height:100vh;font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.5}#ssr-seo-content .ssr-wrap{max-width:960px;margin:0 auto;padding:40px 20px}#ssr-seo-content h1{font-size:2rem;font-weight:800;letter-spacing:-.02em;margin:0 0 .5rem;color:#fff}#ssr-seo-content h2{font-size:1.05rem;font-weight:700;margin:2rem 0 .75rem;color:#fff}#ssr-seo-content p.ssr-lead{font-size:1.05rem;color:#b6b6c0;margin:0 0 1rem;max-width:72ch}#ssr-seo-content a{color:#ff5c7a;text-decoration:none}#ssr-seo-content a:hover{text-decoration:underline}#ssr-seo-content ul.ssr-list{list-style:none;padding:0;margin:0;display:grid;gap:.45rem}#ssr-seo-content ul.ssr-list li{padding:.1rem 0}#ssr-seo-content .ssr-meta{color:#76768a;font-size:.85em}#ssr-seo-content .ssr-desc{color:#9a9aae;display:block;font-size:.9em;margin-top:.1rem}#ssr-seo-content nav.ssr-crumbs{font-size:.85rem;color:#76768a;margin:0 0 1rem}#ssr-seo-content nav.ssr-crumbs a{color:#9a9aae}#ssr-seo-content .ssr-sep{color:#44444f;padding:0 .35rem}</style><div id="ssr-seo-content"><main class="ssr-wrap"><nav class="ssr-crumbs" aria-label="Breadcrumb"><a href="/">Home</a><span class="ssr-sep">/</span><a href="/category/encoding-codecs">Encoding &amp; Codecs</a></nav><h1>Encoding &amp; Codecs</h1><p class="ssr-lead">Browse 328 curated video encoding tools and codec resources — FFmpeg, AV1, HEVC/H.265, H.264, and VP9 encoders for developers on Awesome Video.</p><h2>Subcategories</h2><ul class="ssr-list"><li><a href="/subcategory/benchmarking-performance-tools-for-codecs">Benchmarking &amp; Performance Tools for Codecs</a> <span class="ssr-meta">2 resources</span></li><li><a href="/subcategory/cloud-based-encoding-solutions">Cloud-Based Encoding Solutions</a> <span class="ssr-meta">12 resources</span></li><li><a href="/subcategory/codecs">Codecs</a> <span class="ssr-meta">13 resources</span></li><li><a href="/subcategory/comparative-analysis-of-codecs">Comparative Analysis of Codecs</a> <span class="ssr-meta">3 resources</span></li><li><a href="/subcategory/containerization-packaging-tools">Containerization &amp; Packaging Tools</a> <span class="ssr-meta">22 resources</span></li><li><a href="/subcategory/encoding-tools">Encoding Tools</a> <span class="ssr-meta">94 resources</span></li><li><a href="/subcategory/ffmpeg-based-tools">FFmpeg-Based Tools</a> <span class="ssr-meta">30 resources</span></li><li><a href="/subcategory/hardware-accelerated-transcoding">Hardware Accelerated Transcoding</a> <span class="ssr-meta">5 resources</span></li><li><a href="/subcategory/hardware-codecs-acceleration">Hardware Codecs &amp; Acceleration</a> <span class="ssr-meta">2 resources</span></li><li><a href="/subcategory/multi-format-packaging-tools">Multi-format Packaging Tools</a> <span class="ssr-meta">6 resources</span></li><li><a href="/subcategory/next-generation-codecs-av1-vvc">Next-Generation Codecs AV1 VVC</a> <span class="ssr-meta">4 resources</span></li><li><a href="/subcategory/open-source-encoder-projects">Open Source Encoder Projects</a> <span class="ssr-meta">6 resources</span></li><li><a href="/subcategory/real-time-encoding-solutions">Real-Time Encoding Solutions</a> <span class="ssr-meta">8 resources</span></li><li><a href="/subcategory/scripting-automation-tools">Scripting &amp; Automation Tools</a> <span class="ssr-meta">12 resources</span></li><li><a href="/subcategory/software-codecs">Software Codecs</a> <span class="ssr-meta">1 resources</span></li><li><a href="/subcategory/software-transcoding-tools">Software Transcoding Tools</a> <span class="ssr-meta">14 resources</span></li></ul><h2>Resources <span class="ssr-meta">(showing 1–94 of 94)</span></h2><ul class="ssr-list"><li><a href="/resource/184847">AMD Advanced Media Acceleration (AMA) SDK</a><span class="ssr-desc">A comprehensive SDK from AMD that provides source codes for various elements of media acceleration, including sample codes, third-party int…</span></li><li><a href="/resource/186623">AMD Advanced Media Framework (AMF SDK)</a><span class="ssr-desc">AMD&#39;s GPUOpen Video SDK that provides developers access to GPU-accelerated encoding and decoding (H.264, HEVC, etc.) on AMD hardware.</span></li><li><a href="/resource/185201">AMF (Advanced Media Framework)</a><span class="ssr-desc">AMF is a comprehensive framework by AMD that provides developers with access to hardware-accelerated video encoding, decoding, and processi…</span></li><li><a href="/resource/186494">AV1 vs HEVC – Bitmovin Compression Efficiency Results</a><span class="ssr-desc">A Bitmovin blog post that discusses internal testing results comparing AV1 and HEVC encoders. It provides charts and analysis of bitrate sa…</span></li><li><a href="/resource/185062">Adobe Media Encoder</a><span class="ssr-desc">Adobe Media Encoder is a professional video encoding software that integrates seamlessly with Adobe&#39;s suite of creative tools. It supports…</span></li><li><a href="/resource/186357">Alliance for Open Media (AOMedia)</a><span class="ssr-desc">An industry consortium that develops open, royalty-free media formats. AOMedia created the AV1 video codec and works on related audio/image…</span></li><li><a href="/resource/185364">Android-Video-Trimmer</a><span class="ssr-desc">An Android project that implements video trimming functionality using MediaMetadataRetriever to obtain video frames and FFmpeg for video cr…</span></li><li><a href="/resource/184768">Ateme TITAN</a><span class="ssr-desc">Ateme TITAN is a software suite designed for video origination, acquisition, and compression. It offers high-quality encoding solutions sui…</span></li><li><a href="/resource/185430">Beamr Content-Adaptive Bitrate Encoding</a><span class="ssr-desc">Beamr&#39;s Content-Adaptive Bitrate (CABR) technology is integrated into Encoding.com&#39;s platform, allowing for streaming video with the highes…</span></li><li><a href="/resource/184909">Bento</a><span class="ssr-desc">Bento is an open-source, high-speed serverless video transcoding pipeline designed for deployment on Amazon Web Services (AWS). It offers a…</span></li><li><a href="/resource/185037">Bitrate Viewer</a><span class="ssr-desc">Bitrate Viewer is a free Windows application that allows users to analyze the bitrate of H.264 encoded video files. It provides a graphical…</span></li><li><a href="/resource/186674">CineForm SDK</a><span class="ssr-desc">GoPro’s CineForm codec SDK, open-sourced, providing tools and libraries for the CineForm HD wavelet-based video codec used for high-fidelit…</span></li><li><a href="/resource/185216">CircleHD Video Transcoding Service</a><span class="ssr-desc">CircleHD offers a full-featured video-on-demand platform for developers and content teams building video applications. The service provides…</span></li><li><a href="/resource/186487">Cisco Thor Video Codec</a><span class="ssr-desc">Thor was an experimental video codec developed by Cisco as a candidate for the NETVC (Next-Gen Video) initiative. While Thor itself is not…</span></li><li><a href="/resource/184956">CompressAI</a><span class="ssr-desc">CompressAI is a PyTorch library and evaluation platform for end-to-end compression research. It provides custom operations, layers, models,…</span></li><li><a href="/resource/185297">CrafyVideoJS</a><span class="ssr-desc">CrafyVideoJS is a lightweight, hardware-accelerated JavaScript library that enables in-browser manipulation, decoding, and encoding of MP4…</span></li><li><a href="/resource/184769">DivX Converter</a><span class="ssr-desc">DivX Converter is a video encoding software that allows users to compress and convert video files into the DivX digital format, known for i…</span></li><li><a href="/resource/186258">DolbyLaboratories/dolby_vision_professional_decoder_plugin</a><span class="ssr-desc">DolbyLaboratories/dolby_vision_professional_decoder_plugin - A GitHub repository for video/multimedia development</span></li><li><a href="/resource/185214">FFmpeg</a><span class="ssr-desc">FFmpeg is a free and open-source software project consisting of a suite of libraries and programs for handling video, audio, and other mult…</span></li><li><a href="/resource/185450">FFmpeg Docker Container</a><span class="ssr-desc">This project provides a Docker container for FFmpeg, facilitating the use of FFmpeg in isolated environments. It simplifies the deployment…</span></li><li><a href="/resource/185101">FFmpeg iOS</a><span class="ssr-desc">FFmpeg iOS provides precompiled FFmpeg libraries tailored for iOS development. These libraries enable developers to incorporate robust vide…</span></li><li><a href="/resource/185217">FastPix Cloud Transcoding</a><span class="ssr-desc">FastPix provides a cloud-based transcoding solution that converts video files into multiple resolutions, bitrates, and formats optimized fo…</span></li><li><a href="/resource/186108">Gmmlib</a><span class="ssr-desc">Intel/gmmlib - A GitHub repository for video/multimedia development.</span></li><li><a href="/resource/186240">H.264 profiles and levels | Inside &amp; Outside MediaCoder</a><span class="ssr-desc">H.264 profiles and levels | Inside &amp; Outside MediaCoder - Resource from blog.mediacoderhq.com</span></li><li><a href="/resource/185016">HandBrake Web</a><span class="ssr-desc">A self-hosted platform to use HandBrake on headless devices via a bespoke web interface. It allows users to harness the processing power of…</span></li><li><a href="/resource/185238">IHMC Video Codecs</a><span class="ssr-desc">A Java library providing support for H.264 and MJPEG encoding and decoding, as well as MP4 support. It utilizes native code for efficient v…</span></li><li><a href="/resource/186425">Improving Our Video Encodes for Legacy Devices</a><span class="ssr-desc">A Netflix Tech Blog post describing techniques to ensure Netflix content remains compatible and efficient on older or less powerful devices…</span></li><li><a href="/resource/185333">Intel® Video Processing Library (Intel® VPL)</a><span class="ssr-desc">A library offering advanced access to specialized media hardware, including encode, decode, and video processing features on Intel GPUs. It…</span></li><li><a href="/resource/186604">JCodec</a><span class="ssr-desc">A pure Java library for video and audio codecs, including support for H.264 and AAC decoding, aimed at processing media without native depe…</span></li><li><a href="/resource/185313">JPEG XL Reference Implementation</a><span class="ssr-desc">The official reference implementation of the JPEG XL image format, offering both lossy and lossless compression. This project is valuable f…</span></li><li><a href="/resource/186675">Lagarith Lossless Codec</a><span class="ssr-desc">A lossless video codec for Windows that offers high compression ratios. Useful for archival and intermediate video editing workflows where…</span></li><li><a href="/resource/184771">Libavcodec</a><span class="ssr-desc">Libavcodec is a free and open-source library of codecs for encoding and decoding video and audio data. It is an integral part of many open-…</span></li><li><a href="/resource/185312">Lossless H.264 Codec</a><span class="ssr-desc">An open-source H.264 codec implementation focusing on lossless compression. This project is beneficial for developers requiring high-qualit…</span></li><li><a href="/resource/185376">Low-complexity Deep Video Compression with A Distributed Coding Architecture</a><span class="ssr-desc">This project introduces a deep video compression framework with a distributed coding architecture, aiming to reduce encoding complexity whi…</span></li><li><a href="/resource/185183">MainConcept Codec SDK</a><span class="ssr-desc">MainConcept offers a comprehensive Codec SDK that provides developers with a suite of high-quality codecs for integrating into their applic…</span></li><li><a href="/resource/186109">Media Driver</a><span class="ssr-desc">Intel/media-driver - A GitHub repository for video/multimedia development.</span></li><li><a href="/resource/185445">MediaConversions</a><span class="ssr-desc">A project aimed at learning PowerShell 7+, HandBrakeCLI, and FFmpeg by creating scripts for media conversion. It focuses on optimizing medi…</span></li><li><a href="/resource/185036">MediaInfo</a><span class="ssr-desc">MediaInfo is a free, cross-platform tool that provides detailed technical and tag information about video and audio files. It supports a wi…</span></li><li><a href="/resource/186430">More Efficient Mobile Encodes for Netflix Downloads</a><span class="ssr-desc">Netflix Tech Blog post summarizing improvements in Netflix’s encoding for mobile downloads, targeting low-bandwidth scenarios. It discusses…</span></li><li><a href="/resource/185084">Moscow State University Video Quality Measurement Tool (VQMT)</a><span class="ssr-desc">VQMT is a tool that computes VMAF, SSIM, and PSNR, displaying the scores in a graph. It allows users to view the frames in the video, makin…</span></li><li><a href="/resource/186383">NVIDIA Video Codec SDK</a><span class="ssr-desc">NVIDIA&#39;s official SDK for hardware-accelerated video encoding and decoding (NVENC/NVDEC). Provides APIs to leverage GPU acceleration for H.…</span></li><li><a href="/resource/185506">NextLevelSessionExporter</a><span class="ssr-desc">NextLevelSessionExporter is a Swift library that facilitates media export and transcoding on iOS. It provides a simple API for exporting an…</span></li><li><a href="/resource/185038">Open Source Media Framework</a><span class="ssr-desc">Intel&#39;s Open Source Media Framework provides tools and libraries to increase the speed and performance of video decoding, encoding, process…</span></li><li><a href="/resource/185451">Open Transcoder</a><span class="ssr-desc">Open Transcoder is a media transcoding tool that integrates FFmpeg and OpenH264. It offers a command-line interface for converting media fi…</span></li><li><a href="/resource/185501">OpenEncoder</a><span class="ssr-desc">OpenEncoder is a free audio and video transcoder based on FFmpeg. It offers an easy-to-use interface with features like drag-and-drop file…</span></li><li><a href="/resource/185292">OpenH264</a><span class="ssr-desc">OpenH264 is an open-source H.264 codec library developed by Cisco. It supports H.264 encoding and decoding and is suitable for real-time ap…</span></li><li><a href="/resource/186424">Optimized Shot-Based Encodes for 4K: Now Streaming!</a><span class="ssr-desc">Netflix Tech Blog article on Netflix&#39;s rollout of shot-based encoding for 4K titles. It explains how splitting content by scene (shot) and…</span></li><li><a href="/resource/184902">PLVC</a><span class="ssr-desc">PLVC (Perceptual Learned Video Compression) is a deep learning-based video compression approach that employs a recurrent conditional GAN. I…</span></li><li><a href="/resource/186398">Per-Title Encode Optimization – Netflix TechBlog</a><span class="ssr-desc">Netflix’s seminal whitepaper on Per-Title Encoding Optimization, describing how they determine optimal encoding settings for each content t…</span></li><li><a href="/resource/184901">QADRA</a><span class="ssr-desc">QADRA (Quality-Aware Dynamic Resolution Adaptation) is an open-source Python-based framework designed for adaptive video streaming applicat…</span></li><li><a href="/resource/185083">QCTools (Quality Control Tools for Video Preservation)</a><span class="ssr-desc">QCTools is a free, open-source software developed by BAVC Media in collaboration with Dave Rice and the Dance Heritage Coalition. It enable…</span></li><li><a href="/resource/186624">RIFE (AI Frame Interpolation)</a><span class="ssr-desc">An AI-based method (Real-Time Intermediate Flow Estimation) for frame interpolation to create slow-motion videos by generating intermediate…</span></li><li><a href="/resource/185465">Rasbora</a><span class="ssr-desc">Rasbora is a distributed, scalable open-source video transcoding solution with hardware acceleration, providing an alternative to mainstrea…</span></li><li><a href="/resource/185311">Simple Binary Encoding (SBE)</a><span class="ssr-desc">SBE is a high-performance message codec designed for low-latency applications. It provides efficient encoding and decoding of messages, mak…</span></li><li><a href="/resource/185215">Telestream Vantage</a><span class="ssr-desc">Telestream&#39;s Vantage is a comprehensive video transcoding and workflow automation solution that integrates with various digital asset manag…</span></li><li><a href="/resource/185300">Theora</a><span class="ssr-desc">Theora is a free and open video compression format developed by the Xiph.Org Foundation. Derived from the VP3 codec, Theora offers a royalt…</span></li><li><a href="/resource/184772">Transcoder</a><span class="ssr-desc">Transcoder is a hardware-accelerated video transcoding library for Android, utilizing the MediaCodec APIs. It supports features such as cro…</span></li><li><a href="/resource/186676">UT Video Codec Suite</a><span class="ssr-desc">An open source lossless video codec from Umezawa that provides fast encoding/decoding and is often used for lossless video compression on W…</span></li><li><a href="/resource/185310">VCT (Video Converter &amp; Transcoder)</a><span class="ssr-desc">VCT is a frontend for FFmpeg that allows users to set options, drag multiple files, transcode between formats (e.g., MKV to MP4), manually…</span></li><li><a href="/resource/185466">VCT - Video Converter &amp; Transcoder</a><span class="ssr-desc">VCT is an open-source video/audio converter GUI based on FFmpeg. It works natively for Windows and Linux, allowing batch conversion of audi…</span></li><li><a href="/resource/184959">VCodec Interface C++ Library</a><span class="ssr-desc">VCodec is a C++ library that provides a standardized interface for various video codecs, facilitating video encoding and decoding processes…</span></li><li><a href="/resource/185446">VLC Live Transcoding Guide</a><span class="ssr-desc">A comprehensive guide detailing various methods for live transcoding using VLC and FFmpeg. It includes examples for creating TCP video stre…</span></li><li><a href="/resource/185061">VLC Media Player</a><span class="ssr-desc">VLC is a free and open-source multimedia player that also offers video conversion tools. It supports a wide range of formats and provides b…</span></li><li><a href="/resource/186375">VVenC (Fraunhofer Versatile Video Encoder)</a><span class="ssr-desc">An open source H.266/VVC encoder implementation by Fraunhofer HHI, designed to be fast and efficient while supporting all features of the V…</span></li><li><a href="/resource/184844">VVenC and VVdeC</a><span class="ssr-desc">VVenC is a fast and efficient VVC encoder developed by Fraunhofer HHI, while VVdeC is a live decoder for VVC. Together, they provide an ope…</span></li><li><a href="/resource/185507">Vantage Gateway</a><span class="ssr-desc">Vantage Gateway, formerly known as Encoding.com, is a cloud-based media processing platform that offers comprehensive transcoding, packagin…</span></li><li><a href="/resource/185508">Vantage Transcode</a><span class="ssr-desc">Vantage Transcode by Telestream provides deep and broad support for all major professional video and audio formats, containers, and package…</span></li><li><a href="/resource/185184">Vantage Transcode by Telestream</a><span class="ssr-desc">Vantage Transcode is a powerful transcoding solution that automates the conversion of media files into various formats. It supports a broad…</span></li><li><a href="/resource/185509">Vcodes</a><span class="ssr-desc">Vcodes offers high-performance media processing solutions, supporting major formats and standards used by TV, OTT, and post-production hous…</span></li><li><a href="/resource/185102">Video Processing Project</a><span class="ssr-desc">The Video Processing Project offers a collection of C++ source code for various video processing algorithms and tools used in software medi…</span></li><li><a href="/resource/185444">Video Transcoding Scripts</a><span class="ssr-desc">A collection of Bash scripts designed to transcode, inspect, and convert videos using tools like HandBrake, MKVToolNix, MPlayer, FFmpeg, an…</span></li><li><a href="/resource/184767">Wirecast</a><span class="ssr-desc">Wirecast is a professional live video streaming production software that enables users to create high-quality live-streamed events. It supp…</span></li><li><a href="/resource/185015">Xiph.Org Foundation Projects</a><span class="ssr-desc">The Xiph.Org Foundation develops free and open protocols and software for multimedia, including well-known projects like the Vorbis audio c…</span></li><li><a href="/resource/184846">dav1d</a><span class="ssr-desc">dav1d is an open-source AV1 decoder developed by the VideoLAN and FFmpeg communities. It is designed for speed and efficiency, making it su…</span></li><li><a href="/resource/185365">ffmpeg-apple-arm64-build</a><span class="ssr-desc">A build script for FFmpeg targeting the latest open-source video codecs running on macOS using Apple&#39;s M1 processor.</span></li><li><a href="/resource/184770">libVLC</a><span class="ssr-desc">libVLC is the core engine and interface of the VLC media player, providing a modular framework for multimedia applications. It supports a w…</span></li><li><a href="/resource/185535">libaom</a><span class="ssr-desc">libaom is the reference implementation for the AV1 video coding format developed by the Alliance for Open Media. It provides tools for enco…</span></li><li><a href="/resource/184908">libaom: AV1 Codec Library</a><span class="ssr-desc">libaom is the official AOMedia video codec library for AV1. It provides the tools necessary for encoding and decoding AV1 video streams, of…</span></li><li><a href="/resource/186683">libmpeg2</a><span class="ssr-desc">A free library for decoding MPEG-1 and MPEG-2 video streams. It&#39;s lightweight and portable, used in several open source media players for M…</span></li><li><a href="/resource/184845">libvpx</a><span class="ssr-desc">libvpx is an open-source project that provides libraries for encoding and decoding VP8 and VP9 video codecs. Developed by Google, it is wid…</span></li><li><a href="/resource/184896">libvpx: VP8/VP9 Codec SDK</a><span class="ssr-desc">libvpx is the official WebM project library for VP8 and VP9 video codec implementations. It provides developers with the tools to encode an…</span></li><li><a href="/resource/184897">libwebm: WebM File Parser</a><span class="ssr-desc">libwebm is a library for parsing WebM files, enabling developers to read and write WebM container files. It supports the WebM multimedia fo…</span></li><li><a href="/resource/185252">mediaEngine by nablet GmbH</a><span class="ssr-desc">mediaEngine is a professional video transcoding software that unites multiple components into a single solution, reducing integration time…</span></li><li><a href="/resource/186618">oneVPL (oneAPI Video Processing Library)</a><span class="ssr-desc">Intel&#39;s oneAPI Video Processing Library, providing a unified API to utilize hardware accelerators (CPU/GPU) for video encoding, decoding, a…</span></li><li><a href="/resource/185449">rffmpeg</a><span class="ssr-desc">rffmpeg is a remote SSH FFmpeg wrapper tool that allows users to execute FFmpeg commands on remote servers via SSH. This is particularly us…</span></li><li><a href="/resource/185271">video-transcoding-api</a><span class="ssr-desc">The video-transcoding-api provides an HTTP API for transcoding media files into different formats using pluggable providers. It supports mu…</span></li><li><a href="/resource/185298">videojs-record ffmpeg.wasm Plugin</a><span class="ssr-desc">The ffmpeg.wasm plugin for videojs-record allows developers to run FFmpeg directly in the browser using WebAssembly. This enables on-the-fl…</span></li><li><a href="/resource/184898">webm-tools: WebM Utilities</a><span class="ssr-desc">webm-tools is a collection of utilities for working with WebM files, including tools for handling alpha channels, encryption, and streaming…</span></li><li><a href="/resource/184899">webmdshow: DirectShow Filters for WebM</a><span class="ssr-desc">webmdshow provides DirectShow filters for WebM, allowing developers to integrate WebM playback and encoding capabilities into Windows appli…</span></li><li><a href="/resource/184900">webmquicktime: QuickTime Components for WebM</a><span class="ssr-desc">webmquicktime offers QuickTime components for WebM, enabling QuickTime-based applications to support WebM video playback and encoding, thus…</span></li><li><a href="/resource/186372">x264 (H.264/AVC Encoder)</a><span class="ssr-desc">The most widely used open source H.264/AVC video encoder, known for its high quality and efficiency across many profiles and presets.</span></li><li><a href="/resource/184907">x264: H.264 Video Encoder</a><span class="ssr-desc">x264 is a free software library for encoding video streams into the H.264/MPEG-4 AVC format. It is widely used due to its high performance…</span></li><li><a href="/resource/186373">x265 (H.265/HEVC Encoder)</a><span class="ssr-desc">A high-performance open source H.265/HEVC encoder. x265 is used to create HEVC video streams and is known for being very configurable to ba…</span></li><li><a href="/resource/185299">xvc</a><span class="ssr-desc">xvc is a modern and flexible open-source video codec that offers high compression performance at reasonable encoding and decoding complexit…</span></li></ul></main></div></div>
+    <script>
+      // The Replit dev banner is a development-only convenience. Inject it only
+      // on Replit/dev hosts so production (awesome.video) never requests it.
+      (function () {
+        try {
+          var isDev = location.hostname.endsWith('.replit.dev') ||
+                      location.hostname === 'localhost' ||
+                      location.hostname.endsWith('.repl.co');
+          if (!isDev) return;
+          var s = document.createElement('script');
+          s.type = 'text/javascript';
+          s.src = 'https://replit.com/public/js/replit-dev-banner.js';
+          document.body.appendChild(s);
+        } catch (e) {}
+      })();
+    </script>
+  </body>
+</html>

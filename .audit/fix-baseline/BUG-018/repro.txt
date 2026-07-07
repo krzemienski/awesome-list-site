@@ -1,0 +1,1 @@
+Baseline: /api/search?q=Doom9 → total 3; q=doom9 → total 0 (case-sensitive)

@@ -753,8 +753,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/resources - List approved resources (public)
   app.get('/api/resources', async (req, res) => {
     try {
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 20;
+      // Support explicit offset/limit for pagination (BUG-003). When offset is
+      // provided, it overrides `page`. Clamp to safe integers; reject non-numeric
+      // values with 400.
+      const rawOffset = req.query.offset as string | undefined;
+      const rawLimit = req.query.limit as string | undefined;
+      if (rawOffset !== undefined && isNaN(Number(rawOffset))) {
+        return res.status(400).json({ error: 'invalid_offset' });
+      }
+      if (rawLimit !== undefined && isNaN(Number(rawLimit))) {
+        return res.status(400).json({ error: 'invalid_limit' });
+      }
+      const limit = Math.min(Math.max(parseInt(rawLimit as string) || 20, 1), 500);
+      const offset = rawOffset !== undefined ? Math.max(parseInt(rawOffset as string), 0) : (parseInt(req.query.page as string) || 1) - 1;
       let category = req.query.category as string;
       let subcategory = req.query.subcategory as string;
       const search = req.query.search as string;
@@ -779,12 +790,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (sub) subcategory = sub.name;
       }
 
+      // BUG-002: sub-subcategory filter. The audit's reproduction passes the
+      // display NAME (e.g. subSubcategory=AV1), matching the existing
+      // subcategory behaviour, so pass it straight through to listResources.
+      const subSubcategory = req.query.subSubcategory as string | undefined;
+
+      // BUG-004: respect ?status= with allow-list; default 'approved' for public.
+      const ALLOWED_STATUSES = new Set(['approved', 'pending', 'rejected']);
+      const requestedStatus = req.query.status as string | undefined;
+      let statusFilter: string | undefined = 'approved';
+      if (requestedStatus !== undefined) {
+        if (!ALLOWED_STATUSES.has(requestedStatus)) {
+          return res.status(400).json({ error: 'invalid_status', allowed: Array.from(ALLOWED_STATUSES) });
+        }
+        statusFilter = requestedStatus;
+      }
+
       const result = await resourceRepo.listResources({
-        page,
+        offset,
         limit,
-        status: 'approved',
+        status: statusFilter,
         category,
         subcategory,
+        subSubcategory,
         search
       });
 
@@ -937,6 +965,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const createResourceHandler = async (req: any, res: any) => {
     try {
       const userId = req.user.claims.sub;
+
+      // BUG-008: explicit server-side validation before DB insert
+      const submitSchema = z.object({
+        url: z.string().min(1).url('Invalid URL format'),
+        title: z.string().min(1).max(200, 'Title must be 1-200 characters'),
+        category: z.string().min(1, 'Category is required'),
+        description: z.string().optional(),
+        subcategory: z.string().optional(),
+        subSubcategory: z.string().optional(),
+      });
+      const submitValidation = submitSchema.safeParse(req.body);
+      if (!submitValidation.success) {
+        return res.status(400).json({
+          error: 'validation_failed',
+          errors: submitValidation.error.errors
+        });
+      }
+
+      // BUG-008: validate category against known category slugs or names
+      const knownCategories = await categoryRepo.listCategories();
+      const validCategorySlugs = new Set(knownCategories.map(c => c.slug));
+      const validCategoryNames = new Set(knownCategories.map(c => c.name));
+      const submittedCategory = submitValidation.data.category;
+      if (!validCategorySlugs.has(submittedCategory) && !validCategoryNames.has(submittedCategory)) {
+        return res.status(400).json({ error: 'invalid_category', message: `Unknown category: ${submittedCategory}` });
+      }
+
+      // BUG-012: pre-check for duplicate URL → 409
+      const existingResource = await resourceRepo.getResourceByUrl(submitValidation.data.url);
+      if (existingResource) {
+        return res.status(409).json({
+          error: 'duplicate_url',
+          existingId: existingResource.id,
+          message: 'This URL is already in the catalog'
+        });
+      }
+
       const resourceData = insertResourceSchema.parse(req.body);
 
       await ensureSubSubcategoryExists(
@@ -946,13 +1011,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         resourceData.subSubcategory,
       );
 
-      const resource = await resourceRepo.createResource({
-        ...resourceData,
-        submittedBy: userId,
-        status: 'pending'
-      });
-      
-      res.status(201).json(resource);
+      // BUG-012: unique-constraint safety net (Postgres error code 23505)
+      try {
+        const resource = await resourceRepo.createResource({
+          ...resourceData,
+          submittedBy: userId,
+          status: 'pending'
+        });
+
+        res.status(201).json(resource);
+      } catch (createError: any) {
+        if (createError.code === '23505' || (createError.message && createError.message.includes('unique'))) {
+          return res.status(409).json({ error: 'duplicate_url', message: 'This URL is already in the catalog' });
+        }
+        throw createError;
+      }
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: 'Invalid resource data', errors: error.errors });
@@ -989,6 +1062,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const id = parseInt(req.params.id);
       const userId = req.user.claims.sub;
       
+      // BUG-010: NaN guard → 400
+      if (isNaN(id)) {
+        return res.status(400).json({ message: 'Invalid resource ID' });
+      }
+      
+      // BUG-010: resource-not-found → 404 (not 500)
+      const existing = await resourceRepo.getResource(id);
+      if (!existing) {
+        return res.status(404).json({ message: 'Resource not found' });
+      }
+      
       const resource = await resourceRepo.updateResourceStatus(id, 'approved', userId);
       res.json(resource);
     } catch (error) {
@@ -1002,6 +1086,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const userId = req.user.claims.sub;
+      
+      // BUG-010: NaN guard → 400
+      if (isNaN(id)) {
+        return res.status(400).json({ message: 'Invalid resource ID' });
+      }
+      
+      // BUG-010: resource-not-found → 404 (not 500)
+      const existing = await resourceRepo.getResource(id);
+      if (!existing) {
+        return res.status(404).json({ message: 'Resource not found' });
+      }
       
       const resource = await resourceRepo.updateResourceStatus(id, 'rejected', userId);
       res.json(resource);
@@ -1938,6 +2033,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         resources: stats.totalResources,
         journeys: stats.totalJourneys,
         pendingApprovals: stats.pendingResources,
+        totalPublic: stats.totalPublic,
+        totalPending: stats.totalPending,
+        totalDeleted: stats.totalDeleted,
       });
     } catch (error) {
       console.error('Error fetching admin stats:', error);
@@ -2025,6 +2123,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Invalid resource ID' });
       }
       
+      // BUG-010: no body required; if a body is present it must be a plain object
+      const approveBodySchema = z.object({}).optional();
+      if (req.body !== undefined && req.body !== null && !approveBodySchema.safeParse(req.body).success) {
+        return res.status(400).json({ message: 'Invalid request body' });
+      }
+      
+      // BUG-010: resource-not-found → 404 (not 500)
+      const existing = await resourceRepo.getResource(resourceId);
+      if (!existing) {
+        return res.status(404).json({ message: 'Resource not found' });
+      }
+      
       const updatedResource = await resourceRepo.approveResource(resourceId, userId);
       
       res.json(updatedResource);
@@ -2046,6 +2156,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Invalid resource ID' });
       }
       
+      // BUG-010: resource-not-found → 404 (not 500)
+      const existing = await resourceRepo.getResource(resourceId);
+      if (!existing) {
+        return res.status(404).json({ message: 'Resource not found' });
+      }
+      
       if (!reason || reason.trim().length < 10) {
         return res.status(400).json({ message: 'Rejection reason is required (minimum 10 characters)' });
       }
@@ -2057,6 +2173,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error rejecting resource:', error);
       res.status(500).json({ message: 'Failed to reject resource' });
+    }
+  });
+
+  // POST /api/admin/resources/:id/unapprove - Revert an approved resource to pending
+  // BUG-010: safe reversal of approval. :id constrained to digits to avoid shadowing bulk routes.
+  app.post('/api/admin/resources/:id(\\d+)/unapprove', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const resourceId = parseInt(req.params.id);
+      const userId = req.user.claims.sub;
+
+      if (isNaN(resourceId)) {
+        return res.status(400).json({ message: 'Invalid resource ID' });
+      }
+
+      // BUG-010: no body required; if a body is present it must be a plain object
+      const unapproveBodySchema = z.object({}).optional();
+      if (req.body !== undefined && req.body !== null && !unapproveBodySchema.safeParse(req.body).success) {
+        return res.status(400).json({ message: 'Invalid request body' });
+      }
+
+      const existing = await resourceRepo.getResource(resourceId);
+      if (!existing) {
+        return res.status(404).json({ message: 'Resource not found' });
+      }
+
+      const updatedResource = await resourceRepo.updateResourceStatus(resourceId, 'pending', userId);
+      res.json(updatedResource);
+    } catch (error) {
+      console.error('Error unapproving resource:', error);
+      res.status(500).json({ message: 'Failed to unapprove resource' });
     }
   });
 

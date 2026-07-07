@@ -1,0 +1,3 @@
+content-security-policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com; frame-ancestors 'none'
+set-cookie: GAESA=Cp4BMDAyZjhmZmQ0NzNlZjExZTAxMTU3Y2ExYmQxNWUyNWIzMzYwNTY0YThhMzdlZTZiNzg0OTU2M2U2MDE3MGI2MjlhMzljODhmOTQ0NGZhMGFkNjY5ZTdiOGE1YWZkMmFjOWIwMGU4NGJjZGU5ZGU5NDM2ZjllMTRlMGFiNzhlYTBlMGU0MjA5YmU5MzdmNTYxMDNhYTE0MDM5NGJiZDcQx_v22PMz; expires=Thu, 06-Aug-2026 05:47:12 GMT; path=/
+x-frame-options: DENY

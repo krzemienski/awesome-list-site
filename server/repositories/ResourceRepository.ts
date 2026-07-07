@@ -34,17 +34,19 @@ import {
   type InsertResource,
 } from "@shared/schema";
 import { db } from "../db";
-import { eq, and, sql, desc, like, or } from "drizzle-orm";
+import { eq, and, sql, desc, like, ilike, or } from "drizzle-orm";
 
 /**
  * Options for listing resources with filtering and pagination
  */
 export interface ListResourceOptions {
   page?: number;
+  offset?: number;
   limit?: number;
   status?: string;
   category?: string;
   subcategory?: string;
+  subSubcategory?: string;
   userId?: string;
   search?: string;
 }
@@ -59,8 +61,8 @@ export class ResourceRepository {
    * @returns Object containing resources array and total count
    */
   async listResources(options: ListResourceOptions): Promise<{ resources: Resource[]; total: number }> {
-    const { page = 1, limit = 20, status, category, subcategory, userId, search } = options;
-    const offset = (page - 1) * limit;
+    const { page = 1, limit = 20, status, category, subcategory, subSubcategory, userId, search } = options;
+    const offset = options.offset ?? ((page - 1) * limit);
 
     let query = db.select().from(resources).$dynamic();
     let countQuery = db.select({ count: sql<number>`count(*)::int` }).from(resources).$dynamic();
@@ -79,6 +81,10 @@ export class ResourceRepository {
       conditions.push(eq(resources.subcategory, subcategory));
     }
 
+    if (subSubcategory) {
+      conditions.push(eq(resources.subSubcategory, subSubcategory));
+    }
+
     if (userId) {
       conditions.push(eq(resources.submittedBy, userId));
     }
@@ -86,8 +92,9 @@ export class ResourceRepository {
     if (search) {
       conditions.push(
         or(
-          like(resources.title, `%${search}%`),
-          like(resources.description, `%${search}%`)
+          ilike(resources.title, `%${search}%`),
+          ilike(resources.description, `%${search}%`),
+          ilike(resources.url, `%${search}%`)
         )
       );
     }

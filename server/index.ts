@@ -11,6 +11,7 @@ import { initializeLinkHealthScheduler } from "./jobs/linkHealthScheduler";
 import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
+import crypto from 'crypto';
 
 const { Pool } = pkg;
 const __filename = fileURLToPath(import.meta.url);
@@ -21,9 +22,15 @@ const app = express();
 // BUG-020: don't advertise the Express server via the X-Powered-By header.
 app.disable("x-powered-by");
 
-// BUG-019: baseline security headers. The always-on set is safe in every
-// environment; the stricter frame/CSP policy is production-only so it never
-// interferes with the Replit dev iframe / Vite HMR.
+// BUG-019 / BUG-014: baseline security headers. The always-on set is safe in
+// every environment; the stricter frame/CSP policy is production-only so it
+// never interferes with the Replit dev iframe / Vite HMR.
+//
+// BUG-014: the CSP no longer relies on 'unsafe-inline'. A fresh per-request
+// nonce is minted here and exposed on res.locals.cspNonce. The og-middleware
+// stamps that nonce onto every inline <script>/<style> it flushes (both the
+// static client/index.html boot scripts and the SSR shell <style>), so inline
+// code executes under 'nonce-<value>' instead of the blanket 'unsafe-inline'.
 app.use((_req, res, next) => {
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
@@ -31,20 +38,52 @@ app.use((_req, res, next) => {
     "Permissions-Policy",
     "camera=(), microphone=(), geolocation=()",
   );
+  // BUG-014: per-request CSP nonce, applied to script-src and style-src. Always
+  // generated (even in dev) so downstream middleware can read it unconditionally;
+  // the CSP header itself stays production-only per the BUG-019 rationale above.
+  const nonce = crypto.randomBytes(16).toString("base64");
+  res.locals.cspNonce = nonce;
   if (process.env.NODE_ENV === "production") {
     res.setHeader("X-Frame-Options", "DENY");
     res.setHeader(
       "Content-Security-Policy",
       [
         "default-src 'self'",
-        "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com",
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+        // BUG-014: nonce-based scripts — no 'unsafe-inline'.
+        `script-src 'self' 'nonce-${nonce}' https://www.googletagmanager.com https://replit.com`,
+        // BUG-014: nonce-based styles — no 'unsafe-inline'. The SSR shell's
+        // <style> and the static inline <style> tags are stamped with this same
+        // nonce by stampNonce() in og-middleware (which reads res.locals.cspNonce),
+        // so a nonce-based style-src is fully functional — no 'unsafe-inline'
+        // fallback is needed.
+        `style-src 'self' 'nonce-${nonce}' https://fonts.googleapis.com`,
         "font-src 'self' https://fonts.gstatic.com",
-        "img-src 'self' data: https:",
+        // BUG-014: tighten img-src from a blanket https: to a known allowlist.
+        "img-src 'self' data: https://img.youtube.com https://*.ytimg.com https://avatars.githubusercontent.com https://repository-images.githubusercontent.com https://www.google.com https://www.gstatic.com",
         "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com",
         "frame-ancestors 'none'",
+        // BUG-014: add the missing hardening directives.
+        "form-action 'self'",
+        "base-uri 'self'",
+        "object-src 'none'",
       ].join("; "),
     );
+  }
+  next();
+});
+
+// BUG-015: server-side route guard for auth-gated pages.
+// Without a connect.sid cookie, redirect to /login (302) instead of serving
+// the SPA shell (which only redirects client-side via JS).
+app.use((req, res, next) => {
+  const protectedPatterns = [
+    /^\/admin(\/|$)/,
+    /^\/bookmarks(\/|$)/,
+    /^\/settings(\/|$)/,
+  ];
+  const isProtected = protectedPatterns.some(p => p.test(req.path));
+  if (isProtected && !req.headers.cookie?.includes('connect.sid')) {
+    return res.redirect(302, '/login');
   }
   next();
 });
