@@ -591,12 +591,18 @@ describe('AwesomeLintValidator - Capitalization Validation', () => {
 
 describe('AwesomeLintValidator - Formatting Validation', () => {
   it('should warn about trailing whitespace', () => {
-    const content = `# Awesome Test
-
-## Category
-
-- [Resource](https://example.com) - Description.
-`;
+    // The trailing spaces are appended programmatically so that editors and
+    // formatters (which strip trailing whitespace on save) cannot silently
+    // break this fixture again.
+    const trailingSpaces = ' '.repeat(2);
+    const content = [
+      '# Awesome Test',
+      '',
+      '## Category',
+      '',
+      `- [Resource](https://example.com) - Description.${trailingSpaces}`,
+      '',
+    ].join('\n');
 
     const validator = new AwesomeLintValidator(content);
     const result = validator.validate();
@@ -605,7 +611,7 @@ describe('AwesomeLintValidator - Formatting Validation', () => {
     expect(formatWarnings.length).toBeGreaterThan(0);
   });
 
-  it('should fail validation for asterisk list markers', () => {
+  it('should warn about asterisk list markers', () => {
     const content = `# Awesome Test
 
 ## Category
@@ -616,9 +622,12 @@ describe('AwesomeLintValidator - Formatting Validation', () => {
     const validator = new AwesomeLintValidator(content);
     const result = validator.validate();
 
-    const listErrors = result.errors.filter(e => e.rule === 'list-marker');
-    expect(listErrors.length).toBeGreaterThan(0);
-    expect(listErrors[0].message).toContain('Use "-" for list items');
+    // Deliberately a warning, not an error: many otherwise-valid awesome
+    // lists use "*" markers, so the validator nudges instead of failing
+    // (see validateFormatting in server/validation/awesomeLint.ts).
+    const listWarnings = result.warnings.filter(w => w.rule === 'list-marker');
+    expect(listWarnings.length).toBeGreaterThan(0);
+    expect(listWarnings[0].message).toContain('Prefer "-" for list items');
   });
 
   it('should fail validation when file does not end with newline', () => {
@@ -959,25 +968,29 @@ describe('formatValidationReport - Report Formatting', () => {
 
 describe('AwesomeLintValidator - Complex Integration Tests', () => {
   it('should validate a complete awesome list with multiple issues', () => {
-    const content = `# Great Resources
-
-This is a test list.
-
-## contents
-
-- [Category One](#category-one)
-
-## Category One
-
-* [Resource](https://example.com/) - description without capital
-- [Another](https://example.com/path with spaces) - Another.
-- [Tool](http://example.com) - Uses nodejs and Github.
-
-
-## Category Two
-
-- [Item](https://example.com/item) - Description
-`;
+    // Built line-by-line (with explicit trailing whitespace and NO final
+    // newline) so save-time formatters cannot silently defuse the fixture.
+    const trailingSpaces = ' '.repeat(2);
+    const content = [
+      '# Great Resources',
+      '',
+      'This is a test list.',
+      '',
+      '## contents',
+      '',
+      '- [Category One](#category-one)',
+      '',
+      '## Category One',
+      '',
+      '* [Resource](https://example.com/) - description without capital',
+      '- [Another](https://example.com/path with spaces) - Another.',
+      `- [Tool](http://example.com) - Uses nodejs and Github.${trailingSpaces}`,
+      '',
+      '',
+      '## Category Two',
+      '',
+      '- [Item](https://example.com/item) - Description',
+    ].join('\n');
 
     const validator = new AwesomeLintValidator(content);
     const result = validator.validate();
@@ -987,7 +1000,6 @@ This is a test list.
     const errorRules = result.errors.map(e => e.rule);
     expect(errorRules).toContain('title');
     expect(errorRules).toContain('badge');
-    expect(errorRules).toContain('list-marker');
     expect(errorRules).toContain('url-trailing-slash');
     expect(errorRules).toContain('url-spaces');
     expect(errorRules).toContain('description-capital');
@@ -996,6 +1008,8 @@ This is a test list.
 
     const warningRules = result.warnings.map(w => w.rule);
     expect(warningRules).toContain('category-capital');
+    // list-marker is intentionally a warning (see validateFormatting).
+    expect(warningRules).toContain('list-marker');
     expect(warningRules).toContain('trailing-whitespace');
     expect(warningRules).toContain('url-https');
     expect(warningRules).toContain('capitalization');

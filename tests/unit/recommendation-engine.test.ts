@@ -702,12 +702,38 @@ describe('RecommendationEngine - Recommendation Reasons', () => {
   });
 
   it('should generate default reason when no specific matches found', () => {
+    // Use a locally-built resource set so recommendation resourceIds can be
+    // mapped back to their source resources.
+    const resources = createMockResources();
+    const localEngine = new RecommendationEngine(resources);
+    // RecommendationResult.resourceId carries the resource URL.
+    const resourcesById = new Map(resources.map(r => [r.url, r]));
+
     const userProfile = createUserProfile(['UnrelatedCategory']);
-    const recommendations = engine.generateRecommendations(userProfile, 5);
+    const recommendations = localEngine.generateRecommendations(userProfile, 5);
+    expect(recommendations.length).toBeGreaterThan(0);
+
+    // The profile matches no category or goal, but a resource whose text
+    // contains a beginner indicator (e.g. "Docker Tutorial") legitimately
+    // earns the skill-level reason. Only resources with NO specific match
+    // must fall back to the default "popular in <category>" reason.
+    const beginnerIndicators = ['basic', 'intro', 'getting started', 'tutorial'];
 
     recommendations.forEach(rec => {
-      expect(rec.reason).toContain('popular in');
+      const resource = resourcesById.get(rec.resourceId);
+      expect(resource).toBeDefined();
+      const text = `${resource!.title} ${resource!.description}`.toLowerCase();
+      const hasSkillMatch = beginnerIndicators.some(i => text.includes(i));
+
+      if (hasSkillMatch) {
+        expect(rec.reason).toContain('suitable for beginner level');
+      } else {
+        expect(rec.reason).toContain('popular in');
+      }
     });
+
+    // At least one recommendation must exercise the default-reason path.
+    expect(recommendations.some(rec => rec.reason.includes('popular in'))).toBe(true);
   });
 
   it('should mention category match in reason', () => {

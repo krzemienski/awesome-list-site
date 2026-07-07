@@ -30,6 +30,9 @@ class FakeCategoryRepo {
   async getSubSubcategoryByName(name: string, subcategoryId: number): Promise<FakeSubSubcategory | undefined> {
     return this.subSubcategories.find(ss => ss.name === name && ss.subcategoryId === subcategoryId);
   }
+  async getSubSubcategoryBySlug(slug: string, subcategoryId: number): Promise<FakeSubSubcategory | undefined> {
+    return this.subSubcategories.find(ss => ss.slug === slug && ss.subcategoryId === subcategoryId);
+  }
   async createSubSubcategory(input: { name: string; slug: string; subcategoryId: number }): Promise<FakeSubSubcategory> {
     this.createCalls.push(input);
     const row: FakeSubSubcategory = { id: this.subSubcategories.length + 1, ...input };
@@ -72,6 +75,10 @@ describe('promoteEnrichmentSuggestions', () => {
   });
 
   it('never overwrites curated hierarchy values', async () => {
+    // The curated sub-subcategory row already exists in the hierarchy —
+    // otherwise the always-on backfill guard would (correctly) create it.
+    repo.subSubcategories.push({ id: 100, name: 'WebRTC Servers', slug: 'webrtc-servers', subcategoryId: 10 });
+
     const updates = await promoteEnrichmentSuggestions(
       repo as any,
       {
