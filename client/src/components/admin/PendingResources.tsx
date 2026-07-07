@@ -259,10 +259,10 @@ export default function PendingResources() {
                           <Calendar className="h-3 w-3" />
                           {formatDate(resource.createdAt)}
                         </span>
-                        {(resource.submittedByEmail || resource.submittedBy) && (
+                        {(resource.submittedByEmail ?? resource.submittedBy) && (
                           <span className="flex items-center gap-1 text-muted-foreground">
                             <User className="h-3 w-3" />
-                            {resource.submittedByEmail || resource.submittedBy}
+                            {resource.submittedByEmail ?? resource.submittedBy}
                           </span>
                         )}
                       </div>
@@ -369,13 +369,13 @@ export default function PendingResources() {
                   </Label>
                   <p className="text-sm mt-1">{formatDate(selectedResource.createdAt)}</p>
                 </div>
-                {(selectedResource.submittedByEmail || selectedResource.submittedBy) && (
+                {(selectedResource.submittedByEmail ?? selectedResource.submittedBy) && (
                   <div>
                     <Label className="text-sm font-semibold flex items-center gap-1">
                       <User className="h-3 w-3" />
                       Submitted By
                     </Label>
-                    <p className="text-sm mt-1">{selectedResource.submittedByEmail || selectedResource.submittedBy}</p>
+                    <p className="text-sm mt-1">{selectedResource.submittedByEmail ?? selectedResource.submittedBy}</p>
                   </div>
                 )}
               </div>

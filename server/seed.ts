@@ -58,7 +58,7 @@ async function seedTagsFromResourceMetadata(): Promise<{ tagRows: number; linkRo
   const tagRows = await db.select({ id: tags.id, name: tags.name }).from(tags);
   const tagIdByName = new Map(tagRows.map((t) => [t.name, t.id]));
 
-  const linkValues: Array<{ resourceId: number; tagId: number }> = [];
+  const linkValues: { resourceId: number; tagId: number }[] = [];
   for (const [name, resourceIds] of tagNameToResourceIds) {
     const tagId = tagIdByName.get(name);
     if (!tagId) continue;

@@ -57,7 +57,7 @@ export async function setupVite(app: Express, server: Server) {
       );
 
       // always reload the index.html file from disk incase it changes
-      let template = await fs.promises.readFile(clientTemplate, "utf-8");
+      const template = await fs.promises.readFile(clientTemplate, "utf-8");
       // NOTE: do NOT append a cache-busting query (?v=nanoid) to the entry
       // script. A versioned entry makes Vite build a second, parallel module
       // graph (/src/main.tsx?v=X imports queryClient.ts?v=X while lazy-loaded

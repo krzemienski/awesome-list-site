@@ -246,7 +246,7 @@ export class ResourceRepository {
    * Get all resources with pending status
    * @returns Object containing pending resources array and total count
    */
-  async getPendingResources(): Promise<{ resources: Array<Resource & { submittedByEmail: string | null }>; total: number }> {
+  async getPendingResources(): Promise<{ resources: (Resource & { submittedByEmail: string | null })[]; total: number }> {
     // Join the submitter so the admin approval queue can show a human-readable
     // identity (email) instead of the raw user UUID.
     const rows = await db
