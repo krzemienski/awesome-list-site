@@ -22,7 +22,7 @@ export default function AdminGuard({ children }: AdminGuardProps) {
   }
   
   // Check if user is admin before mounting any admin components
-  const isAdmin = user && user.role === "admin";
+  const isAdmin = user?.role === "admin";
 
   if (!isAdmin) {
     return (

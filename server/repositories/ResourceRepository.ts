@@ -180,7 +180,7 @@ export class ResourceRepository {
    * @returns The updated resource
    */
   async updateResourceStatus(id: number, status: string, approvedBy?: string): Promise<Resource> {
-    const updateData: any = { status, updatedAt: new Date() };
+    const updateData: Partial<typeof resources.$inferInsert> = { status, updatedAt: new Date() };
 
     if (status === 'approved' && approvedBy) {
       updateData.approvedBy = approvedBy;
@@ -374,7 +374,7 @@ export class ResourceRepository {
     resourceId: number | null,
     action: string,
     performedBy?: string,
-    changes?: any,
+    changes?: Record<string, unknown>,
     notes?: string
   ): Promise<void> {
     await db.insert(resourceAuditLog).values({

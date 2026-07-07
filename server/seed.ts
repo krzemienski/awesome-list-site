@@ -108,7 +108,7 @@ function buildCategoryHierarchy(jsonCategories: VideoCategory[]): CategoryHierar
       if (parent && !parent.parent) {
         // Level 2: Parent has no parent
         hierarchy.level2.set(cat.id, { category: cat, parentId: cat.parent });
-      } else if (parent && parent.parent) {
+      } else if (parent?.parent) {
         // Level 3: Parent has a parent
         hierarchy.level3.set(cat.id, { category: cat, parentId: cat.parent });
       }
@@ -149,7 +149,7 @@ function getCategoryDepth(categoryId: string, categoryMap: Map<string, VideoCate
   if (!category.parent) return 1;
 
   const parent = categoryMap.get(category.parent);
-  if (!parent || !parent.parent) return 2;
+  if (!parent?.parent) return 2;
 
   return 3;
 }
@@ -452,10 +452,10 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
         const ancestors = findAncestors(deepest.id, categoryMap);
         
         // Build category names with normalization to canonical names
-        const rawCategoryName = ancestors.level1?.title || '';
+        const rawCategoryName = ancestors.level1?.title ?? '';
         const categoryName = mapCategoryName(rawCategoryName);
-        const subcategoryName = ancestors.level2?.title || null;
-        const subSubcategoryName = ancestors.level3?.title || null;
+        const subcategoryName = ancestors.level2?.title ?? null;
+        const subSubcategoryName = ancestors.level3?.title ?? null;
 
         if (!categoryName) {
           skippedNoCategoryName++;
@@ -481,7 +481,7 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
           subSubcategory: subSubcategoryName,
           status: 'approved',
           metadata: {
-            tags: project.tags || [],
+            tags: project.tags ?? [],
             sourceCategories: project.category,
           },
         });

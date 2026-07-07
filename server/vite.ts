@@ -45,6 +45,7 @@ export async function setupVite(app: Express, server: Server) {
   });
 
   app.use(vite.middlewares);
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises -- Express 4 accepts async handlers; errors are forwarded via next()
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;
 

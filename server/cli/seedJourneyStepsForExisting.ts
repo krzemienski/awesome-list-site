@@ -133,14 +133,14 @@ export interface SeedJourneyStepsSummary {
   journeyRowsCreated: number;
   stepRowsCreated: number;
   inlineStepsCreated: number;
-  perJourney: Array<{
+  perJourney: {
     journeyId: number | null;
     title: string;
     logicalStepsBefore: number;
     logicalStepsAfter: number;
     rowsCreated: number;
     inlineRowsCreated: number;
-  }>;
+  }[];
 }
 
 async function seedStepsForPlan(plan: JourneyPlan, summary: SeedJourneyStepsSummary) {
@@ -320,8 +320,7 @@ export async function seedJourneyStepsForExisting(): Promise<SeedJourneyStepsSum
 const isDirectRun =
   typeof process !== "undefined" &&
   Array.isArray(process.argv) &&
-  process.argv[1] &&
-  process.argv[1].endsWith("seedJourneyStepsForExisting.ts");
+  process.argv[1]?.endsWith("seedJourneyStepsForExisting.ts");
 
 if (isDirectRun) {
   seedJourneyStepsForExisting()

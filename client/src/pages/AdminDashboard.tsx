@@ -25,7 +25,7 @@ import JourneyStepsManager from "@/components/admin/JourneyStepsManager";
 export default function AdminDashboard() {
   const { stats, isLoading, error } = useAdmin();
   const { isAuthenticated, user, isLoading: authLoading } = useAuth();
-  const isAdmin = Boolean(user && (user as any).role === "admin");
+  const isAdmin = Boolean(user && (user as { role?: string }).role === "admin");
 
   const [activeTab, setActiveTab] = useState(() => {
     if (typeof window !== "undefined") {

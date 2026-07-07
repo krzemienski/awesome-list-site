@@ -40,14 +40,14 @@ export default function PendingResources() {
   });
 
   const approveMutation = useMutation({
-    mutationFn: async (resourceId: number) => {
+    mutationFn: async (resourceId: number): Promise<unknown> => {
       return await apiRequest(`/api/admin/resources/${resourceId}/approve`, {
         method: 'POST'
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/pending-resources'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/admin/pending-resources'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
       toast({
         title: "Resource Approved",
         description: "The resource has been approved and added to the public catalog.",
@@ -65,15 +65,15 @@ export default function PendingResources() {
   });
 
   const rejectMutation = useMutation({
-    mutationFn: async ({ resourceId, reason }: { resourceId: number; reason: string }) => {
+    mutationFn: async ({ resourceId, reason }: { resourceId: number; reason: string }): Promise<unknown> => {
       return await apiRequest(`/api/admin/resources/${resourceId}/reject`, {
         method: 'POST',
         body: JSON.stringify({ reason })
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/pending-resources'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/admin/pending-resources'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
       toast({
         title: "Resource Rejected",
         description: "The resource has been rejected.",
@@ -150,7 +150,7 @@ export default function PendingResources() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {[...Array(3)].map((_, i) => (
+            {Array.from({ length: 3 }).map((_, i) => (
               <div key={i} className="flex items-center space-x-4">
                 <Skeleton className="h-12 w-12 rounded-full" />
                 <div className="space-y-2 flex-1">
@@ -165,8 +165,8 @@ export default function PendingResources() {
     );
   }
 
-  const pendingResources = data?.resources || [];
-  const totalPending = data?.total || 0;
+  const pendingResources = data?.resources ?? [];
+  const totalPending = data?.total ?? 0;
 
   if (totalPending === 0) {
     return (
