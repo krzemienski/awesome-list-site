@@ -106,7 +106,7 @@ export default function AdminDashboard() {
       <AdminStats stats={stats} isLoading={isLoading} />
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
-        <div className="w-full overflow-x-auto pb-2">
+        <div className="w-full overflow-x-auto pb-2 admin-tab-scroller">
           <TabsList className="inline-flex w-max">
             <TabsTrigger value="approvals" className="whitespace-nowrap" data-testid="tab-approvals">
               Approvals {stats?.pendingApprovals ? <Badge variant="accent" className="ml-2">{stats.pendingApprovals}</Badge> : null}

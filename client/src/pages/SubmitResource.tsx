@@ -30,6 +30,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useDebounce } from "@/hooks/useDebounce";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { redirectToLogin } from "@/lib/authUtils";
 import { trackGenerateLead } from "@/lib/analytics";
 import SEOHead from "@/components/layout/SEOHead";
 import { submitSeoTitle, submitSeoDescription } from "@shared/seo-templates";
@@ -280,7 +281,7 @@ export default function SubmitResource() {
         description: "Please log in to submit a resource.",
         variant: "destructive",
       });
-      window.location.href = "/api/login";
+      redirectToLogin();
       return;
     }
     submitMutation.mutate(data);
@@ -339,7 +340,7 @@ export default function SubmitResource() {
                   <AlertTitle className="text-yellow-500">Login required to submit</AlertTitle>
                   <AlertDescription>
                     The form below is read-only. Please{" "}
-                    <a href="/api/login" className="underline" data-testid="link-login">log in</a>{" "}
+                    <a href="/login" className="underline" data-testid="link-login">log in</a>{" "}
                     to submit a resource.
                   </AlertDescription>
                 </Alert>

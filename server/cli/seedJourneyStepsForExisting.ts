@@ -8,6 +8,9 @@ interface StepTemplate {
 interface JourneyPlan {
   journeyTitle: string;
   category: string;
+  description: string;
+  difficulty: "beginner" | "intermediate" | "advanced";
+  estimatedDuration: string;
   searchKeywords: string[];
   steps: StepTemplate[];
 }
@@ -16,6 +19,9 @@ const JOURNEY_PLANS: JourneyPlan[] = [
   {
     journeyTitle: "Video Streaming Fundamentals",
     category: "Introduction & Learning",
+    description: "Start from zero and build a working mental model of digital video delivery: codecs, containers, protocols, and players — everything you need before going deeper.",
+    difficulty: "beginner",
+    estimatedDuration: "8-10 hours",
     searchKeywords: ["intro", "fundamental", "beginner", "learning", "tutorial", "basics", "guide", "primer", "overview"],
     steps: [
       { title: "Introduction to Video Streaming", description: "Get oriented with the core concepts of digital video delivery: containers, codecs, bitrates, and how a video gets from a camera to a viewer's screen." },
@@ -29,6 +35,9 @@ const JOURNEY_PLANS: JourneyPlan[] = [
   {
     journeyTitle: "Building Your First Streaming Platform",
     category: "Infrastructure & Delivery",
+    description: "Stand up a complete streaming platform end-to-end: ingest, encoding ladder, packaging, CDN delivery, and an adaptive player — with testing and monitoring before launch.",
+    difficulty: "intermediate",
+    estimatedDuration: "15-20 hours",
     searchKeywords: ["platform", "server", "cdn", "encoding", "infrastructure", "delivery", "origin", "transcode", "pipeline"],
     steps: [
       { title: "Planning Your Streaming Architecture", description: "Sketch the building blocks of a streaming platform: ingest, transcoder, packager, origin, CDN and player. Decide on live vs VOD scope." },
@@ -42,6 +51,9 @@ const JOURNEY_PLANS: JourneyPlan[] = [
   {
     journeyTitle: "FFMPEG Mastery",
     category: "Encoding & Codecs",
+    description: "Go from one-line FFmpeg commands to production pipelines: rate control, filtergraphs, audio processing, hardware acceleration, and repeatable packaging workflows.",
+    difficulty: "intermediate",
+    estimatedDuration: "12-15 hours",
     searchKeywords: ["ffmpeg", "transcode", "encoding", "filter", "command", "convert", "x264", "x265", "libav"],
     steps: [
       { title: "FFmpeg Fundamentals", description: "Learn how FFmpeg structures inputs, outputs, streams and global options. Get comfortable reading and writing one-line commands." },
@@ -55,6 +67,9 @@ const JOURNEY_PLANS: JourneyPlan[] = [
   {
     journeyTitle: "Advanced Live Streaming Architecture",
     category: "Protocols & Transport",
+    description: "Design low-latency, resilient live pipelines: LL-HLS/WebRTC/SRT trade-offs, multi-region distribution, real-time QoE monitoring, and edge processing for high-stakes events.",
+    difficulty: "advanced",
+    estimatedDuration: "20-25 hours",
     searchKeywords: ["live", "streaming", "low latency", "real-time", "webrtc", "rtmp", "srt", "ll-hls", "cmaf"],
     steps: [
       { title: "Live Streaming Fundamentals", description: "Review the live-streaming pipeline end-to-end: contribution, transcoding, packaging, distribution and playback timing budgets." },
@@ -68,6 +83,9 @@ const JOURNEY_PLANS: JourneyPlan[] = [
   {
     journeyTitle: "DRM & Content Protection",
     category: "General Tools",
+    description: "Protect premium video with modern multi-DRM: Widevine, PlayReady, and FairPlay behind a single CENC/CMAF workflow, layered with tokens, watermarking, and concurrency control.",
+    difficulty: "advanced",
+    estimatedDuration: "10-12 hours",
     searchKeywords: ["drm", "widevine", "playready", "fairplay", "encryption", "protection", "license", "cenc", "security"],
     steps: [
       { title: "DRM Fundamentals", description: "Understand how modern DRM systems combine CENC encryption, license servers and EME to protect premium video." },
@@ -112,7 +130,7 @@ async function findResourcesForJourney(plan: JourneyPlan, want: number): Promise
 export interface SeedJourneyStepsSummary {
   journeysTouched: number;
   journeysAlreadyPopulated: number;
-  journeysNotFoundInDb: number;
+  journeyRowsCreated: number;
   stepRowsCreated: number;
   inlineStepsCreated: number;
   perJourney: Array<{
@@ -127,19 +145,21 @@ export interface SeedJourneyStepsSummary {
 
 async function seedStepsForPlan(plan: JourneyPlan, summary: SeedJourneyStepsSummary) {
   const journeys = await storage.listLearningJourneys();
-  const journey = journeys.find(j => j.title === plan.journeyTitle);
+  let journey = journeys.find(j => j.title === plan.journeyTitle);
   if (!journey) {
-    console.warn(`⚠️  Journey not found in DB: "${plan.journeyTitle}" — skipping (journey row must be seeded first).`);
-    summary.journeysNotFoundInDb++;
-    summary.perJourney.push({
-      journeyId: null,
+    // Create the canonical journey row so a fresh database ships with working
+    // Learning Journeys instead of an empty page (previously this skipped and
+    // /api/journeys returned [] on every new deployment).
+    console.log(`🆕 Journey not in DB, creating: "${plan.journeyTitle}"`);
+    journey = await storage.createLearningJourney({
       title: plan.journeyTitle,
-      logicalStepsBefore: 0,
-      logicalStepsAfter: 0,
-      rowsCreated: 0,
-      inlineRowsCreated: 0,
+      description: plan.description,
+      difficulty: plan.difficulty,
+      estimatedDuration: plan.estimatedDuration,
+      category: plan.category,
+      status: "published",
     });
-    return;
+    summary.journeyRowsCreated++;
   }
 
   const existingSteps = await storage.listJourneySteps(journey.id);
@@ -251,7 +271,7 @@ export async function seedJourneyStepsForExisting(): Promise<SeedJourneyStepsSum
   const summary: SeedJourneyStepsSummary = {
     journeysTouched: 0,
     journeysAlreadyPopulated: 0,
-    journeysNotFoundInDb: 0,
+    journeyRowsCreated: 0,
     stepRowsCreated: 0,
     inlineStepsCreated: 0,
     perJourney: [],
@@ -266,13 +286,16 @@ export async function seedJourneyStepsForExisting(): Promise<SeedJourneyStepsSum
     }
   }
 
-  // Post-seed validation: any journey that exists in the DB must now have
-  // at least one step. This is the gate the code review asked for.
+  // Post-seed validation: every canonical journey must now exist in the DB
+  // and have at least one step. This is the gate the code review asked for.
   const journeys = await storage.listLearningJourneys();
   const offenders: string[] = [];
   for (const plan of JOURNEY_PLANS) {
     const j = journeys.find(x => x.title === plan.journeyTitle);
-    if (!j) continue; // legitimately not in DB yet; covered by journeysNotFoundInDb counter
+    if (!j) {
+      offenders.push(`(missing row) "${plan.journeyTitle}"`);
+      continue;
+    }
     const steps = await storage.listJourneySteps(j.id);
     if (steps.length === 0) {
       offenders.push(`#${j.id} "${j.title}"`);
@@ -287,7 +310,7 @@ export async function seedJourneyStepsForExisting(): Promise<SeedJourneyStepsSum
   console.log(
     `🎉 Journey-step seed done. touched=${summary.journeysTouched} ` +
     `alreadyPopulated=${summary.journeysAlreadyPopulated} ` +
-    `notInDb=${summary.journeysNotFoundInDb} ` +
+    `journeyRowsCreated=${summary.journeyRowsCreated} ` +
     `rowsCreated=${summary.stepRowsCreated} (inline=${summary.inlineStepsCreated}).`
   );
   return summary;

@@ -15,8 +15,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { CheckCircle2, XCircle, Eye, ExternalLink, Calendar, User, FolderTree } from "lucide-react";
 import type { Resource } from "@shared/schema";
 
+type PendingResource = Resource & { submittedByEmail?: string | null };
+
 interface PendingResourcesResponse {
-  resources: Resource[];
+  resources: PendingResource[];
   total: number;
 }
 
@@ -24,7 +26,7 @@ export default function PendingResources() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
+  const [selectedResource, setSelectedResource] = useState<PendingResource | null>(null);
   const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
@@ -257,10 +259,10 @@ export default function PendingResources() {
                           <Calendar className="h-3 w-3" />
                           {formatDate(resource.createdAt)}
                         </span>
-                        {resource.submittedBy && (
+                        {(resource.submittedByEmail || resource.submittedBy) && (
                           <span className="flex items-center gap-1 text-muted-foreground">
                             <User className="h-3 w-3" />
-                            {resource.submittedBy}
+                            {resource.submittedByEmail || resource.submittedBy}
                           </span>
                         )}
                       </div>
@@ -367,13 +369,13 @@ export default function PendingResources() {
                   </Label>
                   <p className="text-sm mt-1">{formatDate(selectedResource.createdAt)}</p>
                 </div>
-                {selectedResource.submittedBy && (
+                {(selectedResource.submittedByEmail || selectedResource.submittedBy) && (
                   <div>
                     <Label className="text-sm font-semibold flex items-center gap-1">
                       <User className="h-3 w-3" />
                       Submitted By
                     </Label>
-                    <p className="text-sm mt-1">{selectedResource.submittedBy}</p>
+                    <p className="text-sm mt-1">{selectedResource.submittedByEmail || selectedResource.submittedBy}</p>
                   </div>
                 )}
               </div>

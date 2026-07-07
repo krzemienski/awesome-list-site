@@ -64,8 +64,16 @@ export default function LinkHealthDashboard() {
     queryKey: ['/api/admin/link-health/history'],
   });
 
+  // Explicit queryFn: the default queryFn only fetches queryKey[0], so the
+  // status filter was never sent to the backend.
   const { data: brokenLinksData } = useQuery<BrokenLinksResponse>({
     queryKey: ['/api/admin/link-health/broken-links', statusFilter],
+    queryFn: () =>
+      apiRequest(
+        statusFilter === 'all'
+          ? '/api/admin/link-health/broken-links'
+          : `/api/admin/link-health/broken-links?status=${statusFilter}`,
+      ),
   });
 
   const runCheckMutation = useMutation({

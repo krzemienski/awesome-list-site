@@ -43,11 +43,20 @@ export default function AwesomeListExplorer() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch awesome lists from GitHub
+  // Fetch awesome lists from GitHub.
+  // Explicit queryFn: the default queryFn only fetches queryKey[0] and drops
+  // the params object, which made search 400 (missing q) and pinned
+  // pagination to page 1.
   const { data: listsData, isLoading, error } = useQuery<AwesomeListsResponse>({
     queryKey: searchQuery 
       ? ['/api/github/search', { q: searchQuery, page }]
       : ['/api/github/awesome-lists', { page, per_page: 30 }],
+    queryFn: () =>
+      apiRequest(
+        searchQuery
+          ? `/api/github/search?q=${encodeURIComponent(searchQuery)}&page=${page}`
+          : `/api/github/awesome-lists?page=${page}&per_page=30`,
+      ),
     enabled: isOpen,
   });
 

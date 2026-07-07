@@ -8,12 +8,9 @@ interface AdminGuardProps {
 
 export default function AdminGuard({ children }: AdminGuardProps) {
   const { user, isLoading } = useAuth();
-  
-  console.log('[AdminGuard] Rendering', { isLoading, user, userRole: user?.role });
-  
+
   // Show loading while checking auth
   if (isLoading) {
-    console.log('[AdminGuard] Showing loading state');
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
@@ -26,11 +23,8 @@ export default function AdminGuard({ children }: AdminGuardProps) {
   
   // Check if user is admin before mounting any admin components
   const isAdmin = user && user.role === "admin";
-  
-  console.log('[AdminGuard] isAdmin check:', { user, role: user?.role, isAdmin });
-  
+
   if (!isAdmin) {
-    console.log('[AdminGuard] Access denied - showing admin gate');
     return (
       <div className="container mx-auto px-4 py-8 max-w-2xl">
         <h1 className="font-display font-medium tracking-tight text-2xl sm:text-3xl text-[var(--text)] mb-4 flex items-center gap-2">
@@ -49,7 +43,6 @@ export default function AdminGuard({ children }: AdminGuardProps) {
     );
   }
   
-  console.log('[AdminGuard] Access granted - rendering admin children');
   // Only render children (AdminDashboard) if confirmed admin
   return <>{children}</>;
 }
