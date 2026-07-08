@@ -25,7 +25,7 @@ import JourneyStepsManager from "@/components/admin/JourneyStepsManager";
 export default function AdminDashboard() {
   const { stats, isLoading, error } = useAdmin();
   const { isAuthenticated, user, isLoading: authLoading } = useAuth();
-  const isAdmin = Boolean(user && (user as any).role === "admin");
+  const isAdmin = Boolean(user && (user as { role?: string }).role === "admin");
 
   const [activeTab, setActiveTab] = useState(() => {
     if (typeof window !== "undefined") {
@@ -106,7 +106,7 @@ export default function AdminDashboard() {
       <AdminStats stats={stats} isLoading={isLoading} />
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
-        <div className="w-full overflow-x-auto pb-2">
+        <div className="w-full overflow-x-auto pb-2 admin-tab-scroller">
           <TabsList className="inline-flex w-max">
             <TabsTrigger value="approvals" className="whitespace-nowrap" data-testid="tab-approvals">
               Approvals {stats?.pendingApprovals ? <Badge variant="accent" className="ml-2">{stats.pendingApprovals}</Badge> : null}

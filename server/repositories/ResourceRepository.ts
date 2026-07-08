@@ -30,6 +30,7 @@ import {
   resourceAuditLog,
   resourceEdits,
   researchDiscoveries,
+  users,
   type Resource,
   type InsertResource,
 } from "@shared/schema";
@@ -179,7 +180,7 @@ export class ResourceRepository {
    * @returns The updated resource
    */
   async updateResourceStatus(id: number, status: string, approvedBy?: string): Promise<Resource> {
-    const updateData: any = { status, updatedAt: new Date() };
+    const updateData: Partial<typeof resources.$inferInsert> = { status, updatedAt: new Date() };
 
     if (status === 'approved' && approvedBy) {
       updateData.approvedBy = approvedBy;
@@ -245,12 +246,20 @@ export class ResourceRepository {
    * Get all resources with pending status
    * @returns Object containing pending resources array and total count
    */
-  async getPendingResources(): Promise<{ resources: Resource[]; total: number }> {
-    const pendingResources = await db
-      .select()
+  async getPendingResources(): Promise<{ resources: (Resource & { submittedByEmail: string | null })[]; total: number }> {
+    // Join the submitter so the admin approval queue can show a human-readable
+    // identity (email) instead of the raw user UUID.
+    const rows = await db
+      .select({ resource: resources, submittedByEmail: users.email })
       .from(resources)
+      .leftJoin(users, eq(resources.submittedBy, users.id))
       .where(eq(resources.status, 'pending'))
       .orderBy(desc(resources.createdAt));
+
+    const pendingResources = rows.map((row) => ({
+      ...row.resource,
+      submittedByEmail: row.submittedByEmail ?? null,
+    }));
 
     return {
       resources: pendingResources,
@@ -365,7 +374,7 @@ export class ResourceRepository {
     resourceId: number | null,
     action: string,
     performedBy?: string,
-    changes?: any,
+    changes?: Record<string, unknown>,
     notes?: string
   ): Promise<void> {
     await db.insert(resourceAuditLog).values({

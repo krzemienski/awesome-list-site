@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 import { db } from "./db";
-import { categories, subcategories, subSubcategories, resources, users, resourceEdits } from "@shared/schema";
+import { categories, subcategories, subSubcategories, resources, users, resourceEdits, tags, resourceTags } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import { hashPassword } from "./passwordUtils";
 import { mapCategoryName } from "@shared/categoryMapping";
@@ -16,6 +16,61 @@ function generateSlug(name: string): string {
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
     .trim();
+}
+
+/**
+ * Backfill the tags and resource_tags tables from resources.metadata.tags.
+ * The UI renders tags straight from metadata, but the public developer API
+ * (/api/public/tags) reads the tags table — which nothing populated, so it
+ * always returned an empty list. Idempotent: safe to run on every boot.
+ */
+async function seedTagsFromResourceMetadata(): Promise<{ tagRows: number; linkRows: number }> {
+  const allResources = await db
+    .select({ id: resources.id, metadata: resources.metadata })
+    .from(resources)
+    .where(eq(resources.status, 'approved'));
+
+  const tagNameToResourceIds = new Map<string, number[]>();
+  for (const r of allResources) {
+    const metaTags = (r.metadata as { tags?: unknown } | null)?.tags;
+    if (!Array.isArray(metaTags)) continue;
+    for (const raw of metaTags) {
+      if (typeof raw !== 'string') continue;
+      const name = raw.trim().toLowerCase();
+      if (!name) continue;
+      const ids = tagNameToResourceIds.get(name) ?? [];
+      ids.push(r.id);
+      tagNameToResourceIds.set(name, ids);
+    }
+  }
+
+  if (tagNameToResourceIds.size === 0) return { tagRows: 0, linkRows: 0 };
+
+  const tagValues = Array.from(tagNameToResourceIds.keys()).map((name) => ({
+    name,
+    slug: generateSlug(name) || name,
+  }));
+  // Insert in chunks to keep statements a reasonable size.
+  for (let i = 0; i < tagValues.length; i += 500) {
+    await db.insert(tags).values(tagValues.slice(i, i + 500)).onConflictDoNothing();
+  }
+
+  const tagRows = await db.select({ id: tags.id, name: tags.name }).from(tags);
+  const tagIdByName = new Map(tagRows.map((t) => [t.name, t.id]));
+
+  const linkValues: { resourceId: number; tagId: number }[] = [];
+  for (const [name, resourceIds] of tagNameToResourceIds) {
+    const tagId = tagIdByName.get(name);
+    if (!tagId) continue;
+    for (const resourceId of resourceIds) {
+      linkValues.push({ resourceId, tagId });
+    }
+  }
+  for (let i = 0; i < linkValues.length; i += 1000) {
+    await db.insert(resourceTags).values(linkValues.slice(i, i + 1000)).onConflictDoNothing();
+  }
+
+  return { tagRows: tagValues.length, linkRows: linkValues.length };
 }
 
 interface VideoCategory {
@@ -53,7 +108,7 @@ function buildCategoryHierarchy(jsonCategories: VideoCategory[]): CategoryHierar
       if (parent && !parent.parent) {
         // Level 2: Parent has no parent
         hierarchy.level2.set(cat.id, { category: cat, parentId: cat.parent });
-      } else if (parent && parent.parent) {
+      } else if (parent?.parent) {
         // Level 3: Parent has a parent
         hierarchy.level3.set(cat.id, { category: cat, parentId: cat.parent });
       }
@@ -94,7 +149,7 @@ function getCategoryDepth(categoryId: string, categoryMap: Map<string, VideoCate
   if (!category.parent) return 1;
 
   const parent = categoryMap.get(category.parent);
-  if (!parent || !parent.parent) return 2;
+  if (!parent?.parent) return 2;
 
   return 3;
 }
@@ -364,7 +419,19 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
     let skippedNoDeepest = 0;
     let skippedNoCategoryName = 0;
     let skippedDuplicate = 0;
-    
+
+    // Dedup by NORMALIZED URL (same normalization LegacyRepository uses when
+    // rendering the tree: trim + lowercase + strip trailing slashes). Exact-URL
+    // matching used to let near-duplicates through (e.g. trailing-slash
+    // variants), which made the DB count (1949) disagree with every
+    // UI-visible count (1934) derived from the deduped awesome-list tree.
+    const normalizeUrl = (url: string): string =>
+      (typeof url === 'string' ? url.trim().toLowerCase() : '').replace(/\/+$/, '');
+    const existingUrls = await db.select({ url: resources.url }).from(resources);
+    const seenNormalizedUrls = new Set<string>(
+      existingUrls.map((r) => normalizeUrl(r.url)).filter((u) => u.length > 0)
+    );
+
     for (const project of awesomeData.projects) {
       try {
         // Skip if no category
@@ -385,10 +452,10 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
         const ancestors = findAncestors(deepest.id, categoryMap);
         
         // Build category names with normalization to canonical names
-        const rawCategoryName = ancestors.level1?.title || '';
+        const rawCategoryName = ancestors.level1?.title ?? '';
         const categoryName = mapCategoryName(rawCategoryName);
-        const subcategoryName = ancestors.level2?.title || null;
-        const subSubcategoryName = ancestors.level3?.title || null;
+        const subcategoryName = ancestors.level2?.title ?? null;
+        const subSubcategoryName = ancestors.level3?.title ?? null;
 
         if (!categoryName) {
           skippedNoCategoryName++;
@@ -396,15 +463,13 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
           continue; // Skip if no valid category
         }
 
-        // Check if resource already exists (by URL)
-        const existing = await db.select().from(resources)
-          .where(eq(resources.url, project.homepage))
-          .limit(1);
-        
-        if (existing.length > 0) {
+        // Check if resource already exists (by normalized URL)
+        const normalizedUrl = normalizeUrl(project.homepage);
+        if (normalizedUrl && seenNormalizedUrls.has(normalizedUrl)) {
           skippedDuplicate++;
           continue;
         }
+        if (normalizedUrl) seenNormalizedUrls.add(normalizedUrl);
 
         // Insert resource
         await db.insert(resources).values({
@@ -416,7 +481,7 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
           subSubcategory: subSubcategoryName,
           status: 'approved',
           metadata: {
-            tags: project.tags || [],
+            tags: project.tags ?? [],
             sourceCategories: project.category,
           },
         });
@@ -433,6 +498,18 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
         console.error(`  ❌ ${errorMsg}`);
         result.errors.push(errorMsg);
       }
+    }
+
+    // Populate the tags + resource_tags tables from resource metadata so the
+    // public API (/api/public/tags) reflects the tags the UI renders instead
+    // of returning an empty list. Idempotent via onConflictDoNothing.
+    try {
+      const tagsSeeded = await seedTagsFromResourceMetadata();
+      console.log(`🏷️  Tags: ${tagsSeeded.tagRows} tag rows, ${tagsSeeded.linkRows} resource links ensured`);
+    } catch (tagErr: unknown) {
+      const msg = tagErr instanceof Error ? tagErr.message : 'Unknown error';
+      console.error(`  ⚠️ Tag backfill reported an issue: ${msg}`);
+      result.errors.push(`Tag backfill: ${msg}`);
     }
 
     // Backfill canonical learning-journey steps so /journey/:id pages are

@@ -30,6 +30,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useDebounce } from "@/hooks/useDebounce";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { redirectToLogin } from "@/lib/authUtils";
 import { trackGenerateLead } from "@/lib/analytics";
 import SEOHead from "@/components/layout/SEOHead";
 import { submitSeoTitle, submitSeoDescription } from "@shared/seo-templates";
@@ -76,27 +77,26 @@ interface SubSubcategory {
 }
 
 export default function SubmitResource() {
-  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [showSuccess, setShowSuccess] = useState(false);
   const [duplicateResource, setDuplicateResource] = useState<{ id: number; title: string; status: string } | null>(null);
-  const [isCheckingDuplicate, setIsCheckingDuplicate] = useState(false);
 
   // Fetch categories
-  const { data: categories = [], isLoading: categoriesLoading } = useQuery<Category[]>({
+  const { data: categories = [] } = useQuery<Category[]>({
     queryKey: ['/api/categories'],
     enabled: isAuthenticated,
   });
 
   // Fetch subcategories
-  const { data: subcategories = [], isLoading: subcategoriesLoading } = useQuery<Subcategory[]>({
+  const { data: subcategories = [] } = useQuery<Subcategory[]>({
     queryKey: ['/api/subcategories'],
     enabled: isAuthenticated,
   });
 
   // Fetch sub-subcategories
-  const { data: subSubcategories = [], isLoading: subSubcategoriesLoading } = useQuery<SubSubcategory[]>({
+  const { data: subSubcategories = [] } = useQuery<SubSubcategory[]>({
     queryKey: ['/api/sub-subcategories'],
     enabled: isAuthenticated,
   });
@@ -115,7 +115,7 @@ export default function SubmitResource() {
     },
   });
 
-  const FIELD_ORDER: Array<keyof SubmitResourceFormData> = [
+  const FIELD_ORDER: (keyof SubmitResourceFormData)[] = [
     "title",
     "url",
     "description",
@@ -182,30 +182,30 @@ export default function SubmitResource() {
   useEffect(() => {
     const checkDuplicateUrl = async () => {
       // Only check if URL is valid and starts with https://
-      if (!debouncedUrl || !debouncedUrl.startsWith("https://")) {
+      if (!debouncedUrl?.startsWith("https://")) {
         setDuplicateResource(null);
         return;
       }
 
-      setIsCheckingDuplicate(true);
       try {
         const response = await fetch(`/api/resources/check-url?url=${encodeURIComponent(debouncedUrl)}`);
-        const data = await response.json();
+        const data = (await response.json()) as {
+          exists?: boolean;
+          resource?: { id: number; title: string; status: string };
+        };
 
         if (data.exists && data.resource) {
           setDuplicateResource(data.resource);
         } else {
           setDuplicateResource(null);
         }
-      } catch (error) {
+      } catch {
         // Silently handle errors - don't block the user
         setDuplicateResource(null);
-      } finally {
-        setIsCheckingDuplicate(false);
       }
     };
 
-    checkDuplicateUrl();
+    void checkDuplicateUrl();
   }, [debouncedUrl]);
 
   // Submit mutation
@@ -236,11 +236,11 @@ export default function SubmitResource() {
           url: data.url,
           description: data.description,
           category: category.name,
-          subcategory: subcategory?.name || undefined,
-          subSubcategory: subSubcategory?.name || undefined,
+          subcategory: subcategory?.name ?? undefined,
+          subSubcategory: subSubcategory?.name ?? undefined,
           metadata: tagsArray.length > 0 ? { tags: tagsArray } : {},
         }),
-      });
+      }) as Promise<unknown>;
     },
     onSuccess: (_data, variables) => {
       // GA4 conversion: resource submission completed.
@@ -259,7 +259,7 @@ export default function SubmitResource() {
       });
       
       // Invalidate resources cache
-      queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
       
       // Scroll to top
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -280,7 +280,7 @@ export default function SubmitResource() {
         description: "Please log in to submit a resource.",
         variant: "destructive",
       });
-      window.location.href = "/api/login";
+      redirectToLogin();
       return;
     }
     submitMutation.mutate(data);
@@ -339,12 +339,12 @@ export default function SubmitResource() {
                   <AlertTitle className="text-yellow-500">Login required to submit</AlertTitle>
                   <AlertDescription>
                     The form below is read-only. Please{" "}
-                    <a href="/api/login" className="underline" data-testid="link-login">log in</a>{" "}
+                    <a href="/login" className="underline" data-testid="link-login">log in</a>{" "}
                     to submit a resource.
                   </AlertDescription>
                 </Alert>
               )}
-              <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} className="space-y-6" noValidate>
+              <form onSubmit={(e) => void form.handleSubmit(onSubmit, onInvalid)(e)} className="space-y-6" noValidate>
                 {/* Fields are disabled for logged-out visitors — they can see the
                     form layout as a preview but cannot fill or submit it (BUG-018). */}
                 <fieldset disabled={!isAuthenticated} className="space-y-6 border-0 p-0 m-0 min-w-0">
