@@ -113,7 +113,7 @@ export default function Journeys() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
           <span className="text-sm text-muted-foreground">Filter by category:</span>
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-full sm:w-[200px]" data-testid="select-category-filter">
+            <SelectTrigger className="w-full sm:w-[200px]" aria-label="Filter by category" data-testid="select-category-filter">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

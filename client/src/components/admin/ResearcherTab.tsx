@@ -255,7 +255,7 @@ export default function ResearcherTab() {
                 <div>
                   <Label>Category Focus (Optional)</Label>
                   <Select value={categoryFocus} onValueChange={setCategoryFocus}>
-                    <SelectTrigger className="mt-1">
+                    <SelectTrigger className="mt-1" aria-label="Category focus">
                       <SelectValue placeholder="All categories" />
                     </SelectTrigger>
                     <SelectContent>

@@ -199,7 +199,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <Button variant="ghost" size="sm" onClick={() => setLocation("/login")} className="gap-1.5 h-9 px-2 sm:px-3 min-h-[44px] min-w-[44px]">
+          <Button variant="ghost" size="sm" onClick={() => setLocation("/login")} aria-label="Login" className="gap-1.5 h-9 px-2 sm:px-3 min-h-[44px] min-w-[44px]">
             <LogIn className="h-4 w-4" />
             <span className="hidden sm:inline">Login</span>
           </Button>

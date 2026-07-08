@@ -194,7 +194,7 @@ export default function BatchEnrichmentPanel() {
       case 'failed':
         return 'bg-red-500 hover:bg-red-600';
       case 'cancelled':
-        return 'bg-gray-500 hover:bg-gray-600';
+        return 'bg-gray-600 text-white hover:bg-gray-700'; /* WP-6 a11y: gray-500 + --text was ~4.4:1; gray-600 + white is ~7.6:1 */
       default:
         return '';
     }

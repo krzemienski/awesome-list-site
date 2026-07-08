@@ -411,7 +411,7 @@ export default function LinkHealthDashboard() {
               value={statusFilter}
               onValueChange={(value) => setStatusFilter(value as 'all' | 'broken' | 'timeout' | 'redirect')}
             >
-              <SelectTrigger className="w-[200px]">
+              <SelectTrigger className="w-[200px]" aria-label="Filter by link status">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

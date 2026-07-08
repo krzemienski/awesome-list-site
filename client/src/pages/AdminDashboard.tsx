@@ -118,13 +118,13 @@ export default function AdminDashboard() {
               <Sparkles className="h-4 w-4 mr-1" />
               Enrichment
             </TabsTrigger>
-            <TabsTrigger value="researcher" className="whitespace-nowrap">
+            <TabsTrigger value="researcher" className="whitespace-nowrap" data-testid="tab-researcher">
               <Brain className="h-4 w-4 mr-1" />
               Researcher
             </TabsTrigger>
-            <TabsTrigger value="export" className="whitespace-nowrap">Export</TabsTrigger>
-            <TabsTrigger value="database" className="whitespace-nowrap">Database</TabsTrigger>
-            <TabsTrigger value="resources" className="whitespace-nowrap">Resources</TabsTrigger>
+            <TabsTrigger value="export" className="whitespace-nowrap" data-testid="tab-export">Export</TabsTrigger>
+            <TabsTrigger value="database" className="whitespace-nowrap" data-testid="tab-database">Database</TabsTrigger>
+            <TabsTrigger value="resources" className="whitespace-nowrap" data-testid="tab-resources">Resources</TabsTrigger>
             <TabsTrigger value="categories" className="whitespace-nowrap" data-testid="tab-categories">Categories</TabsTrigger>
             <TabsTrigger value="subcategories" className="whitespace-nowrap" data-testid="tab-subcategories">Subcategories</TabsTrigger>
             <TabsTrigger value="subsubcategories" className="whitespace-nowrap" data-testid="tab-subsubcategories">Sub-Subcats</TabsTrigger>
@@ -132,13 +132,13 @@ export default function AdminDashboard() {
               <ListOrdered className="h-4 w-4 mr-1" />
               Journeys
             </TabsTrigger>
-            <TabsTrigger value="users" className="whitespace-nowrap">Users</TabsTrigger>
-            <TabsTrigger value="github" className="whitespace-nowrap">GitHub</TabsTrigger>
-            <TabsTrigger value="linkhealth" className="whitespace-nowrap">
+            <TabsTrigger value="users" className="whitespace-nowrap" data-testid="tab-users">Users</TabsTrigger>
+            <TabsTrigger value="github" className="whitespace-nowrap" data-testid="tab-github">GitHub</TabsTrigger>
+            <TabsTrigger value="linkhealth" className="whitespace-nowrap" data-testid="tab-linkhealth">
               <Link className="h-4 w-4 mr-1" />
               Link Health
             </TabsTrigger>
-            <TabsTrigger value="audit" className="whitespace-nowrap">Audit</TabsTrigger>
+            <TabsTrigger value="audit" className="whitespace-nowrap" data-testid="tab-audit">Audit</TabsTrigger>
           </TabsList>
         </div>
 
