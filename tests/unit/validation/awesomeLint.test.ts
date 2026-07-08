@@ -628,6 +628,9 @@ describe('AwesomeLintValidator - Formatting Validation', () => {
     const listWarnings = result.warnings.filter(w => w.rule === 'list-marker');
     expect(listWarnings.length).toBeGreaterThan(0);
     expect(listWarnings[0].message).toContain('Prefer "-" for list items');
+    // Guard against the rule regressing back into the error path.
+    const listErrors = result.errors.filter(e => e.rule === 'list-marker');
+    expect(listErrors).toHaveLength(0);
   });
 
   it('should fail validation when file does not end with newline', () => {

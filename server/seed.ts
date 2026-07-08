@@ -23,6 +23,8 @@ function generateSlug(name: string): string {
  * The UI renders tags straight from metadata, but the public developer API
  * (/api/public/tags) reads the tags table — which nothing populated, so it
  * always returned an empty list. Idempotent: safe to run on every boot.
+ * Returns the number of rows actually inserted this run (conflict-skipped
+ * rows are not counted).
  */
 async function seedTagsFromResourceMetadata(): Promise<{ tagRows: number; linkRows: number }> {
   const allResources = await db
@@ -50,9 +52,18 @@ async function seedTagsFromResourceMetadata(): Promise<{ tagRows: number; linkRo
     name,
     slug: generateSlug(name) || name,
   }));
-  // Insert in chunks to keep statements a reasonable size.
+  // Insert in chunks to keep statements a reasonable size. `.returning()`
+  // after onConflictDoNothing yields only the rows actually written, so the
+  // counts we report are real inserts — not attempts that may have been
+  // skipped because the row already existed.
+  let insertedTagRows = 0;
   for (let i = 0; i < tagValues.length; i += 500) {
-    await db.insert(tags).values(tagValues.slice(i, i + 500)).onConflictDoNothing();
+    const inserted = await db
+      .insert(tags)
+      .values(tagValues.slice(i, i + 500))
+      .onConflictDoNothing()
+      .returning({ id: tags.id });
+    insertedTagRows += inserted.length;
   }
 
   const tagRows = await db.select({ id: tags.id, name: tags.name }).from(tags);
@@ -66,11 +77,17 @@ async function seedTagsFromResourceMetadata(): Promise<{ tagRows: number; linkRo
       linkValues.push({ resourceId, tagId });
     }
   }
+  let insertedLinkRows = 0;
   for (let i = 0; i < linkValues.length; i += 1000) {
-    await db.insert(resourceTags).values(linkValues.slice(i, i + 1000)).onConflictDoNothing();
+    const inserted = await db
+      .insert(resourceTags)
+      .values(linkValues.slice(i, i + 1000))
+      .onConflictDoNothing()
+      .returning({ resourceId: resourceTags.resourceId });
+    insertedLinkRows += inserted.length;
   }
 
-  return { tagRows: tagValues.length, linkRows: linkValues.length };
+  return { tagRows: insertedTagRows, linkRows: insertedLinkRows };
 }
 
 interface VideoCategory {
@@ -505,7 +522,7 @@ export async function seedDatabase(options: { clearExisting?: boolean } = {}): P
     // of returning an empty list. Idempotent via onConflictDoNothing.
     try {
       const tagsSeeded = await seedTagsFromResourceMetadata();
-      console.log(`🏷️  Tags: ${tagsSeeded.tagRows} tag rows, ${tagsSeeded.linkRows} resource links ensured`);
+      console.log(`🏷️  Tags: ${tagsSeeded.tagRows} new tag rows, ${tagsSeeded.linkRows} new resource links inserted (existing rows untouched)`);
     } catch (tagErr: unknown) {
       const msg = tagErr instanceof Error ? tagErr.message : 'Unknown error';
       console.error(`  ⚠️ Tag backfill reported an issue: ${msg}`);
