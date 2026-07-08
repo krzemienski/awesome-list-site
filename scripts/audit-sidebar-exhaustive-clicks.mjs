@@ -21,7 +21,7 @@
  *   _validation/sidebar/clicks/*.jpg      — screenshot per FAIL + first per kind
  */
 import { chromium } from "playwright";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, writeFileSync, readFileSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
 
 const BASE = process.env.BASE_URL || "http://localhost:5000";
@@ -50,15 +50,19 @@ async function probePage(page) {
       .filter((h) => !!(h.offsetParent || h.getClientRects().length))
       .map((h) => (h.innerText || "").trim().slice(0, 200));
     const main = document.querySelector("main, [role='main'], #content, body") || document.body;
+    // Hash CONTENT text, not full body text: when the sidebar is expanded its
+    // (identical) text dominates the first N chars of body.innerText and every
+    // page hashes the same, breaking the distinct-from-home check.
+    const contentRoot = document.querySelector("main, [role='main'], #content") || document.body;
     return {
       h1Count: visibleH1.length,
       h1: visibleH1,
       bodyLen: document.body.innerText.length,
-      bodyText: document.body.innerText.slice(0, 4000),
+      bodyText: contentRoot.innerText.slice(0, 4000),
       resourceCards: main.querySelectorAll('article, [data-testid*="resource"], [data-testid*="card"], a[href^="/resource/"]').length,
       listItems: main.querySelectorAll("ul li, ol li").length,
       paragraphs: main.querySelectorAll("p").length,
-      url: location.pathname,
+      url: location.pathname + location.search,
     };
   });
 }
@@ -92,11 +96,18 @@ async function ensureExpanded(page, testid) {
   const state = await isExpanded(page, testid);
   if (state === null) return false; // not in DOM
   if (state === true) return true;
-  const r = await clickByTestid(page, testid, 2500);
-  if (!r.ok) return false;
-  await page.waitForTimeout(180);
-  // verify
-  return (await isExpanded(page, testid)) === true;
+  // The category accordion header row is a <Link> (clicking it NAVIGATES);
+  // disclosure is owned by the sibling toggle-cat-* chevron button.
+  const clickTarget = testid.startsWith("accordion-cat-")
+    ? testid.replace("accordion-cat-", "toggle-cat-")
+    : testid;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const r = await clickByTestid(page, clickTarget, 2500);
+    if (!r.ok) return false;
+    await page.waitForTimeout(250);
+    if ((await isExpanded(page, testid)) === true) return true;
+  }
+  return false;
 }
 
 /* ------------------------- queue discovery ------------------------- */
@@ -221,9 +232,10 @@ async function discoverQueue(page) {
   for (const n of navs) q.push({
     kind: "nav", testid: n.testid, name: n.name, expectedPath: n.href, openVia: [],
   });
+  // Category rows are Links themselves (row-cat-*); no expansion needed to click.
   for (const c of cats) q.push({
-    kind: "cat", testid: `sub-all-${c.slug}`, name: c.name, expectedPath: `/category/${c.slug}`,
-    openVia: [`accordion-cat-${c.slug}`],
+    kind: "cat", testid: `row-cat-${c.slug}`, name: c.name, expectedPath: `/category/${c.slug}`,
+    openVia: [],
   });
   for (const s of subs) q.push({
     kind: "sub", testid: s.testid, name: s.name, expectedPath: s.href || `/subcategory/${s.slug}`,
@@ -261,35 +273,51 @@ async function verifyOne(page, item, homeHash) {
   // wait until URL settles
   try {
     await page.waitForFunction(
-      (p) => location.pathname === p,
+      (p) => location.pathname + location.search === p,
       item.expectedPath,
       { timeout: 2500 },
     );
   } catch {}
   await page.waitForTimeout(180);
 
-  const probe = await probePage(page);
-  const urlOk = probe.url === item.expectedPath;
-  const isHomeNav = item.kind === "nav" && item.expectedPath === "/";
-  const h1Ok = isHomeNav ? true : (probe.h1Count >= 1 && probe.h1.some((t) => looseMatch(t, item.name)));
-  const bodyOk = probe.bodyLen > 400;
-  const distinctOk = isHomeNav ? true : md5(probe.bodyText) !== homeHash;
-  const needsContent = item.kind !== "nav";
-  const contentOk = !needsContent || (probe.resourceCards + probe.listItems + probe.paragraphs >= 1);
-
-  const ok = !errors.length && urlOk && h1Ok && bodyOk && distinctOk && contentOk;
-  return {
-    ok, click: true, errors,
-    url: probe.url, expectedPath: item.expectedPath,
-    urlOk,
-    h1: probe.h1[0]?.slice(0, 80), h1Ok,
-    bodyLen: probe.bodyLen, bodyOk,
-    bodyHash: md5(probe.bodyText), distinctOk,
-    resourceCards: probe.resourceCards,
-    listItems: probe.listItems,
-    paragraphs: probe.paragraphs,
-    contentOk,
+  const evaluate = (probe) => {
+    const urlOk = probe.url === item.expectedPath;
+    const isHomeNav = item.kind === "nav" && item.expectedPath === "/";
+    // `?view=...` filter items (e.g. sidebar "General") land on the parent
+    // category page, whose h1 is the CATEGORY name — any visible h1 is fine.
+    const isViewFilter = item.expectedPath.includes("?");
+    const h1Ok = isHomeNav
+      ? true
+      : isViewFilter
+        ? probe.h1Count >= 1
+        : (probe.h1Count >= 1 && probe.h1.some((t) => looseMatch(t, item.name)));
+    // 250 not 400: legit sparse pages (1-card subcategories) render <400 chars.
+    const bodyOk = probe.bodyLen > 250;
+    const distinctOk = isHomeNav ? true : md5(probe.bodyText) !== homeHash;
+    const needsContent = item.kind !== "nav";
+    const contentOk = !needsContent || (probe.resourceCards + probe.listItems + probe.paragraphs >= 1);
+    const ok = !errors.length && urlOk && h1Ok && bodyOk && distinctOk && contentOk;
+    return {
+      ok, click: true, errors,
+      url: probe.url, expectedPath: item.expectedPath,
+      urlOk,
+      h1: probe.h1[0]?.slice(0, 80), h1Ok,
+      bodyLen: probe.bodyLen, bodyOk,
+      bodyHash: md5(probe.bodyText), distinctOk,
+      resourceCards: probe.resourceCards,
+      listItems: probe.listItems,
+      paragraphs: probe.paragraphs,
+      contentOk,
+    };
   };
+
+  let result = evaluate(await probePage(page));
+  if (!result.ok) {
+    // one settle-and-retry: async content may still be loading at first probe
+    await page.waitForTimeout(700);
+    result = evaluate(await probePage(page));
+  }
+  return result;
 }
 
 async function withWall(promise, ms, tag) {
@@ -313,7 +341,10 @@ async function setupContext(browser) {
 }
 
 (async () => {
-  const browser = await chromium.launch({ args: ["--no-sandbox", "--disable-dev-shm-usage"] });
+  const browser = await chromium.launch({
+    args: ["--no-sandbox", "--disable-dev-shm-usage"],
+    ...(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}),
+  });
 
   let { ctx, page } = await setupContext(browser);
   const homeProbe = await probePage(page);
@@ -334,9 +365,31 @@ async function setupContext(browser) {
   const start = Date.now();
   const kindFirstShot = new Set();
 
+  // RESUME=1: reuse rows from a prior partial exhaustive.json (keyed by
+  // kind+testid) so the audit can finish across bounded shell sessions.
+  const done = new Map();
+  if (process.env.RESUME === "1" && existsSync(`${OUT}/exhaustive.json`)) {
+    try {
+      const prev = JSON.parse(readFileSync(`${OUT}/exhaustive.json`, "utf8"));
+      for (const r of prev.results || []) {
+        if (r.click !== undefined) done.set(`${r.kind}:${r.testid}`, r);
+      }
+      console.log(`resume: loaded ${done.size} prior rows`);
+    } catch (e) {
+      console.log(`resume: could not load prior results (${e.message}) — starting fresh`);
+    }
+  }
+
   for (let i = 0; i < queue.length; i++) {
     const item = queue[i];
     const t0 = Date.now();
+
+    const prior = done.get(`${item.kind}:${item.testid}`);
+    if (prior) {
+      results.push(prior);
+      if (!prior.ok) failures.push(prior);
+      continue;
+    }
 
     const r = await withWall(verifyOne(page, item, homeHash), PER_ITEM_WALL_MS, item.testid);
     let result;

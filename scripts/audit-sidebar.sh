@@ -49,6 +49,24 @@ else
   fi
 fi
 
+# If the playwright package's expected browser revision isn't downloaded
+# (common in the Replit workspace, where an older pinned Chromium lives in
+# .cache/ms-playwright), fall back to any locally installed Chromium via
+# an explicit executable path. CI installs a matching browser, so this
+# branch is a no-op there.
+if [ -z "${CHROMIUM_PATH:-}" ]; then
+  for c in "$PWD"/.cache/ms-playwright/chromium-*/chrome-linux*/chrome \
+           "$HOME"/.cache/ms-playwright/chromium-*/chrome-linux*/chrome; do
+    if [ -x "$c" ]; then
+      if ! node -e 'require("fs").accessSync(require("playwright").chromium.executablePath())' 2>/dev/null; then
+        export CHROMIUM_PATH="$c"
+        echo ">>> using local Chromium fallback: $CHROMIUM_PATH"
+      fi
+      break
+    fi
+  done
+fi
+
 echo ">>> running exhaustive sidebar click audit against $BASE_URL"
 BASE_URL="$BASE_URL" node scripts/audit-sidebar-exhaustive-clicks.mjs
 
