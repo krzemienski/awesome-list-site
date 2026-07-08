@@ -350,7 +350,9 @@ export default function LinkHealthDashboard() {
                 <Tooltip />
                 <Legend />
                 {/* MR-DS-07/08/09 — strokes sourced from centralized CHART_PALETTE
-                    (ok=[2], bad=[5], warn=[3], --accent-2=[1]). */}
+                    (ok=[2], bad=[5], warn=[3], --accent-2=[1]).
+                    DS-OK: strokeWidth={2} recharts data-viz exception — CC-12's 1.5
+                    default scopes lucide iconography only. */}
                 <Line
                   type="monotone"
                   dataKey="healthy"

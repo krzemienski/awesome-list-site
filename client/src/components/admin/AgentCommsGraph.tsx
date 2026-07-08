@@ -227,11 +227,14 @@ export function AgentCommsGraph({ jobType, jobId, isActive }: AgentCommsGraphPro
               const marker = e.kind === "delegation" ? "url(#arrow-delegation)" : "url(#arrow-tool)";
               return (
                 <g key={i}>
+                  {/* DS-OK: SVG data-viz edge weights (2 = delegation emphasis,
+                      1.25 = dashed tool edge) — CC-12's 1.5 default scopes lucide
+                      iconography only; node borders below use the DS 1.5. */}
                   <path
                     d={`M ${x1} ${y1} C ${cx1} ${my}, ${cx2} ${my}, ${x2} ${y2}`}
                     fill="none"
                     stroke={stroke}
-                    strokeWidth={e.kind === "delegation" ? 1.75 : 1.25}
+                    strokeWidth={e.kind === "delegation" ? 2 : 1.25}
                     strokeOpacity={0.55}
                     strokeDasharray={e.kind === "delegation" ? undefined : "4 3"}
                     markerEnd={marker}
