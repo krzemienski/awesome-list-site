@@ -1,0 +1,10 @@
+PASS ui-login-submit :: landed=/admin
+PASS ui-profile-renders :: Skip to main content | Awesome Video | 1,838 resources | Navigation | Home | Submit Resour
+PASS ui-bookmarks-renders :: loc=/bookmarks
+PASS ui-admin-dashboard-renders :: loc=/admin :: Skip to main content | Awesome Video | 1,838 resources | Navigation | Home | Submit Resource | Learning Journeys
+FATAL page.evaluate: Execution context was destroyed, most likely because of a navigation
+    at /tmp/uiAuthed2.cjs:45:14 {
+  name: 'Error'
+}
+
+NOTE: the final "ui-logout-session-cleared" probe crashed on an execution-context navigation race (harness artifact, after all 4 UI checks passed). Logout/session-clearing was already validated in Sweep B via API (logout -> 200, /api/favorites -> 401). QA UI user + sessions removed in teardown below.

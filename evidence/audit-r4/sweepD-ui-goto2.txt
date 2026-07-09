@@ -1,0 +1,23 @@
+PASS route-journey-detail
+PASS route-theme-settings
+PASS route-submit
+PASS route-recommendations
+PASS route-profile-anon-guard
+PASS route-bookmarks-anon-guard
+PASS route-admin-anon-guard
+PASS route-404
+PASS redir-auth-login
+FAIL redir-favorites :: loc=/ len=5830 :: Authentication Required | Please sign in to access this page | Skip to main content | Awesome Video | 1,838 
+FAIL redir-account :: loc=/ len=5830 :: Authentication Required | Please sign in to access this page | Skip to main content | Awesome Video | 1,838 
+PASS redir-home-query
+PASS redir-cat-sub
+PASS redir-subsub-alias
+PASS redir-journey-bare
+FAIL interact-card-click :: no card link
+PASS mobile-home-no-overflow :: scrollWidth=390
+PASS mobile-category-no-overflow :: scrollWidth=390
+== errors: 1
+ERR: Failed to load resource: the server responded with a status of 404 (Not Found)
+== uiA4: pass=15 fail=3 ==
+PASS interact-card-click :: loc=/resource/184751 h1="2025 NAB Show: CineCentral"
+PASS interact-sidebar-category :: /category/community-events
