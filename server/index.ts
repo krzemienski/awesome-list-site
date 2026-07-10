@@ -6,15 +6,28 @@ import { handleSSR } from "./ssr";
 import { errorHandler } from "./middleware/errorHandler";
 import { runMigrations } from "./migrate";
 import { initializeLinkHealthScheduler } from "./jobs/linkHealthScheduler";
+import * as fs from 'fs';
+import * as path from 'path';
+import { fileURLToPath } from 'url';
+import crypto from 'crypto';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
 // BUG-020: don't advertise the Express server via the X-Powered-By header.
 app.disable("x-powered-by");
 
-// BUG-019: baseline security headers. The always-on set is safe in every
-// environment; the stricter frame/CSP policy is production-only so it never
-// interferes with the Replit dev iframe / Vite HMR.
+// BUG-019 / BUG-014: baseline security headers. The always-on set is safe in
+// every environment; the stricter frame/CSP policy is production-only so it
+// never interferes with the Replit dev iframe / Vite HMR.
+//
+// BUG-014: the CSP no longer relies on 'unsafe-inline'. A fresh per-request
+// nonce is minted here and exposed on res.locals.cspNonce. The og-middleware
+// stamps that nonce onto every inline <script>/<style> it flushes (both the
+// static client/index.html boot scripts and the SSR shell <style>), so inline
+// code executes under 'nonce-<value>' instead of the blanket 'unsafe-inline'.
 app.use((_req, res, next) => {
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
@@ -22,20 +35,56 @@ app.use((_req, res, next) => {
     "Permissions-Policy",
     "camera=(), microphone=(), geolocation=()",
   );
+  // BUG-014: per-request CSP nonce, applied to script-src and style-src. Always
+  // generated (even in dev) so downstream middleware can read it unconditionally;
+  // the CSP header itself stays production-only per the BUG-019 rationale above.
+  const nonce = crypto.randomBytes(16).toString("base64");
+  res.locals.cspNonce = nonce;
   if (process.env.NODE_ENV === "production") {
     res.setHeader("X-Frame-Options", "DENY");
     res.setHeader(
       "Content-Security-Policy",
       [
         "default-src 'self'",
-        "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com",
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+        // BUG-014: nonce-based scripts — no 'unsafe-inline'.
+        `script-src 'self' 'nonce-${nonce}' https://www.googletagmanager.com https://replit.com`,
+        // BUG-014: nonce-based styles — no 'unsafe-inline'. The SSR shell's
+        // <style> and the static inline <style> tags are stamped with this same
+        // nonce by stampNonce() in og-middleware (which reads res.locals.cspNonce),
+        // so a nonce-based style-src is fully functional — no 'unsafe-inline'
+        // fallback is needed.
+        `style-src 'self' 'nonce-${nonce}' https://fonts.googleapis.com`,
         "font-src 'self' https://fonts.gstatic.com",
+        // MERGE NOTE (July 10, 2026): BUG-014 proposed an img-src allowlist, but
+        // ResourceCard renders arbitrary external metadata.ogImage URLs via <img>,
+        // so a fixed allowlist would break resource preview images in production.
+        // Keeping the blanket https: for img-src (it covers the allowlist hosts too).
         "img-src 'self' data: https:",
+        // M1 audit fix: allow www.google.com in connect-src (prod console CSP report).
         "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.google.com",
         "frame-ancestors 'none'",
+        // BUG-014: add the missing hardening directives.
+        "form-action 'self'",
+        "base-uri 'self'",
+        "object-src 'none'",
       ].join("; "),
     );
+  }
+  next();
+});
+
+// BUG-015: server-side route guard for auth-gated pages.
+// Without a connect.sid cookie, redirect to /login (302) instead of serving
+// the SPA shell (which only redirects client-side via JS).
+app.use((req, res, next) => {
+  const protectedPatterns = [
+    /^\/admin(\/|$)/,
+    /^\/bookmarks(\/|$)/,
+    /^\/settings(\/|$)/,
+  ];
+  const isProtected = protectedPatterns.some(p => p.test(req.path));
+  if (isProtected && !req.headers.cookie?.includes('connect.sid')) {
+    return res.redirect(302, '/login');
   }
   next();
 });

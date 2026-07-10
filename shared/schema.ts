@@ -1,5 +1,17 @@
 import { sql } from 'drizzle-orm';
-import { pgTable, text, serial, varchar, timestamp, integer, boolean, jsonb, index, uuid, primaryKey, unique, real } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, varchar, timestamp, integer, boolean, jsonb, index, uuid, primaryKey, unique, real, customType } from "drizzle-orm/pg-core";
+
+/**
+ * Postgres tsvector column type for full-text search (BUG-018).
+ * drizzle-orm has no built-in tsvector type, so a customType is required
+ * to mirror migrations/0029_search_fts.sql in shared/schema.ts (keeps the
+ * migration-drift check honest).
+ */
+const tsvector = customType<{ data: string }>({
+  dataType() {
+    return "tsvector";
+  },
+});
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -218,11 +230,17 @@ export const resources = pgTable(
     metadata: jsonb("metadata").$type<Record<string, any>>().default({}),
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow(),
+    // BUG-018 (migrations/0029_search_fts.sql): generated tsvector for FTS.
+    searchTsv: tsvector("search_tsv").generatedAlwaysAs(
+      (): any =>
+        sql`to_tsvector('english', coalesce(title, '') || ' ' || coalesce(description, '') || ' ' || coalesce(url, ''))`,
+    ),
   },
   (table) => [
     index("idx_resources_status").on(table.status),
     index("idx_resources_status_category").on(table.status, table.category),
     index("idx_resources_category").on(table.category),
+    index("idx_resources_search_tsv").using("gin", table.searchTsv),
   ]
 );
 

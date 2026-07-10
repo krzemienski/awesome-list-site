@@ -36,8 +36,12 @@ export default function Journeys() {
     queryKey: ['/api/journeys'],
   });
 
-  // Get unique categories from journeys
-  const categories = Array.from(new Set(journeys.map(j => j.category))).sort();
+  // Get unique categories from journeys. Filter out empty/nullish values:
+  // Radix <SelectItem> throws at render time on an empty-string value, and with
+  // no ErrorBoundary that crash blanks the whole page (BUG-022).
+  const categories = Array.from(
+    new Set(journeys.map((j) => j.category).filter((c): c is string => !!c && c.trim() !== "")),
+  ).sort();
 
   // Filter journeys by category
   const filteredJourneys = selectedCategory === "all" 

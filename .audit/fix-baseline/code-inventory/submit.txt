@@ -1,0 +1,19 @@
+server/routes.ts:120:// `/submit`), the full category taxonomy, and the long-tail detail pages
+server/routes.ts:156:  addUrl('/submit', 'monthly', '0.5');
+server/routes.ts:935:  // Mounted on both the canonical path and the /api/submit alias (BUG-019) via a
+server/routes.ts:965:  app.post('/api/submit', isAuthenticated, createResourceHandler);
+server/og-middleware.ts:441:    "/submit": {
+server/og-middleware.ts:557:    } else if (path === "/about" || path === "/advanced" || path === "/submit") {
+server/og-middleware.ts:591:        ...(path === "/submit"
+server/og-middleware.ts:600:                action: "/submit",
+server/og-middleware.ts:668:              { path: "/submit", label: "Submit a resource" },
+server/og-middleware.ts:672:              { path: "/submit", label: "Submit a resource" },
+Binary file server/.mimirs/index.db matches
+shared/faq.ts:30:      "Use the Submit page at awesome.video/submit. Sign in, provide the resource URL, title, and category, and a maintainer will review your suggestion before it is published to the directory.",
+client/src/App.tsx:112:        <Route path="/submit" component={SubmitResource} />
+client/src/components/layout/new/AppSidebar.tsx:507:    { label: "Submit Resource", icon: Plus, href: "/submit" },
+client/src/components/layout/new/ModernSidebar.tsx:255:              isActiveRoute("/submit") ? "bg-pink-500/20" : ""
+client/src/components/layout/new/ModernSidebar.tsx:257:            onClick={() => navigate('/submit')}
+Binary file client/src/components/layout/new/.mimirs/index.db matches
+Binary file client/src/components/layout/.mimirs/index.db matches
+Binary file client/src/.mimirs/index.db matches

@@ -1,0 +1,1 @@
+Baseline: GAESA cookie lacks __Host- prefix

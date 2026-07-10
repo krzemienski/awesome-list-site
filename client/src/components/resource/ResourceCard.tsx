@@ -81,6 +81,7 @@ function ResourceCard({
     metadata: {},
     createdAt: new Date(),
     updatedAt: new Date(),
+    searchTsv: null,
   };
 
   return (

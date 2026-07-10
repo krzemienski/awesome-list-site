@@ -364,6 +364,7 @@ export default function Category() {
     metadata: dbResource?.metadata || {},
     createdAt: dbResource?.createdAt || new Date(),
     updatedAt: dbResource?.updatedAt || new Date(),
+    searchTsv: dbResource?.searchTsv ?? null,
   });
   
   const handleSuggestEdit = (e: React.MouseEvent, resource: Resource) => {

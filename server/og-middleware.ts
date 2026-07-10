@@ -22,6 +22,7 @@ import {
   renderSearchContent,
   renderCategoriesContent,
 } from "./seo-content";
+import { buildRelatedResources } from "./services/relatedResources";
 
 export const SITE_URL =
   process.env.PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://awesome.video";
@@ -749,6 +750,22 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
           }),
           breadcrumbSchema(found.crumbs),
         ];
+        // BUG-001: fetch all approved resources for this category, not just the
+        // truncated tree slice (getTreeCached caps a node's resources array).
+        let allCategoryResources: any[] = [];
+        try {
+          const { resources } = await storage.listResources({
+            status: "approved",
+            category: found.name,
+            limit: 100000,
+          });
+          allCategoryResources = resources ?? [];
+        } catch (e) {
+          allCategoryResources = found.node?.resources ?? [];
+        }
+        console.log(
+          `[SSR category] ${found.name}: SSR payload size=${allCategoryResources.length} resources`,
+        );
         const bodyHtml = renderTaxonomyContent({
           heading: found.name,
           description: m.description,
@@ -759,7 +776,7 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
             slug: s.slug,
             count: countNodeResources(s),
           })),
-          resources: (found.node?.resources ?? []).map((r: any) => ({
+          resources: allCategoryResources.map((r: any) => ({
             id: r.id,
             title: r.title,
             description: r.description,
@@ -798,6 +815,22 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
           }),
           breadcrumbSchema(found.crumbs),
         ];
+        // BUG-001: fetch all approved resources for this subcategory, not just
+        // the truncated tree slice.
+        let allSubResources: any[] = [];
+        try {
+          const { resources } = await storage.listResources({
+            status: "approved",
+            subcategory: found.name,
+            limit: 100000,
+          });
+          allSubResources = resources ?? [];
+        } catch (e) {
+          allSubResources = found.node?.resources ?? [];
+        }
+        console.log(
+          `[SSR subcategory] ${found.name}: SSR payload size=${allSubResources.length} resources`,
+        );
         const bodyHtml = renderTaxonomyContent({
           heading: found.name,
           description: m.description,
@@ -808,7 +841,7 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
             slug: s.slug,
             count: countNodeResources(s),
           })),
-          resources: (found.node?.resources ?? []).map((r: any) => ({
+          resources: allSubResources.map((r: any) => ({
             id: r.id,
             title: r.title,
             description: r.description,
@@ -845,11 +878,36 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
           }),
           breadcrumbSchema(found.crumbs),
         ];
+        // BUG-001: fetch all approved resources for this sub-subcategory. The
+        // list API has no sub-subcategory filter, so fetch the full approved set
+        // for the parent category (crumb[1]) and filter by subSubcategory name.
+        let allSubSubResources: any[] = [];
+        try {
+          const parentCategory = found.crumbs[1]?.name;
+          const { resources } = await storage.listResources({
+            status: "approved",
+            category: parentCategory,
+            limit: 100000,
+          });
+          allSubSubResources = (resources ?? []).filter(
+            (r: any) => r.subSubcategory === found.name,
+          );
+          // Fall back to the tree slice if the category-scoped filter found
+          // nothing (e.g. taxonomy name drift) so the page never renders empty.
+          if (allSubSubResources.length === 0) {
+            allSubSubResources = found.node?.resources ?? [];
+          }
+        } catch (e) {
+          allSubSubResources = found.node?.resources ?? [];
+        }
+        console.log(
+          `[SSR sub-subcategory] ${found.name}: SSR payload size=${allSubSubResources.length} resources`,
+        );
         const bodyHtml = renderTaxonomyContent({
           heading: found.name,
           description: m.description,
           crumbs: found.crumbs,
-          resources: (found.node?.resources ?? []).map((r: any) => ({
+          resources: allSubSubResources.map((r: any) => ({
             id: r.id,
             title: r.title,
             description: r.description,
@@ -912,11 +970,43 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
             }),
             breadcrumbSchema(crumbs),
           ];
+          // BUG-007: fetch related resources so the SSR body links out to other
+          // resources (rendered as raw <a href="/resource/<id>"> links for
+          // non-JS crawlers). Mirrors GET /api/resources/:id/related.
+          let relatedLinks: { id: number; title: string; description?: string }[] =
+            [];
+          try {
+            const { resources: pool } = await storage.listResources({
+              status: "approved",
+              category: resource.category ?? undefined,
+              limit: 60,
+            });
+            const related = buildRelatedResources(resource as any, pool, 5);
+            const seen = new Set<number>();
+            for (const bucket of [
+              related.similar,
+              related.prerequisites,
+              related.nextSteps,
+            ]) {
+              for (const item of bucket) {
+                const r = item.resource as any;
+                if (r?.id != null && !seen.has(r.id)) {
+                  seen.add(r.id);
+                  relatedLinks.push({
+                    id: r.id,
+                    title: r.title,
+                    description: r.description,
+                  });
+                }
+              }
+            }
+          } catch {}
           const bodyHtml = renderResourceContent({
             heading: resource.title,
             description: m.description,
             crumbs,
             url: resource.url,
+            related: relatedLinks,
           });
           return { meta: m, found: true, bodyHtml };
         }
@@ -1010,6 +1100,36 @@ function renderJsonLd(data: unknown): string {
       return `\n    <script type="application/ld+json">${json}</script>`;
     })
     .join("");
+}
+
+// BUG-014: stamp the per-request CSP nonce onto every INLINE <script> and
+// <style> in the flushed HTML so they satisfy `script-src 'nonce-<value>'` /
+// `style-src 'nonce-<value>'` without the old blanket 'unsafe-inline'. This one
+// pass covers three sources of inline code:
+//   1. the static client/index.html boot scripts (theme, dev-overlay, fonts),
+//   2. the JSON-LD <script type="application/ld+json"> blocks buildMetaTags emits,
+//   3. the SSR shell <style> injected via <!--app-html-->.
+// Only inline tags are touched: a <script> carrying a `src=` is external and is
+// already authorized by 'self' / the explicit host allowlist, so it is skipped
+// (and left unmodified). Tags that already declare a nonce are left as-is. The
+// nonce value is the base64 string minted in server/index.ts; it is emitted
+// verbatim inside a double-quoted attribute, so no escaping beyond the `"`-free
+// base64 alphabet is required.
+function stampNonce(html: string, nonce: string): string {
+  if (!nonce) return html;
+  // Inline <script ...> (no src=, no existing nonce=). The negative lookahead on
+  // the opening-tag attributes rejects any tag that already has src= or nonce=.
+  const withScripts = html.replace(
+    /<script(?![^>]*\b(?:src|nonce)=)([^>]*)>/gi,
+    `<script nonce="${nonce}"$1>`,
+  );
+  // Inline <style ...> (no existing nonce=). <style> never has a src, so the
+  // only guard needed is against a pre-existing nonce.
+  const withStyles = withScripts.replace(
+    /<style(?![^>]*\bnonce=)([^>]*)>/gi,
+    `<style nonce="${nonce}"$1>`,
+  );
+  return withStyles;
 }
 
 export function buildMetaTags(m: RouteMeta): string {
@@ -1279,6 +1399,16 @@ export function ogInjectionMiddleware() {
             html.includes("<!--app-html-->")
           ) {
             html = html.replace("<!--app-html-->", () => bodyHtml!);
+          }
+          // BUG-014: stamp the per-request CSP nonce onto every inline
+          // <script>/<style> now that the head rewrite and SSR body injection
+          // are both applied. res.locals.cspNonce is set by the security-header
+          // middleware in server/index.ts (always, even in dev); when it is
+          // absent (should not happen) stampNonce is a no-op and the HTML is
+          // returned unchanged.
+          const cspNonce = String((res.locals as any)?.cspNonce || "");
+          if (cspNonce) {
+            html = stampNonce(html, cspNonce);
           }
           const buf = Buffer.from(html, "utf-8");
           res.setHeader("content-length", buf.length);

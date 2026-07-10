@@ -1,0 +1,1 @@
+Baseline: SSR /category/encoding-codecs has 94 unique resource links (vs 328 API)

@@ -1,0 +1,58 @@
+server/routes.ts:11: * - Resources: CRUD operations for video resources (/api/resources/*)
+server/routes.ts:753:  // GET /api/resources - List approved resources (public)
+server/routes.ts:754:  app.get('/api/resources', async (req, res) => {
+server/routes.ts:851:  // GET /api/resources/check-url - Check if URL already exists (public)
+server/routes.ts:852:  app.get('/api/resources/check-url', async (req, res) => {
+server/routes.ts:882:  // GET /api/resources/:id - Get single resource
+server/routes.ts:883:  // :id constrained to digits so literal sub-routes like /api/resources/pending and
+server/routes.ts:884:  // /api/resources/check-url are not shadowed by this dynamic param route.
+server/routes.ts:905:  app.get('/api/resources/:id(\\d+)', getResourceByIdHandler);
+server/routes.ts:908:  app.get('/api/resources/:id/related', async (req, res) => {
+server/routes.ts:934:  // POST /api/resources - Submit new resource (authenticated)
+server/routes.ts:964:  app.post('/api/resources', isAuthenticated, createResourceHandler);
+server/routes.ts:967:  // GET /api/resources/pending - List pending resources (admin only)
+server/routes.ts:968:  app.get('/api/resources/pending', isAuthenticated, isAdmin, async (req, res) => {
+server/routes.ts:986:  // PUT /api/resources/:id/approve - Approve resource (admin)
+server/routes.ts:987:  app.put('/api/resources/:id/approve', isAuthenticated, isAdmin, async (req: any, res) => {
+server/routes.ts:1000:  // PUT /api/resources/:id/reject - Reject resource (admin)
+server/routes.ts:1001:  app.put('/api/resources/:id/reject', isAuthenticated, isAdmin, async (req: any, res) => {
+server/routes.ts:1014:  // POST /api/resources/:id/edits - Submit edit suggestion for a resource (authenticated)
+server/routes.ts:1015:  app.post('/api/resources/:id/edits', isAuthenticated, async (req: any, res) => {
+server/repositories/AuditRepository.ts:201:    // Shared whitelist with POST /api/resources/:id/edit — see @shared/schema EDITABLE_RESOURCE_FIELDS
+Binary file server/repositories/.mimirs/index.db matches
+Binary file server/routes/.mimirs/index.db matches
+server/services/relatedResources.ts:6: * Pure, dependency-free scoring used by GET /api/resources/:id/related.
+Binary file server/.mimirs/index.db matches
+client/src/components/ui/resource-recommendations.tsx:54:    queryKey: ['/api/resources/related', currentResource?.id],
+client/src/components/ui/resource-recommendations.tsx:59:      return await apiRequest(`/api/resources/${currentResource.id}/related?limit=5`, {
+client/src/components/ui/suggest-edit-dialog.tsx:306:      return apiRequest(`/api/resources/${resource.id}/edits`, {
+client/src/components/ui/suggest-edit-dialog.tsx:323:      queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
+Binary file client/src/components/ui/.mimirs/index.db matches
+client/src/components/admin/ResourceManager.tsx:143:      queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
+client/src/components/admin/ResourceManager.tsx:170:      queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
+client/src/components/admin/ResourceManager.tsx:197:      queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
+client/src/components/admin/ResourceManager.tsx:225:      queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
+client/src/components/admin/ResourceManager.tsx:252:      queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
+client/src/components/admin/ResourceManager.tsx:280:      queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
+client/src/components/admin/PendingEdits.tsx:48:      queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
+client/src/components/admin/JourneyStepsManager.tsx:95:    queryKey: ["/api/resources", { search: query, limit: 10 }],
+client/src/components/admin/JourneyStepsManager.tsx:99:      const res = await fetch(`/api/resources?${params.toString()}`, {
+client/src/components/admin/JourneyStepsManager.tsx:109:    queryKey: ["/api/resources/picker", value],
+client/src/components/admin/JourneyStepsManager.tsx:112:      const res = await fetch(`/api/resources/${value}`, { credentials: "include" });
+client/src/components/admin/README.md:1008:        fetchUrl: "/api/resources",
+Binary file client/src/components/admin/.mimirs/index.db matches
+client/src/components/resource/BookmarkButton.tsx:78:      queryClient.invalidateQueries({ queryKey: [`/api/resources/${resourceId}`] });
+Binary file client/src/components/resource/.mimirs/index.db matches
+client/src/components/resource/FavoriteButton.tsx:58:      queryClient.invalidateQueries({ queryKey: [`/api/resources/${resourceId}`] });
+client/src/pages/SubmitResource.tsx:192:        const response = await fetch(`/api/resources/check-url?url=${encodeURIComponent(debouncedUrl)}`);
+client/src/pages/SubmitResource.tsx:232:      return apiRequest('/api/resources', {
+client/src/pages/SubmitResource.tsx:262:      queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
+client/src/pages/ResourceDetail.tsx:47:    queryKey: ['/api/resources', id],
+client/src/pages/ResourceDetail.tsx:49:      const response = await fetch(`/api/resources/${id}`, { credentials: 'include' });
+client/src/pages/ResourceDetail.tsx:67:    queryKey: ['/api/resources', id, 'related'],
+client/src/pages/ResourceDetail.tsx:69:      const response = await fetch(`/api/resources/${id}/related`, { credentials: 'include' });
+client/src/pages/Search.tsx:56:    queryKey: ["/api/resources", "search", trimmed],
+client/src/pages/Search.tsx:58:      apiRequest(`/api/resources?search=${encodeURIComponent(trimmed)}&limit=200`, {
+client/src/pages/ThemeSettings.tsx:256:              0123456789 · const x = await fetch(&apos;/api/resources&apos;);
+Binary file client/src/pages/.mimirs/index.db matches
+Binary file client/src/.mimirs/index.db matches

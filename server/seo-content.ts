@@ -73,9 +73,19 @@ const STYLE = [
   "#ssr-seo-content .ssr-sep{color:#44444f;padding:0 .35rem}",
 ].join("");
 
-function shell(inner: string): string {
-  return `<style>${STYLE}</style><div id="ssr-seo-content"><main class="ssr-wrap">${inner}</main></div>`;
+// BUG-014: the shell <style> carries the per-request CSP nonce so it executes
+// under 'nonce-<value>' instead of 'unsafe-inline'. The nonce is threaded in
+// from res.locals.cspNonce by og-middleware.
+function shell(inner: string, nonce: string = ""): string {
+  // Nonce is optional: when set, it's applied to the inline <style> tag so
+  // strict CSP can allow it; when empty, the style ships without a nonce
+  // (compatible with the current CSP that still has 'unsafe-inline' for
+  // style-src in some pre-Wave-6 deployments). The nonce is threaded from
+  // res.locals.cspNonce by og-middleware.
+  const nonceAttr = nonce ? ` nonce="${escapeHtml(nonce)}"` : "";
+  return `<style${nonceAttr}>${STYLE}</style><div id="ssr-seo-content"><main class="ssr-wrap">${inner}</main></div>`;
 }
+
 
 function crumbsHtml(crumbs?: Crumb[]): string {
   if (!crumbs || crumbs.length === 0) return "";
@@ -262,16 +272,32 @@ export function renderResourceContent(opts: {
   description: string;
   crumbs: Crumb[];
   url?: string;
+  // BUG-007: related resource links injected into the SSR payload so
+  // crawlers and link-graph extractors see internal links.
+  related?: { id: number; title: string; description?: string }[];
 }): string {
+
   const ext = externalHref(opts.url);
   const outbound = ext
     ? `<h2>Link</h2>${linkList([{ href: ext, label: "Visit resource" }], true)}`
     : "";
+  // BUG-007: related resource links so non-JS crawlers see internal links out to
+  // similar/prerequisite/next-step resources instead of a dead-end page.
+  const relatedItems: LinkItem[] = (opts.related ?? []).map((r) => ({
+    href: internalHref(`/resource/${r.id}`),
+    label: r.title,
+    desc: snippet(r.description),
+  }));
+  const related =
+    relatedItems.length > 0
+      ? `<h2>Related resources</h2>${linkList(relatedItems)}`
+      : "";
   return shell(
     crumbsHtml(opts.crumbs) +
       `<h1>${escapeHtml(opts.heading)}</h1>` +
       `<p class="ssr-lead">${escapeHtml(opts.description)}</p>` +
-      outbound,
+      outbound +
+      related,
   );
 }
 

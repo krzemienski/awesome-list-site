@@ -1,0 +1,4 @@
+Total sub-subcategories: 107
+Distinct slugs: 32
+Duplicate slug groups: 23
+Top 10 duplicate slugs: [('ffmpeg', 13), ('hls', 11), ('quality-testing', 8), ('dash', 7), ('audio', 6), ('roku', 6), ('subtitles-captions', 6), ('hevc', 4), ('web-players', 4), ('av1', 3)]

@@ -41,6 +41,9 @@ export interface AdminStats {
   totalUsers: number;
   totalResources: number;
   pendingResources: number;
+  totalPublic: number;
+  totalPending: number;
+  totalDeleted: number;
   totalCategories: number;
   totalJourneys: number;
   activeUsers: number;
@@ -99,6 +102,16 @@ export class AdminRepository {
       .from(resources)
       .where(eq(resources.status, 'pending'));
 
+    const [publicCount] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(resources)
+      .where(eq(resources.status, 'approved'));
+
+    const [deletedCount] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(resources)
+      .where(eq(resources.status, 'rejected'));
+
     const [categoryCount] = await db
       .select({ count: sql<number>`count(*)::int` })
       .from(categories);
@@ -120,6 +133,9 @@ export class AdminRepository {
       totalUsers: userCount.count,
       totalResources: resourceCount.count,
       pendingResources: pendingCount.count,
+      totalPublic: publicCount.count,
+      totalPending: pendingCount.count,
+      totalDeleted: deletedCount.count,
       totalCategories: categoryCount.count,
       totalJourneys: journeyCount.count,
       activeUsers: activeCount.count

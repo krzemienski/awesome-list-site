@@ -1,0 +1,20 @@
+HTTP/2 200 
+cache-control: private
+content-length: 37
+content-security-policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com; frame-ancestors 'none'
+content-type: application/json; charset=utf-8
+date: Tue, 07 Jul 2026 05:47:12 GMT
+etag: W/"25-52tCBtateiL36Jt3/evpzwc68m4"
+expires: Tue, 07 Jul 2026 05:47:12 GMT
+permissions-policy: camera=(), microphone=(), geolocation=()
+referrer-policy: strict-origin-when-cross-origin
+server: Google Frontend
+set-cookie: GAESA=Cp4BMDAyZjhmZmQ0NzNlZjExZTAxMTU3Y2ExYmQxNWUyNWIzMzYwNTY0YThhMzdlZTZiNzg0OTU2M2U2MDE3MGI2MjlhMzljODhmOTQ0NGZhMGFkNjY5ZTdiOGE1YWZkMmFjOWIwMGU4NGJjZGU5ZGU5NDM2ZjllMTRlMGFiNzhlYTBlMGU0MjA5YmU5MzdmNTYxMDNhYTE0MDM5NGJiZDcQuPr22PMz; expires=Thu, 06-Aug-2026 05:47:12 GMT; path=/
+strict-transport-security: max-age=63072000; includeSubDomains
+x-cloud-trace-context: de3e89e1bc92dfe9f651f0fcbe5d88c7
+x-content-type-options: nosniff
+x-frame-options: DENY
+via: 1.1 google
+alt-svc: h3=":443"; ma=2592000
+
+{"user":null,"isAuthenticated":false}

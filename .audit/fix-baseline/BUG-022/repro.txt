@@ -1,0 +1,1 @@
+Baseline: SSR /journeys has 5 journey links (SSR OK); SPA reportedly fails hydration
