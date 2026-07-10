@@ -10,6 +10,12 @@ A production-ready React application for browsing and discovering over 2,600 cur
 
 > **Full history:** see [`CHANGELOG.md`](./CHANGELOG.md) for every dated entry back to December 2025.
 
+### Social Login Restored on Login/Register (July 10, 2026)
+- **Root cause of "prod lost social login"**: the June 1 passport-local refactor removed the social sign-in buttons from `Login.tsx`, while the server-side Replit OIDC flow (`/api/login`, `/api/callback`) stayed fully functional — prod `/api/login` still 302'd to replit.com/oidc the whole time. The UI just had no way to reach it.
+- **Fix**: restored an "Or continue with" divider + **Continue with Replit** button (covers Google / GitHub / Apple / X via Replit's provider screen) on both `Login.tsx` and `Register.tsx`, navigating to `/api/login`. Verified with a real-browser click landing on replit.com/oidc; `tsc` clean.
+- **Loop-breaker**: OIDC callback `failureRedirect` changed from `/api/login` (endless consent-screen bounce) to `/login?error=oauth`, which the Login page surfaces as a destructive toast (param stripped after display). **Known deferred edge case**: a Replit sign-in whose email already belongs to a local email/password account still fails the upsert (UNIQUE email, upsert by id) — it now fails gracefully to the login page instead of looping; proper account-linking is deferred (see `.agents/memory/replit-oidc-local-email-collision.md`).
+- **Requires a republish to reach production.**
+
 ### Audit Follow-Ups: Suggested-Paths Cache + /api/health/ai + AI-Path Fix (July 9, 2026)
 - **P2 cold-start fixed**: `/api/learning-paths/suggested` was ~46s cold (3 sequential Claude calls for the anonymous default). Added an in-memory result cache in `learningPathGenerator` (12h TTL, in-flight dedup, empty results never cached) plus a fire-and-forget boot warm-up in `runBackgroundInitialization()`. Post-warm-up the endpoint serves in <40ms; concurrent cold requests share one generation run.
 - **Latent bug surfaced & fixed**: AI path generation had NEVER succeeded — the 2,000-token cap truncated the JSON mid-response, silently falling back to templates every time. Fixed (4,000 tokens + concise-JSON-only prompt + outermost-brace extraction); all 3 suggested paths now come back `generationType: 'ai'` and warm-up dropped 47s→17s.
