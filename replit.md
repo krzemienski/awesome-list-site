@@ -10,6 +10,12 @@ A production-ready React application for browsing and discovering over 2,600 cur
 
 > **Full history:** see [`CHANGELOG.md`](./CHANGELOG.md) for every dated entry back to December 2025.
 
+### Merged External "Production Audit Remediation" from GitHub (July 10, 2026)
+- **Merged origin/main** (external hardening pass, 184 files: nonce-based CSP, BUG-014/015/019/020 fixes, `migrations/0029_search_fts.sql`, og-middleware/routes rewrites) into local main (UI-audit work) and pushed (`4ece6af`, cleanup `a0f4936`).
+- **Conflict resolution (server/index.ts CSP)**: kept blanket `img-src 'self' data: https:` (remote's domain allowlist would break arbitrary ResourceCard ogImage URLs) + kept the `connect-src` google.com entry; removed a dead `const { Pool } = pkg;` that crashed boot. **Prod-risk to watch after republish**: the nonce CSP has no `unsafe-inline` fallback and is production-only — smoke-check the prod browser console for CSP violations on first publish.
+- **Legitimized the hand-dropped FTS migration**: remote added 0029 without journaling it (boot migrator would silently skip it). Added the `_journal.json` entry, mirrored the generated `search_tsv` tsvector column + GIN index in `shared/schema.ts` (customType + generatedAlwaysAs) so the `migration-drift` check passes, and applied the idempotent SQL to the dev DB by hand (dev never runs the boot migrator). Prod applies 0029 automatically at next publish boot. Note: **no server code reads `search_tsv` yet** — it's infra ahead of an FTS implementation (`/api/search` still uses ILIKE via repo).
+- **Cleanup**: deleted remote's stray `pnpm-lock.yaml`/`pnpm-workspace.yaml` (npm project). Verified: tsc clean, migration-drift green, home 200, search working, 9 cats sum 1,836. Architect PASS. **Requires a republish** for remote's fixes + 0029 to reach production.
+
 ### Social Login Restored on Login/Register (July 10, 2026)
 - **Root cause of "prod lost social login"**: the June 1 passport-local refactor removed the social sign-in buttons from `Login.tsx`, while the server-side Replit OIDC flow (`/api/login`, `/api/callback`) stayed fully functional — prod `/api/login` still 302'd to replit.com/oidc the whole time. The UI just had no way to reach it.
 - **Fix**: restored an "Or continue with" divider + **Continue with Replit** button (covers Google / GitHub / Apple / X via Replit's provider screen) on both `Login.tsx` and `Register.tsx`, navigating to `/api/login`. Verified with a real-browser click landing on replit.com/oidc; `tsc` clean.
