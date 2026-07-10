@@ -125,7 +125,8 @@ async function checkSchemaReproduction(baseUrl: string): Promise<void> {
           `A fresh production deploy WOULD NOT match the schema the code expects ("column does not exist" at runtime).\n\n` +
           `drizzle-kit output:\n${output}\n` +
           `Fix: run "npx drizzle-kit generate" to create the missing migration, then re-run this check.\n` +
-          `Reminder: keep new migrations idempotent (prod's journal table is empty and the boot code's 42P07 catch can skip batched statements).`
+          `Reminder: keep new migrations idempotent (prod's journal table may be empty, so the whole chain re-runs at boot; ` +
+          `a non-idempotent statement now FAILS the boot loudly — see scripts/verify-boot-migration-safety.ts).`
       );
     }
 
