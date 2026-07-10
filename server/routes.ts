@@ -686,7 +686,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log('[/api/auth/user] Request received');
       console.log('[/api/auth/user] isAuthenticated:', req.isAuthenticated?.());
-      console.log('[/api/auth/user] req.user?.dbUser:', req.user?.dbUser);
+      console.log('[/api/auth/user] req.user?.dbUser:', req.user?.dbUser
+        ? { id: req.user.dbUser.id, email: req.user.dbUser.email, role: req.user.dbUser.role }
+        : undefined);
       console.log('[/api/auth/user] req.user?.claims?.sub:', req.user?.claims?.sub);
       
       // Check if user is authenticated

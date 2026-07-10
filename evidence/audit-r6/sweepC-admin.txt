@@ -1,0 +1,40 @@
+PASS gate-nonadmin-403 [403]
+__qa_test_audit_r6_1783680524@example.com -> admin
+UPDATE 1
+PASS admin-get-stats [200]
+PASS admin-get-users [200]
+PASS admin-get-pending-resources [200]
+PASS admin-get-resources [200]
+PASS admin-get-resource-edits [200]
+PASS admin-get-categories [200]
+PASS admin-get-subcategories [200]
+PASS admin-get-sub-subcategories [200]
+PASS admin-get-journeys [200]
+PASS admin-get-audit-logs [200]
+PASS admin-get-validation-status [200]
+PASS admin-get-export-json [200]
+PASS admin-get-enrichment-jobs [200]
+PASS admin-get-researcher-jobs [200]
+PASS admin-get-researcher-discoveries [200]
+PASS admin-get-github-sync-status [200]
+PASS admin-get-github-sync-history [200]
+PASS admin-get-link-health-status [200]
+PASS admin-export-md [200]
+PASS resource-approve [200]
+PASS resource-approved-status
+PASS edit-create id=46
+PASS edit-approve [200]
+PASS edit-applied
+PASS edit-reject [200]
+PASS real-185811-untouched
+PASS edit-reject-status
+PASS resource-delete [200]
+PASS resource-deleted-404 [404]
+PASS category-create id=1119
+PASS category-rename [200]
+PASS category-delete [200]
+PASS category-gone
+PASS user2-promote [200]
+PASS user2-role-admin
+PASS user2-demote [200]
+PASS user2-role-user
