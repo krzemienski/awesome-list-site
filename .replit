@@ -27,6 +27,10 @@ author = "agent"
 task = "workflow.run"
 args = "Start application"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "migration-drift"
+
 [[workflows.workflow]]
 name = "Start application"
 author = "agent"
@@ -44,6 +48,17 @@ author = 17784443
 [[workflows.workflow.tasks]]
 task = "workflow.run"
 args = "Start application"
+
+[[workflows.workflow]]
+name = "migration-drift"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx tsx scripts/check-migration-drift.ts"
+
+[workflows.workflow.metadata]
+isValidation = true
 
 [agent]
 integrations = ["javascript_google_analytics:1.0.0", "javascript_anthropic:1.0.0", "javascript_anthropic_ai_integrations:1.0.0", "javascript_log_in_with_replit:1.0.0", "github:1.0.0"]
