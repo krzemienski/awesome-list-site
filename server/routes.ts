@@ -755,8 +755,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/resources - List approved resources (public)
   app.get('/api/resources', async (req, res) => {
     try {
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 20;
+      // Clamp paging params: negative/huge values must not bypass pagination
+      // (a raw limit=-5 previously fell through to "no limit" → full 1,838-row
+      // payload). Client's largest legitimate request is limit=200 (Search).
+      const rawPage = parseInt(req.query.page as string);
+      const page = Math.max(Number.isFinite(rawPage) ? rawPage : 1, 1);
+      const rawLimit = parseInt(req.query.limit as string);
+      const limit = Math.min(Math.max(Number.isFinite(rawLimit) ? rawLimit : 20, 1), 200);
       let category = req.query.category as string;
       let subcategory = req.query.subcategory as string;
       const search = req.query.search as string;

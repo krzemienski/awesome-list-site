@@ -1,0 +1,11 @@
+HTTP/1.1 302 Found
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+Location: https://replit.com/oidc/auth?scope=openid+email+profile+offline_access&prompt=login+consent&client_id=71ccccc7-37f7-4f07-a880-5973ae4aa911&response_type=code&code_challenge=LERY2ELmj15ngEfWvF4gt6NdYJLGfGUo_EhiMod_n14&code_challenge_method=S256&redirect_uri=https%3A%2F%2Flocalhost%2Fapi%2Fcallback
+Content-Length: 0
+Set-Cookie: connect.sid=s%3A7qrBkKJBKCelnLeTdEDcbohSRz3hqXgo.MDuD6v85JDkoqD9mRInkNnKyk0LCE6ILaqAyMd04ioo; Path=/; Expires=Fri, 17 Jul 2026 16:49:55 GMT; HttpOnly; SameSite=Lax
+Date: Fri, 10 Jul 2026 16:49:55 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
