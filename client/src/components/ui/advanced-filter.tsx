@@ -136,14 +136,16 @@ export default function AdvancedFilter({
             <Badge
               key={tag}
               variant="default"
-              className="text-xs cursor-pointer hover:bg-destructive hover:text-destructive-foreground px-2 py-1 flex items-center gap-1 touch-manipulation"
+              className="text-xs cursor-pointer hover:bg-destructive hover:text-destructive-foreground px-3 py-1 min-h-[32px] flex items-center gap-1 touch-manipulation"
               onClick={() => toggleTag(tag)}
+              role="button"
+              aria-label={`Remove ${tag} filter`}
             >
               {tag}
               <X className="h-3 w-3" />
             </Badge>
           ))}
-          <Button variant="ghost" size="sm" onClick={clearAll} className="text-xs h-7 px-2">
+          <Button variant="ghost" size="sm" onClick={clearAll} className="text-xs min-h-[32px] px-2">
             Clear
           </Button>
         </div>

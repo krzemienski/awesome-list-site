@@ -223,7 +223,7 @@ export default function Subcategory() {
         
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight truncate">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight break-words">
               {subcategoryName}
             </h1>
             <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 sm:mt-1">
