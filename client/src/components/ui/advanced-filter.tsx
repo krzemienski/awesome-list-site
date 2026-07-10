@@ -136,9 +136,16 @@ export default function AdvancedFilter({
             <Badge
               key={tag}
               variant="default"
-              className="text-xs cursor-pointer hover:bg-destructive hover:text-destructive-foreground px-3 py-1 min-h-[32px] flex items-center gap-1 touch-manipulation"
+              className="text-xs cursor-pointer hover:bg-destructive hover:text-destructive-foreground px-3 py-1 min-h-[32px] flex items-center gap-1 touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               onClick={() => toggleTag(tag)}
               role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  toggleTag(tag);
+                }
+              }}
               aria-label={`Remove ${tag} filter`}
             >
               {tag}
