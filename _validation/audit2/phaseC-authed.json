@@ -1,0 +1,42 @@
+[
+ {
+  "id": "C6-ui-login",
+  "pass": true,
+  "detail": "path=/admin email=__qa_test_20260708_070413_phasec@example.com role=admin"
+ },
+ {
+  "id": "C7-admin-tabs",
+  "pass": true,
+  "detail": "tabs present: 7/7"
+ },
+ {
+  "id": "C8-form-filled",
+  "pass": true,
+  "detail": "category picked: Community & Events"
+ },
+ {
+  "id": "C8-submitted",
+  "pass": true,
+  "detail": "path=/submit toast=\"Success!Your resource has been submitted for review. It will be visible once approved by an admin.\""
+ },
+ {
+  "id": "C9-pending-appears",
+  "pass": true,
+  "detail": "id=187092 rows=1 badge=0 noReload=true"
+ },
+ {
+  "id": "C9-submittedByEmail",
+  "pass": true,
+  "detail": "emailShown=true uuidLeak=false row=\"__qa_test_20260708_070413 DQC Proof ResourceCommunity & EventsThrowaway QA resource proving submit-to-approve invalidation works in one Quer\""
+ },
+ {
+  "id": "C10-approve-no-reload",
+  "pass": true,
+  "detail": "rowGone=true badge 0→0 badgeDropped=false noReload=true"
+ },
+ {
+  "id": "C10-approved-in-db",
+  "pass": true,
+  "detail": "api status={\"status\":\"approved\",\"title\":\"__qa_test_20260708_070413 DQC Proof Resource\"}"
+ }
+]

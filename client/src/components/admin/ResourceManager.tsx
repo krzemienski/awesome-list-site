@@ -39,10 +39,11 @@ interface ResourcesResponse {
   totalPages: number;
 }
 
+/* WP-6 a11y: black ink on mid-tone badges — white on -500 tones is 2.3–3.8:1 (fails AA). */
 const STATUS_OPTIONS = [
-  { value: "approved", label: "Approved", color: "bg-green-500" },
-  { value: "pending", label: "Pending", color: "bg-yellow-500" },
-  { value: "rejected", label: "Rejected", color: "bg-red-500" }
+  { value: "approved", label: "Approved", color: "bg-green-500 text-black" },
+  { value: "pending", label: "Pending", color: "bg-yellow-500 text-black" },
+  { value: "rejected", label: "Rejected", color: "bg-red-500 text-black" }
 ];
 
 export default function ResourceManager() {
@@ -401,7 +402,7 @@ export default function ResourceManager() {
   const getStatusBadge = (status: string) => {
     const statusInfo = STATUS_OPTIONS.find(s => s.value === status);
     return (
-      <Badge className={`${statusInfo?.color || 'bg-[var(--surface-3)]'} text-white`}>
+      <Badge className={`${statusInfo?.color || 'bg-[var(--surface-3)] text-white'}`}>
         {statusInfo?.label || status}
       </Badge>
     );
@@ -497,7 +498,7 @@ export default function ResourceManager() {
               />
             </div>
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-full sm:w-48" data-testid="select-category-filter">
+              <SelectTrigger className="w-full sm:w-48" aria-label="Filter by category" data-testid="select-category-filter">
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
@@ -509,7 +510,7 @@ export default function ResourceManager() {
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full sm:w-36" data-testid="select-status-filter">
+              <SelectTrigger className="w-full sm:w-36" aria-label="Filter by status" data-testid="select-status-filter">
                 <SelectValue placeholder="All Status" />
               </SelectTrigger>
               <SelectContent>
@@ -519,11 +520,11 @@ export default function ResourceManager() {
                 ))}
               </SelectContent>
             </Select>
-            <Button type="submit" variant="outline" data-testid="button-search">
+            <Button type="submit" variant="outline" aria-label="Search" data-testid="button-search">
               <Search className="h-4 w-4" />
             </Button>
             {(search || categoryFilter || statusFilter) && (
-              <Button type="button" variant="ghost" onClick={clearFilters} data-testid="button-clear-filters">
+              <Button type="button" variant="ghost" onClick={clearFilters} aria-label="Clear filters" data-testid="button-clear-filters">
                 <X className="h-4 w-4" />
               </Button>
             )}
@@ -692,6 +693,7 @@ export default function ResourceManager() {
                           variant="outline"
                           size="sm"
                           onClick={() => openEditDialog(resource)}
+                          aria-label="Edit resource"
                           data-testid={`button-edit-${resource.id}`}
                         >
                           <Pencil className="h-4 w-4" />
@@ -700,6 +702,7 @@ export default function ResourceManager() {
                           variant="destructive"
                           size="sm"
                           onClick={() => openDeleteDialog(resource)}
+                          aria-label="Delete resource"
                           data-testid={`button-delete-${resource.id}`}
                         >
                           <Trash2 className="h-4 w-4" />
@@ -722,6 +725,7 @@ export default function ResourceManager() {
                 size="sm"
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page <= 1}
+                aria-label="Previous page"
                 data-testid="button-prev-page"
               >
                 <ChevronLeft className="h-4 w-4" />
@@ -734,6 +738,7 @@ export default function ResourceManager() {
                 size="sm"
                 onClick={() => setPage(p => Math.min(data?.totalPages || 1, p + 1))}
                 disabled={page >= (data?.totalPages || 1)}
+                aria-label="Next page"
                 data-testid="button-next-page"
               >
                 <ChevronRight className="h-4 w-4" />

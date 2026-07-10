@@ -1,0 +1,138 @@
+{
+  "mode": "anon",
+  "results": [
+    {
+      "route": "home",
+      "target": "skip-link",
+      "selector": "a.skip-link",
+      "found": true,
+      "shot": true,
+      "style": {
+        "tag": "a",
+        "testid": null,
+        "role": null,
+        "cls": "skip-link",
+        "outline": "2px solid rgb(255, 61, 82)",
+        "outlineOffset": "2px",
+        "boxShadow": "none",
+        "borderColor": "rgb(0, 0, 0)",
+        "accentVar": "#ff3d52",
+        "matchesFocusVisible": true
+      }
+    },
+    {
+      "route": "home",
+      "target": "sidebar-nav-row",
+      "selector": "[data-sidebar=\"menu-button\"]",
+      "found": true,
+      "shot": true,
+      "style": {
+        "tag": "button",
+        "testid": null,
+        "role": null,
+        "cls": "peer/menu-button flex w-full items-center gap-2 overflow-hidden p-2 text-left outline-none ring-side",
+        "outline": "0px none rgb(16, 16, 16)",
+        "outlineOffset": "0px",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgb(255, 61, 82) 0px 0px 0px 2px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+        "borderColor": "rgba(244, 243, 238, 0.08)",
+        "accentVar": "#ff3d52",
+        "matchesFocusVisible": true
+      }
+    },
+    {
+      "route": "home",
+      "target": "link",
+      "selector": "main a[href]",
+      "found": true,
+      "shot": true,
+      "style": {
+        "tag": "a",
+        "testid": "link-category-community-events",
+        "role": null,
+        "cls": "block outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset",
+        "outline": "0px none rgb(16, 16, 16)",
+        "outlineOffset": "1px",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgb(0, 0, 0) 0px 0px 0px 2px, rgb(255, 61, 82) 0px 0px 0px 4px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+        "borderColor": "rgba(244, 243, 238, 0.08)",
+        "accentVar": "#ff3d52",
+        "matchesFocusVisible": true
+      }
+    },
+    {
+      "route": "home",
+      "target": "button",
+      "selector": "main button:not([disabled])",
+      "found": true,
+      "shot": true,
+      "style": {
+        "tag": "button",
+        "testid": null,
+        "role": null,
+        "cls": "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium ring-",
+        "outline": "0px none rgb(16, 16, 16)",
+        "outlineOffset": "0px",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgb(0, 0, 0) 0px 0px 0px 2px, rgb(255, 61, 82) 0px 0px 0px 4px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+        "borderColor": "rgba(244, 243, 238, 0.16)",
+        "accentVar": "#ff3d52",
+        "matchesFocusVisible": true
+      }
+    },
+    {
+      "route": "category",
+      "target": "input",
+      "selector": "[data-testid=\"input-search-resources\"]",
+      "found": true,
+      "shot": true,
+      "style": {
+        "tag": "input",
+        "testid": "input-search-resources",
+        "role": null,
+        "cls": "flex h-10 w-full rounded-lg border border-[var(--border-strong)] bg-[var(--surface-2)] px-3 py-2 tex",
+        "outline": "0px none rgb(16, 16, 16)",
+        "outlineOffset": "0px",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgb(0, 0, 0) 0px 0px 0px 2px, rgb(255, 61, 82) 0px 0px 0px 4px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+        "borderColor": "rgb(255, 61, 82)",
+        "accentVar": "#ff3d52",
+        "matchesFocusVisible": true
+      }
+    },
+    {
+      "route": "category",
+      "target": "select-trigger",
+      "selector": "[data-testid=\"select-subcategory-filter\"]",
+      "found": true,
+      "shot": true,
+      "style": {
+        "tag": "button",
+        "testid": "select-subcategory-filter",
+        "role": "combobox",
+        "cls": "flex min-h-[44px] items-center justify-between rounded-lg border border-input bg-[var(--surface)] px",
+        "outline": "0px none rgb(16, 16, 16)",
+        "outlineOffset": "0px",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgb(0, 0, 0) 0px 0px 0px 2px, rgb(255, 61, 82) 0px 0px 0px 4px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+        "borderColor": "color(srgb 1 0.239216 0.321569 / 0.6)",
+        "accentVar": "#ff3d52",
+        "matchesFocusVisible": true
+      }
+    },
+    {
+      "route": "category",
+      "target": "toggle-item",
+      "selector": "[role=\"group\"] button",
+      "found": true,
+      "shot": true,
+      "style": {
+        "tag": "button",
+        "testid": "view-mode-grid",
+        "role": "radio",
+        "cls": "inline-flex items-center justify-center text-sm font-medium ring-offset-background transition-colors",
+        "outline": "0px none rgb(16, 16, 16)",
+        "outlineOffset": "0px",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgb(0, 0, 0) 0px 0px 0px 2px, rgb(255, 61, 82) 0px 0px 0px 4px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+        "borderColor": "rgba(244, 243, 238, 0.08)",
+        "accentVar": "#ff3d52",
+        "matchesFocusVisible": true
+      }
+    }
+  ]
+}

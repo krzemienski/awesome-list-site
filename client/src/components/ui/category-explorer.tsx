@@ -131,7 +131,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
               <Filter className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">Sort:</span>
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-32">
+                <SelectTrigger className="w-32" aria-label="Sort categories">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

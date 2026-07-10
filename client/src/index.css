@@ -97,3 +97,25 @@ vite-error-overlay,
 vite-plugin-checker-error-overlay {
   display: none !important;
 }
+
+/*
+  Admin dashboard tab strip: the 15 tabs overflow horizontally on common
+  desktop widths (<=1280px) and the near-invisible global scrollbar gave no
+  hint that more tabs exist. Show a clearly visible, accent-tinted scrollbar
+  on this container so the overflow is discoverable.
+*/
+.admin-tab-scroller {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--accent) 45%, transparent) transparent;
+}
+.admin-tab-scroller::-webkit-scrollbar {
+  height: 8px;
+  display: block;
+}
+.admin-tab-scroller::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--accent) 40%, transparent);
+  border-radius: 4px;
+}
+.admin-tab-scroller::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--accent) 60%, transparent);
+}

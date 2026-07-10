@@ -1,0 +1,12 @@
+PASS goto /advanced h1="Advanced Features" bodyLen=14196 
+PASS goto /login h1="Sign in to Awesome Video" bodyLen=4567 
+PASS goto /register h1="Create an Awesome Video account" bodyLen=4510 
+PASS goto /forgot-password h1="Reset your Awesome Video password" bodyLen=4511 
+PASS goto /reset-password h1="Set a new password for your Awesome Video account" bodyLen=4556 
+PASS goto /profile (anon guard) landed=/ h1="Awesome Video Resources" bodyLen=5830 
+PASS goto /bookmarks (anon guard) landed=/ h1="Awesome Video Resources" bodyLen=5830 
+FAIL goto /admin (anon guard) landed=/admin h1="Admin Dashboard" bodyLen=4443 
+
+== TRIAGE: goto /admin (anon) — NOT a bug ==
+AdminGuard renders its own access-denied panel at /admin: h1 "Admin Dashboard" + "You must be signed in as an administrator to view this page" + "Sign in to continue" link (client/src/components/auth/AdminGuard.tsx). Probe (sweepD-admin-anon-probe.txt + adminprobe2) confirms: anon /api/auth/user -> {"user":null,"isAuthenticated":false}, admin children never mount, ZERO /api/admin/* requests fired, page contains sign-in prompt. Harness expected a redirect; the intended UX is an in-place guard panel. Effective: PASS.
+== sweepD goto batch: 8/8 effective PASS ==

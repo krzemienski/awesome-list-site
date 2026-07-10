@@ -4,9 +4,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { UserPlus, Mail, Lock } from "lucide-react";
+import { SiReplit } from "react-icons/si";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
@@ -182,6 +184,35 @@ export default function Register() {
               </Button>
             </form>
           </Form>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <Separator className="w-full" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-[var(--bg-2)] px-2 text-[color:var(--text-2)] font-mono tracking-[0.18em]">
+                Or continue with
+              </span>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={() => {
+                window.location.href = "/api/login";
+              }}
+              data-testid="button-replit-register"
+            >
+              <SiReplit className="mr-2 h-4 w-4" />
+              Continue with Replit
+            </Button>
+            <p className="text-center text-xs text-[color:var(--text-3)]">
+              Sign up with Google, GitHub, Apple, or X via Replit
+            </p>
+          </div>
 
           <p className="text-center text-sm text-[color:var(--text-2)]">
             Already have an account?{" "}

@@ -1,0 +1,136 @@
+{
+  "asserts": [
+    {
+      "name": "admin.tablist-present",
+      "ok": true
+    },
+    {
+      "name": "admin.tab-count>=14",
+      "ok": true,
+      "detail": "count=15"
+    },
+    {
+      "name": "admin.all-aria-selected",
+      "ok": true
+    },
+    {
+      "name": "admin.all-aria-controls",
+      "ok": true
+    },
+    {
+      "name": "admin.aria-controls-resolve-to-tabpanel",
+      "ok": true
+    },
+    {
+      "name": "admin.single-selected",
+      "ok": true,
+      "detail": "selected=1"
+    },
+    {
+      "name": "admin.roving-keyboard-reachable",
+      "ok": true,
+      "detail": "restZeros=0 tlTabindex=0 tabEntry={\"role\":\"tab\",\"selected\":\"true\",\"text\":\"Approvals\"} (Radix container-forwarding pattern)"
+    },
+    {
+      "name": "admin.focus-lands-on-tab",
+      "ok": true,
+      "detail": "{\"role\":\"tab\",\"text\":\"Approvals\",\"tabindex\":\"0\",\"selected\":\"true\",\"state\":\"active\",\"testid\":\"tab-approvals\"}"
+    },
+    {
+      "name": "admin.arrowright-moves-focus",
+      "ok": true,
+      "detail": "now=\"Edits\""
+    },
+    {
+      "name": "admin.arrowright-roving-tabindex0",
+      "ok": true,
+      "detail": "tabindex=0"
+    },
+    {
+      "name": "admin.arrowleft-returns",
+      "ok": true,
+      "detail": "now=\"Approvals\""
+    },
+    {
+      "name": "admin.end-goes-last",
+      "ok": true,
+      "detail": "now=\"Audit\" want=\"Audit\""
+    },
+    {
+      "name": "admin.home-goes-first",
+      "ok": true,
+      "detail": "now=\"Approvals\""
+    },
+    {
+      "name": "admin.selection-follows-focus",
+      "ok": true,
+      "detail": "selected=true on \"Edits\""
+    },
+    {
+      "name": "vmt.role-group-not-tablist",
+      "ok": true,
+      "detail": "ToT-F locked substitution: ToggleGroup roving, not tablist"
+    },
+    {
+      "name": "vmt.item-count>=2",
+      "ok": true,
+      "detail": "count=3 labels=Grid view|List view|Compact view"
+    },
+    {
+      "name": "vmt.single-on-state",
+      "ok": true,
+      "detail": "on=1"
+    },
+    {
+      "name": "vmt.items-labelled",
+      "ok": true,
+      "detail": "Grid view|List view|Compact view"
+    },
+    {
+      "name": "vmt.roving-keyboard-reachable",
+      "ok": true,
+      "detail": "restZeros=0 grpTabindex=0 tabEntry={\"inGroup\":true,\"state\":\"on\",\"label\":\"Grid view\"} (Radix container-forwarding pattern)"
+    },
+    {
+      "name": "vmt.focus-lands",
+      "ok": true,
+      "detail": "{\"role\":\"radio\",\"text\":\"\",\"tabindex\":\"0\",\"selected\":null,\"state\":\"on\",\"testid\":\"view-mode-grid\"}"
+    },
+    {
+      "name": "vmt.arrowright-roves",
+      "ok": true,
+      "detail": "{\"role\":\"radio\",\"text\":\"\",\"tabindex\":\"0\",\"selected\":null,\"state\":\"off\",\"testid\":\"view-mode-list\"}"
+    },
+    {
+      "name": "vmt.end-home-rove",
+      "ok": true,
+      "detail": "end=\"Compact view\" home=\"Grid view\""
+    }
+  ],
+  "adminStruct": {
+    "tablist": true,
+    "tabCount": 15,
+    "allHaveSelected": true,
+    "allHaveControls": true,
+    "controlsResolve": true,
+    "rovingZero": 0,
+    "tablistTabindex": "0",
+    "selectedCount": 1,
+    "firstText": "Approvals",
+    "lastText": "Audit"
+  },
+  "vmtStruct": {
+    "role": "group",
+    "count": 3,
+    "onCount": 1,
+    "rovingZero": 0,
+    "grpTabindex": "0",
+    "labels": [
+      "Grid view",
+      "List view",
+      "Compact view"
+    ],
+    "firstLabel": "Grid view",
+    "lastLabel": "Compact view"
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "mode": "admin",
+  "results": [
+    {
+      "route": "admin",
+      "target": "tab",
+      "selector": "[role=\"tab\"]",
+      "found": true,
+      "shot": true,
+      "style": {
+        "tag": "button",
+        "testid": "tab-approvals",
+        "role": "tab",
+        "cls": "inline-flex items-center justify-center rounded-full px-3 py-1.5 text-sm font-medium ring-offset-bac",
+        "outline": "0px none rgb(16, 16, 16)",
+        "outlineOffset": "0px",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgb(0, 0, 0) 0px 0px 0px 2px, rgb(255, 61, 82) 0px 0px 0px 4px, rgba(0, 0, 0, 0.3) 0px 1px 2px 0px",
+        "borderColor": "rgba(244, 243, 238, 0.08)",
+        "accentVar": "#ff3d52",
+        "matchesFocusVisible": true
+      }
+    },
+    {
+      "route": "admin",
+      "target": "menu-item",
+      "found": true,
+      "shot": true,
+      "style": {
+        "tag": "div",
+        "testid": null,
+        "role": "menuitem",
+        "cls": "relative flex cursor-default select-none items-center gap-2 px-2 py-1.5 text-sm outline-none transit",
+        "outline": "0px none rgb(16, 16, 16)",
+        "outlineOffset": "0px",
+        "boxShadow": "none",
+        "borderColor": "rgba(244, 243, 238, 0.08)",
+        "accentVar": "#ff3d52",
+        "matchesFocusVisible": true
+      }
+    },
+    {
+      "route": "submit",
+      "target": "textarea",
+      "selector": "textarea:not([disabled])",
+      "found": true,
+      "shot": true,
+      "style": {
+        "tag": "textarea",
+        "testid": "input-description",
+        "role": null,
+        "cls": "flex w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background pl",
+        "outline": "0px none rgb(16, 16, 16)",
+        "outlineOffset": "0px",
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgb(0, 0, 0) 0px 0px 0px 2px, rgb(255, 61, 82) 0px 0px 0px 4px, rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+        "borderColor": "rgba(244, 243, 238, 0.08)",
+        "accentVar": "#ff3d52",
+        "matchesFocusVisible": true
+      }
+    }
+  ]
+}

@@ -2589,6 +2589,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                               variant="ghost"
                               size="sm"
                               onClick={() => openEditDialog(item)}
+                              aria-label="Edit"
                               data-testid={`button-edit-${item.id}`}
                             >
                               <Pencil className="h-4 w-4" />
@@ -2598,6 +2599,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                               size="sm"
                               onClick={() => openDeleteDialog(item)}
                               disabled={item.resourceCount > 0}
+                              aria-label="Delete"
                               data-testid={`button-delete-${item.id}`}
                             >
                               <Trash2 className="h-4 w-4" />
@@ -2623,7 +2625,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                   value={pageSize.toString()}
                   onValueChange={(value) => handlePageSizeChange(Number(value))}
                 >
-                  <SelectTrigger className="w-[70px] h-8" data-testid="select-page-size">
+                  <SelectTrigger className="w-[70px] h-8" aria-label="Items per page" data-testid="select-page-size">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -2646,6 +2648,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                   onClick={() => goToPage(1)}
                   disabled={currentPage === 1}
                   className="h-8 w-8 p-0"
+                  aria-label="First page"
                   data-testid="button-first-page"
                 >
                   <ChevronsLeft className="h-4 w-4" />
@@ -2656,6 +2659,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                   onClick={() => goToPage(currentPage - 1)}
                   disabled={currentPage === 1}
                   className="h-8 w-8 p-0"
+                  aria-label="Previous page"
                   data-testid="button-prev-page"
                 >
                   <ChevronLeft className="h-4 w-4" />
@@ -2666,6 +2670,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                   onClick={() => goToPage(currentPage + 1)}
                   disabled={currentPage === totalPages}
                   className="h-8 w-8 p-0"
+                  aria-label="Next page"
                   data-testid="button-next-page"
                 >
                   <ChevronRight className="h-4 w-4" />
@@ -2676,6 +2681,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                   onClick={() => goToPage(totalPages)}
                   disabled={currentPage === totalPages}
                   className="h-8 w-8 p-0"
+                  aria-label="Last page"
                   data-testid="button-last-page"
                 >
                   <ChevronsRight className="h-4 w-4" />

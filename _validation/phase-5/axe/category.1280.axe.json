@@ -1,0 +1,17 @@
+{
+  "mode": "public",
+  "route": "/category/encoding-codecs",
+  "slug": "category",
+  "vp": 1280,
+  "rules": [
+    "landmark-one-main",
+    "page-has-heading-one",
+    "color-contrast",
+    "button-name",
+    "link-name",
+    "aria-required-attr",
+    "aria-valid-attr-value",
+    "region"
+  ],
+  "violations": []
+}

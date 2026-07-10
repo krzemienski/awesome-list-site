@@ -2224,18 +2224,22 @@ async function enrichResource(url: string) {
 
 ### Example 5: Testing Connection
 
+The app ships a real health endpoint at `GET /api/health/ai` (see `server/routes.ts`). By default it is cheap (availability + cache stats, no API call); pass `?deep=1` to run a real round-trip test against Claude:
+
 ```typescript
 import { claudeService } from './server/ai/claudeService';
 
-// Health check endpoint
+// Health check endpoint (as implemented in server/routes.ts)
 app.get('/api/health/ai', async (req, res) => {
-  const isConnected = await claudeService.testConnection();
   const stats = claudeService.getStats();
+  const deep = req.query.deep === '1' || req.query.deep === 'true';
 
-  res.json({
-    status: isConnected ? 'healthy' : 'unavailable',
-    ...stats
-  });
+  if (!deep) {
+    return res.json({ status: stats.available ? 'healthy' : 'unavailable', ...stats });
+  }
+
+  const isConnected = await claudeService.testConnection();
+  res.json({ status: isConnected ? 'healthy' : 'unavailable', connectionOk: isConnected, ...stats });
 });
 ```
 
@@ -2495,15 +2499,16 @@ docker run -e AI_INTEGRATIONS_ANTHROPIC_API_KEY=sk-ant-api03-... your-image
 Test your configuration with the health check endpoint:
 
 ```bash
-# Test AI service availability
+# Test AI service availability (cheap — no API call)
 curl http://localhost:5000/api/health/ai
 
 # Expected response
 {
   "status": "healthy",
+  "available": true,
+  "requestCount": 0,
   "cacheSize": 0,
-  "responseCacheSize": 0,
-  "analysisCacheSize": 0
+  "cacheHitRate": 0
 }
 ```
 
@@ -2917,24 +2922,30 @@ console.log(stats);
 Monitor service health programmatically:
 
 ```bash
-# Check AI service health
+# Check AI service health (cheap — no API call)
 curl http://localhost:5000/api/health/ai
+
+# Deep check — makes ONE real (tiny) Claude API call to verify connectivity.
+# Don't point automated monitors at deep mode.
+curl "http://localhost:5000/api/health/ai?deep=1"
 
 # Response examples
 # ✅ Healthy
 {
   "status": "healthy",
-  "cacheSize": 67,
-  "responseCacheSize": 42,
-  "analysisCacheSize": 25
+  "available": true,
+  "requestCount": 67,
+  "cacheSize": 42,
+  "cacheHitRate": 0
 }
 
 # ❌ Unhealthy
 {
   "status": "unavailable",
+  "available": false,
+  "requestCount": 0,
   "cacheSize": 0,
-  "responseCacheSize": 0,
-  "analysisCacheSize": 0
+  "cacheHitRate": 0
 }
 ```
 

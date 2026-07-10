@@ -1,0 +1,37 @@
+BEGIN
+SELECT 2
+    ?column?    | count 
+----------------+-------
+ qa users found |     2
+(1 row)
+
+ERROR:  column "reviewed_by" does not exist
+LINE 1: ...WHERE submitted_by IN (SELECT id FROM qa_uids) OR reviewed_b...
+                                                             ^
+BEGIN
+SELECT 2
+    ?column?    | count 
+----------------+-------
+ qa users found |     2
+(1 row)
+
+DELETE 1
+DELETE 10
+UPDATE 0
+UPDATE 0
+DELETE 0
+DELETE 0
+DELETE 2
+DELETE 34
+COMMIT
+
+== POST-REVIEW FIX: /api/auth/user debug log redaction (architect finding) ==
+Before: line 689 logged the full DB user row incl. bcrypt password hash into server logs.
+Fix: redact to {id,email,role}. Proven on real system after restart (temp user login → authed GET):
+  bcrypt-hash occurrences in fresh post-fix log: 0 (was present pre-fix)
+[/api/auth/user] req.user?.dbUser: {
+  id: '0fefe4e6-9864-4430-ac61-723b7a449d05',
+  email: '__qa_test_r6_redact_1783681508@example.com',
+  role: 'user'
+}
+Temp user torn down; net-zero re-verified: users=6 approved=1838 total=1994 qa_residue=0; tsc exit 0.

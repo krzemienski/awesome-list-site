@@ -16,10 +16,11 @@ interface UsersResponse {
   total: number;
 }
 
+/* WP-6 a11y: black ink on mid-tone badges — white was 3.7–2.2:1 (fails AA). */
 const ROLE_COLORS: Record<string, string> = {
-  admin: "bg-red-500",
-  moderator: "bg-yellow-500",
-  user: "bg-blue-500",
+  admin: "bg-red-500 text-black",
+  moderator: "bg-yellow-500 text-black",
+  user: "bg-blue-500 text-black",
 };
 
 export default function UsersTab() {
@@ -126,7 +127,7 @@ export default function UsersTab() {
                     {user.email || "—"}
                   </TableCell>
                   <TableCell>
-                    <Badge className={`${ROLE_COLORS[user.role || 'user'] || 'bg-gray-500'} text-white`}>
+                    <Badge className={`${ROLE_COLORS[user.role || 'user'] || 'bg-gray-600 text-white'}`}>
                       <Shield className="h-3 w-3 mr-1" />
                       {user.role || 'user'}
                     </Badge>
@@ -139,7 +140,7 @@ export default function UsersTab() {
                       value={user.role || 'user'}
                       onValueChange={(role) => updateRoleMutation.mutate({ userId: user.id, role })}
                     >
-                      <SelectTrigger className="w-32 h-8 text-xs">
+                      <SelectTrigger className="w-32 h-8 text-xs" aria-label="Change user role">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>

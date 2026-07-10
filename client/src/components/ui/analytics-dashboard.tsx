@@ -528,6 +528,9 @@ export default function AnalyticsDashboard({
                     <Tooltip 
                       labelFormatter={(value) => new Date(value).toLocaleDateString()}
                     />
+                    {/* DS-OK: strokeWidth={2} recharts data-viz exception — CC-12's 1.5 default
+                        scopes lucide iconography only; chart line/dot weights follow chart
+                        readability, colors from CHART_PALETTE. */}
                     <Line 
                       type="monotone" 
                       dataKey="views" 

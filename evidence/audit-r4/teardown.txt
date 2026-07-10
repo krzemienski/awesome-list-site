@@ -1,0 +1,18 @@
+qa users found: 2 ["__qa_test_audit_1783640161@example.com","__qa_test_role_1783640232@example.com"]
+deleted 1 rows from api_keys.user_id (rule=c)
+deleted 8 rows from resource_audit_log.performed_by (rule=n)
+deleted 1 rows from user_journey_progress.user_id (rule=c)
+sessions deleted: 3
+users deleted: 2
+check users: 0
+check resources: 0
+check categories: 0
+check tags: 0
+check resource_edits orphan: 0
+check approved total: 1838
+qa users found: 1 ["__qa_test_ui_1783640997@example.com"]
+sessions deleted: 2
+users deleted: 1
+check users residue: 0
+check resources residue: 0
+check approved total: 1838

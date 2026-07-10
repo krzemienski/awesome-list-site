@@ -287,6 +287,7 @@ export default function PendingEdits() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleViewDetails(edit)}
+                          aria-label="View edit details"
                           data-testid={`button-view-edit-${edit.id}`}
                         >
                           <Eye className="h-4 w-4" />

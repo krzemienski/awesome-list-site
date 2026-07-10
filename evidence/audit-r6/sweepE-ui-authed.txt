@@ -1,0 +1,10 @@
+PASS form-login authedAs=__qa_test_audit_r6_1783680524@example.com
+PASS authed /profile h1="__qa_test_audit_r6_1783680524" bodyLen=8338
+PASS authed /bookmarks h1="My Bookmarks" bodyLen=4622
+PASS authed-admin /admin h1="Admin Dashboard" denied=false bodyLen=4778
+screenshot saved evidence/audit-r6/sweepE-admin-dashboard.png
+FATAL page.evaluate: Execution context was destroyed, most likely because of a navigation
+    at /tmp/sweepE_r6.cjs:39:10 {
+  name: 'Error'
+}
+PASS post-logout /admin guard restored denied=true user=null

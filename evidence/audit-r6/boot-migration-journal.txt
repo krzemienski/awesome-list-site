@@ -1,0 +1,63 @@
+ERROR:  relation "drizzle.__drizzle_migrations" does not exist
+LINE 1: ...build_object('journal_rows',(SELECT count(*) FROM drizzle.__...
+                                                             ^
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1783487896066,
+      "tag": "0000_baseline",
+      "breakpoints": true
+    }
+  ]
+}
+NOTE: dev boot skips runMigrations (server/index.ts gates it on NODE_ENV=production), so drizzle.__drizzle_migrations does not exist in the dev DB — expected, not drift. Boot-path proof below runs the real migrator on scratch DBs.
+
+=== Scenario A: half-applied schema, empty journal ===
+  Applied 47/94 baseline statements (partial schema, no journal).
+Found migrations at: ./migrations
+Running database migrations...
+✓ Migrations completed successfully
+✓ Migration journal verified: 1 recorded, all 1 journal entr(y/ies) applied
+  ✓ Boot COMPLETED the half-applied schema (all tables + final index present, journal recorded).
+
+=== Scenario B: non-idempotent new migration must fail loudly ===
+  Applied full baseline schema directly (journal table absent).
+Found migrations at: ./migrations
+Running database migrations...
+Migration failed with "already exists" (42P07). This means a migration is NOT idempotent — the rest of its batched statements were rolled back and the schema may be incomplete. Fix the migration to use IF NOT EXISTS / duplicate_object guards. Refusing to start with a partial schema.
+Migration failed: error: relation "users" already exists
+    at /home/runner/workspace/node_modules/pg/lib/client.js:631:17
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async <anonymous> (/home/runner/workspace/node_modules/src/pg-core/dialect.ts:102:7)
+    at async NodePgSession.transaction (/home/runner/workspace/node_modules/src/node-postgres/session.ts:193:19)
+    at async PgDialect.migrate (/home/runner/workspace/node_modules/src/pg-core/dialect.ts:95:3)
+    at async migrate (/home/runner/workspace/node_modules/src/node-postgres/migrator.ts:10:2)
+    at async runMigrations (/home/runner/workspace/server/migrate.ts:89:5)
+    at async scenarioB (/home/runner/workspace/scripts/verify-boot-migration-safety.ts:157:5)
+    at async main (/home/runner/workspace/scripts/verify-boot-migration-safety.ts:189:5) {
+  length: 99,
+  severity: 'ERROR',
+  code: '42P07',
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'heap.c',
+  line: '1152',
+  routine: 'heap_create_with_catalog'
+}
+  ✓ Boot FAILED LOUDLY ("relation "users" already exists...") and nothing was half-applied.
+
+✅ Boot migration safety proven: completes partial schemas, fails loudly on non-idempotent migrations.
+exit=0

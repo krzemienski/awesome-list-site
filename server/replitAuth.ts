@@ -133,9 +133,13 @@ export async function setupAuth(app: Express) {
 
   app.get("/api/callback", (req, res, next) => {
     ensureStrategy(req.hostname);
+    // On failure, land back on the app's login page (NOT /api/login, which
+    // would bounce straight back to the OIDC screen in an endless loop —
+    // e.g. when the Replit account's email already belongs to a local
+    // email/password account and the upsert hits the unique-email constraint).
     passport.authenticate(`replitauth:${req.hostname}`, {
       successReturnToOrRedirect: "/",
-      failureRedirect: "/api/login",
+      failureRedirect: "/login?error=oauth",
     })(req, res, next);
   });
 

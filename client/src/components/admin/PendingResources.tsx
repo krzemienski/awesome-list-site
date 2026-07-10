@@ -15,8 +15,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { CheckCircle2, XCircle, Eye, ExternalLink, Calendar, User, FolderTree } from "lucide-react";
 import type { Resource } from "@shared/schema";
 
+type PendingResource = Resource & { submittedByEmail?: string | null };
+
 interface PendingResourcesResponse {
-  resources: Resource[];
+  resources: PendingResource[];
   total: number;
 }
 
@@ -24,7 +26,7 @@ export default function PendingResources() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
+  const [selectedResource, setSelectedResource] = useState<PendingResource | null>(null);
   const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
@@ -38,14 +40,14 @@ export default function PendingResources() {
   });
 
   const approveMutation = useMutation({
-    mutationFn: async (resourceId: number) => {
+    mutationFn: async (resourceId: number): Promise<unknown> => {
       return await apiRequest(`/api/admin/resources/${resourceId}/approve`, {
         method: 'POST'
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/pending-resources'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/admin/pending-resources'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
       toast({
         title: "Resource Approved",
         description: "The resource has been approved and added to the public catalog.",
@@ -63,15 +65,15 @@ export default function PendingResources() {
   });
 
   const rejectMutation = useMutation({
-    mutationFn: async ({ resourceId, reason }: { resourceId: number; reason: string }) => {
+    mutationFn: async ({ resourceId, reason }: { resourceId: number; reason: string }): Promise<unknown> => {
       return await apiRequest(`/api/admin/resources/${resourceId}/reject`, {
         method: 'POST',
         body: JSON.stringify({ reason })
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/pending-resources'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/admin/pending-resources'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/admin/stats'] });
       toast({
         title: "Resource Rejected",
         description: "The resource has been rejected.",
@@ -148,7 +150,7 @@ export default function PendingResources() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {[...Array(3)].map((_, i) => (
+            {Array.from({ length: 3 }).map((_, i) => (
               <div key={i} className="flex items-center space-x-4">
                 <Skeleton className="h-12 w-12 rounded-full" />
                 <div className="space-y-2 flex-1">
@@ -163,8 +165,8 @@ export default function PendingResources() {
     );
   }
 
-  const pendingResources = data?.resources || [];
-  const totalPending = data?.total || 0;
+  const pendingResources = data?.resources ?? [];
+  const totalPending = data?.total ?? 0;
 
   if (totalPending === 0) {
     return (
@@ -257,10 +259,10 @@ export default function PendingResources() {
                           <Calendar className="h-3 w-3" />
                           {formatDate(resource.createdAt)}
                         </span>
-                        {resource.submittedBy && (
+                        {(resource.submittedByEmail ?? resource.submittedBy) && (
                           <span className="flex items-center gap-1 text-muted-foreground">
                             <User className="h-3 w-3" />
-                            {resource.submittedBy}
+                            {resource.submittedByEmail ?? resource.submittedBy}
                           </span>
                         )}
                       </div>
@@ -367,13 +369,13 @@ export default function PendingResources() {
                   </Label>
                   <p className="text-sm mt-1">{formatDate(selectedResource.createdAt)}</p>
                 </div>
-                {selectedResource.submittedBy && (
+                {(selectedResource.submittedByEmail ?? selectedResource.submittedBy) && (
                   <div>
                     <Label className="text-sm font-semibold flex items-center gap-1">
                       <User className="h-3 w-3" />
                       Submitted By
                     </Label>
-                    <p className="text-sm mt-1">{selectedResource.submittedBy}</p>
+                    <p className="text-sm mt-1">{selectedResource.submittedByEmail ?? selectedResource.submittedBy}</p>
                   </div>
                 )}
               </div>

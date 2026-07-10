@@ -1,16 +1,17 @@
-import { useState } from "react";
-import { Link, useLocation } from "wouter";
+import { useEffect, useState } from "react";
+import { Link } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { LogIn, Mail, Lock, Chrome, Github } from "lucide-react";
+import { LogIn, Mail, Lock } from "lucide-react";
+import { SiReplit } from "react-icons/si";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { queryClient } from "@/lib/queryClient";
 import SEOHead from "@/components/layout/SEOHead";
 import { trackLogin } from "@/lib/analytics";
 
@@ -21,10 +22,34 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
+interface LoginUser {
+  email: string;
+  role?: string;
+}
+
+interface LoginResponse {
+  user: LoginUser;
+}
+
 export default function Login() {
-  const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+
+  // Surface OIDC callback failures (server redirects here with ?error=oauth).
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("error") === "oauth") {
+      toast({
+        title: "Social sign-in failed",
+        description:
+          "We couldn't complete the sign-in. If you originally created your account with email and password, sign in with those below.",
+        variant: "destructive",
+      });
+      // Strip the param so a refresh doesn't re-fire the toast.
+      window.history.replaceState(null, "", "/login");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -47,7 +72,7 @@ export default function Login() {
       });
 
       if (response.ok) {
-        const result = await response.json();
+        const result = (await response.json()) as LoginResponse;
 
         // GA4 conversion: successful local sign-in.
         trackLogin('password');
@@ -77,14 +102,16 @@ export default function Login() {
         // window.location ensures a fresh load so the session cookie is sent.
         window.location.href = result.user?.role === "admin" ? "/admin" : "/";
       } else {
-        const error = await response.json().catch(() => ({ message: "Invalid email or password" }));
+        const error = (await response
+          .json()
+          .catch(() => ({ message: "Invalid email or password" }))) as { message?: string };
         toast({
           title: "Login failed",
-          description: error.message || "Invalid email or password",
+          description: error.message ?? "Invalid email or password",
           variant: "destructive",
         });
       }
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "An error occurred during login. Please try again.",
@@ -93,10 +120,6 @@ export default function Login() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleOAuthLogin = (provider: string) => {
-    window.location.href = "/api/login";
   };
 
   return (
@@ -121,7 +144,7 @@ export default function Login() {
         </CardHeader>
         <CardContent className="space-y-4">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={(e) => void form.handleSubmit(onSubmit)(e)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="email"
@@ -203,27 +226,26 @@ export default function Login() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
             <Button
+              type="button"
               variant="outline"
-              onClick={() => handleOAuthLogin("google")}
-              data-testid="button-oauth-google"
+              className="w-full"
+              onClick={() => {
+                window.location.href = "/api/login";
+              }}
+              data-testid="button-replit-login"
             >
-              <Chrome className="mr-2 h-4 w-4" />
-              Google
+              <SiReplit className="mr-2 h-4 w-4" />
+              Continue with Replit
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => handleOAuthLogin("github")}
-              data-testid="button-oauth-github"
-            >
-              <Github className="mr-2 h-4 w-4" />
-              GitHub
-            </Button>
+            <p className="text-center text-xs text-[color:var(--text-3)]">
+              Sign in with Google, GitHub, Apple, or X via Replit
+            </p>
           </div>
 
           <p className="text-center text-sm text-[color:var(--text-2)]">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link href="/register" className="text-[color:var(--accent)] hover:underline" data-testid="link-register">
               Create account
             </Link>

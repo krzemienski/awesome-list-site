@@ -1,0 +1,17 @@
+{
+  "mode": "public",
+  "route": "/about",
+  "slug": "about",
+  "vp": 375,
+  "rules": [
+    "landmark-one-main",
+    "page-has-heading-one",
+    "color-contrast",
+    "button-name",
+    "link-name",
+    "aria-required-attr",
+    "aria-valid-attr-value",
+    "region"
+  ],
+  "violations": []
+}

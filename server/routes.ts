@@ -686,7 +686,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log('[/api/auth/user] Request received');
       console.log('[/api/auth/user] isAuthenticated:', req.isAuthenticated?.());
-      console.log('[/api/auth/user] req.user?.dbUser:', req.user?.dbUser);
+      console.log('[/api/auth/user] req.user?.dbUser:', req.user?.dbUser
+        ? { id: req.user.dbUser.id, email: req.user.dbUser.email, role: req.user.dbUser.role }
+        : undefined);
       console.log('[/api/auth/user] req.user?.claims?.sub:', req.user?.claims?.sub);
       
       // Check if user is authenticated
@@ -755,7 +757,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Support explicit offset/limit for pagination (BUG-003). When offset is
       // provided, it overrides `page`. Clamp to safe integers; reject non-numeric
-      // values with 400.
+      // values with 400. Client's largest legitimate request is limit=200.
       const rawOffset = req.query.offset as string | undefined;
       const rawLimit = req.query.limit as string | undefined;
       if (rawOffset !== undefined && isNaN(Number(rawOffset))) {
@@ -764,7 +766,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (rawLimit !== undefined && isNaN(Number(rawLimit))) {
         return res.status(400).json({ error: 'invalid_limit' });
       }
-      const limit = Math.min(Math.max(parseInt(rawLimit as string) || 20, 1), 500);
+      const limit = Math.min(Math.max(parseInt(rawLimit as string) || 20, 1), 200);
       const offset = rawOffset !== undefined ? Math.max(parseInt(rawOffset as string), 0) : (parseInt(req.query.page as string) || 1) - 1;
       let category = req.query.category as string;
       let subcategory = req.query.subcategory as string;
@@ -4225,16 +4227,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/learning-paths/suggested - Get suggested learning paths
   app.get("/api/learning-paths/suggested", async (req, res) => {
     try {
-      const limit = parseInt(req.query.limit as string) || 5;
-      
-      // Create a basic user profile from query params
+      // Abuse hardening: these params feed real AI generation AND the result
+      // cache key, so clamp their cardinality — an attacker varying them freely
+      // could force endless cache misses and burn paid Claude calls.
+      const rawLimit = parseInt(req.query.limit as string);
+      const limit = Math.min(Math.max(Number.isFinite(rawLimit) ? rawLimit : 5, 1), 10);
+
+      const skillLevels = ['beginner', 'intermediate', 'advanced'];
+      const skillLevel = (skillLevels.includes(req.query.skillLevel as string)
+        ? req.query.skillLevel : 'intermediate') as 'beginner' | 'intermediate' | 'advanced';
+
+      const timeCommitments = ['daily', 'weekly', 'flexible'];
+      const timeCommitment = (timeCommitments.includes(req.query.timeCommitment as string)
+        ? req.query.timeCommitment : 'flexible') as 'daily' | 'weekly' | 'flexible';
+
+      // Only accept categories that actually exist in the taxonomy.
+      const requestedCategories = ((req.query.categories as string)?.split(',') || [])
+        .map((c) => c.trim())
+        .filter(Boolean)
+        .slice(0, 10);
+      let preferredCategories: string[] = [];
+      if (requestedCategories.length > 0) {
+        const known = new Set((await categoryRepo.listCategories()).map((c) => c.name));
+        preferredCategories = requestedCategories.filter((c) => known.has(c));
+      }
+
+      const learningGoals = ((req.query.goals as string)?.split(',') || [])
+        .map((g) => g.trim())
+        .filter(Boolean)
+        .slice(0, 5)
+        .map((g) => g.slice(0, 100));
+
+      // Create a basic user profile from the sanitized query params
       const userProfile: AIUserProfile = {
         userId: req.query.userId as string || 'anonymous',
-        preferredCategories: (req.query.categories as string)?.split(',') || [],
-        skillLevel: (req.query.skillLevel as string || 'intermediate') as 'beginner' | 'intermediate' | 'advanced',
-        learningGoals: (req.query.goals as string)?.split(',') || [],
+        preferredCategories,
+        skillLevel,
+        learningGoals,
         preferredResourceTypes: [],
-        timeCommitment: (req.query.timeCommitment as string || 'flexible') as 'daily' | 'weekly' | 'flexible',
+        timeCommitment,
         viewHistory: [],
         bookmarks: [],
         completedResources: [],
@@ -4278,7 +4309,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/learning-paths", async (req, res) => {
     try {
       const userProfile: AIUserProfile = req.body;
-      const limit = parseInt(req.query.limit as string) || 5;
+      const rawLimit = parseInt(req.query.limit as string);
+      const limit = Math.min(Math.max(Number.isFinite(rawLimit) ? rawLimit : 5, 1), 10);
 
       const paths = await learningPathGenerator.getSuggestedPaths(userProfile, limit);
       
@@ -4308,6 +4340,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Health check
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
+  });
+
+  // AI service health check (documented in docs/AI-SERVICES.md).
+  // Cheap by default: reports availability + cache stats without spending an
+  // API call. Pass ?deep=1 to run a real round-trip test against Claude
+  // (costs one tiny API call — don't point automated monitors at deep mode).
+  app.get("/api/health/ai", async (req, res) => {
+    try {
+      const stats = claudeService.getStats();
+      const deep = req.query.deep === '1' || req.query.deep === 'true';
+
+      if (!deep) {
+        return res.json({
+          status: stats.available ? 'healthy' : 'unavailable',
+          ...stats,
+        });
+      }
+
+      const isConnected = await claudeService.testConnection();
+      res.json({
+        status: isConnected ? 'healthy' : 'unavailable',
+        connectionOk: isConnected,
+        ...stats,
+      });
+    } catch (error) {
+      console.error('Error checking AI health:', error);
+      res.status(500).json({ status: 'error', error: 'Failed to check AI service health' });
+    }
   });
 
   // Public developer API (read-only, rate-limited) + API-key identity endpoint.
@@ -4411,6 +4471,14 @@ export async function runBackgroundInitialization(): Promise<void> {
     console.error('❌ Error during auto-seeding (non-fatal):', error);
     console.log('Server will continue without seeding. You can manually seed via /api/admin/seed-database');
   }
+
+  // Warm the anonymous suggested-learning-paths cache in the background so the
+  // first visitor after a restart doesn't wait ~45s of sequential AI calls.
+  // Fire-and-forget: failures are non-fatal (the request path falls back to
+  // on-demand generation with in-flight dedup).
+  learningPathGenerator.warmDefaultSuggestedPaths().catch((error) => {
+    console.error('Suggested-paths cache warm-up failed (non-fatal):', error);
+  });
 
   console.log('✅ Background initialization complete');
 }

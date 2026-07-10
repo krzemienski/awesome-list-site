@@ -75,12 +75,23 @@ export interface PathMilestone {
   order: number;
 }
 
+interface SuggestedPathsCacheEntry {
+  data: GeneratedLearningPath[];
+  expiresAt: number;
+}
+
 export class LearningPathGenerator {
   private static instance: LearningPathGenerator;
   private pathTemplates: Map<string, LearningPathTemplate[]>;
+  private suggestedPathsCache: Map<string, SuggestedPathsCacheEntry>;
+  private suggestedPathsInFlight: Map<string, Promise<GeneratedLearningPath[]>>;
+  private readonly SUGGESTED_CACHE_TTL = 12 * 60 * 60 * 1000; // 12 hours
+  private readonly SUGGESTED_CACHE_MAX = 50;
 
   private constructor() {
     this.pathTemplates = new Map();
+    this.suggestedPathsCache = new Map();
+    this.suggestedPathsInFlight = new Map();
     this.initializeTemplates();
   }
 
@@ -306,9 +317,11 @@ Response format (JSON):
   "prerequisites": ["Required knowledge"],
   "learningObjectives": ["What you'll achieve"],
   "selectedResourceIndices": [0, 2, 5, 8]
-}`;
+}
 
-      const response = await claudeService.generateResponse(prompt, 2000);
+Respond with ONLY the JSON object — no prose before or after it. Keep every description under 30 words so the response stays compact.`;
+
+      const response = await claudeService.generateResponse(prompt, 4000);
 
       if (!response || !response.data) return null;
 
@@ -317,6 +330,13 @@ Response format (JSON):
       cleanedData = cleanedData.replace(/^```\s*/i, '');
       cleanedData = cleanedData.replace(/\s*```$/i, '');
       cleanedData = cleanedData.trim();
+
+      // Tolerate stray prose around the JSON object: parse only the outermost
+      // {...} span. (Observed in the wild: trailing commentary after the JSON.)
+      const firstBrace = cleanedData.indexOf('{');
+      const lastBrace = cleanedData.lastIndexOf('}');
+      if (firstBrace === -1 || lastBrace <= firstBrace) return null;
+      cleanedData = cleanedData.slice(firstBrace, lastBrace + 1);
 
       const pathData = JSON.parse(cleanedData) as AIPathData;
       const selectedResources = pathData.selectedResourceIndices?.map((i: number) => resources[i]).filter(Boolean)
@@ -551,11 +571,92 @@ Response format (JSON):
   }
 
   /**
-   * Get suggested learning paths for a user
+   * Get suggested learning paths for a user.
+   *
+   * Results are cached in-memory (12h TTL) keyed by the profile fields that
+   * actually influence generation, with in-flight deduplication so concurrent
+   * cold requests share ONE generation run instead of each firing their own
+   * sequence of Claude calls (~15s per category, ~45s for the anonymous
+   * default). The cache is warmed at server boot via
+   * warmDefaultSuggestedPaths().
    */
   public async getSuggestedPaths(
     userProfile: UserProfile,
     limit: number = 5
+  ): Promise<GeneratedLearningPath[]> {
+    const key = JSON.stringify({
+      c: userProfile.preferredCategories || [],
+      s: userProfile.skillLevel,
+      g: userProfile.learningGoals || [],
+      t: userProfile.timeCommitment,
+      l: limit,
+    });
+
+    const cached = this.suggestedPathsCache.get(key);
+    if (cached) {
+      if (cached.expiresAt > Date.now()) return cached.data;
+      this.suggestedPathsCache.delete(key);
+    }
+
+    const inFlight = this.suggestedPathsInFlight.get(key);
+    if (inFlight) return inFlight;
+
+    const promise = this.computeSuggestedPaths(userProfile, limit)
+      .then((paths) => {
+        // Don't cache empty results (e.g. every category generation failed) —
+        // let the next request retry instead of pinning a bad answer for 12h.
+        if (paths.length > 0) {
+          if (this.suggestedPathsCache.size >= this.SUGGESTED_CACHE_MAX) {
+            const oldestKey = this.suggestedPathsCache.keys().next().value;
+            if (oldestKey !== undefined) this.suggestedPathsCache.delete(oldestKey);
+          }
+          this.suggestedPathsCache.set(key, {
+            data: paths,
+            expiresAt: Date.now() + this.SUGGESTED_CACHE_TTL,
+          });
+        }
+        return paths;
+      })
+      .finally(() => {
+        this.suggestedPathsInFlight.delete(key);
+      });
+
+    this.suggestedPathsInFlight.set(key, promise);
+    return promise;
+  }
+
+  /**
+   * Pre-generate the anonymous/default suggested paths so the first visitor
+   * after a server restart doesn't wait ~45s of sequential AI calls.
+   * Called (fire-and-forget) from runBackgroundInitialization().
+   * The profile here MUST mirror the defaults built by
+   * GET /api/learning-paths/suggested for an anonymous request.
+   */
+  public async warmDefaultSuggestedPaths(): Promise<void> {
+    const anonProfile: UserProfile = {
+      userId: 'anonymous',
+      preferredCategories: [],
+      skillLevel: 'intermediate',
+      learningGoals: [],
+      preferredResourceTypes: [],
+      timeCommitment: 'flexible',
+      viewHistory: [],
+      bookmarks: [],
+      completedResources: [],
+      completedJourneys: [],
+      journeyProgress: [],
+      ratings: {},
+    };
+    const start = Date.now();
+    const paths = await this.getSuggestedPaths(anonProfile, 5);
+    console.log(
+      `✓ Suggested learning paths cache warmed: ${paths.length} paths in ${Date.now() - start}ms`
+    );
+  }
+
+  private async computeSuggestedPaths(
+    userProfile: UserProfile,
+    limit: number
   ): Promise<GeneratedLearningPath[]> {
     const paths: GeneratedLearningPath[] = [];
 

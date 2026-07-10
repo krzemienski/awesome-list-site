@@ -25,20 +25,23 @@ interface AuditLogsResponse {
   total: number;
 }
 
+/* WP-6 a11y: per-color ink baked into each entry — white on -500 mid-tones was
+   2.3–4.4:1; black ink passes AA (≥4.5:1) on all light/mid tones, white kept
+   only on the dark reds. DS §7: accent-tone surfaces take black ink. */
 const ACTION_COLORS: Record<string, string> = {
-  created: "bg-green-500",
-  updated: "bg-blue-500",
-  approved: "bg-emerald-500",
-  rejected: "bg-red-500",
-  deleted: "bg-red-700",
-  synced: "bg-purple-500",
-  ai_enriched: "bg-cyan-500",
-  ai_enrichment_failed: "bg-orange-500",
-  edit_suggested: "bg-yellow-500",
-  edit_approved: "bg-emerald-600",
-  edit_rejected: "bg-red-600",
-  bulk_import: "bg-indigo-500",
-  status_changed: "bg-amber-500",
+  created: "bg-green-500 text-black",
+  updated: "bg-blue-500 text-black",
+  approved: "bg-emerald-500 text-black",
+  rejected: "bg-red-500 text-black",
+  deleted: "bg-red-700 text-white",
+  synced: "bg-purple-500 text-black",
+  ai_enriched: "bg-cyan-500 text-black",
+  ai_enrichment_failed: "bg-orange-500 text-black",
+  edit_suggested: "bg-yellow-500 text-black",
+  edit_approved: "bg-emerald-600 text-black",
+  edit_rejected: "bg-red-600 text-white",
+  bulk_import: "bg-indigo-500 text-black",
+  status_changed: "bg-amber-500 text-black",
 };
 
 const LIMIT_OPTIONS = ["25", "50", "100", "200"];
@@ -124,7 +127,7 @@ export default function AuditTab() {
             />
           </div>
           <Select value={limit} onValueChange={setLimit}>
-            <SelectTrigger className="w-32">
+            <SelectTrigger className="w-32" aria-label="Rows to show">
               <SelectValue placeholder="Limit" />
             </SelectTrigger>
             <SelectContent>
@@ -133,7 +136,7 @@ export default function AuditTab() {
               ))}
             </SelectContent>
           </Select>
-          <Button type="submit" variant="outline" size="icon">
+          <Button type="submit" variant="outline" size="icon" aria-label="Search">
             <Search className="h-4 w-4" />
           </Button>
           {appliedFilter && (
@@ -147,6 +150,7 @@ export default function AuditTab() {
             size="icon"
             onClick={() => refetch()}
             disabled={isFetching}
+            aria-label="Refresh"
           >
             <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
           </Button>
@@ -171,7 +175,7 @@ export default function AuditTab() {
                   <TableRow key={log.id}>
                     <TableCell className="text-xs text-muted-foreground">{log.id}</TableCell>
                     <TableCell>
-                      <Badge className={`${ACTION_COLORS[log.action] || 'bg-gray-500'} text-white text-xs`}>
+                      <Badge className={`${ACTION_COLORS[log.action] || 'bg-gray-600 text-white'} text-xs`}>
                         {log.action.replace(/_/g, ' ')}
                       </Badge>
                     </TableCell>

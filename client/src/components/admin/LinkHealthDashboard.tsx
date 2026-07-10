@@ -39,13 +39,13 @@ interface LinkHealthHistoryResponse {
 
 interface BrokenLinksResponse {
   success: boolean;
-  checks: Array<LinkHealthCheck & {
+  checks: (LinkHealthCheck & {
     resource?: {
       id: number;
       title: string;
       category: string;
     };
-  }>;
+  })[];
 }
 
 export default function LinkHealthDashboard() {
@@ -64,54 +64,63 @@ export default function LinkHealthDashboard() {
     queryKey: ['/api/admin/link-health/history'],
   });
 
+  // Explicit queryFn: the default queryFn only fetches queryKey[0], so the
+  // status filter was never sent to the backend.
   const { data: brokenLinksData } = useQuery<BrokenLinksResponse>({
     queryKey: ['/api/admin/link-health/broken-links', statusFilter],
+    queryFn: () =>
+      apiRequest(
+        statusFilter === 'all'
+          ? '/api/admin/link-health/broken-links'
+          : `/api/admin/link-health/broken-links?status=${statusFilter}`,
+      ),
   });
 
   const runCheckMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (): Promise<unknown> => {
       return await apiRequest('/api/admin/link-health/run', {
         method: 'POST'
       });
     },
     onSuccess: () => {
       setIsPolling(true);
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/link-health/status'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/link-health/history'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/admin/link-health/status'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/admin/link-health/history'] });
       toast({
         title: "Link health check started",
         description: "The system is now checking all resource links."
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "Failed to start check",
-        description: error.message || "An error occurred while starting the link health check.",
+        description: error.message ?? "An error occurred while starting the link health check.",
         variant: "destructive"
       });
     }
   });
 
   const latestJob = statusData?.job;
-  const jobs = historyData?.jobs || [];
+  const jobs = historyData?.jobs ?? [];
   const isActiveJob = latestJob?.status === 'processing';
-  const brokenLinks = brokenLinksData?.checks || [];
+  const brokenLinks = brokenLinksData?.checks ?? [];
 
   useEffect(() => {
     setIsPolling(isActiveJob);
     if (!isActiveJob && latestJob && ['completed', 'failed', 'cancelled'].includes(latestJob.status)) {
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/link-health/history'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/link-health/broken-links'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/admin/link-health/history'] });
+      void queryClient.invalidateQueries({ queryKey: ['/api/admin/link-health/broken-links'] });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- latestJob object identity changes every poll; keying on status is intentional
   }, [isActiveJob, latestJob?.status]);
 
   const calculateHealthPercentage = (job: LinkHealthJob | null | undefined) => {
-    if (!job || !job.totalLinks || job.totalLinks === 0) return 0;
+    if (!job?.totalLinks || job.totalLinks === 0) return 0;
     return Math.round(((job.healthyLinks || 0) / job.totalLinks) * 100);
   };
 
   const calculateProgress = (job: LinkHealthJob | null | undefined) => {
-    if (!job || !job.totalLinks || job.totalLinks === 0) return 0;
+    if (!job?.totalLinks || job.totalLinks === 0) return 0;
     return Math.round(((job.checkedLinks || 0) / job.totalLinks) * 100);
   };
 
@@ -341,7 +350,9 @@ export default function LinkHealthDashboard() {
                 <Tooltip />
                 <Legend />
                 {/* MR-DS-07/08/09 — strokes sourced from centralized CHART_PALETTE
-                    (ok=[2], bad=[5], warn=[3], --accent-2=[1]). */}
+                    (ok=[2], bad=[5], warn=[3], --accent-2=[1]).
+                    DS-OK: strokeWidth={2} recharts data-viz exception — CC-12's 1.5
+                    default scopes lucide iconography only. */}
                 <Line
                   type="monotone"
                   dataKey="healthy"
@@ -398,9 +409,9 @@ export default function LinkHealthDashboard() {
           <div className="flex items-center gap-4">
             <Select
               value={statusFilter}
-              onValueChange={(value) => setStatusFilter(value as any)}
+              onValueChange={(value) => setStatusFilter(value as 'all' | 'broken' | 'timeout' | 'redirect')}
             >
-              <SelectTrigger className="w-[200px]">
+              <SelectTrigger className="w-[200px]" aria-label="Filter by link status">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -452,10 +463,10 @@ export default function LinkHealthDashboard() {
                         </Badge>
                       </TableCell>
                       <TableCell className="font-medium">
-                        {check.resource?.title || `Resource #${check.resourceId}`}
+                        {check.resource?.title ?? `Resource #${check.resourceId}`}
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
-                        {check.resource?.category || '-'}
+                        {check.resource?.category ?? '-'}
                       </TableCell>
                       <TableCell className="text-sm font-mono max-w-md truncate">
                         <a

@@ -1,0 +1,43 @@
+QA user: __qa_test_audit_r6_1783680524@example.com
+PASS register [201]
+PASS login [200]
+PASS auth-user-email
+PASS favorites-empty [200]
+PASS favorite-add [200]
+PASS favorites-contains
+PASS favorite-del [200]
+PASS bookmark-add [200]
+PASS bookmarks-contains
+PASS bookmark-del [200]
+PASS interaction [200]
+FAIL key-create resp={"message":"API key created. Copy it now — it will not be shown again.","key":"av_de5031855fca4101722f6c74524f1b8e7641a52bc8d4748c50c505db8b19b7b1","apiKey":{"id":"5c5c814a-581d-44ef-9e1c-2a7cea1ccd
+PASS key-list
+PASS bearer-me [200]
+FAIL key-delete expected=200 got=404 body={"message":"Not found"}
+FAIL bearer-revoked got=200
+PASS user-progress [200]
+PASS user-submissions [200]
+PASS user-journeys [200]
+PASS journey-start [200]
+PASS journey-progress-get [200]
+PASS journey-progress-put [200]
+PASS submit-resource id=187096
+PASS submit-status-pending
+PASS suggest-edit [201]
+PASS change-pw [200]
+PASS logout [200]
+PASS session-cleared
+PASS gate-after-logout [401]
+PASS relogin-newpw [200]
+PASS oldpw-rejected [401]
+creds saved: /tmp/qa_r6_creds.txt (uid=50a120bc-b877-4dfe-93f0-39a93e469cc3 rid=187096)
+
+== RETEST APPENDIX (3 FAILs = one harness bug: apiKey.id is a UUID, harness grepped [0-9]+ → empty id → DELETE hit /api/user/api-keys/ → 404 → key never revoked) ==
+cleanup orphan key 5c5c814a-581d-44ef-9e1c-2a7cea1ccd75 -> 200
+PASS key-create id=ee28e572-4b37-4d94-838d-cf0da6348db1
+PASS key-list
+PASS bearer-me [200]
+PASS key-delete [200]
+PASS bearer-revoked [401]
+INFO qa-user api_keys rows left: 2
+== sweepB FINAL: effective 31/31 PASS (3 initial FAILs were one harness UUID-extraction error, full lifecycle re-proven) ==
