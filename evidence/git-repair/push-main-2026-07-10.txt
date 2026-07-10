@@ -1,0 +1,19 @@
+== Git repair + push evidence (2026-07-10T11:07:30Z) ==
+-- 1. active git processes --
+none
+-- 2. stale lock check (specific + global) --
+absent: .git/objects/maintenance.lock
+absent: .git/refs/remotes/origin/HEAD.lock
+absent: .git/index.lock
+no *.lock files remain under .git
+-- 3. fetch origin --
+
+-- RESULT --
+Lock repair: VERIFIED CLEAN — no active git processes; .git/objects/maintenance.lock,
+.git/refs/remotes/origin/HEAD.lock, .git/index.lock all absent; zero *.lock files under .git.
+Fetch/push: BLOCKED by platform policy — the sandbox rejects network git operations from the
+main agent ("Destructive git operations are not allowed in the main agent. Use the project_tasks
+skill to propose a new background Project Task"). The push to origin/main must therefore run via
+the already-proposed background follow-up task (#133: "Clear stale git locks and push main to
+GitHub"), which executes with system-level git protections. Local state is push-ready:
+working tree clean, HEAD == main == 55efd0ff9d81031c7e9251b0eae5c7c851b89a2c.
