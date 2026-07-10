@@ -1,0 +1,30 @@
+== TEARDOWN r5 (net-zero, memory-guided FK order) ==
+BEGIN
+DELETE 1
+UPDATE 0
+UPDATE 0
+UPDATE 0
+UPDATE 0
+UPDATE 0
+DELETE 10
+DELETE 2
+DELETE 0
+DELETE 0
+DELETE 0
+DELETE 0
+DELETE 0
+DELETE 0
+DELETE 2
+COMMIT
+== RECONCILE vs baseline ==
+{"approved" : 1838, "total_resources" : 1994, "users" : 6, "categories" : 9, "journeys" : 5, "qa_users_left" : 0, "qa_resources_left" : 0, "qa_edits_left" : 0}
+baseline was: approved=1838 total=1994 users=6 categories=9 journeys=5
+Community & Events=81
+Encoding & Codecs=325
+General Tools=151
+Infrastructure & Delivery=199
+Intro & Learning=194
+Media Tools=255
+Players & Clients=234
+Protocols & Transport=200
+Standards & Industry=199

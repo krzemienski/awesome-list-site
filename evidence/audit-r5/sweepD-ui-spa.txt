@@ -1,0 +1,14 @@
+PASS spa-nav / h1="Awesome Video Resources" bodyLen=5771
+PASS spa-nav /categories h1="All Categories" bodyLen=482
+PASS spa-nav /category/encoding-codecs h1="Encoding & Codecs" bodyLen=12274
+PASS spa-nav /subcategory/ai-machine-learning-tools h1="AI & Machine Learning Tools" bodyLen=1262
+PASS spa-nav /sub-subcategory/av1-sc2275 h1="AV1" bodyLen=454
+PASS spa-nav /resource/185811 h1="Inca — Message Tracing and Loss Detection For Stre" bodyLen=326
+PASS spa-nav /search?q=ffmpeg h1="Search results for “ffmpeg”" bodyLen=8314
+PASS spa-nav /about h1="About" bodyLen=4740
+FAIL spa-nav /advanced h1="Advanced" bodyLen=10
+PASS spa-nav /journeys h1="Learning Journeys" bodyLen=999
+PASS spa-nav /journey/6 h1="Video Streaming Fundamentals" bodyLen=255
+PASS spa-nav /settings h1="Settings" bodyLen=623
+PASS spa-nav /settings/theme h1="Theme Settings" bodyLen=2316
+PASS spa-nav /submit h1="Submit a Resource" bodyLen=1002

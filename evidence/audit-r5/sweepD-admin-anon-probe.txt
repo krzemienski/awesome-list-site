@@ -1,0 +1,10 @@
+t+2000ms path=/admin body="Skip to main content | Awesome Video | 1,838 resources | Navigation | Home | Submit Resource | Learning Journeys | Advanced | Theme | Categories | Community & Events | 81 | Community Groups | 2 | Online Forums | 2 | Events & Conferences | 5 | Podcast"
+t+3000ms path=/admin body="Skip to main content | Awesome Video | 1,838 resources | Navigation | Home | Submit Resource | Learning Journeys | Advanced | Theme | Categories | Community & Events | 81 | Community Groups | 2 | Online Forums | 2 | Events & Conferences | 5 | Podcast"
+t+5000ms path=/admin body="Skip to main content | Awesome Video | 1,838 resources | Navigation | Home | Submit Resource | Learning Journeys | Advanced | Theme | Categories | Community & Events | 81 | Community Groups | 2 | Online Forums | 2 | Events & Conferences | 5 | Podcast"
+API calls:
+  200 /api/auth/user
+  200 /api/awesome-list
+  200 /api/auth/user
+  200 /api/awesome-list
+  200 /api/auth/user
+  200 /api/awesome-list

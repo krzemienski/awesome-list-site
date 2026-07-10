@@ -1,0 +1,6 @@
+PASS redirect /category/:slug/:sub -> /subcategory/ai-machine-learning-tools
+PASS card-click -> /resource/184847 h1="AMD Advanced Media Acceleration (AMA) SD"
+PASS sidebar-nav-click -> /journeys
+PASS cmdk-search-typing items=16
+PASS mobile-390 / scrollWidth=390
+PASS mobile-390 /category/encoding-codecs scrollWidth=390

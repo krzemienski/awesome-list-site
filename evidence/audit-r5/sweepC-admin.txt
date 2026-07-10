@@ -1,0 +1,42 @@
+PASS nonadmin-403-gate
+PASS admin-login
+PASS admin-role
+PASS adm-get-stats
+PASS adm-get-users
+PASS adm-get-pending-resources
+PASS adm-get-resource-edits
+PASS adm-get-resources
+PASS adm-get-categories
+PASS adm-get-subcategories
+PASS adm-get-sub-subcategories
+PASS adm-get-audit-logs
+PASS adm-get-journeys
+PASS adm-get-export-json
+PASS adm-get-journeys/6/steps
+PASS adm-pending-alias
+PASS adm-get/api/enrichment/jobs
+PASS adm-get/api/researcher/jobs
+PASS adm-get/api/researcher/discoveries
+PASS adm-get/api/github/sync-status
+PASS adm-get/api/github/sync-history
+PASS adm-export-md
+PASS adm-resource-approve
+PASS adm-edit2-create
+PASS adm-edit-approve
+PASS adm-edit-applied
+FAIL adm-edit-reject expected=200 got=400 body={"message":"Rejection reason is required (minimum 10 characters)"}
+PASS real-resource-untouched
+PASS adm-resource-delete
+PASS adm-resource-gone
+PASS adm-cat-create
+PASS adm-cat-rename
+PASS adm-cat-delete
+PASS user2-register
+PASS adm-role-promote
+PASS adm-role-demote
+== sweepC: pass=35 fail=1 (edit2=44 cat=1118 u2=7569a0fe-e452-4440-a4b3-0e4e50ae6b18) ==
+
+== RETEST APPENDIX (adm-edit-reject — initial 400 was a test error: rejection reason (min 10 chars) is required, admin UI always sends it; the 400 is correct validation) ==
+PASS adm-edit-reject [200] (with reason)
+PASS real-resource-still-untouched [200]
+== sweepC FINAL: effective 36/36 PASS (1 initial fail = test error) ==
