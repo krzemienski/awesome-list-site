@@ -1,0 +1,6 @@
+BUG-033 verdict (RE-PROBE on FRESH build 2026-07-11)
+date 2026-07-11
+probe: POST /api/admin/users (anon) -> 404
+actual: POST /api/admin/users (anon) -> 404
+classification: REPRODUCES
+reason: 404 instead of 401/403

@@ -1,0 +1,6 @@
+BUG-031 verdict
+date 2026-07-11
+probe: see code/probe body
+actual: theme-color=#ff3d52 html-class-dark=False
+classification: ALREADY-FIXED
+reason: 

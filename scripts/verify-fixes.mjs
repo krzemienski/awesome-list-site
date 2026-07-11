@@ -3,7 +3,7 @@
 import { chromium } from "playwright";
 import { writeFileSync, mkdirSync } from "fs";
 
-const BASE = "http://localhost:5000";
+const BASE = process.env.VERIFY_BASE || "http://localhost:5000";
 const results = [];
 function record(id, pass, detail) {
   results.push({ id, pass, detail });
@@ -14,7 +14,11 @@ mkdirSync("screenshots/verify", { recursive: true });
 
 (async () => {
   const browser = await chromium.launch({ args: ["--no-sandbox", "--disable-dev-shm-usage"] });
-  const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+  const ctxOpts = { viewport: { width: 1280, height: 800 } };
+  // Optional: load an authenticated storageState so auth-gated pages
+  // (/settings/theme, /admin) are reachable. Set VERIFY_AUTH to the JSON path.
+  if (process.env.VERIFY_AUTH) ctxOpts.storageState = process.env.VERIFY_AUTH;
+  const ctx = await browser.newContext(ctxOpts);
   const page = await ctx.newPage();
   const consoleMsgs = [];
   page.on("console", (m) => consoleMsgs.push(`[${m.type()}] ${m.text().slice(0, 200)}`));

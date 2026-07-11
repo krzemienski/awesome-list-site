@@ -1,0 +1,6 @@
+BUG-041 verdict
+date 2026-07-11
+probe: see code/probe body
+actual: GET /login -> 200, prefill-admin=False
+classification: ALREADY-FIXED
+reason: no pre-fill

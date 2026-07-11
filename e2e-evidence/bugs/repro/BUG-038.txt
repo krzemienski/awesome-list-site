@@ -1,0 +1,6 @@
+BUG-038 verdict
+date 2026-07-11
+probe: see code/probe body
+actual: q=video bytes=12012 q=zzz bytes=12012 default bytes=12012
+classification: ALREADY-FIXED
+reason: queries differ

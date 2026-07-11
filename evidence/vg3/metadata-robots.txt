@@ -1,0 +1,24 @@
+=== VG-3 sitemap/metadata/robots — 2026-07-11T19:58:48Z ===
+-- sitemap already swept: 2000 urls, 0 dupes, 0 future lastmod, 40/40 sampled → 200 (see matrix) --
+
+-- robots.txt vs actual route protection --
+robots Disallow lines:
+Disallow: /api/
+Disallow: /admin
+Disallow: /profile
+Disallow: /bookmarks
+Disallow: /settings/
+Disallow: /api/
+Disallow: /admin
+Disallow: /profile
+Disallow: /bookmarks
+Disallow: /settings/
+  /profile protected now? anon → 302
+  /bookmarks protected? anon → 302
+
+-- metadata on representative pages (title + canonical + og:title + json-ld presence) --
+/ :: title='Awesome Video — 1934+ Curated Video Tools, Codecs &amp; Streaming Resources' canonical=[rel="canonical" href="https://awesome.vi] jsonld_blocks=1 name="description" content="Discover 1934+ curated vide
+/login :: title='Sign In — Awesome Video' canonical=[] jsonld_blocks=0 name="description" content="Sign in to Awesome Video to
+/submit :: title='Submit a Resource — Awesome Video' canonical=[rel="canonical" href="https://awesome.vi] jsonld_blocks=0 name="description" content="Suggest a new video develop
+/recommendations :: title='AI-Powered Recommendations — Awesome Video' canonical=[] jsonld_blocks=0 name="description" content="Personalized video developm
+/about :: title='About — Awesome Video' canonical=[rel="canonical" href="https://awesome.vi] jsonld_blocks=2 name="description" content="Learn about Awesome Video —

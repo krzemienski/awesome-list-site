@@ -1,0 +1,8 @@
+=== VG-0 Local Stack Ready ===
+timestamp: 2026-07-11T19:31:43Z
+app: current source (tsx server/index.ts), NODE_ENV=development, PORT=5055
+db: native postgres awesome_video_local (role nick) — restored from docker awesome-list-db seed + migrations 0029/0030/0031 applied
+resources: 1949
+admin user: admin@example.com
+prod DB (neon) — NOT used for writes; read-only confirm only
+base url: http://localhost:5055

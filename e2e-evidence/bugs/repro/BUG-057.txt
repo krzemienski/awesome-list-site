@@ -1,0 +1,6 @@
+BUG-057 verdict (RE-PROBE on FRESH build 2026-07-11)
+date 2026-07-11
+probe: GET /stats -> 404
+actual: GET /stats -> 404
+classification: ALREADY-FIXED
+reason: route absent (404)

@@ -1,0 +1,6 @@
+BUG-005 verdict
+date 2026-07-11
+probe: see comment
+actual: /api/auth/login -> 404; /api/auth/status -> 404; /api/users/me -> 404
+classification: REPRODUCES
+reason: 

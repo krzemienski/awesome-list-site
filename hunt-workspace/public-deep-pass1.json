@@ -1,0 +1,6936 @@
+[
+ {
+  "url": "https://awesome.video/",
+  "slug": "home",
+  "vp": "1440",
+  "screenshot": "public2_home_1440.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 900,
+     "clientH": 900
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 1440,
+   "viewWidth": 1440,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "Awesome Video — 1946+ Curated Video Tools, Codecs & Streaming Resources",
+   "docLang": "en",
+   "buttonsCount": 76,
+   "linksCount": 227,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 2,
+   "h1Texts": [
+    "Awesome Video Resources"
+   ],
+   "emptyH1": 0,
+   "svgCount": 101,
+   "totalElements": 1494
+  }
+ },
+ {
+  "url": "https://awesome.video/",
+  "slug": "home",
+  "vp": "768",
+  "screenshot": "public2_home_768.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 1024,
+     "clientH": 1024
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [
+    {
+     "tag": "ARTICLE",
+     "cls": "rounded-lg border bg-card text-card-foreground shadow-[var(-",
+     "text": "Login to See Personalized RecommendationsSign in t",
+     "scrollW": 474,
+     "clientW": 414,
+     "scrollH": 210,
+     "clientH": 210
+    }
+   ],
+   "overflowNav": [],
+   "overflowMain": [
+    {
+     "tag": "MAIN",
+     "cls": "flex-1 min-w-0 overflow-x-hidden mx-auto w-full max-w-[1280p",
+     "text": "Awesome Video ResourcesExplore 9 categories with 1",
+     "scrollW": 523,
+     "clientW": 512,
+     "scrollH": 1382,
+     "clientH": 1382
+    }
+   ],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 768,
+   "viewWidth": 768,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "Awesome Video — 1946+ Curated Video Tools, Codecs & Streaming Resources",
+   "docLang": "en",
+   "buttonsCount": 76,
+   "linksCount": 227,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 2,
+   "h1Texts": [
+    "Awesome Video Resources"
+   ],
+   "emptyH1": 0,
+   "svgCount": 101,
+   "totalElements": 1494
+  }
+ },
+ {
+  "url": "https://awesome.video/",
+  "slug": "home",
+  "vp": "375",
+  "screenshot": "public2_home_375.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "text-2xl font-semibold leading-none tracking-tight flex item",
+     "text": "Login to See Personalized Recommendations",
+     "scrollW": 293,
+     "clientW": 293,
+     "scrollH": 74,
+     "clientH": 72
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 375,
+   "viewWidth": 375,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "Awesome Video — 1946+ Curated Video Tools, Codecs & Streaming Resources",
+   "docLang": "en",
+   "buttonsCount": 8,
+   "linksCount": 14,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 2,
+   "h1Texts": [
+    "Awesome Video Resources"
+   ],
+   "emptyH1": 0,
+   "svgCount": 19,
+   "totalElements": 288
+  }
+ },
+ {
+  "url": "https://awesome.video/about",
+  "slug": "about",
+  "vp": "1440",
+  "screenshot": "public2_about_1440.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 900,
+     "clientH": 900
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 1440,
+   "viewWidth": 1440,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "About — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 72,
+   "linksCount": 222,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 11,
+   "h1Texts": [
+    "About"
+   ],
+   "emptyH1": 0,
+   "svgCount": 112,
+   "totalElements": 1614
+  }
+ },
+ {
+  "url": "https://awesome.video/about",
+  "slug": "about",
+  "vp": "768",
+  "screenshot": "public2_about_768.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 1024,
+     "clientH": 1024
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 768,
+   "viewWidth": 768,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "About — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 72,
+   "linksCount": 222,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 11,
+   "h1Texts": [
+    "About"
+   ],
+   "emptyH1": 0,
+   "svgCount": 112,
+   "totalElements": 1614
+  }
+ },
+ {
+  "url": "https://awesome.video/about",
+  "slug": "about",
+  "vp": "375",
+  "screenshot": "public2_about_375.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "text-2xl font-semibold leading-none tracking-tight flex item",
+     "text": "About the maintainer",
+     "scrollW": 261,
+     "clientW": 261,
+     "scrollH": 26,
+     "clientH": 24
+    },
+    {
+     "tag": "DIV",
+     "cls": "text-2xl font-semibold leading-none tracking-tight flex item",
+     "text": "Open source at its core",
+     "scrollW": 261,
+     "clientW": 261,
+     "scrollH": 50,
+     "clientH": 48
+    },
+    {
+     "tag": "DIV",
+     "cls": "text-2xl font-semibold leading-none tracking-tight flex item",
+     "text": "Features",
+     "scrollW": 261,
+     "clientW": 261,
+     "scrollH": 26,
+     "clientH": 24
+    },
+    {
+     "tag": "DIV",
+     "cls": "text-2xl font-semibold leading-none tracking-tight flex item",
+     "text": "Technology Stack",
+     "scrollW": 261,
+     "clientW": 261,
+     "scrollH": 26,
+     "clientH": 24
+    },
+    {
+     "tag": "DIV",
+     "cls": "text-2xl font-semibold leading-none tracking-tight flex item",
+     "text": "Accessibility First",
+     "scrollW": 261,
+     "clientW": 261,
+     "scrollH": 26,
+     "clientH": 24
+    },
+    {
+     "tag": "DIV",
+     "cls": "text-2xl font-semibold leading-none tracking-tight flex item",
+     "text": "Credits",
+     "scrollW": 261,
+     "clientW": 261,
+     "scrollH": 26,
+     "clientH": 24
+    },
+    {
+     "tag": "DIV",
+     "cls": "text-2xl font-semibold leading-none tracking-tight flex item",
+     "text": "Frequently asked questions",
+     "scrollW": 261,
+     "clientW": 261,
+     "scrollH": 50,
+     "clientH": 48
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 375,
+   "viewWidth": 375,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "About — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 4,
+   "linksCount": 9,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 11,
+   "h1Texts": [
+    "About"
+   ],
+   "emptyH1": 0,
+   "svgCount": 30,
+   "totalElements": 408
+  }
+ },
+ {
+  "url": "https://awesome.video/submit",
+  "slug": "submit",
+  "vp": "1440",
+  "screenshot": "public2_submit_1440.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 900,
+     "clientH": 900
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 1440,
+   "viewWidth": 1440,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "Submit a Resource — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 75,
+   "linksCount": 217,
+   "inputsCount": 3,
+   "formCount": 1,
+   "headingCount": 2,
+   "h1Texts": [
+    "Submit a Resource"
+   ],
+   "emptyH1": 0,
+   "svgCount": 92,
+   "totalElements": 1416
+  }
+ },
+ {
+  "url": "https://awesome.video/submit",
+  "slug": "submit",
+  "vp": "768",
+  "screenshot": "public2_submit_768.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 1024,
+     "clientH": 1024
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 768,
+   "viewWidth": 768,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "Submit a Resource — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 75,
+   "linksCount": 217,
+   "inputsCount": 3,
+   "formCount": 1,
+   "headingCount": 2,
+   "h1Texts": [
+    "Submit a Resource"
+   ],
+   "emptyH1": 0,
+   "svgCount": 92,
+   "totalElements": 1416
+  }
+ },
+ {
+  "url": "https://awesome.video/submit",
+  "slug": "submit",
+  "vp": "375",
+  "screenshot": "public2_submit_375.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "flex gap-3 pt-4",
+     "text": "Submit ResourceCancel",
+     "scrollW": 270,
+     "clientW": 261,
+     "scrollH": 60,
+     "clientH": 60
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 375,
+   "viewWidth": 375,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "Submit a Resource — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 7,
+   "linksCount": 4,
+   "inputsCount": 3,
+   "formCount": 1,
+   "headingCount": 2,
+   "h1Texts": [
+    "Submit a Resource"
+   ],
+   "emptyH1": 0,
+   "svgCount": 10,
+   "totalElements": 210
+  }
+ },
+ {
+  "url": "https://awesome.video/recommendations",
+  "slug": "recommendations",
+  "vp": "1440",
+  "screenshot": "public2_recommendations_1440.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 900,
+     "clientH": 900
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 1440,
+   "viewWidth": 1440,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "AI-Powered Recommendations — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 97,
+   "linksCount": 217,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 2,
+   "h1Texts": [
+    "AI-Powered Recommendations"
+   ],
+   "emptyH1": 0,
+   "svgCount": 126,
+   "totalElements": 1619
+  }
+ },
+ {
+  "url": "https://awesome.video/recommendations",
+  "slug": "recommendations",
+  "vp": "768",
+  "screenshot": "public2_recommendations_768.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 1024,
+     "clientH": 1024
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [
+    {
+     "tag": "ARTICLE",
+     "cls": "rounded-lg border bg-card text-card-foreground shadow-[var(-",
+     "text": "whep-to-whipProxies WebRTC offer/answer negotiatio",
+     "scrollW": 201,
+     "clientW": 198,
+     "scrollH": 250,
+     "clientH": 250
+    },
+    {
+     "tag": "ARTICLE",
+     "cls": "rounded-lg border bg-card text-card-foreground shadow-[var(-",
+     "text": "FFmpeg-WHIP-WHEPAdds WHIP/WHEP protocol support to",
+     "scrollW": 201,
+     "clientW": 198,
+     "scrollH": 250,
+     "clientH": 250
+    },
+    {
+     "tag": "ARTICLE",
+     "cls": "rounded-lg border bg-card text-card-foreground shadow-[var(-",
+     "text": "simple-whip-server (Janus)Node.js WHIP server impl",
+     "scrollW": 201,
+     "clientW": 198,
+     "scrollH": 250,
+     "clientH": 250
+    },
+    {
+     "tag": "ARTICLE",
+     "cls": "rounded-lg border bg-card text-card-foreground shadow-[var(-",
+     "text": "biim - LL-HLS packagerPython3 asyncio LL-HLS packa",
+     "scrollW": 201,
+     "clientW": 198,
+     "scrollH": 250,
+     "clientH": 250
+    },
+    {
+     "tag": "ARTICLE",
+     "cls": "rounded-lg border bg-card text-card-foreground shadow-[var(-",
+     "text": "Fastly Compute LL-HLSFastly Compute@Edge applicati",
+     "scrollW": 201,
+     "clientW": 198,
+     "scrollH": 250,
+     "clientH": 250
+    },
+    {
+     "tag": "ARTICLE",
+     "cls": "rounded-lg border bg-card text-card-foreground shadow-[var(-",
+     "text": "Shaka Packager: Low Latency TutorialOfficial Shaka",
+     "scrollW": 201,
+     "clientW": 198,
+     "scrollH": 250,
+     "clientH": 250
+    },
+    {
+     "tag": "ARTICLE",
+     "cls": "rounded-lg border bg-card text-card-foreground shadow-[var(-",
+     "text": "dash.js Low-Latency Streaming DocsReference player",
+     "scrollW": 201,
+     "clientW": 198,
+     "scrollH": 266,
+     "clientH": 266
+    },
+    {
+     "tag": "ARTICLE",
+     "cls": "rounded-lg border bg-card text-card-foreground shadow-[var(-",
+     "text": "SVTA: Architectures for Multi-CDN SwitchingStreami",
+     "scrollW": 201,
+     "clientW": 198,
+     "scrollH": 266,
+     "clientH": 266
+    }
+   ],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 768,
+   "viewWidth": 768,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "AI-Powered Recommendations — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 97,
+   "linksCount": 217,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 2,
+   "h1Texts": [
+    "AI-Powered Recommendations"
+   ],
+   "emptyH1": 0,
+   "svgCount": 126,
+   "totalElements": 1619
+  }
+ },
+ {
+  "url": "https://awesome.video/recommendations",
+  "slug": "recommendations",
+  "vp": "375",
+  "screenshot": "public2_recommendations_375.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "text-2xl font-semibold leading-none tracking-tight flex item",
+     "text": "Login to See Personalized Recommendations",
+     "scrollW": 293,
+     "clientW": 293,
+     "scrollH": 74,
+     "clientH": 72
+    },
+    {
+     "tag": "DIV",
+     "cls": "font-semibold tracking-tight text-lg line-clamp-1 flex-1 min",
+     "text": "Shaka Packager: Low Latency Tutorial",
+     "scrollW": 293,
+     "clientW": 293,
+     "scrollH": 56,
+     "clientH": 28
+    },
+    {
+     "tag": "DIV",
+     "cls": "font-semibold tracking-tight text-lg line-clamp-1 flex-1 min",
+     "text": "dash.js Low-Latency Streaming Docs",
+     "scrollW": 293,
+     "clientW": 293,
+     "scrollH": 56,
+     "clientH": 28
+    },
+    {
+     "tag": "DIV",
+     "cls": "font-semibold tracking-tight text-lg line-clamp-1 flex-1 min",
+     "text": "SVTA: Architectures for Multi-CDN Switching",
+     "scrollW": 293,
+     "clientW": 293,
+     "scrollH": 56,
+     "clientH": 28
+    },
+    {
+     "tag": "DIV",
+     "cls": "font-semibold tracking-tight text-lg line-clamp-1 flex-1 min",
+     "text": "How Cloudflare Streams Video (Engineering)",
+     "scrollW": 293,
+     "clientW": 293,
+     "scrollH": 56,
+     "clientH": 28
+    },
+    {
+     "tag": "DIV",
+     "cls": "font-semibold tracking-tight text-lg line-clamp-1 flex-1 min",
+     "text": "Cloudflare Stream Live: Engineering Deep-Dive",
+     "scrollW": 293,
+     "clientW": 293,
+     "scrollH": 56,
+     "clientH": 28
+    },
+    {
+     "tag": "DIV",
+     "cls": "font-semibold tracking-tight text-lg line-clamp-1 flex-1 min",
+     "text": "Dolby Vision Profiles and Levels Explained",
+     "scrollW": 293,
+     "clientW": 293,
+     "scrollH": 56,
+     "clientH": 28
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 375,
+   "viewWidth": 375,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "AI-Powered Recommendations — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 29,
+   "linksCount": 4,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 2,
+   "h1Texts": [
+    "AI-Powered Recommendations"
+   ],
+   "emptyH1": 0,
+   "svgCount": 44,
+   "totalElements": 413
+  }
+ },
+ {
+  "url": "https://awesome.video/journeys",
+  "slug": "journeys",
+  "vp": "1440",
+  "screenshot": "public2_journeys_1440.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 900,
+     "clientH": 900
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 1440,
+   "viewWidth": 1440,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "Learning Journeys — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 78,
+   "linksCount": 216,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 1,
+   "h1Texts": [
+    "Learning Journeys"
+   ],
+   "emptyH1": 0,
+   "svgCount": 114,
+   "totalElements": 1495
+  }
+ },
+ {
+  "url": "https://awesome.video/journeys",
+  "slug": "journeys",
+  "vp": "768",
+  "screenshot": "public2_journeys_768.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 1024,
+     "clientH": 1024
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 768,
+   "viewWidth": 768,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "Learning Journeys — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 78,
+   "linksCount": 216,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 1,
+   "h1Texts": [
+    "Learning Journeys"
+   ],
+   "emptyH1": 0,
+   "svgCount": 114,
+   "totalElements": 1495
+  }
+ },
+ {
+  "url": "https://awesome.video/journeys",
+  "slug": "journeys",
+  "vp": "375",
+  "screenshot": "public2_journeys_375.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "text-sm text-muted-foreground line-clamp-3",
+     "text": "A comprehensive beginner level journey through int",
+     "scrollW": 261,
+     "clientW": 261,
+     "scrollH": 100,
+     "clientH": 60
+    },
+    {
+     "tag": "DIV",
+     "cls": "text-sm text-muted-foreground line-clamp-3",
+     "text": "A comprehensive intermediate level journey through",
+     "scrollW": 261,
+     "clientW": 261,
+     "scrollH": 100,
+     "clientH": 60
+    },
+    {
+     "tag": "DIV",
+     "cls": "text-sm text-muted-foreground line-clamp-3",
+     "text": "A comprehensive intermediate level journey through",
+     "scrollW": 261,
+     "clientW": 261,
+     "scrollH": 100,
+     "clientH": 60
+    },
+    {
+     "tag": "DIV",
+     "cls": "text-sm text-muted-foreground line-clamp-3",
+     "text": "A comprehensive advanced level journey through pro",
+     "scrollW": 261,
+     "clientW": 261,
+     "scrollH": 100,
+     "clientH": 60
+    },
+    {
+     "tag": "DIV",
+     "cls": "text-sm text-muted-foreground line-clamp-3",
+     "text": "A comprehensive advanced level journey through gen",
+     "scrollW": 261,
+     "clientW": 261,
+     "scrollH": 80,
+     "clientH": 60
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 375,
+   "viewWidth": 375,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "Learning Journeys — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 10,
+   "linksCount": 3,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 1,
+   "h1Texts": [
+    "Learning Journeys"
+   ],
+   "emptyH1": 0,
+   "svgCount": 32,
+   "totalElements": 289
+  }
+ },
+ {
+  "url": "https://awesome.video/advanced",
+  "slug": "advanced",
+  "vp": "1440",
+  "screenshot": "public2_advanced_1440.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 900,
+     "clientH": 900
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 1440,
+   "viewWidth": 1440,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "Advanced — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 105,
+   "linksCount": 245,
+   "inputsCount": 1,
+   "formCount": 0,
+   "headingCount": 2,
+   "h1Texts": [
+    "Advanced Features"
+   ],
+   "emptyH1": 0,
+   "svgCount": 116,
+   "totalElements": 1752
+  }
+ },
+ {
+  "url": "https://awesome.video/advanced",
+  "slug": "advanced",
+  "vp": "768",
+  "screenshot": "public2_advanced_768.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 1024,
+     "clientH": 1024
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [
+    {
+     "tag": "ARTICLE",
+     "cls": "rounded-lg border bg-card text-card-foreground shadow-[var(-",
+     "text": "Community & Events74 resources2 subcategories199 t",
+     "scrollW": 289,
+     "clientW": 182,
+     "scrollH": 460,
+     "clientH": 460
+    },
+    {
+     "tag": "ARTICLE",
+     "cls": "rounded-lg border bg-card text-card-foreground shadow-[var(-",
+     "text": "Encoding & Codecs94 resources16 subcategories197 t",
+     "scrollW": 289,
+     "clientW": 182,
+     "scrollH": 460,
+     "clientH": 460
+    },
+    {
+     "tag": "ARTICLE",
+     "cls": "rounded-lg border bg-card text-card-foreground shadow-[var(-",
+     "text": "General Tools72 resources18 subcategories169 tagsA",
+     "scrollW": 289,
+     "clientW": 182,
+     "scrollH": 420,
+     "clientH": 420
+    },
+    {
+     "tag": "ARTICLE",
+     "cls": "rounded-lg border bg-card text-card-foreground shadow-[var(-",
+     "text": "Infrastructure & Delivery116 resources10 subcatego",
+     "scrollW": 289,
+     "clientW": 182,
+     "scrollH": 420,
+     "clientH": 420
+    },
+    {
+     "tag": "ARTICLE",
+     "cls": "rounded-lg border bg-card text-card-foreground shadow-[var(-",
+     "text": "Intro & Learning115 resources9 subcategories257 ta",
+     "scrollW": 289,
+     "clientW": 182,
+     "scrollH": 520,
+     "clientH": 520
+    },
+    {
+     "tag": "ARTICLE",
+     "cls": "rounded-lg border bg-card text-card-foreground shadow-[var(-",
+     "text": "Media Tools137 resources16 subcategories319 tags3D",
+     "scrollW": 289,
+     "clientW": 182,
+     "scrollH": 520,
+     "clientH": 520
+    },
+    {
+     "tag": "ARTICLE",
+     "cls": "rounded-lg border bg-card text-card-foreground shadow-[var(-",
+     "text": "Players & Clients119 resources10 subcategories224 ",
+     "scrollW": 289,
+     "clientW": 182,
+     "scrollH": 540,
+     "clientH": 540
+    },
+    {
+     "tag": "ARTICLE",
+     "cls": "rounded-lg border bg-card text-card-foreground shadow-[var(-",
+     "text": "Protocols & Transport78 resources9 subcategories13",
+     "scrollW": 289,
+     "clientW": 182,
+     "scrollH": 540,
+     "clientH": 540
+    }
+   ],
+   "overflowNav": [],
+   "overflowMain": [
+    {
+     "tag": "MAIN",
+     "cls": "flex-1 min-w-0 overflow-x-hidden mx-auto w-full max-w-[1280p",
+     "text": "Advanced FeaturesDiscover powerful tools for explo",
+     "scrollW": 554,
+     "clientW": 512,
+     "scrollH": 3934,
+     "clientH": 3934
+    }
+   ],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 768,
+   "viewWidth": 768,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "Advanced — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 105,
+   "linksCount": 245,
+   "inputsCount": 1,
+   "formCount": 0,
+   "headingCount": 2,
+   "h1Texts": [
+    "Advanced Features"
+   ],
+   "emptyH1": 0,
+   "svgCount": 116,
+   "totalElements": 1752
+  }
+ },
+ {
+  "url": "https://awesome.video/advanced",
+  "slug": "advanced",
+  "vp": "375",
+  "screenshot": "public2_advanced_375.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "items-center border text-muted-foreground flex w-full justif",
+     "text": "ExplorerMetricsExportAIAI Recommendations",
+     "scrollW": 388,
+     "clientW": 309,
+     "scrollH": 46,
+     "clientH": 46
+    },
+    {
+     "tag": "DIV",
+     "cls": "text-2xl font-semibold leading-none tracking-tight flex item",
+     "text": "Interactive Category Explorer",
+     "scrollW": 261,
+     "clientW": 261,
+     "scrollH": 50,
+     "clientH": 48
+    },
+    {
+     "tag": "DIV",
+     "cls": "text-2xl font-semibold leading-none tracking-tight flex item",
+     "text": "Category Explorer",
+     "scrollW": 261,
+     "clientW": 261,
+     "scrollH": 26,
+     "clientH": 24
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-start justify-between",
+     "text": "Community & Events74 resources2 subcategories199 t",
+     "scrollW": 265,
+     "clientW": 261,
+     "scrollH": 92,
+     "clientH": 92
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-start justify-between",
+     "text": "Encoding & Codecs94 resources16 subcategories197 t",
+     "scrollW": 265,
+     "clientW": 261,
+     "scrollH": 92,
+     "clientH": 92
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-start justify-between",
+     "text": "General Tools72 resources18 subcategories169 tags",
+     "scrollW": 265,
+     "clientW": 261,
+     "scrollH": 92,
+     "clientH": 92
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-start justify-between",
+     "text": "Infrastructure & Delivery116 resources10 subcatego",
+     "scrollW": 265,
+     "clientW": 261,
+     "scrollH": 92,
+     "clientH": 92
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-start justify-between",
+     "text": "Intro & Learning115 resources9 subcategories257 ta",
+     "scrollW": 265,
+     "clientW": 261,
+     "scrollH": 92,
+     "clientH": 92
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 375,
+   "viewWidth": 375,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "Advanced — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 37,
+   "linksCount": 32,
+   "inputsCount": 1,
+   "formCount": 0,
+   "headingCount": 2,
+   "h1Texts": [
+    "Advanced Features"
+   ],
+   "emptyH1": 0,
+   "svgCount": 34,
+   "totalElements": 546
+  }
+ },
+ {
+  "url": "https://awesome.video/categories",
+  "slug": "categories",
+  "vp": "1440",
+  "screenshot": "public2_categories_1440.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 900,
+     "clientH": 900
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 1440,
+   "viewWidth": 1440,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "All Categories — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 72,
+   "linksCount": 225,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 1,
+   "h1Texts": [
+    "All Categories"
+   ],
+   "emptyH1": 0,
+   "svgCount": 105,
+   "totalElements": 1492
+  }
+ },
+ {
+  "url": "https://awesome.video/categories",
+  "slug": "categories",
+  "vp": "768",
+  "screenshot": "public2_categories_768.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 1024,
+     "clientH": 1024
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 768,
+   "viewWidth": 768,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "All Categories — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 72,
+   "linksCount": 225,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 1,
+   "h1Texts": [
+    "All Categories"
+   ],
+   "emptyH1": 0,
+   "svgCount": 105,
+   "totalElements": 1492
+  }
+ },
+ {
+  "url": "https://awesome.video/categories",
+  "slug": "categories",
+  "vp": "375",
+  "screenshot": "public2_categories_375.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 375,
+   "viewWidth": 375,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "All Categories — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 4,
+   "linksCount": 12,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 1,
+   "h1Texts": [
+    "All Categories"
+   ],
+   "emptyH1": 0,
+   "svgCount": 23,
+   "totalElements": 286
+  }
+ },
+ {
+  "url": "https://awesome.video/category/encoding-codecs",
+  "slug": "category-encoding-codecs",
+  "vp": "1440",
+  "screenshot": "public2_category-encoding-codecs_1440.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 900,
+     "clientH": 900
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex min-h-0 flex-1 flex-col overflow-auto group-data-[colla",
+     "text": "NavigationHomeSubmit ResourceLearning JourneysAdva",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 1359,
+     "clientH": 788
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 620
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 1440,
+   "viewWidth": 1440,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "Video Encoding Tools & Codecs (AV1, HEVC, H.264) — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 153,
+   "linksCount": 217,
+   "inputsCount": 1,
+   "formCount": 0,
+   "headingCount": 1,
+   "h1Texts": [
+    "Encoding & Codecs"
+   ],
+   "emptyH1": 0,
+   "svgCount": 167,
+   "totalElements": 2041
+  }
+ },
+ {
+  "url": "https://awesome.video/category/encoding-codecs",
+  "slug": "category-encoding-codecs",
+  "vp": "768",
+  "screenshot": "public2_category-encoding-codecs_768.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 1024,
+     "clientH": 1024
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex min-h-0 flex-1 flex-col overflow-auto group-data-[colla",
+     "text": "NavigationHomeSubmit ResourceLearning JourneysAdva",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 1359,
+     "clientH": 912
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 620
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 768,
+   "viewWidth": 768,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "Video Encoding Tools & Codecs (AV1, HEVC, H.264) — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 153,
+   "linksCount": 217,
+   "inputsCount": 1,
+   "formCount": 0,
+   "headingCount": 1,
+   "h1Texts": [
+    "Encoding & Codecs"
+   ],
+   "emptyH1": 0,
+   "svgCount": 167,
+   "totalElements": 2041
+  }
+ },
+ {
+  "url": "https://awesome.video/category/encoding-codecs",
+  "slug": "category-encoding-codecs",
+  "vp": "375",
+  "screenshot": "public2_category-encoding-codecs_375.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "text-muted-foreground text-xs sm:text-sm line-clamp-2",
+     "text": "A comprehensive SDK from AMD that provides source ",
+     "scrollW": 293,
+     "clientW": 293,
+     "scrollH": 96,
+     "clientH": 32
+    },
+    {
+     "tag": "DIV",
+     "cls": "text-muted-foreground text-xs sm:text-sm line-clamp-2",
+     "text": "AMD's GPUOpen Video SDK that provides developers a",
+     "scrollW": 293,
+     "clientW": 293,
+     "scrollH": 64,
+     "clientH": 32
+    },
+    {
+     "tag": "DIV",
+     "cls": "text-muted-foreground text-xs sm:text-sm line-clamp-2",
+     "text": "AMF is a comprehensive framework by AMD that provi",
+     "scrollW": 293,
+     "clientW": 293,
+     "scrollH": 144,
+     "clientH": 32
+    },
+    {
+     "tag": "DIV",
+     "cls": "text-muted-foreground text-xs sm:text-sm line-clamp-2",
+     "text": "A Bitmovin blog post that discusses internal testi",
+     "scrollW": 293,
+     "clientW": 293,
+     "scrollH": 96,
+     "clientH": 32
+    },
+    {
+     "tag": "DIV",
+     "cls": "text-muted-foreground text-xs sm:text-sm line-clamp-2",
+     "text": "Adobe Media Encoder is a professional video encodi",
+     "scrollW": 293,
+     "clientW": 293,
+     "scrollH": 112,
+     "clientH": 32
+    },
+    {
+     "tag": "DIV",
+     "cls": "text-muted-foreground text-xs sm:text-sm line-clamp-2",
+     "text": "An industry consortium that develops open, royalty",
+     "scrollW": 293,
+     "clientW": 293,
+     "scrollH": 64,
+     "clientH": 32
+    },
+    {
+     "tag": "DIV",
+     "cls": "text-muted-foreground text-xs sm:text-sm line-clamp-2",
+     "text": "An Android project that implements video trimming ",
+     "scrollW": 293,
+     "clientW": 293,
+     "scrollH": 64,
+     "clientH": 32
+    },
+    {
+     "tag": "DIV",
+     "cls": "text-muted-foreground text-xs sm:text-sm line-clamp-2",
+     "text": "Ateme TITAN is a software suite designed for video",
+     "scrollW": 293,
+     "clientW": 293,
+     "scrollH": 80,
+     "clientH": 32
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 375,
+   "viewWidth": 375,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "Video Encoding Tools & Codecs (AV1, HEVC, H.264) — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 85,
+   "linksCount": 4,
+   "inputsCount": 1,
+   "formCount": 0,
+   "headingCount": 1,
+   "h1Texts": [
+    "Encoding & Codecs"
+   ],
+   "emptyH1": 0,
+   "svgCount": 85,
+   "totalElements": 835
+  }
+ },
+ {
+  "url": "https://awesome.video/subcategory/ffmpeg",
+  "slug": "subcategory-ffmpeg",
+  "vp": "1440",
+  "screenshot": "public2_subcategory-ffmpeg_1440.png",
+  "consoleErrs": [
+   "Failed to load resource: the server responded with a status of 404 ()",
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [
+   "404 https://awesome.video/subcategory/ffmpeg"
+  ],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 900,
+     "clientH": 900
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex min-h-0 flex-1 flex-col overflow-auto group-data-[colla",
+     "text": "NavigationHomeSubmit ResourceLearning JourneysAdva",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 1359,
+     "clientH": 788
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 620
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 1440,
+   "viewWidth": 1440,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "404 — Page Not Found — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 72,
+   "linksCount": 219,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 1,
+   "h1Texts": [
+    "Page Not Found"
+   ],
+   "emptyH1": 0,
+   "svgCount": 91,
+   "totalElements": 1336
+  }
+ },
+ {
+  "url": "https://awesome.video/subcategory/ffmpeg",
+  "slug": "subcategory-ffmpeg",
+  "vp": "768",
+  "screenshot": "public2_subcategory-ffmpeg_768.png",
+  "consoleErrs": [
+   "Failed to load resource: the server responded with a status of 404 ()",
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [
+   "404 https://awesome.video/subcategory/ffmpeg"
+  ],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 1024,
+     "clientH": 1024
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex min-h-0 flex-1 flex-col overflow-auto group-data-[colla",
+     "text": "NavigationHomeSubmit ResourceLearning JourneysAdva",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 1359,
+     "clientH": 912
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 620
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 768,
+   "viewWidth": 768,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "404 — Page Not Found — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 72,
+   "linksCount": 219,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 1,
+   "h1Texts": [
+    "Page Not Found"
+   ],
+   "emptyH1": 0,
+   "svgCount": 91,
+   "totalElements": 1336
+  }
+ },
+ {
+  "url": "https://awesome.video/subcategory/ffmpeg",
+  "slug": "subcategory-ffmpeg",
+  "vp": "375",
+  "screenshot": "public2_subcategory-ffmpeg_375.png",
+  "consoleErrs": [
+   "Failed to load resource: the server responded with a status of 404 ()",
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [
+   "404 https://awesome.video/subcategory/ffmpeg"
+  ],
+  "metrics": {
+   "overflowDivs": [],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 375,
+   "viewWidth": 375,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "404 — Page Not Found — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 4,
+   "linksCount": 6,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 1,
+   "h1Texts": [
+    "Page Not Found"
+   ],
+   "emptyH1": 0,
+   "svgCount": 9,
+   "totalElements": 130
+  }
+ },
+ {
+  "url": "https://awesome.video/sub-subcategory/av1",
+  "slug": "subsubcategory-av1",
+  "vp": "1440",
+  "screenshot": "public2_subsubcategory-av1_1440.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 900,
+     "clientH": 900
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex min-h-0 flex-1 flex-col overflow-auto group-data-[colla",
+     "text": "NavigationHomeSubmit ResourceLearning JourneysAdva",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 1467,
+     "clientH": 788
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 759,
+     "clientH": 728
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 759,
+     "clientH": 759
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 1440,
+   "viewWidth": 1440,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "AV1 — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 79,
+   "linksCount": 222,
+   "inputsCount": 1,
+   "formCount": 0,
+   "headingCount": 1,
+   "h1Texts": [
+    "AV1"
+   ],
+   "emptyH1": 0,
+   "svgCount": 103,
+   "totalElements": 1454
+  }
+ },
+ {
+  "url": "https://awesome.video/sub-subcategory/av1",
+  "slug": "subsubcategory-av1",
+  "vp": "768",
+  "screenshot": "public2_subsubcategory-av1_768.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 1024,
+     "clientH": 1024
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex min-h-0 flex-1 flex-col overflow-auto group-data-[colla",
+     "text": "NavigationHomeSubmit ResourceLearning JourneysAdva",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 1467,
+     "clientH": 912
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 759,
+     "clientH": 728
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 759,
+     "clientH": 759
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [
+    {
+     "tag": "ARTICLE",
+     "cls": "rounded-lg border bg-card text-card-foreground shadow-[var(-",
+     "text": "AV1 CodecWorking with the AV1 Codec Kevin Staunton",
+     "scrollW": 201,
+     "clientW": 198,
+     "scrollH": 310,
+     "clientH": 310
+    },
+    {
+     "tag": "ARTICLE",
+     "cls": "rounded-lg border bg-card text-card-foreground shadow-[var(-",
+     "text": "SVT-AV1An open-source AV1 encoder and decoder from",
+     "scrollW": 201,
+     "clientW": 198,
+     "scrollH": 310,
+     "clientH": 310
+    }
+   ],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [
+    {
+     "tag": "HEADER",
+     "cls": "sticky top-0 z-30 flex h-14 md:h-[60px] items-center gap-2 m",
+     "text": "Toggle SidebarHomeEncoding & CodecsCodecsAV1Search",
+     "scrollW": 512,
+     "clientW": 512,
+     "scrollH": 70,
+     "clientH": 59
+    }
+   ],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 768,
+   "viewWidth": 768,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "AV1 — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 79,
+   "linksCount": 222,
+   "inputsCount": 1,
+   "formCount": 0,
+   "headingCount": 1,
+   "h1Texts": [
+    "AV1"
+   ],
+   "emptyH1": 0,
+   "svgCount": 103,
+   "totalElements": 1454
+  }
+ },
+ {
+  "url": "https://awesome.video/sub-subcategory/av1",
+  "slug": "subsubcategory-av1",
+  "vp": "375",
+  "screenshot": "public2_subsubcategory-av1_375.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 375,
+   "viewWidth": 375,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "AV1 — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 11,
+   "linksCount": 9,
+   "inputsCount": 1,
+   "formCount": 0,
+   "headingCount": 1,
+   "h1Texts": [
+    "AV1"
+   ],
+   "emptyH1": 0,
+   "svgCount": 21,
+   "totalElements": 248
+  }
+ },
+ {
+  "url": "https://awesome.video/login",
+  "slug": "login",
+  "vp": "1440",
+  "screenshot": "public2_login_1440.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 900,
+     "clientH": 900
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 1440,
+   "viewWidth": 1440,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "Sign In — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 74,
+   "linksCount": 218,
+   "inputsCount": 2,
+   "formCount": 1,
+   "headingCount": 1,
+   "h1Texts": [
+    "Sign in to Awesome Video"
+   ],
+   "emptyH1": 0,
+   "svgCount": 91,
+   "totalElements": 1380
+  }
+ },
+ {
+  "url": "https://awesome.video/login",
+  "slug": "login",
+  "vp": "768",
+  "screenshot": "public2_login_768.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 1024,
+     "clientH": 1024
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 768,
+   "viewWidth": 768,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "Sign In — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 74,
+   "linksCount": 218,
+   "inputsCount": 2,
+   "formCount": 1,
+   "headingCount": 1,
+   "h1Texts": [
+    "Sign in to Awesome Video"
+   ],
+   "emptyH1": 0,
+   "svgCount": 91,
+   "totalElements": 1380
+  }
+ },
+ {
+  "url": "https://awesome.video/login",
+  "slug": "login",
+  "vp": "375",
+  "screenshot": "public2_login_375.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 375,
+   "viewWidth": 375,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "Sign In — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 6,
+   "linksCount": 5,
+   "inputsCount": 2,
+   "formCount": 1,
+   "headingCount": 1,
+   "h1Texts": [
+    "Sign in to Awesome Video"
+   ],
+   "emptyH1": 0,
+   "svgCount": 9,
+   "totalElements": 174
+  }
+ },
+ {
+  "url": "https://awesome.video/register",
+  "slug": "register",
+  "vp": "1440",
+  "screenshot": "public2_register_1440.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 900,
+     "clientH": 900
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 1440,
+   "viewWidth": 1440,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "Create an Account — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 74,
+   "linksCount": 217,
+   "inputsCount": 2,
+   "formCount": 1,
+   "headingCount": 1,
+   "h1Texts": [
+    "Create an Awesome Video account"
+   ],
+   "emptyH1": 0,
+   "svgCount": 91,
+   "totalElements": 1379
+  }
+ },
+ {
+  "url": "https://awesome.video/register",
+  "slug": "register",
+  "vp": "768",
+  "screenshot": "public2_register_768.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 1024,
+     "clientH": 1024
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 768,
+   "viewWidth": 768,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "Create an Account — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 74,
+   "linksCount": 217,
+   "inputsCount": 2,
+   "formCount": 1,
+   "headingCount": 1,
+   "h1Texts": [
+    "Create an Awesome Video account"
+   ],
+   "emptyH1": 0,
+   "svgCount": 91,
+   "totalElements": 1379
+  }
+ },
+ {
+  "url": "https://awesome.video/register",
+  "slug": "register",
+  "vp": "375",
+  "screenshot": "public2_register_375.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 375,
+   "viewWidth": 375,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "Create an Account — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 6,
+   "linksCount": 4,
+   "inputsCount": 2,
+   "formCount": 1,
+   "headingCount": 1,
+   "h1Texts": [
+    "Create an Awesome Video account"
+   ],
+   "emptyH1": 0,
+   "svgCount": 9,
+   "totalElements": 173
+  }
+ },
+ {
+  "url": "https://awesome.video/forgot-password",
+  "slug": "forgot-password",
+  "vp": "1440",
+  "screenshot": "public2_forgot-password_1440.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 900,
+     "clientH": 900
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 1440,
+   "viewWidth": 1440,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "Reset Your Password — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 73,
+   "linksCount": 217,
+   "inputsCount": 1,
+   "formCount": 1,
+   "headingCount": 1,
+   "h1Texts": [
+    "Reset your Awesome Video password"
+   ],
+   "emptyH1": 0,
+   "svgCount": 89,
+   "totalElements": 1360
+  }
+ },
+ {
+  "url": "https://awesome.video/forgot-password",
+  "slug": "forgot-password",
+  "vp": "768",
+  "screenshot": "public2_forgot-password_768.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 1024,
+     "clientH": 1024
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 768,
+   "viewWidth": 768,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "Reset Your Password — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 73,
+   "linksCount": 217,
+   "inputsCount": 1,
+   "formCount": 1,
+   "headingCount": 1,
+   "h1Texts": [
+    "Reset your Awesome Video password"
+   ],
+   "emptyH1": 0,
+   "svgCount": 89,
+   "totalElements": 1360
+  }
+ },
+ {
+  "url": "https://awesome.video/forgot-password",
+  "slug": "forgot-password",
+  "vp": "375",
+  "screenshot": "public2_forgot-password_375.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 375,
+   "viewWidth": 375,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "Reset Your Password — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 5,
+   "linksCount": 4,
+   "inputsCount": 1,
+   "formCount": 1,
+   "headingCount": 1,
+   "h1Texts": [
+    "Reset your Awesome Video password"
+   ],
+   "emptyH1": 0,
+   "svgCount": 7,
+   "totalElements": 154
+  }
+ },
+ {
+  "url": "https://awesome.video/reset-password",
+  "slug": "reset-password",
+  "vp": "1440",
+  "screenshot": "public2_reset-password_1440.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 900,
+     "clientH": 900
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 1440,
+   "viewWidth": 1440,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "Set a New Password — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 72,
+   "linksCount": 217,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 1,
+   "h1Texts": [
+    "Set a new password for your Awesome Video account"
+   ],
+   "emptyH1": 0,
+   "svgCount": 89,
+   "totalElements": 1358
+  }
+ },
+ {
+  "url": "https://awesome.video/reset-password",
+  "slug": "reset-password",
+  "vp": "768",
+  "screenshot": "public2_reset-password_768.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 1024,
+     "clientH": 1024
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 768,
+   "viewWidth": 768,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "Set a New Password — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 72,
+   "linksCount": 217,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 1,
+   "h1Texts": [
+    "Set a new password for your Awesome Video account"
+   ],
+   "emptyH1": 0,
+   "svgCount": 89,
+   "totalElements": 1358
+  }
+ },
+ {
+  "url": "https://awesome.video/reset-password",
+  "slug": "reset-password",
+  "vp": "375",
+  "screenshot": "public2_reset-password_375.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 375,
+   "viewWidth": 375,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "Set a New Password — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 4,
+   "linksCount": 4,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 1,
+   "h1Texts": [
+    "Set a new password for your Awesome Video account"
+   ],
+   "emptyH1": 0,
+   "svgCount": 7,
+   "totalElements": 152
+  }
+ },
+ {
+  "url": "https://awesome.video/resource/185020",
+  "slug": "resource-185020",
+  "vp": "1440",
+  "screenshot": "public2_resource-185020_1440.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 900,
+     "clientH": 900
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 1440,
+   "viewWidth": 1440,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 79,
+   "linksCount": 221,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 4,
+   "h1Texts": [
+    "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared"
+   ],
+   "emptyH1": 0,
+   "svgCount": 113,
+   "totalElements": 1545
+  }
+ },
+ {
+  "url": "https://awesome.video/resource/185020",
+  "slug": "resource-185020",
+  "vp": "768",
+  "screenshot": "public2_resource-185020_768.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 1024,
+     "clientH": 1024
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 768,
+   "viewWidth": 768,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 79,
+   "linksCount": 221,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 4,
+   "h1Texts": [
+    "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared"
+   ],
+   "emptyH1": 0,
+   "svgCount": 113,
+   "totalElements": 1545
+  }
+ },
+ {
+  "url": "https://awesome.video/resource/185020",
+  "slug": "resource-185020",
+  "vp": "375",
+  "screenshot": "public2_resource-185020_375.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 375,
+   "viewWidth": 375,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 11,
+   "linksCount": 8,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 4,
+   "h1Texts": [
+    "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared"
+   ],
+   "emptyH1": 0,
+   "svgCount": 31,
+   "totalElements": 339
+  }
+ },
+ {
+  "url": "https://awesome.video/resource/184751",
+  "slug": "resource-184751",
+  "vp": "1440",
+  "screenshot": "public2_resource-184751_1440.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 900,
+     "clientH": 900
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 1440,
+   "viewWidth": 1440,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "2025 NAB Show: CineCentral — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 79,
+   "linksCount": 221,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 4,
+   "h1Texts": [
+    "2025 NAB Show: CineCentral"
+   ],
+   "emptyH1": 0,
+   "svgCount": 113,
+   "totalElements": 1547
+  }
+ },
+ {
+  "url": "https://awesome.video/resource/184751",
+  "slug": "resource-184751",
+  "vp": "768",
+  "screenshot": "public2_resource-184751_768.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 1024,
+     "clientH": 1024
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 768,
+   "viewWidth": 768,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "2025 NAB Show: CineCentral — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 79,
+   "linksCount": 221,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 4,
+   "h1Texts": [
+    "2025 NAB Show: CineCentral"
+   ],
+   "emptyH1": 0,
+   "svgCount": 113,
+   "totalElements": 1547
+  }
+ },
+ {
+  "url": "https://awesome.video/resource/184751",
+  "slug": "resource-184751",
+  "vp": "375",
+  "screenshot": "public2_resource-184751_375.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 375,
+   "viewWidth": 375,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "2025 NAB Show: CineCentral — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 11,
+   "linksCount": 8,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 4,
+   "h1Texts": [
+    "2025 NAB Show: CineCentral"
+   ],
+   "emptyH1": 0,
+   "svgCount": 31,
+   "totalElements": 341
+  }
+ },
+ {
+  "url": "https://awesome.video/resource/186231",
+  "slug": "resource-186231",
+  "vp": "1440",
+  "screenshot": "public2_resource-186231_1440.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 900,
+     "clientH": 900
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 1440,
+   "viewWidth": 1440,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "2501world/transcoding-performance-trial: Runs FFmpeg transcoding processes simultaneously and measures CPU performance — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 79,
+   "linksCount": 221,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 3,
+   "h1Texts": [
+    "2501world/transcoding-performance-trial: Runs FFmpeg transcoding processes simul"
+   ],
+   "emptyH1": 0,
+   "svgCount": 112,
+   "totalElements": 1536
+  }
+ },
+ {
+  "url": "https://awesome.video/resource/186231",
+  "slug": "resource-186231",
+  "vp": "768",
+  "screenshot": "public2_resource-186231_768.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 1024,
+     "clientH": 1024
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [
+    {
+     "tag": "ARTICLE",
+     "cls": "rounded-lg border bg-card text-card-foreground shadow-[var(-",
+     "text": "2501world/transcoding-performance-trial: Runs FFmp",
+     "scrollW": 548,
+     "clientW": 382,
+     "scrollH": 799,
+     "clientH": 799
+    }
+   ],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 768,
+   "viewWidth": 768,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "2501world/transcoding-performance-trial: Runs FFmpeg transcoding processes simultaneously and measures CPU performance — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 79,
+   "linksCount": 221,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 3,
+   "h1Texts": [
+    "2501world/transcoding-performance-trial: Runs FFmpeg transcoding processes simul"
+   ],
+   "emptyH1": 0,
+   "svgCount": 112,
+   "totalElements": 1536
+  }
+ },
+ {
+  "url": "https://awesome.video/resource/186231",
+  "slug": "resource-186231",
+  "vp": "375",
+  "screenshot": "public2_resource-186231_375.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "flex flex-col space-y-1.5 p-6",
+     "text": "2501world/transcoding-performance-trial: Runs FFmp",
+     "scrollW": 365,
+     "clientW": 341,
+     "scrollH": 337,
+     "clientH": 337
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex flex-col gap-4",
+     "text": "2501world/transcoding-performance-trial: Runs FFmp",
+     "scrollW": 341,
+     "clientW": 293,
+     "scrollH": 289,
+     "clientH": 289
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-start justify-between gap-4",
+     "text": "2501world/transcoding-performance-trial: Runs FFmp",
+     "scrollW": 341,
+     "clientW": 293,
+     "scrollH": 289,
+     "clientH": 289
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [
+    {
+     "tag": "ARTICLE",
+     "cls": "rounded-lg border bg-card text-card-foreground shadow-[var(-",
+     "text": "2501world/transcoding-performance-trial: Runs FFmp",
+     "scrollW": 365,
+     "clientW": 341,
+     "scrollH": 746,
+     "clientH": 746
+    }
+   ],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 375,
+   "viewWidth": 375,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "2501world/transcoding-performance-trial: Runs FFmpeg transcoding processes simultaneously and measures CPU performance — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 11,
+   "linksCount": 8,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 3,
+   "h1Texts": [
+    "2501world/transcoding-performance-trial: Runs FFmpeg transcoding processes simul"
+   ],
+   "emptyH1": 0,
+   "svgCount": 30,
+   "totalElements": 330
+  }
+ },
+ {
+  "url": "https://awesome.video/resource/186145",
+  "slug": "resource-186145",
+  "vp": "1440",
+  "screenshot": "public2_resource-186145_1440.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 900,
+     "clientH": 900
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 1440,
+   "viewWidth": 1440,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "3 Cases from a Video Expert: Encoding Basics — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 79,
+   "linksCount": 221,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 3,
+   "h1Texts": [
+    "3 Cases from a Video Expert: Encoding Basics"
+   ],
+   "emptyH1": 0,
+   "svgCount": 112,
+   "totalElements": 1541
+  }
+ },
+ {
+  "url": "https://awesome.video/resource/186145",
+  "slug": "resource-186145",
+  "vp": "768",
+  "screenshot": "public2_resource-186145_768.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 1024,
+     "clientH": 1024
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 768,
+   "viewWidth": 768,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "3 Cases from a Video Expert: Encoding Basics — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 79,
+   "linksCount": 221,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 3,
+   "h1Texts": [
+    "3 Cases from a Video Expert: Encoding Basics"
+   ],
+   "emptyH1": 0,
+   "svgCount": 112,
+   "totalElements": 1541
+  }
+ },
+ {
+  "url": "https://awesome.video/resource/186145",
+  "slug": "resource-186145",
+  "vp": "375",
+  "screenshot": "public2_resource-186145_375.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 375,
+   "viewWidth": 375,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "3 Cases from a Video Expert: Encoding Basics — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 11,
+   "linksCount": 8,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 3,
+   "h1Texts": [
+    "3 Cases from a Video Expert: Encoding Basics"
+   ],
+   "emptyH1": 0,
+   "svgCount": 30,
+   "totalElements": 335
+  }
+ },
+ {
+  "url": "https://awesome.video/resource/186477",
+  "slug": "resource-186477",
+  "vp": "1440",
+  "screenshot": "public2_resource-186477_1440.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 900,
+     "clientH": 900
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 1440,
+   "viewWidth": 1440,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "3DLUT Creator — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 79,
+   "linksCount": 221,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 4,
+   "h1Texts": [
+    "3DLUT Creator"
+   ],
+   "emptyH1": 0,
+   "svgCount": 113,
+   "totalElements": 1547
+  }
+ },
+ {
+  "url": "https://awesome.video/resource/186477",
+  "slug": "resource-186477",
+  "vp": "768",
+  "screenshot": "public2_resource-186477_768.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 1024,
+     "clientH": 1024
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 768,
+   "viewWidth": 768,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "3DLUT Creator — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 79,
+   "linksCount": 221,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 4,
+   "h1Texts": [
+    "3DLUT Creator"
+   ],
+   "emptyH1": 0,
+   "svgCount": 113,
+   "totalElements": 1547
+  }
+ },
+ {
+  "url": "https://awesome.video/resource/186477",
+  "slug": "resource-186477",
+  "vp": "375",
+  "screenshot": "public2_resource-186477_375.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 375,
+   "viewWidth": 375,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "3DLUT Creator — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 11,
+   "linksCount": 8,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 4,
+   "h1Texts": [
+    "3DLUT Creator"
+   ],
+   "emptyH1": 0,
+   "svgCount": 31,
+   "totalElements": 341
+  }
+ },
+ {
+  "url": "https://awesome.video/resource/185570",
+  "slug": "resource-185570",
+  "vp": "1440",
+  "screenshot": "public2_resource-185570_1440.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 900,
+     "clientH": 900
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 1440,
+   "viewWidth": 1440,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "4K Media | Free Ultra-HD / HDR / HLG / Dolby Vision 4K Video Demos — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 79,
+   "linksCount": 221,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 4,
+   "h1Texts": [
+    "4K Media | Free Ultra-HD / HDR / HLG / Dolby Vision 4K Video Demos"
+   ],
+   "emptyH1": 0,
+   "svgCount": 113,
+   "totalElements": 1548
+  }
+ },
+ {
+  "url": "https://awesome.video/resource/185570",
+  "slug": "resource-185570",
+  "vp": "768",
+  "screenshot": "public2_resource-185570_768.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 1024,
+     "clientH": 1024
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 768,
+   "viewWidth": 768,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "4K Media | Free Ultra-HD / HDR / HLG / Dolby Vision 4K Video Demos — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 79,
+   "linksCount": 221,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 4,
+   "h1Texts": [
+    "4K Media | Free Ultra-HD / HDR / HLG / Dolby Vision 4K Video Demos"
+   ],
+   "emptyH1": 0,
+   "svgCount": 113,
+   "totalElements": 1548
+  }
+ },
+ {
+  "url": "https://awesome.video/resource/185570",
+  "slug": "resource-185570",
+  "vp": "375",
+  "screenshot": "public2_resource-185570_375.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 375,
+   "viewWidth": 375,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "4K Media | Free Ultra-HD / HDR / HLG / Dolby Vision 4K Video Demos — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 11,
+   "linksCount": 8,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 4,
+   "h1Texts": [
+    "4K Media | Free Ultra-HD / HDR / HLG / Dolby Vision 4K Video Demos"
+   ],
+   "emptyH1": 0,
+   "svgCount": 31,
+   "totalElements": 342
+  }
+ },
+ {
+  "url": "https://awesome.video/resource/185971",
+  "slug": "resource-185971",
+  "vp": "1440",
+  "screenshot": "public2_resource-185971_1440.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 900,
+     "clientH": 900
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [
+    {
+     "tag": "ARTICLE",
+     "cls": "rounded-lg border bg-card text-card-foreground shadow-[var(-",
+     "text": "507_hls_authoring_for_airplay_2.Protocols & Transp",
+     "scrollW": 653,
+     "clientW": 651,
+     "scrollH": 436,
+     "clientH": 436
+    }
+   ],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 1440,
+   "viewWidth": 1440,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "507_hls_authoring_for_airplay_2. — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 79,
+   "linksCount": 221,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 3,
+   "h1Texts": [
+    "507_hls_authoring_for_airplay_2."
+   ],
+   "emptyH1": 0,
+   "svgCount": 112,
+   "totalElements": 1541
+  }
+ },
+ {
+  "url": "https://awesome.video/resource/185971",
+  "slug": "resource-185971",
+  "vp": "768",
+  "screenshot": "public2_resource-185971_768.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 1024,
+     "clientH": 1024
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [
+    {
+     "tag": "ARTICLE",
+     "cls": "rounded-lg border bg-card text-card-foreground shadow-[var(-",
+     "text": "507_hls_authoring_for_airplay_2.Protocols & Transp",
+     "scrollW": 653,
+     "clientW": 382,
+     "scrollH": 484,
+     "clientH": 484
+    }
+   ],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 768,
+   "viewWidth": 768,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "507_hls_authoring_for_airplay_2. — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 79,
+   "linksCount": 221,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 3,
+   "h1Texts": [
+    "507_hls_authoring_for_airplay_2."
+   ],
+   "emptyH1": 0,
+   "svgCount": 112,
+   "totalElements": 1541
+  }
+ },
+ {
+  "url": "https://awesome.video/resource/185971",
+  "slug": "resource-185971",
+  "vp": "375",
+  "screenshot": "public2_resource-185971_375.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "flex flex-col space-y-1.5 p-6",
+     "text": "507_hls_authoring_for_airplay_2.Protocols & Transp",
+     "scrollW": 435,
+     "clientW": 341,
+     "scrollH": 141,
+     "clientH": 141
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex flex-col gap-4",
+     "text": "507_hls_authoring_for_airplay_2.Protocols & Transp",
+     "scrollW": 411,
+     "clientW": 293,
+     "scrollH": 93,
+     "clientH": 93
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-start justify-between gap-4",
+     "text": "507_hls_authoring_for_airplay_2.Protocols & Transp",
+     "scrollW": 411,
+     "clientW": 293,
+     "scrollH": 93,
+     "clientH": 93
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [
+    {
+     "tag": "ARTICLE",
+     "cls": "rounded-lg border bg-card text-card-foreground shadow-[var(-",
+     "text": "507_hls_authoring_for_airplay_2.Protocols & Transp",
+     "scrollW": 435,
+     "clientW": 341,
+     "scrollH": 486,
+     "clientH": 486
+    }
+   ],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 375,
+   "viewWidth": 375,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "507_hls_authoring_for_airplay_2. — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 11,
+   "linksCount": 8,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 3,
+   "h1Texts": [
+    "507_hls_authoring_for_airplay_2."
+   ],
+   "emptyH1": 0,
+   "svgCount": 30,
+   "totalElements": 335
+  }
+ },
+ {
+  "url": "https://awesome.video/resource/185970",
+  "slug": "resource-185970",
+  "vp": "1440",
+  "screenshot": "public2_resource-185970_1440.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 900,
+     "clientH": 900
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [
+    {
+     "tag": "ARTICLE",
+     "cls": "rounded-lg border bg-card text-card-foreground shadow-[var(-",
+     "text": "510_validating_http_live_streams.Protocols & Trans",
+     "scrollW": 665,
+     "clientW": 651,
+     "scrollH": 436,
+     "clientH": 436
+    }
+   ],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 1440,
+   "viewWidth": 1440,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "510_validating_http_live_streams. — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 79,
+   "linksCount": 221,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 3,
+   "h1Texts": [
+    "510_validating_http_live_streams."
+   ],
+   "emptyH1": 0,
+   "svgCount": 112,
+   "totalElements": 1542
+  }
+ },
+ {
+  "url": "https://awesome.video/resource/185970",
+  "slug": "resource-185970",
+  "vp": "768",
+  "screenshot": "public2_resource-185970_768.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 1024,
+     "clientH": 1024
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [
+    {
+     "tag": "ARTICLE",
+     "cls": "rounded-lg border bg-card text-card-foreground shadow-[var(-",
+     "text": "510_validating_http_live_streams.Protocols & Trans",
+     "scrollW": 665,
+     "clientW": 382,
+     "scrollH": 484,
+     "clientH": 484
+    }
+   ],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 768,
+   "viewWidth": 768,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "510_validating_http_live_streams. — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 79,
+   "linksCount": 221,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 3,
+   "h1Texts": [
+    "510_validating_http_live_streams."
+   ],
+   "emptyH1": 0,
+   "svgCount": 112,
+   "totalElements": 1542
+  }
+ },
+ {
+  "url": "https://awesome.video/resource/185970",
+  "slug": "resource-185970",
+  "vp": "375",
+  "screenshot": "public2_resource-185970_375.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "flex flex-col space-y-1.5 p-6",
+     "text": "510_validating_http_live_streams.Protocols & Trans",
+     "scrollW": 443,
+     "clientW": 341,
+     "scrollH": 141,
+     "clientH": 141
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex flex-col gap-4",
+     "text": "510_validating_http_live_streams.Protocols & Trans",
+     "scrollW": 419,
+     "clientW": 293,
+     "scrollH": 93,
+     "clientH": 93
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-start justify-between gap-4",
+     "text": "510_validating_http_live_streams.Protocols & Trans",
+     "scrollW": 419,
+     "clientW": 293,
+     "scrollH": 93,
+     "clientH": 93
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [
+    {
+     "tag": "ARTICLE",
+     "cls": "rounded-lg border bg-card text-card-foreground shadow-[var(-",
+     "text": "510_validating_http_live_streams.Protocols & Trans",
+     "scrollW": 443,
+     "clientW": 341,
+     "scrollH": 486,
+     "clientH": 486
+    }
+   ],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 375,
+   "viewWidth": 375,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "510_validating_http_live_streams. — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 11,
+   "linksCount": 8,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 3,
+   "h1Texts": [
+    "510_validating_http_live_streams."
+   ],
+   "emptyH1": 0,
+   "svgCount": 30,
+   "totalElements": 336
+  }
+ },
+ {
+  "url": "https://awesome.video/resource/185983",
+  "slug": "resource-185983",
+  "vp": "1440",
+  "screenshot": "public2_resource-185983_1440.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 900,
+     "clientH": 900
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 1440,
+   "viewWidth": 1440,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "515_hls_authoring_update — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 79,
+   "linksCount": 221,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 3,
+   "h1Texts": [
+    "515_hls_authoring_update"
+   ],
+   "emptyH1": 0,
+   "svgCount": 112,
+   "totalElements": 1541
+  }
+ },
+ {
+  "url": "https://awesome.video/resource/185983",
+  "slug": "resource-185983",
+  "vp": "768",
+  "screenshot": "public2_resource-185983_768.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 1024,
+     "clientH": 1024
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [
+    {
+     "tag": "ARTICLE",
+     "cls": "rounded-lg border bg-card text-card-foreground shadow-[var(-",
+     "text": "515_hls_authoring_updateProtocols & TransportHLS T",
+     "scrollW": 567,
+     "clientW": 382,
+     "scrollH": 490,
+     "clientH": 490
+    }
+   ],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 768,
+   "viewWidth": 768,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "515_hls_authoring_update — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 79,
+   "linksCount": 221,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 3,
+   "h1Texts": [
+    "515_hls_authoring_update"
+   ],
+   "emptyH1": 0,
+   "svgCount": 112,
+   "totalElements": 1541
+  }
+ },
+ {
+  "url": "https://awesome.video/resource/185983",
+  "slug": "resource-185983",
+  "vp": "375",
+  "screenshot": "public2_resource-185983_375.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "flex flex-col space-y-1.5 p-6",
+     "text": "515_hls_authoring_updateProtocols & TransportHLS T",
+     "scrollW": 378,
+     "clientW": 341,
+     "scrollH": 141,
+     "clientH": 141
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex flex-col gap-4",
+     "text": "515_hls_authoring_updateProtocols & TransportHLS T",
+     "scrollW": 354,
+     "clientW": 293,
+     "scrollH": 93,
+     "clientH": 93
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-start justify-between gap-4",
+     "text": "515_hls_authoring_updateProtocols & TransportHLS T",
+     "scrollW": 354,
+     "clientW": 293,
+     "scrollH": 93,
+     "clientH": 93
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [
+    {
+     "tag": "ARTICLE",
+     "cls": "rounded-lg border bg-card text-card-foreground shadow-[var(-",
+     "text": "515_hls_authoring_updateProtocols & TransportHLS T",
+     "scrollW": 378,
+     "clientW": 341,
+     "scrollH": 466,
+     "clientH": 466
+    }
+   ],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 375,
+   "viewWidth": 375,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "515_hls_authoring_update — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 11,
+   "linksCount": 8,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 3,
+   "h1Texts": [
+    "515_hls_authoring_update"
+   ],
+   "emptyH1": 0,
+   "svgCount": 30,
+   "totalElements": 335
+  }
+ },
+ {
+  "url": "https://awesome.video/resource/185860",
+  "slug": "resource-185860",
+  "vp": "1440",
+  "screenshot": "public2_resource-185860_1440.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 900,
+     "clientH": 900
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 1440,
+   "viewWidth": 1440,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "9 Best Home Server Apps to Automate Media Management — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 79,
+   "linksCount": 221,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 3,
+   "h1Texts": [
+    "9 Best Home Server Apps to Automate Media Management"
+   ],
+   "emptyH1": 0,
+   "svgCount": 112,
+   "totalElements": 1538
+  }
+ },
+ {
+  "url": "https://awesome.video/resource/185860",
+  "slug": "resource-185860",
+  "vp": "768",
+  "screenshot": "public2_resource-185860_768.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [
+    {
+     "tag": "DIV",
+     "cls": "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[l",
+     "text": "Awesome Video1,946 resourcesNavigationHomeSubmit R",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 1024,
+     "clientH": 1024
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Community Groups5Online Forums3Events & Conference",
+     "scrollW": 255,
+     "clientW": 255,
+     "scrollH": 128,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Online Forums3",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Podcasts & Webinars4",
+     "scrollW": 209,
+     "clientW": 209,
+     "scrollH": 42,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 0
+    },
+    {
+     "tag": "DIV",
+     "cls": "accordion-body-inner",
+     "text": "Benchmarking & Performance Tools for Codecs2Cloud-",
+     "scrollW": 263,
+     "clientW": 255,
+     "scrollH": 655,
+     "clientH": 655
+    },
+    {
+     "tag": "DIV",
+     "cls": "",
+     "text": "Cloud-Based Encoding Solutions12Cloud Platforms1Su",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    },
+    {
+     "tag": "DIV",
+     "cls": "flex items-stretch gap-[2px]",
+     "text": "Cloud-Based Encoding Solutions12",
+     "scrollW": 233,
+     "clientW": 209,
+     "scrollH": 38,
+     "clientH": 38
+    }
+   ],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 768,
+   "viewWidth": 768,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "9 Best Home Server Apps to Automate Media Management — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 79,
+   "linksCount": 221,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 3,
+   "h1Texts": [
+    "9 Best Home Server Apps to Automate Media Management"
+   ],
+   "emptyH1": 0,
+   "svgCount": 112,
+   "totalElements": 1538
+  }
+ },
+ {
+  "url": "https://awesome.video/resource/185860",
+  "slug": "resource-185860",
+  "vp": "375",
+  "screenshot": "public2_resource-185860_375.png",
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used "
+  ],
+  "netErrs": [],
+  "metrics": {
+   "overflowDivs": [],
+   "overflowSections": [],
+   "overflowArticles": [],
+   "overflowNav": [],
+   "overflowMain": [],
+   "overflowHeader": [],
+   "brokenImgs": [],
+   "horizontalOverflow": false,
+   "bodyWidth": 375,
+   "viewWidth": 375,
+   "bodyBgColor": "rgb(0, 0, 0)",
+   "bodyColor": "rgb(244, 243, 238)",
+   "docTitle": "9 Best Home Server Apps to Automate Media Management — Awesome Video",
+   "docLang": "en",
+   "buttonsCount": 11,
+   "linksCount": 8,
+   "inputsCount": 0,
+   "formCount": 0,
+   "headingCount": 3,
+   "h1Texts": [
+    "9 Best Home Server Apps to Automate Media Management"
+   ],
+   "emptyH1": 0,
+   "svgCount": 30,
+   "totalElements": 332
+  }
+ }
+]

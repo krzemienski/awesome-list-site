@@ -1,0 +1,141 @@
+{
+ "journey_1": {
+  "status": 404,
+  "len": 9387
+ },
+ "journey_2": {
+  "status": 404,
+  "len": 9387
+ },
+ "journey_3": {
+  "status": 404,
+  "len": 9387
+ },
+ "journey_4": {
+  "status": 404,
+  "len": 9387
+ },
+ "journey_5": {
+  "status": 404,
+  "len": 9387
+ },
+ "journey_6": {
+  "status": 200,
+  "len": 13047
+ },
+ "journey_7": {
+  "status": 200,
+  "len": 13235
+ },
+ "journey_100": {
+  "status": 404,
+  "len": 9387
+ },
+ "journey_99999": {
+  "status": 404,
+  "len": 9387
+ },
+ "authLinksOnLanding": {
+  "hasLogin": false,
+  "hasRegister": false,
+  "hasSignup": false
+ },
+ "metaHead": {
+  "hasFavicon": true,
+  "canonical": "https://awesome.video/",
+  "themeColor": "#ff3d52",
+  "viewport": "width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover",
+  "lang": "en",
+  "robots": null
+ },
+ "altAuditLanding": {
+  "total": 0,
+  "noAlt": 0,
+  "emptyAlt": 0
+ },
+ "api__api_tags": {
+  "status": 404,
+  "sample": "{\"message\":\"Not found\"}"
+ },
+ "api__api_journeys": {
+  "status": 200,
+  "sample": "[{\"id\":6,\"title\":\"Video Streaming Fundamentals\",\"description\":\"A comprehensive beginner level journey through intro & learning. Master the essential c"
+ },
+ "api__api_votes": {
+  "status": 404,
+  "sample": "{\"message\":\"Not found\"}"
+ },
+ "api__api_bookmarks": {
+  "status": 401,
+  "sample": "{\"message\":\"Unauthorized\"}"
+ },
+ "api__api_newsletter": {
+  "status": 404,
+  "sample": "{\"message\":\"Not found\"}"
+ },
+ "api__api_contact": {
+  "status": 404,
+  "sample": "{\"message\":\"Not found\"}"
+ },
+ "api__api_og": {
+  "status": 404,
+  "sample": "{\"message\":\"Not found\"}"
+ },
+ "api__api_profile": {
+  "status": 404,
+  "sample": "{\"message\":\"Not found\"}"
+ },
+ "api__api_health_ready": {
+  "status": 404,
+  "sample": "{\"message\":\"Not found\"}"
+ },
+ "api__api_metrics": {
+  "status": 404,
+  "sample": "{\"message\":\"Not found\"}"
+ },
+ "api__api_search": {
+  "status": 200,
+  "sample": "{\"query\":\"\",\"total\":0,\"results\":[]}"
+ },
+ "api__api_recommendations": {
+  "status": 200,
+  "sample": "[{\"resource\":{\"id\":188025,\"title\":\"whep-to-whip\",\"url\":\"https://github.com/kevmo314/whep-to-whip\",\"description\":\"Proxies WebRTC offer/answer negotiati"
+ },
+ "api__api_submissions": {
+  "status": 404,
+  "sample": "{\"message\":\"Not found\"}"
+ },
+ "api__api_comments": {
+  "status": 404,
+  "sample": "{\"message\":\"Not found\"}"
+ },
+ "journeysMeta": {
+  "txtLen": 5740,
+  "uniqueH2Count": 1,
+  "journeyCards": 0,
+  "resourceCards": 0,
+  "sidebarCount": 1
+ },
+ "advancedMeta": {
+  "inputs": [
+   {
+    "name": "",
+    "type": "text",
+    "placeholder": "Search categories and resources..."
+   }
+  ],
+  "txtLen": 14254,
+  "h2Count": 2,
+  "resourceCards": 0
+ },
+ "journey1Meta": {
+  "txtLen": 4478,
+  "resourceCards": 0,
+  "h2Count": 0,
+  "h2Sample": []
+ },
+ "h1": {
+  "count": 1,
+  "first": "Awesome Video"
+ }
+}

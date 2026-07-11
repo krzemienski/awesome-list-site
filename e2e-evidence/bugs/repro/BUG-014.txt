@@ -1,0 +1,6 @@
+BUG-014 verdict
+date 2026-07-11
+probe: see code/probe body
+actual: GET / -> 200, no resources count text in HTML
+classification: ALREADY-FIXED
+reason: no offending button

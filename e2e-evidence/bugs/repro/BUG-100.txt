@@ -1,0 +1,6 @@
+BUG-100 verdict
+date 2026-07-11
+probe: share button needs DOM + clipboard permission
+actual: manual: /resource/<id> open in browser
+classification: BLOCKED
+reason: navigator.clipboard.writeText failure requires DOM+permission; no Playwright in this campaign

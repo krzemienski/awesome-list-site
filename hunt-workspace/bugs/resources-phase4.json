@@ -1,0 +1,421 @@
+{
+  "184751": {
+    "slug": "184751",
+    "url": "https://awesome.video/resource/184751",
+    "checks": {
+      "tagProbe": {
+        "hashTag": [
+          {
+            "tag": "div",
+            "text": "#storytelling",
+            "cls": "inline-flex items-center rounded-full border px-2.5 py-0.5 font-semibold transit"
+          },
+          {
+            "tag": "div",
+            "text": "#workshops",
+            "cls": "inline-flex items-center rounded-full border px-2.5 py-0.5 font-semibold transit"
+          },
+          {
+            "tag": "div",
+            "text": "#training",
+            "cls": "inline-flex items-center rounded-full border px-2.5 py-0.5 font-semibold transit"
+          }
+        ],
+        "linked": [],
+        "byCls": [
+          {
+            "tag": "svg",
+            "text": "",
+            "cls": "[object SVGAnimatedString]"
+          }
+        ],
+        "hasTagsHeader": true
+      },
+      "bookmarkState": {
+        "bmBtnCount": 2,
+        "bmBtnTexts": [
+          "Bookmarked",
+          "Remove Bookmark"
+        ],
+        "favBtnCount": 2,
+        "favBtnTexts": [
+          "Favorite",
+          "Add to Favorites"
+        ],
+        "ariaBookmark": []
+      },
+      "bookmarkClickErr": "page.evaluate: SyntaxError: Failed to execute 'querySelectorAll' on 'Document': 'button:has-text(\"Bookmark\"), button:has-text(\"Add to Bookmarks\"), button:has-text(\"Remove from Bookmarks\")' is not a valid selector.\n    at eval (eval at evaluate (:303:30), <anonymous>:2:32)\n    at UtilityScript.evaluate (<anonymous>:305:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+    }
+  },
+  "184763": {
+    "slug": "184763",
+    "url": "https://awesome.video/resource/184763",
+    "checks": {
+      "tagProbe": {
+        "hashTag": [
+          {
+            "tag": "div",
+            "text": "#iOS",
+            "cls": "inline-flex items-center rounded-full border px-2.5 py-0.5 font-semibold transit"
+          },
+          {
+            "tag": "div",
+            "text": "#macOS",
+            "cls": "inline-flex items-center rounded-full border px-2.5 py-0.5 font-semibold transit"
+          },
+          {
+            "tag": "div",
+            "text": "#streaming",
+            "cls": "inline-flex items-center rounded-full border px-2.5 py-0.5 font-semibold transit"
+          }
+        ],
+        "linked": [],
+        "byCls": [
+          {
+            "tag": "svg",
+            "text": "",
+            "cls": "[object SVGAnimatedString]"
+          }
+        ],
+        "hasTagsHeader": true
+      },
+      "bookmarkState": {
+        "bmBtnCount": 2,
+        "bmBtnTexts": [
+          "Bookmarked",
+          "Remove Bookmark"
+        ],
+        "favBtnCount": 2,
+        "favBtnTexts": [
+          "Favorite",
+          "Add to Favorites"
+        ],
+        "ariaBookmark": []
+      },
+      "bookmarkClickErr": "page.evaluate: SyntaxError: Failed to execute 'querySelectorAll' on 'Document': 'button:has-text(\"Bookmark\"), button:has-text(\"Add to Bookmarks\"), button:has-text(\"Remove from Bookmarks\")' is not a valid selector.\n    at eval (eval at evaluate (:303:30), <anonymous>:2:32)\n    at UtilityScript.evaluate (<anonymous>:305:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+    }
+  },
+  "184789": {
+    "slug": "184789",
+    "url": "https://awesome.video/resource/184789",
+    "checks": {
+      "tagProbe": {
+        "hashTag": [
+          {
+            "tag": "div",
+            "text": "#AWS",
+            "cls": "inline-flex items-center rounded-full border px-2.5 py-0.5 font-semibold transit"
+          }
+        ],
+        "linked": [],
+        "byCls": [
+          {
+            "tag": "svg",
+            "text": "",
+            "cls": "[object SVGAnimatedString]"
+          }
+        ],
+        "hasTagsHeader": true
+      },
+      "bookmarkState": {
+        "bmBtnCount": 2,
+        "bmBtnTexts": [
+          "Bookmarked",
+          "Remove Bookmark"
+        ],
+        "favBtnCount": 2,
+        "favBtnTexts": [
+          "Favorite",
+          "Add to Favorites"
+        ],
+        "ariaBookmark": []
+      },
+      "bookmarkClickErr": "page.evaluate: SyntaxError: Failed to execute 'querySelectorAll' on 'Document': 'button:has-text(\"Bookmark\"), button:has-text(\"Add to Bookmarks\"), button:has-text(\"Remove from Bookmarks\")' is not a valid selector.\n    at eval (eval at evaluate (:303:30), <anonymous>:2:32)\n    at UtilityScript.evaluate (<anonymous>:305:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+    }
+  },
+  "184838": {
+    "slug": "184838",
+    "url": "https://awesome.video/resource/184838",
+    "checks": {
+      "tagProbe": {
+        "hashTag": [
+          {
+            "tag": "div",
+            "text": "#on-demand",
+            "cls": "inline-flex items-center rounded-full border px-2.5 py-0.5 font-semibold transit"
+          }
+        ],
+        "linked": [],
+        "byCls": [
+          {
+            "tag": "svg",
+            "text": "",
+            "cls": "[object SVGAnimatedString]"
+          }
+        ],
+        "hasTagsHeader": true
+      },
+      "bookmarkState": {
+        "bmBtnCount": 2,
+        "bmBtnTexts": [
+          "Bookmarked",
+          "Remove Bookmark"
+        ],
+        "favBtnCount": 2,
+        "favBtnTexts": [
+          "Favorite",
+          "Add to Favorites"
+        ],
+        "ariaBookmark": []
+      },
+      "bookmarkClickErr": "page.evaluate: SyntaxError: Failed to execute 'querySelectorAll' on 'Document': 'button:has-text(\"Bookmark\"), button:has-text(\"Add to Bookmarks\"), button:has-text(\"Remove from Bookmarks\")' is not a valid selector.\n    at eval (eval at evaluate (:303:30), <anonymous>:2:32)\n    at UtilityScript.evaluate (<anonymous>:305:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+    }
+  },
+  "185020": {
+    "slug": "185020",
+    "url": "https://awesome.video/resource/185020",
+    "checks": {
+      "tagProbe": {
+        "hashTag": [
+          {
+            "tag": "div",
+            "text": "#RTMP",
+            "cls": "inline-flex items-center rounded-full border px-2.5 py-0.5 font-semibold transit"
+          },
+          {
+            "tag": "div",
+            "text": "#WebRTC",
+            "cls": "inline-flex items-center rounded-full border px-2.5 py-0.5 font-semibold transit"
+          },
+          {
+            "tag": "div",
+            "text": "#HLS",
+            "cls": "inline-flex items-center rounded-full border px-2.5 py-0.5 font-semibold transit"
+          }
+        ],
+        "linked": [],
+        "byCls": [
+          {
+            "tag": "svg",
+            "text": "",
+            "cls": "[object SVGAnimatedString]"
+          }
+        ],
+        "hasTagsHeader": true
+      },
+      "bookmarkState": {
+        "bmBtnCount": 2,
+        "bmBtnTexts": [
+          "Bookmarked",
+          "Remove Bookmark"
+        ],
+        "favBtnCount": 2,
+        "favBtnTexts": [
+          "Favorite",
+          "Add to Favorites"
+        ],
+        "ariaBookmark": []
+      },
+      "bookmarkClickErr": "page.evaluate: SyntaxError: Failed to execute 'querySelectorAll' on 'Document': 'button:has-text(\"Bookmark\"), button:has-text(\"Add to Bookmarks\"), button:has-text(\"Remove from Bookmarks\")' is not a valid selector.\n    at eval (eval at evaluate (:303:30), <anonymous>:2:32)\n    at UtilityScript.evaluate (<anonymous>:305:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+    }
+  },
+  "186145": {
+    "slug": "186145",
+    "url": "https://awesome.video/resource/186145",
+    "checks": {
+      "tagProbe": {
+        "hashTag": [],
+        "linked": [],
+        "byCls": [],
+        "hasTagsHeader": false
+      },
+      "bookmarkState": {
+        "bmBtnCount": 2,
+        "bmBtnTexts": [
+          "Bookmarked",
+          "Remove Bookmark"
+        ],
+        "favBtnCount": 2,
+        "favBtnTexts": [
+          "Favorite",
+          "Add to Favorites"
+        ],
+        "ariaBookmark": []
+      },
+      "bookmarkClickErr": "page.evaluate: SyntaxError: Failed to execute 'querySelectorAll' on 'Document': 'button:has-text(\"Bookmark\"), button:has-text(\"Add to Bookmarks\"), button:has-text(\"Remove from Bookmarks\")' is not a valid selector.\n    at eval (eval at evaluate (:303:30), <anonymous>:2:32)\n    at UtilityScript.evaluate (<anonymous>:305:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+    }
+  },
+  "186212": {
+    "slug": "186212",
+    "url": "https://awesome.video/resource/186212",
+    "checks": {
+      "tagProbe": {
+        "hashTag": [],
+        "linked": [],
+        "byCls": [],
+        "hasTagsHeader": false
+      },
+      "bookmarkState": {
+        "bmBtnCount": 2,
+        "bmBtnTexts": [
+          "Bookmarked",
+          "Remove Bookmark"
+        ],
+        "favBtnCount": 2,
+        "favBtnTexts": [
+          "Favorite",
+          "Add to Favorites"
+        ],
+        "ariaBookmark": []
+      },
+      "bookmarkClickErr": "page.evaluate: SyntaxError: Failed to execute 'querySelectorAll' on 'Document': 'button:has-text(\"Bookmark\"), button:has-text(\"Add to Bookmarks\"), button:has-text(\"Remove from Bookmarks\")' is not a valid selector.\n    at eval (eval at evaluate (:303:30), <anonymous>:2:32)\n    at UtilityScript.evaluate (<anonymous>:305:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+    }
+  },
+  "186231": {
+    "slug": "186231",
+    "url": "https://awesome.video/resource/186231",
+    "checks": {
+      "tagProbe": {
+        "hashTag": [],
+        "linked": [],
+        "byCls": [],
+        "hasTagsHeader": false
+      },
+      "bookmarkState": {
+        "bmBtnCount": 2,
+        "bmBtnTexts": [
+          "Bookmarked",
+          "Remove Bookmark"
+        ],
+        "favBtnCount": 2,
+        "favBtnTexts": [
+          "Favorite",
+          "Add to Favorites"
+        ],
+        "ariaBookmark": []
+      },
+      "bookmarkClickErr": "page.evaluate: SyntaxError: Failed to execute 'querySelectorAll' on 'Document': 'button:has-text(\"Bookmark\"), button:has-text(\"Add to Bookmarks\"), button:has-text(\"Remove from Bookmarks\")' is not a valid selector.\n    at eval (eval at evaluate (:303:30), <anonymous>:2:32)\n    at UtilityScript.evaluate (<anonymous>:305:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+    }
+  },
+  "186477": {
+    "slug": "186477",
+    "url": "https://awesome.video/resource/186477",
+    "checks": {
+      "tagProbe": {
+        "hashTag": [
+          {
+            "tag": "div",
+            "text": "#lut",
+            "cls": "inline-flex items-center rounded-full border px-2.5 py-0.5 font-semibold transit"
+          },
+          {
+            "tag": "div",
+            "text": "#post-production",
+            "cls": "inline-flex items-center rounded-full border px-2.5 py-0.5 font-semibold transit"
+          }
+        ],
+        "linked": [],
+        "byCls": [
+          {
+            "tag": "svg",
+            "text": "",
+            "cls": "[object SVGAnimatedString]"
+          }
+        ],
+        "hasTagsHeader": true
+      },
+      "bookmarkState": {
+        "bmBtnCount": 2,
+        "bmBtnTexts": [
+          "Bookmarked",
+          "Remove Bookmark"
+        ],
+        "favBtnCount": 2,
+        "favBtnTexts": [
+          "Favorite",
+          "Add to Favorites"
+        ],
+        "ariaBookmark": []
+      },
+      "bookmarkClickErr": "page.evaluate: SyntaxError: Failed to execute 'querySelectorAll' on 'Document': 'button:has-text(\"Bookmark\"), button:has-text(\"Add to Bookmarks\"), button:has-text(\"Remove from Bookmarks\")' is not a valid selector.\n    at eval (eval at evaluate (:303:30), <anonymous>:2:32)\n    at UtilityScript.evaluate (<anonymous>:305:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+    }
+  },
+  "186609": {
+    "slug": "186609",
+    "url": "https://awesome.video/resource/186609",
+    "checks": {
+      "tagProbe": {
+        "hashTag": [],
+        "linked": [],
+        "byCls": [],
+        "hasTagsHeader": false
+      },
+      "bookmarkState": {
+        "bmBtnCount": 2,
+        "bmBtnTexts": [
+          "Bookmarked",
+          "Remove Bookmark"
+        ],
+        "favBtnCount": 2,
+        "favBtnTexts": [
+          "Favorite",
+          "Add to Favorites"
+        ],
+        "ariaBookmark": []
+      },
+      "bookmarkClickErr": "page.evaluate: SyntaxError: Failed to execute 'querySelectorAll' on 'Document': 'button:has-text(\"Bookmark\"), button:has-text(\"Add to Bookmarks\"), button:has-text(\"Remove from Bookmarks\")' is not a valid selector.\n    at eval (eval at evaluate (:303:30), <anonymous>:2:32)\n    at UtilityScript.evaluate (<anonymous>:305:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+    }
+  },
+  "187911": {
+    "slug": "187911",
+    "url": "https://awesome.video/resource/187911",
+    "checks": {
+      "tagProbe": {
+        "hashTag": [],
+        "linked": [],
+        "byCls": [],
+        "hasTagsHeader": false
+      },
+      "bookmarkState": {
+        "bmBtnCount": 2,
+        "bmBtnTexts": [
+          "Bookmarked",
+          "Remove Bookmark"
+        ],
+        "favBtnCount": 2,
+        "favBtnTexts": [
+          "Favorite",
+          "Add to Favorites"
+        ],
+        "ariaBookmark": []
+      },
+      "bookmarkClickErr": "page.evaluate: SyntaxError: Failed to execute 'querySelectorAll' on 'Document': 'button:has-text(\"Bookmark\"), button:has-text(\"Add to Bookmarks\"), button:has-text(\"Remove from Bookmarks\")' is not a valid selector.\n    at eval (eval at evaluate (:303:30), <anonymous>:2:32)\n    at UtilityScript.evaluate (<anonymous>:305:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+    }
+  },
+  "188002": {
+    "slug": "188002",
+    "url": "https://awesome.video/resource/188002",
+    "checks": {
+      "tagProbe": {
+        "hashTag": [],
+        "linked": [],
+        "byCls": [],
+        "hasTagsHeader": false
+      },
+      "bookmarkState": {
+        "bmBtnCount": 2,
+        "bmBtnTexts": [
+          "Bookmarked",
+          "Remove Bookmark"
+        ],
+        "favBtnCount": 2,
+        "favBtnTexts": [
+          "Favorite",
+          "Add to Favorites"
+        ],
+        "ariaBookmark": []
+      },
+      "bookmarkClickErr": "page.evaluate: SyntaxError: Failed to execute 'querySelectorAll' on 'Document': 'button:has-text(\"Bookmark\"), button:has-text(\"Add to Bookmarks\"), button:has-text(\"Remove from Bookmarks\")' is not a valid selector.\n    at eval (eval at evaluate (:303:30), <anonymous>:2:32)\n    at UtilityScript.evaluate (<anonymous>:305:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+    }
+  }
+}

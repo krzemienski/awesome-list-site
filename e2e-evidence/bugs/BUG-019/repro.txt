@@ -1,0 +1,6 @@
+BUG-019 verdict
+date 2026-07-11
+probe: see comment
+actual: /recommendations:200 ld+json=False  /submit:200 ld+json=False  /login:200 ld+json=False  /admin:200 ld+json=False
+classification: REPRODUCES
+reason: 

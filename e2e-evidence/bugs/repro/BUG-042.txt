@@ -1,0 +1,6 @@
+BUG-042 verdict (FIXED via SSR prerender injection)
+date 2026-07-11
+probe: GET /reset-password
+actual: <form> rendered with inputs ['newPassword', 'confirmPassword']; <form>=True
+classification: FIXED
+reason: og-middleware.ts prerender injector now emits a real <form> with newPassword + confirmPassword inputs for /reset-password, so HTML-grounded tools see fields.

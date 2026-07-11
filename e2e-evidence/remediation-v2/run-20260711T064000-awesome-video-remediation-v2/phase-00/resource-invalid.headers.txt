@@ -1,0 +1,11 @@
+HTTP/1.1 400 Bad Request
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+Content-Type: application/json; charset=utf-8
+Content-Length: 413
+ETag: W/"19d-ON1J6BRBy79dQ4aqJW4l/4hHsQc"
+Date: Sat, 11 Jul 2026 08:14:22 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+

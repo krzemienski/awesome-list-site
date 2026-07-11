@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes, runBackgroundInitialization } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
+import { serveStatic, log } from "./vite";
 import { handleSSR } from "./ssr";
 import { errorHandler } from "./middleware/errorHandler";
 import { runMigrations } from "./migrate";
@@ -81,6 +81,10 @@ app.use((req, res, next) => {
     /^\/admin(\/|$)/,
     /^\/bookmarks(\/|$)/,
     /^\/settings(\/|$)/,
+    // BUG-017: /profile is a per-user page (same trust level as /bookmarks);
+    // gate it server-side so anonymous deep links get 302 → /login instead of
+    // the SPA shell.
+    /^\/profile(\/|$)/,
   ];
   const isProtected = protectedPatterns.some(p => p.test(req.path));
   if (isProtected && !req.headers.cookie?.includes('connect.sid')) {
@@ -152,6 +156,9 @@ app.use((req, res, next) => {
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
   if (app.get("env") === "development") {
+    // Development-only import keeps Vite and its plugins out of the production
+    // runtime dependency graph.
+    const { setupVite } = await import("./vite-dev");
     await setupVite(app, server);
   } else {
     // In production, add SSR handler before serving static files

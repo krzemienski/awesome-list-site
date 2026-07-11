@@ -1,0 +1,132 @@
+{
+ "adminCatCreate": {
+  "status": 404,
+  "body": "{\"message\":\"Not found\"}"
+ },
+ "apiCategories": {
+  "status": 200,
+  "body": "[{\"id\":1091,\"name\":\"Community & Events\",\"slug\":\"community-events\",\"resourceCount\":87},{\"id\":1085,\"name\":\"Encoding & Codecs\",\"slug\":\"encoding-codecs\",\"resourceCount\":336},{\"id\":1090,\"name\":\"General Tools\",\"slug\":\"general-tools\",\"resourceCount\":175},{\"id\":1089,\"name\":\"Infrastructure & Delivery\",\"slug\":\"infrastructure-delivery\",\"resourceCount\":207},{\"id\":1083,\"name\":\"Intro & Learning\",\"slug\":\"intro-l"
+ },
+ "adminUsersUnaughed": {
+  "status": 401,
+  "body": "{\"message\":\"Unauthorized\"}"
+ },
+ "corsGet": {
+  "status": 200,
+  "body": "{\"resources\":[{\"id\":188025,\"title\":\"whep-to-whip\",\"url\":\"https://github.com/kevmo314/whep-to-whip\",\"description\":\"Proxies WebRTC offer/answer negotiation between a WHEP source and WHIP sink, establish"
+ },
+ "ogImage": {
+  "status": 200,
+  "ct": "image/png",
+  "bytes": 53946,
+  "headBytes": {
+   "type": "Buffer",
+   "data": [
+    137,
+    80,
+    78,
+    71,
+    13,
+    10,
+    26,
+    10
+   ]
+  }
+ },
+ "logoutGet": {
+  "status": 404,
+  "redirectedTo": "https://awesome.video/logout",
+  "body": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <!--OG_META_INJECTED-->\n    <title>Page Not Found — Awesome Video</title>\n    <meta name=\"description\" content=\"The page you're looking for doesn't exist on Awesome Video. Browse the curated index of video development resources instead.\" />\n    <meta nam"
+ },
+ "admin_anon_/api/admin/users": {
+  "status": 401,
+  "body": "{\"message\":\"Unauthorized\"}"
+ },
+ "admin_anon_/api/admin/settings": {
+  "status": 404,
+  "body": "{\"message\":\"Not found\"}"
+ },
+ "admin_anon_/api/admin/journeys": {
+  "status": 401,
+  "body": "{\"message\":\"Unauthorized\"}"
+ },
+ "admin_anon_/api/admin/audit": {
+  "status": 404,
+  "body": "{\"message\":\"Not found\"}"
+ },
+ "adminCategoriesAuthed": {
+  "txt": "Skip to main content | Awesome Video | 1,946 resources | Navigation | Home | Submit Resource | Learning Journeys | Advanced | Theme | Admin | Categories | Community & Events | 87 | Community Groups | 5 | Online Forums | 3 | Events & Conferences | 8 | Podcasts & Webinars | 4 | General | 74 | Encoding & Codecs | 336 | Benchmarking & Performance Tools for Codecs | 2 | Cloud-Based Encoding Solutions | 12 | Cloud Platforms | 1 | Subtitles & Captions | 1 | Codecs | 16 | AV1 | 2 | HEVC | 3 | VP9 | 4 | Comparative Analysis of Codecs | 3 | Containerization & Packaging Tools | 27 | Audio | 5 | FFmpeg | 3 | Origin Servers | 1 | Encoding Tools | 94 | FFMPEG | 12 | FFmpeg-Based Tools | 30 | FFmpeg | 16 | Hardware Accelera",
+  "headingCount": 1,
+  "tableRows": 0,
+  "buttons": 72,
+  "errs": [
+   "Failed to load resource: the server responded with a status of 404 ()",
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+  ]
+ },
+ "search__api_search": {
+  "status": 200,
+  "body": "{\"query\":\"\",\"total\":0,\"results\":[]}"
+ },
+ "search__api_search?q=test": {
+  "status": 200,
+  "body": "{\"query\":\"test\",\"total\":97,\"results\":[{\"id\":188010,\"title\":\"Eyevinn WHIP\",\"url\":\"https://github.com/Eyevinn/whip\",\"description\":\"Open source client and server modules for WHIP (WebRTC-HTTP Ingestion P"
+ },
+ "search__api_v1_search": {
+  "status": 404,
+  "body": "{\"message\":\"Not found\"}"
+ },
+ "feed__rss_xml": {
+  "status": 200
+ },
+ "feed__feed_xml": {
+  "status": 200
+ },
+ "feed__atom_xml": {
+  "status": 200
+ },
+ "feed__sitemap_xml": {
+  "status": 200
+ },
+ "feed__newsletter": {
+  "status": 404
+ },
+ "login_brute_0": {
+  "status": 200
+ },
+ "login_brute_1": {
+  "status": 200
+ },
+ "login_brute_2": {
+  "status": 200
+ },
+ "login_brute_3": {
+  "status": 200
+ },
+ "login_brute_4": {
+  "status": 200
+ },
+ "recommendationsPage": {
+  "txt": "Skip to main content\nAwesome Video\n1,946 resources\nNavigation\nHome\nSubmit Resource\nLearning Journeys\nAdvanced\nTheme\nCategories\nCommunity & Events\n87\nCommunity Groups\n5\nOnline Forums\n3\nEvents & Conferences\n8\nPodcasts & Webinars\n4\nGeneral\n74\nEncoding & Codecs\n336\nBenchmarking & Performance Tools for Codecs\n2\nCloud-Based Encoding Solutions\n12\nCloud Platforms\n1\nSubtitles & Captions\n1\nCodecs\n16\nAV1\n2\nHEVC\n3\nVP9\n4\nComparative Analysis of Codecs\n3\nContainerization & Packaging Tools\n27\nAudio\n5\nFFmpeg\n3\nOrigin Servers\n1\nEncoding Tools\n94\nFFMPEG\n12\nFFmpeg-Based Tools\n30\nFFmpeg\n16\nHardware Accelerated Transcoding\n5\nHardware Codecs & Acceleration\n2\nMulti-format Packaging Tools\n6\nNext-Generation Codecs AV1 VVC\n4\nOpen Source Encoder Projects\n6\nAV1\n2\nReal-Time Encoding Solutions\n8\nScripting & Automation Tools\n12\nFFmpeg\n1\nSoftware Codecs\n1\nSoftware Transcoding Tools\n14\nGeneral\n94\nGeneral Tools\n175\nAPI Libraries & SDKs\n10\nFFmpeg\n1\nQuality & Testing\n1\nRoku\n4\nBuild Scripts & Automation\n7\nFFmpeg\n4\nRoku\n2\nCase Studies & Best Practices in DRM\n4\nHEVC\n1\nCommand-line Utilities & Wrappers\n6\nRoku\n3\nCommunity & Collaboration Platforms\n2\nCross-Platform Media Tools\n8\nAudio\n6\nDRM\n5\nDRM Solutions & Implementations\n6\nDRM Testing & Validation Tools\n2\nDocker & Containerization Tools\n7\nCloud Platforms\n1\nStorage Solutions\n1\nEncryption Tools for Streaming\n9\nDASH\n1\nHLS\n1\nIndependent & Hobbyist Projects\n2\nLogging & Debugging Tools\n6\nRoku\n3\nPerformance & Monitoring Tools\n6\nQuality & Testing\n1\nResearch Projects & Aca",
+  "h2": [
+   "Popular picks to get you started"
+  ],
+  "cards": 0,
+  "errs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+  ]
+ },
+ "categoriesPage": {
+  "txt": "Skip to main content\nAwesome Video\n1,946 resources\nNavigation\nHome\nSubmit Resource\nLearning Journeys\nAdvanced\nTheme\nCategories\nCommunity & Events\n87\nCommunity Groups\n5\nOnline Forums\n3\nEvents & Conferences\n8\nPodcasts & Webinars\n4\nGeneral\n74\nEncoding & Codecs\n336\nBenchmarking & Performance Tools for Codecs\n2\nCloud-Based Encoding Solutions\n12\nCloud Platforms\n1\nSubtitles & Captions\n1\nCodecs\n16\nAV1\n2\nHEVC\n3\nVP9\n4\nComparative Analysis of Codecs\n3\nContainerization & Packaging Tools\n27\nAudio\n5\nFFmpeg\n3\nOrigin Servers\n1\nEncoding Tools\n94\nFFMPEG\n12\nFFmpeg-Based Tools\n30\nFFmpeg\n16\nHardware Accelerated Transcoding\n5\nHardware Codecs & Acceleration\n2\nMulti-format Packaging Tools\n6\nNext-Generation Codecs AV1 VVC\n4\nOpen Source Encoder Projects\n6\nAV1\n2\nReal-Time Encoding Solutions\n8\nScripting & Automation Tools\n12\nFFmpeg\n1\nSoftware Codecs\n1\nSoftware Transcoding Tools\n14\nGeneral\n94\nGeneral Tools\n175\nAPI Libraries & SDKs\n10\nFFmpeg\n1\nQuality & Testing\n1\nRoku\n4\nBuild Scripts & Automation\n7\nFFmpeg\n4\nRoku\n2\nCase Studies & Best Practices in DRM\n4\nHEVC\n1\nCommand-line Utilities & Wrappers\n6\nRoku\n3\nCommunity & Collaboration Platforms\n2\nCross-Platform Media Tools\n8\nAudio\n6\nDRM\n5\nDRM Solutions & Implementations\n6\nDRM Testing & Validation Tools\n2\nDocker & Containerization Tools\n7\nCloud Platforms\n1\nStorage Solutions\n1\nEncryption Tools for Streaming\n9\nDASH\n1\nHLS\n1\nIndependent & Hobbyist Projects\n2\nLogging & Debugging Tools\n6\nRoku\n3\nPerformance & Monitoring Tools\n6\nQuality & Testing\n1\nResearch Projects & Aca",
+  "cards": 27,
+  "errs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+  ]
+ },
+ "aboutPage": {
+  "txt": "Skip to main content\nAwesome Video\n1,946 resources\nNavigation\nHome\nSubmit Resource\nLearning Journeys\nAdvanced\nTheme\nCategories\nCommunity & Events\n87\nCommunity Groups\n5\nOnline Forums\n3\nEvents & Conferences\n8\nPodcasts & Webinars\n4\nGeneral\n74\nEncoding & Codecs\n336\nBenchmarking & Performance Tools for Codecs\n2\nCloud-Based Encoding Solutions\n12\nCloud Platforms\n1\nSubtitles & Captions\n1\nCodecs\n16\nAV1\n2\nHEVC\n3\nVP9\n4\nComparative Analysis of Codecs\n3\nContainerization & Packaging Tools\n27\nAudio\n5\nFFmpeg\n3\nOrigin Servers\n1\nEncoding Tools\n94\nFFMPEG\n12\nFFmpeg-Based Tools\n30\nFFmpeg\n16\nHardware Accelerated Transcoding\n5\nHardware Codecs & Acceleration\n2\nMulti-format Packaging Tools\n6\nNext-Generation Codecs AV1 VVC\n4\nOpen Source Encoder Projects\n6\nAV1\n2\nReal-Time Encoding Solutions\n8\nScripting & Automation Tools\n12\nFFmpeg\n1\nSoftware Codecs\n1\nSoftware Transcoding Tools\n14\nGeneral\n94\nGeneral Tools\n175\nAPI Libraries & SDKs\n10\nFFmpeg\n1\nQuality & Testing\n1\nRoku\n4\nBuild Scripts & Automation\n7\nFFmpeg\n4\nRoku\n2\nCase Studies & Best Practices in DRM\n4\nHEVC\n1\nCommand-line Utilities & Wrappers\n6\nRoku\n3\nCommunity & Collaboration Platforms\n2\nCross-Platform Media Tools\n8\nAudio\n6\nDRM\n5\nDRM Solutions & Implementations\n6\nDRM Testing & Validation Tools\n2\nDocker & Containerization Tools\n7\nCloud Platforms\n1\nStorage Solutions\n1\nEncryption Tools for Streaming\n9\nDASH\n1\nHLS\n1\nIndependent & Hobbyist Projects\n2\nLogging & Debugging Tools\n6\nRoku\n3\nPerformance & Monitoring Tools\n6\nQuality & Testing\n1\nResearch Projects & Aca",
+  "errs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+  ]
+ }
+}

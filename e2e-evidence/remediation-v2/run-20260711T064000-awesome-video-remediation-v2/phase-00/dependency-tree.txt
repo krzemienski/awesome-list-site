@@ -1,0 +1,8 @@
+rest-express@1.0.0 /app
++-- @anthropic-ai/claude-agent-sdk@0.3.201
++-- @hookform/resolvers@5.4.0
++-- @modelcontextprotocol/sdk@1.29.0
++-- drizzle-zod@0.8.3
++-- openai@6.46.0
+`-- zod@4.4.3
+

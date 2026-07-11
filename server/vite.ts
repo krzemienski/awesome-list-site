@@ -1,10 +1,6 @@
 import express, { type Express } from "express";
 import fs from "fs";
 import path from "path";
-import { createServer as createViteServer, createLogger } from "vite";
-import { type Server } from "http";
-import viteConfig from "../vite.config";
-const viteLogger = createLogger();
 
 export function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
@@ -15,64 +11,6 @@ export function log(message: string, source = "express") {
   });
 
   console.log(`${formattedTime} [${source}] ${message}`);
-}
-
-export async function setupVite(app: Express, server: Server) {
-  const serverOptions = {
-    // Preserve `watch.ignored` (and any other server.* fields) from
-    // vite.config.ts — otherwise replacing the entire `server` block here
-    // strips the ignored-paths list and Vite's chokidar starts firing
-    // `[vite] page reload` on every write to ~/workspace/.local/state/**,
-    // which Replit touches ~1×/sec, producing an infinite reload loop.
-    ...(viteConfig.server ?? {}),
-    middlewareMode: true,
-    hmr: { server },
-    allowedHosts: true as const,
-  };
-
-  const vite = await createViteServer({
-    ...viteConfig,
-    configFile: false,
-    customLogger: {
-      ...viteLogger,
-      error: (msg, options) => {
-        viteLogger.error(msg, options);
-        process.exit(1);
-      },
-    },
-    server: serverOptions,
-    appType: "custom",
-  });
-
-  app.use(vite.middlewares);
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises -- Express 4 accepts async handlers; errors are forwarded via next()
-  app.use("*", async (req, res, next) => {
-    const url = req.originalUrl;
-
-    try {
-      const clientTemplate = path.resolve(
-        import.meta.dirname,
-        "..",
-        "client",
-        "index.html",
-      );
-
-      // always reload the index.html file from disk incase it changes
-      const template = await fs.promises.readFile(clientTemplate, "utf-8");
-      // NOTE: do NOT append a cache-busting query (?v=nanoid) to the entry
-      // script. A versioned entry makes Vite build a second, parallel module
-      // graph (/src/main.tsx?v=X imports queryClient.ts?v=X while lazy-loaded
-      // pages import the bare queryClient.ts), so singletons like the
-      // TanStack QueryClient get instantiated twice and page-level cache
-      // invalidations silently no-op. Vite already serves /src modules with
-      // no-cache semantics in dev, so the buster added nothing.
-      const page = await vite.transformIndexHtml(url, template);
-      res.status(200).set({ "Content-Type": "text/html" }).end(page);
-    } catch (e) {
-      vite.ssrFixStacktrace(e as Error);
-      next(e);
-    }
-  });
 }
 
 export function serveStatic(app: Express) {

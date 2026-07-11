@@ -1,0 +1,6 @@
+BUG-039 verdict (RE-PROBE on FRESH build 2026-07-11)
+date 2026-07-11
+probe: /api/resources?limit=5 keys=['resources', 'total']
+actual: /api/resources?limit=5 keys=['resources', 'total']
+classification: REPRODUCES
+reason: no nextCursor in response

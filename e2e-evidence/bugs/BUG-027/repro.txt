@@ -1,0 +1,6 @@
+BUG-027 verdict
+date 2026-07-11
+probe: see comment
+actual: robots=200 profile=200 bookm=200
+classification: ALREADY-FIXED
+reason: 

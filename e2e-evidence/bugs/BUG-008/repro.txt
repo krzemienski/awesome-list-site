@@ -1,0 +1,6 @@
+BUG-008 verdict
+date 2026-07-11
+probe: see comment
+actual: ERR https://www.smarthomebeginner.com/best-home-server-apps/` URLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1006)')); ERR https://www.mo4tech.com/a-brief-history-of-video-compression-standards-1929-to-2020.html` URLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1006)')); ERR https://www.iso.org/standard/76383.html` URLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1006)'))
+classification: ALREADY-FIXED
+reason: 

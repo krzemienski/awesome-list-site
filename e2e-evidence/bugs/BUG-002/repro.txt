@@ -1,0 +1,6 @@
+BUG-002 verdict
+date 2026-07-11
+probe: see comment
+actual: GET / -> 200
+classification: ALREADY-FIXED
+reason: CSP allows google-analytics/google-analytics.com

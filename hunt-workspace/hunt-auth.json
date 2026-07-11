@@ -1,0 +1,63 @@
+{
+  "cookies": [
+    {
+      "name": "GAESA",
+      "value": "Cp4BMDAyZjhmZmQ0NzBmMjc1N2U1N2E2ZTVmNTIxOGI2Y2E5N2IyYWU1NGFiYmFiYjJhZmY5YmRkYmMyZGFjNmM1YTg5ZGNlMzIzNWUzMmI4ZjdhODMwMzc4ODViZDg5NDM4MzBjM2NjM2NkOWE4ZTc0OTkxZGM4MzdjNDlhYWJjNGJlZDY2YjFmM2MzNTM3NDkxOGNmNjM5ZDRiMjFkMzYQheik7vQz",
+      "domain": "awesome.video",
+      "path": "/",
+      "expires": 1786308459.357074,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "_ga",
+      "value": "GA1.1.574717973.1783716460",
+      "domain": ".awesome.video",
+      "path": "/",
+      "expires": 1818276462.17594,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "connect.sid",
+      "value": "s%3ARJyOw-T7GEbL6NOLILpKHZjEOiQhXU0c.8MVNHEOzHrM78kK2CDkc72zUf1wNySuljJEFpgo5NLo",
+      "domain": "awesome.video",
+      "path": "/",
+      "expires": 1784321262.687979,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "_ga_76D744KQCJ",
+      "value": "GS2.1.s1783716459$o1$g1$t1783716462$j57$l0$h0",
+      "domain": ".awesome.video",
+      "path": "/",
+      "expires": 1818276462.347103,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "https://awesome.video",
+      "localStorage": [
+        {
+          "name": "av_acquisition",
+          "value": "{\"landing_page\":\"/login\",\"first_seen\":\"2026-07-10T20:47:39.723Z\"}"
+        },
+        {
+          "name": "ds-accent",
+          "value": "crimson"
+        },
+        {
+          "name": "ds-system",
+          "value": "editorial"
+        }
+      ]
+    }
+  ]
+}

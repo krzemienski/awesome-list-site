@@ -1,0 +1,3 @@
+start-cmd: NODE_ENV=development PORT=5055 DATABASE_URL=postgresql://nick@localhost:5432/awesome_video_local npm run dev
+db: native postgres awesome_video_local (restored from docker seed, 1949 resources)
+timestamp: 2026-07-11T19:28:06Z

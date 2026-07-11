@@ -1,0 +1,6 @@
+BUG-036 verdict
+date 2026-07-11
+probe: see code/probe body
+actual: /journeys theme-color=#ff3d52 html-dark=False
+classification: ALREADY-FIXED
+reason: 

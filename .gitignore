@@ -113,3 +113,4 @@ repomix-output.xml
 # Never commit captured session cookies / auth artifacts
 evidence/cookies-*.txt
 evidence/**/cookies-*.txt
+/.claude-flow

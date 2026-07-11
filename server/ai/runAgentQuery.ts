@@ -110,6 +110,10 @@ function preview(text: string, n = 500): string {
   return t.length > n ? t.slice(0, n) + "…" : t;
 }
 
+function isNativeCapSubtype(subtype?: string): boolean {
+  return subtype === "error_max_turns" || subtype === "error_max_budget_usd";
+}
+
 export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAgentQueryResult> {
   const {
     emitter,
@@ -160,6 +164,8 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
     webSearchCount: 0,
   };
 
+  const stderrLines: string[] = [];
+  let terminalSdkError = false;
   const q = query({
     prompt,
     options: {
@@ -175,6 +181,16 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
       allowedTools,
       disallowedTools,
       env: buildAgentEnv(config),
+      stderr: (data) => {
+        const redacted = data.replace(
+          /((?:token|key|secret|authorization|password|bearer|api.?key|credential)\s*[=:]\s*)\S+/gi,
+          "$1[REDACTED]",
+        );
+        const line = preview(redacted, 1000);
+        if (!line) return;
+        stderrLines.push(line);
+        if (stderrLines.length > 20) stderrLines.shift();
+      },
     },
   });
 
@@ -289,22 +305,36 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
 
         case "result": {
           result.subtype = msg.subtype;
+          terminalSdkError = msg.is_error === true;
           result.totalCostUsd = typeof msg.total_cost_usd === "number" ? msg.total_cost_usd : 0;
           result.tokensIn = msg.usage?.input_tokens ?? 0;
           result.tokensOut = msg.usage?.output_tokens ?? 0;
           result.numTurns = msg.num_turns ?? 0;
           result.durationMs = msg.duration_ms ?? 0;
           result.resultText = typeof msg.result === "string" ? msg.result : "";
-          result.ok = msg.subtype === "success";
+          result.ok = msg.subtype === "success" && msg.is_error !== true;
           if (!result.ok) {
-            result.errorMessage = msg.subtype;
+            const rawErrors = (msg as { errors?: unknown }).errors;
+            const upstreamErrors = Array.isArray(rawErrors)
+              ? rawErrors.filter((error): error is string => typeof error === "string").join("; ")
+              : "";
+            if (result.resultText) {
+              result.errorMessage = result.resultText;
+            } else if (upstreamErrors) {
+              result.errorMessage = upstreamErrors;
+            } else {
+              result.errorMessage =
+                msg.is_error === true ? "Agent SDK returned an error result" : result.subtype;
+            }
           }
           await emitter.emit({
             actor: "orchestrator",
             actorType: "system",
             eventType: "result",
             model,
-            summary: `Run ${msg.subtype} — ${result.numTurns} turns, $${result.totalCostUsd.toFixed(4)}`,
+            summary: msg.is_error === true
+              ? `Run error: ${preview(result.errorMessage ?? result.subtype ?? "unknown")}`
+              : `Run ${msg.subtype} — ${result.numTurns} turns, $${result.totalCostUsd.toFixed(4)}`,
             costUsd: result.totalCostUsd.toFixed(4),
             tokensIn: result.tokensIn,
             tokensOut: result.tokensOut,
@@ -323,8 +353,18 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
           break;
       }
     }
+
+    if (
+      terminalSdkError ||
+      (!result.ok && !result.aborted && !isNativeCapSubtype(result.subtype))
+    ) {
+      throw new Error(result.errorMessage || `Agent run failed: ${result.subtype || "unknown"}`);
+    }
   } catch (err: any) {
-    const emsg = err?.message || String(err);
+    const processDetail = stderrLines.length > 0
+      ? `\nClaude process stderr:\n${stderrLines.join("\n")}`
+      : "";
+    const emsg = `${err?.message || String(err)}${processDetail}`;
     const isBudget = /maximum budget|max budget|budget \(\$/i.test(emsg);
     const isTurns = /maximum (number of )?turns|max turns/i.test(emsg);
     if (abortController.signal.aborted) {
@@ -340,7 +380,7 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
         detail: { reason: "aborted" },
       });
       await mirror("system", "Run cancelled by user");
-    } else if (result.subtype || isBudget || isTurns) {
+    } else if (!terminalSdkError && (isNativeCapSubtype(result.subtype) || isBudget || isTurns)) {
       // Native cap hit: the SDK emits a result message with an `error_max_*`
       // subtype AND THEN throws. Hitting a configured budget/turn cap is a
       // normal termination, not a failure — the result was already captured

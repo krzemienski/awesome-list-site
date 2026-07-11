@@ -1,0 +1,13 @@
+HTTP/1.1 200 OK
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+X-Frame-Options: DENY
+Content-Security-Policy: default-src 'self'; script-src 'self' 'nonce-cP2YNRsuxTRugwCMyJxZnA==' https://www.googletagmanager.com https://replit.com; style-src 'self' 'nonce-cP2YNRsuxTRugwCMyJxZnA==' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.google.com; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none'
+Content-Type: application/json; charset=utf-8
+Content-Length: 68
+ETag: W/"44-o8PFs1uMiPIwGZBQdYibjQNpq34"
+Date: Sat, 11 Jul 2026 17:29:51 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+

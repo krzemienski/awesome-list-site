@@ -1,0 +1,6 @@
+BUG-009 verdict (RE-PROBE on FRESH build 2026-07-11)
+date 2026-07-11
+probe: GET /explore -> 404, bytes=9450, main=False
+actual: GET /explore -> 404, bytes=9450, main=False
+classification: REPRODUCES
+reason: sidebar only

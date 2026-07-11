@@ -1,0 +1,143 @@
+time="2026-07-11T14:57:30-04:00" level=warning msg="/Users/nick/Desktop/awesome-list-site/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+ Image awesome-list-site-app Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 588B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.54kB done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/node:20-alpine
+#3 DONE 0.0s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 997B done
+#4 DONE 0.0s
+
+#5 [builder 1/6] FROM docker.io/library/node:20-alpine
+#5 DONE 0.0s
+
+#6 [builder 2/6] WORKDIR /app
+#6 CACHED
+
+#7 [internal] load build context
+#7 transferring context: 281.34kB 0.1s done
+#7 DONE 0.1s
+
+#8 [builder 3/6] COPY package*.json ./
+#8 DONE 0.1s
+
+#9 [production  4/10] RUN npm ci --omit=dev && npm cache clean --force
+#9 2.732 npm warn deprecated whatwg-encoding@3.1.1: Use @exodus/bytes instead for a more spec-conformant and faster implementation
+#9 3.803 npm warn deprecated recharts@2.15.4: 1.x and 2.x branches are no longer active. Bump to Recharts v3 to receive latest features and bugfixes. See https://github.com/recharts/recharts/wiki/3.0-migration-guide
+#9 4.271 npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
+#9 ...
+
+#10 [builder 4/6] RUN npm ci
+#10 3.098 npm warn deprecated whatwg-encoding@3.1.1: Use @exodus/bytes instead for a more spec-conformant and faster implementation
+#10 5.427 npm warn deprecated recharts@2.15.4: 1.x and 2.x branches are no longer active. Bump to Recharts v3 to receive latest features and bugfixes. See https://github.com/recharts/recharts/wiki/3.0-migration-guide
+#10 5.982 npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
+#10 15.55 npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.is
+#10 15.56 npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.is
+#10 ...
+
+#9 [production  4/10] RUN npm ci --omit=dev && npm cache clean --force
+#9 93.77 
+#9 93.77 added 642 packages, and audited 643 packages in 2m
+#9 93.77 
+#9 93.77 148 packages are looking for funding
+#9 93.77   run `npm fund` for details
+#9 93.80 
+#9 93.80 3 vulnerabilities (2 moderate, 1 high)
+#9 93.80 
+#9 93.80 To address all issues (including breaking changes), run:
+#9 93.80   npm audit fix --force
+#9 93.80 
+#9 93.80 Run `npm audit` for details.
+#9 93.80 npm notice
+#9 93.80 npm notice New major version of npm available! 10.8.2 -> 12.0.1
+#9 93.80 npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.0.1
+#9 93.80 npm notice To update run: npm install -g npm@12.0.1
+#9 93.80 npm notice
+#9 93.88 npm warn using --force Recommended protections disabled.
+#9 DONE 94.7s
+
+#10 [builder 4/6] RUN npm ci
+#10 98.58 
+#10 98.58 added 957 packages, and audited 958 packages in 2m
+#10 98.58 
+#10 98.58 279 packages are looking for funding
+#10 98.58   run `npm fund` for details
+#10 98.64 
+#10 98.64 11 vulnerabilities (8 moderate, 2 high, 1 critical)
+#10 98.64 
+#10 98.64 To address all issues (including breaking changes), run:
+#10 98.64   npm audit fix --force
+#10 98.64 
+#10 98.64 Run `npm audit` for details.
+#10 98.66 npm notice
+#10 98.66 npm notice New major version of npm available! 10.8.2 -> 12.0.1
+#10 98.66 npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.0.1
+#10 98.66 npm notice To update run: npm install -g npm@12.0.1
+#10 98.66 npm notice
+#10 DONE 99.0s
+
+#11 [builder 5/6] COPY . .
+#11 DONE 1.0s
+
+#12 [builder 6/6] RUN npm run build
+#12 0.187 
+#12 0.187 > rest-express@1.0.0 build
+#12 0.187 > vite build && esbuild server/index.ts --platform=node --packages=external --external:./vite-dev --bundle --format=esm --outdir=dist
+#12 0.187 
+#12 0.302 vite v5.4.21 building for production...
+#12 0.390 transforming...
+#12 20.80 ✓ 3036 modules transformed.
+#12 21.12 rendering chunks...
+#12 21.17 computing gzip size...
+#12 21.19 ../dist/public/index.html                           9.00 kB │ gzip:   3.00 kB
+#12 21.19 ../dist/public/assets/index-KIZ-LfRY.css          174.73 kB │ gzip:  27.80 kB
+#12 21.19 ../dist/public/assets/AdminDashboard-B4Fet4Dg.js  599.97 kB │ gzip: 153.25 kB
+#12 21.19 ../dist/public/assets/index-CM98m81y.js           902.80 kB │ gzip: 261.26 kB
+#12 21.19 
+#12 21.19 (!) Some chunks are larger than 500 kB after minification. Consider:
+#12 21.19 - Using dynamic import() to code-split the application
+#12 21.19 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+#12 21.19 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+#12 21.19 ✓ built in 20.87s
+#12 21.26 
+#12 21.26   dist/index.js  642.0kb
+#12 21.26 
+#12 21.26 ⚡ Done in 15ms
+#12 DONE 21.3s
+
+#13 [production  5/10] COPY --from=builder /app/dist ./dist
+#13 DONE 0.0s
+
+#14 [production  6/10] COPY --from=builder /app/server ./server
+#14 DONE 0.1s
+
+#15 [production  7/10] COPY --from=builder /app/shared ./shared
+#15 DONE 0.0s
+
+#16 [production  8/10] COPY --from=builder /app/migrations ./migrations
+#16 DONE 0.0s
+
+#17 [production  9/10] COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
+#17 DONE 0.0s
+
+#18 [production 10/10] COPY --from=builder /app/tsconfig.json ./tsconfig.json
+#18 DONE 0.0s
+
+#19 exporting to image
+#19 exporting layers
+#19 exporting layers 4.7s done
+#19 writing image sha256:62f90b2c294ad866cfef88158ad96ae3926936202db892b0f091c5a2bee9e4bb
+#19 writing image sha256:62f90b2c294ad866cfef88158ad96ae3926936202db892b0f091c5a2bee9e4bb done
+#19 naming to docker.io/library/awesome-list-site-app done
+#19 DONE 4.7s
+
+#20 resolving provenance for metadata file
+#20 DONE 0.0s
+ Image awesome-list-site-app Built 

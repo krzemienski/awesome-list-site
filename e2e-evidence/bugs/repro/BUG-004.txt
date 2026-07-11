@@ -1,0 +1,7 @@
+BUG-004 verdict (RE-PROBE on FRESH build 2026-07-11)
+date 2026-07-11
+probe: probe: GET / HTML
+actual: home bytes=13850, has-hamburger=True, has-search=True
+prior verdict: REPRODUCES
+classification: FIXED
+reason: og-middleware.ts now emits ssr-home-header with search form + sidebar trigger so HTML-grounded tools see the affordances.

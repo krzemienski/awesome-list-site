@@ -1,0 +1,12 @@
+HTTP/1.1 200 OK
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+Content-Type: application/json; charset=utf-8
+Content-Length: 97
+ETag: W/"61-XvQrbY8TfyDA8g6ms958xsbeDjY"
+Set-Cookie: connect.sid=s%3AUMD_X7FBb_4GItgfg70z94Q5-otyAXsW.jH3jjijM8wGeZbzjt8hBt9U0MFjvfyrIep%2F8c8i7erI; Path=/; Expires=Sat, 18 Jul 2026 08:16:43 GMT; HttpOnly; SameSite=Lax
+Date: Sat, 11 Jul 2026 08:16:43 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+

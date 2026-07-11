@@ -1,0 +1,21 @@
+Claude API key not found - AI features will use fallback methods
+Running in local mode - Replit OAuth disabled, use local auth at /api/auth/local/login
+3:07:58 PM [express] serving on port 5050 (development mode)
+🔄 Running background initialization (development mode)...
+📊 Note: /api/awesome-list now serves from PostgreSQL database
+Link health scheduler initialized (disabled)
+✅ Orphan watchdog: no stuck jobs found
+Checking if database needs seeding...
+✓ Database already populated: 12 categories, 1954 resources
+✅ Background initialization complete
+✓ Suggested learning paths cache warmed: 3 paths in 7ms
+3:07:58 PM [express] GET /api/health 200 in 4ms :: {"status":"ok"}
+3:07:58 PM [express] GET /api/resources 200 in 9ms :: {"resources":[{"id":186685,"title":"PyAV","url…
+3:07:58 PM [express] GET /api/resources 200 in 8ms :: {"resources":[],"total":0}
+3:07:58 PM [express] GET /api/resources 200 in 7ms :: {"resources":[{"id":186685,"title":"PyAV","url…
+3:08:20 PM [express] GET /api/resources 200 in 9ms :: {"resources":[{"id":186685,"title":"PyAV","url…
+3:08:20 PM [express] GET /api/resources 200 in 9ms :: {"resources":[],"total":0}
+3:08:20 PM [express] GET /api/resources 200 in 8ms :: {"resources":[{"id":186685,"title":"PyAV","url…
+3:08:20 PM [express] POST /api/resources 401 in 0ms :: {"message":"Unauthorized"}
+3:08:20 PM [express] GET /api/auth/status 404 in 2ms :: {"message":"Not found"}
+3:08:20 PM [express] GET /api/auth/login 404 in 0ms :: {"message":"Not found"}

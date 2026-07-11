@@ -1,0 +1,6 @@
+BUG-086 verdict
+date 2026-07-11
+probe: GET /sitemap.xml
+actual: code=200 bytes=336645
+classification: BLOCKED
+reason: needs deeper per-bug probe (admin / OG image)
