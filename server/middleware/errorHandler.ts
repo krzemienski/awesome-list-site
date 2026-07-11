@@ -61,7 +61,7 @@ export function errorHandler(
   if (err instanceof ZodError) {
     const validationError = new ValidationError(
       "Validation failed",
-      err.errors
+      err.issues
     );
 
     res.status(validationError.statusCode).json({

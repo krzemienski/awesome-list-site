@@ -1,0 +1,1 @@
+[{"id":1,"jobType":"research","jobId":1,"seq":0,"actor":"orchestrator","actorType":"system","eventType":"error","model":null,"targetActor":null,"summary":"Claude Code process exited with code 1","detail":{"name":"Error"},"tokensIn":null,"tokensOut":null,"costUsd":null,"durationMs":null,"ts":"2026-07-11T08:17:14.353Z"}]

@@ -1,0 +1,6 @@
+BUG-012 verdict
+date 2026-07-11
+probe: see comment
+actual: GET /search?q=… -> 200, resource-links-in-body=False
+classification: REPRODUCES
+reason: 

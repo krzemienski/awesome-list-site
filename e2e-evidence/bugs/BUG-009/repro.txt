@@ -1,0 +1,6 @@
+BUG-009 verdict
+date 2026-07-11
+probe: see comment
+actual: GET /explore -> 404, body bytes=9450
+classification: REPRODUCES
+reason: 

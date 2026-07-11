@@ -1,0 +1,6 @@
+BUG-003 verdict
+date 2026-07-11
+probe: see comment
+actual: GET /settings/theme -> 200
+classification: REPRODUCES
+reason: 

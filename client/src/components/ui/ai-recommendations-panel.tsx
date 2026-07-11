@@ -45,9 +45,9 @@ interface AIRecommendationsPanelProps {
 
 const formSchema = z.object({
   skillLevel: z.enum(['beginner', 'intermediate', 'advanced']),
-  preferredCategories: z.array(z.string()).default([]),
-  learningGoals: z.array(z.string()).default([]),
-  preferredResourceTypes: z.array(z.string()).default([]),
+  preferredCategories: z.array(z.string()),
+  learningGoals: z.array(z.string()),
+  preferredResourceTypes: z.array(z.string()),
   timeCommitment: z.enum(['daily', 'weekly', 'flexible']),
 });
 

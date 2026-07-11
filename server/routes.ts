@@ -739,8 +739,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/auth/logout - Logout user
   app.post('/api/auth/logout', async (req: any, res) => {
     try {
-      req.logout(() => {
-        res.json({ success: true });
+      // BUG-092/094: req.logout() alone only clears passport's req.user — it does
+      // NOT destroy the session record or clear the connect.sid cookie. Because the
+      // server-side route guard (server/index.ts) gates protected pages on cookie
+      // PRESENCE, a lingering connect.sid let deep-links to /admin, /profile etc.
+      // stay reachable after logout. Destroy the session and clear the cookie so
+      // logout actually invalidates the session end-to-end.
+      req.logout((logoutErr: any) => {
+        if (logoutErr) {
+          console.error("Error during req.logout:", logoutErr);
+          return res.status(500).json({ message: "Failed to logout" });
+        }
+        req.session?.destroy((destroyErr: any) => {
+          if (destroyErr) {
+            console.error("Error destroying session:", destroyErr);
+            return res.status(500).json({ message: "Failed to logout" });
+          }
+          res.clearCookie("connect.sid", { path: "/" });
+          res.json({ success: true });
+        });
       });
     } catch (error) {
       console.error("Error logging out:", error);
@@ -770,7 +787,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const offset = rawOffset !== undefined ? Math.max(parseInt(rawOffset as string), 0) : (parseInt(req.query.page as string) || 1) - 1;
       let category = req.query.category as string;
       let subcategory = req.query.subcategory as string;
-      const search = req.query.search as string;
+      // BUG-015: accept `q` as an alias for `search` so /api/resources?q=… reaches
+      // the real filter layer. `search` wins if both are present (explicit param).
+      const search = (req.query.search as string) ?? (req.query.q as string);
 
       // Accept category/subcategory as either the display NAME (what the client
       // sends) or a URL slug (e.g. ?category=encoding-codecs — BUG-022). Real
@@ -981,7 +1000,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!submitValidation.success) {
         return res.status(400).json({
           error: 'validation_failed',
-          errors: submitValidation.error.errors
+          errors: submitValidation.error.issues
         });
       }
 
@@ -1030,7 +1049,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: 'Invalid resource data', errors: error.errors });
+        return res.status(400).json({ message: 'Invalid resource data', errors: error.issues });
       }
       console.error('Error creating resource:', error);
       res.status(500).json({ message: 'Failed to create resource' });
@@ -1195,7 +1214,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(edit);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: 'Invalid edit data', errors: error.errors });
+        return res.status(400).json({ message: 'Invalid edit data', errors: error.issues });
       }
       console.error('Error creating edit suggestion:', error);
       res.status(500).json({ message: 'Failed to create edit suggestion' });
@@ -1236,7 +1255,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (!validation.success) {
           return res.status(400).json({ 
             message: 'Invalid categoryId parameter', 
-            errors: validation.error.errors 
+            errors: validation.error.issues
           });
         }
         
@@ -1270,7 +1289,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (!validation.success) {
           return res.status(400).json({ 
             message: 'Invalid subcategoryId parameter', 
-            errors: validation.error.errors 
+            errors: validation.error.issues
           });
         }
         
@@ -1896,7 +1915,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(step);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: 'Invalid step data', errors: error.errors });
+        return res.status(400).json({ message: 'Invalid step data', errors: error.issues });
       }
       console.error('Error creating journey step:', error);
       res.status(500).json({ message: 'Failed to create journey step' });
@@ -1934,7 +1953,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.json(updated);
       } catch (error) {
         if (error instanceof z.ZodError) {
-          return res.status(400).json({ message: 'Invalid step data', errors: error.errors });
+          return res.status(400).json({ message: 'Invalid step data', errors: error.issues });
         }
         console.error('Error updating journey step:', error);
         res.status(500).json({ message: 'Failed to update journey step' });
@@ -2015,7 +2034,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.json({ steps });
       } catch (error) {
         if (error instanceof z.ZodError) {
-          return res.status(400).json({ message: 'Invalid reorder payload', errors: error.errors });
+          return res.status(400).json({ message: 'Invalid reorder payload', errors: error.issues });
         }
         console.error('Error reordering journey steps:', error);
         res.status(500).json({ message: 'Failed to reorder journey steps' });
@@ -2229,7 +2248,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validationResult.success) {
         return res.status(400).json({ 
           message: 'Validation failed', 
-          errors: validationResult.error.errors 
+          errors: validationResult.error.issues
         });
       }
       
@@ -2458,7 +2477,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validationResult.success) {
         return res.status(400).json({ 
           message: 'Validation failed', 
-          errors: validationResult.error.errors 
+          errors: validationResult.error.issues
         });
       }
       
@@ -2636,7 +2655,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validationResult.success) {
         return res.status(400).json({ 
           message: 'Validation failed', 
-          errors: validationResult.error.errors 
+          errors: validationResult.error.issues
         });
       }
       
@@ -2678,7 +2697,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validationResult.success) {
         return res.status(400).json({ 
           message: 'Validation failed', 
-          errors: validationResult.error.errors 
+          errors: validationResult.error.issues
         });
       }
       
@@ -2775,7 +2794,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validationResult.success) {
         return res.status(400).json({ 
           message: 'Validation failed', 
-          errors: validationResult.error.errors 
+          errors: validationResult.error.issues
         });
       }
       
@@ -2827,7 +2846,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validationResult.success) {
         return res.status(400).json({ 
           message: 'Validation failed', 
-          errors: validationResult.error.errors 
+          errors: validationResult.error.issues
         });
       }
       
@@ -2931,7 +2950,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validationResult.success) {
         return res.status(400).json({ 
           message: 'Validation failed', 
-          errors: validationResult.error.errors 
+          errors: validationResult.error.issues
         });
       }
       
@@ -2983,7 +3002,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validationResult.success) {
         return res.status(400).json({ 
           message: 'Validation failed', 
-          errors: validationResult.error.errors 
+          errors: validationResult.error.issues
         });
       }
       

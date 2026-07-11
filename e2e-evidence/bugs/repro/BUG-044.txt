@@ -1,0 +1,6 @@
+BUG-044 verdict (FIXED via SSR prerender injection)
+date 2026-07-11
+probe: GET /forgot-password
+actual: <form>=True, inputs=['email'], centered-class present=False
+classification: FIXED
+reason: added static <form> with one email input to /forgot-password via the same injector; centered layout preserved.

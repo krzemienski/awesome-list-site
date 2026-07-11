@@ -1,0 +1,6 @@
+BUG-047 verdict
+date 2026-07-11
+probe: see code/probe body
+actual: /robots.txt -> 200, Sitemap-line=True
+classification: ALREADY-FIXED
+reason: 

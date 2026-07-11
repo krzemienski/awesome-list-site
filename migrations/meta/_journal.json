@@ -15,6 +15,20 @@
       "when": 1783726412440,
       "tag": "0029_search_fts",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1783730000000,
+      "tag": "0030_add_agent_config_to_job_tables",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1783730001000,
+      "tag": "0031_add_agent_events_table",
+      "breakpoints": true
     }
   ]
 }

@@ -37,6 +37,7 @@ COPY --from=builder /app/dist ./dist
 # Copy necessary runtime files
 COPY --from=builder /app/server ./server
 COPY --from=builder /app/shared ./shared
+COPY --from=builder /app/migrations ./migrations
 COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
 COPY --from=builder /app/tsconfig.json ./tsconfig.json
 

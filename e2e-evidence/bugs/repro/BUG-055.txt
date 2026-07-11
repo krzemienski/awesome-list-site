@@ -1,0 +1,6 @@
+BUG-055 verdict (RE-PROBE on FRESH build 2026-07-11)
+date 2026-07-11
+probe: GET / -> 200, HSTS-present=False
+actual: GET / -> 200, HSTS-present=False
+classification: REPRODUCES
+reason: no HSTS

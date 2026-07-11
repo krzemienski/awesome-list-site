@@ -1,0 +1,11 @@
+HTTP/1.1 200 OK
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+Content-Type: application/json; charset=utf-8
+Content-Length: 1098
+ETag: W/"44a-dGcTlox7Eu4A50cjpAai2YUgfME"
+Date: Sat, 11 Jul 2026 08:18:18 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+

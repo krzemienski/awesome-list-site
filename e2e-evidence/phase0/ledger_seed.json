@@ -1,0 +1,620 @@
+[
+  {
+    "id": "BUG-001",
+    "severity": "HIGH",
+    "symptom": "BUG-001 \u2014 CSP directive blocks Replit feedback-widget on every page",
+    "excerpt": "1. Open any same-origin page at https://awesome.video/ in a fresh browser session. | 2. Open DevTools console. | 3. Console shows: `Loading the script 'https://replit-cdn.com/feedback-widget/widget.gl"
+  },
+  {
+    "id": "BUG-002",
+    "severity": "MEDIUM",
+    "symptom": "BUG-002 \u2014 Google Analytics 4 endpoint unreachable (Fetch API error)",
+    "excerpt": "1. Open https://awesome.video/ in a fresh chromium. | 2. Open DevTools Network tab. | 3. Click any link or trigger any interaction. Watch for failed GA4 hits."
+  },
+  {
+    "id": "BUG-003",
+    "severity": "HIGH",
+    "symptom": "BUG-003 \u2014 /settings/theme has no Light/Dark toggle",
+    "excerpt": "1. Open https://awesome.video/settings/theme in a fresh chromium at 1440\u00d7900. | 2. The page shows preset themes (Editorial / Terminal / Geist / Brutalist / SwissGrid), font choices, accent colors (Cri"
+  },
+  {
+    "id": "BUG-004",
+    "severity": "HIGH",
+    "symptom": "BUG-004 \u2014 No search input on public landing/mobile pages",
+    "excerpt": "1. Open https://awesome.video/ in a fresh chromium at 1440\u00d7900. | 2. Look for a search input anywhere on the page. There is no `input[type=\"search\"]`, no placeholder \"Search\", no combobox. | 3. Open h"
+  },
+  {
+    "id": "BUG-005",
+    "severity": "MEDIUM",
+    "symptom": "BUG-005 \u2014 Inconsistent auth API surface: /api/auth/login & /api/auth/status 404",
+    "excerpt": "1. From a host shell, GET https://awesome.video/api/auth/login \u2014 `404 {\"message\":\"Not found\"}`. | 2. GET https://awesome.video/api/auth/status \u2014 `404 {\"message\":\"Not found\"}`. | 3. Compare: /api/healt"
+  },
+  {
+    "id": "BUG-006",
+    "severity": "LOW",
+    "symptom": "BUG-006 \u2014 /signup returns 404; users land on /register with no UI hint",
+    "excerpt": "1. Open https://awesome.video/signup in a fresh chromium \u2014 404 {\"message\":\"Not found\"} is served. | 2. Open https://awesome.video/register \u2014 200, the actual signup page. | 3. From a navigation perspec"
+  },
+  {
+    "id": "BUG-007",
+    "severity": "HIGH",
+    "symptom": "BUG-007 \u2014 Sidebar toggle chevrons are undersized touch targets (22\u00d738)",
+    "excerpt": "1. Open https://awesome.video/category/community-events at 1440\u00d7900. | 2. In the left sidebar, click the small chevron toggle next to \"Community Groups\", \"Events & Conferences\", \"Cloud-Based Encoding "
+  },
+  {
+    "id": "BUG-008",
+    "severity": "MEDIUM",
+    "symptom": "BUG-008 \u2014 Six resource pages link to outbound URLs that return HTTP 403 (Forbidden)",
+    "excerpt": "1. https://awesome.video/resource/185860 \u2014 outbound `https://www.smarthomebeginner.com/best-home-server-apps/` returns **HTTP 403**. | 2. https://awesome.video/resource/185224 \u2014 outbound `https://www."
+  },
+  {
+    "id": "BUG-009",
+    "severity": "LOW",
+    "symptom": "BUG-009 \u2014 /explore returns HTTP 404 (hard status)",
+    "excerpt": "- `bug-deep-hunt.json`, `navCheck[].path == '/explore'` returns `404` | - `curl -I https://awesome.video/explore` returns 404"
+  },
+  {
+    "id": "BUG-010",
+    "severity": "MEDIUM",
+    "symptom": "BUG-010 \u2014 /journeys renders same sidebar as homepage; only 1 actual journey link",
+    "excerpt": "1. Open https://awesome.video/journeys in a fresh chromium at 1440\u00d7900. | 2. The visible page is dominated by the standard sidebar (Categories with 87 entries \u2014 Community Groups 5, Online Forums 3, Ev"
+  },
+  {
+    "id": "BUG-011",
+    "severity": "MEDIUM",
+    "symptom": "BUG-011 \u2014 /submit form has method=\"get\" and an aria-hidden empty SELECT",
+    "excerpt": "1. Open https://awesome.video/submit in a fresh chromium at 1440\u00d7900. | 2. Inspect the form: `<form action=\"https://awesome.video/submit\" method=\"get\" ...>`. Submissions will put the entry into the UR"
+  },
+  {
+    "id": "BUG-012",
+    "severity": "HIGH",
+    "symptom": "BUG-012 \u2014 /resource?q=<term> returns 404 (no public search endpoint reachable)",
+    "excerpt": "- bug-deep-hunt.json, `url_search_ffmpeg.url_search_codec.url_search_streaming.url_search_asdfqwertyzzz` all show `status: 404, text: 'Loading...'` | - `screenshots/url_search_ffmpeg.png` \u2014 soft-404 w"
+  },
+  {
+    "id": "BUG-013",
+    "severity": "MEDIUM",
+    "symptom": "BUG-013 \u2014 26 of 80 sampled resource pages have no description (data quality)",
+    "excerpt": "- `big-resource-sweep.json`, `no_description` array (length 26) | - Crawl-derived HTML for each slug | 1. After fix, sweeping 100 random resources shows \u226595% have a"
+  },
+  {
+    "id": "BUG-014",
+    "severity": "LOW",
+    "symptom": "BUG-014 \u2014 Top-bar on landing lists resource count as a button (clicking it does nothing useful)",
+    "excerpt": "1. Open https://awesome.video/ in a fresh chromium at 1440\u00d7900. | 2. The top bar shows a button with text \"Awesome Video 1,946 resources\". | 3. Click the button. Nothing visible happens \u2014 no route cha"
+  },
+  {
+    "id": "BUG-015",
+    "severity": "HIGH",
+    "symptom": "BUG-015 \u2014 /subcategory/ffmpeg returns HTTP 404 on every viewport",
+    "excerpt": "1. Open https://awesome.video/subcategory/ffmpeg in a fresh chromium. | 2. Observe network panel: the document itself returns 404. | 3. Console shows: `Failed to load resource: the server responded wi"
+  },
+  {
+    "id": "BUG-016",
+    "severity": "HIGH",
+    "symptom": "BUG-016 \u2014 Login page email field pre-filled with admin@example.com (no actual account exists)",
+    "excerpt": "1. Open https://awesome.video/login in a fresh chromium. | 2. The Email input is pre-filled with the literal value `admin@example.com`. | 3. The Password input is empty."
+  },
+  {
+    "id": "BUG-017",
+    "severity": "MEDIUM",
+    "symptom": "BUG-017 \u2014 Sidebar category labels truncated with ellipsis on every page at every viewport",
+    "excerpt": "1. Open any public page at 1440px. | 2. Look at the left sidebar's \"Categories\" section. | 3. Five of nine category labels are truncated with ellipsis:"
+  },
+  {
+    "id": "BUG-018",
+    "severity": "MEDIUM",
+    "symptom": "BUG-018 \u2014 Forgot-password page renders left-aligned instead of centered at 1440",
+    "excerpt": "1. Open https://awesome.video/forgot-password at 1440\u00d7900. | 2. The card sits in the left half of the main content area, leaving ~370px of empty space to its right. | 3. Compare with /login (also at 1"
+  },
+  {
+    "id": "BUG-019",
+    "severity": "HIGH",
+    "symptom": "BUG-019 \u2014 Reset-password page has no form at all on the unauthenticated public visit",
+    "excerpt": "1. Open https://awesome.video/reset-password (no token in URL). | 2. Page renders \"Invalid reset link \u2014 This link is missing its reset token.\" | 3. There is **no password input, no submit button, no e"
+  },
+  {
+    "id": "BUG-020",
+    "severity": "MEDIUM",
+    "symptom": "BUG-020 \u2014 No search input is rendered on the landing page at 1440\u00d7900 \u2014 placeholder appears only via screenshot artifact",
+    "excerpt": "1. Open https://awesome.video/ at 1440\u00d7900. | 2. Inspect: topbar has a search input with placeholder \"Search resources...\" and a \"/\" keyboard hint. | - `screenshots/public2_home_1440.png` \u2014 topbar sho"
+  },
+  {
+    "id": "BUG-021",
+    "severity": "MEDIUM",
+    "symptom": "BUG-021 \u2014 sitemap.xml lists the same sub-subcategory URLs 2\u201311 times",
+    "excerpt": "- `even-more.json`, `sitemapDups` array | - raw `curl | grep | sort | uniq -c` output above | 1. Each <loc> appears exactly once in the sitemap."
+  },
+  {
+    "id": "BUG-022",
+    "severity": "LOW",
+    "symptom": "BUG-022 \u2014 404 page renders the full category sidebar (218 links), wasting crawl budget",
+    "excerpt": "- `even-more.json`, `notFound.links = 218`, `status = 404` | - `screenshots/404_custom.png` | 1. The 404 page renders \u22645 internal links (e.g., Home + a Browse-all CTA)."
+  },
+  {
+    "id": "BUG-023",
+    "severity": "HIGH",
+    "symptom": "BUG-023 \u2014 /categories renders only the standard sidebar (no category-grid content)",
+    "excerpt": "1. Open https://awesome.video/categories in a fresh chromium at 1440\u00d7900. | 2. The page title is \"Categories\" (or similar) but the body is essentially the same as the sidebar on any other page \u2014 the s"
+  },
+  {
+    "id": "BUG-024",
+    "severity": "HIGH",
+    "symptom": "BUG-024 \u2014 /about renders only the standard sidebar (no real \"about\" content)",
+    "excerpt": "1. Open https://awesome.video/about in a fresh chromium at 1440\u00d7900. | 2. The page title is \"About \u2014 Awesome Video\" but the body is essentially | 3. The META description (`\"Learn about Awesome Video \u2014"
+  },
+  {
+    "id": "BUG-025",
+    "severity": "HIGH",
+    "symptom": "BUG-025 \u2014 /recommendations renders only the standard sidebar (no recommendation cards)",
+    "excerpt": "1. Open https://awesome.video/recommendations in a fresh chromium at 1440\u00d7900. | 2. The page title is \"AI-Powered Recommendations \u2014 Awesome Video\" with | 3. The rendered body has **no actual recommend"
+  },
+  {
+    "id": "BUG-026",
+    "severity": "LOW",
+    "symptom": "BUG-026 \u2014 sitemap.xml only contains 6 /journey URLs despite top-nav promising \"Learning Journeys\"",
+    "excerpt": "- `even-more.json`, `sitemap.sampleTail: [\"/journey/6\", \"/journey/7\", ...]` \u2014 only ~6 journeys in sitemap | - `even-more.json`, `journeys.links = 1` \u2014 only 1 journey link on /journeys"
+  },
+  {
+    "id": "BUG-027",
+    "severity": "LOW",
+    "symptom": "BUG-027 \u2014 robots.txt blocks /bookmarks + /profile but routes serve auth-gate page with HTTP 200",
+    "excerpt": "1. /robots.txt contains: | 2. But `curl -I https://awesome.video/bookmarks` \u2192 **200** with the | 3. The pages aren't gated behind a 401/302 (see BUG-017), so anonymous"
+  },
+  {
+    "id": "BUG-028",
+    "severity": "HIGH",
+    "symptom": "BUG-028 \u2014 /journey/<n> pages return 200 but render only sidebar (no journey content)",
+    "excerpt": "- `bug-deep-hunt.json` shows journey depth checks | - `screenshots/journey_1.png` and `journeys_list.png` | 1. /journey/<n> renders a heading with the journey title + a sequence of"
+  },
+  {
+    "id": "BUG-029",
+    "severity": "MEDIUM",
+    "symptom": "BUG-029 \u2014 Public landing page has no Login / Sign-up link in primary navigation",
+    "excerpt": "1. Open https://awesome.video/ in a fresh chromium at 1440\u00d7900. | 2. Inspect every `<a href>` in the visible header (top bar + nav). There | 3. Compare with the top-bar buttons: Home, Submit Resource,"
+  },
+  {
+    "id": "BUG-031",
+    "severity": "LOW",
+    "symptom": "BUG-031 \u2014 No <meta name=\"theme-color\"> tag (mobile chrome ignores dark default)",
+    "excerpt": "- `even-more2.json`, `metaHead.themeColor: null` | 1. Every public page contains `<meta name=\"theme-color\" content=\"...\">`. | 2. Verifiable: `curl -s https://awesome.video/ | grep theme-color`"
+  },
+  {
+    "id": "BUG-032",
+    "severity": "MEDIUM",
+    "symptom": "BUG-032 \u2014 sitemap.xml lists /journey/1..5 but they all return hard 404",
+    "excerpt": "- `quickprobe.json`, `journey_1..5.status = 404` | - `even-more.json`, `sitemap.sampleTail: [..., /journey/6, /journey/7, /journey/8, /journey/9, /journey/10]` | 1. Every <loc> in the sitemap returns "
+  },
+  {
+    "id": "BUG-033",
+    "severity": "MEDIUM",
+    "symptom": "BUG-033 \u2014 /advanced placeholder \"Search categories and resources...\" is the only input and never updates results",
+    "excerpt": "1. Open https://awesome.video/advanced in a fresh chromium at 1440\u00d7900. | 2. The page has a single text input with placeholder \"Search categories and resources...\". | 3. Submit the form (e.g., type \"f"
+  },
+  {
+    "id": "BUG-034",
+    "severity": "HIGH",
+    "symptom": "BUG-034 \u2014 /journeys page has only one H1/H2 heading and zero journey cards",
+    "excerpt": "1. Open https://awesome.video/journeys in a fresh chromium at 1440\u00d7900. | 2. The page's rendered body is only ~5,740 chars (mostly the sidebar + | 3. There is **exactly one** unique H1/H2/H3 heading ("
+  },
+  {
+    "id": "BUG-035",
+    "severity": "HIGH",
+    "symptom": "BUG-035 \u2014 Mobile menu (375\u00d7812) lacks an obvious hamburger toggle",
+    "excerpt": "1. Open https://awesome.video/ in a fresh chromium at 375\u00d7812 (mobile) | 2. The visible top bar shows the Home / Submit / Journeys / Advanced / Theme buttons. | 3. With only 4 clickable links visible "
+  },
+  {
+    "id": "BUG-036",
+    "severity": "LOW",
+    "symptom": "BUG-036 \u2014 `<meta name=\"theme-color\" content=\"#ff3d52\">` clashes with site palette (crimson, not the dark bg)",
+    "excerpt": "- `quickprobe.json`, `metaHead.themeColor: '#ff3d52'` | - HTML inspection | 1. <meta name=\"theme-color\"> matches body background for dark mode (the"
+  },
+  {
+    "id": "BUG-038",
+    "severity": "CRITICAL",
+    "symptom": "BUG-038 \u2014 /advanced?q=<query> ignores the query string (same body for ffmpeg vs asdfqwerty)",
+    "excerpt": "- `another-round.json`, `advanced_q_*` entries all show identical `catCards: 19`, `subcatCards: 189`, `resourceCards: 0` | - The placeholder on the input is \"Search categories and resources...\" \u2014 clea"
+  },
+  {
+    "id": "BUG-039",
+    "severity": "MEDIUM",
+    "symptom": "BUG-039 \u2014 /api/resources pagination is broken (no `nextCursor`)",
+    "excerpt": "1. Include `nextCursor` (or `nextPage`, `cursor`) in the response when more items exist. | 2. Return distinct content on subsequent calls when the cursor is supplied. | - `wider-bugs.json`, `paginatio"
+  },
+  {
+    "id": "BUG-041",
+    "severity": "HIGH",
+    "symptom": "BUG-041 \u2014 Login form pre-fills the email field with \"admin@example.com\" for every visitor",
+    "excerpt": "1. Open https://awesome.video/login in a fresh chromium at 1440\u00d7900. | 2. The email field is pre-filled with `admin@example.com`. | 3. Open the same URL in a different browser (no cookies) \u2014 same pre-"
+  },
+  {
+    "id": "BUG-042",
+    "severity": "HIGH",
+    "symptom": "BUG-042 \u2014 /reset-password renders zero form inputs",
+    "excerpt": "1. Open https://awesome.video/reset-password in a fresh chromium at | 2. The page renders a heading + a \"Back to login\" link, but **no | 3. A user who clicks the password-reset link from their email h"
+  },
+  {
+    "id": "BUG-043",
+    "severity": "MEDIUM",
+    "symptom": "BUG-043 \u2014 Sidebar category labels truncated with ellipsis (5 of 9 at every viewport)",
+    "excerpt": "1. Open https://awesome.video/ in a fresh chromium at any of the three | 2. Inspect the sidebar nav. At least 5 of 9 top-level category labels | 3. The sidebar's `scrollWidth=233` overflows its `clien"
+  },
+  {
+    "id": "BUG-044",
+    "severity": "MEDIUM",
+    "symptom": "BUG-044 \u2014 /forgot-password form is left-aligned instead of centered at 1440\u00d7900",
+    "excerpt": "1. Open https://awesome.video/forgot-password in a fresh chromium at | 2. The recovery form is left-aligned inside its container; the rest of | 3. Compared to /login (centered at the same viewport), /"
+  },
+  {
+    "id": "BUG-045",
+    "severity": "MEDIUM",
+    "symptom": "BUG-045 \u2014 /subcategory/ffmpeg returns HTTP 404 (another sitemap-listed 404)",
+    "excerpt": "- `public-deep`-audit: `/subcategory/ffmpeg` returns 404 at all three | - cross-checked against sitemap `subcategory/ffmpeg` entry"
+  },
+  {
+    "id": "BUG-046",
+    "severity": "MEDIUM",
+    "symptom": "BUG-046 \u2014 /sitemap.xml `<lastmod>` for entries beyond today (2026-07-11+)",
+    "excerpt": "- `quickprobe.json`'s wider scan | - raw curl output, grep lastmod | 1. No <lastmod> entry exceeds the actual build timestamp."
+  },
+  {
+    "id": "BUG-047",
+    "severity": "LOW",
+    "symptom": "BUG-047 \u2014 /bookmarks and /profile blocked in robots.txt but return HTTP 200 to anonymous",
+    "excerpt": "1. robots.txt says \"no crawl.\" | 2. HTTP returns 200 with full sidebar. | 3. The body says \"Please sign in\" \u2014 so a crawler that ignores robots.txt will index a gating page."
+  },
+  {
+    "id": "BUG-048",
+    "severity": "MEDIUM",
+    "symptom": "BUG-048 \u2014 /login submits empty fields silently (no inline error before server responds)",
+    "excerpt": "- `contrast-seo-vuln.json`, `loginEmptySubmit = { errs: [...], inputsValidity: [...] }` | - `screenshots/login_empty_submit.png` (early capture) | 1. Each input field has an associated <span role=\"ale"
+  },
+  {
+    "id": "BUG-049",
+    "severity": "MEDIUM",
+    "symptom": "BUG-049 \u2014 More resource URLs from sitemap return HTTP 404",
+    "excerpt": "- `more-probes.json`, `resource_404_*` entries | 1. /tmp/bad-urls.txt is empty after the build. | 2. The sitemap generator filters non-200 URLs at build time."
+  },
+  {
+    "id": "BUG-050",
+    "severity": "HIGH",
+    "symptom": "BUG-050 \u2014 /journey/6/7/8/9/10 detail pages render only the sidebar \u2014 the journey narrative is empty",
+    "excerpt": "- `wider-bugs.json`, `journey6_deep = { mainAnchorCount: 18, mainResourceCount: 0, h2Count: 7, stepButtons: 0 }` | - `extra-probes.json` (same shape across 6/7/8/9/10) | 1. Each journey section (under"
+  },
+  {
+    "id": "BUG-051",
+    "severity": "MEDIUM",
+    "symptom": "BUG-051 \u2014 Duplicate /redundant sitemap entries for the same canonical URL",
+    "excerpt": "- `curated` URLs share canonical URL but appear >1 time in sitemap. | - Crawl-budget waste + Google may treat as spam. | - `even-more.json`, `sitemapDups`"
+  },
+  {
+    "id": "BUG-052",
+    "severity": "LOW",
+    "symptom": "BUG-052 \u2014 CSP header missing `form-action` (form-submission origin allowed by default)",
+    "excerpt": "- `contrast-seo-vuln.json`, `hdr___.csp` (truncated to 200 chars; full CSP lacks form-action) | 1. Every page emits `content-security-policy: ... form-action 'self';` | 2. The /submit form still posts"
+  },
+  {
+    "id": "BUG-053",
+    "severity": "LOW",
+    "symptom": "BUG-053 \u2014 CSP missing `base-uri 'self'` and `object-src 'none'` (defense-in-depth)",
+    "excerpt": "- `base-uri 'self';` \u2014 prevents `<base href=\"\u2026\">` injection. | - `object-src 'none';` \u2014 prevents plugin/object embed. | - `even-more.json` `hdr___` rows"
+  },
+  {
+    "id": "BUG-054",
+    "severity": "LOW",
+    "symptom": "BUG-054 \u2014 Several pages do not set Permissions-Policy / Feature-Policy for camera/mic",
+    "excerpt": "- `contrast-seo-vuln.json`, `hdr___` rows | 1. Every page returns the same Permissions-Policy header. | 2. Verifiable with curl + grep."
+  },
+  {
+    "id": "BUG-055",
+    "severity": "LOW",
+    "symptom": "BUG-055 \u2014 /recommendations has no `cross-origin-opener-policy` (Spectre-class)",
+    "excerpt": "- `Cross-Origin-Opener-Policy: same-origin` | - `Cross-Origin-Embedder-Policy: require-corp` | - `Cross-Origin-Resource-Policy: same-origin`"
+  },
+  {
+    "id": "BUG-056",
+    "severity": "LOW",
+    "symptom": "BUG-056 \u2014 /api/admin/resources returns 404 on PUT/PATCH/DELETE (verb coverage inconsistent)",
+    "excerpt": "- GET \u2192 401 (correctly auth-gated) | - POST \u2192 401 | - PUT \u2192 404 \"Not found\""
+  },
+  {
+    "id": "BUG-057",
+    "severity": "LOW",
+    "symptom": "BUG-057 \u2014 /api/admin/users POST without auth returns 401 but the body reveals \"Unauthorized\" \u2014 schema disclosure",
+    "excerpt": "- `quick4.json`, `admin_users_POST_*` rows | 1. POST /api/admin/users with empty body returns 404 (or 401 with a | 2. Same for any /api/admin/* path attempted anonymously."
+  },
+  {
+    "id": "BUG-058",
+    "severity": "MEDIUM",
+    "symptom": "BUG-058 \u2014 /api/resources responds to cross-origin requests (CORS allowOrigin reflects)",
+    "excerpt": "- `Access-Control-Allow-Origin: https://awesome.video` (allow-list), or | - Same-site-only cookies + no CORS = no cross-origin read. | - `quick4.json`, `corsResources` and `cors_options_*`"
+  },
+  {
+    "id": "BUG-059",
+    "severity": "LOW",
+    "symptom": "BUG-059 \u2014 /api/admin/resources GET returns 400 (not 401) for anonymous \u2014 auth-error inconsistency",
+    "excerpt": "- `quick4.json`, `admin_resources_GET.status: 400` | 1. GET /api/admin/resources for an anonymous client returns 401 with | 2. Verifiable with curl."
+  },
+  {
+    "id": "BUG-060",
+    "severity": "LOW",
+    "symptom": "BUG-060 \u2014 Single sitemap.xml has 2155 entries; should be split per sitemap-index protocol",
+    "excerpt": "- `even-more.json`, `sitemap.count: 2155` | 1. /sitemap_index.xml references /sitemap/sitemap-0.xml ... | 2. Each child <50,000 URLs and <50 MB."
+  },
+  {
+    "id": "BUG-061",
+    "severity": "LOW",
+    "symptom": "BUG-061 \u2014 robots.txt `Crawl-delay: 1` slow-crawls the site (interactive UX unaffected)",
+    "excerpt": "- raw `curl robots.txt` | 1. /robots.txt follows Google's current best practices: include a | 2. Crawl-delay may be tuned based on origin SLO."
+  },
+  {
+    "id": "BUG-062",
+    "severity": "MEDIUM",
+    "symptom": "BUG-062 \u2014 /admin route accessible for anonymous users (HTML shell; only API/data is gated)",
+    "excerpt": "1. Open https://awesome.video/admin in a fresh anonymous chromium. | 2. The page loads (HTTP 200). The HTML chrome is the standard SPA shell. | 3. The body briefly shows \"Loading admin dashboard\u2026\", th"
+  },
+  {
+    "id": "BUG-063",
+    "severity": "MEDIUM",
+    "symptom": "BUG-063 \u2014 /resource?q=<query> renders page but body says \"Loading\u2026\" (SPA hydration hidden)",
+    "excerpt": ""
+  },
+  {
+    "id": "BUG-064",
+    "severity": "LOW",
+    "symptom": "BUG-064 \u2014 /api/users is missing (no public profile lookup), yet internals use /api/users",
+    "excerpt": "- /register uses /api/users/register (probably) | - /login uses /api/users/login (probably) | - `quickprobe.json`, `api__api_users_*` rows"
+  },
+  {
+    "id": "BUG-065",
+    "severity": "MEDIUM",
+    "symptom": "BUG-065 \u2014 Resource count \"1,952\" is hard-coded on landing while actual count varies",
+    "excerpt": "1. The static chrome text reads \"1,946+ resources\" (in the title bar) | 2. Recent sitemap generators should reflect the live /api/awesome-list | - `landing-1440-initial.png` shows \"1,946 resources\""
+  },
+  {
+    "id": "BUG-066",
+    "severity": "LOW",
+    "symptom": "BUG-066 \u2014 Login redirect: after successful login the user goes to /admin, but the homepage CTA to \"Admin\" is invisible",
+    "excerpt": "1. After login, the response redirects to /admin (confirmed earlier: phase2-login.js). | 2. The /admin shell + dashboard then takes a long 7\u201310 s to render (see BUG-101 / BUG-104). | 3. During this ti"
+  },
+  {
+    "id": "BUG-067",
+    "severity": "LOW",
+    "symptom": "BUG-067 \u2014 /api/v1/* namespace is empty (no versioning)",
+    "excerpt": "- /api/v1/* exists mirroring current /api/* and /api is an alias. | - The team adopts the convention to never break /api/* contracts and | - `quickprobe.json`, `api__api_v2_*` etc"
+  },
+  {
+    "id": "BUG-068",
+    "severity": "LOW",
+    "symptom": "BUG-068 \u2014 Admin pages (admin, login, register) lack `noindex` in head meta",
+    "excerpt": "- `contrast-seo-vuln.json`, `seo[].robots` (always null) | 1. curl `https://awesome.video/admin` includes the meta robots noindex tag. | 2. Same for /login, /register, /forgot-password, /reset-passwor"
+  },
+  {
+    "id": "BUG-069",
+    "severity": "LOW",
+    "symptom": "BUG-069 \u2014 /journey/6..10 render side-truncated headings in the page nav (e.g., \"Eve\u2026\", \"Cod\u2026\")",
+    "excerpt": "1. Open https://awesome.video/journey/6 in a fresh chromium at 1440\u00d7900. | 2. Inspect the in-page nav (the step list). Section titles render | 3. Same on /journey/7..10."
+  },
+  {
+    "id": "BUG-070",
+    "severity": "LOW",
+    "symptom": "BUG-070 \u2014 \"/\" keyboard shortcut does nothing on / or anywhere on the public surface",
+    "excerpt": "1. Open https://awesome.video/ in a fresh chromium. | 2. Make sure no input is focused. Press `/` on the keyboard. | 3. Nothing visible happens. The landing has no search input (BUG-004)."
+  },
+  {
+    "id": "BUG-071",
+    "severity": "MEDIUM",
+    "symptom": "BUG-071 \u2014 /search?q= serves a custom page but the body has only the sidebar (no results)",
+    "excerpt": "- earlier `navCheck` showed /search \u2192 200 | - visual inspection on /search shows no results | 1. /search?q=<real-term> shows \u22651 matching resource card."
+  },
+  {
+    "id": "BUG-072",
+    "severity": "MEDIUM",
+    "symptom": "BUG-072 \u2014 SameSite=Lax connect.sid cookie allows cross-origin GET to /api/* with cookies",
+    "excerpt": "1. Embed <img src=\"https://awesome.video/api/admin/resources\"> or | 2. If the user is logged in to awesome.video and visits the phishing | 3. The admin API may have endpoints where a GET mutates state"
+  },
+  {
+    "id": "BUG-073",
+    "severity": "LOW",
+    "symptom": "BUG-073 \u2014 Mobile landing sidebar slides are not reachable: floating button disappears on scroll",
+    "excerpt": "1. Open https://awesome.video/ in a fresh mobile chromium at 375\u00d7812. | 2. Scroll halfway down the page. | 3. The top-nav buttons (Home, Submit, Journeys, Advanced, Theme) stay"
+  },
+  {
+    "id": "BUG-074",
+    "severity": "LOW",
+    "symptom": "BUG-074 \u2014 Admin dashboard has \"Toggle Sidebar\" but admin actually has 2 sidebars (left + right)",
+    "excerpt": "1. Open https://awesome.video/admin (with admin auth) in a fresh chromium at 1440\u00d7900. | 2. The screen has THREE sidebars/render columns visible: | - `screenshots/admin_dashboard.png`, `admin_a_loaded"
+  },
+  {
+    "id": "BUG-075",
+    "severity": "LOW",
+    "symptom": "BUG-075 \u2014 /journeys page meta description promises content not rendered",
+    "excerpt": "- title: \"Learning Journeys \u2014 Awesome Video\" | - description: \"Guided multi-step learning paths for video development \u2014 from beginner streaming to advanced encoding pipelines.\" | - The page actually r"
+  },
+  {
+    "id": "BUG-076",
+    "severity": "LOW",
+    "symptom": "BUG-076 \u2014 /admin/users POST without auth returns 404 (defensive enumeration)",
+    "excerpt": "- GET /api/admin/users (no auth) \u2192 401. | - POST /api/admin/users (no auth) \u2192 404. | - `quick4.json`, `admin_users_POST_2_{}.status: 404`"
+  },
+  {
+    "id": "BUG-077",
+    "severity": "LOW",
+    "symptom": "BUG-077 \u2014 /api/admin/resources accepts POST with empty body (no 400 on malformed body)",
+    "excerpt": "- `quick4.json`, `admin_users_POST_*` | 1. POST without auth returns 401. | 2. POST with auth + malformed body returns 400."
+  },
+  {
+    "id": "BUG-078",
+    "severity": "LOW",
+    "symptom": "BUG-078 \u2014 /admin \"Loading\u2026\" appears during hydration; meta description/title don't change",
+    "excerpt": "- BUG-101 / BUG-066 evidence | 1. /admin shows within 1s a more informative title (\"Loading admin\u2026 | 2. The body renders a dashboard-shaped skeleton immediately."
+  },
+  {
+    "id": "BUG-079",
+    "severity": "MEDIUM",
+    "symptom": "BUG-079 \u2014 /login email \"admin@example.com\" prefill is also in placeholder attribute",
+    "excerpt": "- `phase2-login.js` captured the input \u2014 placeholder matches. | 1. <input name=\"email\"> has placeholder=\"you@example.com\" (or | 2. Verifiable with curl."
+  },
+  {
+    "id": "BUG-080",
+    "severity": "MEDIUM",
+    "symptom": "BUG-080 \u2014 Deeper admin paths (/admin/users, /admin/resources) currently SPA-render but bypass auth check at HTTP level",
+    "excerpt": "- `bug-deep-hunt.json`, `navCheck[]` for `/admin/categories` and `/admin/resources` returning 404 | 1. The status codes are consistent for any /admin/* route. | 2. Verifiable with curl in a tight loop"
+  },
+  {
+    "id": "BUG-081",
+    "severity": "LOW",
+    "symptom": "BUG-081 \u2014 /sitemap.xml `<lastmod>` for /journey/1..5 (the broken ones) is 2026-07-10",
+    "excerpt": "- `quickprobe.json`, sitemap-related entries | 1. Every <loc> in the sitemap returns 2xx; no stale entries. | 2. The lastmod value reflects the entity's last genuine edit."
+  },
+  {
+    "id": "BUG-082",
+    "severity": "LOW",
+    "symptom": "BUG-082 \u2014 /og-image.png always 200 (any title) \u2014 risk of arbitrary image generation",
+    "excerpt": "- `even-more.json`, `ogImage` | 1. /og-image.png?title=<title-with-1000-chars> either rejects with 400 | 2. /og-image.png?title=<script>alert(1)</script> does not embed raw"
+  },
+  {
+    "id": "BUG-083",
+    "severity": "LOW",
+    "symptom": "BUG-083 \u2014 No OpenAPI / API documentation surface",
+    "excerpt": "- raw curl above | 1. /openapi.json returns 200 with valid OpenAPI 3.0 JSON. | 2. The spec documents the listed endpoints."
+  },
+  {
+    "id": "BUG-084",
+    "severity": "LOW",
+    "symptom": "BUG-084 \u2014 /admin fetches /api/admin/stats repeatedly while loading (rate-limit risk)",
+    "excerpt": "- /api/admin/stats observed in admin trace | - timing overlap with the 7-10s Loading window | 1. Open DevTools Network panel on /admin: /api/admin/stats is requested"
+  },
+  {
+    "id": "BUG-085",
+    "severity": "LOW",
+    "symptom": "BUG-085 \u2014 /resource pages on mobile lack a \"View more in this category\" affordance",
+    "excerpt": "1. Open any /resource/<id> at 375\u00d7812. | 2. The page shows title + content. There is no visible filter control | - `resources-audit` outputs"
+  },
+  {
+    "id": "BUG-086",
+    "severity": "LOW",
+    "symptom": "BUG-086 \u2014 Admin pending-list has no column-sort control",
+    "excerpt": "1. Open /admin (with admin auth) and click Approvals. | 2. The pending-approval rows are listed in insertion order (FIFO). | - `screenshots/admin_dashboard.png` (admin approvals area)"
+  },
+  {
+    "id": "BUG-087",
+    "severity": "LOW",
+    "symptom": "BUG-087 \u2014 Admin pages lack an audit-log surface (no /api/admin/audit, no Audit Log tab)",
+    "excerpt": "- `quickprobe.json`, `api__api_audit_*` | 1. /admin \u2192 Audit tab shows a paginated table. | 2. /api/admin/audit returns 200 (admin-only) with audit records."
+  },
+  {
+    "id": "BUG-088",
+    "severity": "LOW",
+    "symptom": "BUG-088 \u2014 Pending resource edit-history has no diff view in /admin",
+    "excerpt": "1. Open /admin \u2192 Edits tab (admin auth). | 2. Each row shows the proposed change but there is no diff against the | - `screenshots/admin_dashboard.png`"
+  },
+  {
+    "id": "BUG-089",
+    "severity": "MEDIUM",
+    "symptom": "BUG-089 \u2014 Many sub-subcategory pages redirect / 404 randomly (sitemap promises working sub-subcategories but live routes return 404)",
+    "excerpt": "- `even-more.json`, sitemap | - raw curl pipeline | 1. After audit, every sub-subcategory URL in the sitemap returns 200."
+  },
+  {
+    "id": "BUG-090",
+    "severity": "MEDIUM",
+    "symptom": "BUG-090 \u2014 /admin/categories renders a Categories nav header but the SPA shell doesn't load data fast",
+    "excerpt": "1. Open /admin/categories (with admin auth). | 2. The page renders the same \"Loading\u2026\" placeholder as /admin. | 3. After 7-10s, the category management UI appears."
+  },
+  {
+    "id": "BUG-091",
+    "severity": "LOW",
+    "symptom": "BUG-091 \u2014 robots.txt has trailing whitespace + extra blank line at EOF",
+    "excerpt": "- raw `curl ... | xxd` | 1. /robots.txt ends with a single \\n. | 2. Verifiable with curl + xxd."
+  },
+  {
+    "id": "BUG-092",
+    "severity": "MEDIUM",
+    "symptom": "BUG-092 \u2014 /logout GET route does not clear session cookie (silent no-op)",
+    "excerpt": "- /logout accepts POST and clears the cookie, or | - /logout (GET/POST) actively clears the cookie via Set-Cookie. | - `more-bugs.json`, `logoutGet`"
+  },
+  {
+    "id": "BUG-093",
+    "severity": "MEDIUM",
+    "symptom": "BUG-093 \u2014 /resource pages don't surface the curators / authors of curated listings",
+    "excerpt": "- `resources-audit`, `resource-phase*.json` | 1. /resource/<id> shows a \"Curated by <handle>\" or \"Submitted anonymously\" line. | 2. Verifiable."
+  },
+  {
+    "id": "BUG-094",
+    "severity": "LOW",
+    "symptom": "BUG-094 \u2014 /admin nav state doesn't reflect the current user when reloading (logout/login flicker)",
+    "excerpt": "1. As admin (logged in), navigate /admin. | 2. Open DevTools \u2192 Application \u2192 Cookies \u2192 delete connect.sid. | 3. The page now shows \"Authentication Required\" but only after a 7-10s"
+  },
+  {
+    "id": "BUG-095",
+    "severity": "LOW",
+    "symptom": "BUG-095 \u2014 /resource pages bias external links toward GitHub (15+ of top 25 outbound domains are github.com)",
+    "excerpt": "- `big-resource-sweep.json`, `outbound_unique_domains` | 1. Quarterly curation includes 10+ non-GitHub entries. | 2. Top-10 unique external-domain histogram shows GitHub \u226440% by"
+  },
+  {
+    "id": "BUG-096",
+    "severity": "LOW",
+    "symptom": "BUG-096 \u2014 /og-image.png accepts arbitrarily long titles and embeds them in the image (DDoS / spam surface)",
+    "excerpt": "- `even-more.json`, `ogImage` | 1. /og-image.png?title=<3000 chars> returns 400 with a clear message. | 2. The cache layer caches by title-hash so SSR load stays bounded."
+  },
+  {
+    "id": "BUG-097",
+    "severity": "LOW",
+    "symptom": "BUG-097 \u2014 Tab panels under /admin don't expose `aria-current` or `aria-selected`",
+    "excerpt": "- manual inspection of /admin HTML | 1. Each tab is role=\"tab\". | 2. Active tab carries aria-selected=\"true\"."
+  },
+  {
+    "id": "BUG-098",
+    "severity": "MEDIUM",
+    "symptom": "BUG-098 \u2014 /journey/N pages cite \"Learning Path\" with section titles but no step renderer (no actual interactive journey UI)",
+    "excerpt": "- `another-round.json`, `journey6`, `journey7` | 1. Each H2 has an associated \"Mark step as done\" toggle. | 2. A progress indicator shows N of M steps completed."
+  },
+  {
+    "id": "BUG-099",
+    "severity": "MEDIUM",
+    "symptom": "BUG-099 \u2014 /admin fetches data with no client-side error boundary (a failed /api/admin/* silently leaves the user staring at \"Loading\u2026\")",
+    "excerpt": "1. Network throttle /api/admin/* to a 500 ms failure. | 2. Visit /admin. The SPA shows \"Loading\u2026\" forever \u2014 no error UI, no | - `/api/admin/*` 500 path"
+  },
+  {
+    "id": "BUG-100",
+    "severity": "HIGH",
+    "symptom": "BUG-100 \u2014 Share button on every /resource/* page silently fails: shows \"Unable to copy / Please copy the URL manually\"",
+    "excerpt": "1. Navigate to any `/resource/<id>` page, e.g. `https://awesome.video/resource/185020` in a fresh Chromium browser (no auth). | 2. Click the \"Share\" button in the top action bar (heart of the page nex"
+  },
+  {
+    "id": "BUG-101",
+    "severity": "MEDIUM",
+    "symptom": "BUG-101 \u2014 /api/admin/* GET returns data when accessed with valid auth context but middleware appears weak",
+    "excerpt": "1. Run `curl -i https://awesome.video/api/admin/users` from any session that does NOT send an auth cookie. Response: | 2. Run `curl -i https://awesome.video/api/admin/users` from a session that DOES s"
+  },
+  {
+    "id": "BUG-102",
+    "severity": "LOW",
+    "symptom": "BUG-102 \u2014 Admin list endpoints accept any limit / negative offset (DoS, enumeration)",
+    "excerpt": "1. Authenticate as admin and load the admin dashboard at `/admin` (which fires GET `/api/admin/resources` to populate the table). | 2. Run: `curl -b 'connect.sid=...'' 'https://awesome.video/api/admin"
+  },
+  {
+    "id": "BUG-103",
+    "severity": "LOW",
+    "symptom": "BUG-103 \u2014 Cleanup: test artifacts created during prior admin audit run still visible in production API",
+    "excerpt": "1. Open the public `/api/categories` endpoint (no auth): | 2. The list contains a stale test artifact named `Audit-NoAuth-A` with `slug: audit-noauth-a-XYZ123` and `resourceCount: 0`. | 3. This catego"
+  },
+  {
+    "id": "BUG-104",
+    "severity": "LOW",
+    "symptom": "BUG-104 \u2014 /admin/subpages return 404 but breadcrumbs confirm route names exist",
+    "excerpt": "1. Authenticate and open `/admin/categories`, `/admin/resources`, `/admin/users`, `/admin/settings`, `/admin/jobs`, `/admin/flags`, `/admin/audit`, `/admin/logs`, `/admin/login`, `/admin/profile`, `/a"
+  },
+  {
+    "id": "BUG-105",
+    "severity": "MEDIUM",
+    "symptom": "BUG-105 \u2014 connect.sid cookie uses SameSite=Lax, not Strict",
+    "excerpt": "1. From any browser session, inspect a Set-Cookie header from awesome.video (e.g. via `curl -i https://awesome.video/`). | 2. Header reads: `set-cookie: connect.sid=s%3A...; Path=/; Expires=...; HttpO"
+  },
+  {
+    "id": "BUG-106",
+    "severity": "LOW",
+    "symptom": "BUG-106 \u2014 Server leaks internal Google Cloud infrastructure details in headers",
+    "excerpt": "1. `curl -I https://awesome.video/` | 2. Observe headers: | - `admin-fast-api.json` line 471-491: response headers from GET `/admin` (admin-fast-api `phase: headers` block)."
+  }
+]

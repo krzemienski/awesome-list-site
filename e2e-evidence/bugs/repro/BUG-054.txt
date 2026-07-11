@@ -1,0 +1,6 @@
+BUG-054 verdict
+date 2026-07-11
+probe: GET / headers
+actual: Permissions-Policy present=True
+classification: ALREADY-FIXED
+reason: 

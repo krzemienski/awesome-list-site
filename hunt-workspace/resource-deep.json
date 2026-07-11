@@ -1,0 +1,3152 @@
+[
+ {
+  "url": "https://awesome.video/resource/185020",
+  "status": 200,
+  "slug": "185020",
+  "slugTaken": true,
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+  ],
+  "buttons": [
+   {
+    "text": "Awesome Video1,946 resources",
+    "aria": null,
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Community & Events",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Community Groups",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Events & Conferences",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Encoding & Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cloud-Based Encoding Solutions",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Containerization & Packaging Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encoding Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle FFmpeg-Based Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Open Source Encoder Projects",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Scripting & Automation Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand General Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle API Libraries & SDKs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Build Scripts & Automation",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Case Studies & Best Practices in DRM",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Command-line Utilities & Wrappers",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cross-Platform Media Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Docker & Containerization Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encryption Tools for Streaming",
+    "disabled": false
+   }
+  ],
+  "externals": [
+   "https://www.100ms.live/blog/rtmp-vs-webrtc-vs-hls"
+  ],
+  "outline": [
+   "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared",
+   "A network protocol analyzer that can be used to debug streaming video at the packet level. Wireshark supports protocols like RTMP, HLS (HTTP), and MPEG-TS, allowing developers to inspect segment requests, manifest files, and timing to diagnose streaming issues.",
+   "A pure Go implementation of the WebRTC protocol, enabling developers to build real-time video (and audio) streaming applications without external dependencies."
+  ],
+  "outboundResults": [
+   {
+    "url": "https://www.100ms.live/blog/rtmp-vs-webrtc-vs-hls",
+    "status": 200
+   }
+  ],
+  "voteTest": null
+ },
+ {
+  "url": "https://awesome.video/resource/184751",
+  "status": 200,
+  "slug": "184751",
+  "slugTaken": true,
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+  ],
+  "buttons": [
+   {
+    "text": "Awesome Video1,946 resources",
+    "aria": null,
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Community & Events",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Community Groups",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Events & Conferences",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Encoding & Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cloud-Based Encoding Solutions",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Containerization & Packaging Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encoding Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle FFmpeg-Based Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Open Source Encoder Projects",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Scripting & Automation Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand General Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle API Libraries & SDKs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Build Scripts & Automation",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Case Studies & Best Practices in DRM",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Command-line Utilities & Wrappers",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cross-Platform Media Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Docker & Containerization Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encryption Tools for Streaming",
+    "disabled": false
+   }
+  ],
+  "externals": [
+   "https://www.tvtechnology.com/features/2025-nab-show-cinecentral-fuses-tools-and-technique"
+  ],
+  "outline": [
+   "2025 NAB Show: CineCentral",
+   "Streaming Media University offers a series of workshops designed to educate professionals on the latest tools and techniques in the streaming industry. These workshops cover a range of topics, including production gear, software solutions, and best practices for delivering high-quality streaming content. They provide hands-on experience and insights from industry experts, making them valuable for developers and technologists in the video streaming field.",
+   "DV Info Net Forums is a community dedicated to digital video production, covering topics such as camera systems, editing software, and production techniques. It provides a platform for professionals and enthusiasts to share knowledge, ask questions, and discuss the latest developments in video technology."
+  ],
+  "outboundResults": [
+   {
+    "url": "https://www.tvtechnology.com/features/2025-nab-show-cinecentral-fuses-tools-and-technique",
+    "status": 200
+   }
+  ],
+  "voteTest": null
+ },
+ {
+  "url": "https://awesome.video/resource/186231",
+  "status": 200,
+  "slug": "186231",
+  "slugTaken": true,
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+  ],
+  "buttons": [
+   {
+    "text": "Awesome Video1,946 resources",
+    "aria": null,
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Community & Events",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Community Groups",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Events & Conferences",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Encoding & Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cloud-Based Encoding Solutions",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Containerization & Packaging Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encoding Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle FFmpeg-Based Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Open Source Encoder Projects",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Scripting & Automation Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand General Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle API Libraries & SDKs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Build Scripts & Automation",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Case Studies & Best Practices in DRM",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Command-line Utilities & Wrappers",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cross-Platform Media Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Docker & Containerization Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encryption Tools for Streaming",
+    "disabled": false
+   }
+  ],
+  "externals": [
+   "https://github.com/2501world/transcoding-performance-trial"
+  ],
+  "outline": [
+   "2501world/transcoding-performance-trial: Runs FFmpeg transcoding processes simultaneously and measures CPU performance",
+   "Comprehensive video codec benchmarking and research platform with ML-based optimization methods, stereoscopic quality assessment, and codec comparison studies. Includes research on x264/x265 preset optimization and video quality metrics analysis.",
+   "Professional HEVC/H.265 and AVC/H.264 video encoding quality evaluation tool integrated with FFmpeg. Includes VMAF and PSNR metric generation, supports objective quality analysis and performance benchmarking for transcoding workflows."
+  ],
+  "outboundResults": [
+   {
+    "url": "https://github.com/2501world/transcoding-performance-trial",
+    "status": 200
+   }
+  ],
+  "voteTest": null
+ },
+ {
+  "url": "https://awesome.video/resource/186145",
+  "status": 200,
+  "slug": "186145",
+  "slugTaken": true,
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+  ],
+  "buttons": [
+   {
+    "text": "Awesome Video1,946 resources",
+    "aria": null,
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Community & Events",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Community Groups",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Events & Conferences",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Encoding & Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cloud-Based Encoding Solutions",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Containerization & Packaging Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encoding Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle FFmpeg-Based Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Open Source Encoder Projects",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Scripting & Automation Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand General Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle API Libraries & SDKs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Build Scripts & Automation",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Case Studies & Best Practices in DRM",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Command-line Utilities & Wrappers",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cross-Platform Media Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Docker & Containerization Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encryption Tools for Streaming",
+    "disabled": false
+   }
+  ],
+  "externals": [
+   "https://medium.com/vicuesoft-techblog/3-cases-from-a-video-expert-encoding-basics-b1ba1c398af8"
+  ],
+  "outline": [
+   "3 Cases from a Video Expert: Encoding Basics",
+   "A hands-on introduction to video technology: image, video, codec (av1, vp9, h265) and more (ffmpeg encoding). - leandromoreira/digital_video_introduction",
+   "An introduction to the basics of video coding"
+  ],
+  "outboundResults": [
+   {
+    "url": "https://medium.com/vicuesoft-techblog/3-cases-from-a-video-expert-encoding-basics-b1ba1c398af8",
+    "status": 200
+   }
+  ],
+  "voteTest": null
+ },
+ {
+  "url": "https://awesome.video/resource/186477",
+  "status": 200,
+  "slug": "186477",
+  "slugTaken": true,
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+  ],
+  "buttons": [
+   {
+    "text": "Awesome Video1,946 resources",
+    "aria": null,
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Community & Events",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Community Groups",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Events & Conferences",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Encoding & Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cloud-Based Encoding Solutions",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Containerization & Packaging Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encoding Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle FFmpeg-Based Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Open Source Encoder Projects",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Scripting & Automation Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand General Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle API Libraries & SDKs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Build Scripts & Automation",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Case Studies & Best Practices in DRM",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Command-line Utilities & Wrappers",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cross-Platform Media Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Docker & Containerization Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encryption Tools for Streaming",
+    "disabled": false
+   }
+  ],
+  "externals": [
+   "https://3dlutcreator.com/"
+  ],
+  "outline": [
+   "3DLUT Creator",
+   "An AI-powered command-line tool to remove the background from images and videos. It uses deep learning to perform background removal with a simple interface.",
+   "Academy Software Foundation's industry-standard color management framework for color space transforms and display transforms, used by Nuke, Blender, Krita, and major VFX pipelines."
+  ],
+  "outboundResults": [
+   {
+    "url": "https://3dlutcreator.com/",
+    "status": 200
+   }
+  ],
+  "voteTest": null
+ },
+ {
+  "url": "https://awesome.video/resource/185570",
+  "status": 200,
+  "slug": "185570",
+  "slugTaken": true,
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+  ],
+  "buttons": [
+   {
+    "text": "Awesome Video1,946 resources",
+    "aria": null,
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Community & Events",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Community Groups",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Events & Conferences",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Encoding & Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cloud-Based Encoding Solutions",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Containerization & Packaging Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encoding Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle FFmpeg-Based Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Open Source Encoder Projects",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Scripting & Automation Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand General Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle API Libraries & SDKs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Build Scripts & Automation",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Case Studies & Best Practices in DRM",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Command-line Utilities & Wrappers",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cross-Platform Media Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Docker & Containerization Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encryption Tools for Streaming",
+    "disabled": false
+   }
+  ],
+  "externals": [
+   "https://4kmedia.org/"
+  ],
+  "outline": [
+   "4K Media | Free Ultra-HD / HDR / HLG / Dolby Vision 4K Video Demos",
+   "Generates a 3D cube LUT for HDR-to-SDR conversion by comparing paired HDR/SDR video samples.",
+   "Self-hosted web-UI media converter with GPU acceleration (NVENC/AMF/QSV), Docker-ready, supports batch resolution upscaling and audio extraction."
+  ],
+  "outboundResults": [
+   {
+    "url": "https://4kmedia.org/",
+    "status": 200
+   }
+  ],
+  "voteTest": null
+ },
+ {
+  "url": "https://awesome.video/resource/185971",
+  "status": 200,
+  "slug": "185971",
+  "slugTaken": true,
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+  ],
+  "buttons": [
+   {
+    "text": "Awesome Video1,946 resources",
+    "aria": null,
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Community & Events",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Community Groups",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Events & Conferences",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Encoding & Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cloud-Based Encoding Solutions",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Containerization & Packaging Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encoding Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle FFmpeg-Based Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Open Source Encoder Projects",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Scripting & Automation Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand General Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle API Libraries & SDKs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Build Scripts & Automation",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Case Studies & Best Practices in DRM",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Command-line Utilities & Wrappers",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cross-Platform Media Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Docker & Containerization Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encryption Tools for Streaming",
+    "disabled": false
+   }
+  ],
+  "externals": [
+   "https://devstreaming-cdn.apple.com/videos/wwdc/2019/507fk9wyls0np6piwk/507/507_hls_authoring_for_airplay_2_video.pdf"
+  ],
+  "outline": [
+   "507_hls_authoring_for_airplay_2.",
+   "Apple's HLS Tools assist developers in creating and validating HTTP Live Streaming (HLS) content for Apple devices.",
+   "Mux offers a set of test HLS streams, primarily used by hls.js and hosted by Mux, for testing and development."
+  ],
+  "outboundResults": [
+   {
+    "url": "https://devstreaming-cdn.apple.com/videos/wwdc/2019/507fk9wyls0np6piwk/507/507_hls_authoring_for_airplay_2_video.pdf",
+    "status": 200
+   }
+  ],
+  "voteTest": null
+ },
+ {
+  "url": "https://awesome.video/resource/185970",
+  "status": 200,
+  "slug": "185970",
+  "slugTaken": true,
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+  ],
+  "buttons": [
+   {
+    "text": "Awesome Video1,946 resources",
+    "aria": null,
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Community & Events",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Community Groups",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Events & Conferences",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Encoding & Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cloud-Based Encoding Solutions",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Containerization & Packaging Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encoding Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle FFmpeg-Based Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Open Source Encoder Projects",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Scripting & Automation Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand General Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle API Libraries & SDKs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Build Scripts & Automation",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Case Studies & Best Practices in DRM",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Command-line Utilities & Wrappers",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cross-Platform Media Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Docker & Containerization Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encryption Tools for Streaming",
+    "disabled": false
+   }
+  ],
+  "externals": [
+   "https://devstreaming-cdn.apple.com/videos/wwdc/2016/510ndmh9wkcvzneegv2/510/510_validating_http_live_streams.pdf"
+  ],
+  "outline": [
+   "510_validating_http_live_streams.",
+   "Apple's HLS Tools assist developers in creating and validating HTTP Live Streaming (HLS) content for Apple devices.",
+   "Mux offers a set of test HLS streams, primarily used by hls.js and hosted by Mux, for testing and development."
+  ],
+  "outboundResults": [
+   {
+    "url": "https://devstreaming-cdn.apple.com/videos/wwdc/2016/510ndmh9wkcvzneegv2/510/510_validating_http_live_streams.pdf",
+    "status": 200
+   }
+  ],
+  "voteTest": null
+ },
+ {
+  "url": "https://awesome.video/resource/185983",
+  "status": 200,
+  "slug": "185983",
+  "slugTaken": true,
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+  ],
+  "buttons": [
+   {
+    "text": "Awesome Video1,946 resources",
+    "aria": null,
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Community & Events",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Community Groups",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Events & Conferences",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Encoding & Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cloud-Based Encoding Solutions",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Containerization & Packaging Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encoding Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle FFmpeg-Based Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Open Source Encoder Projects",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Scripting & Automation Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand General Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle API Libraries & SDKs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Build Scripts & Automation",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Case Studies & Best Practices in DRM",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Command-line Utilities & Wrappers",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cross-Platform Media Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Docker & Containerization Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encryption Tools for Streaming",
+    "disabled": false
+   }
+  ],
+  "externals": [
+   "https://devstreaming-cdn.apple.com/videos/wwdc/2017/515vy4sl7iu70/515/515_hls_authoring_update.pdf"
+  ],
+  "outline": [
+   "515_hls_authoring_update",
+   "Apple's HLS Tools assist developers in creating and validating HTTP Live Streaming (HLS) content for Apple devices.",
+   "Mux offers a set of test HLS streams, primarily used by hls.js and hosted by Mux, for testing and development."
+  ],
+  "outboundResults": [
+   {
+    "url": "https://devstreaming-cdn.apple.com/videos/wwdc/2017/515vy4sl7iu70/515/515_hls_authoring_update.pdf",
+    "status": 200
+   }
+  ],
+  "voteTest": null
+ },
+ {
+  "url": "https://awesome.video/resource/185860",
+  "status": 200,
+  "slug": "185860",
+  "slugTaken": true,
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+  ],
+  "buttons": [
+   {
+    "text": "Awesome Video1,946 resources",
+    "aria": null,
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Community & Events",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Community Groups",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Events & Conferences",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Encoding & Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cloud-Based Encoding Solutions",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Containerization & Packaging Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encoding Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle FFmpeg-Based Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Open Source Encoder Projects",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Scripting & Automation Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand General Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle API Libraries & SDKs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Build Scripts & Automation",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Case Studies & Best Practices in DRM",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Command-line Utilities & Wrappers",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cross-Platform Media Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Docker & Containerization Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encryption Tools for Streaming",
+    "disabled": false
+   }
+  ],
+  "externals": [
+   "https://www.smarthomebeginner.com/best-home-server-apps/"
+  ],
+  "outline": [
+   "9 Best Home Server Apps to Automate Media Management",
+   "Middleware for serving HTTP Live Streaming (HLS) compatible media streams. - t-mullen/hls-server.",
+   "Self hosted streaming media server. HTTPS://docs.streama-project.com/ - streamaserver/streama."
+  ],
+  "outboundResults": [
+   {
+    "url": "https://www.smarthomebeginner.com/best-home-server-apps/",
+    "status": 403
+   }
+  ],
+  "voteTest": null
+ },
+ {
+  "url": "https://awesome.video/resource/185180",
+  "status": 200,
+  "slug": "185180",
+  "slugTaken": true,
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+  ],
+  "buttons": [
+   {
+    "text": "Awesome Video1,946 resources",
+    "aria": null,
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Community & Events",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Community Groups",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Events & Conferences",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Encoding & Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cloud-Based Encoding Solutions",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Containerization & Packaging Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encoding Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle FFmpeg-Based Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Open Source Encoder Projects",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Scripting & Automation Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand General Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle API Libraries & SDKs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Build Scripts & Automation",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Case Studies & Best Practices in DRM",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Command-line Utilities & Wrappers",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cross-Platform Media Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Docker & Containerization Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encryption Tools for Streaming",
+    "disabled": false
+   }
+  ],
+  "externals": [
+   "https://docslib.org/doc/10606874/a-brief-history-of-video-coding"
+  ],
+  "outline": [
+   "A Brief History of Video Coding",
+   "The BBC Research & Development blog where broadcast technology advancements are discussed. Includes articles on new video compression techniques, streaming trials, and standards.",
+   "The first open movie from the Blender Foundation (2006). It's an animated short film widely used in the past as a standard test video for new compression codecs and media players."
+  ],
+  "outboundResults": [
+   {
+    "url": "https://docslib.org/doc/10606874/a-brief-history-of-video-coding",
+    "status": 200
+   }
+  ],
+  "voteTest": null
+ },
+ {
+  "url": "https://awesome.video/resource/185224",
+  "status": 200,
+  "slug": "185224",
+  "slugTaken": true,
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+  ],
+  "buttons": [
+   {
+    "text": "Awesome Video1,946 resources",
+    "aria": null,
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Community & Events",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Community Groups",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Events & Conferences",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Encoding & Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cloud-Based Encoding Solutions",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Containerization & Packaging Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encoding Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle FFmpeg-Based Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Open Source Encoder Projects",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Scripting & Automation Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand General Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle API Libraries & SDKs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Build Scripts & Automation",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Case Studies & Best Practices in DRM",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Command-line Utilities & Wrappers",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cross-Platform Media Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Docker & Containerization Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encryption Tools for Streaming",
+    "disabled": false
+   }
+  ],
+  "externals": [
+   "https://www.mo4tech.com/a-brief-history-of-video-compression-standards-1929-to-2020.html"
+  ],
+  "outline": [
+   "A Brief History of Video Compression Standards: 1929 to 2020",
+   "The BBC Research & Development blog where broadcast technology advancements are discussed. Includes articles on new video compression techniques, streaming trials, and standards.",
+   "The first open movie from the Blender Foundation (2006). It's an animated short film widely used in the past as a standard test video for new compression codecs and media players."
+  ],
+  "outboundResults": [
+   {
+    "url": "https://www.mo4tech.com/a-brief-history-of-video-compression-standards-1929-to-2020.html",
+    "status": 403
+   }
+  ],
+  "voteTest": null
+ },
+ {
+  "url": "https://awesome.video/resource/184838",
+  "status": 200,
+  "slug": "184838",
+  "slugTaken": true,
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+  ],
+  "buttons": [
+   {
+    "text": "Awesome Video1,946 resources",
+    "aria": null,
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Community & Events",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Community Groups",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Events & Conferences",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Encoding & Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cloud-Based Encoding Solutions",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Containerization & Packaging Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encoding Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle FFmpeg-Based Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Open Source Encoder Projects",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Scripting & Automation Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand General Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle API Libraries & SDKs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Build Scripts & Automation",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Case Studies & Best Practices in DRM",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Command-line Utilities & Wrappers",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cross-Platform Media Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Docker & Containerization Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encryption Tools for Streaming",
+    "disabled": false
+   }
+  ],
+  "externals": [
+   "https://raftlabs.medium.com/the-complete-guide-to-build-a-live-streaming-app-learn-the-best-approach-and-tech-stack-263bd67e2915"
+  ],
+  "outline": [
+   "A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App",
+   "An official Wiki guide from FFmpeg explaining how to set up streaming using FFmpeg, including examples for streaming via RTMP to servers or using FFmpeg as a server for HLS/DASH.",
+   "The BBC Research & Development blog where broadcast technology advancements are discussed. Includes articles on new video compression techniques, streaming trials, and standards."
+  ],
+  "outboundResults": [
+   {
+    "url": "https://raftlabs.medium.com/the-complete-guide-to-build-a-live-streaming-app-learn-the-best-approach-and-tech-stack-263bd67e2915",
+    "status": 200
+   }
+  ],
+  "voteTest": null
+ },
+ {
+  "url": "https://awesome.video/resource/185762",
+  "status": 200,
+  "slug": "185762",
+  "slugTaken": true,
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+  ],
+  "buttons": [
+   {
+    "text": "Awesome Video1,946 resources",
+    "aria": null,
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Community & Events",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Community Groups",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Events & Conferences",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Encoding & Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cloud-Based Encoding Solutions",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Containerization & Packaging Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encoding Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle FFmpeg-Based Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Open Source Encoder Projects",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Scripting & Automation Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand General Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle API Libraries & SDKs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Build Scripts & Automation",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Case Studies & Best Practices in DRM",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Command-line Utilities & Wrappers",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cross-Platform Media Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Docker & Containerization Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encryption Tools for Streaming",
+    "disabled": false
+   }
+  ],
+  "externals": [
+   "https://medium.com/@eyevinntechnology/a-docker-container-with-the-video-streaming-tools-you-need-b8319e98f36a"
+  ],
+  "outline": [
+   "A Docker container with the video streaming tools you need",
+   "Axinom offers DRM tools for encoding and decoding, ensuring secure streaming media delivery.",
+   "A set of command lines to debug video streaming files like mp4 (MPEG-4 Part 14), ts (MPEG-2 Part 1), fmp4 in Dash, HLS, or MSS, with or without DRM. - leandromoreira/video-containers-debugging-tools."
+  ],
+  "outboundResults": [
+   {
+    "url": "https://medium.com/@eyevinntechnology/a-docker-container-with-the-video-streaming-tools-you-need-b8319e98f36a",
+    "status": 200
+   }
+  ],
+  "voteTest": null
+ },
+ {
+  "url": "https://awesome.video/resource/185752",
+  "status": 200,
+  "slug": "185752",
+  "slugTaken": true,
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+  ],
+  "buttons": [
+   {
+    "text": "Awesome Video1,946 resources",
+    "aria": null,
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Community & Events",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Community Groups",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Events & Conferences",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Encoding & Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cloud-Based Encoding Solutions",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Containerization & Packaging Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encoding Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle FFmpeg-Based Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Open Source Encoder Projects",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Scripting & Automation Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand General Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle API Libraries & SDKs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Build Scripts & Automation",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Case Studies & Best Practices in DRM",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Command-line Utilities & Wrappers",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cross-Platform Media Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Docker & Containerization Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encryption Tools for Streaming",
+    "disabled": false
+   }
+  ],
+  "externals": [
+   "https://medium.com/netflix-techblog/a-large-scale-comparison-of-x264-x265-and-libvpx-a-sneak-peek-2e81e88f8b0f"
+  ],
+  "outline": [
+   "A Large-Scale Comparison of x264, x265, and libvpx",
+   "Comprehensive Python-based quantitative comparison tool for lossless and lossy audio codecs. Benchmarks compression ratio, bitrate, encoding/decoding speed across multiple formats including FLAC, Opus, Vorbis, AAC, and more.",
+   "Professional HEVC/H.265 and AVC/H.264 video encoding quality evaluation tool integrated with FFmpeg. Includes VMAF and PSNR metric generation, supports objective quality analysis and performance benchmarking for transcoding workflows."
+  ],
+  "outboundResults": [
+   {
+    "url": "https://medium.com/netflix-techblog/a-large-scale-comparison-of-x264-x265-and-libvpx-a-sneak-peek-2e81e88f8b0f",
+    "status": 200
+   }
+  ],
+  "voteTest": null
+ },
+ {
+  "url": "https://awesome.video/resource/185829",
+  "status": 200,
+  "slug": "185829",
+  "slugTaken": true,
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+  ],
+  "buttons": [
+   {
+    "text": "Awesome Video1,946 resources",
+    "aria": null,
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Community & Events",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Community Groups",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Events & Conferences",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Encoding & Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cloud-Based Encoding Solutions",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Containerization & Packaging Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encoding Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle FFmpeg-Based Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Open Source Encoder Projects",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Scripting & Automation Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand General Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle API Libraries & SDKs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Build Scripts & Automation",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Case Studies & Best Practices in DRM",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Command-line Utilities & Wrappers",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cross-Platform Media Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Docker & Containerization Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encryption Tools for Streaming",
+    "disabled": false
+   }
+  ],
+  "externals": [
+   "https://www.slideshare.net/vcodex/a-short-history-of-video-coding?from_m_app=ios"
+  ],
+  "outline": [
+   "A short history of video coding",
+   "Free educational webinars, videos and other resources focused on the Broadcast Industry",
+   "This talk aims to shed light on colorspaces - what they are, how and why they work, why we should care about handling edge cases properly. Starting with hist..."
+  ],
+  "outboundResults": [
+   {
+    "url": "https://www.slideshare.net/vcodex/a-short-history-of-video-coding?from_m_app=ios",
+    "status": 200
+   }
+  ],
+  "voteTest": null
+ },
+ {
+  "url": "https://awesome.video/resource/186305",
+  "status": 200,
+  "slug": "186305",
+  "slugTaken": true,
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+  ],
+  "buttons": [
+   {
+    "text": "Awesome Video1,946 resources",
+    "aria": null,
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Community & Events",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Community Groups",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Events & Conferences",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Encoding & Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cloud-Based Encoding Solutions",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Containerization & Packaging Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encoding Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle FFmpeg-Based Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Open Source Encoder Projects",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Scripting & Automation Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand General Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle API Libraries & SDKs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Build Scripts & Automation",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Case Studies & Best Practices in DRM",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Command-line Utilities & Wrappers",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cross-Platform Media Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Docker & Containerization Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encryption Tools for Streaming",
+    "disabled": false
+   }
+  ],
+  "externals": [
+   "https://www.iso.org/standard/76383.html"
+  ],
+  "outline": [
+   "AAC Audio Coding Standard - ISO/IEC 14496-3",
+   "Defines the compressed video format for AVC/h264",
+   "Defines the compressed video format HEVC/h265"
+  ],
+  "outboundResults": [
+   {
+    "url": "https://www.iso.org/standard/76383.html",
+    "status": 403
+   }
+  ],
+  "voteTest": null
+ },
+ {
+  "url": "https://awesome.video/resource/187911",
+  "status": 200,
+  "slug": "187911",
+  "slugTaken": true,
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+  ],
+  "buttons": [
+   {
+    "text": "Awesome Video1,946 resources",
+    "aria": null,
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Community & Events",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Community Groups",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Events & Conferences",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Encoding & Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cloud-Based Encoding Solutions",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Containerization & Packaging Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encoding Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle FFmpeg-Based Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Open Source Encoder Projects",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Scripting & Automation Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand General Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle API Libraries & SDKs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Build Scripts & Automation",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Case Studies & Best Practices in DRM",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Command-line Utilities & Wrappers",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cross-Platform Media Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Docker & Containerization Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encryption Tools for Streaming",
+    "disabled": false
+   }
+  ],
+  "externals": [
+   "https://github.com/LennartPaduch/abr-video-player"
+  ],
+  "outline": [
+   "ABR Video Player",
+   "Original academic paper introducing the BOLA Lyapunov-based adaptive bitrate algorithm, theoretical foundation for many ABR implementations.",
+   "Reference simulator implementing BOLA and MPC adaptive bitrate algorithms, based on dash.js, widely used in ABR research papers."
+  ],
+  "outboundResults": [
+   {
+    "url": "https://github.com/LennartPaduch/abr-video-player",
+    "status": 200
+   }
+  ],
+  "voteTest": null
+ },
+ {
+  "url": "https://awesome.video/resource/185199",
+  "status": 200,
+  "slug": "185199",
+  "slugTaken": true,
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+  ],
+  "buttons": [
+   {
+    "text": "Awesome Video1,946 resources",
+    "aria": null,
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Community & Events",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Community Groups",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Events & Conferences",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Encoding & Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cloud-Based Encoding Solutions",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Containerization & Packaging Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encoding Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle FFmpeg-Based Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Open Source Encoder Projects",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Scripting & Automation Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand General Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle API Libraries & SDKs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Build Scripts & Automation",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Case Studies & Best Practices in DRM",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Command-line Utilities & Wrappers",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cross-Platform Media Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Docker & Containerization Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encryption Tools for Streaming",
+    "disabled": false
+   }
+  ],
+  "externals": [
+   "https://www.mile-high.video/technical-program"
+  ],
+  "outline": [
+   "ACM Mile-High Video 2025",
+   "SEGMENTS:2023, introduced by the Streaming Video Technology Alliance, was a one-day public conference held on May 16, 2023, in New Orleans. The event provided a comprehensive walkthrough of the streaming video workflow, covering topics from content ingestion to analytics, and featured speakers from over 25 companies discussing challenges and best practices in operating streaming services.",
+   "SIGGRAPH 2025 is an annual conference on computer graphics and interactive techniques, featuring presentations on the latest research, technologies, and applications in the field. It includes a trade show, educational courses, and panel discussions relevant to video technology professionals."
+  ],
+  "outboundResults": [
+   {
+    "url": "https://www.mile-high.video/technical-program",
+    "status": 200
+   }
+  ],
+  "voteTest": null
+ },
+ {
+  "url": "https://awesome.video/resource/186236",
+  "status": 200,
+  "slug": "186236",
+  "slugTaken": true,
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+  ],
+  "buttons": [
+   {
+    "text": "Awesome Video1,946 resources",
+    "aria": null,
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Community & Events",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Community Groups",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Events & Conferences",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Encoding & Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cloud-Based Encoding Solutions",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Containerization & Packaging Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encoding Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle FFmpeg-Based Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Open Source Encoder Projects",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Scripting & Automation Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand General Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle API Libraries & SDKs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Build Scripts & Automation",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Case Studies & Best Practices in DRM",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Command-line Utilities & Wrappers",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cross-Platform Media Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Docker & Containerization Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encryption Tools for Streaming",
+    "disabled": false
+   }
+  ],
+  "externals": [
+   "https://github.com/AK1194/Video-Compression-motion-estimation-block-video-encoder"
+  ],
+  "outline": [
+   "AK1194/Video-Compression-motion-estimation-block-video-encoder: This repository is about video compression, and more specifically about the motion estimation block (ME block) of a video encoder. It is a research project for developing an efficient motion",
+   "Comprehensive Python-based quantitative comparison tool for lossless and lossy audio codecs. Benchmarks compression ratio, bitrate, encoding/decoding speed across multiple formats including FLAC, Opus, Vorbis, AAC, and more.",
+   "A rewrite of the interface and orchestration layers of FFmpeg. Includes...\n* Graphical user interface that makes it easy to visualize, edit, validate and run your graph\n* Jobs defined in JSON files\n* Import any FFmpeg command-line\n* Real-time encoding control system - dynamically optimizes encoder settings to maintain real-time frame rates\n* Open Telemetry / Prometheus metrics \n* Add custom Go processing nodes\n* Integrations with AI engines, including...\n   * Whisper speech to text\n   * Vidi 2.5 multimodal scene understanding\n   * TwelveLabs multimodal video understanding and embedding\n   * YOLOv8 object detection and classification\n   * YOLOv8 face detection and alignment with SFace Embedding\n* Custom motion-compensated scene detector\n* Go port of PySceneDetect (5 scene detection algorithms)\n* Integrated support of LibRAW (decoding, processing of camera RAW formats)\n* Simple video sequence editor\n* Support for remote or distributed execution"
+  ],
+  "outboundResults": [
+   {
+    "url": "https://github.com/AK1194/Video-Compression-motion-estimation-block-video-encoder",
+    "status": 200
+   }
+  ],
+  "voteTest": null
+ },
+ {
+  "url": "https://awesome.video/resource/184847",
+  "status": 200,
+  "slug": "184847",
+  "slugTaken": true,
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+  ],
+  "buttons": [
+   {
+    "text": "Awesome Video1,946 resources",
+    "aria": null,
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Community & Events",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Community Groups",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Events & Conferences",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Encoding & Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cloud-Based Encoding Solutions",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Containerization & Packaging Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encoding Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle FFmpeg-Based Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Open Source Encoder Projects",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Scripting & Automation Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand General Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle API Libraries & SDKs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Build Scripts & Automation",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Case Studies & Best Practices in DRM",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Command-line Utilities & Wrappers",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cross-Platform Media Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Docker & Containerization Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encryption Tools for Streaming",
+    "disabled": false
+   }
+  ],
+  "externals": [
+   "https://amd.github.io/ama-sdk/latest/git_hub.html"
+  ],
+  "outline": [
+   "AMD Advanced Media Acceleration (AMA) SDK",
+   "AMD's GPUOpen Video SDK that provides developers access to GPU-accelerated encoding and decoding (H.264, HEVC, etc.) on AMD hardware.",
+   "Comprehensive Python-based quantitative comparison tool for lossless and lossy audio codecs. Benchmarks compression ratio, bitrate, encoding/decoding speed across multiple formats including FLAC, Opus, Vorbis, AAC, and more."
+  ],
+  "outboundResults": [
+   {
+    "url": "https://amd.github.io/ama-sdk/latest/git_hub.html",
+    "status": 200
+   }
+  ],
+  "voteTest": null
+ },
+ {
+  "url": "https://awesome.video/resource/186623",
+  "status": 200,
+  "slug": "186623",
+  "slugTaken": true,
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+  ],
+  "buttons": [
+   {
+    "text": "Awesome Video1,946 resources",
+    "aria": null,
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Community & Events",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Community Groups",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Events & Conferences",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Encoding & Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cloud-Based Encoding Solutions",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Containerization & Packaging Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encoding Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle FFmpeg-Based Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Open Source Encoder Projects",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Scripting & Automation Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand General Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle API Libraries & SDKs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Build Scripts & Automation",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Case Studies & Best Practices in DRM",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Command-line Utilities & Wrappers",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cross-Platform Media Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Docker & Containerization Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encryption Tools for Streaming",
+    "disabled": false
+   }
+  ],
+  "externals": [
+   "https://github.com/GPUOpen-LibrariesAndSDKs/AMF"
+  ],
+  "outline": [
+   "AMD Advanced Media Framework (AMF SDK)",
+   "An open source lossless video codec from Umezawa that provides fast encoding/decoding and is often used for lossless video compression on Windows (supports RGB and YUV formats).",
+   "Intel's oneAPI Video Processing Library, providing a unified API to utilize hardware accelerators (CPU/GPU) for video encoding, decoding, and processing."
+  ],
+  "outboundResults": [
+   {
+    "url": "https://github.com/GPUOpen-LibrariesAndSDKs/AMF",
+    "status": 200
+   }
+  ],
+  "voteTest": null
+ },
+ {
+  "url": "https://awesome.video/resource/185201",
+  "status": 200,
+  "slug": "185201",
+  "slugTaken": true,
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+  ],
+  "buttons": [
+   {
+    "text": "Awesome Video1,946 resources",
+    "aria": null,
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Community & Events",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Community Groups",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Events & Conferences",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Encoding & Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cloud-Based Encoding Solutions",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Containerization & Packaging Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encoding Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle FFmpeg-Based Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Open Source Encoder Projects",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Scripting & Automation Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand General Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle API Libraries & SDKs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Build Scripts & Automation",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Case Studies & Best Practices in DRM",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Command-line Utilities & Wrappers",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cross-Platform Media Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Docker & Containerization Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encryption Tools for Streaming",
+    "disabled": false
+   }
+  ],
+  "externals": [
+   "https://github.com/GPUOpen-LibrariesAndSDKs/AMF/wiki/Guide-for-Video-CODEC-Encoder-App-Developers"
+  ],
+  "outline": [
+   "AMF (Advanced Media Framework)",
+   "AMD's GPUOpen Video SDK that provides developers access to GPU-accelerated encoding and decoding (H.264, HEVC, etc.) on AMD hardware.",
+   "StreamPack is a lightweight, high-performance toolkit for building streaming video processing pipelines on Android. It provides reusable components for frame sources, transformations, encoding, and output, making it easy to develop efficient real-time video applications with a modular and composable architecture."
+  ],
+  "outboundResults": [
+   {
+    "url": "https://github.com/GPUOpen-LibrariesAndSDKs/AMF/wiki/Guide-for-Video-CODEC-Encoder-App-Developers",
+    "status": 200
+   }
+  ],
+  "voteTest": null
+ },
+ {
+  "url": "https://awesome.video/resource/188002",
+  "status": 200,
+  "slug": "188002",
+  "slugTaken": true,
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+  ],
+  "buttons": [
+   {
+    "text": "Awesome Video1,946 resources",
+    "aria": null,
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Community & Events",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Community Groups",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Events & Conferences",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Encoding & Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cloud-Based Encoding Solutions",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Containerization & Packaging Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encoding Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle FFmpeg-Based Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Open Source Encoder Projects",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Scripting & Automation Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand General Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle API Libraries & SDKs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Build Scripts & Automation",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Case Studies & Best Practices in DRM",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Command-line Utilities & Wrappers",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cross-Platform Media Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Docker & Containerization Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encryption Tools for Streaming",
+    "disabled": false
+   }
+  ],
+  "externals": [
+   "https://aomediacodec.github.io/av1-hdr10plus/"
+  ],
+  "outline": [
+   "AOM HDR10+ AV1 Metadata Handling Specification",
+   "Official Dolby technical support article breaking down Dolby Vision profiles 0-9, cross-compatible base layers (HDR10/HLG/SDR fallback via VUI metadata).",
+   "Official Dolby FAQ with profile-specific engineering detail on Dolby Vision Profile 8 and 9."
+  ],
+  "outboundResults": [
+   {
+    "url": "https://aomediacodec.github.io/av1-hdr10plus/",
+    "status": 200
+   }
+  ],
+  "voteTest": null
+ },
+ {
+  "url": "https://awesome.video/resource/186102",
+  "status": 200,
+  "slug": "186102",
+  "slugTaken": true,
+  "consoleErrs": [
+   "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+  ],
+  "buttons": [
+   {
+    "text": "Awesome Video1,946 resources",
+    "aria": null,
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Community & Events",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Community Groups",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Events & Conferences",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand Encoding & Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cloud-Based Encoding Solutions",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Codecs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Containerization & Packaging Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encoding Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle FFmpeg-Based Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Open Source Encoder Projects",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Scripting & Automation Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Expand General Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle API Libraries & SDKs",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Build Scripts & Automation",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Case Studies & Best Practices in DRM",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Command-line Utilities & Wrappers",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Cross-Platform Media Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Docker & Containerization Tools",
+    "disabled": false
+   },
+   {
+    "text": "",
+    "aria": "Toggle Encryption Tools for Streaming",
+    "disabled": false
+   }
+  ],
+  "externals": [
+   "https://github.com/AOMediaCodec/av1-rtp-spec"
+  ],
+  "outline": [
+   "AOMediaCodec/av1-rtp-spec",
+   "Defines the file format and structure",
+   "Defines both the metadata structure and some client/server requirements"
+  ],
+  "outboundResults": [
+   {
+    "url": "https://github.com/AOMediaCodec/av1-rtp-spec",
+    "status": 200
+   }
+  ],
+  "voteTest": null
+ }
+]

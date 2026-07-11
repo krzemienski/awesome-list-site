@@ -1,0 +1,6 @@
+BUG-007 verdict
+date 2026-07-11
+probe: default-stub
+actual: untouched
+classification: BLOCKED
+reason: no specific probe defined

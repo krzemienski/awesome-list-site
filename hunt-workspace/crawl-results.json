@@ -1,0 +1,3040 @@
+{
+ "results": [
+  {
+   "url": "https://awesome.video",
+   "status": 200,
+   "title": "Awesome Video — 1946+ Curated Video Tools, Codecs & Streaming Resources",
+   "h1": "Awesome Video Resources",
+   "links": 227,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/settings/theme",
+   "status": 200,
+   "title": "Theme Settings — Awesome Video",
+   "h1": "Theme Settings",
+   "links": 218,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/journeys",
+   "status": 200,
+   "title": "Learning Journeys — Awesome Video",
+   "h1": "Learning Journeys",
+   "links": 216,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/submit",
+   "status": 200,
+   "title": "Submit a Resource — Awesome Video",
+   "h1": "Submit a Resource",
+   "links": 217,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/category/community-events",
+   "status": 200,
+   "title": "Video Community & Streaming Conferences — Awesome Video",
+   "h1": "",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/advanced",
+   "status": 200,
+   "title": "Advanced — Awesome Video",
+   "h1": "",
+   "links": 9,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/community-groups",
+   "status": 200,
+   "title": "Community Groups — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716338231&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716338231&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/sub-subcategory/online-forums",
+   "status": 200,
+   "title": "Online Forums — Awesome Video",
+   "h1": "Loading sub-subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716338332&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716338332&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/events-conferences",
+   "status": 200,
+   "title": "Events & Conferences — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716338737&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716338737&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/sub-subcategory/podcasts-webinars",
+   "status": 200,
+   "title": "Podcasts & Webinars — Awesome Video",
+   "h1": "Loading sub-subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716338822&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716338822&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/category/community-events?view=general",
+   "status": 200,
+   "title": "Video Community & Streaming Conferences — Awesome Video",
+   "h1": "",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716339004&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716339004&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/category/encoding-codecs",
+   "status": 200,
+   "title": "Video Encoding Tools & Codecs (AV1, HEVC, H.264) — Awesome Video",
+   "h1": "",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716339177&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716339177&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/benchmarking-performance-tools-for-codecs",
+   "status": 200,
+   "title": "Benchmarking & Performance Tools for Codecs — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716339421&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716339421&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/cloud-based-encoding-solutions",
+   "status": 200,
+   "title": "Cloud-Based Encoding Solutions — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716339568&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716339568&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/sub-subcategory/vp9",
+   "status": null,
+   "title": "",
+   "h1": "",
+   "links": 0,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [],
+   "netErrs": [],
+   "error": "page.goto: net::ERR_NETWORK_CHANGED at https://awesome.video/sub-subcategory/vp9\nCall log:\n  - navigating to \"https://awesome.video/sub-subcategory/vp9\", waiting until \"domcontentloaded\"\n"
+  },
+  {
+   "url": "https://awesome.video/sub-subcategory/cloud-platforms",
+   "status": 200,
+   "title": "Cloud Platforms — Awesome Video",
+   "h1": "Loading sub-subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716339885&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716339885&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c",
+    "Failed to load resource: net::ERR_NETWORK_CHANGED"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/comparative-analysis-of-codecs",
+   "status": null,
+   "title": "",
+   "h1": "",
+   "links": 0,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [],
+   "netErrs": [],
+   "error": "page.goto: Navigation to \"https://awesome.video/subcategory/comparative-analysis-of-codecs\" is interrupted by another navigation to \"chrome-error://chromewebdata/\"\nCall log:\n  - navigating to \"https:/"
+  },
+  {
+   "url": "https://awesome.video/sub-subcategory/subtitles-captions",
+   "status": 200,
+   "title": "Subtitles & Captions — Awesome Video",
+   "h1": "Loading sub-subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716340246&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716340246&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/sub-subcategory/audio",
+   "status": null,
+   "title": "",
+   "h1": "",
+   "links": 0,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [],
+   "netErrs": [],
+   "error": "page.goto: Navigation to \"https://awesome.video/sub-subcategory/audio\" is interrupted by another navigation to \"https://awesome.video/subcategory/comparative-analysis-of-codecs\"\nCall log:\n  - navigati"
+  },
+  {
+   "url": "https://awesome.video/subcategory/codecs",
+   "status": 200,
+   "title": "Codecs — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716340601&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716340601&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/sub-subcategory/origin-servers",
+   "status": null,
+   "title": "",
+   "h1": "",
+   "links": 0,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [],
+   "netErrs": [],
+   "error": "page.goto: Navigation to \"https://awesome.video/sub-subcategory/origin-servers\" is interrupted by another navigation to \"https://awesome.video/sub-subcategory/audio\"\nCall log:\n  - navigating to \"https"
+  },
+  {
+   "url": "https://awesome.video/subcategory/ffmpeg-based-tools",
+   "status": null,
+   "title": "",
+   "h1": "",
+   "links": 0,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [],
+   "netErrs": [],
+   "error": "page.goto: Navigation to \"https://awesome.video/subcategory/ffmpeg-based-tools\" is interrupted by another navigation to \"https://awesome.video/sub-subcategory/origin-servers\"\nCall log:\n  - navigating "
+  },
+  {
+   "url": "https://awesome.video/sub-subcategory/av1",
+   "status": 200,
+   "title": "AV1 — Awesome Video",
+   "h1": "",
+   "links": 0,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716340843&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716340843&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c",
+    "Failed to load resource: net::ERR_NETWORK_CHANGED",
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716342142&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/hardware-accelerated-transcoding",
+   "status": null,
+   "title": "",
+   "h1": "",
+   "links": 0,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [],
+   "netErrs": [],
+   "error": "page.goto: Navigation to \"https://awesome.video/subcategory/hardware-accelerated-transcoding\" is interrupted by another navigation to \"https://awesome.video/subcategory/ffmpeg-based-tools\"\nCall log:\n "
+  },
+  {
+   "url": "https://awesome.video/sub-subcategory/hevc",
+   "status": 200,
+   "title": "HEVC — Awesome Video",
+   "h1": "HEVC",
+   "links": 7,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716341040&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716341040&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Failed to load resource: net::ERR_NETWORK_CHANGED",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/multi-format-packaging-tools",
+   "status": null,
+   "title": "",
+   "h1": "",
+   "links": 0,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [],
+   "netErrs": [],
+   "error": "page.goto: Navigation to \"https://awesome.video/subcategory/multi-format-packaging-tools\" is interrupted by another navigation to \"https://awesome.video/subcategory/hardware-accelerated-transcoding\"\nC"
+  },
+  {
+   "url": "https://awesome.video/subcategory/open-source-encoder-projects",
+   "status": null,
+   "title": "",
+   "h1": "",
+   "links": 0,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [],
+   "netErrs": [],
+   "error": "page.goto: Navigation to \"https://awesome.video/subcategory/open-source-encoder-projects\" is interrupted by another navigation to \"https://awesome.video/subcategory/multi-format-packaging-tools\"\nCall "
+  },
+  {
+   "url": "https://awesome.video/subcategory/real-time-encoding-solutions",
+   "status": null,
+   "title": "",
+   "h1": "",
+   "links": 0,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [],
+   "netErrs": [],
+   "error": "page.goto: Navigation to \"https://awesome.video/subcategory/real-time-encoding-solutions\" is interrupted by another navigation to \"https://awesome.video/subcategory/open-source-encoder-projects\"\nCall "
+  },
+  {
+   "url": "https://awesome.video/subcategory/containerization-packaging-tools",
+   "status": 200,
+   "title": "Containerization & Packaging Tools — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716341476&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716341476&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/scripting-automation-tools",
+   "status": null,
+   "title": "",
+   "h1": "",
+   "links": 0,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [],
+   "netErrs": [],
+   "error": "page.goto: Navigation to \"https://awesome.video/subcategory/scripting-automation-tools\" is interrupted by another navigation to \"https://awesome.video/subcategory/real-time-encoding-solutions\"\nCall lo"
+  },
+  {
+   "url": "https://awesome.video/sub-subcategory/ffmpeg",
+   "status": 200,
+   "title": "FFmpeg — Awesome Video",
+   "h1": "Loading sub-subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716341664&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716341664&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/software-transcoding-tools",
+   "status": null,
+   "title": "",
+   "h1": "",
+   "links": 0,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [],
+   "netErrs": [],
+   "error": "page.goto: Navigation to \"https://awesome.video/subcategory/software-transcoding-tools\" is interrupted by another navigation to \"https://awesome.video/subcategory/scripting-automation-tools\"\nCall log:"
+  },
+  {
+   "url": "https://awesome.video/category/general-tools",
+   "status": null,
+   "title": "",
+   "h1": "",
+   "links": 0,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [],
+   "netErrs": [],
+   "error": "page.goto: Navigation to \"https://awesome.video/category/general-tools\" is interrupted by another navigation to \"https://awesome.video/subcategory/software-transcoding-tools\"\nCall log:\n  - navigating "
+  },
+  {
+   "url": "https://awesome.video/subcategory/encoding-tools",
+   "status": 200,
+   "title": "Encoding Tools — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716341759&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716341759&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/api-libraries-sdks",
+   "status": null,
+   "title": "",
+   "h1": "",
+   "links": 0,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [],
+   "netErrs": [],
+   "error": "page.goto: Navigation to \"https://awesome.video/subcategory/api-libraries-sdks\" is interrupted by another navigation to \"https://awesome.video/category/general-tools\"\nCall log:\n  - navigating to \"http"
+  },
+  {
+   "url": "https://awesome.video/subcategory/hardware-codecs-acceleration",
+   "status": 200,
+   "title": "Hardware Codecs & Acceleration — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716342142&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716342142&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/next-generation-codecs-av1-vvc",
+   "status": 200,
+   "title": "Next-Generation Codecs AV1 VVC — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/category/encoding-codecs?view=general",
+   "status": 200,
+   "title": "Video Encoding Tools & Codecs (AV1, HEVC, H.264) — Awesome Video",
+   "h1": "",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716342856&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716342856&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/sub-subcategory/quality-testing",
+   "status": 200,
+   "title": "Quality & Testing — Awesome Video",
+   "h1": "Loading sub-subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716343076&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716343076&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/software-codecs",
+   "status": 200,
+   "title": "Software Codecs — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716342762&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716342762&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/sub-subcategory/roku",
+   "status": 200,
+   "title": "Roku — Awesome Video",
+   "h1": "Loading sub-subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Failed to load resource: net::ERR_NETWORK_CHANGED",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/build-scripts-automation",
+   "status": 200,
+   "title": "Build Scripts & Automation — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716343546&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716343546&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/case-studies-best-practices-in-drm",
+   "status": 200,
+   "title": "Case Studies & Best Practices in DRM — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716343619&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716343619&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/command-line-utilities-wrappers",
+   "status": 200,
+   "title": "Command-line Utilities & Wrappers — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716344036&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716344036&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/community-collaboration-platforms",
+   "status": 200,
+   "title": "Community & Collaboration Platforms — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716344289&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716344289&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/cross-platform-media-tools",
+   "status": 200,
+   "title": "Cross-Platform Media Tools — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716344298&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716344298&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/drm",
+   "status": 200,
+   "title": "DRM — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716344475&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716344475&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/drm-solutions-implementations",
+   "status": 200,
+   "title": "DRM Solutions & Implementations — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716344815&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716344815&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/drm-testing-validation-tools",
+   "status": 200,
+   "title": "DRM Testing & Validation Tools — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716344912&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716344912&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/docker-containerization-tools",
+   "status": 200,
+   "title": "Docker & Containerization Tools — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716345227&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716345227&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/sub-subcategory/storage-solutions",
+   "status": 200,
+   "title": "Storage Solutions — Awesome Video",
+   "h1": "Loading sub-subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716345434&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716345434&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/encryption-tools-for-streaming",
+   "status": 200,
+   "title": "Encryption Tools for Streaming — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716345523&gcd=13l3l3l3l1l1&npa=0&dma=0&are=1&cid=1906978903.1783716334&frm=0&pscdl=",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716345523&gcd=13l3l3l3l1l1&npa=0&dma=0&are=1&cid=1906978903.1783716334&frm=0",
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716345523&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716345523&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/sub-subcategory/dash",
+   "status": 200,
+   "title": "DASH — Awesome Video",
+   "h1": "Loading sub-subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716345724&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716345724&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/sub-subcategory/hls",
+   "status": 200,
+   "title": "HLS — Awesome Video",
+   "h1": "Loading sub-subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716346084&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716346084&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/independent-hobbyist-projects",
+   "status": 200,
+   "title": "Independent & Hobbyist Projects — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716346173&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716346173&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/logging-debugging-tools",
+   "status": 200,
+   "title": "Logging & Debugging Tools — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716346541&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716346541&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/performance-monitoring-tools",
+   "status": 200,
+   "title": "Performance & Monitoring Tools — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716346628&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716346628&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/research-projects-academic-resources",
+   "status": 200,
+   "title": "Research Projects & Academic Resources — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716346722&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716346722&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/specialized-utility-scripts",
+   "status": 200,
+   "title": "Specialized Utility Scripts — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716347155&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716347155&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/test-content-sample-streams",
+   "status": 200,
+   "title": "Test Content & Sample Streams — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716347332&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716347332&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/widevine-fairplay-playready-integrations",
+   "status": 200,
+   "title": "Widevine FairPlay PlayReady Integrations — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716347492&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716347492&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/sub-subcategory/android",
+   "status": 200,
+   "title": "Android — Awesome Video",
+   "h1": "Loading sub-subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716347806&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716347806&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/category/general-tools?view=general",
+   "status": 200,
+   "title": "Video Development Tools & Utilities — Awesome Video",
+   "h1": "",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716347906&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716347906&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/category/infrastructure-delivery",
+   "status": 200,
+   "title": "Video Infrastructure, CDN & Delivery Tools — Awesome Video",
+   "h1": "",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716348067&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716348067&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/cdn-integration-distribution",
+   "status": 200,
+   "title": "CDN Integration & Distribution — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716348336&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716348336&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/sub-subcategory/cdn-integration",
+   "status": 200,
+   "title": "CDN Integration — Awesome Video",
+   "h1": "Loading sub-subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716348474&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716348474&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/cloud-cdn",
+   "status": 200,
+   "title": "Cloud & CDN — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716348707&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716348707&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/edge-computing-caching-solutions",
+   "status": 200,
+   "title": "Edge Computing & Caching Solutions — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716348910&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716348910&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/live-streaming-servers",
+   "status": 200,
+   "title": "Live Streaming Servers — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716349074&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716349074&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/multi-cdn-management",
+   "status": 200,
+   "title": "Multi-CDN Management — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716349289&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716349289&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/peer-to-peer-streaming-solutions",
+   "status": 200,
+   "title": "Peer-to-Peer Streaming Solutions — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716349554&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716349554&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/rtmprtsphttp-protocol-servers",
+   "status": 200,
+   "title": "RTMPRTSPHTTP Protocol Servers — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716349718&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716349718&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/streaming-analytics-monitoring",
+   "status": 200,
+   "title": "Streaming Analytics & Monitoring — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716349883&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716349883&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/streaming-servers",
+   "status": 200,
+   "title": "Streaming Servers — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716350189&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716350189&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/vod-streaming-servers",
+   "status": 200,
+   "title": "VOD Streaming Servers — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716350285&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716350285&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/category/infrastructure-delivery?view=general",
+   "status": 200,
+   "title": "Video Infrastructure, CDN & Delivery Tools — Awesome Video",
+   "h1": "",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716350585&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716350585&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/category/intro-learning",
+   "status": 200,
+   "title": "Learn Video Development: Courses & Tutorials — Awesome Video",
+   "h1": "",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716350762&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716350762&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/books-courses",
+   "status": 200,
+   "title": "Books & Courses — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716350860&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716350860&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/case-studies-whitepapers",
+   "status": 200,
+   "title": "Case Studies & Whitepapers — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716351058&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716351058&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/community-blogs-forums",
+   "status": 200,
+   "title": "Community Blogs & Forums — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716351369&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716351369&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/encoding-transcoding-guides",
+   "status": 200,
+   "title": "Encoding & Transcoding Guides — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716351547&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716351547&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/learning-resources",
+   "status": 200,
+   "title": "Learning Resources — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716351826&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716351826&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/player-development-documentation",
+   "status": 200,
+   "title": "Player Development Documentation — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716352033&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716352033&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/tutorials-case-studies",
+   "status": 200,
+   "title": "Tutorials & Case Studies — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716352194&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716352194&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/video-streaming-tutorials",
+   "status": 200,
+   "title": "Video Streaming Tutorials — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716352410&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716352410&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/webinars-conference-talks",
+   "status": 200,
+   "title": "Webinars & Conference Talks — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716352567&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716352567&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/category/intro-learning?view=general",
+   "status": 200,
+   "title": "Learn Video Development: Courses & Tutorials — Awesome Video",
+   "h1": "",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716352839&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716352839&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/category/media-tools",
+   "status": 200,
+   "title": "Media Processing & Video Editing Tools — Awesome Video",
+   "h1": "",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716352963&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716352963&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/ads-qoe",
+   "status": 200,
+   "title": "Ads & QoE — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716353385&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716353385&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/ai-machine-learning-tools",
+   "status": 200,
+   "title": "AI & Machine Learning Tools — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716353296&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716353296&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/audio-subtitles",
+   "status": 200,
+   "title": "Audio & Subtitles — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716353562&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716353562&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/audio-analysis-processing",
+   "status": 200,
+   "title": "Audio Analysis & Processing — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716353763&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716353763&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/batch-processing-automation",
+   "status": 200,
+   "title": "Batch Processing & Automation — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716354124&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716354124&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/color-grading-correction-tools",
+   "status": 200,
+   "title": "Color Grading & Correction Tools — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716354209&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716354209&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/color-science-histogram-analysis",
+   "status": 200,
+   "title": "Color Science & Histogram Analysis — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716354622&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716354622&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/conversion-format-tools",
+   "status": 200,
+   "title": "Conversion & Format Tools — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716354720&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716354720&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/effects-compositing-tools",
+   "status": 200,
+   "title": "Effects & Compositing Tools — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716354861&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716354861&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/metadata-extraction-management",
+   "status": 200,
+   "title": "Metadata Extraction & Management — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716355010&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716355010&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/non-linear-editing-suites",
+   "status": 200,
+   "title": "Non-linear Editing Suites — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716355325&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716355325&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/quality-analysis-metrics",
+   "status": 200,
+   "title": "Quality Analysis & Metrics — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716355554&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716355554&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/scene-detection-segmentation",
+   "status": 200,
+   "title": "Scene Detection & Segmentation — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716355885&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716355885&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/subtitle-caption-tools",
+   "status": 200,
+   "title": "Subtitle & Caption Tools — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716356008&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716356008&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/vmaf-psnr-ssim-tools",
+   "status": 200,
+   "title": "VMAF PSNR SSIM Tools — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716356286&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716356286&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/video-analytics-benchmarking",
+   "status": 200,
+   "title": "Video Analytics & Benchmarking — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716356432&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716356432&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/category/media-tools?view=general",
+   "status": 200,
+   "title": "Media Processing & Video Editing Tools — Awesome Video",
+   "h1": "",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716356574&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716356574&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/category/players-clients",
+   "status": 200,
+   "title": "Open-Source Video Players & Client SDKs — Awesome Video",
+   "h1": "",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716356816&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716356816&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/browser-extensions",
+   "status": 200,
+   "title": "Browser Extensions — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716357107&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716357107&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/sub-subcategory/web-players",
+   "status": 200,
+   "title": "Web Players — Awesome Video",
+   "h1": "Loading sub-subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716357295&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716357295&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/desktop-players",
+   "status": 200,
+   "title": "Desktop Players — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716357691&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716357691&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/embedded-players",
+   "status": 200,
+   "title": "Embedded Players — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716357780&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716357780&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/frameworks-ui-components",
+   "status": 200,
+   "title": "Frameworks & UI Components — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716358077&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716358077&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/hardware-players",
+   "status": 200,
+   "title": "Hardware Players — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716358185&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716358185&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/mobile-web-players",
+   "status": 200,
+   "title": "Mobile & Web Players — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716358411&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716358411&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/sub-subcategory/iostvos",
+   "status": 200,
+   "title": "iOS/tvOS — Awesome Video",
+   "h1": "Loading sub-subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716358514&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716358514&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/mobile-players",
+   "status": 200,
+   "title": "Mobile Players — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716358878&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716358878&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/set-top-box-players",
+   "status": 200,
+   "title": "Set-top Box Players — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716358964&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716358964&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/sub-subcategory/chromecast",
+   "status": 200,
+   "title": "Chromecast — Awesome Video",
+   "h1": "Loading sub-subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716359445&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716359445&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/smart-tv-players",
+   "status": 200,
+   "title": "Smart TV Players — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716359336&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716359336&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/sub-subcategory/smart-tvs",
+   "status": 200,
+   "title": "Smart TVs — Awesome Video",
+   "h1": "Loading sub-subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716359532&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716359532&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/web-players",
+   "status": 200,
+   "title": "Web Players — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716359675&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716359675&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/category/players-clients?view=general",
+   "status": 200,
+   "title": "Open-Source Video Players & Client SDKs — Awesome Video",
+   "h1": "",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716360177&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716360177&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/category/protocols-transport",
+   "status": 200,
+   "title": "Streaming Protocols: HLS, DASH, WebRTC & RTMP — Awesome Video",
+   "h1": "",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716360276&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716360276&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/cmaf-fmp4-packaging",
+   "status": 200,
+   "title": "CMAF & fMP4 Packaging — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716361315&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716361315&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/adaptive-streaming",
+   "status": 200,
+   "title": "Adaptive Streaming — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716361208&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716361208&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/adaptive-bitrate-algorithms-tools",
+   "status": 200,
+   "title": "Adaptive Bitrate Algorithms & Tools — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716361117&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716361117&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/dash-manifest-tools",
+   "status": 200,
+   "title": "DASH Manifest Tools — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716361554&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716361554&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/dash-tools",
+   "status": 200,
+   "title": "DASH Tools — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716361666&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716361666&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/hls-manifest-parsers-generators",
+   "status": 200,
+   "title": "HLS Manifest Parsers & Generators — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716361928&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716361928&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/hls-tools",
+   "status": 200,
+   "title": "HLS Tools — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716362580&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716362580&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/low-latency-streaming-tools",
+   "status": 200,
+   "title": "Low-Latency Streaming Tools — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716362705&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716362705&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/transport-protocols",
+   "status": 200,
+   "title": "Transport Protocols — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716362906&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716362906&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/sub-subcategory/rist",
+   "status": 200,
+   "title": "RIST — Awesome Video",
+   "h1": "Loading sub-subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716363017&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716363017&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/category/protocols-transport?view=general",
+   "status": 200,
+   "title": "Streaming Protocols: HLS, DASH, WebRTC & RTMP — Awesome Video",
+   "h1": "",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716363299&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716363299&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/category/standards-industry",
+   "status": 200,
+   "title": "Video Standards & Industry Specifications — Awesome Video",
+   "h1": "",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716363484&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716363484&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/adaptive-streaming-standards",
+   "status": 200,
+   "title": "Adaptive Streaming Standards — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716363682&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716363682&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/sub-subcategory/official-specs",
+   "status": 200,
+   "title": "Official Specs — Awesome Video",
+   "h1": "Loading sub-subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716363948&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716363948&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/best-practices-guidelines",
+   "status": 200,
+   "title": "Best Practices & Guidelines — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716364051&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716364051&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/sub-subcategory/hdr-guidelines",
+   "status": 200,
+   "title": "HDR Guidelines — Awesome Video",
+   "h1": "Loading sub-subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716364140&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716364140&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/closed-captioning-subtitling-standards",
+   "status": 200,
+   "title": "Closed Captioning & Subtitling Standards — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716364519&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716364519&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/drm-content-protection-standards",
+   "status": 200,
+   "title": "DRM & Content Protection Standards — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716364620&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716364620&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/industry-forums-standards-bodies",
+   "status": 200,
+   "title": "Industry Forums & Standards Bodies — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716364839&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716364839&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/sub-subcategory/mpeg-forums",
+   "status": 200,
+   "title": "MPEG & Forums — Awesome Video",
+   "h1": "Loading sub-subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716365234&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716365234&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/specs-standards",
+   "status": 200,
+   "title": "Specs & Standards — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716365335&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716365335&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/vendors-hdr",
+   "status": 200,
+   "title": "Vendors & HDR — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716365472&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716365472&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/sub-subcategory/vendor-docs",
+   "status": 200,
+   "title": "Vendor Docs — Awesome Video",
+   "h1": "Loading sub-subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716365816&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716365816&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/subcategory/video-codec-specifications",
+   "status": 200,
+   "title": "Video Codec Specifications — Awesome Video",
+   "h1": "Loading subcategory…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716365904&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716365904&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/category/standards-industry?view=general",
+   "status": 200,
+   "title": "Video Standards & Industry Specifications — Awesome Video",
+   "h1": "",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716366119&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716366119&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/about",
+   "status": 200,
+   "title": "About — Awesome Video",
+   "h1": "About",
+   "links": 15,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716366423&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716366423&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/recommendations",
+   "status": 200,
+   "title": "AI-Powered Recommendations — Awesome Video",
+   "h1": "AI-Powered Recommendations",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716366538&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716366538&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/login",
+   "status": 200,
+   "title": "Sign In — Awesome Video",
+   "h1": "Sign in to Awesome Video",
+   "links": 11,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716366771&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716366771&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/categories",
+   "status": 200,
+   "title": "All Categories — Awesome Video",
+   "h1": "All Categories",
+   "links": 9,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716367062&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AEAAAAQ&ae=a&are=1&cid=1906978903.178371",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716367062&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AEAAAAQ&ae=a&are=1&cid=1906978903",
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716367062&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716367062&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/185020",
+   "status": 200,
+   "title": "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared — Awesome Video",
+   "h1": "100ms: RTMP vs WebRTC vs HLS - Live Video Streaming Protocols Compared",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716367194&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716367194&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/184751",
+   "status": 200,
+   "title": "2025 NAB Show: CineCentral — Awesome Video",
+   "h1": "2025 NAB Show: CineCentral",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716367298&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716367298&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/186231",
+   "status": 200,
+   "title": "2501world/transcoding-performance-trial: Runs FFmpeg transcoding processes simultaneously and measures CPU performance —",
+   "h1": "2501world/transcoding-performance-trial: Runs FFmpeg transcoding processes simultaneously and measures CPU performance",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716367652&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716367652&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/186145",
+   "status": 200,
+   "title": "3 Cases from a Video Expert: Encoding Basics — Awesome Video",
+   "h1": "3 Cases from a Video Expert: Encoding Basics",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716367741&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716367741&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/186477",
+   "status": 200,
+   "title": "3DLUT Creator — Awesome Video",
+   "h1": "3DLUT Creator",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716367946&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716367946&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/185570",
+   "status": 200,
+   "title": "4K Media | Free Ultra-HD / HDR / HLG / Dolby Vision 4K Video Demos — Awesome Video",
+   "h1": "4K Media | Free Ultra-HD / HDR / HLG / Dolby Vision 4K Video Demos",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716368282&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716368282&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/185971",
+   "status": 200,
+   "title": "507_hls_authoring_for_airplay_2. — Awesome Video",
+   "h1": "507_hls_authoring_for_airplay_2.",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716368456&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716368456&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/185970",
+   "status": 200,
+   "title": "510_validating_http_live_streams. — Awesome Video",
+   "h1": "510_validating_http_live_streams.",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716368566&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716368566&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/185983",
+   "status": 200,
+   "title": "515_hls_authoring_update — Awesome Video",
+   "h1": "515_hls_authoring_update",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716369026&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716369026&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/185860",
+   "status": 200,
+   "title": "9 Best Home Server Apps to Automate Media Management — Awesome Video",
+   "h1": "9 Best Home Server Apps to Automate Media Management",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716369180&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716369180&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/185180",
+   "status": 200,
+   "title": "A Brief History of Video Coding — Awesome Video",
+   "h1": "A Brief History of Video Coding",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716369276&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716369276&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/185224",
+   "status": 200,
+   "title": "A Brief History of Video Compression Standards: 1929 to 2020 — Awesome Video",
+   "h1": "A Brief History of Video Compression Standards: 1929 to 2020",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716369496&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716369496&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/184838",
+   "status": 200,
+   "title": "A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App — Awesome Video",
+   "h1": "A Comprehensive Guide To Develop A Live Video & On-demand Video Streaming App",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716369732&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716369732&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/185762",
+   "status": 200,
+   "title": "A Docker container with the video streaming tools you need — Awesome Video",
+   "h1": "A Docker container with the video streaming tools you need",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716369889&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716369889&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/185752",
+   "status": 200,
+   "title": "A Large-Scale Comparison of x264, x265, and libvpx — Awesome Video",
+   "h1": "Loading resource…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716370294&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716370294&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/185829",
+   "status": 200,
+   "title": "A short history of video coding — Awesome Video",
+   "h1": "Loading resource…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716370382&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716370382&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/186305",
+   "status": 200,
+   "title": "AAC Audio Coding Standard - ISO/IEC 14496-3 — Awesome Video",
+   "h1": "",
+   "links": 0,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716370562&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716370562&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/187911",
+   "status": 200,
+   "title": "ABR Video Player — Awesome Video",
+   "h1": "Loading resource…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716370925&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716370925&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/185199",
+   "status": 200,
+   "title": "ACM Mile-High Video 2025 — Awesome Video",
+   "h1": "Loading resource…",
+   "links": 10,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716371140&gcd=13l3l3l3l1l1&npa=0&dma=0&are=1&cid=1906978903.1783716334&frm=0&pscdl=",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716371140&gcd=13l3l3l3l1l1&npa=0&dma=0&are=1&cid=1906978903.1783716334&frm=0",
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716371140&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716371140&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/186236",
+   "status": 200,
+   "title": "AK1194/Video-Compression-motion-estimation-block-video-encoder: This repository is about video compression, and more spe",
+   "h1": "AK1194/Video-Compression-motion-estimation-block-video-encoder: This repository is about video compression, and more spe",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716371430&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716371430&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/184847",
+   "status": 200,
+   "title": "AMD Advanced Media Acceleration (AMA) SDK — Awesome Video",
+   "h1": "AMD Advanced Media Acceleration (AMA) SDK",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716371833&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716371833&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/186623",
+   "status": 200,
+   "title": "AMD Advanced Media Framework (AMF SDK) — Awesome Video",
+   "h1": "AMD Advanced Media Framework (AMF SDK)",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716372376&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716372376&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/185201",
+   "status": 200,
+   "title": "AMF (Advanced Media Framework) — Awesome Video",
+   "h1": "AMF (Advanced Media Framework)",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716373050&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716373050&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/188002",
+   "status": 200,
+   "title": "AOM HDR10+ AV1 Metadata Handling Specification — Awesome Video",
+   "h1": "AOM HDR10+ AV1 Metadata Handling Specification",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716373987&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716373987&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/186102",
+   "status": 200,
+   "title": "AOMediaCodec/av1-rtp-spec — Awesome Video",
+   "h1": "AOMediaCodec/av1-rtp-spec",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716374503&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716374503&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/186370",
+   "status": 200,
+   "title": "AV1 Bitstream & Decoding Specification (1.0.0 with Errata 1) — Awesome Video",
+   "h1": "AV1 Bitstream & Decoding Specification (1.0.0 with Errata 1)",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716375630&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716375630&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/187946",
+   "status": 200,
+   "title": "ASWF Encoding Guidelines: Encode VP9 — Awesome Video",
+   "h1": "ASWF Encoding Guidelines: Encode VP9",
+   "links": 221,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716375535&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716375535&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/185610",
+   "status": 200,
+   "title": "AV1 Codec — Awesome Video",
+   "h1": "AV1 Codec",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716375713&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716375713&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/185563",
+   "status": 200,
+   "title": "AOSP and AAOS Meetup Archive — Awesome Video",
+   "h1": "AOSP and AAOS Meetup Archive",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716375379&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716375379&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/185426",
+   "status": 200,
+   "title": "AV1 Video Codec — Awesome Video",
+   "h1": "AV1 Video Codec",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716375870&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716375870&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/186157",
+   "status": 200,
+   "title": "AV1 decoder model — Awesome Video",
+   "h1": "AV1 decoder model",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716375987&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716375987&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716375987&gcd=13l3l3l3l1l1&npa=0&dma=0&are=1&cid=1906978903.1783716334&frm=0&pscdl=",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716375987&gcd=13l3l3l3l1l1&npa=0&dma=0&are=1&cid=1906978903.1783716334&frm=0",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/186494",
+   "status": 200,
+   "title": "AV1 vs HEVC – Bitmovin Compression Efficiency Results — Awesome Video",
+   "h1": "AV1 vs HEVC – Bitmovin Compression Efficiency Results",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716376904&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716376904&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/186307",
+   "status": 200,
+   "title": "AVC/HEVC in ISOBMFF - ISO/IEC 14496-15 — Awesome Video",
+   "h1": "AVC/HEVC in ISOBMFF - ISO/IEC 14496-15",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716377022&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716377022&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/186303",
+   "status": 200,
+   "title": "AVC/h264 Video Coding Standard - ISO/IEC 14496-10 — Awesome Video",
+   "h1": "AVC/h264 Video Coding Standard - ISO/IEC 14496-10",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716377112&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716377112&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/185134",
+   "status": 200,
+   "title": "AVIXA AV Standards — Awesome Video",
+   "h1": "AVIXA AV Standards",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716377351&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716377351&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/184763",
+   "status": 200,
+   "title": "AVPlayer — Awesome Video",
+   "h1": "AVPlayer",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716377467&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716377467&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/185090",
+   "status": 200,
+   "title": "AVideo CDN Storage — Awesome Video",
+   "h1": "AVideo CDN Storage",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716377592&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716377592&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/185499",
+   "status": 200,
+   "title": "AVstandards — Awesome Video",
+   "h1": "AVstandards",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716378069&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716378069&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/185001",
+   "status": 200,
+   "title": "AWS CDN Video Streaming Service — Awesome Video",
+   "h1": "AWS CDN Video Streaming Service",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716378154&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716378154&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/185951",
+   "status": 200,
+   "title": "AWS CloudFront Live failover — Awesome Video",
+   "h1": "AWS CloudFront Live failover",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716378280&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716378280&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/185950",
+   "status": 200,
+   "title": "AWS CloudFront for Live Streaming — Awesome Video",
+   "h1": "AWS CloudFront for Live Streaming",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716378573&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716378573&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/185022",
+   "status": 200,
+   "title": "AWS Elemental Live — Awesome Video",
+   "h1": "AWS Elemental Live",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716378692&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716378692&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/185221",
+   "status": 200,
+   "title": "AWS Elemental Media Services — Awesome Video",
+   "h1": "AWS Elemental Media Services",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716379045&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716379045&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/185489",
+   "status": 200,
+   "title": "AWS Elemental MediaConnect — Awesome Video",
+   "h1": "AWS Elemental MediaConnect",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716379244&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716379244&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/185176",
+   "status": 200,
+   "title": "AWS Elemental MediaConvert — Awesome Video",
+   "h1": "AWS Elemental MediaConvert",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716379353&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716379353&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/184872",
+   "status": 200,
+   "title": "AWS Elemental MediaLive — Awesome Video",
+   "h1": "AWS Elemental MediaLive",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716379570&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716379570&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/185556",
+   "status": 200,
+   "title": "AWS Elemental MediaPackage — Awesome Video",
+   "h1": "AWS Elemental MediaPackage",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716379854&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716379854&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/185557",
+   "status": 200,
+   "title": "AWS Elemental MediaTailor — Awesome Video",
+   "h1": "AWS Elemental MediaTailor",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716380010&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716380010&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/185073",
+   "status": 200,
+   "title": "AWS Media & Entertainment Cloud Solutions — Awesome Video",
+   "h1": "AWS Media & Entertainment Cloud Solutions",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716380410&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716380410&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/184789",
+   "status": 200,
+   "title": "AWS Media Services — Awesome Video",
+   "h1": "AWS Media Services",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716380513&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716380513&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/184877",
+   "status": 200,
+   "title": "AWS Media Services Training — Awesome Video",
+   "h1": "AWS Media Services Training",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716380688&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716380688&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/184992",
+   "status": 200,
+   "title": "AWS SPEKE Reference Server — Awesome Video",
+   "h1": "AWS SPEKE Reference Server",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716380878&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716380878&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716380878&gcd=13l3l3l3l1l1&npa=0&dma=0&are=1&cid=1906978903.1783716334&frm=0&ngs=1&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716380878&gcd=13l3l3l3l1l1&npa=0&dma=0&are=1&cid=1906978903.1783716334&frm=0",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/186609",
+   "status": 200,
+   "title": "Able Player — Awesome Video",
+   "h1": "Able Player",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716381141&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716381141&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  },
+  {
+   "url": "https://awesome.video/resource/186212",
+   "status": 200,
+   "title": "About Frame Rates or Why 29.97? — Awesome Video",
+   "h1": "About Frame Rates or Why 29.97?",
+   "links": 14,
+   "overflow": false,
+   "notFound": false,
+   "consoleErrs": [
+    "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716381262&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783716334&",
+    "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783716381262&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=1906978903.1783",
+    "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.c"
+   ],
+   "netErrs": []
+  }
+ ],
+ "total": 205
+}

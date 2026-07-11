@@ -1,0 +1,6 @@
+BUG-045 verdict (RE-PROBE on FRESH build 2026-07-11)
+date 2026-07-11
+probe: /subcategory/ffmpeg -> 404, in-sitemap=True
+actual: /subcategory/ffmpeg -> 404, in-sitemap=True
+classification: REPRODUCES
+reason: 404 in sitemap

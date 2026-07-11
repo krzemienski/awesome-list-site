@@ -1,0 +1,6 @@
+BUG-048 verdict
+date 2026-07-11
+probe: GET /sitemap.xml
+actual: loc total=2006 unique=2006 dup=0
+classification: ALREADY-FIXED
+reason: no duplicates

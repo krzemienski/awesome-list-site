@@ -38,8 +38,22 @@ replit.md
 
 # Testing
 coverage/
+tests/
 *.test.ts
 *.spec.ts
+
+# Local audit, planning, and agent evidence
+hunt-workspace/
+plans/
+evidence/
+e2e-evidence/
+awesome-list-site-ds/
+.campaign/
+.cursor/
+.serena/
+.specs/
+.mcp.json
+scripts/p7-*.mjs
 
 # Auto Claude
 .auto-claude/

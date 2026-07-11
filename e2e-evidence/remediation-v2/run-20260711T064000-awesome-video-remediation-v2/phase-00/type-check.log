@@ -1,0 +1,5 @@
+
+> rest-express@1.0.0 type-check
+> tsc --noEmit
+
+exit_code=0

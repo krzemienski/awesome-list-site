@@ -397,31 +397,54 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
   const path = url.split("?")[0].replace(/\/+$/, "") || "/";
   const page = parsePage(url);
 
-  // Home
-  if (path === "/" || path === "") {
-    const m = defaultMeta(path);
-    let categories: { name: string; slug: string; count: number }[] = [];
-    try {
-      const data = await getTreeCached();
-      const resourceCount = data?.resources?.length ?? 2000;
-      const categoryCount = data?.categories?.length ?? 80;
-      m.title = homeSeoTitle(resourceCount);
-      m.description = homeSeoDescription(resourceCount, categoryCount);
-      m.image = ogImage(SITE_NAME, "Home", resourceCount);
-      categories = (data?.categories ?? []).map((c: any) => ({
-        name: c.name,
-        slug: c.slug,
-        count: countNodeResources(c),
-      }));
-    } catch {}
-    m.structuredData = webSiteSchema(m.description);
-    const bodyHtml = renderHomeContent({
-      heading: SITE_NAME,
-      description: m.description,
-      categories,
-    });
-    return { meta: m, found: true, bodyHtml };
-  }
+// BUG-004 / BUG-035: static header chrome for HTML-grounded clients (the SPA's
+// pre-hydration shell sees an empty top-bar / zero search inputs). Emits the
+// same affordances AppHeader.tsx renders after hydration, so crawlers and
+// non-JS visitors can find the search form and toggle the navigation drawer.
+function homeShellChrome(): string {
+  return [
+    '<header class="ssr-chrome" data-testid="ssr-home-header">',
+    '  <button type="button" aria-label="Toggle navigation menu" data-testid="mobile-drawer-trigger" class="ssr-drawer-trigger">☰</button>',
+    '  <form action="/search" method="get" role="search" aria-label="Search resources" class="ssr-search-form">',
+    '    <input type="search" name="q" placeholder="Search resources…" aria-label="Search" />',
+    '    <button type="submit">Search</button>',
+    '  </form>',
+    '  <nav aria-label="Primary"></nav>',
+    '</header>',
+  ].join("\n");
+}
+
+ // Home
+ if (path === "/" || path === "") {
+   const m = defaultMeta(path);
+   let categories: { name: string; slug: string; count: number }[] = [];
+   try {
+     const data = await getTreeCached();
+     const resourceCount = data?.resources?.length ?? 2000;
+     const categoryCount = data?.categories?.length ?? 80;
+     m.title = homeSeoTitle(resourceCount);
+     m.description = homeSeoDescription(resourceCount, categoryCount);
+     m.image = ogImage(SITE_NAME, "Home", resourceCount);
+     categories = (data?.categories ?? []).map((c: any) => ({
+       name: c.name,
+       slug: c.slug,
+       count: countNodeResources(c),
+     }));
+   } catch {}
+   m.structuredData = webSiteSchema(m.description);
+   const bodyHtml =
+     homeShellChrome() +
+     renderHomeContent({
+       heading: SITE_NAME,
+       description: m.description,
+       categories,
+     });
+   return { meta: m, found: true, bodyHtml };
+ }
+
+  // Static page routes (every fixed client route in App.tsx). These always
+
+  // Static page routes
 
   // Static page routes (every fixed client route in App.tsx). These always
   // resolve to a real page → HTTP 200, even when auth-gated (the SPA renders
@@ -647,31 +670,70 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
           : {}),
         categories,
       });
-    } else if (path === "/login" || path === "/register") {
+    } else if (path === "/login" || path === "/register" || path === "/reset-password" || path === "/forgot-password") {
       // Noindex utility pages still get a minimal readable body so non-JS
       // crawlers (GPTBot, ClaudeBot, PerplexityBot, Applebot-Extended) see real
       // content instead of an empty SPA shell. noindex governs indexing only —
       // the pages remain crawlable and readable.
+      // BUG-042 / BUG-044: /reset-password and /forgot-password render zero
+      // inputs at the SPA shell — emit real <form> markup so HTML-grounded
+      // tooling (search bots, accessibility readers, password-manager form
+      // autofill) see the fields. The client hydrates its own interactive
+      // form over this markup.
       const isLogin = path === "/login";
+      const isRegister = path === "/register";
+      const isForgot = path === "/forgot-password";
+      const isReset = path === "/reset-password";
+      const staticForm = isForgot || isReset ? {
+        action: isReset ? "/api/auth/reset-password" : "/api/auth/forgot-password",
+        heading: isReset ? "Set a new password" : "Request a password reset link",
+        submitLabel: isReset ? "Update password" : "Send reset link",
+        fields: isReset
+          ? [
+              { name: "newPassword", label: "New password", placeholder: "At least 8 characters", required: true },
+              { name: "confirmPassword", label: "Confirm new password", required: true },
+            ]
+          : [
+              { name: "email", label: "Your account email", placeholder: "you@example.com", required: true },
+            ],
+      } : undefined;
       bodyHtml = renderStaticPageContent({
         heading: isLogin
           ? "Sign in to Awesome Video"
-          : "Create an Awesome Video account",
+          : isRegister
+            ? "Create an Awesome Video account"
+            : isReset
+              ? "Set a New Password"
+              : "Reset your Awesome Video password",
         description: m.description,
         paragraphs: [
           isLogin
             ? "Welcome back. Sign in to access your bookmarks, submitted resources, and personalized learning journeys."
-            : "Join the community to submit and save resources. A free account lets you bookmark tools, suggest new resources, and track your learning journeys.",
+            : isRegister
+              ? "Join the community to submit and save resources. A free account lets you bookmark tools, suggest new resources, and track your learning journeys."
+              : isReset
+                ? "Choose a new password for your Awesome Video account. The reset link from your email should already have the secret token appended; submit both the new password and a confirmation."
+                : "Enter the email tied to your account and we'll send you a one-time password reset link. The link expires in one hour.",
         ],
         links: isLogin
           ? [
               { path: "/register", label: "Create an account" },
               { path: "/submit", label: "Submit a resource" },
             ]
-          : [
-              { path: "/login", label: "Sign in" },
-              { path: "/submit", label: "Submit a resource" },
-            ],
+          : isRegister
+            ? [
+                { path: "/login", label: "Sign in" },
+                { path: "/submit", label: "Submit a resource" },
+              ]
+            : isReset
+              ? [
+                  { path: "/login", label: "Back to login" },
+                  { path: "/forgot-password", label: "Request a new reset link" },
+                ]
+              : [
+                  { path: "/login", label: "Back to login" },
+                ],
+        ...(staticForm ? { form: staticForm } : {}),
       });
     } else if (path === "/search") {
       // BUG-002: render real SSR search results for ?q= (still noindex).
@@ -1075,9 +1137,8 @@ async function resolveRouteUncached(url: string): Promise<ResolvedRoute> {
   }
 
   // Anything else is an unknown route → soft 404.
-  return { meta: notFoundMeta(path), found: false };
+   return { meta: notFoundMeta(path), found: false };
 }
-
 const META_BLOCK_MARKER = "<!--OG_META_INJECTED-->";
 
 function escapeHtml(s: string) {

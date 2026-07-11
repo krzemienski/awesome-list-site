@@ -1,0 +1,70 @@
+{
+  "results": [
+    {
+      "id": "landing-loads",
+      "pass": true,
+      "detail": "title=\"Awesome Video — 1934+ Curated Video Tools, Codecs & Streaming Resources\""
+    },
+    {
+      "id": "search-affordance-present",
+      "pass": false,
+      "detail": "search input count=0"
+    },
+    {
+      "id": "search-returns-results",
+      "pass": true,
+      "detail": "/search?q=ffmpeg body mentions an ffmpeg-related result=true"
+    },
+    {
+      "id": "login-no-prefill",
+      "pass": true,
+      "detail": "email value=\"\" placeholder=\"admin@example.com\""
+    },
+    {
+      "id": "login-email-labelled",
+      "pass": true,
+      "detail": "email has label/aria-label=true"
+    },
+    {
+      "id": "nav-content /about",
+      "pass": true,
+      "detail": "textLen=6114 headings=11 sample=\"About  awesome.video is the web home of awesome-video — a community-curated list\""
+    },
+    {
+      "id": "nav-content /categories",
+      "pass": true,
+      "detail": "textLen=403 headings=1 sample=\"All Categories  Browse every category of curated video development resources.  9\""
+    },
+    {
+      "id": "nav-content /recommendations",
+      "pass": true,
+      "detail": "textLen=3044 headings=2 sample=\"AI-Powered Recommendations  Get personalized resource recommendations based on y\""
+    },
+    {
+      "id": "nav-content /journeys",
+      "pass": true,
+      "detail": "textLen=212 headings=2 sample=\"Learning Journeys  Explore structured learning paths to master new skills step b\""
+    },
+    {
+      "id": "share-button-present",
+      "pass": true,
+      "detail": "share button count=1 on /resource/1949"
+    },
+    {
+      "id": "no-hscroll-mobile",
+      "pass": true,
+      "detail": "scrollWidth-clientWidth=0px at 375px"
+    },
+    {
+      "id": "no-hscroll-tablet",
+      "pass": true,
+      "detail": "scrollWidth-clientWidth=0px at 768px"
+    },
+    {
+      "id": "console-clean",
+      "pass": true,
+      "detail": "0 console errors"
+    }
+  ],
+  "consoleErrs": []
+}

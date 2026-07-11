@@ -1,0 +1,6 @@
+BUG-021 verdict
+date 2026-07-11
+probe: see comment
+actual: /sitemap.xml -> 200, ffmpeg dup=1
+classification: ALREADY-FIXED
+reason: 

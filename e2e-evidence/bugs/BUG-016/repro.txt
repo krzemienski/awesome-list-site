@@ -1,0 +1,6 @@
+BUG-016 verdict
+date 2026-07-11
+probe: see comment
+actual: POST /api/resources (anon) -> 401
+classification: ALREADY-FIXED
+reason: anon POST returns 401 — auth gate works

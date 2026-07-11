@@ -1,0 +1,143 @@
+{
+  "results": [
+    {
+      "id": "V1-row-click-navigates",
+      "pass": true,
+      "detail": "tag=a, href=/category/community-events, clicked → url=http://localhost:5000/category/community-events"
+    },
+    {
+      "id": "V2-chevron-toggles-not-navigates",
+      "pass": true,
+      "detail": "url unchanged=true, chevron aria-expanded=true"
+    },
+    {
+      "id": "V3-keyboard-enter-on-row-navigates",
+      "pass": true,
+      "detail": "Enter on row-cat-community-events → url=http://localhost:5000/category/community-events"
+    },
+    {
+      "id": "V4-keyboard-enter-on-chevron-toggles",
+      "pass": true,
+      "detail": "url unchanged=true, aria-expanded=true"
+    },
+    {
+      "id": "V4b-keyboard-space-on-chevron-toggles",
+      "pass": true,
+      "detail": "url unchanged=true, aria-expanded=true"
+    },
+    {
+      "id": "V4c-collapse-roundtrip",
+      "pass": true,
+      "detail": "after second click, aria-expanded=false"
+    },
+    {
+      "id": "V5-font-pick-writes-state",
+      "pass": true,
+      "detail": "localStorage=jetbrains, --font-sans='JetBrains Mono', ui-monospace, monospace"
+    },
+    {
+      "id": "V6-font-persists-across-routes",
+      "pass": true,
+      "detail": "on /login: ls=jetbrains, --font-sans='JetBrains Mono', ui-monospace, monospace, body=Inter, system-ui, sans-serif"
+    },
+    {
+      "id": "V7-font-survives-hard-reload",
+      "pass": true,
+      "detail": "after F5 on /login: --font-sans='JetBrains Mono', ui-monospace, monospace"
+    },
+    {
+      "id": "V8-system-default-clears-override",
+      "pass": true,
+      "detail": "ls=system, --font-sans=\"\""
+    },
+    {
+      "id": "V9-advanced-active-tab-styled",
+      "pass": true,
+      "detail": "{\"text\":\"Explorer\",\"color\":\"rgb(255, 61, 82)\",\"borderBottom\":\"rgb(255, 61, 82)\",\"bg\":\"rgba(244, 243, 238, 0.05)\"}"
+    },
+    {
+      "id": "V11-font-map-drift",
+      "pass": true,
+      "detail": "all 6 font ids agree between boot script and FONT_OPTIONS"
+    },
+    {
+      "id": "V10-no-unexpected-console-errors",
+      "pass": true,
+      "detail": "0 errors"
+    }
+  ],
+  "consoleMsgs": [
+    "[debug] [vite] connecting...",
+    "[debug] [vite] connected.",
+    "[info] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+    "[debug] [vite] connecting...",
+    "[debug] [vite] connected.",
+    "[info] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+    "[debug] [vite] connecting...",
+    "[debug] [vite] connected.",
+    "[info] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+    "[debug] [vite] connecting...",
+    "[debug] [vite] connected.",
+    "[info] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+    "[debug] [vite] connecting...",
+    "[debug] [vite] connected.",
+    "[info] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+    "[debug] [vite] connecting...",
+    "[debug] [vite] connected.",
+    "[info] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+    "[debug] [vite] connecting...",
+    "[debug] [vite] connected.",
+    "[info] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+    "[debug] [vite] connecting...",
+    "[debug] [vite] connected.",
+    "[info] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+    "[debug] [vite] connecting...",
+    "[debug] [vite] connected.",
+    "[info] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+    "[debug] [vite] connecting...",
+    "[debug] [vite] connected.",
+    "[info] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+    "[debug] [vite] connecting...",
+    "[debug] [vite] connected.",
+    "[info] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+    "[debug] [vite] connecting...",
+    "[debug] [vite] connected.",
+    "[info] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+    "[debug] [vite] connecting...",
+    "[debug] [vite] connected.",
+    "[info] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+    "[debug] [vite] connecting...",
+    "[debug] [vite] connected.",
+    "[info] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+    "[debug] [vite] connecting...",
+    "[debug] [vite] connected.",
+    "[info] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+    "[debug] [vite] connecting...",
+    "[debug] [vite] connected.",
+    "[info] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+    "[debug] [vite] connecting...",
+    "[debug] [vite] connected.",
+    "[info] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+    "[debug] [vite] connecting...",
+    "[debug] [vite] connected.",
+    "[info] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+    "[debug] [vite] connecting...",
+    "[debug] [vite] connected.",
+    "[info] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+    "[debug] [vite] connecting...",
+    "[debug] [vite] connected.",
+    "[info] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+    "[debug] [vite] connecting...",
+    "[debug] [vite] connected.",
+    "[info] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+    "[debug] [vite] connecting...",
+    "[debug] [vite] connected.",
+    "[info] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+    "[debug] [vite] connecting...",
+    "[debug] [vite] connected.",
+    "[info] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+    "[debug] [vite] connecting...",
+    "[debug] [vite] connected.",
+    "[info] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold"
+  ]
+}

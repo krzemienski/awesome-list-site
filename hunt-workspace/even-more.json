@@ -1,0 +1,196 @@
+{
+ "sitemap": {
+  "count": 2155,
+  "sample": [
+   "https://awesome.video/",
+   "https://awesome.video/categories",
+   "https://awesome.video/journeys",
+   "https://awesome.video/advanced",
+   "https://awesome.video/about"
+  ],
+  "sampleTail": [
+   "https://awesome.video/journey/6",
+   "https://awesome.video/journey/7",
+   "https://awesome.video/journey/8",
+   "https://awesome.video/journey/9",
+   "https://awesome.video/journey/10"
+  ]
+ },
+ "sitemapDups": [
+  [
+   "https://awesome.video/sub-subcategory/podcasts-webinars",
+   2
+  ],
+  [
+   "https://awesome.video/sub-subcategory/cloud-platforms",
+   3
+  ],
+  [
+   "https://awesome.video/sub-subcategory/subtitles-captions",
+   6
+  ],
+  [
+   "https://awesome.video/sub-subcategory/av1",
+   3
+  ],
+  [
+   "https://awesome.video/sub-subcategory/hevc",
+   4
+  ],
+  [
+   "https://awesome.video/sub-subcategory/audio",
+   6
+  ],
+  [
+   "https://awesome.video/sub-subcategory/ffmpeg",
+   8
+  ],
+  [
+   "https://awesome.video/sub-subcategory/quality-testing",
+   8
+  ],
+  [
+   "https://awesome.video/sub-subcategory/roku",
+   6
+  ],
+  [
+   "https://awesome.video/sub-subcategory/storage-solutions",
+   2
+  ],
+  [
+   "https://awesome.video/sub-subcategory/dash",
+   7
+  ],
+  [
+   "https://awesome.video/sub-subcategory/hls",
+   11
+  ],
+  [
+   "https://awesome.video/sub-subcategory/android",
+   3
+  ],
+  [
+   "https://awesome.video/sub-subcategory/web-players",
+   4
+  ],
+  [
+   "https://awesome.video/sub-subcategory/iostvos",
+   2
+  ],
+  [
+   "https://awesome.video/sub-subcategory/rist",
+   2
+  ],
+  [
+   "https://awesome.video/sub-subcategory/official-specs",
+   3
+  ],
+  [
+   "https://awesome.video/sub-subcategory/mpeg-forums",
+   3
+  ]
+ ],
+ "apiCategories": {
+  "status": 200,
+  "body": "[{\"id\":1091,\"name\":\"Community & Events\",\"slug\":\"community-events\",\"resourceCount\":87},{\"id\":1085,\"name\":\"Encoding & Codecs\",\"slug\":\"encoding-codecs\",\"resourceCount\":336},{\"id\":1090,\"name\":\"General Tools\",\"slug\":\"general-tools\",\"resourceCount\":175},{\"id\":1089,\"name\":\"Infrastructure & Delivery\",\"slug\":\"infrastructure-delivery\",\"resourceCount\":207},{\"id\":1083,\"name\":\"Intro & Learning\",\"slug\":\"intro-learning\",\"resourceCount\":194},{\"id\":1087,\"name\":\"Media Tools\",\"slug\":\"media-tools\",\"resourceCount\":272},{\"id\":1086,\"name\":\"Players & Clients\",\"slug\":\"players-clients\",\"resourceCount\":242},{\"id\":1084,\""
+ },
+ "hdr__": {
+  "status": 200,
+  "ct": "text/html; charset=UTF-8",
+  "cache": "public, max-age=0",
+  "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.",
+  "xfo": "DENY",
+  "cf": "no-cf-hdr"
+ },
+ "hdr__api_health": {
+  "status": 200,
+  "ct": "application/json; charset=utf-8",
+  "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.",
+  "xfo": "DENY",
+  "cf": "no-cf-hdr"
+ },
+ "hdr__api_resources": {
+  "status": 200,
+  "ct": "application/json; charset=utf-8",
+  "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.",
+  "xfo": "DENY",
+  "cf": "no-cf-hdr"
+ },
+ "hdr__api_categories": {
+  "status": 200,
+  "ct": "application/json; charset=utf-8",
+  "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.",
+  "xfo": "DENY",
+  "cf": "no-cf-hdr"
+ },
+ "unauth_post__api_admin_categories": {
+  "status": 401,
+  "body": "{\"message\":\"Unauthorized\"}"
+ },
+ "unauth_post__api_admin_categories_edit": {
+  "status": 404,
+  "body": "{\"message\":\"Not found\"}"
+ },
+ "unauth_post__api_admin_resources_edit": {
+  "status": 404,
+  "body": "{\"message\":\"Not found\"}"
+ },
+ "unauth_post__api_admin_users": {
+  "status": 404,
+  "body": "{\"message\":\"Not found\"}"
+ },
+ "unauth_post__api_admin_users_delete": {
+  "status": 404,
+  "body": "{\"message\":\"Not found\"}"
+ },
+ "sitemap__sitemap-0_xml": {
+  "status": 200,
+  "bytes": 9067
+ },
+ "sitemap__sitemap_index_xml": {
+  "status": 200,
+  "bytes": 9067
+ },
+ "sitemap__sitemap_sitemap_xml": {
+  "status": 200,
+  "bytes": 9067
+ },
+ "loginHiddenFields": [],
+ "notFound": {
+  "status": 404,
+  "txt": "Skip to main content\nAwesome Video\n1,946 resources\nNavigation\nHome\nSubmit Resource\nLearning Journeys\nAdvanced\nTheme\nCategories\nCommunity & Events\n87\nCommunity Groups\n5\nOnline Forums\n3\nEvents & Conferences\n8\nPodcasts & Webinars\n4\nGeneral\n74\nEncoding & Codecs\n336\nBenchmarking & Performance Tools for Codecs\n2\nCloud-Based Encoding Solutions\n12\nCloud Platforms\n1\nSubtitles & Captions\n1\nCodecs\n16\nAV1\n2\nHEVC\n3\nVP9\n4\nComparative Analysis of Codecs\n3\nContainerization & Packaging Tools\n27\nAudio\n5\nFFmpeg\n3\nOrigin Servers\n1\nEncoding Tools\n94\nFFMPEG\n12\nFFmpeg-Based Tools\n30\nFFmpeg\n16\nHardware Accelerated Transcoding\n5\nHardware Codecs & Acceleration\n2\nMulti-format Packaging Tools\n6\nNext-Generation Codecs AV1 VVC\n4\nOpen Source Encoder Projects\n6\nAV1\n2\nReal-Time Encoding Solutions\n8\nScripting & Automation ",
+  "links": 218
+ },
+ "canon__category_encoding-codecs": {
+  "status": 200,
+  "canonical": "https://awesome.video/category/encoding-codecs"
+ },
+ "canon__resource_188025": {
+  "status": 200,
+  "canonical": "https://awesome.video/resource/188025"
+ },
+ "canon__journeys": {
+  "status": 200,
+  "canonical": "https://awesome.video/journeys"
+ },
+ "canon__advanced": {
+  "status": 200,
+  "canonical": "https://awesome.video/advanced"
+ },
+ "ogImage": {
+  "status": 200,
+  "bytes": 53946,
+  "head": "89504e470d0a1a0a0000000d49484452"
+ },
+ "cookiesDomain": [
+  {
+   "name": "connect.sid",
+   "domain": "awesome.video",
+   "path": "/",
+   "httpOnly": true,
+   "secure": true,
+   "sameSite": "Lax",
+   "expires": 1784322109.450703
+  }
+ ]
+}

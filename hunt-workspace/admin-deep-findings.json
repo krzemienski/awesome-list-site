@@ -1,0 +1,505 @@
+{
+  "findings": [],
+  "consoleErrs": [
+    {
+      "type": "error",
+      "text": "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+    },
+    {
+      "type": "error",
+      "text": "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717324633&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&ngs=1&pscdl=noapi&rcb=12&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B24.0.0."
+    },
+    {
+      "type": "error",
+      "text": "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717324633&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&ngs=1&pscdl=noapi&rcb=12&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B"
+    },
+    {
+      "type": "error",
+      "text": "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717324633&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&ngs=1&pscdl=noapi&rcb=12&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B24.0.0."
+    },
+    {
+      "type": "error",
+      "text": "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717324633&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&ngs=1&pscdl=noapi&rcb=12&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B"
+    },
+    {
+      "type": "error",
+      "text": "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+    },
+    {
+      "type": "error",
+      "text": "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717403535&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&pscdl=noapi&rcb=8&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B24.0.0.0&uam=&"
+    },
+    {
+      "type": "error",
+      "text": "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717403535&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&pscdl=noapi&rcb=8&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B24.0.0."
+    },
+    {
+      "type": "error",
+      "text": "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717403535&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&pscdl=noapi&rcb=8&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B24.0.0.0&uam=&"
+    },
+    {
+      "type": "error",
+      "text": "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717403535&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&pscdl=noapi&rcb=8&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B24.0.0."
+    },
+    {
+      "type": "error",
+      "text": "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+    },
+    {
+      "type": "error",
+      "text": "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717410329&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&ngs=1&pscdl=noapi&rcb=2&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B24.0.0.0"
+    },
+    {
+      "type": "error",
+      "text": "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717410329&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&ngs=1&pscdl=noapi&rcb=2&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B2"
+    },
+    {
+      "type": "error",
+      "text": "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717410329&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&ngs=1&pscdl=noapi&rcb=2&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B24.0.0.0"
+    },
+    {
+      "type": "error",
+      "text": "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717410329&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&ngs=1&pscdl=noapi&rcb=2&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B2"
+    },
+    {
+      "type": "error",
+      "text": "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+    },
+    {
+      "type": "error",
+      "text": "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717416721&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&pscdl=noapi&rcb=9&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B24.0.0.0&uam=&"
+    },
+    {
+      "type": "error",
+      "text": "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717416721&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&pscdl=noapi&rcb=9&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B24.0.0."
+    },
+    {
+      "type": "error",
+      "text": "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717416721&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&pscdl=noapi&rcb=9&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B24.0.0.0&uam=&"
+    },
+    {
+      "type": "error",
+      "text": "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717416721&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&pscdl=noapi&rcb=9&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B24.0.0."
+    },
+    {
+      "type": "error",
+      "text": "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+    },
+    {
+      "type": "error",
+      "text": "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717423147&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&ngs=1&pscdl=noapi&rcb=2&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B24.0.0.0"
+    },
+    {
+      "type": "error",
+      "text": "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717423147&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&ngs=1&pscdl=noapi&rcb=2&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B2"
+    },
+    {
+      "type": "error",
+      "text": "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717423147&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&ngs=1&pscdl=noapi&rcb=2&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B24.0.0.0"
+    },
+    {
+      "type": "error",
+      "text": "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717423147&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&ngs=1&pscdl=noapi&rcb=2&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B2"
+    },
+    {
+      "type": "error",
+      "text": "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+    },
+    {
+      "type": "error",
+      "text": "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717429476&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&ngs=1&pscdl=noapi&rcb=19&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B24.0.0."
+    },
+    {
+      "type": "error",
+      "text": "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717429476&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&ngs=1&pscdl=noapi&rcb=19&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B"
+    },
+    {
+      "type": "error",
+      "text": "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717429476&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&ngs=1&pscdl=noapi&rcb=19&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B24.0.0."
+    },
+    {
+      "type": "error",
+      "text": "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717429476&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&ngs=1&pscdl=noapi&rcb=19&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B"
+    },
+    {
+      "type": "error",
+      "text": "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+    },
+    {
+      "type": "error",
+      "text": "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717435856&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&ngs=1&pscdl=noapi&rcb=3&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B24.0.0.0"
+    },
+    {
+      "type": "error",
+      "text": "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717435856&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&ngs=1&pscdl=noapi&rcb=3&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B2"
+    },
+    {
+      "type": "error",
+      "text": "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717435856&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&ngs=1&pscdl=noapi&rcb=3&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B24.0.0.0"
+    },
+    {
+      "type": "error",
+      "text": "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717435856&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&ngs=1&pscdl=noapi&rcb=3&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B2"
+    },
+    {
+      "type": "error",
+      "text": "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+    },
+    {
+      "type": "error",
+      "text": "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717442463&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&ngs=1&pscdl=noapi&rcb=10&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B24.0.0."
+    },
+    {
+      "type": "error",
+      "text": "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717442463&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&ngs=1&pscdl=noapi&rcb=10&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B"
+    },
+    {
+      "type": "error",
+      "text": "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717442463&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&ngs=1&pscdl=noapi&rcb=10&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B24.0.0."
+    },
+    {
+      "type": "error",
+      "text": "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717442463&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&ngs=1&pscdl=noapi&rcb=10&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B"
+    },
+    {
+      "type": "error",
+      "text": "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+    },
+    {
+      "type": "error",
+      "text": "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717448860&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&ngs=1&pscdl=noapi&rcb=17&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B24.0.0."
+    },
+    {
+      "type": "error",
+      "text": "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717448860&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&ngs=1&pscdl=noapi&rcb=17&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B"
+    },
+    {
+      "type": "error",
+      "text": "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717448860&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&ngs=1&pscdl=noapi&rcb=17&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B24.0.0."
+    },
+    {
+      "type": "error",
+      "text": "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717448860&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&ngs=1&pscdl=noapi&rcb=17&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B"
+    },
+    {
+      "type": "error",
+      "text": "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+    },
+    {
+      "type": "error",
+      "text": "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717455147&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&ngs=1&pscdl=noapi&rcb=18&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B24.0.0."
+    },
+    {
+      "type": "error",
+      "text": "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717455147&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&ngs=1&pscdl=noapi&rcb=18&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B"
+    },
+    {
+      "type": "error",
+      "text": "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717455147&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&ngs=1&pscdl=noapi&rcb=18&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B24.0.0."
+    },
+    {
+      "type": "error",
+      "text": "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717455147&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&ngs=1&pscdl=noapi&rcb=18&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B"
+    },
+    {
+      "type": "error",
+      "text": "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+    },
+    {
+      "type": "error",
+      "text": "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717461396&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&pscdl=noapi&rcb=2&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B24.0.0.0&uam=&"
+    },
+    {
+      "type": "error",
+      "text": "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717461396&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&pscdl=noapi&rcb=2&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B24.0.0."
+    },
+    {
+      "type": "error",
+      "text": "Connecting to 'https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717461396&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&pscdl=noapi&rcb=2&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B24.0.0.0&uam=&"
+    },
+    {
+      "type": "error",
+      "text": "Fetch API cannot load https://www.google.com/g/collect?v=2&tid=G-76D744KQCJ&gtm=45je6781v9253068394za200zd9253068394&_p=1783717461396&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=AAAAAAQ&are=1&cid=574717973.1783716460&frm=0&pscdl=noapi&rcb=2&sr=1440x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B149.0.7827.55%7CChromium%3B149.0.7827.55%7CNot%29A%253BBrand%3B24.0.0."
+    },
+    {
+      "type": "error",
+      "text": "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+    }
+  ],
+  "reqLog": [
+    {
+      "url": "https://awesome.video/admin/users",
+      "status": 404,
+      "method": "GET"
+    },
+    {
+      "url": "https://awesome.video/admin/users/new",
+      "status": 404,
+      "method": "GET"
+    },
+    {
+      "url": "https://awesome.video/admin/settings",
+      "status": 404,
+      "method": "GET"
+    },
+    {
+      "url": "https://awesome.video/admin/profile",
+      "status": 404,
+      "method": "GET"
+    },
+    {
+      "url": "https://awesome.video/admin/audit",
+      "status": 404,
+      "method": "GET"
+    },
+    {
+      "url": "https://awesome.video/admin/logs",
+      "status": 404,
+      "method": "GET"
+    },
+    {
+      "url": "https://awesome.video/admin/flags",
+      "status": 404,
+      "method": "GET"
+    },
+    {
+      "url": "https://awesome.video/admin/api/users",
+      "status": 404,
+      "method": "GET"
+    },
+    {
+      "url": "https://awesome.video/admin/api/resources",
+      "status": 404,
+      "method": "GET"
+    },
+    {
+      "url": "https://awesome.video/admin/api/config",
+      "status": 404,
+      "method": "GET"
+    },
+    {
+      "url": "https://awesome.video/admin/journeys",
+      "status": 404,
+      "method": "GET"
+    },
+    {
+      "url": "https://awesome.video/admin/submissions",
+      "status": 404,
+      "method": "GET"
+    },
+    {
+      "url": "https://awesome.video/admin/login",
+      "status": 404,
+      "method": "GET"
+    },
+    {
+      "url": "https://awesome.video/admin/categories",
+      "status": 404,
+      "method": "GET"
+    },
+    {
+      "url": "https://awesome.video/admin/categories/new",
+      "status": 404,
+      "method": "GET"
+    },
+    {
+      "url": "https://awesome.video/admin/resources",
+      "status": 404,
+      "method": "GET"
+    },
+    {
+      "url": "https://awesome.video/admin/resources/new",
+      "status": 404,
+      "method": "GET"
+    },
+    {
+      "url": "https://awesome.video/admin/jobs",
+      "status": 404,
+      "method": "GET"
+    },
+    {
+      "url": "https://awesome.video/admin/analytics",
+      "status": 404,
+      "method": "GET"
+    }
+  ],
+  "probeResults": [
+    {
+      "route": "/admin",
+      "status": 200,
+      "finalUrl": "https://awesome.video/admin",
+      "snippet": "Skip to main content | Awesome Video | 1,946 resources | Navigation | Home | Submit Resource | Learning Journeys | Advanced | Theme | Admin | Categories | Community & Events | 87 | Community Groups | 5 | Online Forums | 3 | Events & Conferences | 8 |"
+    },
+    {
+      "route": "/admin/users",
+      "status": 404,
+      "finalUrl": "https://awesome.video/admin/users",
+      "snippet": "Skip to main content | Awesome Video | 1,946 resources | Navigation | Home | Submit Resource | Learning Journeys | Advanced | Theme | Admin | Categories | Community & Events | 87 | Community Groups | 5 | Online Forums | 3 | Events & Conferences | 8 |"
+    },
+    {
+      "route": "/admin/users/new",
+      "status": 404,
+      "finalUrl": "https://awesome.video/admin/users/new",
+      "snippet": "Skip to main content | Awesome Video | 1,946 resources | Navigation | Home | Submit Resource | Learning Journeys | Advanced | Theme | Admin | Categories | Community & Events | 87 | Community Groups | 5 | Online Forums | 3 | Events & Conferences | 8 |"
+    },
+    {
+      "route": "/admin/settings",
+      "status": 404,
+      "finalUrl": "https://awesome.video/admin/settings",
+      "snippet": "Skip to main content | Awesome Video | 1,946 resources | Navigation | Home | Submit Resource | Learning Journeys | Advanced | Theme | Admin | Categories | Community & Events | 87 | Community Groups | 5 | Online Forums | 3 | Events & Conferences | 8 |"
+    },
+    {
+      "route": "/admin/profile",
+      "status": 404,
+      "finalUrl": "https://awesome.video/admin/profile",
+      "snippet": "Skip to main content | Awesome Video | 1,946 resources | Navigation | Home | Submit Resource | Learning Journeys | Advanced | Theme | Admin | Categories | Community & Events | 87 | Community Groups | 5 | Online Forums | 3 | Events & Conferences | 8 |"
+    },
+    {
+      "route": "/admin/audit",
+      "status": 404,
+      "finalUrl": "https://awesome.video/admin/audit",
+      "snippet": "Skip to main content | Awesome Video | 1,946 resources | Navigation | Home | Submit Resource | Learning Journeys | Advanced | Theme | Admin | Categories | Community & Events | 87 | Community Groups | 5 | Online Forums | 3 | Events & Conferences | 8 |"
+    },
+    {
+      "route": "/admin/logs",
+      "status": 404,
+      "finalUrl": "https://awesome.video/admin/logs",
+      "snippet": "Skip to main content | Awesome Video | 1,946 resources | Navigation | Home | Submit Resource | Learning Journeys | Advanced | Theme | Admin | Categories | Community & Events | 87 | Community Groups | 5 | Online Forums | 3 | Events & Conferences | 8 |"
+    },
+    {
+      "route": "/admin/flags",
+      "status": 404,
+      "finalUrl": "https://awesome.video/admin/flags",
+      "snippet": "Skip to main content | Awesome Video | 1,946 resources | Navigation | Home | Submit Resource | Learning Journeys | Advanced | Theme | Admin | Categories | Community & Events | 87 | Community Groups | 5 | Online Forums | 3 | Events & Conferences | 8 |"
+    },
+    {
+      "route": "/admin/api/users",
+      "status": 404,
+      "finalUrl": "https://awesome.video/admin/api/users",
+      "snippet": "Skip to main content | Awesome Video | 1,946 resources | Navigation | Home | Submit Resource | Learning Journeys | Advanced | Theme | Admin | Categories | Community & Events | 87 | Community Groups | 5 | Online Forums | 3 | Events & Conferences | 8 |"
+    },
+    {
+      "route": "/admin/api/resources",
+      "status": 404,
+      "finalUrl": "https://awesome.video/admin/api/resources",
+      "snippet": "Skip to main content | Awesome Video | 1,946 resources | Navigation | Home | Submit Resource | Learning Journeys | Advanced | Theme | Admin | Categories | Community & Events | 87 | Community Groups | 5 | Online Forums | 3 | Events & Conferences | 8 |"
+    },
+    {
+      "route": "/admin/api/config",
+      "status": 404,
+      "finalUrl": "https://awesome.video/admin/api/config",
+      "snippet": "Skip to main content | Awesome Video | 1,946 resources | Navigation | Home | Submit Resource | Learning Journeys | Advanced | Theme | Admin | Categories | Community & Events | 87 | Community Groups | 5 | Online Forums | 3 | Events & Conferences | 8 |"
+    },
+    {
+      "route": "/admin/journeys",
+      "status": 404,
+      "finalUrl": "https://awesome.video/admin/journeys",
+      "snippet": "Skip to main content | Awesome Video | 1,946 resources | Navigation | Home | Submit Resource | Learning Journeys | Advanced | Theme | Admin | Categories | Community & Events | 87 | Community Groups | 5 | Online Forums | 3 | Events & Conferences | 8 |"
+    },
+    {
+      "route": "/admin/submissions",
+      "status": 404,
+      "finalUrl": "https://awesome.video/admin/submissions",
+      "snippet": "Skip to main content | Awesome Video | 1,946 resources | Navigation | Home | Submit Resource | Learning Journeys | Advanced | Theme | Admin | Categories | Community & Events | 87 | Community Groups | 5 | Online Forums | 3 | Events & Conferences | 8 |"
+    },
+    {
+      "route": "/admin/login",
+      "status": 404,
+      "finalUrl": "https://awesome.video/admin/login",
+      "snippet": "Skip to main content | Awesome Video | 1,946 resources | Navigation | Home | Submit Resource | Learning Journeys | Advanced | Theme | Admin | Categories | Community & Events | 87 | Community Groups | 5 | Online Forums | 3 | Events & Conferences | 8 |"
+    },
+    {
+      "route": "/admin/categories",
+      "status": 404,
+      "finalUrl": "https://awesome.video/admin/categories",
+      "snippet": "Skip to main content | Awesome Video | 1,946 resources | Navigation | Home | Submit Resource | Learning Journeys | Advanced | Theme | Admin | Categories | Community & Events | 87 | Community Groups | 5 | Online Forums | 3 | Events & Conferences | 8 |"
+    },
+    {
+      "route": "/admin/categories/new",
+      "status": 404,
+      "finalUrl": "https://awesome.video/admin/categories/new",
+      "snippet": "Skip to main content | Awesome Video | 1,946 resources | Navigation | Home | Submit Resource | Learning Journeys | Advanced | Theme | Admin | Categories | Community & Events | 87 | Community Groups | 5 | Online Forums | 3 | Events & Conferences | 8 |"
+    },
+    {
+      "route": "/admin/resources",
+      "status": 404,
+      "finalUrl": "https://awesome.video/admin/resources",
+      "snippet": "Skip to main content | Awesome Video | 1,946 resources | Navigation | Home | Submit Resource | Learning Journeys | Advanced | Theme | Admin | Categories | Community & Events | 87 | Community Groups | 5 | Online Forums | 3 | Events & Conferences | 8 |"
+    },
+    {
+      "route": "/admin/resources/new",
+      "status": 404,
+      "finalUrl": "https://awesome.video/admin/resources/new",
+      "snippet": "Skip to main content | Awesome Video | 1,946 resources | Navigation | Home | Submit Resource | Learning Journeys | Advanced | Theme | Admin | Categories | Community & Events | 87 | Community Groups | 5 | Online Forums | 3 | Events & Conferences | 8 |"
+    },
+    {
+      "route": "/admin/jobs",
+      "status": 404,
+      "finalUrl": "https://awesome.video/admin/jobs",
+      "snippet": "Skip to main content | Awesome Video | 1,946 resources | Navigation | Home | Submit Resource | Learning Journeys | Advanced | Theme | Admin | Categories | Community & Events | 87 | Community Groups | 5 | Online Forums | 3 | Events & Conferences | 8 |"
+    },
+    {
+      "route": "/admin/analytics",
+      "status": 404,
+      "finalUrl": "https://awesome.video/admin/analytics",
+      "snippet": "Skip to main content | Awesome Video | 1,946 resources | Navigation | Home | Submit Resource | Learning Journeys | Advanced | Theme | Admin | Categories | Community & Events | 87 | Community Groups | 5 | Online Forums | 3 | Events & Conferences | 8 |"
+    }
+  ],
+  "tabScreenshots": {
+    "Approvals": {
+      "before": "https://awesome.video/admin",
+      "after": "https://awesome.video/admin",
+      "shotPath": "/Users/nick/Desktop/awesome-list-site/hunt-workspace/screenshots/admin2_tab_approvals.png"
+    },
+    "Edits": {
+      "before": "https://awesome.video/admin",
+      "after": "https://awesome.video/admin",
+      "shotPath": "/Users/nick/Desktop/awesome-list-site/hunt-workspace/screenshots/admin2_tab_edits.png"
+    },
+    "Enrichment": {
+      "before": "https://awesome.video/admin",
+      "after": "https://awesome.video/admin",
+      "shotPath": "/Users/nick/Desktop/awesome-list-site/hunt-workspace/screenshots/admin2_tab_enrichment.png"
+    },
+    "Researcher": {
+      "before": "https://awesome.video/admin",
+      "after": "https://awesome.video/admin",
+      "shotPath": "/Users/nick/Desktop/awesome-list-site/hunt-workspace/screenshots/admin2_tab_researcher.png"
+    },
+    "Export": {
+      "before": "https://awesome.video/admin",
+      "after": "https://awesome.video/admin",
+      "shotPath": "/Users/nick/Desktop/awesome-list-site/hunt-workspace/screenshots/admin2_tab_export.png"
+    },
+    "Database": {
+      "before": "https://awesome.video/admin",
+      "after": "https://awesome.video/admin",
+      "shotPath": "/Users/nick/Desktop/awesome-list-site/hunt-workspace/screenshots/admin2_tab_database.png"
+    },
+    "Resources": {
+      "before": "https://awesome.video/admin",
+      "after": "https://awesome.video/admin",
+      "shotPath": "/Users/nick/Desktop/awesome-list-site/hunt-workspace/screenshots/admin2_tab_resources.png"
+    },
+    "Categories": {
+      "before": "https://awesome.video/admin",
+      "after": "https://awesome.video/admin",
+      "shotPath": "/Users/nick/Desktop/awesome-list-site/hunt-workspace/screenshots/admin2_tab_categories.png"
+    },
+    "Subcategories": {
+      "before": "https://awesome.video/admin",
+      "after": "https://awesome.video/admin",
+      "shotPath": "/Users/nick/Desktop/awesome-list-site/hunt-workspace/screenshots/admin2_tab_subcategories.png"
+    },
+    "Sub-Subcats": {
+      "before": "https://awesome.video/admin",
+      "after": "https://awesome.video/admin",
+      "shotPath": "/Users/nick/Desktop/awesome-list-site/hunt-workspace/screenshots/admin2_tab_subsubcats.png"
+    },
+    "Jobs": {
+      "before": "https://awesome.video/admin",
+      "after": "https://awesome.video/admin",
+      "shotPath": "/Users/nick/Desktop/awesome-list-site/hunt-workspace/screenshots/admin2_tab_jobs.png"
+    }
+  }
+}

@@ -1,0 +1,6 @@
+BUG-008 verdict
+date 2026-07-11
+probe: see code/probe body
+actual: ERR https://www.smarthomebeginner.com/best-home-server-apps/`; ERR https://www.mo4tech.com/a-brief-history-of-video-compression-standards-1929-to-2020.html`; ERR https://www.iso.org/standard/76383.html`
+classification: ALREADY-FIXED
+reason: all outbound OK

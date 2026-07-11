@@ -1,0 +1,1613 @@
+{
+  "184751": {
+    "slug": "184751",
+    "url": "https://awesome.video/resource/184751",
+    "consoleErrs": [
+      {
+        "t": "error",
+        "text": "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+      }
+    ],
+    "tagInvestigation": [
+      {
+        "tag": "svg",
+        "text": "",
+        "cls": "[object SVGAnimatedString]",
+        "href": null
+      }
+    ],
+    "missingAltImgs": [],
+    "brokenImgs": [],
+    "outbound": [
+      {
+        "href": "https://www.tvtechnology.com/features/2025-nab-show-cinecentral-fuses-tools-and-technique",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "clickProbe": {
+      "Bookmark": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/184751",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Added to bookmarksResource saved to your bookmarks"
+          }
+        ]
+      },
+      "Add to Bookmarks": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/184751",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Added to bookmarksResource saved to your bookmarks"
+          }
+        ]
+      },
+      "Share": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/184751",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Unable to copyPlease copy the URL manually from the address bar"
+          }
+        ]
+      },
+      "Share This Page": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/184751",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Unable to copyPlease copy the URL manually from the address bar"
+          }
+        ]
+      },
+      "Report": {
+        "found": false
+      },
+      "Upvote": {
+        "found": false
+      },
+      "Vote": {
+        "found": false
+      },
+      "Like": {
+        "found": false
+      },
+      "Star": {
+        "found": false
+      },
+      "Save": {
+        "found": false
+      }
+    }
+  },
+  "184763": {
+    "slug": "184763",
+    "url": "https://awesome.video/resource/184763",
+    "consoleErrs": [
+      {
+        "t": "error",
+        "text": "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+      }
+    ],
+    "tagInvestigation": [
+      {
+        "tag": "svg",
+        "text": "",
+        "cls": "[object SVGAnimatedString]",
+        "href": null
+      }
+    ],
+    "missingAltImgs": [],
+    "brokenImgs": [],
+    "outbound": [
+      {
+        "href": "https://developer.apple.com/documentation/avfoundation/avplayer",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "clickProbe": {
+      "Bookmark": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/184763",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Added to bookmarksResource saved to your bookmarks"
+          }
+        ]
+      },
+      "Add to Bookmarks": {
+        "found": false
+      },
+      "Share": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/184763",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Unable to copyPlease copy the URL manually from the address bar"
+          }
+        ]
+      },
+      "Share This Page": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/184763",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Unable to copyPlease copy the URL manually from the address bar"
+          }
+        ]
+      },
+      "Report": {
+        "found": false
+      },
+      "Upvote": {
+        "found": false
+      },
+      "Vote": {
+        "found": false
+      },
+      "Like": {
+        "found": false
+      },
+      "Star": {
+        "found": false
+      },
+      "Save": {
+        "found": false
+      }
+    }
+  },
+  "184789": {
+    "slug": "184789",
+    "url": "https://awesome.video/resource/184789",
+    "consoleErrs": [
+      {
+        "t": "error",
+        "text": "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+      }
+    ],
+    "tagInvestigation": [
+      {
+        "tag": "svg",
+        "text": "",
+        "cls": "[object SVGAnimatedString]",
+        "href": null
+      }
+    ],
+    "missingAltImgs": [],
+    "brokenImgs": [],
+    "outbound": [
+      {
+        "href": "https://aws.amazon.com/media-services/",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "clickProbe": {
+      "Bookmark": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/184789",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Added to bookmarksResource saved to your bookmarks"
+          }
+        ]
+      },
+      "Add to Bookmarks": {
+        "found": false
+      },
+      "Share": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/184789",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Unable to copyPlease copy the URL manually from the address bar"
+          }
+        ]
+      },
+      "Share This Page": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/184789",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Unable to copyPlease copy the URL manually from the address bar"
+          }
+        ]
+      },
+      "Report": {
+        "found": false
+      },
+      "Upvote": {
+        "found": false
+      },
+      "Vote": {
+        "found": false
+      },
+      "Like": {
+        "found": false
+      },
+      "Star": {
+        "found": false
+      },
+      "Save": {
+        "found": false
+      }
+    }
+  },
+  "184838": {
+    "slug": "184838",
+    "url": "https://awesome.video/resource/184838",
+    "consoleErrs": [
+      {
+        "t": "error",
+        "text": "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+      }
+    ],
+    "tagInvestigation": [
+      {
+        "tag": "svg",
+        "text": "",
+        "cls": "[object SVGAnimatedString]",
+        "href": null
+      }
+    ],
+    "missingAltImgs": [],
+    "brokenImgs": [],
+    "outbound": [
+      {
+        "href": "https://raftlabs.medium.com/the-complete-guide-to-build-a-live-streaming-app-learn-the-best-approach-and-tech-stack-263bd67e2915",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "clickProbe": {
+      "Bookmark": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/184838",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Added to bookmarksResource saved to your bookmarks"
+          }
+        ]
+      },
+      "Add to Bookmarks": {
+        "found": false
+      },
+      "Share": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/184838",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Unable to copyPlease copy the URL manually from the address bar"
+          }
+        ]
+      },
+      "Share This Page": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/184838",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Unable to copyPlease copy the URL manually from the address bar"
+          }
+        ]
+      },
+      "Report": {
+        "found": false
+      },
+      "Upvote": {
+        "found": false
+      },
+      "Vote": {
+        "found": false
+      },
+      "Like": {
+        "found": false
+      },
+      "Star": {
+        "found": false
+      },
+      "Save": {
+        "found": false
+      }
+    }
+  },
+  "185020": {
+    "slug": "185020",
+    "url": "https://awesome.video/resource/185020",
+    "consoleErrs": [
+      {
+        "t": "error",
+        "text": "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+      }
+    ],
+    "tagInvestigation": [
+      {
+        "tag": "svg",
+        "text": "",
+        "cls": "[object SVGAnimatedString]",
+        "href": null
+      }
+    ],
+    "missingAltImgs": [],
+    "brokenImgs": [],
+    "outbound": [
+      {
+        "href": "https://www.100ms.live/blog/rtmp-vs-webrtc-vs-hls",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "clickProbe": {
+      "Bookmark": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/185020",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": []
+      },
+      "Add to Bookmarks": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/185020",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Added to bookmarksResource saved to your bookmarks"
+          }
+        ]
+      },
+      "Share": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/185020",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Unable to copyPlease copy the URL manually from the address bar"
+          }
+        ]
+      },
+      "Share This Page": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/185020",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Unable to copyPlease copy the URL manually from the address bar"
+          }
+        ]
+      },
+      "Report": {
+        "found": false
+      },
+      "Upvote": {
+        "found": false
+      },
+      "Vote": {
+        "found": false
+      },
+      "Like": {
+        "found": false
+      },
+      "Star": {
+        "found": false
+      },
+      "Save": {
+        "found": false
+      }
+    }
+  },
+  "186145": {
+    "slug": "186145",
+    "url": "https://awesome.video/resource/186145",
+    "consoleErrs": [
+      {
+        "t": "error",
+        "text": "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+      }
+    ],
+    "tagInvestigation": [],
+    "missingAltImgs": [],
+    "brokenImgs": [],
+    "outbound": [
+      {
+        "href": "https://medium.com/vicuesoft-techblog/3-cases-from-a-video-expert-encoding-basics-b1ba1c398af8",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "clickProbe": {
+      "Bookmark": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/186145",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Added to bookmarksResource saved to your bookmarks"
+          }
+        ]
+      },
+      "Add to Bookmarks": {
+        "found": false
+      },
+      "Share": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/186145",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Unable to copyPlease copy the URL manually from the address bar"
+          }
+        ]
+      },
+      "Share This Page": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/186145",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Unable to copyPlease copy the URL manually from the address bar"
+          }
+        ]
+      },
+      "Report": {
+        "found": false
+      },
+      "Upvote": {
+        "found": false
+      },
+      "Vote": {
+        "found": false
+      },
+      "Like": {
+        "found": false
+      },
+      "Star": {
+        "found": false
+      },
+      "Save": {
+        "found": false
+      }
+    }
+  },
+  "186212": {
+    "slug": "186212",
+    "url": "https://awesome.video/resource/186212",
+    "consoleErrs": [
+      {
+        "t": "error",
+        "text": "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+      }
+    ],
+    "tagInvestigation": [],
+    "missingAltImgs": [],
+    "brokenImgs": [],
+    "outbound": [
+      {
+        "href": "http://theautomaticfilmmaker.com/blog/2009/2/23/about-frame-rates-or-why-2997.html",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "clickProbe": {
+      "Bookmark": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/186212",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Added to bookmarksResource saved to your bookmarks"
+          }
+        ]
+      },
+      "Add to Bookmarks": {
+        "found": false
+      },
+      "Share": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/186212",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Unable to copyPlease copy the URL manually from the address bar"
+          }
+        ]
+      },
+      "Share This Page": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/186212",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Unable to copyPlease copy the URL manually from the address bar"
+          }
+        ]
+      },
+      "Report": {
+        "found": false
+      },
+      "Upvote": {
+        "found": false
+      },
+      "Vote": {
+        "found": false
+      },
+      "Like": {
+        "found": false
+      },
+      "Star": {
+        "found": false
+      },
+      "Save": {
+        "found": false
+      }
+    }
+  },
+  "186231": {
+    "slug": "186231",
+    "url": "https://awesome.video/resource/186231",
+    "consoleErrs": [
+      {
+        "t": "error",
+        "text": "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+      }
+    ],
+    "tagInvestigation": [],
+    "missingAltImgs": [],
+    "brokenImgs": [],
+    "outbound": [
+      {
+        "href": "https://github.com/2501world/transcoding-performance-trial",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "clickProbe": {
+      "Bookmark": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/186231",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Added to bookmarksResource saved to your bookmarks"
+          }
+        ]
+      },
+      "Add to Bookmarks": {
+        "found": false
+      },
+      "Share": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/186231",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Unable to copyPlease copy the URL manually from the address bar"
+          }
+        ]
+      },
+      "Share This Page": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/186231",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Unable to copyPlease copy the URL manually from the address bar"
+          }
+        ]
+      },
+      "Report": {
+        "found": false
+      },
+      "Upvote": {
+        "found": false
+      },
+      "Vote": {
+        "found": false
+      },
+      "Like": {
+        "found": false
+      },
+      "Star": {
+        "found": false
+      },
+      "Save": {
+        "found": false
+      }
+    }
+  },
+  "186477": {
+    "slug": "186477",
+    "url": "https://awesome.video/resource/186477",
+    "consoleErrs": [
+      {
+        "t": "error",
+        "text": "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+      }
+    ],
+    "tagInvestigation": [
+      {
+        "tag": "svg",
+        "text": "",
+        "cls": "[object SVGAnimatedString]",
+        "href": null
+      }
+    ],
+    "missingAltImgs": [],
+    "brokenImgs": [],
+    "outbound": [
+      {
+        "href": "https://3dlutcreator.com/",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "clickProbe": {
+      "Bookmark": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/186477",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Added to bookmarksResource saved to your bookmarks"
+          }
+        ]
+      },
+      "Add to Bookmarks": {
+        "found": false
+      },
+      "Share": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/186477",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Unable to copyPlease copy the URL manually from the address bar"
+          }
+        ]
+      },
+      "Share This Page": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/186477",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Unable to copyPlease copy the URL manually from the address bar"
+          }
+        ]
+      },
+      "Report": {
+        "found": false
+      },
+      "Upvote": {
+        "found": false
+      },
+      "Vote": {
+        "found": false
+      },
+      "Like": {
+        "found": false
+      },
+      "Star": {
+        "found": false
+      },
+      "Save": {
+        "found": false
+      }
+    }
+  },
+  "186609": {
+    "slug": "186609",
+    "url": "https://awesome.video/resource/186609",
+    "consoleErrs": [
+      {
+        "t": "error",
+        "text": "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+      }
+    ],
+    "tagInvestigation": [],
+    "missingAltImgs": [],
+    "brokenImgs": [],
+    "outbound": [
+      {
+        "href": "https://ableplayer.github.io/ableplayer",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "clickProbe": {
+      "Bookmark": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/186609",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Added to bookmarksResource saved to your bookmarks"
+          }
+        ]
+      },
+      "Add to Bookmarks": {
+        "found": false
+      },
+      "Share": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/186609",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Unable to copyPlease copy the URL manually from the address bar"
+          }
+        ]
+      },
+      "Share This Page": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/186609",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Unable to copyPlease copy the URL manually from the address bar"
+          }
+        ]
+      },
+      "Report": {
+        "found": false
+      },
+      "Upvote": {
+        "found": false
+      },
+      "Vote": {
+        "found": false
+      },
+      "Like": {
+        "found": false
+      },
+      "Star": {
+        "found": false
+      },
+      "Save": {
+        "found": false
+      }
+    }
+  },
+  "187911": {
+    "slug": "187911",
+    "url": "https://awesome.video/resource/187911",
+    "consoleErrs": [
+      {
+        "t": "error",
+        "text": "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+      }
+    ],
+    "tagInvestigation": [],
+    "missingAltImgs": [],
+    "brokenImgs": [],
+    "outbound": [
+      {
+        "href": "https://github.com/LennartPaduch/abr-video-player",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "clickProbe": {
+      "Bookmark": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/187911",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Added to bookmarksResource saved to your bookmarks"
+          }
+        ]
+      },
+      "Add to Bookmarks": {
+        "found": false
+      },
+      "Share": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/187911",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Unable to copyPlease copy the URL manually from the address bar"
+          }
+        ]
+      },
+      "Share This Page": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/187911",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Unable to copyPlease copy the URL manually from the address bar"
+          }
+        ]
+      },
+      "Report": {
+        "found": false
+      },
+      "Upvote": {
+        "found": false
+      },
+      "Vote": {
+        "found": false
+      },
+      "Like": {
+        "found": false
+      },
+      "Star": {
+        "found": false
+      },
+      "Save": {
+        "found": false
+      }
+    }
+  },
+  "188002": {
+    "slug": "188002",
+    "url": "https://awesome.video/resource/188002",
+    "consoleErrs": [
+      {
+        "t": "error",
+        "text": "Loading the script 'https://replit-cdn.com/feedback-widget/widget.global.js' violates the following Content Security Policy directive: \"script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://replit.com\". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked."
+      }
+    ],
+    "tagInvestigation": [],
+    "missingAltImgs": [],
+    "brokenImgs": [],
+    "outbound": [
+      {
+        "href": "https://aomediacodec.github.io/av1-hdr10plus/",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "clickProbe": {
+      "Bookmark": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/188002",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Added to bookmarksResource saved to your bookmarks"
+          }
+        ]
+      },
+      "Add to Bookmarks": {
+        "found": false
+      },
+      "Share": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/188002",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Unable to copyPlease copy the URL manually from the address bar"
+          }
+        ]
+      },
+      "Share This Page": {
+        "found": true,
+        "urlChanged": false,
+        "newURL": "https://awesome.video/resource/188002",
+        "countersChanged": false,
+        "beforeCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "afterCount": [
+          "87",
+          "87",
+          "5",
+          "3",
+          "8",
+          "4"
+        ],
+        "popoversAfter": [
+          {
+            "role": null,
+            "text": "Unable to copyPlease copy the URL manually from the address bar"
+          }
+        ]
+      },
+      "Report": {
+        "found": false
+      },
+      "Upvote": {
+        "found": false
+      },
+      "Vote": {
+        "found": false
+      },
+      "Like": {
+        "found": false
+      },
+      "Star": {
+        "found": false
+      },
+      "Save": {
+        "found": false
+      }
+    }
+  }
+}

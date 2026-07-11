@@ -1,0 +1,75 @@
+{
+  "confirmedBugs": [
+    {
+      "id": "BUG-100",
+      "title": "Share button on every /resource/* page silently fails: shows 'Unable to copy / Please copy the URL manually'",
+      "severity": "HIGH",
+      "evidencePath": "/Users/nick/Desktop/awesome-list-site/hunt-workspace/bugs/BUG-100/evidence.md",
+      "affectedUrls": "all /resource/* (reproduced on 12 of 12: 184751, 184763, 184789, 184838, 185020, 186145, 186212, 186231, 186477, 186609, 187911, 188002)",
+      "affectedViewports": "all three (desktop / tablet / mobile)",
+      "reproduced": true
+    },
+    {
+      "id": "BUG-101",
+      "title": "/resource/186145 has a placeholder description: Description field is the literal word 'Introduction'",
+      "severity": "HIGH",
+      "evidencePath": "/Users/nick/Desktop/awesome-list-site/hunt-workspace/bugs/BUG-101/evidence.md",
+      "affectedUrls": "https://awesome.video/resource/186145",
+      "affectedViewports": "all three (desktop / tablet / mobile)",
+      "reproduced": true,
+      "reproductionCount": 2
+    },
+    {
+      "id": "BUG-102",
+      "title": "6 of 12 sampled /resource/* pages render no freeform Tags section (#hashtag chips)",
+      "severity": "MEDIUM",
+      "evidencePath": "/Users/nick/Desktop/awesome-list-site/hunt-workspace/bugs/BUG-102/evidence.md",
+      "affectedUrls": "https://awesome.video/resource/186145, /resource/186212, /resource/186231, /resource/186609, /resource/187911, /resource/188002",
+      "controlPagesWithTags": "184751, 184763, 184789, 184838, 185020, 186477",
+      "affectedViewports": "all three (desktop / tablet / mobile)",
+      "reproduced": true,
+      "reproductionCount": 2
+    },
+    {
+      "id": "BUG-103",
+      "title": "/resource/* pages have no upvote / vote / like / star / score widget; only Favorite / Bookmark / Share / Visit",
+      "severity": "MEDIUM",
+      "evidencePath": "/Users/nick/Desktop/awesome-list-site/hunt-workspace/bugs/BUG-103/evidence.md",
+      "affectedUrls": "all /resource/* (12 of 12)",
+      "affectedViewports": "all three (desktop / tablet / mobile)",
+      "reproduced": true
+    },
+    {
+      "id": "BUG-104",
+      "title": "'Quick Actions' sidebar duplicates the same actions already in the top action bar (Favorite / Bookmark / Share / Open Resource)",
+      "severity": "MEDIUM",
+      "evidencePath": "/Users/nick/Desktop/awesome-list-site/hunt-workspace/bugs/BUG-104/evidence.md",
+      "affectedUrls": "all /resource/* (12 of 12)",
+      "affectedViewports": "desktop and tablet (sidebar), mobile (stacks below)",
+      "reproduced": true
+    }
+  ],
+  "pagesTouched": 12,
+  "screenshotsProduced": 36,
+  "auditNotes": {
+    "urls": [
+      "https://awesome.video/resource/185020",
+      "https://awesome.video/resource/184751",
+      "https://awesome.video/resource/186231",
+      "https://awesome.video/resource/186145",
+      "https://awesome.video/resource/186477",
+      "https://awesome.video/resource/184763",
+      "https://awesome.video/resource/188002",
+      "https://awesome.video/resource/187911",
+      "https://awesome.video/resource/186609",
+      "https://awesome.video/resource/186212",
+      "https://awesome.video/resource/184789",
+      "https://awesome.video/resource/184838"
+    ],
+    "viewports": { "desktop": "1440x900", "tablet": "768x1024", "mobile": "375x812" },
+    "screenshotPathPattern": "screenshots/res_<slug>_<vp>.png",
+    "outboundExternalUrlsChecked": 12,
+    "outboundExternalFailures": 0,
+    "outcomeNote": "All 5 confirmed bugs include written evidence.md with symptom-first title, severity, URL+viewport, repro steps, expected vs actual, screenshot refs, and a self-contained fix prompt. BUG-101 and BUG-102 were each reproduced twice. BUG-100 was reproduced across 24 distinct share-button-click events. BUG-104 is reproduced via DOM probe (2 fav buttons + 2 bookmark buttons + 2 share buttons = same toggle in two places). BUG-103 was reproduced by exhaustive DOM search for upvote/vote/like/score class names returning 0 matches on every page."
+  }
+}

@@ -1,0 +1,6 @@
+BUG-006 verdict (RE-PROBE on FRESH build 2026-07-11)
+date 2026-07-11
+probe: GET /signup -> 404
+actual: GET /signup -> 404
+classification: REPRODUCES
+reason: no form

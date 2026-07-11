@@ -1,0 +1,6 @@
+BUG-105 verdict
+date 2026-07-11
+probe: GET /login
+actual: Set-Cookie=
+classification: BLOCKED
+reason: Set-Cookie observation requires an authenticated response, but HUNT_PW unset and container has no ADMIN_PASSWORD

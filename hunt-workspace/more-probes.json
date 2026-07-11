@@ -1,0 +1,29 @@
+{
+ "journeyEntries": [
+  "https://awesome.video/journey/6",
+  "https://awesome.video/journey/7",
+  "https://awesome.video/journey/8",
+  "https://awesome.video/journey/9",
+  "https://awesome.video/journey/10"
+ ],
+ "journey_status_6": {
+  "url": "https://awesome.video/journey/6",
+  "status": 200
+ },
+ "journey_status_7": {
+  "url": "https://awesome.video/journey/7",
+  "status": 200
+ },
+ "journey_status_8": {
+  "url": "https://awesome.video/journey/8",
+  "status": 200
+ },
+ "journey_status_9": {
+  "url": "https://awesome.video/journey/9",
+  "status": 200
+ },
+ "journey_status_10": {
+  "url": "https://awesome.video/journey/10",
+  "status": 200
+ }
+}

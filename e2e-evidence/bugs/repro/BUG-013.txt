@@ -1,0 +1,6 @@
+BUG-013 verdict
+date 2026-07-11
+probe: see code/probe body
+actual: /api/resources -> 200, all 20 resources have descriptions
+classification: ALREADY-FIXED
+reason: ok

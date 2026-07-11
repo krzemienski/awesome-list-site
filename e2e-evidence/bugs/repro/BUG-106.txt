@@ -1,0 +1,6 @@
+BUG-106 verdict
+date 2026-07-11
+probe: GET / headers
+actual: server/powered-by leaking=False via=[]
+classification: ALREADY-FIXED
+reason: 

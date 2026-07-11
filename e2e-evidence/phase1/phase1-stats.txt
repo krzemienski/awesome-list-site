@@ -1,0 +1,26 @@
+phase1 captured 2026-07-11
+
+server_up:
+  http://localhost:5004/   200 OK
+  /api/resources           200
+  /sitemap.xml             200
+  CSP header present (production-gated behavior works here)
+
+db_up:
+  host:   awesome-phase0-db:5432 (docker network)
+  user:   postgres
+  db:     awesome_list
+  rows:   resources=1935
+
+tsc_baseline:
+  errors: 0 (clean)
+
+lint_baseline:
+  total_flagged: 3822 errors + 20 warnings = 3842 problems
+  local-install: pnpm install ran in ~22s
+  dominant_failure: ESLint project-service parse errors for files NOT in
+    tsconfig.json (tests/helpers/test-db-url.ts, tests/setup.ts, vitest.config.ts,
+    verify-cache-performance.js, etc.)
+  Treat literal "3822" as the regression baseline; defining "no NEW" means
+  no more flagged-lines per category (tsc errors must stay 0; lint flagged
+  items must not increase past 3822).

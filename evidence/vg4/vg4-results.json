@@ -1,0 +1,42 @@
+[
+  {
+    "id": "anon-gate /admin",
+    "pass": true,
+    "detail": "final=http://localhost:5055/login status=200"
+  },
+  {
+    "id": "anon-gate /admin/categories",
+    "pass": true,
+    "detail": "final=http://localhost:5055/login status=200"
+  },
+  {
+    "id": "anon-gate /profile",
+    "pass": true,
+    "detail": "final=http://localhost:5055/login status=200"
+  },
+  {
+    "id": "anon-gate /bookmarks",
+    "pass": true,
+    "detail": "final=http://localhost:5055/login status=200"
+  },
+  {
+    "id": "admin-load-timing",
+    "pass": true,
+    "detail": "dashboard usable in 229ms (threshold 7000)"
+  },
+  {
+    "id": "admin-tabs",
+    "pass": true,
+    "detail": "tabs=15 active=\"Approvals\" labels=[\"Approvals\",\"Edits\",\"Enrichment\",\"Researcher\",\"Export\",\"Database\",\"Resources\",\"Categories\"]"
+  },
+  {
+    "id": "logout-invalidates",
+    "pass": true,
+    "detail": "logout=200 authedAfter=false"
+  },
+  {
+    "id": "post-logout-admin-gated",
+    "pass": true,
+    "detail": "final=http://localhost:5055/login"
+  }
+]

@@ -1,0 +1,6 @@
+BUG-022 verdict
+date 2026-07-11
+probe: see code/probe body
+actual: GET /404 -> 404, sidebar links in body=8
+classification: ALREADY-FIXED
+reason: ok
