@@ -159,7 +159,7 @@ export default function Login() {
                           id="email"
                           type="email"
                           autoComplete="email"
-                          placeholder="admin@example.com"
+                          placeholder="you@example.com"
                           className="pl-10"
                           data-testid="input-email"
                           disabled={isLoading}

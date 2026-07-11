@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation, useSearch, Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -140,7 +140,7 @@ function SubItem({
       }
       title={count === 0 ? `${label} (no resources yet)` : label}
     >
-      <span className="flex-1 min-w-0 truncate" title={label}>{label}</span>
+      <span className="flex-1 min-w-0 break-words" title={label}>{label}</span>
       {typeof count === "number" && (
         <span
           className="font-mono shrink-0 tabular-nums"
@@ -211,14 +211,23 @@ function CategoryAccordion({
   const expandedHeight = useMemo(() => {
     let h = 8; // bottom padding only ("All in" row removed in P4)
     subs.forEach((sub) => {
-      h += 36;
+      h += 44;
       if ((sub.subSubcategories || []).length > 0 && openSubs.includes(subKey(sub.name))) {
         h += sub.subSubcategories!.length * 32 + 12;
       }
     });
-    if (directCount > 0) h += 36; // "General" row
+    if (directCount > 0) h += 44; // "General" row
     return h;
   }, [subs, openSubs, directCount]);
+
+  // The calculator above assumes one line per row; break-words labels can
+  // wrap to 2+ lines, so measure the real content height after each commit
+  // and never let max-height clip it (scrollHeight ignores max-height).
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const [measuredHeight, setMeasuredHeight] = useState(0);
+  useEffect(() => {
+    if (bodyRef.current) setMeasuredHeight(bodyRef.current.scrollHeight);
+  });
 
   // Semantic split (post-architect-review):
   //  - The row is a <Link> (real navigation semantics; right-click/cmd-click
@@ -258,7 +267,7 @@ function CategoryAccordion({
             <CategoryIcon className="size-[13px]" />
           </span>
           <span
-            className="truncate"
+            className="min-w-0 break-words"
             title={cat.name}
             style={{
               fontSize: 13,
@@ -287,16 +296,9 @@ function CategoryAccordion({
               aria-expanded={isOpen}
               aria-controls={`accordion-body-${catSlug}`}
               data-testid={`toggle-cat-${catSlug}`}
-              className="inline-flex items-center justify-center w-6 h-6 rounded-sm hover:bg-[var(--surface-2)] focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
+              className="inline-flex items-center justify-center w-6 min-w-[24px] min-h-[44px] rounded-sm text-[var(--text-3)] hover:bg-[var(--surface-2)] focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
             >
-              <ChevronRight
-                className="size-3 shrink-0"
-                style={{
-                  transition: "transform 220ms cubic-bezier(0.2,0.65,0.3,1)",
-                  transform: isOpen ? "rotate(90deg)" : "rotate(0deg)",
-                  color: "var(--text-3)",
-                }}
-              />
+              <ChevronRight className={cn("size-3 shrink-0 chevron-rotate", isOpen && "rotate-90")} />
             </button>
           )}
         </span>
@@ -305,8 +307,9 @@ function CategoryAccordion({
       {(subs.length > 0 || directCount > 0) && (
         <div
           id={`accordion-body-${catSlug}`}
+          ref={bodyRef}
           className="accordion-body"
-          style={{ maxHeight: isOpen ? expandedHeight : 0 }}
+          style={{ maxHeight: isOpen ? Math.max(expandedHeight, measuredHeight) : 0 }}
         >
           <div className="accordion-body-inner">
             {/* P4 — removed "All in {cat.name} →" link; not present in ref 09/10.
@@ -351,18 +354,9 @@ function CategoryAccordion({
                         data-state={subOpen ? "open" : "closed"}
                         data-testid={`expand-sub-${subSlug}`}
                         className="shrink-0 inline-flex items-center justify-center rounded-md hover:bg-[var(--surface)] text-[var(--text-3)] hover:text-[var(--text)]"
-                        style={{ width: 22, minHeight: 36 }}
+                        style={{ width: 24, minHeight: 44 }}
                       >
-                        <ChevronRight
-                          className="size-3"
-                          style={{
-                            transition:
-                              "transform 200ms cubic-bezier(0.2,0.65,0.3,1)",
-                            transform: subOpen
-                              ? "rotate(90deg)"
-                              : "rotate(0deg)",
-                          }}
-                        />
+                        <ChevronRight className={cn("size-3 chevron-rotate", subOpen && "rotate-90")} />
                       </button>
                       <SubItem
                         label={sub.name}

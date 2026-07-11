@@ -72,17 +72,16 @@ describe('Phase 8 — Sidebar UX static guards (BUG-007 + BUG-043)', () => {
 
   describe('BUG-043 — label truncation fix', () => {
     it('top-level category label uses break-words (not truncate)', () => {
-      // The category label span is the second <span> inside the accordion
-      // header (icon span is the first). Find the {cat.name} render.
-      const catNameRender = tsx.match(
-        /\{cat\.name\}<\/span>[\s\S]{0,80}?<\/Link>/,
+      // The category label span carries title={cat.name} and renders
+      // {cat.name}. Match it directly (the previous walk-backwards-from-
+      // first-occurrence heuristic broke on unrelated `${cat.name}`
+      // template literals earlier in the file).
+      const labelSpan = tsx.match(
+        /<span\s+className="([^"]*)"\s+title=\{cat\.name\}[\s\S]{0,300}?\{cat\.name\}\s*<\/span>/,
       );
-      expect(catNameRender, 'cat.name label span must exist').toBeTruthy();
-      // Walk backwards to find the opening <span className=...> tag for that label.
-      const startIdx = tsx.lastIndexOf('<span', tsx.indexOf('{cat.name}'));
-      const openingTag = tsx.slice(startIdx, tsx.indexOf('>', startIdx) + 1);
-      expect(openingTag, 'category label opening tag').toMatch(/break-words/);
-      expect(openingTag, 'category label must NOT truncate').not.toMatch(/\btruncate\b/);
+      expect(labelSpan, 'cat.name label span must exist').toBeTruthy();
+      expect(labelSpan![1], 'category label opening tag').toMatch(/break-words/);
+      expect(labelSpan![1], 'category label must NOT truncate').not.toMatch(/\btruncate\b/);
     });
 
     it('SubItem label uses break-words (not truncate)', () => {
