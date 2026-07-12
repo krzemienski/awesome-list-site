@@ -159,6 +159,7 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
           className="h-9 w-9 min-h-[44px] min-w-[44px] relative touch-manipulation"
           onClick={() => setLocation("/settings/theme")}
           title="Theme Settings"
+          aria-label="Theme Settings"
         >
           <Palette className="h-4 w-4" />
         </Button>

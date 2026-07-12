@@ -123,7 +123,7 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
             Find <em className="not-italic" style={{ fontStyle: 'italic', color: 'var(--accent)' }}>resources</em>
           </DialogTitle>
           <DialogDescription>
-            Find packages, libraries, and tools in the awesome list.
+            Find video development resources in the awesome list.
           </DialogDescription>
         </DialogHeader>
         
@@ -132,7 +132,7 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none z-10" />
             <CommandInput
               ref={inputRef}
-              placeholder="Search packages, libraries, and tools..."
+              placeholder="Search resources..."
               value={query}
               onValueChange={(value) => {
                 console.log(`Input value changed to: "${value}"`);

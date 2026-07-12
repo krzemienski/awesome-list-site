@@ -72,7 +72,7 @@ test.describe('Search and Discovery Flow', () => {
       // Verify dialog opened
       await expect(page.getByRole('dialog')).toBeVisible();
       await expect(page.getByRole('heading', { name: /Search Resources/i })).toBeVisible();
-      await expect(page.getByPlaceholder(/Search packages, libraries, and tools/i)).toBeVisible();
+      await expect(page.getByPlaceholder(/Search resources/i)).toBeVisible();
     });
 
     test('should open search dialog with keyboard shortcut', async ({ page }) => {
@@ -95,7 +95,7 @@ test.describe('Search and Discovery Flow', () => {
 
       // Check if input is focused (give it a moment to auto-focus)
       await page.waitForTimeout(200);
-      const searchInput = page.getByPlaceholder(/Search packages, libraries, and tools/i);
+      const searchInput = page.getByPlaceholder(/Search resources/i);
       await expect(searchInput).toBeFocused();
     });
 
@@ -141,7 +141,7 @@ test.describe('Search and Discovery Flow', () => {
       await searchButton.click();
 
       // Type search query that won't match anything
-      const searchInput = page.getByPlaceholder(/Search packages, libraries, and tools/i);
+      const searchInput = page.getByPlaceholder(/Search resources/i);
       await searchInput.fill('xyzabc123nonexistent');
 
       // Wait a bit for search to process
@@ -158,7 +158,7 @@ test.describe('Search and Discovery Flow', () => {
       await searchButton.click();
 
       // Type a common search term likely to have results
-      const searchInput = page.getByPlaceholder(/Search packages, libraries, and tools/i);
+      const searchInput = page.getByPlaceholder(/Search resources/i);
       await searchInput.fill('video');
 
       // Wait for results to appear
@@ -178,7 +178,7 @@ test.describe('Search and Discovery Flow', () => {
       await searchButton.click();
 
       // Type single character
-      const searchInput = page.getByPlaceholder(/Search packages, libraries, and tools/i);
+      const searchInput = page.getByPlaceholder(/Search resources/i);
       await searchInput.fill('a');
 
       // Should still show placeholder message
@@ -200,7 +200,7 @@ test.describe('Search and Discovery Flow', () => {
       await searchButton.click();
 
       // Type search query
-      const searchInput = page.getByPlaceholder(/Search packages, libraries, and tools/i);
+      const searchInput = page.getByPlaceholder(/Search resources/i);
       await searchInput.fill('ffmpeg');
 
       // Wait for potential results
@@ -231,7 +231,7 @@ test.describe('Search and Discovery Flow', () => {
       await searchButton.click();
 
       // Type search query
-      const searchInput = page.getByPlaceholder(/Search packages, libraries, and tools/i);
+      const searchInput = page.getByPlaceholder(/Search resources/i);
       await searchInput.fill('test search');
 
       // Close dialog
@@ -241,7 +241,7 @@ test.describe('Search and Discovery Flow', () => {
       await searchButton.click();
 
       // Verify input is cleared
-      const clearedInput = page.getByPlaceholder(/Search packages, libraries, and tools/i);
+      const clearedInput = page.getByPlaceholder(/Search resources/i);
       await expect(clearedInput).toHaveValue('');
     });
   });
@@ -381,7 +381,7 @@ test.describe('Search and Discovery Flow', () => {
       await expect(page.getByRole('heading', { name: /Search Resources/i })).toBeVisible();
 
       // Search input should have placeholder
-      const input = page.getByPlaceholder(/Search packages, libraries, and tools/i);
+      const input = page.getByPlaceholder(/Search resources/i);
       await expect(input).toBeVisible();
     });
 

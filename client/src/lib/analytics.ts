@@ -63,15 +63,23 @@ export const initGA = () => {
   // Initialize gtag. send_page_view:false — the initial page_view and every
   // route-change page_view are fired manually from use-analytics (single
   // source). debug_mode:true (DEV only) routes events to GA4 DebugView.
-  const script2 = document.createElement('script');
-  const configParams = `{ send_page_view: false${import.meta.env.DEV ? ', debug_mode: true' : ''} }`;
-  script2.innerHTML = `
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', '${measurementId}', ${configParams});
-  `;
-  document.head.appendChild(script2);
+  //
+  // July 2026 audit BUG-004: this used to inject an INLINE <script> for the
+  // dataLayer/gtag bootstrap. Dynamically-injected inline scripts carry no CSP
+  // nonce, so production's nonce-based script-src blocked it — window.gtag was
+  // never defined and ALL analytics silently died in prod. Running the same
+  // bootstrap as module code (covered by script-src 'self') needs no inline
+  // script at all. NOTE: gtag MUST push the `arguments` object (not an array),
+  // so this stays a regular function, never an arrow function.
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function gtag() {
+    // eslint-disable-next-line prefer-rest-params
+    window.dataLayer.push(arguments);
+  };
+  window.gtag('js', new Date());
+  const configParams: Record<string, unknown> = { send_page_view: false };
+  if (import.meta.env.DEV) configParams.debug_mode = true;
+  window.gtag('config', measurementId, configParams);
 };
 
 // Standard GA4 context attached to every event.

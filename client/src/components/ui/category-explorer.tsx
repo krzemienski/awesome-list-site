@@ -17,6 +17,45 @@ interface CategoryExplorerProps {
   className?: string;
 }
 
+// BUG-001 (July 2026 audit): the tree nests most resources under
+// category.subcategories[].resources (and their subSubcategories), so
+// `category.resources.length` is the DIRECT-only count and wildly understates
+// totals. Same recursive helper as Home.tsx / AppSidebar.tsx / Categories.tsx —
+// card counts here must agree with the sidebar and home cards.
+function getTotalResourceCount(item: {
+  resources?: Resource[];
+  subcategories?: unknown[];
+  subSubcategories?: unknown[];
+}): number {
+  let total = item.resources?.length || 0;
+  if (item.subcategories) {
+    total += (item.subcategories as any[]).reduce(
+      (sum: number, sub: any) => sum + getTotalResourceCount(sub),
+      0,
+    );
+  }
+  if (item.subSubcategories) {
+    total += (item.subSubcategories as any[]).reduce(
+      (sum: number, ss: any) => sum + getTotalResourceCount(ss),
+      0,
+    );
+  }
+  return total;
+}
+
+// Flatten every resource in a category (direct + subcategories + sub-subs) so
+// tag stats reflect the whole category, not just direct resources.
+function getAllCategoryResources(category: Category): Resource[] {
+  const all: Resource[] = [...(category.resources || [])];
+  for (const sub of category.subcategories || []) {
+    all.push(...(sub.resources || []));
+    for (const ss of sub.subSubcategories || []) {
+      all.push(...(ss.resources || []));
+    }
+  }
+  return all;
+}
+
 export default function CategoryExplorer({ categories, resources, className }: CategoryExplorerProps) {
   const [, navigate] = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
@@ -37,15 +76,19 @@ export default function CategoryExplorer({ categories, resources, className }: C
   // Filter and sort categories
   const filteredCategories = useMemo(() => {
     let filtered = categories.filter(category => {
+      // BUG-001 follow-through: filter across ALL nested resources, not just
+      // direct ones, so categories whose resources live in subcategories still
+      // match search terms and tag filters.
+      const allResources = getAllCategoryResources(category);
       const matchesSearch = searchTerm === "" || 
         category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        category.resources.some(resource => 
+        allResources.some(resource => 
           resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
           resource.description.toLowerCase().includes(searchTerm.toLowerCase())
         );
 
       const matchesTags = selectedTags.length === 0 ||
-        category.resources.some(resource =>
+        allResources.some(resource =>
           resource.tags?.some(tag => selectedTags.includes(tag))
         );
 
@@ -58,10 +101,10 @@ export default function CategoryExplorer({ categories, resources, className }: C
         case "name":
           return a.name.localeCompare(b.name);
         case "count":
-          return b.resources.length - a.resources.length;
+          return getTotalResourceCount(b) - getTotalResourceCount(a);
         case "activity":
           // Sort by most recent or most popular (using resource count as proxy)
-          return b.resources.length - a.resources.length;
+          return getTotalResourceCount(b) - getTotalResourceCount(a);
         default:
           return 0;
       }
@@ -91,10 +134,10 @@ export default function CategoryExplorer({ categories, resources, className }: C
   };
 
   const getCategoryStats = (category: Category) => {
-    const totalResources = category.resources.length;
+    const totalResources = getTotalResourceCount(category);
     const subcategoryCount = category.subcategories?.length || 0;
     const uniqueTags = new Set(
-      category.resources.flatMap((r) => ((r as any).metadata?.tags as string[] | undefined) ?? r.tags ?? [])
+      getAllCategoryResources(category).flatMap((r) => ((r as any).metadata?.tags as string[] | undefined) ?? r.tags ?? [])
     ).size;
 
     return { totalResources, subcategoryCount, uniqueTags };
@@ -272,9 +315,11 @@ export default function CategoryExplorer({ categories, resources, className }: C
               </CardHeader>
 
               <CardContent className="pt-0">
-                {/* Quick preview of top resources */}
+                {/* Quick preview of top resources — pulled from the WHOLE
+                    category (direct + nested) so the "+N more" figure agrees
+                    with the corrected card total (BUG-001). */}
                 <div className="space-y-2 mb-3">
-                  {category.resources.slice(0, 3).map(resource => (
+                  {getAllCategoryResources(category).slice(0, 3).map(resource => (
                     <div key={resource.id} className="text-sm">
                       <a
                         href={resource.url}
@@ -289,9 +334,9 @@ export default function CategoryExplorer({ categories, resources, className }: C
                       </p>
                     </div>
                   ))}
-                  {category.resources.length > 3 && (
+                  {stats.totalResources > 3 && (
                     <p className="text-xs text-muted-foreground">
-                      +{category.resources.length - 3} more resources
+                      +{stats.totalResources - 3} more resources
                     </p>
                   )}
                 </div>
@@ -311,7 +356,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
                               onClick={() => navigate(`/subcategory/${subcategory.slug}`)}
                               className="h-6 px-2 text-xs"
                             >
-                              {subcategory.name} ({subcategory.resources?.length || 0})
+                              {subcategory.name} ({getTotalResourceCount(subcategory)})
                             </Button>
                           ))}
                         </div>

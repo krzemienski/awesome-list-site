@@ -85,7 +85,7 @@ export default function Search() {
           ref={inputRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Search packages, libraries, and tools…"
+          placeholder="Search resources..."
           className="pl-10"
           data-testid="input-search-page"
         />

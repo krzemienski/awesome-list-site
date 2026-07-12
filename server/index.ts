@@ -47,7 +47,11 @@ app.use((_req, res, next) => {
       [
         "default-src 'self'",
         // BUG-014: nonce-based scripts — no 'unsafe-inline'.
-        `script-src 'self' 'nonce-${nonce}' https://www.googletagmanager.com https://replit.com`,
+        // July 2026 audit BUG-003: Replit's deployment platform injects
+        // <script src="https://replit-cdn.com/feedback-widget/widget.global.js">
+        // into the served HTML (it is NOT in our source, so we cannot nonce or
+        // remove it) — allowlist the origin so the widget loads cleanly.
+        `script-src 'self' 'nonce-${nonce}' https://www.googletagmanager.com https://replit.com https://replit-cdn.com`,
         // BUG-014: nonce-based styles — no 'unsafe-inline'. The SSR shell's
         // <style> and the static inline <style> tags are stamped with this same
         // nonce by stampNonce() in og-middleware (which reads res.locals.cspNonce),
@@ -61,7 +65,9 @@ app.use((_req, res, next) => {
         // Keeping the blanket https: for img-src (it covers the allowlist hosts too).
         "img-src 'self' data: https:",
         // M1 audit fix: allow www.google.com in connect-src (prod console CSP report).
-        "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.google.com",
+        // BUG-003: replit.com + replit-cdn.com so the platform feedback widget
+        // can phone home without spawning new CSP violations once its script loads.
+        "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.google.com https://replit.com https://replit-cdn.com",
         "frame-ancestors 'none'",
         // BUG-014: add the missing hardening directives.
         "form-action 'self'",
@@ -86,7 +92,13 @@ app.use((req, res, next) => {
     // the SPA shell.
     /^\/profile(\/|$)/,
   ];
-  const isProtected = protectedPatterns.some(p => p.test(req.path));
+  // July 2026 audit BUG-002: /settings/theme is a public, localStorage-only
+  // appearance page (no account data) — exempt it so anonymous visitors can
+  // change the theme instead of hitting a login wall.
+  const publicExceptions = [/^\/settings\/theme(\/|$)/];
+  const isProtected =
+    protectedPatterns.some(p => p.test(req.path)) &&
+    !publicExceptions.some(p => p.test(req.path));
   if (isProtected && !req.headers.cookie?.includes('connect.sid')) {
     return res.redirect(302, '/login');
   }
