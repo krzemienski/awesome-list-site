@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -326,6 +326,36 @@ export default function ResourceManager() {
     resetEditForm();
     setCreateDialogOpen(true);
   };
+
+  // NEW-013: /admin/resources?resourceId=N (ResourceDetail's "Edit in Admin"
+  // deep-link) opens that resource's edit dialog directly instead of dumping
+  // the admin on an unfiltered table. The param is stripped afterwards so a
+  // refresh or tab switch doesn't reopen the dialog.
+  const deepLinkHandled = useRef(false);
+  useEffect(() => {
+    if (deepLinkHandled.current) return;
+    deepLinkHandled.current = true;
+    const params = new URLSearchParams(window.location.search);
+    const rid = parseInt(params.get("resourceId") || "", 10);
+    if (!rid || Number.isNaN(rid)) return;
+    const stripParam = () => {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("resourceId");
+      window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+    };
+    fetch(`/api/resources/${rid}`, { credentials: "include" })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
+      .then((resource: Resource) => openEditDialog(resource))
+      .catch(() => {
+        toast({
+          title: "Resource not found",
+          description: `Resource #${rid} could not be loaded for editing.`,
+          variant: "destructive",
+        });
+      })
+      .finally(stripParam);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const openDeleteDialog = (resource: Resource) => {
     setSelectedResource(resource);

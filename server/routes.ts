@@ -56,7 +56,7 @@ import { fetchAwesomeList } from "./parser";
 import { fetchAwesomeVideoData } from "./awesome-video-parser-clean";
 import { RecommendationEngine, UserProfile } from "./recommendation-engine";
 import { fetchAwesomeLists, searchAwesomeLists } from "./github-api";
-import { insertResourceSchema, EDITABLE_RESOURCE_FIELDS, insertJourneyStepSchema, passwordResetTokens, type Resource } from "@shared/schema";
+import { insertResourceSchema, EDITABLE_RESOURCE_FIELDS, insertJourneyStepSchema, insertLearningJourneySchema, passwordResetTokens, type Resource } from "@shared/schema";
 import { ensureSubSubcategoryExists } from "./repositories/ensureSubSubcategory";
 import { z } from "zod";
 import { syncService } from "./github/syncService";
@@ -843,7 +843,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // silently truncated limit=2000 requests) and the response now carries
       // `limit` / `offset` / `nextOffset` so callers can page the full catalog:
       // repeat with offset=nextOffset until nextOffset is null.
-      const rawOffset = req.query.offset as string | undefined;
+      // BUG-039: `cursor` is accepted as an alias for `offset` (and the
+      // response carries a matching `nextCursor`), since API consumers
+      // reasonably probe for cursor-style paging. offset wins if both given.
+      const rawCursor = req.query.cursor as string | undefined;
+      const rawOffset = (req.query.offset as string | undefined) ?? rawCursor;
       const rawLimit = req.query.limit as string | undefined;
       if (rawOffset !== undefined && isNaN(Number(rawOffset))) {
         return res.status(400).json({ error: 'invalid_offset' });
@@ -892,6 +896,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (!ALLOWED_STATUSES.has(requestedStatus)) {
           return res.status(400).json({ error: 'invalid_status', allowed: Array.from(ALLOWED_STATUSES) });
         }
+        // NEW-006 companion: non-approved listings are admin-only, otherwise
+        // the detail endpoint's status gate is bypassable via bulk listing.
+        // (The admin UI uses /api/resources/pending, which already requires
+        // admin; this path only ever served anonymous probes.)
+        if (requestedStatus !== 'approved') {
+          const requesterId = (req as any).user?.claims?.sub;
+          const requester = requesterId ? await userRepo.getUser(requesterId) : undefined;
+          if (!requester || requester.role !== 'admin') {
+            return res.status(403).json({ error: 'forbidden', message: 'Non-approved listings require admin access' });
+          }
+        }
         statusFilter = requestedStatus;
       }
 
@@ -909,7 +924,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const nextOffset = offset + result.resources.length < result.total
         ? offset + result.resources.length
         : null;
-      res.json({ ...result, limit, offset, nextOffset });
+      res.json({ ...result, limit, offset, nextOffset, nextCursor: nextOffset });
     } catch (error) {
       console.error('Error fetching resources:', error);
       res.status(500).json({ message: 'Failed to fetch resources' });
@@ -1017,6 +1032,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'Resource not found' });
       }
 
+      // NEW-006: non-approved (pending/rejected) resources are not public.
+      // Serve them only to admins (the admin UI deep-links into detail pages);
+      // everyone else gets the same 404 as a missing id so status is not
+      // leaked. This mirrors og-middleware, which already soft-404s
+      // non-approved /resource/:id routes for crawlers.
+      if (resource.status !== 'approved') {
+        const userId = req.user?.claims?.sub;
+        const user = userId ? await userRepo.getUser(userId) : undefined;
+        if (!user || user.role !== 'admin') {
+          return res.status(404).json({ message: 'Resource not found' });
+        }
+      }
+
       res.json(resource);
     } catch (error) {
       console.error('Error fetching resource:', error);
@@ -1037,6 +1065,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const resource = await resourceRepo.getResource(id);
       if (!resource) {
         return res.json(empty);
+      }
+      // NEW-006 companion: for a non-approved seed id, return the empty shape
+      // to non-admins — a populated `similar` list would confirm the hidden
+      // id exists and leak its category.
+      if (resource.status !== 'approved') {
+        const requesterId = (req as any).user?.claims?.sub;
+        const requester = requesterId ? await userRepo.getUser(requesterId) : undefined;
+        if (!requester || requester.role !== 'admin') {
+          return res.json(empty);
+        }
       }
       // Pull a pool of approved resources in the same category to rank against.
       const { resources: pool } = await resourceRepo.listResources({
@@ -1939,6 +1977,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // PUT /api/admin/journeys/:id - Update journey metadata (title, description,
+  // difficulty, duration, etc.). NEW-005: added so template-boilerplate journey
+  // descriptions can be corrected via the admin API (including on production,
+  // which has no direct DB access).
+  app.put('/api/admin/journeys/:id', isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const journeyId = parseInt(req.params.id, 10);
+      if (isNaN(journeyId)) {
+        return res.status(400).json({ message: 'Invalid journey ID' });
+      }
+      const parsed = insertLearningJourneySchema.partial().safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ message: 'Invalid journey update', errors: parsed.error.issues });
+      }
+      if (Object.keys(parsed.data).length === 0) {
+        return res.status(400).json({ message: 'Empty update: provide at least one updatable field' });
+      }
+      const journey = await learningJourneyRepo.getLearningJourney(journeyId);
+      if (!journey) {
+        return res.status(404).json({ message: 'Journey not found' });
+      }
+      const updated = await learningJourneyRepo.updateLearningJourney(journeyId, parsed.data);
+      res.json(updated);
+    } catch (error) {
+      console.error('Error updating journey:', error);
+      res.status(500).json({ message: 'Failed to update journey' });
+    }
+  });
+
   // GET /api/admin/journeys/:id/steps - List steps for a journey
   app.get('/api/admin/journeys/:id/steps', isAuthenticated, isAdmin, async (req, res) => {
     try {
@@ -2178,6 +2245,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // DELETE /api/admin/users/:id - Delete a user (NEW-004: QA/test account
+  // cleanup). Self-deletion is blocked. Content is preserved: the user's
+  // submitted/approved resources are detached (attribution nulled) rather than
+  // cascade-deleted; their pending edit suggestions are removed. Personal data
+  // (bookmarks, favorites, progress, preferences, API keys) cascades away.
+  app.delete('/api/admin/users/:id', isAuthenticated, isAdmin, async (req: any, res) => {
+    try {
+      const targetId = req.params.id;
+      if (req.user?.claims?.sub === targetId) {
+        return res.status(400).json({ message: 'You cannot delete your own account' });
+      }
+      const target = await userRepo.getUser(targetId);
+      if (!target) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      const summary = await userRepo.deleteUserWithCleanup(targetId);
+      res.json({ success: true, deletedUserId: targetId, email: target.email, ...summary });
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      res.status(500).json({ message: 'Failed to delete user' });
+    }
+  });
+
   // ============= Audit Log Routes =============
 
   // GET /api/admin/audit-logs - List audit log entries

@@ -2,13 +2,15 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Users, ChevronLeft, ChevronRight, Shield, User as UserIcon } from "lucide-react";
+import { Users, ChevronLeft, ChevronRight, Shield, User as UserIcon, Trash2 } from "lucide-react";
 import type { User } from "@shared/schema";
 
 interface UsersResponse {
@@ -26,7 +28,9 @@ const ROLE_COLORS: Record<string, string> = {
 export default function UsersTab() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user: currentUser } = useAuth();
   const [page, setPage] = useState(1);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const limit = 20;
 
   const { data, isLoading } = useQuery<UsersResponse>({
@@ -52,6 +56,24 @@ export default function UsersTab() {
     },
     onError: (error: Error) => {
       toast({ title: "Update Failed", description: error.message, variant: "destructive" });
+    },
+  });
+
+  // NEW-004: admin user deletion (QA/test account cleanup). The server blocks
+  // self-deletion, detaches the user's catalog resources instead of deleting
+  // them, and cascades personal data away.
+  const deleteUserMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      return await apiRequest(`/api/admin/users/${userId}`, { method: 'DELETE' });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
+      toast({ title: "User Deleted", description: "The user account has been removed." });
+      setUserToDelete(null);
+    },
+    onError: (error: Error) => {
+      toast({ title: "Delete Failed", description: error.message, variant: "destructive" });
+      setUserToDelete(null);
     },
   });
 
@@ -136,19 +158,33 @@ export default function UsersTab() {
                     {formatDate(user.createdAt)}
                   </TableCell>
                   <TableCell>
-                    <Select
-                      value={user.role || 'user'}
-                      onValueChange={(role) => updateRoleMutation.mutate({ userId: user.id, role })}
-                    >
-                      <SelectTrigger className="w-32 h-8 text-xs" aria-label="Change user role">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="user">User</SelectItem>
-                        <SelectItem value="moderator">Moderator</SelectItem>
-                        <SelectItem value="admin">Admin</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <div className="flex items-center gap-2">
+                      <Select
+                        value={user.role || 'user'}
+                        onValueChange={(role) => updateRoleMutation.mutate({ userId: user.id, role })}
+                      >
+                        <SelectTrigger className="w-32 h-8 text-xs" aria-label="Change user role">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="user">User</SelectItem>
+                          <SelectItem value="moderator">Moderator</SelectItem>
+                          <SelectItem value="admin">Admin</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {user.id !== currentUser?.id && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                          onClick={() => setUserToDelete(user)}
+                          aria-label={`Delete user ${user.email || user.id}`}
+                          data-testid={`button-delete-user-${user.id}`}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
@@ -187,6 +223,34 @@ export default function UsersTab() {
             </div>
           </div>
         )}
+
+        <AlertDialog open={!!userToDelete} onOpenChange={(open) => { if (!open) setUserToDelete(null); }}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete this user?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This permanently deletes{" "}
+                <span className="font-medium text-foreground">
+                  {userToDelete?.email || userToDelete?.id}
+                </span>{" "}
+                along with their bookmarks, favorites, progress, and API keys.
+                Any resources they submitted stay in the catalog (attribution is
+                removed). This cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => userToDelete && deleteUserMutation.mutate(userToDelete.id)}
+                disabled={deleteUserMutation.isPending}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                data-testid="button-confirm-delete-user"
+              >
+                {deleteUserMutation.isPending ? "Deleting…" : "Delete User"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </CardContent>
     </Card>
   );

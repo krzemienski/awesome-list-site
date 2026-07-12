@@ -517,7 +517,10 @@ export default function ResourceDetail() {
                 <>
                   <Separator />
                   <div className="flex flex-wrap items-center gap-4 pt-2">
-                    <Link href="/admin">
+                    {/* NEW-013: deep-link straight to this resource's edit
+                        dialog in the admin Resources tab, not the bare
+                        dashboard (which lands on Approvals). */}
+                    <Link href={`/admin/resources?resourceId=${resource.id}`}>
                       <Button variant="outline" data-testid="button-edit-admin">
                         <Edit className="h-4 w-4 mr-2" />
                         Edit in Admin

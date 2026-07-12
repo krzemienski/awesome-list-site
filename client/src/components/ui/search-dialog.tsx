@@ -18,6 +18,9 @@ interface SearchDialogProps {
 export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDialogProps) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Resource[]>([]);
+  // NEW-015: total match count across the whole catalog, shown above the
+  // (top-15-capped) quick results so users know how many matches exist.
+  const [totalMatches, setTotalMatches] = useState(0);
   const debouncedQuery = useDebounce(query, 600);
   const [, navigate] = useLocation();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -44,9 +47,11 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
   useEffect(() => {
     if (!query || query.length < 2 || !fuse) {
       setResults([]);
+      setTotalMatches(0);
       return;
     }
     const searchResults = fuse.search(query);
+    setTotalMatches(searchResults.length);
     setResults(searchResults.slice(0, 15).map(result => result.item));
   }, [query, fuse]);
 
@@ -101,6 +106,7 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
     if (!isOpen) {
       setQuery("");
       setResults([]);
+      setTotalMatches(0);
     }
   }, [isOpen]);
 
@@ -134,10 +140,7 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
               ref={inputRef}
               placeholder="Search resources..."
               value={query}
-              onValueChange={(value) => {
-                console.log(`Input value changed to: "${value}"`);
-                setQuery(value);
-              }}
+              onValueChange={setQuery}
               className="w-full pl-10 pr-4 py-2"
             />
           </div>
@@ -145,6 +148,16 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
           <CommandList className="max-h-[300px] overflow-y-auto">
             {query.length >= 2 ? (
               <>
+                {totalMatches > 0 && (
+                  <div
+                    className="px-3 pt-2 pb-1 text-xs text-muted-foreground"
+                    data-testid="search-result-count"
+                    aria-live="polite"
+                  >
+                    {totalMatches} match{totalMatches === 1 ? "" : "es"}
+                    {totalMatches > results.length ? ` — showing top ${results.length}` : ""}
+                  </div>
+                )}
                 <CommandGroup>
                   {/* Pinned first so plain Enter goes to the full search page. */}
                   <CommandItem

@@ -128,6 +128,44 @@ export class UserRepository {
   }
 
   /**
+   * Delete a user with full FK cleanup (NEW-004: admin user deletion).
+   *
+   * Content is preserved: the user's submitted/approved resources are
+   * DETACHED (submitted_by/approved_by nulled) instead of cascade-deleted, so
+   * deleting an account never removes public catalog entries. Their pending
+   * resource-edit suggestions are deleted (meaningless without a submitter);
+   * job/sync attributions are nulled. Personal rows (bookmarks, favorites,
+   * interactions, journey progress, preferences, API keys, password-reset
+   * tokens) cascade via their FKs. resource_audit_log.performed_by is
+   * ON DELETE SET NULL, so audit history survives with attribution removed.
+   *
+   * @param userId - ID of the user to delete
+   * @returns Counts of detached resources and deleted edit suggestions
+   */
+  async deleteUserWithCleanup(userId: string): Promise<{ resourcesDetached: number; editsDeleted: number }> {
+    return await db.transaction(async (tx) => {
+      const detachedSubmitted = await tx.execute(
+        sql`UPDATE resources SET submitted_by = NULL WHERE submitted_by = ${userId}`
+      );
+      const detachedApproved = await tx.execute(
+        sql`UPDATE resources SET approved_by = NULL WHERE approved_by = ${userId}`
+      );
+      const editsDeleted = await tx.execute(
+        sql`DELETE FROM resource_edits WHERE submitted_by = ${userId}`
+      );
+      await tx.execute(sql`UPDATE resource_edits SET handled_by = NULL WHERE handled_by = ${userId}`);
+      await tx.execute(sql`UPDATE github_sync_history SET performed_by = NULL WHERE performed_by = ${userId}`);
+      await tx.execute(sql`UPDATE enrichment_jobs SET started_by = NULL WHERE started_by = ${userId}`);
+      await tx.execute(sql`UPDATE research_jobs SET started_by = NULL WHERE started_by = ${userId}`);
+      await tx.delete(users).where(eq(users.id, userId));
+      return {
+        resourcesDetached: (detachedSubmitted.rowCount ?? 0) + (detachedApproved.rowCount ?? 0),
+        editsDeleted: editsDeleted.rowCount ?? 0,
+      };
+    });
+  }
+
+  /**
    * Legacy method - Get user by username
    * @deprecated Not used with OAuth-based authentication
    * @param username - Username to search for

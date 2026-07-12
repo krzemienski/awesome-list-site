@@ -10,6 +10,12 @@ A production-ready React application for browsing and discovering over 2,600 cur
 
 > **Full history:** see [`CHANGELOG.md`](./CHANGELOG.md) for every dated entry back to December 2025.
 
+### Master Fix Prompt Remediation — Run4 (July 12, 2026)
+- **18-finding external audit triaged live**: 10 findings STALE (audit predates the July 10 republish), 6 fixed, 1 platform-injected (NEW-014 feedback badge — zero app code, Replit dev-preview only), 1 pending user decision (NEW-002 light mode — dark-only is by design). Full table: `evidence/run4/findings-table.md`.
+- **Server**: NEW-006 non-approved resources 404 to non-admins on `/api/resources/:id` + BUG-004 companion (`?status=pending|rejected` listing now admin-only, 403) + `/related` returns empty shape for hidden ids; BUG-039 `?cursor=` alias + `nextCursor`; new `PUT /api/admin/journeys/:id`; new `DELETE /api/admin/users/:id` with `deleteUserWithCleanup` (detaches submitted/approved resources instead of deleting content, removes edit suggestions, personal data cascades).
+- **Client**: Users tab delete button + confirm dialog (self excluded); "Edit in Admin" deep-links to `/admin/resources?resourceId=N` and auto-opens the edit dialog (param stripped after); search dialog shows "N matches — showing top 15"; journey descriptions rewritten to 5 unique real blurbs (dev via SQL; prod via the new PUT post-republish).
+- **Verified live** (Iron Rule): tsc clean; curl auth/negative/lifecycle tests on every endpoint; Playwright sweep 8/8 PASS (`scripts/run4-verify-dev.mjs`); architect PASS after closing its two flagged leaks. **Requires republish**; then prod follow-ups: journey descriptions via PUT, delete 2 `__qa_test` users via the new DELETE.
+
 ### Merged External "Production Audit Remediation" from GitHub (July 10, 2026)
 - **Merged origin/main** (external hardening pass, 184 files: nonce-based CSP, BUG-014/015/019/020 fixes, `migrations/0029_search_fts.sql`, og-middleware/routes rewrites) into local main (UI-audit work) and pushed (`4ece6af`, cleanup `a0f4936`).
 - **Conflict resolution (server/index.ts CSP)**: kept blanket `img-src 'self' data: https:` (remote's domain allowlist would break arbitrary ResourceCard ogImage URLs) + kept the `connect-src` google.com entry; removed a dead `const { Pool } = pkg;` that crashed boot. **Prod-risk to watch after republish**: the nonce CSP has no `unsafe-inline` fallback and is production-only — smoke-check the prod browser console for CSP violations on first publish.
