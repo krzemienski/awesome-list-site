@@ -10,6 +10,12 @@ A production-ready React application for browsing and discovering over 2,600 cur
 
 > **Full history:** see [`CHANGELOG.md`](./CHANGELOG.md) for every dated entry back to December 2025. Older "Recent Changes" entries are moved there periodically.
 
+### Master Fix Prompt Round 2 Remediation — Run5 (July 12, 2026)
+- **56-finding external audit triaged live**: 19 fixed, 35 closed without code (18 stale, 8 invalid, 2 by-design, 2 platform, 3 not-a-defect, 1 explained), 2 declined (drag-drop reorder, admin kbd shortcuts). Full table: `evidence/run5/findings-table.md`.
+- **Server**: public `GET /api/tags` (1,759 aggregated metadata tags); `GET /api/admin/users?q=` filter; `GET /api/admin/users/export` CSV (formula-injection guarded, no password data).
+- **Client**: admin — typed-confirm re-seed, masked emails + reveal, user search/export, enrichment stat clamps, bulk resource actions, per-tab ErrorBoundary; public — footer nav, word-boundary truncation, search pagination + cap notice, `?sort=` persistence, password strength meter, back-to-top, anon favorite/bookmark sign-in prompts, ⌘K recent searches.
+- **Verified** (Iron Rule): tsc clean; curl auth/negative on all new endpoints; Playwright 17/17 PASS (`scripts/run5-verify-dev.mjs`); architect PASS. **Needs republish to reach production.**
+
 ### Master Fix Prompt Remediation — Run4 (July 12, 2026)
 - **18-finding external audit triaged live**: 10 findings STALE (audit predates the July 10 republish), 6 fixed, 1 platform-injected (NEW-014 feedback badge — zero app code, Replit dev-preview only), 1 closed by user decision (NEW-002 — keeping the site dark-only by design). Full table: `evidence/run4/findings-table.md`.
 - **Server**: NEW-006 non-approved resources 404 to non-admins on `/api/resources/:id` + BUG-004 companion (`?status=pending|rejected` listing now admin-only, 403) + `/related` returns empty shape for hidden ids; BUG-039 `?cursor=` alias + `nextCursor`; new `PUT /api/admin/journeys/:id`; new `DELETE /api/admin/users/:id` with `deleteUserWithCleanup` (detaches submitted/approved resources instead of deleting content, removes edit suggestions, personal data cascades).

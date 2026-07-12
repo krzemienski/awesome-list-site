@@ -1,10 +1,40 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Link } from "wouter";
+import { ArrowUp } from "lucide-react";
 import { AwesomeList } from "@/types/awesome-list";
 import AppSidebar from "./AppSidebar";
 import AppHeader from "./AppHeader";
 import SearchDialog from "@/components/ui/search-dialog";
+import { Button } from "@/components/ui/button";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
+
+/** R2-L01: floating "back to top" button, appears after scrolling ~600px. */
+function BackToTop() {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setVisible(window.scrollY > 600);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  if (!visible) return null;
+
+  return (
+    <Button
+      variant="outline"
+      size="icon"
+      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      aria-label="Back to top"
+      data-testid="button-back-to-top"
+      className="fixed bottom-6 right-6 z-40 h-11 w-11 shadow-lg bg-[var(--surface)]"
+    >
+      <ArrowUp className="h-5 w-5" />
+    </Button>
+  );
+}
 
 interface User {
   id: string;
@@ -63,17 +93,29 @@ export default function MainLayout({ awesomeList, isLoading, children, user, onL
         >
           {children}
         </main>
-        {/* R1 — minimal app footer (restored from T002 removal per ref 01/02/04/07) */}
+        {/* R1 — minimal app footer; R2-M19 — navigation links + copyright. */}
         <footer className="border-t border-[var(--border)] mt-auto">
-          <div className="mx-auto w-full max-w-[1280px] px-4 sm:px-6 md:px-12 py-4 flex items-center justify-between text-xs text-[color:var(--text-3)]">
-            <span>Built with React &amp; shadcn/ui</span>
-            <a
-              href="/about"
-              className="hover:text-[color:var(--text)] transition-colors"
-              data-testid="footer-about"
-            >
-              About
-            </a>
+          <div className="mx-auto w-full max-w-[1280px] px-4 sm:px-6 md:px-12 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[color:var(--text-3)]">
+            <span data-testid="footer-copyright">
+              © {new Date().getFullYear()} Awesome Video · Built with React &amp; shadcn/ui
+            </span>
+            <nav aria-label="Footer" className="flex items-center gap-4">
+              <Link href="/" className="hover:text-[color:var(--text)] transition-colors" data-testid="footer-home">
+                Home
+              </Link>
+              <Link href="/categories" className="hover:text-[color:var(--text)] transition-colors" data-testid="footer-categories">
+                Categories
+              </Link>
+              <Link href="/journeys" className="hover:text-[color:var(--text)] transition-colors" data-testid="footer-journeys">
+                Journeys
+              </Link>
+              <Link href="/submit" className="hover:text-[color:var(--text)] transition-colors" data-testid="footer-submit">
+                Submit
+              </Link>
+              <Link href="/about" className="hover:text-[color:var(--text)] transition-colors" data-testid="footer-about">
+                About
+              </Link>
+            </nav>
           </div>
         </footer>
         </SidebarInset>
@@ -83,6 +125,7 @@ export default function MainLayout({ awesomeList, isLoading, children, user, onL
         setIsOpen={setSearchOpen}
         resources={awesomeList?.resources || []}
       />
+      <BackToTop />
     </SidebarProvider>
   );
 }

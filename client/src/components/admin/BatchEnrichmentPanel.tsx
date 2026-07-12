@@ -8,6 +8,16 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
@@ -58,6 +68,8 @@ export default function BatchEnrichmentPanel() {
   const [authToken, setAuthToken] = useState("");
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  // R2-H04 companion: cancel-job confirmation via AlertDialog, not confirm().
+  const [jobToCancel, setJobToCancel] = useState<number | null>(null);
 
   const [isPolling, setIsPolling] = useState(false);
 
@@ -165,9 +177,7 @@ export default function BatchEnrichmentPanel() {
   };
 
   const handleCancelJob = (jobId: number) => {
-    if (confirm('Are you sure you want to cancel this enrichment job? This action cannot be undone.')) {
-      cancelMutation.mutate(jobId);
-    }
+    setJobToCancel(jobId);
   };
 
   const getStatusBadgeVariant = (status: string) => {
@@ -209,6 +219,28 @@ export default function BatchEnrichmentPanel() {
   const calculateProgress = (job: EnrichmentJob) => {
     if (!job.totalResources || job.totalResources === 0) return 0;
     return Math.round(((job.processedResources || 0) / job.totalResources) * 100);
+  };
+
+  // R2-M04: some legacy jobs recorded processed > total (retries were counted
+  // twice). Clamp the DISPLAYED processed count so the table never shows
+  // impossible "49 / 32" style figures; the raw values stay in the DB.
+  const displayProcessed = (job: EnrichmentJob) => {
+    const total = job.totalResources || 0;
+    const processed = job.processedResources || 0;
+    return total > 0 ? Math.min(processed, total) : processed;
+  };
+
+  // R2-M06: a "completed" job in which every processed resource failed is a
+  // failure from the operator's perspective — badge it as failed.
+  const effectiveStatus = (job: EnrichmentJob) => {
+    if (
+      job.status === 'completed' &&
+      (job.processedResources || 0) > 0 &&
+      (job.successfulResources || 0) === 0
+    ) {
+      return 'failed';
+    }
+    return job.status;
   };
 
   const estimateTimeRemaining = (job: EnrichmentJob) => {
@@ -520,20 +552,20 @@ export default function BatchEnrichmentPanel() {
                       <TableCell className="font-mono">#{job.id}</TableCell>
                       <TableCell>
                         <Badge
-                          variant={getStatusBadgeVariant(job.status)}
-                          className={getStatusBadgeClassName(job.status)}
+                          variant={getStatusBadgeVariant(effectiveStatus(job))}
+                          className={getStatusBadgeClassName(effectiveStatus(job))}
                           data-testid={`status-badge-${job.id}`}
                         >
-                          {job.status === 'processing' && (
+                          {effectiveStatus(job) === 'processing' && (
                             <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
                           )}
-                          {job.status === 'completed' && (
+                          {effectiveStatus(job) === 'completed' && (
                             <CheckCircle2 className="h-3 w-3 mr-1" />
                           )}
-                          {job.status === 'failed' && (
+                          {effectiveStatus(job) === 'failed' && (
                             <AlertCircle className="h-3 w-3 mr-1" />
                           )}
-                          {job.status}
+                          {effectiveStatus(job)}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
@@ -547,16 +579,23 @@ export default function BatchEnrichmentPanel() {
                           : job.status === 'processing' ? 'In progress...' : '-'}
                       </TableCell>
                       <TableCell className="text-center font-mono">
-                        {job.processedResources || 0} / {job.totalResources || 0}
+                        {displayProcessed(job)} / {job.totalResources || 0}
                       </TableCell>
                       <TableCell className="text-center">
-                        <Badge variant="outline" className={
-                          calculateSuccessRate(job) >= 90 ? 'border-green-500 text-green-500' :
-                          calculateSuccessRate(job) >= 70 ? 'border-yellow-500 text-yellow-500' :
-                          'border-red-500 text-red-500'
-                        }>
-                          {calculateSuccessRate(job)}%
-                        </Badge>
+                        {(job.processedResources || 0) === 0 ? (
+                          /* R2-M05: no resources processed → no meaningful rate. */
+                          <Badge variant="outline" className="text-muted-foreground">
+                            N/A
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className={
+                            calculateSuccessRate(job) >= 90 ? 'border-green-500 text-green-500' :
+                            calculateSuccessRate(job) >= 70 ? 'border-yellow-500 text-yellow-500' :
+                            'border-red-500 text-red-500'
+                          }>
+                            {calculateSuccessRate(job)}%
+                          </Badge>
+                        )}
                       </TableCell>
                       <TableCell className="text-right">
                         <Button
@@ -746,6 +785,29 @@ export default function BatchEnrichmentPanel() {
           )}
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={jobToCancel !== null} onOpenChange={(open) => { if (!open) setJobToCancel(null); }}>
+        <AlertDialogContent data-testid="dialog-cancel-job">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cancel this enrichment job?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Job #{jobToCancel} will stop processing. Resources already enriched
+              keep their metadata; unprocessed resources stay unchanged. This
+              cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-job-dismiss">Keep running</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => { if (jobToCancel !== null) { cancelMutation.mutate(jobToCancel); setJobToCancel(null); } }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              data-testid="button-cancel-job-confirm"
+            >
+              Cancel job
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

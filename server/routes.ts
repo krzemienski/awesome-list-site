@@ -1359,6 +1359,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // GET /api/tags - Aggregated tag counts (public, R2-M02). Tags live in
+  // resources.metadata->'tags' (jsonb string array), not the (empty) tags
+  // table, so aggregate over approved resources. ~2k rows → single-digit ms.
+  app.get('/api/tags', async (_req, res) => {
+    try {
+      const result = await db.execute(sql`
+        SELECT tag, count(*)::int AS count
+        FROM resources r,
+             jsonb_array_elements_text(r.metadata->'tags') AS tag
+        WHERE r.status = 'approved'
+          AND jsonb_typeof(r.metadata->'tags') = 'array'
+        GROUP BY tag
+        ORDER BY count DESC, tag ASC
+      `);
+      res.set('Cache-Control', 'public, max-age=300');
+      res.json({
+        total: result.rows.length,
+        tags: result.rows.map((r: any) => ({ tag: r.tag, count: r.count })),
+      });
+    } catch (error) {
+      console.error('Error aggregating tags:', error);
+      res.status(500).json({ message: 'Failed to fetch tags' });
+    }
+  });
+
   // GET /api/subcategories - List all subcategories (public)
   app.get('/api/subcategories', async (req, res) => {
     try {
@@ -2215,8 +2240,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
-      
-      const result = await userRepo.listUsers(page, limit);
+      const q = typeof req.query.q === 'string' ? req.query.q : undefined;
+
+      const result = await userRepo.listUsers(page, limit, q);
       // Never expose password hashes over the API, even to admins. Strip the
       // password field from every user before sending the response.
       const sanitizedUsers = result.users.map(({ password, ...rest }) => rest);
@@ -2227,6 +2253,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // GET /api/admin/users/export - CSV export of all users (R2-L08).
+  // Password hashes are never included. Cells that could be interpreted as
+  // spreadsheet formulas (= + - @ prefixes) are quoted with a leading
+  // apostrophe to prevent CSV-injection when opened in Excel/Sheets.
+  app.get('/api/admin/users/export', isAuthenticated, isAdmin, async (_req, res) => {
+    try {
+      const allUsers = await userRepo.listAllUsers();
+      const csvCell = (value: unknown): string => {
+        let s = value === null || value === undefined ? '' : String(value);
+        if (/^[=+\-@]/.test(s)) s = `'${s}`;
+        if (/[",\n\r]/.test(s)) s = `"${s.replace(/"/g, '""')}"`;
+        return s;
+      };
+      const header = ['id', 'email', 'firstName', 'lastName', 'role', 'authProvider', 'createdAt'];
+      const lines = [header.join(',')];
+      for (const u of allUsers) {
+        const provider = u.password ? 'local' : 'replit';
+        lines.push([
+          csvCell(u.id),
+          csvCell(u.email),
+          csvCell(u.firstName),
+          csvCell(u.lastName),
+          csvCell(u.role),
+          csvCell(provider),
+          csvCell(u.createdAt instanceof Date ? u.createdAt.toISOString() : u.createdAt),
+        ].join(','));
+      }
+      res.set('Content-Type', 'text/csv; charset=utf-8');
+      res.set('Content-Disposition', `attachment; filename="users-export-${new Date().toISOString().slice(0, 10)}.csv"`);
+      res.send(lines.join('\r\n') + '\r\n');
+    } catch (error) {
+      console.error('Error exporting users:', error);
+      res.status(500).json({ message: 'Failed to export users' });
+    }
+  });
+
   // PUT /api/admin/users/:id/role - Change user role
   app.put('/api/admin/users/:id/role', isAuthenticated, isAdmin, async (req: any, res) => {
     try {

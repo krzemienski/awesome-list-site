@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search as SearchIcon, AlertCircle } from "lucide-react";
+import { Search as SearchIcon, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import SEOHead from "@/components/layout/SEOHead";
 import ResourceCard from "@/components/resource/ResourceCard";
 import type { Resource as DbResource } from "@shared/schema";
@@ -18,6 +18,9 @@ export default function Search() {
 
   const [input, setInput] = useState(urlQuery);
   const [debounced, setDebounced] = useState(urlQuery);
+  // R2-M11: client-side pagination over the fetched result set.
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 24;
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Auto-focus on mount.
@@ -55,7 +58,8 @@ export default function Search() {
   } = useQuery<{ resources: DbResource[]; total: number }>({
     queryKey: ["/api/resources", "search", trimmed],
     queryFn: async () =>
-      apiRequest(`/api/resources?search=${encodeURIComponent(trimmed)}&limit=200`, {
+      // R2-M11: limit bumped 200→1000 so pagination covers broad queries.
+      apiRequest(`/api/resources?search=${encodeURIComponent(trimmed)}&limit=1000`, {
         method: "GET",
       }),
     enabled: trimmed.length >= 2,
@@ -63,6 +67,14 @@ export default function Search() {
   });
 
   const results = data?.resources ?? [];
+  const totalPages = Math.max(1, Math.ceil(results.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const pageResults = results.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+
+  // New query → back to page 1.
+  useEffect(() => {
+    setPage(1);
+  }, [trimmed]);
 
   return (
     <div className="space-y-6">
@@ -133,9 +145,11 @@ export default function Search() {
         <>
           <p className="text-sm text-muted-foreground" data-testid="text-result-count">
             {data?.total ?? results.length} result{(data?.total ?? results.length) === 1 ? "" : "s"} for “{trimmed}”
+            {(data?.total ?? 0) > results.length ? ` · showing first ${results.length}` : ""}
+            {totalPages > 1 ? ` · page ${safePage} of ${totalPages}` : ""}
           </p>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {results.map((r) => (
+            {pageResults.map((r) => (
               <ResourceCard
                 key={r.id}
                 resource={{
@@ -149,6 +163,39 @@ export default function Search() {
               />
             ))}
           </div>
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-3 pt-2" data-testid="search-pagination">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={safePage <= 1}
+                onClick={() => {
+                  setPage(safePage - 1);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                data-testid="button-search-prev"
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                Previous
+              </Button>
+              <span className="text-sm text-muted-foreground tabular-nums">
+                {safePage} / {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={safePage >= totalPages}
+                onClick={() => {
+                  setPage(safePage + 1);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                data-testid="button-search-next"
+              >
+                Next
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            </div>
+          )}
         </>
       )}
     </div>

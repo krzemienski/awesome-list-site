@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Edit, ChevronRight } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
 import FavoriteButton from "./FavoriteButton";
 import BookmarkButton from "./BookmarkButton";
 import { SuggestEditDialog } from "@/components/ui/suggest-edit-dialog";
@@ -36,7 +35,6 @@ function ResourceCard({
   className,
   onClick
 }: ResourceCardProps) {
-  const { isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
   const [suggestEditOpen, setSuggestEditOpen] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -126,23 +124,23 @@ function ResourceCard({
           <CardTitle className="text-lg line-clamp-1 flex-1 min-w-0">
             {titleContent}
           </CardTitle>
-          {isAuthenticated && (
-            <div className="relative z-10 flex items-center gap-1 ml-2">
-              <FavoriteButton
-                resourceId={resource.id}
-                isFavorited={resource.isFavorited}
-                favoriteCount={resource.favoriteCount}
-                size="sm"
-                showCount={false}
-              />
-              <BookmarkButton
-                resourceId={resource.id}
-                isBookmarked={resource.isBookmarked}
-                notes={resource.bookmarkNotes}
-                size="sm"
-              />
-            </div>
-          )}
+          {/* R2-L09: shown to anonymous users too — the buttons themselves
+              prompt sign-in on click instead of hiding the affordance. */}
+          <div className="relative z-10 flex items-center gap-1 ml-2">
+            <FavoriteButton
+              resourceId={resource.id}
+              isFavorited={resource.isFavorited}
+              favoriteCount={resource.favoriteCount}
+              size="sm"
+              showCount={false}
+            />
+            <BookmarkButton
+              resourceId={resource.id}
+              isBookmarked={resource.isBookmarked}
+              notes={resource.bookmarkNotes}
+              size="sm"
+            />
+          </div>
         </div>
         {resource.description && (
           <p className="text-sm text-muted-foreground mt-2 line-clamp-2">

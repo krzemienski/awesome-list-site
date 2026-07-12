@@ -29,7 +29,7 @@ import {
   type InsertApiKey,
 } from "@shared/schema";
 import { db } from "../db";
-import { eq, and, desc, sql } from "drizzle-orm";
+import { eq, and, desc, sql, or, ilike } from "drizzle-orm";
 import { generateApiKey, hashApiKey } from "../apiKeyUtils";
 
 /**
@@ -95,21 +95,50 @@ export class UserRepository {
    * @param limit - Number of users per page
    * @returns Object containing users array and total count
    */
-  async listUsers(page = 1, limit = 20): Promise<{ users: User[]; total: number }> {
+  async listUsers(page = 1, limit = 20, q?: string): Promise<{ users: User[]; total: number }> {
     const offset = (page - 1) * limit;
 
-    const [totalResult] = await db
+    // Optional search filter across email + first/last name (M17). A single
+    // combined predicate keeps count and page queries in lockstep.
+    const searchFilter = q && q.trim()
+      ? or(
+          ilike(users.email, `%${q.trim()}%`),
+          ilike(users.firstName, `%${q.trim()}%`),
+          ilike(users.lastName, `%${q.trim()}%`),
+        )
+      : undefined;
+
+    const totalQuery = db
       .select({ count: sql<number>`count(*)::int` })
       .from(users);
+    const [totalResult] = searchFilter
+      ? await totalQuery.where(searchFilter)
+      : await totalQuery;
 
-    const userList = await db
+    const pageQuery = db
       .select()
       .from(users)
       .orderBy(desc(users.createdAt))
       .limit(limit)
       .offset(offset);
+    const userList = searchFilter
+      ? await db
+          .select()
+          .from(users)
+          .where(searchFilter)
+          .orderBy(desc(users.createdAt))
+          .limit(limit)
+          .offset(offset)
+      : await pageQuery;
 
     return { users: userList, total: totalResult.count };
+  }
+
+  /**
+   * List ALL users (no pagination) — used by the admin CSV export (L08).
+   */
+  async listAllUsers(): Promise<User[]> {
+    return db.select().from(users).orderBy(desc(users.createdAt));
   }
 
   /**

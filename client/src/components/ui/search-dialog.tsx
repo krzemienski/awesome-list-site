@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
+import { Search, Clock, X } from "lucide-react";
 import { useLocation } from "wouter";
 import Fuse from "fuse.js";
 import { Resource } from "@/types/awesome-list";
@@ -15,12 +15,42 @@ interface SearchDialogProps {
   resources: Resource[];
 }
 
+// R2-L10: recent searches persisted in localStorage (max 5, most recent first).
+const RECENT_SEARCHES_KEY = "recent-searches";
+const RECENT_SEARCHES_MAX = 5;
+
+function readRecentSearches(): string[] {
+  try {
+    const raw = localStorage.getItem(RECENT_SEARCHES_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed.filter((s) => typeof s === "string").slice(0, RECENT_SEARCHES_MAX) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveRecentSearch(query: string): string[] {
+  const trimmed = query.trim();
+  if (trimmed.length < 2) return readRecentSearches();
+  const next = [trimmed, ...readRecentSearches().filter((s) => s.toLowerCase() !== trimmed.toLowerCase())].slice(
+    0,
+    RECENT_SEARCHES_MAX,
+  );
+  try {
+    localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(next));
+  } catch {
+    // storage full/unavailable — non-fatal
+  }
+  return next;
+}
+
 export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDialogProps) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Resource[]>([]);
   // NEW-015: total match count across the whole catalog, shown above the
   // (top-15-capped) quick results so users know how many matches exist.
   const [totalMatches, setTotalMatches] = useState(0);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const debouncedQuery = useDebounce(query, 600);
   const [, navigate] = useLocation();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -64,7 +94,16 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
     const endTime = performance.now();
     trackSearch(debouncedQuery, searchResults.length);
     trackPerformance('search_time', endTime - startTime);
+    // R2-L10: a settled (debounced) query counts as a "recent search".
+    setRecentSearches(saveRecentSearch(debouncedQuery));
   }, [debouncedQuery, fuse]);
+
+  // R2-L10: load persisted recent searches whenever the dialog opens.
+  useEffect(() => {
+    if (isOpen) {
+      setRecentSearches(readRecentSearches());
+    }
+  }, [isOpen]);
 
   // Global keyboard shortcut listener (Cmd+K, Ctrl+K, and `/`)
   // MR-DS-03 — `/` branch added (dead listener in App.tsx deleted) so the
@@ -225,6 +264,41 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
                   </div>
                 )}
               </>
+            ) : recentSearches.length > 0 ? (
+              /* R2-L10: recent searches shown while the input is empty. */
+              <CommandGroup>
+                <div className="flex items-center justify-between px-3 pt-2 pb-1">
+                  <span className="text-xs text-muted-foreground uppercase tracking-[0.14em]">Recent searches</span>
+                  <button
+                    type="button"
+                    className="text-xs text-muted-foreground hover:text-[color:var(--text)] flex items-center gap-1"
+                    onClick={() => {
+                      try {
+                        localStorage.removeItem(RECENT_SEARCHES_KEY);
+                      } catch {
+                        // ignore
+                      }
+                      setRecentSearches([]);
+                    }}
+                    data-testid="button-clear-recent-searches"
+                  >
+                    <X className="h-3 w-3" />
+                    Clear
+                  </button>
+                </div>
+                {recentSearches.map((recent, index) => (
+                  <CommandItem
+                    key={`recent-${recent}`}
+                    value={`recent-${recent}`}
+                    onSelect={() => setQuery(recent)}
+                    className="flex items-center gap-2 p-3 cursor-pointer"
+                    data-testid={`recent-search-${index}`}
+                  >
+                    <Clock className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <span className="text-sm">{recent}</span>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
             ) : (
               <div className="flex flex-col items-center justify-center h-[200px] text-center p-4">
                 <div className="flex h-16 w-16 items-center justify-center bg-muted rounded-lg">

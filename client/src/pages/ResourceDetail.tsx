@@ -113,6 +113,30 @@ export default function ResourceDetail() {
     }
   });
 
+  // R2-L09: anonymous users get a clear sign-in prompt instead of a
+  // confusing failed request.
+  const handleFavoriteClick = () => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Sign in to favorite",
+        description: "Create an account or sign in to save your favorite resources.",
+      });
+      return;
+    }
+    favoriteMutation.mutate();
+  };
+
+  const handleBookmarkClick = () => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Sign in to bookmark",
+        description: "Create an account or sign in to save resources to your bookmarks.",
+      });
+      return;
+    }
+    bookmarkMutation.mutate();
+  };
+
   const trackInteraction = useMutation({
     mutationFn: async (interaction: {
       resourceId: string;
@@ -282,32 +306,30 @@ export default function ResourceDetail() {
         </Link>
         
         <div className="flex flex-wrap items-center gap-2">
-          {isAuthenticated && (
-            <>
-              <Button
-                variant={isFavorite ? "default" : "outline"}
-                size="sm"
-                onClick={() => favoriteMutation.mutate()}
-                disabled={favoriteMutation.isPending}
-                data-testid="button-favorite"
-                className="min-h-[44px] px-4"
-              >
-                <Heart className={`h-4 w-4 mr-2 ${isFavorite ? 'fill-current' : ''}`} />
-                <span className="hidden sm:inline">{isFavorite ? 'Favorited' : 'Favorite'}</span>
-              </Button>
-              <Button
-                variant={isBookmarked ? "default" : "outline"}
-                size="sm"
-                onClick={() => bookmarkMutation.mutate()}
-                disabled={bookmarkMutation.isPending}
-                data-testid="button-bookmark"
-                className="min-h-[44px] px-4"
-              >
-                <Bookmark className={`h-4 w-4 mr-2 ${isBookmarked ? 'fill-current' : ''}`} />
-                <span className="hidden sm:inline">{isBookmarked ? 'Bookmarked' : 'Bookmark'}</span>
-              </Button>
-            </>
-          )}
+          {/* R2-L09: favorite/bookmark shown to anonymous users too — clicks
+              prompt sign-in instead of hiding the affordance. */}
+          <Button
+            variant={isFavorite ? "default" : "outline"}
+            size="sm"
+            onClick={handleFavoriteClick}
+            disabled={favoriteMutation.isPending}
+            data-testid="button-favorite"
+            className="min-h-[44px] px-4"
+          >
+            <Heart className={`h-4 w-4 mr-2 ${isFavorite ? 'fill-current' : ''}`} />
+            <span className="hidden sm:inline">{isFavorite ? 'Favorited' : 'Favorite'}</span>
+          </Button>
+          <Button
+            variant={isBookmarked ? "default" : "outline"}
+            size="sm"
+            onClick={handleBookmarkClick}
+            disabled={bookmarkMutation.isPending}
+            data-testid="button-bookmark"
+            className="min-h-[44px] px-4"
+          >
+            <Bookmark className={`h-4 w-4 mr-2 ${isBookmarked ? 'fill-current' : ''}`} />
+            <span className="hidden sm:inline">{isBookmarked ? 'Bookmarked' : 'Bookmark'}</span>
+          </Button>
           <Button 
             variant="outline" 
             size="sm" 

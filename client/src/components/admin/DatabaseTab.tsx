@@ -1,6 +1,19 @@
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Database,
   RefreshCw,
@@ -51,6 +64,11 @@ interface SeedDatabaseResponse {
 export default function DatabaseTab({ stats }: DatabaseTabProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  // R2-H04: destructive Clear & Re-seed requires an explicit typed
+  // confirmation inside a proper AlertDialog instead of a native confirm().
+  const [reseedDialogOpen, setReseedDialogOpen] = useState(false);
+  const [reseedConfirmText, setReseedConfirmText] = useState("");
+  const reseedConfirmed = reseedConfirmText.trim().toUpperCase() === "RESEED";
 
   const seedDatabaseMutation = useMutation({
     mutationFn: async (options: { clearExisting?: boolean } = {}) => {
@@ -76,9 +94,14 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
   });
 
   const handleClearAndReseed = () => {
-    if (confirm('Are you sure you want to clear all existing data and re-seed? This action cannot be undone.')) {
-      seedDatabaseMutation.mutate({ clearExisting: true });
-    }
+    setReseedConfirmText("");
+    setReseedDialogOpen(true);
+  };
+
+  const confirmClearAndReseed = () => {
+    if (!reseedConfirmed) return;
+    setReseedDialogOpen(false);
+    seedDatabaseMutation.mutate({ clearExisting: true });
   };
 
   return (
@@ -207,7 +230,11 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
                 </div>
                 {(stats?.totalPending ?? 0) + (stats?.totalDeleted ?? 0) > 0 && (
                   <div className="text-[10px] text-[var(--text-2)]">
-                    +{stats?.totalPending ?? 0} pending · {stats?.totalDeleted ?? 0} rejected
+                    {/* R2-M22: only mention non-zero buckets (no "+0 pending"). */}
+                    {[
+                      (stats?.totalPending ?? 0) > 0 ? `+${stats?.totalPending} pending` : null,
+                      (stats?.totalDeleted ?? 0) > 0 ? `${stats?.totalDeleted} rejected` : null,
+                    ].filter(Boolean).join(" · ")}
                   </div>
                 )}
               </div>
@@ -227,6 +254,46 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
           </div>
         </CardContent>
       </Card>
+
+      <AlertDialog open={reseedDialogOpen} onOpenChange={setReseedDialogOpen}>
+        <AlertDialogContent data-testid="dialog-clear-reseed">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-destructive" />
+              Clear all data and re-seed?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This permanently deletes <strong>all existing resources, categories, and
+              related data</strong> from the database and re-populates it from the
+              awesome-video source. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="reseed-confirm">
+              Type <span className="font-mono font-bold">RESEED</span> to confirm
+            </Label>
+            <Input
+              id="reseed-confirm"
+              value={reseedConfirmText}
+              onChange={(e) => setReseedConfirmText(e.target.value)}
+              placeholder="RESEED"
+              autoComplete="off"
+              data-testid="input-reseed-confirm"
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-reseed-cancel">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmClearAndReseed}
+              disabled={!reseedConfirmed}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              data-testid="button-reseed-confirm"
+            >
+              Clear &amp; Re-seed
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -22,6 +22,58 @@ const registerSchema = z.object({
 
 type RegisterFormData = z.infer<typeof registerSchema>;
 
+// R2-M27: lightweight password strength scoring — no external dependency.
+// Score 0-4 from length + character-class variety.
+function scorePassword(pw: string): number {
+  if (!pw) return 0;
+  let score = 0;
+  if (pw.length >= 8) score++;
+  if (pw.length >= 12) score++;
+  const classes =
+    Number(/[a-z]/.test(pw)) +
+    Number(/[A-Z]/.test(pw)) +
+    Number(/[0-9]/.test(pw)) +
+    Number(/[^a-zA-Z0-9]/.test(pw));
+  if (classes >= 2) score++;
+  if (classes >= 3 && pw.length >= 10) score++;
+  return Math.min(score, 4);
+}
+
+const STRENGTH_LABELS = ["Too short", "Weak", "Fair", "Good", "Strong"];
+const STRENGTH_COLORS = [
+  "bg-[var(--border)]",
+  "bg-[#ff5c7a]",
+  "bg-[#ffb84d]",
+  "bg-[#5eddf2]",
+  "bg-[#34d08c]",
+];
+
+function PasswordStrengthMeter({ password }: { password: string }) {
+  if (!password) return null;
+  const score = scorePassword(password);
+  return (
+    <div className="space-y-1 pt-1" data-testid="password-strength">
+      <div className="flex gap-1" aria-hidden>
+        {[1, 2, 3, 4].map((seg) => (
+          <div
+            key={seg}
+            className={`h-1 flex-1 rounded-full transition-colors ${
+              score >= seg ? STRENGTH_COLORS[score] : "bg-[var(--border)]"
+            }`}
+          />
+        ))}
+      </div>
+      <p
+        className="text-xs text-[color:var(--text-2)]"
+        aria-live="polite"
+        data-testid="password-strength-label"
+      >
+        Password strength: {STRENGTH_LABELS[score]}
+      </p>
+    </div>
+  );
+}
+
 export default function Register() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -170,6 +222,7 @@ export default function Register() {
                         />
                       </div>
                     </FormControl>
+                    <PasswordStrengthMeter password={field.value} />
                     <FormMessage />
                   </FormItem>
                 )}

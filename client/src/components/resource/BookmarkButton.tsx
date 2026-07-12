@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
 interface BookmarkButtonProps {
@@ -38,6 +39,7 @@ function BookmarkButton({
   const [notesDialogOpen, setNotesDialogOpen] = useState(false);
   const [tempNotes, setTempNotes] = useState("");
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
 
   // `remove` is captured at click time and passed as the mutation variable so
   // the POST/DELETE decision never depends on the optimistic state flip below
@@ -103,7 +105,17 @@ function BookmarkButton({
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
+    // R2-L09: anonymous users get a clear sign-in prompt instead of a
+    // confusing failed request.
+    if (!isAuthenticated) {
+      toast({
+        title: "Sign in to bookmark",
+        description: "Create an account or sign in to save resources to your bookmarks.",
+      });
+      return;
+    }
+
     if (!isBookmarked && showNotesDialog) {
       // Open notes dialog for new bookmark
       setTempNotes(notes);

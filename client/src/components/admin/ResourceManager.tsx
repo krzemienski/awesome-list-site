@@ -63,6 +63,8 @@ export default function ResourceManager() {
   const [selectedResourceIds, setSelectedResourceIds] = useState<number[]>([]);
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
+  // R2-H04 companion: bulk hard-delete needs an explicit confirmation dialog.
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
 
   const [editForm, setEditForm] = useState({
     title: "",
@@ -412,6 +414,11 @@ export default function ResourceManager() {
 
   const handleBulkDelete = () => {
     if (selectedResourceIds.length === 0) return;
+    setBulkDeleteDialogOpen(true);
+  };
+
+  const confirmBulkDelete = () => {
+    setBulkDeleteDialogOpen(false);
     bulkDeleteMutation.mutate(selectedResourceIds);
   };
 
@@ -653,6 +660,30 @@ export default function ResourceManager() {
               </DialogFooter>
             </DialogContent>
           </Dialog>
+
+          {/* Bulk Delete Confirmation */}
+          <AlertDialog open={bulkDeleteDialogOpen} onOpenChange={setBulkDeleteDialogOpen}>
+            <AlertDialogContent data-testid="dialog-bulk-delete">
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete {selectedResourceIds.length} resource{selectedResourceIds.length === 1 ? '' : 's'}?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This permanently deletes the selected resource{selectedResourceIds.length === 1 ? '' : 's'} from
+                  the catalog, including any bookmarks, favorites, and journey references
+                  pointing at {selectedResourceIds.length === 1 ? 'it' : 'them'}. This cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel data-testid="button-bulk-delete-cancel">Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={confirmBulkDelete}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  data-testid="button-bulk-delete-confirm"
+                >
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
 
           <ScrollArea className="h-[600px]">
             <Table>

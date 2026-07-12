@@ -22,6 +22,7 @@ import SubcategoryManager from "@/components/admin/SubcategoryManager";
 import SubSubcategoryManager from "@/components/admin/SubSubcategoryManager";
 import ResearcherTab from "@/components/admin/ResearcherTab";
 import JourneyStepsManager from "@/components/admin/JourneyStepsManager";
+import ErrorBoundary from "@/components/ErrorBoundary";
 // Run3 audit R3-02: the 15 valid tab ids — used to validate /admin/:section
 // deep-links (unknown sections fall back to the default tab).
 const ADMIN_TAB_IDS = [
@@ -165,64 +166,66 @@ export default function AdminDashboard() {
           </TabsList>
         </div>
 
+        {/* R2-L13: each tab body sits in its own ErrorBoundary so a render
+            crash in one panel can't blank the entire admin dashboard. */}
         <TabsContent value="approvals" data-testid="content-approvals">
-          <PendingResources />
+          <ErrorBoundary label="Approvals tab"><PendingResources /></ErrorBoundary>
         </TabsContent>
 
         <TabsContent value="edits" data-testid="content-edits">
-          <PendingEdits />
+          <ErrorBoundary label="Edits tab"><PendingEdits /></ErrorBoundary>
         </TabsContent>
 
         <TabsContent value="enrichment" data-testid="content-enrichment">
-          <BatchEnrichmentPanel />
+          <ErrorBoundary label="Enrichment tab"><BatchEnrichmentPanel /></ErrorBoundary>
         </TabsContent>
 
         <TabsContent value="researcher">
-          <ResearcherTab />
+          <ErrorBoundary label="Researcher tab"><ResearcherTab /></ErrorBoundary>
         </TabsContent>
 
         <TabsContent value="export">
-          <ExportTab />
+          <ErrorBoundary label="Export tab"><ExportTab /></ErrorBoundary>
         </TabsContent>
 
         <TabsContent value="database">
-          <DatabaseTab stats={stats} />
+          <ErrorBoundary label="Database tab"><DatabaseTab stats={stats} /></ErrorBoundary>
         </TabsContent>
 
         <TabsContent value="resources">
-          <ResourceManager />
+          <ErrorBoundary label="Resources tab"><ResourceManager /></ErrorBoundary>
         </TabsContent>
 
         <TabsContent value="categories" data-testid="content-categories">
-          <CategoryManager />
+          <ErrorBoundary label="Categories tab"><CategoryManager /></ErrorBoundary>
         </TabsContent>
 
         <TabsContent value="subcategories" data-testid="content-subcategories">
-          <SubcategoryManager />
+          <ErrorBoundary label="Subcategories tab"><SubcategoryManager /></ErrorBoundary>
         </TabsContent>
 
         <TabsContent value="subsubcategories" data-testid="content-subsubcategories">
-          <SubSubcategoryManager />
+          <ErrorBoundary label="Sub-Subcategories tab"><SubSubcategoryManager /></ErrorBoundary>
         </TabsContent>
 
         <TabsContent value="journeys" data-testid="content-journeys">
-          <JourneyStepsManager />
+          <ErrorBoundary label="Journeys tab"><JourneyStepsManager /></ErrorBoundary>
         </TabsContent>
 
         <TabsContent value="users">
-          <UsersTab />
+          <ErrorBoundary label="Users tab"><UsersTab /></ErrorBoundary>
         </TabsContent>
 
         <TabsContent value="github">
-          <GitHubSyncPanel />
+          <ErrorBoundary label="GitHub tab"><GitHubSyncPanel /></ErrorBoundary>
         </TabsContent>
 
         <TabsContent value="linkhealth">
-          <LinkHealthDashboard />
+          <ErrorBoundary label="Link Health tab"><LinkHealthDashboard /></ErrorBoundary>
         </TabsContent>
 
         <TabsContent value="audit">
-          <AuditTab />
+          <ErrorBoundary label="Audit tab"><AuditTab /></ErrorBoundary>
         </TabsContent>
       </Tabs>
     </div>

@@ -73,7 +73,27 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
   const { user, isAuthenticated } = useAuth();
 
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState("default");
+  // R2-M25: sort survives refresh via ?sort= URL param. wouter's useLocation()
+  // is path-only, so read/write window.location.search directly and use
+  // history.replaceState (no navigation, no og-middleware impact — the server
+  // only keys off ?page=).
+  const VALID_SORTS = ["default", "name-asc", "name-desc", "count-desc", "count-asc"];
+  const [sortBy, setSortBy] = useState(() => {
+    const fromUrl = new URLSearchParams(window.location.search).get("sort");
+    return fromUrl && VALID_SORTS.includes(fromUrl) ? fromUrl : "default";
+  });
+
+  const handleSortChange = (next: string) => {
+    setSortBy(next);
+    const params = new URLSearchParams(window.location.search);
+    if (next === "default") {
+      params.delete("sort");
+    } else {
+      params.set("sort", next);
+    }
+    const qs = params.toString();
+    window.history.replaceState(null, "", `${window.location.pathname}${qs ? `?${qs}` : ""}`);
+  };
 
   const baseCategories = useMemo(() => {
     if (!awesomeList?.categories) return [];
@@ -199,7 +219,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
         sortBy={sortBy}
         availableTags={availableTags}
         onTagsChange={setSelectedTags}
-        onSortChange={setSortBy}
+        onSortChange={handleSortChange}
       />
 
       {filteredCategories.length === 0 ? (
@@ -228,10 +248,16 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
           const Icon = categoryIcons[category.name] || FileText;
           const totalCount = category.displayCount;
           const firstResource = category.resources[0];
+          // R2-M23: truncate on a word boundary so cards never end mid-word
+          // like "faster tha...".
+          const truncateAtWord = (text: string, max: number) => {
+            if (text.length <= max) return text;
+            const cut = text.substring(0, max);
+            const lastSpace = cut.lastIndexOf(" ");
+            return `${(lastSpace > max * 0.5 ? cut.substring(0, lastSpace) : cut).replace(/[\s.,;:!?]+$/, "")}…`;
+          };
           const description = firstResource?.description
-            ? firstResource.description.length > 90
-              ? `${firstResource.description.substring(0, 90)}...`
-              : firstResource.description
+            ? truncateAtWord(firstResource.description, 90)
             : "";
 
           return (

@@ -4,6 +4,7 @@ import { Heart } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
 interface FavoriteButtonProps {
@@ -26,6 +27,7 @@ function FavoriteButton({
   const [isFavorited, setIsFavorited] = useState(initialFavorited);
   const [favoriteCount, setFavoriteCount] = useState(initialCount);
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
 
   // `remove` is captured at click time and passed as the mutation variable so
   // the POST/DELETE decision never depends on the optimistic state flip below
@@ -80,6 +82,17 @@ function FavoriteButton({
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    // R2-L09: anonymous users get a clear sign-in prompt instead of a
+    // confusing failed request.
+    if (!isAuthenticated) {
+      toast({
+        title: "Sign in to favorite",
+        description: "Create an account or sign in to save your favorite resources.",
+      });
+      return;
+    }
+
     favoriteMutation.mutate(isFavorited);
   };
 

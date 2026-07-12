@@ -37,7 +37,11 @@ export default function AdminStats({ stats, isLoading }: AdminStatsProps) {
           value: publicCount,
           sublabel:
             pendingCount || rejectedCount
-              ? `+${pendingCount} pending · ${rejectedCount} rejected`
+              ? /* R2-M22: only mention non-zero buckets (no "+0 pending"). */
+                [
+                  pendingCount ? `+${pendingCount} pending` : null,
+                  rejectedCount ? `${rejectedCount} rejected` : null,
+                ].filter(Boolean).join(" · ")
               : undefined,
           testId: "stat-live-resources",
         },
