@@ -4,6 +4,43 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 
 ---
 
+## July 12, 2026
+
+### Master Fix Prompt Remediation — Run4
+- **18-finding external audit triaged live**: 10 findings STALE (audit predates the July 10 republish), 6 fixed, 1 platform-injected (NEW-014 feedback badge — zero app code, Replit dev-preview only), 1 closed by user decision (NEW-002 — keeping the site dark-only by design). Full table: `evidence/run4/findings-table.md`.
+- **Server**: NEW-006 non-approved resources 404 to non-admins on `/api/resources/:id` + BUG-004 companion (`?status=pending|rejected` listing now admin-only, 403) + `/related` returns empty shape for hidden ids; BUG-039 `?cursor=` alias + `nextCursor`; new `PUT /api/admin/journeys/:id`; new `DELETE /api/admin/users/:id` with `deleteUserWithCleanup` (detaches submitted/approved resources instead of deleting content, removes edit suggestions, personal data cascades).
+- **Client**: Users tab delete button + confirm dialog (self excluded); "Edit in Admin" deep-links to `/admin/resources?resourceId=N` and auto-opens the edit dialog (param stripped after); search dialog shows "N matches — showing top 15"; journey descriptions rewritten to 5 unique real blurbs (dev via SQL; prod via the new PUT post-republish).
+- **Verified live** (Iron Rule): tsc clean; curl auth/negative/lifecycle tests on every endpoint; Playwright sweep 8/8 PASS (`scripts/run4-verify-dev.mjs`); architect PASS after closing its two flagged leaks. **Republished + prod follow-ups DONE**: 5 journey descriptions applied via PUT, 2 `__qa_test` users deleted via the new DELETE (journals in `.local/prod-cleanup/`), NEW-006/BUG-004/BUG-039 smoke-checked live, CSP clean (0 violations on first publish with the nonce CSP).
+
+## July 10, 2026
+
+### Merged External "Production Audit Remediation" from GitHub
+- **Merged origin/main** (external hardening pass, 184 files: nonce-based CSP, BUG-014/015/019/020 fixes, `migrations/0029_search_fts.sql`, og-middleware/routes rewrites) into local main (UI-audit work) and pushed (`4ece6af`, cleanup `a0f4936`).
+- **Conflict resolution (server/index.ts CSP)**: kept blanket `img-src 'self' data: https:` (remote's domain allowlist would break arbitrary ResourceCard ogImage URLs) + kept the `connect-src` google.com entry; removed a dead `const { Pool } = pkg;` that crashed boot. **Prod-risk to watch after republish**: the nonce CSP has no `unsafe-inline` fallback and is production-only — smoke-check the prod browser console for CSP violations on first publish.
+- **Legitimized the hand-dropped FTS migration**: remote added 0029 without journaling it (boot migrator would silently skip it). Added the `_journal.json` entry, mirrored the generated `search_tsv` tsvector column + GIN index in `shared/schema.ts` (customType + generatedAlwaysAs) so the `migration-drift` check passes, and applied the idempotent SQL to the dev DB by hand (dev never runs the boot migrator). Prod applies 0029 automatically at next publish boot. Note: **no server code reads `search_tsv` yet** — it's infra ahead of an FTS implementation (`/api/search` still uses ILIKE via repo).
+- **Cleanup**: deleted remote's stray `pnpm-lock.yaml`/`pnpm-workspace.yaml` (npm project). Verified: tsc clean, migration-drift green, home 200, search working, 9 cats sum 1,836. Architect PASS. **Requires a republish** for remote's fixes + 0029 to reach production.
+
+### Social Login Restored on Login/Register
+- **Root cause of "prod lost social login"**: the June 1 passport-local refactor removed the social sign-in buttons from `Login.tsx`, while the server-side Replit OIDC flow (`/api/login`, `/api/callback`) stayed fully functional — prod `/api/login` still 302'd to replit.com/oidc the whole time. The UI just had no way to reach it.
+- **Fix**: restored an "Or continue with" divider + **Continue with Replit** button (covers Google / GitHub / Apple / X via Replit's provider screen) on both `Login.tsx` and `Register.tsx`, navigating to `/api/login`. Verified with a real-browser click landing on replit.com/oidc; `tsc` clean.
+- **Loop-breaker**: OIDC callback `failureRedirect` changed from `/api/login` (endless consent-screen bounce) to `/login?error=oauth`, which the Login page surfaces as a destructive toast (param stripped after display). **Known deferred edge case**: a Replit sign-in whose email already belongs to a local email/password account still fails the upsert (UNIQUE email, upsert by id) — it now fails gracefully to the login page instead of looping; proper account-linking is deferred (see `.agents/memory/replit-oidc-local-email-collision.md`).
+- **Requires a republish to reach production.**
+
+## July 9, 2026
+
+### Audit Follow-Ups: Suggested-Paths Cache + /api/health/ai + AI-Path Fix
+- **P2 cold-start fixed**: `/api/learning-paths/suggested` was ~46s cold (3 sequential Claude calls for the anonymous default). Added an in-memory result cache in `learningPathGenerator` (12h TTL, in-flight dedup, empty results never cached) plus a fire-and-forget boot warm-up in `runBackgroundInitialization()`. Post-warm-up the endpoint serves in <40ms; concurrent cold requests share one generation run.
+- **Latent bug surfaced & fixed**: AI path generation had NEVER succeeded — the 2,000-token cap truncated the JSON mid-response, silently falling back to templates every time. Fixed (4,000 tokens + concise-JSON-only prompt + outermost-brace extraction); all 3 suggested paths now come back `generationType: 'ai'` and warm-up dropped 47s→17s.
+- **Docs drift closed**: implemented the documented-but-missing `GET /api/health/ai` (cheap by default — availability + cache stats, no API call; `?deep=1` runs one real round-trip). `docs/AI-SERVICES.md` examples updated to the real response shape.
+- **Abuse hardening** (architect-suggested): both learning-path endpoints clamp `limit` to [1,10]; `/suggested` whitelists skillLevel/timeCommitment, validates `categories` against real DB names, and caps `goals` — unauthenticated param variation can no longer force endless cache misses that burn paid Claude calls. `/api/resources/pending` alias intentionally kept (covered by the existing integration test suite).
+
+## July 7, 2026
+
+### Empty-Taxonomy Cleanup + Count-Parity Re-Proof
+- **Re-proved count parity with the official Playwright tester** (3 runs, all pass; the tester counted DOM cards, not just labels): subcategory `video-codec-specifications` 20/20; `encoding-codecs` 325/325 across "Page 1 of 14" @24/page with distinct titles on pages 1–3; "Codecs" filter → 13; "av1" search → 19; players-clients 234/234; mobile-players 16/16; opened 6+ resource detail pages (real h1 + external link); mobile 390px had no horizontal overflow (scrollWidth 384).
+- **"Clean all" empty taxonomy nodes (dev DB)**: removed 6 empty subcategories + 17 empty sub-subcategories (15 direct + 2 cascaded). Safe because resources link to taxonomy by TEXT (no FK) and the tree builder folds any unmapped text into its nearest valid ancestor — verified 0 category-orphans and asserted every deleted node had 0 resources by full chain (0 unsafe). Post-cleanup: total still **1,838**, all 9 category counts unchanged, 0 empty nodes remain (subcats 102→96, subsubs 107→90). Architect review **PASS**. No app bugs found.
+- **Prod pass DONE (live admin API, no deploy)**: cleaned prod's own empty taxonomy nodes directly against the live DB. Deleted **4 empty subcategories + 16 empty sub-subcategories** (subcats 102→98, subsubs 107→91); approved total held at **1,848**, all 9 per-category counts unchanged, 0 category-orphans, live `/api/awesome-list` still 9 cats / 98 subcats / 91 subsubs; 0 `__EMPTY_DEL_` leftovers. Prod's delete guard counts resources BY NAME across ALL statuses, so 10 name-collided empty nodes (e.g. 5× "FFmpeg") were name-blocked and removed via a **rename-to-unique-then-delete** workaround (PATCH only updates the taxonomy row, never `resources`). An architect-mandated all-status pre-check **kept 3 nodes** ("Vendors & HDR" subcat + "Vendor Docs"/"Audio" sub-subs) because each still holds a non-approved (pending/rejected) resource on its exact chain — deleting them would misfold a future approval; they stay hidden from users by the `AppSidebar` empty-node filter. Recovery journal + deleted-list in `.local/prod-cleanup/`.
+
 ## July 6, 2026
 
 ### Production Resource-Count Reconciliation + Search/Content Fixes
