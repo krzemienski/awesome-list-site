@@ -187,7 +187,7 @@ export default function RecommendationPanel({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Brain className="h-5 w-5" />
-            AI-Powered Recommendations
+            Personalized Recommendations
             {recommendations && recommendations.some((r: RecommendationResult) => r.aiGenerated) && (
               <Badge variant="secondary" className="text-xs">
                 Enhanced by AI
@@ -195,7 +195,7 @@ export default function RecommendationPanel({
             )}
           </CardTitle>
           <CardDescription>
-            Personalized suggestions using Claude AI based on your preferences and learning goals
+            Personalized suggestions based on your preferences and learning goals
           </CardDescription>
         </CardHeader>
         <CardContent>

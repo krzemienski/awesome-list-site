@@ -70,16 +70,26 @@ export function useAIRecommendations(
     mutationFn: async (profile?: UserProfile): Promise<RecommendationsResponse> => {
       const url = `/api/recommendations?limit=${limit}`;
       const finalProfile = profile || userProfile;
-      
-      if (finalProfile) {
-        return await apiRequest(url, { 
-          method: 'POST', 
-          body: JSON.stringify(finalProfile) 
-        });
-      } else {
-        // Use GET for anonymous users
-        return await apiRequest(url, { method: 'GET' });
+
+      // The server returns a BARE ARRAY of RecommendationResult from both the
+      // POST (profiled) and GET (anonymous) endpoints. Normalize to the
+      // { recommendations, learningPaths } shape this hook exposes — without
+      // this, the /recommendations page read `.recommendations` off an array
+      // and always rendered the empty state (run3 audit R3-14).
+      const raw = finalProfile
+        ? await apiRequest(url, {
+            method: 'POST',
+            body: JSON.stringify(finalProfile)
+          })
+        : await apiRequest(url, { method: 'GET' });
+
+      if (Array.isArray(raw)) {
+        return { recommendations: raw, learningPaths: [] };
       }
+      return {
+        recommendations: Array.isArray(raw?.recommendations) ? raw.recommendations : [],
+        learningPaths: Array.isArray(raw?.learningPaths) ? raw.learningPaths : []
+      };
     },
     onSuccess: (data) => {
       // Cache locally

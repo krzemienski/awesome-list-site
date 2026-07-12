@@ -1,5 +1,5 @@
 import { useState, memo } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -84,22 +84,50 @@ function ResourceCard({
     searchTsv: null,
   };
 
+  // Run3 audit R3-31: the card title is a REAL anchor (stretched-link pattern)
+  // instead of a JS-only onClick <div>, so middle-click / cmd-click / "open in
+  // new tab" / link previews work and crawlers see an href. The after:inset-0
+  // overlay keeps the whole card clickable; interactive children (favorite,
+  // bookmark, Open Link, Suggest Edit) sit above it via relative z-10. The
+  // legacy onClick prop path (custom card behavior) is preserved unchanged.
+  const titleContent = onClick ? (
+    resource.name
+  ) : isValidDbResource ? (
+    <Link
+      href={`/resource/${resource.id}`}
+      className="hover:text-primary transition-colors after:absolute after:inset-0 after:content-['']"
+      data-testid={`link-resource-title-${resource.id}`}
+    >
+      {resource.name}
+    </Link>
+  ) : (
+    <a
+      href={resource.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="hover:text-primary transition-colors after:absolute after:inset-0 after:content-['']"
+      data-testid={`link-resource-title-${resource.id}`}
+    >
+      {resource.name}
+    </a>
+  );
+
   return (
     <Card 
       className={cn(
-        "group hover:border-primary/50 transition-all cursor-pointer",
+        "group relative hover:border-primary/50 transition-all cursor-pointer",
         className
       )}
-      onClick={handleCardClick}
+      onClick={onClick ? handleCardClick : undefined}
       data-testid={`card-resource-${resource.id}`}
     >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <CardTitle className="text-lg line-clamp-1 flex-1 min-w-0">
-            {resource.name}
+            {titleContent}
           </CardTitle>
           {isAuthenticated && (
-            <div className="flex items-center gap-1 ml-2">
+            <div className="relative z-10 flex items-center gap-1 ml-2">
               <FavoriteButton
                 resourceId={resource.id}
                 isFavorited={resource.isFavorited}
@@ -193,7 +221,7 @@ function ResourceCard({
           )}
         </div>
         
-        <div className="flex gap-2">
+        <div className="relative z-10 flex gap-2">
           <Button 
             variant="outline" 
             size="sm" 

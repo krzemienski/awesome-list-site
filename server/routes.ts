@@ -56,10 +56,11 @@ import { fetchAwesomeList } from "./parser";
 import { fetchAwesomeVideoData } from "./awesome-video-parser-clean";
 import { RecommendationEngine, UserProfile } from "./recommendation-engine";
 import { fetchAwesomeLists, searchAwesomeLists } from "./github-api";
-import { insertResourceSchema, EDITABLE_RESOURCE_FIELDS, insertJourneyStepSchema, passwordResetTokens } from "@shared/schema";
+import { insertResourceSchema, EDITABLE_RESOURCE_FIELDS, insertJourneyStepSchema, passwordResetTokens, type Resource } from "@shared/schema";
 import { ensureSubSubcategoryExists } from "./repositories/ensureSubSubcategory";
 import { z } from "zod";
 import { syncService } from "./github/syncService";
+import { ensureMinDescription } from "./github/importHygiene";
 import { recommendationEngine, UserProfile as AIUserProfile } from "./ai/recommendationEngine";
 import { buildRelatedResources } from "./services/relatedResources";
 import { registerPublicApiRoutes } from "./api/public";
@@ -137,7 +138,14 @@ async function generateSitemap(_req: any, res: any) {
   const baseUrl = SITE_URL.replace(/\/+$/, "");
   const urls: string[] = [];
 
+  // Run3 audit R3-05: sub-subcategory slugs are shared across parents (e.g.
+  // "ffmpeg" appears under several subcategories), so the tree walk below can
+  // visit the same public URL many times. Every <loc> must appear exactly once.
+  const seenLocs = new Set<string>();
+
   const addUrl = (path: string, changefreq: string, priority: string) => {
+    if (seenLocs.has(path)) return;
+    seenLocs.add(path);
     urls.push(`  <url>
     <loc>${xmlEscape(baseUrl + path)}</loc>
     <lastmod>${currentDate}</lastmod>
@@ -195,6 +203,27 @@ ${urls.join('\n')}
 
   res.set('Content-Type', 'application/xml');
   res.send(sitemap);
+}
+
+// Run3 audit R3-17: the export/validation pipeline must count the exact same
+// catalog the public site serves. getAllApprovedResources() returns the raw
+// approved table (URL duplicates + category-orphans included), which is how
+// admin validation drifted to "2052 resources, 10 categories" while the public
+// tree showed 1951/9. Flattening the hierarchical tree yields the deduped,
+// orphan-excluded set — parity with /api/categories by construction.
+async function getPublicCatalogResources(): Promise<Resource[]> {
+  const tree = await legacyRepo.getAwesomeListFromDatabase();
+  const out: Resource[] = [];
+  for (const cat of tree?.categories ?? []) {
+    out.push(...(cat.resources ?? []));
+    for (const sub of cat.subcategories ?? []) {
+      out.push(...(sub.resources ?? []));
+      for (const ss of sub.subSubcategories ?? []) {
+        out.push(...(ss.resources ?? []));
+      }
+    }
+  }
+  return out;
 }
 
 /**
@@ -765,6 +794,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Run3 audit R3-10: browser-facing GET /logout. Mirrors POST /api/auth/logout
+  // (destroy session + clear cookie) then redirects home, so pasting /logout in
+  // the address bar works instead of 404ing. GET is technically CSRF-able, but
+  // "log the user out" is a nuisance-level primitive and the convenience wins.
+  app.get('/logout', (req: any, res) => {
+    const finish = () => {
+      res.clearCookie("connect.sid", { path: "/" });
+      res.redirect(302, "/");
+    };
+    try {
+      req.logout(() => {
+        if (req.session) {
+          req.session.destroy(() => finish());
+        } else {
+          finish();
+        }
+      });
+    } catch {
+      finish();
+    }
+  });
+
+  // Run3 audit R3-10: consistent /api/auth/* surface.
+  // GET /api/auth/status — lightweight session probe (no user payload).
+  app.get('/api/auth/status', (req: any, res) => {
+    res.json({ authenticated: Boolean(req.isAuthenticated?.() && req.user) });
+  });
+  // /api/auth/login was probed by auditors and 404'd; answer with a 405 that
+  // documents the real login endpoints instead.
+  app.all('/api/auth/login', (_req, res) => {
+    res.status(405).set('Allow', 'POST').json({
+      message:
+        'Use POST /api/auth/local/login (email/password) or GET /api/login (Replit OAuth).',
+    });
+  });
+
   // Note: /api/login, /api/callback are set up in setupAuth()
 
   // ============= Resource Routes =============
@@ -774,7 +839,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Support explicit offset/limit for pagination (BUG-003). When offset is
       // provided, it overrides `page`. Clamp to safe integers; reject non-numeric
-      // values with 400. Client's largest legitimate request is limit=200.
+      // values with 400. Run3 audit R3-06: the cap is 1000 (was 200, which
+      // silently truncated limit=2000 requests) and the response now carries
+      // `limit` / `offset` / `nextOffset` so callers can page the full catalog:
+      // repeat with offset=nextOffset until nextOffset is null.
       const rawOffset = req.query.offset as string | undefined;
       const rawLimit = req.query.limit as string | undefined;
       if (rawOffset !== undefined && isNaN(Number(rawOffset))) {
@@ -783,7 +851,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (rawLimit !== undefined && isNaN(Number(rawLimit))) {
         return res.status(400).json({ error: 'invalid_limit' });
       }
-      const limit = Math.min(Math.max(parseInt(rawLimit as string) || 20, 1), 200);
+      const limit = Math.min(Math.max(parseInt(rawLimit as string) || 20, 1), 1000);
       const offset = rawOffset !== undefined ? Math.max(parseInt(rawOffset as string), 0) : (parseInt(req.query.page as string) || 1) - 1;
       let category = req.query.category as string;
       let subcategory = req.query.subcategory as string;
@@ -837,7 +905,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         search
       });
 
-      res.json(result);
+      // R3-06: explicit paging metadata. nextOffset is null on the last page.
+      const nextOffset = offset + result.resources.length < result.total
+        ? offset + result.resources.length
+        : null;
+      res.json({ ...result, limit, offset, nextOffset });
     } catch (error) {
       console.error('Error fetching resources:', error);
       res.status(500).json({ message: 'Failed to fetch resources' });
@@ -1092,6 +1164,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const existing = await resourceRepo.getResource(id);
       if (!existing) {
         return res.status(404).json({ message: 'Resource not found' });
+      }
+      
+      // Run3 audit R3-28: approval gate — a resource never goes live with a
+      // stub description; sanitize (entities/emails) or backfill a fallback.
+      const cleanDescription = ensureMinDescription(existing.description || '', existing.title, existing.url);
+      if (cleanDescription !== (existing.description || '')) {
+        await resourceRepo.updateResource(id, { description: cleanDescription });
       }
       
       const resource = await resourceRepo.updateResourceStatus(id, 'approved', userId);
@@ -2156,6 +2235,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'Resource not found' });
       }
       
+      // Run3 audit R3-28: approval gate — sanitize or backfill a fallback
+      // description so no live resource has a stub under 20 chars.
+      const cleanDescription = ensureMinDescription(existing.description || '', existing.title, existing.url);
+      if (cleanDescription !== (existing.description || '')) {
+        await resourceRepo.updateResource(resourceId, { description: cleanDescription });
+      }
+      
       const updatedResource = await resourceRepo.approveResource(resourceId, userId);
       
       res.json(updatedResource);
@@ -2630,14 +2716,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/admin/categories', isAuthenticated, isAdmin, async (req, res) => {
     try {
       const categories = await categoryRepo.listCategories();
-      
-      const categoriesWithCounts = await Promise.all(
-        categories.map(async (cat) => {
-          const count = await categoryRepo.getCategoryResourceCount(cat.name);
-          return { ...cat, resourceCount: count };
-        })
-      );
-      
+
+      // Run3 audit R3-16: use the approved-only per-category counts (single
+      // GROUP BY query) so the admin Categories tab matches the public
+      // /api/categories resourceCount exactly. getCategoryResourceCount
+      // (all-statuses) is intentionally left unchanged — it backs the
+      // taxonomy delete guard, which must see pending/rejected rows too.
+      const approvedCounts = await categoryRepo.getResourceCountsByCategory();
+      const categoriesWithCounts = categories.map((cat) => ({
+        ...cat,
+        resourceCount: approvedCounts[cat.name] ?? 0,
+      }));
+
       res.json(categoriesWithCounts);
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -3248,8 +3338,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/admin/export - Generate and download awesome list markdown
   app.post('/api/admin/export', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
-      // Get all approved resources
-      const resources = await resourceRepo.getAllApprovedResources();
+      // Export the public catalog (deduped, orphan-excluded) — see R3-17 note
+      // on getPublicCatalogResources().
+      const resources = await getPublicCatalogResources();
       
       // Get export options from request body
       // NOTE: websiteUrl is undefined by default to avoid including internal dev URLs
@@ -3398,8 +3489,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/admin/validate - Run awesome-lint validation on current data
   app.post('/api/admin/validate', isAuthenticated, isAdmin, async (req: any, res) => {
     try {
-      // Get all approved resources
-      const resources = await resourceRepo.getAllApprovedResources();
+      // Validate the public catalog (deduped, orphan-excluded) — see R3-17
+      // note on getPublicCatalogResources(). Counts here must equal the public
+      // sidebar/categories totals.
+      const resources = await getPublicCatalogResources();
       
       // Get export options from request body
       // NOTE: websiteUrl undefined to avoid including dev URLs; includeLicense false per awesome-lint

@@ -52,12 +52,16 @@ app.use((_req, res, next) => {
         // into the served HTML (it is NOT in our source, so we cannot nonce or
         // remove it) — allowlist the origin so the widget loads cleanly.
         `script-src 'self' 'nonce-${nonce}' https://www.googletagmanager.com https://replit.com https://replit-cdn.com`,
-        // BUG-014: nonce-based styles — no 'unsafe-inline'. The SSR shell's
-        // <style> and the static inline <style> tags are stamped with this same
-        // nonce by stampNonce() in og-middleware (which reads res.locals.cspNonce),
-        // so a nonce-based style-src is fully functional — no 'unsafe-inline'
-        // fallback is needed.
-        `style-src 'self' 'nonce-${nonce}' https://fonts.googleapis.com`,
+        // Run3 audit R3-18/R3-19: style-src dropped the nonce in favor of
+        // 'unsafe-inline'. Browsers IGNORE 'unsafe-inline' whenever a nonce is
+        // present in the same directive, so there is no "nonce + fallback"
+        // option — and the platform-injected Replit feedback widget (plus other
+        // third-party snippets we don't render) sets inline style="" attributes
+        // that can never carry our nonce, producing a CSP violation on every
+        // page load and an unstyled widget. Inline STYLE injection is a far
+        // weaker vector than script injection; script-src keeps its strict
+        // nonce policy.
+        `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
         "font-src 'self' https://fonts.gstatic.com",
         // MERGE NOTE (July 10, 2026): BUG-014 proposed an img-src allowlist, but
         // ResourceCard renders arbitrary external metadata.ogImage URLs via <img>,

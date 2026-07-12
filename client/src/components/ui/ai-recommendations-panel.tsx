@@ -173,10 +173,10 @@ export default function AIRecommendationsPanel({ resources }: AIRecommendationsP
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
-            AI-Powered Recommendations
+            Personalized Recommendations
           </CardTitle>
           <CardDescription>
-            Get personalized resource recommendations powered by Claude AI based on your learning profile and goals
+            Get personalized resource recommendations based on your learning profile and goals
           </CardDescription>
         </CardHeader>
       </Card>
@@ -413,7 +413,7 @@ export default function AIRecommendationsPanel({ resources }: AIRecommendationsP
                 ) : (
                   <>
                     <Sparkles className="mr-2 h-4 w-4" />
-                    Generate AI Recommendations
+                    Generate Recommendations
                   </>
                 )}
               </Button>
@@ -431,7 +431,7 @@ export default function AIRecommendationsPanel({ resources }: AIRecommendationsP
               Analyzing Your Profile...
             </CardTitle>
             <CardDescription>
-              Claude AI is generating personalized recommendations based on your preferences
+              Generating personalized recommendations based on your preferences
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -654,7 +654,7 @@ export default function AIRecommendationsPanel({ resources }: AIRecommendationsP
               Ready to Get Started
             </CardTitle>
             <CardDescription>
-              Configure your preferences above and click "Generate AI Recommendations" to receive personalized suggestions powered by Claude AI
+              Configure your preferences above and click "Generate Recommendations" to receive personalized suggestions
             </CardDescription>
           </CardHeader>
         </Card>

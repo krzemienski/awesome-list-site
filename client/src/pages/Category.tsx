@@ -573,18 +573,47 @@ export default function Category() {
                 description: 'Opening resource in new tab',
               });
             };
-            
+
+            // Run3 audit R3-31: render the card title as a REAL anchor with a
+            // stretched-link overlay (after:inset-0) so middle-click / cmd-click /
+            // "open in new tab" and crawlers work; action buttons sit above it
+            // via relative z-10. The card onClick is kept as a fallback for the
+            // non-overlay edge but the anchor stops propagation to avoid a
+            // double navigation.
+            const titleAnchor = (label: React.ReactNode) =>
+              isDbResource(resource) ? (
+                <Link
+                  href={`/resource/${getDbId(resource)}`}
+                  className="after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-[var(--accent)]"
+                  onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                  data-testid={`link-resource-${resourceId}`}
+                >
+                  {label}
+                </Link>
+              ) : (
+                <a
+                  href={resource.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-[var(--accent)]"
+                  onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                  data-testid={`link-resource-${resourceId}`}
+                >
+                  {label}
+                </a>
+              );
+
             if (viewMode === "list") {
               return (
                 <div
                   key={`${resource.url}-${index}`}
-                  className="flex items-center gap-4 p-3 rounded-lg border border-border bg-transparent hover:border-[var(--accent)]/30 hover:shadow-md cursor-pointer transition-all min-w-0"
+                  className="relative flex items-center gap-4 p-3 rounded-lg border border-border bg-transparent hover:border-[var(--accent)]/30 hover:shadow-md cursor-pointer transition-all min-w-0"
                   onClick={handleResourceClick}
                   data-testid={`card-resource-${resourceId}`}
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium truncate">{resource.title}</span>
+                      <span className="font-medium truncate">{titleAnchor(resource.title)}</span>
                       {isDbResource(resource) && (
                         <Badge
                           variant="outline"
@@ -600,7 +629,7 @@ export default function Category() {
                       </p>
                     )}
                   </div>
-                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                  <div className="relative z-10 flex items-center gap-1.5 flex-shrink-0">
                     {resource.subcategory && (
                       <Badge variant="outline" className="text-xs hidden md:inline-flex">{resource.subcategory}</Badge>
                     )}
@@ -637,16 +666,16 @@ export default function Category() {
               return (
                 <Card
                   key={`${resource.url}-${index}`}
-                  className="cursor-pointer hover:border-[var(--accent)]/30 hover:shadow-md transition-all border border-border bg-card p-2.5 sm:p-3 min-w-0 touch-manipulation"
+                  className="relative cursor-pointer hover:border-[var(--accent)]/30 hover:shadow-md transition-all border border-border bg-card p-2.5 sm:p-3 min-w-0 touch-manipulation"
                   onClick={handleResourceClick}
                   data-testid={`card-resource-${resourceId}`}
                 >
                   <div className="flex items-start gap-1.5 min-w-0">
-                    <span className="font-medium text-xs sm:text-sm line-clamp-2 flex-1 min-w-0">{resource.title}</span>
+                    <span className="font-medium text-xs sm:text-sm line-clamp-2 flex-1 min-w-0">{titleAnchor(resource.title)}</span>
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 w-8 p-0 shrink-0 touch-manipulation min-h-[44px] min-w-[44px] -mr-1.5"
+                      className="relative z-10 h-8 w-8 p-0 shrink-0 touch-manipulation min-h-[44px] min-w-[44px] -mr-1.5"
                       onClick={handleExternalLink}
                       data-testid={`button-external-${resourceId}`}
                       title="Open in new tab"
@@ -662,14 +691,14 @@ export default function Category() {
             return (
               <Card
                 key={`${resource.url}-${index}`}
-                className="cursor-pointer hover:border-[var(--accent)]/30 hover:shadow-md transition-all border border-border bg-card text-card-foreground min-w-0 flex flex-col"
+                className="relative cursor-pointer hover:border-[var(--accent)]/30 hover:shadow-md transition-all border border-border bg-card text-card-foreground min-w-0 flex flex-col"
                 onClick={handleResourceClick}
                 data-testid={`card-resource-${resourceId}`}
               >
                 <CardHeader className="p-6 space-y-2">
                   <CardTitle className="text-base sm:text-lg flex items-start gap-2">
-                    <span className="flex-1 min-w-0 line-clamp-2">{resource.title}</span>
-                    <div className="flex items-center gap-0.5 flex-shrink-0">
+                    <span className="flex-1 min-w-0 line-clamp-2">{titleAnchor(resource.title)}</span>
+                    <div className="relative z-10 flex items-center gap-0.5 flex-shrink-0">
                       <Button
                         variant="ghost"
                         size="sm"
@@ -730,7 +759,7 @@ export default function Category() {
                       handleResourceClick();
                     }}
                     data-testid={`button-view-details-${resourceId}`}
-                    className="inline-flex items-center gap-1 text-xs font-medium text-[var(--accent)] hover:underline focus:outline-none focus-visible:underline"
+                    className="relative z-10 inline-flex items-center gap-1 text-xs font-medium text-[var(--accent)] hover:underline focus:outline-none focus-visible:underline"
                   >
                     {isDbResource(resource) ? "View Details" : "Open Resource"}
                     <ExternalLink className="h-3 w-3" />

@@ -46,7 +46,7 @@ export default function Recommendations() {
   return (
     <div className="space-y-6 sm:space-y-8">
       <SEOHead
-        title="AI-Powered Recommendations — Awesome Video"
+        title="Personalized Recommendations — Awesome Video"
         description="Personalized video development resource recommendations based on your interests and learning goals."
         noindex
       />
@@ -55,7 +55,7 @@ export default function Recommendations() {
         <div className="flex items-center gap-2 sm:gap-3">
           <Sparkles className="h-6 w-6 text-[var(--accent)] shrink-0" />
           <h1 className="font-sans font-bold text-2xl sm:text-3xl tracking-tight">
-            AI-Powered Recommendations
+            Personalized Recommendations
           </h1>
         </div>
         <p className="text-sm sm:text-base text-[color:var(--text-2)]">

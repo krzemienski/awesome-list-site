@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useParams, useLocation } from "wouter";
+import { useParams, useLocation, Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -402,16 +402,30 @@ export default function JourneyDetail() {
                           <div className="space-y-2 mb-4">
                             {step.resources.map((resource) => (
                               <div key={resource.id} className="p-3 bg-muted/50 rounded-lg">
-                                <a 
-                                  href={resource.url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="flex items-center gap-2 text-sm hover:text-primary transition-colors min-h-[44px] py-2"
-                                  data-testid={`link-resource-${resource.id}`}
-                                >
-                                  <ExternalLink className="h-4 w-4 flex-shrink-0" />
-                                  <span className="font-medium">{resource.title}</span>
-                                </a>
+                                {/* Run3 audit R3-30: the resource title links to the
+                                    internal detail page (keeps users in the journey
+                                    flow); the external-link icon still opens the
+                                    source site in a new tab. */}
+                                <div className="flex items-center gap-1">
+                                  <Link
+                                    href={`/resource/${resource.id}`}
+                                    className="flex items-center gap-2 text-sm hover:text-primary transition-colors min-h-[44px] py-2 flex-1 min-w-0"
+                                    data-testid={`link-resource-${resource.id}`}
+                                  >
+                                    <BookOpen className="h-4 w-4 flex-shrink-0" />
+                                    <span className="font-medium">{resource.title}</span>
+                                  </Link>
+                                  <a
+                                    href={resource.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center justify-center min-h-[44px] min-w-[44px] text-muted-foreground hover:text-primary transition-colors flex-shrink-0"
+                                    aria-label={`Open ${resource.title} on its source site (new tab)`}
+                                    data-testid={`link-resource-external-${resource.id}`}
+                                  >
+                                    <ExternalLink className="h-4 w-4" />
+                                  </a>
+                                </div>
                                 {resource.description && (
                                   <p className="text-xs text-muted-foreground mt-1 ml-6">
                                     {resource.description}

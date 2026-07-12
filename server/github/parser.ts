@@ -1,6 +1,7 @@
 import { Resource } from "@shared/schema";
 import yaml from "js-yaml";
 import { mapCategoryName } from "@shared/categoryMapping";
+import { isJunkResource, humanizeTitle, sanitizeDescription } from "./importHygiene";
 
 /**
  * Parser for awesome list README files
@@ -316,7 +317,11 @@ export async function parseAwesomeList(content: string): Promise<ParsedAwesomeLi
  * BUG FIX: Now uses mapCategoryName to map variants to canonical categories
  */
 export function convertToDbResources(parsed: ParsedAwesomeList): Partial<Resource>[] {
-  return parsed.resources.map(resource => {
+  return parsed.resources
+    // Run3 audit R3-13: markdown nav junk ("back to top" -> "#readme") and
+    // fragment/relative URLs must never become resources.
+    .filter(resource => !isJunkResource(resource.title, resource.url))
+    .map(resource => {
     // Normalize first to clean special characters
     const normalizedCategory = normalizeCategory(resource.category);
     const normalizedSubcategory = resource.subcategory ? normalizeCategory(resource.subcategory) : undefined;
@@ -326,9 +331,11 @@ export function convertToDbResources(parsed: ParsedAwesomeList): Partial<Resourc
     const canonicalCategory = mapCategoryName(normalizedCategory) || normalizedCategory;
     
     return {
-      title: resource.title,
+      // R3-25: humanize owner/repo slug titles + cap length;
+      // R3-26/27: decode entities + strip emails from descriptions.
+      title: humanizeTitle(resource.title),
       url: resource.url,
-      description: resource.description || '',
+      description: sanitizeDescription(resource.description || ''),
       category: canonicalCategory,
       subcategory: normalizedSubcategory,
       subSubcategory: normalizedSubSubcategory,

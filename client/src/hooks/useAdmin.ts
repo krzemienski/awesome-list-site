@@ -7,6 +7,9 @@ interface AdminStats {
   resources: number;
   journeys: number;
   pendingApprovals: number;
+  totalPublic?: number;
+  totalPending?: number;
+  totalDeleted?: number;
 }
 
 export function useAdmin() {

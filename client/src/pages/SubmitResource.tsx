@@ -344,7 +344,10 @@ export default function SubmitResource() {
                   </AlertDescription>
                 </Alert>
               )}
-              <form onSubmit={(e) => void form.handleSubmit(onSubmit, onInvalid)(e)} className="space-y-6" noValidate>
+              {/* Run3 audit R3-04: explicit method="post" — submission goes via
+                  fetch (react-hook-form onSubmit), but if JS ever fails the
+                  browser must not leak form fields into the URL as a GET. */}
+              <form method="post" onSubmit={(e) => void form.handleSubmit(onSubmit, onInvalid)(e)} className="space-y-6" noValidate>
                 {/* Fields are disabled for logged-out visitors — they can see the
                     form layout as a preview but cannot fill or submit it (BUG-018). */}
                 <fieldset disabled={!isAuthenticated} className="space-y-6 border-0 p-0 m-0 min-w-0">
@@ -440,7 +443,9 @@ export default function SubmitResource() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Category *</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      {/* R3-04: name gives the hidden native select a non-empty
+                          name; the visible trigger is labeled via FormLabel. */}
+                      <Select name={field.name} onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger data-testid="select-category">
                             <SelectValue placeholder="Select a category" />
@@ -470,7 +475,7 @@ export default function SubmitResource() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Subcategory (Optional)</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select name={field.name} onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger data-testid="select-subcategory">
                               <SelectValue placeholder="Select a subcategory" />
@@ -501,7 +506,7 @@ export default function SubmitResource() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Specific Topic (Optional)</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select name={field.name} onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger data-testid="select-subsubcategory">
                               <SelectValue placeholder="Select a specific topic" />

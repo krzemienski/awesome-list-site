@@ -21,6 +21,11 @@ interface DatabaseTabProps {
     resources: number;
     journeys: number;
     pendingApprovals: number;
+    // Run3 audit R3-22: status-split counts from /api/admin/stats so this
+    // panel can show the live (public) number instead of the raw row count.
+    totalPublic?: number;
+    totalPending?: number;
+    totalDeleted?: number;
   };
 }
 
@@ -85,7 +90,7 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
             Database Management
           </CardTitle>
           <CardDescription>
-            Seed the database with 2,011 video resources from awesome-video JSON
+            Seed the database with video resources from the awesome-video JSON source
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -196,10 +201,15 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
             <h4 className="text-sm font-semibold text-[var(--text)] mb-2">Current Database Stats</h4>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               <div className="space-y-1">
-                <div className="text-xs text-[var(--text-2)]">Resources</div>
-                <div className="text-xl font-mono font-bold text-primary">
-                  {stats?.resources || 0}
+                <div className="text-xs text-[var(--text-2)]">Live Resources</div>
+                <div className="text-xl font-mono font-bold text-primary" data-testid="stat-db-live-resources">
+                  {(stats?.totalPublic ?? stats?.resources ?? 0).toLocaleString()}
                 </div>
+                {(stats?.totalPending ?? 0) + (stats?.totalDeleted ?? 0) > 0 && (
+                  <div className="text-[10px] text-[var(--text-2)]">
+                    +{stats?.totalPending ?? 0} pending · {stats?.totalDeleted ?? 0} rejected
+                  </div>
+                )}
               </div>
               <div className="space-y-1">
                 <div className="text-xs text-[var(--text-2)]">Users</div>

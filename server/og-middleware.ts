@@ -520,7 +520,10 @@ function homeShellChrome(): string {
       noindex: true,
     },
     "/recommendations": {
-      title: `AI-Powered Recommendations — ${SITE_NAME}`,
+      // R3-21: count-honest label — recommendations may be rule-based, so the
+      // page no longer claims "AI-Powered" (kept in lockstep with the client
+      // SEOHead title in Recommendations.tsx — two-pass title parity).
+      title: `Personalized Recommendations — ${SITE_NAME}`,
       description: `Personalized video development resource recommendations based on your interests and learning goals.`,
       // Personalized/dynamic content — keep out of the index so the
       // indexable set stays equal to the sitemap.
@@ -545,9 +548,17 @@ function homeShellChrome(): string {
       noindex: true,
     },
   };
-  if (staticRoutes[path]) {
+  // Run3 audit R3-02: /admin/:section deep-links (e.g. /admin/users) are real
+  // client routes that open the matching admin tab — serve them the /admin
+  // meta (noindex) instead of a soft-404. The section list mirrors
+  // AdminDashboard's tab ids; unknown sections still fall through to 404.
+  const adminSectionMatch = path.match(
+    /^\/admin\/(approvals|edits|enrichment|researcher|export|database|resources|categories|subcategories|subsubcategories|journeys|users|github|linkhealth|audit)$/,
+  );
+  const staticKey = adminSectionMatch ? "/admin" : path;
+  if (staticRoutes[staticKey]) {
     const m = defaultMeta(path);
-    Object.assign(m, staticRoutes[path]);
+    Object.assign(m, staticRoutes[staticKey]);
     m.image = ogImage(m.title.split(" — ")[0]);
     let bodyHtml: string | undefined;
     if (path === "/journeys") {
@@ -1375,6 +1386,25 @@ export function ogInjectionMiddleware() {
     }
     if (urlPath === "/auth/login") {
       return res.redirect(301, "/login");
+    }
+    // Run3 audit R3-08/R3-09: more circulating URL shapes that were never
+    // routes — 301 them to their canonical pages instead of soft-404ing.
+    if (urlPath === "/signup") {
+      return res.redirect(301, "/register");
+    }
+    if (urlPath === "/explore") {
+      return res.redirect(301, "/search");
+    }
+    if (/^\/resource\/?$/.test(urlPath)) {
+      // Bare /resource (often seen as /resource?q=term) — canonical is the
+      // search page; carry the query through. Exact-match so this never
+      // hijacks the /resource/:id detail route.
+      const qs = (req.originalUrl || req.url).split("?")[1] || "";
+      const q = new URLSearchParams(qs).get("q");
+      return res.redirect(
+        301,
+        q && q.trim() ? `/search?q=${encodeURIComponent(q.trim())}` : "/search",
+      );
     }
     // BUG-008: the no-hyphen /subsubcategory/:slug 301s to the canonical
     // /sub-subcategory/:slug (a circulating URL shape that was never a route).

@@ -498,7 +498,7 @@ export default function ModernSidebar({ title, categories, resources, isLoading,
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5" />
-              AI-Powered Recommendations
+              Personalized Recommendations
             </DialogTitle>
           </DialogHeader>
           {userProfile ? (

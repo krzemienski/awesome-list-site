@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Shield, Link, Sparkles, Brain, ListOrdered } from "lucide-react";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useAuth } from "@/hooks/useAuth";
-import { Link as WLink } from "wouter";
+import { Link as WLink, useRoute } from "wouter";
 import AdminStats from "@/components/admin/AdminStats";
 import SEOHead from "@/components/layout/SEOHead";
 import ExportTab from "@/components/admin/ExportTab";
@@ -22,12 +22,28 @@ import SubcategoryManager from "@/components/admin/SubcategoryManager";
 import SubSubcategoryManager from "@/components/admin/SubSubcategoryManager";
 import ResearcherTab from "@/components/admin/ResearcherTab";
 import JourneyStepsManager from "@/components/admin/JourneyStepsManager";
+// Run3 audit R3-02: the 15 valid tab ids — used to validate /admin/:section
+// deep-links (unknown sections fall back to the default tab).
+const ADMIN_TAB_IDS = [
+  "approvals", "edits", "enrichment", "researcher", "export", "database",
+  "resources", "categories", "subcategories", "subsubcategories", "journeys",
+  "users", "github", "linkhealth", "audit",
+] as const;
+
 export default function AdminDashboard() {
   const { stats, isLoading, error } = useAdmin();
   const { isAuthenticated, user, isLoading: authLoading } = useAuth();
   const isAdmin = Boolean(user && (user as { role?: string }).role === "admin");
 
+  // R3-02: /admin/:section deep-links (e.g. /admin/users) select that tab.
+  const [, sectionParams] = useRoute("/admin/:section");
+  const sectionTab =
+    sectionParams && (ADMIN_TAB_IDS as readonly string[]).includes(sectionParams.section)
+      ? sectionParams.section
+      : null;
+
   const [activeTab, setActiveTab] = useState(() => {
+    if (sectionTab) return sectionTab;
     if (typeof window !== "undefined") {
       const hash = window.location.hash.replace("#", "");
       if (hash) return hash;
@@ -35,9 +51,16 @@ export default function AdminDashboard() {
     return "approvals";
   });
 
+  // Keep the tab in sync if the user navigates between /admin/:section links.
+  useEffect(() => {
+    if (sectionTab) setActiveTab(sectionTab);
+  }, [sectionTab]);
+
   const handleTabChange = (value: string) => {
     setActiveTab(value);
-    window.history.replaceState(null, "", `#${value}`);
+    // Tab clicks always normalize back to /admin#tab (tabs stay on /admin);
+    // the /admin/:section path form is only an inbound deep-link alias.
+    window.history.replaceState(null, "", `/admin#${value}`);
   };
 
   if (!authLoading && (!isAuthenticated || !isAdmin)) {

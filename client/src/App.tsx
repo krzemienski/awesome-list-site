@@ -1,5 +1,5 @@
 import { useEffect, lazy, Suspense } from "react";
-import { Switch, Route, Redirect } from "wouter";
+import { Switch, Route, Redirect, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { initGA } from "./lib/analytics";
 import { useAnalytics } from "./hooks/use-analytics";
@@ -41,9 +41,27 @@ const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
 import { processAwesomeListData } from "@/lib/parser";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
 
+// Run3 audit R3-29: every path pattern the Switch below can handle. Anything
+// that matches none of these is a hard 404 — rendered as a standalone lean
+// page BEFORE MainLayout so unknown URLs don't get the full app chrome
+// (sidebar/header) that made 404s look like real content pages.
+const KNOWN_ROUTE_PATTERNS: RegExp[] = [
+  /^\/$/,
+  /^\/(login|register|signup|explore|forgot-password|reset-password|categories|category|recommendations|search|about|advanced|submit|journeys|journey|profile|bookmarks|favorites|account|admin|settings|resource)\/?$/,
+  /^\/auth\/(login|register)\/?$/,
+  /^\/category\/[^/]+(\/[^/]+)?$/,
+  /^\/(subcategory|sub-subcategory|subsubcategory)\/[^/]+$/,
+  /^\/resource\/[^/]+$/,
+  /^\/journey\/[^/]+$/,
+  /^\/admin\/[^/]+$/,
+  /^\/settings\/theme\/?$/,
+];
+
 function Router() {
   useAnalytics();
   const { user, isLoading: authLoading, logout } = useAuth();
+  const [location] = useLocation();
+  const isKnownRoute = KNOWN_ROUTE_PATTERNS.some((re) => re.test(location));
 
   const { data: rawData, isLoading, error } = useQuery({
     queryKey: ["awesome-list-data"],
@@ -73,6 +91,15 @@ function Router() {
     );
   }
 
+  // R3-29: unknown URL → standalone lean 404 (no sidebar/header chrome).
+  if (!isKnownRoute) {
+    return (
+      <div className="min-h-screen bg-background px-4">
+        <NotFound />
+      </div>
+    );
+  }
+
   return (
     <MainLayout awesomeList={awesomeList} isLoading={isLoading} user={user ?? undefined} onLogout={logout}>
       <Switch>
@@ -91,6 +118,16 @@ function Router() {
         <Route path="/auth/register">
           <Redirect to="/register" replace />
         </Route>
+        <Route path="/signup">
+          <Redirect to="/register" replace />
+        </Route>
+        <Route path="/explore">
+          <Redirect to="/search" replace />
+        </Route>
+        <Route path="/resource" component={() => {
+          const q = new URLSearchParams(window.location.search).get("q");
+          return <Redirect to={q && q.trim() ? `/search?q=${encodeURIComponent(q.trim())}` : "/search"} replace />;
+        }} />
         <Route path="/category/:slug/:subSlug">
           {(params) => <Redirect to={`/subcategory/${params.subSlug}`} replace />}
         </Route>
@@ -124,6 +161,15 @@ function Router() {
           <Redirect to="/profile" replace />
         </Route>
         <Route path="/admin" component={() => (
+          <AdminGuard>
+            <Suspense fallback={<div className="p-8 text-center text-muted-foreground">Loading…</div>}>
+              <AdminDashboard />
+            </Suspense>
+          </AdminGuard>
+        )} />
+        {/* R3-02: admin section deep-links (/admin/users, /admin/resources, …)
+            open the matching tab — AdminDashboard reads :section via useRoute. */}
+        <Route path="/admin/:section" component={() => (
           <AdminGuard>
             <Suspense fallback={<div className="p-8 text-center text-muted-foreground">Loading…</div>}>
               <AdminDashboard />

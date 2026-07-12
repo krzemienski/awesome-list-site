@@ -7,6 +7,7 @@ import { AuditRepository } from '../repositories/AuditRepository';
 import { CategoryRepository } from '../repositories/CategoryRepository';
 import { fetchUrlMetadata, type UrlMetadata } from './urlScraper';
 import { promoteEnrichmentSuggestions } from './promoteEnrichmentSuggestions';
+import { humanizeTitle, sanitizeDescription } from '../github/importHygiene';
 import { tool, createSdkMcpServer } from '@anthropic-ai/claude-agent-sdk';
 import { z } from 'zod';
 import { AgentEventEmitter } from './agentEvents';
@@ -634,6 +635,11 @@ ${taxonomyHint}`;
       const improvedTitle = this.improveTitle(item.title, item.url);
       if (improvedTitle) updates.title = improvedTitle;
     }
+
+    // Run3 audit R3-25/26/27: enrichment must never persist slug titles,
+    // HTML entities, or email bylines into the live columns.
+    if (updates.title) updates.title = humanizeTitle(updates.title);
+    if (updates.description) updates.description = sanitizeDescription(updates.description);
 
     await this.resourceRepo.updateResource(item.resourceId, updates);
 

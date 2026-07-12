@@ -161,9 +161,9 @@ export default function ResourceRecommendations({
       <Card className={className}>
         <CardContent className="py-12 text-center">
           <Lightbulb className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2">AI-Powered Resource Recommendations</h3>
+          <h3 className="text-lg font-semibold mb-2">Resource Recommendations</h3>
           <p className="text-muted-foreground">
-            Select a resource to see AI-powered semantic recommendations
+            Select a resource to see related recommendations
           </p>
         </CardContent>
       </Card>

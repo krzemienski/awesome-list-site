@@ -38,6 +38,7 @@
 
 import { GitHubClient } from "./client";
 import { parseAwesomeList, convertToDbResources } from "./parser";
+import { normalizeUrlForDedup, normalizeTitleForDedup, domainOf } from "./importHygiene";
 import { AwesomeListFormatter, generateContributingMd } from "./formatter";
 import { CategoryRepository } from "../repositories/CategoryRepository";
 import { ResourceRepository } from "../repositories/ResourceRepository";
@@ -995,13 +996,38 @@ export class GitHubSyncService {
    * Check for conflicts with existing resources
    */
   private async checkConflict(resource: Partial<Resource>): Promise<ConflictResolution> {
-    // Check if resource with same URL exists
+    // Run3 audit R3-24: the old check compared EXACT URLs over only the first
+    // 1,000 approved rows — short-links (link.medium.com) and rows past the
+    // cap slipped through and were re-imported as duplicates. Now we compare
+    // normalized URLs over the whole catalog (any status, so a pending copy
+    // also blocks re-import) and fall back to a title+domain match.
     const existingResources = await this.resourceRepo.listResources({
-      limit: 1000,
-      status: 'approved'
+      limit: 100000,
     });
 
-    const existing = existingResources.resources.find(r => r.url === resource.url);
+    const targetUrlKey = normalizeUrlForDedup(resource.url || '');
+    let existing = existingResources.resources.find(
+      r => normalizeUrlForDedup(r.url) === targetUrlKey
+    );
+
+    if (!existing) {
+      // Same normalized title + same root domain = same item behind a
+      // different URL shape (tracking params, short-links, mirrors).
+      const titleKey = normalizeTitleForDedup(resource.title || '');
+      const domainKey = domainOf(resource.url || '');
+      if (titleKey && domainKey) {
+        existing = existingResources.resources.find(
+          r => normalizeTitleForDedup(r.title) === titleKey && domainOf(r.url) === domainKey
+        );
+        if (existing) {
+          return {
+            action: 'skip',
+            resource: existing,
+            reason: `Duplicate of #${existing.id} (same title + domain, different URL form)`
+          };
+        }
+      }
+    }
 
     if (!existing) {
       return {

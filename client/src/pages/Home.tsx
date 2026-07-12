@@ -279,7 +279,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
           >
             <Sparkles className="h-6 w-6 text-[var(--accent)] shrink-0" />
             <h2 className="font-sans font-bold text-2xl sm:text-3xl tracking-tight">
-              AI-Powered Recommendations
+              Personalized Recommendations
             </h2>
           </Link>
           <p className="text-sm sm:text-base text-[color:var(--text-2)]">

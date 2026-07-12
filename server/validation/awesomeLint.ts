@@ -386,7 +386,10 @@ export class AwesomeLintValidator {
    * Count the number of resources
    */
   private countResources(): number {
-    return this.lines.filter(line => line.trim().match(/^[-*] \[.+\]\(.+\)/)).length;
+    // Run3 audit R3-17: exclude Table-of-Contents entries — those are list
+    // items linking to in-page anchors (`- [Name](#anchor)`), not resources.
+    // Counting them inflated totalResources by (categories + subcategories).
+    return this.lines.filter(line => line.trim().match(/^[-*] \[.+\]\((?!#).+\)/)).length;
   }
 
   /**
