@@ -31,7 +31,7 @@ All verification is live-system (Iron Rule): dev API via curl, dev DB via psql, 
 
 ## Still to do (post-review)
 - Republish, then on prod: apply the 5 journey descriptions via `PUT /api/admin/journeys/:id` (ids 6–10, match by title), delete the 2 `__qa_test` users via `DELETE /api/admin/users/:id` (journal in `.local/prod-cleanup/`), and smoke-check NEW-006/BUG-039 live.
-- NEW-002 light mode: awaiting user decision.
+- ~~NEW-002 light mode~~: **CLOSED — user decided July 12, 2026: keep dark-only (no change).** The pure-black cyberpunk theme is a deliberate design choice, not a defect.
 
 ## Session verification summary
 - `tsc --noEmit` clean.
