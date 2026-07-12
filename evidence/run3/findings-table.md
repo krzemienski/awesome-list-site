@@ -49,3 +49,23 @@ All proof is real-system (Iron Rule): live prod admin API + read-only prod SQL, 
 
 ## Republish required
 Code fixes (routing, admin tabs, recommendations, cards-as-anchors, CSP, import hygiene, paging, sitemap) reach production only after republish. Prod DATA cleanup is already live (applied via admin API). Final live-prod re-proof after republish.
+
+## Live-prod re-proof after republish (Task #136, 2026-07-12)
+
+App republished; every check re-run directly against https://awesome.video.
+
+**Scripted sweeps — all PASS:**
+- `run3-verify-csp.mjs` vs prod: 6/6 routes, 0 CSP violations (R3-18/19).
+- Anonymous browser sweep (`run3-verify-prod-anon.mjs`): 8/8 PASS — lean 404 w/ real 404 status (R3-29), recommendations render + truthful labels (R3-14/21), journey resource links (R3-30), card anchors (R3-31), search face, search→detail→visit href, no mobile overflow @390px.
+- Admin-authed sweep (`run3-verify-dev.mjs` @ prod, real admin login): 8/8 PASS — `/admin/resources` deep-link lands on Resources tab (R3-02), all 15 admin tabs stay on /admin (R3-12), submit select accessibly named (R3-04).
+- Redirects (curl): `/signup`→301 `/register` (R3-08), `/explore`→301 `/search` + `/resource?q=hls`→301 `/search?q=hls` (R3-09), `/logout`→302 `/` (R3-10), `/zzz`→404 status; unauth `/admin/*`→302 `/login`.
+- Paging (R3-06): `nextOffset` paged the full catalog — unique ids == `total` == `/api/categories` sum.
+
+**Residuals found live and fixed via admin API (journal: `.local/prod-cleanup/task136-residual-fixes.json`):**
+- R3-03: pending QA artifact 187918 (`__qa_test_…_DO_NOT_DELETE`) had survived (cleanup's pattern missed it) — DELETED; pending queue now 0.
+- R3-24/15: 3 true cross-domain dup copies had survived the title+domain gate — REJECTED (kept canonical): 188028 link.medium.com short-URL copy of 186425 (netflixtechblog); 186146/186147 medium.com mirrors of blog.twitch.tv originals 185759/185760. Searches now return exactly one card per article; shortener URLs now 0.
+
+**Final prod gates (canonical `importHygiene` functions over all approved rows — `run3-prod-gates.ts`):**
+approved=1928; junk=0, slug-titles=0, entities=0, emails=0, desc<20=0, dup-URL clusters=0, dup title+domain clusters=0, shorteners=0. Parity: `/api/resources` total == `/api/categories` sum == 1928. Sitemap: 2080 locs, 0 dups. Admin stats: totalPublic 1928, pendingApprovals 0.
+
+**Known residual (not fixable from here):** 2 QA users (`__qa_test_*@example.invalid`) remain in the prod Users list — there is no admin user-delete endpoint and the prod DB is read-only from the workspace; needs a small code change (DELETE `/api/admin/users/:id`) + republish, then purge (R3-03 users criterion).
