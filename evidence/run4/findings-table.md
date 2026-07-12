@@ -29,8 +29,12 @@ All verification is live-system (Iron Rule): dev API via curl, dev DB via psql, 
 - **BUG-004 closed**: `GET /api/resources?status=pending|rejected` now requires admin (403 otherwise) — previously anonymous callers could bulk-read exactly the bodies NEW-006 hides. Verified: anon pending/rejected → 403, admin rejected → 200 (total 168), anon approved/default/invalid → 200/200/400.
 - **Related-endpoint leak closed**: `/api/resources/:id/related` returns the empty shape to non-admins for non-approved seed ids (a populated list confirmed hidden ids + leaked category). Verified: anon rejected id → empty, admin same id → populated, anon approved id → unchanged.
 
-## Still to do (post-review)
-- Republish, then on prod: apply the 5 journey descriptions via `PUT /api/admin/journeys/:id` (ids 6–10, match by title), delete the 2 `__qa_test` users via `DELETE /api/admin/users/:id` (journal in `.local/prod-cleanup/`), and smoke-check NEW-006/BUG-039 live.
+## Post-republish prod follow-ups — DONE (July 12, 2026)
+- Republished; all fixes live on https://awesome.video.
+- 5 journey descriptions applied via `PUT /api/admin/journeys/:id` (ids 6–10, titles matched dev exactly; all 200; public `/api/journeys` serves the new copy). Journal: `.local/prod-cleanup/prod-journey-descriptions-20260712.json`.
+- 2 `__qa_test` users deleted via `DELETE /api/admin/users/:id` (both 200, `resourcesDetached:0`, `editsDeleted:0`; 0 remaining). Journal: `.local/prod-cleanup/prod-qa-users-deleted-20260712.json`.
+- Live smoke: NEW-006 anon hidden id 188031 → 404, admin → 200; `/related` on hidden id → empty shape; BUG-004 anon `?status=pending` → 403; BUG-039 `?cursor=5` → offset 5 + `nextCursor` 7, `?cursor=abc` → 400.
+- CSP check (July 10 merge risk): prod homepage loads with **0 CSP violations, 0 console errors**; `/category/encoding-codecs` renders "Showing 332 of 332 resources" with 24 cards on page 1.
 - ~~NEW-002 light mode~~: **CLOSED — user decided July 12, 2026: keep dark-only (no change).** The pure-black cyberpunk theme is a deliberate design choice, not a defect.
 
 ## Session verification summary
