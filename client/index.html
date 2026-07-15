@@ -148,6 +148,16 @@
     </script>
   </head>
   <body>
+    <!-- BUG-004 (run10): real fallback for JS-disabled browsers/crawlers.
+         (A prior "noscript" match in this file was only a comment.) -->
+    <noscript>
+      <div style="max-width:640px;margin:80px auto;padding:24px;font-family:'JetBrains Mono',monospace;color:#e6e6e6;background:#000;border:1px solid #333;">
+        <h1 style="font-size:20px;margin:0 0 12px;">Awesome Video</h1>
+        <p style="margin:0 0 8px;">This app requires JavaScript to browse the 2,600+ curated video development resources.</p>
+        <p style="margin:0;">Please enable JavaScript, or view the source list at
+          <a href="https://github.com/krzemienski/awesome-video" style="color:#5eddf2;">github.com/krzemienski/awesome-video</a>.</p>
+      </div>
+    </noscript>
     <div id="root"><!--app-html--></div>
     <script type="module" src="/src/main.tsx"></script>
     <script>

@@ -31,6 +31,7 @@
 
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
+import rateLimit from "express-rate-limit";
 import {
   UserRepository,
   ResourceRepository,
@@ -479,8 +480,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }
   setupLocalAuth();
 
+  // BUG-008 (run10): IP-based rate limiting across the auth cluster.
+  // Complements the existing per-account cooldown (checkLock) which only
+  // throttles a single email — this caps anonymous credential-stuffing and
+  // register/forgot-password abuse per client IP.
+  const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 20,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { message: "Too many attempts. Please try again later." },
+  });
+
   // Local authentication routes
-  app.post("/api/auth/local/login", (req, res, next) => {
+  app.post("/api/auth/local/login", authLimiter, (req, res, next) => {
     const loginEmail = typeof req.body?.email === "string" ? req.body.email : "";
 
     // Brute-force guard: short-circuit while the account is in a cooldown window.
@@ -551,7 +564,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Self-service account registration for local auth. Additive to the login cluster:
   // creates a role=user account, never touches the existing login/session handlers.
   // Email delivery (verification) is out of scope until an email transport is configured.
-  app.post("/api/auth/register", async (req, res) => {
+  app.post("/api/auth/register", authLimiter, async (req, res) => {
     try {
       const { email, password } = req.body ?? {};
 
@@ -591,7 +604,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // fire-and-forget so response timing doesn't leak whether the account exists.
   // OAuth-only accounts (no local password) are silently skipped. Throttled per
   // email AND per IP before any lookup.
-  app.post("/api/auth/forgot-password", async (req, res) => {
+  app.post("/api/auth/forgot-password", authLimiter, async (req, res) => {
     const GENERIC = { message: "If an account with that email exists, we've sent a password reset link." };
     try {
       const email = typeof req.body?.email === "string" ? req.body.email.trim() : "";
@@ -649,7 +662,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // success it rotates the password, kills ALL of the user's sessions (the person
   // resetting is not signed in), voids their other outstanding tokens, and clears
   // any login lockout.
-  app.post("/api/auth/reset-password", async (req, res) => {
+  app.post("/api/auth/reset-password", authLimiter, async (req, res) => {
     try {
       const { token, newPassword } = req.body ?? {};
       if (typeof token !== "string" || !token || typeof newPassword !== "string") {
@@ -1006,12 +1019,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const existingResource = await resourceRepo.getResourceByUrl(url);
 
       if (existingResource) {
+        // BUG-025 (run10): internal moderation status is NOT included — this is
+        // a public endpoint and pending/rejected state is admin-only detail.
         return res.json({
           exists: true,
           resource: {
             id: existingResource.id,
             title: existingResource.title,
-            status: existingResource.status,
             category: existingResource.category,
             subcategory: existingResource.subcategory
           }
@@ -1108,11 +1122,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
 
       // BUG-008: explicit server-side validation before DB insert
+      // BUG-009 (run10): reject raw HTML/script markup in text fields. React
+      // escapes on render so this is defense-in-depth, not an XSS patch —
+      // markup in titles/descriptions is never legitimate catalog content.
+      const NO_HTML = /<[a-z!/][^>]*>/i;
       const submitSchema = z.object({
         url: z.string().min(1).url('Invalid URL format'),
-        title: z.string().min(1).max(200, 'Title must be 1-200 characters'),
+        title: z.string().min(1).max(200, 'Title must be 1-200 characters')
+          .refine((v) => !NO_HTML.test(v), 'Title must not contain HTML tags'),
         category: z.string().min(1, 'Category is required'),
-        description: z.string().optional(),
+        description: z.string()
+          .refine((v) => !NO_HTML.test(v), 'Description must not contain HTML tags')
+          .optional(),
         subcategory: z.string().optional(),
         subSubcategory: z.string().optional(),
       });

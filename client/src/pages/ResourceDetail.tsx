@@ -426,19 +426,23 @@ export default function ResourceDetail() {
                           {resource.subSubcategory}
                         </Badge>
                       )}
-                      {/* R4-L16: tooltip + a11y context for the status badge. */}
-                      <Badge 
-                        variant={resource.status === 'approved' ? 'default' : 'secondary'}
-                        className={resource.status === 'approved' ? 'bg-green-500/20 text-green-400 border-green-500/30' : ''}
-                        title={resource.status === 'approved'
-                          ? 'Approved: this resource passed review and is publicly listed'
-                          : `Resource status: ${resource.status}`}
-                        aria-label={resource.status === 'approved'
-                          ? 'Approved: this resource passed review and is publicly listed'
-                          : `Resource status: ${resource.status}`}
-                      >
-                        {resource.status}
-                      </Badge>
+                      {/* R4-L16: tooltip + a11y context for the status badge.
+                          BUG-019 (run10): moderation status is internal
+                          workflow state — only admins see the badge now. */}
+                      {user?.role === 'admin' && (
+                        <Badge 
+                          variant={resource.status === 'approved' ? 'default' : 'secondary'}
+                          className={resource.status === 'approved' ? 'bg-green-500/20 text-green-400 border-green-500/30' : ''}
+                          title={resource.status === 'approved'
+                            ? 'Approved: this resource passed review and is publicly listed'
+                            : `Resource status: ${resource.status}`}
+                          aria-label={resource.status === 'approved'
+                            ? 'Approved: this resource passed review and is publicly listed'
+                            : `Resource status: ${resource.status}`}
+                        >
+                          {resource.status}
+                        </Badge>
+                      )}
                     </div>
                   </div>
                   

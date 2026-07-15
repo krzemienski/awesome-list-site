@@ -126,6 +126,22 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
     }
   }
 
+  // BUG-017 (run10): same treatment for /resource/:id — the generic crumb
+  // chain ends in the raw numeric id ("Home > Resource > 2711"). Resolve the
+  // resource title from the detail endpoint and swap it in once loaded.
+  // Note: single-string key (default fetcher reads queryKey[0] only) — this is
+  // a separate cache entry from ResourceDetail's ['/api/resources', id] key.
+  const resourceMatch = location.match(/^\/resource\/(\d+)$/);
+  const { data: crumbResource } = useQuery<{ id: number; title?: string }>({
+    queryKey: [`/api/resources/${resourceMatch?.[1]}`],
+    enabled: !!resourceMatch,
+    staleTime: 5 * 60 * 1000,
+  });
+  if (resourceMatch && crumbResource?.title) {
+    const last = crumbs[crumbs.length - 1];
+    if (last && last.href === location) last.label = crumbResource.title;
+  }
+
   return (
     <header className="sticky top-0 z-30 flex h-14 md:h-[60px] items-center gap-2 md:gap-[18px] border-b border-border bg-[color-mix(in_srgb,var(--bg)_78%,transparent)] backdrop-blur-[14px] px-3 sm:px-6">
       <SidebarTrigger

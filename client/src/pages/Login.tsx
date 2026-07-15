@@ -54,6 +54,9 @@ export default function Login() {
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
+    // BUG-042 (run10): validate on blur so an empty/invalid field shows its
+    // error as soon as the user leaves it, not only on submit.
+    mode: "onTouched",
     defaultValues: {
       email: "",
       password: "",
@@ -99,9 +102,17 @@ export default function Login() {
           description: `Welcome back, ${result.user.email}!`,
         });
 
-        // Route by role: admins land on the dashboard, everyone else on home.
-        // window.location ensures a fresh load so the session cookie is sent.
-        window.location.href = result.user?.role === "admin" ? "/admin" : "/";
+        // BUG-027 (run10): honor a safe ?next= return path so flows like
+        // /submit → login → back work. Same-origin only: must start with "/"
+        // followed by neither "/" nor "\" (browsers normalize "\" to "/", so
+        // "/\evil.com" would otherwise become a protocol-relative redirect).
+        // Falls back to the role-based default. window.location ensures a
+        // fresh load so the session cookie is sent.
+        const nextParam = new URLSearchParams(window.location.search).get("next");
+        const safeNext =
+          nextParam && /^\/(?![/\\])/.test(nextParam) ? nextParam : null;
+        window.location.href =
+          safeNext ?? (result.user?.role === "admin" ? "/admin" : "/");
       } else {
         const error = (await response
           .json()
@@ -262,6 +273,14 @@ export default function Login() {
             Don&apos;t have an account?{" "}
             <Link href="/register" className="text-[color:var(--accent)] hover:underline" data-testid="link-register">
               Create account
+            </Link>
+          </p>
+
+          {/* BUG-045 (run10): explicit no-account escape hatch — browsing
+              never requires sign-in, so say so and link back out. */}
+          <p className="text-center text-sm text-[color:var(--text-2)]">
+            <Link href="/" className="text-[color:var(--accent)] hover:underline" data-testid="link-browse-guest">
+              Continue browsing without an account
             </Link>
           </p>
 

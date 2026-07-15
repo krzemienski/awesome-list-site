@@ -680,7 +680,7 @@ export default function Category() {
                   data-testid={`card-resource-${resourceId}`}
                 >
                   <div className="flex items-start gap-1.5 min-w-0">
-                    <span className="font-medium text-xs sm:text-sm line-clamp-2 flex-1 min-w-0">{titleAnchor(resource.title)}</span>
+                    <span className="font-medium text-xs sm:text-sm line-clamp-2 flex-1 min-w-0" title={resource.title}>{titleAnchor(resource.title)}</span>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -706,7 +706,7 @@ export default function Category() {
               >
                 <CardHeader className="p-6 space-y-2">
                   <CardTitle className="text-base sm:text-lg flex items-start gap-2">
-                    <span className="flex-1 min-w-0 line-clamp-2">{titleAnchor(resource.title)}</span>
+                    <span className="flex-1 min-w-0 line-clamp-2" title={resource.title}>{titleAnchor(resource.title)}</span>
                     <div className="relative z-10 flex items-center gap-0.5 flex-shrink-0">
                       <Button
                         variant="ghost"
@@ -768,7 +768,7 @@ export default function Category() {
                       handleResourceClick();
                     }}
                     data-testid={`button-view-details-${resourceId}`}
-                    className="relative z-10 inline-flex items-center gap-1 text-xs font-medium text-[var(--accent)] hover:underline focus:outline-none focus-visible:underline"
+                    className="relative z-10 inline-flex min-h-[44px] items-center gap-1 py-2 -my-2 text-xs font-medium text-[var(--accent)] hover:underline focus:outline-none focus-visible:underline"
                   >
                     {isDbResource(resource) ? "View Details" : "Open Resource"}
                     <ExternalLink className="h-3 w-3" />

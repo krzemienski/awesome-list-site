@@ -1,0 +1,2 @@
+PASS backslash bypass rejected — landed on http://localhost:5000/admin
+PASS legit ?next=/submit still honored — landed on http://localhost:5000/submit

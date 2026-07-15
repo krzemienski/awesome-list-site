@@ -121,7 +121,9 @@ function ResourceCard({
     >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
-          <CardTitle className="text-lg line-clamp-1 flex-1 min-w-0">
+          {/* BUG-021/036 (run10): full title via native tooltip — the visual
+              title is line-clamped so hover/long-press reveals the rest. */}
+          <CardTitle className="text-lg line-clamp-1 flex-1 min-w-0" title={resource.name}>
             {titleContent}
           </CardTitle>
           {/* R2-L09: shown to anonymous users too — the buttons themselves

@@ -35,6 +35,10 @@ import { trackGenerateLead } from "@/lib/analytics";
 import SEOHead from "@/components/layout/SEOHead";
 import { submitSeoTitle, submitSeoDescription } from "@shared/seo-templates";
 
+// BUG-009 (run10): reject raw HTML/script markup in text fields client-side
+// (mirrors the server-side guard — markup is never legitimate catalog content).
+const NO_HTML = /<[a-z!/][^>]*>/i;
+
 // Form validation schema
 const submitResourceSchema = z.object({
   // BUG-011 (run9): .trim() so whitespace-only input fails min-length
@@ -42,7 +46,8 @@ const submitResourceSchema = z.object({
   title: z.string()
     .trim()
     .min(1, "Title is required")
-    .max(200, "Title must be 200 characters or less"),
+    .max(200, "Title must be 200 characters or less")
+    .refine((v) => !NO_HTML.test(v), "Title must not contain HTML tags"),
   url: z.string()
     .url("Please enter a valid URL")
     .refine((url) => url.startsWith("https://"), {
@@ -51,7 +56,8 @@ const submitResourceSchema = z.object({
   description: z.string()
     .trim()
     .min(10, "Description must be at least 10 characters")
-    .max(1000, "Description must be 1000 characters or less"),
+    .max(1000, "Description must be 1000 characters or less")
+    .refine((v) => !NO_HTML.test(v), "Description must not contain HTML tags"),
   category: z.string().min(1, "Please select a category"),
   subcategory: z.string().optional(),
   subSubcategory: z.string().optional(),
@@ -85,7 +91,7 @@ export default function SubmitResource() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [showSuccess, setShowSuccess] = useState(false);
-  const [duplicateResource, setDuplicateResource] = useState<{ id: number; title: string; status: string } | null>(null);
+  const [duplicateResource, setDuplicateResource] = useState<{ id: number; title: string } | null>(null);
 
   // Fetch categories
   const { data: categories = [] } = useQuery<Category[]>({
@@ -193,9 +199,11 @@ export default function SubmitResource() {
 
       try {
         const response = await fetch(`/api/resources/check-url?url=${encodeURIComponent(debouncedUrl)}`);
+        // BUG-025 (run10): the public check-url endpoint no longer returns
+        // internal moderation status, so the client type/UI dropped it too.
         const data = (await response.json()) as {
           exists?: boolean;
-          resource?: { id: number; title: string; status: string };
+          resource?: { id: number; title: string };
         };
 
         if (data.exists && data.resource) {
@@ -343,7 +351,7 @@ export default function SubmitResource() {
                   <AlertTitle className="text-yellow-500">Login required to submit</AlertTitle>
                   <AlertDescription>
                     The form below is read-only. Please{" "}
-                    <a href="/login" className="underline" data-testid="link-login">log in</a>{" "}
+                    <a href="/login?next=%2Fsubmit" className="underline" data-testid="link-login">log in</a>{" "}
                     to submit a resource.
                   </AlertDescription>
                 </Alert>
@@ -405,7 +413,6 @@ export default function SubmitResource() {
                           <AlertTitle className="text-yellow-500">Duplicate URL Detected</AlertTitle>
                           <AlertDescription>
                             This URL already exists: <strong>{duplicateResource.title}</strong>
-                            {' '}(Status: <span className="capitalize">{duplicateResource.status}</span>)
                             <br />
                             <span className="text-xs text-muted-foreground mt-1 block">
                               You can still submit, but this may be rejected as a duplicate.

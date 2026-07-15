@@ -1,0 +1,10 @@
+PASS BUG-043 formatted count — Explore 9 categories with 1,823 curated resources.
+PASS BUG-013 mobile sheet width — width=318.75px (cap 318.75px)
+PASS BUG-017 breadcrumb resource title — Toggle SidebarHomeResourceAwesome Video: A Curated List of Streaming Video Tools and ResourcesSearch resources...Search.
+PASS BUG-019 anon status badge hidden — elements with exact text 'approved': 0
+PASS BUG-021/036 card title tooltips — elements with title attr: 215
+PASS BUG-045 guest browse link — count=1
+PASS BUG-042 onTouched blur validation — error msgs after blur: 1
+PASS BUG-027 ?next= redirect — landed on http://localhost:5000/submit
+
+8/8 PASS
