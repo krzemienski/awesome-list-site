@@ -1503,6 +1503,15 @@ export function ogInjectionMiddleware() {
           }
           const buf = Buffer.from(html, "utf-8");
           res.setHeader("content-length", buf.length);
+          // July 2026 audit BUG-003 (run8): this HTML embeds a per-request CSP
+          // nonce, so it must never be cached-and-revalidated — a 304 would pair
+          // a stale-nonce body with a fresh-nonce CSP header and block every
+          // inline script. Strip sendFile's template-based validators and mark
+          // the document no-store (headers are not yet sent here; hashed
+          // /assets/* bypass this buffer and keep long-lived caching).
+          res.removeHeader("etag");
+          res.removeHeader("last-modified");
+          res.setHeader("Cache-Control", "no-store");
           return (origEnd as any)(buf, ...args);
         } catch (e) {
           console.warn("[og-middleware] rewrite failed", e);

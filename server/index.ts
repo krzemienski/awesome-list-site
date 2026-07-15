@@ -40,6 +40,32 @@ app.use((_req, res, next) => {
   // the CSP header itself stays production-only per the BUG-019 rationale above.
   const nonce = crypto.randomBytes(16).toString("base64");
   res.locals.cspNonce = nonce;
+  next();
+});
+
+// July 2026 audit BUG-003 (run8): the SPA HTML document carries a per-request
+// CSP nonce, but static sendFile stamps a template-based ETag that never
+// changes. A browser revalidation then gets 304 → it keeps the CACHED body
+// (old nonce) while adopting the fresh CSP header (new nonce), so every
+// inline script is blocked ("Executing inline script violates ...", 4× on
+// /admin). Nonce'd HTML must never be served via 304: drop the conditional
+// request headers for document navigations so sendFile always answers 200
+// with a body whose stamped nonce matches its own CSP header. API routes and
+// hashed /assets/* (extension'd paths) keep normal conditional caching.
+app.use((req, _res, next) => {
+  if (
+    req.method === "GET" &&
+    !req.path.startsWith("/api") &&
+    (!path.extname(req.path) || req.path.endsWith(".html"))
+  ) {
+    delete req.headers["if-none-match"];
+    delete req.headers["if-modified-since"];
+  }
+  next();
+});
+
+app.use((_req, res, next) => {
+  const nonce = String(res.locals.cspNonce || "");
   if (process.env.NODE_ENV === "production") {
     res.setHeader("X-Frame-Options", "DENY");
     res.setHeader(

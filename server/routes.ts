@@ -1901,6 +1901,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/journeys/:id', async (req: any, res) => {
     try {
       const id = parseInt(req.params.id);
+      // BUG-004 (run8): non-numeric ids (e.g. /api/journeys/some-slug) previously
+      // reached the DB with NaN and threw -> 500. Treat them as not found.
+      if (isNaN(id)) {
+        return res.status(404).json({ message: 'Journey not found' });
+      }
       const journey = await learningJourneyRepo.getLearningJourney(id);
       
       if (!journey) {
@@ -1944,6 +1949,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.claims.sub;
       const journeyId = parseInt(req.params.id);
+      if (isNaN(journeyId)) {
+        return res.status(404).json({ message: 'Journey not found' });
+      }
       
       const progress = await learningJourneyRepo.startUserJourney(userId, journeyId);
       res.json(progress);
@@ -1958,6 +1966,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.claims.sub;
       const journeyId = parseInt(req.params.id);
+      if (isNaN(journeyId)) {
+        return res.status(404).json({ message: 'Journey not found' });
+      }
       const { stepId } = req.body;
       
       if (!stepId) {
@@ -1977,6 +1988,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.claims.sub;
       const journeyId = parseInt(req.params.id);
+      if (isNaN(journeyId)) {
+        return res.status(404).json({ message: 'Journey not found' });
+      }
       
       const progress = await learningJourneyRepo.getUserJourneyProgress(userId, journeyId);
       

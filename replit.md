@@ -10,6 +10,11 @@ A production-ready React application for browsing and discovering over 2,600 cur
 
 > **Full history:** see [`CHANGELOG.md`](./CHANGELOG.md) for every dated entry back to December 2025. Older "Recent Changes" entries are moved there periodically.
 
+### Black-Box Audit Remediation — Run8 (July 15, 2026)
+- **6-finding audit triaged live post-Run7-republish**: 2 fixed, 2 invalid (CRITICAL BUG-001 invented slug URLs — app is numeric-id only; BUG-005 admin tabs work live), 1 platform (BUG-002 Replit feedback widget), 1 not-a-defect (BUG-006 = deliberate soft-404 status). Table: `evidence/run8/findings-table.md`.
+- **BUG-003 root cause**: static template ETag + rotating CSP nonce → browser 304 paired cached stale-nonce HTML with fresh-nonce header, blocking all inline scripts on repeat visits. Fix: nonce'd documents never 304 (conditional headers dropped; ETag/Last-Modified stripped; `Cache-Control: no-store` on buffered HTML). **BUG-004**: `/api/journeys/:id*` NaN ids now 404 instead of 500.
+- **Verified** (Iron Rule): tsc clean; dev curl proofs (slug 404, no-store/no-ETag, If-None-Match→200, assets keep ETag); prod P0 smoke desktop+mobile PASS. **Needs republish (2 server fixes).**
+
 ### Master Fix Prompt Round 4 Remediation — Run7 (July 15, 2026)
 - **52-finding external audit triaged live**: audit crawled prod July 12 *pre*-republish; the July 15 republish shipped all Run5+Run6 fixes, so 15 findings were verified fixed-live on prod today. 4 fixed this run; 12 stale, 8 invalid, 5 by-design, 4 platform (incl. CRITICAL C01 GAESA infra cookie again), 3 not-a-defect, 3 declined. Full table: `evidence/run7/findings-table.md`.
 - **Fixes**: R4-H05 residual — Users-tab Name-column fallback leaked raw emails for nameless users, now masked with reveal toggle; R4-M10 generic login subtitle; R4-L16 status-badge tooltip/aria; R4-L17 clickable stat cards (deep-link to admin tabs, keyboard + ARIA).
