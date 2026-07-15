@@ -1,0 +1,37 @@
+=== NEW-009 page=-1 ===
+500
+{"message":"Failed to fetch resources"}
+=== NEW-034 page=abc ===
+200
+{"resources":[{"id":187906,"title":"StreamPack - Multiprotocol live streaming broadcaster libraries for Android","url":"https://github.com/ThibaultBee/StreamPack","description":"StreamPack is a lightw
+=== NEW-033 page=99999 ===
+200
+{"resources":[],"total":1823,"limit":20,"offset":99998,"nextOffset":null,"nextCursor":null}
+=== NEW-012 null byte search ===
+500
+{"message":"Failed to search resources"}
+=== NEW-027 emoji search ===
+200
+{"query":"🎬","total":1,"results":[{"id":185604,"title":"Aws Lambda Ffmpeg","url":"https://github.com/binoculars/aws-lambda-ffmpeg","description":"An S3-triggered Amazon Web Services Lambda function
+=== NEW-019/020 field exposure ===
+{"resources":[{"id":187906,"title":"StreamPack - Multiprotocol live streaming broadcaster libraries for Android","url":"https://github.com/ThibaultBee/StreamPack","description":"StreamPack is a lightweight, high-performance toolkit for building streaming video processing pipelines on Android. It provides reusable components for frame sources, transformations, encoding, and output, making it easy to develop efficient real-time video applications with a modular and composable architecture.","category":"Encoding & Codecs","subcategory":"Real-Time Encoding Solutions","subSubcategory":null,"status":"approved","submittedBy":"61423382","approvedBy":"17784443","approvedAt":"2026-07-02T11:51:39.541Z","githubSynced":false,"lastSyncedAt":null,"metadata":{"tags":["android","srt","rtmp","streaming","camera"]},"createdAt":"2026-06-27T13:55:40.034Z","updatedAt":"2026-07-02T11:51:39.541Z","searchTsv":"'/thibaultbee/streampack':55 'android':8,24 'applic':46 'architectur':52 'broadcast':5 'build':18 'compon':28 'compos':51 'develop':40 'easi':38 'effici':41 'encod':33 'frame':30 'github.com':54 'github.com/thibaultbee/streampack':53 'high':14 'high-perform':13 'librari':6 'lightweight':12 'live':3 '
+=== NEW-008 subcategory filter ===
+200
+{"resources":[],"total":0,"limit":20,"offset":0,"nextOffset":null,"nextCursor":null}
+=== NEW-017 /api/auth/me ===
+404
+{"message":"Not found"}
+=== NEW-002 /api/export ===
+404
+{"message":"Not found"}
+=== NEW-018 favicon ===
+size=621 code=200
+=== NEW-025 HEAD /api/resources ===
+HTTP/1.1 200 OK
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+Content-Type: application/json; charset=utf-8
+Content-Length: 1501
+ETag: W/"5dd-XWuVt1woJEvFswaEAt+sxJZTIEY"
+Date: Wed, 15 Jul 2026 23:42:54 GMT
