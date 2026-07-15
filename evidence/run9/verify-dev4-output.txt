@@ -1,0 +1,49 @@
+PASS BUG-026 password toggle — type password->text->password
+PASS BUG-026 toggle target size — 44x44
+PASS BUG-015 native email validation (evidence) — valid=false message="Please include an '@' in the email address. 'notanemail' is missing an '@'."
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+locator.fill: Timeout 15000ms exceeded.
+Call log:
+[2m  - waiting for locator('input[name=\'title\'], #title').first()[22m
+[2m    - locator resolved to <input value="" name="title" id=":r1:-form-item" aria-invalid="false" data-testid="input-title" data-component-name="Slot" aria-describedby=":r1:-form-item-description" placeholder="e.g., FFmpeg - Video encoding tool" data-replit-metadata="client/src/components/ui/form.tsx:113:4" class="flex h-10 w-full rounded-lg border border-[var(--border-strong)] bg-[var(--surface-2)] px-3 py-2 text-base ring-offset-background transition-colors duration-[var(--motion-fast)] file:border-0 file:bg-transparent file:…/>[22m
+[2m    - fill("   ")[22m
+[2m  - attempting fill action[22m
+[2m    2 × waiting for element to be visible, enabled and editable[22m
+[2m      - element is not enabled[22m
+[2m    - retrying fill action[22m
+[2m    - waiting 20ms[22m
+[2m    2 × waiting for element to be visible, enabled and editable[22m
+[2m      - element is not enabled[22m
+[2m    - retrying fill action[22m
+[2m      - waiting 100ms[22m
+[2m    29 × waiting for element to be visible, enabled and editable[22m
+[2m       - element is not enabled[22m
+[2m     - retrying fill action[22m
+[2m       - waiting 500ms[22m
+
+    at /home/runner/workspace/scripts/run9-verify-dev4.mjs:28:12 {
+  log: [
+    "  - waiting for locator('input[name=\\'title\\'], #title').first()",
+    '    - locator resolved to <input value="" name="title" id=":r1:-form-item" aria-invalid="false" data-testid="input-title" data-component-name="Slot" aria-describedby=":r1:-form-item-description" placeholder="e.g., FFmpeg - Video encoding tool" data-replit-metadata="client/src/components/ui/form.tsx:113:4" class="flex h-10 w-full rounded-lg border border-[var(--border-strong)] bg-[var(--surface-2)] px-3 py-2 text-base ring-offset-background transition-colors duration-[var(--motion-fast)] file:border-0 file:bg-transparent file:…/>',
+    '    - fill("   ")',
+    '  - attempting fill action',
+    '    2 × waiting for element to be visible, enabled and editable',
+    '      - element is not enabled',
+    '    - retrying fill action',
+    '    - waiting 20ms',
+    '    2 × waiting for element to be visible, enabled and editable',
+    '      - element is not enabled',
+    '    - retrying fill action',
+    '      - waiting 100ms',
+    '    29 × waiting for element to be visible, enabled and editable',
+    '       - element is not enabled',
+    '     - retrying fill action',
+    '       - waiting 500ms'
+  ],
+  name: 'TimeoutError'
+}
+
+Node.js v20.20.0

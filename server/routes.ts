@@ -1374,13 +1374,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // table, so aggregate over approved resources. ~2k rows → single-digit ms.
   app.get('/api/tags', async (_req, res) => {
     try {
+      // run9 BUG-018: canonicalize before aggregating — lowercase and collapse
+      // spaces/underscores to hyphens so "open source", "Open Source" and
+      // "open-source" merge into one "open-source" bucket instead of showing
+      // as three near-duplicate filter chips.
       const result = await db.execute(sql`
-        SELECT tag, count(*)::int AS count
+        SELECT lower(regexp_replace(btrim(tag), '[[:space:]_]+', '-', 'g')) AS tag,
+               count(*)::int AS count
         FROM resources r,
              jsonb_array_elements_text(r.metadata->'tags') AS tag
         WHERE r.status = 'approved'
           AND jsonb_typeof(r.metadata->'tags') = 'array'
-        GROUP BY tag
+          AND btrim(tag) <> ''
+        GROUP BY 1
         ORDER BY count DESC, tag ASC
       `);
       res.set('Cache-Control', 'public, max-age=300');

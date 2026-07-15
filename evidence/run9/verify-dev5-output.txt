@@ -1,0 +1,17 @@
+login status: 200
+PASS BUG-011 whitespace title rejected — 'Title is required' visible=true
+PASS BUG-027 filter/sort exclusion — filter was open=true; after: sort=true filter=false
+FAIL BUG-016 local-metrics honest zero-state — {"hint":false,"zeroPct":false,"noLocal":false}
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+page.evaluate: TypeError: Failed to fetch
+    at eval (eval at evaluate (:303:30), <anonymous>:1:25)
+    at UtilityScript.evaluate (<anonymous>:305:16)
+    at UtilityScript.<anonymous> (<anonymous>:1:44)
+    at /home/runner/workspace/scripts/run9-verify-dev5.mjs:45:24 {
+  log: []
+}
+
+Node.js v20.20.0

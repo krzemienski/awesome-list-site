@@ -118,7 +118,15 @@ export default function AdvancedFilter({
         </Popover>
       )}
 
-      <Select value={sortBy} onValueChange={onSortChange}>
+      {/* BUG-027 (run9): opening the sort dropdown closes the filter popover so
+          the two never overlap. */}
+      <Select
+        value={sortBy}
+        onValueChange={onSortChange}
+        onOpenChange={(open) => {
+          if (open) setIsOpen(false);
+        }}
+      >
         <SelectTrigger aria-label="Sort resources" className="w-full sm:w-[180px] min-h-[44px] flex-1 sm:flex-none">
           <SelectValue placeholder="Sort by" />
         </SelectTrigger>

@@ -22,6 +22,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { deslugify } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
 
 interface AppHeaderProps {
   onSearchOpen: () => void;
@@ -83,7 +84,7 @@ function getBreadcrumbs(path: string, categories: any[] = []) {
     submit: "Submit Resource",
     journeys: "Learning Journeys",
     journey: "Journey",
-    login: "Login",
+    login: "Sign in",
     settings: "Settings",
   };
   // Taxonomy routes get a real parent chain resolved from the tree.
@@ -106,6 +107,24 @@ function getBreadcrumbs(path: string, categories: any[] = []) {
 export default function AppHeader({ onSearchOpen, user, onLogout, categories }: AppHeaderProps) {
   const [location, setLocation] = useLocation();
   const crumbs = getBreadcrumbs(location, categories || []);
+
+  // BUG-020 (run9): on /journey/:id the generic crumb chain ends in the raw
+  // numeric id ("Home > Journey > 6"). Resolve the journey title from the
+  // journeys list (tiny payload, shared cache with the Journeys page) and
+  // swap it in once loaded. Query only runs on journey routes.
+  const journeyMatch = location.match(/^\/journey\/(\d+)$/);
+  const { data: journeyList } = useQuery<{ id: number; title: string }[]>({
+    queryKey: ["/api/journeys"],
+    enabled: !!journeyMatch,
+    staleTime: 5 * 60 * 1000,
+  });
+  if (journeyMatch && Array.isArray(journeyList)) {
+    const j = journeyList.find((x) => x.id === Number(journeyMatch[1]));
+    if (j?.title) {
+      const last = crumbs[crumbs.length - 1];
+      if (last && last.href === location) last.label = j.title;
+    }
+  }
 
   return (
     <header className="sticky top-0 z-30 flex h-14 md:h-[60px] items-center gap-2 md:gap-[18px] border-b border-border bg-[color-mix(in_srgb,var(--bg)_78%,transparent)] backdrop-blur-[14px] px-3 sm:px-6">
@@ -200,9 +219,11 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <Button variant="ghost" size="sm" onClick={() => setLocation("/login")} aria-label="Login" className="gap-1.5 h-9 px-2 sm:px-3 min-h-[44px] min-w-[44px]">
+          // BUG-025 (run9): "Sign in" everywhere — matches the /login page and
+          // register flow instead of mixing "Login" and "Sign in".
+          <Button variant="ghost" size="sm" onClick={() => setLocation("/login")} aria-label="Sign in" className="gap-1.5 h-9 px-2 sm:px-3 min-h-[44px] min-w-[44px]">
             <LogIn className="h-4 w-4" />
-            <span className="hidden sm:inline">Login</span>
+            <span className="hidden sm:inline">Sign in</span>
           </Button>
         )}
       </div>

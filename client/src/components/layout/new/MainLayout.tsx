@@ -99,22 +99,34 @@ export default function MainLayout({ awesomeList, isLoading, children, user, onL
             <span data-testid="footer-copyright">
               © {new Date().getFullYear()} Awesome Video · Built with React &amp; shadcn/ui
             </span>
-            <nav aria-label="Footer" className="flex items-center gap-4">
-              <Link href="/" className="hover:text-[color:var(--text)] transition-colors" data-testid="footer-home">
+            {/* BUG-013 (run9): footer links get 44px-tall hit areas (WCAG 2.5.5)
+                — text stays small, the tap target grows. BUG-030: GitHub source
+                link added alongside internal nav. */}
+            <nav aria-label="Footer" className="flex items-center gap-4 flex-wrap justify-center">
+              <Link href="/" className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors" data-testid="footer-home">
                 Home
               </Link>
-              <Link href="/categories" className="hover:text-[color:var(--text)] transition-colors" data-testid="footer-categories">
+              <Link href="/categories" className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors" data-testid="footer-categories">
                 Categories
               </Link>
-              <Link href="/journeys" className="hover:text-[color:var(--text)] transition-colors" data-testid="footer-journeys">
+              <Link href="/journeys" className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors" data-testid="footer-journeys">
                 Journeys
               </Link>
-              <Link href="/submit" className="hover:text-[color:var(--text)] transition-colors" data-testid="footer-submit">
+              <Link href="/submit" className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors" data-testid="footer-submit">
                 Submit
               </Link>
-              <Link href="/about" className="hover:text-[color:var(--text)] transition-colors" data-testid="footer-about">
+              <Link href="/about" className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors" data-testid="footer-about">
                 About
               </Link>
+              <a
+                href="https://github.com/krzemienski/awesome-video"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors"
+                data-testid="footer-github"
+              >
+                GitHub
+              </a>
             </nav>
           </div>
         </footer>

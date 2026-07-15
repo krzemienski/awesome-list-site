@@ -37,7 +37,10 @@ import { submitSeoTitle, submitSeoDescription } from "@shared/seo-templates";
 
 // Form validation schema
 const submitResourceSchema = z.object({
+  // BUG-011 (run9): .trim() so whitespace-only input fails min-length
+  // validation instead of slipping through as a "filled" field.
   title: z.string()
+    .trim()
     .min(1, "Title is required")
     .max(200, "Title must be 200 characters or less"),
   url: z.string()
@@ -46,6 +49,7 @@ const submitResourceSchema = z.object({
       message: "URL must use HTTPS protocol"
     }),
   description: z.string()
+    .trim()
     .min(10, "Description must be at least 10 characters")
     .max(1000, "Description must be 1000 characters or less"),
   category: z.string().min(1, "Please select a category"),

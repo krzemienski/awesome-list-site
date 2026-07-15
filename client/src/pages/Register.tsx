@@ -3,7 +3,7 @@ import { Link } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { UserPlus, Mail, Lock } from "lucide-react";
+import { UserPlus, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { SiReplit } from "react-icons/si";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -77,6 +77,7 @@ function PasswordStrengthMeter({ password }: { password: string }) {
 export default function Register() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -213,13 +214,25 @@ export default function Register() {
                         <Input
                           {...field}
                           id="password"
-                          type="password"
+                          type={showPassword ? "text" : "password"}
                           autoComplete="new-password"
                           placeholder="At least 8 characters"
-                          className="pl-10"
+                          className="pl-10 pr-12"
                           data-testid="input-password"
                           disabled={isLoading}
                         />
+                        {/* BUG-026 (run9): show/hide password toggle (parity with /login) */}
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword((v) => !v)}
+                          aria-label={showPassword ? "Hide password" : "Show password"}
+                          aria-pressed={showPassword}
+                          className="absolute right-0 top-1/2 -translate-y-1/2 min-h-[44px] min-w-[44px] flex items-center justify-center text-muted-foreground hover:text-[color:var(--text)] transition-colors"
+                          data-testid="button-toggle-password"
+                          disabled={isLoading}
+                        >
+                          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
                       </div>
                     </FormControl>
                     <PasswordStrengthMeter password={field.value} />

@@ -21,7 +21,7 @@ console.log('HOME violations:', JSON.stringify(await page.evaluate(() => window.
 // login + admin
 await page.goto(BASE + '/login', { waitUntil: 'networkidle', timeout: 60000 });
 await page.fill('#email', 'admin@example.com');
-await page.fill('input[type="password"]', 'Usmc12345!');
+await page.fill('input[type="password"]', process.env.PROD_ADMIN_PASSWORD);
 await page.click('button[type="submit"]');
 await page.waitForURL('**/admin', { timeout: 30000 }).catch(()=>{});
 await page.goto(BASE + '/admin', { waitUntil: 'networkidle', timeout: 60000 });

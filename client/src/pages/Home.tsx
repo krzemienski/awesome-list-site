@@ -11,6 +11,7 @@ import { homeSeoTitle, homeSeoDescription } from "@shared/seo-templates";
 import AIRecommendationsPanel from "@/components/ui/ai-recommendations-panel";
 import AdvancedFilter from "@/components/ui/advanced-filter";
 import { useAuth } from "@/hooks/useAuth";
+import { normalizeTag } from "@/lib/tags";
 import {
   FileText,
   Video,
@@ -107,13 +108,20 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
   }, [awesomeList?.categories]);
 
   const availableTags = useMemo(() => {
+    // Canonicalize tag variants ("open source" / "open_source" / "Open-Source"
+    // all fold into "open-source") so the filter panel never shows duplicates.
+    // Mirrors the /api/tags SQL normalization — keep the two in lockstep.
     const tagCounts: Record<string, number> = {};
     baseCategories.forEach((cat) => {
       const allRes = getAllResources(cat);
       allRes.forEach((r: any) => {
         const tags = r.tags || r.metadata?.tags || [];
+        const seen = new Set<string>();
         tags.forEach((tag: string) => {
-          tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+          const canonical = normalizeTag(tag);
+          if (!canonical || seen.has(canonical)) return;
+          seen.add(canonical);
+          tagCounts[canonical] = (tagCounts[canonical] || 0) + 1;
         });
       });
     });
@@ -132,8 +140,8 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
       }
       const allRes = getAllResources(cat);
       const matchCount = allRes.filter((r: any) => {
-        const tags = r.tags || r.metadata?.tags || [];
-        return selectedTags.some((t) => tags.includes(t));
+        const tags = (r.tags || r.metadata?.tags || []).map(normalizeTag);
+        return selectedTags.some((t) => tags.includes(normalizeTag(t)));
       }).length;
       return { ...cat, displayCount: matchCount };
     });
@@ -268,7 +276,9 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
               data-testid={`link-category-${category.slug}`}
               className="block outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] rounded-[var(--radius)]"
             >
-              <Card className="h-full cursor-pointer">
+              {/* BUG-023 (run9): hover affordance — accent border on hover,
+                  same pattern as the Categories page cards. */}
+              <Card className="h-full cursor-pointer hover:border-[var(--accent)] transition-colors">
                 <CardHeader className="p-4 space-y-1.5">
                   <div className="flex items-start justify-between gap-3 mb-1">
                     <Icon className="h-5 w-5 text-[var(--accent)] shrink-0" />

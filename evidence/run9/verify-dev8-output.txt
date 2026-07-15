@@ -1,0 +1,17 @@
+PASS BUG-018 selecting merged chip filters home — before=9 after={"cards":9,"totalText":"823 resources"} clicked=true
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+page.goto: Navigation to "http://localhost:5000/category/encoding-codecs" is interrupted by another navigation to "http://localhost:5000/"
+Call log:
+[2m  - navigating to "http://localhost:5000/category/encoding-codecs", waiting until "domcontentloaded"[22m
+
+    at /home/runner/workspace/scripts/run9-verify-dev8.mjs:31:12 {
+  log: [
+    '  - navigating to "http://localhost:5000/category/encoding-codecs", waiting until "domcontentloaded"'
+  ],
+  name: 'Error'
+}
+
+Node.js v20.20.0

@@ -268,6 +268,11 @@ export default function CommunityMetrics({ resources, categories, className }: C
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg">Recent Activity</CardTitle>
+                  {/* run9 BUG-016: engagement is tracked locally per browser —
+                      say so instead of presenting 0/0/0% as broken site data. */}
+                  <CardDescription>
+                    Views and likes are tracked in this browser only — counts build as you explore resources.
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
@@ -290,20 +295,28 @@ export default function CommunityMetrics({ resources, categories, className }: C
                               {resource.title}
                             </a>
                             <div className="flex items-center gap-4 mt-1">
-                              <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                <Eye className="h-3 w-3" />
-                                {resource.trends.clicks}
-                              </span>
-                              <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                <Heart className="h-3 w-3" />
-                                {resource.trends.shares}
-                              </span>
+                              {resource.trends.clicks > 0 || resource.trends.shares > 0 ? (
+                                <>
+                                  <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                    <Eye className="h-3 w-3" />
+                                    {resource.trends.clicks}
+                                  </span>
+                                  <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                    <Heart className="h-3 w-3" />
+                                    {resource.trends.shares}
+                                  </span>
+                                </>
+                              ) : (
+                                <span className="text-xs text-muted-foreground">
+                                  No local activity yet
+                                </span>
+                              )}
                             </div>
                           </div>
                         </div>
                         <div className="text-right">
                           <div className="text-sm font-medium">
-                            {resource.score}%
+                            {resource.score > 0 ? `${resource.score}%` : "—"}
                           </div>
                           <div className="text-xs text-muted-foreground">
                             engagement

@@ -3,7 +3,7 @@ import { Link } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { LogIn, Mail, Lock } from "lucide-react";
+import { LogIn, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { SiReplit } from "react-icons/si";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,6 +33,7 @@ interface LoginResponse {
 
 export default function Login() {
   const { toast } = useToast();
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   // Surface OIDC callback failures (server redirects here with ?error=oauth).
@@ -183,13 +184,25 @@ export default function Login() {
                         <Input
                           {...field}
                           id="password"
-                          type="password"
+                          type={showPassword ? "text" : "password"}
                           autoComplete="current-password"
                           placeholder="Enter your password"
-                          className="pl-10"
+                          className="pl-10 pr-12"
                           data-testid="input-password"
                           disabled={isLoading}
                         />
+                        {/* BUG-026 (run9): show/hide password toggle */}
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword((v) => !v)}
+                          aria-label={showPassword ? "Hide password" : "Show password"}
+                          aria-pressed={showPassword}
+                          className="absolute right-0 top-1/2 -translate-y-1/2 min-h-[44px] min-w-[44px] flex items-center justify-center text-muted-foreground hover:text-[color:var(--text)] transition-colors"
+                          data-testid="button-toggle-password"
+                          disabled={isLoading}
+                        >
+                          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
                       </div>
                     </FormControl>
                     <FormMessage />

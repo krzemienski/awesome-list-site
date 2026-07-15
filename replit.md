@@ -10,6 +10,13 @@ A production-ready React application for browsing and discovering over 2,600 cur
 
 > **Full history:** see [`CHANGELOG.md`](./CHANGELOG.md) for every dated entry back to December 2025. Older "Recent Changes" entries are moved there periodically.
 
+### Black-Box Audit Remediation — Run9 (July 15, 2026)
+- **28-finding audit triaged live** (24 new + 4 carry-overs): 11 fixed, 11 invalid, 3 not-a-defect, 2 platform (Replit feedback widget), 1 fixed-live (BUG-004 via Run8). Table: `evidence/run9/findings-table.md`.
+- **Fixes**: BUG-018 tag canonicalization in BOTH `/api/tags` SQL (1,759→1,601) AND the client filter panels (Home/Category aggregate tags client-side via shared `normalizeTag()` in `client/src/lib/tags.ts` — the audit's actual repro surface; keep SQL + client rules in lockstep); BUG-011 `.trim()` submit validation; BUG-013 footer/skip-link 44px targets; BUG-016 honest local-metrics zero-state; BUG-020 journey-name breadcrumb; BUG-023 card hover; BUG-025 "Sign in" unification; BUG-026 password toggle; BUG-027 filter/sort exclusion; BUG-030 footer GitHub link. **BUG-022 AMF retitle applied directly to prod (PUT 200) — already live.**
+- **Notable invalid**: BUG-024 — sidebar hover exists; audit probed the active item where `.sub-item.active` intentionally wins.
+- **Security**: hardcoded prod admin password stripped from all committed verification scripts (now `process.env.PROD_ADMIN_PASSWORD`); rotation recommended (still in git history).
+- **Verified** (Iron Rule): tsc clean; 9 dev Playwright/curl runs all PASS (`evidence/run9/verify-dev*-output.txt`). **Needs republish (1 server + 11 client fixes).**
+
 ### Black-Box Audit Remediation — Run8 (July 15, 2026)
 - **6-finding audit triaged live post-Run7-republish**: 2 fixed, 2 invalid (CRITICAL BUG-001 invented slug URLs — app is numeric-id only; BUG-005 admin tabs work live), 1 platform (BUG-002 Replit feedback widget), 1 not-a-defect (BUG-006 = deliberate soft-404 status). Table: `evidence/run8/findings-table.md`.
 - **BUG-003 root cause**: static template ETag + rotating CSP nonce → browser 304 paired cached stale-nonce HTML with fresh-nonce header, blocking all inline scripts on repeat visits. Fix: nonce'd documents never 304 (conditional headers dropped; ETag/Last-Modified stripped; `Cache-Control: no-store` on buffered HTML). **BUG-004**: `/api/journeys/:id*` NaN ids now 404 instead of 500.

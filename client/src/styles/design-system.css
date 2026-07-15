@@ -841,6 +841,10 @@ button { font-family: inherit; }
   top: -100px;
   left: 8px;
   z-index: 9999;
+  /* run9 BUG-013: 44px-tall focus target (WCAG 2.5.5) */
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   padding: 8px 14px;
   background: var(--accent);
   color: #000;

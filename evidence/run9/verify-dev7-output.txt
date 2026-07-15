@@ -1,0 +1,18 @@
+PASS BUG-018 home filter single open-source chip — {"openSource":["open-source"],"hasSpaceVariant":false,"sample":["Filter by Tags","Tags","open-source","162","video-streaming","121","streaming","102"]}
+PASS BUG-018 selecting merged chip filters — {"cardCount":9,"badge":null}
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+page.goto: net::ERR_ABORTED at http://localhost:5000/category/encoding-codecs
+Call log:
+[2m  - navigating to "http://localhost:5000/category/encoding-codecs", waiting until "domcontentloaded"[22m
+
+    at /home/runner/workspace/scripts/run9-verify-dev7.mjs:39:12 {
+  log: [
+    '  - navigating to "http://localhost:5000/category/encoding-codecs", waiting until "domcontentloaded"'
+  ],
+  name: 'Error'
+}
+
+Node.js v20.20.0

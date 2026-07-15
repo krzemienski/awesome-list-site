@@ -15,6 +15,7 @@ import { ViewModeToggle, ViewMode } from "@/components/ui/view-mode-toggle";
 import { SuggestEditDialog } from "@/components/ui/suggest-edit-dialog";
 import { ArrowLeft, Search, ExternalLink, Edit } from "lucide-react";
 import { deslugify, slugify } from "@/lib/utils";
+import { normalizeTag } from "@/lib/tags";
 import { Resource } from "@/types/awesome-list";
 import type { Resource as DbResource } from "@shared/schema";
 import NotFound from "@/pages/not-found";
@@ -199,11 +200,18 @@ export default function Category() {
   }, [allResources]);
 
   const availableTags = useMemo(() => {
+    // Canonicalize tag variants (space/underscore/case → hyphenated lowercase)
+    // so "open-source" and "open source" collapse into one chip with a summed
+    // count. Mirrors the /api/tags SQL normalization — keep in lockstep.
     const tagCounts: Record<string, number> = {};
     allResources.forEach((r) => {
       const tags = r.tags || [];
+      const seen = new Set<string>();
       tags.forEach((tag: string) => {
-        tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+        const canonical = normalizeTag(tag);
+        if (!canonical || seen.has(canonical)) return;
+        seen.add(canonical);
+        tagCounts[canonical] = (tagCounts[canonical] || 0) + 1;
       });
     });
     return Object.entries(tagCounts)
@@ -235,8 +243,9 @@ export default function Category() {
     }
 
     if (selectedTags.length > 0) {
+      const wanted = selectedTags.map(normalizeTag);
       results = results.filter(r =>
-        r.tags && r.tags.some(tag => selectedTags.includes(tag))
+        r.tags && r.tags.some(tag => wanted.includes(normalizeTag(tag)))
       );
     }
 
