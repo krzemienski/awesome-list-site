@@ -13,23 +13,31 @@ export function setupLocalAuth() {
     },
     async (email, password, done) => {
       try {
+        // R3-M25: every failure path returns the SAME generic message. Field-format
+        // hints ("password must be at least 8 characters", "invalid email format")
+        // and the OAuth-account hint let probes distinguish failure causes — the
+        // register/reset flows keep their specific validation messages, login does not.
+        const GENERIC = 'Invalid email or password';
+
         if (!validateEmail(email)) {
-          return done(null, false, { message: 'Invalid email format' });
+          return done(null, false, { message: GENERIC });
         }
 
         const passwordValidation = validatePassword(password);
         if (!passwordValidation.valid) {
-          return done(null, false, { message: passwordValidation.error || 'Invalid password' });
+          return done(null, false, { message: GENERIC });
         }
 
         const user = await userRepo.getUserByEmail(email);
         
         if (!user) {
-          return done(null, false, { message: 'Invalid email or password' });
+          return done(null, false, { message: GENERIC });
         }
 
         if (!user.password || typeof user.password !== 'string') {
-          return done(null, false, { message: 'This account uses OAuth. Please login with your OAuth provider.' });
+          // OAuth-only account: still generic — naming the provider would confirm
+          // the email exists. The login page offers "Continue with Replit" anyway.
+          return done(null, false, { message: GENERIC });
         }
 
         const isValidPassword = await comparePassword(password, user.password as string);

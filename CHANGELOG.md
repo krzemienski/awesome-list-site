@@ -4,6 +4,15 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 
 ---
 
+## July 15, 2026
+
+### Master Fix Prompt Round 3 Remediation — Run6
+- **55-finding external audit triaged live**: the audit crawled prod on July 12 *before* the Run5 republish, so 18 findings are Run5 fixes still pending republish. 3 genuinely new defects fixed this run; 14 stale, 7 invalid, 5 by-design, 3 platform (incl. the CRITICAL — GAESA is a Google App Engine affinity cookie injected by Replit infra, not app code; our `connect.sid` has HttpOnly/Secure/SameSite=Lax), 2 not-a-defect, 1 explained, 2 previously declined. Full table: `evidence/run6/findings-table.md`.
+- **R3-H08 (server)**: `/api/resources?sort=` was silently ignored — `listResources` now supports whitelisted `name-asc`/`name-desc` (case-insensitive title) and `newest`/`oldest` (createdAt) with id tiebreaker; the route 400s unknown sorts (`invalid_sort` + allowed list, mirroring the `invalid_status` pattern).
+- **R3-M25 (server)**: local login no longer leaks account existence — every failure path (bad email format, short password, unknown user, OAuth-only account, wrong password) returns the same generic "Invalid email or password". Register/reset keep their specific validation messages.
+- **R3-L16 (client)**: the tag-count badge on "Filter by Tag" gained `title`/`aria-label` ("N tags selected").
+- **Verified live** (Iron Rule): tsc clean; curl — 4 sorts return distinct correct orderings, bogus sort 400s, 3 distinct login-failure shapes return the identical generic message, valid login still 200; prod checks — /register form renders (Playwright, `scripts/run6-prod-register-check.mjs`), `/api/auth/user` 200. **Requires a republish** (carries the 18 Run5 fixes + these 3 to production).
+
 ## July 12, 2026
 
 ### Master Fix Prompt Round 2 Remediation — Run5

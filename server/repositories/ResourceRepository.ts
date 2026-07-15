@@ -35,7 +35,7 @@ import {
   type InsertResource,
 } from "@shared/schema";
 import { db } from "../db";
-import { eq, and, sql, desc, like, ilike, or } from "drizzle-orm";
+import { eq, and, sql, asc, desc, like, ilike, or } from "drizzle-orm";
 
 /**
  * Options for listing resources with filtering and pagination
@@ -50,6 +50,8 @@ export interface ListResourceOptions {
   subSubcategory?: string;
   userId?: string;
   search?: string;
+  /** R3-H08: whitelisted sort order; unknown/absent falls back to newest-first. */
+  sort?: "name-asc" | "name-desc" | "newest" | "oldest";
 }
 
 /**
@@ -62,7 +64,7 @@ export class ResourceRepository {
    * @returns Object containing resources array and total count
    */
   async listResources(options: ListResourceOptions): Promise<{ resources: Resource[]; total: number }> {
-    const { page = 1, limit = 20, status, category, subcategory, subSubcategory, userId, search } = options;
+    const { page = 1, limit = 20, status, category, subcategory, subSubcategory, userId, search, sort } = options;
     const offset = options.offset ?? ((page - 1) * limit);
 
     let query = db.select().from(resources).$dynamic();
@@ -105,9 +107,25 @@ export class ResourceRepository {
       countQuery = countQuery.where(and(...conditions));
     }
 
+    // R3-H08: server-side sort. Title sorts are case-insensitive; id is a
+    // deterministic tiebreaker (createdAt is identical for bulk-seeded rows).
+    const orderBy = (() => {
+      switch (sort) {
+        case "name-asc":
+          return [asc(sql`lower(${resources.title})`), asc(resources.id)];
+        case "name-desc":
+          return [desc(sql`lower(${resources.title})`), desc(resources.id)];
+        case "oldest":
+          return [asc(resources.createdAt), asc(resources.id)];
+        case "newest":
+        default:
+          return [desc(resources.createdAt), desc(resources.id)];
+      }
+    })();
+
     const [totalResult] = await countQuery;
     const resourceList = await query
-      .orderBy(desc(resources.createdAt))
+      .orderBy(...orderBy)
       .limit(limit)
       .offset(offset);
 

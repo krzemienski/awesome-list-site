@@ -888,6 +888,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // subcategory behaviour, so pass it straight through to listResources.
       const subSubcategory = req.query.subSubcategory as string | undefined;
 
+      // R3-H08: server-side sort with allow-list; unknown values 400 (mirrors
+      // the invalid_status pattern) so callers learn the valid options.
+      const ALLOWED_SORTS = ['name-asc', 'name-desc', 'newest', 'oldest'] as const;
+      const requestedSort = req.query.sort as string | undefined;
+      if (requestedSort !== undefined && !ALLOWED_SORTS.includes(requestedSort as any)) {
+        return res.status(400).json({ error: 'invalid_sort', allowed: ALLOWED_SORTS });
+      }
+      const sort = requestedSort as (typeof ALLOWED_SORTS)[number] | undefined;
+
       // BUG-004: respect ?status= with allow-list; default 'approved' for public.
       const ALLOWED_STATUSES = new Set(['approved', 'pending', 'rejected']);
       const requestedStatus = req.query.status as string | undefined;
@@ -917,7 +926,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         category,
         subcategory,
         subSubcategory,
-        search
+        search,
+        sort
       });
 
       // R3-06: explicit paging metadata. nextOffset is null on the last page.

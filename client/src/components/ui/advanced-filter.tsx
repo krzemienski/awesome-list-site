@@ -51,6 +51,8 @@ export default function AdvancedFilter({
                 <Badge
                   variant="secondary"
                   className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs"
+                  title={`${selectedTags.length} ${selectedTags.length === 1 ? "tag" : "tags"} selected`}
+                  aria-label={`${selectedTags.length} ${selectedTags.length === 1 ? "tag" : "tags"} selected`}
                 >
                   {selectedTags.length}
                 </Badge>

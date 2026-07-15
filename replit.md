@@ -10,6 +10,11 @@ A production-ready React application for browsing and discovering over 2,600 cur
 
 > **Full history:** see [`CHANGELOG.md`](./CHANGELOG.md) for every dated entry back to December 2025. Older "Recent Changes" entries are moved there periodically.
 
+### Master Fix Prompt Round 3 Remediation — Run6 (July 15, 2026)
+- **55-finding external audit triaged live**: audit crawled prod July 12 *pre*-Run5-republish, so 18 findings = Run5 fixes pending republish. 3 new defects fixed; 14 stale, 7 invalid, 5 by-design, 3 platform (incl. CRITICAL C01 — GAESA is Replit-infra App Engine affinity cookie; app's `connect.sid` has HttpOnly/Secure/SameSite=Lax), 2 not-a-defect, 1 explained, 2 declined. Full table: `evidence/run6/findings-table.md`.
+- **Fixes**: R3-H08 `/api/resources?sort=` now real (whitelist name-asc/name-desc/newest/oldest, 400 `invalid_sort` otherwise); R3-M25 all local-login failures return generic "Invalid email or password"; R3-L16 tag-count badge a11y label.
+- **Verified** (Iron Rule): tsc clean; curl sort/login proofs on dev; prod /register + /api/auth/user re-proven live. **Needs republish (carries 18 Run5 fixes + 3 Run6 fixes).**
+
 ### Master Fix Prompt Round 2 Remediation — Run5 (July 12, 2026)
 - **56-finding external audit triaged live**: 19 fixed, 35 closed without code (18 stale, 8 invalid, 2 by-design, 2 platform, 3 not-a-defect, 1 explained), 2 declined (drag-drop reorder, admin kbd shortcuts). Full table: `evidence/run5/findings-table.md`.
 - **Server**: public `GET /api/tags` (1,759 aggregated metadata tags); `GET /api/admin/users?q=` filter; `GET /api/admin/users/export` CSV (formula-injection guarded, no password data).
