@@ -10,6 +10,11 @@ A production-ready React application for browsing and discovering over 2,600 cur
 
 > **Full history:** see [`CHANGELOG.md`](./CHANGELOG.md) for every dated entry back to December 2025. Older "Recent Changes" entries are moved there periodically.
 
+### Master Fix Prompt Round 4 Remediation — Run7 (July 15, 2026)
+- **52-finding external audit triaged live**: audit crawled prod July 12 *pre*-republish; the July 15 republish shipped all Run5+Run6 fixes, so 15 findings were verified fixed-live on prod today. 4 fixed this run; 12 stale, 8 invalid, 5 by-design, 4 platform (incl. CRITICAL C01 GAESA infra cookie again), 3 not-a-defect, 3 declined. Full table: `evidence/run7/findings-table.md`.
+- **Fixes**: R4-H05 residual — Users-tab Name-column fallback leaked raw emails for nameless users, now masked with reveal toggle; R4-M10 generic login subtitle; R4-L16 status-badge tooltip/aria; R4-L17 clickable stat cards (deep-link to admin tabs, keyboard + ARIA).
+- **Verified** (Iron Rule): tsc clean; dev Playwright 4/4 + 0-leak check; prod Playwright/curl proofs for all fixed-live verdicts. **Needs republish (4 client fixes).**
+
 ### Master Fix Prompt Round 3 Remediation — Run6 (July 15, 2026)
 - **55-finding external audit triaged live**: audit crawled prod July 12 *pre*-Run5-republish, so 18 findings = Run5 fixes pending republish. 3 new defects fixed; 14 stale, 7 invalid, 5 by-design, 3 platform (incl. CRITICAL C01 — GAESA is Replit-infra App Engine affinity cookie; app's `connect.sid` has HttpOnly/Secure/SameSite=Lax), 2 not-a-defect, 1 explained, 2 declined. Full table: `evidence/run6/findings-table.md`.
 - **Fixes**: R3-H08 `/api/resources?sort=` now real (whitelist name-asc/name-desc/newest/oldest, 400 `invalid_sort` otherwise); R3-M25 all local-login failures return generic "Invalid email or password"; R3-L16 tag-count badge a11y label.

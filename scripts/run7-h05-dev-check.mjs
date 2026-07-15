@@ -1,0 +1,25 @@
+import { chromium } from 'playwright';
+const exePath = new URL('../.cache/ms-playwright/chromium-1223/chrome-linux64/chrome', import.meta.url).pathname;
+const BASE = 'http://localhost:5000';
+const browser = await chromium.launch({ executablePath: exePath });
+const ctx = await browser.newContext();
+const page = await ctx.newPage();
+await page.goto(BASE + '/login', { waitUntil: 'networkidle', timeout: 60000 });
+await page.fill('#email', 'admin@example.com');
+await page.fill('input[type="password"]', 'devtest-run3-Pw1');
+await page.click('button[type="submit"]');
+await page.waitForURL('**/admin', { timeout: 20000 }).catch(()=>{});
+await page.waitForSelector('[data-testid="tab-users"]', { timeout: 20000 });
+await page.click('[data-testid="tab-users"]');
+await page.waitForSelector('table', { timeout: 15000 });
+await page.waitForTimeout(1200);
+const rows = await page.locator('table tbody tr').allTextContents();
+const re = /[a-z0-9._%+-]{2,}[a-z0-9]@[a-z0-9.-]+\.[a-z]{2,}/gi;
+let leaks = 0;
+for (const r of rows) { const m = r.match(re); if (m) { leaks++; console.log('LEAK:', m, r.slice(0,100)); } }
+console.log(`rows=${rows.length} leaks=${leaks}`);
+const masked = rows.some(r => r.includes('•••'));
+console.log(masked && leaks === 0 ? 'PASS name-column mask (dev)' : (rows.length ? (leaks ? 'FAIL leaks present' : 'PASS no leaks (no nameless users to mask?)') : 'FAIL no rows'));
+await page.screenshot({ path: 'evidence/run7/H05-name-column-mask-dev.png' });
+await browser.close();
+process.exit(leaks ? 1 : 0);

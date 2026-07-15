@@ -15,6 +15,8 @@ interface AdminStatsProps {
     totalDeleted?: number;
   };
   isLoading: boolean;
+  /** R4-L17: when provided, stat cards become clickable and jump to the matching admin tab. */
+  onNavigate?: (tab: string) => void;
 }
 
 /**
@@ -22,15 +24,16 @@ interface AdminStatsProps {
  * Shows metrics for users, resources, learning journeys, and pending approvals.
  * The resources card shows the LIVE (approved/public) count so it matches the
  * public catalog exactly (run3 audit R3-01); pending/rejected are a sublabel.
+ * R4-L17: each card deep-links to its admin tab when onNavigate is supplied.
  */
-export default function AdminStats({ stats, isLoading }: AdminStatsProps) {
+export default function AdminStats({ stats, isLoading, onNavigate }: AdminStatsProps) {
   const publicCount = stats?.totalPublic ?? stats?.resources;
   const pendingCount = stats?.totalPending ?? 0;
   const rejectedCount = stats?.totalDeleted ?? 0;
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
       {[
-        { icon: Users, label: "Total Users", value: stats?.users },
+        { icon: Users, label: "Total Users", value: stats?.users, tab: "users" },
         {
           icon: FileText,
           label: "Live Resources",
@@ -44,30 +47,57 @@ export default function AdminStats({ stats, isLoading }: AdminStatsProps) {
                 ].filter(Boolean).join(" · ")
               : undefined,
           testId: "stat-live-resources",
+          tab: "resources",
         },
-        { icon: Activity, label: "Learning Journeys", value: stats?.journeys },
-        { icon: GitBranch, label: "Pending Approvals", value: stats?.pendingApprovals },
-      ].map(({ icon: Icon, label, value, sublabel, testId }: any) => (
-        <Card key={label}>
-          <CardHeader className="pb-2">
-            <CardTitle className="eyebrow flex items-center gap-2 normal-case">
-              <Icon className="h-4 w-4 text-[var(--accent)]" />
-              {label}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div
-              className="font-display font-medium text-3xl tracking-tight tabular-nums text-[var(--text)]"
-              data-testid={testId}
-            >
-              {isLoading ? "—" : value || 0}
-            </div>
-            {!isLoading && sublabel && (
-              <div className="text-xs text-[var(--text-2)] mt-1">{sublabel}</div>
-            )}
-          </CardContent>
-        </Card>
-      ))}
+        { icon: Activity, label: "Learning Journeys", value: stats?.journeys, tab: "journeys" },
+        { icon: GitBranch, label: "Pending Approvals", value: stats?.pendingApprovals, tab: "approvals" },
+      ].map(({ icon: Icon, label, value, sublabel, testId, tab }: any) => {
+        const clickable = Boolean(onNavigate && tab);
+        return (
+          <Card
+            key={label}
+            role={clickable ? "button" : undefined}
+            tabIndex={clickable ? 0 : undefined}
+            aria-label={clickable ? `${label} — open the ${tab} tab` : undefined}
+            title={clickable ? `Open the ${tab} tab` : undefined}
+            onClick={clickable ? () => onNavigate!(tab) : undefined}
+            onKeyDown={
+              clickable
+                ? (e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      onNavigate!(tab);
+                    }
+                  }
+                : undefined
+            }
+            className={
+              clickable
+                ? "cursor-pointer transition-colors hover:border-[var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+                : undefined
+            }
+            data-testid={clickable ? `stat-card-${tab}` : undefined}
+          >
+            <CardHeader className="pb-2">
+              <CardTitle className="eyebrow flex items-center gap-2 normal-case">
+                <Icon className="h-4 w-4 text-[var(--accent)]" />
+                {label}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div
+                className="font-display font-medium text-3xl tracking-tight tabular-nums text-[var(--text)]"
+                data-testid={testId}
+              >
+                {isLoading ? "—" : value || 0}
+              </div>
+              {!isLoading && sublabel && (
+                <div className="text-xs text-[var(--text-2)] mt-1">{sublabel}</div>
+              )}
+            </CardContent>
+          </Card>
+        );
+      })}
     </div>
   );
 }

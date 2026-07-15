@@ -1,0 +1,21 @@
+import { chromium } from 'playwright';
+const exePath = new URL('../.cache/ms-playwright/chromium-1223/chrome-linux64/chrome', import.meta.url).pathname;
+const BASE = 'http://localhost:5000';
+const browser = await chromium.launch({ executablePath: exePath });
+const ctx = await browser.newContext();
+const page = await ctx.newPage();
+await page.goto(BASE + '/login', { waitUntil: 'networkidle', timeout: 60000 });
+await page.fill('#email', 'admin@example.com');
+await page.fill('input[type="password"]', 'devtest-run3-Pw1');
+await page.click('button[type="submit"]');
+await page.waitForURL('**/admin', { timeout: 20000 }).catch(()=>{});
+await page.waitForSelector('[data-testid="tab-users"]', { timeout: 20000 });
+await page.click('[data-testid="tab-users"]');
+await page.waitForSelector('table', { timeout: 15000 });
+await page.waitForTimeout(1200);
+// Scan FULL HTML (text + attributes) of the users table for raw emails, excluding the admin's own session email
+const html = await page.locator('table').evaluate(el => el.outerHTML);
+const re = /[a-z0-9._%+-]{2,}[a-z0-9]@[a-z0-9.-]+\.[a-z]{2,}/gi;
+const matches = (html.match(re) || []).filter(m => m.toLowerCase() !== 'admin@example.com');
+console.log('attribute+text leaks (excl. self):', matches.length, matches.slice(0, 5));
+process.exit(matches.length ? 1 : 0);

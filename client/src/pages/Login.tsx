@@ -139,7 +139,8 @@ export default function Login() {
             Welcome back
           </CardTitle>
           <CardDescription className="text-center">
-            Sign in to access the admin dashboard
+            {/* R4-M10: generic copy — login serves all users, not just admins. */}
+            Sign in to your Awesome Video account
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

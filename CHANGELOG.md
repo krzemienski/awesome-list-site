@@ -6,6 +6,14 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 
 ## July 15, 2026
 
+### Master Fix Prompt Round 4 Remediation — Run7
+- **52-finding external audit triaged live**: the audit crawled prod July 12 *before* today's republish (which shipped all 18 Run5 + 3 Run6 fixes), so most findings repeat now-live fixes. 4 fixed this run, 15 fixed-live (prior-run fixes verified on prod today), 12 stale, 8 invalid, 5 by-design, 4 platform (incl. the CRITICAL — GAESA infra cookie again), 3 not-a-defect, 3 declined (drag-drop, kbd shortcuts, pagination quick-jump). Full table: `evidence/run7/findings-table.md`.
+- **R4-H05 residual (client, HIGH)**: prod verification of the Run5 email mask found a real leak — the Users-tab *Name column* fallback rendered the raw email for users without a display name (13/18 prod users), defeating the masked Email column. The fallback now masks and honors the per-row reveal toggle.
+- **R4-M10 (client)**: login subtitle genericized to "Sign in to your Awesome Video account" (was admin-only copy).
+- **R4-L16 (client)**: resource status badge gained `title`/`aria-label` explaining the status.
+- **R4-L17 (client)**: admin dashboard stat cards are now clickable/keyboard-activatable and jump to the matching admin tab (Users/Resources/Journeys/Approvals).
+- **Verified live** (Iron Rule): tsc clean; dev Playwright 4/4 PASS (`scripts/run7-verify-dev.mjs`) + 0-leak Users-table check; prod Playwright verified H03/H04/H08/M22/M24/M25/L01/L14 live and captured the H05 leak pre-fix; prod curls proved favicon, journey ids 6–10, max resource id 188025, 1,759 tags, real subcategory slugs. **Requires a republish** (H05 residual + 3 small fixes).
+
 ### Master Fix Prompt Round 3 Remediation — Run6
 - **55-finding external audit triaged live**: the audit crawled prod on July 12 *before* the Run5 republish, so 18 findings are Run5 fixes still pending republish. 3 genuinely new defects fixed this run; 14 stale, 7 invalid, 5 by-design, 3 platform (incl. the CRITICAL — GAESA is a Google App Engine affinity cookie injected by Replit infra, not app code; our `connect.sid` has HttpOnly/Secure/SameSite=Lax), 2 not-a-defect, 1 explained, 2 previously declined. Full table: `evidence/run6/findings-table.md`.
 - **R3-H08 (server)**: `/api/resources?sort=` was silently ignored — `listResources` now supports whitelisted `name-asc`/`name-desc` (case-insensitive title) and `newest`/`oldest` (createdAt) with id tiebreaker; the route 400s unknown sorts (`invalid_sort` + allowed list, mirroring the `invalid_status` pattern).

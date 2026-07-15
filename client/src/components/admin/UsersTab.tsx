@@ -194,10 +194,15 @@ export default function UsersTab() {
                           <UserIcon className="h-4 w-4 text-muted-foreground" />
                         </div>
                       )}
-                      <span className="font-medium">
+                      {/* R4-H05: the name-column fallback must respect the email
+                          mask too — showing the raw email here defeated the
+                          masked Email column for users with no display name. */}
+                      <span className="font-medium" data-testid={`text-name-${user.id}`}>
                         {user.firstName || user.lastName
                           ? `${user.firstName || ''} ${user.lastName || ''}`.trim()
-                          : user.email || user.id.slice(0, 8)}
+                          : user.email
+                            ? (revealedIds.has(user.id) ? user.email : maskEmail(user.email))
+                            : user.id.slice(0, 8)}
                       </span>
                     </div>
                   </TableCell>
@@ -249,7 +254,12 @@ export default function UsersTab() {
                           size="sm"
                           className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                           onClick={() => setUserToDelete(user)}
-                          aria-label={`Delete user ${user.email || user.id}`}
+                          aria-label={`Delete user ${
+                            /* R4-H05: keep the raw email out of the DOM unless revealed. */
+                            user.email
+                              ? (revealedIds.has(user.id) ? user.email : maskEmail(user.email))
+                              : user.id
+                          }`}
                           data-testid={`button-delete-user-${user.id}`}
                         >
                           <Trash2 className="h-4 w-4" />

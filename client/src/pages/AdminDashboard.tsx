@@ -127,7 +127,8 @@ export default function AdminDashboard() {
         <p className="text-sm sm:text-base text-[var(--text-2)]">Manage resources, users, and system configuration.</p>
       </div>
 
-      <AdminStats stats={stats} isLoading={isLoading} />
+      {/* R4-L17: stat cards jump straight to their admin tab. */}
+      <AdminStats stats={stats} isLoading={isLoading} onNavigate={handleTabChange} />
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
         <div className="w-full overflow-x-auto pb-2 admin-tab-scroller">
