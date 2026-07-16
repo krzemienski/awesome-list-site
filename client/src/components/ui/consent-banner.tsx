@@ -28,7 +28,7 @@ export default function ConsentBanner() {
     <div
       role="region"
       aria-label="Analytics consent"
-      className="fixed bottom-0 inset-x-0 z-50 border-t border-[var(--border)] bg-[var(--surface)] shadow-lg"
+      className="fixed bottom-0 inset-x-0 z-50 border-t border-[var(--border)] bg-[var(--bg)] shadow-lg"
       data-testid="consent-banner"
     >
       <div className="mx-auto w-full max-w-[1280px] px-4 sm:px-6 md:px-12 py-3 flex flex-col sm:flex-row items-start sm:items-center gap-3">

@@ -462,8 +462,8 @@ export default function Category() {
           </Button>
         </Link>
         
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-          <div className="min-w-0 sm:flex-1">
+        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3">
+          <div className="min-w-0 lg:flex-1">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight break-words">
               {categoryName}
             </h1>
