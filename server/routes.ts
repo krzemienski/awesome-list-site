@@ -911,6 +911,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const toPublicResource = <T extends Record<string, any>>(r: T) =>
     stripInternalResourceFields(r);
 
+  // BUG-v3-M07 (run12): duplicated query params (?q=a&q=b) arrive as arrays,
+  // and `(array as string).replace(...)` threw → 500. Coerce every scalar
+  // query param through this helper: first value wins, non-strings drop to
+  // undefined (e.g. the qs "?q[a]=b" object form).
+  const firstQueryValue = (v: unknown): string | undefined => {
+    if (Array.isArray(v)) v = v[0];
+    return typeof v === 'string' ? v : undefined;
+  };
+
   // GET /api/resources - List approved resources (public)
   app.get('/api/resources', resourceReadLimiter, async (req, res) => {
     try {
@@ -923,10 +932,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // BUG-039: `cursor` is accepted as an alias for `offset` (and the
       // response carries a matching `nextCursor`), since API consumers
       // reasonably probe for cursor-style paging. offset wins if both given.
-      const rawCursor = req.query.cursor as string | undefined;
-      const rawOffset = (req.query.offset as string | undefined) ?? rawCursor;
-      const rawLimit = req.query.limit as string | undefined;
-      const rawPage = req.query.page as string | undefined;
+      const rawCursor = firstQueryValue(req.query.cursor);
+      const rawOffset = firstQueryValue(req.query.offset) ?? rawCursor;
+      const rawLimit = firstQueryValue(req.query.limit);
+      const rawPage = firstQueryValue(req.query.page);
       if (rawOffset !== undefined && isNaN(Number(rawOffset))) {
         return res.status(400).json({ error: 'invalid_offset' });
       }
@@ -944,13 +953,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const offset = rawOffset !== undefined
         ? Math.max(parseInt(rawOffset as string), 0)
         : Math.max((parseInt(rawPage as string) || 1) - 1, 0) * limit;
-      let category = req.query.category as string;
-      let subcategory = req.query.subcategory as string;
+      let category = firstQueryValue(req.query.category) as string;
+      let subcategory = firstQueryValue(req.query.subcategory) as string;
       // BUG-015: accept `q` as an alias for `search` so /api/resources?q=… reaches
       // the real filter layer. `search` wins if both are present (explicit param).
       // NEW-012: strip NUL + control chars — Postgres rejects NUL bytes in text
       // params and the raw driver error surfaced as a 500.
-      const rawSearch = (req.query.search as string) ?? (req.query.q as string);
+      const rawSearch = firstQueryValue(req.query.search) ?? firstQueryValue(req.query.q);
       const search = typeof rawSearch === 'string'
         ? rawSearch.replace(/[\x00-\x1f\x7f]/g, '')
         : rawSearch;
@@ -983,12 +992,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // BUG-002: sub-subcategory filter. The audit's reproduction passes the
       // display NAME (e.g. subSubcategory=AV1), matching the existing
       // subcategory behaviour, so pass it straight through to listResources.
-      const subSubcategory = req.query.subSubcategory as string | undefined;
+      const subSubcategory = firstQueryValue(req.query.subSubcategory);
 
       // R3-H08: server-side sort with allow-list; unknown values 400 (mirrors
       // the invalid_status pattern) so callers learn the valid options.
       const ALLOWED_SORTS = ['name-asc', 'name-desc', 'newest', 'oldest'] as const;
-      const requestedSort = req.query.sort as string | undefined;
+      const requestedSort = firstQueryValue(req.query.sort);
       if (requestedSort !== undefined && !ALLOWED_SORTS.includes(requestedSort as any)) {
         return res.status(400).json({ error: 'invalid_sort', allowed: ALLOWED_SORTS });
       }
@@ -996,7 +1005,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // BUG-004: respect ?status= with allow-list; default 'approved' for public.
       const ALLOWED_STATUSES = new Set(['approved', 'pending', 'rejected']);
-      const requestedStatus = req.query.status as string | undefined;
+      const requestedStatus = firstQueryValue(req.query.status);
       let statusFilter: string | undefined = 'approved';
       if (requestedStatus !== undefined) {
         if (!ALLOWED_STATUSES.has(requestedStatus)) {
@@ -1065,17 +1074,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // share one search path (and /api/search no longer 404s). Results are deduped
   // by normalized URL so near-duplicate rows never surface twice. Shape:
   // { query, total, results }.
-  app.get('/api/search', async (req, res) => {
+  // BUG-v3-M14 (run12): the public search endpoint shares the resource-read
+  // rate limit (100 req/min/IP, 429 + Retry-After) like the other public
+  // GET resource surfaces.
+  app.get('/api/search', resourceReadLimiter, async (req, res) => {
     try {
       // NEW-012: strip NUL + control chars before trimming — Postgres rejects
       // NUL bytes in text params, which previously surfaced as a 500.
-      const q = (((req.query.q as string) || (req.query.search as string)) || '')
+      // BUG-v3-M07 (run12): duplicate ?q= params arrive as an array — coerce
+      // to the first value instead of crashing on .replace.
+      const q = (firstQueryValue(req.query.q) || firstQueryValue(req.query.search) || '')
         .replace(/[\x00-\x1f\x7f]/g, '')
         .trim();
       if (q.length < 2) {
         return res.json({ query: q, total: 0, results: [] });
       }
-      const limit = Math.min(Math.max(parseInt(req.query.limit as string) || 100, 1), 200);
+      const limit = Math.min(Math.max(parseInt(firstQueryValue(req.query.limit) as string) || 100, 1), 200);
       const { resources, total } = await resourceRepo.listResources({
         page: 1,
         limit,
@@ -1280,9 +1294,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // BUG-012: pre-check for duplicate URL → 409
       const existingResource = await resourceRepo.getResourceByUrl(submitValidation.data.url);
       if (existingResource) {
+        // BUG-v3-M11 (run12): no internal identifiers in the duplicate
+        // response — the client only needs to know the URL already exists
+        // (and never consumed existingId).
         return res.status(409).json({
           error: 'duplicate_url',
-          existingId: existingResource.id,
           message: 'This URL is already in the catalog'
         });
       }

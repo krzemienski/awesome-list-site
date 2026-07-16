@@ -10,6 +10,12 @@ A production-ready React application for browsing and discovering over 2,600 cur
 
 > **Full history:** see [`CHANGELOG.md`](./CHANGELOG.md) for every dated entry back to December 2025. Older "Recent Changes" entries are moved there periodically.
 
+### Black-Box Audit Remediation — Run12 (July 16, 2026)
+- **MASTER-FIX-PROMPT-v3 triaged live** (claims 87 findings, enumerates 72 unique IDs; crawl pre-dates July 15 republish): 10 fixed, 12 fixed-prior, 24 invalid, 6 platform (Replit widget + GAESA infra cookie incl. CRITICAL C01), 12 by-design, 1 data, 7 declined. Table: `evidence/run12/findings-table.md`.
+- **Server fixes**: M06 malformed JSON → 400; M07 duplicate `?q=` params → first value 200 (was 500); M11 409 duplicate-submit without `existingId`; M14 search rate limit 100/min → 429 + Retry-After; L02 unsupported methods → 405 + Allow.
+- **Client fixes**: H02/L13 card titles as `<h2>`; L15 resource-specific View Details aria-labels; M33 real pagination range text; M19 lockout toast shows concrete 423 `retryAfter` duration.
+- **Verified** (Iron Rule): tsc clean; live curl + Playwright proofs (`evidence/run12/`). **Needs republish (5 server + 4 client fixes).**
+
 ### Black-Box Audit Remediation — Run10 (July 15, 2026)
 - **57-finding audit triaged live** (BUG-001..057): 16 fixed, 16 invalid, 10 platform (Replit feedback widget incl. CRITICAL BUG-001), 10 not-a-defect/by-design, 3 stale, 2 declined (409 register enum — new rate limiter is the compensating control; email verification — no transport). Table: `evidence/run10/findings-table.md`.
 - **Fixes**: BUG-008 IP rate limiting on the whole auth cluster (`express-rate-limit`, 20/15min, layered on per-account lockout); BUG-009 HTML-tag guard on submit (client + server zod); BUG-025 check-url stops leaking moderation status (server + client UI); BUG-004 real noscript; BUG-013 mobile sidebar capped `max-w-[85vw]` (was 98% — width class wasn't winning); BUG-017 resource-title breadcrumb; BUG-019 admin-only status badge; BUG-021/029/036 title tooltips on clamped card titles; BUG-027 safe `?next=` login redirect (rejects `//` and `/\` bypasses per architect review); BUG-032 44px View Details; BUG-042 onTouched login validation; BUG-043 formatted hero count; BUG-045 guest-browse link; BUG-052 12 double-space descriptions fixed in dev (prod pending credentials).

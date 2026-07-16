@@ -522,7 +522,10 @@ export default function Category() {
       
       <div className="flex items-center justify-between gap-2">
         <p className="text-xs sm:text-sm text-muted-foreground min-w-0 truncate" data-testid="text-results-count">
-          Showing {filteredResources.length} of {allResources.length} resources
+          {/* BUG-v3-M33 (run12): show the actual page range, not page-size-as-subset */}
+          Showing {filteredResources.length === 0
+            ? "0"
+            : `${(currentPage - 1) * PAGE_SIZE + 1}–${Math.min(currentPage * PAGE_SIZE, filteredResources.length)}`} of {filteredResources.length} resources
           {selectedTags.length > 0 && ` (${selectedTags.length} tag${selectedTags.length > 1 ? 's' : ''})`}
         </p>
         <ViewModeToggle value={viewMode} onChange={handleViewModeChange} />
@@ -706,7 +709,8 @@ export default function Category() {
               >
                 <CardHeader className="p-6 space-y-2">
                   <CardTitle className="text-base sm:text-lg flex items-start gap-2">
-                    <span className="flex-1 min-w-0 line-clamp-2" title={resource.title}>{titleAnchor(resource.title)}</span>
+                    {/* BUG-v3-H02 (run12): real h2 so card titles sit under the page h1 */}
+                    <h2 className="flex-1 min-w-0 line-clamp-2 text-base sm:text-lg font-semibold leading-none tracking-tight" title={resource.title}>{titleAnchor(resource.title)}</h2>
                     <div className="relative z-10 flex items-center gap-0.5 flex-shrink-0">
                       <Button
                         variant="ghost"
@@ -769,6 +773,11 @@ export default function Category() {
                     }}
                     data-testid={`button-view-details-${resourceId}`}
                     className="relative z-10 inline-flex min-h-[44px] items-center gap-1 py-2 -my-2 text-xs font-medium text-[var(--accent)] hover:underline focus:outline-none focus-visible:underline"
+                    aria-label={
+                      isDbResource(resource)
+                        ? `View details for ${resource.title}`
+                        : `Open ${resource.title}`
+                    }
                   >
                     {isDbResource(resource) ? "View Details" : "Open Resource"}
                     <ExternalLink className="h-3 w-3" />

@@ -1,0 +1,4 @@
+qa users: [{"id":"3afe4634-3370-472e-a19b-2ffaf3220b33","email":"__qa_test_m11_run12@example.com"}]
+resource_edits: column "user_id" does not exist
+deleted __qa_test_m11_run12@example.com
+remaining qa users: 0

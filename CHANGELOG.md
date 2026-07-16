@@ -4,6 +4,15 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 
 ---
 
+## July 16, 2026
+
+### Black-Box Audit Remediation — Run12
+- **MASTER-FIX-PROMPT-v3 triaged live**: the audit claims 87 findings but enumerates 72 unique IDs (discrepancy documented); crawl predates the July 15 republish. Verdicts: 10 fixed, 12 fixed-prior (Runs 5–11, pending republish at crawl), 24 invalid, 6 platform (Replit feedback widget + GAESA infra cookie incl. CRITICAL C01), 12 by-design, 1 data, 7 declined with rationale. Full table: `evidence/run12/findings-table.md`.
+- **Server fixes (5)**: M06 malformed JSON body → 400 `Invalid JSON payload` (was 500); M07 duplicate query params (`?q=a&q=b`) → shared `firstQueryValue()` uses the first value, 200 (was 500, incl. object-form `q`); M11 duplicate-submit 409 body no longer leaks `existingId` (generic `duplicate_url` message); M14 `/api/search` rate limit 100 req/min/IP → 429 + `Retry-After` (proven: first 429 at request #101); L02 unsupported HTTP methods (`PROPFIND`, `TRACE`, …) → 405 + `Allow` header (was 200 SPA HTML).
+- **Client fixes (4 + companion)**: H02/L13 resource card titles are real `<h2>` under the page `<h1>` (ResourceCard + Category); L15 per-resource "View details for {title}" aria-labels; M33 true pagination range ("Showing 1–24 of 253 resources", page 2 → "25–48"); M19 lockout toast surfaces the real 423 `retryAfter` duration ("Try again in about 14 minutes").
+- **Notable non-defects**: C01 flagged cookie is Replit's `GAESA` infra cookie (app `connect.sid` has HttpOnly/Secure/SameSite=Lax); export is client-side by design (`POST /api/export` never existed); M34 multi-tag OR semantics deliberate; M04 lockout-indistinguishability declined — the 5/min burst limiter 429s enumeration probes before the 423 is reachable, and hiding the lock would contradict M19's honest-duration ask in the same audit.
+- **Verified** (Iron Rule): tsc clean; live curl proofs for all 5 server fixes (`evidence/run12/verify-server*.txt`); Playwright dev sweeps 5/5 + 3/3 + 1/1 PASS (`verify-ui-phase1/2/3.txt`); QA teardown clean (0 `__qa_test` users). **Needs republish (5 server + 4 client fixes).**
+
 ## July 15, 2026
 
 ### Black-Box Audit Remediation — Run10

@@ -1,0 +1,25 @@
+=== M06: malformed JSON -> 400 ===
+status=400
+{"message":"Invalid JSON payload"}
+=== M07: duplicate q params on /api/search -> 200 not 500 ===
+status=200
+{"query":"ffmpeg","total":200,"results":[{"id":187905,"title":"MediaMolder - FFmpeg for the AI era","url":"https://github.com/MediaMolder/mediamolder","description":"A rewrite of the interface and orc
+=== M07: object-form q -> 200 empty ===
+status=200
+=== M07: duplicate params on /api/resources ===
+status=200
+status=200
+=== L02: PROPFIND / and TRACE /api/search -> 405 ===
+status=405 allow=GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS
+status=400
+=== M11: duplicate submit 409 body has no existingId (needs auth; check shape via check first) ===
+=== normal endpoints still fine ===
+resources status=200
+search status=200
+awesome-list status=200
+=== L02 addendum (post-architect re-proof): TRACE/PROPFIND/MKCOL all 405 ===
+TRACE /: 405
+TRACE /api/search?q=x: 405
+PROPFIND /: 405
+MKCOL /: HTTP/1.1 405 Method Not Allowed, Allow: GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS
+(the single 400 recorded earlier for TRACE was a stale pre-restart probe; live guard returns 405 for every unsupported method)

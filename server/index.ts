@@ -135,6 +135,22 @@ app.use((req, res, next) => {
   next();
 });
 
+// BUG-v3-L02 (run12): unsupported/WebDAV-style HTTP methods (PROPFIND, TRACE,
+// etc.) previously fell through to the SPA catch-all and answered 200 + HTML.
+// Answer 405 with an Allow header instead — no route in the app serves them.
+const SUPPORTED_METHODS = new Set([
+  "GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS",
+]);
+app.use((req, res, next) => {
+  if (!SUPPORTED_METHODS.has(req.method)) {
+    return res
+      .status(405)
+      .set("Allow", "GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS")
+      .json({ message: "Method not allowed" });
+  }
+  next();
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 

@@ -1,6 +1,6 @@
 import { useState, memo } from "react";
 import { useLocation, Link } from "wouter";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Edit, ChevronRight } from "lucide-react";
@@ -122,10 +122,15 @@ function ResourceCard({
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           {/* BUG-021/036 (run10): full title via native tooltip — the visual
-              title is line-clamped so hover/long-press reveals the rest. */}
-          <CardTitle className="text-lg line-clamp-1 flex-1 min-w-0" title={resource.name}>
+              title is line-clamped so hover/long-press reveals the rest.
+              BUG-v3-H02 (run12): rendered as a real h2 so resource cards sit
+              beneath the page h1 in the heading hierarchy. */}
+          <h2
+            className="text-lg font-semibold leading-none tracking-tight line-clamp-1 flex-1 min-w-0"
+            title={resource.name}
+          >
             {titleContent}
-          </CardTitle>
+          </h2>
           {/* R2-L09: shown to anonymous users too — the buttons themselves
               prompt sign-in on click instead of hiding the affordance. */}
           <div className="relative z-10 flex items-center gap-1 ml-2">

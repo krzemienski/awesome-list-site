@@ -57,6 +57,20 @@ export function errorHandler(
   res: Response,
   _next: NextFunction
 ): void {
+  // BUG-v3-M06 (run12): malformed JSON bodies. express.json() (body-parser)
+  // throws a SyntaxError carrying `status: 400` and the offending `body` when
+  // the payload fails to parse. That is a client error — answer 400 with a
+  // generic message instead of falling through to the 500 branch.
+  if (
+    err instanceof SyntaxError &&
+    (err as any).status === 400 &&
+    "body" in err
+  ) {
+    res.status(400).json({ message: "Invalid JSON payload" });
+    console.log("Client error (400): malformed JSON body");
+    return;
+  }
+
   // Handle Zod validation errors
   if (err instanceof ZodError) {
     const validationError = new ValidationError(

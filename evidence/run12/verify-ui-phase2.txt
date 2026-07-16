@@ -1,0 +1,5 @@
+PASS H08 no horizontal overflow at 320px — overflowPx=0
+PASS BUG-014 mobile sidebar opens with backdrop — sheet=true overlay=true
+PASS BUG-014 Escape closes sidebar
+
+3/3 PASS

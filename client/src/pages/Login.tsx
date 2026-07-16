@@ -116,12 +116,36 @@ export default function Login() {
       } else {
         const error = (await response
           .json()
-          .catch(() => ({ message: "Invalid email or password" }))) as { message?: string };
-        toast({
-          title: "Login failed",
-          description: error.message ?? "Invalid email or password",
-          variant: "destructive",
-        });
+          .catch(() => ({ message: "Invalid email or password" }))) as {
+          message?: string;
+          retryAfter?: number;
+        };
+        // BUG-v3-M19 (run12): the lockout response (423) carries retryAfter
+        // seconds — surface a concrete recovery duration instead of the
+        // generic "try again later".
+        if (response.status === 423) {
+          const secs =
+            typeof error.retryAfter === "number" && error.retryAfter > 0
+              ? error.retryAfter
+              : null;
+          const wait =
+            secs === null
+              ? "a few minutes"
+              : secs >= 90
+                ? `about ${Math.ceil(secs / 60)} minutes`
+                : `${secs} seconds`;
+          toast({
+            title: "Too many failed attempts",
+            description: `Sign-in is temporarily locked. Try again in ${wait}.`,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Login failed",
+            description: error.message ?? "Invalid email or password",
+            variant: "destructive",
+          });
+        }
       }
     } catch {
       toast({
