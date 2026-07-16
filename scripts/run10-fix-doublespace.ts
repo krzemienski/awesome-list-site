@@ -1,5 +1,5 @@
 // BUG-052 (run10): collapse runs of 2+ spaces in resource descriptions (dev DB).
-// Prod counterpart requires admin API access (PROD_ADMIN_PASSWORD not available).
+// Prod counterpart requires admin API access (admin credentials via ADMIN_PASSWORD secret).
 import { db } from "../server/db";
 import { sql } from "drizzle-orm";
 

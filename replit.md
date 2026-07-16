@@ -15,6 +15,7 @@ A production-ready React application for browsing and discovering over 2,600 cur
 - **Enabler**: boot-time admin password sync from `ADMIN_PASSWORD` secret (bcrypt-compare + rotate, idempotent) — the only supported prod admin rotation path; `PROD_ADMIN_PASSWORD` secret is stale.
 - **Prod hygiene**: 6 audit-junk resources (incl. SSRF/file:// probes) + 3 QA users removed; replica confirms 0 residue, 0 pending.
 - **Verdict PASS**: 2 clean confirmation passes (47/47 UI checks × 3 viewports + 31/31 endpoint contract checks, each pass). Evidence: `audit-evidence/VERDICT.md`, `audit-evidence/confirm-pass-{1,2}/`, `audit-evidence/cycle-01/`.
+- **Same-day follow-ups (all done)**: http keeps re-probed — 0/20 upgradeable, fresh failure reasons in `audit-evidence/http-recheck-2026-07-16.md`; 3 http/https twin duplicates merged on prod (rejected rows 186568/186069/186621 deleted via admin API, snapshots journaled; approved survivors kept — note lives-video.com https is broken so approved row 185277 keeps http) → replica: 0 orphans, 0 duplicate URLs, http_total 21; all committed scripts now read `ADMIN_PASSWORD` (user must delete the obsolete `PROD_ADMIN_PASSWORD` secret via the Secrets tab — agents cannot remove secrets).
 
 ### Black-Box Audit Remediation — Run13 (July 16, 2026)
 - **50-finding MASTER-FIX-PROMPT audit triaged live** (BUG-001..050): 26 fixed, 3 fixed-via-rework, 6 fixed-prior/stale, 9 invalid/no-repro, 2 by-design, 2 declined, 2 prod follow-ups. Table: `evidence/run13/findings-table.md`.

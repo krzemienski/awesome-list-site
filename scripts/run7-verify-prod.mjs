@@ -52,7 +52,7 @@ ok('R4-L14 tag filter control present', (await tagBtn.count()) >= 1, '');
 // R4-H04/H05: admin reseed confirm + masked emails (prod admin)
 await page.goto(BASE + '/login', { waitUntil: 'networkidle', timeout: 60000 });
 await page.fill('#email', 'admin@example.com');
-await page.fill('input[type="password"]', process.env.PROD_ADMIN_PASSWORD);
+await page.fill('input[type="password"]', process.env.ADMIN_PASSWORD);
 await page.click('button[type="submit"]');
 await page.waitForTimeout(3000);
 await page.goto(BASE + '/admin#database', { waitUntil: 'networkidle', timeout: 60000 });

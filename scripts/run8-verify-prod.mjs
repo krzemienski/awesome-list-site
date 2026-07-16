@@ -36,7 +36,7 @@ console.log(JSON.stringify(widgetInfo, null, 1));
 console.log('--- BUG-003: login + /admin CSP ---');
 await page.goto(BASE + '/login', { waitUntil: 'networkidle', timeout: 60000 });
 await page.fill('#email', 'admin@example.com');
-await page.fill('input[type="password"]', process.env.PROD_ADMIN_PASSWORD);
+await page.fill('input[type="password"]', process.env.ADMIN_PASSWORD);
 consoleMsgs.length = 0;
 await page.click('button[type="submit"]');
 await page.waitForURL('**/admin', { timeout: 30000 }).catch(()=>{});

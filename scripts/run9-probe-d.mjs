@@ -7,7 +7,7 @@ const page = await ctx.newPage();
 // login
 await page.goto(BASE + '/login', { waitUntil: 'networkidle', timeout: 60000 });
 await page.fill('[data-testid="input-email"], input[type="email"]', 'admin@example.com');
-await page.fill('[data-testid="input-password"], input[type="password"]', process.env.PROD_ADMIN_PASSWORD);
+await page.fill('[data-testid="input-password"], input[type="password"]', process.env.ADMIN_PASSWORD);
 await page.click('button[type="submit"]');
 await page.waitForTimeout(2500);
 console.log('login url:', page.url());

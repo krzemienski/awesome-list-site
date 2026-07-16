@@ -6,7 +6,7 @@ const ctx = await browser.newContext();
 const page = await ctx.newPage();
 await page.goto(BASE + '/login', { waitUntil: 'networkidle', timeout: 60000 });
 await page.fill('#email', 'admin@example.com');
-await page.fill('input[type="password"]', process.env.PROD_ADMIN_PASSWORD);
+await page.fill('input[type="password"]', process.env.ADMIN_PASSWORD);
 await page.click('button[type="submit"]');
 await page.waitForURL('**/admin', { timeout: 20000 }).catch(()=>{});
 await page.waitForSelector('[data-testid="tab-users"]', { timeout: 20000 });
