@@ -20,7 +20,15 @@ const ADMIN_EMAIL = "admin@example.com";
 const TEST_RESOURCE_ID = 188037;
 const TEST_CATEGORY_ID = 1094;
 
-const journal: any[] = [];
+const JOURNAL_PATH = "audit-evidence/cycle-01/prod-fixes-journal.jsonl";
+function journalAppend(entry: any): void {
+  fs.appendFileSync(JOURNAL_PATH, JSON.stringify({ at: new Date().toISOString(), ...entry }) + "\n");
+}
+function journalRead(): any[] {
+  if (!fs.existsSync(JOURNAL_PATH)) return [];
+  return fs.readFileSync(JOURNAL_PATH, "utf-8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
+}
+
 let sessionCookie = ""; // set ONCE from the login response (connect.sid only) —
 // never updated afterward: prod infra injects its own Set-Cookie (GAESA
 // affinity) on arbitrary responses, which must not clobber the session.
@@ -87,33 +95,40 @@ async function main() {
   if (!login || login.status !== 200) throw new Error(`Login failed: ${login?.status} ${JSON.stringify(login?.json)}`);
   captureSessionCookie(login.res);
   console.log(`✓ Logged in as ${ADMIN_EMAIL} (role: ${login.json?.user?.role})`);
-  journal.push({ step: "login", status: 200, role: login.json?.user?.role });
+  journalAppend({ step: "login", status: 200, role: login.json?.user?.role });
+
+  const prior = journalRead();
+  const doneSteps = new Set(prior.map((e) => e.step === "F-003" ? `F-003:${e.id}` : e.step));
 
   // ---- F-002: QA resource + Test category ---------------------------------
-  const delRes = await api("DELETE", `/api/admin/resources/${TEST_RESOURCE_ID}`);
-  console.log(`F-002 delete resource ${TEST_RESOURCE_ID}: ${delRes.status}${delRes.status === 404 ? " (already gone)" : ""}`);
-  if (![200, 204, 404].includes(delRes.status)) {
-    throw new Error(`Resource delete failed: ${delRes.status} ${JSON.stringify(delRes.json)}`);
-  }
-  journal.push({ step: "F-002-delete-resource", id: TEST_RESOURCE_ID, status: delRes.status, body: delRes.json });
+  if (!doneSteps.has("F-002-delete-resource")) {
+    const delRes = await api("DELETE", `/api/admin/resources/${TEST_RESOURCE_ID}`);
+    console.log(`F-002 delete resource ${TEST_RESOURCE_ID}: ${delRes.status}${delRes.status === 404 ? " (already gone)" : ""}`);
+    if (![200, 204, 404].includes(delRes.status)) {
+      throw new Error(`Resource delete failed: ${delRes.status} ${JSON.stringify(delRes.json)}`);
+    }
+    journalAppend({ step: "F-002-delete-resource", id: TEST_RESOURCE_ID, status: delRes.status, body: delRes.json });
+  } else console.log("F-002 delete resource: already journaled, skipping");
 
-  const delCat = await api("DELETE", `/api/admin/categories/${TEST_CATEGORY_ID}`);
-  console.log(`F-002 delete category ${TEST_CATEGORY_ID} ("Test"): ${delCat.status}${delCat.status === 404 ? " (already gone)" : ""}`);
-  if (![200, 204, 404].includes(delCat.status)) {
-    throw new Error(`Category delete failed (guard?): ${delCat.status} ${JSON.stringify(delCat.json)}`);
-  }
-  journal.push({ step: "F-002-delete-category", id: TEST_CATEGORY_ID, status: delCat.status, body: delCat.json });
+  if (!doneSteps.has("F-002-delete-category")) {
+    const delCat = await api("DELETE", `/api/admin/categories/${TEST_CATEGORY_ID}`);
+    console.log(`F-002 delete category ${TEST_CATEGORY_ID} ("Test"): ${delCat.status}${delCat.status === 404 ? " (already gone)" : ""}`);
+    if (![200, 204, 404].includes(delCat.status)) {
+      throw new Error(`Category delete failed (guard?): ${delCat.status} ${JSON.stringify(delCat.json)}`);
+    }
+    journalAppend({ step: "F-002-delete-category", id: TEST_CATEGORY_ID, status: delCat.status, body: delCat.json });
+  } else console.log("F-002 delete category: already journaled, skipping");
 
-  // ---- F-003: https upgrade ------------------------------------------------
+  // ---- F-003: https upgrade (resumable — journaled ids are skipped) --------
   const targets: { id: number; url: string; twinId: number | null }[] = JSON.parse(
     fs.readFileSync("audit-evidence/cycle-01/prod-http-rows.json", "utf-8"),
   );
-  console.log(`F-003 targets: ${targets.length} http:// rows`);
+  const pending = targets.filter((t) => t.id !== TEST_RESOURCE_ID && !doneSteps.has(`F-003:${t.id}`));
+  console.log(`F-003 targets: ${targets.length} total, ${pending.length} pending this run`);
   let upgraded = 0, kept = 0, skipped = 0;
-  for (const t of targets) {
-    if (t.id === TEST_RESOURCE_ID) { skipped++; continue; }
+  for (const t of pending) {
     if (t.twinId) {
-      journal.push({ step: "F-003", id: t.id, url: t.url, action: "skipped-duplicate-https-twin", twin: t.twinId });
+      journalAppend({ step: "F-003", id: t.id, url: t.url, action: "skipped-duplicate-https-twin", twin: t.twinId });
       console.log(`SKIP  ${t.id} ${t.url} — https twin exists (${t.twinId})`);
       skipped++;
       continue;
@@ -123,27 +138,22 @@ async function main() {
       const newUrl = t.url.replace(/^http:\/\//, "https://");
       const put = await api("PUT", `/api/admin/resources/${t.id}`, { url: newUrl });
       if (put.status === 200) {
-        journal.push({ step: "F-003", id: t.id, from: t.url, to: newUrl, action: "upgraded", detail: check.detail });
+        journalAppend({ step: "F-003", id: t.id, from: t.url, to: newUrl, action: "upgraded", detail: check.detail });
         console.log(`UPGRADE ${t.id} ${t.url} -> https (${check.detail})`);
         upgraded++;
       } else {
-        journal.push({ step: "F-003", id: t.id, url: t.url, action: "put-failed", status: put.status, body: put.json });
+        journalAppend({ step: "F-003", id: t.id, url: t.url, action: "put-failed", status: put.status, body: put.json });
         console.log(`FAIL  ${t.id} ${t.url} — PUT ${put.status} ${JSON.stringify(put.json)}`);
       }
     } else {
-      journal.push({ step: "F-003", id: t.id, url: t.url, action: "kept-http-tls-less-host", detail: check.detail });
+      journalAppend({ step: "F-003", id: t.id, url: t.url, action: "kept-http-tls-less-host", detail: check.detail });
       console.log(`KEEP  ${t.id} ${t.url} — https unreachable (${check.detail})`);
       kept++;
     }
   }
-  console.log(`F-003 done: ${upgraded} upgraded, ${kept} kept (TLS-less), ${skipped} skipped`);
-
-  fs.mkdirSync("audit-evidence/cycle-01", { recursive: true });
-  fs.writeFileSync(
-    "audit-evidence/cycle-01/prod-fixes-journal.json",
-    JSON.stringify({ ranAt: new Date().toISOString(), base: BASE, journal }, null, 2),
-  );
-  console.log("Journal written: audit-evidence/cycle-01/prod-fixes-journal.json");
+  const remaining = targets.filter((t) => t.id !== TEST_RESOURCE_ID && !journalRead().some((e) => e.step === "F-003" && e.id === t.id)).length;
+  console.log(`F-003 this run: ${upgraded} upgraded, ${kept} kept (TLS-less), ${skipped} twin-skipped; ${remaining} remaining`);
+  console.log(remaining === 0 ? "ALL DONE" : "RE-RUN to continue");
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });
