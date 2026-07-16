@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { pgTable, text, serial, varchar, timestamp, integer, boolean, jsonb, index, uuid, primaryKey, unique, real, customType } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, varchar, timestamp, integer, boolean, jsonb, index, uniqueIndex, uuid, primaryKey, unique, real, customType } from "drizzle-orm/pg-core";
 
 /**
  * Postgres tsvector column type for full-text search (BUG-018).
@@ -1298,6 +1298,9 @@ export const researchDiscoveries = pgTable(
     index("idx_research_discoveries_job_id").on(table.jobId),
     index("idx_research_discoveries_status").on(table.status),
     index("idx_research_discoveries_url").on(table.url),
+    // Closes the save-retry/flush double-insert race: a timed-out insert that
+    // later commits can never coexist with its retry's row.
+    uniqueIndex("research_discoveries_job_url_uq").on(table.jobId, table.url),
   ]
 );
 

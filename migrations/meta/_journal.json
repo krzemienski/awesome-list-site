@@ -29,6 +29,13 @@
       "when": 1783730001000,
       "tag": "0031_add_agent_events_table",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1784171154812,
+      "tag": "0032_research_discoveries_job_url_unique",
+      "breakpoints": true
     }
   ]
 }

@@ -1,6 +1,6 @@
 import { db } from '../db';
 import { resources, researchJobs, researchDiscoveries } from '@shared/schema';
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import type { ResearchJob, ResearchDiscovery } from '@shared/schema';
 import { CategoryRepository } from '../repositories/CategoryRepository';
 import { ensureSubSubcategoryExists } from '../repositories/ensureSubSubcategory';
@@ -162,6 +162,50 @@ async function getExistingResourcesByCategory(category: string, limit = 30): Pro
     .limit(lim);
 }
 
+// Resilience knobs for the in-process research tools. Tool handlers must NEVER
+// throw into the MCP layer and NEVER hang: a thrown handler surfaces to the
+// model as a "tool server" failure (the agent then stalls/waits for recovery),
+// and a hung DB call (wedged pool) stalls the whole run.
+const TOOL_DB_TIMEOUT_MS = 8000;
+const SAVE_RETRY_ATTEMPTS = 3;
+const SAVE_RETRY_BASE_MS = 500;
+
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function withTimeout<T>(p: PromiseLike<T>, ms: number, label: string): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const t = setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms);
+    Promise.resolve(p).then(
+      v => { clearTimeout(t); resolve(v); },
+      e => { clearTimeout(t); reject(e); },
+    );
+  });
+}
+
+/** Run a non-essential DB side-effect (counters, log rows) without ever letting it fail the tool. */
+async function bestEffort(p: PromiseLike<unknown>, label: string): Promise<void> {
+  try {
+    await withTimeout(p, TOOL_DB_TIMEOUT_MS, label);
+  } catch (e: any) {
+    console.error(`[research] best-effort ${label} failed:`, e?.message || e);
+  }
+}
+
+/** After a failed flush round, skip opportunistic flushes for this long so a big queue can't slow every tool call. */
+const FLUSH_BACKOFF_MS = 30_000;
+
+/**
+ * Postgres class 22 (data exception) and 23 (integrity violation) errors are
+ * permanent input failures — retrying or queueing the identical row can never
+ * succeed, so callers must fail fast instead.
+ */
+function isNonRetryableDbError(err: any): boolean {
+  const code = err?.code ?? err?.cause?.code;
+  return typeof code === 'string' && (code.startsWith('22') || code.startsWith('23'));
+}
+
 const STALL_PIVOT_NUDGE =
 `STRATEGY PIVOT REQUIRED. Recent candidates were all duplicates. Do NOT repeat similar searches — change approach now:
 1. Delegate a search for a DIFFERENT under-served gap (call get_coverage_gaps again and pick a subcategory not yet searched this run).
@@ -173,6 +217,23 @@ interface ActiveJob {
   abortController: AbortController;
 }
 
+interface SaveDiscoveryInput {
+  title: string;
+  url: string;
+  description: string;
+  suggested_category: string;
+  suggested_subcategory?: string;
+  suggested_sub_subcategory?: string;
+  confidence: number;
+  reasoning: string;
+}
+
+interface PendingDiscovery {
+  input: SaveDiscoveryInput;
+  normalizedUrl: string;
+  queuedAt: string;
+}
+
 interface ResearchRunContext {
   jobId: number;
   emitter: AgentEventEmitter;
@@ -180,6 +241,10 @@ interface ResearchRunContext {
   discoveryCap: number;
   discoveriesSaved: number;
   consecutiveDuplicates: number;
+  /** Discoveries that could not be persisted immediately (transient DB failure); flushed opportunistically + at run end. */
+  pendingDiscoveries: PendingDiscovery[];
+  /** Epoch ms until which opportunistic (non-forced) flushes are skipped after a failed round. */
+  flushBackoffUntil: number;
   addLog: (role: string, content: string, persistNow?: boolean) => Promise<void>;
 }
 
@@ -211,25 +276,42 @@ class ResearchService {
       { url: z.string().describe('The URL to check for duplicates') },
       async ({ url }) => {
         const started = Date.now();
-        await emitCall('check_duplicate', { url });
-        const normalized = normalizeUrl(url);
-        const isDuplicate = ctx.existingUrls.has(normalized);
-        if (isDuplicate) {
-          ctx.consecutiveDuplicates++;
-          await db.update(researchJobs)
-            .set({ duplicatesSkipped: sql`${researchJobs.duplicatesSkipped} + 1` })
-            .where(eq(researchJobs.id, ctx.jobId));
-        } else {
-          ctx.consecutiveDuplicates = 0;
+        try {
+          await emitCall('check_duplicate', { url });
+          // Core check is in-memory (existingUrls Set) — it cannot fail on DB issues.
+          const normalized = normalizeUrl(url);
+          const isDuplicate = ctx.existingUrls.has(normalized);
+          if (isDuplicate) {
+            ctx.consecutiveDuplicates++;
+            await bestEffort(
+              db.update(researchJobs)
+                .set({ duplicatesSkipped: sql`${researchJobs.duplicatesSkipped} + 1` })
+                .where(eq(researchJobs.id, ctx.jobId)),
+              'duplicatesSkipped counter',
+            );
+          } else {
+            ctx.consecutiveDuplicates = 0;
+          }
+          // Opportunistic flush: if earlier saves were queued, retry them now.
+          await this.flushPendingDiscoveries(ctx);
+          let text = JSON.stringify({ isDuplicate, normalizedUrl: normalized });
+          if (isDuplicate && ctx.consecutiveDuplicates > 0 && ctx.consecutiveDuplicates % 3 === 0) {
+            text += `\n\n${STALL_PIVOT_NUDGE}`;
+            await ctx.addLog('system', `Stall nudge injected (${ctx.consecutiveDuplicates} consecutive duplicates).`);
+          }
+          await ctx.addLog('tool_result', `check_duplicate(${url}) → isDuplicate=${isDuplicate}`);
+          await emitResult('check_duplicate', text, Date.now() - started);
+          return { content: [{ type: 'text', text }] };
+        } catch (err: any) {
+          console.error(`[research:${ctx.jobId}] check_duplicate handler error:`, err?.message || err);
+          const text = JSON.stringify({
+            error: preview(String(err?.message || err), 300),
+            recoverable: true,
+            guidance: 'Transient internal issue — call check_duplicate once more for this URL; if it fails again, move on to other candidates. Never stop the run or wait for recovery.',
+          });
+          await emitResult('check_duplicate', text, Date.now() - started);
+          return { content: [{ type: 'text', text }] };
         }
-        let text = JSON.stringify({ isDuplicate, normalizedUrl: normalized });
-        if (isDuplicate && ctx.consecutiveDuplicates > 0 && ctx.consecutiveDuplicates % 3 === 0) {
-          text += `\n\n${STALL_PIVOT_NUDGE}`;
-          await ctx.addLog('system', `Stall nudge injected (${ctx.consecutiveDuplicates} consecutive duplicates).`);
-        }
-        await ctx.addLog('tool_result', `check_duplicate(${url}) → isDuplicate=${isDuplicate}`);
-        await emitResult('check_duplicate', text, Date.now() - started);
-        return { content: [{ type: 'text', text }] };
       },
     );
 
@@ -248,39 +330,80 @@ class ResearchService {
       },
       async (input) => {
         const started = Date.now();
-        await emitCall('save_discovery', { url: input.url, title: input.title, confidence: input.confidence });
-        const normalized = normalizeUrl(input.url);
-        let text: string;
-        if (ctx.discoveriesSaved >= ctx.discoveryCap) {
-          text = JSON.stringify({ saved: false, reason: `Discovery cap of ${ctx.discoveryCap} reached for this run. Wrap up and stop searching.` });
-        } else if (ctx.existingUrls.has(normalized)) {
-          text = JSON.stringify({ saved: false, reason: 'URL already exists (duplicate — you should have caught this with check_duplicate)' });
-        } else if ((input.confidence || 0) < 70) {
-          text = JSON.stringify({ saved: false, reason: `Confidence ${input.confidence} < 70 threshold. Find a higher-quality resource or justify a higher confidence.` });
-        } else {
-          const [discovery] = await db.insert(researchDiscoveries).values({
-            jobId: ctx.jobId,
-            title: input.title,
-            url: input.url,
-            description: input.description || '',
-            suggestedCategory: input.suggested_category || '',
-            suggestedSubcategory: input.suggested_subcategory || '',
-            suggestedSubSubcategory: input.suggested_sub_subcategory || '',
-            confidence: Math.round(input.confidence),
-            reasoning: input.reasoning || '',
-            status: 'pending_review',
-          }).returning();
+        const respond = async (payload: Record<string, any>) => {
+          const text = JSON.stringify(payload);
+          await emitResult('save_discovery', text, Date.now() - started);
+          return { content: [{ type: 'text' as const, text }] };
+        };
+        try {
+          await emitCall('save_discovery', { url: input.url, title: input.title, confidence: input.confidence });
+          const normalized = normalizeUrl(input.url);
+          if (ctx.discoveriesSaved >= ctx.discoveryCap) {
+            return await respond({ saved: false, reason: `Discovery cap of ${ctx.discoveryCap} reached for this run. Wrap up and stop searching.` });
+          }
+          if (ctx.existingUrls.has(normalized)) {
+            return await respond({ saved: false, reason: 'URL already exists (duplicate — you should have caught this with check_duplicate)' });
+          }
+          if ((input.confidence || 0) < 70) {
+            return await respond({ saved: false, reason: `Confidence ${input.confidence} < 70 threshold. Find a higher-quality resource or justify a higher confidence.` });
+          }
+
+          // Flush older queued items first so ordering is roughly preserved.
+          await this.flushPendingDiscoveries(ctx);
+
+          let discoveryId: number | null = null;
+          let lastErr: any = null;
+          for (let attempt = 1; attempt <= SAVE_RETRY_ATTEMPTS; attempt++) {
+            try {
+              discoveryId = await this.insertDiscovery(ctx, input);
+              lastErr = null;
+              break;
+            } catch (e: any) {
+              lastErr = e;
+              console.error(`[research:${ctx.jobId}] save_discovery attempt ${attempt}/${SAVE_RETRY_ATTEMPTS} failed:`, e?.message || e);
+              if (isNonRetryableDbError(e)) break; // permanent input failure — retrying identical input can never succeed
+              if (attempt < SAVE_RETRY_ATTEMPTS) await sleep(SAVE_RETRY_BASE_MS * attempt);
+            }
+          }
+
+          // Permanent rejection (Postgres data/integrity error): the row can
+          // never persist as-is, so do NOT queue it and do NOT mark the URL as
+          // saved — the model may fix the input (e.g. category) and retry.
+          if (discoveryId === null && isNonRetryableDbError(lastErr)) {
+            await ctx.addLog('system', `save_discovery permanently rejected by storage (${preview(String(lastErr?.message || lastErr), 200)}): ${input.title} — ${input.url}`, true);
+            return await respond({
+              saved: false,
+              reason: `Storage permanently rejected this save (${preview(String(lastErr?.message || lastErr), 200)}). Do NOT retry the identical input — fix the input or move on to other candidates. Never stop the run.`,
+            });
+          }
+
+          // Bookkeeping happens regardless of persistence outcome so the agent
+          // never re-saves the same URL and the cap semantics stay intact.
           ctx.existingUrls.add(normalized);
           ctx.discoveriesSaved++;
           ctx.consecutiveDuplicates = 0;
-          await db.update(researchJobs)
-            .set({ totalDiscoveries: sql`${researchJobs.totalDiscoveries} + 1` })
-            .where(eq(researchJobs.id, ctx.jobId));
-          text = JSON.stringify({ saved: true, discoveryId: discovery.id });
-          await ctx.addLog('discovery', `Saved: ${input.title} — ${input.url} (confidence ${input.confidence})`, true);
+
+          if (discoveryId !== null) {
+            await ctx.addLog('discovery', `Saved: ${input.title} — ${input.url} (confidence ${input.confidence})`, true);
+            return await respond({ saved: true, discoveryId });
+          }
+
+          // Storage briefly unavailable: queue in-memory and keep the run moving.
+          ctx.pendingDiscoveries.push({ input: { ...input }, normalizedUrl: normalized, queuedAt: new Date().toISOString() });
+          await ctx.addLog('system', `save_discovery queued after ${SAVE_RETRY_ATTEMPTS} failed attempts (${preview(String(lastErr?.message || lastErr), 200)}): ${input.title} — ${input.url}. Auto-flush will retry.`, true);
+          return await respond({
+            saved: true,
+            queued: true,
+            note: 'Storage was briefly busy, so this discovery is QUEUED server-side and will be persisted automatically. Treat this as saved: do NOT retry this URL, do NOT wait, do NOT stop — continue researching.',
+          });
+        } catch (err: any) {
+          console.error(`[research:${ctx.jobId}] save_discovery handler error:`, err?.message || err);
+          return await respond({
+            error: preview(String(err?.message || err), 300),
+            recoverable: true,
+            guidance: 'Transient internal issue — retry this save_discovery call once; if it fails again, continue with other candidates. Never stop the run or wait for recovery.',
+          });
         }
-        await emitResult('save_discovery', text, Date.now() - started);
-        return { content: [{ type: 'text', text }] };
       },
     );
 
@@ -290,11 +413,22 @@ class ResearchService {
       { limit: z.number().optional().describe('How many gap subcategories to return (default 15, max 30)') },
       async ({ limit }) => {
         const started = Date.now();
-        await emitCall('get_coverage_gaps', { limit });
-        const gaps = await getCoverageGaps(limit || 15);
-        const text = JSON.stringify({ gaps });
-        await emitResult('get_coverage_gaps', `${gaps.length} gaps`, Date.now() - started);
-        return { content: [{ type: 'text', text }] };
+        try {
+          await emitCall('get_coverage_gaps', { limit });
+          const gaps = await withTimeout(getCoverageGaps(limit || 15), TOOL_DB_TIMEOUT_MS, 'get_coverage_gaps query');
+          const text = JSON.stringify({ gaps });
+          await emitResult('get_coverage_gaps', `${gaps.length} gaps`, Date.now() - started);
+          return { content: [{ type: 'text', text }] };
+        } catch (err: any) {
+          console.error(`[research:${ctx.jobId}] get_coverage_gaps handler error:`, err?.message || err);
+          const text = JSON.stringify({
+            gaps: [],
+            degraded: true,
+            note: 'Gap data temporarily unavailable — use the TAXONOMY block in your system prompt (already sorted gap-first) and continue. Do not stop or wait.',
+          });
+          await emitResult('get_coverage_gaps', text, Date.now() - started);
+          return { content: [{ type: 'text', text }] };
+        }
       },
     );
 
@@ -307,15 +441,133 @@ class ResearchService {
       },
       async ({ category, limit }) => {
         const started = Date.now();
-        await emitCall('get_existing_resources', { category, limit });
-        const existing = await getExistingResourcesByCategory(category, limit || 30);
-        const text = JSON.stringify({ count: existing.length, resources: existing });
-        await emitResult('get_existing_resources', `${existing.length} resources`, Date.now() - started);
-        return { content: [{ type: 'text', text }] };
+        try {
+          await emitCall('get_existing_resources', { category, limit });
+          const existing = await withTimeout(getExistingResourcesByCategory(category, limit || 30), TOOL_DB_TIMEOUT_MS, 'get_existing_resources query');
+          const text = JSON.stringify({ count: existing.length, resources: existing });
+          await emitResult('get_existing_resources', `${existing.length} resources`, Date.now() - started);
+          return { content: [{ type: 'text', text }] };
+        } catch (err: any) {
+          console.error(`[research:${ctx.jobId}] get_existing_resources handler error:`, err?.message || err);
+          const text = JSON.stringify({
+            count: 0,
+            resources: [],
+            degraded: true,
+            note: 'Sample data temporarily unavailable — rely on check_duplicate per candidate (in-memory, always available) and continue. Do not stop or wait.',
+          });
+          await emitResult('get_existing_resources', text, Date.now() - started);
+          return { content: [{ type: 'text', text }] };
+        }
       },
     );
 
     return [checkDuplicate, saveDiscovery, coverageGaps, existingResources];
+  }
+
+  /** Insert one discovery row + bump the job counter. Throws on failure — callers decide retry/queue. */
+  private async insertDiscovery(ctx: ResearchRunContext, input: SaveDiscoveryInput): Promise<number> {
+    const rows = await withTimeout(
+      db.insert(researchDiscoveries).values({
+        jobId: ctx.jobId,
+        title: input.title,
+        url: input.url,
+        description: input.description || '',
+        suggestedCategory: input.suggested_category || '',
+        suggestedSubcategory: input.suggested_subcategory || '',
+        suggestedSubSubcategory: input.suggested_sub_subcategory || '',
+        // Clamp to the 1–100 contract so out-of-range model values can never
+        // trigger a permanent DB rejection (e.g. int4 overflow).
+        confidence: Math.min(100, Math.max(1, Math.round(input.confidence || 1))),
+        reasoning: input.reasoning || '',
+        status: 'pending_review',
+      }).onConflictDoNothing({ target: [researchDiscoveries.jobId, researchDiscoveries.url] }).returning(),
+      TOOL_DB_TIMEOUT_MS,
+      'save_discovery insert',
+    );
+    let id = rows[0]?.id;
+    if (id === undefined) {
+      // Conflict: an earlier timed-out attempt for this exact (job, url) already
+      // committed. Adopt that row instead of failing — closes the retry/flush
+      // double-insert race (backed by research_discoveries_job_url_uq).
+      const [existing] = await withTimeout(
+        db.select({ id: researchDiscoveries.id })
+          .from(researchDiscoveries)
+          .where(and(eq(researchDiscoveries.jobId, ctx.jobId), eq(researchDiscoveries.url, input.url)))
+          .limit(1),
+        TOOL_DB_TIMEOUT_MS,
+        'save_discovery conflict lookup',
+      );
+      if (!existing) throw new Error('save_discovery insert conflicted but no existing row was found');
+      console.log(`[research:${ctx.jobId}] save_discovery conflict — adopting existing row ${existing.id} for ${input.url}`);
+      return existing.id;
+    }
+    await bestEffort(
+      db.update(researchJobs)
+        .set({ totalDiscoveries: sql`${researchJobs.totalDiscoveries} + 1` })
+        .where(eq(researchJobs.id, ctx.jobId)),
+      'totalDiscoveries counter',
+    );
+    return id;
+  }
+
+  /**
+   * Retry persisting queued discoveries. Never throws; leaves unrecovered items
+   * in the queue. Bounded so a large queue can never wedge a tool call: stops
+   * at the FIRST transient failure (DB still unhealthy — the rest would fail
+   * too) and then backs off for FLUSH_BACKOFF_MS so subsequent tool calls skip
+   * flushing entirely. Permanently-rejected items are dumped to the persisted
+   * agent log (manual recovery data) and dropped instead of retrying forever.
+   */
+  private async flushPendingDiscoveries(ctx: ResearchRunContext, opts: { force?: boolean } = {}): Promise<{ flushed: number; remaining: number }> {
+    if (ctx.pendingDiscoveries.length === 0) return { flushed: 0, remaining: 0 };
+    if (!opts.force && Date.now() < ctx.flushBackoffUntil) {
+      return { flushed: 0, remaining: ctx.pendingDiscoveries.length };
+    }
+    const still: PendingDiscovery[] = [];
+    let flushed = 0;
+    let halted = false;
+    for (const item of ctx.pendingDiscoveries) {
+      if (halted) { still.push(item); continue; }
+      try {
+        const id = await this.insertDiscovery(ctx, item.input);
+        flushed++;
+        await ctx.addLog('discovery', `Saved (auto-flushed from retry queue, queued ${item.queuedAt}): ${item.input.title} — ${item.input.url} (discoveryId ${id})`, true);
+      } catch (e: any) {
+        if (isNonRetryableDbError(e)) {
+          const dump = JSON.stringify(item.input);
+          console.error(`[research:${ctx.jobId}] queued discovery permanently rejected (${e?.message || e}) — manual recovery data: ${dump}`);
+          await ctx.addLog('error', `Queued discovery permanently rejected by storage (${preview(String(e?.message || e), 200)}) — manual recovery data: ${dump}`, true);
+        } else {
+          still.push(item);
+          halted = true; // one bounded timeout per flush, not N×timeout
+        }
+      }
+    }
+    ctx.pendingDiscoveries.length = 0;
+    ctx.pendingDiscoveries.push(...still);
+    ctx.flushBackoffUntil = halted ? Date.now() + FLUSH_BACKOFF_MS : 0;
+    if (flushed > 0 || still.length > 0) {
+      console.log(`[research:${ctx.jobId}] pending-discovery flush: ${flushed} saved, ${still.length} still queued${halted ? ` (halted on transient failure, backoff ${FLUSH_BACKOFF_MS}ms)` : ''}`);
+    }
+    return { flushed, remaining: still.length };
+  }
+
+  /**
+   * Run-end safety net: retry the queue with backoff; anything STILL unsaved is
+   * dumped verbatim into the persisted agent log so no discovery is ever lost.
+   */
+  private async drainPendingDiscoveries(ctx: ResearchRunContext): Promise<void> {
+    for (let round = 0; round < 3 && ctx.pendingDiscoveries.length > 0; round++) {
+      if (round > 0) await sleep(2000 * round);
+      await this.flushPendingDiscoveries(ctx, { force: true });
+    }
+    if (ctx.pendingDiscoveries.length > 0) {
+      for (const item of ctx.pendingDiscoveries) {
+        const dump = JSON.stringify(item.input);
+        console.error(`[research:${ctx.jobId}] UNRECOVERED queued discovery (manual recovery data): ${dump}`);
+        await ctx.addLog('error', `Discovery could not be persisted after run-end retries — manual recovery data: ${dump}`, true);
+      }
+    }
   }
 
   async startResearchJob(options: {
@@ -407,7 +659,13 @@ class ResearchService {
     const agentLog: Array<{ role: string; content: string; timestamp: string }> = [];
     const persist = async (extra: Record<string, any> = {}) => {
       try {
-        await db.update(researchJobs).set({ agentLog, ...extra }).where(eq(researchJobs.id, jobId));
+        // Timeout-guarded: addLog(..., true) is awaited inside tool handlers,
+        // so a wedged pool hanging this update would stall the whole run.
+        await withTimeout(
+          db.update(researchJobs).set({ agentLog, ...extra }).where(eq(researchJobs.id, jobId)),
+          TOOL_DB_TIMEOUT_MS,
+          'agentLog persist',
+        );
       } catch (e: any) {
         console.error(`[research:${jobId}] persist failed:`, e.message);
       }
@@ -427,6 +685,8 @@ class ResearchService {
       discoveryCap,
       discoveriesSaved: 0,
       consecutiveDuplicates: 0,
+      pendingDiscoveries: [],
+      flushBackoffUntil: 0,
       addLog,
     };
 
@@ -495,6 +755,7 @@ R3. Skip anything from the SATURATED DOMAINS list unless the specific resource i
 R4. Skip generic intro articles, vendor marketing, and SEO listicles. Prefer maintained OSS, niche official docs, conference talks (Demuxed/IBC/NAB), academic papers (ACM/IEEE/arXiv), specialized tools, and technically-deep developer blogs.
 R5. Confidence < 70 → don't save. Quality > quantity.
 R6. Be persistent — the best resources live in the long tail. When a vein runs dry, pivot (different gap, mine a listicle's named tools, GitHub/Show HN/arXiv) and keep delegating. Wind down only once you've genuinely exhausted varied attempts across multiple gaps.
+R7. TOOLS NEVER GO OFFLINE: check_duplicate / save_discovery / get_coverage_gaps / get_existing_resources are in-process — persistence retries and queueing are handled automatically on the server. If a tool result contains queued:true or degraded:true, that IS success: keep going. If a tool result contains an error, retry that one call once, then move on. NEVER wait for a "tool server to recover", never hold candidates back for later, and never end the run early or ask the user what to do because of a tool response.
 
 Database state: ${ctx.totalResources} approved resources across ${ctx.totalDomains} distinct domains. Discovery cap this run: ${discoveryCap}.`;
 
@@ -507,22 +768,30 @@ Database state: ${ctx.totalResources} approved resources across ${ctx.totalDomai
       'SendMessage', 'ReportFindings',
     ];
 
-    const result = await runAgentQuery({
-      jobType: 'research',
-      jobId,
-      emitter,
-      prompt,
-      systemPrompt,
-      model: orchestratorModel,
-      config,
-      mcpServers: { research: mcpServer },
-      agents: { scout },
-      allowedTools,
-      maxTurns,
-      maxBudgetUsd,
-      abortController,
-      log: addLog,
-    });
+    let result!: Awaited<ReturnType<typeof runAgentQuery>>;
+    try {
+      result = await runAgentQuery({
+        jobType: 'research',
+        jobId,
+        emitter,
+        prompt,
+        systemPrompt,
+        model: orchestratorModel,
+        config,
+        mcpServers: { research: mcpServer },
+        agents: { scout },
+        allowedTools,
+        maxTurns,
+        maxBudgetUsd,
+        abortController,
+        log: addLog,
+      });
+    } finally {
+      // Whatever happened to the run (success, error, cancel), never lose
+      // queued discoveries: retry persistence, then dump unrecovered ones
+      // into the persisted agent log.
+      await this.drainPendingDiscoveries(runCtx);
+    }
 
     const [finalJob] = await db.select({
       totalDiscoveries: researchJobs.totalDiscoveries,

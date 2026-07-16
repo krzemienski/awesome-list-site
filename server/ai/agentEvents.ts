@@ -45,6 +45,23 @@ export interface EmitInput {
 
 const MAX_SUMMARY = 4000;
 
+/**
+ * Hard cap on how long one event insert may take. A wedged DB pool must never
+ * hang a caller awaiting emit() — tool handlers and run loops await emits, and
+ * an indefinite hang there reads to the agent as "the tool server is down".
+ */
+const EMIT_TIMEOUT_MS = 8000;
+
+function withEmitTimeout<T>(p: PromiseLike<T>): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const t = setTimeout(() => reject(new Error(`emit timed out after ${EMIT_TIMEOUT_MS}ms`)), EMIT_TIMEOUT_MS);
+    Promise.resolve(p).then(
+      (v) => { clearTimeout(t); resolve(v); },
+      (e) => { clearTimeout(t); reject(e); },
+    );
+  });
+}
+
 export class AgentEventEmitter {
   private seq = 0;
 
@@ -65,7 +82,7 @@ export class AgentEventEmitter {
   async emit(e: EmitInput): Promise<void> {
     const seq = this.seq++;
     try {
-      await db.insert(agentEvents).values({
+      await withEmitTimeout(db.insert(agentEvents).values({
         jobType: this.jobType,
         jobId: this.jobId,
         seq,
@@ -80,7 +97,7 @@ export class AgentEventEmitter {
         tokensOut: e.tokensOut ?? null,
         costUsd: e.costUsd ?? null,
         durationMs: e.durationMs ?? null,
-      });
+      }));
     } catch (err: any) {
       console.error(
         `[agentEvents:${this.jobType}:${this.jobId}] emit failed (seq ${seq}, ${e.eventType}):`,

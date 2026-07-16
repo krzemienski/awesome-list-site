@@ -1,0 +1,21 @@
+Harness job id: 21
+PASS  T1 check_duplicate fresh URL -> isDuplicate=false
+PASS  T2 save_discovery happy path -> saved:true + row in DB — discoveryId=27
+PASS  T3 check_duplicate after save -> isDuplicate=true
+PASS  T4 duplicate save -> saved:false
+[research:21] save_discovery attempt 1/3 failed: value "3000000000" is out of range for type integer
+[research:21] save_discovery attempt 2/3 failed: value "3000000000" is out of range for type integer
+[research:21] save_discovery attempt 3/3 failed: value "3000000000" is out of range for type integer
+PASS  T5 real DB failure -> handler does NOT throw
+PASS  T5 real DB failure -> queued:true response — {"saved":true,"queued":true,"note":"Storage was briefly busy, so this discovery is QUEUED server-side and will be persisted automatically. Treat this as saved: do NOT retry this URL, do NOT wait, do NOT stop — continue researching."}
+PASS  T5 pendingDiscoveries queue holds the candidate
+[research:21] pending-discovery flush: 0 saved, 1 still queued
+[research:21] pending-discovery flush: 0 saved, 1 still queued
+[research:21] pending-discovery flush: 0 saved, 1 still queued
+[research:21] UNRECOVERED queued discovery (manual recovery data): {"title":"QA Overflow Candidate","url":"https://qa-resilience.example.com/overflow-1784170884016","description":"forces int4 overflow","suggested_category":"Encoding & Codecs","confidence":3000000000,"reasoning":"real DB failure path"}
+PASS  T6 drain dumps recovery data into persisted agent log
+PASS  T7 get_coverage_gaps returns gaps — 5 gaps
+PASS  T8 get_existing_resources returns data — count=5
+Cleanup done (harness job, discoveries, agent events removed).
+
+RESULT: 10 passed, 0 failed
