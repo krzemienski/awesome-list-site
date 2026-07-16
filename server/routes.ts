@@ -493,8 +493,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     message: { message: "Too many attempts. Please try again later." },
   });
 
+  // BUG-008 (run11): strict per-minute burst limiter on login only —
+  // max 5 attempts per IP per minute, 429 + Retry-After. Layered under the
+  // 15-minute cluster limiter and the per-account cooldown (checkLock).
+  const loginBurstLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    limit: 5,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { message: "Too many login attempts. Please try again in a minute." },
+  });
+
+  // NEW-051 (run11): public resource-read rate limit — 100 requests per IP
+  // per minute across the public GET resource surfaces, 429 + Retry-After.
+  // Generous enough for real browsing (a page load issues a handful of calls);
+  // caps scraping/abuse.
+  const resourceReadLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    limit: 100,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { message: "Too many requests. Please slow down and try again shortly." },
+  });
+
   // Local authentication routes
-  app.post("/api/auth/local/login", authLimiter, (req, res, next) => {
+  app.post("/api/auth/local/login", loginBurstLimiter, authLimiter, (req, res, next) => {
     const loginEmail = typeof req.body?.email === "string" ? req.body.email : "";
 
     // Brute-force guard: short-circuit while the account is in a cooldown window.
@@ -889,7 +912,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     stripInternalResourceFields(r);
 
   // GET /api/resources - List approved resources (public)
-  app.get('/api/resources', async (req, res) => {
+  app.get('/api/resources', resourceReadLimiter, async (req, res) => {
     try {
       // Support explicit offset/limit for pagination (BUG-003). When offset is
       // provided, it overrides `page`. Clamp to safe integers; reject non-numeric
@@ -1164,10 +1187,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: 'Failed to fetch resource' });
     }
   };
-  app.get('/api/resources/:id(\\d+)', getResourceByIdHandler);
-  app.get('/api/resource/:id(\\d+)', getResourceByIdHandler);
+  app.get('/api/resources/:id(\\d+)', resourceReadLimiter, getResourceByIdHandler);
+  app.get('/api/resource/:id(\\d+)', resourceReadLimiter, getResourceByIdHandler);
 
-  app.get('/api/resources/:id/related', async (req, res) => {
+  app.get('/api/resources/:id/related', resourceReadLimiter, async (req, res) => {
     const empty = { similar: [], prerequisites: [], nextSteps: [], totalFound: 0 };
     try {
       const id = parseInt(req.params.id);

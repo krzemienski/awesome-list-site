@@ -1,0 +1,23 @@
+== NEW-051 run11: 101 rapid GETs to /api/resources?limit=1 from one IP (limit 100/min) — 2026-07-16T01:10:58Z ==
+    100 200
+      1 429
+--- request 101 status + headers ---
+HTTP/1.1 429 Too Many Requests
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+RateLimit-Policy: 100;w=60
+RateLimit-Limit: 100
+RateLimit-Remaining: 0
+RateLimit-Reset: 55
+Retry-After: 55
+Content-Type: application/json; charset=utf-8
+Content-Length: 72
+ETag: W/"48-YxRINhUrX3ES/+UUwcIqfwzftrU"
+Date: Thu, 16 Jul 2026 01:11:04 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+HTTP_STATUS=429
+--- body ---
+{"message":"Too many requests. Please slow down and try again shortly."}

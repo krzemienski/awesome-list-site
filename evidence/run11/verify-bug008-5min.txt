@@ -1,0 +1,36 @@
+== BUG-008 run11: 6 rapid bad login attempts from one IP (limit 5/min) — 2026-07-16T01:08:21Z ==
+--- attempt 1 ---
+HTTP_STATUS=401
+{"message":"Invalid email or password"}
+--- attempt 2 ---
+HTTP_STATUS=401
+{"message":"Invalid email or password"}
+--- attempt 3 ---
+HTTP_STATUS=401
+{"message":"Invalid email or password"}
+--- attempt 4 ---
+HTTP_STATUS=401
+{"message":"Invalid email or password"}
+--- attempt 5 ---
+HTTP_STATUS=401
+{"message":"Invalid email or password"}
+--- attempt 6 ---
+HTTP_STATUS=429
+{"message":"Too many login attempts. Please try again in a minute."}
+--- attempt 6 headers ---
+HTTP/1.1 429 Too Many Requests
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+RateLimit-Policy: 5;w=60
+RateLimit-Limit: 5
+RateLimit-Remaining: 0
+RateLimit-Reset: 60
+Retry-After: 60
+Content-Type: application/json; charset=utf-8
+Content-Length: 68
+ETag: W/"44-W+gZm6M4n6IKmPtxpaB0rj1yDpk"
+Date: Thu, 16 Jul 2026 01:08:29 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+

@@ -14,7 +14,7 @@ Legend: **FIXED** (code changed + verified this run) · **FIXED-PRIOR** (already
 | BUG-005 | HIGH | PLATFORM | "Continue with Replit" frame-detachment is the Replit dev-preview iframe context, not app code. |
 | BUG-006 | HIGH | DECLINED | 409 on duplicate register kept; new IP rate limiter (run10) is the compensating control against enumeration. |
 | BUG-007 | HIGH | DECLINED | No email transport configured; cannot gate activation on verification. |
-| BUG-008 | HIGH | FIXED-PRIOR | IP rate limiting on auth cluster (express-rate-limit 20/15min + per-account lockout), run10. Needs republish. |
+| BUG-008 | HIGH | **FIXED** | Tightened to spec this run: dedicated 5/min/IP burst limiter on login (layered on the run10 20/15min cluster limiter + per-account lockout). Live: attempts 1–5 → 401, attempt 6 → 429 with `Retry-After: 60` (`verify-bug008-5min.txt`). |
 | BUG-010 | HIGH | FIXED | See BUG-010-P. |
 | BUG-012 | HIGH | PLATFORM | Feedback widget reopen — Replit widget. |
 | BUG-014 | HIGH | INVALID | Mobile sidebar uses shadcn `Sheet` whose overlay closes on outside-tap + Esc by default. |
@@ -105,7 +105,7 @@ Legend: **FIXED** (code changed + verified this run) · **FIXED-PRIOR** (already
 | NEW-048 | LOW | BY-DESIGN | Emoji search returns legitimate substring matches. |
 | NEW-049 | LOW | FIXED-PRIOR | Search hint copy already states the 2-char minimum. |
 | NEW-050 | LOW | FIXED | Same as BUG-010-P — disabled form/button styling. |
-| NEW-051 | LOW | DECLINED | 100/min IP limit on `/api/resources` risks throttling the app's own multi-request page loads; auth endpoints already limited. |
+| NEW-051 | LOW | **FIXED** | Implemented per audit spec: 100 req/IP/min limiter on public resource GETs (`/api/resources`, `/api/resources/:id`, `/api/resource/:id`, `/:id/related`). Live: 101 rapid requests → exactly 100×200 then 429 with `Retry-After` (`verify-new051-resource-ratelimit.txt`). Admin/auth routes unaffected; valid login regression-checked 200. |
 | NEW-052 | LOW | BY-DESIGN | API SQL count vs client Fuse count differ by design (different engines). |
 | NEW-053 | LOW | FIXED-PRIOR | Safe `?next=` login redirect for /admin (run10 BUG-027). |
 | NEW-054 | LOW | FIXED-PRIOR | Same `?next=` mechanism covers journey pages. |
@@ -123,9 +123,9 @@ Legend: **FIXED** (code changed + verified this run) · **FIXED-PRIOR** (already
 
 ## Summary
 
-- **FIXED this run (10 code fixes, live-verified):** NEW-008, NEW-009, NEW-012, NEW-017, NEW-019, NEW-033, NEW-034, NEW-043, NEW-044, plus PARTIAL completions BUG-010-P / BUG-013-P / BUG-025-P.
+- **FIXED this run (12 code fixes, live-verified):** BUG-008 (5/min login burst limiter), NEW-008, NEW-009, NEW-012, NEW-017, NEW-019, NEW-033, NEW-034, NEW-043, NEW-044, NEW-051 (100/min resource-read limiter), plus PARTIAL completions BUG-010-P / BUG-013-P / BUG-025-P.
 - **Server changes** (`server/routes.ts`, `server/repositories/CategoryRepository.ts`, `server/repositories/LegacyRepository.ts`, `server/api/public.ts`, new `server/lib/publicResource.ts`): page validation (400 invalid_page), null-byte stripping, shared `stripInternalResourceFields` serializer applied at every public send site (searchTsv removed from list/search/detail/related/awesome-list/public API — 0 across 7 surfaces), pagination metadata, `GET /api/auth/me`, global subcategory-slug filter.
 - **Client changes:** AIAI label, sidebar `80vw` + localStorage persistence, generic duplicate-URL message, SPA `/logout` route (R3-10 completion — client-side nav to `/logout` previously 404'd; now posts `/api/auth/logout` and hard-redirects home; direct nav already handled by server GET `/logout` 302). Proof: `evidence/run11/verify-logout.txt` (curl journey: login 200 → authed 200 → GET /logout 302 → `{"user":null,"isAuthenticated":false}`, cookie jar empty; Playwright SPA pushState journey PASS via `scripts/verify-spa-logout.mjs`).
-- **Not code defects:** platform (Replit feedback widget) ×10, invalid ×13, by-design ×20, data ×6, declined ×4, fixed-prior ×14.
+- **Not code defects:** platform (Replit feedback widget) ×10, invalid ×13, by-design ×20, data ×6, declined ×2 (BUG-006 enumeration message / BUG-007 email verification — both require a real email transport; 5/min login limiter is the compensating control), fixed-prior ×13.
 - **Needs republish** to reach production (server + client fixes).
 - Security regression: SQLi (login 401 / register 400), null-byte (200), emoji (200), page abuse (400) — all handled, none return 500. `evidence/run11/verify-server-fixes.txt`.
