@@ -755,17 +755,23 @@ R3. Skip anything from the SATURATED DOMAINS list unless the specific resource i
 R4. Skip generic intro articles, vendor marketing, and SEO listicles. Prefer maintained OSS, niche official docs, conference talks (Demuxed/IBC/NAB), academic papers (ACM/IEEE/arXiv), specialized tools, and technically-deep developer blogs.
 R5. Confidence < 70 → don't save. Quality > quantity.
 R6. Be persistent — the best resources live in the long tail. When a vein runs dry, pivot (different gap, mine a listicle's named tools, GitHub/Show HN/arXiv) and keep delegating. Wind down only once you've genuinely exhausted varied attempts across multiple gaps.
-R7. TOOLS NEVER GO OFFLINE: check_duplicate / save_discovery / get_coverage_gaps / get_existing_resources are in-process — persistence retries and queueing are handled automatically on the server. If a tool result contains queued:true or degraded:true, that IS success: keep going. If a tool result contains an error, retry that one call once, then move on. NEVER wait for a "tool server to recover", never hold candidates back for later, and never end the run early or ask the user what to do because of a tool response.
+R7. TOOLS ARE RESILIENT BUT NOT INDESTRUCTIBLE: check_duplicate / save_discovery / get_coverage_gaps / get_existing_resources are in-process — persistence retries and queueing are handled automatically on the server. If a tool result contains queued:true or degraded:true, that IS success: keep going. If a tool result contains an error field, retry that one call once, then move on to other candidates. NEVER wait for tools to "recover", never hold candidates back, and never end the run early because of a tool response. If tools truly stop responding entirely the server will terminate the run automatically — that is not your concern.
 
 Database state: ${ctx.totalResources} approved resources across ${ctx.totalDomains} distinct domains. Discovery cap this run: ${discoveryCap}.`;
 
+    // Only the blocking `Task` primitive is allowed for delegation — NOT the
+    // async management set (TaskCreate/TaskList/TaskOutput/etc.). Async
+    // delegation lets the orchestrator end its turn while scouts are still
+    // running; the SDK treats that as run completion and the subsequent
+    // auto-resume kills the in-process MCP bridge (tools go dead for the
+    // remainder of the run). Blocking Task keeps the entire run inside a single
+    // SDK lifecycle event, so the MCP bridge stays alive throughout.
     const allowedTools = [
       'mcp__research__check_duplicate',
       'mcp__research__save_discovery',
       'mcp__research__get_coverage_gaps',
       'mcp__research__get_existing_resources',
-      'Task', 'TaskCreate', 'TaskGet', 'TaskList', 'TaskOutput', 'TaskStop', 'TaskUpdate',
-      'SendMessage', 'ReportFindings',
+      'Task',
     ];
 
     let result!: Awaited<ReturnType<typeof runAgentQuery>>;

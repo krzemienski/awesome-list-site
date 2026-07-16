@@ -48,6 +48,14 @@ const BASELINE_DISALLOWED_TOOLS = [
 // edges. Everything else built-in (e.g. ToolSearch discovery) is noise.
 const GRAPHED_BUILTIN_TOOLS = new Set(["WebSearch"]);
 
+/**
+ * Circuit breaker: how many consecutive MCP tool_use calls (seen in assistant
+ * messages) without a matching handler-emitted tool_result before we abort the
+ * run with a clear error. This fires when the in-process MCP bridge is dead
+ * (e.g. after a spurious SDK resume) so the model can't retry indefinitely.
+ */
+const MCP_CIRCUIT_BREAKER_THRESHOLD = 12;
+
 export interface AgentDefinitionInput {
   description: string;
   prompt: string;
@@ -164,6 +172,24 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
     webSearchCount: 0,
   };
 
+  // ── Circuit breaker: track MCP tool_use calls that never get a handler
+  // response. The emitter hook decrements when any tool_result is emitted
+  // (handlers fire this on every call, success or error). If the count climbs
+  // past the threshold the in-process MCP bridge is assumed dead.
+  let mcpCallsWithoutResult = 0;
+  emitter.setAfterEmitHook((e) => {
+    if (e.eventType === "tool_result") {
+      mcpCallsWithoutResult = 0;
+    }
+  });
+
+  // ── Task attribution: map task_id → actor name so task_updated /
+  // task_notification events resolve the real subagent name instead of null.
+  const taskActorMap = new Map<string, string>();
+  // Track how many delegations are currently in-flight so we can warn if the
+  // SDK emits a result message while scouts are still running.
+  let outstandingDelegations = 0;
+
   const stderrLines: string[] = [];
   let terminalSdkError = false;
   const q = query({
@@ -219,23 +245,53 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
             msg.subtype === "task_updated" ||
             msg.subtype === "task_notification"
           ) {
-            const targetActor = msg.subagent_type || msg.agent_type || null;
+            // Resolve actor name: task_started carries the subagent type; later
+            // events carry only task_id — look up the name from the start event.
+            const rawActor = msg.subagent_type || msg.agent_type || null;
+            const taskId: string | null = msg.task_id ? String(msg.task_id) : null;
+
+            let targetActor: string | null = rawActor;
+            if (msg.subtype === "task_started") {
+              if (taskId && rawActor) taskActorMap.set(taskId, rawActor);
+              outstandingDelegations++;
+            } else {
+              // For updates/notifications prefer the stored name (rawActor may be null).
+              if (taskId && taskActorMap.has(taskId)) targetActor = taskActorMap.get(taskId)!;
+            }
+
             const isStart = msg.subtype === "task_started";
-            const summary =
-              msg.description ||
-              msg.summary ||
-              (isStart ? `Delegating to ${targetActor}` : `Update from ${targetActor}`);
-            await emitter.emit({
-              actor: "orchestrator",
-              actorType: "orchestrator",
-              eventType: isStart ? "delegation" : "delegation_result",
-              targetActor,
-              summary: preview(String(summary)),
-              tokensIn: msg.usage?.input_tokens ?? null,
-              tokensOut: msg.usage?.output_tokens ?? null,
-              detail: { subtype: msg.subtype, task_id: msg.task_id },
-            });
-            await mirror("delegation", `[${msg.subtype}] ${targetActor || ""}: ${preview(String(summary), 200)}`);
+            // A task_notification arriving after we already emitted delegation_result
+            // for this task_id is a duplicate placeholder — suppress it.
+            const isDuplicateResult =
+              !isStart && taskId && !taskActorMap.has(taskId);
+            // Mark task done when we see a completion/result notification so we
+            // can track outstanding delegations accurately.
+            const looksLikeCompletion =
+              !isStart &&
+              (msg.subtype === "task_notification" ||
+                (typeof msg.summary === "string" && /complet|finish|done|result/i.test(msg.summary)));
+            if (looksLikeCompletion && taskId) {
+              taskActorMap.delete(taskId);
+              outstandingDelegations = Math.max(0, outstandingDelegations - 1);
+            }
+
+            if (!isDuplicateResult) {
+              const summary =
+                msg.description ||
+                msg.summary ||
+                (isStart ? `Delegating to ${targetActor}` : `Update from ${targetActor}`);
+              await emitter.emit({
+                actor: "orchestrator",
+                actorType: "orchestrator",
+                eventType: isStart ? "delegation" : "delegation_result",
+                targetActor,
+                summary: preview(String(summary)),
+                tokensIn: msg.usage?.input_tokens ?? null,
+                tokensOut: msg.usage?.output_tokens ?? null,
+                detail: { subtype: msg.subtype, task_id: taskId },
+              });
+              await mirror("delegation", `[${msg.subtype}] ${targetActor || ""}: ${preview(String(msg.description || msg.summary || ""), 200)}`);
+            }
           }
           break;
         }
@@ -252,6 +308,14 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
           const combinedText = textBlocks.map((b) => b.text).join("\n").trim();
           const toolNames = toolUseBlocks.map((b) => b.name);
 
+          // Token accounting: include cache read + creation tokens in tokensIn so
+          // the event log shows total input consumption, not just non-cached tokens.
+          // (Without this, most rows appear as "in 2 / out 2" due to cache hits.)
+          const cacheRead = usage?.cache_read_input_tokens ?? 0;
+          const cacheCreation = usage?.cache_creation_input_tokens ?? 0;
+          const rawIn = usage?.input_tokens ?? null;
+          const totalTokensIn = rawIn !== null ? rawIn + cacheRead + cacheCreation : null;
+
           await emitter.emit({
             actor,
             actorType,
@@ -260,13 +324,14 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
             summary:
               combinedText ||
               (toolNames.length ? `→ tools: ${toolNames.join(", ")}` : "(no text)"),
-            tokensIn: usage?.input_tokens ?? null,
+            tokensIn: totalTokensIn,
             tokensOut: usage?.output_tokens ?? null,
             detail: {
               parent_tool_use_id: msg.parent_tool_use_id ?? null,
               tools: toolNames,
-              cache_read: usage?.cache_read_input_tokens ?? 0,
-              cache_creation: usage?.cache_creation_input_tokens ?? 0,
+              cache_read: cacheRead,
+              cache_creation: cacheCreation,
+              input_tokens_raw: rawIn,
             },
           });
           if (combinedText) await mirror(actor === "orchestrator" ? "assistant" : `assistant:${actor}`, combinedText);
@@ -283,6 +348,29 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
           for (const tb of toolUseBlocks) {
             const name: string = tb.name;
             if (name === "WebSearch") result.webSearchCount++;
+
+            // Circuit breaker: count mcp__ tool_use calls that haven't been
+            // answered by a handler-side tool_result. The afterEmitHook resets
+            // this counter whenever a tool_result is emitted.
+            if (name.startsWith("mcp__")) {
+              mcpCallsWithoutResult++;
+              if (mcpCallsWithoutResult >= MCP_CIRCUIT_BREAKER_THRESHOLD) {
+                const cbMsg =
+                  `MCP tool bridge appears dead: ${mcpCallsWithoutResult} consecutive ` +
+                  `mcp__ tool calls received no handler response. Aborting run to stop ` +
+                  `burning budget on futile retries.`;
+                await emitter.emit({
+                  actor: "orchestrator",
+                  actorType: "system",
+                  eventType: "error",
+                  summary: cbMsg,
+                  detail: { circuit_breaker: true, mcpCallsWithoutResult, tool: name },
+                });
+                await mirror("error", cbMsg);
+                abortController.abort();
+              }
+            }
+
             // Custom mcp__ tools emit their own richer tool_call/result from the
             // handler; only surface graphed built-ins here to avoid duplicates.
             if (GRAPHED_BUILTIN_TOOLS.has(name)) {
@@ -327,6 +415,23 @@ export async function runAgentQuery(params: RunAgentQueryParams): Promise<RunAge
                 msg.is_error === true ? "Agent SDK returned an error result" : result.subtype;
             }
           }
+
+          // Warn if the SDK signals completion while delegations are still tracked
+          // as in-flight. This is the "premature end" pattern: the orchestrator
+          // ended its turn while scouts were still running, so the SDK treated it
+          // as run completion. Removing async task tools (TaskCreate etc.) from
+          // allowedTools prevents this, but log it for observability if it occurs.
+          if (outstandingDelegations > 0 && msg.subtype === "success") {
+            await emitter.emit({
+              actor: "orchestrator",
+              actorType: "system",
+              eventType: "lifecycle",
+              summary: `WARNING: run completed with ${outstandingDelegations} delegation(s) still marked in-flight. ` +
+                `This may indicate premature SDK termination — check that only the blocking Task tool is enabled.`,
+              detail: { outstanding_delegations: outstandingDelegations, subtype: msg.subtype },
+            });
+          }
+
           await emitter.emit({
             actor: "orchestrator",
             actorType: "system",

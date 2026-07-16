@@ -118,7 +118,20 @@ export function AgentEventLog({ jobType, jobId, isActive, height = "360px" }: Ag
                   {(ev.model || ev.tokensIn != null || ev.tokensOut != null || ev.costUsd || ev.durationMs != null) && (
                     <div className="flex gap-3 pl-[72px] mt-0.5 text-[10px] text-muted-foreground flex-wrap">
                       {ev.model && <span>{ev.model}</span>}
-                      {ev.tokensIn != null && <span>in {ev.tokensIn.toLocaleString()}</span>}
+                      {ev.tokensIn != null && (
+                        <span title={
+                          (ev.detail && typeof ev.detail === "object" && (ev.detail as any).cache_read != null)
+                            ? `raw: ${(ev.detail as any).input_tokens_raw ?? "?"} + cache_read: ${(ev.detail as any).cache_read ?? 0} + cache_creation: ${(ev.detail as any).cache_creation ?? 0}`
+                            : undefined
+                        }>
+                          in {ev.tokensIn.toLocaleString()}
+                          {ev.detail && typeof ev.detail === "object" && ((ev.detail as any).cache_read > 0 || (ev.detail as any).cache_creation > 0) && (
+                            <span className="opacity-60 ml-1">
+                              ({(ev.detail as any).cache_read > 0 ? `↩${((ev.detail as any).cache_read as number).toLocaleString()} ` : ""}{(ev.detail as any).cache_creation > 0 ? `⊕${((ev.detail as any).cache_creation as number).toLocaleString()}` : ""})
+                            </span>
+                          )}
+                        </span>
+                      )}
                       {ev.tokensOut != null && <span>out {ev.tokensOut.toLocaleString()}</span>}
                       {ev.costUsd && <span>${ev.costUsd}</span>}
                       {ev.durationMs != null && <span>{ev.durationMs}ms</span>}

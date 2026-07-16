@@ -64,6 +64,7 @@ function withEmitTimeout<T>(p: PromiseLike<T>): Promise<T> {
 
 export class AgentEventEmitter {
   private seq = 0;
+  private afterEmitHook: ((e: EmitInput) => void) | null = null;
 
   constructor(
     private readonly jobType: JobType,
@@ -73,6 +74,15 @@ export class AgentEventEmitter {
   /** Next sequence number that will be assigned (for diagnostics). */
   get currentSeq(): number {
     return this.seq;
+  }
+
+  /**
+   * Register a lightweight synchronous hook called after every successful emit.
+   * Used by runAgentQuery to intercept tool_result events for circuit-breaker
+   * accounting without requiring handlers to know about the breaker.
+   */
+  setAfterEmitHook(cb: (e: EmitInput) => void): void {
+    this.afterEmitHook = cb;
   }
 
   /**
@@ -98,6 +108,9 @@ export class AgentEventEmitter {
         costUsd: e.costUsd ?? null,
         durationMs: e.durationMs ?? null,
       }));
+      if (this.afterEmitHook) {
+        try { this.afterEmitHook(e); } catch { /* hook must never break the run */ }
+      }
     } catch (err: any) {
       console.error(
         `[agentEvents:${this.jobType}:${this.jobId}] emit failed (seq ${seq}, ${e.eventType}):`,
