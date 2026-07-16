@@ -310,6 +310,12 @@ function CategoryAccordion({
           ref={bodyRef}
           className="accordion-body"
           style={{ maxHeight: isOpen ? Math.max(expandedHeight, measuredHeight) : 0 }}
+          /* BUG-019 (run14): collapsed bodies are max-height:0 clipped but the
+             links inside stayed in the tab order — keyboard focus vanished
+             into invisible targets. `inert` removes the whole subtree from
+             focus + the a11y tree while collapsed. Lowercase attribute string
+             (not boolean) so React 18 passes it through to the DOM. */
+          {...(!isOpen ? ({ inert: "" } as any) : {})}
         >
           <div className="accordion-body-inner">
             {/* P4 — removed "All in {cat.name} →" link; not present in ref 09/10.
@@ -372,6 +378,9 @@ function CategoryAccordion({
                       style={{
                         maxHeight: subOpen ? subSubs.length * 32 + 8 : 0,
                       }}
+                      /* BUG-019 (run14): same inert treatment for collapsed
+                         sub-subcategory lists. */
+                      {...(!subOpen ? ({ inert: "" } as any) : {})}
                     >
                       <div
                         style={{

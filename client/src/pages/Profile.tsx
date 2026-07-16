@@ -197,7 +197,10 @@ export default function Profile({ user }: ProfileProps) {
       label: "Learning Streak",
       value: `${progress?.streakDays || 0}d`,
       icon: Trophy,
-      color: "text-yellow-500"
+      color: "text-yellow-500",
+      // BUG-052 (run14): streak counts consecutive days signed in, not
+      // resources viewed — say so, or "2d streak / 0 viewed" reads broken.
+      hint: "Consecutive days signed in",
     },
     {
       label: "Resources Viewed",
@@ -291,6 +294,12 @@ export default function Profile({ user }: ProfileProps) {
                 <div>
                   <p className="text-2xl font-bold">{stat.value}</p>
                   <p className="text-xs text-muted-foreground">{stat.label}</p>
+                  {/* BUG-052 (run14): explain what feeds the metric. */}
+                  {"hint" in stat && stat.hint && (
+                    <p className="text-[10px] text-muted-foreground/70" data-testid={`stat-hint-${stat.label.toLowerCase().replace(/\s+/g, "-")}`}>
+                      {stat.hint}
+                    </p>
+                  )}
                 </div>
               </CardContent>
             </Card>

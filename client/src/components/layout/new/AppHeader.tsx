@@ -162,16 +162,19 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
       />
       <Separator orientation="vertical" className="mr-1 sm:mr-2 h-4 hidden sm:block" />
 
-      <Breadcrumb className="hidden md:flex">
-        <BreadcrumbList>
+      {/* BUG-017 (run14): breadcrumb must stay on ONE line inside the fixed
+          60px header — at 768px the wrapping chain clipped off-screen. The
+          list is nowrap + overflow-hidden and every crumb truncates. */}
+      <Breadcrumb className="hidden md:flex min-w-0 shrink overflow-hidden">
+        <BreadcrumbList className="flex-nowrap overflow-hidden">
           {crumbs.flatMap((crumb, i) => {
             const isLast = i === crumbs.length - 1;
             const nodes = [
-              <BreadcrumbItem key={`${crumb.href}-item`}>
+              <BreadcrumbItem key={`${crumb.href}-item`} className="min-w-0">
                 {isLast ? (
-                  <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
+                  <BreadcrumbPage className="truncate">{crumb.label}</BreadcrumbPage>
                 ) : (
-                  <BreadcrumbLink href={crumb.href}>{crumb.label}</BreadcrumbLink>
+                  <BreadcrumbLink href={crumb.href} className="truncate">{crumb.label}</BreadcrumbLink>
                 )}
               </BreadcrumbItem>,
             ];

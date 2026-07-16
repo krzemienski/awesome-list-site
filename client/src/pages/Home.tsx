@@ -262,7 +262,12 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
           Awesome Video Resources
         </h1>
         <p className="text-sm sm:text-base text-[color:var(--text-2)] max-w-3xl">
-          Explore {filteredCategories.length} categories with {totalResourceCount.toLocaleString()} curated resources.
+          {/* BUG-027 (run14): with a tag filter active BOTH numbers reflect the
+              filter — mixing a filtered category count with the global resource
+              total read as nonsense ("7 categories with 2,140 resources"). */}
+          {selectedTags.length > 0
+            ? `Showing ${filteredCategories.reduce((sum, c) => sum + c.displayCount, 0).toLocaleString()} matching resource${filteredCategories.reduce((sum, c) => sum + c.displayCount, 0) === 1 ? "" : "s"} across ${filteredCategories.length} categor${filteredCategories.length === 1 ? "y" : "ies"}.`
+            : `Explore ${filteredCategories.length} categories with ${totalResourceCount.toLocaleString()} curated resources.`}
         </p>
       </div>
 
@@ -315,7 +320,10 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
           return (
             <Link
               key={category.slug}
-              href={`/category/${category.slug}`}
+              // BUG-025 (run14): active tag filter survives the drill-down —
+              // Category reads ?tags= on mount, so the chip journey ends on a
+              // tag-filtered resource list instead of silently unfiltering.
+              href={`/category/${category.slug}${selectedTags.length > 0 ? `?tags=${encodeURIComponent(selectedTags.join(","))}` : ""}`}
               aria-label={`View ${category.name} category with ${totalCount} resources`}
               data-testid={`link-category-${category.slug}`}
               className="block outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)] rounded-[var(--radius)]"

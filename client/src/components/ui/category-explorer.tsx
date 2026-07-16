@@ -265,7 +265,10 @@ export default function CategoryExplorer({ categories, resources, className }: C
             <Card key={category.name} className="hover:shadow-md transition-shadow">
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
-                  <div className="flex-1">
+                  {/* BUG-015 (run14): min-w-0 + flex-wrap + nowrap spans — at
+                      768px the unwrappable stat row overflowed the card edge
+                      and bled into the neighbor ("202"+"371" → "20371"). */}
+                  <div className="flex-1 min-w-0">
                     <CardTitle className="text-lg flex items-center gap-2">
                       <Button
                         variant="ghost"
@@ -275,18 +278,18 @@ export default function CategoryExplorer({ categories, resources, className }: C
                       >
                         {category.name}
                       </Button>
-                      <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                      <ExternalLink className="h-4 w-4 text-muted-foreground shrink-0" />
                     </CardTitle>
-                    <div className="flex items-center gap-4 mt-2">
-                      <span className="text-sm text-muted-foreground">
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2">
+                      <span className="text-sm text-muted-foreground whitespace-nowrap">
                         {stats.totalResources} resources
                       </span>
                       {stats.subcategoryCount > 0 && (
-                        <span className="text-sm text-muted-foreground">
+                        <span className="text-sm text-muted-foreground whitespace-nowrap">
                           {stats.subcategoryCount} subcategories
                         </span>
                       )}
-                      <span className="text-sm text-muted-foreground">
+                      <span className="text-sm text-muted-foreground whitespace-nowrap">
                         {stats.uniqueTags} tags
                       </span>
                     </div>

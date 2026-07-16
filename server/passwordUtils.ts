@@ -11,6 +11,11 @@ export async function comparePassword(password: string, hashedPassword: string):
 }
 
 export function validateEmail(email: string): boolean {
+  // BUG-035 (run14): cap length at the RFC 5321 practical maximum (254) —
+  // unbounded emails otherwise reach bcrypt-adjacent paths and the DB verbatim.
+  if (email.length > 254) {
+    return false;
+  }
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 }

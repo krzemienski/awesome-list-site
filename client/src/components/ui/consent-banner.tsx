@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +15,26 @@ export default function ConsentBanner() {
   const [choiceMade, setChoiceMade] = useState(
     () => getAnalyticsConsent() !== null,
   );
+  const bannerRef = useRef<HTMLDivElement>(null);
+
+  // BUG-004 (run14): the fixed banner overlapped page content (footer links,
+  // bottom pagination) until a choice was made. While visible, pad the body
+  // by the banner's real height so everything stays reachable; restore on
+  // dismiss/unmount. Re-measures on resize (height changes when the flex row
+  // wraps on small screens).
+  useEffect(() => {
+    if (choiceMade) return;
+    const applyPadding = () => {
+      const h = bannerRef.current?.offsetHeight ?? 0;
+      document.body.style.paddingBottom = h > 0 ? `${h}px` : "";
+    };
+    applyPadding();
+    window.addEventListener("resize", applyPadding);
+    return () => {
+      window.removeEventListener("resize", applyPadding);
+      document.body.style.paddingBottom = "";
+    };
+  }, [choiceMade]);
 
   if (choiceMade) return null;
 
@@ -26,6 +46,7 @@ export default function ConsentBanner() {
 
   return (
     <div
+      ref={bannerRef}
       role="region"
       aria-label="Analytics consent"
       className="fixed bottom-0 inset-x-0 z-50 border-t border-[var(--border)] bg-[var(--bg)] shadow-lg"

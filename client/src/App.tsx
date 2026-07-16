@@ -109,14 +109,24 @@ function Router() {
     return <ErrorPage error={error} />;
   }
 
+  // BUG-009 (run14): shell-first paint. While the auth check resolves, render
+  // the real header/sidebar chrome with content skeletons instead of blocking
+  // the whole app behind a bare full-screen spinner (15s to first content on
+  // slow 3G). Route content stays deferred so auth-gated routes never flash
+  // a wrong redirect before /api/auth/user answers.
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading...</p>
+      <MainLayout awesomeList={awesomeList} isLoading={true} user={undefined} onLogout={logout}>
+        <div className="space-y-6" data-testid="app-shell-skeleton" aria-busy="true" aria-label="Loading page">
+          <div className="h-8 w-2/3 max-w-md rounded-none bg-muted animate-pulse" />
+          <div className="h-4 w-1/2 max-w-sm rounded-none bg-muted animate-pulse" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="h-36 rounded-none bg-muted animate-pulse" />
+            ))}
+          </div>
         </div>
-      </div>
+      </MainLayout>
     );
   }
 

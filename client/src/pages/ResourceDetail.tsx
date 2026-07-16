@@ -31,6 +31,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { trackSelectContent, trackShare, trackResourceFavorite } from "@/lib/analytics";
 import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 import { slugify } from "@/lib/utils";
 import { Blurhash } from "react-blurhash";
 import type { Resource } from "@shared/schema";
@@ -154,12 +155,28 @@ export default function ResourceDetail() {
   });
 
   // R2-L09: anonymous users get a clear sign-in prompt instead of a
-  // confusing failed request.
+  // confusing failed request. BUG-044/026 (run14): the toast now carries a
+  // working "Sign in" action (was a dead end) that preserves the current page
+  // via ?next= — the same gate pattern used across favorite/bookmark surfaces.
+  const signInAction = (
+    <ToastAction
+      altText="Sign in"
+      onClick={() =>
+        setLocation(
+          `/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`,
+        )
+      }
+    >
+      Sign in
+    </ToastAction>
+  );
+
   const handleFavoriteClick = () => {
     if (!isAuthenticated) {
       toast({
         title: "Sign in to favorite",
         description: "Create an account or sign in to save your favorite resources.",
+        action: signInAction,
       });
       return;
     }
@@ -171,6 +188,7 @@ export default function ResourceDetail() {
       toast({
         title: "Sign in to bookmark",
         description: "Create an account or sign in to save resources to your bookmarks.",
+        action: signInAction,
       });
       return;
     }
@@ -271,12 +289,21 @@ export default function ResourceDetail() {
     });
   };
 
-  const handleRelatedResourceClick = (relatedResource: Resource) => {
+  // BUG-011 (run14): related cards are real anchors now. Plain left-clicks are
+  // intercepted for SPA navigation (after tracking); modified clicks
+  // (cmd/ctrl/shift/middle) fall through to native anchor behavior so
+  // open-in-new-tab works.
+  const handleRelatedResourceClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    relatedResource: Resource,
+  ) => {
     trackInteraction.mutate({
       resourceId: relatedResource.id.toString(),
       interactionType: "click",
       metadata: { source: "related-resources", fromResourceId: id }
     });
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    e.preventDefault();
     setLocation(`/resource/${relatedResource.id}`);
   };
 
@@ -355,6 +382,7 @@ export default function ResourceDetail() {
             disabled={favoriteMutation.isPending}
             data-testid="button-favorite"
             className="min-h-[44px] px-4"
+            aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
           >
             <Heart className={`h-4 w-4 mr-2 ${isFavorite ? 'fill-current' : ''}`} />
             <span className="hidden sm:inline">{isFavorite ? 'Favorited' : 'Favorite'}</span>
@@ -366,6 +394,7 @@ export default function ResourceDetail() {
             disabled={bookmarkMutation.isPending}
             data-testid="button-bookmark"
             className="min-h-[44px] px-4"
+            aria-label={isBookmarked ? "Remove bookmark" : "Add bookmark"}
           >
             <Bookmark className={`h-4 w-4 mr-2 ${isBookmarked ? 'fill-current' : ''}`} />
             <span className="hidden sm:inline">{isBookmarked ? 'Bookmarked' : 'Bookmark'}</span>
@@ -376,6 +405,7 @@ export default function ResourceDetail() {
             onClick={handleShare} 
             data-testid="button-share"
             className="min-h-[44px] px-4"
+            aria-label="Share this resource"
           >
             <Share2 className="h-4 w-4 mr-2" />
             <span className="hidden sm:inline">Share</span>
@@ -386,6 +416,7 @@ export default function ResourceDetail() {
             onClick={() => setSuggestEditOpen(true)} 
             data-testid="button-suggest-edit"
             className="min-h-[44px] px-4"
+            aria-label="Suggest an edit"
           >
             <Edit className="h-4 w-4 mr-2" />
             <span className="hidden sm:inline">Suggest Edit</span>
@@ -685,10 +716,11 @@ export default function ResourceDetail() {
                 </p>
               )}
               {filteredRelatedResources.map((related) => (
-                  <div
+                  <a
                     key={related.id}
-                    className="p-3 border border-border hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors group min-h-[44px]"
-                    onClick={() => handleRelatedResourceClick(related)}
+                    href={`/resource/${related.id}`}
+                    className="block p-3 border border-border hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none cursor-pointer transition-colors group min-h-[44px]"
+                    onClick={(e) => handleRelatedResourceClick(e, related)}
                     data-testid={`related-resource-${related.id}`}
                   >
                     <div className="flex items-center justify-between gap-2">
@@ -722,7 +754,7 @@ export default function ResourceDetail() {
                         </div>
                       </div>
                     )}
-                  </div>
+                  </a>
                 ))}
                 {resource.category && (
                   <Link href={`/category/${slugify(resource.category)}`}>

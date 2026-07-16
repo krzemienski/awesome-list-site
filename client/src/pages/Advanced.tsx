@@ -20,7 +20,25 @@ import {
 } from "lucide-react";
 import { AwesomeList, Resource } from "@/types/awesome-list";
 
+const VALID_ADVANCED_TABS = ["explorer", "metrics", "export", "recommendations"];
+
 export default function Advanced() {
+  // BUG-038 (run14): ?tab= deep-links restore the selected tab, and switching
+  // tabs serializes back to the URL (replaceState — wouter useLocation is
+  // path-only, so read/write window.location.search directly).
+  const [tab, setTab] = useState(() => {
+    const fromUrl = new URLSearchParams(window.location.search).get("tab");
+    return fromUrl && VALID_ADVANCED_TABS.includes(fromUrl) ? fromUrl : "explorer";
+  });
+  const handleTabChange = (next: string) => {
+    setTab(next);
+    const params = new URLSearchParams(window.location.search);
+    if (next === "explorer") params.delete("tab");
+    else params.set("tab", next);
+    const qs = params.toString();
+    window.history.replaceState(null, "", `${window.location.pathname}${qs ? `?${qs}` : ""}`);
+  };
+
   const [selectedResource, setSelectedResource] = useState<Resource | undefined>();
   const [userInterests] = useState<string[]>(["web", "api", "testing", "database"]);
   // BUG-026 (run13): selected export format, driven by the showcase cards.
@@ -73,8 +91,11 @@ export default function Advanced() {
 
       {/* Feature Showcase */}
       {/* P6 — active tab gets bg + bottom border per ref 03 */}
-      <Tabs defaultValue="explorer" className="space-y-6">
-        <TabsList className="flex w-full justify-start overflow-x-auto sm:grid sm:grid-cols-4 bg-[var(--surface)] border-b border-[var(--border)] rounded-none p-0 h-auto">
+      {/* BUG-036 (run14): the 4-col grid only engages at lg — at 768px the
+          equal columns hard-truncated "AI Recommendations"; below lg the list
+          stays a scrollable flex row with full-width labels. */}
+      <Tabs value={tab} onValueChange={handleTabChange} className="space-y-6">
+        <TabsList className="flex w-full justify-start overflow-x-auto lg:grid lg:grid-cols-4 bg-[var(--surface)] border-b border-[var(--border)] rounded-none p-0 h-auto">
           <TabsTrigger
             value="explorer"
             className="flex shrink-0 items-center gap-2 whitespace-nowrap rounded-none border-b-2 border-transparent data-[state=active]:border-[var(--accent)] data-[state=active]:bg-[var(--surface-2)] data-[state=active]:text-[var(--accent)] px-4 py-3"

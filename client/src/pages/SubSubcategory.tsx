@@ -199,7 +199,9 @@ export default function SubSubcategory() {
   return (
     <div className="space-y-4 sm:space-y-6 overflow-x-hidden max-w-full">
       <SEOHead
-        title={subSubcategoryName}
+        // BUG-010 (run14): mirror og-middleware's "<name> – <parent>" template
+        // exactly (two-pass parity) so same-named nodes get unique titles.
+        title={subcategoryName ? `${subSubcategoryName} – ${subcategoryName}` : subSubcategoryName}
         description={`Browse ${allResources.length} curated ${subSubcategoryName.toLowerCase()} resources in the ${subcategoryName} category on Awesome Video.`}
         category={subSubcategoryName}
         resourceCount={allResources.length}
@@ -263,12 +265,14 @@ export default function SubSubcategory() {
         availableTags={availableTags}
         onTagsChange={setSelectedTags}
         onSortChange={setSortBy}
+        showCountSorts={false}
       />
       
       {allResources.length > 0 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground" data-testid="text-results-count">
-            Showing {filteredResources.length} of {allResources.length} resources
+            {/* BUG-054 (run14): singular agreement for one-resource pages */}
+            Showing {filteredResources.length} of {allResources.length} resource{allResources.length === 1 ? '' : 's'}
             {selectedTags.length > 0 && ' (filtered)'}
           </p>
         </div>
@@ -284,12 +288,20 @@ export default function SubSubcategory() {
       ) : filteredResources.length === 0 ? (
         <div className="text-center py-12">
           <h3 className="text-lg font-semibold mb-2">No resources found</h3>
+          {/* BUG-042 (run14): copy matches the control that actually caused
+              the empty state (search vs tag filter). */}
           <p className="text-muted-foreground">
-            Try adjusting your tag filters to see more results.
+            {searchTerm && selectedTags.length > 0
+              ? "Try a different search term or adjust your tag filters."
+              : searchTerm
+                ? `No resources match "${searchTerm}". Try a different search term.`
+                : "Try adjusting your tag filters to see more results."}
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        /* BUG-016 (run14): md (768px) drops back to 1 col — sidebar returns
+           at md and 2 cols truncated card titles to 3-5 chars. */
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
           {filteredResources.map((resource, index) => (
             <ResourceCard
               key={`${resource.id ?? resource.url}-${index}`}
@@ -300,6 +312,9 @@ export default function SubSubcategory() {
                 description: resource.description,
                 tags: resource.tags,
               }}
+              onTagClick={(tag) =>
+                setSelectedTags((prev) => (prev.includes(tag) ? prev : [...prev, tag]))
+              }
             />
           ))}
         </div>

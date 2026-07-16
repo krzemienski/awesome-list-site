@@ -131,8 +131,12 @@ export default function AdminDashboard() {
       <AdminStats stats={stats} isLoading={isLoading} onNavigate={handleTabChange} />
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
-        <div className="w-full overflow-x-auto pb-2 admin-tab-scroller">
-          <TabsList className="inline-flex w-max">
+        {/* BUG-020 (run14): the 15-tab strip used to overflow-scroll with no
+            visible affordance — off-screen tabs were undiscoverable at 1440px
+            AND 375px. Tabs now wrap onto extra rows so every tab is always
+            visible; the scroller class is kept only as a safety net. */}
+        <div className="w-full pb-2 admin-tab-scroller">
+          <TabsList className="flex flex-wrap h-auto w-full justify-start gap-1">
             <TabsTrigger value="approvals" className="whitespace-nowrap" data-testid="tab-approvals">
               Approvals {stats?.pendingApprovals ? <Badge variant="accent" className="ml-2">{stats.pendingApprovals}</Badge> : null}
             </TabsTrigger>

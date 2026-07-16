@@ -396,7 +396,12 @@ export class AwesomeLintValidator {
    * Count the number of categories
    */
   private countCategories(): number {
-    return this.lines.filter(line => line.startsWith('## ') && !line.includes('Contents')).length;
+    // BUG-049 (run14): structural H2s are not categories. "Contents" was
+    // already excluded, but "Contributing"/"License" H2s (emitted when the
+    // export includes those sections) inflated the count to 10 when the
+    // catalog has 9 real categories.
+    const structural = /^##\s+(Contents|Contributing|License)\s*$/;
+    return this.lines.filter(line => line.startsWith('## ') && !structural.test(line.trim())).length;
   }
 }
 

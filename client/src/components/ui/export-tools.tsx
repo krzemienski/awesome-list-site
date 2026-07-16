@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -60,6 +60,35 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
     }
   }, [formatOverride]);
 
+  // BUG-005 (run14): checkbox semantics are now literal — checked categories
+  // are exported, none checked = nothing to export. To keep "everything" as
+  // the default, the list initializes with ALL categories checked once the
+  // taxonomy arrives (unless the parent pinned a single category).
+  const categoriesInitialized = useRef(false);
+  useEffect(() => {
+    if (categoriesInitialized.current) return;
+    if (awesomeList.categories.length === 0) return;
+    categoriesInitialized.current = true;
+    if (!selectedCategory) {
+      setExportOptions(prev => ({
+        ...prev,
+        selectedCategories: awesomeList.categories.map(c => c.name),
+      }));
+    }
+  }, [awesomeList.categories, selectedCategory]);
+
+  // BUG-014 (run14): per-category counts must match what the export filter
+  // actually selects (ALL resources in the flat list with that category name),
+  // not just the category's direct children — subcategory resources were
+  // missing from the label counts.
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const r of awesomeList.resources) {
+      counts[r.category] = (counts[r.category] || 0) + 1;
+    }
+    return counts;
+  }, [awesomeList.resources]);
+
   const formatIcons = {
     markdown: <FileText className="h-4 w-4" />,
     json: <Code className="h-4 w-4" />,
@@ -79,8 +108,10 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
   };
 
   const getFilteredResources = (): Resource[] => {
+    // BUG-005 (run14): no categories checked = no resources. "Clear All" used
+    // to silently flip back to exporting EVERYTHING because [] meant "all".
     if (exportOptions.selectedCategories.length === 0) {
-      return awesomeList.resources;
+      return [];
     }
     return awesomeList.resources.filter(resource => 
       exportOptions.selectedCategories.includes(resource.category)
@@ -513,7 +544,7 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
                   onCheckedChange={() => toggleCategory(category.name)}
                 />
                 <label htmlFor={`category-${category.name}`} className="text-sm cursor-pointer">
-                  {category.name} ({category.resources.length})
+                  {category.name} ({categoryCounts[category.name] || 0})
                 </label>
               </div>
             ))}
@@ -530,7 +561,9 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
             <div>Format: <Badge variant="outline">{exportOptions.format.toUpperCase()}</Badge></div>
             <div>Resources: <span className="font-medium">{resourceCount}</span></div>
             <div>Categories: <span className="font-medium">
-              {exportOptions.selectedCategories.length === 0 ? 'All' : exportOptions.selectedCategories.length}
+              {exportOptions.selectedCategories.length === awesomeList.categories.length && awesomeList.categories.length > 0
+                ? `All (${awesomeList.categories.length})`
+                : exportOptions.selectedCategories.length}
             </span></div>
           </div>
         </div>

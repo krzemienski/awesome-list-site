@@ -27,13 +27,18 @@ interface ResourceCardProps {
   fullResource?: Resource;
   className?: string;
   onClick?: () => void;
+  /** BUG-018 (run14): when provided, tag pills become buttons that apply the
+   * tag as a filter on the hosting page; otherwise they link to the
+   * tag-filtered home view. */
+  onTagClick?: (tag: string) => void;
 }
 
 function ResourceCard({
   resource,
   fullResource,
   className,
-  onClick
+  onClick,
+  onTagClick
 }: ResourceCardProps) {
   const [, setLocation] = useLocation();
   const [suggestEditOpen, setSuggestEditOpen] = useState(false);
@@ -199,24 +204,62 @@ function ResourceCard({
         )}
         
         <div className="flex flex-wrap items-center gap-2 mb-3">
+          {/* BUG-012 (run14): "View Details" is a real link to the detail page
+              (was a decorative Badge that swallowed clicks under the
+              stretched-link overlay). */}
           {isValidDbResource && (
-            <Badge variant="outline" className="text-xs border-primary/30 text-primary">
-              <ChevronRight className="h-3 w-3 mr-0.5" />
-              View Details
-            </Badge>
+            <Link
+              href={`/resource/${resource.id}`}
+              className="relative z-10"
+              data-testid={`link-view-details-${resource.id}`}
+              aria-label={`View details for ${resource.name}`}
+            >
+              <Badge variant="outline" className="text-xs border-primary/30 text-primary hover:bg-primary/10 transition-colors">
+                <ChevronRight className="h-3 w-3 mr-0.5" />
+                View Details
+              </Badge>
+            </Link>
           )}
           {resource.category && (
             <Badge variant="secondary" className="text-xs">
               {resource.category}
             </Badge>
           )}
+          {/* BUG-018 (run14): tag pills are interactive — they filter the
+              hosting page (onTagClick) or link to the tag-filtered home. */}
           {resource.tags && resource.tags.length > 0 && (
             <>
-              {resource.tags.slice(0, 3).map((tag) => (
-                <Badge key={tag} variant="outline" className="text-xs">
-                  #{tag}
-                </Badge>
-              ))}
+              {resource.tags.slice(0, 3).map((tag) =>
+                onTagClick ? (
+                  <button
+                    key={tag}
+                    type="button"
+                    className="relative z-10"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onTagClick(tag);
+                    }}
+                    data-testid={`tag-pill-${resource.id}-${tag}`}
+                    aria-label={`Filter by tag ${tag}`}
+                  >
+                    <Badge variant="outline" className="text-xs hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer">
+                      #{tag}
+                    </Badge>
+                  </button>
+                ) : (
+                  <Link
+                    key={tag}
+                    href={`/?tags=${encodeURIComponent(tag)}`}
+                    className="relative z-10"
+                    data-testid={`tag-pill-${resource.id}-${tag}`}
+                    aria-label={`Browse resources tagged ${tag}`}
+                  >
+                    <Badge variant="outline" className="text-xs hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer">
+                      #{tag}
+                    </Badge>
+                  </Link>
+                ),
+              )}
               {resource.tags.length > 3 && (
                 <span className="text-xs text-muted-foreground">
                   +{resource.tags.length - 3} more
@@ -284,6 +327,7 @@ export default memo(ResourceCard, (prevProps, nextProps) => {
     // Compare other props
     prevProps.className === nextProps.className &&
     prevProps.onClick === nextProps.onClick &&
+    prevProps.onTagClick === nextProps.onTagClick &&
     prevProps.fullResource === nextProps.fullResource
   );
 });

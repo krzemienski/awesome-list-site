@@ -180,6 +180,10 @@ async function generateSitemap(_req: any, res: any) {
         addUrl(`/subcategory/${subcategory.slug}`, 'weekly', '0.6');
 
         subcategory.subSubcategories?.forEach(subSubcategory => {
+          // BUG-053 (run14): an empty sub-subcategory renders "No resources
+          // found" and has no inbound link from its parent page — keep such
+          // orphans OUT of the sitemap (sitemap set == reachable content set).
+          if ((subSubcategory.resources?.length ?? 0) === 0) return;
           addUrl(`/sub-subcategory/${subSubcategory.slug}`, 'weekly', '0.5');
         });
       });
@@ -811,15 +815,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // /me follows REST convention: 401 when unauthenticated, else the mapped user.
   app.get('/api/auth/me', async (req: any, res) => {
     try {
+      // BUG-051 (run14): canonical 401 body everywhere is
+      // { message: "Unauthorized" } — matches isAuthenticated middleware.
       if (!req.isAuthenticated?.() || !req.user?.claims?.sub) {
-        return res.status(401).json({ message: 'Not authenticated' });
+        return res.status(401).json({ message: 'Unauthorized' });
       }
       let dbUser = req.user.dbUser;
       if (!dbUser) {
         dbUser = await userRepo.getUser(req.user.claims.sub);
       }
       if (!dbUser) {
-        return res.status(401).json({ message: 'Not authenticated' });
+        return res.status(401).json({ message: 'Unauthorized' });
       }
       res.json({
         id: dbUser.id,
@@ -954,7 +960,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (rawPage !== undefined && !/^\d+$/.test(rawPage.trim())) {
         return res.status(400).json({ error: 'invalid_page' });
       }
-      const limit = Math.min(Math.max(parseInt(rawLimit as string) || 20, 1), 1000);
+      // BUG-050 (run14): cap page size at 100 (was 1000 — full-catalog scrape
+      // in 3 requests). Paging via nextOffset/nextCursor still walks the whole
+      // catalog; bulk consumers should use /api/awesome-list.
+      const limit = Math.min(Math.max(parseInt(rawLimit as string) || 20, 1), 100);
       const offset = rawOffset !== undefined
         ? Math.max(parseInt(rawOffset as string), 0)
         : Math.max((parseInt(rawPage as string) || 1) - 1, 0) * limit;
@@ -1278,6 +1287,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           .optional(),
         subcategory: z.string().optional(),
         subSubcategory: z.string().optional(),
+        // BUG-029 (run14): tags reach the DB via metadata.tags and were the
+        // one text surface the run10 NO_HTML guard missed. Same rule: markup
+        // is never legitimate tag content. Also cap count/length server-side
+        // (the client's 10-tag slice is advisory only).
+        metadata: z.object({
+          tags: z.array(
+            z.string().max(50, 'Tags must be at most 50 characters')
+              .refine((v) => !NO_HTML.test(v), 'Tags must not contain HTML tags')
+          ).max(10, 'At most 10 tags allowed').optional(),
+        }).passthrough().optional(),
       });
       const submitValidation = submitSchema.safeParse(req.body);
       if (!submitValidation.success) {
@@ -4661,7 +4680,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user?.claims?.sub;
       if (!userId) {
-        return res.status(401).json({ error: 'Authentication required' });
+        // BUG-051 (run14): canonical 401 envelope.
+        return res.status(401).json({ message: 'Unauthorized' });
       }
 
       const resourceId = parseInt(req.params.resourceId, 10);

@@ -258,12 +258,14 @@ export default function Subcategory() {
         availableTags={availableTags}
         onTagsChange={setSelectedTags}
         onSortChange={setSortBy}
+        showCountSorts={false}
       />
       
       {allResources.length > 0 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground" data-testid="text-results-count">
-            Showing {filteredResources.length} of {allResources.length} resources
+            {/* BUG-054 (run14): singular agreement for one-resource pages */}
+            Showing {filteredResources.length} of {allResources.length} resource{allResources.length === 1 ? '' : 's'}
             {selectedTags.length > 0 && ` (filtered by ${selectedTags.length} tag${selectedTags.length > 1 ? 's' : ''})`}
           </p>
         </div>
@@ -279,12 +281,20 @@ export default function Subcategory() {
       ) : filteredResources.length === 0 ? (
         <div className="text-center py-12">
           <h3 className="text-lg font-semibold mb-2">No resources found</h3>
+          {/* BUG-042 (run14): copy matches the control that actually caused
+              the empty state (search vs tag filter). */}
           <p className="text-muted-foreground">
-            Try adjusting your tag filters to see more results.
+            {searchTerm && selectedTags.length > 0
+              ? "Try a different search term or adjust your tag filters."
+              : searchTerm
+                ? `No resources match "${searchTerm}". Try a different search term.`
+                : "Try adjusting your tag filters to see more results."}
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        /* BUG-016 (run14): md (768px) drops back to 1 col — the sidebar
+           reappears at md and a 2-col grid left ~60px titles ("Adv…"). */
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
           {filteredResources.map((resource, index) => (
             <ResourceCard
               key={`${resource.id ?? resource.url}-${index}`}
@@ -296,6 +306,9 @@ export default function Subcategory() {
                 category: resource.subSubcategory || undefined,
                 tags: resource.tags,
               }}
+              onTagClick={(tag) =>
+                setSelectedTags((prev) => (prev.includes(tag) ? prev : [...prev, tag]))
+              }
             />
           ))}
         </div>

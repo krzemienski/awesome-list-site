@@ -71,7 +71,7 @@ export default function About() {
               href={MAINTAINER.profileUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent)] hover:underline"
+              className="inline-flex items-center gap-2 min-h-[24px] text-sm font-medium text-[var(--accent)] hover:underline"
             >
               <Github className="h-4 w-4" />
               {MAINTAINER.name} on GitHub

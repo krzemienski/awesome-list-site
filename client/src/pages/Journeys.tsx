@@ -260,18 +260,21 @@ export default function Journeys() {
                     onClick={() => setLocation(`/journey/${journey.id}`)}
                     data-testid={`button-view-journey-${journey.id}`}
                   >
+                    {/* BUG-037 (run14): shrink-0 icons + truncating label — at
+                        768px the flex button squeezed the leading icon and
+                        clipped it. */}
                     {enrolled ? (
                       <>
-                        <CheckCircle2 className="h-4 w-4 mr-2" />
-                        Continue Journey
+                        <CheckCircle2 className="h-4 w-4 mr-2 shrink-0" />
+                        <span className="truncate">Continue Journey</span>
                       </>
                     ) : (
                       <>
-                        <Play className="h-4 w-4 mr-2" />
-                        Start Journey
+                        <Play className="h-4 w-4 mr-2 shrink-0" />
+                        <span className="truncate">Start Journey</span>
                       </>
                     )}
-                    <ArrowRight className="h-4 w-4 ml-auto group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight className="h-4 w-4 ml-auto shrink-0 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </CardFooter>
               </Card>

@@ -1,4 +1,5 @@
 import { useState, memo } from "react";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Bookmark, BookmarkPlus, NotebookPen } from "lucide-react";
 import {
@@ -14,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
@@ -40,6 +42,7 @@ function BookmarkButton({
   const [tempNotes, setTempNotes] = useState("");
   const { toast } = useToast();
   const { isAuthenticated } = useAuth();
+  const [, setLocation] = useLocation();
 
   // `remove` is captured at click time and passed as the mutation variable so
   // the POST/DELETE decision never depends on the optimistic state flip below
@@ -107,11 +110,24 @@ function BookmarkButton({
     e.stopPropagation();
 
     // R2-L09: anonymous users get a clear sign-in prompt instead of a
-    // confusing failed request.
+    // confusing failed request. BUG-044/026 (run14): the toast carries a
+    // working "Sign in" action preserving the current page via ?next=.
     if (!isAuthenticated) {
       toast({
         title: "Sign in to bookmark",
         description: "Create an account or sign in to save resources to your bookmarks.",
+        action: (
+          <ToastAction
+            altText="Sign in"
+            onClick={() =>
+              setLocation(
+                `/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`,
+              )
+            }
+          >
+            Sign in
+          </ToastAction>
+        ),
       });
       return;
     }

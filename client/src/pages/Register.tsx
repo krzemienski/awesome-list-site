@@ -299,7 +299,8 @@ export default function Register() {
 
           <p className="text-center text-sm text-[color:var(--text-2)]">
             Already have an account?{" "}
-            <Link href="/login" className="text-[color:var(--accent)] hover:underline" data-testid="link-login">
+            {/* BUG-028 (run14): >=24px target height for the inline link. */}
+            <Link href="/login" className="inline-flex items-center min-h-[24px] align-middle text-[color:var(--accent)] hover:underline" data-testid="link-login">
               Sign in
             </Link>
           </p>

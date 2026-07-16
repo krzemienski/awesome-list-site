@@ -948,7 +948,14 @@ function homeShellChrome(): string {
       const found = findSubSubcategory(await getTreeCached(), slug);
       if (found) {
         const m = defaultMeta(path);
-        m.title = `${found.name} — ${SITE_NAME}`;
+        // BUG-010 (run14): same-named sub-subcategories (7× "DASH", 2× "FFmpeg")
+        // collided on byte-identical titles. Disambiguate with the parent
+        // subcategory. LOCKSTEP: client SubSubcategory.tsx SEOHead passes
+        // "<name> – <parent>" so both crawl passes see the same title.
+        const parentSubName = found.crumbs[2]?.name;
+        m.title = parentSubName
+          ? `${found.name} – ${parentSubName} — ${SITE_NAME}`
+          : `${found.name} — ${SITE_NAME}`;
         m.description = `Browse ${found.count} curated ${found.name.toLowerCase()} resources for video development on ${SITE_NAME}.`;
         m.image = ogImage(found.name, found.name, found.count);
         m.type = "article";

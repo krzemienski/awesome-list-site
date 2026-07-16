@@ -16,10 +16,18 @@ export default function Search() {
   const [, setLocation] = useLocation();
   const urlQuery = new URLSearchParams(searchString).get("q") ?? "";
 
+  // BUG-038 (run14): pagination state serializes to ?page= so reload/share
+  // restores the same page instead of silently resetting to page 1.
+  const parsePage = (search: string) => {
+    const raw = new URLSearchParams(search).get("page");
+    const n = raw ? parseInt(raw, 10) : 1;
+    return Number.isFinite(n) && n > 0 ? n : 1;
+  };
+
   const [input, setInput] = useState(urlQuery);
   const [debounced, setDebounced] = useState(urlQuery);
   // R2-M11: client-side pagination over the fetched result set.
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(() => parsePage(searchString));
   const PAGE_SIZE = 24;
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -42,10 +50,11 @@ export default function Search() {
     return () => clearTimeout(t);
   }, [input, setLocation]);
 
-  // Back/forward navigation: adopt the URL's q.
+  // Back/forward navigation: adopt the URL's q and page.
   useEffect(() => {
     setInput(urlQuery);
     setDebounced(urlQuery);
+    setPage(parsePage(searchString));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchString]);
 
@@ -71,10 +80,29 @@ export default function Search() {
   const safePage = Math.min(page, totalPages);
   const pageResults = results.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
-  // New query → back to page 1.
+  // New query → back to page 1. Ref-guarded so the mount run doesn't clobber
+  // a ?page= restored from the URL (BUG-038).
+  const prevTrimmed = useRef(trimmed);
   useEffect(() => {
-    setPage(1);
+    if (prevTrimmed.current !== trimmed) {
+      prevTrimmed.current = trimmed;
+      setPage(1);
+    }
   }, [trimmed]);
+
+  // BUG-038 (run14): write the current page into the URL (replaceState — no
+  // navigation, no og-middleware impact; wouter's useSearch stays untouched so
+  // this can't loop with the adoption effect above).
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const current = params.get("page") ?? "1";
+    if (current !== String(safePage)) {
+      if (safePage > 1) params.set("page", String(safePage));
+      else params.delete("page");
+      const qs = params.toString();
+      window.history.replaceState(null, "", `/search${qs ? `?${qs}` : ""}`);
+    }
+  }, [safePage]);
 
   return (
     <div className="space-y-6">

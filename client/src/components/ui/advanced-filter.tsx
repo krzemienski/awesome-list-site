@@ -13,6 +13,13 @@ interface AdvancedFilterProps {
   availableTags: { tag: string; count: number }[];
   onTagsChange: (tags: string[]) => void;
   onSortChange: (sortBy: string) => void;
+  /**
+   * BUG-003 (run14): "Most/Fewest Resources" only makes sense where the list
+   * being sorted is a list of CATEGORIES (Home). On flat resource lists
+   * (Category/Subcategory/Sub-subcategory pages) those options were silent
+   * no-ops — hide them there.
+   */
+  showCountSorts?: boolean;
 }
 
 export default function AdvancedFilter({
@@ -21,6 +28,7 @@ export default function AdvancedFilter({
   availableTags,
   onTagsChange,
   onSortChange,
+  showCountSorts = true,
 }: AdvancedFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isTagsOpen, setIsTagsOpen] = useState(true);
@@ -134,8 +142,12 @@ export default function AdvancedFilter({
           <SelectItem value="default">Default</SelectItem>
           <SelectItem value="name-asc">Name A-Z</SelectItem>
           <SelectItem value="name-desc">Name Z-A</SelectItem>
-          <SelectItem value="count-desc">Most Resources</SelectItem>
-          <SelectItem value="count-asc">Fewest Resources</SelectItem>
+          {showCountSorts && (
+            <>
+              <SelectItem value="count-desc">Most Resources</SelectItem>
+              <SelectItem value="count-asc">Fewest Resources</SelectItem>
+            </>
+          )}
         </SelectContent>
       </Select>
 

@@ -132,6 +132,16 @@ export default function PendingResources() {
     return text.substring(0, maxLength) + "...";
   };
 
+  // BUG-034 (run14): submissions carry tags in metadata.tags (the submit form
+  // writes there); some rows also have a top-level tags column. Surface both.
+  const getSubmissionTags = (resource: any): string[] => {
+    const metaTags = resource?.metadata?.tags;
+    const colTags = resource?.tags;
+    const raw = Array.isArray(metaTags) && metaTags.length > 0 ? metaTags : colTags;
+    if (!Array.isArray(raw)) return [];
+    return raw.filter((t): t is string => typeof t === "string" && t.trim().length > 0);
+  };
+
   const formatDate = (date: Date | null) => {
     if (!date) return 'Unknown';
     return new Date(date).toLocaleDateString('en-US', {
@@ -252,6 +262,17 @@ export default function PendingResources() {
                       <p className="text-sm text-muted-foreground">
                         {truncateText(resource.description, 80)}
                       </p>
+                      {/* BUG-034 (run14): reviewers must see submitted tags —
+                          approvals were previously blind to tag content. */}
+                      {getSubmissionTags(resource).length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-1" data-testid={`tags-pending-${resource.id}`}>
+                          {getSubmissionTags(resource).map((tag) => (
+                            <Badge key={tag} variant="secondary" className="text-[10px] px-1.5 py-0">
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col gap-1 text-sm">
@@ -340,6 +361,19 @@ export default function PendingResources() {
                 <Label className="text-sm font-semibold">Description</Label>
                 <p className="text-sm mt-1">{selectedResource.description}</p>
               </div>
+              {/* BUG-034 (run14): tags visible in the detail modal too. */}
+              {getSubmissionTags(selectedResource).length > 0 && (
+                <div>
+                  <Label className="text-sm font-semibold">Tags</Label>
+                  <div className="flex flex-wrap gap-1 mt-1" data-testid="tags-detail-modal">
+                    {getSubmissionTags(selectedResource).map((tag) => (
+                      <Badge key={tag} variant="secondary">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label className="text-sm font-semibold flex items-center gap-1">

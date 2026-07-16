@@ -74,11 +74,13 @@ const PAGE_SIZE = 24;
 
 /**
  * Normalize the sort URL param. The canonical AdvancedFilter values
- * ("default", "name-asc", "name-desc", "count-asc", "count-desc") pass through
- * unchanged so a reload/back-button restores the select; the ?sort= alias plus
- * the bare shorthand "name"/"asc"/"desc" map onto name ordering (BUG-006).
+ * ("default", "name-asc", "name-desc") pass through unchanged so a
+ * reload/back-button restores the select; the ?sort= alias plus the bare
+ * shorthand "name"/"asc"/"desc" map onto name ordering (BUG-006).
+ * BUG-003 (run14): count-asc/count-desc are no longer offered on resource
+ * lists (they only sort category grids) — legacy URLs fold to "default".
  */
-const CANONICAL_SORTS = new Set(["default", "name-asc", "name-desc", "count-asc", "count-desc"]);
+const CANONICAL_SORTS = new Set(["default", "name-asc", "name-desc"]);
 function normalizeSort(value: string | null): string {
   if (!value) return "default";
   const v = value.toLowerCase();
@@ -285,7 +287,22 @@ export default function Category() {
   // selected value while in General view, so picking "All Subcategories" or any
   // real subcategory is always a genuine change that fires onValueChange.
   const handleSubcategoryChange = (value: string) => {
-    if (value === "__general__") return; // already in General view
+    // BUG-055 (run14): "General (no subcategory)" is now a first-class,
+    // always-listed option — selecting it navigates INTO ?view=general
+    // (previously the sentinel was display-only and the bucket was reachable
+    // only via the sidebar link).
+    if (value === "__general__") {
+      if (isGeneralView) return; // already in General view
+      setSelectedSubcategory("all");
+      setPage(1);
+      const params = new URLSearchParams();
+      if (searchTerm) params.set("search", searchTerm);
+      if (selectedTags.length > 0) params.set("tags", selectedTags.join(","));
+      if (sortBy && sortBy !== "default") params.set("sortBy", sortBy);
+      params.set("view", "general");
+      setLocation(`/category/${slug}?${params.toString()}`);
+      return;
+    }
     setSelectedSubcategory(value);
     setPage(1);
     if (isGeneralView) {
@@ -478,9 +495,9 @@ export default function Category() {
                   <SelectValue placeholder="Filter by subcategory" />
                 </SelectTrigger>
                 <SelectContent>
-                  {isGeneralView && (
-                    <SelectItem value="__general__">General (no subcategory)</SelectItem>
-                  )}
+                  {/* BUG-055 (run14): always selectable, not just visible while
+                      already in General view. */}
+                  <SelectItem value="__general__">General (no subcategory)</SelectItem>
                   <SelectItem value="all">All Subcategories</SelectItem>
                   {subcategories.map(sub => (
                     <SelectItem key={sub} value={sub}>{sub}</SelectItem>
@@ -517,6 +534,7 @@ export default function Category() {
           availableTags={availableTags}
           onTagsChange={(tags) => { setSelectedTags(tags); setPage(1); }}
           onSortChange={(value) => { setSortBy(value); setPage(1); }}
+          showCountSorts={false}
         />
       </div>
       
@@ -525,7 +543,7 @@ export default function Category() {
           {/* BUG-v3-M33 (run12): show the actual page range, not page-size-as-subset */}
           Showing {filteredResources.length === 0
             ? "0"
-            : `${(currentPage - 1) * PAGE_SIZE + 1}–${Math.min(currentPage * PAGE_SIZE, filteredResources.length)}`} of {filteredResources.length} resources
+            : `${(currentPage - 1) * PAGE_SIZE + 1}–${Math.min(currentPage * PAGE_SIZE, filteredResources.length)}`} of {filteredResources.length} resource{filteredResources.length === 1 ? "" : "s"}
           {selectedTags.length > 0 && ` (${selectedTags.length} tag${selectedTags.length > 1 ? 's' : ''})`}
         </p>
         <ViewModeToggle value={viewMode} onChange={handleViewModeChange} />
@@ -556,7 +574,8 @@ export default function Category() {
       ) : (
         <div className={
           viewMode === "grid"
-            ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 min-w-0"
+            // BUG-016 (run14): md drops to 1 col — sidebar returns at 768px.
+            ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 min-w-0"
             : viewMode === "list"
             ? "flex flex-col gap-2 min-w-0"
             : "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 min-w-0"
@@ -752,10 +771,28 @@ export default function Category() {
                     {resource.subSubcategory && (
                       <Badge variant="outline" className="text-xs">{resource.subSubcategory}</Badge>
                     )}
+                    {/* BUG-018 (run14): tag pills are real filter controls —
+                        clicking one applies that tag instead of falling through
+                        to the card's stretched title link. */}
                     {resource.tags && resource.tags.slice(0, 3).map((tag, tagIndex) => (
-                      <Badge key={tagIndex} variant="secondary" className="text-xs">
-                        {tag}
-                      </Badge>
+                      <button
+                        key={tagIndex}
+                        type="button"
+                        className="relative z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedTags((prev) =>
+                            prev.includes(tag) ? prev : [...prev, tag]
+                          );
+                          setPage(1);
+                        }}
+                        aria-label={`Filter by tag ${tag}`}
+                        data-testid={`tag-pill-${resourceId}-${tagIndex}`}
+                      >
+                        <Badge variant="secondary" className="text-xs cursor-pointer hover:bg-[color-mix(in_srgb,var(--accent)_20%,transparent)]">
+                          {tag}
+                        </Badge>
+                      </button>
                     ))}
                     {resource.tags && resource.tags.length > 3 && (
                       <Badge variant="secondary" className="text-xs">

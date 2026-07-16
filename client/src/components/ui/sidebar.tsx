@@ -127,8 +127,17 @@ const SidebarProvider = React.forwardRef<
       if (openMobile) {
         const prev = document.body.style.overflow;
         document.body.style.overflow = 'hidden';
+        // BUG-006 (run14): guarantee Escape dismisses the mobile drawer even
+        // if focus sits outside the Radix dialog subtree.
+        const handleEscape = (event: KeyboardEvent) => {
+          if (event.key === "Escape") {
+            setOpenMobile(false);
+          }
+        };
+        window.addEventListener("keydown", handleEscape);
         return () => {
           document.body.style.overflow = prev;
+          window.removeEventListener("keydown", handleEscape);
         };
       }
     }, [openMobile]);
@@ -212,10 +221,13 @@ const Sidebar = React.forwardRef<
     if (isMobile) {
       return (
         <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
+          {/* BUG-006 (run14): the built-in Sheet close button was hidden via
+              [&>button]:hidden, leaving the drawer with no visible close
+              control. It's now shown with a 44px touch target. */}
           <SheetContent
             data-sidebar="sidebar"
             data-mobile="true"
-            className="w-[--sidebar-width] max-w-[80vw] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
+            className="w-[--sidebar-width] max-w-[80vw] bg-sidebar p-0 text-sidebar-foreground [&>button]:flex [&>button]:min-h-[44px] [&>button]:min-w-[44px] [&>button]:items-center [&>button]:justify-center [&>button]:z-20 [&>button]:right-1 [&>button]:top-1 [&>button_svg]:h-5 [&>button_svg]:w-5"
             style={
               {
                 "--sidebar-width": SIDEBAR_WIDTH_MOBILE,

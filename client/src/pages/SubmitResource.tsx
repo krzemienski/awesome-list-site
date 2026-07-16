@@ -30,6 +30,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useDebounce } from "@/hooks/useDebounce";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { humanizeApiError } from "@/lib/apiError";
 import { redirectToLogin } from "@/lib/authUtils";
 import { trackGenerateLead } from "@/lib/analytics";
 import SEOHead from "@/components/layout/SEOHead";
@@ -277,9 +278,10 @@ export default function SubmitResource() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     },
     onError: (error: Error) => {
+      // BUG-007 (run14): map raw "STATUS: body" API errors to friendly copy.
       toast({
         title: "Submission Failed",
-        description: error.message || "Failed to submit resource. Please try again.",
+        description: humanizeApiError(error, "Failed to submit resource. Please try again."),
         variant: "destructive",
       });
     },
@@ -351,7 +353,7 @@ export default function SubmitResource() {
                   <AlertTitle className="text-yellow-500">Login required to submit</AlertTitle>
                   <AlertDescription>
                     The form below is read-only. Please{" "}
-                    <a href="/login?next=%2Fsubmit" className="underline" data-testid="link-login">log in</a>{" "}
+                    <a href="/login?next=%2Fsubmit" className="inline-flex items-center min-h-[24px] align-middle underline" data-testid="link-login">log in</a>{" "}
                     to submit a resource.
                   </AlertDescription>
                 </Alert>
@@ -587,7 +589,16 @@ export default function SubmitResource() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => setLocation('/')}
+                    onClick={() => {
+                      // BUG-033 (run14): don't silently discard a filled form.
+                      if (
+                        form.formState.isDirty &&
+                        !window.confirm("Discard your unsaved submission?")
+                      ) {
+                        return;
+                      }
+                      setLocation('/');
+                    }}
                     disabled={submitMutation.isPending}
                     data-testid="button-cancel"
                   >

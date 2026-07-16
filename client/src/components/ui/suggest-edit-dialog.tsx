@@ -36,16 +36,21 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { humanizeApiError } from "@/lib/apiError";
 import type { Resource } from "@shared/schema";
 
-const suggestEditSchema = z.object({
+// BUG-024 (run14): the HTTPS rule applies to NEW urls only. Legacy resources
+// whose canonical URL is still http:// (their https twin is broken — see the
+// http-recheck journal) pre-fill the form with that value; an unchanged URL
+// must never block an edit to other fields.
+const makeSuggestEditSchema = (originalUrl: string) => z.object({
   title: z.string()
     .min(1, "Title is required")
     .max(200, "Title must be 200 characters or less"),
   url: z.string()
     .url("Please enter a valid URL")
-    .refine((url) => url.startsWith("https://"), {
-      message: "URL must use HTTPS protocol"
+    .refine((url) => url === originalUrl || url.startsWith("https://"), {
+      message: "New URLs must use HTTPS (keeping the current URL unchanged is fine)"
     }),
   description: z.string()
     .min(10, "Description must be at least 10 characters")
@@ -55,7 +60,7 @@ const suggestEditSchema = z.object({
   subSubcategory: z.string().optional(),
 });
 
-type SuggestEditFormData = z.infer<typeof suggestEditSchema>;
+type SuggestEditFormData = z.infer<ReturnType<typeof makeSuggestEditSchema>>;
 
 interface Category {
   id: number;
@@ -94,11 +99,20 @@ interface SuggestEditDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
+// BUG-023 (run14): the diff is computed on RESOLVED NAMES (the caller maps
+// select IDs back to taxonomy names first). Comparing the stored name against
+// the raw select ID made every submit look like a change (no-op edits sailed
+// through) and persisted raw IDs like "1089" into proposedChanges/proposedData
+// — which the admin approve path would then merge into the resource verbatim.
 function calculateDiff(original: Resource, updated: SuggestEditFormData): Record<string, { old: unknown; new: unknown }> {
   const diff: Record<string, { old: unknown; new: unknown }> = {};
 
   // SECURITY FIX: Improved diff calculation with array support (ISSUE 4)
   const EDITABLE_FIELDS = ['title', 'description', 'url', 'tags', 'category', 'subcategory', 'subSubcategory'] as const;
+
+  // null / undefined / "" are the same "empty" for comparison purposes
+  // (original subcategory NULL pre-fills the form as "").
+  const norm = (v: unknown) => (v === null || v === undefined ? "" : v);
 
   for (const field of EDITABLE_FIELDS) {
     const oldValue = original[field as keyof Resource];
@@ -113,7 +127,7 @@ function calculateDiff(original: Resource, updated: SuggestEditFormData): Record
       }
     }
     // Regular comparison for scalars
-    else if (oldValue !== newValue) {
+    else if (norm(oldValue) !== norm(newValue)) {
       diff[field] = { old: oldValue, new: newValue };
     }
   }
@@ -143,7 +157,7 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
   });
 
   const form = useForm<SuggestEditFormData>({
-    resolver: zodResolver(suggestEditSchema),
+    resolver: zodResolver(makeSuggestEditSchema(resource.url || "")),
     defaultValues: {
       title: resource.title || "",
       url: resource.url || "",
@@ -287,13 +301,7 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
   };
 
   const submitMutation = useMutation({
-    mutationFn: async (data: SuggestEditFormData) => {
-      const proposedChanges = calculateDiff(resource, data);
-      
-      if (Object.keys(proposedChanges).length === 0) {
-        throw new Error("No changes detected");
-      }
-      
+    mutationFn: async ({ data, proposedChanges }: { data: SuggestEditFormData; proposedChanges: Record<string, { old: unknown; new: unknown }> }) => {
       const proposedData = {
         title: data.title,
         url: data.url,
@@ -323,16 +331,39 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
       queryClient.invalidateQueries({ queryKey: ['/api/resources'] });
     },
     onError: (error: Error) => {
+      // BUG-007 (run14): map raw "STATUS: body" API errors to friendly copy.
       toast({
         title: "Submission Failed",
-        description: error.message || "Failed to submit edit suggestion",
+        description: humanizeApiError(error, "Failed to submit edit suggestion. Please try again."),
         variant: "destructive",
       });
     },
   });
 
+  // BUG-023 (run14): resolve select IDs back to taxonomy NAMES before diffing
+  // and submitting — the edit queue stores/merges these values verbatim, and
+  // the old→new diff must compare like with like or no-op submits pass.
   const onSubmit = (data: SuggestEditFormData) => {
-    submitMutation.mutate(data);
+    const idToName = (list: { id: number; name: string }[], id?: string) =>
+      id ? list.find((x) => x.id.toString() === id)?.name ?? id : "";
+
+    const resolved: SuggestEditFormData = {
+      ...data,
+      category: idToName(categories, data.category),
+      subcategory: idToName(subcategories, data.subcategory),
+      subSubcategory: idToName(subSubcategories, data.subSubcategory),
+    };
+
+    const proposedChanges = calculateDiff(resource, resolved);
+    if (Object.keys(proposedChanges).length === 0) {
+      toast({
+        title: "No changes to submit",
+        description: "The form matches the current resource — edit a field first.",
+      });
+      return;
+    }
+
+    submitMutation.mutate({ data: resolved, proposedChanges });
   };
 
   if (!isAuthenticated) {
@@ -340,26 +371,34 @@ export function SuggestEditDialog({ resource, open, onOpenChange }: SuggestEditD
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <div className="eyebrow" aria-hidden>// Auth required</div>
+            {/* BUG-048 (run14): user-facing copy, not dev jargon */}
+            <div className="eyebrow" aria-hidden>// Sign in required</div>
             <DialogTitle className="font-display text-2xl font-medium tracking-tight">
-              Login <em className="not-italic" style={{ fontStyle: 'italic', color: 'var(--accent)' }}>required</em>
+              Sign in <em className="not-italic" style={{ fontStyle: 'italic', color: 'var(--accent)' }}>required</em>
             </DialogTitle>
             <DialogDescription>
-              Please log in to suggest edits for this resource. This helps us maintain the quality of our curated list and track contributions.
+              Please sign in to suggest edits for this resource. This helps us maintain the quality of our curated list and track contributions.
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-4 py-4">
             <Card>
               <CardContent className="p-4">
                 <p className="text-sm mb-4" style={{ color: 'var(--text-2)' }}>
-                  We value your input! Once logged in, you can propose updates to titles, descriptions, categories, and more.
+                  We value your input! Once signed in, you can propose updates to titles, descriptions, categories, and more.
                 </p>
+                {/* BUG-001 (run14): /auth was a 404 — route to the real login
+                    page and come back here afterwards via ?next= */}
                 <Button
                   className="w-full"
-                  onClick={() => window.location.href = "/auth"}
+                  onClick={() => {
+                    const next = encodeURIComponent(
+                      window.location.pathname + window.location.search,
+                    );
+                    window.location.href = `/login?next=${next}`;
+                  }}
                   data-testid="button-login-redirect"
                 >
-                  Go to Login
+                  Sign in
                 </Button>
               </CardContent>
             </Card>

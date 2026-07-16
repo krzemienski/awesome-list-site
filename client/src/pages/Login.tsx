@@ -266,9 +266,10 @@ export default function Login() {
                 )}
               />
               <div className="flex justify-end -mt-1">
+                {/* BUG-028 (run14): inline links get >=24px target height. */}
                 <Link
                   href="/forgot-password"
-                  className="text-xs text-[color:var(--text-2)] hover:text-[color:var(--accent)] hover:underline"
+                  className="inline-flex items-center min-h-[24px] text-xs text-[color:var(--text-2)] hover:text-[color:var(--accent)] hover:underline"
                   data-testid="link-forgot-password"
                 >
                   Forgot password?
@@ -316,7 +317,7 @@ export default function Login() {
 
           <p className="text-center text-sm text-[color:var(--text-2)]">
             Don&apos;t have an account?{" "}
-            <Link href="/register" className="text-[color:var(--accent)] hover:underline" data-testid="link-register">
+            <Link href="/register" className="inline-flex items-center min-h-[24px] align-middle text-[color:var(--accent)] hover:underline" data-testid="link-register">
               Create account
             </Link>
           </p>
@@ -324,7 +325,7 @@ export default function Login() {
           {/* BUG-045 (run10): explicit no-account escape hatch — browsing
               never requires sign-in, so say so and link back out. */}
           <p className="text-center text-sm text-[color:var(--text-2)]">
-            <Link href="/" className="text-[color:var(--accent)] hover:underline" data-testid="link-browse-guest">
+            <Link href="/" className="inline-flex items-center min-h-[24px] align-middle text-[color:var(--accent)] hover:underline" data-testid="link-browse-guest">
               Continue browsing without an account
             </Link>
           </p>
