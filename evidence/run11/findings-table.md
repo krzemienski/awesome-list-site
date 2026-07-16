@@ -12,8 +12,8 @@ Legend: **FIXED** (code changed + verified this run) · **FIXED-PRIOR** (already
 | BUG-001 | CRITICAL | PLATFORM | "Maximum attachments reached" is the Replit dev-preview feedback widget; zero app code. Reused run10 verdict. |
 | BUG-003 | CRITICAL | BY-DESIGN | SPA has no SSR forms; og-middleware prerenders crawler content, forms hydrate client-side. Reused run8. |
 | BUG-005 | HIGH | PLATFORM | "Continue with Replit" frame-detachment is the Replit dev-preview iframe context, not app code. |
-| BUG-006 | HIGH | DECLINED | 409 on duplicate register kept; new IP rate limiter (run10) is the compensating control against enumeration. |
-| BUG-007 | HIGH | DECLINED | No email transport configured; cannot gate activation on verification. |
+| BUG-006 | HIGH | DECLINED | 409 on duplicate register kept; 5/min login burst limiter (run11) + 20/15min cluster limiter are the compensating controls against enumeration. User deferred (2026-07-16): publish current fixes first, revisit email verification later. |
+| BUG-007 | HIGH | DECLINED | No email transport configured; cannot gate activation on verification. User deferred (2026-07-16): decide after republish (would need Resend/SendGrid + sign-up flow change). |
 | BUG-008 | HIGH | **FIXED** | Tightened to spec this run: dedicated 5/min/IP burst limiter on login (layered on the run10 20/15min cluster limiter + per-account lockout). Live: attempts 1–5 → 401, attempt 6 → 429 with `Retry-After: 60` (`verify-bug008-5min.txt`). |
 | BUG-010 | HIGH | FIXED | See BUG-010-P. |
 | BUG-012 | HIGH | PLATFORM | Feedback widget reopen — Replit widget. |
