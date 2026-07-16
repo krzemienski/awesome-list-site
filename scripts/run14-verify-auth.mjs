@@ -80,7 +80,7 @@ await page.waitForSelector('[data-testid="button-back"]', { timeout: 15000 });
         title: "__qa_test_run14 tag visibility probe",
         url: "https://example.com/__qa_test_run14_tags",
         description: "Temporary QA submission to verify reviewer tag visibility.",
-        category: "Encoding Tools",
+        category: "Encoding & Codecs",
         metadata: { tags: ["qa-tag-run14", "hls"] },
       }),
     });
@@ -93,7 +93,7 @@ await page.waitForSelector('[data-testid="button-back"]', { timeout: 15000 });
         title: "__qa_test_run14 xss probe",
         url: "https://example.com/__qa_test_run14_xss",
         description: "Temporary QA submission for tag guard.",
-        category: "Encoding Tools",
+        category: "Encoding & Codecs",
         metadata: { tags: ["<script>alert(1)</script>"] },
       }),
     });
@@ -158,11 +158,14 @@ await page.waitForTimeout(1500);
   await page.waitForTimeout(1200);
   await page.locator('input[name="title"], [data-testid="input-title"]').first().fill("dirty form probe");
   const cancel = page.locator("button", { hasText: /^cancel$/i }).first();
+  // The fix uses a native window.confirm — it never appears in the DOM, so
+  // capture Playwright's dialog event (dismiss = stay on the form).
+  let confirmMsg = "";
+  page.once("dialog", async (d) => { confirmMsg = d.message(); await d.dismiss(); });
   await cancel.click();
   await page.waitForTimeout(700);
-  const dlg = await page.locator('[role="alertdialog"], [role="dialog"]').last().innerText().catch(() => "");
-  ok("BUG-033 cancel confirms discard", /discard|unsaved|are you sure|keep editing/i.test(dlg),
-    `dialog="${dlg.replace(/\s+/g, " ").slice(0, 100)}"`);
+  ok("BUG-033 cancel confirms discard", /discard|unsaved/i.test(confirmMsg),
+    `confirm="${confirmMsg.slice(0, 100)}" stillOnSubmit=${page.url().includes("/submit")}`);
 }
 
 await browser.close();

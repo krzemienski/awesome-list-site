@@ -145,7 +145,10 @@ app.use((req, res, next) => {
     protectedPatterns.some(p => p.test(req.path)) &&
     !publicExceptions.some(p => p.test(req.path));
   if (isProtected && !req.headers.cookie?.includes('connect.sid')) {
-    return res.redirect(302, '/login');
+    // BUG-008 (run14): carry the originally requested page in ?next= so the
+    // login page can return the user there after sign-in (Login already
+    // validates the param against open-redirect payloads).
+    return res.redirect(302, `/login?next=${encodeURIComponent(req.originalUrl)}`);
   }
   next();
 });

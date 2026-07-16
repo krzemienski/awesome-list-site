@@ -1,4 +1,5 @@
 import { useParams, Link, useLocation } from "wouter";
+import { hasInAppHistory } from "@/lib/nav-history";
 import { useQuery } from "@tanstack/react-query";
 import NotFound from "@/pages/not-found";
 import { useState, useEffect, useMemo } from "react";
@@ -361,7 +362,11 @@ export default function ResourceDetail() {
           className="gap-2"
           data-testid="button-back"
           onClick={() => {
-            if (window.history.length > 1) {
+            // BUG-013 (run14): history.length lies on deep links (about:blank
+            // and the new-tab page count toward it), sending fresh-tab
+            // visitors to a blank page. Only go back when the app itself
+            // recorded an in-app navigation.
+            if (hasInAppHistory() && window.history.length > 1) {
               window.history.back();
             } else {
               setLocation("/");

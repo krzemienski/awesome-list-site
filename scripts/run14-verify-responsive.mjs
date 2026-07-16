@@ -89,9 +89,12 @@ const browser = await chromium.launch({ executablePath: EXE });
 
   // BUG-015: explorer stat rows don't bleed out of cards
   await page.goto(BASE + "/advanced", { waitUntil: "domcontentloaded", timeout: 30000 });
-  await page.waitForTimeout(2500);
+  await page.waitForFunction(
+    () => [...document.querySelectorAll(".grid > *")].some(c => /resources/i.test(c.textContent || "")),
+    { timeout: 20000 },
+  );
   const bleed = await page.evaluate(() => {
-    const cards = [...document.querySelectorAll(".grid > div, .grid > a")].filter(c => c.querySelector("span"));
+    const cards = [...document.querySelectorAll(".grid > *")].filter(c => /resources/i.test(c.textContent || ""));
     let overflows = 0, checked = 0;
     cards.forEach(c => {
       checked++;
@@ -123,18 +126,19 @@ const browser = await chromium.launch({ executablePath: EXE });
   ok("BUG-017 breadcrumb one line @768", !!crumb && crumb.oneLine,
     crumb ? `list h=${crumb.h.toFixed(0)} scrollH=${crumb.scrollH}` : "breadcrumb list not found");
 
-  // BUG-016: category resource grid is 1 column at 768
-  await page.goto(BASE + "/category/encoding-tools", { waitUntil: "domcontentloaded" });
+  // BUG-016: subcategory resource grid is 1 column at 768 (fix lives in Subcategory.tsx)
+  await page.goto(BASE + "/subcategory/encoding-tools", { waitUntil: "domcontentloaded" });
   await page.waitForSelector('[data-testid^="link-view-details-"], .grid', { timeout: 15000 });
   await page.waitForTimeout(800);
   const gridCols = await page.evaluate(() => {
     const grids = [...document.querySelectorAll("div.grid")].filter(g =>
-      g.className.includes("md:grid-cols-1") || g.querySelector('[data-testid^="link-view-details-"]'));
-    const g = grids.find(x => x.children.length > 1) || grids[0];
-    if (!g) return null;
-    return getComputedStyle(g).gridTemplateColumns.split(" ").length;
+      g.className.includes("md:grid-cols-1") && g.querySelector('[data-testid^="link-view-details-"]'));
+    const g = grids.find(x => x.children.length > 1);
+    if (!g) return { cols: null, cards: 0 };
+    return { cols: getComputedStyle(g).gridTemplateColumns.split(" ").length, cards: g.children.length };
   });
-  ok("BUG-016 category grid 1 col @768", gridCols === 1, `grid columns=${gridCols}`);
+  ok("BUG-016 category grid 1 col @768", gridCols.cols === 1 && gridCols.cards > 1,
+    `grid columns=${gridCols.cols} cards=${gridCols.cards}`);
 
   // BUG-037: journey buttons — icons not squeezed/clipped
   await page.goto(BASE + "/journeys", { waitUntil: "domcontentloaded" });

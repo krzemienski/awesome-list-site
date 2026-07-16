@@ -269,12 +269,16 @@ export default function CategoryExplorer({ categories, resources, className }: C
                       768px the unwrappable stat row overflowed the card edge
                       and bled into the neighbor ("202"+"371" → "20371"). */}
                   <div className="flex-1 min-w-0">
-                    <CardTitle className="text-lg flex items-center gap-2">
+                    <CardTitle className="text-lg flex items-center gap-2 min-w-0">
+                      {/* BUG-015 (run14): whitespace-normal + min-w-0 — the
+                          Button primitive defaults to nowrap, so long category
+                          names pushed the trailing icon past the card edge at
+                          narrow widths instead of wrapping. */}
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => navigate(`/category/${category.slug}`)}
-                        className="p-0 h-auto font-semibold text-left hover:text-primary"
+                        className="p-0 h-auto font-semibold text-left hover:text-primary whitespace-normal break-words min-w-0"
                       >
                         {category.name}
                       </Button>

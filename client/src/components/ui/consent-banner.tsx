@@ -26,13 +26,22 @@ export default function ConsentBanner() {
     if (choiceMade) return;
     const applyPadding = () => {
       const h = bannerRef.current?.offsetHeight ?? 0;
-      document.body.style.paddingBottom = h > 0 ? `${h}px` : "";
+      const pad = h > 0 ? `${h}px` : "";
+      document.body.style.paddingBottom = pad;
+      // The sidebar layout's inset column overflows body's own box (body is
+      // viewport-height while the grid content scrolls past it), so body
+      // padding alone never lifts the footer above the fixed banner — pad
+      // the footer's flow container too.
+      const inset = document.querySelector("footer")?.parentElement;
+      if (inset instanceof HTMLElement) inset.style.paddingBottom = pad;
     };
     applyPadding();
     window.addEventListener("resize", applyPadding);
     return () => {
       window.removeEventListener("resize", applyPadding);
       document.body.style.paddingBottom = "";
+      const inset = document.querySelector("footer")?.parentElement;
+      if (inset instanceof HTMLElement) inset.style.paddingBottom = "";
     };
   }, [choiceMade]);
 

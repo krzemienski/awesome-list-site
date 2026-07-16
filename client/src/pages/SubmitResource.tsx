@@ -125,6 +125,11 @@ export default function SubmitResource() {
       tags: "",
     },
   });
+  // BUG-033 (run14): react-hook-form's formState is a Proxy — isDirty is only
+  // tracked once it's read during render. Reading it for the first time inside
+  // the Cancel click handler returns a stale `false`, silently skipping the
+  // discard confirmation. Subscribe here, use the value in the handler.
+  const { isDirty } = form.formState;
 
   const FIELD_ORDER: (keyof SubmitResourceFormData)[] = [
     "title",
@@ -592,7 +597,7 @@ export default function SubmitResource() {
                     onClick={() => {
                       // BUG-033 (run14): don't silently discard a filled form.
                       if (
-                        form.formState.isDirty &&
+                        isDirty &&
                         !window.confirm("Discard your unsaved submission?")
                       ) {
                         return;

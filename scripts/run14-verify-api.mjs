@@ -53,7 +53,7 @@ const j = async (path, opts) => {
 {
   const attempt = async (email) => {
     const t0 = performance.now();
-    const { r, body } = await j("/api/auth/login", {
+    const { r, body } = await j("/api/auth/local/login", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password: "definitely-Wrong-Pass1!" }),
     });

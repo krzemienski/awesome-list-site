@@ -3,6 +3,7 @@ import { Switch, Route, Redirect, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { initGA } from "./lib/analytics";
 import { useAnalytics } from "./hooks/use-analytics";
+import { noteLocationChange } from "./lib/nav-history";
 import { useAuth } from "./hooks/useAuth";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 
@@ -91,6 +92,12 @@ function Router() {
   const { user, isLoading: authLoading, logout } = useAuth();
   const [location] = useLocation();
   const isKnownRoute = KNOWN_ROUTE_PATTERNS.some((re) => re.test(location));
+
+  // BUG-013 (run14): count wouter navigations so back buttons can tell a
+  // deep-linked first page (no in-app history) from real in-app browsing.
+  useEffect(() => {
+    noteLocationChange();
+  }, [location]);
 
   const { data: rawData, isLoading, error } = useQuery({
     queryKey: ["awesome-list-data"],

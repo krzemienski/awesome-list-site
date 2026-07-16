@@ -10,10 +10,15 @@ const ok = (name, pass, detail) => {
   console.log(`${pass ? "PASS" : "FAIL"} ${name} — ${detail}`);
 };
 
+const PART = process.argv[2] ?? "all";
+const run1 = PART === "all" || PART === "1";
+const run2 = PART === "all" || PART === "2";
+
 const browser = await chromium.launch({ executablePath: EXE });
 const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
 const page = await ctx.newPage();
 
+if (run1) {
 // --- Home: consent banner (BUG-004), P0, tag-filter subtitle (BUG-027) + drill-down (BUG-025)
 await page.goto(BASE + "/", { waitUntil: "domcontentloaded", timeout: 30000 });
 await page.waitForSelector('[data-testid="list-categories"]', { timeout: 15000 });
@@ -31,8 +36,12 @@ await page.waitForSelector('[data-testid="list-categories"]', { timeout: 15000 }
     const links = [...document.querySelectorAll("footer a")];
     const l = links.find(a => a.getBoundingClientRect().height > 0);
     if (!l) return "no-footer-link";
+    l.scrollIntoView({ block: "center", behavior: "instant" });
     const r = l.getBoundingClientRect();
-    const el = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+    const el = document.elementFromPoint(
+      Math.min(r.left + r.width / 2, innerWidth - 1),
+      Math.min(Math.max(r.top + r.height / 2, 0), innerHeight - 1),
+    );
     return el && (el === l || l.contains(el) || el.closest("a") === l) ? "reachable" : `covered-by:${el?.tagName}.${el?.className?.toString().slice(0, 40)}`;
   });
   ok("BUG-004 footer reachable under banner", covered === "reachable", covered);
@@ -56,16 +65,9 @@ await page.waitForSelector('[data-testid="list-categories"], [data-testid="empty
 }
 
 // --- Category page: sort options (BUG-003), General bucket (BUG-055), tag pills (BUG-018), View Details link (BUG-012)
-await page.goto(BASE + "/category/encoding-tools", { waitUntil: "domcontentloaded" });
+await page.goto(BASE + "/category/encoding-codecs", { waitUntil: "domcontentloaded" });
 await page.waitForSelector('[data-testid="select-subcategory-filter"]', { timeout: 15000 });
 {
-  // BUG-012: View Details is a real link
-  const vd = page.locator('[data-testid^="link-view-details-"]').first();
-  const vdHref = await vd.getAttribute("href").catch(() => null);
-  const vdTag = await vd.evaluate(el => el.tagName).catch(() => "?");
-  ok("BUG-012 View Details real link", vdTag === "A" && !!vdHref && vdHref.startsWith("/resource/"),
-    `tag=${vdTag} href=${vdHref}`);
-
   // BUG-003: sort dropdown must not offer count sorts on resource lists
   const combos = page.locator('button[role="combobox"]');
   const n = await combos.count();
@@ -118,11 +120,25 @@ await page.waitForSelector('[data-testid="text-results-count"]', { timeout: 1500
 {
   const count = (await page.locator('[data-testid="text-results-count"]').textContent())?.trim();
   ok("BUG-054 singular count line", count === "Showing 1 of 1 resource", `"${count}"`);
+
+  // BUG-012: View Details is a real link on sub(sub)category listing cards
+  // (the audited surface — shared ResourceCard; category pages use their own
+  // semantic <button>, which the audit explicitly accepted).
+  const vd = page.locator('[data-testid^="link-view-details-"]').first();
+  const vdHref = await vd.getAttribute("href").catch(() => null);
+  const vdTag = await vd.evaluate(el => el.tagName).catch(() => "?");
+  ok("BUG-012 View Details real link", vdTag === "A" && !!vdHref && vdHref.startsWith("/resource/"),
+    `tag=${vdTag} href=${vdHref}`);
   await page.waitForTimeout(800); // let SEOHead settle
   const clientTitle = await page.title();
   const serverTitle = await page.evaluate(async () => {
     const html = await (await fetch(location.href)).text();
-    return html.match(/<title>([^<]*)<\/title>/)?.[1] ?? "(none)";
+    const raw = html.match(/<title>([^<]*)<\/title>/)?.[1] ?? "(none)";
+    // The server HTML-escapes entities inside <title> (&amp; etc.) — decode
+    // before comparing with document.title, which is already decoded.
+    const el = document.createElement("textarea");
+    el.innerHTML = raw;
+    return el.value;
   });
   ok("BUG-010 client/server title parity", clientTitle === serverTitle && /FFMPEG – Scripting & Automation Tools/.test(clientTitle),
     `client="${clientTitle}" server="${serverTitle}"`);
@@ -133,7 +149,9 @@ await page.waitForSelector('[data-testid="text-results-count"]', { timeout: 1500
   const good = /Try a different search term/.test(emptyCopy || "") || /No resources match "zzzznotfoundzzz"/.test(bodyText);
   ok("BUG-042 empty-state names the cause", good, `copy="${(emptyCopy || "").trim().slice(0, 90)}"`);
 }
+} // end run1
 
+if (run2) {
 // --- Resource detail: BUG-013 back fallback, BUG-011 related anchors, BUG-044/026 toast, BUG-048/001 suggest-edit gate
 {
   const p2 = await ctx.newPage();
@@ -162,7 +180,9 @@ await page.waitForSelector('[data-testid="text-results-count"]', { timeout: 1500
     await suggest.click();
     await p2.waitForTimeout(600);
     const dialogText = await p2.locator('[role="dialog"]').innerText().catch(() => "");
-    ok("BUG-048 no dev jargon in gate", dialogText.length > 0 && !/AUTH REQUIRED|\/\//.test(dialogText),
+    // The "//" eyebrow prefix is the site's design motif (audit: "// PROFILE",
+    // "// SEARCH" are fine) — only the dev-jargon wording was the defect.
+    ok("BUG-048 no dev jargon in gate", dialogText.length > 0 && !/AUTH REQUIRED/i.test(dialogText),
       `dialog="${dialogText.replace(/\s+/g, " ").slice(0, 110)}"`);
     const loginBtn = p2.locator('[data-testid="button-login-redirect"]');
     const present = await loginBtn.count();
@@ -222,20 +242,28 @@ await page.waitForSelector("text=Clear All", { timeout: 15000 });
     d.resources.forEach(r => { counts[r.category] = (counts[r.category] || 0) + 1; });
     return counts;
   });
-  const catName = "Encoding Tools";
-  const label = await page.locator("label, div", { hasText: new RegExp(`^${catName}`) }).first().textContent().catch(() => "");
-  const shown = label?.match(/\((\d[\d,]*)\)/)?.[1]?.replace(/,/g, "");
+  const catName = "Encoding & Codecs";
+  // The checkbox row renders "Encoding & Codecs (323)"; the accordion header
+  // shows the count in a separate badge without parens — target the row.
+  const shown = await page.evaluate((cat) => {
+    const el = [...document.querySelectorAll("div, label")].find((e) => {
+      const t = e.textContent?.trim() || "";
+      return t.startsWith(`${cat} (`) && t.length < cat.length + 12;
+    });
+    return el?.textContent?.match(/\((\d[\d,]*)\)/)?.[1]?.replace(/,/g, "") ?? null;
+  }, catName);
   ok("BUG-014 export counts match flat list", !!shown && parseInt(shown) === expected[catName],
     `${catName}: shown=${shown} expected=${expected[catName]}`);
 
   // BUG-005: Clear All really clears
   await page.locator("text=Clear All").first().click();
   await page.waitForTimeout(500);
+  // Scope to the category-selection checkboxes (labels like "Media Tools (252)").
+  // Option toggles (include descriptions/tags/...) are separate and stay checked.
   const checked = await page.evaluate(() =>
-    [...document.querySelectorAll('[role="checkbox"][data-state="checked"], input[type="checkbox"]:checked')].length);
-  const bodyTxt = await page.locator("body").innerText();
-  const zeroish = /0 resources|Nothing to export|0 of/i.test(bodyTxt) || checked === 0;
-  ok("BUG-005 Clear All clears selection", checked === 0 && zeroish, `checked-after-clear=${checked}`);
+    [...document.querySelectorAll('[role="checkbox"][data-state="checked"], input[type="checkbox"]:checked')]
+      .filter(c => /\(\d/.test(c.closest("div")?.textContent || "")).length);
+  ok("BUG-005 Clear All clears selection", checked === 0, `category-boxes-checked-after-clear=${checked}`);
 }
 
 // --- Search: ?page= restore (BUG-038)
@@ -244,7 +272,8 @@ await page.waitForTimeout(1500);
 {
   const stillPage2 = page.url().includes("page=2");
   const bodyTxt = await page.locator("body").innerText();
-  const pageMarker = /Page 2|21[-–]/.test(bodyTxt);
+  // Rendered as "· page 2 of N" and "2 / N" (PAGE_SIZE=24 → no "21-" range).
+  const pageMarker = /page 2 of|2 \/ \d/i.test(bodyTxt);
   ok("BUG-038 search ?page= restore", stillPage2 && pageMarker, `url=${page.url()} marker=${pageMarker}`);
 }
 
@@ -268,6 +297,7 @@ await page.waitForTimeout(1500);
     `skeleton=${sawSkeleton} chrome=${sawChrome} clearedAfter=${skeletonGone}`);
   await p5.close();
 }
+} // end run2
 
 await browser.close();
 const failed = results.filter(x => !x.pass);

@@ -40,6 +40,12 @@ export default function Search() {
   useEffect(() => {
     const t = setTimeout(() => {
       setDebounced(input);
+      // BUG-038 (run14): if the URL's q already matches the input (e.g. on
+      // mount with /search?q=x&page=2), leave the URL alone — rewriting the
+      // target here would strip a restored ?page=. Only rewrite when the
+      // query actually changed (then dropping ?page= = reset to page 1).
+      const currentQ = new URLSearchParams(window.location.search).get("q") ?? "";
+      if (input === currentQ) return;
       const target = input
         ? `/search?q=${encodeURIComponent(input)}`
         : "/search";
@@ -94,6 +100,11 @@ export default function Search() {
   // navigation, no og-middleware impact; wouter's useSearch stays untouched so
   // this can't loop with the adoption effect above).
   useEffect(() => {
+    // While results are still loading, totalPages is a placeholder 1 and
+    // safePage would clamp a URL-restored ?page= down to 1 — and because
+    // wouter patches replaceState, that write loops back through the
+    // adoption effect and permanently resets the page. Wait for data.
+    if (!data) return;
     const params = new URLSearchParams(window.location.search);
     const current = params.get("page") ?? "1";
     if (current !== String(safePage)) {
@@ -102,7 +113,7 @@ export default function Search() {
       const qs = params.toString();
       window.history.replaceState(null, "", `/search${qs ? `?${qs}` : ""}`);
     }
-  }, [safePage]);
+  }, [safePage, data]);
 
   return (
     <div className="space-y-6">

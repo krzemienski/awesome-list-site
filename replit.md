@@ -10,6 +10,12 @@ A production-ready React application for browsing and discovering over 2,600 cur
 
 > **Full history:** see [`CHANGELOG.md`](./CHANGELOG.md) for every dated entry back to December 2025. Older "Recent Changes" entries are moved there periodically.
 
+### Black-Box Audit Remediation — Run14 (July 16, 2026)
+- **55-finding MASTER-FIX-PROMPT audit triaged live** (BUG-001..055): 38 code fixes, 8 data fixes (journaled, prod rerun pending), 1 fixed+prod-followup (BUG-053 sitemap/empty node), 1 fixed-prior (BUG-002 recs, Run13), 2 declined (BUG-031 register 409 / BUG-032 lockout — documented security tradeoffs). Full table: `evidence/run14/findings-table.md`.
+- **Notable root causes**: BUG-033 RHF `formState` is a Proxy — `isDirty` must be READ during render to subscribe; first read inside a click handler returns stale `false`. BUG-004 consent banner had to pad BOTH `body` and the footer's sidebar-inset scroll parent (inset overflows body's viewport box). BUG-038 Search debounce effect was rewriting the URL on mount and stripping `?page=`. BUG-019 collapsed sidebar accordions now `inert` (both levels). BUG-049 validator excluded structural H2s (Contributing/License) — now reports 9 categories.
+- **Verified** (Iron Rule): tsc clean; 5 suites green — API 12/12, responsive 12/12 (@375/@768), desktop 13/13 + 12/12 (@1440), auth 10/10; BUG-019 live inert/focus probe; BUG-049 via authed `POST /api/admin/validate`. QA residue zero (fixtures, edit probes, users all torn down). Architect review PASS.
+- **Needs republish** (server: og-middleware, routes, localAuth, passwordUtils, awesomeLint, index; client: consent-banner, Search, SubmitResource, ResourceDetail, nav-history, App, category-explorer + more). **Prod follow-ups after republish**: rerun `scripts/run14-data-fixes.ts` on prod (8 data findings); delete empty "other-encoders" node via admin API.
+
 ### Full UI Experience Audit — PROD, zero-defects PASS (July 16, 2026)
 - **Complete prod audit of https://awesome.video** (28 screens × 3 viewports, 26 interaction groups, 134 endpoints inventoried): 4 findings, all fixed + republished — F-001 transparent consent banner; F-002 leftover Test category/resource (deleted live, /category/test → 404); F-003 http→https upgrade (19 upgraded, 21 kept with journaled TLS failures, 3 https-twin skips); F-004 tablet H1 mid-word wrap.
 - **Enabler**: boot-time admin password sync from `ADMIN_PASSWORD` secret (bcrypt-compare + rotate, idempotent) — the only supported prod admin rotation path; `PROD_ADMIN_PASSWORD` secret is stale.
