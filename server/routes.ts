@@ -64,6 +64,7 @@ import { syncService } from "./github/syncService";
 import { ensureMinDescription } from "./github/importHygiene";
 import { recommendationEngine, UserProfile as AIUserProfile } from "./ai/recommendationEngine";
 import { buildRelatedResources } from "./services/relatedResources";
+import { stripInternalResourceFields } from "./lib/publicResource";
 import { registerPublicApiRoutes } from "./api/public";
 import { learningPathGenerator } from "./ai/learningPathGenerator";
 import { claudeService } from "./ai/claudeService";
@@ -777,7 +778,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch user" });
     }
   });
-  
+
+  // GET /api/auth/me - Authenticated-user alias (NEW-017). Unlike /api/auth/user
+  // (which always 200s with { user: null } so the SPA can boot anonymously),
+  // /me follows REST convention: 401 when unauthenticated, else the mapped user.
+  app.get('/api/auth/me', async (req: any, res) => {
+    try {
+      if (!req.isAuthenticated?.() || !req.user?.claims?.sub) {
+        return res.status(401).json({ message: 'Not authenticated' });
+      }
+      let dbUser = req.user.dbUser;
+      if (!dbUser) {
+        dbUser = await userRepo.getUser(req.user.claims.sub);
+      }
+      if (!dbUser) {
+        return res.status(401).json({ message: 'Not authenticated' });
+      }
+      res.json({
+        id: dbUser.id,
+        email: dbUser.email,
+        name: dbUser.firstName && dbUser.lastName
+          ? `${dbUser.firstName} ${dbUser.lastName}`
+          : dbUser.firstName || dbUser.email?.split('@')[0] || 'User',
+        avatar: dbUser.profileImageUrl,
+        role: dbUser.role,
+        createdAt: dbUser.createdAt,
+      });
+    } catch (error) {
+      console.error('Error fetching user (me):', error);
+      res.status(500).json({ message: 'Failed to fetch user' });
+    }
+  });
+
   // POST /api/auth/logout - Logout user
   app.post('/api/auth/logout', async (req: any, res) => {
     try {
@@ -846,7 +878,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Note: /api/login, /api/callback are set up in setupAuth()
 
   // ============= Resource Routes =============
-  
+
+  // NEW-019: public resource serializer. Removes the internal `searchTsv`
+  // full-text vector (an index implementation detail no client consumes) from
+  // any resource returned on a public endpoint. Other columns (status,
+  // submittedBy, githubSynced, …) are intentionally retained: authenticated
+  // surfaces — the community-metrics panel, profile "my submissions", and the
+  // admin console — read them, and none carry PII beyond opaque user ids.
+  const toPublicResource = <T extends Record<string, any>>(r: T) =>
+    stripInternalResourceFields(r);
+
   // GET /api/resources - List approved resources (public)
   app.get('/api/resources', async (req, res) => {
     try {
@@ -862,19 +903,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const rawCursor = req.query.cursor as string | undefined;
       const rawOffset = (req.query.offset as string | undefined) ?? rawCursor;
       const rawLimit = req.query.limit as string | undefined;
+      const rawPage = req.query.page as string | undefined;
       if (rawOffset !== undefined && isNaN(Number(rawOffset))) {
         return res.status(400).json({ error: 'invalid_offset' });
       }
       if (rawLimit !== undefined && isNaN(Number(rawLimit))) {
         return res.status(400).json({ error: 'invalid_limit' });
       }
+      // NEW-009 / NEW-034: `page` must be a positive integer. Previously a
+      // negative page produced a negative SQL offset → 500, and non-numeric
+      // values were silently normalized to 1 (masking client bugs). Both now
+      // return 400, matching the invalid_offset / invalid_limit contract.
+      if (rawPage !== undefined && !/^\d+$/.test(rawPage.trim())) {
+        return res.status(400).json({ error: 'invalid_page' });
+      }
       const limit = Math.min(Math.max(parseInt(rawLimit as string) || 20, 1), 1000);
-      const offset = rawOffset !== undefined ? Math.max(parseInt(rawOffset as string), 0) : (parseInt(req.query.page as string) || 1) - 1;
+      const offset = rawOffset !== undefined
+        ? Math.max(parseInt(rawOffset as string), 0)
+        : Math.max((parseInt(rawPage as string) || 1) - 1, 0) * limit;
       let category = req.query.category as string;
       let subcategory = req.query.subcategory as string;
       // BUG-015: accept `q` as an alias for `search` so /api/resources?q=… reaches
       // the real filter layer. `search` wins if both are present (explicit param).
-      const search = (req.query.search as string) ?? (req.query.q as string);
+      // NEW-012: strip NUL + control chars — Postgres rejects NUL bytes in text
+      // params and the raw driver error surfaced as a 500.
+      const rawSearch = (req.query.search as string) ?? (req.query.q as string);
+      const search = typeof rawSearch === 'string'
+        ? rawSearch.replace(/[\x00-\x1f\x7f]/g, '')
+        : rawSearch;
 
       // Accept category/subcategory as either the display NAME (what the client
       // sends) or a URL slug (e.g. ?category=encoding-codecs — BUG-022). Real
@@ -891,8 +947,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           category = cat.name;
         }
       }
-      if (subcategory && SLUG_SHAPE.test(subcategory) && resolvedCategory) {
-        const sub = await categoryRepo.getSubcategoryBySlug(subcategory, resolvedCategory.id);
+      if (subcategory && SLUG_SHAPE.test(subcategory)) {
+        // Prefer the category-scoped lookup when the category is known;
+        // otherwise (NEW-008) resolve the slug globally so
+        // `?subcategory=<slug>` filters even without a category param.
+        const sub = resolvedCategory
+          ? await categoryRepo.getSubcategoryBySlug(subcategory, resolvedCategory.id)
+          : await categoryRepo.getSubcategoryBySlugGlobal(subcategory);
         if (sub) subcategory = sub.name;
       }
 
@@ -947,7 +1008,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const nextOffset = offset + result.resources.length < result.total
         ? offset + result.resources.length
         : null;
-      res.json({ ...result, limit, offset, nextOffset, nextCursor: nextOffset });
+      // NEW-019: strip the internal `searchTsv` full-text vector from public
+      // responses (never consumed by any client; it is an implementation
+      // detail of the search index).
+      const publicResources = result.resources.map(toPublicResource);
+      // NEW-033: structured pagination metadata alongside the legacy
+      // offset/nextOffset fields, so API consumers get page/totalPages/hasMore.
+      const currentPage = Math.floor(offset / limit) + 1;
+      const totalPages = Math.max(Math.ceil(result.total / limit), 1);
+      res.json({
+        ...result,
+        resources: publicResources,
+        limit,
+        offset,
+        nextOffset,
+        nextCursor: nextOffset,
+        pagination: {
+          page: currentPage,
+          limit,
+          total: result.total,
+          totalPages,
+          hasMore: nextOffset !== null,
+        },
+      });
     } catch (error) {
       console.error('Error fetching resources:', error);
       res.status(500).json({ message: 'Failed to fetch resources' });
@@ -961,7 +1044,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // { query, total, results }.
   app.get('/api/search', async (req, res) => {
     try {
-      const q = (((req.query.q as string) || (req.query.search as string)) || '').trim();
+      // NEW-012: strip NUL + control chars before trimming — Postgres rejects
+      // NUL bytes in text params, which previously surfaced as a 500.
+      const q = (((req.query.q as string) || (req.query.search as string)) || '')
+        .replace(/[\x00-\x1f\x7f]/g, '')
+        .trim();
       if (q.length < 2) {
         return res.json({ query: q, total: 0, results: [] });
       }
@@ -982,7 +1069,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       // `total` is the true match count from the repo (post-cleanup there are no
       // URL-duplicate rows, so it equals the deduped count); `results` is this page.
-      res.json({ query: q, total, results });
+      // NEW-019: strip internal `searchTsv` from each public result.
+      res.json({ query: q, total, results: results.map(toPublicResource) });
     } catch (error) {
       console.error('Error searching resources:', error);
       res.status(500).json({ message: 'Failed to search resources' });
@@ -1069,7 +1157,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      res.json(resource);
+      // NEW-019: strip internal `searchTsv` from the public detail response.
+      res.json(toPublicResource(resource));
     } catch (error) {
       console.error('Error fetching resource:', error);
       res.status(500).json({ message: 'Failed to fetch resource' });
@@ -1107,7 +1196,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: 'approved',
         category: resource.category ?? undefined,
       });
-      res.json(buildRelatedResources(resource, pool, limit));
+      const related = buildRelatedResources(resource, pool, limit);
+      const sanitizeItems = (items: any[]) =>
+        items.map((item) => ({
+          ...item,
+          resource: stripInternalResourceFields(item.resource),
+        }));
+      res.json({
+        ...related,
+        similar: sanitizeItems(related.similar),
+        prerequisites: sanitizeItems(related.prerequisites),
+        nextSteps: sanitizeItems(related.nextSteps),
+      });
     } catch (error) {
       console.error('Error fetching related resources:', error);
       res.json(empty);

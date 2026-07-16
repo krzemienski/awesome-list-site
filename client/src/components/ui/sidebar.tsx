@@ -74,7 +74,11 @@ const SidebarProvider = React.forwardRef<
     const isMobile = useIsMobile()
     const [openMobile, setOpenMobile] = React.useState(false)
 
-    const [_open, _setOpen] = React.useState(defaultOpen)
+    const [_open, _setOpen] = React.useState<boolean>(() => {
+      if (typeof window === "undefined") return defaultOpen
+      const stored = window.localStorage.getItem(SIDEBAR_COOKIE_NAME)
+      return stored === null ? defaultOpen : stored === "true"
+    })
     const open = openProp ?? _open
     const setOpen = React.useCallback(
       (value: boolean | ((value: boolean) => boolean)) => {
@@ -83,6 +87,11 @@ const SidebarProvider = React.forwardRef<
           setOpenProp(openState)
         } else {
           _setOpen(openState)
+          try {
+            window.localStorage.setItem(SIDEBAR_COOKIE_NAME, String(openState))
+          } catch {
+            /* localStorage unavailable (private mode) — non-fatal */
+          }
         }
       },
       [setOpenProp, open]
@@ -206,7 +215,7 @@ const Sidebar = React.forwardRef<
           <SheetContent
             data-sidebar="sidebar"
             data-mobile="true"
-            className="w-[--sidebar-width] max-w-[85vw] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
+            className="w-[--sidebar-width] max-w-[80vw] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
             style={
               {
                 "--sidebar-width": SIDEBAR_WIDTH_MOBILE,

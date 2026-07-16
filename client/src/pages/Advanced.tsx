@@ -99,8 +99,7 @@ export default function Advanced() {
             className="flex shrink-0 items-center gap-2 whitespace-nowrap rounded-none border-b-2 border-transparent data-[state=active]:border-[var(--accent)] data-[state=active]:bg-[var(--surface-2)] data-[state=active]:text-[var(--accent)] px-4 py-3"
           >
             <Lightbulb className="h-4 w-4" />
-            <span className="sm:hidden">AI</span>
-            <span className="hidden sm:inline">AI Recommendations</span>
+            <span>AI Recommendations</span>
           </TabsTrigger>
         </TabsList>
 

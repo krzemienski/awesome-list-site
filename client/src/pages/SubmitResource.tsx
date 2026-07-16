@@ -412,7 +412,7 @@ export default function SubmitResource() {
                           <AlertCircle className="h-4 w-4 text-yellow-500" />
                           <AlertTitle className="text-yellow-500">Duplicate URL Detected</AlertTitle>
                           <AlertDescription>
-                            This URL already exists: <strong>{duplicateResource.title}</strong>
+                            This URL has already been submitted.
                             <br />
                             <span className="text-xs text-muted-foreground mt-1 block">
                               You can still submit, but this may be rejected as a duplicate.

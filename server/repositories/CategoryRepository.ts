@@ -238,6 +238,23 @@ export class CategoryRepository {
   }
 
   /**
+   * Get a subcategory by its slug WITHOUT a parent category (NEW-008). Slugs are
+   * unique per category, so this returns the first global match — enough to
+   * resolve `?subcategory=<slug>` filters that omit the category param. If the
+   * same slug exists under multiple parents, the first row wins (best-effort).
+   * @param slug - Subcategory slug (URL-safe identifier)
+   * @returns Subcategory object or undefined if not found
+   */
+  async getSubcategoryBySlugGlobal(slug: string): Promise<Subcategory | undefined> {
+    const [subcategory] = await db
+      .select()
+      .from(subcategories)
+      .where(eq(subcategories.slug, slug))
+      .limit(1);
+    return subcategory;
+  }
+
+  /**
    * Create a new subcategory
    * @param subcategory - Subcategory data to insert
    * @returns The created subcategory

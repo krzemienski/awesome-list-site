@@ -1,0 +1,25 @@
+=== RUN11 VERIFY Thu Jul 16 12:07:05 AM UTC 2026 ===
+--- NEW-009 page=-1 (expect 400 invalid_page) ---
+400 {"error":"invalid_page"}
+--- NEW-034 page=abc (expect 400 invalid_page) ---
+400 {"error":"invalid_page"}
+--- page=2 valid (expect 200) ---
+200
+--- NEW-012 null-byte search (expect 200) ---
+200 resources:200
+--- NEW-019 searchTsv leak (expect empty) ---
+--- NEW-019 search endpoint searchTsv (expect empty) ---
+--- NEW-033 pagination metadata (expect object) ---
+{"page": 2, "limit": 5, "total": 1823, "totalPages": 365, "hasMore": true}
+--- NEW-017 /api/auth/me anon (expect 401) ---
+401
+--- detail searchTsv (expect empty) ---
+total= 0
+=== searchTsv full-coverage probe Thu Jul 16 12:19:02 AM UTC 2026 ===
+/api/resources?limit=5 -> searchTsv occurrences: 0
+/api/search?q=video -> searchTsv occurrences: 0
+/api/resources/187906 -> searchTsv occurrences: 0
+/api/resources/187906/related -> searchTsv occurrences: 0
+/api/awesome-list -> searchTsv occurrences: 0
+/api/public/resources?limit=5 -> searchTsv occurrences: 0
+/api/public/resources/187906 -> searchTsv occurrences: 0

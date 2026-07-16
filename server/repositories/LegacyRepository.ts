@@ -34,6 +34,7 @@ import {
 } from "@shared/schema";
 import { db } from "../db";
 import { eq, asc } from "drizzle-orm";
+import { stripInternalResourceFields } from "../lib/publicResource";
 
 // Hierarchical category structure types
 export interface HierarchicalSubSubcategory {
@@ -98,14 +99,18 @@ export class LegacyRepository {
     // dev) and repairs the rendered tree + counts + sitemap + client on dirty
     // data. One tree is the single source of truth for all of them.
     const seenUrls = new Set<string>();
-    const allResources = allResourcesRaw.filter((r) => {
-      const raw = typeof r.url === 'string' ? r.url.trim().toLowerCase() : '';
-      const key = raw.replace(/\/+$/, '');
-      if (!key) return true; // no URL → cannot dedup, keep it
-      if (seenUrls.has(key)) return false;
-      seenUrls.add(key);
-      return true;
-    });
+    const allResources = allResourcesRaw
+      .filter((r) => {
+        const raw = typeof r.url === 'string' ? r.url.trim().toLowerCase() : '';
+        const key = raw.replace(/\/+$/, '');
+        if (!key) return true; // no URL → cannot dedup, keep it
+        if (seenUrls.has(key)) return false;
+        seenUrls.add(key);
+        return true;
+      })
+      // Strip the internal searchTsv vector at the source so the whole tree
+      // (and og-middleware, which shares this builder) never leaks it.
+      .map((r) => stripInternalResourceFields(r));
 
     // Fetch all categories, subcategories, and sub-subcategories
     const allCategories = await db

@@ -32,6 +32,7 @@ import type { Express, Request, Response } from "express";
 import { storage } from "../storage";
 import { freeTierLimiter } from "../middleware/rateLimit";
 import { requireApiKey } from "../middleware/apiAuth";
+import { stripInternalResourceFields } from "../lib/publicResource";
 
 /**
  * Register all public API routes
@@ -161,7 +162,10 @@ export function registerPublicApiRoutes(app: Express): void {
         search
       });
 
-      res.json(result);
+      res.json({
+        ...result,
+        resources: (result.resources ?? []).map(stripInternalResourceFields),
+      });
     } catch (error) {
       console.error('Error fetching public resources:', error);
       res.status(500).json({ message: 'Failed to fetch resources' });
@@ -248,7 +252,7 @@ export function registerPublicApiRoutes(app: Express): void {
         return res.status(404).json({ message: 'Resource not found' });
       }
 
-      res.json(resource);
+      res.json(stripInternalResourceFields(resource));
     } catch (error) {
       console.error('Error fetching public resource:', error);
       res.status(500).json({ message: 'Failed to fetch resource' });
