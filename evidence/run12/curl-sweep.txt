@@ -1,0 +1,134 @@
+=== Run12 curl sweep vs PROD 2026-07-16T03:35:05Z ===
+--- [C01] GET / Set-Cookie + CSP style-src (M16) ---
+content-security-policy: default-src 'self'; script-src 'self' 'nonce-4ehhWzQUvevfR5F5+mfX5g==' https://www.googletagmanager.com https://replit.com https://replit-cdn.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.google.com https://replit.com https://replit-cdn.com; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none'
+set-cookie: GAESA=Cp4BMDAxNTQ4ZjcyOTkxOGJhOTU2ZjYwODRhNjViYTUwMzAzZjI3MDVmNGI2ODNjYmYwOGU2ZDIwYWZlOTI0OWQ4MjFhZGUxODI2Y2RhNmRkZWFhN2ZjZDFlYzVlNjY2MDA0NDZlMDFhYzJjZjY2NGZiYzZkNTQ3ZGFmN2MyNGMyMDY0ODVlMGE0ZGRjNGQ3ZDhiN2IyZDRjNmExMzU5ZjYQ5of4x_Yz; expires=Sat, 15-Aug-2026 03:35:05 GMT; path=/
+--- [BUG-003] /login input count + noscript ---
+input tags: 0
+noscript: 2
+--- [NEW-002] POST /api/export ---
+status=404
+--- [M05] ratelimit headers on /api/resources ---
+ratelimit-limit: 100
+ratelimit-policy: 100;w=60
+ratelimit-remaining: 99
+ratelimit-reset: 60
+--- [M07] duplicate q params ---
+status=500
+{"message":"Failed to search resources"}
+--- [M08] limit=1000 ---
+status=200 bytes=784627
+resources returned: 1000 pagination: {"page":1,"limit":1000,"total":2014,"totalPages":3,"hasMore":true}
+--- [M10] robots.txt ---
+# robots.txt for Awesome Video (https://awesome.video)
+
+User-agent: *
+Allow: /
+
+# Priority crawling for primary sections
+Allow: /category/
+Allow: /subcategory/
+Allow: /sub-subcategory/
+Allow: /resource/
+Allow: /journey/
+Allow: /journeys
+Allow: /advanced
+Allow: /about
+
+# Block API + private/auth routes (still admit social crawlers below)
+Disallow: /api/
+Disallow: /admin
+Disallow: /profile
+Disallow: /bookmarks
+Disallow: /settings/
+
+# Sitemap (absolute URL — required by spec)
+Sitemap: https://awesome.video/sitemap.xml
+
+Crawl-delay: 1
+
+# Social media crawlers: full access (needed for OG previews)
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Facebot
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+User-agent: Slackbot
+Allow: /
+
+User-agent: Slackbot-LinkExpanding
+Allow: /
+
+User-agent: WhatsApp
+Allow: /
+
+User-agent: TelegramBot
+Allow: /
+
+User-agent: Discordbot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+# Search engines
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+# AI search & assistant crawlers: explicitly allowed so AI answer engines
+# (ChatGPT, Perplexity, Claude, Gemini, Copilot, Meta AI) can crawl and cite
+# this site. Same private-route exclusions as the default group.
+User-agent: GPTBot
+User-agent: ChatGPT-User
+User-agent: OAI-SearchBot
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: ClaudeBot
+User-agent: Claude-Web
+User-agent: anthropic-ai
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: Meta-ExternalAgent
+User-agent: Amazonbot
+User-agent: cohere-ai
+Allow: /
+Disallow: /api/
+Disallow: /admin
+Disallow: /profile
+Disallow: /bookmarks
+Disallow: /settings/
+--- [M15] /api/health ---
+status=200 {"status":"ok"}
+--- [L01] page=999999999 ---
+status=200 {"resources":[],"total":2014,"limit":5,"offset":4999999990,"nextOffset":null,"nextCursor":null,"pagination":{"page":999999999,"limit":5,"total":2014,"totalPages":403,"hasMore":false}}
+--- [L02] PROPFIND / ---
+status=200
+--- [M03] null byte search ---
+status=200 {"query":"test","total":119,"results":[{"id":188128,"title":"ABRBench — ABR Benchmark with OOD Trace Sets","url":"https://github.com/luopeng69131/AB
+--- [M11] check-url duplicate ---
+status=200 {"exists":true,"resource":{"id":185662,"title":"FFmpeg (FFmpeg)","category":"Encoding & Codecs","subcategory":"Encoding Tools"}}
+--- [M14] search rate limit headers ---
+HTTP/2 200 
