@@ -47,7 +47,7 @@ import { fetchStaticAwesomeList } from "@/lib/static-data";
 // (sidebar/header) that made 404s look like real content pages.
 const KNOWN_ROUTE_PATTERNS: RegExp[] = [
   /^\/$/,
-  /^\/(login|register|signup|explore|forgot-password|reset-password|categories|category|recommendations|search|about|advanced|submit|journeys|journey|profile|bookmarks|favorites|account|admin|settings|resource)\/?$/,
+  /^\/(login|logout|register|signup|explore|forgot-password|reset-password|categories|category|recommendations|search|about|advanced|submit|journeys|journey|profile|bookmarks|favorites|account|admin|settings|resource)\/?$/,
   /^\/auth\/(login|register)\/?$/,
   /^\/category\/[^/]+(\/[^/]+)?$/,
   /^\/(subcategory|sub-subcategory|subsubcategory)\/[^/]+$/,
@@ -56,6 +56,32 @@ const KNOWN_ROUTE_PATTERNS: RegExp[] = [
   /^\/admin\/[^/]+$/,
   /^\/settings\/theme\/?$/,
 ];
+
+// Run3 audit R3-10: SPA-side /logout. Direct browser navigation is handled by
+// the server's GET /logout (302 → "/"), but client-side navigation to /logout
+// previously fell through to the 404 page with the session intact. This route
+// posts to /api/auth/logout then hard-redirects home — the full reload wipes
+// all in-memory query cache so no stale authed data survives.
+function Logout() {
+  useEffect(() => {
+    fetch("/api/auth/logout", { method: "POST", credentials: "include" })
+      .catch(() => {
+        // Even if the API call fails, fall through to the redirect — the
+        // server GET /logout on the next full load is the backstop.
+      })
+      .finally(() => {
+        window.location.replace("/");
+      });
+  }, []);
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+        <p className="text-muted-foreground">Signing out…</p>
+      </div>
+    </div>
+  );
+}
 
 function Router() {
   useAnalytics();
@@ -109,6 +135,7 @@ function Router() {
           return <Home awesomeList={awesomeList} isLoading={isLoading} />;
         }} />
         <Route path="/login" component={Login} />
+        <Route path="/logout" component={Logout} />
         <Route path="/register" component={Register} />
         <Route path="/forgot-password" component={ForgotPassword} />
         <Route path="/reset-password" component={ResetPassword} />

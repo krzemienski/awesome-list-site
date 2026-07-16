@@ -1,0 +1,38 @@
+=== R3-10 /logout direct-nav proof Thu Jul 16 12:58:40 AM UTC 2026 ===
+--- 1. login (POST /api/auth/local/login) ---
+login status: 200
+--- 2. authed check ---
+/api/auth/user (authed): 200
+--- 3. GET /logout ---
+GET /logout: 302 redirect=http://localhost:5000/
+--- 4. session after logout ---
+/api/auth/user (after /logout): 200
+--- 4b. body after /logout ---
+{"user":null,"isAuthenticated":false}
+--- 4c. anon baseline (no cookies) ---
+{"user":null,"isAuthenticated":false}
+--- 4d. cookie jar contents after /logout ---
+0
+no connect.sid in jar
+node:internal/modules/esm/resolve:873
+  throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+        ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'playwright' imported from /tmp/verify-spa-logout.mjs
+    at packageResolve (node:internal/modules/esm/resolve:873:9)
+    at moduleResolve (node:internal/modules/esm/resolve:946:18)
+    at defaultResolve (node:internal/modules/esm/resolve:1188:11)
+    at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:708:12)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:657:25)
+    at ModuleLoader.resolve (node:internal/modules/esm/loader:640:38)
+    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:264:38)
+    at ModuleJob._link (node:internal/modules/esm/module_job:168:49) {
+  code: 'ERR_MODULE_NOT_FOUND'
+}
+
+Node.js v20.20.0
+login status: 200
+before SPA /logout: {"user":{"id":"d460f5e7-a085-4083-96a2-2f20dc9315c4","email":"admin@example.com","name":"Admin User","avatar":null,"role":"admin","createdAt":"2025-11-18T16:40:48.993Z"},"isAuthenticated":true}
+after SPA /logout: {"user":null,"isAuthenticated":false}
+final URL: http://localhost:5000/
+PASS SPA /logout clears session and redirects home
