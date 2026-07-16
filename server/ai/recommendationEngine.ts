@@ -168,7 +168,18 @@ export class RecommendationEngine {
       // enrichedProfile already has a copy of userProfile
     }
 
-    const cacheKey = `${enrichedProfile.userId}_${limit}`;
+    // BUG-013 (run13): the cache key must include the profile inputs that
+    // shape the result. Previously `${userId}_${limit}` meant every anonymous
+    // profile (userId "anonymous") shared ONE cache entry, so changing
+    // categories/skill/goals returned identical recommendations for 30 min.
+    const profileFingerprint = [
+      [...(enrichedProfile.preferredCategories || [])].sort().join(','),
+      enrichedProfile.skillLevel || '',
+      [...(enrichedProfile.learningGoals || [])].sort().join(','),
+      [...(enrichedProfile.preferredResourceTypes || [])].sort().join(','),
+      enrichedProfile.timeCommitment || '',
+    ].join('|');
+    const cacheKey = `${enrichedProfile.userId}_${limit}_${profileFingerprint}`;
     
     // Check cache if not forcing refresh
     if (!forceRefresh) {

@@ -201,17 +201,22 @@ export default function Subcategory() {
         resourceCount={allResources.length}
       />
 
-      <Breadcrumbs
-        items={[
-          {
-            label: categoryName,
-            href: `/category/${getCategorySlug(categoryName)}`,
-          },
-          {
-            label: subcategoryName,
-          },
-        ]}
-      />
+      {/* BUG-030 (run13): the app header already renders this exact crumb
+          chain on md+ screens — page-level breadcrumbs are now mobile-only so
+          desktop doesn't show the trail twice. */}
+      <div className="md:hidden">
+        <Breadcrumbs
+          items={[
+            {
+              label: categoryName,
+              href: `/category/${getCategorySlug(categoryName)}`,
+            },
+            {
+              label: subcategoryName,
+            },
+          ]}
+        />
+      </div>
 
       <div className="space-y-3 sm:space-y-4">
         <Link href={`/category/${getCategorySlug(categoryName)}`}>

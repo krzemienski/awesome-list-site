@@ -1,0 +1,10 @@
+014 sub-24px interactive on home (mobile): [] total=0
+030 breadcrumb nav count on sub-subcategory (mobile): 1 => ["HomeSub-subcategoryIntroduction"]
+034 tab count: 4
+034 last tab selected after scroll+click: true
+034 last tab label: AI Recommendations
+025 checkbox states (init/boxclick/labelclick): checked -> unchecked -> checked
+031 /resource/9999999 headings: ["Resource Not Found"]
+031 shared-template footer present: 1
+032 Visit Resource occurrences: 2
+032 Open Resource occurrences: 0

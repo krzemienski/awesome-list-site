@@ -1,0 +1,25 @@
+020 banner visible on first visit: true
+020 gtag requested BEFORE consent: 0
+020 stored after accept: granted
+020 gtag requested AFTER accept: 1
+020 banner gone after accept: true
+020 stored after decline: denied
+020 gtag after decline: 0
+003 palette opened: true
+003 result count: 16
+003 URL after result click: /search
+019 /terms h1: Terms of Use
+019 /privacy h1: Privacy Policy
+019 footer terms link: 1
+008 View Details elements: 0
+032 Open/Visit action count: 1
+032 Share action count: 1
+004 Open Resource href: null
+004 displayed URL text: http://avisynth.nl/index.php/Main_Page
+010 journey title/card links: 5
+042 anon login prompt: true
+042 Start Journey button (anon should be none): 0
+031 404 headings: ["/totally-bogus-route => Page Not Found","/resource/9999999 => Resource Not Found | Resource Not Found","/category/bogus-cat => This page doesn't exist.","/sub-subcategory/bogus-slug => Page Not Found"]
+017 /?tags=ffmpeg shows tag active: true
+023 header sign-in href on /about: null
+023 URL after sign-in click: /login?next=%2Fabout

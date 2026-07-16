@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { CardContent } from "@/components/ui/card";
 import { AwesomeList, Category, Resource } from "@/types/awesome-list";
 import SEOHead from "@/components/layout/SEOHead";
+import { useToast } from "@/hooks/use-toast";
 import { homeSeoTitle, homeSeoDescription } from "@shared/seo-templates";
 import AIRecommendationsPanel from "@/components/ui/ai-recommendations-panel";
 import AdvancedFilter from "@/components/ui/advanced-filter";
@@ -72,8 +73,51 @@ function getAllResources(category: Category): Resource[] {
 
 export default function Home({ awesomeList, isLoading }: HomeProps) {
   const { user, isAuthenticated } = useAuth();
+  const { toast } = useToast();
 
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  // BUG-047 (run13): the register flow lands here with ?welcome=1 after its
+  // full-page nav (which drops any in-flight toast). Greet once, then strip
+  // the param so refreshes don't re-fire.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("welcome") === "1") {
+      toast({
+        title: "Welcome to Awesome Video!",
+        description:
+          "Your account is ready. Bookmark resources, track journeys, and submit your own finds.",
+      });
+      params.delete("welcome");
+      const qs = params.toString();
+      window.history.replaceState(
+        null,
+        "",
+        `${window.location.pathname}${qs ? `?${qs}` : ""}`,
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // BUG-017 (run13): tag filters survive refresh + are deep-linkable via
+  // ?tags=a,b (same replaceState pattern as ?sort= below). ResourceDetail tag
+  // badges link here as /?tags=<tag>.
+  const [selectedTags, setSelectedTagsState] = useState<string[]>(() => {
+    const fromUrl = new URLSearchParams(window.location.search).get("tags");
+    return fromUrl
+      ? fromUrl.split(",").map((t) => t.trim()).filter(Boolean)
+      : [];
+  });
+
+  const setSelectedTags = (next: string[]) => {
+    setSelectedTagsState(next);
+    const params = new URLSearchParams(window.location.search);
+    if (next.length === 0) {
+      params.delete("tags");
+    } else {
+      params.set("tags", next.join(","));
+    }
+    const qs = params.toString();
+    window.history.replaceState(null, "", `${window.location.pathname}${qs ? `?${qs}` : ""}`);
+  };
   // R2-M25: sort survives refresh via ?sort= URL param. wouter's useLocation()
   // is path-only, so read/write window.location.search directly and use
   // history.replaceState (no navigation, no og-middleware impact — the server

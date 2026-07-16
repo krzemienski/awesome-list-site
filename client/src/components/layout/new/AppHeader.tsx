@@ -98,8 +98,19 @@ function getBreadcrumbs(path: string, categories: any[] = []) {
   if (segments.length === 1) {
     crumbs.push({ label: routeLabels[segments[0]] || deslugify(segments[0]), href: path });
   } else if (segments.length >= 2) {
-    crumbs.push({ label: routeLabels[segments[0]] || deslugify(segments[0]), href: `/${segments[0]}` });
-    crumbs.push({ label: deslugify(segments[1]), href: path });
+    if (segments[0] === "journey") {
+      // BUG-029 (run13): the intermediate crumb must point at the real listing
+      // page (/journeys), not the bare /journey redirect stub.
+      crumbs.push({ label: "Learning Journeys", href: "/journeys" });
+      crumbs.push({ label: deslugify(segments[1]), href: path });
+    } else if (segments[0] === "resource") {
+      // BUG-041 (run13): there is no /resource listing page — the old
+      // intermediate "Resource" crumb was a dead link, so it's dropped.
+      crumbs.push({ label: deslugify(segments[1]), href: path });
+    } else {
+      crumbs.push({ label: routeLabels[segments[0]] || deslugify(segments[0]), href: `/${segments[0]}` });
+      crumbs.push({ label: deslugify(segments[1]), href: path });
+    }
   }
   return crumbs;
 }
@@ -237,7 +248,13 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
         ) : (
           // BUG-025 (run9): "Sign in" everywhere — matches the /login page and
           // register flow instead of mixing "Login" and "Sign in".
-          <Button variant="ghost" size="sm" onClick={() => setLocation("/login")} aria-label="Sign in" className="gap-1.5 h-9 px-2 sm:px-3 min-h-[44px] min-w-[44px]">
+          <Button variant="ghost" size="sm" onClick={() => {
+            // BUG-023 (run13): carry the current page as a safe ?next= so
+            // signing in returns the user here (login already validates it).
+            const here = window.location.pathname + window.location.search;
+            const skipNext = here === "/" || here.startsWith("/login") || here.startsWith("/register");
+            setLocation(skipNext ? "/login" : `/login?next=${encodeURIComponent(here)}`);
+          }} aria-label="Sign in" className="gap-1.5 h-9 px-2 sm:px-3 min-h-[44px] min-w-[44px]">
             <LogIn className="h-4 w-4" />
             <span className="hidden sm:inline">Sign in</span>
           </Button>

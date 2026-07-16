@@ -23,6 +23,8 @@ import { AwesomeList, Resource } from "@/types/awesome-list";
 export default function Advanced() {
   const [selectedResource, setSelectedResource] = useState<Resource | undefined>();
   const [userInterests] = useState<string[]>(["web", "api", "testing", "database"]);
+  // BUG-026 (run13): selected export format, driven by the showcase cards.
+  const [exportFormat, setExportFormat] = useState<"markdown" | "json" | "csv" | "pdf" | "html" | "yaml" | undefined>();
 
   const { data: awesomeList, isLoading } = useQuery<AwesomeList>({
     queryKey: ['/api/awesome-list'],
@@ -164,58 +166,10 @@ export default function Advanced() {
         </TabsContent>
 
         <TabsContent value="metrics" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5" />
-                Community Analytics Dashboard
-              </CardTitle>
-              <CardDescription>
-                Track engagement, contributions, and popularity metrics across the awesome list ecosystem
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-2">
-                      <Zap className="h-4 w-4 text-yellow-500" />
-                      <span className="text-sm text-muted-foreground">Activity Level</span>
-                    </div>
-                    <p className="text-2xl font-bold mt-1">High</p>
-                    <p className="text-xs text-green-600 mt-1">
-                      Active community with regular updates
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-2">
-                      <BarChart3 className="h-4 w-4 text-blue-500" />
-                      <span className="text-sm text-muted-foreground">Quality Score</span>
-                    </div>
-                    <p className="text-2xl font-bold mt-1">A+</p>
-                    <p className="text-xs text-blue-600 mt-1">
-                      Comprehensive documentation and categorization
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-2">
-                      <Lightbulb className="h-4 w-4 text-purple-500" />
-                      <span className="text-sm text-muted-foreground">Completeness</span>
-                    </div>
-                    <p className="text-2xl font-bold mt-1">95%</p>
-                    <p className="text-xs text-purple-600 mt-1">
-                      Well-organized with detailed descriptions
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
-            </CardContent>
-          </Card>
-
+          {/* BUG-049 (run13): the old "Activity High / Quality A+ / Completeness
+              95%" cards were hard-coded vanity numbers with no data source —
+              removed. CommunityMetrics below computes real counts from the
+              live catalog. */}
           <CommunityMetrics 
             resources={awesomeList.resources}
             categories={awesomeList.categories}
@@ -234,28 +188,46 @@ export default function Advanced() {
               </CardDescription>
             </CardHeader>
             <CardContent>
+              {/* BUG-026 (run13): format cards are now buttons that select the
+                  matching format in the export panel below. */}
               <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6">
-                {[
-                  { format: "Markdown", icon: "📝", desc: "GitHub-ready" },
-                  { format: "JSON", icon: "⚡", desc: "API-friendly" },
-                  { format: "CSV", icon: "📊", desc: "Spreadsheet" },
-                  { format: "PDF", icon: "📄", desc: "Professional" },
-                  { format: "HTML", icon: "🌐", desc: "Web-ready" },
-                  { format: "YAML", icon: "⚙️", desc: "Config files" }
-                ].map(item => (
-                  <Card key={item.format}>
-                    <CardContent className="p-3 text-center">
-                      <div className="text-2xl mb-1">{item.icon}</div>
-                      <div className="font-medium text-sm">{item.format}</div>
-                      <div className="text-xs text-muted-foreground">{item.desc}</div>
-                    </CardContent>
-                  </Card>
+                {([
+                  { format: "Markdown", value: "markdown", icon: "📝", desc: "GitHub-ready" },
+                  { format: "JSON", value: "json", icon: "⚡", desc: "API-friendly" },
+                  { format: "CSV", value: "csv", icon: "📊", desc: "Spreadsheet" },
+                  { format: "PDF", value: "pdf", icon: "📄", desc: "Professional" },
+                  { format: "HTML", value: "html", icon: "🌐", desc: "Web-ready" },
+                  { format: "YAML", value: "yaml", icon: "⚙️", desc: "Config files" }
+                ] as const).map(item => (
+                  <button
+                    key={item.format}
+                    type="button"
+                    onClick={() => setExportFormat(item.value)}
+                    aria-pressed={exportFormat === item.value}
+                    aria-label={`Select ${item.format} export format`}
+                    className="text-left"
+                    data-testid={`button-format-${item.value}`}
+                  >
+                    <Card
+                      className={
+                        exportFormat === item.value
+                          ? "border-[var(--accent)] ring-1 ring-[var(--accent)]"
+                          : "hover:border-[var(--accent)] transition-colors cursor-pointer"
+                      }
+                    >
+                      <CardContent className="p-3 text-center">
+                        <div className="text-2xl mb-1">{item.icon}</div>
+                        <div className="font-medium text-sm">{item.format}</div>
+                        <div className="text-xs text-muted-foreground">{item.desc}</div>
+                      </CardContent>
+                    </Card>
+                  </button>
                 ))}
               </div>
             </CardContent>
           </Card>
 
-          <ExportTools awesomeList={awesomeList} />
+          <ExportTools awesomeList={awesomeList} formatOverride={exportFormat} />
         </TabsContent>
 
         <TabsContent value="recommendations" className="space-y-6">

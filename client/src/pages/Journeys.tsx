@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -194,7 +194,15 @@ export default function Journeys() {
                     </Badge>
                   </div>
                   <CardTitle className="text-lg sm:text-xl leading-tight">
-                    {journey.title}
+                    {/* BUG-010 (run13): journey titles are links, matching the
+                        card-title-as-link pattern used on resource cards. */}
+                    <Link
+                      href={`/journey/${journey.id}`}
+                      className="hover:underline hover:text-[var(--accent)] transition-colors"
+                      data-testid={`link-journey-title-${journey.id}`}
+                    >
+                      {journey.title}
+                    </Link>
                   </CardTitle>
                   <CardDescription className="line-clamp-3">
                     {journey.description}

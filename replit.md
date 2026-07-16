@@ -10,6 +10,12 @@ A production-ready React application for browsing and discovering over 2,600 cur
 
 > **Full history:** see [`CHANGELOG.md`](./CHANGELOG.md) for every dated entry back to December 2025. Older "Recent Changes" entries are moved there periodically.
 
+### Black-Box Audit Remediation — Run13 (July 16, 2026)
+- **50-finding MASTER-FIX-PROMPT audit triaged live** (BUG-001..050): 26 fixed, 3 fixed-via-rework, 6 fixed-prior/stale, 9 invalid/no-repro, 2 by-design, 2 declined, 2 prod follow-ups. Table: `evidence/run13/findings-table.md`.
+- **Server/infra**: gzip compression (2.67MB → 504KB awesome-list); migration 0033 sub-subcategory slug dedupe (idempotent, no unique index — Publish applies schema diff before data fix); public serializer strips submitter/pipeline metadata; password blocklist + max length; https-upgrade script (13 dev http rows KEPT — real TLS errors journaled).
+- **Client**: /terms + /privacy pages; GA consent banner (no gtag before Accept); palette navigation + count parity; `?tags=` URL sync; linked taxonomy chips/journey titles; real Back button; authed /login redirect; `?next=` on sign-in; password cleared on failed login; `/?welcome=1` register greeting; shared 404 card everywhere; single "Visit Resource" CTA.
+- **Verified** (Iron Rule): tsc clean; 3 Playwright sweeps (desktop/mobile-375px/auth) + curl proofs (`evidence/run13/`); QA users torn down. **Needs republish; then prod follow-ups: 0033 auto-migration, https-upgrade (36 rows), /category/test removal.**
+
 ### Black-Box Audit Remediation — Run12 (July 16, 2026)
 - **MASTER-FIX-PROMPT-v3 triaged live** (claims 87 findings, enumerates 72 unique IDs; crawl pre-dates July 15 republish): 10 fixed, 12 fixed-prior, 24 invalid, 6 platform (Replit widget + GAESA infra cookie incl. CRITICAL C01), 12 by-design, 1 data, 7 declined. Table: `evidence/run12/findings-table.md`.
 - **Server fixes**: M06 malformed JSON → 400; M07 duplicate `?q=` params → first value 200 (was 500); M11 409 duplicate-submit without `existingId`; M14 search rate limit 100/min → 429 + Retry-After; L02 unsupported methods → 405 + Allow.

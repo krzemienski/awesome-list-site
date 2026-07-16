@@ -70,38 +70,31 @@ export default function CommunityMetrics({ resources, categories, className }: C
 
   // Calculate metrics based on actual resource properties from database
   const metrics = useMemo(() => {
-    // Count actual resource types by analyzing real properties
-    const githubSyncedResources = resources.filter(r => r.githubSynced === true);
+    // Count actual resource types by analyzing real properties.
+    // BUG-027 (run13): `githubSynced` is an internal sync-pipeline field and is
+    // no longer present in public payloads, so the old "GitHub Synced" bucket
+    // (which keyed off it) was removed rather than always rendering 0.
     const pendingResources = resources.filter(r => r.status === 'pending');
     const aiEnrichedResources = resources.filter(r => r.metadata?.aiEnriched === true);
-    
-    // Approved resources that are NOT github synced and NOT AI enriched (avoid double-counting)
-    const approvedOnlyResources = resources.filter(r => 
-      r.status === 'approved' && 
-      r.githubSynced !== true && 
+
+    // Approved resources that are NOT AI enriched (avoid double-counting)
+    const approvedOnlyResources = resources.filter(r =>
+      r.status === 'approved' &&
       r.metadata?.aiEnriched !== true
     );
-    
+
     // Group categories by actual resource distribution
-    const githubCategories = Array.from(new Set(githubSyncedResources.map(r => r.category)));
     const aiEnrichedCategories = Array.from(new Set(aiEnrichedResources.map(r => r.category)));
     const approvedCategories = Array.from(new Set(approvedOnlyResources.map(r => r.category)));
     const pendingCategories = Array.from(new Set(pendingResources.map(r => r.category)));
 
     const contributors: ContributorMetric[] = [
       {
-        name: "GitHub Synced Resources",
-        contributions: githubSyncedResources.length,
-        categories: githubCategories.length > 0 ? githubCategories : [] as string[],
-        badge: "Primary Source",
-        level: "platinum" as const
-      },
-      {
         name: "Approved Resources",
         contributions: approvedOnlyResources.length,
         categories: approvedCategories.length > 0 ? approvedCategories : [] as string[],
         badge: "Verified",
-        level: "gold" as const
+        level: "platinum" as const
       },
       {
         name: "AI Enriched",

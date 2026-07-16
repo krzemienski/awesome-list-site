@@ -164,6 +164,10 @@ async function generateSitemap(_req: any, res: any) {
   addUrl('/advanced', 'weekly', '0.6');
   addUrl('/about', 'monthly', '0.5');
   addUrl('/submit', 'monthly', '0.5');
+  // BUG-019 (run13): legal pages are indexable → must be in the sitemap
+  // (indexable set stays equal to the sitemap).
+  addUrl('/terms', 'yearly', '0.3');
+  addUrl('/privacy', 'yearly', '0.3');
 
   // Category taxonomy + every approved resource detail page.
   try {
@@ -902,12 +906,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ============= Resource Routes =============
 
-  // NEW-019: public resource serializer. Removes the internal `searchTsv`
-  // full-text vector (an index implementation detail no client consumes) from
-  // any resource returned on a public endpoint. Other columns (status,
-  // submittedBy, githubSynced, …) are intentionally retained: authenticated
-  // surfaces — the community-metrics panel, profile "my submissions", and the
-  // admin console — read them, and none carry PII beyond opaque user ids.
+  // NEW-019 / BUG-027 (run13): public resource serializer. Strips internal
+  // fields from any resource returned on a public endpoint: `searchTsv`,
+  // moderation/audit columns (submittedBy, approvedBy), GitHub sync-pipeline
+  // state (githubSynced, lastSyncedAt), and enrichment-pipeline internals in
+  // metadata (source, confidence, discoveryId, researchJobId,
+  // enrichmentError). `status` stays (client soft-404/pending views key off
+  // it); admin surfaces read the unstripped rows via /api/admin/* routes.
   const toPublicResource = <T extends Record<string, any>>(r: T) =>
     stripInternalResourceFields(r);
 

@@ -1,6 +1,7 @@
 import { useParams, Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import NotFound from "@/pages/not-found";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -62,6 +63,45 @@ export default function ResourceDetail() {
     queryKey: ['/api/bookmarks'],
     enabled: isAuthenticated
   });
+
+  // BUG-039 (run13): subcategory/sub-subcategory badges become real links.
+  // Slugs are resolved from the cached taxonomy tree (shared with the
+  // sidebar) because DB slugs are NOT always slugify(name) — de-duplicated
+  // sub-subcategories carry "-sc<id>" suffixes.
+  const { data: awesomeListTree } = useQuery<{
+    categories?: {
+      name: string;
+      slug?: string;
+      subcategories?: {
+        name: string;
+        slug?: string;
+        subSubcategories?: { name: string; slug?: string }[];
+      }[];
+    }[];
+  }>({
+    queryKey: ['/api/awesome-list'],
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const taxonomySlugs = useMemo(() => {
+    const out: { subcategory?: string; subSubcategory?: string } = {};
+    if (!awesomeListTree?.categories || !resource) return out;
+    for (const cat of awesomeListTree.categories) {
+      if (cat.name !== resource.category) continue;
+      for (const sub of cat.subcategories || []) {
+        if (sub.name !== resource.subcategory) continue;
+        out.subcategory = sub.slug;
+        if (resource.subSubcategory) {
+          const ss = (sub.subSubcategories || []).find(
+            (s) => s.name === resource.subSubcategory,
+          );
+          out.subSubcategory = ss?.slug;
+        }
+        return out;
+      }
+    }
+    return out;
+  }, [awesomeListTree, resource]);
 
   const { data: relatedResources } = useQuery<{ similar: { resource: Resource; score: number; reasons: string[] }[] }>({
     queryKey: ['/api/resources', id, 'related'],
@@ -272,22 +312,9 @@ export default function ResourceDetail() {
   }
 
   if (error || !resource) {
-    return (
-      <div className="space-y-4 sm:space-y-6 max-w-4xl mx-auto px-0 sm:px-4">
-        <SEOHead title="Page Not Found" noindex />
-        <h1 className="sr-only">Resource Not Found</h1>
-        <div className="text-center py-12">
-          <h2 className="text-2xl font-bold mb-4">Resource Not Found</h2>
-          <p className="text-muted-foreground mb-6">The resource you're looking for doesn't exist or has been removed.</p>
-          <Link href="/">
-            <Button>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
-            </Button>
-          </Link>
-        </div>
-      </div>
-    );
+    // BUG-031 (run13): use the shared 404 template (with a contextual
+    // heading) so every not-found surface renders the same card.
+    return <NotFound heading="Resource Not Found" />;
   }
 
   return (
@@ -298,12 +325,25 @@ export default function ResourceDetail() {
       />
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <Link href="/">
-          <Button variant="ghost" size="sm" className="gap-2" data-testid="button-back">
-            <ArrowLeft className="h-4 w-4" />
-            Back
-          </Button>
-        </Link>
+        {/* BUG-011 (run13): "Back" now behaves like a real back button —
+            history.back() when there is history, home as the fallback for
+            direct/deep-linked visits. */}
+        <Button
+          variant="ghost"
+          size="sm"
+          className="gap-2"
+          data-testid="button-back"
+          onClick={() => {
+            if (window.history.length > 1) {
+              window.history.back();
+            } else {
+              setLocation("/");
+            }
+          }}
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </Button>
         
         <div className="flex flex-wrap items-center gap-2">
           {/* R2-L09: favorite/bookmark shown to anonymous users too — clicks
@@ -417,14 +457,38 @@ export default function ResourceDetail() {
                         </Link>
                       )}
                       {resource.subcategory && (
-                        <Badge variant="outline">
-                          {resource.subcategory}
-                        </Badge>
+                        taxonomySlugs.subcategory ? (
+                          <Link href={`/subcategory/${taxonomySlugs.subcategory}`}>
+                            <Badge
+                              variant="outline"
+                              className="cursor-pointer hover:bg-secondary/80"
+                              data-testid="badge-subcategory"
+                            >
+                              {resource.subcategory}
+                            </Badge>
+                          </Link>
+                        ) : (
+                          <Badge variant="outline" data-testid="badge-subcategory">
+                            {resource.subcategory}
+                          </Badge>
+                        )
                       )}
                       {resource.subSubcategory && (
-                        <Badge variant="outline">
-                          {resource.subSubcategory}
-                        </Badge>
+                        taxonomySlugs.subSubcategory ? (
+                          <Link href={`/sub-subcategory/${taxonomySlugs.subSubcategory}`}>
+                            <Badge
+                              variant="outline"
+                              className="cursor-pointer hover:bg-secondary/80"
+                              data-testid="badge-sub-subcategory"
+                            >
+                              {resource.subSubcategory}
+                            </Badge>
+                          </Link>
+                        ) : (
+                          <Badge variant="outline" data-testid="badge-sub-subcategory">
+                            {resource.subSubcategory}
+                          </Badge>
+                        )
                       )}
                       {/* R4-L16: tooltip + a11y context for the status badge.
                           BUG-019 (run10): moderation status is internal
@@ -515,14 +579,18 @@ export default function ResourceDetail() {
                       Tags
                     </h2>
                     <div className="flex flex-wrap gap-2">
+                      {/* BUG-039 (run13): tags link to the home catalog
+                          pre-filtered on that tag (?tags= is read on mount). */}
                       {tags.map((tag, index) => (
-                        <Badge 
-                          key={index} 
-                          variant="outline" 
-                          className="text-xs border-primary/30 text-primary"
-                        >
-                          #{tag}
-                        </Badge>
+                        <Link key={index} href={`/?tags=${encodeURIComponent(tag)}`}>
+                          <Badge
+                            variant="outline"
+                            className="text-xs border-primary/30 text-primary cursor-pointer hover:bg-primary/10"
+                            data-testid={`tag-link-${index}`}
+                          >
+                            #{tag}
+                          </Badge>
+                        </Link>
                       ))}
                     </div>
                   </div>
@@ -578,43 +646,18 @@ export default function ResourceDetail() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
+              {/* BUG-032 (run13): Share/Favorite/Bookmark used to be repeated
+                  here verbatim from the top action bar. The card now carries
+                  only the primary CTA; the top bar owns the secondary
+                  actions. Label matches the top-bar "Visit Resource" so it
+                  reads as the same action, not a second one. */}
               <Button 
                 className="w-full min-h-[44px]" 
                 onClick={handleVisitResource}
               >
                 <ExternalLink className="h-4 w-4 mr-2" />
-                Open Resource
+                Visit Resource
               </Button>
-              <Button 
-                variant="outline" 
-                className="w-full min-h-[44px]" 
-                onClick={handleShare}
-              >
-                <Share2 className="h-4 w-4 mr-2" />
-                Share This Page
-              </Button>
-              {isAuthenticated && (
-                <>
-                  <Button 
-                    variant={isFavorite ? "default" : "outline"}
-                    className="w-full min-h-[44px]" 
-                    onClick={() => favoriteMutation.mutate()}
-                    disabled={favoriteMutation.isPending}
-                  >
-                    <Heart className={`h-4 w-4 mr-2 ${isFavorite ? 'fill-current' : ''}`} />
-                    {isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
-                  </Button>
-                  <Button 
-                    variant={isBookmarked ? "default" : "outline"}
-                    className="w-full min-h-[44px]" 
-                    onClick={() => bookmarkMutation.mutate()}
-                    disabled={bookmarkMutation.isPending}
-                  >
-                    <Bookmark className={`h-4 w-4 mr-2 ${isBookmarked ? 'fill-current' : ''}`} />
-                    {isBookmarked ? 'Remove Bookmark' : 'Add to Bookmarks'}
-                  </Button>
-                </>
-              )}
             </CardContent>
           </Card>
 

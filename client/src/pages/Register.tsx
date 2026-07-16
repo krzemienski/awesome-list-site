@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "wouter";
+import { useEffect, useRef, useState } from "react";
+import { Link, useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -13,6 +13,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import SEOHead from "@/components/layout/SEOHead";
+import { useAuth } from "@/hooks/useAuth";
 import { trackSignUp } from "@/lib/analytics";
 
 const registerSchema = z.object({
@@ -78,6 +79,19 @@ export default function Register() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [, setLocation] = useLocation();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  // Distinguishes "arrived already signed in" from "signed up via this form" —
+  // the form's own success path handles its redirect, so the effect below
+  // must not race it.
+  const submitStartedRef = useRef(false);
+
+  // BUG-021 (run13): visiting /register while already signed in silently
+  // showed the form again. Redirect home instead.
+  useEffect(() => {
+    if (authLoading || !isAuthenticated || submitStartedRef.current) return;
+    setLocation("/", { replace: true });
+  }, [authLoading, isAuthenticated, setLocation]);
 
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -88,6 +102,7 @@ export default function Register() {
   });
 
   const onSubmit = async (data: RegisterFormData) => {
+    submitStartedRef.current = true;
     setIsLoading(true);
     try {
       const response = await fetch("/api/auth/register", {
@@ -134,7 +149,9 @@ export default function Register() {
           title: "Account created",
           description: `Welcome, ${result.user.email}!`,
         });
-        window.location.href = "/";
+        // BUG-047 (run13): land on home with ?welcome=1 so the destination
+        // page greets the new account (the full-page nav drops this toast).
+        window.location.href = "/?welcome=1";
       } else {
         // Account exists but auto-login failed — send them to the login page.
         toast({

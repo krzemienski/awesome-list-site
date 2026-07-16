@@ -454,6 +454,16 @@ function homeShellChrome(): string {
       title: `About — ${SITE_NAME}`,
       description: `Learn about ${SITE_NAME} — the web home of the awesome-video curated list by Nick Krzemienski — and awesome-list-site, the open-source platform that powers it.`,
     },
+    // BUG-019 (run13): legal pages — indexable + listed in the sitemap.
+    // Titles must mirror the client SEOHead titles exactly (two-pass parity).
+    "/terms": {
+      title: `Terms of Use — ${SITE_NAME}`,
+      description: `The terms that govern your use of ${SITE_NAME} — a free, community-curated directory of video development resources.`,
+    },
+    "/privacy": {
+      title: `Privacy Policy — ${SITE_NAME}`,
+      description: `How ${SITE_NAME} handles your data: what we collect, how it's used, and the analytics choices you control.`,
+    },
     "/advanced": {
       title: advancedSeoTitle,
       description: advancedSeoDescription,

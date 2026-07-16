@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express, { type Request, Response, NextFunction } from "express";
+import compression from "compression";
 import { registerRoutes, runBackgroundInitialization } from "./routes";
 import { serveStatic, log } from "./vite";
 import { handleSSR } from "./ssr";
@@ -18,6 +19,20 @@ const app = express();
 
 // BUG-020: don't advertise the Express server via the X-Powered-By header.
 app.disable("x-powered-by");
+
+// BUG-006 (run13): gzip/brotli-negotiated response compression. The
+// awesome-list JSON is ~3 MB uncompressed; without this every page load pays
+// the full transfer. Skip event-stream responses (compression buffering
+// breaks SSE-style streaming if ever added).
+app.use(
+  compression({
+    filter: (req, res) => {
+      const type = String(res.getHeader("Content-Type") || "");
+      if (type.includes("text/event-stream")) return false;
+      return compression.filter(req, res);
+    },
+  }),
+);
 
 // BUG-019 / BUG-014: baseline security headers. The always-on set is safe in
 // every environment; the stricter frame/CSP policy is production-only so it

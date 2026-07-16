@@ -24,6 +24,30 @@ declare global {
 const getMeasurementId = (): string | undefined =>
   import.meta.env.VITE_GA_MEASUREMENT_ID as string | undefined;
 
+// BUG-020 (run13): analytics is consent-gated. The choice lives in
+// localStorage; initGA() hard-returns until the visitor explicitly accepts,
+// so gtag.js is never even downloaded pre-consent. Every tracking helper
+// already no-ops while window.gtag is undefined.
+const CONSENT_KEY = 'analytics-consent';
+export type AnalyticsConsent = 'granted' | 'denied' | null;
+
+export const getAnalyticsConsent = (): AnalyticsConsent => {
+  try {
+    const v = localStorage.getItem(CONSENT_KEY);
+    return v === 'granted' || v === 'denied' ? v : null;
+  } catch {
+    return null;
+  }
+};
+
+export const setAnalyticsConsent = (value: 'granted' | 'denied') => {
+  try {
+    localStorage.setItem(CONSENT_KEY, value);
+  } catch {
+    // Storage unavailable (private mode) — treat as session-only choice.
+  }
+};
+
 const domainOf = (url: string): string | undefined => {
   try {
     return new URL(url).hostname;
@@ -41,6 +65,10 @@ const domainOf = (url: string): string | undefined => {
 let gaInitialized = false;
 export const initGA = () => {
   if (gaInitialized) return;
+
+  // BUG-020 (run13): never load gtag without explicit consent. The consent
+  // banner calls initGA() again right after the visitor accepts.
+  if (getAnalyticsConsent() !== 'granted') return;
 
   const measurementId = getMeasurementId();
 

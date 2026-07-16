@@ -89,7 +89,11 @@ export default function MainLayout({ awesomeList, isLoading, children, user, onL
         */}
         <main
           id="main"
-          className="flex-1 min-w-0 overflow-x-hidden mx-auto w-full max-w-[1280px] px-4 sm:px-6 md:px-12 py-8"
+          // BUG-043 (run13): tabIndex={-1} makes the skip-link target
+          // programmatically focusable, so "Skip to content" actually moves
+          // keyboard focus instead of only scrolling.
+          tabIndex={-1}
+          className="flex-1 min-w-0 overflow-x-hidden mx-auto w-full max-w-[1280px] px-4 sm:px-6 md:px-12 py-8 focus:outline-none"
         >
           {children}
         </main>
@@ -118,6 +122,13 @@ export default function MainLayout({ awesomeList, isLoading, children, user, onL
               <Link href="/about" className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors" data-testid="footer-about">
                 About
               </Link>
+              {/* BUG-019 (run13): real legal pages instead of dead promises. */}
+              <Link href="/terms" className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors" data-testid="footer-terms">
+                Terms
+              </Link>
+              <Link href="/privacy" className="inline-flex items-center min-h-[44px] hover:text-[color:var(--text)] transition-colors" data-testid="footer-privacy">
+                Privacy
+              </Link>
               <a
                 href="https://github.com/krzemienski/awesome-video"
                 target="_blank"
@@ -135,7 +146,6 @@ export default function MainLayout({ awesomeList, isLoading, children, user, onL
       <SearchDialog
         isOpen={searchOpen}
         setIsOpen={setSearchOpen}
-        resources={awesomeList?.resources || []}
       />
       <BackToTop />
     </SidebarProvider>

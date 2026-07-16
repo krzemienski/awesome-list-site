@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Link } from "wouter";
+import { useEffect, useRef, useState } from "react";
+import { Link, useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import SEOHead from "@/components/layout/SEOHead";
 import { trackLogin } from "@/lib/analytics";
+import { useAuth } from "@/hooks/useAuth";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -35,6 +36,22 @@ export default function Login() {
   const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [, setLocation] = useLocation();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  // Distinguishes "arrived already signed in" from "signed in via this form" —
+  // the form's own success path handles its redirect (incl. the admin →
+  // /admin default), so the effect below must not race it.
+  const submitStartedRef = useRef(false);
+
+  // BUG-021 (run13): visiting /login while already signed in silently showed
+  // the form again. Redirect to the safe ?next= target or home instead.
+  useEffect(() => {
+    if (authLoading || !isAuthenticated || submitStartedRef.current) return;
+    const nextParam = new URLSearchParams(window.location.search).get("next");
+    const safeNext =
+      nextParam && /^\/(?![/\\])/.test(nextParam) ? nextParam : null;
+    setLocation(safeNext ?? "/", { replace: true });
+  }, [authLoading, isAuthenticated, setLocation]);
 
   // Surface OIDC callback failures (server redirects here with ?error=oauth).
   useEffect(() => {
@@ -64,6 +81,7 @@ export default function Login() {
   });
 
   const onSubmit = async (data: LoginFormData) => {
+    submitStartedRef.current = true;
     setIsLoading(true);
     try {
       const response = await fetch("/api/auth/local/login", {
@@ -146,6 +164,9 @@ export default function Login() {
             variant: "destructive",
           });
         }
+        // BUG-046 (run13): clear the rejected password so the user retypes it
+        // instead of resubmitting the same wrong value; email stays put.
+        form.resetField("password");
       }
     } catch {
       toast({

@@ -1,18 +1,33 @@
-import { useState, useEffect, useMemo, useRef } from "react";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { useState, useEffect, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Command, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Search, Clock, X } from "lucide-react";
+import { Search, Clock, X, Loader2 } from "lucide-react";
 import { useLocation } from "wouter";
-import Fuse from "fuse.js";
-import { Resource } from "@/types/awesome-list";
-import { trackSearch, trackResourceClick, trackPerformance } from "@/lib/analytics";
+import { apiRequest } from "@/lib/queryClient";
+import { trackSearch, trackResourceClick } from "@/lib/analytics";
 import { useDebounce } from "@/hooks/useDebounce";
 
 interface SearchDialogProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
-  resources: Resource[];
+}
+
+// BUG-003/BUG-007 (run13): the palette used to run its own client-side Fuse
+// index over the static tree — different matcher, different counts than the
+// /search page, and result clicks opened external URLs instead of in-app
+// resource pages. It now runs the SAME server search as the /search page
+// (identical queryKey → shared React Query cache entry), so counts always
+// agree, and selecting a result navigates in-app to /resource/:id.
+
+interface DbSearchResource {
+  id: number;
+  title: string;
+  url: string;
+  description: string | null;
+  category: string | null;
+  subcategory: string | null;
 }
 
 // R2-L10: recent searches persisted in localStorage (max 5, most recent first).
@@ -44,59 +59,39 @@ function saveRecentSearch(query: string): string[] {
   return next;
 }
 
-export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDialogProps) {
+export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<Resource[]>([]);
-  // NEW-015: total match count across the whole catalog, shown above the
-  // (top-15-capped) quick results so users know how many matches exist.
-  const [totalMatches, setTotalMatches] = useState(0);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
-  const debouncedQuery = useDebounce(query, 600);
+  const debouncedQuery = useDebounce(query, 300);
   const [, navigate] = useLocation();
   const inputRef = useRef<HTMLInputElement>(null);
-  const linkClickingRef = useRef(false);
 
-  // Debug: Log resources to see if they're being passed correctly
-  // Search dialog initialized with ${resources?.length || 0} resources
+  const trimmed = debouncedQuery.trim();
 
-  // Create Fuse.js instance for search with special character support
-  const fuse = useMemo(() => {
-    if (!resources || resources.length === 0) return null;
-    return new Fuse(resources, {
-      keys: ['title', 'description', 'category', 'subcategory'],
-      threshold: 0.4, // More lenient for punctuation (was 0.3)
-      includeScore: true,
-      ignoreLocation: true,
-      minMatchCharLength: 2,
-      shouldSort: true,
-      ignoreFieldNorm: true, // Ignore field length for better special char matching
-    });
-  }, [resources]);
+  // Same queryKey + fetch as the /search page, so both surfaces share one
+  // cached result set and always report the same match count.
+  const { data, isFetching } = useQuery<{ resources: DbSearchResource[]; total: number }>({
+    queryKey: ["/api/resources", "search", trimmed],
+    queryFn: async () =>
+      apiRequest(`/api/resources?search=${encodeURIComponent(trimmed)}&limit=1000`, {
+        method: "GET",
+      }),
+    enabled: isOpen && trimmed.length >= 2,
+    staleTime: 60 * 1000,
+  });
 
-  // Live search results — instant, runs on every keystroke (not tracked).
+  const allMatches = trimmed.length >= 2 ? data?.resources ?? [] : [];
+  const totalMatches = allMatches.length;
+  const results = allMatches.slice(0, 15);
+
+  // Track the search once the debounced query settles and results arrive —
+  // one `search` event per settled query, not one per keystroke.
   useEffect(() => {
-    if (!query || query.length < 2 || !fuse) {
-      setResults([]);
-      setTotalMatches(0);
-      return;
-    }
-    const searchResults = fuse.search(query);
-    setTotalMatches(searchResults.length);
-    setResults(searchResults.slice(0, 15).map(result => result.item));
-  }, [query, fuse]);
-
-  // Track the search once the user pauses typing (debounced) so a single search
-  // emits exactly one `search` event instead of one per keystroke.
-  useEffect(() => {
-    if (!debouncedQuery || debouncedQuery.length < 2 || !fuse) return;
-    const startTime = performance.now();
-    const searchResults = fuse.search(debouncedQuery);
-    const endTime = performance.now();
-    trackSearch(debouncedQuery, searchResults.length);
-    trackPerformance('search_time', endTime - startTime);
+    if (!trimmed || trimmed.length < 2 || !data) return;
+    trackSearch(trimmed, data.resources.length);
     // R2-L10: a settled (debounced) query counts as a "recent search".
-    setRecentSearches(saveRecentSearch(debouncedQuery));
-  }, [debouncedQuery, fuse]);
+    setRecentSearches(saveRecentSearch(trimmed));
+  }, [trimmed, data]);
 
   // R2-L10: load persisted recent searches whenever the dialog opens.
   useEffect(() => {
@@ -144,23 +139,17 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
   useEffect(() => {
     if (!isOpen) {
       setQuery("");
-      setResults([]);
-      setTotalMatches(0);
     }
   }, [isOpen]);
 
-  // Prevent dialog from closing when clicking search results
-  const handleOpenChange = (open: boolean) => {
-    // If trying to close while clicking a link, prevent it
-    if (!open && linkClickingRef.current) {
-      return;
-    }
-    // Otherwise, allow normal open/close behavior
-    setIsOpen(open);
+  const openResource = (resource: DbSearchResource) => {
+    trackResourceClick(resource.title, resource.url, resource.category || "");
+    setIsOpen(false);
+    navigate(`/resource/${resource.id}`);
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <div className="eyebrow" aria-hidden>// Search</div>
@@ -187,81 +176,72 @@ export default function SearchDialog({ isOpen, setIsOpen, resources }: SearchDia
           <CommandList className="max-h-[300px] overflow-y-auto">
             {query.length >= 2 ? (
               <>
-                {totalMatches > 0 && (
-                  <div
-                    className="px-3 pt-2 pb-1 text-xs text-muted-foreground"
-                    data-testid="search-result-count"
-                    aria-live="polite"
-                  >
-                    {totalMatches} match{totalMatches === 1 ? "" : "es"}
-                    {totalMatches > results.length ? ` — showing top ${results.length}` : ""}
+                {isFetching && results.length === 0 ? (
+                  <div className="flex items-center justify-center gap-2 h-[120px] text-sm text-muted-foreground" data-testid="search-loading">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Searching…
                   </div>
-                )}
-                <CommandGroup>
-                  {/* Pinned first so plain Enter goes to the full search page. */}
-                  <CommandItem
-                    key="view-all-results"
-                    value={`view-all-${query}`}
-                    onSelect={() => {
-                      setIsOpen(false);
-                      navigate(`/search?q=${encodeURIComponent(query)}`);
-                    }}
-                    className="flex items-center gap-2 p-3 cursor-pointer"
-                    data-testid="search-view-all"
-                  >
-                    <Search className="h-4 w-4 shrink-0 text-[var(--accent)]" />
-                    <span className="text-sm font-medium">
-                      View all results for “{query}”
-                    </span>
-                  </CommandItem>
-                  {results.map((resource, index) => (
-                    <CommandItem
-                      key={`${resource.title}-${resource.url}-${index}`}
-                      asChild
-                      onSelect={(e) => {
-                        // Set flag to prevent dialog from closing
-                        linkClickingRef.current = true;
-                        trackResourceClick(resource.title, resource.url, resource.category);
-                        // Open link in new tab
-                        window.open(resource.url, '_blank', 'noopener,noreferrer');
-                        // Reset flag after longer delay to ensure guard works
-                        setTimeout(() => {
-                          linkClickingRef.current = false;
-                        }, 500);
-                      }}
-                      data-testid={`search-result-${index}`}
-                    >
-                      <a
-                        href={resource.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => {
-                          // Prevent anchor's default navigation - onSelect handles it
-                          e.preventDefault();
-                        }}
-                        className="flex flex-col gap-1 cursor-pointer p-3 no-underline text-inherit hover:no-underline"
+                ) : (
+                  <>
+                    {totalMatches > 0 && (
+                      <div
+                        className="px-3 pt-2 pb-1 text-xs text-muted-foreground"
+                        data-testid="search-result-count"
+                        aria-live="polite"
                       >
-                        <div className="font-medium text-sm">{resource.title}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {resource.category} {resource.subcategory ? `→ ${resource.subcategory}` : ''} 
+                        {totalMatches}{totalMatches >= 1000 ? "+" : ""} match{totalMatches === 1 ? "" : "es"}
+                        {totalMatches > results.length ? ` — showing top ${results.length}` : ""}
+                      </div>
+                    )}
+                    <CommandGroup>
+                      {/* Pinned first so plain Enter goes to the full search page. */}
+                      <CommandItem
+                        key="view-all-results"
+                        value={`view-all-${query}`}
+                        onSelect={() => {
+                          setIsOpen(false);
+                          navigate(`/search?q=${encodeURIComponent(query)}`);
+                        }}
+                        className="flex items-center gap-2 p-3 cursor-pointer"
+                        data-testid="search-view-all"
+                      >
+                        <Search className="h-4 w-4 shrink-0 text-[var(--accent)]" />
+                        <span className="text-sm font-medium">
+                          View all results for “{query}”
+                        </span>
+                      </CommandItem>
+                      {results.map((resource, index) => (
+                        <CommandItem
+                          key={`resource-${resource.id}`}
+                          value={`resource-${resource.id}`}
+                          onSelect={() => openResource(resource)}
+                          className="flex flex-col items-start gap-1 p-3 cursor-pointer"
+                          data-testid={`search-result-${index}`}
+                        >
+                          <div className="font-medium text-sm">{resource.title}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {resource.category} {resource.subcategory ? `→ ${resource.subcategory}` : ''}
+                          </div>
+                          {resource.description && (
+                            <div className="text-xs text-muted-foreground line-clamp-2">
+                              {resource.description}
+                            </div>
+                          )}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                    {!isFetching && results.length === 0 && (
+                      <div className="flex flex-col items-center justify-center h-[160px] text-center p-4">
+                        <div className="flex h-16 w-16 items-center justify-center bg-muted rounded-lg">
+                          <Search className="h-8 w-8 text-muted-foreground" />
                         </div>
-                        <div className="text-xs text-muted-foreground line-clamp-2">
-                          {resource.description}
-                        </div>
-                      </a>
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-                {results.length === 0 && (
-                  <div className="flex flex-col items-center justify-center h-[160px] text-center p-4">
-                    <div className="flex h-16 w-16 items-center justify-center bg-muted rounded-lg">
-                      <Search className="h-8 w-8 text-muted-foreground" />
-                    </div>
-                    <h3 className="mt-4 text-sm font-semibold">No quick results found</h3>
-                    <p className="mt-2 text-xs text-muted-foreground">
-                      Press Enter to search all resources, or try different keywords
-                    </p>
-                  </div>
+                        <h3 className="mt-4 text-sm font-semibold">No results found</h3>
+                        <p className="mt-2 text-xs text-muted-foreground">
+                          Try different keywords or check the spelling
+                        </p>
+                      </div>
+                    )}
+                  </>
                 )}
               </>
             ) : recentSearches.length > 0 ? (

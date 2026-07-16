@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -21,6 +21,12 @@ interface ExportToolsProps {
   awesomeList: AwesomeList;
   selectedCategory?: string;
   className?: string;
+  /**
+   * BUG-026 (run13): lets the parent page (Advanced → format showcase cards)
+   * drive the selected export format so the cards are functional, not
+   * decorative.
+   */
+  formatOverride?: ExportFormat;
 }
 
 type ExportFormat = "markdown" | "json" | "csv" | "pdf" | "html" | "yaml";
@@ -34,7 +40,7 @@ interface ExportOptions {
   selectedCategories: string[];
 }
 
-export default function ExportTools({ awesomeList, selectedCategory, className }: ExportToolsProps) {
+export default function ExportTools({ awesomeList, selectedCategory, className, formatOverride }: ExportToolsProps) {
   const { toast } = useToast();
   const [exportOptions, setExportOptions] = useState<ExportOptions>({
     format: "markdown",
@@ -45,6 +51,14 @@ export default function ExportTools({ awesomeList, selectedCategory, className }
     selectedCategories: selectedCategory ? [selectedCategory] : []
   });
   const [isExporting, setIsExporting] = useState(false);
+
+  // BUG-026 (run13): apply a parent-driven format selection (Advanced page
+  // format showcase cards) to the local export options.
+  useEffect(() => {
+    if (formatOverride) {
+      setExportOptions(prev => ({ ...prev, format: formatOverride }));
+    }
+  }, [formatOverride]);
 
   const formatIcons = {
     markdown: <FileText className="h-4 w-4" />,
@@ -298,13 +312,39 @@ export default function ExportTools({ awesomeList, selectedCategory, className }
           filename = `${awesomeList.title.toLowerCase().replace(/\s+/g, '-')}.yaml`;
           mimeType = 'text/yaml';
           break;
-        case 'pdf':
+        case 'pdf': {
+          // BUG-024 (run13): the old "premium subscription" toast was fake —
+          // no premium tier exists. Real behavior: render the HTML report in a
+          // new window and open the browser print dialog so the user can save
+          // as PDF (standard client-side PDF path, no server dependency).
+          const htmlForPdf = generateHTML(resources);
+          const printWindow = window.open('', '_blank');
+          if (!printWindow) {
+            toast({
+              title: "Popup Blocked",
+              description: "Allow popups for this site, then try the PDF export again.",
+              variant: "destructive",
+            });
+            return;
+          }
+          printWindow.document.open();
+          printWindow.document.write(htmlForPdf);
+          printWindow.document.close();
+          printWindow.focus();
+          setTimeout(() => {
+            try {
+              printWindow.print();
+            } catch {
+              // window may have been closed — nothing to do
+            }
+          }, 400);
           toast({
-            title: "PDF Export",
-            description: "PDF export requires a premium subscription. Please use HTML export and print to PDF as an alternative.",
+            title: "PDF Ready",
+            description: `${resources.length} resources prepared — use the print dialog to save as PDF`,
             variant: "default",
           });
           return;
+        }
       }
 
       // Create and download file

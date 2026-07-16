@@ -213,21 +213,26 @@ export default function SubSubcategory() {
           </Button>
         </Link>
         
-        <Breadcrumbs
-          items={[
-            {
-              label: categoryName,
-              href: parentCategory?.slug ? `/category/${parentCategory.slug}` : undefined,
-            },
-            {
-              label: subcategoryName,
-              href: parentSubcategory?.slug ? `/subcategory/${parentSubcategory.slug}` : undefined,
-            },
-            {
-              label: subSubcategoryName,
-            },
-          ]}
-        />
+        {/* BUG-030 (run13): the app header already renders this exact crumb
+            chain on md+ screens — page-level breadcrumbs are now mobile-only
+            so desktop doesn't show the trail twice. */}
+        <div className="md:hidden">
+          <Breadcrumbs
+            items={[
+              {
+                label: categoryName,
+                href: parentCategory?.slug ? `/category/${parentCategory.slug}` : undefined,
+              },
+              {
+                label: subcategoryName,
+                href: parentSubcategory?.slug ? `/subcategory/${parentSubcategory.slug}` : undefined,
+              },
+              {
+                label: subSubcategoryName,
+              },
+            ]}
+          />
+        </div>
 
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
