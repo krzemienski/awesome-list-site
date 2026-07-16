@@ -71,7 +71,7 @@ import { claudeService } from "./ai/claudeService";
 import { AwesomeListFormatter } from "./github/formatter";
 import { validateAwesomeList, formatValidationReport } from "./validation/awesomeLint";
 import { checkResourceLinks, formatLinkCheckReport } from "./validation/linkChecker";
-import { seedDatabase } from "./seed";
+import { seedDatabase, syncAdminPasswordFromEnv } from "./seed";
 import { enrichmentService } from "./ai/enrichmentService";
 import { parseAgentConfigFromRequest, stripJobAuthSecret } from "./ai/agentRuntime";
 import { db } from "./db";
@@ -4894,6 +4894,15 @@ export async function runBackgroundInitialization(): Promise<void> {
     await runOrphanWatchdogStartup();
   } catch (err) {
     console.error('Failed to import/run orphan watchdog (non-fatal):', err);
+  }
+
+  // Reconcile the local admin password with the ADMIN_PASSWORD secret on
+  // every boot (seedAdminUser only runs when the DB is empty, so this is the
+  // only rotation path on a populated deployment). Non-fatal on failure.
+  try {
+    await syncAdminPasswordFromEnv();
+  } catch (err) {
+    console.error('Admin password sync failed (non-fatal):', err);
   }
 
   // Both dev and production: Check and seed database if needed

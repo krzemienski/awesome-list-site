@@ -2,7 +2,7 @@ import fetch from 'node-fetch';
 import { db } from "./db";
 import { categories, subcategories, subSubcategories, resources, users, resourceEdits, tags, resourceTags } from "@shared/schema";
 import { eq } from "drizzle-orm";
-import { hashPassword } from "./passwordUtils";
+import { hashPassword, comparePassword } from "./passwordUtils";
 import { mapCategoryName } from "@shared/categoryMapping";
 import { seedJourneyStepsForExisting } from "./cli/seedJourneyStepsForExisting";
 
@@ -249,6 +249,34 @@ async function seedAdminUser(): Promise<boolean> {
     console.error(`❌ Failed to create admin user: ${errorMessage}`);
     return false;
   }
+}
+
+/**
+ * Boot-time admin-password reconciliation. seedAdminUser() only runs when the
+ * database is empty, so on a populated deployment there is otherwise NO path
+ * to rotate the local admin password (production DB is not directly writable;
+ * the reset-email flow can't reach the placeholder admin inbox). This runs on
+ * every boot: if the ADMIN_PASSWORD secret is set and differs from the stored
+ * hash for admin@example.com, the hash is rotated. Idempotent, never logs the
+ * password value. No-ops when the secret is unset/short or the user is absent.
+ */
+export async function syncAdminPasswordFromEnv(): Promise<void> {
+  const adminEmail = "admin@example.com";
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  if (!adminPassword || adminPassword.length < 8) return;
+
+  const existing = await db.select().from(users).where(eq(users.email, adminEmail)).limit(1);
+  if (existing.length === 0) return; // creation is seedAdminUser's job
+
+  const admin = existing[0];
+  if (admin.password && (await comparePassword(adminPassword, admin.password))) {
+    return; // already in sync — nothing to do
+  }
+
+  const hashedPassword = await hashPassword(adminPassword);
+  await db.update(users).set({ password: hashedPassword }).where(eq(users.id, admin.id));
+  console.log(`🔐 Admin password rotated from ADMIN_PASSWORD secret (${adminEmail})`);
 }
 
 /**
