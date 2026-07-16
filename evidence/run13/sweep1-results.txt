@@ -23,3 +23,8 @@
 017 /?tags=ffmpeg shows tag active: true
 023 header sign-in href on /about: null
 023 URL after sign-in click: /login?next=%2Fabout
+--- palette filter proof (shouldFilter={false} at search-dialog line 164; custom values are inert) ---
+query="hls" visible rows=16 sample=["go2rtcInfrastructure & Delivery → Stream","ZLMediaKitInfrastructure & Delivery → St"]
+query="codec" visible rows=16 sample=["Video Processing Benchmarks and Research","FFV1 CodecEncoding & Codecs → CodecsFFmp"]
+query="streaming" visible rows=16 sample=["StreamPack - Multiprotocol live streamin","QUANTEEC Digital Rights ManagementGenera"]
+query="streaming" row click -> /resource/187906
