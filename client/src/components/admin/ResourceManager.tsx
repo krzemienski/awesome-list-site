@@ -898,7 +898,11 @@ export default function ResourceManager() {
                 <SelectTrigger className="w-28 h-8 shrink-0" aria-label="Rows per page" data-testid="select-page-size">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                {/* NB-019 (run18): popper positioning is collision-aware and
+                    caps the listbox to --radix-select-content-available-height,
+                    so at the table footer it flips up instead of opening below
+                    the viewport (or forcing a scroll-lock). */}
+                <SelectContent position="popper">
                   <SelectItem value="25">25 / page</SelectItem>
                   <SelectItem value="50">50 / page</SelectItem>
                   <SelectItem value="100">100 / page</SelectItem>
@@ -955,7 +959,10 @@ export default function ResourceManager() {
       </Card>
 
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-        <DialogContent className="max-w-2xl bg-[var(--bg-2)] border-[var(--border)]">
+        {/* NB-005 (run18): cap height to the small-viewport unit (svh accounts
+            for mobile URL bars) and scroll internally so every field + the
+            Save/Cancel footer stay reachable at 812×375 landscape. */}
+        <DialogContent className="max-w-2xl max-h-[90svh] overflow-y-auto bg-[var(--bg-2)] border-[var(--border)]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Pencil className="h-5 w-5" />
@@ -1092,7 +1099,9 @@ export default function ResourceManager() {
       </Dialog>
 
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-        <DialogContent className="max-w-2xl bg-[var(--bg-2)] border-[var(--border)]">
+        {/* NB-005 (run18): same svh height cap as the edit dialog so the Create
+            form's footer stays reachable on short landscape viewports. */}
+        <DialogContent className="max-w-2xl max-h-[90svh] overflow-y-auto bg-[var(--bg-2)] border-[var(--border)]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Plus className="h-5 w-5" />

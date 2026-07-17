@@ -17,7 +17,12 @@ import { trackLogin } from "@/lib/analytics";
 import { useAuth } from "@/hooks/useAuth";
 
 const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
+  // BUG-037 (run18): an empty email must read "Email is required", not
+  // "Please enter a valid email address" — min(1) fires before email().
+  email: z
+    .string()
+    .min(1, "Email is required")
+    .email("Please enter a valid email address"),
   // Run16 BUG-064: empty submit must say the password is required, not stay
   // silent (min(1) fires first; min(8) covers short-but-present values).
   password: z
@@ -220,6 +225,9 @@ export default function Login() {
                     <FormControl>
                       <div className="relative">
                         <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        {/* BUG-049 (run18): native required/type=email aid AT,
+                            autofill and mobile keyboards; the form's noValidate
+                            keeps zod's styled inline messages authoritative. */}
                         <Input
                           {...field}
                           id="email"
@@ -229,6 +237,7 @@ export default function Login() {
                           className="pl-10"
                           data-testid="input-email"
                           disabled={isLoading}
+                          required
                         />
                       </div>
                     </FormControl>
@@ -245,15 +254,21 @@ export default function Login() {
                     <FormControl>
                       <div className="relative">
                         <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        {/* NB-034 (run18): short "Password" placeholder so it
+                            isn't clipped at 320px. BUG-049: native required/
+                            minLength for AT + autofill (noValidate keeps zod's
+                            styled messages authoritative). */}
                         <Input
                           {...field}
                           id="password"
                           type={showPassword ? "text" : "password"}
                           autoComplete="current-password"
-                          placeholder="Enter your password"
+                          placeholder="Password"
                           className="pl-10 pr-12"
                           data-testid="input-password"
                           disabled={isLoading}
+                          required
+                          minLength={8}
                         />
                         {/* BUG-026 (run9): show/hide password toggle */}
                         <button

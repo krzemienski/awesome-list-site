@@ -102,7 +102,12 @@ export default function LinkHealthDashboard() {
   });
 
   const latestJob = statusData?.job;
-  const jobs = historyData?.jobs ?? [];
+  // BUG-031 (run18): the history endpoint can echo the same job multiple times
+  // (one row per job×check join), which plotted duplicate trend points for a
+  // single run — dedupe by job id in the render layer.
+  const jobs = Array.from(
+    new Map((historyData?.jobs ?? []).map((j) => [j.id, j])).values()
+  );
   const isActiveJob = latestJob?.status === 'processing';
   const brokenLinks = brokenLinksData?.checks ?? [];
 
@@ -434,9 +439,11 @@ export default function LinkHealthDashboard() {
               <AlertDescription>
                 {/* Run16 BUG-043: don't claim "all links are healthy" when no
                     link check has ever run — there is no data to back it. */}
-                {/* Run17 BUG-030: reference the button by its real label. */}
+                {/* BUG-030 (run18): reference the button by its ACTUAL label —
+                    the empty-state summary button reads "Run Link Check", not
+                    "Run Check Now", so the instruction now matches. */}
                 {!latestJob
-                  ? 'No link check has been run yet. Click "Run Check Now" to scan the catalog.'
+                  ? 'No link check has been run yet. Click "Run Link Check" to scan the catalog.'
                   : statusFilter === 'all'
                     ? 'No problem links found. All links are healthy!'
                     : `No ${statusFilter} links found.`

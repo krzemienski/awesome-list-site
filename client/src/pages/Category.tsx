@@ -569,7 +569,9 @@ export default function Category() {
       </div>
       
       <div className="flex items-center justify-between gap-2">
-        <p className="text-xs sm:text-sm text-muted-foreground min-w-0 truncate" data-testid="text-results-count">
+        {/* NB-051 (run18): let the position label wrap at narrow widths instead
+            of truncating to "…of 11 resou…"; keep it readable at 375px. */}
+        <p className="text-xs sm:text-sm text-muted-foreground min-w-0 whitespace-normal break-words" data-testid="text-results-count">
           {/* BUG-v3-M33 (run12): show the actual page range, not page-size-as-subset */}
           Showing {filteredResources.length === 0
             ? "0"

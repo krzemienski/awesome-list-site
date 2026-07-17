@@ -15,7 +15,19 @@ export default function ConsentBanner() {
   const [choiceMade, setChoiceMade] = useState(
     () => getAnalyticsConsent() !== null,
   );
+  // NB-003 (run18): at very small widths (<360px, e.g. 320×568) the stacked
+  // banner grew tall enough to sit over the /login submit button. Track a
+  // compact breakpoint so we can render a single-row, reduced-copy bar there.
+  const [isCompact, setIsCompact] = useState(
+    () => typeof window !== "undefined" && window.innerWidth < 360,
+  );
   const bannerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const onResize = () => setIsCompact(window.innerWidth < 360);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   // BUG-004 (run14): the fixed banner overlapped page content (footer links,
   // bottom pagination) until a choice was made. While visible, pad the body
@@ -52,6 +64,55 @@ export default function ConsentBanner() {
     setChoiceMade(true);
     if (value === "granted") initGA();
   };
+
+  // NB-003 (run18): condensed single-row bar for <360px viewports. Reduced
+  // padding, trimmed copy and inline Accept/Decline buttons keep the banner
+  // short (and max-h capped) so it no longer covers the centred /login submit
+  // button at 320×568. The body/footer padding effect above still runs, so the
+  // form stays fully reachable while the bar is visible.
+  if (isCompact) {
+    return (
+      <div
+        ref={bannerRef}
+        role="region"
+        aria-label="Analytics consent"
+        className="fixed bottom-0 inset-x-0 z-50 border-t border-[var(--border)] bg-[var(--bg)] shadow-lg"
+        data-testid="consent-banner"
+      >
+        <div className="mx-auto flex w-full max-w-[1280px] max-h-[30vh] items-center gap-2 overflow-hidden px-3 py-2">
+          <p className="min-w-0 flex-1 truncate text-xs text-[color:var(--text-2)]">
+            Analytics cookies?{" "}
+            <Link
+              href="/privacy"
+              className="underline hover:text-[color:var(--text)]"
+              data-testid="consent-privacy-link"
+            >
+              Privacy
+            </Link>
+          </p>
+          <div className="flex shrink-0 items-center gap-1.5">
+            <Button
+              variant="outline"
+              size="sm"
+              className="min-h-[36px] px-2 text-xs"
+              onClick={() => decide("denied")}
+              data-testid="consent-decline"
+            >
+              Decline
+            </Button>
+            <Button
+              size="sm"
+              className="min-h-[36px] px-2 text-xs"
+              onClick={() => decide("granted")}
+              data-testid="consent-accept"
+            >
+              Accept
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

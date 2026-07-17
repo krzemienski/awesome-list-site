@@ -36,6 +36,11 @@ export function validatePassword(password: string): { valid: boolean; error?: st
   if (!password || password.length < 8) {
     return { valid: false, error: 'Password must be at least 8 characters long' };
   }
+  // NB-001 (run18): reject whitespace-only (or mostly-whitespace) passwords —
+  // 8 spaces previously passed the length check and authenticated.
+  if (password.trim().length < 8) {
+    return { valid: false, error: "Password can't be spaces only" };
+  }
   // BUG-015 (run13): cap length — bcrypt truncates at 72 bytes and unbounded
   // input is a cheap DoS vector for the hashing path.
   if (password.length > 128) {

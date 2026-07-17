@@ -131,7 +131,10 @@ function ResourceCard({
               BUG-v3-H02 (run12): rendered as a real h2 so resource cards sit
               beneath the page h1 in the heading hierarchy. */}
           <h2
-            className="text-lg font-semibold leading-none tracking-tight line-clamp-1 flex-1 min-w-0"
+            /* NB-050 (run18): allow titles to wrap to two lines with an
+               ellipsis (break-words) instead of hard-clipping mid-word in the
+               grid; the native title tooltip still reveals the full text. */
+            className="text-lg font-semibold leading-tight tracking-tight line-clamp-2 break-words flex-1 min-w-0"
             title={resource.name}
           >
             {titleContent}

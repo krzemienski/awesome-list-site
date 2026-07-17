@@ -250,7 +250,10 @@ export default function PendingResources() {
                   <TableHead>Category</TableHead>
                   <TableHead>Description</TableHead>
                   <TableHead>Submitted</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  {/* BUG-001 (run18): pin Actions to the right edge so
+                      Approve/Reject stay reachable while the wide table scrolls
+                      horizontally (bg-card hides the columns sliding under it). */}
+                  <TableHead className="text-right sticky right-0 bg-card z-20 border-l border-border">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -312,7 +315,7 @@ export default function PendingResources() {
                         )}
                       </div>
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right sticky right-0 bg-card z-10 border-l border-border">
                       <div className="flex items-center justify-end gap-2">
                         <Button
                           variant="ghost"
@@ -351,6 +354,11 @@ export default function PendingResources() {
               </TableBody>
             </Table>
           </div>
+          {/* BUG-001 (run18): discoverability hint — the Actions column is
+              pinned right so the review buttons never require deep scrolling. */}
+          <p className="text-xs text-muted-foreground mt-2 sm:hidden">
+            Swipe the table sideways to see all columns — Approve/Reject stay pinned to the right.
+          </p>
         </CardContent>
       </Card>
 

@@ -1,4 +1,5 @@
 import { memo, useState } from "react";
+import { useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -6,6 +7,8 @@ import { ExternalLink, Brain, TrendingUp, Sparkles, ThumbsUp, ThumbsDown } from 
 import { useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
+import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
 /**
@@ -53,7 +56,40 @@ function RecommendationCard({
     resource.userFeedback || null
   );
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
+  const [, setLocation] = useLocation();
   const confidence = resource.confidence || 0;
+
+  // NB-038 (run18): logged-out feedback must be honest — do NOT pretend the
+  // vote was saved. Prompt the user to sign in (with a working Sign in action)
+  // and skip the mutation entirely instead of firing a fake "thanks" toast.
+  const handleFeedback = (
+    feedbackType: 'helpful' | 'not_helpful',
+    e: React.MouseEvent
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isAuthenticated) {
+      toast({
+        title: "Sign in to save feedback",
+        description: "Create an account or sign in so your recommendation feedback is saved.",
+        action: (
+          <ToastAction
+            altText="Sign in"
+            onClick={() =>
+              setLocation(
+                `/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`
+              )
+            }
+          >
+            Sign in
+          </ToastAction>
+        ),
+      });
+      return;
+    }
+    feedbackMutation.mutate(feedbackType);
+  };
 
   // Determine confidence level
   const getConfidenceLevel = (conf: number) => {
@@ -207,12 +243,8 @@ function RecommendationCard({
                 "h-8 px-3",
                 feedback === 'helpful' && "text-green-500 hover:text-green-600 bg-green-500/10"
               )}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                feedbackMutation.mutate('helpful');
-              }}
-              disabled={feedbackMutation.isPending || !userId}
+              onClick={(e) => handleFeedback('helpful', e)}
+              disabled={feedbackMutation.isPending}
               aria-label="Mark as helpful"
             >
               <ThumbsUp
@@ -230,12 +262,8 @@ function RecommendationCard({
                 "h-8 px-3",
                 feedback === 'not_helpful' && "text-red-500 hover:text-red-600 bg-red-500/10"
               )}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                feedbackMutation.mutate('not_helpful');
-              }}
-              disabled={feedbackMutation.isPending || !userId}
+              onClick={(e) => handleFeedback('not_helpful', e)}
+              disabled={feedbackMutation.isPending}
               aria-label="Mark as not helpful"
             >
               <ThumbsDown

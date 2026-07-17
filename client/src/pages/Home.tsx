@@ -236,11 +236,20 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
   }
 
   if (!awesomeList) {
+    // NB-055 (run18): the catalog error card previously surfaced raw internals
+    // (the "/api/awesome-list (attempt 2/2)" fetch string). Show friendly,
+    // non-technical copy plus a Retry action instead — no endpoint paths or
+    // attempt counters leak into user-visible UI here.
     return (
       <div className="space-y-6">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Error Loading Resources</h1>
-          <p className="text-muted-foreground">Please try refreshing the page.</p>
+          <h1 className="text-2xl font-bold mb-4">We couldn't load the catalog</h1>
+          <p className="text-muted-foreground mb-6">
+            We couldn't load the catalog. Please try again.
+          </p>
+          <Button onClick={() => window.location.reload()} data-testid="button-retry-catalog">
+            Retry
+          </Button>
         </div>
       </div>
     );

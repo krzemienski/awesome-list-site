@@ -224,8 +224,11 @@ export default function UsersTab() {
             {data?.users && data.users.length > 0 ? (
               data.users.map((user) => (
                 <TableRow key={user.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
+                  {/* BUG-012 (run18): cap the name cell + truncate so a legal
+                      101-char display name can't stretch the table (it was
+                      unwrapping to ~2,369px); full value stays in the title. */}
+                  <TableCell className="max-w-[240px]">
+                    <div className="flex items-center gap-2 min-w-0">
                       {user.profileImageUrl ? (
                         <img
                           src={user.profileImageUrl}
@@ -241,7 +244,11 @@ export default function UsersTab() {
                           (masked) email from the adjacent column — show a muted
                           em-dash instead. (Replaces the R4-H05 email fallback.) */}
                       {user.firstName || user.lastName ? (
-                        <span className="font-medium" data-testid={`text-name-${user.id}`}>
+                        <span
+                          className="font-medium truncate"
+                          title={`${user.firstName || ''} ${user.lastName || ''}`.trim()}
+                          data-testid={`text-name-${user.id}`}
+                        >
                           {`${user.firstName || ''} ${user.lastName || ''}`.trim()}
                         </span>
                       ) : (

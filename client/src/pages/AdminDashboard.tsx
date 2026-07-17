@@ -85,7 +85,14 @@ export default function AdminDashboard() {
   useEffect(() => {
     const syncFromUrl = () => {
       const tab = tabFromWindow();
-      if (tab) setActiveTab(tab);
+      if (tab) {
+        setActiveTab(tab);
+      } else if (window.location.pathname === "/admin") {
+        // BUG-008 (run18): Back/Forward that strips the #hash must return to
+        // the default tab so the URL (/admin) and the visible tab stay in sync
+        // instead of leaving a stale active tab (e.g. Resources) on bare /admin.
+        setActiveTab("approvals");
+      }
     };
     window.addEventListener("hashchange", syncFromUrl);
     window.addEventListener("popstate", syncFromUrl);
@@ -100,8 +107,12 @@ export default function AdminDashboard() {
     // Tab clicks always normalize back to /admin#tab (tabs stay on /admin);
     // the /admin/:section path form is only an inbound deep-link alias.
     // BUG-086: pushState (not replaceState) so Back returns to the prior tab.
+    // BUG-007 (run18): preserve the current query string (e.g. the
+    // ?status=rejected the "N rejected" stat deep-link sets) so ResourceManager
+    // can still read it on mount — the previous /admin#tab pushState dropped it,
+    // which is why the rejected stat opened Resources with "All Status".
     if (window.location.hash !== `#${value}`) {
-      window.history.pushState(null, "", `/admin#${value}`);
+      window.history.pushState(null, "", `/admin${window.location.search}#${value}`);
     }
   };
 
@@ -171,6 +182,10 @@ export default function AdminDashboard() {
       {/* R4-L17: stat cards jump straight to their admin tab. */}
       <AdminStats stats={stats} isLoading={isLoading} onNavigate={handleTabChange} />
 
+      {/* NB-020 (run18): `activeTab` is always one of the TabsTrigger values
+          (normalizeTab yields a valid id or the "approvals" default), so Radix's
+          roving tabindex always makes exactly the active trigger tabbable
+          (tabindex=0) and arrow keys move focus between tabs — never all -1. */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
         {/* BUG-020 (run14): the 15-tab strip used to overflow-scroll with no
             visible affordance — off-screen tabs were undiscoverable at 1440px

@@ -234,6 +234,22 @@ const Sidebar = React.forwardRef<
               } as React.CSSProperties
             }
             side={side}
+            onOpenAutoFocus={(e) => {
+              // NB-002 (run18): give the drawer's Radix focus trap a
+              // deterministic entry point on the first real nav link so the
+              // whole nav list is inside the tab cycle (initial focus was
+              // landing on the logo, after which Tab could ping-pong to the
+              // content box and skip the nav). Radix still records the
+              // hamburger trigger separately for Escape/close focus return.
+              const content = e.currentTarget as HTMLElement
+              const first =
+                content.querySelector<HTMLElement>("a[href]") ??
+                content.querySelector<HTMLElement>("button:not([disabled])")
+              if (first) {
+                e.preventDefault()
+                first.focus()
+              }
+            }}
           >
             <SheetHeader className="sr-only">
               <SheetTitle>Sidebar</SheetTitle>

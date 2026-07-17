@@ -92,11 +92,11 @@ export class ResourceRepository {
       conditions.push(eq(resources.submittedBy, userId));
     }
 
-    if (search) {
-      // Run16 BUG-044: %, _ and \ are LIKE metacharacters — a search for "___"
-      // used to match EVERY 3+-char row (66KB response). Escape them so the
-      // user's literal text is what gets matched (PG default escape is \).
-      const escapedSearch = search.replace(/[\\%_]/g, (m) => `\\${m}`);
+    // Run16 BUG-044: %, _ and \ are LIKE metacharacters — a search for "___"
+    // used to match EVERY 3+-char row (66KB response). Escape them so the
+    // user's literal text is what gets matched (PG default escape is \).
+    const escapedSearch = search ? search.replace(/[\\%_]/g, (m) => `\\${m}`) : undefined;
+    if (search && escapedSearch !== undefined) {
       conditions.push(
         or(
           ilike(resources.title, `%${escapedSearch}%`),
@@ -122,7 +122,26 @@ export class ResourceRepository {
         case "oldest":
           return [asc(resources.createdAt), asc(resources.id)];
         case "newest":
+          return [desc(resources.createdAt), desc(resources.id)];
         default:
+          // NB-013 (run18): when searching without an explicit sort, rank by
+          // relevance — exact title match first, then title prefix, then title
+          // substring, then description/url-only matches — instead of raw
+          // recency (an exact "FFmpeg" title used to land at position ~158).
+          if (search && escapedSearch !== undefined) {
+            const q = search.toLowerCase();
+            const prefix = `${escapedSearch.toLowerCase()}%`;
+            const substr = `%${escapedSearch.toLowerCase()}%`;
+            return [
+              asc(sql`CASE
+                WHEN lower(${resources.title}) = ${q} THEN 0
+                WHEN lower(${resources.title}) LIKE ${prefix} THEN 1
+                WHEN lower(${resources.title}) LIKE ${substr} THEN 2
+                ELSE 3 END`),
+              asc(sql`lower(${resources.title})`),
+              asc(resources.id),
+            ];
+          }
           return [desc(resources.createdAt), desc(resources.id)];
       }
     })();
@@ -215,7 +234,11 @@ export class ResourceRepository {
       const chunk = ids.slice(i, i + CHUNK);
       await db
         .update(resources)
-        .set({ githubSynced: true, lastSyncedAt: syncedAt, updatedAt: syncedAt })
+        // NB-029 (run18): do NOT bump updatedAt here — sync bookkeeping is not
+        // a content change. The July 2026 export stamped all 2,302 resources
+        // with one identical updatedAt, which the sitemap then emitted as
+        // 2,506 identical <lastmod> values (meaningless to crawlers).
+        .set({ githubSynced: true, lastSyncedAt: syncedAt })
         .where(inArray(resources.id, chunk));
     }
   }

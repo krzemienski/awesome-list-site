@@ -134,6 +134,29 @@ const isAdmin = async (req: any, res: Response, next: any) => {
 const HTTPS_URL_RE = /^https:\/\//i;
 const WEB_URL_RE = /^https?:\/\//i;
 
+// BUG-018 (run18): scheme checks alone let "https://qaverify" (dotless
+// hostname) and URLs containing literal spaces reach the DB verbatim. A
+// catalog URL must parse, carry no whitespace, and have a dotted hostname
+// with a plausible TLD (or be localhost — rejected too: never valid here).
+function isPlausiblePublicUrl(raw: string): boolean {
+  if (/\s/.test(raw)) return false;
+  try {
+    const u = new URL(raw);
+    const host = u.hostname;
+    if (!host.includes('.')) return false;
+    if (host.startsWith('.') || host.endsWith('.') || host.includes('..')) return false;
+    // Letters/digits/hyphen labels (punycode xn-- included); IPs excluded on
+    // purpose — public catalog resources are never bare IPs.
+    if (!/^[a-z0-9-]+(\.[a-z0-9-]+)+$/i.test(host)) return false;
+    const tld = host.split('.').pop()!;
+    if (tld.length < 2 || /^\d+$/.test(tld)) return false;
+    return true;
+  } catch {
+    return false;
+  }
+}
+const URL_HOSTNAME_MESSAGE = 'URL must have a valid hostname (e.g. https://example.com)';
+
 function xmlEscape(value: string): string {
   return value
     .replace(/&/g, "&amp;")
@@ -1034,6 +1057,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (rawPage !== undefined && !/^-?\d+$/.test(rawPage.trim())) {
         return res.status(400).json({ error: 'invalid_page', message: 'page must be an integer' });
       }
+      // BUG-053 (run18): a negative/zero page is a caller bug, not something
+      // to silently coerce to page 1 — reject it explicitly.
+      if (rawPage !== undefined && parseInt(rawPage.trim()) < 1) {
+        return res.status(400).json({ error: 'invalid_page', message: 'page must be >= 1' });
+      }
       // BUG-050 (run14): cap page size at 100 (was 1000 — full-catalog scrape
       // in 3 requests). Paging via nextOffset/nextCursor still walks the whole
       // catalog; bulk consumers should use /api/awesome-list.
@@ -1360,7 +1388,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // pasted URL is never meaningful and used to fail .url() confusingly.
         url: z.string().trim().min(1).url('Invalid URL format')
           // Run16 BUG-001: enforce the https-only contract the UI promises.
-          .refine((v) => HTTPS_URL_RE.test(v), 'Must be a valid HTTPS URL'),
+          .refine((v) => HTTPS_URL_RE.test(v), 'Must be a valid HTTPS URL')
+          // BUG-018 (run18): dotted-hostname / no-whitespace sanity.
+          .refine(isPlausiblePublicUrl, URL_HOSTNAME_MESSAGE),
         title: z.string().min(1).max(200, 'Title must be 1-200 characters')
           .refine((v) => !NO_HTML.test(v), 'Title must not contain HTML tags'),
         category: z.string().min(1, 'Category is required'),
@@ -1382,8 +1412,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       const submitValidation = submitSchema.safeParse(req.body);
       if (!submitValidation.success) {
+        // BUG-019 (run18): surface per-field messages so the client can map
+        // them onto form fields (metadata.tags → "tags") instead of a
+        // generic field-less toast. `errors` kept for back-compat.
+        const fieldErrors: Record<string, string> = {};
+        for (const issue of submitValidation.error.issues) {
+          let key = String(issue.path[0] ?? 'form');
+          if (key === 'metadata' && issue.path[1] === 'tags') key = 'tags';
+          if (!fieldErrors[key]) fieldErrors[key] = issue.message;
+        }
         return res.status(400).json({
           error: 'validation_failed',
+          message: 'Validation failed',
+          fieldErrors,
           errors: submitValidation.error.issues
         });
       }
@@ -1570,6 +1611,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // approval path writes it straight onto the live resource.
       if (sanitizedProposedData.url !== undefined && !WEB_URL_RE.test(String(sanitizedProposedData.url))) {
         return res.status(400).json({ message: 'URL must start with http:// or https://' });
+      }
+      // BUG-018 (run18): edit-approved URLs go live too — same hostname sanity.
+      if (sanitizedProposedData.url !== undefined && !isPlausiblePublicUrl(String(sanitizedProposedData.url))) {
+        return res.status(400).json({ message: URL_HOSTNAME_MESSAGE });
       }
       
       // tags is stored in metadata.tags (not a column). Reject non-array shapes
@@ -3181,7 +3226,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Run16 BUG-001/BUG-031: admin-created resources go live immediately —
         // require a real https URL, not just a non-empty string.
         url: insertResourceSchema.shape.url.trim().min(1, 'URL is required')
-          .refine((v) => HTTPS_URL_RE.test(v), 'Must be a valid HTTPS URL'),
+          .refine((v) => HTTPS_URL_RE.test(v), 'Must be a valid HTTPS URL')
+          // BUG-018 (run18): dotted-hostname / no-whitespace sanity.
+          .refine(isPlausiblePublicUrl, URL_HOSTNAME_MESSAGE),
       });
       
       const validationResult = createSchema.safeParse(req.body);

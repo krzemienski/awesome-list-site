@@ -237,7 +237,17 @@ export default function Journeys() {
                             {progressPercent}%
                           </span>
                         </div>
-                        <div className="h-2 bg-muted rounded-full overflow-hidden">
+                        {/* NB-058 (run18): progress bar exposes progressbar ARIA
+                            semantics so assistive tech announces the percent. */}
+                        <div
+                          className="h-2 bg-muted rounded-full overflow-hidden"
+                          role="progressbar"
+                          aria-valuenow={progressPercent}
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                          aria-label={`${journey.title} progress: ${progressPercent}%`}
+                          data-testid={`progressbar-journey-${journey.id}`}
+                        >
                           <div 
                             className="h-full bg-gradient-to-r from-primary to-primary/80 transition-all duration-500"
                             style={{ width: `${progressPercent}%` }}

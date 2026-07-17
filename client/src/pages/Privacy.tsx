@@ -46,10 +46,59 @@ export default function Privacy() {
           <section className="space-y-2">
             <h2 className="text-base font-semibold text-[color:var(--text)]">3. Cookies</h2>
             <p>
-              We use a session cookie to keep you signed in and local storage
-              for preferences such as your theme and your analytics consent
-              choice. Third-party sign-in providers may set their own cookies
-              during authentication.
+              We keep cookies to a minimum. Preferences such as your theme and
+              your analytics consent choice are stored in your browser's local
+              storage (not cookies). The cookies you may see are:
+            </p>
+            {/* NB-035 (run18): replaced the vague cookie paragraph with an
+                accurate breakdown — connect.sid is our session auth cookie,
+                GAESA is set by the Google App Engine hosting edge (not us, not
+                for tracking), and the _ga* analytics cookies are only set after
+                you consent. */}
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs sm:text-sm border-collapse" data-testid="table-cookies">
+                <thead>
+                  <tr className="border-b border-[var(--border)] text-[color:var(--text)]">
+                    <th className="py-2 pr-4 font-semibold align-top">Cookie</th>
+                    <th className="py-2 pr-4 font-semibold align-top">Purpose</th>
+                    <th className="py-2 font-semibold align-top">Lifetime</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b border-[var(--border)]">
+                    <td className="py-2 pr-4 align-top font-mono">connect.sid</td>
+                    <td className="py-2 pr-4 align-top">
+                      Session cookie that keeps you signed in after you log in.
+                      Only set once you have an account and sign in.
+                    </td>
+                    <td className="py-2 align-top">Persists for 7 days</td>
+                  </tr>
+                  <tr className="border-b border-[var(--border)]">
+                    <td className="py-2 pr-4 align-top font-mono">GAESA</td>
+                    <td className="py-2 pr-4 align-top">
+                      Infrastructure cookie set by our hosting edge (Google App
+                      Engine). It supports request routing — we do not use it to
+                      track you and it carries no analytics.
+                    </td>
+                    <td className="py-2 align-top">Set by the hosting platform</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2 pr-4 align-top font-mono">_ga, _ga_*</td>
+                    <td className="py-2 pr-4 align-top">
+                      Google Analytics cookies that measure aggregate usage.
+                      These are only set after you accept analytics in the
+                      consent banner; decline and they are never created.
+                    </td>
+                    <td className="py-2 align-top">
+                      _ga up to 2 years; _ga_* up to 2 years
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              Third-party sign-in providers may also set their own cookies while
+              you authenticate with them.
             </p>
           </section>
 
@@ -77,7 +126,20 @@ export default function Privacy() {
               >
                 About page
               </Link>
-              ; approved resources you submitted remain in the directory but
+              {" "}or by{" "}
+              {/* NB-036 (run18): no contact email exists, so document a real,
+                  reachable channel — open a GitHub issue on the awesome-video
+                  repo — for account/data deletion requests. */}
+              <a
+                href="https://github.com/krzemienski/awesome-video/issues"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline underline-offset-4 hover:text-[color:var(--text)]"
+                data-testid="link-privacy-github-issues"
+              >
+                opening a GitHub issue
+              </a>
+              . Approved resources you submitted remain in the directory but
               are detached from your identity.
             </p>
           </section>

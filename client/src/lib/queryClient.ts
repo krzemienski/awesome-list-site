@@ -1,10 +1,22 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 import { trackApiPerformance, trackError } from "./analytics";
 
+// NB-028 (run18): errors must carry the HTTP status as a real property —
+// retry predicates checking `'status' in error` silently failed against the
+// plain Error thrown before, so 401s retried like transient faults.
+// message keeps the legacy "<status>: <body>" shape callers parse.
+export class ApiError extends Error {
+  status: number;
+  constructor(status: number, body: string) {
+    super(`${status}: ${body}`);
+    this.status = status;
+  }
+}
+
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
-    throw new Error(`${res.status}: ${text}`);
+    throw new ApiError(res.status, text);
   }
 }
 

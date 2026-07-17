@@ -73,6 +73,12 @@ function humanizeJobError(msg: string): string {
   return msg;
 }
 
+// NB-033 (run18): one cost formatter — always $X.XXXX (4 decimals) so the cost
+// column/detail never mixes $0.00 / $0.0000 / $12.3801 representations.
+function formatCost(value: string | number | null | undefined): string {
+  return `$${Number(value ?? 0).toFixed(4)}`;
+}
+
 function getDiscoveryStatusBadge(status: string) {
   switch (status) {
     case "pending_review":
@@ -611,14 +617,49 @@ export default function ResearcherTab() {
                           <TableCell className="font-medium">#{job.id}</TableCell>
                           <TableCell>{getStatusBadge(job.status)}</TableCell>
                           <TableCell className="max-w-[200px] truncate text-xs">{job.prompt}</TableCell>
-                          <TableCell>{job.totalDiscoveries || 0}</TableCell>
+                          {/* NB-031 (run18): a cancelled run can't have accrued
+                              metrics it never reached — show "—" for zeroed
+                              approved/cost/turns; keep a real "found" count but
+                              annotate that it was found before cancellation. */}
                           <TableCell>
-                            <span className="text-green-400">{job.approvedDiscoveries || 0}</span>
-                            {' / '}
-                            <span className="text-red-400">{job.rejectedDiscoveries || 0}</span>
+                            {job.status === 'cancelled' && (job.totalDiscoveries || 0) > 0 ? (
+                              <span title="found before cancellation">{job.totalDiscoveries}</span>
+                            ) : (
+                              job.totalDiscoveries || 0
+                            )}
                           </TableCell>
-                          <TableCell>${job.estimatedCostUsd || '0.00'}</TableCell>
-                          <TableCell>{job.turnsUsed || 0}/{job.maxTurns}</TableCell>
+                          <TableCell>
+                            {job.status === 'cancelled' && (job.approvedDiscoveries || 0) === 0 && (job.rejectedDiscoveries || 0) === 0 ? (
+                              <span className="text-muted-foreground">—</span>
+                            ) : (
+                              <>
+                                <span className="text-green-400">{job.approvedDiscoveries || 0}</span>
+                                {' / '}
+                                <span className="text-red-400">{job.rejectedDiscoveries || 0}</span>
+                              </>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {job.status === 'cancelled' && (!job.estimatedCostUsd || Number(job.estimatedCostUsd) === 0) ? (
+                              <span className="text-muted-foreground">—</span>
+                            ) : (
+                              formatCost(job.estimatedCostUsd)
+                            )}
+                          </TableCell>
+                          {/* NB-032 (run18): turnsUsed accumulates across
+                              continuation runs while maxTurns is per-run, so used
+                              can exceed the cap — annotate instead of hiding. */}
+                          <TableCell>
+                            {job.status === 'cancelled' && (job.turnsUsed || 0) === 0 ? (
+                              <span className="text-muted-foreground">—</span>
+                            ) : (job.turnsUsed || 0) > (job.maxTurns || 0) ? (
+                              <span title={`used across continuation runs (cap ${job.maxTurns}/run)`}>
+                                {job.turnsUsed}/{job.maxTurns}
+                              </span>
+                            ) : (
+                              <>{job.turnsUsed || 0}/{job.maxTurns}</>
+                            )}
+                          </TableCell>
                           <TableCell className="text-xs">
                             {job.createdAt ? formatAdminDate(job.createdAt) : '-'}
                           </TableCell>
@@ -702,7 +743,8 @@ export default function ResearcherTab() {
                   <div className="text-xs text-muted-foreground">Duplicates</div>
                 </div>
                 <div className="text-center p-2 border rounded">
-                  <div className="text-lg font-bold">${selectedJob.estimatedCostUsd || '0.00'}</div>
+                  {/* NB-033 (run18): same 4-decimal formatter as the table. */}
+                  <div className="text-lg font-bold">{formatCost(selectedJob.estimatedCostUsd)}</div>
                   <div className="text-xs text-muted-foreground">Cost</div>
                 </div>
               </div>
@@ -737,13 +779,26 @@ export default function ResearcherTab() {
               {selectedJob.errorMessage && (
                 <Alert variant="destructive">
                   <AlertCircle className="w-4 h-4" />
-                  <AlertDescription>{humanizeJobError(selectedJob.errorMessage)}</AlertDescription>
+                  {/* NB-018 (run18): long unbroken tokens/URLs in agent errors
+                      blew the banner to ~1,786px inside the dialog — force the
+                      text to wrap and clip within the modal width. */}
+                  <AlertDescription className="max-w-full overflow-hidden break-all whitespace-pre-wrap">
+                    {humanizeJobError(selectedJob.errorMessage)}
+                  </AlertDescription>
                 </Alert>
               )}
 
               <div className="flex items-center justify-between">
                 <Label className="text-xs text-muted-foreground">
-                  Turns: {selectedJob.turnsUsed || 0}/{selectedJob.maxTurns} ·
+                  {/* NB-032 (run18): annotate turns that exceed the per-run cap. */}
+                  Turns:{' '}
+                  {(selectedJob.turnsUsed || 0) > (selectedJob.maxTurns || 0) ? (
+                    <span title={`used across continuation runs (cap ${selectedJob.maxTurns}/run)`}>
+                      {selectedJob.turnsUsed}/{selectedJob.maxTurns}
+                    </span>
+                  ) : (
+                    <>{selectedJob.turnsUsed || 0}/{selectedJob.maxTurns}</>
+                  )}{' '}·
                   In: {(selectedJob.totalInputTokens || 0).toLocaleString()} ·
                   Out: {(selectedJob.totalOutputTokens || 0).toLocaleString()} tok
                 </Label>

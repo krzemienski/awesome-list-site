@@ -1,0 +1,119 @@
+{
+  "startedAt": "2026-07-17T22:13:16.872Z",
+  "base": "https://awesome.video",
+  "steps": {
+    "login": [
+      {
+        "attempt": 1,
+        "ok": true
+      }
+    ],
+    "BUG-004/062": [
+      {
+        "before": [
+          {
+            "id": 199,
+            "sn": 1,
+            "rid": 185310
+          },
+          {
+            "id": 201,
+            "sn": 1,
+            "rid": 185451
+          },
+          {
+            "id": 202,
+            "sn": 2,
+            "rid": 186158
+          },
+          {
+            "id": 203,
+            "sn": 2,
+            "rid": 185939
+          },
+          {
+            "id": 205,
+            "sn": 3,
+            "rid": 186608
+          },
+          {
+            "id": 206,
+            "sn": 3,
+            "rid": 186482
+          },
+          {
+            "id": 207,
+            "sn": 3,
+            "rid": 186413
+          },
+          {
+            "id": 208,
+            "sn": 4,
+            "rid": 186412
+          },
+          {
+            "id": 209,
+            "sn": 4,
+            "rid": 186238
+          },
+          {
+            "id": 210,
+            "sn": 4,
+            "rid": 186186
+          },
+          {
+            "id": 211,
+            "sn": 5,
+            "rid": 186181
+          },
+          {
+            "id": 212,
+            "sn": 5,
+            "rid": 186172
+          },
+          {
+            "id": 215,
+            "sn": 6,
+            "rid": 185760
+          },
+          {
+            "id": 216,
+            "sn": 6,
+            "rid": 185759
+          }
+        ]
+      },
+      {
+        "noop": "no dead/dup step rows present"
+      }
+    ],
+    "BUG-047": [
+      {
+        "noop": "title already \"FFmpeg Mastery\""
+      }
+    ],
+    "BUG-026": [
+      {
+        "placeholderCount": 0,
+        "ids": []
+      }
+    ],
+    "BUG-057": [
+      {
+        "noop": "truncated tail no longer present",
+        "tail": "production workflow."
+      }
+    ],
+    "BUG-061": [
+      {
+        "id": 185850,
+        "noop": "already clean"
+      },
+      {
+        "id": 185907,
+        "noop": "title already \"TV Subtitle Extraction\""
+      }
+    ]
+  },
+  "finishedAt": "2026-07-17T22:13:18.557Z"
+}

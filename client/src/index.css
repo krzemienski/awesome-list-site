@@ -80,6 +80,19 @@
   code, pre, kbd, samp {
     font-family: var(--font-mono);
   }
+
+  /* NB-023 (run18): make interactive elements advertise their affordance —
+     enabled buttons, role=button, links, label[for], selects and summary all
+     get a pointer cursor. Disabled buttons keep the default (not-allowed is
+     applied by their own styles). */
+  button:not(:disabled),
+  [role="button"],
+  a,
+  label[for],
+  select,
+  summary {
+    cursor: pointer;
+  }
 }
 
 /* selection rule lives in design-system.css with proper color-mix alpha */
@@ -118,4 +131,71 @@ vite-plugin-checker-error-overlay {
 }
 .admin-tab-scroller::-webkit-scrollbar-thumb:hover {
   background: color-mix(in srgb, var(--accent) 60%, transparent);
+}
+
+/*
+  NB-021 (run18): printable stylesheet. The app is a dark, full-bleed SPA with
+  no print rules, so pages like /, /about and resource views printed as black
+  pages with unreadable low-contrast text and all the chrome baked in. These
+  rules force a light background + black text for print, drop dark full-bleed
+  backgrounds, hide non-content chrome (header, sidebar, consent banner, toasts,
+  footer), and render links as plain readable text.
+*/
+@media print {
+  html,
+  body,
+  #root,
+  main,
+  [role="main"] {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  /* Neutralise dark full-bleed surfaces so nothing prints as a black block. */
+  *,
+  *::before,
+  *::after {
+    background-image: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* Hide site chrome that shouldn't appear on paper. */
+  header,
+  nav,
+  footer,
+  [data-sidebar],
+  [data-testid="consent-banner"],
+  [data-testid="app-header"],
+  [data-sonner-toaster],
+  [role="toolbar"],
+  .no-print {
+    display: none !important;
+  }
+
+  /* In-content semantic headers (e.g. /categories page title) are content,
+     not chrome — re-show them after the blanket header hide above. */
+  main header,
+  [role="main"] header {
+    display: block !important;
+  }
+
+  main,
+  [role="main"],
+  article,
+  .prose {
+    color: #000 !important;
+  }
+
+  /* Links stay readable as text; expose the destination for reference. */
+  a {
+    color: #000 !important;
+    text-decoration: underline;
+  }
+
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    word-break: break-all;
+  }
 }

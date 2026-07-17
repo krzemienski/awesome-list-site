@@ -1,4 +1,4 @@
-import { useState, memo } from "react";
+import { useState, memo, useRef } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Heart } from "lucide-react";
@@ -32,6 +32,15 @@ function FavoriteButton({
   const { isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
 
+  // NB-024 (run18): keep a handle to the previous favorite toast and dismiss it
+  // before firing a new one, so rapid toggles never leave a stale toast
+  // contradicting the final favorited state.
+  const lastToastRef = useRef<{ dismiss: () => void } | null>(null);
+  const showFavoriteToast = (opts: Parameters<typeof toast>[0]) => {
+    lastToastRef.current?.dismiss();
+    lastToastRef.current = toast(opts);
+  };
+
   // `remove` is captured at click time and passed as the mutation variable so
   // the POST/DELETE decision never depends on the optimistic state flip below
   // (reading the mutable `isFavorited` inside mutationFn caused removals to
@@ -62,7 +71,7 @@ function FavoriteButton({
       queryClient.invalidateQueries({ queryKey: ['/api/favorites'] });
       queryClient.invalidateQueries({ queryKey: [`/api/resources/${resourceId}`] });
       
-      toast({
+      showFavoriteToast({
         description: remove ? "Removed from favorites" : "Added to favorites",
         duration: 2000
       });
@@ -85,6 +94,10 @@ function FavoriteButton({
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    // NB-059/NB-022 (run18): guard in-flight clicks here instead of the native
+    // `disabled` attribute — a disabled flip while focused drops focus to body.
+    if (favoriteMutation.isPending) return;
 
     // R2-L09: anonymous users get a clear sign-in prompt instead of a
     // confusing failed request. BUG-044/026 (run14): the toast carries a
@@ -124,7 +137,8 @@ function FavoriteButton({
         className
       )}
       onClick={handleClick}
-      disabled={favoriteMutation.isPending}
+      aria-disabled={favoriteMutation.isPending}
+      aria-busy={favoriteMutation.isPending}
       aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
       aria-pressed={isFavorited}
       data-testid="button-favorite"

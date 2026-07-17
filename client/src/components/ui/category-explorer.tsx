@@ -327,7 +327,8 @@ export default function CategoryExplorer({ categories, resources, className }: C
                         variant="ghost"
                         size="sm"
                         onClick={() => navigate(`/category/${category.slug}`)}
-                        className="p-0 h-auto font-semibold text-left hover:text-primary whitespace-normal break-words min-w-0"
+                        // BUG-048 (run18): min-h keeps the inline title link a ≥24px tap target.
+                        className="p-0 h-auto min-h-[24px] font-semibold text-left hover:text-primary whitespace-normal break-words min-w-0"
                       >
                         {category.name}
                       </Button>

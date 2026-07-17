@@ -80,9 +80,19 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
     staleTime: 60 * 1000,
   });
 
+  const queryTrimmed = query.trim();
   const allMatches = trimmed.length >= 2 ? data?.resources ?? [] : [];
-  const totalMatches = allMatches.length;
+  // NB-044 (run18): show the TRUE match count from the server (data.total),
+  // not the length of the (limit-capped) result page — the palette only renders
+  // the top 15 rows but the count must reflect the full match set (e.g. 255).
+  const totalMatches = trimmed.length >= 2 ? data?.total ?? allMatches.length : 0;
   const results = allMatches.slice(0, 15);
+  // NB-045 (run18): gate every result surface on the TRIMMED query so a
+  // whitespace-only input ("   ") never shows results, a "View all" row, or
+  // routes to /search — it falls back to the recent/min-length empty states.
+  const showResults = queryTrimmed.length >= 2;
+  const isPending =
+    showResults && results.length === 0 && (isFetching || queryTrimmed !== trimmed);
 
   // Track the search once the debounced query settles and results arrive —
   // one `search` event per settled query, not one per keystroke.
@@ -150,18 +160,38 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent
+        className="sm:max-w-lg max-h-[min(85svh,520px)] grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden"
+        onCloseAutoFocus={(e) => {
+          // NB-026 (run18): both the header trigger click AND the "/"/⌘K
+          // shortcut opens must return focus to a real, visible control — never
+          // to <body>. Redirect to the header search chip (the palette's
+          // canonical trigger) so keyboard users land somewhere sensible.
+          const chip = document.querySelector<HTMLElement>(
+            'button[aria-label="Open search"]',
+          );
+          if (chip) {
+            e.preventDefault();
+            chip.focus();
+          }
+        }}
+      >
+        {/* NB-004 (run18): in short viewports (e.g. 812×375 landscape) the
+            header chrome squeezed the result list below one row's height, so
+            the keyboard-active item could never be fully visible. Under
+            max-height:480px the decorative eyebrow hides, the title shrinks,
+            and the description collapses to sr-only (kept for a11y). */}
         <DialogHeader>
-          <div className="eyebrow" aria-hidden>// Search</div>
-          <DialogTitle className="font-display text-2xl font-medium tracking-tight">
+          <div className="eyebrow [@media(max-height:480px)]:hidden" aria-hidden>// Search</div>
+          <DialogTitle className="font-display text-2xl font-medium tracking-tight [@media(max-height:480px)]:text-base">
             Find <em className="not-italic" style={{ fontStyle: 'italic', color: 'var(--accent)' }}>resources</em>
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="[@media(max-height:480px)]:sr-only">
             Find video development resources in the awesome list.
           </DialogDescription>
         </DialogHeader>
         
-        <Command className="overflow-visible" shouldFilter={false}>
+        <Command className="min-h-0" shouldFilter={false}>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none z-10" />
             <CommandInput
@@ -173,10 +203,10 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
             />
           </div>
           
-          <CommandList className="max-h-[300px] overflow-y-auto">
-            {query.length >= 2 ? (
+          <CommandList className="flex-1 min-h-0 overflow-y-auto">
+            {showResults ? (
               <>
-                {isFetching && results.length === 0 ? (
+                {isPending ? (
                   <div className="flex items-center justify-center gap-2 h-[120px] text-sm text-muted-foreground" data-testid="search-loading">
                     <Loader2 className="h-4 w-4 animate-spin" />
                     Searching…
@@ -189,7 +219,7 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
                         data-testid="search-result-count"
                         aria-live="polite"
                       >
-                        {totalMatches}{totalMatches >= 1000 ? "+" : ""} match{totalMatches === 1 ? "" : "es"}
+                        {totalMatches.toLocaleString()} match{totalMatches === 1 ? "" : "es"}
                         {totalMatches > results.length ? ` — showing top ${results.length}` : ""}
                       </div>
                     )}
@@ -197,17 +227,17 @@ export default function SearchDialog({ isOpen, setIsOpen }: SearchDialogProps) {
                       {/* Pinned first so plain Enter goes to the full search page. */}
                       <CommandItem
                         key="view-all-results"
-                        value={`view-all-${query}`}
+                        value={`view-all-${queryTrimmed}`}
                         onSelect={() => {
                           setIsOpen(false);
-                          navigate(`/search?q=${encodeURIComponent(query)}`);
+                          navigate(`/search?q=${encodeURIComponent(queryTrimmed)}`);
                         }}
                         className="flex items-center gap-2 p-3 cursor-pointer"
                         data-testid="search-view-all"
                       >
                         <Search className="h-4 w-4 shrink-0 text-[var(--accent)]" />
                         <span className="text-sm font-medium">
-                          View all results for “{query}”
+                          View all results for “{queryTrimmed}”
                         </span>
                       </CommandItem>
                       {results.map((resource, index) => (

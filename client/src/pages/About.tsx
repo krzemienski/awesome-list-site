@@ -77,6 +77,24 @@ export default function About() {
               {MAINTAINER.name} on GitHub
               <ExternalLink className="h-3.5 w-3.5" />
             </a>
+            {/* NB-036 (run18): there is no support email, so point people at a
+                real, reachable channel — the awesome-video GitHub issues — for
+                questions and for account / data-deletion requests. */}
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Questions, corrections, or an account/data-deletion request? The
+              best way to reach us is to{" "}
+              <a
+                href="https://github.com/krzemienski/awesome-video/issues"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 min-h-[24px] align-middle font-medium text-[var(--accent)] hover:underline"
+                data-testid="link-about-github-issues"
+              >
+                open an issue on GitHub
+                <ExternalLink className="h-3.5 w-3.5" />
+              </a>
+              .
+            </p>
           </div>
         </CardContent>
       </Card>

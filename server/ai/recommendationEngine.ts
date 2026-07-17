@@ -1,6 +1,14 @@
 import { storage } from '../storage';
 import { Resource, User } from '@shared/schema';
-import { generateAIRecommendations as generateClaudeRecommendations, generateAILearningPaths } from './recommendations';
+import {
+  generateAIRecommendations as generateClaudeRecommendations,
+  generateAILearningPaths,
+  calculateSkillMatch,
+  calculateGoalsMatch,
+  calculateTypeMatch,
+  buildRecommendationReason,
+  skillPhrase,
+} from './recommendations';
 import { claudeService } from './claudeService';
 
 export interface UserProfile {
@@ -327,50 +335,56 @@ export class RecommendationEngine {
         const preferredPool = preferred.length > 0
           ? eligibleResources.filter(r => r.category && preferred.includes(r.category))
           : eligibleResources;
-        const popularResources = await this.getPopularResources(preferredPool, limit);
-        const chosenUrls = new Set(popularResources.map(r => r.url));
-        const padResources = preferred.length > 0 && popularResources.length < limit
+        // NB-007 (run18): the old path took the top-`limit` popular resources
+        // and stamped a FIXED positional confidence ladder (85 − 3·rank →
+        // rendered as 0.85→0.60) that ignored Skill/Goals/Types entirely, so
+        // changing those inputs never changed the results. Now a 3×-wide
+        // popularity pool is re-ranked by a deterministic blend of popularity
+        // + skill + goals + resource-type match, so every advertised input
+        // shifts both membership and scores (deterministic per config — the
+        // cache key already fingerprints these inputs).
+        const blend = (resource: Resource, index: number, poolSize: number) => {
+          const popularity = poolSize > 1 ? 1 - index / (poolSize - 1) : 1;
+          const skillScore = calculateSkillMatch(resource, enrichedProfile.skillLevel);
+          const goalsScore = calculateGoalsMatch(resource, enrichedProfile.learningGoals);
+          const typeScore = calculateTypeMatch(resource, enrichedProfile.preferredResourceTypes);
+          const score = 0.4 * popularity + 0.25 * skillScore + 0.2 * goalsScore + 0.15 * typeScore;
+          return { skillScore, goalsScore, typeScore, score };
+        };
+        const popularCandidates = await this.getPopularResources(preferredPool, limit * 3);
+        const rankedPreferred = popularCandidates
+          .map((resource, index) => ({ resource, comps: blend(resource, index, popularCandidates.length) }))
+          .sort((a, b) => b.comps.score - a.comps.score)
+          .slice(0, limit);
+        const chosenUrls = new Set(rankedPreferred.map(r => r.resource.url));
+        // Run16 BUG-004: off-preference rows are only appended when the
+        // preferred pool can't fill the list, and those padded rows say so.
+        const padCandidates = preferred.length > 0 && rankedPreferred.length < limit
           ? await this.getPopularResources(
               eligibleResources.filter(r => !chosenUrls.has(r.url)),
-              limit - popularResources.length
+              (limit - rankedPreferred.length) * 3
             )
           : [];
-        const skillPhrase = !enrichedProfile.skillLevel || enrichedProfile.skillLevel === 'beginner'
-          ? 'for getting started'
-          : `for ${enrichedProfile.skillLevel} learners`;
-        // Run15 BUG-013: identical "75% — Popular among users" on every card
-        // read as filler. Confidence now decays with popularity rank (the list
-        // IS rank-ordered), and the reason names the resource's category so
-        // each card explains itself.
-        recommendations = popularResources.map((resource, index) => {
-          const confidence = Math.max(60, 85 - index * 3);
-          const where = resource.category ? `in ${resource.category}` : 'across the catalog';
-          const matchesPreference = preferred.length > 0;
-          const reason = index === 0
-            ? `Top pick ${where} ${skillPhrase}`
-            : matchesPreference
-              ? `Popular ${where}, one of your selected categories`
-              : `Popular ${where}`;
-          return {
-            resource,
-            confidence,
-            reason,
-            type: 'rule_based' as const,
-            score: confidence / 100
-          };
-        });
-        const padOffset = recommendations.length;
-        recommendations.push(...padResources.map((resource, index) => {
-          const confidence = Math.max(55, 85 - (padOffset + index) * 3);
-          const where = resource.category ? `in ${resource.category}` : 'across the catalog';
-          return {
-            resource,
-            confidence,
-            reason: `Popular ${where} — added because your selected categories had few unseen resources`,
-            type: 'rule_based' as const,
-            score: confidence / 100
-          };
+        const rankedPad = padCandidates
+          .map((resource, index) => ({ resource, comps: blend(resource, index, padCandidates.length) }))
+          .sort((a, b) => b.comps.score - a.comps.score)
+          .slice(0, limit - rankedPreferred.length);
+        // NB-042: reasons come from the ONE shared deterministic builder, so
+        // the same resource + profile reads identically on every page.
+        recommendations = rankedPreferred.map(({ resource, comps }) => ({
+          resource,
+          confidence: Math.min(95, Math.max(55, Math.round(40 + comps.score * 55))),
+          reason: buildRecommendationReason(resource, enrichedProfile, { ...comps, popular: true }),
+          type: 'rule_based' as const,
+          score: comps.score
         }));
+        recommendations.push(...rankedPad.map(({ resource, comps }) => ({
+          resource,
+          confidence: Math.min(90, Math.max(50, Math.round(35 + comps.score * 55))),
+          reason: `${buildRecommendationReason(resource, enrichedProfile, { ...comps, popular: true })} — added because your selected categories had few unseen resources`,
+          type: 'rule_based' as const,
+          score: comps.score
+        })));
 
         // Cache and return early for cold-start users
         this.recommendationCache.set(cacheKey, {
@@ -581,7 +595,9 @@ export class RecommendationEngine {
       const skillScore = this.calculateSkillLevelMatch(resource, userProfile.skillLevel);
       score += skillScore * 20;
       if (skillScore > 0.5) {
-        reasons.push(`suitable for ${userProfile.skillLevel} level`);
+        // NB-042 (run18): same skill vocabulary as buildRecommendationReason —
+        // the phrase always names the user's OWN configured level.
+        reasons.push(`a good fit ${skillPhrase(userProfile.skillLevel)}`);
       }
 
       // Learning goals alignment (15% weight)
@@ -621,46 +637,17 @@ export class RecommendationEngine {
    * Calculate skill level match score
    */
   private calculateSkillLevelMatch(resource: Resource, skillLevel: string): number {
-    const text = `${resource.title} ${resource.description}`.toLowerCase();
-    
-    const skillIndicators = {
-      beginner: ['basic', 'intro', 'introduction', 'getting started', 'tutorial', 'beginner', 'fundamentals', '101'],
-      intermediate: ['guide', 'how to', 'implementation', 'practical', 'hands-on', 'workshop', 'intermediate'],
-      advanced: ['advanced', 'expert', 'deep dive', 'optimization', 'performance', 'architecture', 'complex', 'professional']
-    };
-
-    const indicators = skillIndicators[skillLevel as keyof typeof skillIndicators] || [];
-    const matches = indicators.filter(indicator => text.includes(indicator));
-
-    // Perfect match if multiple indicators found
-    if (matches.length >= 2) return 1.0;
-    if (matches.length === 1) return 0.7;
-    
-    // Partial credit for adjacent skill levels
-    if (skillLevel === 'intermediate') return 0.5; // Intermediate can benefit from all levels
-    
-    return 0.3; // Base score
+    // NB-042 (run18): delegates to the shared helper so every scoring path
+    // agrees on what "matches the user's level" means.
+    return calculateSkillMatch(resource, skillLevel);
   }
 
   /**
    * Calculate alignment with learning goals
    */
   private calculateGoalsAlignment(resource: Resource, learningGoals: string[]): number {
-    if (learningGoals.length === 0) return 0.5;
-
-    const resourceText = `${resource.title} ${resource.description} ${resource.category || ''}`.toLowerCase();
-    let totalAlignment = 0;
-
-    learningGoals.forEach(goal => {
-      const goalWords = goal.toLowerCase().split(/\s+/).filter(word => word.length > 2);
-      const matchingWords = goalWords.filter(word => resourceText.includes(word));
-      
-      if (matchingWords.length > 0) {
-        totalAlignment += matchingWords.length / goalWords.length;
-      }
-    });
-
-    return Math.min(totalAlignment / learningGoals.length, 1.0);
+    // NB-042 (run18): delegates to the shared helper (see above).
+    return calculateGoalsMatch(resource, learningGoals);
   }
 
   /**

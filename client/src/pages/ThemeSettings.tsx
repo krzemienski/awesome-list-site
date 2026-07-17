@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import { ArrowLeft, Check, Palette, Layers, Eye, Sparkles, Zap, Type } from "lucide-react";
 import { ThemeProviderContext } from "@/components/ui/theme-provider";
@@ -55,6 +55,46 @@ export default function ThemeSettings() {
     toast({ title: "Accent applied", description: `${label} is now the active accent.` });
   };
 
+  // NB-057 (run18): the three theme pickers are ARIA radiogroups built from
+  // custom card <button role="radio">s (not Radix RadioGroup), so arrow keys
+  // did nothing and every card was tabbable. Implement standard radiogroup
+  // keyboard semantics: roving tabindex (only the checked card is in the tab
+  // order) + Arrow/Home/End move focus AND select (select-follows-focus),
+  // matching native <input type="radio"> groups.
+  const radioRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const systemIds = Object.keys(systems);
+  const accentIds = accents.map((a) => a.id);
+  const fontIds = FONT_OPTIONS.map((f) => f.id);
+
+  const makeRadioKeyDown =
+    (group: string, ids: string[], currentId: string, onSelect: (id: string) => void) =>
+    (e: React.KeyboardEvent<HTMLButtonElement>) => {
+      const navKeys = ["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp", "Home", "End"];
+      if (!navKeys.includes(e.key) || ids.length === 0) return;
+      e.preventDefault();
+      const idx = Math.max(ids.indexOf(currentId), 0);
+      let next = idx;
+      switch (e.key) {
+        case "ArrowRight":
+        case "ArrowDown":
+          next = (idx + 1) % ids.length;
+          break;
+        case "ArrowLeft":
+        case "ArrowUp":
+          next = (idx - 1 + ids.length) % ids.length;
+          break;
+        case "Home":
+          next = 0;
+          break;
+        case "End":
+          next = ids.length - 1;
+          break;
+      }
+      const nextId = ids[next];
+      onSelect(nextId);
+      radioRefs.current[`${group}:${nextId}`]?.focus();
+    };
+
   return (
     <div className="max-w-5xl space-y-10">
       <SEOHead
@@ -102,10 +142,13 @@ export default function ThemeSettings() {
             return (
               <button
                 key={id}
+                ref={(el) => { radioRefs.current[`system:${id}`] = el; }}
                 type="button"
                 role="radio"
                 aria-checked={isActive}
+                tabIndex={isActive ? 0 : -1}
                 onClick={() => handlePickSystem(id)}
+                onKeyDown={makeRadioKeyDown("system", systemIds, systemId, handlePickSystem)}
                 data-testid={`system-option-${id}`}
                 className="text-left rounded-[var(--radius)] border bg-[var(--surface)] p-4 transition-colors hover:border-[var(--border-strong)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] cursor-pointer"
                 style={{

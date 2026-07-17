@@ -1,4 +1,4 @@
-import { useState, memo } from "react";
+import { useState, memo, useRef } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Bookmark, BookmarkPlus, NotebookPen } from "lucide-react";
@@ -44,6 +44,15 @@ function BookmarkButton({
   const { isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
 
+  // NB-024 (run18): keep a handle to the previous bookmark toast and dismiss it
+  // before firing a new one, so rapid toggles never leave a stale "Removed"
+  // toast contradicting the final bookmarked state.
+  const lastToastRef = useRef<{ dismiss: () => void } | null>(null);
+  const showBookmarkToast = (opts: Parameters<typeof toast>[0]) => {
+    lastToastRef.current?.dismiss();
+    lastToastRef.current = toast(opts);
+  };
+
   // `remove` is captured at click time and passed as the mutation variable so
   // the POST/DELETE decision never depends on the optimistic state flip below
   // (reading the mutable `isBookmarked` inside mutationFn caused removals to
@@ -86,7 +95,7 @@ function BookmarkButton({
         // Run17 BUG-013: removal is one click — give the toast a working Undo
         // so a misclick isn't permanent (notes are restored too).
         const restoredNotes = notes;
-        toast({
+        showBookmarkToast({
           description: "Bookmark removed",
           duration: 6000,
           action: (
@@ -102,7 +111,7 @@ function BookmarkButton({
                   setIsBookmarked(true);
                   queryClient.invalidateQueries({ queryKey: ["/api/bookmarks"] });
                   queryClient.invalidateQueries({ queryKey: [`/api/resources/${resourceId}`] });
-                  toast({ description: "Bookmark restored", duration: 2000 });
+                  showBookmarkToast({ description: "Bookmark restored", duration: 2000 });
                 } catch {
                   toast({
                     title: "Error",
@@ -117,7 +126,7 @@ function BookmarkButton({
           ),
         });
       } else {
-        toast({ description: "Bookmark added", duration: 2000 });
+        showBookmarkToast({ description: "Bookmark added", duration: 2000 });
       }
       
       // Close notes dialog if open
@@ -141,6 +150,10 @@ function BookmarkButton({
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    // NB-059/NB-022 (run18): guard in-flight clicks here instead of the native
+    // `disabled` attribute — a disabled flip while focused drops focus to body.
+    if (bookmarkMutation.isPending) return;
 
     // R2-L09: anonymous users get a clear sign-in prompt instead of a
     // confusing failed request. BUG-044/026 (run14): the toast carries a
@@ -196,7 +209,8 @@ function BookmarkButton({
           className
         )}
         onClick={handleClick}
-        disabled={bookmarkMutation.isPending}
+        aria-disabled={bookmarkMutation.isPending}
+        aria-busy={bookmarkMutation.isPending}
         aria-label={isBookmarked ? "Remove bookmark" : "Add bookmark"}
         aria-pressed={isBookmarked}
         data-testid="button-bookmark"

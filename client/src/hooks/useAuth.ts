@@ -17,14 +17,22 @@ interface AuthResponse {
 }
 
 export function useAuth() {
-  const { data, isLoading, error } = useQuery<AuthResponse>({
+  const { data, isLoading, error, refetch } = useQuery<AuthResponse>({
     queryKey: ['/api/auth/user'],
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: (failureCount, error: unknown) => {
       // Don't retry on 401 - user is simply not authenticated
-      if (error && typeof error === 'object' && 'status' in error && error.status === 401) return false;
-      return failureCount < 3;
-    }
+      if (error && typeof error === 'object' && 'status' in error && (error as { status: number }).status === 401) return false;
+      return failureCount < 2;
+    },
+    // NB-028 (run18): an errored auth query used to restart its full retry
+    // cycle every time an observer remounted. Router's skeleton gate flips
+    // page components in/out of the tree on auth pending<->error transitions,
+    // so retryOnMount:true produced an unbounded remount/refetch storm
+    // (~26 req/45s) with a permanent skeleton. Failed auth checks now stay
+    // failed until the user explicitly retries (refetchAuth) or navigates
+    // with a full reload.
+    retryOnMount: false,
   });
 
   const logoutMutation = useMutation({
@@ -51,6 +59,7 @@ export function useAuth() {
     isLoading,
     isAuthenticated: data?.isAuthenticated ?? false,
     error,
+    refetchAuth: refetch,
     logout: logoutMutation.mutate
   };
 }

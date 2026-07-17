@@ -87,6 +87,129 @@ export interface AIRecommendationResult {
   aiGenerated: boolean;
 }
 
+// ---------------------------------------------------------------------------
+// NB-007 / NB-042 (run18): shared scoring + reason helpers.
+// Every non-AI recommendation path (cold-start popularity blend, rule-based
+// scorer, Claude-unavailable fallback) must derive scores from the SAME
+// advertised inputs (skill level, learning goals, resource types) and phrase
+// its reason through ONE deterministic builder, so the same resource + the
+// same profile always reads identically on /profile and /advanced.
+// ---------------------------------------------------------------------------
+
+const SKILL_INDICATORS: Record<string, string[]> = {
+  beginner: ['basic', 'intro', 'introduction', 'getting started', 'tutorial', 'beginner', 'fundamentals', '101'],
+  intermediate: ['guide', 'how to', 'implementation', 'practical', 'hands-on', 'workshop', 'intermediate'],
+  advanced: ['advanced', 'expert', 'deep dive', 'optimization', 'performance', 'architecture', 'complex', 'professional'],
+};
+
+export function calculateSkillMatch(resource: Resource, skillLevel: string): number {
+  const text = `${resource.title} ${resource.description || ''}`.toLowerCase();
+  const indicators = SKILL_INDICATORS[skillLevel] || [];
+  const matches = indicators.filter(indicator => text.includes(indicator));
+  if (matches.length >= 2) return 1.0;
+  if (matches.length === 1) return 0.7;
+  if (skillLevel === 'intermediate') return 0.5; // benefits from most levels
+  return 0.3;
+}
+
+export function calculateGoalsMatch(resource: Resource, learningGoals: string[]): number {
+  if (!learningGoals || learningGoals.length === 0) return 0.5;
+  const resourceText = `${resource.title} ${resource.description || ''} ${resource.category || ''}`.toLowerCase();
+  let totalAlignment = 0;
+  for (const goal of learningGoals) {
+    const goalWords = goal.toLowerCase().split(/\s+/).filter(word => word.length > 2);
+    if (goalWords.length === 0) continue;
+    const matchingWords = goalWords.filter(word => resourceText.includes(word));
+    if (matchingWords.length > 0) totalAlignment += matchingWords.length / goalWords.length;
+  }
+  return Math.min(totalAlignment / learningGoals.length, 1.0);
+}
+
+// Keyword hints per resource type as offered by the preference UIs
+// ("Documentation", "Tutorials", "Tools", "Case Studies", "Video", …).
+const TYPE_KEYWORDS: Record<string, string[]> = {
+  documentation: ['documentation', 'docs', 'reference', 'specification', 'spec', 'api'],
+  tutorial: ['tutorial', 'guide', 'how to', 'walkthrough', 'getting started', 'learn'],
+  tool: ['tool', 'cli', 'utility', 'analyzer', 'inspector', 'editor', 'converter', 'validator'],
+  library: ['library', 'sdk', 'package', 'module', 'player'],
+  framework: ['framework'],
+  service: ['service', 'cloud', 'hosted', 'saas', 'platform'],
+  'case study': ['case study', 'case-study', 'postmortem', 'lessons learned', 'how we'],
+  'community resource': ['community', 'forum', 'awesome', 'slack', 'discord', 'newsletter', 'meetup'],
+  video: ['video', 'talk', 'presentation', 'webinar', 'conference', 'youtube', 'recording'],
+  article: ['article', 'blog', 'post', 'write-up', 'writeup'],
+  course: ['course', 'class', 'training', 'workshop', 'bootcamp'],
+  book: ['book', 'ebook', 'handbook'],
+};
+
+function normalizeTypeKey(rawType: string): string {
+  const lower = rawType.toLowerCase().trim();
+  if (lower.endsWith('ies')) return lower.slice(0, -3) + 'y';
+  if (lower.endsWith('s')) return lower.slice(0, -1);
+  return lower;
+}
+
+export function calculateTypeMatch(resource: Resource, preferredResourceTypes: string[]): number {
+  if (!preferredResourceTypes || preferredResourceTypes.length === 0) return 0.5; // neutral
+  const text = `${resource.title} ${resource.description || ''}`.toLowerCase();
+  let matched = 0;
+  for (const rawType of preferredResourceTypes) {
+    const key = normalizeTypeKey(rawType);
+    const keywords = TYPE_KEYWORDS[key] || [key];
+    if (keywords.some(k => text.includes(k))) matched++;
+  }
+  return matched / preferredResourceTypes.length;
+}
+
+export function skillPhrase(skillLevel: string): string {
+  switch (skillLevel) {
+    case 'advanced': return 'for advanced practitioners';
+    case 'intermediate': return 'for intermediate learners';
+    default: return 'for getting started';
+  }
+}
+
+export interface ReasonComponents {
+  skillScore: number;
+  goalsScore: number;
+  typeScore: number;
+  popular?: boolean;
+}
+
+/**
+ * ONE deterministic reason per (resource, profile) pair. The skill phrase
+ * always reflects the user's OWN configured level — a Beginner is never told
+ * a pick is "for intermediate learners" (NB-042).
+ */
+export function buildRecommendationReason(
+  resource: Resource,
+  profile: Pick<UserProfile, 'skillLevel' | 'preferredCategories' | 'learningGoals' | 'preferredResourceTypes'>,
+  comps: ReasonComponents
+): string {
+  const parts: string[] = [];
+  if (resource.category && (profile.preferredCategories || []).includes(resource.category)) {
+    parts.push(`matches your interest in ${resource.category}`);
+  }
+  if (comps.goalsScore > 0.5 && (profile.learningGoals || []).length > 0) {
+    parts.push('aligns with your learning goals');
+  }
+  if (comps.typeScore > 0.5 && (profile.preferredResourceTypes || []).length > 0) {
+    parts.push('one of your preferred resource types');
+  }
+  if (comps.skillScore >= 0.7) {
+    parts.push(`a good fit ${skillPhrase(profile.skillLevel)}`);
+  }
+  if (parts.length === 0) {
+    parts.push(
+      comps.popular
+        ? (resource.category ? `popular in ${resource.category}` : 'popular across the catalog')
+        : 'based on your preferences'
+    );
+  }
+  const sentence = parts.slice(0, 2).join(' and ');
+  return sentence.charAt(0).toUpperCase() + sentence.slice(1);
+}
+
 export interface AILearningPath {
   id: string;
   title: string;
@@ -320,41 +443,28 @@ function generateFallbackRecommendations(
         userProfile.completedResources.includes(resource.url)) {
       return;
     }
-    
+
+    // NB-007 (run18): score from ALL advertised inputs via the shared
+    // helpers (previously goals used a naive joined-string match and
+    // preferred resource types were ignored entirely).
+    const skillScore = calculateSkillMatch(resource, userProfile.skillLevel);
+    const goalsScore = calculateGoalsMatch(resource, userProfile.learningGoals);
+    const typeScore = calculateTypeMatch(resource, userProfile.preferredResourceTypes);
     let score = 0;
-    let reason = 'Rule-based recommendation';
-    
-    // Category preference (40% weight)
     if (userProfile.preferredCategories.includes(resource.category || '')) {
-      score += 0.4;
-      reason = `Matches your interest in ${resource.category}`;
+      score += 0.35;
     }
-    
-    // Skill level matching (30% weight)
-    const resourceText = `${resource.title} ${resource.description}`.toLowerCase();
-    if (userProfile.skillLevel === 'beginner' && 
-        (resourceText.includes('beginner') || resourceText.includes('intro') || resourceText.includes('basic'))) {
-      score += 0.3;
-    } else if (userProfile.skillLevel === 'advanced' && 
-               (resourceText.includes('advanced') || resourceText.includes('expert') || resourceText.includes('professional'))) {
-      score += 0.3;
-    } else if (userProfile.skillLevel === 'intermediate') {
-      score += 0.2; // Intermediate can benefit from most resources
-    }
-    
-    // Learning goals alignment (30% weight)
-    const goalKeywords = userProfile.learningGoals.join(' ').toLowerCase();
-    if (goalKeywords && resourceText.includes(goalKeywords)) {
-      score += 0.3;
-    }
-    
+    score += skillScore * 0.25 + goalsScore * 0.25 + typeScore * 0.15;
+
     if (score > 0.2) {
       recommendations.push({
         resourceId: resource.url,
         score,
-        reason,
+        // NB-042 (run18): one deterministic reason per (resource, profile).
+        reason: buildRecommendationReason(resource, userProfile, { skillScore, goalsScore, typeScore }),
         category: resource.category || 'Unknown',
-        confidenceLevel: 0.6, // Lower confidence for rule-based
+        // Confidence tracks the actual match strength instead of a flat 0.6.
+        confidenceLevel: Math.min(0.9, Math.max(0.4, 0.35 + score * 0.55)),
         aiGenerated: false
       });
     }

@@ -49,7 +49,10 @@ interface CategoryMetric {
   name: string;
   resourceCount: number;
   growthRate: number;
-  engagement: number;
+  // NB-047 (run18): renamed from the misleading "engagement" — this is purely a
+  // size ratio (share of the catalog), not real engagement. See the categories
+  // tab for the honest label.
+  catalogShare: number;
   completeness: number;
 }
 
@@ -158,9 +161,11 @@ export default function CommunityMetrics({ resources, categories, className }: C
     const categoryMetrics: CategoryMetric[] = categories.map(category => {
       const allCategoryResources = getAllCategoryResources(category);
       const resourceCount = allCategoryResources.length;
-      // Engagement based on category's share of total resources
-      const avgPerCategory = totalCategoryResources / Math.max(categories.length, 1);
-      const engagement = Math.round((resourceCount / Math.max(avgPerCategory, 1)) * 100);
+      // NB-047 (run18): this metric is the category's share of the total catalog
+      // (real, derived from resource counts) — NOT engagement. The old
+      // "engagement = share of average" could hit a capped 100%, which
+      // contradicted the Popular tab's real 0% per-browser engagement.
+      const catalogShare = Math.round((resourceCount / Math.max(totalCategoryResources, 1)) * 100);
       // Count how many resources in this category are recent (has createdAt in last 30 days)
       const now = new Date();
       const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
@@ -173,10 +178,10 @@ export default function CommunityMetrics({ resources, categories, className }: C
         name: category.name,
         resourceCount,
         growthRate: Math.min(100, growthRate),
-        engagement: Math.min(100, engagement),
+        catalogShare: Math.min(100, catalogShare),
         completeness: Math.min(100, (resourceCount / 50) * 100)
       };
-    }).sort((a, b) => b.engagement - a.engagement);
+    }).sort((a, b) => b.catalogShare - a.catalogShare);
 
     // Calculate actual weekly growth from recent resources
     const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
@@ -481,11 +486,14 @@ export default function CommunityMetrics({ resources, categories, className }: C
                           </p>
                         </div>
                         <div className="text-right">
-                          <div className={`text-lg font-bold ${getEngagementColor(category.engagement)}`}>
-                            {category.engagement}%
+                          {/* NB-047 (run18): labeled honestly as the category's
+                              share of the catalog — the previous "engagement"
+                              label contradicted the Popular tab's real 0%. */}
+                          <div className="text-lg font-bold text-foreground">
+                            {category.catalogShare}%
                           </div>
                           <div className="text-xs text-muted-foreground">
-                            engagement
+                            of catalog
                           </div>
                         </div>
                       </div>

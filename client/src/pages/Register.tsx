@@ -17,8 +17,18 @@ import { useAuth } from "@/hooks/useAuth";
 import { trackSignUp } from "@/lib/analytics";
 
 const registerSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  // BUG-037 (run18): an empty email must read "Email is required", not
+  // "Please enter a valid email address" — min(1) fires before email().
+  email: z
+    .string()
+    .min(1, "Email is required")
+    .email("Please enter a valid email address"),
+  // NB-001 (run18): reject whitespace-only passwords — a string of spaces
+  // used to satisfy min(8). Server enforces the same message.
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .refine((v) => v.trim().length >= 8, "Password can't be spaces only"),
   // Run15 BUG-043: confirm-password field to catch typos before submit.
   confirmPassword: z.string().min(1, "Please confirm your password"),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -235,6 +245,9 @@ export default function Register() {
                     <FormControl>
                       <div className="relative">
                         <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        {/* BUG-049 (run18): native required/type=email aid AT,
+                            autofill and mobile keyboards; the form's noValidate
+                            keeps zod's styled inline messages authoritative. */}
                         <Input
                           {...field}
                           id="email"
@@ -244,6 +257,7 @@ export default function Register() {
                           className="pl-10"
                           data-testid="input-email"
                           disabled={isLoading}
+                          required
                         />
                       </div>
                     </FormControl>
@@ -270,10 +284,12 @@ export default function Register() {
                           id="password"
                           type={showPassword ? "text" : "password"}
                           autoComplete="new-password"
-                          placeholder="At least 8 characters"
+                          placeholder="Password"
                           className="pl-10 pr-12"
                           data-testid="input-password"
                           disabled={isLoading}
+                          required
+                          minLength={8}
                         />
                         {/* BUG-026 (run9): show/hide password toggle (parity with /login) */}
                         <button
@@ -309,10 +325,12 @@ export default function Register() {
                           id="confirmPassword"
                           type={showConfirmPassword ? "text" : "password"}
                           autoComplete="new-password"
-                          placeholder="Re-enter your password"
+                          placeholder="Confirm password"
                           className="pl-10 pr-12"
                           data-testid="input-confirm-password"
                           disabled={isLoading}
+                          required
+                          minLength={8}
                         />
                         {/* Run17 BUG-042: confirm field gets its own show/hide
                             toggle (parity with the password field above). */}

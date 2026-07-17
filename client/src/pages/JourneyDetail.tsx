@@ -140,6 +140,25 @@ export default function JourneyDetail() {
     },
   });
 
+  // NB-059/NB-060 (run18): single entry point for step toggles.
+  // - NB-059: early-return while a PUT is in flight so rapid clicks can't fire
+  //   duplicate PUTs (the buttons use aria-disabled, not the native disabled
+  //   attribute, to avoid dropping focus to <body>).
+  // - NB-060: when offline, tell the user immediately and DO NOT fire the
+  //   mutation (no silent queue that surprises them with a toast on reconnect).
+  const handleToggleStep = (stepIds: number[], completed: boolean) => {
+    if (completeStepMutation.isPending) return;
+    if (typeof navigator !== "undefined" && navigator.onLine === false) {
+      toast({
+        title: "You're offline",
+        description: "You're offline — change not saved. Reconnect and try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+    completeStepMutation.mutate({ stepIds, completed });
+  };
+
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case "beginner":
@@ -299,7 +318,12 @@ export default function JourneyDetail() {
                     {progressPercent}%
                   </span>
                 </div>
-                <Progress value={progressPercent} className="h-3" data-testid="progress-bar-journey" />
+                <Progress
+                  value={progressPercent}
+                  className="h-3"
+                  aria-label={`${journey.title} progress: ${progressPercent}%`}
+                  data-testid="progress-bar-journey"
+                />
                 <p className="text-sm text-muted-foreground">
                   {completedCount} of {totalSteps} steps completed
                 </p>
@@ -438,9 +462,13 @@ export default function JourneyDetail() {
                         {isEnrolled && !isStepCompleted && (
                           <Button 
                             variant="outline"
-                            className="min-h-[44px]"
-                            onClick={() => completeStepMutation.mutate({ stepIds: step.rowIds, completed: true })}
-                            disabled={completeStepMutation.isPending}
+                            className={cn(
+                              "min-h-[44px]",
+                              completeStepMutation.isPending && "opacity-60",
+                            )}
+                            onClick={() => handleToggleStep(step.rowIds, true)}
+                            aria-disabled={completeStepMutation.isPending}
+                            aria-busy={completeStepMutation.isPending}
                             data-testid={`button-complete-step-${step.stepNumber}`}
                           >
                             {completeStepMutation.isPending ? (
@@ -457,9 +485,13 @@ export default function JourneyDetail() {
                         {isStepCompleted && (
                           <Button
                             variant="ghost"
-                            className="min-h-[44px] px-2 text-green-500 hover:text-green-600"
-                            onClick={() => completeStepMutation.mutate({ stepIds: step.rowIds, completed: false })}
-                            disabled={completeStepMutation.isPending}
+                            className={cn(
+                              "min-h-[44px] px-2 text-green-500 hover:text-green-600",
+                              completeStepMutation.isPending && "opacity-60",
+                            )}
+                            onClick={() => handleToggleStep(step.rowIds, false)}
+                            aria-disabled={completeStepMutation.isPending}
+                            aria-busy={completeStepMutation.isPending}
                             data-testid={`button-uncomplete-step-${step.stepNumber}`}
                           >
                             <CheckCircle2 className="h-4 w-4 mr-2" />

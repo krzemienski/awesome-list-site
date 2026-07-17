@@ -53,7 +53,10 @@ export default function ChangePasswordForm() {
       if (response.ok) {
         toast({
           title: "Password changed",
-          description: "Your password was updated. Other sessions have been signed out.",
+          // NB-040 (run18): describe the real effect (you stay signed in here,
+          // other devices are signed out) without implying a session-list/revoke
+          // feature that this page doesn't offer.
+          description: "Your password was updated. You'll stay signed in on this device.",
         });
         form.reset();
       } else {
@@ -83,7 +86,11 @@ export default function ChangePasswordForm() {
           Change Password
         </CardTitle>
         <CardDescription>
-          Updating your password signs out all your other active sessions.
+          {/* NB-040 (run18): matches the real effect and the UI on this page —
+              this is the only account-security control here; there is no separate
+              session list to view or revoke. */}
+          Change your account password. For your security, you'll stay signed in on
+          this device and be signed out on your other devices.
         </CardDescription>
       </CardHeader>
       <CardContent>

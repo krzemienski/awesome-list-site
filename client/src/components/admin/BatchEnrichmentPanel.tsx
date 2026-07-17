@@ -586,12 +586,24 @@ export default function BatchEnrichmentPanel() {
                           : '-'}
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
+                        {/* BUG-029 (run18): the Ended cell must show the REAL
+                            end timestamp or an explicit "—" — a cancelled job
+                            with no recorded end previously showed a bare "-"
+                            that read like missing data rather than "never
+                            ended". */}
                         {job.completedAt 
                           ? formatAdminDateTime(job.completedAt)
-                          : job.status === 'processing' ? 'In progress...' : '-'}
+                          : job.status === 'processing' ? 'In progress...' : '—'}
                       </TableCell>
                       <TableCell className="text-center font-mono">
-                        {displayProcessed(job)} / {job.totalResources || 0}
+                        {/* BUG-029 (run18): a completed job with nothing to do
+                            showed "0 / 0", which read as a contradiction —
+                            say so in words instead. */}
+                        {(job.totalResources || 0) === 0 && effectiveStatus(job) !== 'processing' ? (
+                          <span className="text-muted-foreground font-sans text-xs">Nothing to process</span>
+                        ) : (
+                          <>{displayProcessed(job)} / {job.totalResources || 0}</>
+                        )}
                       </TableCell>
                       <TableCell className="text-center">
                         {(job.processedResources || 0) === 0 ? (

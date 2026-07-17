@@ -284,7 +284,12 @@ export default function AIRecommendationsPanel({ resources, showHeader = true }:
                           render={({ field }) => (
                             <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                               <FormControl>
+                                {/* BUG-048 (run18): the 16px checkbox failed the
+                                    ≥24px touch-target rule — a centered 24px
+                                    pseudo-element enlarges the hit area while the
+                                    visible box stays 16px. */}
                                 <Checkbox
+                                  className="relative before:absolute before:left-1/2 before:top-1/2 before:h-6 before:w-6 before:-translate-x-1/2 before:-translate-y-1/2 before:content-['']"
                                   data-testid={`checkbox-category-${category.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
                                   checked={field.value?.includes(category)}
                                   onCheckedChange={(checked) => {

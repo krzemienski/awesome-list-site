@@ -379,18 +379,33 @@ export default function Profile({ user }: ProfileProps) {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {stats.map((stat) => {
           const Icon = stat.icon;
+          // NB-041 (run18): a "0d" streak reads as broken for new users — show
+          // onboarding copy instead of the empty number.
+          const isEmptyStreak =
+            stat.label === "Learning Streak" && !(progress?.streakDays);
           return (
             <Card key={stat.label}>
               <CardContent className="p-4 flex items-center gap-3">
                 <Icon className={`h-8 w-8 ${stat.color}`} />
                 <div>
-                  <p className="text-2xl font-bold">{stat.value}</p>
-                  <p className="text-xs text-muted-foreground">{stat.label}</p>
-                  {/* BUG-052 (run14): explain what feeds the metric. */}
-                  {"hint" in stat && stat.hint && (
-                    <p className="text-[10px] text-muted-foreground/70" data-testid={`stat-hint-${stat.label.toLowerCase().replace(/\s+/g, "-")}`}>
-                      {stat.hint}
-                    </p>
+                  {isEmptyStreak ? (
+                    <>
+                      <p className="text-sm font-semibold" data-testid="text-streak-onboarding">
+                        Start your streak — come back tomorrow!
+                      </p>
+                      <p className="text-xs text-muted-foreground">{stat.label}</p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-2xl font-bold">{stat.value}</p>
+                      <p className="text-xs text-muted-foreground">{stat.label}</p>
+                      {/* BUG-052 (run14): explain what feeds the metric. */}
+                      {"hint" in stat && stat.hint && (
+                        <p className="text-[10px] text-muted-foreground/70" data-testid={`stat-hint-${stat.label.toLowerCase().replace(/\s+/g, "-")}`}>
+                          {stat.hint}
+                        </p>
+                      )}
+                    </>
                   )}
                 </div>
               </CardContent>
@@ -821,6 +836,46 @@ export default function Profile({ user }: ProfileProps) {
                               <p className="text-sm text-muted-foreground line-clamp-2">
                                 {resource.description}
                               </p>
+                              {/* NB-039 (run18): surface the submitted URL
+                                  (truncated) and a details expander so users can
+                                  review exactly what they submitted. Withdrawing a
+                                  submission needs a server endpoint that does not
+                                  exist yet, so it is intentionally not offered. */}
+                              {resource.url && (
+                                <a
+                                  href={resource.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="mt-1 block max-w-full truncate text-xs text-muted-foreground hover:text-primary"
+                                  title={resource.url}
+                                  data-testid={`text-submission-url-${resource.id}`}
+                                >
+                                  {resource.url}
+                                </a>
+                              )}
+                              <details className="mt-2" data-testid={`details-submission-${resource.id}`}>
+                                <summary className="cursor-pointer text-xs text-primary">
+                                  View submission details
+                                </summary>
+                                <div className="mt-2 space-y-1">
+                                  <p className="text-xs text-muted-foreground whitespace-pre-wrap break-words">
+                                    {resource.description || "No description provided."}
+                                  </p>
+                                  {resource.url && (
+                                    <p className="text-xs break-all">
+                                      <span className="text-muted-foreground">URL: </span>
+                                      <a
+                                        href={resource.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="hover:text-primary underline"
+                                      >
+                                        {resource.url}
+                                      </a>
+                                    </p>
+                                  )}
+                                </div>
+                              </details>
                               <div className="flex items-center gap-2 mt-2">
                                 <Badge variant="secondary" className="text-xs">
                                   {resource.category}

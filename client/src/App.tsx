@@ -89,7 +89,7 @@ function Logout() {
 
 function Router() {
   useAnalytics();
-  const { user, isLoading: authLoading, logout } = useAuth();
+  const { user, isLoading: authLoading, error: authError, refetchAuth, logout } = useAuth();
   const [location] = useLocation();
   const isKnownRoute = KNOWN_ROUTE_PATTERNS.some((re) => re.test(location));
 
@@ -154,6 +154,26 @@ function Router() {
 
   return (
     <MainLayout awesomeList={awesomeList} isLoading={isLoading} user={user ?? undefined} onLogout={logout}>
+      {/* NB-028 (run18): when the auth check itself fails (429/500/network),
+          the app keeps working logged-out — surface it once with a manual
+          retry instead of silently looping refetches behind a skeleton. */}
+      {authError ? (
+        <div
+          className="mb-4 flex flex-wrap items-center gap-3 border border-destructive/40 bg-destructive/10 px-4 py-2 text-sm"
+          role="alert"
+          data-testid="banner-auth-error"
+        >
+          <span>We couldn't verify your sign-in status. You can keep browsing as a guest.</span>
+          <button
+            type="button"
+            className="underline underline-offset-2 font-medium"
+            onClick={() => refetchAuth()}
+            data-testid="button-auth-retry"
+          >
+            Retry
+          </button>
+        </div>
+      ) : null}
       <Switch>
         <Route path="/" component={() => {
           const q = new URLSearchParams(window.location.search).get("q");

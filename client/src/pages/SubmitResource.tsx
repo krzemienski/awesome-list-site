@@ -26,6 +26,16 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -111,6 +121,8 @@ export default function SubmitResource() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [showSuccess, setShowSuccess] = useState(false);
+  // NB-054 (run18): styled discard-confirmation dialog state (replaces window.confirm)
+  const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
   const [duplicateResource, setDuplicateResource] = useState<{ id: number; title: string } | null>(null);
 
   // Fetch categories
@@ -619,10 +631,11 @@ export default function SubmitResource() {
                     variant="outline"
                     onClick={() => {
                       // BUG-033 (run14): don't silently discard a filled form.
-                      if (
-                        isDirty &&
-                        !window.confirm("Discard your unsaved submission?")
-                      ) {
+                      // NB-054 (run18): native window.confirm() replaced with the
+                      // app's styled AlertDialog — visually consistent, keyboard
+                      // accessible, and themable (native confirm is neither).
+                      if (isDirty) {
+                        setShowDiscardConfirm(true);
                         return;
                       }
                       setLocation('/');
@@ -633,6 +646,30 @@ export default function SubmitResource() {
                     Cancel
                   </Button>
                 </div>
+
+                {/* NB-054 (run18): styled discard-confirmation dialog */}
+                <AlertDialog open={showDiscardConfirm} onOpenChange={setShowDiscardConfirm}>
+                  <AlertDialogContent data-testid="dialog-discard-confirm">
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Discard your unsaved submission?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        You have unsaved changes in this form. Leaving now will
+                        discard everything you've entered.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel data-testid="button-discard-cancel">
+                        Keep editing
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        data-testid="button-discard-confirm"
+                        onClick={() => setLocation('/')}
+                      >
+                        Discard
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </form>
             </Form>
           </CardContent>

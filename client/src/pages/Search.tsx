@@ -90,6 +90,10 @@ export default function Search() {
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
   const pageResults = results;
+  // NB-048 (run18): surface the item range on the current page so users know
+  // where they are in the result set, not just a running page counter.
+  const rangeStart = total === 0 ? 0 : (safePage - 1) * PAGE_SIZE + 1;
+  const rangeEnd = (safePage - 1) * PAGE_SIZE + results.length;
 
   // A URL-restored ?page= beyond the last page fetches an empty page —
   // snap back to the real last page once the total is known.
@@ -213,8 +217,18 @@ export default function Search() {
       ) : (
         <>
           <p className="text-sm text-muted-foreground break-words" data-testid="text-result-count">
-            {total} result{total === 1 ? "" : "s"} for “{trimmed}”
-            {totalPages > 1 ? ` · page ${safePage} of ${totalPages}` : ""}
+            {/* NB-048 (run18): "Page X of Y · showing N–M of T results" so the
+                indicator states position + range, not just a total. */}
+            {totalPages > 1 ? (
+              <>
+                Page {safePage} of {totalPages} · showing {rangeStart}–{rangeEnd} of {total} result
+                {total === 1 ? "" : "s"} for “{trimmed}”
+              </>
+            ) : (
+              <>
+                {total} result{total === 1 ? "" : "s"} for “{trimmed}”
+              </>
+            )}
           </p>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {pageResults.map((r) => (

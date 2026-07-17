@@ -287,6 +287,30 @@ app.use((req, res, next) => {
         maxAge: "1y",
       }),
     );
+    // NB-009 (run18): unknown FILE-LIKE paths (/.env, /backup.zip, dead hashed
+    // /assets/*.js) used to fall through to the SPA fallback and answer 200 +
+    // index.html (soft-404 that masks dead assets and "confirms" sensitive
+    // filenames). If the last path segment contains a dot and no real file
+    // exists under the static root, answer 404 before serveStatic's fallback.
+    // Extension-less SPA routes are untouched. Dev is exempt on purpose: the
+    // Vite dev pipeline serves dotted module paths (/src/App.tsx, /@vite/…).
+    const staticRoot = path.resolve(import.meta.dirname, "public");
+    app.use((req, res, next) => {
+      if (req.method !== "GET" && req.method !== "HEAD") return next();
+      const lastSegment = req.path.split("/").pop() ?? "";
+      if (!lastSegment.includes(".")) return next();
+      try {
+        const decoded = decodeURIComponent(req.path);
+        const candidate = path.resolve(staticRoot, "." + decoded);
+        // Path-traversal guard: the resolved file must stay inside the root.
+        if (candidate.startsWith(staticRoot + path.sep) && fs.existsSync(candidate) && fs.statSync(candidate).isFile()) {
+          return next();
+        }
+      } catch {
+        // malformed encoding → treat as not found
+      }
+      return res.status(404).type("text/plain").send("Not Found");
+    });
     serveStatic(app);
   }
 

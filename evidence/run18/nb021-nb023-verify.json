@@ -1,0 +1,99 @@
+{
+  "nb023": {
+    "sidebar-toggle": {
+      "found": true,
+      "cursor": "pointer",
+      "hoverChanged": true,
+      "before": {
+        "cursor": "pointer",
+        "bg": "rgba(0, 0, 0, 0)",
+        "border": "rgba(244, 243, 238, 0.08)",
+        "color": "rgb(244, 243, 238)",
+        "boxShadow": "none",
+        "transform": "none",
+        "textDecoration": "none"
+      },
+      "after": {
+        "cursor": "pointer",
+        "bg": "rgba(244, 243, 238, 0.05)",
+        "border": "rgba(244, 243, 238, 0.08)",
+        "color": "rgb(244, 243, 238)",
+        "boxShadow": "none",
+        "transform": "none",
+        "textDecoration": "none"
+      }
+    },
+    "home-card": {
+      "found": true,
+      "cursor": "pointer",
+      "before": {
+        "borderColor": "rgba(244, 243, 238, 0.08)",
+        "bg": "rgba(244, 243, 238, 0.024)"
+      },
+      "after": {
+        "borderColor": "rgb(255, 61, 82)",
+        "bg": "rgba(244, 243, 238, 0.024)"
+      },
+      "hoverChanged": true,
+      "note": "hover state lives on child Card border (accent)"
+    },
+    "primary-button": {
+      "found": true,
+      "cursor": "pointer",
+      "hoverChanged": true,
+      "before": {
+        "cursor": "pointer",
+        "bg": "rgba(0, 0, 0, 0)",
+        "border": "rgba(244, 243, 238, 0.08)",
+        "color": "rgb(244, 243, 238)",
+        "boxShadow": "none",
+        "transform": "none",
+        "textDecoration": "none"
+      },
+      "after": {
+        "cursor": "pointer",
+        "bg": "rgba(244, 243, 238, 0.05)",
+        "border": "rgba(244, 243, 238, 0.08)",
+        "color": "rgb(244, 243, 238)",
+        "boxShadow": "none",
+        "transform": "none",
+        "textDecoration": "none"
+      }
+    },
+    "footer-link": {
+      "found": true,
+      "cursor": "pointer",
+      "hoverChanged": true,
+      "before": {
+        "cursor": "pointer",
+        "bg": "rgba(0, 0, 0, 0)",
+        "border": "rgba(244, 243, 238, 0.08)",
+        "color": "rgba(244, 243, 238, 0.52)",
+        "boxShadow": "none",
+        "transform": "none",
+        "textDecoration": "none"
+      },
+      "after": {
+        "cursor": "pointer",
+        "bg": "rgba(0, 0, 0, 0)",
+        "border": "rgba(244, 243, 238, 0.08)",
+        "color": "rgb(244, 243, 238)",
+        "boxShadow": "none",
+        "transform": "none",
+        "textDecoration": "none"
+      }
+    }
+  },
+  "nb021_home": {
+    "bodyBg": "rgb(255, 255, 255)",
+    "bodyColor": "rgb(0, 0, 0)",
+    "consentBannerHidden": true,
+    "sidebarHidden": true
+  },
+  "nb021_about": {
+    "bodyBg": "rgb(255, 255, 255)",
+    "bodyColor": "rgb(0, 0, 0)",
+    "consentBannerHidden": true,
+    "sidebarHidden": true
+  }
+}

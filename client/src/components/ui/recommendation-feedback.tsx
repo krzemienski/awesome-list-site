@@ -1,9 +1,12 @@
 import { useState, memo } from "react";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { ThumbsUp, ThumbsDown } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
+import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
 interface RecommendationFeedbackProps {
@@ -25,6 +28,30 @@ function RecommendationFeedback({
 }: RecommendationFeedbackProps) {
   const [feedback, setFeedback] = useState<'helpful' | 'not_helpful' | null>(null);
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
+  const [, setLocation] = useLocation();
+
+  // NB-038 (run18): logged-out feedback used to fake-accept ("Thanks! We'll
+  // recommend more like this") while storing nothing. Give honest UX instead —
+  // prompt the user to sign in with a working action and skip the mutation.
+  const promptSignIn = () => {
+    toast({
+      title: "Sign in to save feedback",
+      description: "Create an account or sign in so your recommendation feedback is saved.",
+      action: (
+        <ToastAction
+          altText="Sign in"
+          onClick={() =>
+            setLocation(
+              `/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`
+            )
+          }
+        >
+          Sign in
+        </ToastAction>
+      ),
+    });
+  };
 
   const feedbackMutation = useMutation({
     mutationFn: async (newFeedback: 'helpful' | 'not_helpful') => {
@@ -79,6 +106,12 @@ function RecommendationFeedback({
     e.preventDefault();
     e.stopPropagation();
 
+    // NB-038 (run18): honest logged-out UX — prompt sign-in, store nothing.
+    if (!isAuthenticated) {
+      promptSignIn();
+      return;
+    }
+
     // Toggle feedback if clicking the same button
     const newFeedback = feedback === 'helpful' ? null : 'helpful';
 
@@ -94,6 +127,12 @@ function RecommendationFeedback({
   const handleThumbsDown = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    // NB-038 (run18): honest logged-out UX — prompt sign-in, store nothing.
+    if (!isAuthenticated) {
+      promptSignIn();
+      return;
+    }
 
     // Toggle feedback if clicking the same button
     const newFeedback = feedback === 'not_helpful' ? null : 'not_helpful';
@@ -117,11 +156,10 @@ function RecommendationFeedback({
         size={size}
         className={cn(
           "group relative",
-          feedback === 'helpful' && "text-green-500 hover:text-green-600",
-          !userId && "opacity-50 cursor-not-allowed"
+          feedback === 'helpful' && "text-green-500 hover:text-green-600"
         )}
         onClick={handleThumbsUp}
-        disabled={feedbackMutation.isPending || !userId}
+        disabled={feedbackMutation.isPending}
         aria-label={feedback === 'helpful' ? "Remove helpful feedback" : "Mark as helpful"}
         data-testid="button-thumbs-up"
       >
@@ -148,11 +186,10 @@ function RecommendationFeedback({
         size={size}
         className={cn(
           "group relative",
-          feedback === 'not_helpful' && "text-red-500 hover:text-red-600",
-          !userId && "opacity-50 cursor-not-allowed"
+          feedback === 'not_helpful' && "text-red-500 hover:text-red-600"
         )}
         onClick={handleThumbsDown}
-        disabled={feedbackMutation.isPending || !userId}
+        disabled={feedbackMutation.isPending}
         aria-label={feedback === 'not_helpful' ? "Remove not helpful feedback" : "Mark as not helpful"}
         data-testid="button-thumbs-down"
       >

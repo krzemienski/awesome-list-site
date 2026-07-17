@@ -40,6 +40,47 @@ interface ExportOptions {
   selectedCategories: string[];
 }
 
+// NB-010 (run18): escape EVERY content-derived value before it lands in the
+// exported HTML document. Raw titles/descriptions/tags/URLs previously flowed
+// straight into markup, so a resource description containing `<video>`,
+// `<audio>`, `<mux-player>` or a stray `&` produced live embeds / broken
+// entities in the exported file. Escapes &, <, >, ", ' — safe for both text
+// nodes and double-quoted attribute values (e.g. href).
+function escapeHtml(value: unknown): string {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+// NB-011 (run18): emit a strictly-parseable double-quoted YAML scalar.
+// Unescaped backslashes (Windows paths, regex fragments in descriptions) used
+// to break strict YAML parsers; here we escape `\` first then `"` and wrap the
+// result so every scalar round-trips cleanly.
+function yamlString(value: unknown): string {
+  const escaped = String(value ?? "")
+    .replace(/\\/g, "\\\\")
+    .replace(/"/g, '\\"');
+  return `"${escaped}"`;
+}
+
+// NB-012 (run18): the awesome-list payload carries per-resource tags in
+// `metadata.tags` (jsonb) — there is NO top-level `tags` column, so the
+// "Include tags" option was reading the always-empty `resource.tags`. Resolve
+// tags from either shape so the option produces real values everywhere.
+function getResourceTags(resource: Resource): string[] {
+  const top = Array.isArray(resource.tags) ? resource.tags : [];
+  const meta = Array.isArray(resource.metadata?.tags)
+    ? (resource.metadata!.tags as unknown[])
+    : [];
+  const source = top.length ? top : meta;
+  return source.filter(
+    (t): t is string => typeof t === "string" && t.trim().length > 0
+  );
+}
+
 export default function ExportTools({ awesomeList, selectedCategory, className, formatOverride }: ExportToolsProps) {
   const { toast } = useToast();
   const [exportOptions, setExportOptions] = useState<ExportOptions>({
@@ -139,8 +180,10 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
           if (exportOptions.includeDescriptions && resource.description) {
             content += ` - ${resource.description}`;
           }
-          if (exportOptions.includeTags && resource.tags?.length) {
-            content += ` \`${resource.tags.join('` `')}\``;
+          // NB-012 (run18): read tags from metadata.tags fallback.
+          const tags = getResourceTags(resource);
+          if (exportOptions.includeTags && tags.length) {
+            content += ` \`${tags.join('` `')}\``;
           }
           content += '\n';
         });
@@ -155,8 +198,10 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
         if (exportOptions.includeDescriptions && resource.description) {
           content += ` - ${resource.description}`;
         }
-        if (exportOptions.includeTags && resource.tags?.length) {
-          content += ` \`${resource.tags.join('` `')}\``;
+        // NB-012 (run18): read tags from metadata.tags fallback.
+        const tags = getResourceTags(resource);
+        if (exportOptions.includeTags && tags.length) {
+          content += ` \`${tags.join('` `')}\``;
         }
         content += '\n';
       });
@@ -172,13 +217,17 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
       description: awesomeList.description,
       exportDate: new Date().toISOString(),
       totalResources: resources.length,
-      resources: resources.map(resource => ({
-        title: resource.title,
-        url: resource.url,
-        ...(exportOptions.includeDescriptions && { description: resource.description }),
-        ...(exportOptions.includeCategories && { category: resource.category }),
-        ...(exportOptions.includeTags && resource.tags?.length && { tags: resource.tags })
-      }))
+      resources: resources.map(resource => {
+        // NB-012 (run18): tags live in metadata.tags — emit a real tags key.
+        const tags = getResourceTags(resource);
+        return {
+          title: resource.title,
+          url: resource.url,
+          ...(exportOptions.includeDescriptions && { description: resource.description }),
+          ...(exportOptions.includeCategories && { category: resource.category }),
+          ...(exportOptions.includeTags && tags.length > 0 && { tags })
+        };
+      })
     };
     return JSON.stringify(exportData, null, 2);
   };
@@ -204,7 +253,10 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
         row.push(`"${(resource.description || '').replace(/"/g, '""')}"`);
       }
       if (exportOptions.includeTags) {
-        row.push(`"${(resource.tags || []).join('; ')}"`);
+        // NB-012 (run18): real tags from metadata.tags, semicolon-joined and
+        // CSV-escaped (doubled quotes).
+        const tags = getResourceTags(resource);
+        row.push(`"${tags.join('; ').replace(/"/g, '""')}"`);
       }
       
       content += row.join(',') + '\n';
@@ -220,7 +272,7 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${awesomeList.title}</title>
+    <title>${escapeHtml(awesomeList.title)}</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
         h1 { color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; }
@@ -234,10 +286,11 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
     </style>
 </head>
 <body>
-    <h1>${awesomeList.title}</h1>`;
+    <h1>${escapeHtml(awesomeList.title)}</h1>`;
 
     if (exportOptions.includeDescriptions) {
-      content += `<p>${awesomeList.description}</p>`;
+      // NB-010 (run18): escape all content-derived interpolations.
+      content += `<p>${escapeHtml(awesomeList.description)}</p>`;
     }
 
     if (exportOptions.groupByCategory) {
@@ -248,15 +301,16 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
       }, {} as Record<string, Resource[]>);
 
       Object.entries(categorizedResources).forEach(([category, categoryResources]) => {
-        content += `<h2>${category}</h2>`;
+        content += `<h2>${escapeHtml(category)}</h2>`;
         categoryResources.forEach(resource => {
           content += `<div class="resource">
-            <div class="resource-title"><a href="${resource.url}" target="_blank">${resource.title}</a></div>`;
+            <div class="resource-title"><a href="${escapeHtml(resource.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(resource.title)}</a></div>`;
           if (exportOptions.includeDescriptions && resource.description) {
-            content += `<div class="resource-description">${resource.description}</div>`;
+            content += `<div class="resource-description">${escapeHtml(resource.description)}</div>`;
           }
-          if (exportOptions.includeTags && resource.tags?.length) {
-            content += `<div class="tags">${resource.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>`;
+          const tags = getResourceTags(resource);
+          if (exportOptions.includeTags && tags.length) {
+            content += `<div class="tags">${tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('')}</div>`;
           }
           content += `</div>`;
         });
@@ -264,44 +318,49 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
     } else {
       resources.forEach(resource => {
         content += `<div class="resource">
-          <div class="resource-title"><a href="${resource.url}" target="_blank">${resource.title}</a></div>`;
+          <div class="resource-title"><a href="${escapeHtml(resource.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(resource.title)}</a></div>`;
         if (exportOptions.includeCategories) {
-          content += `<div class="resource-category">Category: ${resource.category}</div>`;
+          content += `<div class="resource-category">Category: ${escapeHtml(resource.category)}</div>`;
         }
         if (exportOptions.includeDescriptions && resource.description) {
-          content += `<div class="resource-description">${resource.description}</div>`;
+          content += `<div class="resource-description">${escapeHtml(resource.description)}</div>`;
         }
-        if (exportOptions.includeTags && resource.tags?.length) {
-          content += `<div class="tags">${resource.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>`;
+        const tags = getResourceTags(resource);
+        if (exportOptions.includeTags && tags.length) {
+          content += `<div class="tags">${tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('')}</div>`;
         }
         content += `</div>`;
       });
     }
 
-    content += `<div class="footer">Exported from ${awesomeList.title} on ${new Date().toLocaleDateString()}</div>
+    content += `<div class="footer">Exported from ${escapeHtml(awesomeList.title)} on ${escapeHtml(new Date().toLocaleDateString())}</div>
 </body>
 </html>`;
     return content;
   };
 
   const generateYAML = (resources: Resource[]): string => {
-    let content = `title: "${awesomeList.title}"\n`;
-    content += `description: "${awesomeList.description}"\n`;
-    content += `export_date: "${new Date().toISOString()}"\n`;
+    // NB-011 (run18): every scalar goes through yamlString() so backslashes and
+    // quotes are escaped and the document parses under strict YAML parsers.
+    let content = `title: ${yamlString(awesomeList.title)}\n`;
+    content += `description: ${yamlString(awesomeList.description)}\n`;
+    content += `export_date: ${yamlString(new Date().toISOString())}\n`;
     content += `total_resources: ${resources.length}\n`;
     content += `resources:\n`;
     
     resources.forEach(resource => {
-      content += `  - title: "${resource.title}"\n`;
-      content += `    url: "${resource.url}"\n`;
+      content += `  - title: ${yamlString(resource.title)}\n`;
+      content += `    url: ${yamlString(resource.url)}\n`;
       if (exportOptions.includeCategories) {
-        content += `    category: "${resource.category}"\n`;
+        content += `    category: ${yamlString(resource.category)}\n`;
       }
       if (exportOptions.includeDescriptions && resource.description) {
-        content += `    description: "${resource.description.replace(/"/g, '\\"')}"\n`;
+        content += `    description: ${yamlString(resource.description)}\n`;
       }
-      if (exportOptions.includeTags && resource.tags?.length) {
-        content += `    tags: [${resource.tags.map(tag => `"${tag}"`).join(', ')}]\n`;
+      // NB-012 (run18): tags resolved from metadata.tags.
+      const tags = getResourceTags(resource);
+      if (exportOptions.includeTags && tags.length) {
+        content += `    tags: [${tags.map(tag => yamlString(tag)).join(', ')}]\n`;
       }
     });
 
@@ -344,11 +403,37 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
           mimeType = 'text/yaml';
           break;
         case 'pdf': {
-          // BUG-024 (run13) / Run15 BUG-004: render the HTML report into a
-          // hidden same-page iframe and print THAT — no popup, so popup
-          // blockers can't leave the user with a blank flash and nothing
-          // else. Standard client-side save-as-PDF path, no server work.
+          // NB-006 (run18): the previous hidden-iframe print branch could fail
+          // silently — if the iframe never fired `onload` (some srcdoc/print
+          // restrictions) or `print()` threw, the user got NO download, NO
+          // popup and NO feedback within 60s. Now every path gives feedback
+          // within ~2s: an immediate toast confirms we're opening the print
+          // dialog, and a load-timeout + print-failure fallback downloads the
+          // printable HTML file with an explanatory toast. Standard
+          // client-side save-as-PDF flow, no server work.
           const htmlForPdf = generateHTML(resources);
+          const baseName = awesomeList.title.toLowerCase().replace(/\s+/g, '-');
+          let settled = false;
+
+          const downloadPrintableHtml = () => {
+            if (settled) return;
+            settled = true;
+            const blob = new Blob([htmlForPdf], { type: 'text/html' });
+            const dlUrl = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = dlUrl;
+            link.download = `${baseName}.html`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(dlUrl);
+            toast({
+              title: "Downloaded printable HTML",
+              description: "We couldn't open the print dialog, so we saved a printable HTML file — open it and print to PDF.",
+              variant: "default",
+            });
+          };
+
           const frame = document.createElement('iframe');
           frame.style.position = 'fixed';
           frame.style.right = '0';
@@ -357,22 +442,35 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
           frame.style.height = '0';
           frame.style.border = '0';
           frame.setAttribute('aria-hidden', 'true');
-          frame.srcdoc = htmlForPdf;
+
+          // Fallback if the iframe never loads within a few seconds.
+          const loadTimer = window.setTimeout(() => {
+            frame.remove();
+            downloadPrintableHtml();
+          }, 3000);
+
           frame.onload = () => {
+            window.clearTimeout(loadTimer);
             try {
               frame.contentWindow?.focus();
               frame.contentWindow?.print();
+              settled = true;
+              // Keep the frame alive while the (blocking) print dialog is up;
+              // clean it up shortly after the handler returns.
+              setTimeout(() => frame.remove(), 60_000);
             } catch {
-              // printing unavailable — nothing else to do
+              frame.remove();
+              downloadPrintableHtml();
             }
-            // Keep the frame alive while the (blocking) print dialog is up;
-            // clean it up shortly after the handler returns.
-            setTimeout(() => frame.remove(), 60_000);
           };
+
+          frame.srcdoc = htmlForPdf;
           document.body.appendChild(frame);
+
+          // Immediate feedback (<2s) regardless of how the print flow resolves.
           toast({
-            title: "PDF Ready",
-            description: `${resources.length} resources prepared — use the print dialog to save as PDF`,
+            title: "Opening print dialog",
+            description: `${resources.length} resources prepared — choose "Save as PDF" in the dialog.`,
             variant: "default",
           });
           return;
@@ -478,6 +576,7 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
           <div className="space-y-2">
             <div className="flex items-center space-x-2">
               <Checkbox
+                className="relative before:absolute before:left-1/2 before:top-1/2 before:h-6 before:w-6 before:-translate-x-1/2 before:-translate-y-1/2 before:content-['']"
                 id="descriptions"
                 checked={exportOptions.includeDescriptions}
                 onCheckedChange={(checked) => 
@@ -488,6 +587,7 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
             </div>
             <div className="flex items-center space-x-2">
               <Checkbox
+                className="relative before:absolute before:left-1/2 before:top-1/2 before:h-6 before:w-6 before:-translate-x-1/2 before:-translate-y-1/2 before:content-['']"
                 id="tags"
                 checked={exportOptions.includeTags}
                 onCheckedChange={(checked) => 
@@ -498,6 +598,7 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
             </div>
             <div className="flex items-center space-x-2">
               <Checkbox
+                className="relative before:absolute before:left-1/2 before:top-1/2 before:h-6 before:w-6 before:-translate-x-1/2 before:-translate-y-1/2 before:content-['']"
                 id="categories"
                 checked={exportOptions.includeCategories}
                 onCheckedChange={(checked) => 
@@ -508,6 +609,7 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
             </div>
             <div className="flex items-center space-x-2">
               <Checkbox
+                className="relative before:absolute before:left-1/2 before:top-1/2 before:h-6 before:w-6 before:-translate-x-1/2 before:-translate-y-1/2 before:content-['']"
                 id="groupByCategory"
                 checked={exportOptions.groupByCategory}
                 onCheckedChange={(checked) => 

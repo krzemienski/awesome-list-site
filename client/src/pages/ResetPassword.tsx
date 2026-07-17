@@ -122,7 +122,10 @@ export default function ResetPassword() {
             </div>
           ) : (
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              {/* BUG-049 (run18): noValidate so zod owns the styled inline
+                  messages (parity with /login, /register) while the native
+                  required/minLength below still aid AT + autofill. */}
+              <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <FormField
                   control={form.control}
                   name="newPassword"
@@ -141,6 +144,8 @@ export default function ResetPassword() {
                             className="pl-10"
                             data-testid="input-new-password"
                             disabled={isLoading}
+                            required
+                            minLength={8}
                           />
                         </div>
                       </FormControl>
@@ -166,6 +171,8 @@ export default function ResetPassword() {
                             className="pl-10"
                             data-testid="input-confirm-password"
                             disabled={isLoading}
+                            required
+                            minLength={8}
                           />
                         </div>
                       </FormControl>

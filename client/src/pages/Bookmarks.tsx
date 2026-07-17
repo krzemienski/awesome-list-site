@@ -21,8 +21,27 @@ interface BookmarkedResource {
   bookmarkedAt?: string;
 }
 
+const VALID_SORTS = ["date-desc", "date-asc", "name-asc", "name-desc", "category"];
+
 export default function Bookmarks() {
-  const [sortBy, setSortBy] = useState("date-desc");
+  // NB-025 (run18): two-way sync the sort with ?sort= so the ordering survives a
+  // reload/back-forward and is shareable. wouter's useLocation is path-only, so
+  // read window.location.search directly.
+  const [sortBy, setSortBy] = useState(() => {
+    const s = new URLSearchParams(window.location.search).get("sort");
+    return s && VALID_SORTS.includes(s) ? s : "date-desc";
+  });
+
+  const handleSortChange = (value: string) => {
+    setSortBy(value);
+    const params = new URLSearchParams(window.location.search);
+    params.set("sort", value);
+    window.history.replaceState(
+      {},
+      "",
+      `${window.location.pathname}?${params.toString()}`,
+    );
+  };
 
   const { data: bookmarks, isLoading, error } = useQuery<BookmarkedResource[]>({
     queryKey: ['/api/bookmarks'],
@@ -129,7 +148,7 @@ export default function Bookmarks() {
 
       {hasBookmarks && (
         <div className="flex items-center gap-4">
-          <Select value={sortBy} onValueChange={setSortBy}>
+          <Select value={sortBy} onValueChange={handleSortChange}>
             <SelectTrigger className="w-[200px]">
               <SelectValue placeholder="Sort by..." />
             </SelectTrigger>
