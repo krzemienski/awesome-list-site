@@ -198,7 +198,7 @@ function RecommendationCard({
           )}
 
           {/* Feedback Buttons */}
-          <div className="flex items-center gap-2 pt-2 border-t border-border">
+          <div className="flex items-center gap-2 pt-2 border-t border-border flex-wrap">
             <span className="text-xs text-muted-foreground mr-1">Was this helpful?</span>
             <Button
               variant="ghost"

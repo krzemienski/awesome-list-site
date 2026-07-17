@@ -335,6 +335,23 @@ export class LearningJourneyRepository {
    * @returns The updated progress record
    */
   async updateUserJourneyProgress(userId: string, journeyId: number, stepId: number): Promise<UserJourneyProgress> {
+    return this.updateUserJourneyProgressBatch(userId, journeyId, [stepId]);
+  }
+
+  /**
+   * Batch-update user's journey progress in a single read+write (Run17 BUG-016:
+   * a logical step maps to up to 3 rows sharing a stepNumber; completing it
+   * previously issued one PUT per row — 3 round trips and 3 UPDATEs).
+   * @param stepIds - All step row ids of the logical step being toggled
+   * @param completed - Explicit target state; when omitted, each id is toggled
+   *                    (back-compat with the single-step API contract).
+   */
+  async updateUserJourneyProgressBatch(
+    userId: string,
+    journeyId: number,
+    stepIds: number[],
+    completed?: boolean,
+  ): Promise<UserJourneyProgress> {
     // First get current progress
     const [current] = await db
       .select()
@@ -348,24 +365,32 @@ export class LearningJourneyRepository {
 
     // Toggle: adding a step marks it complete; sending the same step id again
     // removes it so users can un-complete a step and reduce their progress.
-    const completedSteps = current?.completedSteps ? [...current.completedSteps] : [];
-    const existingIdx = completedSteps.indexOf(stepId);
-    if (existingIdx === -1) {
-      completedSteps.push(stepId);
-    } else {
-      completedSteps.splice(existingIdx, 1);
+    // With an explicit `completed` flag the ids are unioned/removed instead,
+    // which is idempotent even if rows drifted into a mixed state.
+    const completedSet = new Set(current?.completedSteps ?? []);
+    for (const stepId of stepIds) {
+      if (completed === true) {
+        completedSet.add(stepId);
+      } else if (completed === false) {
+        completedSet.delete(stepId);
+      } else if (completedSet.has(stepId)) {
+        completedSet.delete(stepId);
+      } else {
+        completedSet.add(stepId);
+      }
     }
+    const completedSteps = Array.from(completedSet);
 
     // Check if all steps are completed
     const allSteps = await this.listJourneySteps(journeyId);
     const allCompleted = allSteps.every(step =>
-      step.isOptional || completedSteps.includes(step.id)
+      step.isOptional || completedSet.has(step.id)
     );
 
     const [updated] = await db
       .update(userJourneyProgress)
       .set({
-        currentStepId: stepId,
+        currentStepId: stepIds[stepIds.length - 1],
         completedSteps,
         lastAccessedAt: new Date(),
         completedAt: allCompleted ? new Date() : null

@@ -321,7 +321,7 @@ export default function LinkHealthDashboard() {
                 ) : (
                   <>
                     <Activity className="h-4 w-4 mr-2" />
-                    Run First Check
+                    Run Link Check
                   </>
                 )}
               </Button>
@@ -434,8 +434,9 @@ export default function LinkHealthDashboard() {
               <AlertDescription>
                 {/* Run16 BUG-043: don't claim "all links are healthy" when no
                     link check has ever run — there is no data to back it. */}
+                {/* Run17 BUG-030: reference the button by its real label. */}
                 {!latestJob
-                  ? 'No link check has been run yet. Click "Run Link Check" to scan the catalog.'
+                  ? 'No link check has been run yet. Click "Run Check Now" to scan the catalog.'
                   : statusFilter === 'all'
                     ? 'No problem links found. All links are healthy!'
                     : `No ${statusFilter} links found.`

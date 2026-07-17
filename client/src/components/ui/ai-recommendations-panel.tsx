@@ -526,10 +526,21 @@ export default function AIRecommendationsPanel({ resources, showHeader = true }:
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Target className="h-5 w-5 text-primary" />
-                Your Personalized Recommendations
+                {userProfile.preferredCategories.length > 0 ||
+                userProfile.learningGoals.length > 0 ||
+                userProfile.preferredResourceTypes.length > 0
+                  ? "Your Personalized Recommendations"
+                  : "Recommended Resources"}
               </CardTitle>
+              {/* Run17 BUG-043: only claim personalization when the user has
+                  actually set preferences — otherwise be honest that these
+                  are general picks. */}
               <CardDescription>
-                {recommendations.length} resources selected specifically for your learning journey
+                {userProfile.preferredCategories.length > 0 ||
+                userProfile.learningGoals.length > 0 ||
+                userProfile.preferredResourceTypes.length > 0
+                  ? `${recommendations.length} resources selected specifically for your learning journey`
+                  : `${recommendations.length} recommended resources — popular picks from across the catalog. Set preferences above for personalized results.`}
                 {recommendations.some(r => r.type === 'ai_powered') && (
                   <Badge variant="outline" className="ml-2">
                     <Sparkles className="h-3 w-3 mr-1" />

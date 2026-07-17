@@ -21,7 +21,7 @@ interface SEOHeadProps {
 
 const SITE_NAME = "Awesome Video";
 const SITE_TAGLINE =
-  "The curated index of 1,800+ video development resources — players, encoders, codecs, streaming, AI, tools, and community.";
+  "The curated index of 2,300+ video development resources — players, encoders, codecs, streaming, AI, tools, and community.";
 
 // Canonical base must match the server SITE_URL (server/og-middleware.ts) so the
 // client-hydrated canonical / og:url / og:image never drift to a non-apex host
@@ -76,7 +76,7 @@ export default function SEOHead({
     category
       ? `Discover ${resourceCount || 'curated'} ${category.toLowerCase()} resources on ${SITE_NAME}. Find the best tools, libraries, and frameworks for video development.`
       : awesomeList
-      ? `${awesomeList.description || SITE_TAGLINE} Explore ${awesomeList.resources?.length || '1800+'} carefully curated resources across ${awesomeList.categories?.length || '80+'} categories.`
+      ? `${awesomeList.description || SITE_TAGLINE} Explore ${awesomeList.resources?.length || '2300+'} carefully curated resources across ${awesomeList.categories?.length || '80+'} categories.`
       : SITE_TAGLINE
   );
 

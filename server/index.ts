@@ -83,13 +83,10 @@ app.use((_req, res, next) => {
   const nonce = String(res.locals.cspNonce || "");
   if (process.env.NODE_ENV === "production") {
     res.setHeader("X-Frame-Options", "DENY");
-    // Run16 BUG-094: HSTS — the site is HTTPS-only (Replit terminates TLS and
-    // http:// redirects to https://). 2-year max-age + includeSubDomains +
-    // preload (the preload list requires both flags and max-age ≥ 1 year).
-    res.setHeader(
-      "Strict-Transport-Security",
-      "max-age=63072000; includeSubDomains; preload",
-    );
+    // Run16 BUG-094 set an app-level HSTS header, but Replit's edge already
+    // sends its own Strict-Transport-Security — the two copies arrived as
+    // duplicate headers with conflicting directives (Run17 BUG-051). The edge
+    // owns TLS termination, so it owns HSTS; the app copy is dropped.
     res.setHeader(
       "Content-Security-Policy",
       [
@@ -174,6 +171,38 @@ app.use((req, res, next) => {
       .json({ message: "Method not allowed" });
   }
   next();
+});
+
+// Run17 BUG-054: CSRF hardening for cookie-authed mutations. Browsers always
+// attach an Origin header to cross-origin POST/PUT/PATCH/DELETE, so rejecting
+// mutations whose Origin host differs from the request Host blocks cross-site
+// forgery without breaking curl / server-to-server clients (no Origin header).
+// `Origin: null` (sandboxed iframes, cross-origin redirect chains) is also
+// rejected — it is a known CSRF vector and never legitimate for this app.
+// Defense-in-depth alongside SameSite=Lax session cookies.
+app.use((req, res, next) => {
+  if (req.method === "GET" || req.method === "HEAD" || req.method === "OPTIONS") {
+    return next();
+  }
+  const origin = req.headers.origin;
+  if (!origin) return next();
+  // Normalize away default ports: run15 BUG-038 showed the Replit edge can
+  // surface hosts with an explicit `:443`, so `awesome.video` must compare
+  // equal to `awesome.video:443` (and `:80` for http) or every browser
+  // mutation in prod would 403.
+  const stripDefaultPort = (host: string | undefined) =>
+    host?.replace(/:(443|80)$/, "") ?? "";
+  try {
+    const originHost = stripDefaultPort(new URL(origin).host);
+    if (originHost === stripDefaultPort(req.headers.host)) return next();
+    // Fallback allowlist: PUBLIC_SITE_URL is the server's canonical site var
+    // (same one og-middleware uses; defaults to https://awesome.video).
+    const siteUrl = process.env.PUBLIC_SITE_URL || "https://awesome.video";
+    if (originHost === stripDefaultPort(new URL(siteUrl).host)) return next();
+  } catch {
+    // fall through to rejection (malformed Origin)
+  }
+  return res.status(403).json({ message: "Cross-origin request rejected" });
 });
 
 app.use(express.json());

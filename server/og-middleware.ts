@@ -1390,8 +1390,10 @@ export function ogInjectionMiddleware() {
       return res.redirect(301, "/");
     }
     if (urlPath === "/favorites") {
-      // /favorites was never a route; canonical is the bookmarks page (BUG-015).
-      return res.redirect(301, "/bookmarks");
+      // Run17 BUG-055: favorites and bookmarks are different collections — the
+      // old 301 → /bookmarks sent users to the wrong list. Canonical home for
+      // favorites is the profile Favorites tab (client route mirrors this).
+      return res.redirect(301, "/profile?tab=favorites");
     }
     if (urlPath === "/account") {
       // /account was never a route; canonical is the profile page (BUG-016).

@@ -71,9 +71,10 @@ export default function ConsentBanner() {
           allow it.{" "}
           <span className="hidden sm:inline">No personal data is sent either way. </span>
           See our{" "}
+          {/* Run17 BUG-048: inline-flex + min-h keeps the tap target ≥24px. */}
           <Link
             href="/privacy"
-            className="underline hover:text-[color:var(--text)]"
+            className="underline hover:text-[color:var(--text)] inline-flex items-center min-h-[24px] align-middle"
             data-testid="consent-privacy-link"
           >
             Privacy Policy

@@ -1,0 +1,128 @@
+{
+  "BUG-023-crumbs@768": {
+    "items": [
+      {
+        "t": "Home",
+        "w": 39
+      },
+      {
+        "t": "<svg>",
+        "w": 14
+      },
+      {
+        "t": "187997",
+        "w": 54
+      }
+    ],
+    "minTextW": 39
+  },
+  "BUG-023-crumbs@820": {
+    "items": [
+      {
+        "t": "Home",
+        "w": 39
+      },
+      {
+        "t": "<svg>",
+        "w": 14
+      },
+      {
+        "t": "187997",
+        "w": 54
+      }
+    ],
+    "minTextW": 39
+  },
+  "BUG-023-crumbs@900": {
+    "items": [
+      {
+        "t": "Home",
+        "w": 39
+      },
+      {
+        "t": "<svg>",
+        "w": 14
+      },
+      {
+        "t": "187997",
+        "w": 54
+      }
+    ],
+    "minTextW": 39
+  },
+  "BUG-023-crumbs@1024": {
+    "items": [
+      {
+        "t": "Home",
+        "w": 39
+      },
+      {
+        "t": "<svg>",
+        "w": 14
+      },
+      {
+        "t": "187997",
+        "w": 54
+      }
+    ],
+    "minTextW": 39
+  },
+  "BUG-023-crumbs@1280": {
+    "items": [
+      {
+        "t": "Home",
+        "w": 39
+      },
+      {
+        "t": "<svg>",
+        "w": 14
+      },
+      {
+        "t": "187997",
+        "w": 54
+      }
+    ],
+    "minTextW": 39
+  },
+  "BUG-046-journeys": {
+    "total": 5,
+    "continueAtZero": [],
+    "sample": [
+      {
+        "label": "Start Journey",
+        "pct": null
+      },
+      {
+        "label": "Start Journey",
+        "pct": null
+      },
+      {
+        "label": "Start Journey",
+        "pct": null
+      },
+      {
+        "label": "Continue Journey",
+        "pct": "100"
+      },
+      {
+        "label": "Continue Journey",
+        "pct": "6"
+      }
+    ]
+  },
+  "BUG-028-subtitle": "0 of 1,991 resources match your filters",
+  "BUG-034-pagesize-after-fix": {
+    "text": "25 / page",
+    "w": 112,
+    "clipped": false
+  },
+  "BUG-033-swipe-hint": "Swipe the table sideways to see category, status, and actions.",
+  "BUG-029-status-badges": [
+    "completed",
+    "completed",
+    "cancelled",
+    "cancelled",
+    "completed",
+    "failed"
+  ]
+}

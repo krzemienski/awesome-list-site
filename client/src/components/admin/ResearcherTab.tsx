@@ -403,7 +403,7 @@ export default function ResearcherTab() {
                 <Alert>
                   <Zap className="w-4 h-4" />
                   <AlertDescription>
-                    Uses Claude Sonnet 4 (~$3/M input, $15/M output tokens). Typical job costs $0.10-$0.50. The researcher automatically deduplicates against {categoriesData?.resources?.length || '~1,950'} existing resources.
+                    Uses Claude Sonnet 4 (~$3/M input, $15/M output tokens). Recent jobs have cost roughly $2.50-$27 depending on scope and duration (see Job History below). The researcher automatically deduplicates against {categoriesData?.resources?.length || '~1,950'} existing resources.
                   </AlertDescription>
                 </Alert>
 

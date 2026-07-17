@@ -15,6 +15,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Breadcrumb,
+  BreadcrumbEllipsis,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
@@ -211,10 +212,23 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
             // usable link — never let flexbox squeeze it to zero width. Only
             // the deeper (long) crumbs participate in truncation.
             const isRoot = i === 0;
+            // Run17 BUG-023: at md–lg widths (768–1023px) there isn't room
+            // for the full trail — middle crumbs compressed to unreadable
+            // 2–8px slivers. Below lg, collapse all middle crumbs into a
+            // single ellipsis so only "Home › … › Current" renders, each
+            // part readable and clickable. Full trail returns at lg+.
+            const isMiddle = !isRoot && !isLast;
+            const middleVis = "hidden lg:flex min-w-0";
             const nodes = [
               <BreadcrumbItem
                 key={`${crumb.href}-item`}
-                className={isRoot && !isLast ? "shrink-0" : "min-w-0"}
+                className={
+                  isRoot && !isLast
+                    ? "shrink-0"
+                    : isMiddle
+                      ? middleVis
+                      : "min-w-0"
+                }
               >
                 {isLast ? (
                   <BreadcrumbPage className="truncate">{crumb.label}</BreadcrumbPage>
@@ -229,7 +243,23 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
               </BreadcrumbItem>,
             ];
             if (!isLast) {
-              nodes.push(<BreadcrumbSeparator key={`${crumb.href}-sep`} />);
+              nodes.push(
+                <BreadcrumbSeparator
+                  key={`${crumb.href}-sep`}
+                  className={isMiddle ? "hidden lg:flex" : undefined}
+                />,
+              );
+            }
+            if (isRoot && crumbs.length > 2) {
+              nodes.push(
+                <BreadcrumbItem
+                  key="crumb-ellipsis"
+                  className="lg:hidden shrink-0"
+                >
+                  <BreadcrumbEllipsis className="h-4 w-4" />
+                </BreadcrumbItem>,
+                <BreadcrumbSeparator key="crumb-ellipsis-sep" className="lg:hidden" />,
+              );
             }
             return nodes;
           })}

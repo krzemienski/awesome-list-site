@@ -57,10 +57,14 @@ export default function AuditTab() {
   // Run16 BUG-083: clicking a row opens a detail view with the full payload.
   const [selectedLog, setSelectedLog] = useState<AuditLogEntry | null>(null);
 
+  // Run17 BUG-010: real pagination — the tab used to silently cap at the row
+  // limit with no way to reach older entries.
+  const [offset, setOffset] = useState(0);
+
   const { data, isLoading, refetch, isFetching } = useQuery<AuditLogsResponse>({
-    queryKey: ['/api/admin/audit-logs', appliedFilter, appliedLimit],
+    queryKey: ['/api/admin/audit-logs', appliedFilter, appliedLimit, offset],
     queryFn: async () => {
-      const params = new URLSearchParams({ limit: appliedLimit });
+      const params = new URLSearchParams({ limit: appliedLimit, offset: String(offset) });
       if (appliedFilter) params.set('resourceId', appliedFilter);
       const response = await fetch(`/api/admin/audit-logs?${params}`, { credentials: 'include' });
       if (!response.ok) throw new Error('Failed to fetch audit logs');
@@ -72,11 +76,13 @@ export default function AuditTab() {
     e.preventDefault();
     setAppliedFilter(resourceIdFilter);
     setAppliedLimit(limit);
+    setOffset(0);
   };
 
   const clearFilter = () => {
     setResourceIdFilter("");
     setAppliedFilter("");
+    setOffset(0);
   };
 
   const formatDate = (date: string | null) => {
@@ -135,7 +141,7 @@ export default function AuditTab() {
               previously only took effect after also pressing Search. */}
           <Select
             value={limit}
-            onValueChange={(v) => { setLimit(v); setAppliedLimit(v); }}
+            onValueChange={(v) => { setLimit(v); setAppliedLimit(v); setOffset(0); }}
           >
             <SelectTrigger className="w-32" aria-label="Rows to show">
               <SelectValue placeholder="Limit" />
@@ -242,6 +248,38 @@ export default function AuditTab() {
         <p className="text-xs text-muted-foreground mt-2 sm:hidden">
           Swipe the table sideways to see all columns.
         </p>
+
+        {/* Run17 BUG-010: range readout + Previous/Next through the full log. */}
+        {data && data.total > 0 && (
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+            <p className="text-sm text-muted-foreground" data-testid="text-audit-range">
+              {offset + 1}–{Math.min(offset + (data.logs?.length || 0), data.total)} of{" "}
+              {data.total.toLocaleString()} entries
+            </p>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={offset === 0 || isFetching}
+                onClick={() => setOffset(Math.max(0, offset - parseInt(appliedLimit, 10)))}
+                data-testid="button-audit-prev"
+              >
+                Previous
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={offset + parseInt(appliedLimit, 10) >= data.total || isFetching}
+                onClick={() => setOffset(offset + parseInt(appliedLimit, 10))}
+                data-testid="button-audit-next"
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
 
         {/* Run16 BUG-083: full-entry detail view — complete changes payload
             and notes, no truncation. */}

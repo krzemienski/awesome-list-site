@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -124,6 +124,26 @@ export default function GitHubSyncPanel() {
   const latestFailure = failedJobs
     .slice()
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+
+  // Run17 BUG-031: repeated retries of the same action/status/error read as
+  // duplicate rows — collapse them into one entry with a ×N counter (most
+  // recent occurrence shown).
+  const dedupedQueue = useMemo(() => {
+    const map = new Map<string, { item: SyncQueueItem; count: number }>();
+    for (const item of syncQueue) {
+      const key = [item.action, item.status, item.repositoryUrl, item.errorMessage || ""].join("|");
+      const existing = map.get(key);
+      if (existing) {
+        existing.count += 1;
+        if (new Date(item.createdAt) > new Date(existing.item.createdAt)) {
+          existing.item = item;
+        }
+      } else {
+        map.set(key, { item, count: 1 });
+      }
+    }
+    return Array.from(map.values());
+  }, [syncQueue]);
 
   return (
     <div className="space-y-6">
@@ -263,9 +283,13 @@ export default function GitHubSyncPanel() {
                       Latest error: {latestFailure.errorMessage}
                     </p>
                   )}
+                  {/* Run17 BUG-031: failure state gives concrete next steps. */}
                   <p className="text-xs">
-                    If errors mention credentials or tokens, the GitHub connection
-                    likely needs to be reconnected.
+                    Next steps: if errors mention credentials or tokens, reconnect
+                    the GitHub connection. "Timeout exceeded when trying to
+                    connect" came from an export bookkeeping bug that has been
+                    fixed — start a new export to confirm; older failed jobs can
+                    be ignored.
                   </p>
                 </AlertDescription>
               </Alert>
@@ -332,7 +356,7 @@ export default function GitHubSyncPanel() {
                 <h4 className="text-sm font-semibold">Recent Sync Jobs</h4>
                 <ScrollArea className="h-[200px] rounded border">
                   <div className="p-2 space-y-2">
-                    {syncQueue.map((item) => (
+                    {dedupedQueue.map(({ item, count }) => (
                       <div
                         key={item.id}
                         className="p-2 rounded bg-muted/50 text-sm space-y-1"
@@ -348,6 +372,11 @@ export default function GitHubSyncPanel() {
                             <span className="text-xs text-muted-foreground">
                               {formatSyncDate(item.processedAt || item.createdAt)}
                             </span>
+                            {count > 1 && (
+                              <Badge variant="outline" className="text-xs" data-testid={`badge-repeat-${item.id}`}>
+                                ×{count}
+                              </Badge>
+                            )}
                           </div>
                           <Badge variant={
                             item.status === 'completed' ? 'default' :

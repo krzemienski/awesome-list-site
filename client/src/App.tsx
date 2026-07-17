@@ -3,7 +3,7 @@ import { Switch, Route, Redirect, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { initGA } from "./lib/analytics";
 import { useAnalytics } from "./hooks/use-analytics";
-import { noteLocationChange } from "./lib/nav-history";
+import { noteLocationChange, useScrollRestoration } from "./lib/nav-history";
 import { useAuth } from "./hooks/useAuth";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 
@@ -98,6 +98,10 @@ function Router() {
   useEffect(() => {
     noteLocationChange();
   }, [location]);
+
+  // Run17 BUG-052: Back/Forward return to the saved scroll position instead
+  // of the top; forward navigations still start at the top.
+  useScrollRestoration(location);
 
   const { data: rawData, isLoading, error } = useQuery({
     queryKey: ["awesome-list-data"],
@@ -205,8 +209,10 @@ function Router() {
         </Route>
         <Route path="/profile" component={() => (<AuthGuard><Profile user={user} /></AuthGuard>)} />
         <Route path="/bookmarks" component={() => (<AuthGuard><Bookmarks /></AuthGuard>)} />
+        {/* Run17 BUG-055: favorites and bookmarks are different collections —
+            this used to land on /bookmarks. */}
         <Route path="/favorites">
-          <Redirect to="/bookmarks" replace />
+          <Redirect to="/profile?tab=favorites" replace />
         </Route>
         <Route path="/account">
           <Redirect to="/profile" replace />

@@ -138,6 +138,20 @@ export default function ResourceManager() {
     refetchInterval: 30000
   });
 
+  // Run17 BUG-028: unfiltered grand total so the header never claims
+  // "Manage all 0 resources" while a filter is active.
+  const { data: grandTotalData } = useQuery<ResourcesResponse>({
+    queryKey: ['/api/admin/resources', 'grand-total'],
+    queryFn: async () => {
+      const response = await fetch('/api/admin/resources?page=1&limit=1', {
+        credentials: 'include'
+      });
+      if (!response.ok) throw new Error('Failed to fetch resource total');
+      return response.json();
+    },
+    staleTime: 60000
+  });
+
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number, data: Partial<Resource> }) => {
       return await apiRequest(`/api/admin/resources/${id}`, {
@@ -553,7 +567,11 @@ export default function ResourceManager() {
                 Resource Database Editor
               </CardTitle>
               <CardDescription>
-                Manage all {data?.total || 0} resources in the database
+                {/* Run17 BUG-028: filtered views say "X of Y match" instead of
+                    binding "Manage all …" to the filtered count. */}
+                {(search || categoryFilter || statusFilter)
+                  ? `${(data?.total ?? 0).toLocaleString()} of ${(grandTotalData?.total ?? 0).toLocaleString()} resources match your filters`
+                  : `Manage all ${((grandTotalData?.total ?? data?.total) || 0).toLocaleString()} resources in the database`}
               </CardDescription>
             </div>
             <Button 
@@ -861,6 +879,10 @@ export default function ResourceManager() {
               </TableBody>
             </Table>
           </div>
+          {/* Run17 BUG-033: same sideways-scroll hint the Users table has. */}
+          <p className="text-xs text-muted-foreground mt-2 sm:hidden">
+            Swipe the table sideways to see category, status, and actions.
+          </p>
 
           {/* Run16 BUG-035: page-size selector + first/last jump buttons. */}
           <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-[var(--border)]">
@@ -871,7 +893,9 @@ export default function ResourceManager() {
                   : `Showing ${((page - 1) * limit) + 1} - ${Math.min(page * limit, data?.total || 0)} of ${data?.total || 0} resources`}
               </div>
               <Select value={String(limit)} onValueChange={(v) => { setLimit(parseInt(v, 10)); setPage(1); }}>
-                <SelectTrigger className="w-28 h-8" aria-label="Rows per page" data-testid="select-page-size">
+                {/* Run17 BUG-034: shrink-0 — flexbox squeezed the trigger below w-28
+                    at 375px and ellipsis-clipped "25 / page" to "25 /…". */}
+                <SelectTrigger className="w-28 h-8 shrink-0" aria-label="Rows per page" data-testid="select-page-size">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

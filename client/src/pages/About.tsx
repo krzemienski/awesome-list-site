@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
 import {
   Sparkles,
   Zap,
@@ -51,10 +51,10 @@ export default function About() {
           (shared/about-content.ts) and the site's Organization.founder schema. */}
       <Card className="mb-4">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <h2 className="text-2xl font-semibold leading-none tracking-tight flex items-center gap-2">
             <Users className="h-5 w-5 text-[var(--accent)]" />
             About the maintainer
-          </CardTitle>
+          </h2>
           <CardDescription>{MAINTAINER.role}</CardDescription>
         </CardHeader>
         <CardContent>
@@ -84,10 +84,10 @@ export default function About() {
       {/* The source list & the platform */}
       <Card className="mb-4">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <h2 className="text-2xl font-semibold leading-none tracking-tight flex items-center gap-2">
             <Github className="h-5 w-5 text-[var(--accent)]" />
             Open source at its core
-          </CardTitle>
+          </h2>
           <CardDescription>
             The curated list that feeds this site, and the platform that renders it
           </CardDescription>
@@ -155,10 +155,10 @@ export default function About() {
       {/* Features Grid */}
       <Card className="mb-4">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <h2 className="text-2xl font-semibold leading-none tracking-tight flex items-center gap-2">
             <Zap className="h-5 w-5 text-[color:var(--text-2)]" />
             Features
-          </CardTitle>
+          </h2>
           <CardDescription>
             Built for speed, accessibility, and user experience
           </CardDescription>
@@ -192,10 +192,10 @@ export default function About() {
       {/* Technology Stack */}
       <Card className="mb-4">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <h2 className="text-2xl font-semibold leading-none tracking-tight flex items-center gap-2">
             <Code2 className="h-5 w-5 text-[color:var(--text-2)]" />
             Technology Stack
-          </CardTitle>
+          </h2>
           <CardDescription>
             Modern web technologies for optimal performance
           </CardDescription>
@@ -255,10 +255,10 @@ export default function About() {
       {/* Accessibility */}
       <Card className="mb-4">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <h2 className="text-2xl font-semibold leading-none tracking-tight flex items-center gap-2">
             <Accessibility className="h-5 w-5 text-[color:var(--text-2)]" />
             Accessibility First
-          </CardTitle>
+          </h2>
           <CardDescription>
             Following WCAG 2.1 AA guidelines for inclusive design
           </CardDescription>
@@ -285,10 +285,10 @@ export default function About() {
       {/* Credits */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <h2 className="text-2xl font-semibold leading-none tracking-tight flex items-center gap-2">
             <Heart className="h-5 w-5 text-[color:var(--text-2)]" />
             Credits
-          </CardTitle>
+          </h2>
           <CardDescription>
             Built with open source technologies
           </CardDescription>
@@ -344,10 +344,10 @@ export default function About() {
       {/* FAQ — content shared verbatim with the server's FAQPage schema (shared/faq.ts) */}
       <Card className="mt-4">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <h2 className="text-2xl font-semibold leading-none tracking-tight flex items-center gap-2">
             <HelpCircle className="h-5 w-5 text-[var(--accent)]" />
             Frequently asked questions
-          </CardTitle>
+          </h2>
           <CardDescription>
             Quick answers about the site, the list, and how to contribute
           </CardDescription>

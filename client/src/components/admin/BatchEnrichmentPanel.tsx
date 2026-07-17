@@ -233,10 +233,12 @@ export default function BatchEnrichmentPanel() {
 
   // R2-M06: a "completed" job in which every processed resource failed is a
   // failure from the operator's perspective — badge it as failed.
+  // Run17 BUG-029: same for a "completed" job that had work to do but never
+  // processed anything (0/N) — "completed" there contradicted the counts.
   const effectiveStatus = (job: EnrichmentJob) => {
     if (
       job.status === 'completed' &&
-      (job.processedResources || 0) > 0 &&
+      ((job.processedResources || 0) > 0 || (job.totalResources || 0) > 0) &&
       (job.successfulResources || 0) === 0
     ) {
       return 'failed';
@@ -598,12 +600,16 @@ export default function BatchEnrichmentPanel() {
                             N/A
                           </Badge>
                         ) : (
+                          /* Run17 BUG-029: show the fraction the rate is over —
+                             a bare "100%" on a failed job read as a
+                             contradiction when only the processed subset
+                             succeeded before the job died. */
                           <Badge variant="outline" className={
                             calculateSuccessRate(job) >= 90 ? 'border-green-500 text-green-500' :
                             calculateSuccessRate(job) >= 70 ? 'border-yellow-500 text-yellow-500' :
                             'border-red-500 text-red-500'
                           }>
-                            {calculateSuccessRate(job)}%
+                            {job.successfulResources || 0}/{job.processedResources || 0} ok ({calculateSuccessRate(job)}%)
                           </Badge>
                         )}
                       </TableCell>

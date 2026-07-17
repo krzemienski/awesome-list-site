@@ -82,10 +82,43 @@ function BookmarkButton({
       queryClient.invalidateQueries({ queryKey: ['/api/bookmarks'] });
       queryClient.invalidateQueries({ queryKey: [`/api/resources/${resourceId}`] });
       
-      toast({
-        description: vars.remove ? "Bookmark removed" : "Bookmark added",
-        duration: 2000
-      });
+      if (vars.remove) {
+        // Run17 BUG-013: removal is one click — give the toast a working Undo
+        // so a misclick isn't permanent (notes are restored too).
+        const restoredNotes = notes;
+        toast({
+          description: "Bookmark removed",
+          duration: 6000,
+          action: (
+            <ToastAction
+              altText="Undo bookmark removal"
+              onClick={async () => {
+                try {
+                  await apiRequest(`/api/bookmarks/${resourceId}`, {
+                    method: "POST",
+                    body: JSON.stringify(restoredNotes ? { notes: restoredNotes } : {}),
+                    credentials: "include",
+                  });
+                  setIsBookmarked(true);
+                  queryClient.invalidateQueries({ queryKey: ["/api/bookmarks"] });
+                  queryClient.invalidateQueries({ queryKey: [`/api/resources/${resourceId}`] });
+                  toast({ description: "Bookmark restored", duration: 2000 });
+                } catch {
+                  toast({
+                    title: "Error",
+                    description: "Couldn't restore the bookmark. Please try again.",
+                    variant: "destructive",
+                  });
+                }
+              }}
+            >
+              Undo
+            </ToastAction>
+          ),
+        });
+      } else {
+        toast({ description: "Bookmark added", duration: 2000 });
+      }
       
       // Close notes dialog if open
       setNotesDialogOpen(false);

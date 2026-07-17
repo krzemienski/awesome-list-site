@@ -511,7 +511,11 @@ export default function Category() {
               {categoryName}
             </h1>
             <p className="text-sm text-muted-foreground mt-0.5 sm:mt-1">
-              {allResources.length} resources available
+              {/* Run17 BUG-059: header count follows the active filter instead of
+                  contradicting the "Showing 1-N of M" line below. */}
+              {filteredResources.length === allResources.length
+                ? `${allResources.length} resources available`
+                : `${filteredResources.length} of ${allResources.length} resources shown`}
             </p>
           </div>
           <div className="flex items-center gap-3 shrink-0">
@@ -523,7 +527,7 @@ export default function Category() {
                 <SelectContent>
                   {/* BUG-055 (run14): always selectable, not just visible while
                       already in General view. */}
-                  <SelectItem value="__general__">General (no subcategory)</SelectItem>
+                  <SelectItem value="__general__">Uncategorized</SelectItem>
                   <SelectItem value="all">All Subcategories</SelectItem>
                   {subcategories.map(sub => (
                     <SelectItem key={sub} value={sub}>{sub}</SelectItem>

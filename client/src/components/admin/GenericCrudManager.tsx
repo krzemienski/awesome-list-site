@@ -2608,6 +2608,19 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
               </TableRow>
             </TableHeader>
             <TableBody>
+              {/* Run17 BUG-032: a filter with zero matches renders an explicit
+                  empty row instead of headers floating over nothing. */}
+              {(!paginatedItems || paginatedItems.length === 0) && (
+                <TableRow>
+                  <TableCell
+                    colSpan={getVisibleColumns.length + (bulkOperationsEnabled ? 1 : 0)}
+                    className="text-center py-8 text-muted-foreground"
+                    data-testid={`empty-${testIdEntityPlural}`}
+                  >
+                    No {entityNamePlural.toLowerCase()} match your search.
+                  </TableCell>
+                </TableRow>
+              )}
               {paginatedItems?.map((item) => (
                 <TableRow key={item.id} data-testid={`row-${testIdEntity}-${item.id}`} className={selectedIds.has(item.id) ? "bg-muted/50" : ""}>
                   {bulkOperationsEnabled && (

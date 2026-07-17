@@ -862,6 +862,19 @@ button { font-family: inherit; }
   outline-offset: 2px;
 }
 
+/* Run17 BUG-005 (WCAG 2.4.7): global keyboard-focus indicator. Sidebar links
+   computed a near-black default outline on the black theme and shadcn buttons
+   ship focus-visible:outline-none with a ring that resolves invisible here —
+   so keyboard focus was undetectable on most tab stops. :where() keeps
+   specificity at 0; !important is required to beat Tailwind's outline-none
+   utility on the same pseudo-class. Mouse clicks are unaffected
+   (:focus-visible only matches keyboard-driven focus). */
+:where(a, button, [role="button"], [role="tab"], [role="menuitem"], input,
+    select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent) !important;
+  outline-offset: 2px;
+}
+
 /* DISABLED UTILITY (CC-18) */
 [disabled],
 [aria-disabled="true"],

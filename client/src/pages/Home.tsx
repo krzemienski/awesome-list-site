@@ -384,8 +384,10 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
                 <LogIn className="h-5 w-5" />
                 Login to See Personalized Recommendations
               </CardTitle>
+              {/* Run17 BUG-045: honest copy — quick recommendations work without
+                  an account, so say so instead of implying a hard login gate. */}
               <CardDescription>
-                Sign in to unlock AI-powered recommendations tailored to your skill level and interests
+                Sign in for AI-powered recommendations tailored to your skill level and interests — or browse quick recommendations below, no account needed
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col sm:flex-row gap-3 sm:items-center">

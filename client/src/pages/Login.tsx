@@ -209,7 +209,8 @@ export default function Login() {
           <Form {...form}>
             {/* Run15 BUG-047: explicit method="post" so a no-JS submit can
                 never put credentials in the URL (default form method is GET). */}
-            <form method="post" onSubmit={(e) => void form.handleSubmit(onSubmit)(e)} className="space-y-4">
+            {/* Run17 BUG-039 parity: zod owns validation — no native bubbles. */}
+            <form method="post" noValidate onSubmit={(e) => void form.handleSubmit(onSubmit)(e)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="email"

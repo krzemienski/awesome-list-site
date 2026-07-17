@@ -143,7 +143,14 @@ interface Recommendation {
 }
 
 export default function Profile({ user }: ProfileProps) {
-  const [activeTab, setActiveTab] = useState("overview");
+  // Run17 BUG-055: /favorites redirects here with ?tab=favorites — honor a
+  // valid ?tab= on first render so the link lands on the right collection.
+  const [activeTab, setActiveTab] = useState(() => {
+    const t = new URLSearchParams(window.location.search).get("tab");
+    return t && ["overview", "favorites", "bookmarks", "submissions", "security"].includes(t)
+      ? t
+      : "overview";
+  });
   const { logout } = useAuth();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -152,13 +159,26 @@ export default function Profile({ user }: ProfileProps) {
   const [nameDialogOpen, setNameDialogOpen] = useState(false);
   const [editFirstName, setEditFirstName] = useState("");
   const [editLastName, setEditLastName] = useState("");
+  // Run17 BUG-011: inline validation message (empty save is rejected, not
+  // silently fallen back to the email local-part).
+  const [nameError, setNameError] = useState<string | null>(null);
 
   const openNameDialog = () => {
     // Best-effort prefill from the combined display name.
     const parts = (user?.name || "").trim().split(/\s+/);
     setEditFirstName(parts[0] === user?.email?.split("@")[0] ? "" : parts[0] || "");
     setEditLastName(parts.slice(1).join(" "));
+    setNameError(null);
     setNameDialogOpen(true);
+  };
+
+  const handleSaveName = () => {
+    if (!editFirstName.trim() && !editLastName.trim()) {
+      setNameError("Enter at least a first or last name.");
+      return;
+    }
+    setNameError(null);
+    updateNameMutation.mutate();
   };
 
   const updateNameMutation = useMutation({
@@ -301,8 +321,9 @@ export default function Profile({ user }: ProfileProps) {
 
         <div className="flex-1 text-center sm:text-left">
           <div className="eyebrow mb-2" aria-hidden>// Profile</div>
-          <h1 className="font-display text-3xl sm:text-4xl font-medium tracking-tight mb-2 flex items-center gap-2 justify-center sm:justify-start">
-            {user.name || "User"}
+          <h1 className="font-display text-3xl sm:text-4xl font-medium tracking-tight mb-2 flex items-center gap-2 justify-center sm:justify-start min-w-0">
+            {/* Run17 BUG-012: truncate — CSS defense for names at the 50-char cap */}
+            <span className="truncate">{user.name || "User"}</span>
             <Button
               variant="ghost"
               size="icon"
@@ -380,7 +401,9 @@ export default function Profile({ user }: ProfileProps) {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-5 h-auto p-1">
+        {/* Run17 BUG-014: fixed 5-col grid garbled/clipped labels at ≤768px —
+            wrap on small screens, grid only from lg up. */}
+        <TabsList className="w-full h-auto p-1 flex flex-wrap justify-start gap-1 lg:grid lg:grid-cols-5">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="favorites">Favorites</TabsTrigger>
           <TabsTrigger value="bookmarks">Bookmarks</TabsTrigger>
@@ -941,8 +964,8 @@ export default function Profile({ user }: ProfileProps) {
           <DialogHeader>
             <DialogTitle>Edit display name</DialogTitle>
             <DialogDescription>
-              This is the name shown on your profile. Leave both fields empty to
-              fall back to your email username.
+              This is the name shown on your profile. Enter at least a first or
+              last name.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
@@ -951,7 +974,7 @@ export default function Profile({ user }: ProfileProps) {
               <Input
                 id="edit-first-name"
                 value={editFirstName}
-                maxLength={60}
+                maxLength={50}
                 onChange={(e) => setEditFirstName(e.target.value)}
                 data-testid="input-first-name"
               />
@@ -961,11 +984,20 @@ export default function Profile({ user }: ProfileProps) {
               <Input
                 id="edit-last-name"
                 value={editLastName}
-                maxLength={60}
+                maxLength={50}
                 onChange={(e) => setEditLastName(e.target.value)}
                 data-testid="input-last-name"
               />
             </div>
+            {nameError && (
+              <p
+                className="text-sm text-destructive"
+                role="alert"
+                data-testid="text-name-error"
+              >
+                {nameError}
+              </p>
+            )}
           </div>
           <DialogFooter>
             <Button
@@ -976,7 +1008,7 @@ export default function Profile({ user }: ProfileProps) {
               Cancel
             </Button>
             <Button
-              onClick={() => updateNameMutation.mutate()}
+              onClick={handleSaveName}
               disabled={updateNameMutation.isPending}
               data-testid="button-save-name"
             >

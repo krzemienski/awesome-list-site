@@ -148,10 +148,31 @@ export default function ResourceDetail() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/bookmarks'] });
-      toast({
-        title: isBookmarked ? "Removed from bookmarks" : "Added to bookmarks",
-        description: isBookmarked ? "Resource removed from your bookmarks" : "Resource saved to your bookmarks"
-      });
+      if (isBookmarked) {
+        // Run17 BUG-013: removal is instant — offer a one-click Undo instead
+        // of a confirm dialog.
+        toast({
+          title: "Removed from bookmarks",
+          description: "Resource removed from your bookmarks",
+          action: (
+            <ToastAction
+              altText="Undo bookmark removal"
+              onClick={async () => {
+                await apiRequest(`/api/bookmarks/${id}`, { method: 'POST' });
+                queryClient.invalidateQueries({ queryKey: ['/api/bookmarks'] });
+              }}
+              data-testid="button-undo-bookmark-removal"
+            >
+              Undo
+            </ToastAction>
+          ),
+        });
+      } else {
+        toast({
+          title: "Added to bookmarks",
+          description: "Resource saved to your bookmarks"
+        });
+      }
     }
   });
 
@@ -609,7 +630,7 @@ export default function ResourceDetail() {
                   href={resource.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-primary hover:underline break-all flex items-center gap-2 text-sm md:text-base"
+                  className="text-primary hover:underline break-all flex items-center gap-2 text-sm md:text-base min-h-[24px]"
                   data-testid="link-url"
                 >
                   {resource.url}
@@ -668,12 +689,14 @@ export default function ResourceDetail() {
                     {/* NEW-013: deep-link straight to this resource's edit
                         dialog in the admin Resources tab, not the bare
                         dashboard (which lands on Approvals). */}
-                    <Link href={`/admin/resources?resourceId=${resource.id}`}>
-                      <Button variant="outline" data-testid="button-edit-admin">
+                    {/* Run17 BUG-058: asChild — one anchor, one tab stop (was a
+                        button nested inside an anchor: invalid + double stop). */}
+                    <Button asChild variant="outline" data-testid="button-edit-admin">
+                      <Link href={`/admin/resources?resourceId=${resource.id}`}>
                         <Edit className="h-4 w-4 mr-2" />
                         Edit in Admin
-                      </Button>
-                    </Link>
+                      </Link>
+                    </Button>
                     <span className="text-sm text-muted-foreground">
                       Resource ID: {resource.id}
                     </span>

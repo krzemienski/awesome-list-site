@@ -1959,17 +1959,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.claims.sub;
       const NO_HTML = /<[a-z!/][^>]*>/i;
+      // Run17 BUG-012: cap at 50 (was 60) per audit; header CSS truncation is
+      // the second line of defense for anything at the cap.
       const nameField = z
         .string()
         .trim()
-        .max(60, 'Name must be 60 characters or fewer')
+        .max(50, 'Name must be 50 characters or fewer')
         .refine((v) => !NO_HTML.test(v), 'Name must not contain HTML tags')
         .optional();
       const profileSchema = z
         .object({ firstName: nameField, lastName: nameField })
         .refine((v) => v.firstName !== undefined || v.lastName !== undefined, {
           message: 'Provide firstName or lastName',
-        });
+        })
+        // Run17 BUG-011: clearing BOTH names in one request is rejected — the
+        // old behavior 200'd and silently fell back to the email local-part.
+        .refine(
+          (v) => !(v.firstName !== undefined && v.lastName !== undefined &&
+                   v.firstName === '' && v.lastName === ''),
+          { message: 'Enter at least a first or last name' },
+        );
       const parsed = profileSchema.safeParse(req.body ?? {});
       if (!parsed.success) {
         return res.status(400).json({ message: parsed.error.issues[0]?.message || 'Invalid profile data' });
@@ -2187,10 +2196,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
               .filter(n => !isNaN(n))
           );
           
+          // Run17 BUG-003: completedSteps stores step ROW ids while stepCount
+          // counts logical steps (distinct stepNumbers). Counting raw rows mixed
+          // units and produced >100% progress (e.g. 18 rows / 6 steps = 300%).
+          // A logical step counts as complete when every non-optional row of its
+          // stepNumber is in completedSteps (matches completedAt semantics).
+          const completedRowIds = new Set(progress?.completedSteps ?? []);
+          const rowsByStepNumber = new Map<number, { id: number; isOptional: boolean }[]>();
+          for (const s of steps) {
+            const n = typeof s.stepNumber === 'number' ? s.stepNumber : parseInt(s.stepNumber, 10);
+            if (isNaN(n)) continue;
+            const rows = rowsByStepNumber.get(n) ?? [];
+            rows.push({ id: s.id, isOptional: !!s.isOptional });
+            rowsByStepNumber.set(n, rows);
+          }
+          let completedStepCount = 0;
+          rowsByStepNumber.forEach((rows) => {
+            const required = rows.filter(r => !r.isOptional);
+            const consider = required.length > 0 ? required : rows;
+            if (consider.every(r => completedRowIds.has(r.id))) completedStepCount++;
+          });
+          
           return {
             ...journey,
             stepCount: uniqueStepNumbers.size,
-            completedStepCount: progress?.completedSteps?.length || 0,
+            completedStepCount,
             isEnrolled: !!progress
           };
         });
@@ -2296,13 +2326,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (isNaN(journeyId)) {
         return res.status(404).json({ message: 'Journey not found' });
       }
-      const { stepId } = req.body;
-      
-      if (!stepId) {
+      // Run17 BUG-016: accept either a single stepId (legacy) or a stepIds
+      // array so a logical step (up to 3 rows per stepNumber) completes in ONE
+      // request instead of one PUT per row. `completed` (optional boolean)
+      // makes the write idempotent; omitted = per-id toggle (legacy contract).
+      const { stepId, stepIds, completed } = req.body ?? {};
+      const ids: number[] = Array.isArray(stepIds)
+        ? stepIds.filter((n: unknown) => Number.isInteger(n))
+        : Number.isInteger(stepId) ? [stepId] : [];
+
+      if (ids.length === 0) {
         return res.status(400).json({ message: 'Step ID is required' });
       }
-      
-      const progress = await learningJourneyRepo.updateUserJourneyProgress(userId, journeyId, stepId);
+      if (typeof completed !== 'boolean' && typeof completed !== 'undefined') {
+        return res.status(400).json({ message: 'completed must be a boolean' });
+      }
+
+      const progress = await learningJourneyRepo.updateUserJourneyProgressBatch(
+        userId, journeyId, ids, completed,
+      );
       res.json(progress);
     } catch (error) {
       console.error('Error updating journey progress:', error);

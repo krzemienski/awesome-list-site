@@ -200,7 +200,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
               ) : (
                 <>
                   <Link className="mr-2 h-4 w-4" />
-                  Check All Links
+                  Run Link Check
                 </>
               )}
             </Button>

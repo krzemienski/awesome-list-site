@@ -111,19 +111,17 @@ export default function JourneyDetail() {
   // sharing the same stepNumber). The backend only sets completedAt once EVERY
   // non-optional row id is in completedSteps, so completing a logical step must
   // mark all of its row ids — otherwise the journey can never finalize.
+  // Run17 BUG-016: all row ids go in ONE PUT (stepIds + explicit completed
+  // flag) instead of a sequential per-row PUT loop (3 writes per click).
   const completeStepMutation = useMutation({
-    mutationFn: async (stepIds: number[]) => {
-      let last;
-      for (const stepId of stepIds) {
-        last = await apiRequest(`/api/journeys/${id}/progress`, {
-          method: 'PUT',
-          body: JSON.stringify({ stepId }),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-      }
-      return last;
+    mutationFn: async ({ stepIds, completed }: { stepIds: number[]; completed: boolean }) => {
+      return await apiRequest(`/api/journeys/${id}/progress`, {
+        method: 'PUT',
+        body: JSON.stringify({ stepIds, completed }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/journeys/${id}`] });
@@ -441,7 +439,7 @@ export default function JourneyDetail() {
                           <Button 
                             variant="outline"
                             className="min-h-[44px]"
-                            onClick={() => completeStepMutation.mutate(step.rowIds)}
+                            onClick={() => completeStepMutation.mutate({ stepIds: step.rowIds, completed: true })}
                             disabled={completeStepMutation.isPending}
                             data-testid={`button-complete-step-${step.stepNumber}`}
                           >
@@ -460,7 +458,7 @@ export default function JourneyDetail() {
                           <Button
                             variant="ghost"
                             className="min-h-[44px] px-2 text-green-500 hover:text-green-600"
-                            onClick={() => completeStepMutation.mutate(step.rowIds)}
+                            onClick={() => completeStepMutation.mutate({ stepIds: step.rowIds, completed: false })}
                             disabled={completeStepMutation.isPending}
                             data-testid={`button-uncomplete-step-${step.stepNumber}`}
                           >

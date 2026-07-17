@@ -196,9 +196,10 @@ export default function Journeys() {
                   <CardTitle className="text-lg sm:text-xl leading-tight">
                     {/* BUG-010 (run13): journey titles are links, matching the
                         card-title-as-link pattern used on resource cards. */}
+                    {/* Run17 BUG-048: ≥24px tap target. */}
                     <Link
                       href={`/journey/${journey.id}`}
-                      className="hover:underline hover:text-[var(--accent)] transition-colors"
+                      className="hover:underline hover:text-[var(--accent)] transition-colors inline-flex items-center min-h-[24px]"
                       data-testid={`link-journey-title-${journey.id}`}
                     >
                       {journey.title}
@@ -263,7 +264,10 @@ export default function Journeys() {
                     {/* BUG-037 (run14): shrink-0 icons + truncating label — at
                         768px the flex button squeezed the leading icon and
                         clipped it. */}
-                    {enrolled ? (
+                    {/* Run17 BUG-046: "Continue" only once real progress exists —
+                        enrolled-with-zero-progress previously showed "Continue
+                        Journey" on journeys the user had never actually begun. */}
+                    {enrolled && (journey.completedStepCount || 0) > 0 ? (
                       <>
                         <CheckCircle2 className="h-4 w-4 mr-2 shrink-0" />
                         <span className="truncate">Continue Journey</span>

@@ -103,6 +103,7 @@ export default function Register() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [, setLocation] = useLocation();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   // Distinguishes "arrived already signed in" from "signed up via this form" —
@@ -221,8 +222,10 @@ export default function Register() {
         <CardContent className="space-y-4">
           <Form {...form}>
             {/* Run15 BUG-047 (parity with /login): explicit method="post" so a
-                no-JS submit can never put credentials in the URL. */}
-            <form method="post" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                no-JS submit can never put credentials in the URL.
+                Run17 BUG-039: noValidate — zod owns validation so the email
+                field shows the styled inline message, not a native bubble. */}
+            <form method="post" noValidate onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="email"
@@ -244,6 +247,11 @@ export default function Register() {
                         />
                       </div>
                     </FormControl>
+                    {/* Run17 BUG-040: the display name is derived from the email
+                        prefix — say so instead of doing it silently. */}
+                    <p className="text-xs text-[color:var(--text-3)]" data-testid="text-display-name-hint">
+                      Your display name starts as the part before the @ — change it anytime in Profile.
+                    </p>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -299,13 +307,26 @@ export default function Register() {
                         <Input
                           {...field}
                           id="confirmPassword"
-                          type={showPassword ? "text" : "password"}
+                          type={showConfirmPassword ? "text" : "password"}
                           autoComplete="new-password"
                           placeholder="Re-enter your password"
-                          className="pl-10"
+                          className="pl-10 pr-12"
                           data-testid="input-confirm-password"
                           disabled={isLoading}
                         />
+                        {/* Run17 BUG-042: confirm field gets its own show/hide
+                            toggle (parity with the password field above). */}
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPassword((v) => !v)}
+                          aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                          aria-pressed={showConfirmPassword}
+                          className="absolute right-0 top-1/2 -translate-y-1/2 min-h-[44px] min-w-[44px] flex items-center justify-center text-muted-foreground hover:text-[color:var(--text)] transition-colors"
+                          data-testid="button-toggle-confirm-password"
+                          disabled={isLoading}
+                        >
+                          {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
                       </div>
                     </FormControl>
                     <FormMessage />

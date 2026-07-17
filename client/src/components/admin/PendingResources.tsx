@@ -11,7 +11,6 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { CheckCircle2, XCircle, Eye, ExternalLink, Calendar, User, FolderTree, RefreshCw } from "lucide-react";
 import type { Resource } from "@shared/schema";
 
@@ -33,6 +32,8 @@ export default function PendingResources() {
   const [rejectionReason, setRejectionReason] = useState("");
   const [resourceToApprove, setResourceToApprove] = useState<Resource | null>(null);
   const [resourceToReject, setResourceToReject] = useState<Resource | null>(null);
+  // Run17 BUG-027: "Check again" busy/outcome state for the empty view.
+  const [recheckState, setRecheckState] = useState<'idle' | 'checking' | 'checked'>('idle');
 
   const { data, isLoading } = useQuery<PendingResourcesResponse>({
     queryKey: ['/api/admin/pending-resources'],
@@ -195,15 +196,25 @@ export default function PendingResources() {
             <p className="text-muted-foreground mb-4">
               There are no pending resources to review at this time.
             </p>
-            {/* Run16 BUG-078: empty state gets an explicit refresh control. */}
+            {/* Run16 BUG-078: empty state gets an explicit refresh control.
+                Run17 BUG-027: it now shows a busy state while re-fetching and
+                announces the outcome via role="status". */}
             <Button
               variant="outline"
-              onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/admin/pending-resources'] })}
+              disabled={recheckState === 'checking'}
+              onClick={async () => {
+                setRecheckState('checking');
+                await queryClient.invalidateQueries({ queryKey: ['/api/admin/pending-resources'] });
+                setRecheckState('checked');
+              }}
               data-testid="button-refresh-pending-resources"
             >
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Check again
+              <RefreshCw className={`h-4 w-4 mr-2 ${recheckState === 'checking' ? 'animate-spin' : ''}`} />
+              {recheckState === 'checking' ? 'Checking…' : 'Check again'}
             </Button>
+            <p role="status" aria-live="polite" className="text-sm text-muted-foreground mt-3">
+              {recheckState === 'checked' ? 'Checked — still no pending resources.' : ''}
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -227,7 +238,11 @@ export default function PendingResources() {
           </div>
         </CardHeader>
         <CardContent>
-          <ScrollArea className="h-[600px]">
+          {/* Run17 BUG-001: was a Radix ScrollArea (overflow-hidden viewport) —
+              the ~2800px-wide table was CLIPPED with no horizontal scrollbar,
+              hiding Description/Submitted/Actions. Plain overflow-auto restores
+              both axes (mirrors the run16 BUG-011 admin-table pattern). */}
+          <div className="h-[600px] overflow-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -241,9 +256,9 @@ export default function PendingResources() {
               <TableBody>
                 {pendingResources.map((resource) => (
                   <TableRow key={resource.id} data-testid={`row-pending-resource-${resource.id}`}>
-                    <TableCell className="font-medium">
-                      <div className="flex items-center gap-2">
-                        <span>{resource.title}</span>
+                    <TableCell className="font-medium max-w-[320px]">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="truncate" title={resource.title}>{resource.title}</span>
                         <a
                           href={resource.url}
                           target="_blank"
@@ -335,7 +350,7 @@ export default function PendingResources() {
                 ))}
               </TableBody>
             </Table>
-          </ScrollArea>
+          </div>
         </CardContent>
       </Card>
 
