@@ -3829,11 +3829,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Process immediately in background
       syncService.exportToGitHub(repositoryUrl, options)
-        .then(result => {
+        .then(async result => {
+          if (result.errors.length > 0) {
+            console.error('GitHub export failed:', result.errors);
+            await githubSyncRepo.updateGithubSyncStatus(queueItem.id, 'failed', result.errors.join('; '));
+            return;
+          }
           console.log('GitHub export completed:', result);
+          await githubSyncRepo.updateGithubSyncStatus(queueItem.id, 'completed', undefined, {
+            exported: result.exported,
+            commitSha: result.commitSha,
+            commitUrl: result.commitUrl
+          });
         })
-        .catch(error => {
+        .catch(async error => {
           console.error('GitHub export failed:', error);
+          await githubSyncRepo.updateGithubSyncStatus(
+            queueItem.id,
+            'failed',
+            error instanceof Error ? error.message : String(error)
+          ).catch(() => {});
         });
       
       res.json({

@@ -40,7 +40,7 @@ export class GitHubClient {
 
   constructor(token?: string) {
     if (!token) {
-      token = process.env.GITHUB_TOKEN;
+      token = process.env.GITHUB_PUSH_TOKEN || process.env.GITHUB_TOKEN;
     }
 
     if (!token) {

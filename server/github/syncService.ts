@@ -824,19 +824,8 @@ export class GitHubSyncService {
         commitMessage
       );
 
-      // Add to sync queue
-      await this.syncRepo.addToGithubSyncQueue({
-        repositoryUrl: repoUrl,
-        action: 'export',
-        status: 'completed',
-        resourceIds: resourceIds as any,
-        metadata: {
-          exported: result.exported,
-          commitSha: result.commitSha,
-          commitMessage,
-          diff: { added, updated, removed }
-        } as any
-      });
+      // Note: queue-row status is owned by the caller (route or queue processor),
+      // which updates the row it created — no extra terminal row is inserted here.
 
     } catch (error: any) {
       // Provide user-friendly error messages for common GitHub issues
@@ -857,18 +846,9 @@ export class GitHubSyncService {
       
       result.errors.push(errorMsg);
       console.error('GitHub export error:', errorMsg);
-
-      // Log failed export via updateGithubSyncStatus if queue item exists
-      // Or log in metadata if creating new queue item
-      await this.syncRepo.addToGithubSyncQueue({
-        repositoryUrl: repoUrl,
-        action: 'export',
-        status: 'failed',
-        resourceIds: [] as any,
-        metadata: { 
-          error: errorMsg
-        } as any
-      });
+      // Queue-row failure status is recorded by the caller (route or queue
+      // processor) via updateGithubSyncStatus on the row it created — no
+      // duplicate terminal row is inserted here.
     }
 
     return result;
