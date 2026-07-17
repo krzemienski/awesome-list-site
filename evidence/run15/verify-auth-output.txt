@@ -1,0 +1,18 @@
+PASS BUG-034 fav/bookmark aria-pressed — favorite false->true, bookmark=false
+PASS BUG-005 profile Settings navigates — landed on /settings/theme
+PASS BUG-006 favorite rows linked — first favorite href=/resource/187906
+PASS BUG-049 display-name edit UI — "Admin User" -> "QA Run15" -> restored "Admin User"
+  cleanup: favorite aria-pressed=false
+PASS BUG-041 suggest-edit no-op blocked — toast=true dialogOpen=true
+
+5/5 PASS (part 1)
+PASS BUG-016 Escape closes dialog — dialog open after Escape=false
+PASS BUG-014 create validation — dialogOpen=true missing/required-msg=true
+PASS BUG-002 category create works — rowVisible=true dialogClosed=true
+PASS BUG-015 duplicate toast humanized — humanized=true raw-json=false
+  cleanup: QA category deleted=true
+PASS BUG-019 batch size 0 guarded — guard-toast=true jobs 25->25
+PASS BUG-030 sync date format — raw-locale-dates=[] formatted-sample=[]
+PASS BUG-035 link health zero-state honest — zero-state copy shown
+
+7/7 PASS (part 2)

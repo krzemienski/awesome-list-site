@@ -43,6 +43,8 @@ function ResourceCard({
   const [, setLocation] = useLocation();
   const [suggestEditOpen, setSuggestEditOpen] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  // Run15 BUG-022: expandable tag row ("+N more" reveals the hidden tags)
+  const [showAllTags, setShowAllTags] = useState(false);
 
   const numericId = parseInt(resource.id);
   const isValidDbResource = !isNaN(numericId) && numericId > 0;
@@ -229,7 +231,7 @@ function ResourceCard({
               hosting page (onTagClick) or link to the tag-filtered home. */}
           {resource.tags && resource.tags.length > 0 && (
             <>
-              {resource.tags.slice(0, 3).map((tag) =>
+              {(showAllTags ? resource.tags : resource.tags.slice(0, 3)).map((tag) =>
                 onTagClick ? (
                   <button
                     key={tag}
@@ -260,10 +262,26 @@ function ResourceCard({
                   </Link>
                 ),
               )}
+              {/* Run15 BUG-022: "+N more" is now a real control — clicking it
+                  reveals the remaining tags (and can collapse them again). */}
               {resource.tags.length > 3 && (
-                <span className="text-xs text-muted-foreground">
-                  +{resource.tags.length - 3} more
-                </span>
+                <button
+                  type="button"
+                  className="relative z-10 text-xs text-muted-foreground hover:text-foreground underline-offset-2 hover:underline cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowAllTags((v) => !v);
+                  }}
+                  aria-expanded={showAllTags}
+                  aria-label={
+                    showAllTags
+                      ? "Show fewer tags"
+                      : `Show ${resource.tags.length - 3} more tags`
+                  }
+                  data-testid={`button-more-tags-${resource.id}`}
+                >
+                  {showAllTags ? "Show fewer" : `+${resource.tags.length - 3} more`}
+                </button>
               )}
             </>
           )}

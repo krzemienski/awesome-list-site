@@ -169,12 +169,24 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
         <BreadcrumbList className="flex-nowrap overflow-hidden">
           {crumbs.flatMap((crumb, i) => {
             const isLast = i === crumbs.length - 1;
+            // Run15 BUG-045: the root "Home" crumb is short and must stay a
+            // usable link — never let flexbox squeeze it to zero width. Only
+            // the deeper (long) crumbs participate in truncation.
+            const isRoot = i === 0;
             const nodes = [
-              <BreadcrumbItem key={`${crumb.href}-item`} className="min-w-0">
+              <BreadcrumbItem
+                key={`${crumb.href}-item`}
+                className={isRoot && !isLast ? "shrink-0" : "min-w-0"}
+              >
                 {isLast ? (
                   <BreadcrumbPage className="truncate">{crumb.label}</BreadcrumbPage>
                 ) : (
-                  <BreadcrumbLink href={crumb.href} className="truncate">{crumb.label}</BreadcrumbLink>
+                  <BreadcrumbLink
+                    href={crumb.href}
+                    className={isRoot ? "whitespace-nowrap" : "truncate"}
+                  >
+                    {crumb.label}
+                  </BreadcrumbLink>
                 )}
               </BreadcrumbItem>,
             ];

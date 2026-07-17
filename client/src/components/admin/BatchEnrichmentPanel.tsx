@@ -21,6 +21,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { formatAdminDateTime } from "@/lib/utils";
 import { 
   Sparkles, 
   Play, 
@@ -304,7 +305,13 @@ export default function BatchEnrichmentPanel() {
                 min={1}
                 max={50}
                 value={batchSize}
-                onChange={(e) => setBatchSize(parseInt(e.target.value) || 10)}
+                onChange={(e) => {
+                  // Run15 BUG-019: parseInt(...) || 10 coerced 0 to 10, silently
+                  // bypassing the 1-50 guard and starting a real job. Keep the
+                  // raw value so handleStartEnrichment can reject it.
+                  const v = parseInt(e.target.value, 10);
+                  setBatchSize(Number.isNaN(v) ? 0 : v);
+                }}
                 disabled={hasActiveJob}
                 data-testid="input-batch-size"
               />
@@ -570,12 +577,12 @@ export default function BatchEnrichmentPanel() {
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
                         {job.startedAt 
-                          ? new Date(job.startedAt).toLocaleString()
+                          ? formatAdminDateTime(job.startedAt)
                           : '-'}
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
                         {job.completedAt 
-                          ? new Date(job.completedAt).toLocaleString()
+                          ? formatAdminDateTime(job.completedAt)
                           : job.status === 'processing' ? 'In progress...' : '-'}
                       </TableCell>
                       <TableCell className="text-center font-mono">

@@ -80,12 +80,20 @@ export class UserRepository {
   }
 
   /**
-   * Get a user by their email address
+   * Get a user by their email address (case-insensitive).
+   * Run15 BUG-001: emails are one logical identity regardless of case —
+   * lookups for login/register/reset must match Foo@X.com to foo@x.com.
+   * Emails are stored lowercase going forward (migration 0034 lowercased
+   * historical rows), but the lookup stays case-insensitive defensively.
    * @param email - Email address to search for
    * @returns User object or undefined if not found
    */
   async getUserByEmail(email: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.email, email));
+    const normalized = email.trim().toLowerCase();
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(sql`lower(${users.email}) = ${normalized}`);
     return user;
   }
 
@@ -151,6 +159,29 @@ export class UserRepository {
     const [user] = await db
       .update(users)
       .set({ role, updatedAt: new Date() })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
+  /**
+   * Update a user's display name (Run15 BUG-049: self-service profile edit).
+   * Only firstName/lastName are settable through this path — role, email and
+   * password have their own guarded flows.
+   * @param userId - User ID to update
+   * @param profile - firstName/lastName (null clears the field)
+   * @returns Updated user object
+   */
+  async updateUserProfile(
+    userId: string,
+    profile: { firstName?: string | null; lastName?: string | null },
+  ): Promise<User> {
+    const set: Record<string, unknown> = { updatedAt: new Date() };
+    if (profile.firstName !== undefined) set.firstName = profile.firstName;
+    if (profile.lastName !== undefined) set.lastName = profile.lastName;
+    const [user] = await db
+      .update(users)
+      .set(set)
       .where(eq(users.id, userId))
       .returning();
     return user;

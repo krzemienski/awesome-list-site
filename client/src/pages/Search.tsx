@@ -71,20 +71,49 @@ export default function Search() {
     isError,
     refetch,
   } = useQuery<{ resources: DbResource[]; total: number }>({
-    queryKey: ["/api/resources", "search", trimmed],
+    // Run15: server-side pagination — fetch one 24-row page instead of a
+    // 1000-row payload sliced client-side. Page is part of the cache key.
+    queryKey: ["/api/resources", "search", trimmed, page],
     queryFn: async () =>
-      // R2-M11: limit bumped 200→1000 so pagination covers broad queries.
-      apiRequest(`/api/resources?search=${encodeURIComponent(trimmed)}&limit=1000`, {
-        method: "GET",
-      }),
+      apiRequest(
+        `/api/resources?search=${encodeURIComponent(trimmed)}&page=${page}&limit=${PAGE_SIZE}`,
+        { method: "GET" },
+      ),
     enabled: trimmed.length >= 2,
     staleTime: 60 * 1000,
+    // Keep the previous page's rows on screen while the next page loads.
+    placeholderData: (prev) => prev,
   });
 
   const results = data?.resources ?? [];
-  const totalPages = Math.max(1, Math.ceil(results.length / PAGE_SIZE));
+  const total = data?.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
-  const pageResults = results.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+  const pageResults = results;
+
+  // A URL-restored ?page= beyond the last page fetches an empty page —
+  // snap back to the real last page once the total is known.
+  useEffect(() => {
+    if (data && page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [data, page, totalPages]);
+
+  // Run15 BUG-048: direct page-jump input state. Mirrors safePage whenever
+  // the effective page changes; committed on Enter/blur.
+  const [pageJumpValue, setPageJumpValue] = useState(String(safePage));
+  useEffect(() => {
+    setPageJumpValue(String(safePage));
+  }, [safePage]);
+  const commitPageJump = () => {
+    const n = parseInt(pageJumpValue, 10);
+    if (Number.isFinite(n) && n >= 1 && n <= totalPages && n !== safePage) {
+      setPage(n);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      setPageJumpValue(String(safePage));
+    }
+  };
 
   // New query → back to page 1. Ref-guarded so the mount run doesn't clobber
   // a ?page= restored from the URL (BUG-038).
@@ -138,6 +167,7 @@ export default function Search() {
           onChange={(e) => setInput(e.target.value)}
           placeholder="Search resources..."
           className="pl-10"
+          aria-label="Search resources"
           data-testid="input-search-page"
         />
       </div>
@@ -174,7 +204,7 @@ export default function Search() {
             <div className="flex h-16 w-16 items-center justify-center bg-muted rounded-lg">
               <SearchIcon className="h-8 w-8 text-muted-foreground" />
             </div>
-            <h2 className="text-sm font-semibold" data-testid="text-no-results">
+            <h2 className="text-sm font-semibold break-words max-w-full px-4" data-testid="text-no-results">
               No results for “{trimmed}”
             </h2>
             <p className="text-xs text-muted-foreground">Try different keywords</p>
@@ -182,9 +212,8 @@ export default function Search() {
         </Card>
       ) : (
         <>
-          <p className="text-sm text-muted-foreground" data-testid="text-result-count">
-            {data?.total ?? results.length} result{(data?.total ?? results.length) === 1 ? "" : "s"} for “{trimmed}”
-            {(data?.total ?? 0) > results.length ? ` · showing first ${results.length}` : ""}
+          <p className="text-sm text-muted-foreground break-words" data-testid="text-result-count">
+            {total} result{total === 1 ? "" : "s"} for “{trimmed}”
             {totalPages > 1 ? ` · page ${safePage} of ${totalPages}` : ""}
           </p>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -217,8 +246,27 @@ export default function Search() {
                 <ChevronLeft className="h-4 w-4 mr-1" />
                 Previous
               </Button>
-              <span className="text-sm text-muted-foreground tabular-nums">
-                {safePage} / {totalPages}
+              {/* Run15 BUG-048: direct page jump for long result sets. */}
+              <span className="flex items-center gap-2 text-sm text-muted-foreground tabular-nums">
+                <label htmlFor="search-page-jump" className="sr-only">
+                  Go to page
+                </label>
+                <Input
+                  id="search-page-jump"
+                  type="number"
+                  min={1}
+                  max={totalPages}
+                  value={pageJumpValue}
+                  onChange={(e) => setPageJumpValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") commitPageJump();
+                  }}
+                  onBlur={commitPageJump}
+                  className="h-8 w-16 text-center"
+                  aria-label={`Page number, 1 to ${totalPages}`}
+                  data-testid="input-search-page-jump"
+                />
+                <span>/ {totalPages}</span>
               </span>
               <Button
                 variant="outline"

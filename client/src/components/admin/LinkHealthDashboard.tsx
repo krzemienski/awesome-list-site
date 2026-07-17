@@ -20,6 +20,7 @@ import {
   Link2,
   AlertTriangle
 } from "lucide-react";
+import { formatAdminDateTime, formatAdminDate } from "@/lib/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -175,7 +176,7 @@ export default function LinkHealthDashboard() {
 
   // Prepare trend chart data from last 10 jobs
   const trendData = jobs.slice(0, 10).reverse().map((job) => ({
-    date: new Date(job.createdAt).toLocaleDateString(),
+    date: formatAdminDate(job.createdAt),
     healthy: ((job.healthyLinks || 0) / (job.totalLinks || 1)) * 100,
     broken: ((job.brokenLinks || 0) / (job.totalLinks || 1)) * 100,
     redirect: ((job.redirectLinks || 0) / (job.totalLinks || 1)) * 100,
@@ -205,7 +206,7 @@ export default function LinkHealthDashboard() {
           </CardTitle>
           <CardDescription>
             {latestJob
-              ? `Last check: ${new Date(latestJob.createdAt).toLocaleString()}`
+              ? `Last check: ${formatAdminDateTime(latestJob.createdAt)}`
               : 'No link health checks performed yet'
             }
           </CardDescription>

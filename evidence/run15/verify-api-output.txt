@@ -1,0 +1,12 @@
+PASS BUG-001 case-variant register blocked — first=201, case-variant=409 {"message":"An account with this email already exists"}
+PASS BUG-003 server pagination — p1=50 p2=50 overlap=0 total=1822
+PASS BUG-008 server tag cap — metadata.tags×12 -> 400 {"error":"validation_failed","errors":[{"origin":"array","code":"too_big","maximum":10,"inclusive":true,"path":["metadata","tags"],"message"
+PASS BUG-010 admin/public step-count parity — j6: admin=18 public=18 | j7: admin=6 public=6 | j8: admin=6 public=6 | j9: admin=6 public=6 | j10: admin=6 public=6
+PASS BUG-013 rec variance — n=10 scores=0.85,0.82,0.79,0.76,0.73 reasons=4 distinct
+PASS BUG-017 progress reflects activity — before={"totalResources":1822,"completedResources":0,"streakDays":0,"totalTimeSpent":"0h 0m","skillLevel":"beginner"} after={"totalResources":1822,"completedResources":0,"streakDays":1,"totalTimeSpent":"0h 0m","skillLevel":"beginner"}
+PASS BUG-029 same-password rejected — same pw -> 400 {"message":"New password must be different from your current password"}
+PASS BUG-037 trailing-space URL trimmed — url=https://github.com/ThibaultBee/StreamPack clean={"exists":true,"resource":{"id":187906,"title":"StreamPack - spaced={"exists":true,"resource":{"id":187906,"title":"StreamPack -
+PASS BUG-042 CSV emails masked — status=200 masked-cells=true leak=false sample=ea6ae02c-c91f-46e7-af54-ec6135373e90,_•••@example.com,,,user,local,2026-07-17T03
+PASS BUG-049 profile name PATCH — patch=200 {"id":"ea6ae02c-c91f-46e7-af54-ec6135373e90","email":"__qa_test_run15_case_1784260075479@example.com authUser.name=QA Probe
+
+10/10 PASS

@@ -598,11 +598,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Email delivery (verification) is out of scope until an email transport is configured.
   app.post("/api/auth/register", authLimiter, async (req, res) => {
     try {
-      const { email, password } = req.body ?? {};
+      const { email: rawEmail, password } = req.body ?? {};
 
-      if (typeof email !== "string" || typeof password !== "string") {
+      if (typeof rawEmail !== "string" || typeof password !== "string") {
         return res.status(400).json({ message: "Email and password are required" });
       }
+      // Run15 BUG-001: emails are one logical identity regardless of case.
+      // Store lowercase so QATEST+CASE1@x.com and qatest+case1@x.com can never
+      // become two accounts (getUserByEmail is case-insensitive to match).
+      const email = rawEmail.trim().toLowerCase();
       if (!validateEmail(email)) {
         return res.status(400).json({ message: "Invalid email format" });
       }
@@ -1149,7 +1153,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/resources/check-url - Check if URL already exists (public)
   app.get('/api/resources/check-url', async (req, res) => {
     try {
-      const url = req.query.url as string;
+      // Run15 BUG-037: trim like the submit schema does — a pasted URL with a
+      // trailing space must resolve to the same duplicate-check result.
+      const url = typeof req.query.url === 'string' ? req.query.url.trim() : '';
 
       if (!url) {
         return res.status(400).json({ message: 'URL parameter is required' });
@@ -1278,7 +1284,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // markup in titles/descriptions is never legitimate catalog content.
       const NO_HTML = /<[a-z!/][^>]*>/i;
       const submitSchema = z.object({
-        url: z.string().min(1).url('Invalid URL format'),
+        // Run15 BUG-037: trim before validating — a trailing space after a
+        // pasted URL is never meaningful and used to fail .url() confusingly.
+        url: z.string().trim().min(1).url('Invalid URL format'),
         title: z.string().min(1).max(200, 'Title must be 1-200 characters')
           .refine((v) => !NO_HTML.test(v), 'Title must not contain HTML tags'),
         category: z.string().min(1, 'Category is required'),
@@ -1759,6 +1767,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: 'Current password is incorrect' });
       }
 
+      // Run15 BUG-029: "changing" to the identical password is always a user
+      // error — reject it explicitly instead of silently succeeding.
+      if (newPassword === currentPassword) {
+        return res.status(400).json({ message: 'New password must be different from your current password' });
+      }
+
       const pwCheck = validatePassword(newPassword);
       if (!pwCheck.valid) {
         return res.status(400).json({ message: pwCheck.error || 'Invalid new password' });
@@ -1856,6 +1870,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('[DELETE /api/user/api-keys/:id] Error:', error);
       return res.status(500).json({ message: 'Failed to revoke API key' });
+    }
+  });
+
+  // PATCH /api/user/profile — self-service display-name edit (Run15 BUG-049).
+  // Only firstName/lastName; email/password/role have their own guarded flows.
+  app.patch('/api/user/profile', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const NO_HTML = /<[a-z!/][^>]*>/i;
+      const nameField = z
+        .string()
+        .trim()
+        .max(60, 'Name must be 60 characters or fewer')
+        .refine((v) => !NO_HTML.test(v), 'Name must not contain HTML tags')
+        .optional();
+      const profileSchema = z
+        .object({ firstName: nameField, lastName: nameField })
+        .refine((v) => v.firstName !== undefined || v.lastName !== undefined, {
+          message: 'Provide firstName or lastName',
+        });
+      const parsed = profileSchema.safeParse(req.body ?? {});
+      if (!parsed.success) {
+        return res.status(400).json({ message: parsed.error.issues[0]?.message || 'Invalid profile data' });
+      }
+      // Empty string clears the field (stored as NULL, matching OAuth-created rows).
+      const toValue = (v: string | undefined) => (v === undefined ? undefined : v === '' ? null : v);
+      const updated = await userRepo.updateUserProfile(userId, {
+        firstName: toValue(parsed.data.firstName),
+        lastName: toValue(parsed.data.lastName),
+      });
+      if (!updated) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      return res.json({
+        id: updated.id,
+        email: updated.email,
+        firstName: updated.firstName,
+        lastName: updated.lastName,
+        role: updated.role,
+      });
+    } catch (error) {
+      console.error('[PATCH /api/user/profile] Error:', error);
+      return res.status(500).json({ message: 'Failed to update profile' });
     }
   });
 
@@ -2207,7 +2264,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const enriched = journeys.map((j) => ({
         ...j,
         steps: stepsMap.get(j.id) || [],
-        stepCount: (stepsMap.get(j.id) || []).length,
+        // Run15 BUG-010: count DISTINCT stepNumbers (a logical step stores up
+        // to 3 rows — one per resource), matching the public /api/journeys
+        // computation so admin and public step counts agree.
+        stepCount: new Set(
+          (stepsMap.get(j.id) || [])
+            .map(s => typeof s.stepNumber === 'number' ? s.stepNumber : parseInt(s.stepNumber, 10))
+            .filter(n => !isNaN(n))
+        ).size,
       }));
       res.json({ journeys: enriched });
     } catch (error) {
@@ -2480,13 +2544,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (/[",\n\r]/.test(s)) s = `"${s.replace(/"/g, '""')}"`;
         return s;
       };
+      // Run15 BUG-042: the CSV must not leak more PII than the admin UI it
+      // mirrors — mask emails exactly like UsersTab's maskEmail (first char +
+      // ••• + domain). The full address stays DB-only.
+      const maskEmail = (email: unknown): string => {
+        if (typeof email !== 'string' || !email.includes('@')) return '';
+        const [local, domain] = email.split('@');
+        return `${local.slice(0, 1)}•••@${domain}`;
+      };
       const header = ['id', 'email', 'firstName', 'lastName', 'role', 'authProvider', 'createdAt'];
       const lines = [header.join(',')];
       for (const u of allUsers) {
         const provider = u.password ? 'local' : 'replit';
         lines.push([
           csvCell(u.id),
-          csvCell(u.email),
+          csvCell(maskEmail(u.email)),
           csvCell(u.firstName),
           csvCell(u.lastName),
           csvCell(u.role),
@@ -4129,6 +4201,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { filter = 'unenriched', batchSize = 10 } = req.body;
       const userId = req.user?.claims?.sub;
 
+      // Run15 BUG-019 companion: the client guard alone is bypassable —
+      // reject out-of-range batch sizes at the API too.
+      const parsedBatchSize = Number(batchSize);
+      if (!Number.isInteger(parsedBatchSize) || parsedBatchSize < 1 || parsedBatchSize > 50) {
+        return res.status(400).json({
+          success: false,
+          message: 'Batch size must be an integer between 1 and 50.'
+        });
+      }
+
       let agentConfig;
       try {
         agentConfig = await parseAgentConfigFromRequest(req.body);
@@ -4910,8 +4992,11 @@ export async function runBackgroundInitialization(): Promise<void> {
   // killed by the last server restart. Mark them failed so the admin UIs
   // (Enrichment, GitHub) don't show fictitious "processing" forever.
   try {
-    const { runOrphanWatchdogStartup } = await import('./jobs/orphanJobWatchdog');
+    const { runOrphanWatchdogStartup, startOrphanWatchdogPeriodic } = await import('./jobs/orphanJobWatchdog');
     await runOrphanWatchdogStartup();
+    // Run15 BUG-011: also sweep every 5 minutes so jobs orphaned while the
+    // server stays up (worker crash mid-run) don't show "processing" forever.
+    startOrphanWatchdogPeriodic();
   } catch (err) {
     console.error('Failed to import/run orphan watchdog (non-fatal):', err);
   }

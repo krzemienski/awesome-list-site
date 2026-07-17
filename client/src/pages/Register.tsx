@@ -19,14 +19,38 @@ import { trackSignUp } from "@/lib/analytics";
 const registerSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
+  // Run15 BUG-043: confirm-password field to catch typos before submit.
+  confirmPassword: z.string().min(1, "Please confirm your password"),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
 });
 
 type RegisterFormData = z.infer<typeof registerSchema>;
+
+// Run15 BUG-031: dictionary penalty — common passwords score "Very weak"
+// regardless of length/class variety. Checked against the lowercased input
+// with trailing digits/symbols stripped ("Password123!" → "password").
+const COMMON_PASSWORDS = new Set([
+  "password", "passwort", "passw0rd", "password1", "qwerty", "qwertyuiop",
+  "letmein", "welcome", "monkey", "dragon", "iloveyou", "sunshine",
+  "princess", "football", "baseball", "superman", "trustno1", "abc123",
+  "abcd1234", "12345678", "123456789", "1234567890", "admin123",
+  "changeme", "internet", "whatever", "computer", "michael", "jessica",
+  "starwars", "shadow", "master", "freedom", "batman", "secret",
+]);
+
+function isDictionaryPassword(pw: string): boolean {
+  const lower = pw.toLowerCase();
+  const stripped = lower.replace(/[\d!@#$%^&*()_+\-=.,;:'"?]+$/, "");
+  return COMMON_PASSWORDS.has(lower) || COMMON_PASSWORDS.has(stripped);
+}
 
 // R2-M27: lightweight password strength scoring — no external dependency.
 // Score 0-4 from length + character-class variety.
 function scorePassword(pw: string): number {
   if (!pw) return 0;
+  if (isDictionaryPassword(pw)) return 0;
   let score = 0;
   if (pw.length >= 8) score++;
   if (pw.length >= 12) score++;
@@ -40,7 +64,7 @@ function scorePassword(pw: string): number {
   return Math.min(score, 4);
 }
 
-const STRENGTH_LABELS = ["Too short", "Weak", "Fair", "Good", "Strong"];
+const STRENGTH_LABELS = ["Very weak", "Weak", "Fair", "Good", "Strong"];
 const STRENGTH_COLORS = [
   "bg-[var(--border)]",
   "bg-[#ff5c7a]",
@@ -98,18 +122,21 @@ export default function Register() {
     defaultValues: {
       email: "",
       password: "",
+      confirmPassword: "",
     },
   });
 
   const onSubmit = async (data: RegisterFormData) => {
     submitStartedRef.current = true;
     setIsLoading(true);
+    // confirmPassword is a client-only field — never send it to the API.
+    const credentials = { email: data.email, password: data.password };
     try {
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify(data),
+        body: JSON.stringify(credentials),
       });
 
       if (!response.ok) {
@@ -131,7 +158,7 @@ export default function Register() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify(data),
+        body: JSON.stringify(credentials),
       });
 
       if (loginResponse.ok) {
@@ -193,7 +220,9 @@ export default function Register() {
         </CardHeader>
         <CardContent className="space-y-4">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {/* Run15 BUG-047 (parity with /login): explicit method="post" so a
+                no-JS submit can never put credentials in the URL. */}
+            <form method="post" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="email"
@@ -257,6 +286,32 @@ export default function Register() {
                   </FormItem>
                 )}
               />
+              {/* Run15 BUG-043: confirm-password field */}
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor="confirmPassword">Confirm password</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          {...field}
+                          id="confirmPassword"
+                          type={showPassword ? "text" : "password"}
+                          autoComplete="new-password"
+                          placeholder="Re-enter your password"
+                          className="pl-10"
+                          data-testid="input-confirm-password"
+                          disabled={isLoading}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <Button
                 type="submit"
                 className="w-full"
@@ -293,7 +348,7 @@ export default function Register() {
               Continue with Replit
             </Button>
             <p className="text-center text-xs text-[color:var(--text-3)]">
-              Sign up with Google, GitHub, Apple, or X via Replit
+              Uses Replit&apos;s secure sign-in
             </p>
           </div>
 

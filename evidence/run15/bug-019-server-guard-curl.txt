@@ -1,0 +1,10 @@
+# BUG-019 server-side batch-size guard — POST /api/enrichment/start (authed admin session)
+# Captured 2026-07-17 against dev (localhost:5000)
+
+POST {"batchSize":0}
+{"success":false,"message":"Batch size must be an integer between 1 and 50."}
+status=400
+
+POST {"batchSize":500}
+{"success":false,"message":"Batch size must be an integer between 1 and 50."}
+status=400

@@ -243,9 +243,11 @@ export default function ThemeSettings() {
             <code className="block font-mono text-[10.5px] text-[color:var(--text-3)] tracking-wider uppercase">
               Typography
             </code>
-            <h1 className="font-display text-3xl font-bold tracking-tight">
+            {/* Run15 BUG-027: type specimen, not a page heading — the page's
+                only h1 is "Theme Settings" at the top. */}
+            <p className="font-display text-3xl font-bold tracking-tight">
               The quick brown fox <em className="text-[var(--accent)]">jumps</em> over
-            </h1>
+            </p>
             <h3 className="font-sans text-lg font-semibold">Section heading</h3>
             <p className="text-sm text-[color:var(--text-2)] max-w-2xl">
               Body copy renders in the system&rsquo;s primary sans face. Accent color drives links,

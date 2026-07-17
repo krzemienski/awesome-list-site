@@ -50,6 +50,7 @@ const submitResourceSchema = z.object({
     .max(200, "Title must be 200 characters or less")
     .refine((v) => !NO_HTML.test(v), "Title must not contain HTML tags"),
   url: z.string()
+    .trim()
     .url("Please enter a valid URL")
     .refine((url) => url.startsWith("https://"), {
       message: "URL must use HTTPS protocol"
@@ -62,7 +63,14 @@ const submitResourceSchema = z.object({
   category: z.string().min(1, "Please select a category"),
   subcategory: z.string().optional(),
   subSubcategory: z.string().optional(),
-  tags: z.string().optional(),
+  // Run15 BUG-008: an 11th tag used to be silently dropped by a .slice(0, 10)
+  // at submit time — reject loudly instead so the user knows what happened.
+  tags: z.string()
+    .optional()
+    .refine(
+      (v) => !v || v.split(',').map((t) => t.trim()).filter(Boolean).length <= 10,
+      "At most 10 tags allowed — remove some tags",
+    ),
 });
 
 type SubmitResourceFormData = z.infer<typeof submitResourceSchema>;
@@ -229,9 +237,10 @@ export default function SubmitResource() {
   // Submit mutation
   const submitMutation = useMutation({
     mutationFn: async (data: SubmitResourceFormData) => {
-      // Parse tags from comma-separated string
+      // Parse tags from comma-separated string. Run15 BUG-008: no silent
+      // .slice(0, 10) — the form schema rejects >10 tags with an error.
       const tagsArray = data.tags 
-        ? data.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0).slice(0, 10)
+        ? data.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0)
         : [];
 
       // Find the selected entities to get their names for submission

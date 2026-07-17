@@ -1,0 +1,17 @@
+== BUG-038 evidence: HTTP->HTTPS redirect Location header (prod, 2026-07-17T04:22Z) ==
+--- curl -sI http://awesome.video/ ---
+HTTP/1.1 301 Moved Permanently
+Cache-Control: private
+Location: https://awesome.video:443/
+Content-Length: 0
+Date: Fri, 17 Jul 2026 04:22:50 GMT
+Content-Type: text/html; charset=UTF-8
+
+--- curl -sI http://awesome.video/search ---
+HTTP/1.1 301 Moved Permanently
+Cache-Control: private
+Location: https://awesome.video:443/search
+Content-Length: 0
+Date: Fri, 17 Jul 2026 04:22:50 GMT
+Content-Type: text/html; charset=UTF-8
+

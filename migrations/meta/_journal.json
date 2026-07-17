@@ -43,6 +43,13 @@
       "when": 1784260000000,
       "tag": "0033_dedupe_sub_subcategory_slugs",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1784680000000,
+      "tag": "0034_normalize_user_emails_lowercase",
+      "breakpoints": true
     }
   ]
 }

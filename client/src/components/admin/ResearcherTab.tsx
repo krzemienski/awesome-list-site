@@ -38,6 +38,7 @@ import {
   Server,
   KeyRound,
 } from "lucide-react";
+import { formatAdminDate } from "@/lib/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -571,7 +572,7 @@ export default function ResearcherTab() {
                           <TableCell>${job.estimatedCostUsd || '0.00'}</TableCell>
                           <TableCell>{job.turnsUsed || 0}/{job.maxTurns}</TableCell>
                           <TableCell className="text-xs">
-                            {job.createdAt ? new Date(job.createdAt).toLocaleDateString() : '-'}
+                            {job.createdAt ? formatAdminDate(job.createdAt) : '-'}
                           </TableCell>
                           <TableCell>
                             <div className="flex gap-1">

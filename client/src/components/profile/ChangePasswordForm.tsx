@@ -18,6 +18,12 @@ const changePasswordSchema = z
   .refine((data) => data.newPassword === data.confirmPassword, {
     message: "Passwords do not match",
     path: ["confirmPassword"],
+  })
+  // Run15 BUG-029: block no-op rotation client-side too (server also 400s) —
+  // "changing" to the same password would still invalidate other sessions.
+  .refine((data) => data.newPassword !== data.currentPassword, {
+    message: "New password must be different from your current password",
+    path: ["newPassword"],
   });
 
 type ChangePasswordData = z.infer<typeof changePasswordSchema>;

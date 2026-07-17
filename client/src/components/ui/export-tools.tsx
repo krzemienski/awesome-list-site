@@ -344,31 +344,32 @@ export default function ExportTools({ awesomeList, selectedCategory, className, 
           mimeType = 'text/yaml';
           break;
         case 'pdf': {
-          // BUG-024 (run13): the old "premium subscription" toast was fake —
-          // no premium tier exists. Real behavior: render the HTML report in a
-          // new window and open the browser print dialog so the user can save
-          // as PDF (standard client-side PDF path, no server dependency).
+          // BUG-024 (run13) / Run15 BUG-004: render the HTML report into a
+          // hidden same-page iframe and print THAT — no popup, so popup
+          // blockers can't leave the user with a blank flash and nothing
+          // else. Standard client-side save-as-PDF path, no server work.
           const htmlForPdf = generateHTML(resources);
-          const printWindow = window.open('', '_blank');
-          if (!printWindow) {
-            toast({
-              title: "Popup Blocked",
-              description: "Allow popups for this site, then try the PDF export again.",
-              variant: "destructive",
-            });
-            return;
-          }
-          printWindow.document.open();
-          printWindow.document.write(htmlForPdf);
-          printWindow.document.close();
-          printWindow.focus();
-          setTimeout(() => {
+          const frame = document.createElement('iframe');
+          frame.style.position = 'fixed';
+          frame.style.right = '0';
+          frame.style.bottom = '0';
+          frame.style.width = '0';
+          frame.style.height = '0';
+          frame.style.border = '0';
+          frame.setAttribute('aria-hidden', 'true');
+          frame.srcdoc = htmlForPdf;
+          frame.onload = () => {
             try {
-              printWindow.print();
+              frame.contentWindow?.focus();
+              frame.contentWindow?.print();
             } catch {
-              // window may have been closed — nothing to do
+              // printing unavailable — nothing else to do
             }
-          }, 400);
+            // Keep the frame alive while the (blocking) print dialog is up;
+            // clean it up shortly after the handler returns.
+            setTimeout(() => frame.remove(), 60_000);
+          };
+          document.body.appendChild(frame);
           toast({
             title: "PDF Ready",
             description: `${resources.length} resources prepared — use the print dialog to save as PDF`,

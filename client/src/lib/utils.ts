@@ -84,3 +84,18 @@ export function getCategorySlug(category: string): string {
 export function getSubcategorySlug(category: string, subcategory: string): string {
   return `${slugify(category)}-${slugify(subcategory)}`;
 }
+
+// Run15 BUG-030: one explicit date format for the whole admin surface —
+// locale-pinned so every admin table reads the same regardless of viewer locale.
+export function formatAdminDateTime(date: string | Date): string {
+  return new Date(date).toLocaleString('en-US', {
+    month: 'short', day: 'numeric', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+  });
+}
+
+export function formatAdminDate(date: string | Date): string {
+  return new Date(date).toLocaleDateString('en-US', {
+    month: 'short', day: 'numeric', year: 'numeric',
+  });
+}

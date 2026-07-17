@@ -1,0 +1,32 @@
+{
+  "startedAt": "2026-07-17T03:43:37.661Z",
+  "steps": {
+    "BUG-009": [
+      {
+        "skip": "no entity-escaped rows (already clean)"
+      }
+    ],
+    "BUG-011": [
+      {
+        "skip": "no stuck sync jobs"
+      }
+    ],
+    "BUG-046": [
+      {
+        "renamedNode": {
+          "id": 3702,
+          "from": "Podcasts & Webinars",
+          "to": "Podcasts",
+          "slug": "podcasts"
+        },
+        "repointedResources": [
+          {
+            "id": 185847,
+            "title": "The Video Insiders"
+          }
+        ]
+      }
+    ]
+  },
+  "finishedAt": "2026-07-17T03:43:37.779Z"
+}

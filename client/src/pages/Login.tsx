@@ -202,7 +202,9 @@ export default function Login() {
         </CardHeader>
         <CardContent className="space-y-4">
           <Form {...form}>
-            <form onSubmit={(e) => void form.handleSubmit(onSubmit)(e)} className="space-y-4">
+            {/* Run15 BUG-047: explicit method="post" so a no-JS submit can
+                never put credentials in the URL (default form method is GET). */}
+            <form method="post" onSubmit={(e) => void form.handleSubmit(onSubmit)(e)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="email"
@@ -311,7 +313,7 @@ export default function Login() {
               Continue with Replit
             </Button>
             <p className="text-center text-xs text-[color:var(--text-3)]">
-              Sign in with Google, GitHub, Apple, or X via Replit
+              Uses Replit&apos;s secure sign-in
             </p>
           </div>
 

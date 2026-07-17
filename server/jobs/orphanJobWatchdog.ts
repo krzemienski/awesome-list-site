@@ -1,6 +1,6 @@
 import { db } from "../db";
 import { enrichmentJobs, githubSyncQueue } from "@shared/schema";
-import { sql, and, inArray, lt, or, isNull } from "drizzle-orm";
+import { sql, and, inArray, notInArray, lt, or, isNull } from "drizzle-orm";
 
 const ORPHAN_THRESHOLD_MS = 5 * 60 * 1000;
 
@@ -10,8 +10,35 @@ export interface OrphanSweepResult {
   cutoff: Date;
 }
 
-export async function sweepOrphanedJobs(thresholdMs = ORPHAN_THRESHOLD_MS): Promise<OrphanSweepResult> {
+// Run15 BUG-011 follow-up (architect review): ids currently owned by a live
+// in-process worker. startedAt/createdAt are written once — long enrichment
+// runs and sync imports routinely exceed the 5-minute threshold, so an
+// age-only periodic sweep would falsely fail genuine in-flight jobs. Owned
+// ids are excluded; truly orphaned rows (worker died, registry empty) still
+// match.
+export interface OrphanSweepExclusions {
+  enrichmentJobIds?: number[];
+  syncQueueIds?: number[];
+}
+
+export async function sweepOrphanedJobs(
+  thresholdMs = ORPHAN_THRESHOLD_MS,
+  exclude: OrphanSweepExclusions = {},
+): Promise<OrphanSweepResult> {
   const cutoff = new Date(Date.now() - thresholdMs);
+  const liveEnrichmentIds = exclude.enrichmentJobIds ?? [];
+  const liveSyncIds = exclude.syncQueueIds ?? [];
+
+  const eConditions = [
+    inArray(enrichmentJobs.status, ['pending', 'processing']),
+    or(
+      and(isNull(enrichmentJobs.startedAt), lt(enrichmentJobs.createdAt, cutoff)),
+      lt(enrichmentJobs.startedAt, cutoff),
+    ),
+  ];
+  if (liveEnrichmentIds.length > 0) {
+    eConditions.push(notInArray(enrichmentJobs.id, liveEnrichmentIds));
+  }
 
   const eResult = await db
     .update(enrichmentJobs)
@@ -20,21 +47,21 @@ export async function sweepOrphanedJobs(thresholdMs = ORPHAN_THRESHOLD_MS): Prom
       errorMessage: 'Orphaned by server restart',
       completedAt: new Date(),
     })
-    .where(
-      and(
-        inArray(enrichmentJobs.status, ['pending', 'processing']),
-        or(
-          and(isNull(enrichmentJobs.startedAt), lt(enrichmentJobs.createdAt, cutoff)),
-          lt(enrichmentJobs.startedAt, cutoff),
-        ),
-      ),
-    )
+    .where(and(...eConditions))
     .returning({ id: enrichmentJobs.id });
 
   // Queue rows: only flip 'processing' rows whose start predates the cutoff —
   // those are the genuine orphans whose worker died. 'pending' rows are a
   // legitimate backlog and must NOT be failed just because no worker has
   // picked them up yet (architect review: avoid failing untouched backlog by age).
+  const gConditions = [
+    inArray(githubSyncQueue.status, ['processing']),
+    lt(githubSyncQueue.createdAt, cutoff),
+  ];
+  if (liveSyncIds.length > 0) {
+    gConditions.push(notInArray(githubSyncQueue.id, liveSyncIds));
+  }
+
   const gResult = await db
     .update(githubSyncQueue)
     .set({
@@ -42,12 +69,7 @@ export async function sweepOrphanedJobs(thresholdMs = ORPHAN_THRESHOLD_MS): Prom
       errorMessage: 'Orphaned by server restart',
       processedAt: new Date(),
     })
-    .where(
-      and(
-        inArray(githubSyncQueue.status, ['processing']),
-        lt(githubSyncQueue.createdAt, cutoff),
-      ),
-    )
+    .where(and(...gConditions))
     .returning({ id: githubSyncQueue.id });
 
   return {
@@ -70,4 +92,43 @@ export async function runOrphanWatchdogStartup(): Promise<void> {
   } catch (err: any) {
     console.error('❌ Orphan watchdog failed (non-fatal):', err?.message || err);
   }
+}
+
+// Run15 BUG-011: the startup sweep only catches jobs orphaned BEFORE the
+// current boot. A worker that dies mid-run while the server stays up (e.g.
+// unhandled rejection inside the GitHub sync loop) left rows in 'processing'
+// forever, so the admin GitHub tab showed perpetual in-progress jobs. Sweep
+// periodically too — same 5-minute orphan threshold, checked every 5 minutes.
+// The periodic sweep excludes ids owned by live in-process workers (architect
+// review: a genuine enrichment run regularly exceeds 5 minutes and startedAt
+// is never refreshed — without the exclusion every real run would be flipped
+// to failed mid-flight). The startup sweep needs no exclusion: at boot no
+// worker has started yet, so nothing is legitimately owned.
+const PERIODIC_SWEEP_INTERVAL_MS = 5 * 60 * 1000;
+let periodicTimer: NodeJS.Timeout | null = null;
+
+export function startOrphanWatchdogPeriodic(): void {
+  if (periodicTimer) return; // idempotent — never double-schedule
+  periodicTimer = setInterval(async () => {
+    try {
+      // Dynamic imports keep the watchdog free of load-order coupling.
+      const [{ enrichmentService }, { syncService }] = await Promise.all([
+        import('../ai/enrichmentService'),
+        import('../github/syncService'),
+      ]);
+      const r = await sweepOrphanedJobs(undefined, {
+        enrichmentJobIds: enrichmentService.getActiveJobIds(),
+        syncQueueIds: syncService.getActiveQueueIds(),
+      });
+      if (r.enrichmentJobsFailed > 0 || r.githubSyncQueueFailed > 0) {
+        console.log(
+          `🧹 Orphan watchdog (periodic): flipped ${r.enrichmentJobsFailed} enrichment_jobs + ${r.githubSyncQueueFailed} github_sync_queue rows to failed`,
+        );
+      }
+    } catch (err: any) {
+      console.error('❌ Orphan watchdog periodic sweep failed (non-fatal):', err?.message || err);
+    }
+  }, PERIODIC_SWEEP_INTERVAL_MS);
+  // Never keep the process alive just for the watchdog.
+  periodicTimer.unref?.();
 }

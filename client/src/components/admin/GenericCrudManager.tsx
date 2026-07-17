@@ -16,6 +16,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Pencil, Trash2, Save, X, LucideIcon, Upload, FileIcon, XCircle, Bold, Italic, Underline, Strikethrough, Link, Heading, List, ListOrdered, Quote, Code, Check, ChevronsUpDown, Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Download, Square, CheckSquare, Minus, Undo, Redo, History, Clock } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { humanizeApiError } from "@/lib/apiError";
+import { formatAdminDateTime } from "@/lib/utils";
 
 /**
  * Base entity interface that all managed entities must extend.
@@ -1731,9 +1733,10 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       setValidationErrors({});
     },
     onError: (error: any) => {
+      // Run15 BUG-015: surface a human sentence, not a raw "400: {json}" blob.
       toast({
         title: "Error",
-        description: error.message || `Failed to create ${entityName.toLowerCase()}`,
+        description: humanizeApiError(error, `Failed to create ${entityName.toLowerCase()}`),
         variant: "destructive"
       });
     }
@@ -1788,9 +1791,10 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       setValidationErrors({});
     },
     onError: (error: any) => {
+      // Run15 BUG-015: surface a human sentence, not a raw "400: {json}" blob.
       toast({
         title: "Error",
-        description: error.message || `Failed to update ${entityName.toLowerCase()}`,
+        description: humanizeApiError(error, `Failed to update ${entityName.toLowerCase()}`),
         variant: "destructive"
       });
     }
@@ -1828,9 +1832,10 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       setSelectedItem(null);
     },
     onError: (error: any) => {
+      // Run15 BUG-015: surface a human sentence, not a raw "400: {json}" blob.
       toast({
         title: "Error",
-        description: error.message || `Failed to delete ${entityName.toLowerCase()}`,
+        description: humanizeApiError(error, `Failed to delete ${entityName.toLowerCase()}`),
         variant: "destructive"
       });
       setDeleteDialogOpen(false);
@@ -1871,9 +1876,10 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       clearSelection();
     },
     onError: (error: any) => {
+      // Run15 BUG-015: surface a human sentence, not a raw "400: {json}" blob.
       toast({
         title: "Error",
-        description: error.message || `Failed to delete ${entityNamePlural.toLowerCase()}`,
+        description: humanizeApiError(error, `Failed to delete ${entityNamePlural.toLowerCase()}`),
         variant: "destructive"
       });
       setBulkDeleteDialogOpen(false);
@@ -3355,7 +3361,7 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                       </div>
                       <div className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
                         <Clock className="h-3 w-3" />
-                        {new Date(entry.timestamp).toLocaleString()}
+                        {formatAdminDateTime(entry.timestamp)}
                       </div>
                     </div>
                   </div>

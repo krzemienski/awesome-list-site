@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,18 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import {
   User,
   Heart,
@@ -23,6 +35,7 @@ import {
   Star,
   FileText,
   Edit,
+  Pencil,
   BookOpen,
   CheckCircle,
   XCircle,
@@ -35,7 +48,7 @@ import RecommendationCard from "@/components/ai/RecommendationCard";
 import ChangePasswordForm from "@/components/profile/ChangePasswordForm";
 import { useAuth } from "@/hooks/useAuth";
 import { formatDistanceToNow } from "date-fns";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import SEOHead from "@/components/layout/SEOHead";
 
 interface ProfileProps {
@@ -133,6 +146,44 @@ export default function Profile({ user }: ProfileProps) {
   const [activeTab, setActiveTab] = useState("overview");
   const { logout } = useAuth();
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
+
+  // Run15 BUG-049: self-service display-name edit.
+  const [nameDialogOpen, setNameDialogOpen] = useState(false);
+  const [editFirstName, setEditFirstName] = useState("");
+  const [editLastName, setEditLastName] = useState("");
+
+  const openNameDialog = () => {
+    // Best-effort prefill from the combined display name.
+    const parts = (user?.name || "").trim().split(/\s+/);
+    setEditFirstName(parts[0] === user?.email?.split("@")[0] ? "" : parts[0] || "");
+    setEditLastName(parts.slice(1).join(" "));
+    setNameDialogOpen(true);
+  };
+
+  const updateNameMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest("/api/user/profile", {
+        method: "PATCH",
+        body: JSON.stringify({
+          firstName: editFirstName.trim(),
+          lastName: editLastName.trim(),
+        }),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      setNameDialogOpen(false);
+      toast({ title: "Name updated", description: "Your display name has been saved." });
+    },
+    onError: (err: any) => {
+      toast({
+        title: "Couldn't update name",
+        description: err?.message?.replace(/^\d+:\s*/, "") || "Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
 
   // Fetch favorites
   const { data: favorites, isLoading: favoritesLoading } = useQuery<Favorite[]>({
@@ -203,10 +254,13 @@ export default function Profile({ user }: ProfileProps) {
       hint: "Consecutive days signed in",
     },
     {
-      label: "Resources Viewed",
+      // Run15 BUG-017: the server counts completed learning journeys here,
+      // not viewed resources — label it honestly.
+      label: "Journeys Completed",
       value: progress?.completedResources || 0,
       icon: Target,
-      color: "text-green-500"
+      color: "text-green-500",
+      hint: "Learning journeys finished",
     }
   ];
 
@@ -247,8 +301,18 @@ export default function Profile({ user }: ProfileProps) {
 
         <div className="flex-1 text-center sm:text-left">
           <div className="eyebrow mb-2" aria-hidden>// Profile</div>
-          <h1 className="font-display text-3xl sm:text-4xl font-medium tracking-tight mb-2">
+          <h1 className="font-display text-3xl sm:text-4xl font-medium tracking-tight mb-2 flex items-center gap-2 justify-center sm:justify-start">
             {user.name || "User"}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 shrink-0"
+              aria-label="Edit display name"
+              data-testid="button-edit-name"
+              onClick={openNameDialog}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
           </h1>
           <div className="flex flex-wrap items-center gap-4 text-sm justify-center sm:justify-start" style={{ color: 'var(--text-2)' }}>
             {user.email && (
@@ -272,7 +336,14 @@ export default function Profile({ user }: ProfileProps) {
         </div>
         
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">
+          {/* Run15 BUG-005: Settings was a dead button — route it to the
+              theme/appearance settings page. */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setLocation("/settings/theme")}
+            data-testid="button-profile-settings"
+          >
             <Settings className="h-4 w-4 mr-2" />
             Settings
           </Button>
@@ -338,12 +409,15 @@ export default function Profile({ user }: ProfileProps) {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {/* Progress Bar */}
+                  {/* Progress Bar — Run15 BUG-017: the server metric counts
+                      completed learning journeys, and "0 / 1822 resources"
+                      read as broken. Compare journeys completed vs journeys
+                      started instead. */}
                   <div>
                     <div className="flex justify-between text-sm mb-2">
-                      <span>Resources Completed</span>
-                      <span className="font-medium">
-                        {progress?.completedResources || 0} / {progress?.totalResources || 0}
+                      <span>Journeys Completed</span>
+                      <span className="font-medium" data-testid="text-journeys-progress">
+                        {progress?.completedResources || 0} / {userJourneys?.length || 0} started
                       </span>
                     </div>
                     <div
@@ -353,7 +427,7 @@ export default function Profile({ user }: ProfileProps) {
                       <div
                         className="h-full transition-[width] duration-[var(--motion-base)] ease-[var(--motion-ease)]"
                         style={{
-                          width: `${((progress?.completedResources || 0) / (progress?.totalResources || 1)) * 100}%`,
+                          width: `${((progress?.completedResources || 0) / (userJourneys?.length || 1)) * 100}%`,
                           background: 'var(--accent)',
                         }}
                       />
@@ -530,7 +604,16 @@ export default function Profile({ user }: ProfileProps) {
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1 min-w-0">
-                            <h4 className="font-medium truncate">{favorite.title}</h4>
+                            {/* Run15 BUG-006: title links to the in-app resource page. */}
+                            <h4 className="font-medium truncate">
+                              <Link
+                                href={`/resource/${favorite.id}`}
+                                className="hover:underline"
+                                data-testid={`link-favorite-${favorite.id}`}
+                              >
+                                {favorite.title}
+                              </Link>
+                            </h4>
                             <div className="flex items-center gap-2 mt-1">
                               <Badge variant="secondary" className="text-xs">
                                 {favorite.category}
@@ -602,7 +685,16 @@ export default function Profile({ user }: ProfileProps) {
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1 min-w-0">
-                            <h4 className="font-medium truncate">{bookmark.title}</h4>
+                            {/* Run15 BUG-006: title links to the in-app resource page. */}
+                            <h4 className="font-medium truncate">
+                              <Link
+                                href={`/resource/${bookmark.id}`}
+                                className="hover:underline"
+                                data-testid={`link-bookmark-${bookmark.id}`}
+                              >
+                                {bookmark.title}
+                              </Link>
+                            </h4>
                             {bookmark.notes && (
                               <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
                                 {bookmark.notes}
@@ -842,6 +934,57 @@ export default function Profile({ user }: ProfileProps) {
           <ChangePasswordForm />
         </TabsContent>
       </Tabs>
+
+      {/* Run15 BUG-049: display-name edit dialog */}
+      <Dialog open={nameDialogOpen} onOpenChange={setNameDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit display name</DialogTitle>
+            <DialogDescription>
+              This is the name shown on your profile. Leave both fields empty to
+              fall back to your email username.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-first-name">First name</Label>
+              <Input
+                id="edit-first-name"
+                value={editFirstName}
+                maxLength={60}
+                onChange={(e) => setEditFirstName(e.target.value)}
+                data-testid="input-first-name"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-last-name">Last name</Label>
+              <Input
+                id="edit-last-name"
+                value={editLastName}
+                maxLength={60}
+                onChange={(e) => setEditLastName(e.target.value)}
+                data-testid="input-last-name"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setNameDialogOpen(false)}
+              disabled={updateNameMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => updateNameMutation.mutate()}
+              disabled={updateNameMutation.isPending}
+              data-testid="button-save-name"
+            >
+              {updateNameMutation.isPending ? "Saving..." : "Save"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

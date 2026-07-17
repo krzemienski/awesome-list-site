@@ -11,6 +11,9 @@ import { GitBranch, Download, Upload, RefreshCw, CheckCircle2, XCircle, Clock, E
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+// Run15 BUG-030: one explicit date format for the whole admin surface —
+// shared formatter keeps every admin table's timestamps identical.
+import { formatAdminDateTime as formatSyncDate } from "@/lib/utils";
 
 interface SyncHistory {
   id: number;
@@ -239,7 +242,7 @@ export default function GitHubSyncPanel() {
                     </span>
                     <Badge variant="outline">
                       <Clock className="h-3 w-3 mr-1" />
-                      {new Date(lastSync.createdAt).toLocaleString()}
+                      {formatSyncDate(lastSync.createdAt)}
                     </Badge>
                   </div>
                   
@@ -347,7 +350,7 @@ export default function GitHubSyncPanel() {
                         <span className="font-semibold capitalize">{sync.direction}</span>
                       </div>
                       <span className="text-xs text-muted-foreground">
-                        {new Date(sync.createdAt).toLocaleString()}
+                        {formatSyncDate(sync.createdAt)}
                       </span>
                     </div>
                     

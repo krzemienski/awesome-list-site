@@ -387,6 +387,7 @@ export default function ResourceDetail() {
             disabled={favoriteMutation.isPending}
             data-testid="button-favorite"
             className="min-h-[44px] px-4"
+            aria-pressed={isFavorite}
             aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
           >
             <Heart className={`h-4 w-4 mr-2 ${isFavorite ? 'fill-current' : ''}`} />
@@ -399,6 +400,7 @@ export default function ResourceDetail() {
             disabled={bookmarkMutation.isPending}
             data-testid="button-bookmark"
             className="min-h-[44px] px-4"
+            aria-pressed={isBookmarked}
             aria-label={isBookmarked ? "Remove bookmark" : "Add bookmark"}
           >
             <Bookmark className={`h-4 w-4 mr-2 ${isBookmarked ? 'fill-current' : ''}`} />

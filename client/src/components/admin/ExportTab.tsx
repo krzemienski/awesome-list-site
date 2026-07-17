@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { formatAdminDateTime } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import type { ValidationStatus } from "@/components/admin/types/validation";
 
@@ -208,7 +209,7 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
           {validationStatus?.lastUpdated && (
             <div className="flex items-center gap-2 text-sm text-[var(--text-2)]">
               <Clock className="h-4 w-4" />
-              Last validated: {new Date(validationStatus.lastUpdated).toLocaleString()}
+              Last validated: {formatAdminDateTime(validationStatus.lastUpdated)}
             </div>
           )}
         </CardContent>

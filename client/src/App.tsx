@@ -137,12 +137,14 @@ function Router() {
     );
   }
 
-  // R3-29: unknown URL → standalone lean 404 (no sidebar/header chrome).
+  // Run15 BUG-033 (supersedes R3-29's lean standalone 404): unknown URLs keep
+  // the full sidebar/header chrome so lost visitors can navigate away instead
+  // of hitting a dead end.
   if (!isKnownRoute) {
     return (
-      <div className="min-h-screen bg-background px-4">
+      <MainLayout awesomeList={awesomeList} isLoading={isLoading} user={user ?? undefined} onLogout={logout}>
         <NotFound />
-      </div>
+      </MainLayout>
     );
   }
 

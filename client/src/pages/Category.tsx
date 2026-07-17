@@ -119,6 +119,8 @@ export default function Category() {
   });
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [resourceToEdit, setResourceToEdit] = useState<DbResource | null>(null);
+  // Run15 BUG-022: which cards have their full tag row revealed ("+N more").
+  const [expandedTagCards, setExpandedTagCards] = useState<Set<string>>(new Set());
   
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     if (typeof window !== 'undefined') {
@@ -774,7 +776,7 @@ export default function Category() {
                     {/* BUG-018 (run14): tag pills are real filter controls —
                         clicking one applies that tag instead of falling through
                         to the card's stretched title link. */}
-                    {resource.tags && resource.tags.slice(0, 3).map((tag, tagIndex) => (
+                    {resource.tags && (expandedTagCards.has(resourceId) ? resource.tags : resource.tags.slice(0, 3)).map((tag, tagIndex) => (
                       <button
                         key={tagIndex}
                         type="button"
@@ -794,10 +796,33 @@ export default function Category() {
                         </Badge>
                       </button>
                     ))}
+                    {/* Run15 BUG-022: "+N" is a real control — it reveals the
+                        hidden tags (and collapses them again). */}
                     {resource.tags && resource.tags.length > 3 && (
-                      <Badge variant="secondary" className="text-xs">
-                        +{resource.tags.length - 3}
-                      </Badge>
+                      <button
+                        type="button"
+                        className="relative z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setExpandedTagCards((prev) => {
+                            const next = new Set(prev);
+                            if (next.has(resourceId)) next.delete(resourceId);
+                            else next.add(resourceId);
+                            return next;
+                          });
+                        }}
+                        aria-expanded={expandedTagCards.has(resourceId)}
+                        aria-label={
+                          expandedTagCards.has(resourceId)
+                            ? "Show fewer tags"
+                            : `Show ${resource.tags.length - 3} more tags`
+                        }
+                        data-testid={`button-more-tags-${resourceId}`}
+                      >
+                        <Badge variant="secondary" className="text-xs cursor-pointer hover:bg-[color-mix(in_srgb,var(--accent)_20%,transparent)]">
+                          {expandedTagCards.has(resourceId) ? "Show fewer" : `+${resource.tags.length - 3} more`}
+                        </Badge>
+                      </button>
                     )}
                   </div>
                 </CardContent>

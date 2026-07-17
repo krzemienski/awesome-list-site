@@ -248,11 +248,13 @@ export default function CommunityMetrics({ resources, categories, className }: C
                   <CardContent className="p-4">
                     <div className="flex items-center gap-2">
                       <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm text-muted-foreground">Growth Rate</span>
+                      {/* Run15 BUG-012: weeklyGrowth is a raw new-resource
+                          count, not a percentage — label it honestly. */}
+                      <span className="text-sm text-muted-foreground">New This Week</span>
                     </div>
-                    <p className="text-2xl font-bold mt-1">+{metrics.weeklyGrowth}%</p>
+                    <p className="text-2xl font-bold mt-1">+{metrics.weeklyGrowth}</p>
                     <p className="text-xs text-green-600 mt-1">
-                      Weekly average
+                      resources added
                     </p>
                   </CardContent>
                 </Card>
@@ -308,8 +310,10 @@ export default function CommunityMetrics({ resources, categories, className }: C
                           </div>
                         </div>
                         <div className="text-right">
+                          {/* Run15 BUG-039: show a real 0% instead of a
+                              dangling dash when there's no engagement yet. */}
                           <div className="text-sm font-medium">
-                            {resource.score > 0 ? `${resource.score}%` : "—"}
+                            {resource.score}%
                           </div>
                           <div className="text-xs text-muted-foreground">
                             engagement

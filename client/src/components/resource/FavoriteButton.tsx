@@ -126,6 +126,7 @@ function FavoriteButton({
       onClick={handleClick}
       disabled={favoriteMutation.isPending}
       aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
+      aria-pressed={isFavorited}
       data-testid="button-favorite"
     >
       <div className="flex items-center gap-1.5">

@@ -149,6 +149,13 @@ export class EnrichmentService {
     return EnrichmentService.instance;
   }
 
+  // Run15 BUG-011 (architect review): the periodic orphan sweep must never
+  // flip jobs that a live in-process worker still owns — startedAt is written
+  // once and long enrichment runs routinely exceed the 5-minute threshold.
+  public getActiveJobIds(): number[] {
+    return Array.from(this.processingJobs);
+  }
+
   async queueBatchEnrichment(options: QueueBatchEnrichmentOptions): Promise<number> {
     const {
       filter = 'unenriched',

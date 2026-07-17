@@ -190,6 +190,10 @@ export class GitHubSyncService {
   private resourceRepo: ResourceRepository;
   private auditRepo: AuditRepository;
   private syncRepo: GithubSyncRepository;
+  // Run15 BUG-011 (architect review): queue rows currently owned by a live
+  // in-process worker. The periodic orphan sweep excludes these ids so a
+  // long-running import/export is never falsely flipped to failed mid-flight.
+  private activeQueueIds: Set<number> = new Set();
 
   constructor(githubToken?: string) {
     this.client = new GitHubClient(githubToken);
@@ -931,6 +935,7 @@ export class GitHubSyncService {
     console.log(`Found ${queueItems.length} pending items in queue`);
 
     for (const item of queueItems) {
+      this.activeQueueIds.add(item.id);
       try {
         // Update status to processing
         await this.syncRepo.updateGithubSyncStatus(item.id, 'processing');
@@ -986,10 +991,18 @@ export class GitHubSyncService {
           'failed',
           error.message
         );
+      } finally {
+        this.activeQueueIds.delete(item.id);
       }
     }
 
     console.log('Queue processing completed');
+  }
+
+  // Run15 BUG-011 (architect review): expose live-owned queue row ids for the
+  // periodic orphan sweep's exclusion list.
+  getActiveQueueIds(): number[] {
+    return Array.from(this.activeQueueIds);
   }
 
   /**

@@ -165,6 +165,7 @@ function BookmarkButton({
         onClick={handleClick}
         disabled={bookmarkMutation.isPending}
         aria-label={isBookmarked ? "Remove bookmark" : "Add bookmark"}
+        aria-pressed={isBookmarked}
         data-testid="button-bookmark"
       >
         <div className="flex items-center gap-1.5">

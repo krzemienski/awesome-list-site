@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -88,7 +88,7 @@ const RESOURCE_TYPES = [
 ];
 
 export default function AIRecommendationsPanel({ resources }: AIRecommendationsPanelProps) {
-  const { userProfile } = useUserProfile();
+  const { userProfile, updateProfile, isLoaded } = useUserProfile();
   const {
     generateRecommendations,
     recommendations,
@@ -115,7 +115,33 @@ export default function AIRecommendationsPanel({ resources }: AIRecommendationsP
     },
   });
 
+  // Run15 BUG-018: the saved profile loads from localStorage asynchronously
+  // (after mount), but useForm captured its defaults on first render — so a
+  // reload always showed factory defaults even though the profile was saved.
+  // Rehydrate the form ONCE when the stored profile arrives.
+  const rehydratedRef = useRef(false);
+  useEffect(() => {
+    if (!isLoaded || rehydratedRef.current) return;
+    rehydratedRef.current = true;
+    form.reset({
+      skillLevel: userProfile.skillLevel || 'beginner',
+      preferredCategories: userProfile.preferredCategories || [],
+      learningGoals: userProfile.learningGoals || [],
+      preferredResourceTypes: userProfile.preferredResourceTypes || [],
+      timeCommitment: userProfile.timeCommitment || 'flexible',
+    });
+  }, [isLoaded, userProfile, form]);
+
   const onSubmit = (values: FormValues) => {
+    // Run15 BUG-018: persist the chosen preferences so they survive reloads.
+    updateProfile({
+      skillLevel: values.skillLevel,
+      preferredCategories: values.preferredCategories,
+      learningGoals: values.learningGoals,
+      preferredResourceTypes: values.preferredResourceTypes,
+      timeCommitment: values.timeCommitment,
+    });
+
     const payload = {
       userId: userProfile.userId,
       preferredCategories: values.preferredCategories,
@@ -199,9 +225,11 @@ export default function AIRecommendationsPanel({ resources }: AIRecommendationsP
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Skill Level</FormLabel>
+                    {/* Run15 BUG-018: controlled `value` (not defaultValue) so
+                        the rehydrating form.reset updates the visible trigger. */}
                     <Select 
                       onValueChange={field.onChange} 
-                      defaultValue={field.value}
+                      value={field.value}
                       data-testid="select-skill-level"
                     >
                       <FormControl>
@@ -368,9 +396,10 @@ export default function AIRecommendationsPanel({ resources }: AIRecommendationsP
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Time Commitment</FormLabel>
+                    {/* Run15 BUG-018: controlled `value` — see skillLevel above. */}
                     <Select 
                       onValueChange={field.onChange} 
-                      defaultValue={field.value}
+                      value={field.value}
                       data-testid="select-time-commitment"
                     >
                       <FormControl>

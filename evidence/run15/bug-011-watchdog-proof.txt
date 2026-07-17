@@ -1,0 +1,5 @@
+== BUG-011 evidence: orphan watchdog transitions stuck sync jobs to terminal state ==
+Row 39 (created by QA export test 2026-07-17 03:35, server restarted mid-run):
+id=39 status=failed error='Orphaned by server restart' processed_at=2026-07-17 03:46:14
+Periodic sweep registered at boot: startOrphanWatchdogPeriodic() — server/routes.ts (~line 4999), sweeps every 5 min.
+Row deleted post-verification as QA residue.

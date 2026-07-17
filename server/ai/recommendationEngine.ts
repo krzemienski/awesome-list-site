@@ -317,13 +317,24 @@ export class RecommendationEngine {
       if (isColdStart) {
         console.log('[COLD-START] Generating popular resources for new user:', enrichedProfile.userId);
         const popularResources = await this.getPopularResources(eligibleResources, limit);
-        recommendations = popularResources.map(resource => ({
-          resource,
-          confidence: 75, // Medium-high confidence for popular items
-          reason: 'Popular among users',
-          type: 'rule_based' as const,
-          score: 0.75
-        }));
+        // Run15 BUG-013: identical "75% — Popular among users" on every card
+        // read as filler. Confidence now decays with popularity rank (the list
+        // IS rank-ordered), and the reason names the resource's category so
+        // each card explains itself.
+        recommendations = popularResources.map((resource, index) => {
+          const confidence = Math.max(60, 85 - index * 3);
+          const where = resource.category ? `in ${resource.category}` : 'across the catalog';
+          const reason = index === 0
+            ? `Top pick ${where} for getting started`
+            : `Popular ${where}`;
+          return {
+            resource,
+            confidence,
+            reason,
+            type: 'rule_based' as const,
+            score: confidence / 100
+          };
+        });
 
         // Cache and return early for cold-start users
         this.recommendationCache.set(cacheKey, {
