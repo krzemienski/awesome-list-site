@@ -3,6 +3,12 @@ import { enrichmentJobs, githubSyncQueue } from "@shared/schema";
 import { sql, and, inArray, notInArray, lt, or, isNull } from "drizzle-orm";
 
 const ORPHAN_THRESHOLD_MS = 5 * 60 * 1000;
+// Run15 BUG-011 prod follow-up: 'pending' queue rows are legitimate short-term
+// backlog (never age-swept at 5 min), but rows pending for over a week were
+// abandoned by a dead worker or a long-gone admin session and would otherwise
+// sit "in progress" in the admin GitHub tab forever. 7 days is far beyond any
+// real processing delay (the queue is drained on demand within minutes).
+const STALE_PENDING_THRESHOLD_MS = 7 * 24 * 60 * 60 * 1000;
 
 export interface OrphanSweepResult {
   enrichmentJobsFailed: number;
@@ -54,9 +60,19 @@ export async function sweepOrphanedJobs(
   // those are the genuine orphans whose worker died. 'pending' rows are a
   // legitimate backlog and must NOT be failed just because no worker has
   // picked them up yet (architect review: avoid failing untouched backlog by age).
+  const stalePendingCutoff = new Date(Date.now() - STALE_PENDING_THRESHOLD_MS);
   const gConditions = [
-    inArray(githubSyncQueue.status, ['processing']),
-    lt(githubSyncQueue.createdAt, cutoff),
+    or(
+      and(
+        inArray(githubSyncQueue.status, ['processing']),
+        lt(githubSyncQueue.createdAt, cutoff),
+      ),
+      // Abandoned backlog: pending for over a week is never legitimate.
+      and(
+        inArray(githubSyncQueue.status, ['pending']),
+        lt(githubSyncQueue.createdAt, stalePendingCutoff),
+      ),
+    ),
   ];
   if (liveSyncIds.length > 0) {
     gConditions.push(notInArray(githubSyncQueue.id, liveSyncIds));

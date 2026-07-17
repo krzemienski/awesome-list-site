@@ -10,6 +10,10 @@ A production-ready React application for browsing and discovering over 2,600 cur
 
 > **Full history:** see [`CHANGELOG.md`](./CHANGELOG.md) for every dated entry back to December 2025. Older "Recent Changes" entries are moved there periodically.
 
+### Run15 Publish + Prod Data Fixes (July 17, 2026)
+- **Run15 build republished** (verified live via masked CSV export). Prod data fixes applied through the live admin API via new `scripts/run15-data-fixes-prod.ts` (prod DB is not agent-writable): BUG-009 both entity rows decoded; BUG-046 node 3712 → "Podcasts" + resource 185847 repointed. Journal: `evidence/run15/data-fixes-prod.json`.
+- **Watchdog extended**: `github_sync_queue` rows `pending` for >7 days are now swept to failed (boot + periodic) — the 16 prod rows stuck since Nov 2025 clear automatically on the NEXT republish (the 5-min sweep deliberately never touches `pending`, and no admin endpoint can fail queue rows).
+
 ### Black-Box Audit Remediation — Run15 (July 17, 2026)
 - **50-finding MASTER-FIX-PROMPT audit triaged live** (BUG-001..050): 27 fixed + 1 fixed-prior (BUG-025), 13 invalid, 2 data-fix (BUG-009 entity-unescape / BUG-046 duplicate node — journaled, prod rerun pending), 1 platform (BUG-038 edge appends `:443`), 1 user-action (BUG-020 www DNS), 1 by-design (BUG-050 public theme picker), 1 declined (BUG-021). Full table: `evidence/run15/findings-table.md`.
 - **Notable: BUG-011 orphan-job watchdog** — startup sweep + 5-min periodic sweep flips stuck `pending`/`processing` enrichment + GitHub-sync rows to failed. Architect blocker fixed: the periodic sweep now EXCLUDES jobs owned by live in-process workers (`enrichmentService.getActiveJobIds()` + `syncService.getActiveQueueIds()` registries) because `startedAt` is written once and real enrichment runs exceed 5 min — age-only sweeping would falsely fail them. Probe: `evidence/run15/bug-011-watchdog-exclusion-probe.txt` (owned rows survive; unowned stale rows still flip).

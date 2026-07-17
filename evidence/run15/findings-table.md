@@ -64,6 +64,7 @@ Evidence files (this dir): `verify-api-output.txt` (10/10), `verify-desktop-outp
 - PLATFORM: 1 (BUG-038) · USER-ACTION: 1 (BUG-020) · BY-DESIGN: 1 (BUG-050) · DECLINED: 1 (BUG-021)
 
 ## Prod follow-ups after republish
-1. Rerun `scripts/run15-data-fixes.ts` against prod (BUG-009 entity-unescape, BUG-011 stuck-job sweep, BUG-046 duplicate-node rename).
-2. BUG-020 remains a user DNS action (add `www` CNAME in Replit Deployments custom-domain settings).
-3. Case-insensitive email hardening (architect review follow-up to BUG-026): dedupe any prod rows colliding on `lower(email)`, then add a unique functional index `CREATE UNIQUE INDEX ... ON users (lower(email))` so the DB enforces what the app-level lowercase normalization assumes.
+1. ✅ DONE (July 17, 2026) — Run15 build republished (verified live via BUG-042 masked CSV export). Data fixes applied via `scripts/run15-data-fixes-prod.ts` (admin API — prod DB is not directly writable): BUG-009 both entity rows (188392, 188458) decoded; BUG-046 node 3712 renamed → "Podcasts" (slug `podcasts`) + resource 185847 repointed. Journal: `evidence/run15/data-fixes-prod.json`. Live smoke: descriptions render `<Video>` / `<60ms`, node + resource verified via public API.
+2. ⏳ BUG-011 prod data half: the 16 prod `github_sync_queue` rows stuck in `pending` (Nov 2025–Jun 2026) are NOT swept by the shipped watchdog (it deliberately leaves `pending` as legit backlog) and no admin endpoint can fail them. The watchdog now ALSO fails `pending` rows older than 7 days (dev-verified: 30-day row flipped, fresh row survived). This lands on the NEXT republish after this task merges — no manual step needed, boot sweep clears them.
+3. BUG-020 remains a user DNS action (add `www` CNAME in Replit Deployments custom-domain settings).
+4. Case-insensitive email hardening (architect review follow-up to BUG-026): dedupe any prod rows colliding on `lower(email)`, then add a unique functional index `CREATE UNIQUE INDEX ... ON users (lower(email))` so the DB enforces what the app-level lowercase normalization assumes.
