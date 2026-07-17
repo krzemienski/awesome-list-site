@@ -1,0 +1,57 @@
+{
+  "startedAt": "2026-07-17T13:03:53.316Z",
+  "base": "https://awesome.video",
+  "steps": {
+    "BUG-003": [
+      {
+        "id": 188454,
+        "skip": "already gone (404)"
+      }
+    ],
+    "BUG-007": [
+      {
+        "id": 185407,
+        "before": "https://dyte.io/blog/rtmp-webrtc-hls/",
+        "after": "https://web.archive.org/web/20250904075527/https://dyte.io/blog/rtmp-webrtc-hls/",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "BUG-056": [
+      {
+        "id": 185741,
+        "before": "Hybrik Samples — video development resource from github.com.",
+        "after": "Sample job JSON files and API integration scripts for Dolby Hybrik, a cloud-based media transcoding and QC platform. The repo demonstrates transcode presets, analysis/QC jobs, and workflow automation against the Hybrik API.",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "BUG-054": [
+      {
+        "id": 3733,
+        "slug": "ffmpeg-sc2254",
+        "from": "FFMPEG",
+        "to": "FFmpeg",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "id": 3625,
+        "slug": "ffmpeg",
+        "from": "FFMPEG",
+        "to": "FFmpeg",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "id": 3734,
+        "slug": "ffmpeg-sc2247",
+        "from": "FFMPEG",
+        "to": "FFmpeg",
+        "status": 200,
+        "ok": true
+      }
+    ]
+  },
+  "finishedAt": "2026-07-17T13:03:58.125Z"
+}
