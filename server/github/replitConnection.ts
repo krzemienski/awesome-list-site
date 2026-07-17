@@ -1,8 +1,14 @@
 import { Octokit } from '@octokit/rest';
+// Replit GitHub integration (connection:conn_github_01K5WB2HVYFJ5B6FMXSNF7VY4V)
+// Uses @replit/connectors-sdk proxy fetch — the SDK handles identity, token
+// refresh, and auth headers automatically. Do NOT revert to the legacy
+// /api/v2/connection token-fetch endpoint; it no longer serves this connection.
+import { ReplitConnectors } from '@replit/connectors-sdk';
 
 /**
  * Replit GitHub Connection Helper
- * Manages OAuth token retrieval from Replit's connection service
+ * Connector-first via the Replit connectors proxy, with a personal access
+ * token fallback stored in secrets.
  */
 
 // Octokit throttle options type
@@ -14,32 +20,70 @@ interface ThrottleOptions {
   };
 }
 
-// Replit connection settings types
-interface ReplitConnectionSettings {
-  settings: {
-    expires_at?: string;
-    access_token?: string;
-    oauth?: {
-      credentials?: {
-        access_token?: string;
-      };
-    };
-  };
-}
-
-let connectionSettings: ReplitConnectionSettings | undefined;
+const OCTOKIT_BASE_OPTIONS = {
+  userAgent: 'awesome-list-sync v1.0.0',
+  throttle: {
+    onRateLimit: (retryAfter: number, options: ThrottleOptions) => {
+      console.warn(`GitHub rate limit reached for ${options.method} ${options.url}`);
+      if (options.request.retryCount === 0) {
+        console.log(`Retrying after ${retryAfter} seconds`);
+        return true;
+      }
+    },
+    onSecondaryRateLimit: (_retryAfter: number, options: ThrottleOptions) => {
+      console.warn(`GitHub secondary rate limit for ${options.method} ${options.url}`);
+    },
+  },
+};
 
 /**
  * Fallback: personal access token stored as a secret.
- * GITHUB_PUSH_TOKEN is a classic PAT with repo + workflow scopes.
+ * GITHUB_PERSONAL_ACCESS_TOKEN is the current PAT (repo + workflow scopes);
+ * GITHUB_PUSH_TOKEN and GITHUB_TOKEN are older names kept for compatibility.
  */
-function getFallbackToken(): string | undefined {
-  return process.env.GITHUB_PUSH_TOKEN;
+export function getFallbackToken(): string | undefined {
+  return (
+    process.env.GITHUB_PERSONAL_ACCESS_TOKEN ||
+    process.env.GITHUB_PUSH_TOKEN ||
+    process.env.GITHUB_TOKEN
+  );
 }
 
-/** Unified token extraction from connection settings (flat or nested under oauth.credentials). */
-function extractConnectionToken(settings?: ReplitConnectionSettings): string | undefined {
-  return settings?.settings?.access_token || settings?.settings?.oauth?.credentials?.access_token;
+/**
+ * Build an Octokit that routes every request through the Replit connectors
+ * proxy. Never cache the returned client — the SDK mints fresh auth per call.
+ */
+function buildConnectorOctokit(): Octokit {
+  const connectors = new ReplitConnectors();
+  const proxyFetch = connectors.createProxyFetch('github');
+  return new Octokit({
+    ...OCTOKIT_BASE_OPTIONS,
+    request: { fetch: proxyFetch },
+  });
+}
+
+// Cache health verdicts briefly so we don't hit /user on every call.
+const VALIDATION_TTL_MS = 5 * 60 * 1000;
+let connectorVerdict: { ok: boolean; checkedAt: number } | undefined;
+let validatedToken: { token: string; validatedAt: number } | undefined;
+
+/** True when the Replit GitHub connector answers an authenticated request. */
+async function connectorWorks(): Promise<boolean> {
+  if (connectorVerdict && Date.now() - connectorVerdict.checkedAt < VALIDATION_TTL_MS) {
+    return connectorVerdict.ok;
+  }
+  try {
+    const octokit = buildConnectorOctokit();
+    await octokit.rest.users.getAuthenticated();
+    connectorVerdict = { ok: true, checkedAt: Date.now() };
+  } catch (err) {
+    console.warn(
+      'Replit GitHub connector unavailable:',
+      err instanceof Error ? err.message : err
+    );
+    connectorVerdict = { ok: false, checkedAt: Date.now() };
+  }
+  return connectorVerdict.ok;
 }
 
 /**
@@ -47,6 +91,9 @@ function extractConnectionToken(settings?: ReplitConnectionSettings): string | u
  * Returns true when GitHub accepts the token.
  */
 async function isTokenValid(token: string): Promise<boolean> {
+  if (validatedToken?.token === token && Date.now() - validatedToken.validatedAt < VALIDATION_TTL_MS) {
+    return true;
+  }
   try {
     const res = await fetch('https://api.github.com/user', {
       headers: {
@@ -55,127 +102,51 @@ async function isTokenValid(token: string): Promise<boolean> {
         'User-Agent': 'awesome-list-sync v1.0.0'
       }
     });
-    return res.status !== 401 && res.status !== 403;
+    if (res.status !== 401 && res.status !== 403) {
+      validatedToken = { token, validatedAt: Date.now() };
+      return true;
+    }
+    return false;
   } catch {
     // Network error — assume the token itself may still be fine.
     return true;
   }
 }
 
-// Cache validation verdicts briefly so we don't hit /user on every call.
-let validatedToken: { token: string; validatedAt: number } | undefined;
-const VALIDATION_TTL_MS = 5 * 60 * 1000;
-
 /**
- * If the connector token turns out to be bad at runtime, fall back to the PAT
- * (validated) before giving up.
+ * Get a fresh GitHub client. Prefers the Replit GitHub connection; falls back
+ * to the personal access token secret when the connector is unavailable.
+ * WARNING: Never cache this client. Always call this function fresh.
  */
-async function resolveWorkingToken(connectorToken: string | undefined): Promise<string> {
-  const fallback = getFallbackToken();
-
-  if (connectorToken) {
-    if (validatedToken?.token === connectorToken && Date.now() - validatedToken.validatedAt < VALIDATION_TTL_MS) {
-      return connectorToken;
-    }
-    if (await isTokenValid(connectorToken)) {
-      validatedToken = { token: connectorToken, validatedAt: Date.now() };
-      return connectorToken;
-    }
-    console.warn('Replit GitHub connector token was rejected by GitHub (bad credentials).');
-    // Connector token is bad — invalidate the settings cache so the next call refetches.
-    connectionSettings = undefined;
+export async function getGitHubClient(): Promise<Octokit> {
+  if (await connectorWorks()) {
+    return buildConnectorOctokit();
   }
 
+  const fallback = getFallbackToken();
+  if (fallback && await isTokenValid(fallback)) {
+    console.log('GitHub connector unavailable; using personal access token fallback.');
+    return new Octokit({
+      ...OCTOKIT_BASE_OPTIONS,
+      auth: fallback,
+    });
+  }
   if (fallback) {
-    if (validatedToken?.token === fallback && Date.now() - validatedToken.validatedAt < VALIDATION_TTL_MS) {
-      return fallback;
-    }
-    if (await isTokenValid(fallback)) {
-      if (!connectorToken) {
-        console.log('GitHub connector not connected; using GITHUB_PUSH_TOKEN personal access token.');
-      } else {
-        console.log('Falling back to GITHUB_PUSH_TOKEN personal access token.');
-      }
-      validatedToken = { token: fallback, validatedAt: Date.now() };
-      return fallback;
-    }
-    console.warn('GITHUB_PUSH_TOKEN was rejected by GitHub (bad credentials).');
+    console.warn('GitHub personal access token was rejected by GitHub (bad credentials).');
   }
 
   throw new Error(
-    'No working GitHub credentials. Re-authorize the Replit GitHub connection or refresh the GITHUB_PUSH_TOKEN secret.'
+    'No working GitHub credentials. Re-authorize the Replit GitHub connection or refresh the GITHUB_PERSONAL_ACCESS_TOKEN secret.'
   );
 }
 
-async function getAccessToken(): Promise<string> {
-  // Use cached connector settings if still unexpired
-  if (connectionSettings && connectionSettings.settings.expires_at && new Date(connectionSettings.settings.expires_at).getTime() > Date.now()) {
-    return resolveWorkingToken(extractConnectionToken(connectionSettings));
-  }
-
-  const hostname = process.env.REPLIT_CONNECTORS_HOSTNAME;
-  const xReplitToken = process.env.REPL_IDENTITY 
-    ? 'repl ' + process.env.REPL_IDENTITY 
-    : process.env.WEB_REPL_RENEWAL 
-    ? 'depl ' + process.env.WEB_REPL_RENEWAL 
-    : null;
-
-  if (!xReplitToken) {
-    return resolveWorkingToken(undefined);
-  }
-
-  try {
-    // Fetch connection settings from Replit
-    connectionSettings = await fetch(
-      'https://' + hostname + '/api/v2/connection?include_secrets=true&connector_names=github',
-      {
-        headers: {
-          'Accept': 'application/json',
-          'X_REPLIT_TOKEN': xReplitToken
-        }
-      }
-    ).then(res => res.json()).then(data => data.items?.[0]);
-  } catch (err) {
-    connectionSettings = undefined;
-    console.warn('Failed to fetch Replit GitHub connection settings:', err instanceof Error ? err.message : err);
-  }
-
-  return resolveWorkingToken(extractConnectionToken(connectionSettings));
-}
-
 /**
- * Get a fresh GitHub client with current access token
- * WARNING: Never cache this client. Access tokens expire.
- * Always call this function to get a fresh client.
- */
-export async function getGitHubClient(): Promise<Octokit> {
-  const accessToken = await getAccessToken();
-  return new Octokit({ 
-    auth: accessToken,
-    userAgent: 'awesome-list-sync v1.0.0',
-    throttle: {
-      onRateLimit: (retryAfter: number, options: ThrottleOptions) => {
-        console.warn(`GitHub rate limit reached for ${options.method} ${options.url}`);
-        if (options.request.retryCount === 0) {
-          console.log(`Retrying after ${retryAfter} seconds`);
-          return true;
-        }
-      },
-      onSecondaryRateLimit: (retryAfter: number, options: ThrottleOptions) => {
-        console.warn(`GitHub secondary rate limit for ${options.method} ${options.url}`);
-      },
-    },
-  });
-}
-
-/**
- * Check if GitHub connection is available
+ * Check if GitHub connection is available (connector or fallback token).
  */
 export async function isGitHubConnected(): Promise<boolean> {
-  try {
-    await getAccessToken();
+  if (await connectorWorks()) {
     return true;
-  } catch {
-    return false;
   }
+  const fallback = getFallbackToken();
+  return !!fallback && await isTokenValid(fallback);
 }
