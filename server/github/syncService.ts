@@ -770,16 +770,10 @@ export class GitHubSyncService {
 
       console.log(`✓ Committed changes: ${newCommit.sha}`);
 
-      // Update resources as synced
+      // Update resources as synced (single bulk UPDATE — a per-resource
+      // Promise.all here exhausted the pg pool on large exports)
       const resourceIds = currentResources.map(r => r.id);
-      await Promise.all(
-        resourceIds.map(id => 
-          this.resourceRepo.updateResource(id, { 
-            githubSynced: true, 
-            lastSyncedAt: new Date() 
-          } as Partial<InsertResource>)
-        )
-      );
+      await this.resourceRepo.markResourcesSynced(resourceIds);
 
       // Store sync history with snapshot and diff counts
       await this.syncRepo.saveSyncHistory({

@@ -35,7 +35,7 @@ import {
   type InsertResource,
 } from "@shared/schema";
 import { db } from "../db";
-import { eq, and, sql, asc, desc, like, ilike, or } from "drizzle-orm";
+import { eq, and, sql, asc, desc, like, ilike, or, inArray } from "drizzle-orm";
 
 /**
  * Options for listing resources with filtering and pagination
@@ -198,6 +198,26 @@ export class ResourceRepository {
     await this.logResourceAudit(id, 'updated', resource.submittedBy ?? undefined, resource);
 
     return updatedResource;
+  }
+
+  /**
+   * Bulk-mark resources as synced to GitHub in a single UPDATE.
+   * Replaces the previous per-resource Promise.all pattern, which opened
+   * thousands of parallel connections and exhausted the pg pool
+   * ("timeout exceeded when trying to connect") on large exports.
+   * @param ids - Resource IDs to flag as synced
+   * @param syncedAt - Timestamp to record as lastSyncedAt
+   */
+  async markResourcesSynced(ids: number[], syncedAt: Date = new Date()): Promise<void> {
+    if (ids.length === 0) return;
+    const CHUNK = 5000;
+    for (let i = 0; i < ids.length; i += CHUNK) {
+      const chunk = ids.slice(i, i + CHUNK);
+      await db
+        .update(resources)
+        .set({ githubSynced: true, lastSyncedAt: syncedAt, updatedAt: syncedAt })
+        .where(inArray(resources.id, chunk));
+    }
   }
 
   /**
