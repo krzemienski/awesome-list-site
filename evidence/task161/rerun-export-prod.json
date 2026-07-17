@@ -1,0 +1,93 @@
+{
+  "startedAt": "2026-07-17T12:53:44.993Z",
+  "base": "https://awesome.video",
+  "repo": "https://github.com/krzemienski/awesome-video",
+  "steps": [
+    {
+      "step": "pre-queue",
+      "at": "2026-07-17T12:53:46.090Z",
+      "total": 45,
+      "recent": [
+        {
+          "id": 1,
+          "action": "import",
+          "status": "failed",
+          "createdAt": "2025-11-18T23:00:23.647Z"
+        },
+        {
+          "id": 2,
+          "action": "import",
+          "status": "failed",
+          "createdAt": "2025-11-18T23:00:23.782Z"
+        },
+        {
+          "id": 3,
+          "action": "import",
+          "status": "failed",
+          "createdAt": "2025-11-18T23:17:07.404Z"
+        },
+        {
+          "id": 4,
+          "action": "import",
+          "status": "completed",
+          "createdAt": "2025-11-18T23:19:00.087Z"
+        },
+        {
+          "id": 5,
+          "action": "export",
+          "status": "failed",
+          "createdAt": "2025-11-19T00:29:42.834Z"
+        }
+      ]
+    },
+    {
+      "step": "export-start",
+      "at": "2026-07-17T12:53:46.284Z",
+      "queueId": 46,
+      "response": {
+        "message": "Export started",
+        "queueId": 46,
+        "status": "processing"
+      }
+    },
+    {
+      "step": "queue-final",
+      "at": "2026-07-17T12:54:07.753Z",
+      "id": 46,
+      "status": "completed",
+      "metadata": {
+        "exported": 2302,
+        "commitSha": "7505d39b404b04a204afbef3c2507f14107a31e9",
+        "commitUrl": "https://github.com/krzemienski/awesome-video/commit/7505d39b404b04a204afbef3c2507f14107a31e9"
+      }
+    },
+    {
+      "step": "history-latest-export",
+      "at": "2026-07-17T12:54:08.198Z",
+      "id": 1,
+      "repositoryUrl": "https://github.com/krzemienski/awesome-video",
+      "direction": "export",
+      "commitSha": "7505d39b404b04a204afbef3c2507f14107a31e9",
+      "commitMessage": "Initial awesome list export",
+      "commitUrl": "https://github.com/krzemienski/awesome-video/commit/7505d39b404b04a204afbef3c2507f14107a31e9",
+      "resourcesAdded": 2302,
+      "resourcesUpdated": 0,
+      "resourcesRemoved": 0,
+      "totalResources": 2302,
+      "performedBy": null,
+      "snapshot": {
+        "resourceCount": 2302,
+        "note": "full snapshot elided (1.2MB)"
+      },
+      "metadata": {
+        "diff": {
+          "added": 2302,
+          "removed": 0,
+          "updated": 0
+        }
+      },
+      "createdAt": "2026-07-17T12:54:04.952Z"
+    }
+  ],
+  "finishedAt": "2026-07-17T12:54:08.209Z"
+}
