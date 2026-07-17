@@ -1,5 +1,5 @@
 {
-  "startedAt": "2026-07-17T05:36:13.097Z",
+  "startedAt": "2026-07-17T05:48:20.103Z",
   "base": "https://awesome.video",
   "steps": {
     "BUG-009": [
@@ -29,91 +29,10 @@
     "BUG-011": [
       {
         "totalQueueRows": 43,
-        "nonTerminal": [
-          {
-            "id": 1,
-            "status": "pending",
-            "createdAt": "2025-11-18T23:00:23.647Z"
-          },
-          {
-            "id": 3,
-            "status": "pending",
-            "createdAt": "2025-11-18T23:17:07.404Z"
-          },
-          {
-            "id": 12,
-            "status": "pending",
-            "createdAt": "2025-12-01T06:43:33.506Z"
-          },
-          {
-            "id": 19,
-            "status": "pending",
-            "createdAt": "2025-12-03T21:14:37.176Z"
-          },
-          {
-            "id": 21,
-            "status": "pending",
-            "createdAt": "2025-12-03T21:58:21.592Z"
-          },
-          {
-            "id": 23,
-            "status": "pending",
-            "createdAt": "2026-01-28T08:25:03.265Z"
-          },
-          {
-            "id": 25,
-            "status": "pending",
-            "createdAt": "2026-01-28T08:25:24.999Z"
-          },
-          {
-            "id": 27,
-            "status": "pending",
-            "createdAt": "2026-02-11T23:35:38.914Z"
-          },
-          {
-            "id": 29,
-            "status": "pending",
-            "createdAt": "2026-02-12T00:20:19.730Z"
-          },
-          {
-            "id": 31,
-            "status": "pending",
-            "createdAt": "2026-02-12T01:02:04.046Z"
-          },
-          {
-            "id": 33,
-            "status": "pending",
-            "createdAt": "2026-02-12T01:04:38.126Z"
-          },
-          {
-            "id": 35,
-            "status": "pending",
-            "createdAt": "2026-02-12T01:07:57.104Z"
-          },
-          {
-            "id": 37,
-            "status": "pending",
-            "createdAt": "2026-06-03T05:16:42.187Z"
-          },
-          {
-            "id": 39,
-            "status": "pending",
-            "createdAt": "2026-06-25T21:58:38.615Z"
-          },
-          {
-            "id": 40,
-            "status": "pending",
-            "createdAt": "2026-06-25T21:58:44.381Z"
-          },
-          {
-            "id": 41,
-            "status": "pending",
-            "createdAt": "2026-06-25T21:58:48.919Z"
-          }
-        ],
-        "verdict": "FAIL — stuck rows remain"
+        "nonTerminal": [],
+        "verdict": "PASS — watchdog swept all stuck jobs"
       }
     ]
   },
-  "finishedAt": "2026-07-17T05:36:15.987Z"
+  "finishedAt": "2026-07-17T05:48:22.655Z"
 }
