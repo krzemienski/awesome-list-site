@@ -29,12 +29,13 @@ import {
   resourceAuditLog,
   resourceEdits,
   resources,
+  users,
   EDITABLE_RESOURCE_FIELDS,
   type ResourceEdit,
   type InsertResourceEdit,
 } from "@shared/schema";
 import { db } from "../db";
-import { eq, desc, asc, or } from "drizzle-orm";
+import { eq, desc, asc, or, sql } from "drizzle-orm";
 
 /**
  * Repository class for audit log and resource edit operations
@@ -71,32 +72,63 @@ export class AuditRepository {
    * @param limit - Maximum number of entries to return (default: 50)
    * @returns Array of audit log entries, ordered by most recent first
    */
-  async getResourceAuditLog(resourceId: number | null, limit = 50): Promise<any[]> {
-    // If resourceId is null, return all audit logs
-    if (resourceId === null) {
-      return await db
-        .select()
-        .from(resourceAuditLog)
-        .orderBy(desc(resourceAuditLog.createdAt))
-        .limit(limit);
+  // Run16 BUG-041: real offset-based pagination (the endpoint used to ignore
+  // offset entirely and report total = page size). Run16 BUG-084: LEFT JOIN
+  // users so the admin UI can show WHO acted (email) instead of a raw UUID.
+  //
+  // Matching on resourceId uses both originalResourceId and resourceId:
+  // - New logs (have originalResourceId set)
+  // - Old logs from before migration (only have resourceId set)
+  // Note: Logs for deleted resources created before migration are lost (both fields NULL)
+  private auditLogWhere(resourceId: number | null) {
+    if (resourceId === null) return undefined;
+    return or(
+      eq(resourceAuditLog.originalResourceId, resourceId),
+      eq(resourceAuditLog.resourceId, resourceId)
+    );
+  }
+
+  async getResourceAuditLog(resourceId: number | null, limit = 50, offset = 0): Promise<any[]> {
+    const whereClause = this.auditLogWhere(resourceId);
+    let query = db
+      .select({
+        id: resourceAuditLog.id,
+        resourceId: resourceAuditLog.resourceId,
+        originalResourceId: resourceAuditLog.originalResourceId,
+        action: resourceAuditLog.action,
+        performedBy: resourceAuditLog.performedBy,
+        performedByEmail: users.email,
+        changes: resourceAuditLog.changes,
+        notes: resourceAuditLog.notes,
+        createdAt: resourceAuditLog.createdAt,
+      })
+      .from(resourceAuditLog)
+      .leftJoin(users, eq(resourceAuditLog.performedBy, users.id));
+
+    if (whereClause) {
+      query = query.where(whereClause) as any;
     }
 
-    // Return logs for this resource using both originalResourceId and resourceId
-    // This handles both:
-    // - New logs (have originalResourceId set)
-    // - Old logs from before migration (only have resourceId set)
-    // Note: Logs for deleted resources created before migration are lost (both fields NULL)
-    return await db
-      .select()
-      .from(resourceAuditLog)
-      .where(
-        or(
-          eq(resourceAuditLog.originalResourceId, resourceId),
-          eq(resourceAuditLog.resourceId, resourceId)
-        )
-      )
+    return await query
       .orderBy(desc(resourceAuditLog.createdAt))
-      .limit(limit);
+      .limit(limit)
+      .offset(offset);
+  }
+
+  /**
+   * Count audit log entries (same matching semantics as getResourceAuditLog)
+   * so the admin UI can paginate against the REAL total, not the page size.
+   */
+  async countAuditLogs(resourceId: number | null): Promise<number> {
+    const whereClause = this.auditLogWhere(resourceId);
+    let query = db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(resourceAuditLog);
+    if (whereClause) {
+      query = query.where(whereClause) as any;
+    }
+    const [row] = await query;
+    return row?.count ?? 0;
   }
 
   /**

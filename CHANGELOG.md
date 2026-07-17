@@ -4,6 +4,18 @@ All notable changes to the Awesome Video Resource Viewer project. Newest entries
 
 ---
 
+## July 17, 2026
+
+### Run15 Publish + Prod Data Fixes
+- **Run15 build republished** (verified live via masked CSV export). Prod data fixes applied through the live admin API via new `scripts/run15-data-fixes-prod.ts` (prod DB is not agent-writable): BUG-009 both entity rows decoded; BUG-046 node 3712 → "Podcasts" + resource 185847 repointed. Journal: `evidence/run15/data-fixes-prod.json`.
+- **Watchdog extended**: `github_sync_queue` rows `pending` for >7 days are now swept to failed (boot + periodic) — the 16 prod rows stuck since Nov 2025 clear automatically on the NEXT republish (the 5-min sweep deliberately never touches `pending`, and no admin endpoint can fail queue rows).
+
+### Black-Box Audit Remediation — Run15
+- **50-finding MASTER-FIX-PROMPT audit triaged live** (BUG-001..050): 27 fixed + 1 fixed-prior (BUG-025), 13 invalid, 2 data-fix (BUG-009 entity-unescape / BUG-046 duplicate node — journaled, prod rerun pending), 1 platform (BUG-038 edge appends `:443`), 1 user-action (BUG-020 www DNS), 1 by-design (BUG-050 public theme picker), 1 declined (BUG-021). Full table: `evidence/run15/findings-table.md`.
+- **Notable: BUG-011 orphan-job watchdog** — startup sweep + 5-min periodic sweep flips stuck `pending`/`processing` enrichment + GitHub-sync rows to failed. Architect blocker fixed: the periodic sweep now EXCLUDES jobs owned by live in-process workers (`enrichmentService.getActiveJobIds()` + `syncService.getActiveQueueIds()` registries) because `startedAt` is written once and real enrichment runs exceed 5 min — age-only sweeping would falsely fail them. Probe: `evidence/run15/bug-011-watchdog-exclusion-probe.txt` (owned rows survive; unowned stale rows still flip).
+- **Verified** (Iron Rule): tsc clean; suites green — API 10/10, desktop 11/11 + 9/9, auth 5/5 + 7/7, mobile@375 4/4, BUG-045 tablet@768 probe; P0 smoke 12/12; migration-drift clean; QA teardown residue 0 (probe rows + 5 `__qa_test` users removed).
+- **Prod follow-ups after republish**: rerun `scripts/run15-data-fixes.ts` (BUG-009/011/046); user adds `www` CNAME (BUG-020); dedupe `lower(email)` collisions + add unique functional index on `users(lower(email))`.
+
 ## July 16, 2026
 
 ### Black-Box Audit Remediation — Run14

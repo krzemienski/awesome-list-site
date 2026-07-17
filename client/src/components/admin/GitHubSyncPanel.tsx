@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { GitBranch, Download, Upload, RefreshCw, CheckCircle2, XCircle, Clock, ExternalLink, Activity } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -47,6 +48,9 @@ export default function GitHubSyncPanel() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [repoUrl, setRepoUrl] = useState("krzemienski/awesome-video");
+  // Run16 BUG-039: import rewrites the local catalog and export pushes a real
+  // commit — both need an explicit confirmation step before firing.
+  const [confirmAction, setConfirmAction] = useState<"import" | "export" | null>(null);
 
   const { data: syncHistory } = useQuery<SyncHistory[]>({
     queryKey: ['/api/github/sync-history'],
@@ -113,6 +117,13 @@ export default function GitHubSyncPanel() {
   const lastSync = syncHistory?.[0];
   const syncQueue = syncQueueData?.items || [];
   const pendingJobs = syncQueue.filter(item => item.status === 'pending' || item.status === 'processing').length;
+  // Run16 BUG-015: a broken integration must be VISIBLE. Surface failed jobs
+  // (e.g. "Bad credentials") prominently instead of hiding them — previously a
+  // panel with 37 of 43 failed jobs looked perfectly healthy.
+  const failedJobs = syncQueue.filter(item => item.status === 'failed');
+  const latestFailure = failedJobs
+    .slice()
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
 
   return (
     <div className="space-y-6">
@@ -165,7 +176,7 @@ export default function GitHubSyncPanel() {
                 Pull resources from the GitHub repository and update the database
               </p>
               <Button
-                onClick={() => importMutation.mutate()}
+                onClick={() => setConfirmAction("import")}
                 disabled={importMutation.isPending || !repoUrl}
                 className="w-full"
                 data-testid="button-import-github"
@@ -193,7 +204,7 @@ export default function GitHubSyncPanel() {
                 Push approved resources to GitHub README with smart commit message
               </p>
               <Button
-                onClick={() => exportMutation.mutate()}
+                onClick={() => setConfirmAction("export")}
                 disabled={exportMutation.isPending || !repoUrl}
                 className="w-full"
                 data-testid="button-export-github"
@@ -215,7 +226,7 @@ export default function GitHubSyncPanel() {
         </CardContent>
       </Card>
 
-      {(pendingJobs > 0 || lastSync) && (
+      {(syncQueue.length > 0 || lastSync) && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
@@ -223,15 +234,42 @@ export default function GitHubSyncPanel() {
                 <Activity className="h-5 w-5" />
                 Sync Status
               </span>
-              {pendingJobs > 0 && (
-                <Badge variant="secondary" className="animate-pulse">
-                  <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
-                  {pendingJobs} in progress
-                </Badge>
-              )}
+              <span className="flex items-center gap-2">
+                {failedJobs.length > 0 && (
+                  <Badge variant="destructive" data-testid="badge-failed-jobs">
+                    <XCircle className="h-3 w-3 mr-1" />
+                    {failedJobs.length} failed
+                  </Badge>
+                )}
+                {pendingJobs > 0 && (
+                  <Badge variant="secondary" className="animate-pulse">
+                    <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
+                    {pendingJobs} in progress
+                  </Badge>
+                )}
+              </span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            {failedJobs.length > 0 && (
+              <Alert variant="destructive" data-testid="alert-sync-failures">
+                <XCircle className="h-4 w-4" />
+                <AlertDescription className="space-y-1">
+                  <p className="font-semibold">
+                    {failedJobs.length} of {syncQueue.length} recent sync job{syncQueue.length !== 1 ? 's' : ''} failed
+                  </p>
+                  {latestFailure?.errorMessage && (
+                    <p className="text-sm font-mono break-words">
+                      Latest error: {latestFailure.errorMessage}
+                    </p>
+                  )}
+                  <p className="text-xs">
+                    If errors mention credentials or tokens, the GitHub connection
+                    likely needs to be reconnected.
+                  </p>
+                </AlertDescription>
+              </Alert>
+            )}
             {lastSync && (
               <Alert>
                 <CheckCircle2 className="h-4 w-4" />
@@ -297,23 +335,34 @@ export default function GitHubSyncPanel() {
                     {syncQueue.map((item) => (
                       <div
                         key={item.id}
-                        className="flex items-center justify-between p-2 rounded bg-muted/50 text-sm"
+                        className="p-2 rounded bg-muted/50 text-sm space-y-1"
                       >
-                        <div className="flex items-center gap-2">
-                          {item.status === 'completed' && <CheckCircle2 className="h-4 w-4 text-green-500" />}
-                          {item.status === 'failed' && <XCircle className="h-4 w-4 text-red-500" />}
-                          {(item.status === 'pending' || item.status === 'processing') && (
-                            <RefreshCw className="h-4 w-4 text-yellow-500 animate-spin" />
-                          )}
-                          <span className="font-medium capitalize">{item.action}</span>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            {item.status === 'completed' && <CheckCircle2 className="h-4 w-4 text-green-500" />}
+                            {item.status === 'failed' && <XCircle className="h-4 w-4 text-red-500" />}
+                            {(item.status === 'pending' || item.status === 'processing') && (
+                              <RefreshCw className="h-4 w-4 text-yellow-500 animate-spin" />
+                            )}
+                            <span className="font-medium capitalize">{item.action}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {formatSyncDate(item.processedAt || item.createdAt)}
+                            </span>
+                          </div>
+                          <Badge variant={
+                            item.status === 'completed' ? 'default' :
+                            item.status === 'failed' ? 'destructive' :
+                            'secondary'
+                          }>
+                            {item.status}
+                          </Badge>
                         </div>
-                        <Badge variant={
-                          item.status === 'completed' ? 'default' :
-                          item.status === 'failed' ? 'destructive' :
-                          'secondary'
-                        }>
-                          {item.status}
-                        </Badge>
+                        {/* Run16 BUG-015: failed jobs must show WHY they failed. */}
+                        {item.status === 'failed' && item.errorMessage && (
+                          <p className="text-xs font-mono text-destructive break-words pl-6">
+                            {item.errorMessage}
+                          </p>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -387,6 +436,47 @@ export default function GitHubSyncPanel() {
           </CardContent>
         </Card>
       )}
+
+      {/* Run16 BUG-039: confirm before firing import (rewrites local catalog)
+          or export (pushes a real commit to the repository). */}
+      <AlertDialog open={!!confirmAction} onOpenChange={(open) => { if (!open) setConfirmAction(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {confirmAction === "import" ? "Import from GitHub?" : "Export to GitHub?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {confirmAction === "import" ? (
+                <>
+                  This pulls the resource list from{" "}
+                  <span className="font-medium text-foreground">{repoUrl}</span>{" "}
+                  and updates the database to match — new resources are added and
+                  existing ones may be updated.
+                </>
+              ) : (
+                <>
+                  This pushes the approved catalog as a commit to{" "}
+                  <span className="font-medium text-foreground">{repoUrl}</span>,
+                  rewriting its README resource list.
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-sync-action">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (confirmAction === "import") importMutation.mutate();
+                if (confirmAction === "export") exportMutation.mutate();
+                setConfirmAction(null);
+              }}
+              data-testid="button-confirm-sync-action"
+            >
+              {confirmAction === "import" ? "Start Import" : "Start Export"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

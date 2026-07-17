@@ -432,9 +432,13 @@ export default function LinkHealthDashboard() {
             <Alert>
               <Info className="h-4 w-4" />
               <AlertDescription>
-                {statusFilter === 'all'
-                  ? 'No problem links found. All links are healthy!'
-                  : `No ${statusFilter} links found.`
+                {/* Run16 BUG-043: don't claim "all links are healthy" when no
+                    link check has ever run — there is no data to back it. */}
+                {!latestJob
+                  ? 'No link check has been run yet. Click "Run Link Check" to scan the catalog.'
+                  : statusFilter === 'all'
+                    ? 'No problem links found. All links are healthy!'
+                    : `No ${statusFilter} links found.`
                 }
               </AlertDescription>
             </Alert>

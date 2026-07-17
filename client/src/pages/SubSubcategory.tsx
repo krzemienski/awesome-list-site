@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useParams, Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -9,6 +9,9 @@ import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import SEOHead from "@/components/layout/SEOHead";
 import AdvancedFilter from "@/components/ui/advanced-filter";
 import ResourceCard from "@/components/resource/ResourceCard";
+import { ResourceListRow, ResourceCompactCard } from "@/components/resource/resource-view-modes";
+import { ViewModeToggle, ViewMode } from "@/components/ui/view-mode-toggle";
+import { safeGetItem, safeSetItem } from "@/lib/safeStorage";
 import { ArrowLeft, Search } from "lucide-react";
 import { deslugify } from "@/lib/utils";
 import { Resource } from "@/types/awesome-list";
@@ -16,6 +19,10 @@ import NotFound from "@/pages/not-found";
 import { processAwesomeListData } from "@/lib/parser";
 import { fetchStaticAwesomeList } from "@/lib/static-data";
 import { trackCategoryView } from "@/lib/analytics";
+
+// Run16 BUG-051: same page size as Category so sub-subcategory lists paginate
+// instead of rendering hundreds of cards at once.
+const PAGE_SIZE = 24;
 
 export default function SubSubcategory() {
   const { slug } = useParams<{ slug: string }>();
@@ -29,6 +36,20 @@ export default function SubSubcategory() {
   });
   const [sortBy, setSortBy] = useState(() => getSearchParams().get("sortBy") || "default");
   const [searchTerm, setSearchTerm] = useState(() => getSearchParams().get("search") || "");
+  const [page, setPage] = useState(() => {
+    const p = parseInt(getSearchParams().get("page") || "1", 10);
+    return Number.isFinite(p) && p > 0 ? p : 1;
+  });
+  // Run16 BUG-050: grid/list/compact toggle, shared preference key with
+  // Category so the choice follows the user across taxonomy levels.
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    const saved = safeGetItem('awesome-list-view-mode');
+    return saved === 'grid' || saved === 'list' || saved === 'compact' ? saved : 'grid';
+  });
+  const handleViewModeChange = (mode: ViewMode) => {
+    setViewMode(mode);
+    safeSetItem('awesome-list-view-mode', mode);
+  };
   
   const { data: rawData, isLoading, error } = useQuery({
     queryKey: ["awesome-list-data"],
@@ -122,30 +143,67 @@ export default function SubSubcategory() {
 
     return results;
   }, [allResources, searchTerm, selectedTags, sortBy]);
-  
+
+  // ----- Client-side pagination (Run16 BUG-051, mirrors Category BUG-007) -----
+  const totalPages = Math.max(1, Math.ceil(filteredResources.length / PAGE_SIZE));
+  const currentPage = Math.min(Math.max(page, 1), totalPages);
+  const pagedResources = useMemo(
+    () => filteredResources.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
+    [filteredResources, currentPage],
+  );
+
+  useEffect(() => {
+    if (!isLoading && filteredResources.length > 0 && page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [isLoading, filteredResources.length, page, totalPages]);
+
+  // Run16 BUG-005: tag/sort changes PUSH history entries so Back restores the
+  // previous list state; search keystrokes, initial normalization, and the
+  // post-popstate re-sync still replace.
+  const urlSyncInitializedRef = useRef(false);
+  const popNavigationRef = useRef(false);
+  const pushSnapshotRef = useRef("");
+
   useEffect(() => {
     const params = new URLSearchParams();
 
     if (searchTerm) params.set("search", searchTerm);
     if (selectedTags.length > 0) params.set("tags", selectedTags.join(","));
     if (sortBy && sortBy !== "default") params.set("sortBy", sortBy);
+    if (page > 1) params.set("page", String(page));
 
     const newSearch = params.toString();
     const newPath = `/sub-subcategory/${slug}${newSearch ? `?${newSearch}` : ""}`;
     const currentPath = `${window.location.pathname}${window.location.search}`;
 
+    const pushSnapshot = JSON.stringify([page, selectedTags, sortBy]);
     if (currentPath !== newPath) {
-      window.history.replaceState({}, "", newPath);
+      const shouldPush =
+        urlSyncInitializedRef.current &&
+        !popNavigationRef.current &&
+        pushSnapshotRef.current !== pushSnapshot;
+      if (shouldPush) {
+        window.history.pushState({}, "", newPath);
+      } else {
+        window.history.replaceState({}, "", newPath);
+      }
     }
-  }, [searchTerm, selectedTags, sortBy, slug, location]);
+    urlSyncInitializedRef.current = true;
+    popNavigationRef.current = false;
+    pushSnapshotRef.current = pushSnapshot;
+  }, [searchTerm, selectedTags, sortBy, page, slug, location]);
 
   useEffect(() => {
     const handlePopState = () => {
+      popNavigationRef.current = true;
       const params = getSearchParams();
       setSearchTerm(params.get("search") || "");
       const tags = params.get("tags");
       setSelectedTags(tags ? tags.split(",") : []);
       setSortBy(params.get("sortBy") || "default");
+      const p = parseInt(params.get("page") || "1", 10);
+      setPage(Number.isFinite(p) && p > 0 ? p : 1);
     };
 
     window.addEventListener("popstate", handlePopState);
@@ -208,12 +266,16 @@ export default function SubSubcategory() {
       />
       
       <div className="space-y-3 sm:space-y-4">
-        <Link href={parentSubcategory?.slug ? `/subcategory/${parentSubcategory.slug}` : "/"}>
-          <Button variant="ghost" size="sm" className="gap-2" data-testid="button-back-subcategory">
+        {/* Run16 BUG-049: asChild so the anchor IS the ≥44px button. */}
+        <Button asChild variant="ghost" size="sm" className="gap-2 min-h-[44px]">
+          <Link
+            href={parentSubcategory?.slug ? `/subcategory/${parentSubcategory.slug}` : "/"}
+            data-testid="button-back-subcategory"
+          >
             <ArrowLeft className="h-4 w-4" />
             Back to {subcategoryName || "Home"}
-          </Button>
-        </Link>
+          </Link>
+        </Button>
         
         {/* BUG-030 (run13): the app header already renders this exact crumb
             chain on md+ screens — page-level breadcrumbs are now mobile-only
@@ -252,7 +314,7 @@ export default function SubSubcategory() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
           placeholder="Search resources..."
           className="pl-9 min-h-[44px]"
           data-testid="input-search"
@@ -263,18 +325,22 @@ export default function SubSubcategory() {
         selectedTags={selectedTags}
         sortBy={sortBy}
         availableTags={availableTags}
-        onTagsChange={setSelectedTags}
-        onSortChange={setSortBy}
+        onTagsChange={(tags) => { setSelectedTags(tags); setPage(1); }}
+        onSortChange={(value) => { setSortBy(value); setPage(1); }}
         showCountSorts={false}
       />
       
       {allResources.length > 0 && (
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground" data-testid="text-results-count">
-            {/* BUG-054 (run14): singular agreement for one-resource pages */}
-            Showing {filteredResources.length} of {allResources.length} resource{allResources.length === 1 ? '' : 's'}
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-sm text-muted-foreground min-w-0 truncate" data-testid="text-results-count">
+            {/* Run16 BUG-051: show the page range like Category does. */}
+            Showing {filteredResources.length === 0
+              ? "0"
+              : `${(currentPage - 1) * PAGE_SIZE + 1}–${Math.min(currentPage * PAGE_SIZE, filteredResources.length)}`} of {filteredResources.length} resource{filteredResources.length === 1 ? '' : 's'}
             {selectedTags.length > 0 && ' (filtered)'}
           </p>
+          {/* Run16 BUG-050: view mode toggle, matching Category. */}
+          <ViewModeToggle value={viewMode} onChange={handleViewModeChange} />
         </div>
       )}
       
@@ -301,22 +367,69 @@ export default function SubSubcategory() {
       ) : (
         /* BUG-016 (run14): md (768px) drops back to 1 col — sidebar returns
            at md and 2 cols truncated card titles to 3-5 chars. */
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
-          {filteredResources.map((resource, index) => (
-            <ResourceCard
-              key={`${resource.id ?? resource.url}-${index}`}
-              resource={{
-                id: resource.id != null ? String(resource.id) : "",
-                name: resource.title,
-                url: resource.url,
-                description: resource.description,
-                tags: resource.tags,
-              }}
-              onTagClick={(tag) =>
-                setSelectedTags((prev) => (prev.includes(tag) ? prev : [...prev, tag]))
-              }
-            />
-          ))}
+        <div className={
+          viewMode === "grid"
+            ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4"
+            : viewMode === "list"
+            ? "flex flex-col gap-2 min-w-0"
+            : "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 min-w-0"
+        }>
+          {pagedResources.map((resource, index) => {
+            const normalized = {
+              id: resource.id != null ? String(resource.id) : "",
+              title: resource.title,
+              url: resource.url,
+              description: resource.description,
+            };
+            if (viewMode === "list") {
+              return <ResourceListRow key={`${resource.id ?? resource.url}-${index}`} resource={normalized} />;
+            }
+            if (viewMode === "compact") {
+              return <ResourceCompactCard key={`${resource.id ?? resource.url}-${index}`} resource={normalized} />;
+            }
+            return (
+              <ResourceCard
+                key={`${resource.id ?? resource.url}-${index}`}
+                resource={{
+                  id: normalized.id,
+                  name: resource.title,
+                  url: resource.url,
+                  description: resource.description,
+                  tags: resource.tags,
+                }}
+                onTagClick={(tag) => {
+                  setSelectedTags((prev) => (prev.includes(tag) ? prev : [...prev, tag]));
+                  setPage(1);
+                }}
+              />
+            );
+          })}
+        </div>
+      )}
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-3 pt-6" data-testid="pagination-controls">
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={currentPage <= 1}
+            onClick={() => setPage(currentPage - 1)}
+            data-testid="button-prev-page"
+          >
+            Previous
+          </Button>
+          <span className="text-sm text-muted-foreground" data-testid="text-page-indicator">
+            Page {currentPage} of {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={currentPage >= totalPages}
+            onClick={() => setPage(currentPage + 1)}
+            data-testid="button-next-page"
+          >
+            Next
+          </Button>
         </div>
       )}
     </div>

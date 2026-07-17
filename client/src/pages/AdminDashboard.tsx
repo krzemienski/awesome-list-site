@@ -31,6 +31,32 @@ const ADMIN_TAB_IDS = [
   "users", "github", "linkhealth", "audit",
 ] as const;
 
+// Run16 BUG-085: human-guessable slug aliases → canonical tab ids.
+const ADMIN_TAB_ALIASES: Record<string, string> = {
+  "link-health": "linkhealth",
+  "sub-subcategories": "subsubcategories",
+  "sub-subcats": "subsubcategories",
+  "github-sync": "github",
+};
+
+// Run16 BUG-034/074/085: normalize any inbound tab slug (hash, ?tab= query
+// param, or /admin/:section) to a valid tab id, or null if unknown.
+function normalizeTab(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  const slug = raw.replace(/^#/, "").toLowerCase();
+  const mapped = ADMIN_TAB_ALIASES[slug] ?? slug;
+  return (ADMIN_TAB_IDS as readonly string[]).includes(mapped) ? mapped : null;
+}
+
+function tabFromWindow(): string | null {
+  if (typeof window === "undefined") return null;
+  const fromHash = normalizeTab(window.location.hash);
+  if (fromHash) return fromHash;
+  // BUG-074: /admin?tab=export style deep links.
+  const fromQuery = normalizeTab(new URLSearchParams(window.location.search).get("tab"));
+  return fromQuery;
+}
+
 export default function AdminDashboard() {
   const { stats, isLoading, error } = useAdmin();
   const { isAuthenticated, user, isLoading: authLoading } = useAuth();
@@ -45,11 +71,7 @@ export default function AdminDashboard() {
 
   const [activeTab, setActiveTab] = useState(() => {
     if (sectionTab) return sectionTab;
-    if (typeof window !== "undefined") {
-      const hash = window.location.hash.replace("#", "");
-      if (hash) return hash;
-    }
-    return "approvals";
+    return tabFromWindow() ?? "approvals";
   });
 
   // Keep the tab in sync if the user navigates between /admin/:section links.
@@ -57,11 +79,30 @@ export default function AdminDashboard() {
     if (sectionTab) setActiveTab(sectionTab);
   }, [sectionTab]);
 
+  // Run16 BUG-034/086: keep the active tab in sync with manual hash edits
+  // (hashchange) and Back/Forward (popstate). Tab clicks pushState below, so
+  // Back walks the tab trail instead of exiting the dashboard.
+  useEffect(() => {
+    const syncFromUrl = () => {
+      const tab = tabFromWindow();
+      if (tab) setActiveTab(tab);
+    };
+    window.addEventListener("hashchange", syncFromUrl);
+    window.addEventListener("popstate", syncFromUrl);
+    return () => {
+      window.removeEventListener("hashchange", syncFromUrl);
+      window.removeEventListener("popstate", syncFromUrl);
+    };
+  }, []);
+
   const handleTabChange = (value: string) => {
     setActiveTab(value);
     // Tab clicks always normalize back to /admin#tab (tabs stay on /admin);
     // the /admin/:section path form is only an inbound deep-link alias.
-    window.history.replaceState(null, "", `/admin#${value}`);
+    // BUG-086: pushState (not replaceState) so Back returns to the prior tab.
+    if (window.location.hash !== `#${value}`) {
+      window.history.pushState(null, "", `/admin#${value}`);
+    }
   };
 
   if (!authLoading && (!isAuthenticated || !isAdmin)) {

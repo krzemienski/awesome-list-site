@@ -49,6 +49,23 @@ export default function AdvancedFilter({
 
   return (
     <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
+      {/* Run16 BUG-052: pages whose resources carry no tags used to silently
+          omit the control, which read as an inconsistency across taxonomy
+          pages — show it disabled with an explanation instead. */}
+      {availableTags.length === 0 && (
+        <Button
+          variant="outline"
+          size="sm"
+          className="min-h-[44px] flex-1 sm:flex-none"
+          disabled
+          title="No tags available for the resources on this page"
+          data-testid="button-filter-by-tag-disabled"
+        >
+          <SlidersHorizontal className="h-4 w-4 mr-2" />
+          Filter by Tag
+          <span className="sr-only">(no tags available for the resources on this page)</span>
+        </Button>
+      )}
       {availableTags.length > 0 && (
         <Popover open={isOpen} onOpenChange={setIsOpen}>
           <PopoverTrigger asChild>

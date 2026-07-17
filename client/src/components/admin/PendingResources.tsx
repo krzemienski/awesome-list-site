@@ -12,7 +12,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { CheckCircle2, XCircle, Eye, ExternalLink, Calendar, User, FolderTree } from "lucide-react";
+import { CheckCircle2, XCircle, Eye, ExternalLink, Calendar, User, FolderTree, RefreshCw } from "lucide-react";
 import type { Resource } from "@shared/schema";
 
 type PendingResource = Resource & { submittedByEmail?: string | null };
@@ -192,9 +192,18 @@ export default function PendingResources() {
           <div className="text-center py-12">
             <CheckCircle2 className="h-16 w-16 mx-auto mb-4 text-muted-foreground/50" />
             <h3 className="text-lg font-semibold mb-2">All Caught Up!</h3>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground mb-4">
               There are no pending resources to review at this time.
             </p>
+            {/* Run16 BUG-078: empty state gets an explicit refresh control. */}
+            <Button
+              variant="outline"
+              onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/admin/pending-resources'] })}
+              data-testid="button-refresh-pending-resources"
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Check again
+            </Button>
           </div>
         </CardContent>
       </Card>

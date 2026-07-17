@@ -59,11 +59,6 @@ function ResourceCard({
     }
   };
 
-  const handleExternalLink = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    window.open(resource.url, '_blank', 'noopener,noreferrer');
-  };
-
   const handleSuggestEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
     setSuggestEditOpen(true);
@@ -95,12 +90,15 @@ function ResourceCard({
   // overlay keeps the whole card clickable; interactive children (favorite,
   // bookmark, Open Link, Suggest Edit) sit above it via relative z-10. The
   // legacy onClick prop path (custom card behavior) is preserved unchanged.
+  // Run16 BUG-049: inline-block + py-1/-my-1 lifts the anchor's own hit-box to
+  // ≥24px (WCAG 2.5.8) without moving the text; the stretched after:inset-0
+  // overlay still makes the whole card the effective target.
   const titleContent = onClick ? (
     resource.name
   ) : isValidDbResource ? (
     <Link
       href={`/resource/${resource.id}`}
-      className="hover:text-primary transition-colors after:absolute after:inset-0 after:content-['']"
+      className="inline-block py-1 -my-1 hover:text-primary transition-colors after:absolute after:inset-0 after:content-['']"
       data-testid={`link-resource-title-${resource.id}`}
     >
       {resource.name}
@@ -110,7 +108,7 @@ function ResourceCard({
       href={resource.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="hover:text-primary transition-colors after:absolute after:inset-0 after:content-['']"
+      className="inline-block py-1 -my-1 hover:text-primary transition-colors after:absolute after:inset-0 after:content-['']"
       data-testid={`link-resource-title-${resource.id}`}
     >
       {resource.name}
@@ -288,15 +286,24 @@ function ResourceCard({
         </div>
         
         <div className="relative z-10 flex gap-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
+          {/* Run16 BUG-006/BUG-020: real anchor (not JS window.open) so the
+              action can never silently fail and middle-click/cmd-click work */}
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
             className="flex-1 border-primary/50 hover:bg-primary/10 hover:border-primary min-h-[44px]"
-            onClick={handleExternalLink}
-            data-testid={`button-visit-${resource.id}`}
           >
-            <ExternalLink className="h-4 w-4 mr-2" />
-            Open Link
+            <a
+              href={resource.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              data-testid={`button-visit-${resource.id}`}
+            >
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Open Link
+            </a>
           </Button>
           {isValidDbResource && (
             <Button

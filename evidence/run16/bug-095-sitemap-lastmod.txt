@@ -1,0 +1,43 @@
+=== BUG-095: sitemap real lastmod (dev, 2026-07-17T10:03:01Z) ===
+distinct lastmod values (top 10):
+   1451 <lastmod>2026-06-25</lastmod>
+    345 <lastmod>2026-01-20</lastmod>
+    140 <lastmod>2026-07-16</lastmod>
+     66 <lastmod>2026-06-03</lastmod>
+     11 <lastmod>2026-07-02</lastmod>
+      4 <lastmod>2026-07-17</lastmod>
+total urls: 2030, urls with lastmod: 2017
+--- static pages omit lastmod (first url block) ---
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://awesome.video/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://awesome.video/categories</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://awesome.video/journeys</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://awesome.video/advanced</loc>
+    <changefreq>weekly</changefreq>
+--- sample resource url block ---
+  <url>
+    <loc>https://awesome.video/resource/185020</loc>
+    <lastmod>2026-01-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+--
+  <url>
+    <loc>https://awesome.video/resource/185570</loc>
+    <lastmod>2026-06-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+--

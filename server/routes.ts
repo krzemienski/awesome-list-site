@@ -126,6 +126,14 @@ const isAdmin = async (req: any, res: Response, next: any) => {
 // canonicals never disagree. DB problems degrade gracefully: dynamic sections
 // are skipped, but a valid XML document with the static routes is always
 // returned (never a 404 / 500 on an empty or unavailable DB).
+// Run16 BUG-001 (CRITICAL): z.string().url() accepts ANY scheme (javascript:,
+// ftp:, data:, http:) while the UI promises "Must be a valid HTTPS URL".
+// One shared guard for every write surface that accepts a resource URL:
+// - new resources (public submit + admin create) must be https://
+// - updates/edit-suggestions may keep legacy http:// but never a non-web scheme
+const HTTPS_URL_RE = /^https:\/\//i;
+const WEB_URL_RE = /^https?:\/\//i;
+
 function xmlEscape(value: string): string {
   return value
     .replace(/&/g, "&amp;")
@@ -136,7 +144,6 @@ function xmlEscape(value: string): string {
 }
 
 async function generateSitemap(_req: any, res: any) {
-  const currentDate = new Date().toISOString().split('T')[0];
   const baseUrl = SITE_URL.replace(/\/+$/, "");
   const urls: string[] = [];
 
@@ -145,12 +152,37 @@ async function generateSitemap(_req: any, res: any) {
   // visit the same public URL many times. Every <loc> must appear exactly once.
   const seenLocs = new Set<string>();
 
-  const addUrl = (path: string, changefreq: string, priority: string) => {
+  // Run16 BUG-095: <lastmod> used to be hardcoded to "today" on every URL,
+  // telling crawlers the entire site changes daily. Emit REAL per-resource
+  // updatedAt dates (taxonomy pages = max of their member resources) and OMIT
+  // lastmod where there is no real change signal (static pages) — an absent
+  // lastmod is more honest than a fabricated one.
+  const resourceLastmod = new Map<number, string>();
+  try {
+    const result: any = await db.execute(
+      sql`SELECT id, updated_at FROM resources WHERE status = 'approved' AND updated_at IS NOT NULL`
+    );
+    for (const row of (result.rows ?? result)) {
+      resourceLastmod.set(Number(row.id), new Date(row.updated_at).toISOString().split('T')[0]);
+    }
+  } catch (error) {
+    console.error('Error loading resource lastmod dates for sitemap:', error);
+  }
+  const maxLastmodOf = (ids: number[]): string | undefined => {
+    let max: string | undefined;
+    for (const id of ids) {
+      const d = resourceLastmod.get(id);
+      if (d && (!max || d > max)) max = d;
+    }
+    return max;
+  };
+
+  const addUrl = (path: string, changefreq: string, priority: string, lastmod?: string) => {
     if (seenLocs.has(path)) return;
     seenLocs.add(path);
     urls.push(`  <url>
-    <loc>${xmlEscape(baseUrl + path)}</loc>
-    <lastmod>${currentDate}</lastmod>
+    <loc>${xmlEscape(baseUrl + path)}</loc>${lastmod ? `
+    <lastmod>${lastmod}</lastmod>` : ''}
     <changefreq>${changefreq}</changefreq>
     <priority>${priority}</priority>
   </url>`);
@@ -173,24 +205,41 @@ async function generateSitemap(_req: any, res: any) {
   try {
     const awesomeListData = await legacyRepo.getAwesomeListFromDatabase();
 
+    const resourceIdsOf = (node: any): number[] =>
+      (node?.resources ?? []).map((r: any) => Number(r.id)).filter((n: number) => Number.isFinite(n));
+
     awesomeListData?.categories?.forEach(category => {
-      addUrl(`/category/${category.slug}`, 'weekly', '0.7');
+      // Run16 BUG-095: compute each node's lastmod as the max updatedAt of
+      // every resource it (transitively) contains, so taxonomy pages carry a
+      // real change date. Children are collected first, then URLs emitted.
+      const catIds: number[] = resourceIdsOf(category);
+      const subEntries: Array<{ slug: string; lastmod?: string }> = [];
+      const ssEntries: Array<{ slug: string; lastmod?: string }> = [];
 
       category.subcategories?.forEach(subcategory => {
-        addUrl(`/subcategory/${subcategory.slug}`, 'weekly', '0.6');
+        const subIds: number[] = resourceIdsOf(subcategory);
 
         subcategory.subSubcategories?.forEach(subSubcategory => {
+          const ssIds = resourceIdsOf(subSubcategory);
+          subIds.push(...ssIds);
           // BUG-053 (run14): an empty sub-subcategory renders "No resources
           // found" and has no inbound link from its parent page — keep such
           // orphans OUT of the sitemap (sitemap set == reachable content set).
-          if ((subSubcategory.resources?.length ?? 0) === 0) return;
-          addUrl(`/sub-subcategory/${subSubcategory.slug}`, 'weekly', '0.5');
+          if (ssIds.length === 0) return;
+          ssEntries.push({ slug: subSubcategory.slug, lastmod: maxLastmodOf(ssIds) });
         });
+
+        catIds.push(...subIds);
+        subEntries.push({ slug: subcategory.slug, lastmod: maxLastmodOf(subIds) });
       });
+
+      addUrl(`/category/${category.slug}`, 'weekly', '0.7', maxLastmodOf(catIds));
+      subEntries.forEach(e => addUrl(`/subcategory/${e.slug}`, 'weekly', '0.6', e.lastmod));
+      ssEntries.forEach(e => addUrl(`/sub-subcategory/${e.slug}`, 'weekly', '0.5', e.lastmod));
     });
 
     awesomeListData?.resources?.forEach(resource => {
-      addUrl(`/resource/${resource.id}`, 'monthly', '0.5');
+      addUrl(`/resource/${resource.id}`, 'monthly', '0.5', resourceLastmod.get(Number(resource.id)));
     });
   } catch (error) {
     console.error('Error adding category/resource URLs to sitemap:', error);
@@ -548,6 +597,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Count this failure toward the lockout threshold (generic message — no enumeration).
         recordFailure(loginEmail);
         console.log('[local/login] Authentication failed:', info?.message);
+        // Run16 BUG-042: security-relevant auth events now hit the audit trail.
+        // performedBy stays null — the attempted email may not map to any user
+        // (FK to users.id), so the identity attempted lives in `changes`.
+        auditRepo.logResourceAudit(null, 'auth.login_failed', undefined, { email: loginEmail }, 'Local login failed')
+          .catch((e) => console.error('[audit] login_failed log error:', e));
         return res.status(401).json({ message: info?.message || "Invalid credentials" });
       }
       
@@ -572,6 +626,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
           // Successful login clears any accumulated failure/lock state for this email.
           clearOnSuccess(loginEmail);
+
+          // Run16 BUG-042: record successful logins in the audit trail.
+          auditRepo.logResourceAudit(null, 'auth.login', user.claims.sub, { email: user.claims.email }, 'Local login success')
+            .catch((e) => console.error('[audit] login log error:', e));
 
           // Fetch user from database to get the role
           const dbUser = await userRepo.getUser(user.claims.sub);
@@ -622,6 +680,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const hashed = await hashPassword(password);
       const created = await userRepo.upsertUser({ email, password: hashed, role: "user" });
+
+      // Run16 BUG-042: record account creation in the audit trail.
+      auditRepo.logResourceAudit(null, 'auth.register', created.id, { email: created.email }, 'Local account created')
+        .catch((e) => console.error('[audit] register log error:', e));
 
       // Never return the password hash.
       return res.status(201).json({
@@ -856,6 +918,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // PRESENCE, a lingering connect.sid let deep-links to /admin, /profile etc.
       // stay reachable after logout. Destroy the session and clear the cookie so
       // logout actually invalidates the session end-to-end.
+      // Run16 BUG-042: capture identity BEFORE logout/destroy wipes req.user.
+      const logoutUserId: string | undefined = req.user?.claims?.sub;
       req.logout((logoutErr: any) => {
         if (logoutErr) {
           console.error("Error during req.logout:", logoutErr);
@@ -867,6 +931,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             return res.status(500).json({ message: "Failed to logout" });
           }
           res.clearCookie("connect.sid", { path: "/" });
+          if (logoutUserId) {
+            auditRepo.logResourceAudit(null, 'auth.logout', logoutUserId, undefined, 'Logout')
+              .catch((e) => console.error('[audit] logout log error:', e));
+          }
           res.json({ success: true });
         });
       });
@@ -951,23 +1019,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const rawOffset = firstQueryValue(req.query.offset) ?? rawCursor;
       const rawLimit = firstQueryValue(req.query.limit);
       const rawPage = firstQueryValue(req.query.page);
+      // Run16 BUG-090: ONE consistent pagination contract — non-numeric values
+      // are 400 (invalid_offset / invalid_limit / invalid_page), every numeric
+      // out-of-range value is CLAMPED into range (page<1→1, limit→[1,100],
+      // offset<0→0). Previously page=-5 errored while page=0 clamped, and
+      // limit=0 silently became the default 20 while limit=-1 became 1.
+      // Run16 BUG-091: error bodies carry `message` alongside the machine code.
       if (rawOffset !== undefined && isNaN(Number(rawOffset))) {
-        return res.status(400).json({ error: 'invalid_offset' });
+        return res.status(400).json({ error: 'invalid_offset', message: 'offset must be a number' });
       }
       if (rawLimit !== undefined && isNaN(Number(rawLimit))) {
-        return res.status(400).json({ error: 'invalid_limit' });
+        return res.status(400).json({ error: 'invalid_limit', message: 'limit must be a number' });
       }
-      // NEW-009 / NEW-034: `page` must be a positive integer. Previously a
-      // negative page produced a negative SQL offset → 500, and non-numeric
-      // values were silently normalized to 1 (masking client bugs). Both now
-      // return 400, matching the invalid_offset / invalid_limit contract.
-      if (rawPage !== undefined && !/^\d+$/.test(rawPage.trim())) {
-        return res.status(400).json({ error: 'invalid_page' });
+      if (rawPage !== undefined && !/^-?\d+$/.test(rawPage.trim())) {
+        return res.status(400).json({ error: 'invalid_page', message: 'page must be an integer' });
       }
       // BUG-050 (run14): cap page size at 100 (was 1000 — full-catalog scrape
       // in 3 requests). Paging via nextOffset/nextCursor still walks the whole
       // catalog; bulk consumers should use /api/awesome-list.
-      const limit = Math.min(Math.max(parseInt(rawLimit as string) || 20, 1), 100);
+      const limit = rawLimit !== undefined
+        ? Math.min(Math.max(parseInt(rawLimit as string), 1), 100)
+        : 20;
       const offset = rawOffset !== undefined
         ? Math.max(parseInt(rawOffset as string), 0)
         : Math.max((parseInt(rawPage as string) || 1) - 1, 0) * limit;
@@ -1017,7 +1089,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const ALLOWED_SORTS = ['name-asc', 'name-desc', 'newest', 'oldest'] as const;
       const requestedSort = firstQueryValue(req.query.sort);
       if (requestedSort !== undefined && !ALLOWED_SORTS.includes(requestedSort as any)) {
-        return res.status(400).json({ error: 'invalid_sort', allowed: ALLOWED_SORTS });
+        return res.status(400).json({ error: 'invalid_sort', message: `sort must be one of: ${ALLOWED_SORTS.join(', ')}`, allowed: ALLOWED_SORTS });
       }
       const sort = requestedSort as (typeof ALLOWED_SORTS)[number] | undefined;
 
@@ -1027,7 +1099,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let statusFilter: string | undefined = 'approved';
       if (requestedStatus !== undefined) {
         if (!ALLOWED_STATUSES.has(requestedStatus)) {
-          return res.status(400).json({ error: 'invalid_status', allowed: Array.from(ALLOWED_STATUSES) });
+          return res.status(400).json({ error: 'invalid_status', message: `status must be one of: ${Array.from(ALLOWED_STATUSES).join(', ')}`, allowed: Array.from(ALLOWED_STATUSES) });
         }
         // NEW-006 companion: non-approved listings are admin-only, otherwise
         // the detail endpoint's status gate is bypassable via bulk listing.
@@ -1286,7 +1358,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const submitSchema = z.object({
         // Run15 BUG-037: trim before validating — a trailing space after a
         // pasted URL is never meaningful and used to fail .url() confusingly.
-        url: z.string().trim().min(1).url('Invalid URL format'),
+        url: z.string().trim().min(1).url('Invalid URL format')
+          // Run16 BUG-001: enforce the https-only contract the UI promises.
+          .refine((v) => HTTPS_URL_RE.test(v), 'Must be a valid HTTPS URL'),
         title: z.string().min(1).max(200, 'Title must be 1-200 characters')
           .refine((v) => !NO_HTML.test(v), 'Title must not contain HTML tags'),
         category: z.string().min(1, 'Category is required'),
@@ -1490,6 +1564,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (sanitizedProposedData.description && sanitizedProposedData.description.length > 2000) {
         return res.status(400).json({ message: 'Description too long (max 2000 characters)' });
+      }
+
+      // Run16 BUG-001: a proposed URL change must stay a web URL — the edit
+      // approval path writes it straight onto the live resource.
+      if (sanitizedProposedData.url !== undefined && !WEB_URL_RE.test(String(sanitizedProposedData.url))) {
+        return res.status(400).json({ message: 'URL must start with http:// or https://' });
       }
       
       // tags is stored in metadata.tags (not a column). Reject non-array shapes
@@ -2431,12 +2511,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         await learningJourneyRepo.deleteJourneyStep(stepId);
 
-        // Renumber remaining steps so order stays contiguous.
+        // Run16 BUG-013: renumber remaining steps GROUP-aware. Rows sharing a
+        // stepNumber are one logical step (multi-resource); the old row-based
+        // renumber (1..N per row) exploded 6 logical steps into 18 after any
+        // single delete. Groups keep their membership; group numbers become
+        // contiguous 1..G.
         const remaining = steps.filter((s) => s.id !== stepId);
         if (remaining.length > 0) {
-          await learningJourneyRepo.reorderJourneySteps(
+          const groupNumbers = [...new Set(remaining.map((s) => s.stepNumber))].sort(
+            (a, b) => a - b,
+          );
+          const newNumberByOld = new Map(groupNumbers.map((n, i) => [n, i + 1]));
+          await learningJourneyRepo.setJourneyStepNumbers(
             journeyId,
-            remaining.map((s) => s.id),
+            remaining.map((s) => ({
+              id: s.id,
+              stepNumber: newNumberByOld.get(s.stepNumber)!,
+            })),
           );
         }
         res.json({ success: true });
@@ -2459,19 +2550,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(400).json({ message: 'Invalid journey ID' });
         }
 
-        const bodySchema = z.object({
-          stepIds: z.array(z.number().int().positive()).min(1),
-        });
-        const { stepIds } = bodySchema.parse(req.body);
+        // Run16 BUG-013: accepts either flat `stepIds` (legacy — every row is
+        // its own group) or `stepGroups` (rows sharing a logical step travel
+        // together and keep a shared stepNumber).
+        const bodySchema = z
+          .object({
+            stepIds: z.array(z.number().int().positive()).min(1).optional(),
+            stepGroups: z
+              .array(z.array(z.number().int().positive()).min(1))
+              .min(1)
+              .optional(),
+          })
+          .refine((b) => !!b.stepIds !== !!b.stepGroups, {
+            message: 'Provide exactly one of stepIds or stepGroups',
+          });
+        const body = bodySchema.parse(req.body);
+        const groups: number[][] =
+          body.stepGroups ?? body.stepIds!.map((id) => [id]);
+        const flatIds = groups.flat();
 
         const existing = await learningJourneyRepo.listJourneySteps(journeyId);
-        if (existing.length !== stepIds.length) {
+        if (existing.length !== flatIds.length) {
           return res
             .status(400)
             .json({ message: 'Reorder must include exactly every step of the journey' });
         }
         const existingSet = new Set(existing.map((s) => s.id));
-        const reorderSet = new Set(stepIds);
+        const reorderSet = new Set(flatIds);
         if (
           existingSet.size !== reorderSet.size ||
           [...existingSet].some((id) => !reorderSet.has(id))
@@ -2479,7 +2584,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(400).json({ message: 'Reorder must reference the journey\'s existing steps exactly once each' });
         }
 
-        const steps = await learningJourneyRepo.reorderJourneySteps(journeyId, stepIds);
+        const steps = await learningJourneyRepo.setJourneyStepNumbers(
+          journeyId,
+          groups.flatMap((groupIds, i) =>
+            groupIds.map((id) => ({ id, stepNumber: i + 1 })),
+          ),
+        );
         res.json({ steps });
       } catch (error) {
         if (error instanceof z.ZodError) {
@@ -2519,8 +2629,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
       const q = typeof req.query.q === 'string' ? req.query.q : undefined;
+      // Run16 BUG-087: optional sort params (whitelisted in the repository).
+      const sortBy = typeof req.query.sortBy === 'string' ? req.query.sortBy : undefined;
+      const sortDir = typeof req.query.sortDir === 'string' ? req.query.sortDir : undefined;
 
-      const result = await userRepo.listUsers(page, limit, q);
+      const result = await userRepo.listUsers(page, limit, q, sortBy, sortDir);
       // Never expose password hashes over the API, even to admins. Strip the
       // password field from every user before sending the response.
       const sanitizedUsers = result.users.map(({ password, ...rest }) => rest);
@@ -2585,6 +2698,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Invalid role' });
       }
       
+      // Run16 BUG-014: block self role changes server-side — a one-click
+      // self-demotion would lock the last admin out (mirrors the existing
+      // self-delete guard below).
+      if (req.user?.claims?.sub === userId) {
+        return res.status(400).json({ message: 'You cannot change your own role' });
+      }
+      
       const user = await userRepo.updateUserRole(userId, role);
       res.json(user);
     } catch (error) {
@@ -2621,14 +2741,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/admin/audit-logs - List audit log entries
   app.get('/api/admin/audit-logs', isAuthenticated, isAdmin, async (req, res) => {
     try {
-      const limit = parseInt(req.query.limit as string) || 50;
+      // Run16 BUG-041: honor offset + return the REAL total (the endpoint used
+      // to ignore offset and echo total = logs.length, making pagination
+      // impossible past the first page).
+      const limit = Math.min(Math.max(parseInt(req.query.limit as string) || 50, 1), 500);
+      const offset = Math.max(parseInt(req.query.offset as string) || 0, 0);
       const resourceId = req.query.resourceId ? parseInt(req.query.resourceId as string) : null;
-      
-      const logs = await auditRepo.getResourceAuditLog(
-        resourceId && !isNaN(resourceId) ? resourceId : null,
-        limit
-      );
-      res.json({ logs, total: logs.length });
+      const rid = resourceId && !isNaN(resourceId) ? resourceId : null;
+
+      const [logs, total] = await Promise.all([
+        auditRepo.getResourceAuditLog(rid, limit, offset),
+        auditRepo.countAuditLogs(rid),
+      ]);
+      res.json({ logs, total, limit, offset });
     } catch (error) {
       console.error('Error fetching audit logs:', error);
       res.status(500).json({ message: 'Failed to fetch audit logs' });
@@ -2710,7 +2835,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!reason || reason.trim().length < 10) {
         return res.status(400).json({ message: 'Rejection reason is required (minimum 10 characters)' });
       }
-      
+
+      // Run16 BUG-046: rejecting a non-pending resource used to fall through
+      // to the catch → 500. It is a state conflict, not a server error.
+      if (existing.status !== 'pending') {
+        return res.status(409).json({
+          message: `Only pending resources can be rejected here (this resource is '${existing.status}'). Use the resource status controls to change an approved resource.`,
+        });
+      }
+
       await resourceRepo.rejectResource(resourceId, userId, reason);
       const updatedResource = await resourceRepo.getResource(resourceId);
       
@@ -2766,7 +2899,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'Resource not found' });
       }
       
-      const updateSchema = insertResourceSchema.partial();
+      const updateSchema = insertResourceSchema.partial().extend({
+        // Run16 BUG-001: updates may keep a legacy http:// URL but a NEW value
+        // must be a web URL — javascript:/ftp:/data: never reach the DB.
+        url: insertResourceSchema.shape.url.trim()
+          .refine((v) => WEB_URL_RE.test(v), 'URL must start with http:// or https://')
+          .optional(),
+      });
       const validationResult = updateSchema.safeParse(req.body);
       
       if (!validationResult.success) {
@@ -2964,13 +3103,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const search = req.query.search as string;
       const category = req.query.category as string;
       const status = req.query.status as string;
+      // Run16 BUG-035: pass the whitelisted sort through to the repo
+      // (unknown values fall back to newest-first inside listResources).
+      const sort = req.query.sort as "name-asc" | "name-desc" | "newest" | "oldest" | undefined;
       
       const result = await resourceRepo.listResources({
         page,
         limit,
         search,
         category,
-        status: status || undefined
+        status: status || undefined,
+        sort
       });
       
       res.json({
@@ -2993,7 +3136,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const createSchema = insertResourceSchema.extend({
         title: insertResourceSchema.shape.title.min(1, 'Title is required'),
-        url: insertResourceSchema.shape.url.min(1, 'URL is required'),
+        // Run16 BUG-001/BUG-031: admin-created resources go live immediately —
+        // require a real https URL, not just a non-empty string.
+        url: insertResourceSchema.shape.url.trim().min(1, 'URL is required')
+          .refine((v) => HTTPS_URL_RE.test(v), 'Must be a valid HTTPS URL'),
       });
       
       const validationResult = createSchema.safeParse(req.body);
@@ -3738,9 +3884,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/github/sync-history - Get all sync history
   app.get('/api/github/sync-history', isAuthenticated, isAdmin, async (req, res) => {
     try {
-      const history = await githubSyncRepo.getSyncHistory();
-      
-      res.json(history.sort((a, b) => 
+      // Run16 BUG-038: older sync runs were only recorded in github_sync_queue
+      // (the canonical github_sync_history table came later and is empty on
+      // long-lived deployments), so the panel showed "no syncs" despite
+      // completed runs. Merge terminal queue rows into the history shape,
+      // skipping any queue row that has a matching canonical history row
+      // (same repo + direction within 10 min) to avoid double-counting runs
+      // recorded in BOTH tables.
+      const [history, queueItems] = await Promise.all([
+        githubSyncRepo.getSyncHistory(),
+        githubSyncRepo.getGithubSyncQueue(),
+      ]);
+
+      const unwrap = (v: any): number => Array.isArray(v) ? (Number(v[0]) || 0) : (Number(v) || 0);
+      const TEN_MIN = 10 * 60 * 1000;
+      const fromQueue = queueItems
+        .filter(q => q.status === 'completed' || q.status === 'failed')
+        .filter(q => !history.some(h =>
+          h.repositoryUrl === q.repositoryUrl &&
+          h.direction === q.action &&
+          Math.abs(new Date(h.createdAt!).getTime() - new Date((q.processedAt ?? q.createdAt)!).getTime()) < TEN_MIN
+        ))
+        .map(q => {
+          const md = (q.metadata ?? {}) as Record<string, any>;
+          const added = md.diff?.added ?? unwrap(md.imported);
+          const updated = md.diff?.updated ?? unwrap(md.updated);
+          const removed = md.diff?.removed ?? 0;
+          return {
+            // Offset keeps queue-derived ids from colliding with real history ids.
+            id: 1_000_000 + q.id,
+            repositoryUrl: q.repositoryUrl,
+            direction: q.action,
+            commitSha: md.commitSha ?? null,
+            commitMessage: md.commitMessage ?? (q.status === 'failed' ? (q.errorMessage || 'Sync failed') : null),
+            commitUrl: null,
+            resourcesAdded: added,
+            resourcesUpdated: updated,
+            resourcesRemoved: removed,
+            totalResources: unwrap(md.exported) || (added + updated + unwrap(md.skipped)) || (Array.isArray(q.resourceIds) ? q.resourceIds.length : 0),
+            performedBy: null,
+            createdAt: q.processedAt ?? q.createdAt,
+          };
+        });
+
+      res.json([...history, ...fromQueue].sort((a: any, b: any) =>
         new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
       ));
     } catch (error) {
@@ -4443,6 +4630,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ success: false, message: 'Prompt must be at least 10 characters' });
       }
 
+      // Run16 BUG-008: server-side guardrails mirroring the launch form
+      // (budget $0.25–$10.00, turns 5–100). The API used to accept any value
+      // (e.g. maxTurns=301000 / $113 budgets) and silently run with it.
+      let budget = '1.00';
+      if (maxBudgetUsd !== undefined && maxBudgetUsd !== null && String(maxBudgetUsd).trim() !== '') {
+        const n = Number(maxBudgetUsd);
+        if (!Number.isFinite(n) || n < 0.25 || n > 10) {
+          return res.status(400).json({ success: false, message: 'maxBudgetUsd must be a number between 0.25 and 10.00' });
+        }
+        budget = n.toFixed(2);
+      }
+      let turns = 30;
+      if (maxTurns !== undefined && maxTurns !== null && String(maxTurns).trim() !== '') {
+        const n = Number(maxTurns);
+        if (!Number.isInteger(n) || n < 5 || n > 100) {
+          return res.status(400).json({ success: false, message: 'maxTurns must be an integer between 5 and 100' });
+        }
+        turns = n;
+      }
+
       let agentConfig;
       try {
         agentConfig = await parseAgentConfigFromRequest(req.body);
@@ -4454,8 +4661,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const jobId = await researchService.startResearchJob({
         prompt: prompt.trim(),
         categoryFocus: categoryFocus || undefined,
-        maxBudgetUsd: maxBudgetUsd || '1.00',
-        maxTurns: maxTurns || 30,
+        maxBudgetUsd: budget,
+        maxTurns: turns,
         startedBy: userId,
         model: agentConfig.model,
         baseUrl: agentConfig.baseUrl,
@@ -4551,8 +4758,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= Database-Driven Routes =============
 
   // API routes for awesome list - NOW SERVED FROM DATABASE
+  // Run16 BUG-002: the unfiltered awesome-list payload is ~2.7MB and was
+  // rebuilt from the DB on every request. Cache the serialized tree for 60s
+  // and answer conditional requests with 304 via a strong content-hash ETag
+  // (compression middleware already gzips the 200 path). Filtered requests
+  // (rare, admin/deep-link only) bypass the cache. Staleness ceiling after an
+  // admin edit is the 60s TTL — acceptable for a read-mostly catalog.
+  let awesomeListCache: { body: string; etag: string; builtAt: number } | null = null;
+  const AWESOME_LIST_TTL_MS = 60_000;
+
   app.get("/api/awesome-list", async (req, res) => {
     try {
+      // Extract query parameters for filtering
+      const { category, subcategory, subSubcategory } = req.query;
+      const isUnfiltered = !category && !subcategory && !subSubcategory;
+
+      if (isUnfiltered && awesomeListCache && Date.now() - awesomeListCache.builtAt < AWESOME_LIST_TTL_MS) {
+        res.set('ETag', awesomeListCache.etag);
+        res.set('Cache-Control', 'public, max-age=0, must-revalidate');
+        if (req.headers['if-none-match'] === awesomeListCache.etag) {
+          return res.status(304).end();
+        }
+        return res.type('application/json').send(awesomeListCache.body);
+      }
+
       // Use database-driven hierarchy (replaces static JSON)
       const data = await legacyRepo.getAwesomeListFromDatabase();
       
@@ -4561,9 +4790,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(500).json({ error: 'No awesome list data available' });
       }
 
-      // Extract query parameters for filtering
-      const { category, subcategory, subSubcategory } = req.query;
-      
+      if (isUnfiltered) {
+        const body = JSON.stringify(data);
+        const etag = '"' + crypto.createHash('sha1').update(body).digest('hex') + '"';
+        awesomeListCache = { body, etag, builtAt: Date.now() };
+        res.set('ETag', etag);
+        res.set('Cache-Control', 'public, max-age=0, must-revalidate');
+        if (req.headers['if-none-match'] === etag) {
+          return res.status(304).end();
+        }
+        console.log(`📊 /api/awesome-list: ${data.resources.length} resources, ${data.categories.length} categories (cache rebuild)`);
+        return res.type('application/json').send(body);
+      }
+
       let filteredResources = data.resources;
 
       // Apply filtering based on query parameters
@@ -4935,6 +5174,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Registered here so its concrete /api/public/* routes are matched before the
   // catch-all 404 below.
   registerPublicApiRoutes(app);
+
+  // Run16 BUG-091: wrong-method requests on existing endpoints used to return
+  // 404 as if the path didn't exist. These app.all() handlers sit AFTER the
+  // real routes, so they only see methods no real route matched → 405 + Allow.
+  // OPTIONS passes through (preflight/introspection stays untouched).
+  const PUBLIC_METHOD_ALLOW: Array<[string, string]> = [
+    ['/api/resources', 'GET, POST'],
+    ['/api/search', 'GET'],
+    ['/api/categories', 'GET'],
+    ['/api/journeys', 'GET'],
+    ['/api/awesome-list', 'GET'],
+  ];
+  for (const [routePath, allow] of PUBLIC_METHOD_ALLOW) {
+    app.all(routePath, (req, res, next) => {
+      if (req.method === 'OPTIONS') return next();
+      res.set('Allow', allow);
+      res.status(405).json({ message: `Method ${req.method} not allowed. Allowed: ${allow}` });
+    });
+  }
+
+  // Run16 BUG-091: one "not found" body per semantic — /api/resources/abc used
+  // to fall to the generic catch-all ('Not found') while /api/resources/0 said
+  // 'Resource not found'. A non-numeric id is still a resource lookup. Non-GET
+  // methods on the detail path get 405 like the collections above.
+  app.all('/api/resources/:id', (req, res, next) => {
+    if (req.method === 'OPTIONS') return next();
+    if (req.method === 'GET' || req.method === 'HEAD') {
+      return res.status(404).json({ message: 'Resource not found' });
+    }
+    res.set('Allow', 'GET');
+    return res.status(405).json({ message: `Method ${req.method} not allowed. Allowed: GET` });
+  });
 
   // JSON 404 fallback for unmatched /api/* routes.
   // Must be registered after all other /api/* handlers so it only catches

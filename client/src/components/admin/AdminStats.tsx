@@ -38,14 +38,45 @@ export default function AdminStats({ stats, isLoading, onNavigate }: AdminStatsP
           icon: FileText,
           label: "Live Resources",
           value: publicCount,
+          /* R2-M22: only mention non-zero buckets (no "+0 pending").
+             Run16 BUG-029: pending/rejected are now deep-links — pending jumps
+             to the approvals tab, rejected opens the resources tab pre-filtered
+             to status=rejected (ResourceManager reads ?status= on mount). */
           sublabel:
-            pendingCount || rejectedCount
-              ? /* R2-M22: only mention non-zero buckets (no "+0 pending"). */
-                [
-                  pendingCount ? `+${pendingCount} pending` : null,
-                  rejectedCount ? `${rejectedCount} rejected` : null,
-                ].filter(Boolean).join(" · ")
-              : undefined,
+            pendingCount || rejectedCount ? (
+              <>
+                {pendingCount ? (
+                  <button
+                    type="button"
+                    className="underline decoration-dotted hover:text-[var(--accent)]"
+                    data-testid="link-stat-pending"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onNavigate?.("approvals");
+                    }}
+                  >
+                    +{pendingCount} pending
+                  </button>
+                ) : null}
+                {pendingCount && rejectedCount ? " · " : null}
+                {rejectedCount ? (
+                  <button
+                    type="button"
+                    className="underline decoration-dotted hover:text-[var(--accent)]"
+                    data-testid="link-stat-rejected"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const url = new URL(window.location.href);
+                      url.searchParams.set("status", "rejected");
+                      window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+                      onNavigate?.("resources");
+                    }}
+                  >
+                    {rejectedCount} rejected
+                  </button>
+                ) : null}
+              </>
+            ) : undefined,
           testId: "stat-live-resources",
           tab: "resources",
         },

@@ -376,7 +376,7 @@ export default function Home({ awesomeList, isLoading }: HomeProps) {
         </div>
 
         {isAuthenticated ? (
-          <AIRecommendationsPanel resources={awesomeList.resources} />
+          <AIRecommendationsPanel resources={awesomeList.resources} showHeader={false} />
         ) : (
           <Card>
             <CardHeader>

@@ -55,15 +55,19 @@ export default function NotFound({ heading = "Page Not Found", suggestion }: Not
             You can return to the home page to explore our curated collection of awesome resources.
           </p>
         </CardContent>
-        <CardFooter className="flex justify-end gap-2">
-          <Button variant="outline" asChild>
-            <Link href="/">
+        {/* Run16 BUG-045: at 375px the unwrappable row pushed "Browse all
+            categories" 9px off the left viewport edge. Stack the CTAs
+            full-width on narrow screens; row layout resumes at sm. The
+            categories CTA also now points at /categories, not home. */}
+        <CardFooter className="flex flex-col sm:flex-row flex-wrap sm:justify-end gap-2">
+          <Button variant="outline" asChild className="w-full sm:w-auto">
+            <Link href="/categories" data-testid="link-browse-categories">
               <List className="mr-2 h-4 w-4" />
               Browse all categories
             </Link>
           </Button>
-          <Button asChild>
-            <Link href="/">
+          <Button asChild className="w-full sm:w-auto">
+            <Link href="/" data-testid="link-go-home">
               <Home className="mr-2 h-4 w-4" />
               Go Home
             </Link>

@@ -14,7 +14,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Plus,
   Pencil,
@@ -23,6 +22,8 @@ import {
   ExternalLink,
   ChevronLeft,
   ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
   Database,
   Filter,
   X,
@@ -51,7 +52,9 @@ export default function ResourceManager() {
   const queryClient = useQueryClient();
   
   const [page, setPage] = useState(1);
-  const [limit] = useState(25);
+  // Run16 BUG-035: page size + sort are now user-selectable.
+  const [limit, setLimit] = useState(25);
+  const [sort, setSort] = useState<"newest" | "oldest" | "name-asc" | "name-desc">("newest");
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("");
@@ -117,11 +120,12 @@ export default function ResourceManager() {
   };
 
   const { data, isLoading } = useQuery<ResourcesResponse>({
-    queryKey: ['/api/admin/resources', page, limit, search, categoryFilter, statusFilter],
+    queryKey: ['/api/admin/resources', page, limit, search, categoryFilter, statusFilter, sort],
     queryFn: async () => {
       const params = new URLSearchParams();
       params.set('page', page.toString());
       params.set('limit', limit.toString());
+      if (sort !== 'newest') params.set('sort', sort);
       if (search) params.set('search', search);
       if (categoryFilter) params.set('category', categoryFilter);
       if (statusFilter) params.set('status', statusFilter);
@@ -326,6 +330,9 @@ export default function ResourceManager() {
 
   const openCreateDialog = () => {
     resetEditForm();
+    // Run16 BUG-031: new resources follow the approval workflow by default —
+    // the admin can still explicitly pick "approved" in the dialog.
+    setEditForm(prev => ({ ...prev, status: "pending" }));
     setCreateDialogOpen(true);
   };
 
@@ -338,6 +345,16 @@ export default function ResourceManager() {
     if (deepLinkHandled.current) return;
     deepLinkHandled.current = true;
     const params = new URLSearchParams(window.location.search);
+    // Run16 BUG-029: ?status=rejected|pending|approved pre-filters the table
+    // (used by the dashboard's "N rejected" stat sublabel deep-link). The
+    // param is stripped so refreshes don't re-apply a stale filter.
+    const statusParam = params.get("status");
+    if (statusParam && STATUS_OPTIONS.some(s => s.value === statusParam)) {
+      setStatusFilter(statusParam);
+      const url = new URL(window.location.href);
+      url.searchParams.delete("status");
+      window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+    }
     const rid = parseInt(params.get("resourceId") || "", 10);
     if (!rid || Number.isNaN(rid)) return;
     const stripParam = () => {
@@ -364,8 +381,32 @@ export default function ResourceManager() {
     setDeleteDialogOpen(true);
   };
 
+  // Run16 BUG-012: the Edit dialog used to submit with no client-side checks
+  // (blank title/URL only failed server-side with a raw error). Both dialogs
+  // now share the same validation, mirroring the server's http(s) URL rule.
+  const validateEditForm = (): boolean => {
+    if (!editForm.title.trim() || !editForm.url.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Title and URL are required",
+        variant: "destructive"
+      });
+      return false;
+    }
+    if (!/^https?:\/\//i.test(editForm.url.trim())) {
+      toast({
+        title: "Validation Error",
+        description: "URL must start with http:// or https://",
+        variant: "destructive"
+      });
+      return false;
+    }
+    return true;
+  };
+
   const handleSaveEdit = () => {
     if (!selectedResource) return;
+    if (!validateEditForm()) return;
     updateMutation.mutate({
       id: selectedResource.id,
       data: editForm
@@ -373,10 +414,13 @@ export default function ResourceManager() {
   };
 
   const handleCreate = () => {
-    if (!editForm.title || !editForm.url) {
+    if (!validateEditForm()) return;
+    // Run16 BUG-031: require a category on create so new resources never
+    // land in the catalog as "Uncategorized".
+    if (!editForm.category) {
       toast({
         title: "Validation Error",
-        description: "Title and URL are required",
+        description: "Please select a category for the new resource",
         variant: "destructive"
       });
       return;
@@ -534,7 +578,11 @@ export default function ResourceManager() {
                 data-testid="input-search-resources"
               />
             </div>
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            {/* Run16 BUG-009: the "All ..." items carry value="all" (Radix forbids
+                value=""), but the API treats a literal status/category of "all"
+                as a real filter value and matches nothing. Map "all" back to ""
+                (= param omitted) so resetting a filter actually resets it. */}
+            <Select value={categoryFilter} onValueChange={(v) => setCategoryFilter(v === "all" ? "" : v)}>
               <SelectTrigger className="w-full sm:w-48" aria-label="Filter by category" data-testid="select-category-filter">
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="All Categories" />
@@ -546,7 +594,7 @@ export default function ResourceManager() {
                 ))}
               </SelectContent>
             </Select>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v === "all" ? "" : v)}>
               <SelectTrigger className="w-full sm:w-36" aria-label="Filter by status" data-testid="select-status-filter">
                 <SelectValue placeholder="All Status" />
               </SelectTrigger>
@@ -555,6 +603,18 @@ export default function ResourceManager() {
                 {STATUS_OPTIONS.map(status => (
                   <SelectItem key={status.value} value={status.value}>{status.label}</SelectItem>
                 ))}
+              </SelectContent>
+            </Select>
+            {/* Run16 BUG-035: user-selectable sort order (server-side, whitelisted). */}
+            <Select value={sort} onValueChange={(v) => { setSort(v as typeof sort); setPage(1); }}>
+              <SelectTrigger className="w-full sm:w-40" aria-label="Sort resources" data-testid="select-sort">
+                <SelectValue placeholder="Sort" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">Newest first</SelectItem>
+                <SelectItem value="oldest">Oldest first</SelectItem>
+                <SelectItem value="name-asc">Title A–Z</SelectItem>
+                <SelectItem value="name-desc">Title Z–A</SelectItem>
               </SelectContent>
             </Select>
             <Button type="submit" variant="outline" aria-label="Search" data-testid="button-search">
@@ -685,7 +745,12 @@ export default function ResourceManager() {
             </AlertDialogContent>
           </AlertDialog>
 
-          <ScrollArea className="h-[600px]">
+          {/* Run16 BUG-011: Radix ScrollArea's viewport renders content at
+              display:table/min-width:100%, so the table's own overflow-auto
+              wrapper grows to full table width and never scrolls horizontally —
+              Actions were physically unreachable at 375/768px. A native
+              overflow-auto div scrolls BOTH axes. */}
+          <div className="h-[600px] overflow-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -705,6 +770,19 @@ export default function ResourceManager() {
                 </TableRow>
               </TableHeader>
               <TableBody>
+                {/* Run16 BUG-080: explicit empty state instead of a blank table. */}
+                {!isLoading && (data?.resources.length || 0) === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={6} className="py-12 text-center text-sm text-[var(--text-2)]" data-testid="row-empty-state">
+                      {(search || categoryFilter || statusFilter)
+                        ? <>No resources match the current search or filters.{' '}
+                            <button type="button" className="text-primary underline" onClick={clearFilters} data-testid="button-empty-clear-filters">
+                              Clear filters
+                            </button></>
+                        : "No resources yet."}
+                    </TableCell>
+                  </TableRow>
+                )}
                 {data?.resources.map((resource) => (
                   <TableRow
                     key={resource.id}
@@ -726,15 +804,23 @@ export default function ResourceManager() {
                         <div className="font-medium truncate max-w-[300px]" title={resource.title || ''}>
                           {resource.title || 'Untitled'}
                         </div>
-                        <a
-                          href={resource.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-primary hover:underline flex items-center gap-1 truncate max-w-[300px]"
-                        >
-                          {resource.url}
-                          <ExternalLink className="h-3 w-3 flex-shrink-0" />
-                        </a>
+                        {/* Run16 BUG-036: only http(s) URLs get a live anchor —
+                            legacy rows with other schemes render as plain text. */}
+                        {/^https?:\/\//i.test(resource.url || '') ? (
+                          <a
+                            href={resource.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-primary hover:underline flex items-center gap-1 truncate max-w-[300px]"
+                          >
+                            {resource.url}
+                            <ExternalLink className="h-3 w-3 flex-shrink-0" />
+                          </a>
+                        ) : (
+                          <span className="text-xs text-[var(--text-2)] truncate max-w-[300px] block">
+                            {resource.url}
+                          </span>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
@@ -774,13 +860,38 @@ export default function ResourceManager() {
                 ))}
               </TableBody>
             </Table>
-          </ScrollArea>
+          </div>
 
-          <div className="flex items-center justify-between pt-4 border-t border-[var(--border)]">
-            <div className="text-sm text-[var(--text-2)]">
-              Showing {((page - 1) * limit) + 1} - {Math.min(page * limit, data?.total || 0)} of {data?.total || 0} resources
+          {/* Run16 BUG-035: page-size selector + first/last jump buttons. */}
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-[var(--border)]">
+            <div className="flex items-center gap-3">
+              <div className="text-sm text-[var(--text-2)]">
+                {(data?.total || 0) === 0
+                  ? "0 resources"
+                  : `Showing ${((page - 1) * limit) + 1} - ${Math.min(page * limit, data?.total || 0)} of ${data?.total || 0} resources`}
+              </div>
+              <Select value={String(limit)} onValueChange={(v) => { setLimit(parseInt(v, 10)); setPage(1); }}>
+                <SelectTrigger className="w-28 h-8" aria-label="Rows per page" data-testid="select-page-size">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="25">25 / page</SelectItem>
+                  <SelectItem value="50">50 / page</SelectItem>
+                  <SelectItem value="100">100 / page</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage(1)}
+                disabled={page <= 1}
+                aria-label="First page"
+                data-testid="button-first-page"
+              >
+                <ChevronsLeft className="h-4 w-4" />
+              </Button>
               <Button
                 variant="outline"
                 size="sm"
@@ -803,6 +914,16 @@ export default function ResourceManager() {
                 data-testid="button-next-page"
               >
                 <ChevronRight className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage(data?.totalPages || 1)}
+                disabled={page >= (data?.totalPages || 1)}
+                aria-label="Last page"
+                data-testid="button-last-page"
+              >
+                <ChevronsRight className="h-4 w-4" />
               </Button>
             </div>
           </div>

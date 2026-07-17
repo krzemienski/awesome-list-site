@@ -81,6 +81,27 @@ const EMPTY_FORM: StepFormState = {
   isOptional: false,
 };
 
+// Run16 BUG-013: the DB stores one row per step-resource (up to 3 rows share a
+// stepNumber). The editor previously rendered every raw row as its own step
+// (badges 1,1,1,2,2,2…) while the card/public page said "6 steps". The dialog
+// now groups rows into logical steps.
+interface StepGroup {
+  stepNumber: number;
+  rows: JourneyStep[];
+}
+
+function groupSteps(steps: JourneyStep[]): StepGroup[] {
+  const map = new Map<number, JourneyStep[]>();
+  for (const s of steps) {
+    const arr = map.get(s.stepNumber);
+    if (arr) arr.push(s);
+    else map.set(s.stepNumber, [s]);
+  }
+  return [...map.entries()]
+    .sort((a, b) => a[0] - b[0])
+    .map(([stepNumber, rows]) => ({ stepNumber, rows }));
+}
+
 function ResourcePicker({
   value,
   onChange,
@@ -193,6 +214,7 @@ function StepEditor({
   submitLabel,
   onSubmit,
   isPending,
+  showResourcePicker = true,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -201,6 +223,7 @@ function StepEditor({
   submitLabel: string;
   onSubmit: (form: StepFormState) => void;
   isPending: boolean;
+  showResourcePicker?: boolean;
 }) {
   const [form, setForm] = useState<StepFormState>(initial);
 
@@ -239,13 +262,19 @@ function StepEditor({
               data-testid="step-description-input"
             />
           </div>
-          <div className="space-y-2">
-            <Label>Resource (optional)</Label>
-            <ResourcePicker
-              value={form.resourceId}
-              onChange={(id) => setForm((f) => ({ ...f, resourceId: id }))}
-            />
-          </div>
+          {showResourcePicker ? (
+            <div className="space-y-2">
+              <Label>Resource (optional)</Label>
+              <ResourcePicker
+                value={form.resourceId}
+                onChange={(id) => setForm((f) => ({ ...f, resourceId: id }))}
+              />
+            </div>
+          ) : (
+            <p className="text-xs text-muted-foreground">
+              This step links multiple resources — manage them from the step list.
+            </p>
+          )}
           <div className="flex items-center gap-2">
             <Checkbox
               id="step-optional"
@@ -308,6 +337,9 @@ function StepsDialog({
   });
 
   const steps = useMemo(() => data?.steps ?? [], [data]);
+  // Run16 BUG-013: render LOGICAL steps (rows grouped by stepNumber), not raw
+  // step-resource rows — the raw list showed 18 rows with badges 1,1,1,2,2,2…
+  const groups = useMemo(() => groupSteps(steps), [steps]);
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ["/api/admin/journeys", journeyId, "steps"] });
@@ -336,43 +368,73 @@ function StepsDialog({
       toast({ title: "Could not add step", description: err.message, variant: "destructive" }),
   });
 
+  // Group edit: title/description/isOptional apply to EVERY row of the logical
+  // step; each row keeps its own linked resource (except single-row steps,
+  // where the picker is shown and resourceId is editable).
   const updateMutation = useMutation({
-    mutationFn: async ({ id, form }: { id: number; form: StepFormState }) =>
-      apiRequest(`/api/admin/journeys/${journeyId}/steps/${id}`, {
-        method: "PATCH",
-        body: JSON.stringify({
-          title: form.title,
-          description: form.description || null,
-          resourceId: form.resourceId,
-          isOptional: form.isOptional,
-        }),
-      }),
+    mutationFn: async ({ group, form }: { group: StepGroup; form: StepFormState }) => {
+      for (const row of group.rows) {
+        await apiRequest(`/api/admin/journeys/${journeyId}/steps/${row.id}`, {
+          method: "PATCH",
+          body: JSON.stringify({
+            title: form.title,
+            description: form.description || null,
+            resourceId: group.rows.length === 1 ? form.resourceId : row.resourceId,
+            isOptional: form.isOptional,
+          }),
+        });
+      }
+    },
     onSuccess: () => {
       toast({ title: "Step saved" });
-      setEditingStep(null);
+      setEditingGroup(null);
       invalidate();
     },
-    onError: (err: Error) =>
-      toast({ title: "Could not save step", description: err.message, variant: "destructive" }),
+    onError: (err: Error) => {
+      toast({ title: "Could not save step", description: err.message, variant: "destructive" });
+      invalidate();
+    },
   });
 
-  const deleteMutation = useMutation({
+  // Deletes a whole logical step (all of its rows). The server renumbers the
+  // remaining steps group-aware.
+  const deleteGroupMutation = useMutation({
+    mutationFn: async (group: StepGroup) => {
+      for (const row of group.rows) {
+        await apiRequest(`/api/admin/journeys/${journeyId}/steps/${row.id}`, {
+          method: "DELETE",
+        });
+      }
+    },
+    onSuccess: () => {
+      toast({ title: "Step deleted" });
+      setDeletingGroup(null);
+      invalidate();
+    },
+    onError: (err: Error) => {
+      toast({ title: "Could not delete step", description: err.message, variant: "destructive" });
+      invalidate();
+    },
+  });
+
+  // Removes a single linked resource row from a multi-resource step.
+  const removeRowMutation = useMutation({
     mutationFn: async (id: number) =>
       apiRequest(`/api/admin/journeys/${journeyId}/steps/${id}`, { method: "DELETE" }),
     onSuccess: () => {
-      toast({ title: "Step deleted" });
-      setDeletingStep(null);
+      toast({ title: "Resource removed from step" });
+      setRemovingRow(null);
       invalidate();
     },
     onError: (err: Error) =>
-      toast({ title: "Could not delete step", description: err.message, variant: "destructive" }),
+      toast({ title: "Could not remove resource", description: err.message, variant: "destructive" }),
   });
 
   const reorderMutation = useMutation({
-    mutationFn: async (stepIds: number[]) =>
+    mutationFn: async (stepGroups: number[][]) =>
       apiRequest(`/api/admin/journeys/${journeyId}/steps/reorder`, {
         method: "POST",
-        body: JSON.stringify({ stepIds }),
+        body: JSON.stringify({ stepGroups }),
       }),
     onSuccess: () => invalidate(),
     onError: (err: Error) =>
@@ -380,15 +442,16 @@ function StepsDialog({
   });
 
   const [createOpen, setCreateOpen] = useState(false);
-  const [editingStep, setEditingStep] = useState<JourneyStep | null>(null);
-  const [deletingStep, setDeletingStep] = useState<JourneyStep | null>(null);
+  const [editingGroup, setEditingGroup] = useState<StepGroup | null>(null);
+  const [deletingGroup, setDeletingGroup] = useState<StepGroup | null>(null);
+  const [removingRow, setRemovingRow] = useState<JourneyStep | null>(null);
 
   const move = (index: number, direction: -1 | 1) => {
     const target = index + direction;
-    if (target < 0 || target >= steps.length) return;
-    const next = [...steps];
+    if (target < 0 || target >= groups.length) return;
+    const next = [...groups];
     [next[index], next[target]] = [next[target], next[index]];
-    reorderMutation.mutate(next.map((s) => s.id));
+    reorderMutation.mutate(next.map((g) => g.rows.map((r) => r.id)));
   };
 
   return (
@@ -423,80 +486,102 @@ function StepsDialog({
               No steps yet — click "Add step" to create the first one.
             </p>
           )}
-          {steps.map((step, index) => (
-            <div
-              key={step.id}
-              className="flex gap-3 items-start border rounded-md p-3"
-              data-testid={`step-row-${step.id}`}
-            >
-              <div className="flex flex-col items-center gap-1 pt-1">
-                <Badge variant="outline">{step.stepNumber}</Badge>
-                <div className="flex flex-col">
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-6 w-6"
-                    onClick={() => move(index, -1)}
-                    disabled={index === 0 || reorderMutation.isPending}
-                    aria-label="Move step up"
-                    data-testid={`step-up-${step.id}`}
-                  >
-                    <ArrowUp className="h-3 w-3" />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-6 w-6"
-                    onClick={() => move(index, 1)}
-                    disabled={index === steps.length - 1 || reorderMutation.isPending}
-                    aria-label="Move step down"
-                    data-testid={`step-down-${step.id}`}
-                  >
-                    <ArrowDown className="h-3 w-3" />
-                  </Button>
+          {groups.map((group, index) => {
+            const primary = group.rows[0];
+            const linkedRows = group.rows.filter((r) => r.resourceId !== null);
+            return (
+              <div
+                key={primary.id}
+                className="flex gap-3 items-start border rounded-md p-3"
+                data-testid={`step-group-${primary.id}`}
+              >
+                <div className="flex flex-col items-center gap-1 pt-1">
+                  <Badge variant="outline">{index + 1}</Badge>
+                  <div className="flex flex-col">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-6 w-6"
+                      onClick={() => move(index, -1)}
+                      disabled={index === 0 || reorderMutation.isPending}
+                      aria-label="Move step up"
+                      data-testid={`step-up-${primary.id}`}
+                    >
+                      <ArrowUp className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-6 w-6"
+                      onClick={() => move(index, 1)}
+                      disabled={index === groups.length - 1 || reorderMutation.isPending}
+                      aria-label="Move step down"
+                      data-testid={`step-down-${primary.id}`}
+                    >
+                      <ArrowDown className="h-3 w-3" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-medium">{step.title}</span>
-                  {step.isOptional && <Badge variant="secondary">Optional</Badge>}
-                  {step.resourceId && (
-                    <Badge variant="outline" className="gap-1">
-                      <ExternalLink className="h-3 w-3" />
-                      Resource #{step.resourceId}
-                    </Badge>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-medium">{primary.title}</span>
+                    {primary.isOptional && <Badge variant="secondary">Optional</Badge>}
+                  </div>
+                  {primary.description && (
+                    <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap break-words">
+                      {primary.description}
+                    </p>
+                  )}
+                  {linkedRows.length > 0 && (
+                    <div className="flex items-center gap-1.5 flex-wrap mt-2">
+                      <span className="text-xs text-muted-foreground">
+                        {linkedRows.length} linked resource{linkedRows.length !== 1 ? "s" : ""}:
+                      </span>
+                      {linkedRows.map((row) => (
+                        <Badge key={row.id} variant="outline" className="gap-1">
+                          <ExternalLink className="h-3 w-3" />
+                          #{row.resourceId}
+                          {group.rows.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => setRemovingRow(row)}
+                              className="hover:opacity-80"
+                              aria-label={`Remove resource #${row.resourceId} from this step`}
+                              data-testid={`step-remove-resource-${row.id}`}
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          )}
+                        </Badge>
+                      ))}
+                    </div>
                   )}
                 </div>
-                {step.description && (
-                  <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap break-words">
-                    {step.description}
-                  </p>
-                )}
-              </div>
 
-              <div className="flex gap-1">
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => setEditingStep(step)}
-                  aria-label="Edit step"
-                  data-testid={`step-edit-${step.id}`}
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => setDeletingStep(step)}
-                  aria-label="Delete step"
-                  data-testid={`step-delete-${step.id}`}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                <div className="flex gap-1">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => setEditingGroup(group)}
+                    aria-label="Edit step"
+                    data-testid={`step-edit-${primary.id}`}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => setDeletingGroup(group)}
+                    aria-label="Delete step"
+                    data-testid={`step-delete-${primary.id}`}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <StepEditor
@@ -510,49 +595,79 @@ function StepsDialog({
         />
 
         <StepEditor
-          open={editingStep !== null}
+          open={editingGroup !== null}
           onOpenChange={(o) => {
-            if (!o) setEditingStep(null);
+            if (!o) setEditingGroup(null);
           }}
           initial={
-            editingStep
+            editingGroup
               ? {
-                  title: editingStep.title,
-                  description: editingStep.description ?? "",
-                  resourceId: editingStep.resourceId,
-                  isOptional: !!editingStep.isOptional,
+                  title: editingGroup.rows[0].title,
+                  description: editingGroup.rows[0].description ?? "",
+                  resourceId: editingGroup.rows[0].resourceId,
+                  isOptional: !!editingGroup.rows[0].isOptional,
                 }
               : EMPTY_FORM
           }
           title="Edit step"
           submitLabel={updateMutation.isPending ? "Saving…" : "Save changes"}
           onSubmit={(form) =>
-            editingStep && updateMutation.mutate({ id: editingStep.id, form })
+            editingGroup && updateMutation.mutate({ group: editingGroup, form })
           }
           isPending={updateMutation.isPending}
+          showResourcePicker={(editingGroup?.rows.length ?? 1) === 1}
         />
 
         <AlertDialog
-          open={deletingStep !== null}
+          open={deletingGroup !== null}
           onOpenChange={(o) => {
-            if (!o) setDeletingStep(null);
+            if (!o) setDeletingGroup(null);
           }}
         >
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Delete this step?</AlertDialogTitle>
               <AlertDialogDescription>
-                Removing "{deletingStep?.title}" will renumber the remaining steps. This
-                cannot be undone.
+                Removing "{deletingGroup?.rows[0]?.title}"
+                {(deletingGroup?.rows.length ?? 0) > 1
+                  ? ` and its ${deletingGroup?.rows.length} linked resources`
+                  : ""}{" "}
+                will renumber the remaining steps. This cannot be undone.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction
-                onClick={() => deletingStep && deleteMutation.mutate(deletingStep.id)}
+                onClick={() => deletingGroup && deleteGroupMutation.mutate(deletingGroup)}
                 data-testid="confirm-delete-step"
               >
-                Delete
+                {deleteGroupMutation.isPending ? "Deleting…" : "Delete"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        <AlertDialog
+          open={removingRow !== null}
+          onOpenChange={(o) => {
+            if (!o) setRemovingRow(null);
+          }}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Remove this resource?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Resource #{removingRow?.resourceId} will be unlinked from
+                "{removingRow?.title}". The step itself stays.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => removingRow && removeRowMutation.mutate(removingRow.id)}
+                data-testid="confirm-remove-resource"
+              >
+                {removeRowMutation.isPending ? "Removing…" : "Remove"}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

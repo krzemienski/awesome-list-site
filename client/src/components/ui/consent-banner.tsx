@@ -61,10 +61,16 @@ export default function ConsentBanner() {
       className="fixed bottom-0 inset-x-0 z-50 border-t border-[var(--border)] bg-[var(--bg)] shadow-lg"
       data-testid="consent-banner"
     >
-      <div className="mx-auto w-full max-w-[1280px] px-4 sm:px-6 md:px-12 py-3 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+      {/* Run16 BUG-062: shrink the mobile footprint (tighter padding, second
+          sentence hidden on xs) so the fixed banner obscures less of the
+          viewport at 375px; body/footer padding above keeps everything
+          reachable by scrolling. */}
+      <div className="mx-auto w-full max-w-[1280px] px-4 sm:px-6 md:px-12 py-2 sm:py-3 flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
         <p className="text-xs sm:text-sm text-[color:var(--text-2)] flex-1">
           We use Google Analytics to understand aggregate usage — only if you
-          allow it. No personal data is sent either way. See our{" "}
+          allow it.{" "}
+          <span className="hidden sm:inline">No personal data is sent either way. </span>
+          See our{" "}
           <Link
             href="/privacy"
             className="underline hover:text-[color:var(--text)]"

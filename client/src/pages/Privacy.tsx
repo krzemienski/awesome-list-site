@@ -1,3 +1,4 @@
+import { Link } from "wouter";
 import SEOHead from "@/components/layout/SEOHead";
 import { Card, CardContent } from "@/components/ui/card";
 import { Shield } from "lucide-react";
@@ -66,9 +67,18 @@ export default function Privacy() {
             <p>
               Account data is kept while your account is active. You can
               request deletion of your account and personal data by contacting
-              the maintainer via the About page; approved resources you
-              submitted remain in the directory but are detached from your
-              identity.
+              the maintainer via the{" "}
+              {/* Run16 BUG-067: the copy referenced the About page without
+                  linking it. */}
+              <Link
+                href="/about"
+                className="underline underline-offset-4 hover:text-[color:var(--text)]"
+                data-testid="link-privacy-about"
+              >
+                About page
+              </Link>
+              ; approved resources you submitted remain in the directory but
+              are detached from your identity.
             </p>
           </section>
 

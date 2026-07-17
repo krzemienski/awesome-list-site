@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AgentEventLog } from "@/components/admin/AgentEventLog";
 import { AgentCommsGraph } from "@/components/admin/AgentCommsGraph";
@@ -57,6 +58,19 @@ function getStatusBadge(status: string) {
     default:
       return <Badge variant="outline"><Clock className="w-3 h-3 mr-1" />{status}</Badge>;
   }
+}
+
+// Run16 BUG-026: raw SDK failures like "Claude Code process exited with code 1"
+// are meaningless to an admin. Map known patterns to a plain-language
+// explanation while keeping the raw text for debugging.
+function humanizeJobError(msg: string): string {
+  if (/exited with code \d+/i.test(msg) || /process exited/i.test(msg)) {
+    return `The research agent crashed before finishing. This is usually transient — try launching the job again; if it keeps happening, lower the budget/turn limits. (Technical detail: ${msg})`;
+  }
+  if (/abort/i.test(msg)) {
+    return `The job was stopped before it could finish. (Technical detail: ${msg})`;
+  }
+  return msg;
 }
 
 function getDiscoveryStatusBadge(status: string) {
@@ -171,6 +185,30 @@ export default function ResearcherTab() {
     },
   });
 
+  // Run16 BUG-008: the launch button used to fire even while the native
+  // number inputs were flagged invalid (budget $0 jobs got created). Block
+  // submission client-side, mirroring the server's 0.25–10.00 / 5–100 ranges.
+  const handleLaunch = () => {
+    const budget = Number(maxBudget);
+    if (!Number.isFinite(budget) || budget < 0.25 || budget > 10) {
+      toast({
+        title: "Invalid budget",
+        description: "Budget must be between $0.25 and $10.00.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (!Number.isInteger(maxTurns) || maxTurns < 5 || maxTurns > 100) {
+      toast({
+        title: "Invalid max turns",
+        description: "Max turns must be a whole number between 5 and 100.",
+        variant: "destructive",
+      });
+      return;
+    }
+    startMutation.mutate();
+  };
+
   const cancelMutation = useMutation({
     mutationFn: async (jobId: number) => {
       return await apiRequest(`/api/researcher/jobs/${jobId}`, { method: 'DELETE' });
@@ -223,7 +261,9 @@ export default function ResearcherTab() {
   return (
     <div className="space-y-6">
       <Tabs defaultValue="launch" className="w-full">
-        <TabsList className="mb-4">
+        {/* Run16 BUG-030: wrap at narrow widths — the fixed inline-flex bar
+            was 465px wide and pushed "Job History" off-screen at 375px. */}
+        <TabsList className="mb-4 flex flex-wrap h-auto w-full justify-start gap-1">
           <TabsTrigger value="launch"><Brain className="w-4 h-4 mr-1" />Launch Research</TabsTrigger>
           <TabsTrigger value="review">
             <Search className="w-4 h-4 mr-1" />Review Discoveries
@@ -368,7 +408,7 @@ export default function ResearcherTab() {
                 </Alert>
 
                 <Button
-                  onClick={() => startMutation.mutate()}
+                  onClick={handleLaunch}
                   disabled={startMutation.isPending || prompt.trim().length < 10}
                   className="w-full"
                 >
@@ -392,8 +432,11 @@ export default function ResearcherTab() {
                 ) : (
                   <div className="space-y-3">
                     {activeJobs.map(job => {
+                      // Run16 BUG-027: the list endpoint now ships only the
+                      // latest log entry (agentLogLast) instead of the full
+                      // agentLog; fall back to the old shape defensively.
                       const log = (job.agentLog as Array<{ role: string; content: string; timestamp: string }> | null) || [];
-                      const last = log[log.length - 1];
+                      const last = ((job as any).agentLogLast as { role: string; content: string; timestamp: string } | null) ?? log[log.length - 1];
                       return (
                         <Card key={job.id} className="border-blue-500/20">
                           <CardContent className="p-4 space-y-2">
@@ -538,7 +581,12 @@ export default function ResearcherTab() {
             </CardHeader>
             <CardContent>
               {jobsLoading ? (
-                <p className="text-sm text-muted-foreground text-center py-4">Loading...</p>
+                /* Run16 BUG-077: skeleton rows instead of a bare text node. */
+                <div className="space-y-3 py-2" aria-label="Loading research jobs">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <Skeleton key={i} className="h-10 w-full" />
+                  ))}
+                </div>
               ) : !jobs || jobs.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-8">No research jobs yet</p>
               ) : (
@@ -580,6 +628,7 @@ export default function ResearcherTab() {
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => { setSelectedJobId(job.id); setShowJobDetails(true); }}
+                                aria-label={`View details for job #${job.id}`}
                                 data-testid={`button-research-details-${job.id}`}
                               >
                                 <Eye className="w-3 h-3" />
@@ -590,6 +639,7 @@ export default function ResearcherTab() {
                                   variant="ghost"
                                   className="text-destructive"
                                   onClick={() => cancelMutation.mutate(job.id)}
+                                  aria-label={`Cancel job #${job.id}`}
                                 >
                                   <XCircle className="w-3 h-3" />
                                 </Button>
@@ -602,8 +652,8 @@ export default function ResearcherTab() {
                             <TableCell colSpan={9} className="p-0">
                               <Alert variant="destructive" className="rounded-none border-x-0 border-t-0">
                                 <AlertCircle className="w-4 h-4" />
-                                <AlertDescription className="text-xs font-mono break-all">
-                                  Job #{job.id}: {job.errorMessage}
+                                <AlertDescription className="text-xs break-all">
+                                  Job #{job.id}: {humanizeJobError(job.errorMessage)}
                                 </AlertDescription>
                               </Alert>
                             </TableCell>
@@ -687,7 +737,7 @@ export default function ResearcherTab() {
               {selectedJob.errorMessage && (
                 <Alert variant="destructive">
                   <AlertCircle className="w-4 h-4" />
-                  <AlertDescription>{selectedJob.errorMessage}</AlertDescription>
+                  <AlertDescription>{humanizeJobError(selectedJob.errorMessage)}</AlertDescription>
                 </Alert>
               )}
 

@@ -1,0 +1,11 @@
+BUG-018 preference selects: [
+ {
+  "testid": "trigger-skill-level",
+  "name": "Skill Level"
+ },
+ {
+  "testid": "trigger-time-commitment",
+  "name": "Time Commitment"
+ }
+]
+PASS BUG-018 all 2 preference selects have accessible names

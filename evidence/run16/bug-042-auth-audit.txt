@@ -1,0 +1,7 @@
+=== BUG-042: auth events audited (dev, 2026-07-17T10:05:13Z) ===
+--- failed login attempt ---
+{"message":"Invalid email or password"}
+status=401
+--- latest audit entries (auth.*) ---
+14170 auth.login_failed performedBy: None email-in-changes: admin@example.com 2026-07-17T10:05:13.984Z
+14169 auth.login performedBy: d460f5e7-a085-4083-96a2-2f20dc9315c4 email-in-changes: admin@example.com 2026-07-17T10:02:44.314Z

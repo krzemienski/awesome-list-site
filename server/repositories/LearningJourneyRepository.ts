@@ -118,6 +118,55 @@ export class LearningJourneyRepository {
   }
 
   /**
+   * Run16 BUG-013: set explicit stepNumbers on a journey's rows.
+   * The data model stores up to 3 rows per LOGICAL step (one per linked
+   * resource), so multiple rows legitimately share a stepNumber. Row-based
+   * renumbering (1..N per row) would explode 6 logical steps into 18 —
+   * callers pass group-preserving assignments instead.
+   * Two-phase transactional update, same collision-safety as reorder.
+   *
+   * @param journeyId - Journey owning the steps
+   * @param assignments - Explicit { id, stepNumber } pairs (ids must belong to the journey)
+   * @returns The journey's steps after renumbering
+   */
+  async setJourneyStepNumbers(
+    journeyId: number,
+    assignments: { id: number; stepNumber: number }[],
+  ): Promise<JourneyStep[]> {
+    if (assignments.length === 0) {
+      return this.listJourneySteps(journeyId);
+    }
+
+    const existing = await db
+      .select()
+      .from(journeySteps)
+      .where(eq(journeySteps.journeyId, journeyId));
+    const existingIds = new Set(existing.map((s) => s.id));
+    for (const { id } of assignments) {
+      if (!existingIds.has(id)) {
+        throw new Error(`Step ${id} does not belong to journey ${journeyId}`);
+      }
+    }
+
+    await db.transaction(async (tx) => {
+      for (const { id, stepNumber } of assignments) {
+        await tx
+          .update(journeySteps)
+          .set({ stepNumber: -stepNumber })
+          .where(eq(journeySteps.id, id));
+      }
+      for (const { id, stepNumber } of assignments) {
+        await tx
+          .update(journeySteps)
+          .set({ stepNumber })
+          .where(eq(journeySteps.id, id));
+      }
+    });
+
+    return this.listJourneySteps(journeyId);
+  }
+
+  /**
    * Get a learning journey by its ID
    * @param id - Journey ID
    * @returns Journey object or undefined if not found

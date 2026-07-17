@@ -517,10 +517,11 @@ export default function BatchEnrichmentPanel() {
               <Clock className="h-5 w-5" />
               Job History
             </span>
+            {/* Run16 BUG-072: single text node — the Badge is inline-flex,
+                and separate JSX text children become flex items whose
+                boundary whitespace is dropped ("31 totaljobs"). */}
             {jobs.length > 0 && (
-              <Badge variant="outline">
-                {jobs.length} total jobs
-              </Badge>
+              <Badge variant="outline">{`${jobs.length} total jobs`}</Badge>
             )}
           </CardTitle>
           <CardDescription>
@@ -547,7 +548,9 @@ export default function BatchEnrichmentPanel() {
                     <TableHead className="w-[60px]">ID</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Started</TableHead>
-                    <TableHead>Completed</TableHead>
+                    {/* Run16 BUG-070: "Ended" — failed/cancelled jobs also
+                        carry this timestamp, "Completed" implied success. */}
+                    <TableHead>Ended</TableHead>
                     <TableHead className="text-center">Processed</TableHead>
                     <TableHead className="text-center">Success Rate</TableHead>
                     <TableHead className="text-right">Actions</TableHead>

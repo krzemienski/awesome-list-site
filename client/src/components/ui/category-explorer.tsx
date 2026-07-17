@@ -56,13 +56,58 @@ function getAllCategoryResources(category: Category): Resource[] {
   return all;
 }
 
+// Run16 BUG-023: "Activity" used to alias Resource Count (identical order).
+// Real activity = the most recent createdAt/updatedAt across ALL nested
+// resources, so recently-touched categories rank first regardless of size.
+function getLatestActivityTs(category: Category): number {
+  let latest = 0;
+  for (const r of getAllCategoryResources(category)) {
+    const raw = r.updatedAt || r.createdAt;
+    if (!raw) continue;
+    const ts = Date.parse(raw);
+    if (!Number.isNaN(ts) && ts > latest) latest = ts;
+  }
+  return latest;
+}
+
+const VALID_EXPLORER_SORTS = ["name", "count", "activity"];
+
+// Run16 BUG-060: /advanced explorer search + sort deep-link via ?q= & ?sort=
+// (alongside the existing ?tab= sync in Advanced.tsx). replaceState is used
+// directly because wouter's useLocation() is path-only; other params (tab=)
+// are preserved.
+function syncExplorerParam(key: string, value: string | null) {
+  const params = new URLSearchParams(window.location.search);
+  if (value) params.set(key, value);
+  else params.delete(key);
+  const qs = params.toString();
+  window.history.replaceState(null, "", `${window.location.pathname}${qs ? `?${qs}` : ""}`);
+}
+
 export default function CategoryExplorer({ categories, resources, className }: CategoryExplorerProps) {
   const [, navigate] = useLocation();
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(
+    () => new URLSearchParams(window.location.search).get("q") || "",
+  );
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState("name");
+  const [sortBy, setSortBy] = useState(() => {
+    const s = new URLSearchParams(window.location.search).get("sort");
+    return s && VALID_EXPLORER_SORTS.includes(s) ? s : "name";
+  });
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    syncExplorerParam("q", value || null);
+  };
+  const handleSortChange = (value: string) => {
+    setSortBy(value);
+    syncExplorerParam("sort", value === "name" ? null : value);
+  };
   const [showSubcategories, setShowSubcategories] = useState(true);
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
+  // Run16 BUG-024: the toggle used to gate only a per-card chevron whose
+  // content ALSO required manual expansion, so checking/unchecking produced
+  // zero visible change. Now the toggle shows subcategory lists on every card
+  // by default; the per-card chevron collapses individual cards.
+  const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set());
 
   // Extract all unique tags
   const allTags = useMemo(() => {
@@ -102,9 +147,12 @@ export default function CategoryExplorer({ categories, resources, className }: C
           return a.name.localeCompare(b.name);
         case "count":
           return getTotalResourceCount(b) - getTotalResourceCount(a);
-        case "activity":
-          // Sort by most recent or most popular (using resource count as proxy)
-          return getTotalResourceCount(b) - getTotalResourceCount(a);
+        case "activity": {
+          // Run16 BUG-023: most recently updated/added first; ties fall back
+          // to name so the order is stable and visibly distinct from count.
+          const diff = getLatestActivityTs(b) - getLatestActivityTs(a);
+          return diff !== 0 ? diff : a.name.localeCompare(b.name);
+        }
         default:
           return 0;
       }
@@ -122,7 +170,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
   };
 
   const toggleCategoryExpansion = (categoryName: string) => {
-    setExpandedCategories(prev => {
+    setCollapsedCategories(prev => {
       const newSet = new Set(prev);
       if (newSet.has(categoryName)) {
         newSet.delete(categoryName);
@@ -163,7 +211,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
             <Input
               placeholder="Search categories and resources..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               className="pl-10"
             />
           </div>
@@ -173,7 +221,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
             <div className="flex items-center gap-2">
               <Filter className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">Sort:</span>
-              <Select value={sortBy} onValueChange={setSortBy}>
+              <Select value={sortBy} onValueChange={handleSortChange}>
                 <SelectTrigger className="w-32" aria-label="Sort categories">
                   <SelectValue />
                 </SelectTrigger>
@@ -243,7 +291,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
                 variant="ghost"
                 size="sm"
                 onClick={() => {
-                  setSearchTerm("");
+                  handleSearchChange("");
                   setSelectedTags([]);
                 }}
                 className="h-6 px-2 text-xs"
@@ -259,7 +307,8 @@ export default function CategoryExplorer({ categories, resources, className }: C
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredCategories.map(category => {
           const stats = getCategoryStats(category);
-          const isExpanded = expandedCategories.has(category.name);
+          // Run16 BUG-024: expanded by default while the toggle is on.
+          const isExpanded = showSubcategories && !collapsedCategories.has(category.name);
 
           return (
             <Card key={category.name} className="hover:shadow-md transition-shadow">
@@ -299,24 +348,23 @@ export default function CategoryExplorer({ categories, resources, className }: C
                     </div>
                   </div>
                   
+                  {/* Run16 BUG-024: plain button — the old CollapsibleTrigger
+                      lived in a Collapsible DISCONNECTED from the content one,
+                      so it never drove anything but component-local state. */}
                   {showSubcategories && category.subcategories?.length > 0 && (
-                    <Collapsible>
-                      <CollapsibleTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => toggleCategoryExpansion(category.name)}
-                          aria-label={isExpanded ? `Collapse ${category.name}` : `Expand ${category.name}`}
-                          aria-expanded={isExpanded}
-                          className="h-8 w-8 p-0 min-h-[44px] min-w-[44px]"
-                        >
-                          <ChevronRight className={cn(
-                            "h-4 w-4 transform transition-transform",
-                            isExpanded ? "rotate-90" : "rotate-0"
-                          )} />
-                        </Button>
-                      </CollapsibleTrigger>
-                    </Collapsible>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => toggleCategoryExpansion(category.name)}
+                      aria-label={isExpanded ? `Collapse ${category.name}` : `Expand ${category.name}`}
+                      aria-expanded={isExpanded}
+                      className="h-8 w-8 p-0 min-h-[44px] min-w-[44px]"
+                    >
+                      <ChevronRight className={cn(
+                        "h-4 w-4 transform transition-transform",
+                        isExpanded ? "rotate-90" : "rotate-0"
+                      )} />
+                    </Button>
                   )}
                 </div>
               </CardHeader>
@@ -401,7 +449,7 @@ export default function CategoryExplorer({ categories, resources, className }: C
             <Button
               variant="outline"
               onClick={() => {
-                setSearchTerm("");
+                handleSearchChange("");
                 setSelectedTags([]);
               }}
             >

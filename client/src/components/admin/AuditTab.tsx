@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { FileText, Search, RefreshCw } from "lucide-react";
 
 interface AuditLogEntry {
@@ -15,6 +17,7 @@ interface AuditLogEntry {
   originalResourceId: number | null;
   action: string;
   performedBy: string | null;
+  performedByEmail: string | null;
   changes: Record<string, any> | null;
   notes: string | null;
   createdAt: string | null;
@@ -51,6 +54,8 @@ export default function AuditTab() {
   const [limit, setLimit] = useState("50");
   const [appliedFilter, setAppliedFilter] = useState<string>("");
   const [appliedLimit, setAppliedLimit] = useState("50");
+  // Run16 BUG-083: clicking a row opens a detail view with the full payload.
+  const [selectedLog, setSelectedLog] = useState<AuditLogEntry | null>(null);
 
   const { data, isLoading, refetch, isFetching } = useQuery<AuditLogsResponse>({
     queryKey: ['/api/admin/audit-logs', appliedFilter, appliedLimit],
@@ -126,7 +131,12 @@ export default function AuditTab() {
               type="number"
             />
           </div>
-          <Select value={limit} onValueChange={setLimit}>
+          {/* Run16 BUG-040: apply the row limit immediately on change — it
+              previously only took effect after also pressing Search. */}
+          <Select
+            value={limit}
+            onValueChange={(v) => { setLimit(v); setAppliedLimit(v); }}
+          >
             <SelectTrigger className="w-32" aria-label="Rows to show">
               <SelectValue placeholder="Limit" />
             </SelectTrigger>
@@ -156,7 +166,15 @@ export default function AuditTab() {
           </Button>
         </form>
 
-        <div className="overflow-x-auto">
+        {/* Run16 BUG-088: on narrow screens the table scrolls sideways — a
+            right-edge fade + explicit hint make the hidden columns
+            discoverable instead of silently clipping them. */}
+        <div className="relative">
+          <div
+            className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-card to-transparent sm:hidden"
+            aria-hidden="true"
+          />
+          <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
@@ -172,7 +190,13 @@ export default function AuditTab() {
             <TableBody>
               {data?.logs && data.logs.length > 0 ? (
                 data.logs.map((log) => (
-                  <TableRow key={log.id}>
+                  <TableRow
+                    key={log.id}
+                    /* Run16 BUG-083: row click opens the full-entry detail view. */
+                    className="cursor-pointer"
+                    onClick={() => setSelectedLog(log)}
+                    data-testid={`row-audit-log-${log.id}`}
+                  >
                     <TableCell className="text-xs text-muted-foreground">{log.id}</TableCell>
                     <TableCell>
                       <Badge className={`${ACTION_COLORS[log.action] || 'bg-gray-600 text-white'} text-xs`}>
@@ -184,8 +208,14 @@ export default function AuditTab() {
                         ? `#${log.originalResourceId || log.resourceId}`
                         : "system"}
                     </TableCell>
-                    <TableCell className="text-xs text-muted-foreground max-w-[120px] truncate">
-                      {log.performedBy ? log.performedBy.slice(0, 12) : "system"}
+                    <TableCell className="text-xs text-muted-foreground max-w-[160px] truncate">
+                      {/* Run16 BUG-084: show the actor's email when known
+                          instead of a truncated raw UUID. */}
+                      {log.performedByEmail
+                        ? log.performedByEmail
+                        : log.performedBy
+                          ? log.performedBy.slice(0, 12)
+                          : "system"}
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground max-w-[200px] truncate">
                       {summarizeChanges(log.changes)}
@@ -207,7 +237,58 @@ export default function AuditTab() {
               )}
             </TableBody>
           </Table>
+          </div>
         </div>
+        <p className="text-xs text-muted-foreground mt-2 sm:hidden">
+          Swipe the table sideways to see all columns.
+        </p>
+
+        {/* Run16 BUG-083: full-entry detail view — complete changes payload
+            and notes, no truncation. */}
+        <Dialog open={!!selectedLog} onOpenChange={(open) => { if (!open) setSelectedLog(null); }}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Audit entry #{selectedLog?.id}</DialogTitle>
+              <DialogDescription>
+                {selectedLog && (
+                  <>
+                    {selectedLog.action.replace(/_/g, ' ')} ·{" "}
+                    {selectedLog.originalResourceId || selectedLog.resourceId
+                      ? `Resource #${selectedLog.originalResourceId || selectedLog.resourceId}`
+                      : "system"}{" "}
+                    · {formatDate(selectedLog.createdAt)}
+                  </>
+                )}
+              </DialogDescription>
+            </DialogHeader>
+            {selectedLog && (
+              <div className="space-y-3 text-sm">
+                <div>
+                  <span className="text-muted-foreground">Performed by: </span>
+                  {selectedLog.performedByEmail || selectedLog.performedBy || "system"}
+                </div>
+                <div>
+                  <div className="text-muted-foreground mb-1">Notes</div>
+                  <p className="whitespace-pre-wrap break-words" data-testid="text-audit-detail-notes">
+                    {selectedLog.notes || "—"}
+                  </p>
+                </div>
+                <div>
+                  <div className="text-muted-foreground mb-1">Changes</div>
+                  {selectedLog.changes && Object.keys(selectedLog.changes).length > 0 ? (
+                    <ScrollArea className="max-h-[300px] border rounded p-2">
+                      <pre className="text-xs whitespace-pre-wrap break-all" data-testid="text-audit-detail-changes">
+                        {JSON.stringify(selectedLog.changes, null, 2)}
+                      </pre>
+                    </ScrollArea>
+                  ) : (
+                    <p>—</p>
+                  )}
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </CardContent>
     </Card>
   );

@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Users, ChevronLeft, ChevronRight, Shield, User as UserIcon, Trash2, Search, Eye, EyeOff, Download } from "lucide-react";
+import { Users, ChevronLeft, ChevronRight, Shield, User as UserIcon, Trash2, Search, Eye, EyeOff, Download, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import type { User } from "@shared/schema";
 
 /**
@@ -43,12 +43,27 @@ export default function UsersTab() {
   const { user: currentUser } = useAuth();
   const [page, setPage] = useState(1);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  // Run16 BUG-037: role changes are privilege changes — confirm before applying.
+  const [pendingRoleChange, setPendingRoleChange] = useState<{ user: User; role: string } | null>(null);
   // R2-M17: server-side user search (email / first / last name).
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   // R2-H05: ids whose emails are currently revealed.
   const [revealedIds, setRevealedIds] = useState<Set<string>>(new Set());
+  // Run16 BUG-087: server-side column sorting.
+  const [sortBy, setSortBy] = useState<"name" | "email" | "role" | "createdAt">("createdAt");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const limit = 20;
+
+  const toggleSort = (col: "name" | "email" | "role" | "createdAt") => {
+    if (sortBy === col) {
+      setSortDir(d => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortBy(col);
+      setSortDir(col === "createdAt" ? "desc" : "asc");
+    }
+    setPage(1);
+  };
 
   // Debounce the search box → query param, resetting to page 1 on change.
   useEffect(() => {
@@ -60,10 +75,12 @@ export default function UsersTab() {
   }, [searchInput]);
 
   const { data, isLoading } = useQuery<UsersResponse>({
-    queryKey: ['/api/admin/users', page, limit, searchQuery],
+    queryKey: ['/api/admin/users', page, limit, searchQuery, sortBy, sortDir],
     queryFn: async () => {
       const params = new URLSearchParams({ page: page.toString(), limit: limit.toString() });
       if (searchQuery) params.set('q', searchQuery);
+      params.set('sortBy', sortBy);
+      params.set('sortDir', sortDir);
       const response = await fetch(`/api/admin/users?${params}`, { credentials: 'include' });
       if (!response.ok) throw new Error('Failed to fetch users');
       return response.json();
@@ -167,13 +184,39 @@ export default function UsersTab() {
             </a>
           </Button>
         </div>
-        <Table>
+        {/* Run16 BUG-088: on narrow screens the table scrolls sideways — a
+            right-edge fade + explicit hint make the hidden columns
+            discoverable instead of silently clipping them. */}
+        <div className="relative">
+          <div
+            className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-card to-transparent sm:hidden"
+            aria-hidden="true"
+          />
+          <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>User</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Joined</TableHead>
+              {/* Run16 BUG-087: sortable column headers (server-side sort). */}
+              {([
+                { key: "name", label: "User" },
+                { key: "email", label: "Email" },
+                { key: "role", label: "Role" },
+                { key: "createdAt", label: "Joined" },
+              ] as const).map(col => (
+                <TableHead key={col.key}>
+                  <button
+                    type="button"
+                    onClick={() => toggleSort(col.key)}
+                    className="inline-flex items-center gap-1 hover:text-foreground transition-colors"
+                    aria-label={`Sort by ${col.label}`}
+                    data-testid={`button-sort-${col.key}`}
+                  >
+                    {col.label}
+                    {sortBy === col.key
+                      ? (sortDir === "asc" ? <ArrowUp className="h-3.5 w-3.5" /> : <ArrowDown className="h-3.5 w-3.5" />)
+                      : <ArrowUpDown className="h-3.5 w-3.5 opacity-40" />}
+                  </button>
+                </TableHead>
+              ))}
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -194,16 +237,16 @@ export default function UsersTab() {
                           <UserIcon className="h-4 w-4 text-muted-foreground" />
                         </div>
                       )}
-                      {/* R4-H05: the name-column fallback must respect the email
-                          mask too — showing the raw email here defeated the
-                          masked Email column for users with no display name. */}
-                      <span className="font-medium" data-testid={`text-name-${user.id}`}>
-                        {user.firstName || user.lastName
-                          ? `${user.firstName || ''} ${user.lastName || ''}`.trim()
-                          : user.email
-                            ? (revealedIds.has(user.id) ? user.email : maskEmail(user.email))
-                            : user.id.slice(0, 8)}
-                      </span>
+                      {/* Run16 BUG-087: nameless accounts no longer duplicate the
+                          (masked) email from the adjacent column — show a muted
+                          em-dash instead. (Replaces the R4-H05 email fallback.) */}
+                      {user.firstName || user.lastName ? (
+                        <span className="font-medium" data-testid={`text-name-${user.id}`}>
+                          {`${user.firstName || ''} ${user.lastName || ''}`.trim()}
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground" data-testid={`text-name-${user.id}`}>—</span>
+                      )}
                     </div>
                   </TableCell>
                   <TableCell className="text-muted-foreground text-sm">
@@ -235,11 +278,31 @@ export default function UsersTab() {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
+                      {/* Run16 BUG-014: an admin must not be able to demote
+                          themselves with one click — the delete button already
+                          hides on the own row, so the role select is disabled
+                          there too (matching the server-side self-demote guard). */}
                       <Select
                         value={user.role || 'user'}
-                        onValueChange={(role) => updateRoleMutation.mutate({ userId: user.id, role })}
+                        /* Run16 BUG-037: stage the change and confirm first. */
+                        onValueChange={(role) => {
+                          if (role !== (user.role || 'user')) setPendingRoleChange({ user, role });
+                        }}
+                        disabled={user.id === currentUser?.id}
                       >
-                        <SelectTrigger className="w-32 h-8 text-xs" aria-label="Change user role">
+                        <SelectTrigger
+                          className="w-32 h-8 text-xs"
+                          aria-label={
+                            user.id === currentUser?.id
+                              ? "You cannot change your own role"
+                              : "Change user role"
+                          }
+                          title={
+                            user.id === currentUser?.id
+                              ? "You cannot change your own role"
+                              : undefined
+                          }
+                        >
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -277,7 +340,11 @@ export default function UsersTab() {
               </TableRow>
             )}
           </TableBody>
-        </Table>
+          </Table>
+        </div>
+        <p className="text-xs text-muted-foreground mt-2 sm:hidden">
+          Swipe the table sideways to see role, join date, and actions.
+        </p>
 
         {totalPages > 1 && (
           <div className="flex items-center justify-between mt-4">
@@ -304,6 +371,41 @@ export default function UsersTab() {
             </div>
           </div>
         )}
+
+        {/* Run16 BUG-037: explicit confirmation before applying a role change. */}
+        <AlertDialog open={!!pendingRoleChange} onOpenChange={(open) => { if (!open) setPendingRoleChange(null); }}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Change user role?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will change{" "}
+                <span className="font-medium text-foreground">
+                  {pendingRoleChange?.user.email
+                    ? maskEmail(pendingRoleChange.user.email)
+                    : pendingRoleChange?.user.id}
+                </span>{" "}
+                from <span className="font-medium text-foreground">{pendingRoleChange?.user.role || "user"}</span>{" "}
+                to <span className="font-medium text-foreground">{pendingRoleChange?.role}</span>.
+                {pendingRoleChange?.role === "admin" && " Admins have full access to this panel, including user management."}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel data-testid="button-cancel-role-change">Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  if (pendingRoleChange) {
+                    updateRoleMutation.mutate({ userId: pendingRoleChange.user.id, role: pendingRoleChange.role });
+                  }
+                  setPendingRoleChange(null);
+                }}
+                disabled={updateRoleMutation.isPending}
+                data-testid="button-confirm-role-change"
+              >
+                Change Role
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
         <AlertDialog open={!!userToDelete} onOpenChange={(open) => { if (!open) setUserToDelete(null); }}>
           <AlertDialogContent>

@@ -248,9 +248,10 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
 
               {validationStatus.awesomeLint.errors.length > 0 && (
                 <div className="space-y-2">
+                  {/* Run16 BUG-073: expanders get a ≥44px touch target. */}
                   <button
                     onClick={() => setShowErrors(!showErrors)}
-                    className="flex items-center gap-2 text-sm font-semibold text-red-400 hover:text-red-300"
+                    className="flex min-h-11 items-center gap-2 text-sm font-semibold text-red-400 hover:text-red-300"
                   >
                     {showErrors ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                     Errors ({validationStatus.awesomeLint.errors.length})
@@ -277,9 +278,10 @@ export default function ExportTab({ validationStatus: propValidationStatus }: Ex
 
               {validationStatus.awesomeLint.warnings.length > 0 && (
                 <div className="space-y-2">
+                  {/* Run16 BUG-073: 140×20px expander → ≥44px touch target. */}
                   <button
                     onClick={() => setShowWarnings(!showWarnings)}
-                    className="flex items-center gap-2 text-sm font-semibold text-yellow-400 hover:text-yellow-300"
+                    className="flex min-h-11 items-center gap-2 text-sm font-semibold text-yellow-400 hover:text-yellow-300"
                   >
                     {showWarnings ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                     Warnings ({validationStatus.awesomeLint.warnings.length})

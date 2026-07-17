@@ -41,6 +41,12 @@ import {
 
 interface AIRecommendationsPanelProps {
   resources: Resource[];
+  /**
+   * Run16 BUG-048: pages that already render their own "Personalized
+   * Recommendations" heading (Home, /recommendations) pass false so the
+   * panel doesn't repeat it back-to-back.
+   */
+  showHeader?: boolean;
 }
 
 const formSchema = z.object({
@@ -87,7 +93,7 @@ const RESOURCE_TYPES = [
   "Community Resources",
 ];
 
-export default function AIRecommendationsPanel({ resources }: AIRecommendationsPanelProps) {
+export default function AIRecommendationsPanel({ resources, showHeader = true }: AIRecommendationsPanelProps) {
   const { userProfile, updateProfile, isLoaded } = useUserProfile();
   const {
     generateRecommendations,
@@ -175,15 +181,15 @@ export default function AIRecommendationsPanel({ resources }: AIRecommendationsP
     return resource;
   };
 
-  const getConfidenceColor = (confidence: number) => {
-    if (confidence >= 0.8) return "text-green-500";
-    if (confidence >= 0.6) return "text-primary";
-    return "text-primary";
-  };
-
+  // Run16 BUG-019: the badge previously hardcoded text-green-500 on top of the
+  // default (red) badge background — 4.20:1 at 12px, failing WCAG AA, and a
+  // red/green pairing hostile to color-vision deficiency. (confidence is a
+  // 0–100 percent here, so the old >= 0.8 check was also always true.) The
+  // badge now relies on each variant's own AA-compliant foreground color and
+  // tiers by variant only.
   const getConfidenceBadgeVariant = (confidence: number): "default" | "secondary" | "outline" => {
-    if (confidence >= 0.8) return "default";
-    if (confidence >= 0.6) return "secondary";
+    if (confidence >= 80) return "default";
+    if (confidence >= 60) return "secondary";
     return "outline";
   };
 
@@ -194,18 +200,20 @@ export default function AIRecommendationsPanel({ resources }: AIRecommendationsP
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
-            Personalized Recommendations
-          </CardTitle>
-          <CardDescription>
-            Get personalized resource recommendations based on your learning profile and goals
-          </CardDescription>
-        </CardHeader>
-      </Card>
+      {/* Header (suppressed where the page renders its own — Run16 BUG-048) */}
+      {showHeader && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-primary" />
+              Personalized Recommendations
+            </CardTitle>
+            <CardDescription>
+              Get personalized resource recommendations based on your learning profile and goals
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      )}
 
       {/* Preference Form */}
       <Card>
@@ -572,7 +580,6 @@ export default function AIRecommendationsPanel({ resources }: AIRecommendationsP
                         )}
                         <Badge 
                           variant={getConfidenceBadgeVariant(rec.confidence)}
-                          className={getConfidenceColor(rec.confidence)}
                           data-testid={`badge-confidence-${index}`}
                         >
                           <TrendingUp className="h-3 w-3 mr-1" />

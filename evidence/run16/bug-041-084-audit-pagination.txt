@@ -1,0 +1,9 @@
+=== BUG-041/084: audit-logs real pagination (dev, 2026-07-17T10:04:51Z) ===
+--- limit=5 offset=0 ---
+keys: ['limit', 'logs', 'offset', 'total']
+total: 3228 limit: 5 offset: 0 rows: 5
+first ids: [14169, 14168, 14167, 14166, 14165]
+--- limit=5 offset=5 (different rows) ---
+ids: [14164, 14163, 14162, 14161, 14160]
+--- limit=99999 clamps to 500 ---
+limit: 500 rows: 500 total: 3228

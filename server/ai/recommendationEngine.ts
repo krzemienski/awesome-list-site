@@ -316,7 +316,28 @@ export class RecommendationEngine {
       // For cold-start users, use popular resources as recommendations
       if (isColdStart) {
         console.log('[COLD-START] Generating popular resources for new user:', enrichedProfile.userId);
-        const popularResources = await this.getPopularResources(eligibleResources, limit);
+        // Run16 BUG-004: the cold-start path previously ignored the user's
+        // explicitly selected preferred categories entirely (they only fed the
+        // rule-based scorer, which cold-start never reaches) and hard-coded
+        // "for getting started" regardless of skill level. Now the popular
+        // pool is filtered to the preferred categories first, off-preference
+        // rows are only appended when the preferred pool can't fill the list,
+        // and those padded rows say so honestly.
+        const preferred = (enrichedProfile.preferredCategories || []).filter(Boolean);
+        const preferredPool = preferred.length > 0
+          ? eligibleResources.filter(r => r.category && preferred.includes(r.category))
+          : eligibleResources;
+        const popularResources = await this.getPopularResources(preferredPool, limit);
+        const chosenUrls = new Set(popularResources.map(r => r.url));
+        const padResources = preferred.length > 0 && popularResources.length < limit
+          ? await this.getPopularResources(
+              eligibleResources.filter(r => !chosenUrls.has(r.url)),
+              limit - popularResources.length
+            )
+          : [];
+        const skillPhrase = !enrichedProfile.skillLevel || enrichedProfile.skillLevel === 'beginner'
+          ? 'for getting started'
+          : `for ${enrichedProfile.skillLevel} learners`;
         // Run15 BUG-013: identical "75% — Popular among users" on every card
         // read as filler. Confidence now decays with popularity rank (the list
         // IS rank-ordered), and the reason names the resource's category so
@@ -324,9 +345,12 @@ export class RecommendationEngine {
         recommendations = popularResources.map((resource, index) => {
           const confidence = Math.max(60, 85 - index * 3);
           const where = resource.category ? `in ${resource.category}` : 'across the catalog';
+          const matchesPreference = preferred.length > 0;
           const reason = index === 0
-            ? `Top pick ${where} for getting started`
-            : `Popular ${where}`;
+            ? `Top pick ${where} ${skillPhrase}`
+            : matchesPreference
+              ? `Popular ${where}, one of your selected categories`
+              : `Popular ${where}`;
           return {
             resource,
             confidence,
@@ -335,6 +359,18 @@ export class RecommendationEngine {
             score: confidence / 100
           };
         });
+        const padOffset = recommendations.length;
+        recommendations.push(...padResources.map((resource, index) => {
+          const confidence = Math.max(55, 85 - (padOffset + index) * 3);
+          const where = resource.category ? `in ${resource.category}` : 'across the catalog';
+          return {
+            resource,
+            confidence,
+            reason: `Popular ${where} — added because your selected categories had few unseen resources`,
+            type: 'rule_based' as const,
+            score: confidence / 100
+          };
+        }));
 
         // Cache and return early for cold-start users
         this.recommendationCache.set(cacheKey, {

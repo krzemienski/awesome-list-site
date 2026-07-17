@@ -1,0 +1,15 @@
+=== BUG-002: /api/awesome-list cache + ETag/304 (dev, 2026-07-17T10:02:57Z) ===
+--- request 1 (cold, timed) ---
+time_total=0.151911s size=2678461
+X-Content-Type-Options: nosniff
+ETag: "3b5424083f1ea94e6c54f59924c19494599b75ec"
+Cache-Control: public, max-age=0, must-revalidate
+Content-Type: application/json; charset=utf-8
+--- request 2 (warm, timed) ---
+time_total=0.012944s size=2678461
+--- request 3 (If-None-Match: "3b5424083f1ea94e6c54f59924c19494599b75ec") ---
+HTTP/1.1 304 Not Modified
+ETag: "3b5424083f1ea94e6c54f59924c19494599b75ec"
+status=304 size=0 time_total=0.003129s
+--- filtered path unaffected ---
+status=200 size=1406510

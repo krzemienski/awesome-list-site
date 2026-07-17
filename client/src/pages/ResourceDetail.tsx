@@ -282,8 +282,10 @@ export default function ResourceDetail() {
     }
   };
 
+  // Run16 BUG-020: the Visit Resource CTAs are real anchors now (Button
+  // asChild), so navigation is native and can never silently no-op;
+  // middle-click/cmd-click also work. The click handler only fires the toast.
   const handleVisitResource = () => {
-    window.open(resource?.url, '_blank', 'noopener,noreferrer');
     toast({
       title: "Opening resource",
       description: "Opening in a new tab"
@@ -549,13 +551,20 @@ export default function ResourceDetail() {
                   </div>
                   
                   <Button
+                    asChild
                     className="flex-shrink-0 min-h-[44px]"
-                    onClick={handleVisitResource}
-                    data-testid="button-visit"
                   >
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    <span className="hidden sm:inline">Visit Resource</span>
-                    <span className="sm:hidden">Visit</span>
+                    <a
+                      href={resource.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={handleVisitResource}
+                      data-testid="button-visit"
+                    >
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      <span className="hidden sm:inline">Visit Resource</span>
+                      <span className="sm:hidden">Visit</span>
+                    </a>
                   </Button>
                 </div>
               </div>
@@ -689,12 +698,19 @@ export default function ResourceDetail() {
                   only the primary CTA; the top bar owns the secondary
                   actions. Label matches the top-bar "Visit Resource" so it
                   reads as the same action, not a second one. */}
-              <Button 
-                className="w-full min-h-[44px]" 
-                onClick={handleVisitResource}
+              <Button
+                asChild
+                className="w-full min-h-[44px]"
               >
-                <ExternalLink className="h-4 w-4 mr-2" />
-                Visit Resource
+                <a
+                  href={resource.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={handleVisitResource}
+                >
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Visit Resource
+                </a>
               </Button>
             </CardContent>
           </Card>
@@ -764,12 +780,15 @@ export default function ResourceDetail() {
                   </a>
                 ))}
                 {resource.category && (
-                  <Link href={`/category/${slugify(resource.category)}`}>
-                    <Button variant="ghost" size="sm" className="w-full mt-2">
+                  /* Run16 BUG-057: the inline wouter <Link> wrapping a Button
+                     produced a 20px-tall anchor box (< 24px WCAG 2.5.8).
+                     asChild makes the anchor itself the ≥44px button. */
+                  <Button asChild variant="ghost" size="sm" className="w-full mt-2 min-h-[44px]">
+                    <Link href={`/category/${slugify(resource.category)}`} data-testid="link-view-all-category">
                       View all in {resource.category}
                       <ChevronRight className="h-4 w-4 ml-1" />
-                    </Button>
-                  </Link>
+                    </Link>
+                  </Button>
                 )}
               </CardContent>
             </Card>

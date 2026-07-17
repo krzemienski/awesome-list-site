@@ -69,6 +69,10 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
   const [reseedDialogOpen, setReseedDialogOpen] = useState(false);
   const [reseedConfirmText, setReseedConfirmText] = useState("");
   const reseedConfirmed = reseedConfirmText.trim().toUpperCase() === "RESEED";
+  // Run16 BUG-010: plain Seed Database is also a DB mutation — it must ask
+  // before firing (consistent with Clear & Re-seed, which types RESEED).
+  // A simple confirm dialog suffices since seeding is additive, not destructive.
+  const [seedDialogOpen, setSeedDialogOpen] = useState(false);
 
   const seedDatabaseMutation = useMutation({
     mutationFn: async (options: { clearExisting?: boolean } = {}) => {
@@ -130,9 +134,8 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
           <div className="space-y-3">
             <div className="flex items-center gap-4">
               <Button
-                onClick={() => seedDatabaseMutation.mutate({ clearExisting: false })}
+                onClick={() => setSeedDialogOpen(true)}
                 disabled={seedDatabaseMutation.isPending}
-               
                 data-testid="button-seed-database"
               >
                 {seedDatabaseMutation.isPending ? (
@@ -254,6 +257,34 @@ export default function DatabaseTab({ stats }: DatabaseTabProps) {
           </div>
         </CardContent>
       </Card>
+
+      <AlertDialog open={seedDialogOpen} onOpenChange={setSeedDialogOpen}>
+        <AlertDialogContent data-testid="dialog-seed-database">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Database className="h-5 w-5 text-primary" />
+              Seed the database?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This adds all categories, subcategories, and resources from the
+              awesome-video JSON source. Resources already in the database are
+              skipped, so no existing data is removed — but new rows may be added.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-seed-cancel">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setSeedDialogOpen(false);
+                seedDatabaseMutation.mutate({ clearExisting: false });
+              }}
+              data-testid="button-seed-confirm"
+            >
+              Seed Database
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AlertDialog open={reseedDialogOpen} onOpenChange={setReseedDialogOpen}>
         <AlertDialogContent data-testid="dialog-clear-reseed">

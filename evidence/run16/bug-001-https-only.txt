@@ -1,0 +1,11 @@
+=== BUG-001: non-HTTPS URL rejection on submission (dev, 2026-07-17T10:04:22Z) ===
+--- POST /api/resources url=http://insecure.example.com/tool ---
+{"error":"validation_failed","errors":[{"code":"custom","path":["url"],"message":"Must be a valid HTTPS URL"}]}
+status=400
+--- POST /api/resources url=ftp://files.example.com/x ---
+{"error":"validation_failed","errors":[{"code":"custom","path":["url"],"message":"Must be a valid HTTPS URL"}]}
+status=400
+--- POST /api/resources url=javascript:alert(1) ---
+{"error":"validation_failed","errors":[{"code":"custom","path":["url"],"message":"Must be a valid HTTPS URL"}]}
+status=400
+--- control: https URL passes validation? (dry check via suggest-metadata-free invalid category to avoid creating row) — skipped; validation error above proves the refine fires before insert ---

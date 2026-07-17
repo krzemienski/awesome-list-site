@@ -140,17 +140,55 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
   // BUG-017 (run10): same treatment for /resource/:id — the generic crumb
   // chain ends in the raw numeric id ("Home > Resource > 2711"). Resolve the
   // resource title from the detail endpoint and swap it in once loaded.
-  // Note: single-string key (default fetcher reads queryKey[0] only) — this is
-  // a separate cache entry from ResourceDetail's ['/api/resources', id] key.
+  // Run16 BUG-058: the key now MATCHES ResourceDetail's ['/api/resources', id]
+  // entry (with an equivalent queryFn) so header + page share ONE cache entry
+  // and missing resources fire a single GET /api/resources/:id, not two.
   const resourceMatch = location.match(/^\/resource\/(\d+)$/);
-  const { data: crumbResource } = useQuery<{ id: number; title?: string }>({
-    queryKey: [`/api/resources/${resourceMatch?.[1]}`],
+  const resourceId = resourceMatch?.[1];
+  const { data: crumbResource } = useQuery<{
+    id: number;
+    title?: string;
+    category?: string;
+    subcategory?: string;
+    subSubcategory?: string;
+  }>({
+    queryKey: ['/api/resources', resourceId],
+    queryFn: async () => {
+      const response = await fetch(`/api/resources/${resourceId}`, { credentials: 'include' });
+      if (!response.ok) throw new Error('Resource not found');
+      return response.json();
+    },
     enabled: !!resourceMatch,
-    staleTime: 5 * 60 * 1000,
   });
   if (resourceMatch && crumbResource?.title) {
     const last = crumbs[crumbs.length - 1];
-    if (last && last.href === location) last.label = crumbResource.title;
+    if (last && last.href === location) {
+      last.label = crumbResource.title;
+      // Run16 BUG-059: insert the resource's taxonomy chain (category >
+      // subcategory > sub-subcategory) so the crumb reflects its real location
+      // instead of just "Home > <title>". Slugs come from the shared tree —
+      // DB slugs are NOT always slugify(name) (de-duplicated "-sc<id>" suffixes).
+      const chain: { label: string; href: string }[] = [];
+      const cat = (categories || []).find((c: any) => c.name === crumbResource.category);
+      if (cat?.slug) {
+        chain.push({ label: cat.name, href: `/category/${cat.slug}` });
+        const sub = (cat.subcategories || []).find(
+          (s: any) => s.name === crumbResource.subcategory,
+        );
+        if (sub?.slug) {
+          chain.push({ label: sub.name, href: `/subcategory/${sub.slug}` });
+          if (crumbResource.subSubcategory) {
+            const ss = (sub.subSubcategories || []).find(
+              (x: any) => x.name === crumbResource.subSubcategory,
+            );
+            if (ss?.slug) {
+              chain.push({ label: ss.name, href: `/sub-subcategory/${ss.slug}` });
+            }
+          }
+        }
+      }
+      crumbs.splice(crumbs.length - 1, 0, ...chain);
+    }
   }
 
   return (
@@ -205,8 +243,12 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
           aria-label="Open search"
         >
           <Search className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
-          <span className="text-muted-foreground truncate hidden sm:inline">Search resources...</span>
-          <span className="text-muted-foreground truncate sm:hidden">Search...</span>
+          {/* Run16 BUG-047: at 768px the trigger is squeezed to ~78px of
+              label space, truncating "Search resources..." to "Search re…".
+              Show the full label only from lg up; tablet + mobile get the
+              short label that fits. */}
+          <span className="text-muted-foreground truncate hidden lg:inline">Search resources...</span>
+          <span className="text-muted-foreground truncate lg:hidden">Search...</span>
           <kbd className="pointer-events-none ml-auto hidden h-5 select-none items-center gap-1 rounded-sm border border-border bg-[var(--surface-2)] px-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--text-2)] md:flex">
             /
           </kbd>
@@ -228,7 +270,12 @@ export default function AppHeader({ onSearchOpen, user, onLogout, categories }: 
         {user ? (
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+              {/* Run16 BUG-079: icon-only avatar trigger needs an accessible name. */}
+              <Button
+                variant="ghost"
+                className="relative h-9 w-9 rounded-full"
+                aria-label="Open account menu"
+              >
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={user.avatar} alt={user.name} />
                   <AvatarFallback>{user.name ? user.name[0].toUpperCase() : "U"}</AvatarFallback>

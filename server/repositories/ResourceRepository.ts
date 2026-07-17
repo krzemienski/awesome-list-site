@@ -93,11 +93,15 @@ export class ResourceRepository {
     }
 
     if (search) {
+      // Run16 BUG-044: %, _ and \ are LIKE metacharacters — a search for "___"
+      // used to match EVERY 3+-char row (66KB response). Escape them so the
+      // user's literal text is what gets matched (PG default escape is \).
+      const escapedSearch = search.replace(/[\\%_]/g, (m) => `\\${m}`);
       conditions.push(
         or(
-          ilike(resources.title, `%${search}%`),
-          ilike(resources.description, `%${search}%`),
-          ilike(resources.url, `%${search}%`)
+          ilike(resources.title, `%${escapedSearch}%`),
+          ilike(resources.description, `%${escapedSearch}%`),
+          ilike(resources.url, `%${escapedSearch}%`)
         )
       );
     }

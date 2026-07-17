@@ -1,0 +1,28 @@
+=== BUG-008: researcher/start budget+turns validation (dev, 2026-07-17T10:06:09Z) ===
+NOTE: earlier probe used wrong keys (budget/turns) which the API ignores by design; real fields are maxBudgetUsd/maxTurns.
+jobs before: 19
+--- POST /api/researcher/start {"prompt":"Find new HLS tooling resources for the catalog","maxBudgetUsd":0.05} ---
+{"success":false,"message":"maxBudgetUsd must be a number between 0.25 and 10.00"}
+status=400
+--- POST /api/researcher/start {"prompt":"Find new HLS tooling resources for the catalog","maxBudgetUsd":50} ---
+{"success":false,"message":"maxBudgetUsd must be a number between 0.25 and 10.00"}
+status=400
+--- POST /api/researcher/start {"prompt":"Find new HLS tooling resources for the catalog","maxBudgetUsd":113} ---
+{"success":false,"message":"maxBudgetUsd must be a number between 0.25 and 10.00"}
+status=400
+--- POST /api/researcher/start {"prompt":"Find new HLS tooling resources for the catalog","maxBudgetUsd":"abc"} ---
+{"success":false,"message":"maxBudgetUsd must be a number between 0.25 and 10.00"}
+status=400
+--- POST /api/researcher/start {"prompt":"Find new HLS tooling resources for the catalog","maxTurns":3} ---
+{"success":false,"message":"maxTurns must be an integer between 5 and 100"}
+status=400
+--- POST /api/researcher/start {"prompt":"Find new HLS tooling resources for the catalog","maxTurns":301000} ---
+{"success":false,"message":"maxTurns must be an integer between 5 and 100"}
+status=400
+--- POST /api/researcher/start {"prompt":"Find new HLS tooling resources for the catalog","maxTurns":7.5} ---
+{"success":false,"message":"maxTurns must be an integer between 5 and 100"}
+status=400
+--- POST /api/researcher/start {"prompt":"Find new HLS tooling resources for the catalog","maxTurns":"xyz"} ---
+{"success":false,"message":"maxTurns must be an integer between 5 and 100"}
+status=400
+jobs after: 19 (must equal before)

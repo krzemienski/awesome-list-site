@@ -1,0 +1,42 @@
+{
+  "appliedAt": "2026-07-17",
+  "environment": "development (direct SQL; prod mirror = scripts/run16-data-fixes-prod.ts, run AFTER republish)",
+  "fixes": {
+    "BUG-003": {
+      "action": "none in dev",
+      "note": "QA resource 188454 does not exist in the dev DB (SELECT count(*)=0) — prod-only artifact. Prod script rejects it via PUT /api/resources/188454/reject after verifying title~'QA Queue Verify' and url~example.com."
+    },
+    "BUG-007": {
+      "resourceId": 185407,
+      "before": { "url": "https://dyte.io/blog/rtmp-webrtc-hls/", "status": "approved", "title": "RTMP vs. WebRTC vs. HLS - A Comparison of Streaming Protocols" },
+      "after": { "url": "https://web.archive.org/web/20250904075527/https://dyte.io/blog/rtmp-webrtc-hls/" },
+      "verification": "Live re-verified 2026-07-17: dyte.io/blog/rtmp-webrtc-hls/ = 502 (browser UA, curl), dyte.io root = 200 (blog path is gone, not a bot-block). Wayback snapshot 20250904075527 available=true status=200 via archive.org/wayback/available API.",
+      "sql": "UPDATE resources SET url=<wayback> WHERE id=185407 (UPDATE 1)"
+    },
+    "BUG-056": {
+      "resourceId": 185741,
+      "before": { "description": "Hybrik Samples — video development resource from github.com." },
+      "after": { "description": "Sample job JSON files and API integration scripts for Dolby Hybrik, a cloud-based media transcoding and QC platform. The repo demonstrates transcode presets, analysis/QC jobs, and workflow automation against the Hybrik API." },
+      "note": "GitHub API repo description is literally 'Hybrik Samples' (no help) — description hand-written from repo contents. Only applied in prod if placeholder regex still matches.",
+      "sql": "UPDATE resources SET description=... WHERE id=185741 (UPDATE 1)"
+    },
+    "BUG-054-partial": {
+      "action": "casing normalization only; structural dedup of 17 same-named sub-subcategory groups DECLINED (taxonomy redesign, out of scope)",
+      "renamed": "name 'FFMPEG' -> 'FFmpeg', slugs untouched (no collision possible)",
+      "devRowsBefore": "10 rows named 'FFMPEG' (dev had 10 all-caps; prod audit saw 3 FFMPEG + 7 FFmpeg — script renames whatever name==='FFMPEG' remains)",
+      "devRowsAfter": [
+        { "id": 3625, "slug": "ffmpeg" },
+        { "id": 3672, "slug": "ffmpeg-sc2222" },
+        { "id": 3673, "slug": "ffmpeg-sc2223" },
+        { "id": 3674, "slug": "ffmpeg-sc2226" },
+        { "id": 3675, "slug": "ffmpeg-sc2241" },
+        { "id": 3677, "slug": "ffmpeg-sc2247" },
+        { "id": 3678, "slug": "ffmpeg-sc2249" },
+        { "id": 3679, "slug": "ffmpeg-sc2251" },
+        { "id": 3681, "slug": "ffmpeg-sc2254" },
+        { "id": 3682, "slug": "ffmpeg-sc2266" }
+      ],
+      "sql": "UPDATE sub_subcategories SET name='FFmpeg' WHERE name='FFMPEG' (UPDATE 10)"
+    }
+  }
+}

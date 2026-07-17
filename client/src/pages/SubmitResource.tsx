@@ -49,8 +49,11 @@ const submitResourceSchema = z.object({
     .min(1, "Title is required")
     .max(200, "Title must be 200 characters or less")
     .refine((v) => !NO_HTML.test(v), "Title must not contain HTML tags"),
+  // Run16 BUG-061: an EMPTY url used to say "Please enter a valid URL" —
+  // min(1) fires first so a blank field reads "URL is required".
   url: z.string()
     .trim()
+    .min(1, "URL is required")
     .url("Please enter a valid URL")
     .refine((url) => url.startsWith("https://"), {
       message: "URL must use HTTPS protocol"
@@ -65,11 +68,19 @@ const submitResourceSchema = z.object({
   subSubcategory: z.string().optional(),
   // Run15 BUG-008: an 11th tag used to be silently dropped by a .slice(0, 10)
   // at submit time — reject loudly instead so the user knows what happened.
+  // Run16 BUG-065: cap each individual tag at 50 chars (a 300-char "tag"
+  // previously sailed through client validation).
   tags: z.string()
     .optional()
     .refine(
       (v) => !v || v.split(',').map((t) => t.trim()).filter(Boolean).length <= 10,
       "At most 10 tags allowed — remove some tags",
+    )
+    .refine(
+      (v) =>
+        !v ||
+        v.split(',').map((t) => t.trim()).filter(Boolean).every((t) => t.length <= 50),
+      "Each tag must be 50 characters or fewer",
     ),
 });
 
@@ -428,10 +439,13 @@ export default function SubmitResource() {
                           <AlertCircle className="h-4 w-4 text-yellow-500" />
                           <AlertTitle className="text-yellow-500">Duplicate URL Detected</AlertTitle>
                           <AlertDescription>
-                            This URL has already been submitted.
+                            {/* Run16 BUG-061: the server hard-blocks duplicate
+                                URLs with a 409 — the old copy promised "you
+                                can still submit", which was never true. */}
+                            This URL is already in the catalog.
                             <br />
                             <span className="text-xs text-muted-foreground mt-1 block">
-                              You can still submit, but this may be rejected as a duplicate.
+                              It can't be submitted again — if something about the existing entry is wrong, use "Suggest Edit" on the resource page instead.
                             </span>
                           </AlertDescription>
                         </Alert>

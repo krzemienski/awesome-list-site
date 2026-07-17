@@ -2031,6 +2031,30 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
     });
   };
 
+  /**
+   * Run16 BUG-033: shared name/slug sanity checks for taxonomy CRUD —
+   * length caps plus a case-insensitive duplicate check against the loaded
+   * list (excluding the row being edited). Returns an error string or null.
+   */
+  const validateNameSlug = (excludeId?: number): string | null => {
+    const name = String(formData.name ?? "").trim();
+    const slug = String(formData.slug ?? "").trim();
+    if (name.length > 100) return "Name must be 100 characters or fewer";
+    if (slug.length > 100) return "Slug must be 100 characters or fewer";
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
+      return "Slug may only contain lowercase letters, numbers, and hyphens";
+    }
+    const dupName = (items || []).find(
+      i => i.id !== excludeId && i.name.trim().toLowerCase() === name.toLowerCase()
+    );
+    if (dupName) return `A ${entityName.toLowerCase()} named "${dupName.name}" already exists`;
+    const dupSlug = (items || []).find(
+      i => i.id !== excludeId && i.slug.trim().toLowerCase() === slug.toLowerCase()
+    );
+    if (dupSlug) return `The slug "${dupSlug.slug}" is already in use`;
+    return null;
+  };
+
   const handleCreate = async () => {
     const requiredFields = ["name", "slug", ...parents.map(p => p.fieldName)];
     const requiredCustomFields = customFields.filter(f => f.required && f.type !== "file" && f.type !== "multiselect").map(f => f.name);
@@ -2063,6 +2087,13 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
         description: `${fieldLabels.join(", ")} ${fieldLabels.length === 1 ? 'is' : 'are'} required`,
         variant: "destructive"
       });
+      return;
+    }
+
+    // Run16 BUG-033: length + duplicate checks before hitting the API.
+    const nameSlugError = validateNameSlug();
+    if (nameSlugError) {
+      toast({ title: "Validation Error", description: nameSlugError, variant: "destructive" });
       return;
     }
 
@@ -2172,6 +2203,13 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
         description: `${fieldLabels.join(", ")} ${fieldLabels.length === 1 ? 'is' : 'are'} required`,
         variant: "destructive"
       });
+      return;
+    }
+
+    // Run16 BUG-033: length + duplicate checks (excluding the row itself).
+    const nameSlugError = validateNameSlug(selectedItem.id);
+    if (nameSlugError) {
+      toast({ title: "Validation Error", description: nameSlugError, variant: "destructive" });
       return;
     }
 
@@ -2288,11 +2326,23 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
       newFormData[parent.fieldName] = item[parent.fieldName]?.toString() || "";
 
       if (parent.filterBy && index > 0) {
-        const parentItem = parentData[parents[index - 1].fieldName]?.find(
-          p => p.id === item[parents[index - 1].fieldName]
+        // Run16 BUG-032: derive the grandparent selection from the item's own
+        // parent row. E.g. a sub-subcategory only stores subcategoryId — look
+        // that subcategory up in the loaded parent data and lift its
+        // categoryId into the form so both dropdowns prefill correctly.
+        const parentRow = parentData[parent.fieldName]?.find(
+          p => p.id === item[parent.fieldName]
         );
-        if (parentItem) {
-          newFormData[parent.filterBy] = parentItem[parent.filterBy]?.toString() || "";
+        if (parentRow && parentRow[parent.filterBy] != null) {
+          newFormData[parent.filterBy] = parentRow[parent.filterBy]!.toString();
+        } else {
+          // Fallback: the item itself may carry the grandparent id directly.
+          const parentItem = parentData[parents[index - 1].fieldName]?.find(
+            p => p.id === item[parents[index - 1].fieldName]
+          );
+          if (parentItem) {
+            newFormData[parent.filterBy] = parentItem[parent.filterBy]?.toString() || "";
+          }
         }
       }
     });
@@ -2600,16 +2650,28 @@ export default function GenericCrudManager<T extends BaseEntityWithCount>({
                             >
                               <Pencil className="h-4 w-4" />
                             </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => openDeleteDialog(item)}
-                              disabled={item.resourceCount > 0}
-                              aria-label="Delete"
-                              data-testid={`button-delete-${item.id}`}
+                            {/* Run16 BUG-081: disabled delete gets a visible reason.
+                                The title lives on a wrapping span because disabled
+                                buttons swallow hover events in some browsers. */}
+                            <span
+                              title={item.resourceCount > 0
+                                ? `Cannot delete: ${item.resourceCount} resource${item.resourceCount === 1 ? "" : "s"} still assigned. Move or delete them first.`
+                                : undefined}
+                              className="inline-block"
                             >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => openDeleteDialog(item)}
+                                disabled={item.resourceCount > 0}
+                                aria-label={item.resourceCount > 0
+                                  ? `Delete unavailable: ${item.resourceCount} resources still assigned`
+                                  : "Delete"}
+                                data-testid={`button-delete-${item.id}`}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </span>
                           </div>
                         ) : (
                           item[col.key]

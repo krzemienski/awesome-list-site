@@ -29,7 +29,7 @@ import {
   type InsertApiKey,
 } from "@shared/schema";
 import { db } from "../db";
-import { eq, and, desc, sql, or, ilike } from "drizzle-orm";
+import { eq, and, asc, desc, sql, or, ilike, type SQL } from "drizzle-orm";
 import { generateApiKey, hashApiKey } from "../apiKeyUtils";
 
 /**
@@ -103,7 +103,13 @@ export class UserRepository {
    * @param limit - Number of users per page
    * @returns Object containing users array and total count
    */
-  async listUsers(page = 1, limit = 20, q?: string): Promise<{ users: User[]; total: number }> {
+  async listUsers(
+    page = 1,
+    limit = 20,
+    q?: string,
+    sortBy?: string,
+    sortDir?: string,
+  ): Promise<{ users: User[]; total: number }> {
     const offset = (page - 1) * limit;
 
     // Optional search filter across email + first/last name (M17). A single
@@ -123,21 +129,48 @@ export class UserRepository {
       ? await totalQuery.where(searchFilter)
       : await totalQuery;
 
-    const pageQuery = db
-      .select()
-      .from(users)
-      .orderBy(desc(users.createdAt))
-      .limit(limit)
-      .offset(offset);
+    // Run16 BUG-087: sortable columns. The sort key is validated against an
+    // explicit whitelist — anything else falls back to createdAt — so the raw
+    // query-string value never reaches SQL. Case-insensitive text ordering,
+    // NULLS LAST so blank names/emails sink regardless of direction.
+    const dirDesc = sortDir !== "asc";
+    const textCol = (col: typeof users.email | typeof users.role) =>
+      dirDesc
+        ? sql`lower(${col}) DESC NULLS LAST`
+        : sql`lower(${col}) ASC NULLS LAST`;
+    let orderExpr: SQL;
+    switch (sortBy) {
+      case "email":
+        orderExpr = textCol(users.email);
+        break;
+      case "name":
+        orderExpr = dirDesc
+          ? sql`lower(coalesce(${users.firstName}, '') || ' ' || coalesce(${users.lastName}, '')) DESC NULLS LAST`
+          : sql`lower(coalesce(${users.firstName}, '') || ' ' || coalesce(${users.lastName}, '')) ASC NULLS LAST`;
+        break;
+      case "role":
+        orderExpr = textCol(users.role);
+        break;
+      case "createdAt":
+      default:
+        orderExpr = dirDesc ? desc(users.createdAt) : asc(users.createdAt);
+        break;
+    }
+
     const userList = searchFilter
       ? await db
           .select()
           .from(users)
           .where(searchFilter)
-          .orderBy(desc(users.createdAt))
+          .orderBy(orderExpr)
           .limit(limit)
           .offset(offset)
-      : await pageQuery;
+      : await db
+          .select()
+          .from(users)
+          .orderBy(orderExpr)
+          .limit(limit)
+          .offset(offset);
 
     return { users: userList, total: totalResult.count };
   }

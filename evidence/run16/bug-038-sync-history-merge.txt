@@ -1,0 +1,9 @@
+=== BUG-038: sync-history includes terminal queue rows (dev, 2026-07-17T10:05:17Z) ===
+total rows: 38
+canonical history rows: 0 | queue-derived rows: 38
+1000001 import added: 0 updated: 0 total: 0 sha:  2026-05-20T08:42:48.419Z
+1000003 import added: 0 updated: 0 total: 0 sha:  2026-05-20T08:42:48.419Z
+1000012 export added: 0 updated: 0 total: 0 sha:  2026-05-20T08:42:48.419Z
+1000019 import added: 0 updated: 0 total: 0 sha:  2026-05-20T08:42:48.419Z
+1000021 import added: 0 updated: 0 total: 0 sha:  2026-05-20T08:42:48.419Z
+1000023 import added: 0 updated: 0 total: 0 sha:  2026-05-20T08:42:48.419Z

@@ -138,17 +138,33 @@ export default function CommunityMetrics({ resources, categories, className }: C
       })
       .sort((a, b) => b.score - a.score);
 
+    // Run16 BUG-025: `category.resources` is the DIRECT-only slice of the
+    // tree — most resources live under subcategories/sub-subcategories, so
+    // the tab showed 923 total vs the 2303 every other surface reports.
+    // Flatten the whole branch so counts agree with the sidebar/Explorer.
+    const getAllCategoryResources = (category: (typeof categories)[number]) => {
+      const all = [...(category.resources || [])];
+      for (const sub of category.subcategories || []) {
+        all.push(...(sub.resources || []));
+        for (const ss of (sub as any).subSubcategories || []) {
+          all.push(...(ss.resources || []));
+        }
+      }
+      return all;
+    };
+
     // Calculate category metrics based on actual resource data
-    const totalCategoryResources = categories.reduce((sum, c) => sum + c.resources.length, 0);
+    const totalCategoryResources = categories.reduce((sum, c) => sum + getAllCategoryResources(c).length, 0);
     const categoryMetrics: CategoryMetric[] = categories.map(category => {
-      const resourceCount = category.resources.length;
+      const allCategoryResources = getAllCategoryResources(category);
+      const resourceCount = allCategoryResources.length;
       // Engagement based on category's share of total resources
       const avgPerCategory = totalCategoryResources / Math.max(categories.length, 1);
       const engagement = Math.round((resourceCount / Math.max(avgPerCategory, 1)) * 100);
       // Count how many resources in this category are recent (has createdAt in last 30 days)
       const now = new Date();
       const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-      const recentResources = category.resources.filter(r => {
+      const recentResources = allCategoryResources.filter(r => {
         if (!r.createdAt) return false;
         return new Date(r.createdAt) > thirtyDaysAgo;
       }).length;

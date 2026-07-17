@@ -95,7 +95,10 @@ export default function Advanced() {
           equal columns hard-truncated "AI Recommendations"; below lg the list
           stays a scrollable flex row with full-width labels. */}
       <Tabs value={tab} onValueChange={handleTabChange} className="space-y-6">
-        <TabsList className="flex w-full justify-start overflow-x-auto lg:grid lg:grid-cols-4 bg-[var(--surface)] border-b border-[var(--border)] rounded-none p-0 h-auto">
+        {/* Run16 BUG-066: at 375px the 4th tab ("AI Recommendations") was
+            clipped off-screen with no scroll cue — wrap the tab bar on small
+            screens so every tab stays visible. */}
+        <TabsList className="flex w-full flex-wrap justify-start sm:flex-nowrap sm:overflow-x-auto lg:grid lg:grid-cols-4 bg-[var(--surface)] border-b border-[var(--border)] rounded-none p-0 h-auto">
           <TabsTrigger
             value="explorer"
             className="flex shrink-0 items-center gap-2 whitespace-nowrap rounded-none border-b-2 border-transparent data-[state=active]:border-[var(--accent)] data-[state=active]:bg-[var(--surface-2)] data-[state=active]:text-[var(--accent)] px-4 py-3"

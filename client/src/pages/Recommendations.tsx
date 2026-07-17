@@ -71,7 +71,7 @@ export default function Recommendations() {
             ))}
           </div>
         ) : (
-          <AIRecommendationsPanel resources={awesomeList.resources} />
+          <AIRecommendationsPanel resources={awesomeList.resources} showHeader={false} />
         )
       ) : (
         <>

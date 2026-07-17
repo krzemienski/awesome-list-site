@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useParams, Link, useLocation, useSearch, Redirect } from "wouter";
 import { safeGetItem, safeSetItem } from "@/lib/safeStorage";
 import { useQuery } from "@tanstack/react-query";
@@ -318,6 +318,15 @@ export default function Category() {
     }
   };
 
+  // Run16 BUG-005: list-state changes (page, subcategory, tags, sort) must
+  // PUSH history entries so browser Back returns to the previous in-app state
+  // instead of leaving the page. Search keystrokes still replace (a push per
+  // keystroke would spam history), as do the initial-mount URL normalization
+  // and the re-sync that follows a popstate restore.
+  const urlSyncInitializedRef = useRef(false);
+  const popNavigationRef = useRef(false);
+  const pushSnapshotRef = useRef("");
+
   useEffect(() => {
     const params = new URLSearchParams();
 
@@ -328,7 +337,7 @@ export default function Category() {
     // Only the canonical ?tags=/?sortBy= params are written, so a ?tag=/?sort=
     // alias used on arrival is normalized away after the first sync.
     if (page > 1) params.set("page", String(page));
-    // Preserve the reactive general-view flag so it survives replaceState writes
+    // Preserve the reactive general-view flag so it survives history writes
     // triggered by other filter changes.
     if (isGeneralView) params.set("view", "general");
 
@@ -336,13 +345,26 @@ export default function Category() {
     const newPath = `/category/${slug}${newSearch ? `?${newSearch}` : ""}`;
     const currentPath = `${window.location.pathname}${window.location.search}`;
 
+    const pushSnapshot = JSON.stringify([page, selectedSubcategory, selectedTags, sortBy, isGeneralView]);
     if (currentPath !== newPath) {
-      window.history.replaceState({}, "", newPath);
+      const shouldPush =
+        urlSyncInitializedRef.current &&
+        !popNavigationRef.current &&
+        pushSnapshotRef.current !== pushSnapshot;
+      if (shouldPush) {
+        window.history.pushState({}, "", newPath);
+      } else {
+        window.history.replaceState({}, "", newPath);
+      }
     }
+    urlSyncInitializedRef.current = true;
+    popNavigationRef.current = false;
+    pushSnapshotRef.current = pushSnapshot;
   }, [searchTerm, selectedSubcategory, selectedTags, sortBy, page, slug, location, isGeneralView]);
 
   useEffect(() => {
     const handlePopState = () => {
+      popNavigationRef.current = true;
       const params = getSearchParams();
       setSearchTerm(params.get("search") || "");
       setSelectedSubcategory(params.get("subcategory") || "all");
@@ -474,12 +496,14 @@ export default function Category() {
       />
       
       <div className="space-y-3 sm:space-y-4">
-        <Link href="/">
-          <Button variant="ghost" size="sm" className="gap-2" data-testid="button-back-home">
+        {/* Run16 BUG-049: asChild so the anchor IS the ≥44px button (the
+            wrapping-Link pattern produced a 20px-tall anchor box). */}
+        <Button asChild variant="ghost" size="sm" className="gap-2 min-h-[44px]">
+          <Link href="/" data-testid="button-back-home">
             <ArrowLeft className="h-4 w-4" />
             Back to Home
-          </Button>
-        </Link>
+          </Link>
+        </Button>
         
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3">
           <div className="min-w-0 lg:flex-1">
@@ -598,14 +622,9 @@ export default function Category() {
               }
             };
             
-            const handleExternalLink = (e: React.MouseEvent) => {
-              e.stopPropagation();
-              window.open(resource.url, '_blank', 'noopener,noreferrer');
-              toast({
-                title: resource.title,
-                description: 'Opening resource in new tab',
-              });
-            };
+            // Run16 BUG-006: the open-in-new-tab action is now a REAL anchor
+            // (Button asChild) instead of a JS window.open button, so it can
+            // never silently no-op and middle-click/cmd-click work.
 
             // Run3 audit R3-31: render the card title as a REAL anchor with a
             // stretched-link overlay (after:inset-0) so middle-click / cmd-click /
@@ -617,7 +636,8 @@ export default function Category() {
               isDbResource(resource) ? (
                 <Link
                   href={`/resource/${getDbId(resource)}`}
-                  className="after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-[var(--accent)]"
+                  /* Run16 BUG-049: inline-block + py/-my ≥24px hit-box */
+                  className="inline-block py-1 -my-1 after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-[var(--accent)]"
                   onClick={(e: React.MouseEvent) => e.stopPropagation()}
                   data-testid={`link-resource-${resourceId}`}
                 >
@@ -628,7 +648,7 @@ export default function Category() {
                   href={resource.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-[var(--accent)]"
+                  className="inline-block py-1 -my-1 after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-[var(--accent)]"
                   onClick={(e: React.MouseEvent) => e.stopPropagation()}
                   data-testid={`link-resource-${resourceId}`}
                 >
@@ -667,15 +687,22 @@ export default function Category() {
                       <Badge variant="outline" className="text-xs hidden md:inline-flex">{resource.subcategory}</Badge>
                     )}
                     <Button
+                      asChild
                       variant="ghost"
                       size="sm"
                       className="h-8 w-8 p-0 min-h-[44px] min-w-[44px] touch-manipulation"
-                      onClick={handleExternalLink}
-                      data-testid={`button-external-${resourceId}`}
-                      title="Open in new tab"
-                      aria-label="Open in new tab"
                     >
-                      <ExternalLink className="h-4 w-4" />
+                      <a
+                        href={resource.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        data-testid={`button-external-${resourceId}`}
+                        title="Open in new tab"
+                        aria-label="Open in new tab"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </a>
                     </Button>
                     {isDbResource(resource) && (
                       <Button
@@ -706,15 +733,22 @@ export default function Category() {
                   <div className="flex items-start gap-1.5 min-w-0">
                     <span className="font-medium text-xs sm:text-sm line-clamp-2 flex-1 min-w-0" title={resource.title}>{titleAnchor(resource.title)}</span>
                     <Button
+                      asChild
                       variant="ghost"
                       size="sm"
                       className="relative z-10 h-8 w-8 p-0 shrink-0 touch-manipulation min-h-[44px] min-w-[44px] -mr-1.5"
-                      onClick={handleExternalLink}
-                      data-testid={`button-external-${resourceId}`}
-                      title="Open in new tab"
-                      aria-label="Open in new tab"
                     >
-                      <ExternalLink className="h-3.5 w-3.5" />
+                      <a
+                        href={resource.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        data-testid={`button-external-${resourceId}`}
+                        title="Open in new tab"
+                        aria-label="Open in new tab"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      </a>
                     </Button>
                   </div>
                 </Card>
@@ -734,15 +768,22 @@ export default function Category() {
                     <h2 className="flex-1 min-w-0 line-clamp-2 text-base sm:text-lg font-semibold leading-none tracking-tight" title={resource.title}>{titleAnchor(resource.title)}</h2>
                     <div className="relative z-10 flex items-center gap-0.5 flex-shrink-0">
                       <Button
+                        asChild
                         variant="ghost"
                         size="sm"
                         className="h-8 w-8 p-0 min-h-[44px] min-w-[44px] touch-manipulation"
-                        onClick={handleExternalLink}
-                        data-testid={`button-external-${resourceId}`}
-                        title="Open in new tab"
-                        aria-label="Open in new tab"
                       >
-                        <ExternalLink className="h-4 w-4" />
+                        <a
+                          href={resource.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          data-testid={`button-external-${resourceId}`}
+                          title="Open in new tab"
+                          aria-label="Open in new tab"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </a>
                       </Button>
                       {isDbResource(resource) && (
                         <Button

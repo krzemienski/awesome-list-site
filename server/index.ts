@@ -83,6 +83,13 @@ app.use((_req, res, next) => {
   const nonce = String(res.locals.cspNonce || "");
   if (process.env.NODE_ENV === "production") {
     res.setHeader("X-Frame-Options", "DENY");
+    // Run16 BUG-094: HSTS — the site is HTTPS-only (Replit terminates TLS and
+    // http:// redirects to https://). 2-year max-age + includeSubDomains +
+    // preload (the preload list requires both flags and max-age ≥ 1 year).
+    res.setHeader(
+      "Strict-Transport-Security",
+      "max-age=63072000; includeSubDomains; preload",
+    );
     res.setHeader(
       "Content-Security-Policy",
       [
@@ -239,6 +246,18 @@ app.use((req, res, next) => {
   } else {
     // In production, add SSR handler before serving static files
     app.use(handleSSR);
+    // Run16 BUG-016: Vite emits content-hashed filenames under /assets, so
+    // they are safe to cache for a year as immutable. serveStatic
+    // (server/vite.ts, unmodifiable) mounts express.static with the default
+    // maxAge=0 — and send() overwrites any pre-set Cache-Control — so a
+    // dedicated static handler for /assets must run FIRST.
+    app.use(
+      "/assets",
+      express.static(path.resolve(import.meta.dirname, "public", "assets"), {
+        immutable: true,
+        maxAge: "1y",
+      }),
+    );
     serveStatic(app);
   }
 

@@ -18,7 +18,12 @@ import { useAuth } from "@/hooks/useAuth";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  // Run16 BUG-064: empty submit must say the password is required, not stay
+  // silent (min(1) fires first; min(8) covers short-but-present values).
+  password: z
+    .string()
+    .min(1, "Password is required")
+    .min(8, "Password must be at least 8 characters"),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;

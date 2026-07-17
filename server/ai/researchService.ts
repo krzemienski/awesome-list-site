@@ -1,6 +1,6 @@
 import { db } from '../db';
 import { resources, researchJobs, researchDiscoveries } from '@shared/schema';
-import { and, eq, sql } from 'drizzle-orm';
+import { and, eq, sql, getTableColumns } from 'drizzle-orm';
 import type { ResearchJob, ResearchDiscovery } from '@shared/schema';
 import { CategoryRepository } from '../repositories/CategoryRepository';
 import { ensureSubSubcategoryExists } from '../repositories/ensureSubSubcategory';
@@ -812,12 +812,20 @@ Database state: ${ctx.totalResources} approved resources across ${ctx.totalDomai
       `Tokens: in=${result.tokensIn} out=${result.tokensOut}, Cost: $${result.totalCostUsd.toFixed(4)}`,
     );
 
+    // Run16 BUG-028: an aborted run can resolve before the SDK reports any
+    // usage (numTurns/cost all zero). Don't stamp zeros over the row in that
+    // case — keep whatever accounting was last persisted instead of
+    // manufacturing a "0 turns / $0.0000" contradiction next to real finds.
+    const abortedWithNoUsage =
+      result.aborted && result.numTurns === 0 && result.totalCostUsd === 0;
     await persist({
       status: result.aborted ? 'cancelled' : 'completed',
-      turnsUsed: result.numTurns,
-      totalInputTokens: result.tokensIn,
-      totalOutputTokens: result.tokensOut,
-      estimatedCostUsd: result.totalCostUsd.toFixed(4),
+      ...(abortedWithNoUsage ? {} : {
+        turnsUsed: result.numTurns,
+        totalInputTokens: result.tokensIn,
+        totalOutputTokens: result.tokensOut,
+        estimatedCostUsd: result.totalCostUsd.toFixed(4),
+      }),
       completedAt: new Date(),
     });
   }
@@ -834,8 +842,27 @@ Database state: ${ctx.totalResources} approved resources across ${ctx.totalDomai
     return job;
   }
 
-  async listJobs(limit = 20): Promise<ResearchJob[]> {
-    return db.select().from(researchJobs).orderBy(sql`${researchJobs.createdAt} DESC`).limit(limit);
+  // Run16 BUG-027: the jobs LIST used to ship every job's FULL agentLog
+  // (hundreds of KB per response). The list view only needs a count and the
+  // latest entry (active-job ticker); the detail dialog fetches /jobs/:id
+  // separately and still gets the complete log via getJob().
+  async listJobs(limit = 20): Promise<Array<Omit<ResearchJob, 'agentLog'> & {
+    agentLogCount: number;
+    agentLogLast: { role: string; content: string; timestamp: string } | null;
+  }>> {
+    const { agentLog: _omit, ...summaryCols } = getTableColumns(researchJobs);
+    return db
+      .select({
+        ...summaryCols,
+        agentLogCount: sql<number>`coalesce(jsonb_array_length(${researchJobs.agentLog}), 0)`,
+        agentLogLast: sql<{ role: string; content: string; timestamp: string } | null>`
+          case when coalesce(jsonb_array_length(${researchJobs.agentLog}), 0) > 0
+          then ${researchJobs.agentLog} -> (jsonb_array_length(${researchJobs.agentLog}) - 1)
+          else null end`,
+      })
+      .from(researchJobs)
+      .orderBy(sql`${researchJobs.createdAt} DESC`)
+      .limit(limit) as any;
   }
 
   async getDiscoveries(jobId: number): Promise<ResearchDiscovery[]> {

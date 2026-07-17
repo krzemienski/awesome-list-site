@@ -92,7 +92,9 @@ export default function TagFilter({ resources, selectedTags, onTagsChange }: Tag
                     className="flex items-center space-x-2 p-2 hover:bg-accent cursor-pointer"
                     onClick={() => toggleTag(tag)}
                   >
+                    {/* Run16 BUG-017: accessible name for the checkbox (WCAG 4.1.2) */}
                     <Checkbox
+                      aria-label={`Filter by ${tag}`}
                       checked={selectedTags.includes(tag)}
                       onCheckedChange={() => toggleTag(tag)}
                     />
