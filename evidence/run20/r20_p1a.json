@@ -1,0 +1,66 @@
+{
+  "script": "p1a public desktop",
+  "base": "https://awesome.video",
+  "startedAt": "2026-07-18T19:16:32.323Z",
+  "checks": {
+    "NB-023_hover_home_card": {
+      "before": {
+        "border": "rgba(244, 243, 238, 0.08)",
+        "cursor": "pointer"
+      },
+      "after": {
+        "border": "rgba(244, 243, 238, 0.08)",
+        "cursor": "pointer"
+      },
+      "changed": false,
+      "cursorPointer": "pointer"
+    },
+    "NB-050_line_clamp_present": {
+      "lineClampEls": 9
+    },
+    "NB-021_print": {
+      "bodyBg": "rgb(255, 255, 255)",
+      "sidebarVisible": false
+    },
+    "NB-044_match_count": {
+      "countShown": "1,259",
+      "snippet": "1,259 matches — showing top 15"
+    },
+    "NB-045_whitespace_query": {
+      "matchCountLine": null,
+      "treatedAsEmpty": true
+    },
+    "NB-026_escape_focus": {
+      "tag": "BUTTON",
+      "isBody": false
+    },
+    "NB-017_NB-037_categories": {
+      "cardsChecked": 9,
+      "cardsWithDupCount": 0,
+      "cardsWithLineClampTitle": 9
+    },
+    "NB-048_position_indicator": {
+      "found": true,
+      "line": "Page 1 of 53 · showing 1–24 of 1259 results for “video”"
+    },
+    "NB-058_progressbar_aria": {
+      "count": 0,
+      "withValuenow": 0,
+      "withLabel": 0
+    },
+    "NB-038_anon_thumbs": {
+      "url": "https://awesome.video/recommendations",
+      "pageSnippet": [
+        "Skip to main content",
+        "Awesome Video",
+        "2,302 resources",
+        "Navigation",
+        "Home",
+        "Submit Resource"
+      ],
+      "thumbResult": null
+    }
+  },
+  "pageErrors": [],
+  "finishedAt": "2026-07-18T19:17:01.338Z"
+}

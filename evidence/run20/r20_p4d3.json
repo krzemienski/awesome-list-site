@@ -1,0 +1,15 @@
+{
+  "script": "p4d3 NB-038 anon thumbs on /advanced",
+  "checks": {
+    "NB-038_advanced_anon": {
+      "tabState": "true",
+      "genCount": 1,
+      "thumbCount": 10,
+      "toasts": [
+        "Sign in to save feedback Create an account or sign in so your recommendation feedback is saved. Sign in"
+      ],
+      "honestSignInPrompt": true,
+      "fakeSuccess": false
+    }
+  }
+}

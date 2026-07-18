@@ -1,0 +1,29 @@
+{
+  "script": "p4b authed",
+  "checks": {
+    "NB-041_streak_onboarding": {
+      "authed": true,
+      "streakCopy": "Start your streak — come back tomorrow!"
+    },
+    "NB-040_security_copy": {
+      "found": true,
+      "mentionsOtherDevices": true,
+      "noSessionList": true
+    },
+    "NB-054_discard_dialog": {
+      "styledDialog": true,
+      "nativeConfirm": false
+    },
+    "NB-022_focus_kept": {
+      "focusTestId": "BODY",
+      "toasts": []
+    },
+    "NB-024_toast_replaced": {
+      "openToasts": []
+    },
+    "NB-025_sort_url_sync": {
+      "comboFound": false
+    }
+  },
+  "finishedAt": "2026-07-18T19:33:41.515Z"
+}

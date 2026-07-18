@@ -194,6 +194,9 @@ export default function ResourceDetail() {
   );
 
   const handleFavoriteClick = () => {
+    // NB-022 (run20): guard in-flight clicks here instead of the native
+    // `disabled` attribute — a disabled flip while focused drops focus to body.
+    if (favoriteMutation.isPending) return;
     if (!isAuthenticated) {
       toast({
         title: "Sign in to favorite",
@@ -206,6 +209,9 @@ export default function ResourceDetail() {
   };
 
   const handleBookmarkClick = () => {
+    // NB-022 (run20): same in-flight guard as favorite — keep the button
+    // enabled so keyboard focus survives the toggle.
+    if (bookmarkMutation.isPending) return;
     if (!isAuthenticated) {
       toast({
         title: "Sign in to bookmark",
@@ -422,7 +428,8 @@ export default function ResourceDetail() {
             variant={isFavorite ? "default" : "outline"}
             size="sm"
             onClick={handleFavoriteClick}
-            disabled={favoriteMutation.isPending}
+            aria-disabled={favoriteMutation.isPending}
+            aria-busy={favoriteMutation.isPending}
             data-testid="button-favorite"
             className="min-h-[44px] px-4"
             aria-pressed={isFavorite}
@@ -437,7 +444,8 @@ export default function ResourceDetail() {
             variant={isBookmarked ? "default" : "outline"}
             size="sm"
             onClick={handleBookmarkClick}
-            disabled={bookmarkMutation.isPending}
+            aria-disabled={bookmarkMutation.isPending}
+            aria-busy={bookmarkMutation.isPending}
             data-testid="button-bookmark"
             className="min-h-[44px] px-4"
             aria-pressed={isBookmarked}

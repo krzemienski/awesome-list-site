@@ -1,0 +1,46 @@
+{
+  "script": "p5a2 NB-020 Tab path + NB-019 popper rect",
+  "checks": {
+    "NB-020_tab_key_path": {
+      "tabIndexes": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "reached": null
+    },
+    "NB-019_popper_open": {
+      "trigBox": {
+        "y": 605,
+        "x": 589
+      },
+      "open": true,
+      "state": "open",
+      "top": 1174,
+      "bottom": 1316,
+      "left": 589,
+      "right": 717,
+      "vw": 1440,
+      "vh": 900,
+      "visible": true,
+      "within": false,
+      "opts": [
+        "25 / page",
+        "50 / page",
+        "100 / page"
+      ]
+    }
+  }
+}

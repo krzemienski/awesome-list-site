@@ -1,0 +1,35 @@
+{
+  "script": "p5b admin NB-005 landscape + researcher NB-018/031/032/033",
+  "checks": {
+    "NB-005_modal_landscape": {
+      "h": 338,
+      "vh": 375,
+      "maxH": "337.5px",
+      "overflowY": "auto",
+      "fitsViewport": true,
+      "scrollable": true,
+      "saveExists": true,
+      "saveReachable": true
+    },
+    "NB-018_031_032_033_researcher": {
+      "overflowX": false,
+      "costsSample": [
+        "$3",
+        "$15",
+        "$2.50",
+        "$27"
+      ],
+      "cost4dp": 0,
+      "badCosts": [
+        "$3",
+        "$15",
+        "$27"
+      ],
+      "turnsTxt": [
+        "Turns"
+      ],
+      "hasDashPlaceholders": false,
+      "peek": "Launch Research Review Discoveries Job History New Research Job Configure and launch an AI researcher to discover new video streaming resources Research Prompt Category Focus (Optional) All categories Budget (USD) Max Turns Custom Model & Endpoint (optional) Uses Claude Sonnet 4 (~$3/M input, $15/M output tokens). Recent jobs have cost roughly $2.50-$27 depending on scope and duration (see Job History below). The researcher automatically deduplicates against 2302 existing resources. Launch Resea"
+    }
+  }
+}

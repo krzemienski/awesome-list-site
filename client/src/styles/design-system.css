@@ -68,8 +68,16 @@
   --motion-ease: cubic-bezier(0.2, 0.65, 0.3, 1);
 }
 
-/* ============== BASE ============== */
-html, body { height: 100%; }
+/* ============== BASE ==============
+   NB-019 (run20): body must NOT be height-capped at 100%. With
+   `body { height: 100% }` the body box stays viewport-sized while content
+   overflows it, so when Radix scroll-lock sets `overflow: hidden` on body
+   (any Select/popover open) the document scroll range collapses and
+   window.scrollY clamps to 0 — the page visibly jumps to the top and the
+   dropdown opens off-screen. `min-height` keeps the atmosphere gradient
+   covering the viewport on short pages without capping the box. */
+html { height: 100%; }
+body { min-height: 100%; }
 body {
   background: var(--bg);
   background-image: var(--bg-atmosphere);

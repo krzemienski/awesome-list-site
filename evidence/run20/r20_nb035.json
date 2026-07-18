@@ -1,0 +1,17 @@
+{
+  "script": "nb035/036 privacy about",
+  "checks": {
+    "NB-035_privacy_cookies": {
+      "mentionsConnectSid": true,
+      "mentionsGA": true,
+      "mentionsGAESA": true,
+      "mentionsLocalStorage": true,
+      "deletionContact": "deletion\n\nAccount data is kept while your account is active",
+      "hasContactChannel": false
+    },
+    "NB-036_about_contact": {
+      "hasContactChannel": false,
+      "snippet": ""
+    }
+  }
+}

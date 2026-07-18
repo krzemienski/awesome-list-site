@@ -1,0 +1,38 @@
+{
+  "script": "dbg2: nb020 focus-forward; nb019 scroll-jump",
+  "checks": {
+    "NB-020_focus_forward": {
+      "landedRole": "tab",
+      "landedText": "Approvals",
+      "landedSelected": "true",
+      "afterArrow": {
+        "focusText": "Edits",
+        "focusTabIndex": 0
+      }
+    },
+    "nb019_before_click": {
+      "trigTop": 536,
+      "windowScrollY": 782,
+      "scrollers": [
+        {
+          "tag": "HTML",
+          "cls": "dark",
+          "scrollTop": 782
+        }
+      ]
+    },
+    "nb019_after_open": {
+      "trigTop": 536,
+      "windowScrollY": 782,
+      "scrollers": [
+        {
+          "tag": "HTML",
+          "cls": "dark",
+          "scrollTop": 782
+        }
+      ],
+      "popperTop": 580,
+      "bodyStyle": "padding-bottom: 69px; pointer-events: none;"
+    }
+  }
+}

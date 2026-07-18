@@ -1,0 +1,19 @@
+{
+  "script": "nb022 keyboard",
+  "checks": {
+    "dev_kb": {
+      "focusedBefore": "button-bookmark",
+      "at600": {
+        "focus": "button-bookmark"
+      },
+      "at2100": {
+        "focus": "button-bookmark",
+        "pressed": "false"
+      },
+      "final": {
+        "pressed": "true",
+        "focus": "button-bookmark"
+      }
+    }
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "script": "dbg NB-019 popper placement + NB-020 roving",
+  "checks": {
+    "nb020_dom": {
+      "listTabIndex": 0,
+      "listAttrs": [
+        "role=tablist",
+        "aria-orientation=horizontal",
+        "data-replit-metadata=client/src/pages/AdminDashboard.tsx:214:10",
+        "data-component-name=TabsList",
+        "tabindex=0",
+        "data-orientation=horizontal",
+        "style=outline: none;"
+      ],
+      "selTabAttrs": [
+        "type=button",
+        "role=tab",
+        "aria-selected=true",
+        "aria-controls=radix-:r6:-content-approvals",
+        "data-state=active",
+        "id=radix-:r6:-trigger-approvals",
+        "data-replit-metadata=client/src/pages/AdminDashboard.tsx:215:12",
+        "data-component-name=TabsTrigger",
+        "data-testid=tab-approvals",
+        "tabindex=-1",
+        "data-orientation=horizontal",
+        "data-radix-collection-item="
+      ]
+    },
+    "nb019_dbg": {
+      "scrollY": 0,
+      "wrapPos": {
+        "position": "fixed",
+        "transform": "matrix(1, 0, 0, 1, 589, 1176)",
+        "top": "0px",
+        "left": "0px",
+        "minWidth": "max-content"
+      },
+      "wrapRect": {
+        "top": 1176,
+        "left": 589
+      },
+      "wrapParent": "BODY",
+      "breakChain": [
+        {
+          "tag": "DIV",
+          "transform": "matrix(1, 0, 0, 1, 589, 1176)"
+        }
+      ],
+      "htmlBreak": null
+    }
+  }
+}

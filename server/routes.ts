@@ -2210,6 +2210,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // DELETE /api/user/submissions/:id - Withdraw own pending resource submission
+  // (NB-039). Only the submitter may withdraw, and only while still pending —
+  // approved/rejected items are part of the moderated catalog/audit history.
+  app.delete('/api/user/submissions/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const resourceId = parseInt(req.params.id);
+
+      if (isNaN(resourceId)) {
+        return res.status(400).json({ message: 'Invalid resource ID' });
+      }
+
+      const resource = await resourceRepo.getResource(resourceId);
+      if (!resource) {
+        return res.status(404).json({ message: 'Submission not found' });
+      }
+      if (resource.submittedBy !== userId) {
+        return res.status(403).json({ message: 'You can only withdraw your own submissions' });
+      }
+      if (resource.status !== 'pending') {
+        return res.status(409).json({ message: 'Only pending submissions can be withdrawn' });
+      }
+
+      // deleteResource writes the 'deleted' audit row itself (before the row is
+      // removed, so the audit FK stays valid) and cleans up the non-cascading
+      // child FKs (resource_edits, research_discoveries.created_resource_id).
+      // Do NOT log the deletion again here.
+      await resourceRepo.deleteResource(resourceId, userId);
+
+      res.json({ message: 'Submission withdrawn' });
+    } catch (error) {
+      console.error('Error withdrawing submission:', error);
+      res.status(500).json({ message: 'Failed to withdraw submission' });
+    }
+  });
+
   // GET /api/user/journeys - Get user's learning journeys with details
   app.get('/api/user/journeys', isAuthenticated, async (req: any, res) => {
     try {
@@ -4817,13 +4853,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Run16 BUG-008: server-side guardrails mirroring the launch form
-      // (budget $0.25–$10.00, turns 5–100). The API used to accept any value
-      // (e.g. maxTurns=301000 / $113 budgets) and silently run with it.
+      // (budget min $0.25, turns 5–100). The API used to accept any value
+      // (e.g. maxTurns=301000 / $0 budgets) and silently run with it.
+      // Run20 (user request): no upper budget cap — only the $0.25 floor
+      // remains so degenerate $0 jobs can't be created.
       let budget = '1.00';
       if (maxBudgetUsd !== undefined && maxBudgetUsd !== null && String(maxBudgetUsd).trim() !== '') {
         const n = Number(maxBudgetUsd);
-        if (!Number.isFinite(n) || n < 0.25 || n > 10) {
-          return res.status(400).json({ success: false, message: 'maxBudgetUsd must be a number between 0.25 and 10.00' });
+        if (!Number.isFinite(n) || n < 0.25) {
+          return res.status(400).json({ success: false, message: 'maxBudgetUsd must be a number of at least 0.25' });
         }
         budget = n.toFixed(2);
       }

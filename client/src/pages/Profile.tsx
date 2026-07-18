@@ -15,6 +15,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -40,7 +50,8 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
-  Sparkles
+  Sparkles,
+  Trash2
 } from "lucide-react";
 import FavoriteButton from "@/components/resource/FavoriteButton";
 import BookmarkButton from "@/components/resource/BookmarkButton";
@@ -199,6 +210,31 @@ export default function Profile({ user }: ProfileProps) {
     onError: (err: any) => {
       toast({
         title: "Couldn't update name",
+        description: err?.message?.replace(/^\d+:\s*/, "") || "Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // NB-039: withdraw one of the user's own still-pending submissions.
+  const [withdrawTarget, setWithdrawTarget] = useState<SubmittedResource | null>(null);
+
+  const withdrawMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return apiRequest(`/api/user/submissions/${id}`, { method: "DELETE" });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user/submissions"] });
+      setWithdrawTarget(null);
+      toast({
+        title: "Submission withdrawn",
+        description: "Your pending submission has been removed.",
+      });
+    },
+    onError: (err: any) => {
+      setWithdrawTarget(null);
+      toast({
+        title: "Couldn't withdraw submission",
         description: err?.message?.replace(/^\d+:\s*/, "") || "Please try again.",
         variant: "destructive",
       });
@@ -838,9 +874,9 @@ export default function Profile({ user }: ProfileProps) {
                               </p>
                               {/* NB-039 (run18): surface the submitted URL
                                   (truncated) and a details expander so users can
-                                  review exactly what they submitted. Withdrawing a
-                                  submission needs a server endpoint that does not
-                                  exist yet, so it is intentionally not offered. */}
+                                  review exactly what they submitted. Pending
+                                  submissions can be withdrawn via
+                                  DELETE /api/user/submissions/:id. */}
                               {resource.url && (
                                 <a
                                   href={resource.url}
@@ -885,16 +921,31 @@ export default function Profile({ user }: ProfileProps) {
                                 </span>
                               </div>
                             </div>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              asChild
-                              data-testid={`button-view-resource-${resource.id}`}
-                            >
-                              <a href={resource.url} target="_blank" rel="noopener noreferrer">
-                                <ExternalLink className="h-4 w-4" />
-                              </a>
-                            </Button>
+                            <div className="flex items-center gap-1">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                asChild
+                                data-testid={`button-view-resource-${resource.id}`}
+                              >
+                                <a href={resource.url} target="_blank" rel="noopener noreferrer">
+                                  <ExternalLink className="h-4 w-4" />
+                                </a>
+                              </Button>
+                              {resource.status === 'pending' && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-destructive hover:text-destructive"
+                                  onClick={() => setWithdrawTarget(resource)}
+                                  disabled={withdrawMutation.isPending}
+                                  aria-label={`Withdraw submission ${resource.title}`}
+                                  data-testid={`button-withdraw-submission-${resource.id}`}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              )}
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -1072,6 +1123,42 @@ export default function Profile({ user }: ProfileProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* NB-039: confirm before withdrawing a pending submission — the delete
+          is permanent (the row plus any of its suggested edits are removed). */}
+      <AlertDialog
+        open={!!withdrawTarget}
+        onOpenChange={(open) => {
+          if (!open) setWithdrawTarget(null);
+        }}
+      >
+        <AlertDialogContent data-testid="dialog-withdraw-submission">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Withdraw this submission?</AlertDialogTitle>
+            <AlertDialogDescription>
+              "{withdrawTarget?.title}" will be permanently removed from the
+              review queue. This can't be undone — you can submit it again
+              later if you change your mind.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={withdrawMutation.isPending}>
+              Keep it
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={withdrawMutation.isPending}
+              onClick={(e) => {
+                e.preventDefault();
+                if (withdrawTarget) withdrawMutation.mutate(withdrawTarget.id);
+              }}
+              data-testid="button-confirm-withdraw"
+            >
+              {withdrawMutation.isPending ? "Withdrawing..." : "Withdraw"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

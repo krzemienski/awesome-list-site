@@ -1,0 +1,16 @@
+{
+  "script": "p1b intercepts + hover retest",
+  "base": "https://awesome.video",
+  "startedAt": "2026-07-18T19:20:07.768Z",
+  "checks": {
+    "NB-028_forced500": {
+      "authRequestsIn20s": 3,
+      "bannerLine": "We couldn't verify your sign-in status. You can keep browsing as a guest.",
+      "hasRetryControl": true
+    },
+    "NB-028_real401": {
+      "authRequestsIn10s": 1
+    }
+  },
+  "finishedAt": "2026-07-18T19:20:42.715Z"
+}

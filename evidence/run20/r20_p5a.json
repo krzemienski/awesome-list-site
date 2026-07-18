@@ -1,0 +1,99 @@
+{
+  "script": "p5a admin NB-020/005/019",
+  "checks": {
+    "NB-020_tabs_keyboard": {
+      "tabsBefore": [
+        {
+          "txt": "Approvals\n4",
+          "ti": -1,
+          "sel": "true"
+        },
+        {
+          "txt": "Edits",
+          "ti": -1,
+          "sel": "false"
+        },
+        {
+          "txt": "Enrichment",
+          "ti": -1,
+          "sel": "false"
+        },
+        {
+          "txt": "Researcher",
+          "ti": -1,
+          "sel": "false"
+        },
+        {
+          "txt": "Export",
+          "ti": -1,
+          "sel": "false"
+        },
+        {
+          "txt": "Database",
+          "ti": -1,
+          "sel": "false"
+        },
+        {
+          "txt": "Resources",
+          "ti": -1,
+          "sel": "false"
+        },
+        {
+          "txt": "Categories",
+          "ti": -1,
+          "sel": "false"
+        },
+        {
+          "txt": "Subcategories",
+          "ti": -1,
+          "sel": "false"
+        },
+        {
+          "txt": "Sub-Subcats",
+          "ti": -1,
+          "sel": "false"
+        },
+        {
+          "txt": "Journeys",
+          "ti": -1,
+          "sel": "false"
+        },
+        {
+          "txt": "Users",
+          "ti": -1,
+          "sel": "false"
+        },
+        {
+          "txt": "GitHub",
+          "ti": -1,
+          "sel": "false"
+        },
+        {
+          "txt": "Link Health",
+          "ti": -1,
+          "sel": "false"
+        },
+        {
+          "txt": "Audit",
+          "ti": -1,
+          "sel": "false"
+        }
+      ],
+      "afterArrow": {
+        "selIdx": 1,
+        "focusIdx": 1,
+        "anyTabbable": true
+      }
+    },
+    "NB-019_rpp_dropdown": {
+      "found": true,
+      "top": 1178,
+      "bottom": 1320,
+      "left": 589,
+      "right": 717,
+      "vw": 1440,
+      "vh": 900,
+      "within": false
+    }
+  }
+}

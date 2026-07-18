@@ -1,0 +1,50 @@
+{
+  "script": "p2 mobile",
+  "base": "https://awesome.video",
+  "startedAt": "2026-07-18T19:21:29.596Z",
+  "checks": {
+    "NB-003_consent_320": {
+      "consentBanner": {
+        "height": 53
+      },
+      "submitReachable": {
+        "hit": true,
+        "rect": {
+          "y": 464,
+          "h": 44
+        }
+      }
+    },
+    "NB-034_pw_placeholder_320": {
+      "placeholder": "Password",
+      "clipped": false
+    },
+    "NB-002_drawer_focus": {
+      "focusIn": {
+        "activeTag": "A",
+        "activeText": "Home",
+        "inDrawer": true
+      },
+      "focusBack": {
+        "activeTag": "BODY",
+        "isTrigger": false
+      }
+    },
+    "NB-053_toast_viewport": {
+      "top": "526px",
+      "bottom": "109px",
+      "classes": "fixed bottom-[var(--consent-banner-h,0px)] top-auto z-[100] flex max-h-screen w-full flex-col p-4 sm:bottom-[var(--consent-banner-h,0px)] sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]"
+    },
+    "NB-051_position_label_375": {
+      "catHref": "/category/community-events",
+      "ellipsizedPositionLabels": []
+    },
+    "NB-004_palette_812x375": {
+      "text": "Video Coding: An Introduction to Standard Codecs\nI",
+      "top": 168,
+      "bottom": 268,
+      "inViewport": true
+    }
+  },
+  "finishedAt": "2026-07-18T19:21:47.635Z"
+}

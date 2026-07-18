@@ -1,0 +1,17 @@
+{
+  "script": "nb036 anchor hrefs",
+  "checks": {
+    "NB-036_privacy_link": {
+      "found": true,
+      "href": "https://github.com/krzemienski/awesome-video/issues",
+      "text": "opening a GitHub issue",
+      "visible": true
+    },
+    "NB-036_about_link": {
+      "found": true,
+      "href": "https://github.com/krzemienski/awesome-video/issues",
+      "text": "open an issue on GitHub",
+      "visible": true
+    }
+  }
+}

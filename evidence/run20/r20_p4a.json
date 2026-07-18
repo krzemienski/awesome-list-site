@@ -1,0 +1,31 @@
+{
+  "script": "p4a recs A/B + register",
+  "checks": {
+    "NB-007_ab_sets": {
+      "lenA": 8,
+      "lenB": 8,
+      "overlap": 1,
+      "distinct": true
+    },
+    "NB-042_reasons": {
+      "sampleA": [
+        "Aligns with your learning goals and one of your preferred resource types — added because your selected categories had few unseen resources",
+        "Popular in Encoding & Codecs — added because your selected categories had few unseen resources",
+        "Popular in Media Tools — added because your selected categories had few unseen resources"
+      ],
+      "sampleB": [
+        "Matches your interest in Encoding & Codecs and one of your preferred resource types",
+        "Matches your interest in Encoding & Codecs and one of your preferred resource types",
+        "Matches your interest in Encoding & Codecs and one of your preferred resource types"
+      ]
+    },
+    "register": {
+      "status": 201,
+      "body": "{\"id\":\"7c9c348e-7436-412c-ac06-fae0c8a94de2\",\"email\":\"__qa_test_run20@example.com\",\"role\":\"user\"}"
+    },
+    "login": {
+      "status": 200,
+      "gotSid": true
+    }
+  }
+}

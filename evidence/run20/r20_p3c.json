@@ -1,0 +1,12 @@
+{
+  "script": "p3c csv",
+  "checks": {
+    "NB-012_csv": {
+      "file": "awesome-video.csv",
+      "header": "Title,URL,Category,Description,Tags",
+      "hasTags": true,
+      "logicalRows": 2302,
+      "fieldCountMismatches_first500": 0
+    }
+  }
+}

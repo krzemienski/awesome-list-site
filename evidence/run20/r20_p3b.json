@@ -1,0 +1,23 @@
+{
+  "script": "p3b html+pdf",
+  "base": "https://awesome.video",
+  "startedAt": "2026-07-18T19:29:55.314Z",
+  "checks": {
+    "NB-010_html_escape": {
+      "file": "awesome-video.html",
+      "bytes": 1199854,
+      "scriptTagsInBody": 0,
+      "escapedAmps": 108,
+      "toasts": "Export Successful 2302 resources exported as HTML | Notification Export Successful2302 resources exported as HTML"
+    },
+    "NB-012_html_tags": {
+      "tagsRendered": true
+    },
+    "NB-006_pdf_feedback": {
+      "toasts": "Opening print dialog 2302 resources prepared — choose \"Save as PDF\" in the dialog.",
+      "fallbackDownload": null,
+      "gaveFeedback": true
+    }
+  },
+  "finishedAt": "2026-07-18T19:30:16.008Z"
+}

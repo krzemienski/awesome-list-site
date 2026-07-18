@@ -250,6 +250,19 @@ const Sidebar = React.forwardRef<
                 first.focus()
               }
             }}
+            onCloseAutoFocus={(e) => {
+              // NB-002 (run20): Radix restores focus to the element focused at
+              // open time, but the header trigger re-renders when openMobile
+              // flips, so the saved ref can be a detached node and focus falls
+              // to <body>. Re-resolve the live trigger and focus it explicitly.
+              const trig = document.querySelector<HTMLElement>(
+                'button[data-sidebar="trigger"]'
+              )
+              if (trig) {
+                e.preventDefault()
+                trig.focus()
+              }
+            }}
           >
             <SheetHeader className="sr-only">
               <SheetTitle>Sidebar</SheetTitle>

@@ -193,13 +193,14 @@ export default function ResearcherTab() {
 
   // Run16 BUG-008: the launch button used to fire even while the native
   // number inputs were flagged invalid (budget $0 jobs got created). Block
-  // submission client-side, mirroring the server's 0.25–10.00 / 5–100 ranges.
+  // submission client-side, mirroring the server's min-$0.25 / 5–100 ranges
+  // (Run20: no upper budget cap per user request).
   const handleLaunch = () => {
     const budget = Number(maxBudget);
-    if (!Number.isFinite(budget) || budget < 0.25 || budget > 10) {
+    if (!Number.isFinite(budget) || budget < 0.25) {
       toast({
         title: "Invalid budget",
-        description: "Budget must be between $0.25 and $10.00.",
+        description: "Budget must be at least $0.25.",
         variant: "destructive",
       });
       return;
@@ -324,7 +325,6 @@ export default function ResearcherTab() {
                         type="number"
                         step="0.25"
                         min="0.25"
-                        max="10.00"
                         value={maxBudget}
                         onChange={(e) => setMaxBudget(e.target.value)}
                       />
